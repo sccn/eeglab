@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.242  2005/01/10 19:46:47  scott
+% added (undoc) arg 'whitebk'
+%
 % Revision 1.241  2005/01/07 22:39:40  scott
 % fixed 'labelpoint' keyword for 'electrodes' (used in eeglab.m)
 %
@@ -1491,8 +1494,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %%%%%%%%%%% reset color limits for grid plot %%%%%%%%%%%%%%%%%%%%%%%%%
     %
     if isstr(MAPLIMITS) 
-      amin = min(min(gridvalues(find(gridchans~=0))));
-      amax = max(max(gridvalues(find(gridchans~=0))));
+      amin = min(min(gridvalues(~isnan(gridvalues))));
+      amax = max(max(gridvalues(~isnan(gridvalues))));
       if strcmp(MAPLIMITS,'absmax')
         amin = -max(max(abs([amin amax])));
         amax = max(max(abs([amin amax])));
