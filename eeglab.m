@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2002/08/13 17:10:37  scott
+% menu
+%
 % Revision 1.121  2002/08/13 17:09:10  scott
 % menu
 %
@@ -728,9 +731,9 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
 help_m  = uimenu( W_MAIN, 'Label', 'Help');
 uimenu( help_m, 'Label', 'About EEGLAB', 'CallBack', 'pophelp(''eeglab'');');
-uimenu( help_m, 'Label', 'About EEGLAB help', 'CallBack', 'pophelp(''eeg_helphelp'');','separator','on');
+uimenu( help_m, 'Label', 'About EEGLAB help', 'CallBack', 'pophelp(''eeg_helphelp'');');
 uimenu( help_m, 'Label', 'EEGLAB license', 'CallBack', 'pophelp(''license.txt'', 1);');
-uimenu( help_m, 'Label', 'EEGLAB menus', 'CallBack', 'eeg_helpmenu;');
+uimenu( help_m, 'Label', 'EEGLAB menus', 'CallBack', 'eeg_helpmenu;','separator','on');
 help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
     uimenu( help_subm1, 'Label', 'Toolbox functions', 'CallBack', 'pophelp(''ica'');');
 	uimenu( help_subm1, 'Label', 'Signal processing functions', 'callback', 'eeg_helpsigproc;');	
