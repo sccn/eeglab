@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2002/10/09 18:20:21  arno
+% line thickness
+%
 % Revision 1.55  2002/10/09 18:12:00  arno
 % new inputs logfreq, shiftdims, vert, smooth ...
 %
@@ -309,11 +312,14 @@ if length(g.limits)<5 | isnan(g.limits(5)) % default caxis plotting limits
   mincax = g.limits(5); 
 end
 if length(g.limits)<6 | isnan(g.limits(6))
-  if exist('mincax')
-    g.limits(6) = -mincax; % avoid recalculation
-  else
-    g.limits(6) = max(abs(tfdata(:)));
-  end
+    defaultlim = 1;
+    if exist('mincax')
+        g.limits(6) = -mincax; % avoid recalculation
+    else
+        g.limits(6) = max(abs(tfdata(:)));
+    end
+else 
+    defaultlim = 0;
 end
 if length(g.sigthresh) == 1
     g.sigthresh(2) = 1;
@@ -495,8 +501,10 @@ else % g.showchan==0 -> image std() of selchans
     end;
     tfave = tfdat;
     
-    g.limits(6) = max(max(abs(tfave)));
-    g.limits(5) = -g.limits(6); % make symmetrical
+    if defaultlim
+        g.limits(6) = max(max(abs(tfave)));
+        g.limits(5) = -g.limits(6); % make symmetrical
+    end;
 end
 
 if strcmpi(g.logfreq, 'on'), 
