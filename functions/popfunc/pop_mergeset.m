@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/09/04 22:17:19  luca
+% improving epoch merge checking -arno
+%
 % Revision 1.9  2002/08/13 23:58:35  arno
 % update error message
 %
@@ -146,6 +149,7 @@ else
 	% concatenate events
 	% ------------------
 	if ~isempty(INEEG2.event)
+        disp('Concatenating events...');
 		if isfield( INEEG1.event, 'epoch')
 			for index = 1:length(INEEG2.event(:))
 				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1.trials;
@@ -157,19 +161,27 @@ else
 			end;    
 		end;
 		
-		INEEG1.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
-	end;
-
-	if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
-			& ~isempty(INEEG1.epoch) & ~isempty(INEEG2.epoch)
-		try 
-			INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
-		catch
-			disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
+        orilen = length(INEEG1.event);
+        allfields = union(fieldnames(INEEG1.event), fieldnames(INEEG2.event) );
+		for i=1:length( allfields )
+            for e=1:length(INEEG2.event)
+                tmpval = getfield(INEEG2.event, { e }, allfields{i});
+                INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
+            end;
 		end;
-	else
-		INEEG1.epoch =[];
+        INEEG1.epoch = []; % epoch info regenrated at the end by 'eventconsistency'
 	end;
+    
+	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
+	%		& ~isempty(INEEG1.epoch) & ~isempty(INEEG2.epoch)
+	%	try 
+	%		INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
+	%	catch
+	%		disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
+	%	end;
+	%else
+	%	INEEG1.epoch =[];
+	%end;
 
 	if INEEG1.trials > 1 | INEEG2.trials > 1
 		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
@@ -193,6 +205,10 @@ else
 	else
 		INEEG1.icaact = [];
 	end;
+
+	if ~isempty(INEEG2.event)
+        INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
+    end;
 end;
 
 % build the command
