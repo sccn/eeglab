@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2004/11/18 03:11:55  scott
+% chanlocs -> subsample channels for topoplots
+%
 % Revision 1.79  2004/11/17 18:06:33  scott
 % debug 'vert' (specify latencies in ms, documented), limcontrib and vert line styles, 'pvaf'
 %
@@ -1142,7 +1145,8 @@ if strcmpi(g.dispmaps, 'on')
         end
         eloc = readlocs(g.chanlocs);
         if length(eloc) ~= chans
-            fprintf('envtopo() error: %d channels not read from the named channel location file.\n',chans);
+            fprintf(...
+              'envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
             return
         end
     end
@@ -1154,8 +1158,8 @@ if strcmpi(g.dispmaps, 'on')
         axes(axt)                             % topoplot axes
         cla
         
-        chanlocs = g.chanlocs(g.plotchans);
-        if ~isempty(g.chanlocs)
+        chanlocs = g.chanlocs(g.plotchans); % topoplot based on the selected data channels 
+        if ~isempty(chanlocs)
             if ~isempty(varargin) 
                 figure(myfig);topoplot(maxproj(g.plotchans,t),chanlocs, varargin{:}); 
             else 
