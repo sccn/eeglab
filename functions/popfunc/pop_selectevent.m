@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/10/29 22:37:09  scott
+% text
+%
 % Revision 1.34  2002/10/29 22:36:33  scott
 % text
 %
@@ -253,7 +256,7 @@ if nargin<2
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
         if strcmpi(allfields{index}, 'latency')
             if EEG.trials > 1
-                uilist{end-2} = { 'Style', 'text', 'string', '(ms)     ' };
+                uilist{end-2} = { 'Style', 'text', 'string', '<- in ms' };
             else
                 uilist{end-2} = { 'Style', 'text', 'string', '(s)' };	   
             end;
