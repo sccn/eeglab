@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/06/27 01:01:48  arno
+% updating timesout help
+%
 % Revision 1.38  2003/06/19 01:22:09  arno
 % debuging lowmem for multiple condition and 'coher'
 %
@@ -994,7 +997,7 @@ end;
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
 g.subitc = 'off';
-[alltfX freqs timesout R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
+[alltfX freqs timesout R] = timefreq(X, g.srate, 'ntimesout', g.timesout, 'winsize', g.winsize, ...
                                 'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                 g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                       'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 

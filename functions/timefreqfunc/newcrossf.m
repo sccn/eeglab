@@ -184,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/06/27 01:01:32  arno
+% updating timesout help
+%
 % Revision 1.58  2003/06/21 01:08:24  arno
 % reshaping Rdiff if one freq output
 %
@@ -1019,7 +1022,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% -------------------------------------
 	% compute time frequency decompositions
 	% -------------------------------------
-    spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
+    spectraloptions = { 'ntimesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
                 g.detrend, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
                 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
 
