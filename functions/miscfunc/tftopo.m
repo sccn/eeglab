@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/30 20:45:56  scott
+% showchan==0 -> blockave(abs(tfdata)) -sm
+%
 % Revision 1.8  2002/04/27 01:37:19  scott
 % same -sm
 %
@@ -227,7 +230,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot tfdata image for specified channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure;
+% figure;
 colormap(cc);
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
 imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
@@ -236,7 +239,7 @@ if showchan>0
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
 else
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
-    blockave(abs(matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan),length(times))));
+    blockave(abs(matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan)),length(times)));
 end
 hold on;
 axis([limits(1:4)]);
