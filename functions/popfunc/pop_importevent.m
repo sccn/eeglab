@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/09/04 17:53:45  luca
+% added ;
+%
 % Revision 1.7  2002/08/12 18:33:09  arno
 % quesdlg2
 %
@@ -200,7 +203,6 @@ if ~isempty(args)
 else
     g = [];
 end;
-g;
 
 % test the presence of variables
 % ------------------------------
@@ -232,7 +234,6 @@ if ~isnan(g.align.val)
     end
     g.align.nbevent = length(EEG.event);
     g.align.txt = sprintf('Check alignment between pre-existing (old) and loaded event latencies:\nOld event latencies (10 first): %s ...\n', int2str(cell2mat({ EEG.event(1:min(10, length(EEG.event))).latency })));
-    g.align
 end;
 
 tmpfields = fieldnames(g);
