@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/05/23 17:20:59  scott
+% *** empty log message ***
+%
 % Revision 1.5  2002/05/23 17:19:21  scott
 % *** empty log message ***
 %
@@ -143,7 +146,7 @@ if nargin<4,
   xadv = 0;
 end
 if isempty(xadv) | xadv == 0,
-  xadv = 1.0;
+  xadv = 1.0; % DEFAULT XADV
 end
 
 if nargin<3,
@@ -175,7 +178,7 @@ if fastave==0
   end
 end
 
-outframes = floor(((lastx-firstx+xadv)-xwidth)/xadv)+1;
+outframes = floor(0.99999+((lastx-firstx+xadv)-xwidth)/xadv);
 if verbose
   fprintf('movav() will output %d frames.\n',outframes);
 end
