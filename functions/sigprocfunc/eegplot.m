@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2004/03/11 18:41:13  arno
+% boundary events width
+%
 % Revision 1.91  2003/12/06 02:13:36  arno
 % header
 %
@@ -1232,9 +1235,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       g.eventstyle      = g.eventstyle (mod(indexcolor-1               ,length(g.eventstyle))+1);
       
       % for width, only boundary events have width 2
-      for index = 1:length(g.eventtypes)
-          if strcmpi(g.eventtypes{index}, 'boundary'), indexwidth(index) = 1;
-          else                                         indexwidth(index) = 2;
+      if iscell(g.eventtypes)
+          for index = 1:length(g.eventtypes)
+              if strcmpi(g.eventtypes{index}, 'boundary'), indexwidth(index) = 1;
+              else                                         indexwidth(index) = 2;
+              end;
           end;
       end;
       g.eventtypewidths = g.eventwidths (mod(indexwidth([1:length(g.eventtypes)])-1 ,length(g.eventwidths))+1);
