@@ -1,7 +1,7 @@
 % eeg_insertbound() - insert boundary event in EEGLAB event structure.
 %
 % Usage:
-%   >> [eventout indold] = eeg_insertbound( eventin, pnts, ...
+%   >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
 %                                           latency, abslatency, duration);
 %
 % Inputs:
@@ -16,7 +16,8 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
-%   indold     - old event indices (in returned array)
+%   indnew     - array of indices returning new event index for any old 
+%                (input eventin) event index
 %
 % Notes:
 %   1) This function performs the following: add boundary events to the 
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/06/04 01:30:39  arno
+% initial boundary event. Exact boundary latency
+%
 % Revision 1.21  2004/06/03 21:24:31  arno
 % same
 %
@@ -114,7 +118,7 @@
 % Initial revision
 %
 
-function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
+function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
     
     if nargin < 2
         help eeg_insertbound;
@@ -129,7 +133,7 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
     end;
     
     eventout = eventin;
-    indold   = 1:length(eventin);
+    indnew   = 1:length(eventin);
 	for tmpindex = 1:length(boundevents)
         if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
                             
@@ -152,7 +156,7 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
                 tmp = eventout(end);
                 eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
                 eventout(tmpind2) = tmp;
-                indold(tmpind2:end) = indold(tmpind2:end)+1;
+                indnew(tmpind2:end) = indnew(tmpind2:end)+1;
             else
                 tmpind2 = length(eventout)+1;
                 eventout(tmpind2).type     = 'boundary';
