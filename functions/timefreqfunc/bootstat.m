@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/05/23 00:58:17  arno
+% larger range for 'vals' parameters
+%
 % Revision 1.10  2003/05/02 18:07:11  arno
 % debuging 1-D bootstrap
 %
@@ -180,6 +183,7 @@ end;
 
 if isempty(g.basevect)
 	g.basevect = 1:times;
+    if length(g.basevect) == 1, disp('Warning 1 value only for shuffling dimension'); end;
 end;
 
 % vector of only one dimension
@@ -371,16 +375,16 @@ if ~strcmpi(g.distfit, 'none')
     valcomp = linspace(min(abs(Rbootout(:))), max(abs(Rbootout(:))), 100);
     
     [mu sigma] = normfit(abs(Rbootout(:)));
-    normy = normpdf(valcomp, mu, sigma);
     accarrayout = 1 - normcdf(g.vals, mu, sigma); % cumulative density distribution
                                         % formula of normal distribution
                                         % y = 1/sqrt(2) * exp( -(x-mu).^2/(sigma*sigma*2) ) / (sqrt(pi)*sigma);
 
     %figure;
-    %hist(abs(Rbootout));
+    %hist(abs(Rbootout)); tmpax = axis;
     %hold on;
-    %plot(valcomp, normy, 'r');
-    return;
+    %normy = normpdf(valcomp, mu, sigma);
+    %plot(valcomp, normy/max(normy)*tmpax(4), 'r');
+    %return;
 end;
     
     
