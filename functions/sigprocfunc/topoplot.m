@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/07/01 23:11:51  arno
+% adding handle output
+%
 % Revision 1.31  2003/07/01 23:10:17  julie
 % topoplot2() -> topoplot()
 %
@@ -224,6 +227,7 @@ SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
 DIPOLE = [];
 VERBOSE = 'on';
+noplot = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -284,6 +288,8 @@ if nargs > 2
     end
     Param = lower(Param);
     switch lower(Param)
+	 case 'noplot'
+            noplot = 1;
 	 case 'colormap'
 	  if size(Value,2)~=3
           error('topoplot(): Colormap must be a n x 3 matrix')
@@ -450,7 +456,8 @@ if ~strcmp(STYLE,'blank')
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
   
   [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
-  
+
+  if ~noplot
   % Take data within head
   mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
   ii = find(mask == 0);
@@ -630,4 +637,7 @@ hold off
 axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+
+end % noplot
+
 handle = gca;
