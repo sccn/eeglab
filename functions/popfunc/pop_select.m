@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/09 03:03:26  arno
+% removing debug message
+%
 % Revision 1.4  2002/04/09 01:31:41  arno
 % debuging event latency recalculation
 %
@@ -313,8 +316,7 @@ EEG.reject.rejmanual = [];
 % in the future to gain time -----------------------------------  
 EEG = rmfield( EEG, 'stats');
 EEG.stats.jp = [];
-
-% ********* problem with ICA and other estimator, need to be fixed
+EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate command
 % ----------------
