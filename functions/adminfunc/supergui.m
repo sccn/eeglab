@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [handlers, width, height ] = ...
-%             supergui( geomx, geomy, { arguments1 }, { arguments2 }... );
+%             supergui( figh, geomx, geomy, { arguments1 }, { arguments2 }... );
 % 
 % Inputs:
 %   figh    - figure handler, if 0 create a new figure
@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/11/10 16:47:37  arno
+% do not take listbox size into account
+%
 % Revision 1.38  2004/11/05 19:23:04  arno
 % same
 %
@@ -268,10 +271,12 @@ for row = 1:length(geomx)
 			set( rowhandle(column), 'units', 'pixels');			
 			curpos = get(rowhandle(column), 'position');
 			curext = get(rowhandle(column), 'extent');
-			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton') & ~strcmp(style, 'listbox')
+			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
 				factmultx = max(factmultx, curext(3)/curpos(3));
 			end;
-            factmulty = max(factmulty, curext(4)/curpos(4));
+            if  ~strcmp(style, 'listbox')
+                factmulty = max(factmulty, curext(4)/curpos(4));
+            end;
 			set( rowhandle(column), 'units', 'normalized');			
 
 			% Uniformize button text aspect (first letter must be Capital)
