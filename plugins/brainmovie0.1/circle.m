@@ -26,6 +26,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 22:22:52  arno
+% test
+%
 
 function [h, h2] = circle( X, Y, radius, colorfill, coloredge, oriangle, endangle, dashed, thickness, segments);
 
@@ -53,6 +56,9 @@ if nargin < 9
 end;
 if nargin < 10
 	segments = 50;
+end;
+if radius <= 0
+    return;
 end;
 
 A = linspace(oriangle/180*pi, endangle/180*pi, segments);
