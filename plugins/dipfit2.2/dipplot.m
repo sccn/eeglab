@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.101  2004/11/11 01:40:39  arno
+%new dipnames option
+%
 %Revision 1.100  2004/06/15 17:57:06  arno
 %do not know
 %
@@ -471,7 +474,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'num'       'string'   { 'on' 'off' }     'off';
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
                                  'std'       'cell'     []                  {};
-                                 'dipname'   'cell'     []                  {};
+                                 'dipnames'   'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
                                  'projcol'   ''         []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
@@ -714,22 +717,22 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             for index = 1:length(sources)
                 if index~=1 
                     if sources(index).component ~= sources(index-1).component
-                        if isempty(g.dipname)
+                        if isempty(g.dipnames)
                             textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', ...
                                                         sources(index).component, 100*sources(index).rv) };
                         else
                             textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
-                                                               g.dipname{index}, 100*sources(index).rv) };
+                                                               g.dipnames{index}, 100*sources(index).rv) };
                         end;
                         colorcount = colorcount+1;
                     end;
                 else 
-                    if isempty(g.dipname)
+                    if isempty(g.dipnames)
                         textforgui(colorcount) = { sprintf( 'Component %d (R.V. %3.2f)', ...
                                                         sources(index).component, 100*sources(index).rv) };
                     else
                         textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
-                                                           g.dipname{index}, 100*sources(index).rv) };
+                                                           g.dipnames{index}, 100*sources(index).rv) };
                     end;
                     colorcount = colorcount+1;
                 end;
@@ -881,11 +884,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
             dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
             dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
-            if isempty(g.dipname)
+            if isempty(g.dipnames)
                 dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
                                            sources(index).rv*100);
             else
-                dipstruct.rv     = sprintf('C %d (%3.2f)',g.dipname{index}, sources(index).rv*100);
+                dipstruct.rv     = sprintf('C %d (%3.2f)',g.dipnames{index}, sources(index).rv*100);
             end;
             if ~strcmpi(g.spheres,'on') % plot disk markers
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
