@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/10/13 23:28:18  scott
+% added Ampflag, Valflag defaults -sm
+%
 % Revision 1.46  2002/10/13 23:24:48  scott
 % typo
 %
@@ -1131,7 +1134,7 @@ else
      fprintf('Sorting data on mean value between %f and %f ms.\n',...
             sttime,endtime);
   end
-  sortval = mean(data(stframe:endframe,:)');
+  sortval = mean(data(stframe:endframe,:));
   [sortval,sortidx] = sort(sortval);
   data = data(:,sortidx);
   if ~isempty(auxvar)
