@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/10/29 16:35:57  arno
+% msg typo
+%
 % Revision 1.18  2003/07/30 23:53:58  arno
 % debug multiple return values
 %
@@ -180,9 +183,9 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
                 if ~isstr(res{it}), testres = 1; end;
             end;
             if testres == 0,
-                g = [];
-                for tmpi = 1:length(res)
-                    g = [ g res{tmpi} 10 ];
+                g = res{1};
+                for tmpi = 2:length(res)
+                    g = [ g 10 'or ' res{tmpi} ];
                 end;
                 return; 
             end;
