@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 03:25:28  arno
+% added eeg check set consistency
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -88,6 +91,15 @@ end;
 
 I = [];
 
+% warning if data epochs
+% ----------------------
+if nargin<2 & EEG.trials > 1
+		questdlg(['Though epoch information is defined in terms of event,' 10 ...
+				  'this function is usually used to import events into continuous data.' 10 ...
+				  'For data epochs you may better use menu /File/Import epoch info/'], ...
+				'pop_importevent warning', 'OK', 'OK');
+end;
+	
 % remove the event field
 % ----------------------
 if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
