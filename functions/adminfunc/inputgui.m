@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [ outparam ] = inputgui( geometry, listui );
-%   >> [ outparam userdat ] = ...
+%   >> [ outparam userdat strhalt] = ...
 %             inputgui( geometry, listui, help, title, userdat, mode );
 % 
 % Inputs:
@@ -30,6 +30,9 @@
 %                add up an output for each interactive uicontrol, i.e
 %                edit box, radio button, checkbox and listbox.
 %   userdat    - 'userdata' value of the figure.
+%   strhalt    - the funciton returns when the 'userdata' field of the
+%                button with the tag 'ok' is modified. THis return the
+%                new value of this field.
 %
 % Note: the function also add three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
@@ -58,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/27 00:17:25  arno
+% debugging function call
+%
 % Revision 1.4  2002/04/26 23:32:04  arno
 % updated mode argument value and processing
 %
@@ -73,7 +79,7 @@
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode);
+function [result, userdat, strhalt] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode);
 
 if nargin < 2
    help inputgui;
@@ -113,8 +119,10 @@ waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
 
 result = {};
 userdat = [];
+strhalt = '';
 try, findobj(fig); % figure still exist ?
 catch, return; end;
+strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
 
 % output parameters
 % -----------------
