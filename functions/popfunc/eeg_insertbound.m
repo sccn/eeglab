@@ -19,8 +19,9 @@
 %
 % Notes:
 %   1) This function performs the following: add boundary events to the 
-%   'event' structures; remove nested boundaries.
-%   2) all latencies are given in data point unit.
+%   'event' structures; remove nested boundaries; recompute the latencies
+%   of all events.
+%   2) all latencies are given in data point unit. 
 % 
 % Author: Arnaud Delorme, SCCN, INC, UCSD, April, 19, 2004
 %
@@ -45,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/06/08 17:29:39  arno
+% removing boundevent input
+%
 % Revision 1.24  2004/06/07 18:53:13  arno
 % resort event in decreasing latency
 %
@@ -136,17 +140,17 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
         lengths = zeros(size(regions));
     end;
     
+    if length(regions)
+        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', size(regions, 1));
+    else 
+        return;
+    end;
+
     % recompute latencies fo boundevents (in new dataset)
     % ---------------------------------------------------
     [regions tmpsort] = sort(regions);
     lengths           = lengths(tmpsort);
-    boundevents       = regions(:,1)-1;
-    for i=1:size(regions,1)
-        for index=i+1:size(regions)
-            boundevents(index) = boundevents(index) - lengths(i);
-        end;
-    end;
-    boundevents = boundevents+0.5;
+    boundevents       = regions(:,1)-0.5;
     
     % sort boundevents by decreasing order (otherwise bug in new event index)
     % ------------------------------------
@@ -154,12 +158,14 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     lengths     = lengths    (end:-1:1);
     eventout    = eventin;
     indnew      = 1:length(eventin);
-	for tmpindex = 1:length(boundevents)
+    allnest     = [];
+    countrm     = 0;
+	for tmpindex = 1:length(boundevents) % sorted in decreasing order
         if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
                             
             % find event succeding boundary to insert event 
-            % at the correct location in the urevent structure
-            % ------------------------------
+            % at the correct location in the event structure
+            % ----------------------------------------------
             if ~isempty(eventin) & isfield(eventin, 'latency')
                 alllats   = cell2mat( { eventout.latency } ) - boundevents(tmpindex);
                 tmpind    = find( alllats >= 0 );
@@ -185,9 +191,17 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             eventout(tmpind2).duration = lengths(tmpindex); % just to create field
             
             [ tmpnest addlength ] = findnested(eventout, tmpind2);
-            % We use to remove nested event (tmpnest) but this
-            % interfere with parent function eeg_eegre()
             
+            % recompute latencies and remove events in the rejected region
+            % ------------------------------------------------------------
+            eventout(tmpnest) = [];
+            countrm           = countrm+length(tmpnest);
+            for latind = tmpind2+1:length(eventout)
+                eventout(latind).latency = eventout(latind).latency-lengths(tmpindex);
+            end;
+            
+            % add lengths of previous events (must be done after above
+            % --------------------------------------------------------
             if addlength == -1
                 eventout(tmpind2) = rmfield(eventout, 'duration');
                 disp('Warning: old boundary event type present in dataset');
@@ -201,6 +215,11 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
         end; 
 	end;
 
+    if countrm > 0
+        fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', countrm);
+    end;
+
+    
 % look for nested events
 % retrun indices of nested events and
 % their total length
@@ -213,13 +232,13 @@ function [ indnested, addlen ] = findnested(event, ind);
     while tmpind < length(event) & ...
         event(tmpind).latency < event(ind).latency+event(ind).duration
         if strcmpi(event(tmpind).type, 'boundary')
-            indnested = [ indnested tmpind ];
             if ~isempty( event(tmpind).duration )
                 addlen    = addlen + event(tmpind).duration;
             else
                 addlen = -1; % error
             end;
         end;
+        indnested = [ indnested tmpind ];
         tmpind = tmpind+1;
     end;
     
