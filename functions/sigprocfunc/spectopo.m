@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2003/12/03 19:29:40  arno
+% more warnings if using spec()
+%
 % Revision 1.80  2003/12/03 19:25:24  arno
 % add message
 %
@@ -985,6 +988,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     end;
     if exist('pwelch') == 2, usepwelch = 1; else usepwelch=0; end;
     if ~usepwelch
+        disp('');
         disp('Signal processing toolbox absent: spectrum computed using spec() function');
         disp('THIS FUNCTION (SPEC()) RETURNS INNACURATE POWER OVER FILTERED REGIONS');
     end;
