@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2004/01/23 02:55:15  scott
+% documenting maxersp
+%
 % Revision 1.67  2004/01/23 02:23:35  scott
 % add erspmax
 %
@@ -627,8 +630,9 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   end;
   g.winsize = size(g.alltapers, 1);
   g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
-  nfk = floor([0 g.maxfreq]./g.srate.*g.pad);
-  g.padratio = 2*nfk(2)/g.winsize;
+  %nfk = floor([0 g.maxfreq]./g.srate.*g.pad); % not used any more
+  %g.padratio = 2*nfk(2)/g.winsize;
+  g.padratio = g.pad/g.winsize;
  
   %compute number of frequencies
   %nf = max(256, g.pad*2^nextpow2(g.winsize+1)); 
@@ -818,7 +822,8 @@ for i=1:trials
             if ~isempty(g.mtaper)   % apply multitaper (no hanning window)
                 tmpXMT = fft(g.alltapers .* ...
                              (tmpX(:) * ones(1,size(g.alltapers,2))), g.pad);
-			    tmpXMT = tmpXMT(nfk(1)+1:nfk(2),:);
+			    %tmpXMT = tmpXMT(nfk(1)+1:nfk(2),:);
+			    tmpXMT = tmpXMT(2:g.padratio*g.winsize/2+1,:);
                 PP(:,j) = mean(abs(tmpXMT).^2, 2); 
                   % power; can also ponderate multitaper by their eigenvalues v
 		        tmpX = win .* tmpX(:);
