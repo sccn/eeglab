@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/05/02 23:24:34  scott
+% removed 'axis off' -sm
+%
 % Revision 1.3  2002/05/02 23:22:14  scott
 % added 'axis off' -sm
 %
@@ -113,3 +116,4 @@ end
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
 rotate3d on
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
