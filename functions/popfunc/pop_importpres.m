@@ -1,14 +1,14 @@
 % pop_importpres() - append presentation file events into eeglab()
 %
 % Usage:
-%   >> [dat] = pop_importpres( EEG, filename );
+%   >> EEGOUT = pop_importpres( EEGIN, filename );
 %
 % Inputs:
-%   EEG            - input dataset
+%   EEGIN          - input dataset
 %   filename       - file name
 % 
 % Outputs:
-%   EEG            - data structure
+%   EEGOUT         - data structure
 %
 % Note: 1) if they are pre-existing events in the input dataset,
 %       this function will recalculate the latency of the events
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 function [EEG, command] = pop_importpres(EEG, filename); 
 command = '';
