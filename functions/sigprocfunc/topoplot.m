@@ -1,6 +1,6 @@
-% topoplot() - plot a topographic map of an EEG field as a 2-D
+% topoplot() - plot a topographic map of a scalp data field in a 2-D
 %              circular view (looking down at the top of the head) 
-%              using cointerpolation on a fine cartesian grid.
+%              using interpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
 %        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
@@ -8,52 +8,51 @@
 %    		datavector - vector of values at the corresponding locations.
 %                        if a single channel number, show location of that 
 %                        channel (use with 'style', 'blank' only)
-%   		chan_locs  - name of an EEG electrode position file (See
-%                             >> topoplot 'example' for format). Can also be a
-%                        structure (see >> help pop_editset)
+%   		chan_locs  - name of an EEG electrode position file (see
+%                        >> topoplot 'example' for format). May also be an
+%                        EEG.chanlocs structure (see >> help pop_editset)
 % Optional Parameters:
-%   'shrink'           - ['on'|'off'|'force'|factor] normalize electrode polar
-%                        coordinates if maximum radius > 0.5 ('on') so that
-%                        maximu radius is 0.5. 'force' normalize radius so 
-%                        that the maximum is 0.5. factor apply a normalizing
-%                        factor (percentage of the maximum). {default = 'off'}.
+%   'shrink'           - ['on'|'off'|'force'|factor] 'on': normalize electrode 
+%                        polar coordinates if maximum radius > 0.5 so that
+%                        maximu radius is 0.5. 'force': normalize radius so 
+%                        that the maximum is 0.5. 'factor': apply a normalizing
+%                        factor (percentage of the maximum) {default = 'off'}.
 %                        Note that the chan_locs structure may have an optional
 %                        shrink field (same format as this parameter).
-%   'colormap'        -  any sized colormap
-%   'interplimits'    - 'electrodes' to furthest electrode; 'head' to edge of
-%                        head {default 'head'}
-%   'gridscale'       -  scaling grid size {default 67}
+%   'colormap'        -  (n,3) any sized colormap
+%   'interplimits'    - ['electrodes'|'head'] 'electrodes': to furthest electrode; 
+%                       'head' to edge of head {default 'head'}.
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
-%                        map from coordinate XI,YI to coordinates XE, YE, ZE (head is 
-%                        radius one). If several rows, plot one dipole per row.
-%   'dipnorm'         - ['on'|'off'] normlaize deipole length. { default = 'off'}.
-%   'diporient'       - [-1|1] invert dipole orientation. { default = 1 }.
-%   'diplen'          - [real] scale dipole lenght. { default = 1 }.
-%   'dipscale'        - [real] scale dipole size. { default = 1 }.
-%   'dipcolor'        - [color] change dipole color. { default = 'k' (black) }.
+%                        map from coordinate XI,YI to coordinates XE, YE, ZE (head 
+%                        model has radius 1). If several rows, plot one dipole per row.
+%   'dipnorm'         - ['on'|'off'] normalize deipole length {default = 'off'}.
+%   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
+%   'diplen'          - [real] scale dipole length {default = 1}.
+%   'dipscale'        - [real] scale dipole size {default = 1}.
+%   'dipcolor'        - [color] change dipole color {default = 'k' (black)}.
 %                        The dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
-%                        Coordinates returned by dipplot can be used.
+%                        Coordinates returned by dipplot() may be used.
 %   'maplimits'       - 'absmax' +/- the absolute-max 
 %                       'maxmin' scale to data range
 %                        [clim1,clim2] user-definined lo/hi
 %                        {default = 'absmax'}
-%   'style'           - 'straight' colormap only
-%                       'contour' contour lines only
-%                       'both' - both colormap and contour lines
-%                       'fill' - constant color between lines
-%                       'blank' - just plot electrode locations
+%   'style'           - 'straight' - colormap only
+%                       'contour'  - contour lines only
+%                       'both'     - both colormap and contour lines
+%                       'fill'     - constant color between lines
+%                       'blank'    - only plot electrode locations
 %                       {default = 'both'}
 %   'numcontour'      - number of contour lines {default = 6}
 %   'shading'         - 'flat','interp'  {default = 'flat'}
-%   'headcolor'       - Color of head cartoon {default black}
+%   'headcolor'       - color of head cartoon {default black}
 %   'verbose'         - ['on'|'off'] default is 'on'.
 %   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
-%   'noplot'          - ['on'|'off'|[rad theta]] Do not plot (but return interpolated data).
-%                        If [rad theta] coordinates of a (possibly missing) channel, returns
-%                        interpolated val for channel location. For channel location conventions
-%                        see >> topoplot 'example'
-%   'gridscale'       - [int value >> 1] - interpoled data matrix size (rows) (default: 67)
+%   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
+%                        If [rad theta] are coordinates of a (possibly missing) channel, 
+%                        returns interpolated value for channel location. For location 
+%                        conventions, see >> topoplot 'example'
+%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
 %   'efontsize'       - detail
 %   'electcolor'      - detail
 %   'emarker'         - detail
@@ -97,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2003/11/06 16:31:18  arno
+% changing dipnorm
+%
 % Revision 1.65  2003/11/06 02:04:41  arno
 % correct orientation
 %
