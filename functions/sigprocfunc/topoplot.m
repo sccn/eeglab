@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/07/01 23:23:36  julie
+% debug noplot
+%
 % Revision 1.33  2003/07/01 23:18:04  julie
 % added 'noplot' arg, undocumented
 %
@@ -465,7 +468,7 @@ if ~strcmp(STYLE,'blank')
   ii = find(mask == 0);
   Zi(ii) = NaN;
 
-  if noplot==0 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if ~noplot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % calculate colormap limits
   m = size(colormap,1);
