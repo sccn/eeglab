@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/12/05 00:26:20  arno
+% [6~[6~dataset history
+%
 % Revision 1.12  2002/07/24 00:51:47  arno
 % editing header
 %
@@ -106,7 +109,7 @@ if length(EEG) > 1
 	end;
 	return;
 end;
-[ EEG2 com] = eeg_checkset(EEG);
+[ EEG com] = eeg_checkset(EEG);
 if ~isempty(com)
     if ~isfield(EEG, 'history')
         EEG.history = '';
