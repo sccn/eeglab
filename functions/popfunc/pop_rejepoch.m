@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -77,7 +80,7 @@ end;
 
 % create a new set if set_out is non nul 
 % --------------------------------------
-EEG = pop_select( EEG, 'trialrange', find(tmprej > 0));
+EEG = pop_select( EEG, 'notrial', find(tmprej > 0));
 
 com = sprintf( '%s = pop_rejepoch( %s, %s, %d);', inputname(1), ...
 			inputname(1), int2str( tmprej ), confirm);		
