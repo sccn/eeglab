@@ -26,21 +26,23 @@
 %         Research Centre (tom.campbell@helsinki.fi) Spartam nanctus es: Hanc exorna. 
 %         Combined with amplitudearea_msuV() by Darren Weber, UCSF 28/1/05
 %         Retested and debugged Tom Campbell 2/2/05
+%         Reconceived, factored somewhat, tested and debugged Tom Campbell 13:24 23.3.2005
 
 
-function [channels,overall_amplitude] = eeg_amplitudearea(EEG, channels, resrate, wstart, wend)
+
+function [channels,overall_amplitude] = eeg_amplitudearea2(EEG, channels, resrate, wstart, wend)
 
 if wstart > wend
     error ('ERROR: wstart must be greater than wend')
 else
-    [channels, overall_amplitude] = amplitudearea_msuV (EEG,channels, resrate, wstart, wend)
+    [channels, overall_amplitude] = eeg_amplitudearea_msuV (EEG,channels, resrate, wstart, wend)
     overall_amplitude = overall_amplitude/(wend - wstart)
 end
 
 return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [channels, overall_area] = amplitudearea_msuV (EEG, channels, resrate, wstart, wend)
+function [channels, overall_area] = eeg_amplitudearea_msuV (EEG, channels, resrate, wstart, wend)
 
 %if ndim(EEG.data) ~= 3
 %  error('EEG.data must be 3-D data epochs');
@@ -49,7 +51,7 @@ erp = mean(EEG.data,3);
 
 [tmp ind1] =min( abs( EEG.times - wstart ) ); % closest time index to wstart
 [tmp ind2] =min( abs( EEG.times - wend ) ); % closest time index to wend
-restep = 1000/resrate
+restep = 1/resrate
 
 
 if EEG.times(ind1) > wstart 
@@ -72,78 +74,176 @@ while timr(tr) < wend
     timr(tr) = timr(tr-1)+ restep;
 end
 
+
 for x = 1:size(channels,2)
     channel = channels(x)
     %resamples
     rerp(x, 1:tr) = spline(tim(:),erp(channel, ind1:ind2), timr(1:tr))
+    pent = timr(tr - 1)
+    overall_area(x) = 0
     for y = 1:(tr -1)
-        %identify which sample is the height of the rectangle under the
-        %curve and which sample is the height of the triangle capping the
-        %rectangle
-        if (abs(rerp(x,y)) <= abs(rerp(x,y+1)))
-            rhtsamp = y
-            thtsamp = y + 1
-        else 
-            rhtsamp = y + 1
-            thtsamp = y
-        end
-        if y < (tr-1) | ((y == (tr-1)) & (wend - timr(tr - 1)) == restep) 
-            if ((rerp(x,y) > 0)& (rerp(x,y+1) < 0))|((rerp(x,y) < 0)& (rerp(x,y+1) > 0))
-                %handles samples containing a zerocrossing with two
-                %triangles and trigonometry
-                opposite = abs(rerp(x,y))+abs(rerp(x,y+1))
-                adjacent = restep
-                tantheta = opposite/adjacent
-                zerocross(x,y) = abs(rerp(x,y))/tantheta
-                remainder(x,y) = adjacent - zerocross(x,y)
-                area(x,y) = ((zerocross(x,y)/2)* (rerp(x,y)))+ ((remainder(x,y)/2)* (rerp(x,y+1)))
-            else       
-                rectanglearea = rerp(x,(rhtsamp))*restep 
-                trianglearea = (rerp(x,(thtsamp))-rerp(x,(rhtsamp)))*restep/2 
-                area(x,y) =  rectanglearea  + trianglearea
-            end 
-        elseif (y == (tr-1)) & ((wend - timr(tr - 1)) < restep)
-            endstep = wend - timr(tr - 1)
-            opposite = abs(rerp(x,y))+abs(rerp(x,y+1))
-            adjacent = restep
-            tantheta = opposite/adjacent
-            zerocross = abs(rerp(x,y))/tantheta
-             if (((rerp(x,y) > 0)& (rerp(x,y+1) < 0))|((rerp(x,y) < 0)& (rerp(x,y+1) > 0)))&(zerocross < endstep)
-                %handles samples containing a zerocrossing with two
-                %triangles and trigonometry
-                remainder = endstep - zerocross
-                opposite2 = tantheta * remainder * sign(rerp(x,y)) * -1
-                area(x,y) = ((zerocross/2)* (rerp(x,y)))+ ((remainder/2)* opposite2)
-            elseif thtsamp > rhtsamp
-                % test for amplitude increase from left to right and fits
-                % area with a rectangle capped by a triangle
-                opposite = abs(rerp(x,(thtsamp))) - abs(rerp(x,(rhtsamp)))
-                adjacent = restep
-                tantheta = opposite/adjacent
-                triht = tantheta * endstep * sign(rerp(x,(thtsamp)))
-                trianglearea = (endstep/2)*triht 
-                rectanglearea = rerp(x,(rhtsamp))*endstep
-                area(x,y) =  rectanglearea + trianglearea
-            elseif rhtsamp > thtsamp 
-                 % tests for amplitude decrease from left to right and fits area with
-                % two rectangles capped by a triangle with trigonometry
-                opposite = abs(rerp(x,(thtsamp))) - abs(rerp(x,(rhtsamp))) 
-                adjacent = restep
-                tantheta = opposite/adjacent
-                excessstep = restep - endstep
-                extrarectangleht = tantheta* excessstep * sign(rerp(x,(thtsamp)))
-                extrarectanglearea = extrarectangleht * endstep *sign(rerp(x,(thtsamp)))
-                triht = (opposite - extrarectangleht) * sign(rerp(x,(thtsamp)))
-                trianglearea = (endstep/2)*triht *sign(rerp(x,(thtsamp)))
-                rectanglearea = rerp(x,(rhtsamp))*endstep
-                area(x,y) =  rectanglearea + extrarectanglearea + trianglearea
+        v1 =  rerp(x,(y))
+        v2 =  rerp(x,(y+1))
+        if ((v1 > 0) & (v2 < 0)) | ((v1 < 0) & (v2 > 0))
+            if (y == (tr-1)) & (timr(y+1)> wend)
+                area1 = zero_crossing_truncated(v1, v2, restep, wend, pent)    
+            else    
+                area1 = zero_crossing(v1, v2, restep)
+            end
+        else
+            if( y == (tr-1)) & (timr(y+1)> wend)
+                area1 = rect_tri_truncated(v1, v2, restep,wend,pent)
+            else
+                area1 = rect_tri(v1, v2, restep)
             end
         end
+        overall_area(x) = overall_area(x) + area1
     end
 end
 
-for x = 1:(size(channels,2))
-    overall_area(x) = sum(area(x,:))
-end
+return
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [area] = zero_crossing(v1,v2,step)
+    if (v1 > v2)
+        T1 = v1
+        T2 = v2
+    else
+        T1 = v2
+        T2 = v1
+    end
+    tantheta = (abs(T1)+ abs(T2))/step
+    if (v1 > v2)
+        %decline
+        z = abs(T1)/tantheta
+        tr1= abs(T1)*(z/2)
+        tr2= abs(T2)*((step-z)/2)
+    else
+        %incline
+        z = abs(T2)/tantheta
+        tr2= abs(T2)*(z/2)
+        tr1= abs(T1)*((step-z)/2)
+    end
+    [area] = (tr1 - tr2)
+return
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [area] = zero_crossing_truncated(v1,v2,step,wend,pent)
+    if (v1 > v2)
+        T1 = v1
+        T2 = v2
+    else
+        T1 = v2
+        T2 = v1
+    end
+    tantheta = (abs(T1)+ abs(T2))/step
+    s = wend - pent
+    if (v1 > v2)
+        z = abs(T1)/tantheta
+        if s < z   
+            %decline,truncated before zerocrossing
+            t1 = tantheta * s
+            r1 = abs(T1)-abs(t1)
+            tr1= abs(t1)*(s/2)
+            tr2= 0
+            rect1 = r1*s
+            rect2 = 0
+        else
+            %decline,truncated after zerocrossing
+            t2= tantheta*(s-z)
+            tr1= abs(T1)*(z/2)
+            tr2 = abs(t2)*((s-z)/2)
+            rect1 = 0
+            rect2 = 0
+        end    
+    else
+        z = abs(T2)/tantheta
+        if s < z
+            %incline,truncated before zerocrossing
+            t2 = tantheta * s
+            r2 = abs(T2)-abs(t2)
+            tr1= 0
+            tr2= abs(t2)*(s/2)            
+            rect1 = 0
+            rect2 = r2*s
+        else
+            %incline,truncated after zerocrossing
+            t1= tantheta*(s-z)
+            tr1 = abs(t1)*((s-z)/2)
+            tr2 = abs(T2) * (z/2)
+            rect1 = 0
+            rect2 = 0
+        end
+    end
+
+[area] = ((rect1 + tr1) - (rect2 + tr2))
+return
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [area] = rect_tri(v1,v2,step)
+    if (abs(v1) > abs(v2))
+        T = abs(v1)-abs(v2)
+        R = abs(v2)
+    else
+        T = abs(v2)-abs(v1)
+        R = abs(v1)
+    end
+    rect = R*step
+    tri = T*(step/2)
+    if v1 > 0
+        area = 1* (rect+tri)
+    else
+        area = -1 * (rect+tri)
+    end
+return
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [area] = rect_tri_truncated(v1,v2,step,wend,pent)
+    if (abs(v1) > abs(v2))
+        T = abs(v1)-abs(v2)
+        R = abs(v2)
+    else
+        T = abs(v2)-abs(v1)
+        R = abs(v1)
+    end
+    
+    tantheta = abs(T)/step
+    s = wend -pent
+    
+    if (v1>0)
+        if v1 >v2
+        %positive decline
+            t = tantheta*s
+            e = abs(T)-abs(t)
+            rect = s*R
+            exrect = s*e
+            tri = (s/2)*R
+        else
+        %positive incline
+            t = tantheta*s
+            rect = s*R
+            exrect = 0
+            tri = (s/2)*R
+        end
+    else
+       if v1 >v2
+        %negative decline
+            t = tantheta*s
+            rect = s*R
+            exrect = 0
+            tri = (s/2)*R
+        else
+        %negative incline 
+            t = tantheta*s
+            e = abs(T)-abs(t)
+            rect = s*R
+            exrect = s*e
+            tri = (s/2)*R
+        end
+    end
+    tri = T*(step/2)
+    if v1 > 0
+        area = 1* (rect+exrect+tri)
+    else
+        area = -1 * (rect+exrect+tri)
+    end
 return
