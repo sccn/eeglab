@@ -2,16 +2,14 @@
 %
 % Usage:
 %   >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
-%                                           latency, abslatency, duration);
+%                                           abslatency, duration);
 %
 % Inputs:
 %   eventin    - EEGLAB event structure
 %   pnts       - data points in EEG dataset
-%   latency    - relative latency (in the event structure) of boundary 
-%                event(s)
 %   abslatency - absolute latency of regions in original dataset. Can
 %                also be an array of [beg end] latency with one row
-%                per region removed. Then 'lengths' is ignored.
+%                per region removed. Then 'lengths' argument is ignored.
 %   duration   - length of removed regions
 %
 % Outputs:
@@ -47,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/06/07 18:53:13  arno
+% resort event in decreasing latency
+%
 % Revision 1.23  2004/06/07 18:44:35  arno
 % changing variable name
 %
@@ -121,7 +122,7 @@
 % Initial revision
 %
 
-function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
+function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     
     if nargin < 2
         help eeg_insertbound;
@@ -135,14 +136,24 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, region
         lengths = zeros(size(regions));
     end;
     
+    % recompute latencies fo boundevents (in new dataset)
+    % ---------------------------------------------------
+    [regions tmpsort] = sort(regions);
+    lengths           = lengths(tmpsort);
+    boundevents       = regions(:,1)-1;
+    for i=1:size(regions,1)
+        for index=i+1:size(regions)
+            boundevents(index) = boundevents(index) - lengths(i);
+        end;
+    end;
+    boundevents = boundevents+0.5;
+    
     % sort boundevents by decreasing order (otherwise bug in new event index)
     % ------------------------------------
-    [boundevents tmpsort] = sort(boundevents); boundevents = boundevents(end:-1:1);
-    lengths               = lengths(tmpsort);  lengths     = lengths    (end:-1:1);
-    regions               = regions(tmpsort);  regions     = regions    (end:-1:1);
-    
-    eventout = eventin;
-    indnew   = 1:length(eventin);
+    boundevents = boundevents(end:-1:1);
+    lengths     = lengths    (end:-1:1);
+    eventout    = eventin;
+    indnew      = 1:length(eventin);
 	for tmpindex = 1:length(boundevents)
         if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
                             
@@ -150,7 +161,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, region
             % at the correct location in the urevent structure
             % ------------------------------
             if ~isempty(eventin) & isfield(eventin, 'latency')
-                alllats   = cell2mat( { eventout.latency } ) - regions(tmpindex)+0.5;
+                alllats   = cell2mat( { eventout.latency } ) - boundevents(tmpindex);
                 tmpind    = find( alllats >= 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
                 tmpind2        = tmpind(tmpind2);
@@ -170,7 +181,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, region
                 tmpind2 = length(eventout)+1;
                 eventout(tmpind2).type     = 'boundary';
             end;
-            eventout(tmpind2).latency  = regions(tmpindex)-0.5;
+            eventout(tmpind2).latency  = boundevents(tmpindex);
             eventout(tmpind2).duration = lengths(tmpindex); % just to create field
             
             [ tmpnest addlength ] = findnested(eventout, tmpind2);
