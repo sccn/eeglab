@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.148  2004/03/18 00:18:09  arno
+% skirt option
+%
 % Revision 1.147  2004/02/25 15:29:39  scott
 % dont plot border if shrinkfac < .01
 %
@@ -588,12 +591,19 @@ if length(Vl) > 1
     Vl     = Vl(ind);
 end;
 labels = labels(ind);
+
+% shrink and skirt factor decoding
+% --------------------------------
 if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), 
-   shrinkfactor = tmpeloc(1).shrink; 
+   shrinkfactor = tmpeloc(1).shrink;
+end;
+if abs(shrinkfactor) > 3
+    shrinkfactor = (shrinkfactor-90)/90; 
 end;
 if strcmpi(skirtfactor, 'off') & isfield(tmpeloc, 'skirt'), 
    skirtfactor = tmpeloc(1).skirt; 
 end;
+
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
