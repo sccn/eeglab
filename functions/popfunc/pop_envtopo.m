@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/03/31 17:57:45  arno
+% debug call for 2 conditions
+%
 % Revision 1.29  2005/03/07 21:26:02  arno
 % chaninfo
 %
@@ -270,7 +273,6 @@ else
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     end;    
 end;
-com
 eval(com);
 
 return;
