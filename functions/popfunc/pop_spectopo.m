@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/20 01:23:28  arno
+% debuging varargin decoding
+%
 % Revision 1.3  2002/04/25 17:05:21  scott
 % fruther editting -sm
 %
@@ -62,7 +65,7 @@ if nargin < 1
 	return;
 end;	
 
-if nargin < 4
+if nargin < 2
 	promptstr    = { 'Epoch time range (ms) to include [min max]:', ...
 	                 'Percent windows to sample (0 to 100):', ...
 			         'Scalp map frequencies (Hz):', ...
@@ -73,13 +76,23 @@ if nargin < 4
 	result       = inputdlg( promptstr, 'Channel spectra and maps -- pop_spectopo()', 1, inistr);
 	if size(result,1) == 0 return; end;
 	timerange    = eval( [ '[' result{1} ']' ] );
-	percent      = eval( [ '[' result{2} ']' ] ) / 100; 
+	percent      = eval( [ '[' result{2} ']' ] ); 
 	topofreqs    = eval( [ '[' result{3} ']' ] );
 	options      =  [ ',' result{4} ];
 	figure;
 else
 	options = [',' vararg2str(varargin)];
+	if isempty(timerange)
+		timerange = [ EEG.xmin*1000 EEG.xmax*1000 ];
+	end;
+	if nargin < 3 
+		percent = 100;
+	end;
+	if nargin < 4 
+		topofreqs = [];
+	end;
 end;
+timerange
 
 if isempty(topofreqs)
     close(gcf);
