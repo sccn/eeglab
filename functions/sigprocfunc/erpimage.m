@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/08/21 18:36:13  arno
+% adding error message
+%
 % Revision 1.33  2002/08/19 19:48:25  arno
 % commenting crosscoher for Mac compatibility
 %
@@ -212,7 +215,7 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been dropped from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(oridata,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
 %
 %%%%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,6 +315,7 @@ if nargin < 1
   return
 end
 
+data = oridata;
 if isstr(data) 
    ans=strcmp(data,'moreargs');
    if ans==1
@@ -1501,6 +1505,7 @@ if Erpflag == YES
  axes(ax1); % reset current axes to the erpimage
  xtick = get(ax1,'Xtick');     % remember x-axis tick locations
  xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
+ set(ax1, 'xticklabel' []);
  widthxticklabel = size(xticklabel,2);
  xticklabel = cellstr(xticklabel);
  for tmpindex = 1:length(xticklabel)
