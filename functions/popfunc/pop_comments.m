@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/08 20:52:45  arno
+% removing debug msg
+%
 % Revision 1.3  2002/04/06 02:58:37  arno
 % returning [] when no modification
 %
@@ -71,7 +74,7 @@ if nargin < 3
 	end;
 	
 	h = title(plottitle);
-	set(h, 'fontweight', 'bold');
+	set(h, 'fontweight', 'bold', 'interpreter', 'none');
 	
 	axis off;
 
