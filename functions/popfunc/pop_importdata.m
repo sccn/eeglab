@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/11 21:18:34  arno
+% *** empty log message ***
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -135,7 +138,6 @@ for i=1:2:length(args)
         com = sprintf('%s, ''%s'', []', com, args{i} );
     end;
 end;
-[ 'EEGOUT = pop_editset(EEGOUT' com ');']
 
 eval( [ 'EEGOUT = pop_editset(EEGOUT' com ');'] );
 com = [ 'EEG = pop_importdata(' com(2:end) ');'];
