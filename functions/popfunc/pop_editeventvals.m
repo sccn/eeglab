@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/06/14 16:11:16  arno
+% moving check somewhere else
+%
 % Revision 1.28  2004/06/12 23:37:08  arno
 % more messages
 %
@@ -256,7 +259,14 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       % -------------
       if isfield(eventtmp, 'epoch'), curepoch = eventtmp(valnum).epoch; end;
       if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
-          urvalnum = eventtmp(valnum).urevent;
+          % find non empty urvalnum
+          urvalnum = [];
+          count = 0;
+          while isempty(urvalnum)
+              tmpindex = mod(valnum+count-1, length(eventtmp)+1)+1;
+              urvalnum = eventtmp(valnum+count).urevent;
+              count = count+1;
+          end;
           if isfield(EEG.urevent, 'epoch'), urcurepoch = EEG.urevent(urvalnum).epoch; end;
           urvalnum = urvalnum + shift;
       end;
@@ -430,7 +440,6 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
               else editval = editval*EEG.srate;      % seconds -> point
               end;
           end;
-          
           EEG.urevent = setfield(EEG.urevent, {urvalnum}, field, editval);
       end;
 
