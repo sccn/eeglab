@@ -161,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.210  2004/06/05 01:52:45  arno
+% aligntime as string to avoid really realigning
+%
 % Revision 1.209  2004/06/05 01:33:07  arno
 % spetial option to preserve backward compatibility
 %
@@ -3057,7 +3060,7 @@ end
 %   
 %%%%%%%%%%%%%%% save plotting limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-limits = [timelimits(1:2) minerp maxerp minamp maxamp mincoh maxcoh];
+limits = [min(times) max(times) minerp maxerp minamp maxamp mincoh maxcoh];
 limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
 
 %   
