@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/10/29 17:14:14  arno
+% typo
+%
 % Revision 1.26  2002/10/29 01:17:52  arno
 % pop field for new field
 %
@@ -473,7 +476,13 @@ return;
     
 function var = setstruct( var, fieldname, indices, values )
     if exist('indices') ~= 1, indices = 1:length(var); end;
-    for index = 1:length(indices)
-        var = setfield(var, {indices(index)}, fieldname, values(index));
+    if length(values) > 1
+        for index = 1:length(indices)
+            var = setfield(var, {indices(index)}, fieldname, values(index));
+        end;
+    else
+        for index = 1:length(indices)
+            var = setfield(var, {indices(index)}, fieldname, values);
+        end;
     end;
 return;
