@@ -1,5 +1,5 @@
 % dipplot() - Visualize EEG equivalent-dipole locations and orientations 
-%             in the BESA spherical head model or in a averaged MRI model.
+%             in the MNI average MRI head or in the BESA spherical head model. 
 % Usage:
 %   >> dipplot( sources, 'key', 'val', ...);
 %   >> [sources X Y Z XE YE ZE] = dipplot( sources, 'key', 'val', ...);
@@ -12,12 +12,11 @@
 %                besaphloc: BESA horizontal angle of the dipole
 %                besathori: BESA azimuth angle of the dipole orientation
 %                besaphori: BESA horiz. angle of the dipole orientation
-%                posxyz: DIPFIT dipole 3D carthesian position in mm
-%                momxyz: DIPFIT dipole 3D carthesian orientation
+%                posxyz: DIPFIT dipole 3-D Cartesian position in mm
+%                momxyz: DIPFIT dipole 3-D Cartesian orientation
 %                optional fields for BESA and DIPFIT dipole info
 %                     component: component number
 %                     rv:        residual variance
-%
 % Optional input:
 %  'rvrange'  - [min max] Only plot dipoles with residual variace within the
 %               given range. Default: plot all dipoles.
@@ -147,6 +146,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.103  2004/11/11 02:34:15  arno
+%fixing dipnames
+%
 %Revision 1.102  2004/11/11 02:11:16  arno
 %dipname -> dipnames
 %
