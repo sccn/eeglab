@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/05/19 14:19:35  scott
+% added cartoon of showchan if > 0  -sm
+%
 % Revision 1.44  2002/05/19 14:17:55  scott
 % *** empty log message ***
 %
@@ -382,14 +385,15 @@ set(xl,'fontsize',16);
 set(gca,'yaxislocation','left')
 if showchan>0
    % tl=title(['Channel ',int2str(showchan)]);
+   % set(tl,'fontsize',14);
 else
   if exist('std')==2
    tl=title(['Signed channel st. dev.']);
   else
    tl=title(['Signed channel mean']);
   end
+  set(tl,'fontsize',14);
 end
-set(tl,'fontsize',14);
 
 yl=ylabel(['Frequency (Hz)']);
 set(yl,'fontsize',16);
