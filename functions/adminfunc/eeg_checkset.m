@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2002/10/29 01:17:37  arno
+% implementing user abord
+%
 % Revision 1.75  2002/10/20 21:32:08  arno
 % nan activation computation debug
 %
@@ -722,6 +725,13 @@ if ~isempty( varargin)
 		  if EEG.trials == 1
 			  errordlg2(strvcat('Epochs must be extracted before running that function', 'Use /Tools/Extract epochs'), 'Error');
 			  error('eeg_checkset error: epochs must be extracted before running that function'); return
+		  end;
+		 case 'besa', 
+		  if ~isfield(EEG, 'sources')
+			  errordlg2(strvcat('No dipole information', '1) Component maps must be exported: Tools > Localize ... BESA > Export ...' ...
+                                , '2) BESA must be run to localize the equivalent dipoles', ...
+                                '3) BESA dipoles must be imported: Tools > Localize ... BESA > Import ...'), 'Error');
+			  error('eeg_checkset error: no BESA dipole information'); return
 		  end;
 		 case 'event', 
 		  if isempty(EEG.event)
