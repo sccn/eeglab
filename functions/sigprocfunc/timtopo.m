@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/03/04 21:10:50  scott
+% titlefont -sm
+%
 % Revision 1.34  2003/03/04 18:52:41  scott
 % cleaning up -sm
 %
@@ -286,6 +289,22 @@ end
 pos = get(gca,'Position');
 axis('off')
 cla % clear the current axes
+if pos(4)>0.70
+   titlefont= 16;
+   axfont = 16;
+elseif pos(4)>0.40
+   titlefont= 14;
+   axfont = 14;
+elseif pos(4)>0.30
+   titlefont= 12;
+   axfont = 12;
+elseif pos(4)>0.22
+   titlefont= 10;
+   axfont = 10;
+else
+   titlefont= 8;
+   axfont = 8;
+end
 
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
@@ -350,7 +369,7 @@ fprintf('\n');
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % site the plot at bottom of the figure
-axdata = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
+axdata = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',axfont);
 set(axdata,'Color',BACKCOLOR);
 
 limits = get(axdata,'Ylim');
@@ -366,9 +385,9 @@ if length(plotchans)==1
   set(pl,'linewidth',2);
 end
 l= xlabel('Time (ms)');
-set(l,'FontSize',16);
+set(l,'FontSize',axfont);
 l=ylabel('Potential (uV)');
-set(l,'FontSize',16);
+set(l,'FontSize',axfont);
 axis([xmin xmax ymin ymax]);
 hold on
 
@@ -398,7 +417,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 axall = axes('Position',pos,...
-             'Visible','Off','Fontsize',16);    % whole-gca invisible axes
+             'Visible','Off','FontSize',axfont);    % whole-gca invisible axes
 axes(axall)
 set(axall,'Color',BACKCOLOR);
 axis([0 1 0 1])
@@ -454,7 +473,7 @@ for t=1:ntopos
   % headplot(data(:,plotframes(t)),'chan.spline'); 
   
   timetext = num2str(plottimes(t),'%4.0f');
-  text(0.00,0.70,timetext,'FontSize',14,'HorizontalAlignment','Center');
+  text(0.00,0.70,timetext,'FontSize',axfont-2,'HorizontalAlignment','Center');
 end
 
 %
@@ -471,21 +490,10 @@ set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-if pos(4)>0.70
-   titlefont= 16;
-elseif pos(4)>0.40
-   titlefont= 14;
-elseif pos(4)>0.30
-   titlefont= 12;
-elseif pos(4)>0.22
-   titlefont= 10;
-else
-   titlefont= 8;
-end
 text(0.16,0.625,titl,'FontSize',titlefont,'HorizontalAlignment','Center','FontWeight','Bold');
 
-text(0.966,0.695,'+','FontSize',16,'HorizontalAlignment','Center');
-text(0.966,0.625,'-','FontSize',16,'HorizontalAlignment','Center');
+text(0.966,0.695,'+','FontSize',axfont,'HorizontalAlignment','Center');
+text(0.966,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
 
 axes(axall)
 set(axall,'layer','top'); % bring component lines to top
@@ -493,7 +501,7 @@ set(axall,'layer','top'); % bring component lines to top
   if ~isempty(varargin)
     try,
 		if ~isempty( strmatch( 'absmax', varargin))
-			text(0.86,0.624,'0','FontSize',16,'HorizontalAlignment','Center');
+			text(0.86,0.624,'0','FontSize',axfont,'HorizontalAlignment','Center');
 		end;
 	catch, end;
   end
