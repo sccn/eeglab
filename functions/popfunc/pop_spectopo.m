@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/10/23 01:40:50  arno
+% message - sm & ad
+%
 % Revision 1.29  2002/10/08 15:41:32  arno
 % adding icawinv
 %
@@ -237,7 +240,7 @@ if nargin < 3
 		if ~isempty(result{9}),    options = [ options ', ''freqrange'',[' result{9} ']' ]; end;
 		if ~isempty(result{10}), options      =  [ options ',' result{10} ]; end;
 	end;		
-	figure;
+	figure('tag', 'spectopo');
         set(gcf,'Name','spectopo()');
 else
 	options = [',' vararg2str(varargin)];
