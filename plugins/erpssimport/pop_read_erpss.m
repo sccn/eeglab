@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/01/28 18:15:53  arno
+% adding filename and filepath
+%
 % Revision 1.5  2003/01/28 16:49:09  arno
 % debugging read error
 %
@@ -53,7 +56,7 @@ command = '';
 
 if nargin < 1
 	% ask user
-	[filenametmp, filepath] = uigetfile('*.*', 'Choose a ERPSS file -- pop_read_erpss'); 
+	[filenametmp, filepath] = uigetfile('*.rdf;*.RDF', 'Choose a ERPSS file -- pop_read_erpss'); 
     drawnow;
 	if filenametmp == 0 return; end;
 	filename = [filepath '/' filenametmp];
