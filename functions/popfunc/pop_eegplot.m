@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/06/25 22:23:56  scott
+% *** empty log message ***
+%
 % Revision 1.3  2002/04/26 21:28:17  arno
 % eeg_updatemenu
 %
@@ -76,7 +79,8 @@ if nargin < 3 & EEG.trials > 1
 	% which set to save
 	% -----------------
     promptstr    = { 'Add to previously labelled rejections (yes/no)', ...
-         	     'Reject labelled trials (yes/no)' };
+         	         'Reject labelled trials (yes/no)', ...
+						 };
 	inistr       = { 'yes', 'no' };
 	result       = inputdlg( promptstr, fastif(typerej, 'Manual component rejection -- pop_eegplot()', 'Manual trials rejection -- pop_eegplot()'), 1,  inistr);
 	size_result  = size( result );
