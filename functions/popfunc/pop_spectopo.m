@@ -26,7 +26,7 @@
 %                      passed to topoplot() to adjust details of the scalp maps
 %                      For details see  >> help topoplot
 %
-% Graphic interface for ICA components (dataflag = 0):
+% Graphic interface for components (dataflag = 0):
 %   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
 %                      in computing the spectra (by default the whole epoch or data).
 %                      spectopo() equivalent: 'timerange'
@@ -57,7 +57,7 @@
 % Inputs:
 %   EEG         - Input EEGLAB dataset
 %   dataflag    - If 1, process the input data channels. 
-%                 If 0, process its ICA component activations.
+%                 If 0, process its component activations.
 %                   {Default: 1, process the data channels}.
 %   timerange   - [min_ms max_ms] Epoch time range to use in computing the spectra
 %                   {Default: whole input epochs}
@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/02/26 17:40:35  scott
+% header edits -sm
+%
 % Revision 1.33  2003/02/26 03:14:28  arno
 % graphic interface help
 %
