@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/06/28 15:44:43  arno
+% redrawing figure
+%
 % Revision 1.5  2004/06/16 22:00:20  arno
 % debug for integer
 %
@@ -74,7 +77,7 @@ else
 end;
 
 geometry = {[1] [1 1]};
-geomvert = [length(g.liststring)+1 1];
+geomvert = [min(length(g.liststring), 10) 1];
 if ~strcmp(g.selectionmode, 'multiple') | ...
     (iscell(g.liststring) & length(g.liststring) == 1) | ...
     (isstr (g.liststring) & size  (g.liststring,1) == 1)
