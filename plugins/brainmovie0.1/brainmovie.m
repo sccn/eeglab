@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/12/05 15:55:39  arno
+% debugging plotorder
+%
 % Revision 1.37  2002/12/04 22:51:31  arno
 % debugging plotorder
 %
@@ -692,7 +695,7 @@ end;
 % scan time windows
 % -----------------
 for indeximage = alltimepoints
-%indeximage = 123;
+    
 	fprintf('Processing image %d\n', indeximage);
 
 	% invert background if necessary
@@ -892,8 +895,8 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
         
     % if the two circle are too close and do not draw the line
     % --------------------------------------------------------
-    if ((pos1(1) - pos2(1)) < 0.05*(g.xlimaxes(2) - g.xlimaxes(1))) & ...
-        ((pos1(2) - pos2(2)) < 0.05*(g.ylimaxes(2) - g.ylimaxes(1))), return;
+    distance = abs(pos1(1)+j*pos1(2)-pos2(1)-i*pos2(2));
+    if distance < 0.05*(g.ylimaxes(2) - g.ylimaxes(1)), return;
     end;
     
 	crossfpowerabs = abs(crossfpower);
@@ -917,7 +920,8 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
 	%[ pos1(1) pos2(1) ] , [ pos1(2) pos2(2) ], tmpcolor, tmpthick, mod(curphase,1), 0
 	
 	if tmpthick > 0	
-		if circfact ~= 0
+         fprintf('(%d,%d)->(%d,%d) %3.2f: %3.2f %3.2f %3.2f\n', pos1(1), pos2(1), pos1(2), pos2(2), distance, crossfpower, crossfangle, circfact);
+        if circfact ~= 0
 			circpatch( [ pos1(1) pos2(1) ] , [ pos1(2) pos2(2) ], circfact, tmpcolor, g.resmult*tmpthick, 100, mod(curphase,1), 0);
 		else
 			superline( [ pos1(1) pos2(1) ] , [ pos1(2) pos2(2) ], tmpcolor, g.resmult*tmpthick, mod(curphase,1), 0);
