@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/23 19:21:24  arno
+% fixing division error
+%
 % Revision 1.9  2002/10/23 19:01:51  arno
 % nothing
 %
@@ -118,7 +121,7 @@ end
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
 % mesh_file  = [ICADIR '/newupper.mat']; % whole head model file (183K)
-mesh_file  = ['mhead.mat'];      % upper head model file (987K)
+mesh_file  = ['mhead'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
