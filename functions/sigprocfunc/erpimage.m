@@ -102,6 +102,11 @@
 %     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
 %    sortidx  = indices of sorted data epochs plotted
 %
+% Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
+%
+% Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title 'Test', 
+% sorted epochs not smoothed or decimated. Also plots the epoch-mean ERP, a color bar, 
+% and a dashed vertical line at -350 ms.
 
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme, 
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
@@ -135,6 +140,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2002/11/09 21:07:29  scott
+% reorganized help message optional argument list
+%
 % Revision 1.66  2002/10/15 17:52:00  scott
 % help msg - only two args required
 %
