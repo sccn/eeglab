@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/10/30 18:50:37  arno
+% debugging dipole
+%
 % Revision 1.16  2002/10/30 16:41:21  arno
 % adding the dipole option
 %
@@ -157,7 +160,7 @@
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function handle = topoplot(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function handle = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
@@ -316,10 +319,10 @@ if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
-if length(Vl) > 1 & length(Vl) ~= length(Th),
- fprintf('topoplot(): data vector length (%d) must be the same as chan_locs file rows (%d)\n',...
-               length(Vl),length(Th));
-end
+%if length(Vl) > 1 & length(Vl) ~= length(Th),
+% fprintf('topoplot(): data vector length (%d) must be the same as chan_locs file rows (%d)\n',...
+%               length(Vl),length(Th));
+%end
 
 if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
@@ -341,13 +344,18 @@ if ~isempty(Vl)
 		Vl = Vl(enum);
 	else
 		if strcmp(STYLE,'blank')
-			tmpind = find(enum == Vl);
-			if isempty(tmpind)
-				disp('Topoplot warning: channel out of head limits');
-				Vl = [];
-			else
-				Vl = tmpind;
-			end;
+            tmpVl=[];
+            cc=1;
+            for kk=1:length(Vl)
+                tmpind = find(enum == Vl(kk));
+                if isempty(tmpind)
+                    disp('Topoplot warning: channel out of head limits');
+                else
+                    tmpVl(cc) = tmpind;
+                    cc=cc+1;
+                end;
+            end
+            Vl=tmpVl;
 		end;
 	end;	
 end;
@@ -425,13 +433,16 @@ else % style 'blank'
     a = textsc('Channel locations', 'title');
     set(a, 'fontweight', 'bold');
   end;
-  
-  if length(Vl) == 1
-    if exist('EMARKERSIZE1CHAN') == 1
-      hp2 = plot(y(Vl),x(Vl),'.','Color', 'red', 'markersize', EMARKERSIZE1CHAN);
-    else
-      hp2 = plot(y(Vl),x(Vl),'.','Color', 'red', 'markersize', 40);
-    end;
+
+  if length(Vl) < length(enum)
+      for kk = 1:length(Vl)
+          if exist('EMARKERSIZE1CHAN') == 1
+              hp2 = plot(y(Vl(kk)),x(Vl(kk)),'.','Color', 'red', 'markersize', EMARKERSIZE1CHAN);
+          else
+              hp2 = plot(y(Vl(kk)),x(Vl(kk)),'.','Color', 'red', 'markersize', 40);
+              hold on
+          end;
+      end
   end;
 end
 
