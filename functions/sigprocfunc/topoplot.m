@@ -3,7 +3,7 @@
 %              using cointerpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
-%        >>  topoplot(datavector, chan_locs, 'Param1','Value1', ...)
+%        >>  [h zi] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
 %
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
@@ -22,7 +22,7 @@
 %                        Note that the chan_locs structure may have an optional
 %                        shrink field (same format as this parameter).
 %   'colormap'        -  any sized colormap
-%   'interplimits'    - 'electrodes' to furthest electrode 'head' to edge of
+%   'interplimits'    - 'electrodes' to furthest electrode; 'head' to edge of
 %                        head {default 'head'}
 %   'gridscale'       -  scaling grid size {default 67}
 %   'dipole'          -  [XI YI XE YE L S C] plot dipole on the top of the scalp
@@ -46,13 +46,19 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'headcolor'       - Color of head cartoon {default black}
 %   'verbose'         - ['on'|'off'] default is 'on'.
-%   'electrodes'      - 'on','off','labels','numbers','labelpoint','numpoint'
+%   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
+%   'noplot'          - ['on'|'off'] Do not plot (but return interpolated data).
+%   'gridscale'       - [int value >> 1] - interpoled data matrix size (rows) (default: 67)
 %   'efontsize'       - detail
 %   'electcolor'      - detail
 %   'emarker'         - detail
 %   'emarkersize'     - detail
 %   'emarkersize1chan' - detail
 %  
+% Outputs:
+%         h           - axes handle
+%         grid        - (67,67) interpolated data image (off-head points = NaN).
+%
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
 %    (Angle-0 =Cz-to-Fz; C3-angle =-90; Radius at edge of image = 0.5)
@@ -85,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/07/15 23:55:40  arno
+% retreiving version 1.28
+%
 % Revision 1.28  2003/06/27 18:53:04  arno
 % header msg
 %
@@ -194,9 +203,13 @@
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function handle = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
+noplot  = 'off';
+handle = [];
+Zi = [];
+
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
 INTERPLIMITS = 'head';  % head, electrodes
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
@@ -206,7 +219,7 @@ STYLE = 'both';       % both,straight,fill,contour,blank
 HCOLOR = [0 0 0];
 ECOLOR = [0 0 0];
 CONTCOLOR = [0 0 0];
-ELECTROD = 'on';      % ON OFF LABEL
+ELECTRODES = 'on';      % ON OFF LABEL
 EMARKER = '.';
 EMARKERSIZE = [];     % DEFAULTS SET IN CODE 
 EFSIZE = get(0,'DefaultAxesFontSize');
@@ -300,7 +313,22 @@ if nargs > 2
 	 case 'numcontour'
 	  CONTOURNUM = Value;
 	 case 'electrodes'
-	  ELECTROD = lower(Value);
+	  ELECTRODES = lower(Value);
+         if strcmpi(ELECTRODES,'pointlabels')
+             ELECTRODES = 'labelpoint'; % backwards compatability
+         end
+         if strcmpi(ELECTRODES,'pointnumbers')
+             ELECTRODES = 'numpoint'; % backwards compatability
+         end
+         if ~strcmpi(ELECTRODES,'labelpoint') ...
+            & ~strcmpi(ELECTRODES,'numpoint') ...
+            & ~strcmp(ELECTRODES,'on') ...
+            & ~strcmp(ELECTRODES,'off') ...
+            & ~strcmp(ELECTRODES,'labels') ...
+            & ~strcmpi(ELECTRODES,'numbers') 
+		 	   fprintf('topoplot(): Unknown value for keyword ''electrodes''.\n');
+            return
+         end
 	 case 'dipole'
 	  DIPOLE = Value;
 	 case 'emarker'
@@ -322,6 +350,14 @@ if nargs > 2
 	  if ~any(strcmp(SHADING,{'flat','interp'}))
 		  error('Invalid shading parameter')
 	  end
+     case 'noplot'
+      noplot = Value;
+     case 'gridscale'
+      GRID_SCALE = Value;
+      if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
+           fprintf('topoplot(): ''gridscale'' value must be integer > 4.\n');
+           return
+      end
 	 otherwise
 	  error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
     end
@@ -375,13 +411,13 @@ if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
 		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
 		if strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radius shrunk by %2.3g to show all\n', squeeze);
+            fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g to show all\n', squeeze);
         end;
 		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
 	end;	
 else 
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): electrode radius shrinked by %2.3g\n', shrinkfactor);
+        fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g\n', shrinkfactor);
 	end;
     Rd = Rd-shrinkfactor*Rd; % squeeze electrodes in squeeze*100% to have all inside
 end;
@@ -423,10 +459,6 @@ labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
 
-ha = gca;
-cla
-hold on
-
 if ~strcmp(STYLE,'blank')
   % find limits for interpolation
   if strcmp(INTERPLIMITS,'head')
@@ -440,6 +472,7 @@ if ~strcmp(STYLE,'blank')
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
   
+  fprintf('running griddata()...\n');
   [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
   
   % Take data within head
@@ -447,6 +480,11 @@ if ~strcmp(STYLE,'blank')
   ii = find(mask == 0);
   Zi(ii) = NaN;
   
+   if strcmpi(noplot, 'on') 
+       fprintf('topoplot(): no plot requested.\n')
+       return;
+   end
+
   % calculate colormap limits
   m = size(colormap,1);
   if isstr(MAPLIMITS)
@@ -456,6 +494,9 @@ if ~strcmp(STYLE,'blank')
     elseif strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
       amin = min(min(Zi));
       amax = max(max(Zi));
+    else
+      fprintf('topoplot(): unknown ''maplimits'' value.\n');
+      return
     end
   else
     amin = MAPLIMITS(1);
@@ -464,6 +505,9 @@ if ~strcmp(STYLE,'blank')
   delta = xi(2)-xi(1); % length of grid entry
   
   % Draw topoplot on head
+   cla
+   hold on
+
   if strcmp(STYLE,'contour')
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
   elseif strcmp(STYLE,'both')
@@ -481,12 +525,22 @@ if ~strcmp(STYLE,'blank')
   caxis([amin amax]) % set coloraxis
 
 else % style 'blank'
-  if strcmp(ELECTROD,'labelpoint') |  strcmp(ELECTROD,'numpoint')
+   if strcmpi(noplot, 'on') 
+       fprintf('topoplot(): no plot requested.\n')
+       return;
+   end
+
+   cla
+   hold on
+   set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+
+  if strcmp(ELECTRODES,'labelpoint') |  strcmp(ELECTRODES,'numpoint')
     text(-0.6,-0.6, ...
     [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']);
     text(-0.6,-0.65, ...
     [ 'Click on electrodes to toggle name/number']);
-    a = textsc('Channel locations', 'title');
+    % a = textsc('Channel locations', 'title');
+    a = title('Channel locations');
     set(a, 'fontweight', 'bold');
   end;
 
@@ -502,9 +556,9 @@ else % style 'blank'
   end;
 end
 
-set(ha,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+handle = gca;
 
-% %%% Draw Head %%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%% Draw Head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 l = 0:2*pi/100:2*pi;
 basex = .18*rmax;  
 tip = rmax*1.15; base = rmax-.004;
@@ -512,7 +566,7 @@ EarX = [.497 .510 .518 .5299 .5419 .54 .547 .532 .510 .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 % Plot Electrodes
-if strcmp(ELECTROD,'on') 
+if strcmp(ELECTRODES,'on') 
   if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -526,13 +580,13 @@ if strcmp(ELECTROD,'on')
    end
   end
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
-elseif strcmp(ELECTROD,'labels')
+elseif strcmp(ELECTRODES,'labels')
   for i = 1:size(labels,1)
     text(y(i),x(i),labels(i,:),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
-elseif strcmp(ELECTROD,'labelpoint')
+elseif strcmp(ELECTRODES,'labelpoint')
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -554,7 +608,7 @@ elseif strcmp(ELECTROD,'labelpoint')
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
-elseif strcmp(ELECTROD,'numpoint')
+elseif strcmp(ELECTRODES,'numpoint')
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -576,7 +630,7 @@ elseif strcmp(ELECTROD,'numpoint')
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
-elseif strcmp(ELECTROD,'numbers')
+elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
     text(y(i),x(i),int2str(enum(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
@@ -621,3 +675,4 @@ hold off
 axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+
