@@ -106,6 +106,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2004/03/22 17:57:21  scott
+% added arg 'intrad' - separated interpolation and plotting areas
+% Now, by default, interpolates over all the (radius<=1) electrodes.
+% Added 'intsquare' option - interpolated values in electrodes in the entire
+% interpolation square, not just the (plotting) disk. Can give more accurate
+% interpolation at edges of the plotting disk i.e. interpolation instead of
+% extrapolation), if there are additional channel locations beyond the plotting area
+%
 % Revision 1.169  2004/03/22 03:25:41  scott
 % re-implmenting shrink options
 %
@@ -701,7 +709,9 @@ if isstr(loc_file)
 	[tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
 else % a locs struct
 	[tmpeloc labels Th Rd indices] = readlocs(loc_file);
+        % Note: Th and Rd correspond to indices channels-with-coordinates only
 end
+
 if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
     tmpeloc(end) = [];
@@ -724,8 +734,8 @@ if length(Values) > 1
       Values     = Values(indices);
    end
 end;
-labels = labels(indices);
-labels = strvcat(labels);
+labels = labels(indices); % remove labels for electrodes without locations
+labels = strvcat(labels); % make a label string matrix
 
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -837,7 +847,7 @@ else
 end
 
 if length(pltchans) < length(Rd) & strcmpi(VERBOSE, 'on')
-        fprintf('Interpolating %d and plotting %d of the %d electrodes.\n', ...
+        fprintf('Interpolating %d and plotting %d of the %d scalp electrodes.\n', ...
                    length(intchans),length(pltchans),length(Rd));    
 end;	
 %
