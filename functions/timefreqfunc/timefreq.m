@@ -36,8 +36,11 @@
 %                   if cycles >0: *longest* window length to use. This
 %                   determines the lowest output frequency  {~frames/8}
 %      'timesout' = Number of output times (int<frames-winsize). Enter a 
-%                   negative value [-S] to subsample original time by S. 
-%                   {def: 200}
+%                   negative value [-S] to subsample original time by S.
+%                   Enter an array to obtain spectral decomposition at 
+%                   specific time values (note: algorithm find closest time 
+%                   point in data and this might result in an unevenly spaced
+%                   time array. {def: 200}
 %      'freqs'    = [min max] frequency limits. Default [minfreq srate/2], 
 %                   minfreq being determined by the number of data points, 
 %                   cycles and sampling frequency. Enter a single value
@@ -95,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/06/19 00:24:01  arno
+% adding error message if negative number of time points
+%
 % Revision 1.24  2003/05/29 15:14:30  arno
 % allowing vector for timesout
 %
