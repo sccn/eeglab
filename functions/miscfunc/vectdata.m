@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/21 14:53:04  arno
+% Initial revision
+%
 
 function [interparray, timesout] = vectdata( array, timevect, varargin );
 
@@ -68,16 +71,18 @@ if size(array,2) == 1
 end;
 
 if ~isempty(g.average)
-    if any( (timevect(2:end) -timevect(1:end-1)) - mean(timevect)) % not uniform values
+    timediff = timevect(2:end) -timevect(1:end-1);
+    if any( timediff - mean(timediff)) % not uniform values
         fprintf('Data has to be interpolated uniformly for moving average\n');
-        minspace = min(timevect(2:end) -timevect(1:end-1));
+        minspace = min(timediff);
         newtimevect = linspace(timevect(1), timevect(end), ceil((timevect(end)-timevect(1))/minspace)); 
         array = interpolate( array, timevect, newtimevect, g.method);
         timevect = newtimevect;
     end;
     g.average = round(g.average/(timevect(2)-timevect(1)));
     fprintf('Moving average updated to %d\n', g.average);
-    array = convolve(array, ones(1, g.average));
+    %array = convolve(array, ones(1, g.average));
+    array = conv2(array, ones(1, g.average)/g.average, 'same');
 end;
 
 interparray = interpolate( array, timevect, g.timesout, g.method);
