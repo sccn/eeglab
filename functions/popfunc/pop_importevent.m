@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/11/07 02:14:26  arno
+% more detailed message
+%
 % Revision 1.23  2003/11/07 02:10:56  arno
 % remove events with no latencies
 %
