@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/13 17:40:41  arno
+% same
+%
 % Revision 1.18  2002/08/13 17:38:13  arno
 % ordinate adjustment
 %
@@ -215,10 +218,10 @@ for row = 1:length(geomx)
 		if ~isempty(currentelem)
 			rowhandle(column) = uicontrol( 'unit', 'normalized', 'position', ...
 						                      [posx posy width height].*s+q, currentelem{:});
-			
+						
 			% this simply compute a factor so that all uicontrol will be visible
 			% ------------------------------------------------------------------
-			style = get(rowhandle(column), 'style');
+			style = get( rowhandle(column), 'style');			
 			set( rowhandle(column), 'units', 'pixels');			
 			curpos = get(rowhandle(column), 'position');
 			curext = get(rowhandle(column), 'extent');
@@ -228,6 +231,7 @@ for row = 1:length(geomx)
 			if ~strcmp(style, 'pushbutton')
 				factmulty = max(factmulty, curext(4)/curpos(4));
 			end;
+			fprintf('%d/%d\n', curext(4), curpos(4));
 			set( rowhandle(column), 'units', 'normalized');			
         else 
 			rowhandle(column) = 0;
@@ -254,6 +258,19 @@ pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = pos(3)*factmultx;
 pos(4) = pos(4)*factmulty;
 set(gcf, 'position', pos);
+
+
+% vertical alignment to bottom for text
+% ---------------------------------------
+for index = 1:length(allhandlers)
+	if allhandlers(index) ~= 0
+		if strcmp(get(allhandlers(index), 'style'), 'text')
+			curpos = get(allhandlers(index), 'position');
+			curext = get(allhandlers(index), 'extent');
+			set(allhandlers(index), 'position',[curpos(1) curpos(2) curpos(3) curext(4)]);
+		end;
+	end;
+end;
 
 % setting defaults colors
 %------------------------
