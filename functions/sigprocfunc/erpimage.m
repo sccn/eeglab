@@ -59,7 +59,10 @@
 %                smoothing. Use 'cycles' (below) for wavelet length. 
 %                {Default: [0 25 8 13 180]}
 %  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. 
-%                See 'phasesort'.
+%                See 'phasesort'. Note: If ms_center is 'Inf', then sorting
+%                is by mean power across the time window specified by 'winsort' below.
+%  'sortwin' - [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
+%                by mean amplitude across window centers shifted from start_ms to end_ms by 10 ms.
 %  'showwin' - Show sorting window behind ERP trace. {default: don't show sorting window}
 %
 % Plot time-varying spectral amplitude instead of potential:
@@ -97,8 +100,8 @@
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
-%   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
 %   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
+%   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
 %   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
 %               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
@@ -162,6 +165,11 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.218  2004/08/30 18:32:06  scott
+% added figure(curfig) before plotting functions to keep
+% version 7.0.0 from reverting plotting to the EEGLAB menu window
+% when plotting from the gui (only).  -sm
+%
 % Revision 1.217  2004/08/30 17:08:49  scott
 % debug last
 %
@@ -913,6 +921,7 @@ Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
 Phaseflag = NO;     % don't sort by phase
 Ampflag   = NO;     % don't sort by amplitude
+Sortwinflag = NO;   % sort by amplitude over a window
 Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
@@ -1224,7 +1233,7 @@ if nargin > 6
             phargs = Arg;
 		  
             if phargs(3) < 0
-              error('erpimage(): Invalid negative argument for keyword ''phasesort''');
+              error('erpimage(): Invalid negative frequency argument for keyword ''phasesort''');
             end
             if n>=4
 			  if phargs(4) < 0
@@ -1244,6 +1253,24 @@ if nargin > 6
 			  topphase = phargs(5);
             end
             Phaseflag = NO;
+	  elseif Sortwinflag == YES % 'ampsort' mean amplitude over a time window
+          n = length(Arg);
+          sortwinarg = Arg;
+          if n > 2
+			  error('erpimage(): Too many arguments for keyword ''sortwin''');
+          end
+          if min(sortwinarg(1)) < times(1) | max(sortwinarg(1)) > times(end)
+			  		error('erpimage(): start time for value sorting out of bounds.');
+          end
+          if n > 1
+           if min(sortwinarg(2)) < times(1) | max(sortwinarg(2)) > times(end)
+			  		error('erpimage(): end time for value sorting out of bounds.');
+           end
+          end
+          if n > 1 & sortwinarg(1) > sortwinarg(2)
+			  		error('erpimage(): Value sorting time range must be increasing.');
+          end
+          Sortwinflag = NO;
 	  elseif Ampflag == YES % 'ampsort',[center_time,prcnt_reject,minfreq,maxfreq]
           n = length(Arg);
           if n > 4
@@ -1260,15 +1287,17 @@ if nargin > 6
 			  		end
           end
           
-          if min(ampargs(1)) < times(1) | max(ampargs(1)) > times(end)
+          if ~isinf(ampargs(1))
+             if min(ampargs(1)) < times(1) | max(ampargs(1)) > times(end)
 			  		error('erpimage(): time for amplitude sorting filter out of bounds.');
+             end
           end
 
           if ampargs(2) >= 100 | ampargs(2) < -100
-			  		error('%-argument for keyword ''ampsort'' must be (-100;100)');
+			  		error('percentile argument for keyword ''ampsort'' must be (-100;100)');
           end
           
-          if length(ampargs) == 4 & ampargs(3) > ampargs(4)
+          if length(ampargs) == 4 & abs(ampargs(3)) > abs(ampargs(4))
 			  		error('erpimage(): Amplitude sorting frequency range must be increasing.');
           end
           Ampflag = NO;
@@ -1344,6 +1373,8 @@ if nargin > 6
 		  Phaseflag = YES;
 	  elseif strcmp(Arg,'ampsort') 
 		  Ampflag = YES;
+	  elseif strcmp(Arg,'sortwin') 
+		  Sortwinflag = YES;
 	  elseif strcmp(Arg,'valsort')
 		  Valflag = YES;
 	  elseif strcmp(Arg,'auxvar')
@@ -1438,18 +1469,18 @@ if exist('phargs')
 	end
 end
 if exist('ampargs')
-	if ampargs(3) > srate/2
+	if abs(ampargs(3)) > srate/2
     	  fprintf(...
            'erpimage(): amplitude-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
-              ampargs(3),srate/2);
+              abs(ampargs(3)),srate/2);
 	end
-    %DEFAULT_CYCLES = 9*ampargs(3)/(ampargs(3)+10); % 3 cycles at 5 Hz
-	if frames < DEFAULT_CYCLES*srate/ampargs(3)
+    % DEFAULT_CYCLES = 9*abs(ampargs(3))/(abs(ampargs(3))+10); % 3 cycles at 5 Hz
+	if frames < DEFAULT_CYCLES*srate/abs(ampargs(3))
 		fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
-				ampargs(3),DEFAULT_CYCLES);
+				abs(ampargs(3)),DEFAULT_CYCLES);
 		return
 	end
-	if length(ampargs)==4 & ampargs(4) > srate/2
+	if length(ampargs)==4 & abs(ampargs(4)) > srate/2
 		ampargs(4) = srate/2;
   fprintf('> Reducing max ''ampsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
 	end
@@ -1611,7 +1642,7 @@ end;
 %
 if exist('phargs') == 1 % if phase-sort
 	if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency in specified band
-        if exist('psd') == 2
+        if exist('psd') == 2 % requires Singla Processing Toolbox
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
         else
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
@@ -1628,14 +1659,14 @@ if exist('phargs') == 1 % if phase-sort
 	else
 		freq = phargs(3); % else use specified frequency
 	end
-	
-	[dummy minx] = min(abs(times-phargs(1)));
-	winlen = floor(DEFAULT_CYCLES*srate/freq);
-	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
-        tmprange = find(winloc>0 & winloc<=frames);
-        winloc = winloc(tmprange); % sorting window times
-    
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+        
+       phwin = phargs(1);
+       [dummy minx] = min(abs(times-phwin)); % closest time to requested
+       winlen = floor(DEFAULT_CYCLES*srate/freq);
+       winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
+       tmprange = find(winloc>0 & winloc<=frames);
+       winloc = winloc(tmprange); % sorting window times
+       [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
     if length(tmprange) ~=  winlen+1
         filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
@@ -1703,55 +1734,62 @@ if exist('phargs') == 1 % if phase-sort
 %
 elseif exist('ampargs') == 1 % if amplitude-sort
 	if length(ampargs) == 4 % find max frequency in specified band
-        if exist('psd') == 2
+          if exist('psd') == 2
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
-        else
+          else
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
-        end;
-		
-		pxx = 10*log10(pxx);
-		n = find(freqs >= ampargs(3) & freqs <= ampargs(4));
-		if ~length(n)
-			freq = ampargs(3);
-		end
-		[dummy maxx] = max(pxx(n));
-		freq = freqs(n(maxx));
+          end;
+	  pxx = 10*log10(pxx);
+	  n = find(freqs >= ampargs(3) & freqs <= ampargs(4));
+	  if ~length(n)
+		  freq = ampargs(3);
+	  end
+	  [dummy maxx] = max(pxx(n));
+	  freq = freqs(n(maxx));
 	else
-		freq = ampargs(3); % else use specified frequency
+	  freq = ampargs(3); % else use specified frequency
 	end
 	
-	[dummy minx] = min(abs(times-ampargs(1)));
-	winlen = floor(DEFAULT_CYCLES*srate/freq);
-	%winloc = minx-[winlen:-1:0]; % ending time version
-	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
-        tmprange = find(winloc>0 & winloc<=frames);
-        winloc = winloc(tmprange); % sorting window frames
-    
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
-	
-    if length(tmprange) ~=  winlen+1
-        filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
-        timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
-        phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq;
-        fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
-        fprintf(...
+        SPECTWININCR = 10;	% make spectral sorting time windows increment by 10 ms
+        if isinf(ampargs(1))
+            ampwins = sortwinarg(1):SPECWININCR:sortwinarg(2);
+        else
+            ampwins = ampargs(1);
+        end
+        phsamps = 0;
+        for ampwin = ampwins
+	   [dummy minx] = min(abs(times-ampwin)); % find nearest time point to requested
+	   winlen = floor(DEFAULT_CYCLES*srate/freq);
+	   %winloc = minx-[winlen:-1:0]; % ending time version
+	   winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
+           tmprange = find(winloc>0 & winloc<=frames);
+           winloc = winloc(tmprange); % sorting window frames
+	   [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+           phsamps = phsamps+phsamp;  % accumulate amplitudes across 'sortwin'
+	end
+     	if length(tmprange) ~=  winlen+1 % ????????? -sm 9/1/04
+       	 	filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
+        	timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
+        	phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq;
+        	fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
+        	fprintf(...
 '    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
-                filtersize, 1000/freq*filtersize, timecenter);
-        fprintf(...
+                	filtersize, 1000/freq*filtersize, timecenter);
+        	fprintf(...
 '    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
-           length(winloc), ampargs(1));
-    else
-        fprintf(...
+           		length(winloc), ampargs(1));
+    	else
+        	fprintf(...
 'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
-        fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
-    end;
+        	fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
+    	end;
 
 	%
 	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
 	ampargs(2) = ampargs(2)/100; % convert rejection rate from % to fraction
-	[tmp n] = sort(phsamp); % sort amplitudes
+	[tmp n] = sort(phsamps); % sort amplitudes
 	if ampargs(2)>=0
 	   n = n(ceil(ampargs(2)*length(n))+1:end); % if rej 0, select all trials
 	   fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
@@ -1767,7 +1805,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	% Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
 	data = data(:,n); % amp-sort the data, removing rejected-amp trials
-	phsamp = phsamp(n);           % amp-sort the amps
+	phsamps = phsamps(n);           % amp-sort the amps
 	phaseangles = phaseangles(n); % amp-sort the phaseangles
 	sortvar = sortvar(n);         % amp-sort the trial indices
 	ntrials = length(n);          % number of trials retained
@@ -1777,7 +1815,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	%
 	% Sort remaining data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	[phsamp sortidx] = sort(phsamp); % sort trials on amplitude
+	[phsamps sortidx] = sort(phsamps); % sort trials on amplitude
 	data    =  data(:,sortidx);                % sort data by amp
 	phaseangles  =  phaseangles(sortidx);      % sort angles by amp
 	sortvar = sortvar(sortidx);                % sort input sortvar by amp
