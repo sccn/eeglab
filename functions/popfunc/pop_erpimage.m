@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.119  2004/05/15 00:30:12  arno
+% putting back microvolt
+%
 % Revision 1.118  2004/03/02 21:55:00  arno
 % recover version 1.114
 %
@@ -648,10 +651,10 @@ if popup
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
     options = '';
-	if ~typeplot
+	if ~typeplot & isempty(projchan)
 		options = [options ',''yerplabel'',''''' ];
     else
-   		options = [options ',''yerplabel'',''\muV''' ];     
+   		options = [options ',''yerplabel'',''\muV''' ];
 	end;
 	if isempty(titleplot)
         if typeplot==1
