@@ -1,32 +1,28 @@
-% pop_topoplot() - plot head of subjects with a pop-up window if only
-%                  two arguments.
+% pop_topoplot() - Plot scalp map(s) in a figure window. If number of 
+%                  arguments is 2, Pop-up an interactive query window.
 %
 % Usage:
 %   >> pop_topoplot( EEG, typeplot, latencies, title, options...);
 %
 % Inputs:
-%   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component (default:1)
-%   latencies/components  - for EEG: array of latencies (in millisecond)
-%                at which the head should be plotted.  
-%                For components: array of index of components to plot. If
-%                negative indices are entered, the function will plot the
-%                components corresponding to the absolute value of these
-%                indices and inverse the polarity of the plot. To leave blank 
-%                subplot, enter nan in this vector. For components [1 nan -3 4]
-%                plots component 1, blank, 3 in reverse polarity and 4.
+%   EEG        - Input dataset (see eeglab())
+%   typeplot   - 1=channels, 0=components {Default:1}
+%   items      - [array] If channels, epoch latencies (in ms) 
+%                to plot scalp maps. If components, component indices 
+%                to plot. Negative indices -> invert map polarity. 
+%                NaN -> leave a blank subplot. (Ex: [1 -3 NaN 4])
 %   title      - plot title.
-%   rowscols   - Vector of the form [m,n] where m is total vertical tiles and n 
-%                is horizontal tiles per page. If the number of maps exceeds m*n,
-%                multiple figures will be produced {def|0 -> one near-square page}.
-%   options    - TOPOPLOT options. Default is none. Separate the options
-%                using comma. Example 'style', 'straight'. See TOPOPLOT  
-%                help for further details. Default is no options. 
+%   rowscols   - Vector of the form [m,n] giving [rows, cols] per page.
+%                If the number of maps exceeds m*n, multiple figures 
+%                are produced {Default|0 -> one near-square page}.
+%   options    - topoplot() argument options. Separate using commas. 
+%                Example 'style', 'straight'. See topoplot() help 
+%                for further details. {Default: none}. 
 %
 % Note:
-%   A new figure is created only when the pop_up window is called or when
-%   several channel/components are plotted, so you may call this command 
-%   to draw topographic maps in a tiled window.     
+%   A new figure is created automatically only when the pop_up window is 
+$   called or when more than one page of maps are plotted. Thus, this 
+%   command may be used to draw topographic maps in a figure sub-axis.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -51,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/13 17:49:37  arno
+% debug color
+%
 % Revision 1.5  2002/08/12 16:31:20  arno
 % inputdlg2
 %
