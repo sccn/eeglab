@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.33  2003/06/12 23:49:56  arno
+%dipplot normalization
+%
 %Revision 1.32  2003/06/10 19:04:11  arno
 %nothing
 %
@@ -246,6 +249,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % axis image and limits
     % ---------------------
+    TCPARAMS  = []; % transform coordinate parameters
     if strcmpi(g.image, 'besa')
         IMAGESLOC   = { { 'besatop.pcx' } { 'besarear.pcx' } { 'besaside.pcx' } };
         IMAGESAXIS  = { -1  1 -1 };
@@ -272,16 +276,24 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         BACKCOLOR = 'k';
         AXISLIM   = [-1.25 1.25 -1.1 1.1 -1.2 1.2];
     else 
-       [IMAGESLOC IMAGESAXIS] = getmriimgs;
-       addpath('/data/common/matlab/MRIimages');
-       IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0 0.17] } ;% [ -0.12 0] };
-       IMAGESMULT   = { 1.2 1.2 1.2 } ;%[ 1.4 1.15 ] };
-       %IMAGESOFFSET = { [0 0  NaN]   [0 NaN 0]  [NaN 0 0] } ;% [ -0.12 0] };
-       %IMAGESMULT   = { [1 1  NaN]   [1 NaN 1]  [NaN 1 1]} ;%[ 1.4 1.15 ] };
+       IMAGESLOC = load('/home/arno/matlab/MNI/VolumeMNI.mat');
+       IMAGESLOC = IMAGESLOC.V; V = IMAGESLOC;
+       coordinc = 2; % 2 mm
+       allcoords1 = [0:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
+       allcoords2 = [0:coordinc:size(V,2)*coordinc]-size(V,2)/2*coordinc;
+       allcoords3 = [0:coordinc:size(V,3)*coordinc]-size(V,3)/2*coordinc;
+       IMAGESAXIS  = { allcoords3/84.747 allcoords2/84.747 allcoords1/84.747 };
+       %               transverse(horiz)    sagital(side)    coronal(rear)
+       IMAGESOFFSET = { []   []  [] };
+       IMAGESMULT   = { };
        COLORMESH = 'w';
        BACKCOLOR = 'k';
        %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
        AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
+       TCPARAMS  = AXISLIM; % transform coordinate parameters
+       
+       %plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [57 85 65]);
+       %view(30, 45); axis equal; return;
     end;
 
     % conversion
@@ -410,7 +422,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmp(g.gui, 'on')
         figure;
     end;
-	 plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [1 1 1]);
+    plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [1 1 1]);
     set(gca, 'color', BACKCOLOR);
     %warning off; a = imread('besaside.pcx'); warning on;
     % BECAUSE OF A BUG IN THE WARP FUNCTION, THIS DOES NOT WORK (11/02)
@@ -419,17 +431,26 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
          view(g.view);
     else view(DEFAULTVIEW);
     end;
-    axis square;
-    axis(AXISLIM);
-    axis off;
     
+    % format axis (BESA or MRI)
+    if isempty( TCPARAMS )
+        axis square;
+        axis(AXISLIM);
+    else
+        axis equal;
+        set(gca, 'cameraviewanglemode', 'manual'); % disable change size
+        camzoom(1.2^3);
+    end;
+    axis off;
+        
     % plot sphere mesh and nose
     % -------------------------
     [x y z] = sphere(10);
     x = x*100*scaling; y = y*100*scaling; z=z*100*scaling;
     hold on; 
-    h = line(x,y,z); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
-    h = line(x,z,y); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
+    [xx yy zz] = transformcoords(x, y, z, TCPARAMS); 
+    h = line(xx,yy,zz); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
+    h = line(xx,zz,yy); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
     %h = line([0 0;0 0],[-1 -1.2; -1.2 -1], [-0.3 -0.7; -0.7 -0.7]);
     %set(h, 'color', COLORMESH, 'linewidth', 3, 'tag', 'noze');
     
@@ -480,15 +501,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tag = [ 'dipole' num2str(index) ];
-            h = line( [x xo]', [y yo]', [z zo]');
-            dipstruct.pos3d = [x y z];
+            [xx  yy  zz]  = transformcoords(x,  y,  z, TCPARAMS); 
+            [xxo yyo zzo] = transformcoords(xo, yo, zo, TCPARAMS); 
+            h = line( [xx xxo]', [yy yyo]', [zz zzo]');
+            dipstruct.pos3d = [xx yy zz];
             dipstruct.rv    = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
             set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', g.color{index}); end;
             
             % draw point
             hold on;
-            h = plot3(x,  y,  z); 
+            h = plot3(xx,  yy,  zz); 
             set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
             
@@ -511,33 +534,33 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [x xo]', [y yo]', [-1 -1]');
+                    h = line( [xx xxo]', [yy yyo]', [-1 -1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(x,  y,  -1); 
+                h = plot3(xxo,  yyo,  -1); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [x xo]', [1 1]', [z zo]');
+                    h = line( [xx xxo]', [1 1]', [zz zzo]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(x,  1,  z); 
+                h = plot3(xx,  1,  zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [-1 -1]', [y yo]', [z zo]');
+                    h = line( [-1 -1]', [yy yyo]', [zz zzo]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(-1,  y,  z); 
+                h = plot3(-1,  yy,  zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
@@ -546,7 +569,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             if isfield(sources, 'component')
                 if strcmp(g.num, 'on')
-                    h = text(x,  y,  z, [ '  ' int2str(sources(index).component)]);
+                    h = text(xx,  yy,  zz, [ '  ' int2str(sources(index).component)]);
                     set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize/2 );
                 end;
             end;
@@ -558,7 +581,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if ~isempty(g.std)
         for index = 1:length(g.std)
             if ~iscell(g.std{index})
-                plotellipse(sources, g.std{index}, 1);
+                plotellipse(sources, g.std{index}, 1, TCPARAMS);
             else
                 sc = plotellipse(sources, g.std{index}{1}, g.std{index}{2});
                 if length( g.std{index} ) > 2
@@ -658,48 +681,57 @@ return;
     % 2D projection DEPRECATED
     % -------------
     % internal constants
-    scaling = 0.89;
-    ori = 90;
-    radiusoriinit = 35;
+% $$$     scaling = 0.89;
+% $$$     ori = 90;
+% $$$     radiusoriinit = 35;
+% $$$ 
+% $$$     figure; 
+% $$$     warning off; a = imread(IMAGESLOC{1}); warning on;
+% $$$     imagesc(a);
+% $$$     colormap('gray');
+% $$$     axis image;
+% $$$     
+% $$$     % plot projected coordinates
+% $$$     tmpxlim = get(gca, 'xlim'); centerx = tmpxlim(2)/2+0.2;
+% $$$     tmpylim = get(gca, 'ylim'); centery = tmpylim(2)/2+6;
+% $$$     realradius = sin(source.sph_phi/180*pi)*source.sph_radius;
+% $$$     absloc = centerx - cos((source.sph_theta+ori)/180*pi)*realradius*scaling;
+% $$$     ordloc = centery - sin((source.sph_theta+ori)/180*pi)*realradius*scaling;
+% $$$     absmax = centerx - cos((source.sph_theta+ori)/180*pi)*100*scaling;
+% $$$     ordmax = centery - sin((source.sph_theta+ori)/180*pi)*100*scaling;
+% $$$     circle(centerx, centery, 4, 'r', 'r');
+% $$$     circle(absloc, ordloc, 4, 'k', 'k');
+% $$$     circle(absmax, ordmax, 4, 'k', 'k');
+% $$$ 
+% $$$     radiusori = sin(source.sph_phiori/180*pi)*radiusoriinit;
+% $$$     absori = absloc - cos((source.sph_thetaori+ori)/180*pi)*radiusori*scaling;
+% $$$     ordori = ordloc - sin((source.sph_thetaori+ori)/180*pi)*radiusori*scaling;
+% $$$     h = line( [absloc absori]', [ordloc ordori]');
+% $$$     set(h, 'color', 'k', 'linewidth', 4);
 
-    figure; 
-    warning off; a = imread(IMAGESLOC{1}); warning on;
-    imagesc(a);
-    colormap('gray');
-    axis image;
+% $$$ function h = myezplot3(strX, strY, strZ, range);
+% $$$     figure; h = ezplot3(strX, strY, strZ, range);
+% $$$     xdata = get(h, 'xdata');
+% $$$     ydata = get(h, 'ydata');
+% $$$     zdata = get(h, 'zdata');
+% $$$     close;
+% $$$     h = plot3(xdata, ydata, zdata);
+
+function [x,y,z] = transformcoords(x, y, z, TCPARAMS);
+    if ~isempty(TCPARAMS)
+        x = x*TCPARAMS(4);
+        y = y*TCPARAMS(2);
+        z = z*TCPARAMS(6);
+    end;
+    return;
     
-    % plot projected coordinates
-    tmpxlim = get(gca, 'xlim'); centerx = tmpxlim(2)/2+0.2;
-    tmpylim = get(gca, 'ylim'); centery = tmpylim(2)/2+6;
-    realradius = sin(source.sph_phi/180*pi)*source.sph_radius;
-    absloc = centerx - cos((source.sph_theta+ori)/180*pi)*realradius*scaling;
-    ordloc = centery - sin((source.sph_theta+ori)/180*pi)*realradius*scaling;
-    absmax = centerx - cos((source.sph_theta+ori)/180*pi)*100*scaling;
-    ordmax = centery - sin((source.sph_theta+ori)/180*pi)*100*scaling;
-    circle(centerx, centery, 4, 'r', 'r');
-    circle(absloc, ordloc, 4, 'k', 'k');
-    circle(absmax, ordmax, 4, 'k', 'k');
-
-    radiusori = sin(source.sph_phiori/180*pi)*radiusoriinit;
-    absori = absloc - cos((source.sph_thetaori+ori)/180*pi)*radiusori*scaling;
-    ordori = ordloc - sin((source.sph_thetaori+ori)/180*pi)*radiusori*scaling;
-    h = line( [absloc absori]', [ordloc ordori]');
-    set(h, 'color', 'k', 'linewidth', 4);
-
-function h = myezplot3(strX, strY, strZ, range);
-    figure; h = ezplot3(strX, strY, strZ, range);
-    xdata = get(h, 'xdata');
-    ydata = get(h, 'ydata');
-    zdata = get(h, 'zdata');
-    close;
-    h = plot3(xdata, ydata, zdata);
-
-function sc = plotellipse(sources, ind, nstd);
+function sc = plotellipse(sources, ind, nstd, TCPARAMS);
 
     for i = 1:length(ind)
         tmpval(1,i) = -sources(ind(i)).posxyz(1);    
         tmpval(2,i) = -sources(ind(i)).posxyz(2);    
-        tmpval(3,i) = sources(ind(i)).posxyz(3);    
+        tmpval(3,i) = sources(ind(i)).posxyz(3);
+        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = transformcoords(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
     end;
     
     % mean and covariance
@@ -819,12 +851,10 @@ function updatedipplot(fig, nbsources)
    if length(imginfos{1}) > 1 % several images
       delete(findobj('parent', gca, 'tag', 'img'));
       
-      tmp = userdat.pos3d(1)
-      indx = minpos(imgaxis{1} - userdat.pos3d(3) + 8/84.747);
+      indx = minpos(imgaxis{1} - userdat.pos3d(3) + 4/84.747);
       indy = minpos(imgaxis{2} - userdat.pos3d(2) - 4/84.747);
       indz = minpos(imgaxis{3} - userdat.pos3d(1) + 4/84.747);
-      tmp = userdat.pos3d*84.747
-      [ imgaxis{3}(indx) imgaxis{2}(indy) imgaxis{1}(indz)]*84.747
+      %[ imgaxis{3}(indx) imgaxis{2}(indy) imgaxis{1}(indz)]*84.747
       plotimgs( imglocs, imgoffset, imgmult, imgaxis, axislim, [indx indy indz]);
    end;
    	
@@ -833,13 +863,21 @@ function updatedipplot(fig, nbsources)
 function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, index);
    
     %try,
-        fprintf('Reading img: %s\n', IMAGESLOC{1}{index(1)} );
-        warning off;  a = double(imread(IMAGESLOC{1}{index(1)}))/255; warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        aspect_ratio   = size(a,1)/size(a,2);
-        wx = ([-1 1; -1 1])*IMAGESMULT{1}*AXISLIM(2)+IMAGESOFFSET{1}(1);
-        wy = ([-1 -1; 1 1])*IMAGESMULT{1}*AXISLIM(4)*aspect_ratio+IMAGESOFFSET{1}(2);
-        wz = [ 1 1; 1 1]*IMAGESAXIS{1}(index(1))*1.07;
+        if iscell(IMAGESLOC)
+            fprintf('Reading img: %s\n', IMAGESLOC{1}{index(1)} );
+            warning off;  a = double(imread(IMAGESLOC{1}{index(1)}))/255; warning on;
+            if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+            aspect_ratio   = size(a,1)/size(a,2);
+            wx = ([-1 1; -1 1])*IMAGESMULT{1}*AXISLIM(2)+IMAGESOFFSET{1}(1);
+            wy = ([-1 -1; 1 1])*IMAGESMULT{1}*AXISLIM(4)*aspect_ratio+IMAGESOFFSET{1}(2);
+            wz = [ 1 1; 1 1]*IMAGESAXIS{1}(index(1))*1.07;
+        else
+            a = repmat(rot90(squeeze(IMAGESLOC(:,:,index(1)))), [1 1 3]); 
+            if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+            wx = [min(IMAGESAXIS{3}) max(IMAGESAXIS{3}); min(IMAGESAXIS{3}) max(IMAGESAXIS{3})];
+            wy = [min(IMAGESAXIS{2}) min(IMAGESAXIS{2}); max(IMAGESAXIS{2}) max(IMAGESAXIS{2})];
+            wz = [ 1 1; 1 1]*IMAGESAXIS{1}(index(1));
+        end;
         % DISPLAY IF REAL RATIO OF IMAGE CORRESPOND TO RATIO SHOWN ON SCREEN
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
         %       IMAGESMULT{1}(1)/ IMAGESMULT{1}(2) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(4)-AXISLIM(3)) );
@@ -848,13 +886,20 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         hold on; %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
     %catch, error(lasterr); end;
     try,
-        fprintf('Reading img: %s\n', IMAGESLOC{2}{index(2)} );
-        warning off; a = double(imread(IMAGESLOC{2}{index(2)}))/255;  warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        aspect_ratio   = size(a,1)/size(a,2);
-        wx = ([-1 1; -1 1])*IMAGESMULT{2}*AXISLIM(2)+IMAGESOFFSET{2}(1);
-        wz = ([1 1; -1 -1])*IMAGESMULT{2}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{2}(3);
-        wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2))*1.07;
+        if iscell(IMAGESLOC)
+            fprintf('Reading img: %s\n', IMAGESLOC{2}{index(2)} );
+            warning off; a = double(imread(IMAGESLOC{2}{index(2)}))/255;  warning on;
+            if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+            aspect_ratio   = size(a,1)/size(a,2);
+            wx = ([-1 1; -1 1])*IMAGESMULT{2}*AXISLIM(2)+IMAGESOFFSET{2}(1);
+            wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2))*1.07;
+            wz = ([1 1; -1 -1])*IMAGESMULT{2}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{2}(3);
+        else
+            a = repmat(rot90(squeeze(IMAGESLOC(:,index(2),:))), [1 1 3]); 
+            wx = [min(IMAGESAXIS{3}) max(IMAGESAXIS{3}); min(IMAGESAXIS{3}) max(IMAGESAXIS{3})];
+            wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2));
+            wz = [max(IMAGESAXIS{1}) max(IMAGESAXIS{1}); min(IMAGESAXIS{1}) min(IMAGESAXIS{1})];
+        end;            
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
            'EdgeColor','none', 'CDataMapping','direct','tag','img', 'facelighting', 'none');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
@@ -862,13 +907,20 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
     catch, error(lasterr); end;
     try,
-        fprintf('Reading img: %s\n', IMAGESLOC{3}{index(3)} );
-        warning off; a = double(imread(IMAGESLOC{3}{index(3)}))/255;  warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        aspect_ratio   = size(a,1)/size(a,2);
-        wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3))*1.07;
-        wy = ([-1 1; -1 1])*IMAGESMULT{3}*AXISLIM(4)+IMAGESOFFSET{3}(2);
-        wz = ([1 1; -1 -1])*IMAGESMULT{3}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{3}(3);
+        if iscell(IMAGESLOC)
+            fprintf('Reading img: %s\n', IMAGESLOC{3}{index(3)} );
+            warning off; a = double(imread(IMAGESLOC{3}{index(3)}))/255;  warning on;
+            if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+            aspect_ratio   = size(a,1)/size(a,2);
+            wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3))*1.07;
+            wy = ([-1 1; -1 1])*IMAGESMULT{3}*AXISLIM(4)+IMAGESOFFSET{3}(2);
+            wz = ([1 1; -1 -1])*IMAGESMULT{3}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{3}(3);
+        else
+            a = repmat(rot90(squeeze(IMAGESLOC(index(3),:,:))), [1 1 3]); 
+            wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3));
+            wy = [min(IMAGESAXIS{2}) max(IMAGESAXIS{2}); min(IMAGESAXIS{2}) max(IMAGESAXIS{2})];
+            wz = [max(IMAGESAXIS{1}) max(IMAGESAXIS{1}); min(IMAGESAXIS{1}) min(IMAGESAXIS{1})];
+        end;            
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
            'EdgeColor','none', 'CDataMapping','direct','tag','img', 'facelighting', 'none');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1), ...
