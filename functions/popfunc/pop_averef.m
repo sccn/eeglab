@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/21 02:14:35  arno
+% debug
+%
 % Revision 1.7  2002/08/21 02:13:39  arno
 % more messages
 %
@@ -71,7 +74,7 @@ if nargin < 2 | confirm == 1
 	% -----------------
 	 ButtonName=questdlg2( strvcat('Convert the data to average reference?', ...
 								   'Note: ICA activations will also be converted if they exist...'), ...
-	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes', 'pop_averef');
+	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', return;
 	 end;
