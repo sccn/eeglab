@@ -39,10 +39,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/13 02:23:09  arno
+% header ...
+%
 
 function  [TrialData] = readegi(filename)
 
-if nargin < 2
+if nargin < 1
     help readegi;
     return;
 end;
