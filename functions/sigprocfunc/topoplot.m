@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.143  2004/02/19 15:56:28  scott
+% plot dipole(s) last
+%
 % Revision 1.142  2004/02/19 15:49:58  scott
 % plot dipoles inside head in 'skirt' mode
 %
@@ -638,9 +641,9 @@ Rd = Rd(enum);
 labels = labels(enum,:);
 
 if exist('QUAD_SKIRT') % not ready yet!!!
-if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
+  if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
    Th = skirt_Th(Th,Rd,rmax*squeezefac);  % rotate the angles of the electrodes in the 'skirt'
-end
+  end
 end
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
@@ -729,16 +732,16 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
 %
 if exist('QUAD_SKIRT') % not-ready!!!
-if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
+ if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
   skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2) > rmax*squeezefac & ...
          abs(Thi)<pi/4);
   ii = find(mask == 0);
-size(ii)
+  size(ii)
   Zi(ii) = NaN;
-keyboard
-end
+  keyboard
+ end
 end % exist
   
   %
@@ -748,9 +751,9 @@ end % exist
   hold on
   h = gca; % uses current axes
 
-  if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+  if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt') & squeezefac<0.92
     AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
-                      % shrunk by the 'skirt' option
+                      % shrunk enough by the 'skirt' option
   end
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
 
@@ -921,7 +924,7 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot ksirt outline
   set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+5); % hide the disk edge jaggiess with BACKCOLOR
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
