@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/03/05 02:30:37  scott
+% emarkersize
+%
 % Revision 1.43  2003/03/05 02:28:35  scott
 % same
 %
@@ -482,17 +485,13 @@ for t=1:ntopos
   if topowidth<0.12
     if ~isempty(topoargs)
         % topoargs = ['''emarkersize'',4,' topoargs];
-        topoargs = ['''electrodes'',''off'',' topoargs];
+        topoargs = ['''electrodes'',''off'', ' topoargs];
     else
         % topoargs = ['''emarkersize'',4'];
-        topoargs = ['''electrodes'',''off'''];
+        topoargs = ['''electrodes'', ''off'''];
     end
   end
-  if ~isempty(varargin)
-    topoplot(data(:,plotframes(t)),chan_locs, varargin{:}); 
-  else
-    topoplot(data(:,plotframes(t)),chan_locs); 
-  end
+  topoplot(data(:,plotframes(t)),chan_locs, topoargs); % plot the scalp map 
   %
   % ELSE make a 3-D headplot
   %
