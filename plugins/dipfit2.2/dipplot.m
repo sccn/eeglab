@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.62  2003/10/31 23:29:29  arno
+%dicreases dipole size for summary mode
+%
 %Revision 1.61  2003/10/31 19:50:38  arno
 %reordering 2 dipoles, delete old edges
 %
