@@ -81,7 +81,7 @@
 %                   Shows projection on grand mean coherence vector at each time 
 %                   and trial. {default: no}
  
-% $LOG$
+% $Log erpimage.m,v $
 % 3/5/98 added nosort option -sm
 % 3/22/98 added colorbar ylabel, sym. range finding -sm
 % 5/08/98 added noplot option -sm
