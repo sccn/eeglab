@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.267  2003/11/25 19:40:58  arno
+% removing BIOSIG
+%
 % Revision 1.266  2003/11/25 19:30:01  arno
 % removing ant menus
 %
@@ -1257,16 +1260,29 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
             if exist(dircontent.m{index}) == 7
                 addpath(dircontent.m{index})
                 funcname = dircontent.m{index};
-                disp(['eeglab: adding plugin "' funcname '" (path added)' ]);    
+                disp(['eeglab: adding plugin "' funcname '" (path added; see help ' funcname ')' ]);    
             else 
                 funcname = dircontent.m{index}(1:end-2);
-                disp(['eeglab: adding plugin "' funcname '"' ]);    
+                disp(['eeglab: adding plugin "' funcname '" (see help ' funcname ')' ]);    
             end;
             eval( [ funcname '(gcf, trystrs, catchstrs)' ], ...
                  ['disp(''eeglab: error while adding plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
     end;
 
+    % changing plugin menu color
+    % --------------------------
+    fourthsub_m = findobj('parent', fourth_m);
+    importsub_m = findobj('parent', neuromenu);
+    epochsub_m  = findobj('parent', importepoch);
+    eventsub_m  = findobj('parent', importevent);
+    exportsub_m = findobj('parent', exportm);
+    PLUGIN_COL = 'r';
+    if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'color', PLUGIN_COL); end;
+    if length(importsub_m) > 10, set(importsub_m(1:end-10), 'color', PLUGIN_COL); end;
+    if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'color', PLUGIN_COL); end;
+    if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'color', PLUGIN_COL); end;
+    if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'color', PLUGIN_COL); end;
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
