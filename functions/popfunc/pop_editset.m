@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/08 02:29:33  scott
+% *** empty log message ***
+%
 % Revision 1.4  2002/04/08 02:26:28  scott
 % *** empty log message ***
 %
@@ -199,7 +202,7 @@ for curfield = tmpfields'
                          else
                             EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname);' );
                          end;
-                         if ~isempty(EEGOUT.icaweight) & isempty(EEGOUT.icasphere)
+                         if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
