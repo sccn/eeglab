@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/04/23 16:34:05  arno
+% adapting to new dipplot format
+%
 % Revision 1.26  2003/04/23 16:32:14  arno
 % using coords for non-template plot
 %
@@ -462,19 +465,12 @@ elseif isstr(g.movparams)
     error('Movparams template can only be ''mritop'' and ''mriside''');
 else
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps);
-        [tmp plotorder] = sort( coordinates(:,2) );
-        coordinates = coordinates(:, [1 3]); % remove Z
-    else
-        plotorder   = g.showcomps;
-        coordinates = g.coordinates;
+        error('pop_brainmovie: if using a non-template plot, you must specify 2-D dipoles coordinates');
     end;
-
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'plotorder',  plotorder(g.showcomps),
-                          'condtitle' alltitles 'coordinates', coordinates, ...
+    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
