@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.180  2003/11/26 18:16:23  scott
+% help msg
+%
 % Revision 1.179  2003/11/19 01:06:22  arno
 % including hanning function
 %
@@ -1487,8 +1490,11 @@ end;
 %
 if exist('phargs') == 1 % if phase-sort
 	if length(phargs) >= 4 % find max frequency in specified band
-		[pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
-		
+        if exist('psd') == 2
+            [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+        else
+            [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+        end;
 	%gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
 		
 		pxx = 10*log10(pxx);
@@ -1577,7 +1583,11 @@ if exist('phargs') == 1 % if phase-sort
 %
 elseif exist('ampargs') == 1 % if amplitude-sort
 	if length(ampargs) == 4 % find max frequency in specified band
-		[pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+        if exist('psd') == 2
+            [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+        else
+            [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
+        end;
 		
 		pxx = 10*log10(pxx);
 		n = find(freqs >= ampargs(3) & freqs <= ampargs(4));
@@ -1865,8 +1875,12 @@ end
 %
 if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
 	% find max frequency in specified band
-	[pxx,tmpfreq] = psd(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
-
+    if exist('psd') == 2
+        [pxx,tmpfreq] = psd(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+    else
+        [pxx,tmpfreq] = spec(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+    end;
+    
 	pxx = 10*log10(pxx);
 	n = find(tmpfreq >= coherfreq(1) & tmpfreq <= coherfreq(2));
 	if ~length(n)
@@ -2892,8 +2906,13 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
     end
     
     % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
-    [Pxx,Pxxc,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
-                       512,srate,winlength,0,0.05);
+    if exist('psd') == 2
+        [Pxx,Pxxc,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+                           512,srate,winlength,0,0.05);
+    else
+        [Pxx,Pxxc,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+                           512,srate,winlength,0);
+    end;
     plot(F,10*log10(Pxx));
     goodfs = find(F>= lospecHz & F <= hispecHz);
     maxgfs = max(10*log10(Pxx(goodfs)));
