@@ -33,8 +33,11 @@
 %                edit box, radio button, checkbox and listbox.
 %   userdat    - 'userdata' value of the figure.
 %   strhalt    - the funciton returns when the 'userdata' field of the
-%                button with the tag 'ok' is modified. THis return the
+%                button with the tag 'ok' is modified. This return the
 %                new value of this field.
+%   outstruct  - returns outputs as a structure (only tagged ui controls
+%                are considered). The field name of the structure is
+%                the tag of the ui and contain the ui value or string.
 %
 % Note: the function also add three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
@@ -63,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/14 18:17:11  arno
+% new supergui arg
+%
 % Revision 1.12  2002/08/13 21:44:55  arno
 % debug
 %
@@ -102,7 +108,7 @@
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat, strhalt] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode, geomvert);
+function [result, userdat, strhalt, resstruct] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode, geomvert);
 
 if nargin < 2
    help inputgui;
@@ -146,6 +152,7 @@ waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
 result = {};
 userdat = [];
 strhalt = '';
+resstruct = [];
 try, findobj(fig); % figure still exist ?
 catch, return; end;
 strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
@@ -167,6 +174,27 @@ for index=1:length(allobj)
    catch, end;
 end;   
 userdat = get(fig, 'userdata');
+if nargout >= 4
+	resstruct = myguihandles(fig);
+end;
+
 if isstr(mode) & strcmp(mode, 'normal')
 	close(fig);
 end;
+
+% function for gui res
+% --------------------
+function g = myguihandles(fig)
+	g = [];
+	h = findobj('parent', gcf);
+	for index = 1:length(h)
+		if ~isempty(get(h(index), 'tag'))
+			try, 
+				switch get(h(index), 'style')
+				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
+				 case { 'value' 'radio' 'checkbox' }, ...
+					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
+				end;
+			catch, end;
+		end;
+	end;
