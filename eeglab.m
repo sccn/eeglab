@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.208  2003/01/10 00:49:54  arno
+% change default position
+%
 % Revision 1.207  2003/01/09 18:35:33  arno
 % putting dataset name in title
 %
@@ -1142,7 +1145,7 @@ titleh   = findobj('parent', gcf, 'tag', 'win0');
 alltexth = findobj('parent', gcf, 'style', 'text');
 alltexth = setdiff(alltexth, titleh);
 
-set(gcf, 'Position',[545.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
+set(gcf, 'Position',[245.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
 set(titleh, 'fontsize', 14, 'fontweight', 'bold');
 set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
 set(W_MAIN, 'userdata', {[] []}, 'visible', 'on');
