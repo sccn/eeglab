@@ -61,7 +61,8 @@
 % 'envelope'    - (2,points,conditions) envelopes of the data for each condition
 %                 giving the min and max traces of each envelope
 % 'envylabel'   - ordinate label for envelope. Default 'Potential \muV'
-% 'envvert'     - vector of time indices to insert vertical lines
+% 'envvert'     - vector of time indices to insert vertical lines. A cell array
+%                 of vector (1 per condition) can also be given.
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (nrows = num. of conditions)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
@@ -89,6 +90,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/18 23:28:32  arno
+% lots of modification (2 days of programing)
+%
 % Revision 1.2  2002/04/10 22:27:58  arno
 % *** empty log message ***
 %
@@ -558,7 +562,11 @@ for indeximage = alltimepoints
 				ylabel(g.envylabel, 'fontweight', 'bold', 'fontsize', 12*g.resmult);
 			end;
 			if ~isempty(g.envvert)
-				for timevert=g.envvert
+				if iscell(g.envvert)
+					 tmpvert = g.envvert{ tmpcond };
+				else tmpvert = g.envvert;
+				end;
+				for timevert=tmpvert
 					plot([timevert timevert], [minordinate maxordinate], 'm--', 'linewidth', g.resmult);
 				end;
 			end;
