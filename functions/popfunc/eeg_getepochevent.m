@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/18 18:22:27  arno
+% typo can not
+%
 % Revision 1.2  2002/04/10 03:08:57  arno
 % reprogrammed event selection
 %
@@ -81,9 +84,10 @@ if nargin <2
 end;    
 if nargin <3
     timewin = [-Inf Inf];
-else if isempty(timewin)
+else 
+	if isempty(timewin)
         timewin = [-Inf Inf];
-     end;
+	end;
 end;
 if nargin <4
     fieldname = 'latency';
@@ -104,9 +108,6 @@ end;
     
 % check if EEG.epoch and EEG.event contains 'latency' field
 % ------------------------------------------
-if ~isfield( EEG.event, 'latency' )
-    disp('Getepochevent: no ''latency'' field in events, abord'); return;
-end;
 if ~isfield( EEG.event, fieldname)
     disp(['Getepochevent: no ''' fieldname ''' field in events, abord']); return;
 end;
