@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/05/09 18:18:36  scott
+% added printout of frames per weight -sm
+%
 % Revision 1.14  2003/12/15 23:28:34  arno
 % debug nochangeupdate
 %
@@ -618,7 +621,7 @@ if verbose,
       end
    end
    fprintf('Decomposing %d frames per ICA weight ((%d)^2 = %d weights, %d frames)\n',...
-           floor(frames/comps.^2),comps.^2,frames);
+           floor(frames/ncomps.^2),ncomps.^2,frames);
    fprintf('Initial learning rate will be %g, block size %d.\n',...
            lrate,block);
    if momentum>0,
@@ -970,22 +973,24 @@ end
          angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
      end
      if verbose,
+      places = -floor(log10(nochange));
       if step > 2, 
           if ~extended,
-           fprintf('step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg\n', ...
-                       step,      lrate,        change,    degconst*angledelta);
+           ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg\n', ...
+                       step,      lrate,        places+1,places,   degconst*angledelta);
           else
-           fprintf('step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg, %d subgauss\n',...
-                       step,      lrate,        change, degconst*angledelta,...
-                                                               (ncomps-sum(diag(signs)))/2);
+           ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg, %d subgauss\n',...
+                       step,      lrate,        degconst*angledelta,...
+                                                     places+1,places,           (ncomps-sum(diag(signs)))/2);
           end
       elseif ~extended
-         fprintf('step %d - lrate %5f, wchange %7.6f\n',...
-                     step,      lrate,        change);
+         ps = sprintf('step %d - lrate %5f, wchange %%%d.%df\n',...
+                     step,      lrate,       places+1,places  );
       else
-         fprintf('step %d - lrate %5f, wchange %7.6f, %d subgauss\n',...
-                     step,      lrate,        change, (ncomps-sum(diag(signs)))/2);
+         ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
+                     step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
       end % step > 2
+      fprintf(ps,change);
      end; % if verbose
   %
   %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
