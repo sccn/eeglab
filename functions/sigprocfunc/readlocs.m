@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/05/02 01:34:56  arno
+% getting XYZ back
+%
 % Revision 1.8  2002/05/02 00:33:43  arno
 % remove minus
 %
@@ -79,7 +82,7 @@
 % correcting polhemus reading
 %
 % Revision 1.5  2002/05/01 03:27:40  arno
-% removing sperical
+% removing spherical
 %
 % Revision 1.4  2002/05/01 02:11:56  arno
 % new .txt format
