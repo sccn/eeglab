@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/11/18 16:19:42  scott
+% text labels
+%
 % Revision 1.11  2002/11/12 21:32:41  luca
 % added check for empty EEG.chanlocs array
 %
@@ -140,11 +143,10 @@ end;
 %fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
 if isempty(EEG.chanlocs)
-    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2); %s', outstr);
+    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2);', outstr);
 else 
-    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs ); %s', outstr);
+    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs );', outstr);
 end
-
 
 eval(com)	
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
