@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/07/12 23:11:03  arno
+% dftfilt->1
+%
 % Revision 1.35  2002/07/11 20:56:28  arno
 % debugging maxamp
 %
@@ -401,6 +404,7 @@ for index = 1:length(allfields)
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
 		  'memory' 'compute' 'maxamp' };
+	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
 end;
