@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2004/06/14 16:10:04  arno
+% resoring event latencies
+%
 % Revision 1.123  2004/06/04 01:05:02  arno
 % allowing latencies of 0.5
 %
@@ -1106,7 +1109,7 @@ if ~isempty( varargin)
           % -------------
           if isfield(EEG.event, 'latency')
               try, 
-                  TMPEEG = pop_editeventvals(EEG, 'sort', { 'latency' });
+                  TMPEEG = pop_editeventvals(EEG, 'sort', { 'epoch' 0 'latency' 0 });
                   if ~isequal(TMPEEG.event, EEG.event)
                       EEG = TMPEEG;
                       disp('Event resorted by increasing latencies. Some event indices have changed.');
