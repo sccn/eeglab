@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/09 21:57:25  arno
+% documenting limcontrib
+%
 % Revision 1.7  2002/10/09 21:32:18  arno
 % documenting option subcomp
 %
@@ -402,7 +405,7 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
   i = i+frame1-1;
 
   if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped
-      ix = find(envdata(1,c*frames+1:(c+1)*frames) <= ymax);
+      ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
       [val,ix] = max(envdata(1,c*frames+ix));
       plotframes(c) = ix; % draw line from max non-clipped env maximum
       maxproj(:,c)  = proj(:,ix);
