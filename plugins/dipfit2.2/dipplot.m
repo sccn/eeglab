@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.89  2004/06/01 15:48:50  scott
+%sphere colors
+%
 %Revision 1.88  2004/06/01 05:03:41  scott
 %sphere color
 %
@@ -441,6 +444,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'sphere'      'real'   [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
                                  'spheresize'  'real'   [0 Inf]             5;
+                                 'spherecolor' 'cell'   [1 64]             64;
                                  'links'       'real'   []                  [];
                                  'image'       { 'string' 'real'} []                 'mri' }, ...
                                                                                     'dipplot');
@@ -739,6 +743,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     maxlength = max(sizedip);
     
+    % diph = gca; % DEBUG
+    % colormap('jet');
+    % cbar
+    % axes(diph);
+
     for index = 1:length(sources)
         nbdip = 1;
         if size(sources(index).posxyz, 1) > 1 & any(sources(index).posxyz(2,:)) nbdip = 2; end;
@@ -837,12 +846,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             hold on;
             if strcmpi(g.spheres,'on') % plot spheres
-                spherecolor = g.color{index};
+                spherecolor = g.spherecolor{1+rem(index-1,length(g.spherecolor))};
                 [xs,ys,zs] = sphere;
                 for q = 1:length(xx)
+                     if q==0 % DEBUG
+                         size(zs*g.spheresize+zz(q))
+                         size(spherecolor)
+                     end
                    sf=surf(xs*g.spheresize+xx(q),...
                        ys*g.spheresize+yy(q),...
                          zs*g.spheresize+zz(q),...
+                          repmat(spherecolor,size(zs)),...
                             'edgecolor','none',...
                               'backfacelighting', 'lit', ...
                                'facelighting', 'phong', ...
