@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/01/01 01:55:43  arno
+% removing debugging messages
+%
 % Revision 1.39  2003/01/01 01:54:40  arno
 % debugging missing lines
 %
@@ -770,7 +773,7 @@ for indeximage = alltimepoints
 	%axes(hh2); 	cla; set (gcf, 'visible', g.visible);
 
 	% draw circles
-	% ------------
+	% ------------     
 	for index1 = g.plotorder(:)'
 		for tmpcond = 1:nbconditions
 			axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
@@ -779,7 +782,8 @@ for indeximage = alltimepoints
 			tmppow   = mean(tmptimef( FREQS, indeximage)); % size is power
 			tmptimef = ALLITC{ index1, tmpcond};
 			tmpitc = mean(tmptimef( FREQS, indeximage)); % color is ITC
-			drawcircle( g.coordinates( index1,: ), tmppow, tmpitc, g);
+			%index1, tmpitc, tmppow, 
+            drawcircle( g.coordinates( index1,: ), tmppow, tmpitc, g);
 		end;
 	end;
 	
