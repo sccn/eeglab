@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/09/14 17:34:22  arno
+% Initial revision
+%
 
 function chanlist = getchanlist(chanlocs, type)
     
@@ -41,6 +44,7 @@ function chanlist = getchanlist(chanlocs, type)
     
     if nargin < 2 || ~isfield(chanlocs, 'type')
         chanlist = [1:length(chanlocs)];
+        return;
     end;
     
     % search channel types
