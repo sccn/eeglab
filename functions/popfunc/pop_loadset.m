@@ -10,7 +10,8 @@
 % Output
 %   VAROUT - variable read
 %
-% Note: global dataset structures EEG and ALLEEG may be updated
+% Note: output may be a dataset structure of an array of
+%       dataset structures.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -35,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/23 17:58:40  arno
+% standalone function
+%
 % Revision 1.6  2002/04/12 00:52:53  arno
 % smart load for non-identical structures
 %
