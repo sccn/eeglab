@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/03/14 20:09:59  arno
+% fix spherical
+%
 % Revision 1.23  2005/03/11 22:18:22  arno
 % adding meshfile
 % .,
@@ -225,10 +228,11 @@ else
     
     % plotting
     % --------
+    tmpoptions = { options{:} 'coordformat', EEG.dipfit.coordformat };
     if strcmpi(EEG.dipfit.coordformat, 'spherical')
-        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'sph2spm', sph2spm, options{:});
+        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, tmpoptions{:});
     else
-        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'meshdata', EEG.dipfit.hdmfile, options{:});
+        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'meshdata', EEG.dipfit.hdmfile, tmpoptions{:});
     end;
 end;
     
