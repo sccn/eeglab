@@ -50,6 +50,9 @@
 % average (i.e., channel[j]->n).
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/04 02:31:51  arno
+% adding sweeps
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -71,7 +74,7 @@ if fid<0
 	return;
 end;
 
-S_nsweeps_offset 		= 362;
+S_nsweeps_offset 		= 364; % sweep accept (total sweeps 362)
 S_pnts_offset 			= 368;
 S_nchans_offset 		= 370;
 S_variance_offset 		= 375;
