@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.192  2004/01/24 21:08:29  scott
+% same
+%
 % Revision 1.191  2004/01/24 21:04:09  scott
 % same
 %
@@ -3009,22 +3012,20 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
   WINFILLCOLOR    = [.66 .76 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
+  if ~isempty(winloc)
+    fillwinx = [winloc winloc(end:-1:1)];
+    if ~isempty(axlimits) & sum(isnan(axlimits))==0
+       fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
+    else
+       fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
+    end
+    fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
+  end
   if ~isempty(signif);% (2,times) array giving upper and lower signif limits
       filltimes = [times times(end:-1:1)];
       if size(signif,1) ~=2 | size(signif,2) ~= length(times)
          fprintf('plot1trace(): signif array must be size (2,frames)\n')
          return
-      end
-winloc
-      if ~isempty(winloc)
-         fillwinx = [winloc winloc(end:-1:1)];
-         if ~isempty(axlimits) & sum(isnan(axlimits))==0
-           fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
-         else
-           fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
-         end
-         fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
-fprintf('fillwh done\n');
       end
       fillsignif = [signif(1,:) signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
