@@ -1,6 +1,6 @@
 % crossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input time series. A lower panel (optionally) shows 
-%        the coherence phase difference between the processes. In this panel 
+%        the coherence phase difference between the processes. In this panel:
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
 %        Click on any subplot to view separately and zoom in/out.
@@ -110,16 +110,16 @@
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
 % Plot description:
-%   Assuming both 'plotamp' and 'plotphase' options are set (default), the upper plot
-%   represents data's phase coherence (or linear coherence (see parameter 'type'))
-%   amplitude and the lower plot represents the data's coherence angle difference (in
-%   degree). Click on any plot to pop up a new window
-%   -- Upper left marginal plot represents the average coherence during the baseline period
-%      (blue) and when significance is set, the threshold for significance (dotted black-green).
-%   -- Upper horizontal marginal plot (under coherence image) indicates the maximum 
-%      (green) and minimum (blue) coherence across all frequencies. When significance 
+%   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
+%   presents the magnitude of either phase coherence or linear coherence, depending on 
+%   the 'type' parameter (above). The lower panel presents the coherence phase difference 
+%   (in degrees). Click on any plot to pop up a new window (using 'axcopy()').
+%   -- The upper left marginal panel shows mean coherence during the baseline period
+%      (blue), and when significance is set, the significance threshold (dotted black-green).
+%   -- The horizontal panel under the coherence magnitude image indicates the maximum 
+%      (green) and minimum (blue) coherence values across all frequencies. When significance 
 %      is set (using option 'trials' for 'boottype'), an additional curve indicates the 
-%      threshold for significance (dotted black-green).
+%      significance threshold (dotted black-green).
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
@@ -162,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/08/04 16:22:13  arno
+% marginal plot color
+%
 % Revision 1.60  2003/05/05 16:31:18  arno
 % debug last
 %
