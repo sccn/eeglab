@@ -1,9 +1,10 @@
 % sph2topo() - Convert from a 3-column headplot file in spherical coordinates
-%             to a 3-column topoplot file in polar (not cylindrical) coords.
-%             Used for topoplot() and other 2-d topographic plotting programs.
-%             Assumes a spherical coordinate system in which horizontal angles 
-%             has a range [-180,180] with zero pointing to the right ear. 
-%             In the output polar coordinate system, zero points to the nose.
+%              to 3-column topoplot() locs file in polar (not cylindrical) coords.
+%              Used for topoplot() and other 2-D topographic plotting programs.
+%              Assumes a spherical coordinate system in which horizontal angles 
+%              have a range [-180,180] deg,  with zero pointing to the right ear. 
+%              In the output polar coordinate system, zero points to the nose.
+%              See  >> help readlocs
 % Usage:
 %          >> [chan_num,angle,radius] = sph2topo(input,shrink_factor,method);
 %
@@ -11,17 +12,19 @@
 %   input         = [channo,az,horiz] = chan_number, azumith (deg), horiz. angle (deg)
 %                   When az>0, horiz=0 -> right ear, 90 -> nose 
 %                   When az<0, horiz=0 -> left ear, -90 -> nose
-%   shrink_factor = radial scaling factor>=1 (Note: 1 -> plot edge 90 deg az
-%                   1.5 -> plot edge is +/-135 deg az {default 1`}
+%   shrink_factor = arc_length shrinking factor>=1 (deprecated).
+%                   1 -> plot edge is 90 deg azimuth {default};
+%                   1.5 -> plot edge is +/-135 deg azimuth See 
+%                   >> help topoplot(). 
 %   method        = [1|2], optional. 1 is for Besa compatibility, 2 is for
 %                   compatibility with Matlab function cart2sph(). Default is 2
 %
 % Outputs:
 %   channo  = channel number (as in input)
 %   angle   = horizontal angle (0 -> nose; 90 -> right ear; -90 -> left ear)
-%   radius  = arc radius from vertex (Note: 90 deg az -> 0.5/shrink_factor);
-%             By convention, radius=0.5 is the outer edge of topoplot().
-%             Use shrink_factor>1 to plot chans with abs(az)>90.
+%   radius  = arc_lengrh from vertex (Note: 90 deg az -> 0.5/shrink_factor);
+%             By topoplot() convention, radius=0.5 is the nasion-ear_canal plane.
+%             Use topoplot() 'plotrad' to plot chans with abs(az) > 90 deg.
 %
 % Author: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 6/12/98 
 %
@@ -46,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/06/29 22:57:23  arno
+% changing default for method
+%
 % Revision 1.3  2002/06/29 01:25:56  arno
 % updating header for besa compatibility
 %
