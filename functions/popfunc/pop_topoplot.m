@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2005/03/10 18:46:30  arno
+% nothing
+%
 % Revision 1.61  2005/03/10 17:48:40  arno
 % converting MNI coordinates back to spherical
 %
@@ -394,11 +397,12 @@ for index = 1:size(arg2(:),1)
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
                 if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
                     transform = pinv( sph2spm );                    
-                    tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3)/85;
+                    tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
                     tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
-                    try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3)/85; catch, end;
+                    try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end;
                     try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
                 end;
+                curpos = curpos / 85;
                 if ~isempty(curpos)
                     if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
                         options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
