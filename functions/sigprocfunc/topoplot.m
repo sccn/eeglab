@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.151  2004/03/18 01:44:28  scott
+% 'plotrad' arg and help message re skirt
+%
 % Revision 1.150  2004/03/18 01:26:33  arno
 % plotrad
 %
@@ -641,7 +644,9 @@ else  % if numeric shrinkfactor given
                                                                       shrinkfactor);
 	end;
     squeezefac = 1-shrinkfactor;
-    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)% to fit inside plotting circle
+keyboard
+    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)% 
+                        % to fit inside plotting circle
 end;
 
 % skirt mode
