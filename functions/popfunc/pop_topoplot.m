@@ -51,6 +51,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2004/09/15 18:58:41  hilit
+%
 % Revision 1.54  2004/09/13 19:31:00  arno
 % reverting version 1.49
 %
@@ -356,7 +358,7 @@ for index = 1:size(arg2(:),1)
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
        end;    
-		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1, 'align');
+		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
         set(curax, 'visible', 'off')
    end;
 
