@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/12/09 21:48:58  arno
+% convert 2 double
+%
 % Revision 1.10  2003/06/16 15:32:04  arno
 % debug for arrays of indentical numbers
 %
@@ -118,7 +121,7 @@ for index = 1:length(allargs)
 			else
 				strout = [ strout ',' str2str( tmpvar ) ];
 			end;
-		elseif isnumeric( tmpvar )
+		elseif isnumeric( tmpvar ) | islogical( tmpvar )
 			strout = [ strout ',' array2str( tmpvar ) ];
 		elseif iscell( tmpvar )
 			strout = [ strout ',{' vararg2str( tmpvar ) '}' ];
