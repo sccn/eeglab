@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/06/01 21:46:18  arno
+% NaN when concatenating datasets
+%
 % Revision 1.15  2004/05/15 00:59:05  arno
 % allow empty event array
 %
@@ -109,7 +112,6 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
     end;
     
     eventout = eventin;
-    rmnested = [];
 	for tmpindex = 1:length(boundevents)
         if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= pnts
             
@@ -137,7 +139,11 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
                 end;
                 eventout(tmpind2).latency  = regions(tmpindex)-0.5;
                 eventout(tmpind2).duration = 0; % just to create field
+                
                 [ tmpnest addlength ] = findnested(eventout, tmpind2);
+                % We use to remove nested event (tmpnest) but this
+                % interfere with parent function eeg_eegre()
+                
                 if addlength == -1
                     eventout(tmpind2) = rmfield(eventout, 'duration');
                     disp('Warning: old boundary event type present in dataset');
@@ -147,15 +153,10 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
                     eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
                     if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
                 end;
-                rmnested = [ rmnested tmpnest ];
             end; 
         
         end; 
 	end;
-    
-    % remove nested events
-    % ---------------------
-    eventout(rmnested) = [];
 
 % look for nested events
 % retrun indices of nested events and
