@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/02/17 19:56:05  arno
+% debug frequency assigment for FFT
+%
 % Revision 1.40  2003/12/10 18:15:11  arno
 % msg
 %
@@ -291,24 +294,35 @@ if length(g.freqs) == 2
         % adjust nfreqs depending on frequency range
         tmpfreqs = linspace(0, srate/2, g.nfreqs); 
         tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
+        
+        % adjust limits for FFT (only linear scale)
+        if g.cycles == 0 & ~strcmpi(g.freqscale, 'log')
+            if ~any(tmpfreqs == g.freqs(1))
+                [tmp minind] = min(abs(tmpfreqs-g.freqs(1)));
+                g.freqs(1)   = tmpfreqs(minind);
+                fprintf('Adjust min freq. to %3.2f Hz to match FFT output frequencies\n', g.freqs(1));
+            end;
+            if ~any(tmpfreqs == g.freqs(2))
+                [tmp minind] = min(abs(tmpfreqs-g.freqs(2)));
+                g.freqs(1)   = tmpfreqs(minind);
+                fprintf('Adjust max freq. to %3.2f Hz to match FFT output frequencies\n', g.freqs(2));
+            end;
+        end;
+        
+        % find number of frequencies
+        % --------------------------
         g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
         if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end;
     end;
-end;
 
-% find closest freqs for FFT
-if g.cycles == 0
-    tmpfreqs = linspace(0, srate/2, g.nfreqs); 
-    tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
-    if g.freqs(1)==g.freqs(2), g.freqs = g.freqs(1); 
-    else g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
-    end;
-else 
+    % find closest freqs for FFT
+    % --------------------------
     if strcmpi(g.freqscale, 'log')
         g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
         g.freqs = exp(g.freqs);
     else
-        g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
+        g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs); % this should be OK for FFT
+                                                              % because of the limit adjustment
     end;
 end;
 g.nfreqs = length(g.freqs);
