@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/06/27 01:48:02  arno
+% removing frequency option
+%
 % Revision 1.11  2002/06/27 01:42:48  scott
 % completed help message editing -sm & ad
 %
@@ -368,7 +371,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Position', posbut(5,:), ...
 	'Style','edit', ...
 	'Tag','EPosition',...
-	'string','0',...
+	'string','1',...
 	'Callback', 'eegplot(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -882,7 +885,7 @@ else
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
     EPosition = findobj('tag','EPosition','parent',figh); % ui handle
-    g.time    = str2num(get(EPosition,'string'));  
+    g.time    = str2num(get(EPosition,'string'))-1;  
     g.spacing = str2num(get(ESpacing,'string'));
         
     if p1 == 1
@@ -903,7 +906,7 @@ else
     
     % Update edit box
     g.time = max(0,min(g.time,ceil(g.frames/multiplier)-g.winlength));
-    set(EPosition,'string',num2str(g.time)); 
+    set(EPosition,'string',num2str(g.time+1)); 
     set(figh, 'userdata', g);
 
     % Plot data and update axes
@@ -1050,7 +1053,7 @@ else
     data = get(ax1, 'userdata');
     ESpacing = findobj('tag','ESpacing','parent',gcf);   % ui handle
     EPosition = findobj('tag','EPosition','parent',gcf); % ui handle
-    g.time    = str2num(get(EPosition,'string'));  
+    g.time    = str2num(get(EPosition,'string'))-1;  
     g.spacing = str2num(get(ESpacing,'string'));  
     
     orgspacing= g.spacing;
@@ -1216,7 +1219,7 @@ else
       
       % deal with abscicia
       % ------------------
-      Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'));
+      Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'))-1;
 		if g.trialstag ~= -1
       	 g.winlength = (tmpxlim(2) - tmpxlim(1))/g.trialstag;
         	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.trialstag;
@@ -1225,7 +1228,7 @@ else
        	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.srate;
       end;  
       Eposition = round(Eposition*1000)/1000;
-      set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition));
+      set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
       
       % deal with ordinate
       % ------------------
