@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/05/19 02:21:17  scott
+% *** empty log message ***
+%
 % Revision 1.22  2002/05/19 02:20:26  scott
 % *** empty log message ***
 %
@@ -278,6 +281,7 @@ imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
 if showchan>0
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
+  caxis([limits(5:6)]);
 
 else % showchan==0
   tftimes = mmidx(1):mmidx(2);
@@ -301,10 +305,10 @@ else % showchan==0
 end
 hold on;
 axis([limits(1:4)]);
-caxis([limits(5:6)]);
 
 xl=xlabel('Time (ms)');
 set(xl,'fontsize',16);
+set(gca,'yaxislocation','left')
 yl=ylabel(['Frequency (Hz)     Chan ',int2str(showchan)]);
 set(yl,'fontsize',16);
 set(gca,'fontsize',14)
