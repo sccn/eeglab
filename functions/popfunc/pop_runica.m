@@ -54,6 +54,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/13 17:08:26  scott
+% help msg
+% .,
+%
 % Revision 1.10  2002/10/25 23:55:09  arno
 % interupt only for runica
 %
@@ -176,9 +180,11 @@ if option_computeica
     EEG.icaact    = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
     EEG.icaact    = reshape( EEG.icaact, EEG.nbchan, EEG.pnts, EEG.trials);
 end;
-if length(options < 2)
-    com = sprintf('%s = pop_runica(%s, ''%s'');', inputname(1), inputname(1), icatype);
-else
-    com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1), icatype, options);
+if nargin < 2
+    if length(options < 2)
+        com = sprintf('%s = pop_runica(%s, ''%s'');', inputname(1), inputname(1), icatype);
+    else
+        com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1), icatype, options);
+    end;
 end;
 return;
