@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2003/09/24 00:39:05  scott
+% adding 'horz' -> horizontal line plotting
+%
 % Revision 1.151  2003/09/21 21:12:27  scott
 % edited comments
 %
@@ -710,6 +713,7 @@ Renormflag = NO;
 yerplabel = '\muV';
 yerplabelflag = NO;
 verttimes = [];
+horzepochs = [];
 NoTimeflag= NO;     % by default DO print "Time (ms)" below bottom axis
 Signifflag= NO;     % compute significance instead of receiving it
 Auxvarflag= NO;
