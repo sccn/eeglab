@@ -106,11 +106,12 @@
 %   and the lower plot represents data's ITC (Inter-Trial Coherence). 
 %   Click on any plot to pop up a new window
 %   -- Upper left marginal plot represents the average power during the baseline period
-%      (blue) and when significance is set, the threshold for significance (green).
+%      (blue) and when significance is set, the threshold for significance 
+%      (green-black dotted).
 %   -- Upper horizontal marginal plot (under ERSP image) indicates the maximum (green) and
 %      minimum (blue) relative to baseline power across all frequencies.
 %   -- Lower left marginal plot indicates average ITC during the whole time range (blue)
-%      and when significance is set, the significance threshold (green).
+%      and when significance is set, the significance threshold (green-black dotted).
 %   -- Lower horizontal marginal plot (under ITC image) indicates the ERP.  
 %
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
@@ -141,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/08/04 14:40:51  arno
+% description of plot
+%
 % Revision 1.58  2003/08/02 23:07:10  arno
 % debug h(9)
 %
@@ -1032,10 +1036,11 @@ switch lower(g.plotersp)
 	E = 10 * log10(mbase(dispf));
 	h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                     % to left of ERSP image
+    plot(freqs(dispf),E,'LineWidth',g.linewidth)
 	if ~isnan(g.alpha)
-		plot(freqs(dispf),Pboot(:,dispf)+[E;E],'LineWidth',g.linewidth)
-	else
-		plot(freqs(dispf),E,'LineWidth',g.linewidth)
+        hold on;
+		plot(freqs(dispf),Pboot(:,dispf)+[E;E],'g', 'LineWidth',g.linewidth);
+		plot(freqs(dispf),Pboot(:,dispf)+[E;E],'k:','LineWidth',g.linewidth)
 	end
 
 	axis([freqs(1) freqs(max(dispf)) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
@@ -1128,8 +1133,10 @@ switch lower(g.plotitc)
 	h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                     % ITC left of the ITC image
 	if ~isnan(g.alpha)
-		plot(freqs(dispf),E,freqs(dispf),Rboot(dispf),'LineWidth',g.linewidth)
-		axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(dispf)])+max(E)/3])
+		plot(freqs(dispf),E,'LineWidth',g.linewidth); hold on;
+        plot(freqs(dispf),Rboot(dispf),'g', 'LineWidth',g.linewidth);
+        plot(freqs(dispf),Rboot(dispf),'k:','LineWidth',g.linewidth);
+        axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(dispf)])+max(E)/3])
 	else
 		plot(freqs(dispf),E,'LineWidth',g.linewidth)
 		axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3])
