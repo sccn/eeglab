@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/05/14 16:54:52  arno
+% allowing to read 32-bits data files
+%
 % Revision 1.10  2003/04/10 18:06:18  arno
 % default argument
 %
@@ -147,7 +150,7 @@ else
     EEG = pop_importepoch( EEG, [eegtype(:) accept(:) eegresp(:)], { 'type' 'accept' 'response'}, { }, 1E-3, 0, 1);
 end;    
 command = sprintf('EEG = pop_loadeeg(''%s'', ''%s'', %s);', filename, filepath, ...
-			vararg2str({range_chan range_sweeps range_typeeeg range_response }));
+			vararg2str({range_chan range_sweeps range_typeeeg range_response datformat }));
 
 return;
 
