@@ -71,9 +71,9 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
     
     % decode parameters
     % -----------------
-    cx = center(1);
-    cy = center(2);
-    cz = center(3);
+    centx = center(1);
+    centy = center(2);
+    centz = center(3);
     if length(scale) == 1
         scale = [scale scale scale];
     end;
@@ -99,19 +99,20 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
         rot3d = [ cy*cr+sy*sp*sr    sy*cr-cy*sp*sr     cp*sr  ;
                   -sy*cp            cy*cp               sp     ;
                   sy*sp*cr-cy*sr    -cy*sp*cr-sy*sr     cp*cr  ];
+        dsf
         coords = rot3d*coords;
         
         % scaling and centering
         % ---------------------
-        coords(1,:) = coords(1,:)*scalex-cx;
-        coords(2,:) = coords(2,:)*scaley-cy;
-        coords(3,:) = coords(3,:)*scalez-cz;
+        coords(1,:) = coords(1,:)*scalex-centx;
+        coords(2,:) = coords(2,:)*scaley-centy;
+        coords(3,:) = coords(3,:)*scalez-centz;
     else
         % unscaling and uncentering
         % -------------------------
-        coords(1,:) = (coords(1,:)+cx)/scalex;
-        coords(2,:) = (coords(2,:)+cy)/scaley;
-        coords(3,:) = (coords(3,:)+cz)/scalez;
+        coords(1,:) = (coords(1,:)+centx)/scalex;
+        coords(2,:) = (coords(2,:)+centy)/scaley;
+        coords(3,:) = (coords(3,:)+centz)/scalez;
         
         % pitch roll yaw rotation
         % -----------------------
