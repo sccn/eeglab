@@ -36,9 +36,11 @@
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence
 %                      ('coher') or phase coherence ('phasecoher') also known
 %                      as phase coupling factor' { 'phasecoher' }.
-%       'shuffle'   = ['on'|'off'] return the (phase) coherence using shuffle trials 
+%       'shuffle'   = integer indicating the number of time to compute 
+%                     the (phase) coherence using shuffle trials 
 %                     in order to obtain the amplitude or phase coherence time 
-%                     locked to the stimulus {'no'}. See also the option 'boottype'.
+%                     locked to the stimulus {0=no shuffling}. See also the option
+%                     'boottype'.
 %
 %    Optional Detrend:
 %       'detret'    = ['on'|'off'], Detrend data within epochs.   {'off'}
@@ -65,9 +67,19 @@
 %       'baseboot'  = Bootstrap extend (0=same as 'baseline'; 1=whole epoch). 
 %                     If no baseline is given (NaN), bootstrap extend is the 
 %                     whole epoch {0}
-%       'boottype'  = ['trials'|'times'|'both'] Bootstrap type: Either shuffle
-%                     trials but not windows ('trials'), windows but not trials
-%                     ('times') or both ('both'). See notes      {'times' }
+%       'boottype'  = ['times'|'timestrials'] Bootstrap type: Either shuffle
+%                      windows ('times') or windows and trials
+%                      ('timestrials')                             {'times'}
+%       'bootsub'   = [naccuboot_integer] subtract stimulus locked coherence
+%                     obtained from shuffled trials {0=off}. The integer 
+%                     indicates how many shuffled trial averages to
+%                     accumulate. Note that this number also determines 
+%                     the number of bootstrap replication for significance of
+%                     the returned coherence image, which is equal to
+%                     naccu = ceil(timeout/naccuboot_integer).
+%                     Also plot and the shuffled trial coherence on the right and
+%                     uses bootstrap function arguments for significance of
+%                     the shuffled trial image ('boottype' is forced to 'timestrials')
 %       'rboot'     = Bootstrap coherence limits (e.g., from crossf()) {from data}
 %                     be sure that the bootstrap type is identical to
 %                     the one used to obtain bootstrap coherence limits.
@@ -77,15 +89,17 @@
 %                      File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plot Features:
-%       'plotamp'   = ['on'|'off'], Plot coherence magnitude      {'on'}
-%       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
-%       'title'     = Optional figure title                       {none}
-%       'vert'      = Times to mark with a dotted vertical line   {none}
-%       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'cmax'      = Maximum amplitude for color scale  { use data limits }
-%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
-%       'axesfont'  = Axes font size                               {10}
-%       'titlefont' = Title font size                              {8}
+%       'plotamp'     = ['on'|'off'], Plot coherence magnitude      {'on'}
+%       'plotphase'   = ['on'|'off'], Plot coherence phase angle    {'on'}
+%       'plotbootsub' = ['on'|'off'], Plot coherence for shuffled trials
+%                       if made available using 'bootsub'           {'on'}
+%       'title'       = Optional figure title                       {none}
+%       'vert'        = Times to mark with a dotted vertical line   {none}
+%       'linewidth'   = Line width for marktimes traces (thick=2, thin=1) {2}
+%       'cmax'        = Maximum amplitude for color scale  { use data limits }
+%       'angleunit'   = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
+%       'axesfont'    = Axes font size                               {10}
+%       'titlefont'   = Title font size                              {8}
 %
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
@@ -140,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/19 19:46:28  arno
+% crossf with new trial coherence bootstrap (minus mean)
+%
 % Revision 1.11  2002/04/12 18:10:55  scott
 % added note
 %
@@ -211,8 +228,6 @@ DEFAULT_OVERSMP	= 2;			% Number of times to oversample = vertical resolution
 DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= 'Event-Related Coherence';			% Figure title
 DEFAULT_ALPHA   = NaN;			% Default two-sided significance probability threshold
-AXES_FONT       = 10;
-TITLE_FONT = 14;
            
 if (nargin < 2)
 	help crossf
@@ -278,7 +293,7 @@ g.frame   = frame;
 g.srate   = Fs;
 g.cycles  = varwin;
 
-try, g.shuffle;    catch, g.shuffle = 'off'; end;
+try, g.shuffle;    catch, g.shuffle = 0; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
@@ -294,6 +309,7 @@ try, g.powbase;    catch, g.powbase = nan; end;
 try, g.rboot;      catch, g.rboot = nan; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
 try, g.plotphase;  catch, g.plotphase  = 'on'; end;
+try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
 try, g.detrep;     catch, g.detrep = 'off'; end;
 try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = NaN; end;
@@ -304,13 +320,18 @@ try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.boottype;   catch, g.boottype = 'times'; end; 
+try, g.bootsub;    catch, g.bootsub = 0; end;
 g.type     = lower(g.type);
 g.boottype = lower(g.boottype);
 g.detrep   = lower(g.detrep);
 g.detret   = lower(g.detret);
 g.plotphase = lower(g.plotphase);
+g.plotbootsub = lower(g.plotbootsub);
+g.bootsub = lower(g.bootsub);
 g.plotamp   = lower(g.plotamp);
 g.shuffle   = lower(g.shuffle);
+g.AXES_FONT  = 10;
+g.TITLE_FONT = 14;
 
 % testing arguments consistency
 % -----------------------------
@@ -392,12 +413,34 @@ switch g.type
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 switch g.boottype
-    case { 'trials', 'times', 'both' },;
-    otherwise error('Boot type must be either ''trials'', ''times'' or ''both''');
+    case { 'times', 'timestrials' },;
+    otherwise error('Boot type must be either ''times'' or ''timestrials''');
 end;    
-switch g.shuffle
-    case { 'on', 'off' },;
-    otherwise error('Shuffle type must be either ''on'' or ''off''');
+if (~isnumeric(g.shuffle))
+	error('Shuffle type must be numeric');
+end;
+if (~isnumeric(g.bootsub))
+	error('Bootsub must be numeric');
+	if strcmp(g.boottype, 'times')
+		('Warning: ''bootsub'' is being used, so ''boottype'' was forced to ''timestrials''');
+		g.boottype = 'timestrials';
+	end;
+end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% shuffle trials if necessary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if g.shuffle ~= 0
+	fprintf('Data shuffled\n');
+	XX = reshape(X, size(X,1), frame, size(X,2)/frame);
+	YY = Y;
+	X = [];
+	Y = [];
+	for index = 1:g.shuffle
+		XX = shuffle(XX,1);
+		X = [X XX(:,:)];
+		Y = [Y YY];
+	end;
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -418,12 +461,11 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
            cumulXboot = zeros(g.padratio*g.winsize/2,g.naccu);
            cumulYboot = zeros(g.padratio*g.winsize/2,g.naccu);
     end;
-    switch g.boottype
-        case 'trials'
-	       Rboot = zeros(g.padratio*g.winsize/2, g.timesout,g.naccu); % summed bootstrap coher
-           cumulXboot = zeros(g.padratio*g.winsize/2, g.timesout, g.naccu);
-           cumulYboot = zeros(g.padratio*g.winsize/2, g.timesout, g.naccu);
-    end;            
+    if g.bootsub > 0
+		Rboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub); % summed bootstrap coher
+		cumulXboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub);
+		cumulYboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub);
+    end;
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    	freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
@@ -441,11 +483,10 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
            cumulXboot = zeros(size(win,2),g.naccu);
            cumulYboot = zeros(size(win,2),g.naccu);
     end;        
-    switch g.boottype
-        case 'trials'
-	       Rboot = zeros(size(win,2), g.timesout,g.naccu); % summed bootstrap coher
-           cumulXboot = zeros(size(win,2), g.timesout, g.naccu);
-           cumulYboot = zeros(size(win,2), g.timesout, g.naccu);
+    if g.bootsub > 0
+		Rboottrial = zeros(size(win,2), g.timesout, g.bootsub); % summed bootstrap coher
+		cumulXboottrial = zeros(size(win,2), g.timesout, g.bootsub);
+		cumulYboottrial = zeros(size(win,2), g.timesout, g.bootsub);
     end;            
 end
 
@@ -605,10 +646,41 @@ for t=1:trials,
 	end
 end % t = trial
 
-% handle specific bootstrap types
-% -------------------------------
-if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times') & isnan(g.rboot)
-    fprintf('\nProcessing bootstrap (of %d):',trials);
+% handle trial bootstrap types
+% ----------------------------
+if g.bootsub > 0
+    fprintf('\nProcessing trial bootstrap (of %d):',trials);
+    for allt=1:trials
+		if (rem(allt,10) == 0)
+			fprintf(' %d',allt);
+		end
+	    if rem(allt,120) == 0
+	        fprintf('\n');
+	    end
+	    j=1;
+	    while j<=g.bootsub
+			t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
+			tmpsX = alltmpsX{t(1)};
+			tmpsY = alltmpsY{t(2)};
+			if all(Rn(t(1),:) == 1) & all(Rn(t(2),:) == 1)
+				switch g.type
+				   case 'coher',
+					Rboottrial(:,:,j) = Rboottrial(:,:,j) + tmpsX.*conj(tmpsY); % complex coher.
+					cumulXboottrial(:,:,j) = cumulXboottrial(:,:,j)+abs(tmpsX);
+					cumulYboottrial(:,:,j) = cumulYboottrial(:,:,j)+abs(tmpsY);
+				   case 'phasecoher',
+					Rboottrial(:,:,j) = Rboottrial(:,:,j) + tmpsX.*conj(tmpsY) ./ (abs(tmpsX).*abs(tmpsY)); % complex coher.
+				  end;
+				  j = j+1;
+			end
+	    end
+	end;
+end;
+
+% handle timestrials bootstrap
+% ----------------------------
+if strcmp(g.boottype, 'timestrials') & isnan(g.rboot)
+    fprintf('\nProcessing time and trial bootstrap (of %d):',trials);
     for allt=1:trials
 		if (rem(allt,10) == 0)
 			fprintf(' %d',allt);
@@ -618,54 +690,36 @@ if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times') & isnan(g.rboot)
 	    end
 	    j=1;
 	    while j<=g.naccu
-	        switch g.boottype
-			 case 'trials',
-			  t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
-			  tmpsX = alltmpsX{t(1)};
-			  tmpsY = alltmpsY{t(2)};
-			  if all(Rn(t(1),:) == 1) & all(Rn(t(2),:) == 1)
-				  switch g.type
-				   case 'coher',
-					Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY); % complex coher.
-					cumulXboot(:,:,j) = cumulXboot(:,:,j)+abs(tmpsX);
-					cumulYboot(:,:,j) = cumulYboot(:,:,j)+abs(tmpsY);
-				   case 'phasecoher',
-					Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY) ./ (abs(tmpsX).*abs(tmpsY)); % complex coher.
-				  end;
-				  j = j+1;
-			  end
-			 case 'both',
-			  t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
-			  
-			  goodbasewins = find((Rn(t(1),:) & Rn(t(2),:)) ==1);
-			  if g.baseboot % use baseline windows only
-				  goodbasewins = find(goodbasewins<=baselength); 
-			  end
-			  ngdbasewins = length(goodbasewins);
-			  
-			  if ngdbasewins>1
-				  s = ceil(rand([1 2])*ngdbasewins); % random ints [1,g.timesout]
-				  s=goodbasewins(s);
-				  
-				  tmpsX = alltmpsX{t(1)};
-				  tmpsY = alltmpsY{t(2)};
-				  tmpX = tmpsX(:,s(1));
-				  tmpY = tmpsY(:,s(2));
-				  if all(Rn(t(1),s(1)) == 1) & all(Rn(t(2),s(2)) == 1)
-					  switch g.type
-					   case 'coher',
-						Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
-						cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-						cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
-					   case 'phasecoher',
-						Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
-					  end;
-					  j = j+1;		
-				  end 
-			  end
-	        end;            
-	    end
-	end;
+			t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
+			
+			goodbasewins = find((Rn(t(1),:) & Rn(t(2),:)) ==1);
+			if g.baseboot % use baseline windows only
+				goodbasewins = find(goodbasewins<=baselength); 
+			end
+			ngdbasewins = length(goodbasewins);
+			
+			if ngdbasewins>1
+				s = ceil(rand([1 2])*ngdbasewins); % random ints [1,g.timesout]
+				s=goodbasewins(s);
+				
+				tmpsX = alltmpsX{t(1)};
+				tmpsY = alltmpsY{t(2)};
+				tmpX = tmpsX(:,s(1));
+				tmpY = tmpsY(:,s(2));
+				if all(Rn(t(1),s(1)) == 1) & all(Rn(t(2),s(2)) == 1)
+					switch g.type
+					 case 'coher',
+					  Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
+					  cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
+					  cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
+					 case 'phasecoher',
+					  Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
+					end;
+					j = j+1;		
+				end 
+			end
+		end;            
+	end
 end;
 clear alltmpsX alltmpsY;
 
@@ -676,14 +730,61 @@ switch g.type
   R = R ./ ( cumulX .* cumulY );
   if ~isnan(g.alpha) & isnan(g.rboot)
 	  Rboot = Rboot ./ ( cumulXboot .* cumulYboot );  
-  end;   
+  end;
+  if g.bootsub > 0
+	  Rboottrial = Rboottrial ./ ( cumulXboottrial .* cumulYboottrial );
+  end;
  case 'phasecoher',
   Rn = sum(Rn, 1);
   R = R ./ (ones(size(R,1),1)*Rn);               % coherence magnitude
   if ~isnan(g.alpha) & isnan(g.rboot)
 	  Rboot = Rboot / trials;  
   end;
+  if g.bootsub > 0
+	  Rboottrial = Rboottrial / trials;
+  end;
 end;
+
+% compute baseline
+% ----------------
+mbase = mean(abs(R(:,baseln)'));     % mean baseline coherence magnitude
+
+% compute bootstrap significance level
+% ------------------------------------
+if ~isnan(g.alpha) & isnan(g.rboot) % if bootstrap analysis included . . .
+	Rboot = abs(Rboot); % normalize bootstrap magnitude to [0,1]
+	if ~isnan(g.baseline)
+		Rboot = Rboot - repmat(mbase', [1 g.naccu]); % subtract the man also from Rboot
+	end;
+	Rboot = sort(Rboot')';
+	Rbootout = Rboot;
+elseif ~isnan(g.rboot)
+	Rboot = g.rboot;
+	Rbootout = Rboot;
+end;
+
+if g.bootsub < 0
+	meanRboot = mean(Rboot,3);
+	figure
+	plotall(meanRboot, Rboot, times, freqs, mbase, dispf, g);
+	% WARNING RBOOT IS OF RANK N AND MEANRBOOT IS OF RANK N*g.bootsub
+	% MBASE IS NOT GOOD EITHER
+	
+	R = R - meanRboot; % must subtract man R boot from R (complex)
+	Rboot = Rboot - repmat(meanRboot, [1 1 g.naccu]); % subtract the man also from Rboot
+	Rboot = sort(abs(Rboot),3);  
+	if ~isnan(g.baseline)
+		Rboot = Rboot - repmat(mbase', [1 g.timesout g.naccu]); % subtract the man also from Rboot
+	end;
+	Rbootout = Rboot;
+else	
+	plotall(R, Rboot, times, freqs, mbase, dispf, g);
+end;
+
+% ------------------
+% plotting functions
+% ------------------
+function plotall(R, Rboot, times, freqs, mbase, dispf, g) 
 
 switch lower(g.plotphase)
    case 'on',  
@@ -698,35 +799,6 @@ switch lower(g.plotphase)
        end;     
 end; 
 
-% compute baseline
-% ----------------
-mbase = mean(abs(R(:,baseln)'));     % mean baseline coherence magnitude
-
-% compute bootstrap significance level
-% ------------------------------------
-if ~isnan(g.alpha) & isnan(g.rboot) % if bootstrap analysis included . . .
-    switch g.boottype
-	    case 'trials',
-			meanRboot = mean(Rboot,3);
-			R = R - meanRboot; % must subtract man R boot from R (complex)
-			Rboot = Rboot - repmat(meanRboot, [1 1 g.naccu]); % subtract the man also from Rboot
-			Rboot = sort(abs(Rboot),3);  
-			if ~isnan(g.baseline)
-				Rboot = Rboot - repmat(mbase', [1 g.timesout g.naccu]); % subtract the man also from Rboot
-			end;
-			Rbootout = Rboot;
-        otherwise
-			Rboot = abs(Rboot); % normalize bootstrap magnitude to [0,1]
-			if ~isnan(g.baseline)
-				Rboot = Rboot - repmat(mbase', [1 g.naccu]); % subtract the man also from Rboot
-			end;
-			Rboot = sort(Rboot')';
-			Rbootout = Rboot;
-	end;
-elseif ~isnan(g.rboot)
-	Rboot = g.rboot;
-	Rbootout = Rboot;
-end;
 if ~isnan(g.alpha) % if bootstrap analysis included . . .
     switch g.boottype
 	    case 'trials',
@@ -755,9 +827,10 @@ if ~isnan(g.baseline)
 end;
 Rraw =R; % raw coherence values
 
+	
 if g.plot
     fprintf('\nNow plotting...\n');
-	set(gcf,'DefaultAxesFontSize',AXES_FONT)
+	set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
 	colormap(jet(256));
 	
 	pos = get(gca,'position'); % plot relative to current axes
@@ -914,7 +987,7 @@ if g.plot
 	   h(13) = text(-.05,1.01,g.title);
 	   set(h(13),'VerticalAlignment','bottom')
 	   set(h(13),'HorizontalAlignment','left')
-	   set(h(13),'FontSize',TITLE_FONT)
+	   set(h(13),'FontSize',g.TITLE_FONT)
    end
    axcopy(gcf);
 end;
