@@ -33,7 +33,7 @@
 %                        factor (percentage of the maximum) 'skirt': Plot cartoon head
 %                        at the usual 0.5 radius and show lower locations as a 'skirt' 
 %                        outside the head boundary. {default = chan_locs structure 'shrink' 
-%                        if any. else 'off'}
+%                        value, if any, else 'off'}
 %   'colormap'        -  (n,3) any size colormap
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
 %                        map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2004/02/17 03:14:44  scott
+% expand skirt border radius
+%
 % Revision 1.134  2004/02/15 21:30:01  scott
 % same
 %
@@ -485,11 +488,12 @@
 
 function [handle,chanval,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
-% User Defined Defaults:
+%
+%%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 noplot  = 'off';
 handle = [];
 Zi = [];
-
 chanval = NaN;
 rmax = 0.5;             % head radius - don't change this!
 icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC
@@ -515,7 +519,6 @@ DIPLEN    = 1;
 DIPSCALE  = 1;
 DIPORIENT  = 1;
 DIPCOLOR  = [0 0 0];
-
 VERBOSE = 'on';
 MASKSURF = 'off';
 
@@ -698,6 +701,11 @@ if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common 
 end;
 
 if length(Vl) > 1
+   if max(ind)>length(Vl)
+      fprintf('max channel index in locs (%d) > number of channels in plot data (%d) ',...
+                                   max(ind),length(Vl));
+      error(' ')
+   end
     Vl     = Vl(ind);
 end;
 labels = labels(ind);
@@ -1068,10 +1076,9 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
-%  fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2)); % DEBUG
   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
-  set(hd,'color','w','linewidth',HLINEWIDTH+5);
+  set(hd,'color',[0.99 0.99 0.99],'linewidth',HLINEWIDTH+5);
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
@@ -1079,6 +1086,7 @@ if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
+
 else % no 'skirt'
   plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
@@ -1114,12 +1122,8 @@ function [newTh] = skirt_Th(Th,Rd,maxr)
    if ~isempty(q1)
      dr = Rd(q1)-0.5;
      x = abs(asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi))));
-180*x/pi % DEBUG
-oldTh = Th; % DEBUG
      Th(q1) = x+Th(q1)*(pi2-2*x)/(pi2);
-[q1' 180/pi*oldTh(q1)' 180/pi*Th(q1)'] % DEBUG
    end
-%  fprintf('rotated %d q1 angles\n',length(q1)); % DEBUG
 
    if ~isempty(q2)
      Th(q2) = Th(q2)-pi2; % rotate to q1
@@ -1128,7 +1132,6 @@ oldTh = Th; % DEBUG
      Th(q2) = x+Th(q2)*(pi2-2*x)/pi2;
      Th(q2) = Th(q2)+pi2; % rotate back
    end
-%  fprintf('rotated %d q2 angles\n',length(q2)); % DEBUG
 
    if ~isempty(q3)
      Th(q3) = Th(q3)+pi; % rotate to q1
@@ -1137,7 +1140,6 @@ oldTh = Th; % DEBUG
      Th(q3) = x+Th(q3)*(pi2-2*x)/pi2;
      Th(q3) = Th(q3)-pi; % rotate back
    end
-%  fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
 
    if ~isempty(q4)
      Th(q4) = Th(q4)+pi2; % rotate to q1
@@ -1146,6 +1148,6 @@ oldTh = Th; % DEBUG
      Th(q4) = x+Th(q4)*(pi2-2*x)/pi2;
      Th(q4) = Th(q4)-pi/2; % rotate back
    end
-%  fprintf('rotated %d q4 angles\n',length(q4)); % DEBUG
-  newTh = Th;
+
+   newTh = Th;
 return
