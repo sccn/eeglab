@@ -1,14 +1,14 @@
 % pop_loadset() - load a dataset (pop out window if no arguments)
 %
 % Usage:
-%   >> VAROUT = pop_loadset( filename, filepath);
+%   >> EEGOUT = pop_loadset( filename, filepath);
 %
 % Inputs:
-%   filename  - file name
-%   filepath  - file path
+%   filename  - [string] file name
+%   filepath  - [string] file path (optional)
 %
 % Output
-%   VAROUT - variable read
+%   EEGOUT - EEG data structure from EEGLAB
 %
 % Note: output may be a dataset structure of an array of
 %       dataset structures.
@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/07/16 18:26:19  arno
+% automatically updating filename
+%
 % Revision 1.19  2003/05/20 23:30:57  arno
 % still debuging october 2002 problem
 %
@@ -101,14 +104,25 @@ function [VAROUT, command] = pop_loadset( inputname, inputpath);
 command = '';
 VAROUT  = [];
 %eeg_emptyset;
-if nargin < 2  
+if nargin < 1
 	[inputname, inputpath] = uigetfile('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
 end;
+if nargin < 2
+    inputpath = '';
+end;
 
 fprintf('Pop_loadset: loading file %s ...\n', inputname);
-TMPVAR = load([ inputpath inputname ], '-mat');
+try
+    TMPVAR = load([ inputpath inputname ], '-mat');
+catch,
+    try
+        TMPVAR = load([ inputpath '/' inputname ], '-mat');
+    catch,
+        TMPVAR = load([ inputpath '\' inputname ], '-mat');
+    end;        
+end;
 
 if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
