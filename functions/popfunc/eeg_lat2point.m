@@ -1,24 +1,24 @@
-% eeg_lat2point() - convert latency to point
-%
+% eeg_lat2point() - convert latencies in time units relative to the
+%                   time locking event of an eeglab() data epoch to 
+%                   latencies in data points (assuming concatenated epochs).
 % Usage:
-%       >> [newlat outbound] = eeg_lat2point( lat_array, epoch_array,...
+%       >> [newlat] = eeg_lat2point( lat_array, epoch_array,...
 %                                 srate, timelimits, timeunit);
-%
 % Inputs:
-%   lat_array   - latency array in timeunit
-%   epoch_array - epoch number corresponding to each latency
-%   srate       - sampling rate in Hz
-%   timelimits  - [min max] timelimits in timeunit
-%   timeunit    - time unit in second. Default is 1 second.
+%   lat_array   - latency array in 'timeunit' units (see below)
+%   epoch_array - epoch number for each latency
+%   srate       - data sampling rate in Hz
+%   timelimits  - [min max] epoch timelimits in 'timeunit' units (see below)
+%   timeunit    - time unit relative to seconds. Default is 1 = seconds.
 %
 % Outputs:
-%   newlat      - converted latency values in point assuming concatenated
+%   newlat      - converted latency values in points assuming concatenated
 %                 data epochs (see eeglab() event structure)
-%   outbound    - indices of out of boundary latencies
+%   outbound    - indices of out of boundary latencies (Unimplemented)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
-% See also: eeg_point2lat()
+% See also: eeg_point2lat(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/08 22:03:37  arno
+% update
+%
 % Revision 1.1  2002/05/03 01:04:30  arno
 % Initial revision
 %
