@@ -35,17 +35,6 @@
 %                        outside the head boundary. {default = chan_locs structure 'shrink' 
 %                        value, if any, else 'off'}
 %   'colormap'        -  (n,3) any size colormap
-%   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
-%                        map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
-%                        model has radius 1). If several rows, plot one dipole per row.
-%   'dipnorm'         - ['on'|'off'] normalize deipole length {default = 'off'}.
-%   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
-%   'diplen'          - [real] scale dipole length {default = 1}.
-%   'dipscale'        - [real] scale dipole size {default = 1}.
-%   'dipcolor'        - [color] change dipole color {default = 'k' (black)}.
-%                        The dipole bar is scaled by length L. Dipole size (scaling) 
-%                        is S and its color is C (3 real numbers between 0 and 1).
-%                        Coordinates returned by dipplot() may be used.
 %   'verbose'         - ['on'|'off'] default is 'on'.
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                        If [rad theta] are coordinates of a (possibly missing) channel, 
@@ -55,6 +44,21 @@
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'efontsize'|'electcolor'|'emarker'|'emarkersize'|'emarkersize1chan' - electrode details
+%
+% Dipole plotting options:
+%   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
+%                        map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
+%                        model has radius 1). If several rows, plot one dipole per row.
+%                        May also accept a dipfit structure (see help dipplot()).
+%   'dipnorm'         - ['on'|'off'] normalize deipole length {default = 'off'}.
+%   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
+%   'diplen'          - [real] scale dipole length {default = 1}.
+%   'dipscale'        - [real] scale dipole size {default = 1}.
+%   'dipsphere'       - [real] size of the sphere. Default is 85 mm.
+%   'dipcolor'        - [color] change dipole color {default = 'k' (black)}.
+%                        The dipole bar is scaled by length L. Dipole size (scaling) 
+%                        is S and its color is C (3 real numbers between 0 and 1).
+%                        Coordinates returned by dipplot() may be used.
 %  
 % Outputs:
 %         h           - axes handle
@@ -93,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2004/02/17 18:16:35  scott
+% adjust EMARKERSIZE
+%
 % Revision 1.137  2004/02/17 18:11:36  scott
 % fixed 'skirt'&'fill' problem. Also, made heads bigger
 %
@@ -110,183 +117,11 @@
 %
 % Revision 1.132  2004/02/15 21:02:13  scott
 % same
-%
-% Revision 1.131  2004/02/15 21:01:27  scott
-% same
-%
-% Revision 1.130  2004/02/15 20:57:04  scott
-% same
-%
-% Revision 1.129  2004/02/15 20:48:15  scott
-% same
-%
-% Revision 1.128  2004/02/15 20:44:51  scott
-% same
-%
-% Revision 1.127  2004/02/15 20:44:12  scott
-% sme
-%
-% Revision 1.126  2004/02/15 20:43:47  scott
-% same
-%
-% Revision 1.125  2004/02/15 20:39:39  scott
-% same
-%
-% Revision 1.124  2004/02/15 20:35:56  scott
-% same
-%
-% Revision 1.123  2004/02/15 20:33:10  scott
-% same
-%
-% Revision 1.122  2004/02/15 20:32:37  scott
-% same
-%
-% Revision 1.121  2004/02/15 20:30:46  scott
-% same
-%
-% Revision 1.120  2004/02/15 20:26:59  scott
-% same
-%
-% Revision 1.119  2004/02/15 20:26:21  scott
-% sa,e
-%
-% Revision 1.118  2004/02/15 20:25:26  scott
-% same
-%
-% Revision 1.117  2004/02/15 20:24:07  scott
-% same
-%
-% Revision 1.116  2004/02/15 20:23:39  scott
-% same
-%
-% Revision 1.115  2004/02/15 20:21:59  scott
-% same
-%
-% Revision 1.114  2004/02/15 20:18:03  scott
-% same
-%
-% Revision 1.113  2004/02/15 20:16:35  scott
-% same
-%
-% Revision 1.112  2004/02/15 20:15:13  scott
-% same
-%
-% Revision 1.111  2004/02/15 20:05:56  scott
-% same
-%
-% Revision 1.110  2004/02/15 20:04:20  scott
-% same
-%
-% Revision 1.109  2004/02/15 20:03:40  scott
-% same
-%
-% Revision 1.108  2004/02/15 20:02:02  scott
-% same
-%
-% Revision 1.107  2004/02/15 20:01:34  scott
-% same
-%
-% Revision 1.106  2004/02/15 20:00:13  scott
-% same
-%
-% Revision 1.105  2004/02/15 19:59:04  scott
-% same
-%
-% Revision 1.104  2004/02/15 19:56:43  scott
-% same
-%
-% Revision 1.103  2004/02/15 19:53:36  scott
-% same
-%
-% Revision 1.102  2004/02/15 19:53:06  scott
-% same
-%
-% Revision 1.101  2004/02/15 19:52:01  scott
-% same
-%
-% Revision 1.100  2004/02/15 19:47:27  scott
-% same
-%
-% Revision 1.99  2004/02/15 19:45:27  scott
-% same
-%
-% Revision 1.98  2004/02/15 19:44:44  scott
-% same
-%
-% Revision 1.97  2004/02/15 19:42:31  scott
-% same
-%
 % Revision 1.96  2004/02/15 19:41:48  scott
 % skirt with wedges
 %
 % Revision 1.95  2004/02/15 17:35:49  scott
 % added 'style','skirt'
-%
-% Revision 1.94  2004/02/15 17:29:25  scott
-% same
-%
-% Revision 1.93  2004/02/15 17:28:41  scott
-% same
-%
-% Revision 1.92  2004/02/15 17:17:30  scott
-% same
-%
-% Revision 1.91  2004/02/15 17:06:44  scott
-% same
-%
-% Revision 1.90  2004/02/15 17:05:34  scott
-% same
-%
-% Revision 1.89  2004/02/15 17:04:42  scott
-% same
-%
-% Revision 1.88  2004/02/15 17:04:12  scott
-% same
-%
-% Revision 1.87  2004/02/15 17:03:14  scott
-% same
-%
-% Revision 1.86  2004/02/15 16:58:48  scott
-% same
-%
-% Revision 1.85  2004/02/15 16:55:39  scott
-% same
-%
-% Revision 1.84  2004/02/15 16:52:21  scott
-% same
-%
-% Revision 1.83  2004/02/15 16:48:44  scott
-% same
-%
-% Revision 1.82  2004/02/15 16:45:42  scott
-% same
-%
-% Revision 1.81  2004/02/15 16:44:31  scott
-% same
-%
-% Revision 1.80  2004/02/15 16:30:30  scott
-% same
-%
-% Revision 1.79  2004/02/15 16:29:37  scott
-% same
-%
-% Revision 1.78  2004/02/15 16:28:15  scott
-% same
-%
-% Revision 1.77  2004/02/15 16:26:54  scott
-% same
-%
-% Revision 1.76  2004/02/15 16:25:25  scott
-% same
-%
-% Revision 1.75  2004/02/15 16:13:10  scott
-% same
-%
-% Revision 1.74  2004/02/15 16:07:46  scott
-% same
-%
-% Revision 1.73  2004/02/15 16:07:01  scott
-% same
 %
 % Revision 1.72  2004/02/15 15:58:33  scott
 % formatting, try 'shrink','skirt' ...
@@ -524,6 +359,7 @@ SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = 'off';
 DIPOLE  = [];           % dipole defaults
 DIPNORM   = 'off';
+DIPSPHERE = 85;
 DIPLEN    = 1;
 DIPSCALE  = 1;
 DIPORIENT  = 1;
@@ -636,6 +472,8 @@ if nargs > 2
          end
 	 case 'dipole'
 	  DIPOLE = Value;
+	 case 'dipsphere'
+	  DIPSPHERE = Value;
 	 case 'dipnorm'
 	  DIPNORM = Value;
 	 case 'diplen'
@@ -1055,17 +893,27 @@ if ~isempty(DIPOLE)
     hold on;
     % invert x and y from dipplot
     tmp = DIPOLE;
-    DIPOLE(:,1) = -tmp(:,2);
-    DIPOLE(:,2) =  tmp(:,1);
-    DIPOLE(:,3) = -tmp(:,4);
-    DIPOLE(:,4) =  tmp(:,3);
-    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-    DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
+    if isstruct(DIPOLE)
+        DIPOLE = [];
+        DIPOLE(:,1) = -tmp.posxyz(:,2)/DIPSPHERE;
+        DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE;
+        DIPOLE(:,3) = -tmp.momxyz(:,2);
+        DIPOLE(:,4) =  tmp.momxyz(:,1);
+        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
+        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500;
+    else
+        DIPOLE(:,1) = -tmp(:,2);
+        DIPOLE(:,2) =  tmp(:,1);
+        DIPOLE(:,3) = -tmp(:,4);
+        DIPOLE(:,4) =  tmp(:,3);
+        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
+        DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
+    end;
     if strcmpi(DIPNORM, 'on')
-        for index = size(DIPOLE,1)
+        for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
         end;
-    end; 
+    end;
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
     for index = 1:size(DIPOLE,1)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
