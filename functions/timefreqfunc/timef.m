@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/05/05 16:27:11  arno
+% debug FFT scale
+%
 % Revision 1.54  2003/03/14 01:04:12  arno
 % typo header
 %
@@ -873,7 +876,7 @@ end
 P = P ./ (ones(size(P,1),1) * Rn);
 
 if isnan(g.powbase)
-  fprintf('Computing the mean baseline spectrum\n');
+  fprintf('\nComputing the mean baseline spectrum\n');
   mbase = mean(P(:,baseln),2)';
 else
   fprintf('Using the input baseline spectrum\n');
