@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/29 13:57:49  scott
+% modified PC->PA, 'phasecouple'->'phsamp', made output format (phs,amp,time) -sm
+%
 % Revision 1.17  2002/04/27 21:26:24  scott
 % debugging PC -sm
 %
@@ -642,6 +645,9 @@ for i=1:trials
                   cumulX(:,j) = cumulX(:,j)+abs(tmpX);
 		        case 'phasecoher',
 		          RR(:,j) = tmpX ./ abs(tmpX); % normalized cross-spectral vector
+                  if g.phsamp
+                     cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
+                  end
               end;
          end
           Wn(j) = 1;
