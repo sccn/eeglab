@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.199  2004/01/24 21:36:01  scott
+% *** empty log message ***
+%
 % Revision 1.198  2004/01/24 21:26:50  scott
 % same
 %
@@ -217,7 +220,7 @@
 % help msg
 %
 % Revision 1.179  2003/11/19 01:06:22  arno
-% including hanning function
+% including makehanning function
 %
 % Revision 1.178  2003/11/16 17:48:00  scott
 % plot1erp() -> plot1trace(); printf "Done."
@@ -3026,10 +3029,14 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
   ERPZEROWIDTH = 2;
   if ~isempty(winloc)
     fillwinx = [winloc winloc(end:-1:1)];
+    hannwin = makehanning(length(winloc));
+    hannwin = hannwin(:)'; % make row vector
     if ~isempty(axlimits) & sum(isnan(axlimits))==0
-       fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
+       % fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
+       fillwiny = [hannwin*axlimits(3) hannwin*axlimits(4)];
     else
-       fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
+       % fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
+       fillwiny = [hannwin*1.1*min(erp) hannwin*1.1*max(erp)];
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
     set(fillwh,'edgecolor',WINFILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
@@ -3080,7 +3087,7 @@ data = reshape(data,[frames prod(size(data))/frames]);
 % note: as the number of cycle changes, the frequency shifts a little
 %       this has to be fixed
 win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
-win = win .* repmat(hanning(length(nwin))',length(freq),1);
+win = win .* repmat(makehanning(length(nwin))',length(freq),1);
 %tmp =gcf; figure; plot(real(win)); figure(tmp);
 %fprintf('ANY NAN ************************* %d\n', any(any(isnan( data(nwin,:)))));
 
@@ -3170,13 +3177,13 @@ function out = nan_std(in)
     out = sqrt((sum(in.^2)-sum(in).^2./nonnans)./(nonnans-1));
     out(nononnans) = NaN;
 
-% syemtric hanning function
-function w = hanning(n)
+% symmetric hanning function
+function w = makehanning(n)
 if ~rem(n,2)
-   w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
+   w = 0.5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
    w = [w; w(end:-1:1)];
 else
-   w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
+   w = 0.5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
    w = [w; w(end-1:-1:1)];
 end
 
