@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.169  2003/11/13 02:29:51  scott
+% debug
+%
 % Revision 1.168  2003/11/13 02:28:12  scott
 % debug
 %
@@ -2674,7 +2677,7 @@ if ~isnan(coherfreq)
             end
         end
         
-        if Cohsigflag % plot amplitude significance levels
+        if 0 % Cohsigflag % plot amplitude significance levels
             hold on
             plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
                  'linewidth',SIGNIFWIDTH);
