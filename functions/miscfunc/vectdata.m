@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/07/04 00:01:09  arno
+% newanglevalless constraint for uniform data (on precision)
+%
 % Revision 1.4  2002/10/21 15:52:16  arno
 % debug indices
 %
@@ -83,7 +86,7 @@ if ~isempty(g.average)
     timediff = timevect(2:end) -timevect(1:end-1);
     if any( (timediff - mean(timediff)) > 1e-8 ) % not uniform values
         fprintf('Data has to be interpolated uniformly for moving average\n');
-        minspace = min(timediff);
+        minspace = median(timediff);
         newtimevect = linspace(timevect(1), timevect(end), ceil((timevect(end)-timevect(1))/minspace)); 
         array = interpolate( array, timevect, newtimevect, g.method);
         timevect = newtimevect;
