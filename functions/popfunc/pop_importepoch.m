@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/02/28 16:57:58  arno
+% test if xmin < 0before adding TLE events
+%
 % Revision 1.21  2003/02/28 15:40:34  scott
 % header edit -sm
 %
@@ -284,7 +287,9 @@ if ~isempty(EEG.event)
     end;
 end;
 if strcmpi(g.clearevents, 'on')
-    fprintf('Pop_importepoch: deleting old events if any\n');
+    if ~isempty(EEG.event)
+        fprintf('Pop_importepoch: deleting old events if any\n');
+    end;
     EEG.event = [];
 else 
     fprintf('Pop_importepoch: appending new events to the existing event array\n');
