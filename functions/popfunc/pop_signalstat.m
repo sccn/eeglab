@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 20:42:47  luca
+% added Log tag, changed popup title, added title for table
+%
 
 function varargout = pop_signalstat( EEG, typeproc, cnum, percent );
 
@@ -97,6 +100,7 @@ if typeproc == 1
 %	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( EEG.data(cnum,:),1,[], percent);
 	dlabel=[];
 	dlabel2=['Channel ' num2str(cnum)];
+	map = cnum;
 else 
 	if ~isempty( EEG.icasphere )
         eeg_options; 
@@ -108,6 +112,7 @@ else
 	%	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( tmpsig,1,'Component Activity',percent);
 		dlabel='Component Activity';
 		dlabel2=['Component ' num2str(cnum)];
+		map = EEG.icawinv(:,cnum);
 	else
 		error('You must run ICA first');
 	end;	
@@ -125,7 +130,7 @@ end;
 % -------------------------
 fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
-com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2 ); %s', outstr);
+com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs ); %s', outstr);
 
 eval(com)	
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
