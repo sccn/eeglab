@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/25 14:37:26  arno
+% header problem fix
+%
 % Revision 1.2  2002/04/08 20:47:54  arno
 % adding comments field
 %
@@ -49,7 +52,6 @@ EEG.trials     = 0;
 EEG.srate      = 1;
 EEG.xmin       = 0;
 EEG.xmax       = 0;
-EEG.rt         = [];
 EEG.data       = [];
 EEG.icawinv    = [];
 EEG.icasphere  = [];
