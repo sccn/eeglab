@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/07/28 15:28:24  arno
+% obsolete averef
+%
 % Revision 1.37  2003/05/29 21:45:53  arno
 % allowing to import numerical data array from command line
 %
@@ -233,11 +236,7 @@ if nargin < 2                 % if several arguments, assign values
     if isstr(EEG.ref)
         curref = EEG.ref;
     else
-        if EEG.ref(1) < 0
-            curref = [ int2str(-EEG.ref) ' (absent from data)' ];
-        else
-            curref = [ int2str(-EEG.ref) ' (present in data)' ];
-        end;
+        curref = [ 'channel(s) ' int2str(abs(EEG.ref)) ];
     end;
     uilist = { ...
          { 'Style', 'text', 'string', 'Dataset name (optional):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
