@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/07 22:39:54  arno
+% same
+%
 % Revision 1.9  2002/08/07 22:36:04  arno
 % editing
 %
@@ -163,7 +166,7 @@ if icacomp == 1
 	fprintf('Computing joint probability for channels...\n');
 	[ EEG.stats.jpE rejE ] = jointprob( EEG.data, locthresh, EEG.stats.jpE, 1); 
 
-	fprintf('Computing global joint probability...\n');
+	fprintf('Computing all-channel probability...\n');
 	tmpdata = permute(EEG.data, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
 	[ EEG.stats.jp rej ] = jointprob( tmpdata, globthresh, EEG.stats.jp, 1); 
