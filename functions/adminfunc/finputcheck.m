@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/01/31 02:35:38  arno
+% debugging lowercase/upercase problem
+%
 % Revision 1.14  2002/11/20 01:05:44  arno
 % take into account duplicate parameters
 %
@@ -171,7 +174,7 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	% ---------------------------
 	allfields = fieldnames(g);
 	for index=1:length(allfields)
-		if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
+		if isempty(strmatch(allfields{index}, fieldlist(:, 1)', 'exact'))
 			if ~strcmpi(mode, 'ignore')
 				g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
 			end;
@@ -221,7 +224,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
           g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
       end;
       if ~isempty(fieldval)
-          if isempty(strmatch(lower(tmpval), lower(fieldval)))
+          if isempty(strmatch(lower(tmpval), lower(fieldval), 'exact'))
               g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
           end;
       end;
