@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/05/01 21:23:24  arno
+% no changes
+%
 % Revision 1.33  2002/04/30 04:27:54  arno
 % trying to debug phsamp, still unsucessfull
 %
@@ -563,7 +566,7 @@ else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%
     dispf = find(freqs <= g.maxfreq);
     freqs = freqs(dispf);
 
-	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,.5);
+	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,0.5);
 	P = zeros(size(win,2),g.timesout);       % summed power
 	R = zeros(size(win,2),g.timesout);       % mean coherence
 	PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
@@ -685,7 +688,7 @@ for i=1:trials
 			    tmpXMT = g.alltapers .* (tmpX(:) * ones(1,size(g.alltapers,2)));
 			    tmpXMT = win' * tmpXMT;
                 PP(:,j) = mean(abs(tmpXMT).^2, 2); % power
-		        tmpX = win' * tmpX(:); 
+		        tmpX = win' * tmpX(:);
             else
 		        tmpX = win' * tmpX(:); 
                 PP(:,j) = abs(tmpX).^2; % power
@@ -712,12 +715,15 @@ for i=1:trials
 
         switch g.phsamp
          case 'on' %PA (freq x freq x time)
-          PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * (PP(:,j))';
+          PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((PP(:,j)))';
                                            % x-product: unit phase column
                                            % times amplitude row
         end
 	end % window
 
+	%figure; imagesc(times, freqs, angle(RR));
+	%figure; imagesc(times, freqs, log(PP));
+	
 	if ~isnan(g.alpha) % save surrogate data for bootstrap analysis
         j = 1;
         goodbasewins = find(Wn==1);
