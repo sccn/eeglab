@@ -13,12 +13,13 @@
 %   hicutoff    = high edge frequency in pass band (Hz) {0 -> highpass}
 %   epochframes = frames per epoch (filter each epoch separately {def/0: all}
 %   filtorder   = length of the filter in points {default 3*fix(srate/locutoff)}
+%   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {0}
 %
 % Outputs:
 %    smoothdata = smoothed data
 %    filtwts    = filter coefficients [smoothdata <- filtfilt(filtwts,1,data)]
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1997 
+% Author: Scott Makeig, Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1997 
 
 % Copyright (C) 4-22-97 from bandpass.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -37,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/09 14:55:36  arno
+% update transition band
+%
 % Revision 1.3  2002/08/09 02:06:27  arno
 % updating transition
 %
@@ -52,7 +56,7 @@
 % 12-05-00 added error() calls -sm
 % 01-25-02 reformated help & license, added links -ad 
 
-function [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff,epochframes,filtorder)
+function [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff,epochframes,filtorder, revfilt)
 
 if nargin<4
     fprintf('');
@@ -97,6 +101,9 @@ end
 
 if nargin<6
    filtorder = 0;
+end
+if nargin<7
+   revfilt = 0;
 end
 
 if filtorder==0,
@@ -156,6 +163,9 @@ else
  help eegfilt
  return
 end
+if revfilt
+    m = ~m;
+end;
 
 filtwts = firls(filtorder,f,m); % get FIR filter coefficients
 
