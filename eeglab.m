@@ -173,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/04/23 17:58:16  arno
+% modifying pop_loadset
+%
 % Revision 1.26  2002/04/23 02:03:17  arno
 % updating menus for old and new pop_erpimage.m
 %
@@ -314,7 +317,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_newnonempty]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   'LASTCOM = pop_saveset(EEG);' e_hist]);
 	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   'LASTCOM = pop_saveset;' e_hist ]);
-	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck 'LASTCOM = pop_delset;' e_hist ]);
+	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_hist]);
 	uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_saveh(ALLCOM);' e_hist]);
 	uimenu( first_m, 'Label', 'Quit'             , 'Separator', 'on'        , 'CallBack', ...
@@ -329,7 +332,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[LASTCOM] = pop_copyset; h(LASTCOM); eeg_updatemenu;' e_hist], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Append another dataset', 'CallBack', [ check      '[EEG LASTCOM] = pop_mergeset(EEG);' e_newset]);
-	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    'LASTCOM = pop_delset;' e_hist]);
+	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist]);
 		
 fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset]);

@@ -1,12 +1,13 @@
 % pop_delset() - Delete a dataset into the global variable containing
 %                all datasets.
 %
-% Usage: >> ALLEEG = pop_delset(ALLEEG, indexes);
+% Usage: >> ALLEEG = pop_delset(ALLEEG, indices);
 %
 % Inputs:
 %   ALLEEG   - array of EEG datasets
-%   indexes  - Indexes of datasets to delete. If no index is given,
-%              a pop_up window asks the user to choose.
+%   indices  - Indexes of datasets to delete. If no index is given,
+%              a pop_up window asks the user to choose. If a negative
+%              index is given, it is used a default in the pop-up window.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -33,6 +34,9 @@
 % uses the global variable ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 19:00:30  arno
+% making delset.m standalone
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %
@@ -51,11 +55,15 @@ if isempty( ALLSET )
     return;
 end;    
 
-if nargin < 2
+if nargin < 2 | set_in < 0
 	% which set to delete
 	% -----------------
 	promptstr    = { 'Enter the dataset(s) to delete:' };
-	inistr       = { int2str(CURRENTSET) };
+	if nargin == 2
+		inistr       = { int2str(-set_in) };
+	else
+		inistr       = { '1' };
+	end;
 	result       = inputdlg( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
@@ -76,22 +84,6 @@ for i = set_in
 	catch
 		error('Error: no such dataset');
 		return;
-	end;
-end;
-
-% find a new non-empty dataset
-% ----------------------------   
-if ismember(CURRENTSET, set_in)
-	CURRENTSET = 0;
-	index = 1;
-	while( index <= MAX_SET)
-		try, ALLSET(index).data;
-			if ~isempty( ALLSET(index).data)
-				CURRENTSET = index;
-				break;
-			end;	
-		catch, end;	
- 		index = index+1;
 	end;
 end;
     
