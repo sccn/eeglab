@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/15 00:11:14  arno
+% title bug
+%
 % Revision 1.5  2002/10/09 18:32:47  arno
 % axcopy problem -> only try to execute it
 %
@@ -485,12 +488,7 @@ end;
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
-g.cycles  = varwin(1);
-if length(varwin)>1
-	g.cyclesfact = varwin(2);
-else 
-	g.cyclesfact = 1;
-end;
+g.cycles  = varwin;
 g.type       = lower(g.type);
 g.boottype   = lower(g.boottype);
 g.detrep     = lower(g.detrep);
@@ -566,6 +564,7 @@ if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
 end;
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -621,8 +620,12 @@ if iscell(X)
 
 	subplot(1,3,3); title(g.title{3});
 	if isnan(g.alpha)
-        Rdiff = R1-R2;
-		plotall(Rdiff, [], [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+        switch(g.condboot)
+            case 'abs',  Rdiff = abs(R1)-abs(R2);
+            case 'angle',  Rdiff = angle(R1)-angle(R2);
+            case 'complex',  Rdiff = R1-R2;
+        end;
+		plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
         Rbootout = [];
 	else 
 		% preprocess data and run compstat
@@ -696,7 +699,7 @@ end;
 % display text to user
 %%%%%%%%%%%%%%%%%%%%%%
 trials    = length(X)/g.frame;
-freqs     = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2; % recomputed by timefreq
+freqs     = g.srate*g.cycles(1)/g.winsize*[2:2/g.padratio:g.winsize]/2; % recomputed by timefreq
 dispf     = find(freqs <= g.maxfreq);
 fprintf('\nComputing the Event-Related \n');
 switch g.type
@@ -706,11 +709,11 @@ switch g.type
 end;
 fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
 fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
-if g.cycles==0
+if g.cycles(1)==0
    fprintf('The data window size is %d sample points (%g ms).\n',g.winsize,g.winsize/g.srate);
    fprintf('The FFT length is %d samples\n',g.winsize*g.padratio);
 else
-   fprintf('The window size is %d cycles.\n',g.cycles);
+   fprintf('The window size is %d cycles.\n',g.cycles(1));
    fprintf('The maximum window size is %d sample points (%g ms).\n',g.winsize,g.winsize/g.srate);
 end
 fprintf('The window is applied %d times\n',g.timesout);
@@ -725,6 +728,7 @@ switch g.plotphase
 case 'on', fprintf(['Coherence angles will be imaged in ',g.angleunit,'\n']);
 end;
 
+
 %%%%%%%%%%%%%%%%%%%%%%%
 % main computation loop
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -732,16 +736,16 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% -------------------------------------
 	% compute time frequency decompositions
 	% -------------------------------------
-	fprintf('\nProcessing trial for first input (of %d):',trials);
+    spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
+                        g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
+                        'padratio', g.padratio };
+
+    fprintf('\nProcessing trial for first input (of %d):',trials);
 	X = reshape(X, g.frame, trials);
-	[alltfX freqs times] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
-									'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
-									g.type, 'subitc', g.subitc, 'wavelet', g.cycles); 
+	[alltfX freqs times] = timefreq(X, g.srate, spectraloptions{:});
 	fprintf('\nProcessing trial for second input (of %d):',trials);
 	Y = reshape(Y, g.frame, trials);
-	[alltfY] = timefreq(Y, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
-						'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
-						g.type, 'subitc', g.subitc, 'wavelet', g.cycles); 
+	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
 	nb_points = size(alltfX,1);
 	dispf     = find(freqs <= g.maxfreq);
 	freqs = freqs(dispf);
@@ -806,10 +810,14 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		  formulapost = [ 'coher = coher /' int2str(trials) ];
 		end;
 		
-		Rbootout = bootstat(alltfX, alltfY, formula, 'boottype', g.boottype, ...
+		if ~isnan(g.alpha)
+            Rbootout = bootstat(alltfX, alltfY, formula, 'boottype', g.boottype, ...
 							'formulapost', formulapost, 'formulainit', formulainit, ...
-							'formulaout', formulaout, 'bootside', 'upper', 'naccu', g.naccu);
-		% note that the bootstrap thresholding is actually performed in the display subfunction plotall()
+							'formulaout', formulaout, 'bootside', 'upper', ...
+                            'naccu', g.naccu, 'alpha', g.alpha);
+		else Rbootout = [];
+        end;
+        % note that the bootstrap thresholding is actually performed in the display subfunction plotall()
 	end;
 	
 end;
@@ -869,14 +877,20 @@ end;
 % compute angles
 % --------------
 Rangle = angle(R);
-if g.cycles ~= 0
+if g.cycles(1) ~= 0
    Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
 end
-R = abs(R);
-% if ~isnan(g.baseline)
-% 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
-% end;
-Rraw =R; % raw coherence values
+if ~isreal(R)
+    R = abs(R);
+    Rraw =R; % raw coherence values
+    setylim = 1;
+    % if ~isnan(g.baseline)
+    % 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
+    % end;
+else
+    Rraw = R;
+    setylim = 0;
+end;
 
 if g.plot
    fprintf('\nNow plotting...\n');
@@ -936,7 +950,11 @@ case 'on'
    %title('Event-Related Coherence')
    
    h(8) = axes('Position',[.95 ordinate1 .05 height].*s+q);
-   cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
+   if setylim 
+       cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
+   else
+       cbar(h(8),1:300, [-tmpscale(2) tmpscale(2)]); % use only positive colors (gyorv) 
+   end;
    
    %
    % Plot delta-mean min and max coherence at each time point on bottom of image
@@ -1007,27 +1025,32 @@ case 'on'
    % Plot coherence phase lags in bottom panel
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
-   if strcmp(g.angleunit,'ms')  % convert to ms
-      Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
-      maxangle = max(max(abs(Rangle)));
-   else
-      Rangle = Rangle*180/pi; % convert to degrees
-      maxangle = 180; % use full-cycle plotting 
-   end
-   Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
-   
-   imagesc(times,freqs(dispf),Rangle(dispf,:),[-maxangle maxangle]); % plot the 
-   hold on                                             % coherence phase angles
-   plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % zero-time line
-   for i=1:length(g.marktimes)
-      plot([g.marktimes(i) g.marktimes(i)],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
+   if setylim
+       if strcmp(g.angleunit,'ms')  % convert to ms
+           Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
+           maxangle = max(max(abs(Rangle)));
+       else
+           Rangle = Rangle*180/pi; % convert to degrees
+           maxangle = 180; % use full-cycle plotting 
+       end
+       Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
+       
+       imagesc(times,freqs(dispf),Rangle(dispf,:),[-maxangle maxangle]); % plot the 
+       hold on                                             % coherence phase angles
+       plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % zero-time line
+       for i=1:length(g.marktimes)
+           plot([g.marktimes(i) g.marktimes(i)],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
+       end;
+       
+       ylabel('Freq. (Hz)')
+       xlabel('Time (ms)')
+       
+       h(14)=axes('Position',[.95 ordinate2 .05 height].*s+q);
+       cbar(h(14),0,[-maxangle maxangle]); % two-sided colorbar
+   else 
+       axis off;
+       text(0, 0.5, 'Real values, no angles');
    end;
-   
-   ylabel('Freq. (Hz)')
-   xlabel('Time (ms)')
-   
-   h(14)=axes('Position',[.95 ordinate2 .05 height].*s+q);
-   cbar(h(14),0,[-maxangle maxangle]); % two-sided colorbar
 end
 
 if g.plot
