@@ -1,6 +1,6 @@
-% pop_selectevent() - Find events in a EEG dataset. If the dataset
-%              is the only input, a window pops up to
-%              ask for the relevant parameter values.
+% pop_selectevent() - Find events in an EEG dataset. If the dataset
+%                     is the only input, a window pops up to
+%                     ask for the relevant parameter values.
 %
 % Usage: >> [EEGOUT,event_indices] = pop_selectevent( EEG, 'key1', value1, ...
 %                                                   'key2', value2, ... );
@@ -11,32 +11,32 @@
 %   'type'        - [type_range] event type(s) to include
 %                      Ex: 'type',3  or [2 3 5] or 1:10
 %   'omittype'    - [type_range], type(s) of events to exclude
-%   'latency'     - [latency_range] latency range of the events to include
+%   'latency'     - [latency_range] latency range of events to include
 %                      Ex: 'latency','400 <= 700' Include all events with
 %                           latnecy in the range [400,700]
-%   'omitlatency' - [latency_range] latency range of the events to exclude
-%   'event'       - [event_range], indices of the events to include
-%   'omitevent'   - [event_range], indices of the events to exclude
+%   'omitlatency' - [latency_range] latency range of events to exclude
+%   'event'       - [event_range], indices of events to include
+%   'omitevent'   - [event_range], indices of events to exclude
 %   'USER_VAR'    - [VAR_range], 'USER_VAR' is any user-defined field in
 %                   the event structure. Includes events with values of
 %                   field 'USER_VAR' in the specified range. Use [vector]
 %                   format for integers, 'min<max' format for real numbers.
 %   'omitUSER_VAR' - [VAR_range], 'USER_VAR' range of events to exclude
-%   'select'       - ['normal'|'inverse'] invert the selection of events. Default
-%                    is 'normal'.
+%   'select'       - ['normal'|'inverse'] invert the selection of events. 
+%                    {Default is 'normal'}
 %   'deleteepochs' - ['on'|'off'] 'on' = Delete ALL epochs that do not include
-%                   the specified events. {NOTE Default = 'on'}.
+%                   the specified events. {Default = 'on'}.
 %                   This option is relevant only for epoched datasets derived
 %                   from continuous datasets.
 %   'deleteevents' - ['on'|'off'] 'on' = Delete ALL events except
-%                   the selected events. {NOTE Default = 'off'}.
+%                   the selected events. {Default = 'off'}.
 %   'renametype'   - [string] rename the type of selected events with the
-%                  string given as parameter. Default is [], do not rename
-%                  field.
+%                  string given as parameter. {Default is [], do not rename
+%                  field}.
 %   'oldtypefield' - [string] in conjunction with the previous parameter, 
-%                  create a new field (which name is provided as parameter)
-%                  to store the (old) type of the event which type have been 
-%                  renamed. Default is [], do not create field.
+%                  create a new field (whose 'name' is provided as parameter)
+%                  to store the (old) type of the event whose type has been 
+%                  renamed. {Default is [], do not create field}.
 %
 % Outputs:
 %   EEGOUT - EEG dataset with the selected events only
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/04/16 01:47:42  arno
+% removing function call bug
+%
 % Revision 1.46  2003/01/02 17:19:43  arno
 % changing exemple fom 'target' to "target" for type
 %
