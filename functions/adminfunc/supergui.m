@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/13 17:38:13  arno
+% ordinate adjustment
+%
 % Revision 1.17  2002/08/13 17:28:56  arno
 % new geometry
 %
@@ -152,7 +155,7 @@ end;
 % setting relative height in percent
 % ---------------------------------
 sumcol = sum(geomy);
-geomy  = (1.05+0.003*sumcol)*geomy/sumcol;
+geomy  = (1.03+0.003*sumcol)*geomy/sumcol;
 geomy  = geomy - INSETY*(length(geomy)-1)/length(geomy);
 
 % $$$ % counting rows
@@ -190,7 +193,7 @@ outheight = 0;
 %posy = 1 - height - 1/length(geomx)*INSETY;
 factmultx = 0;
 factmulty = 0; %zeros(length(geomx));
-posy = 1.0+(0.003*sumcol)/2+INSETY;
+posy = 0.98+(0.003*sumcol)/2+INSETY;
 for row = 1:length(geomx)
 
 	% init
