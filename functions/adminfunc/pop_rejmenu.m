@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/13 17:31:35  arno
+% new supergui call
+%
 % Revision 1.8  2002/08/12 22:26:28  arno
 % button color and text
 %
@@ -368,6 +371,3 @@ set(findobj('parent', gcf', 'tag', 'butkurt'),   'backgroundcolor', EEG.reject.r
 set(findobj('parent', gcf', 'tag', 'butspec'),   'backgroundcolor', EEG.reject.rejfreqcol);
 set( findobj('parent', gcf, 'tag', 'rejstatus'), 'style', 'popup');
 
-pos = get(gcf, 'position');
-set(gcf, 'position', [ pos(1:2) 700 1000]); 
-	 
