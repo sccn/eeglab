@@ -142,6 +142,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.73  2004/04/12 23:40:50  arno
+%nothing
+%
 %Revision 1.72  2004/03/26 01:39:04  arno
 %only plotting active dipoles
 %
@@ -745,9 +748,28 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             % draw point
             hold on;
-            h = plot3(xx,  yy,  zz); 
-            set(h, 'userdata', dipstruct, 'tag', tag, ...
+            MAKE_SPHERES = 1;
+            if MAKE_SPHERES
+                spherecolors = g.color{index}
+                SPHERE_FAC = 0.2;
+                [xs,ys,zs] = sphere;
+                options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
+                'direct','tag','img', 'facelighting', 'none' };
+                for q = 1:length(xx)
+                   scolor = repmat(33,size(xs,1),size(xs,2))
+                   surf(xs/SPHERE_FAC+xx(q),...
+                        ys/SPHERE_FAC+yy(q),...
+                        zs/SPHERE_FAC+zz(q),...
+                        scolor);
+                   shading interp
+                   material shiny
+                   light
+                end
+            else
+               h = plot3(xx,  yy,  zz); 
+               set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
+            end
             
             % project onto images
             % -------------------
