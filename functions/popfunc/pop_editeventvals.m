@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/08/29 19:05:19  arno
+% first shot at urevent inserting ...
+%
 % Revision 1.19  2003/06/27 23:30:53  arno
 % adding contextual help
 %
@@ -467,7 +470,9 @@ if nargin<2
     EEG       = userdata{1};
     tmpevents = userdata{2};
     EEG.event = tmpevents;
-    com       = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
+    if ~isempty(userdata{3})
+        com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
+    end;
     return;
     
 else % no interactive inputs
@@ -543,30 +548,6 @@ for curfield = 1:2:length(args)
 	        end;
 	end;
 end;
-
-% generate the output command
-% ---------------------------
-if exist('userdat') == 1
-    if ~isempty(userdat)
-        args = { args{:} userdat{:} };
-    end;
-end; 
-com = sprintf('EEG = pop_editeventvals( %s', inputname(1));
-for i=1:2:length(args)
-    if iscell(args{i+1})
-        com = sprintf('%s, ''%s'', {', com, args{i} );
-        tmpcell = args{i+1};
-        for j=1:length(tmpcell);
-            if isstr( tmpcell{j} )   com = sprintf('%s ''%s'',', com, tmpcell{j} );
-            else                     com = sprintf('%s [%s],',   com, num2str(tmpcell{j}) );
-            end;
-        end;
-        com = sprintf('%s } ', com(1:end-1));     
-    else
-        com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-    end;       
-end;
-com = [com ');'];
 
 return;
 
