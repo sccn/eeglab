@@ -44,7 +44,7 @@
 %                 is only used for visualization. This parameter is attached to the dataset
 %                 and is then used in all 2-D scalp plots. Command line equivalent
 %                 is 'shrink'.
-%   "Shrink(set)/Skirt" - [button] automatically computes the shrinking factor so all
+%   "Shrink to center" - [button] automatically computes the shrinking factor so all
 %                 channels are visible on the 2-D topographical plot.
 %   "Plot 3D" - [button] plot channel positions in 3-D using plotchans3d() function.                 
 %   "Read locations" - [button] read location file using readlocs() function. 
@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2004/03/18 00:28:41  arno
+% debug shrink/skirt
+%
 % Revision 1.90  2004/03/08 19:24:49  arno
 % shink -> shrink
 %
@@ -420,7 +423,7 @@ end;
 
 nbchan = length(chans);
 allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' };
-[chans shrinkorskirt shrinkskirtfact]= checkchans(chans, allfields);
+[chans shrinkorskirt plotrad]= checkchans(chans, allfields);
 
 if nargin < 2
     
@@ -564,15 +567,15 @@ if nargin < 2
 		% add sorting options
 		% -------------------
 		plot2dcom = [ 'if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''))' ...
-					  '   tmpshrink = str2num(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''));' ...
+					  '   plotrad = str2num(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''));' ...
                       'else ' ...
-                      '   tmpshrink = ''auto'';' ...
+                      '   plotrad = [];' ...
 					  'end;' ...
                       'if get(findobj(''parent'', gcbf,  ''tag'', ''shrinkbut''), ''value'')' ...
-					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''shrink'', tmpshrink);' ...
+					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''plotrad'', plotrad, ''shrink'', ''auto'');' ...
 					  'else ' ...
-					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''skirt'', tmpshrink);' ...
-                      'end; clear tmpshrink;' ];
+					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''plotrad'', plotrad);' ...
+                      'end; clear plotrad;' ];
 		geometry = { geometry{:} [1] [1 1.2 0.6 1.2 1] [1] [1 1 1 1]};
         guireadlocs = [ '[tmpf tmpp] = uigetfile(''*'', ''Load a channel location file''); drawnow;' ...
                         'if ~isequal(tmpf, 0),' ...
@@ -595,8 +598,8 @@ if nargin < 2
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
 					{ 'Style', 'text', 'string', 'Head limit (0-180)'} ...
-					{ 'Style', 'edit', 'string', shrinkskirtfact, 'tag', 'shrinkfactor' } ...
-					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Shrink(set)/Skirt', 'value', shrinkorskirt } ...
+					{ 'Style', 'edit', 'string', plotrad, 'tag', 'shrinkfactor' } ...
+					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Shrink to center', 'value', shrinkorskirt } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', plot3d } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Read locations', 'callback', guireadlocs }, ...
 					{ 'Style', 'pushbutton', 'string', 'Read help', 'callback', 'pophelp(''readlocs.m'');' }, ...	
@@ -669,13 +672,14 @@ if nargin < 2
         tmpval         = num2str(get(findobj('parent', gcf, 'tag','shrinkfactor'), 'string'));
         
         if tmpshrinkskirt,
-            chans(1).shrink = num2str(tmpval);
+            chans(1).shrink = 'auto';
             totaluserdat{end+1} = 'shrink';
-            totaluserdat{end+1} = chans(1).shrink;
-        else
-            chans(1).skirt  = num2str(tmpval);
-            totaluserdat{end+1} = 'skirt';
-            totaluserdat{end+1} = chans(1).skirt;
+            totaluserdat{end+1} = 'auto';
+        end;
+        if ~isempty(tmpval)
+            chans(1).plotrad  = num2str(tmpval);
+            totaluserdat{end+1} = 'plotrad';
+            totaluserdat{end+1} = chans(1).plotrad;
         end;
 		close(gcf);
 		if ~isempty( totaluserdat )
@@ -766,8 +770,8 @@ else
 		  case 'shrink'
 		   chans(1).shrink = args{ curfield+1 };		   
            
-		  case 'skirt'
-		   chans(1).skirt  = args{ curfield+1 };		   
+		  case 'plotrad'
+		   chans(1).plotrad = args{ curfield+1 };		   
            
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
@@ -910,33 +914,24 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
-function [chans, shrinkorskirt, factval]= checkchans(chans, fields);
-	shrinkfact = '';
-	skirtfact  = '';
-	if isfield(chans, 'shrink'), 
-		shrinkfact = chans(1).shrink; 
-		chans = rmfield(chans, 'shrink');
-        if isstr(shrinkfact) & ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
-	end;
-	if isfield(chans, 'skirt'), 
-		shrinkfact = chans(1).skirt; 
-		chans = rmfield(chans, 'skirt');
-        if isstr(skirtfact) & ~isempty(str2num(skirtfact)), skirtfact = str2num(skirtfact); end;
-	end;
-    
+function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);	
+
     % shrink and skirt factors
     % ------------------------
     shrinkorskirt = 0;
-    factval = 90;
-    if ~isempty(shrinkfact)
-        shrinkorskirt = 1;
-        factval       = shrinkfact;
-        if abs(factval) < 3,
-            factval = factval*90; % auto-conversion
+	plotrad  = [];
+	if isfield(chans, 'plotrad'), 
+		plotrad = chans(1).plotrad; 
+		chans = rmfield(chans, 'plotrad');
+        if isstr(plotrad) & ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
+	end;
+	if isfield(chans, 'shrink'), 
+		shrinkorskirt = 1;
+        if ~isstr(chans(1).shrink)
+            plotrad = 0.5 + 0.5*chans(1).shrink; % conversion old values
         end;
-    elseif ~isempty(skirtfact)
-        factval       = skirtfact;
-    end;        
+		chans = rmfield(chans, 'shrink');
+	end;
     
     for index = 1:length(fields)
         if ~isfield(chans, fields{index})
