@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2002/10/07 15:44:48  arno
+% updating header and axis off
+%
 % Revision 1.50  2002/10/03 23:39:44  scott
 % added sbplot() plotting -sm & ad
 %
@@ -232,18 +235,23 @@ end
 
 if length(size(tfdata))==2
    nchans = round(size(tfdata,2)/length(times));
-elseif length(size(tfdata))==3
+   tfdata = reshape(tfdata, size(tfdata,1), length(times), nchans); 
+elseif length(size(tfdata))>=3
    nchans = size(tfdata,3);
-   tfdata=tfdata(:,:); % convert to 2-d
 else
    help tftopo
    return
 end
-if nchans*length(times) ~= size(tfdata,2)
+tfdataori = mean(tfdata,4); % for topoplot
+
+if length(times) ~= size(tfdata,2)
    fprintf('tftopo(): tfdata columns must be a multiple of the length of times (%d)\n',...
                  length(times));
    return
 end
+if length(showchan) > 1
+    error('tftopo(): showchan must be a single number');
+end;
 if showchan> nchans | showchan < 0
    fprintf('tftopo(): showchan (%d) must be <= nchans (%d)\n',showchan,nchans);
    return
@@ -265,14 +273,14 @@ if length(limits)<4 | isnan(limits(4))
   limits(4) = freqs(end);
 end
 if length(limits)<5 | isnan(limits(5)) % default caxis plotting limits
-  limits(5) = -max(max(abs(tfdata)));
+  limits(5) = -max(abs(tfdata(:)));
   mincax = limits(5); 
 end
 if length(limits)<6 | isnan(limits(6))
   if exist('mincax')
     limits(6) = -mincax; % avoid recalculation
   else
-    limits(6) = max(max(abs(tfdata)));
+    limits(6) = max(abs(tfdata(:)));
   end
 end
 
@@ -296,7 +304,6 @@ if max(timefreqs(:,1))>max(times)
    fprintf('tftopo(): selected plotting time %g out of range.\n',max(timefreqs(:,1)));
    return
 end
-nchans = size(tfdata,2)/length(times);
 
 if 0 % USE USER-SUPPLIED SCALP MAP ORDER. A GOOD ALGORITHM FOR SELECTING
      % timefreqs POINT ORDER GIVING MAX UNCROSSED LINES IS DIFFICULT!
@@ -342,31 +349,39 @@ mmidx = [mintimeidx maxtimeidx minfreqidx maxfreqidx];
 % Zero out non-significant image features ?????????????
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 range = limits(6)-limits(5);
-colormap('jet');
-c = colormap;
-cc = zeros(256,3);
-if size(c,1)==64
-    for i=1:3
-       cc(:,i) = interp(c(:,i),4);
-    end
-else
-    cc=c;
-end
-cc(find(cc<0))=0;
-cc(find(cc>1))=1;
+cc = jet(256);
+for subject = 1:size(tfdata,4)
+    for elec = 1:size(tfdata,3)
+        tmpfilt = (tfdata(:,:,elec,subject) >= repmat(signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
+                   (tfdata(:,:,elec,subject) <= repmat(signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+        tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
+    end;
+end;
+%colormap('jet');
+%c = colormap;
+%cc = zeros(256,3);
+%if size(c,1)==64
+%    for i=1:3
+%       cc(:,i) = interp(c(:,i),4);
+%    end
+%else
+%    cc=c;
+%nd
+%cc(find(cc<0))=0;
+%cc(find(cc>1))=1;
 
-if exist('signifs')
-  minnull = round(256*(signifs(1)-limits(5))/range)
-  if minnull<1
-    minnull = 1;
-  end
-  maxnull = round(256*(signifs(2)-limits(5))/range)
-  if maxnull>256
-    maxnull = 256;
-  end
-  nullrange = minnull:maxnull;
-  cc(nullrange,:) = repmat(cc(128,:),length(nullrange),1);
-end
+%if exist('signifs')
+%  minnull = round(256*(signifs(1)-limits(5))/range);
+%  if minnull<1
+%    minnull = 1;
+%  end
+%  maxnull = round(256*(signifs(2)-limits(5))/range);
+%  if maxnull>256
+%    maxnull = 256;
+%  end
+%  nullrange = minnull:maxnull;
+%  cc(nullrange,:) = repmat(cc(128,:),length(nullrange),1);
+%end
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot tfdata image for specified channel or selchans std()
@@ -375,40 +390,40 @@ end
 axis off;
 colormap(cc);
 curax = gca; % current plot axes to plot into
-plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
+plotdim = max(1+floor(tfpoints/2),4); % number of topoplots on top of image
 imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1],'ax',curax);
 
 if showchan>0 % -> image showchan data
-  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
-    matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
-  axis([limits(1:4)]);
-  caxis([limits(5:6)]);
-  hold on;
+    imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
+          tfdata(mmidx(3):mmidx(4),mmidx(1):mmidx(2),showchan));
+    axis([limits(1:4)]);
+    caxis([limits(5:6)]);
+    hold on;
 
 else % showchan==0 -> image std() of selchans
-  tftimes = mmidx(1):mmidx(2);
-  tffreqs = mmidx(3):mmidx(4);
-  tfdat = matsel(tfdata,...
-            length(times),...
-              tftimes,...             
-                tffreqs,...
-                  selchans);
+    tftimes = mmidx(1):mmidx(2);
+    tffreqs = mmidx(3):mmidx(4);
+    tfdat   = tfdata(tffreqs,tftimes,selchans,:);
 
-  tfdat = reshape(tfdat,length(tffreqs),length(tftimes),nchans);
-  tfsign = sort(tfdat,3);
-  tfsign = sign(tfsign(:,:,round(nchans/2)));
-
-  if exist('std')==2
-     tfave = tfsign.*std(abs(tfdat),1,3);
-  else
-     tfave = tfsign.*mean(abs(tfdat),3); % use mean() if std() not in search path
-  end
-  cmax = max(max(abs(tfave)));
-  cmin = -cmax; % make symmetrical
-  imagesc(times(tftimes),freqs(tffreqs),tfave);
-  axis([limits(1:4)]);
-  caxis([cmin cmax]);
-  hold on;
+    % if several subject, first (RMS) averaging across subjects
+    if size(tfdata,4) > 1
+        tfsign = sort(tfdat,4);
+        tfsign = sign(tfsign(:,:,:,round(size(tfdat,4)/2)));
+        tfdat  = tfsign.*sqrt(mean(tfdat.*tfdat,4));
+        %tfdat  = tfsign.*std(abs(tfdat),1,4);
+    end;
+    
+    tfsign = sort(tfdat,3);
+    tfsign = sign(tfsign(:,:,round(nchans/2)));
+    tfave  = tfsign.*sqrt(mean(tfdat.*tfdat,3)); % std of all channels
+    %tfave  = tfsign.*std(abs(tfdat),1,3); % std of all channels
+    
+    cmax = max(max(abs(tfave)));
+    cmin = -cmax; % make symmetrical
+    imagesc(times(tftimes),freqs(tffreqs),tfave);
+    axis([limits(1:4)]);
+    caxis([cmin cmax]);
+    hold on;
 end
 axes(imgax)
 xl=xlabel('Time (ms)');
@@ -418,11 +433,7 @@ if showchan>0
    % tl=title(['Channel ',int2str(showchan)]);
    % set(tl,'fontsize',14);
 else
-  if exist('std')==2
-   tl=title(['Signed channel st. dev.']);
-  else
-   tl=title(['Signed channel mean']);
-  end
+   tl=title(['Signed channel rms']);
   set(tl,'fontsize',14);
 end
 
@@ -462,27 +473,33 @@ for n=1:tfpoints
    axis off;
 end
 
+endcaxis = 0;
 for n=1:tfpoints
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    % Plot scalp map using topoplot()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    axes(topoaxes(n));
-   scalpmap = matsel(tfdata,length(times),tfpidx(n,1),tfpidx(n,2),selchans)';
-   topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
-               'electrodes','on','shrink','off');
+   scalpmap = squeeze(tfdataori(tfpidx(n,2),tfpidx(n,1),selchans));   
+   %topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
+   %            'electrodes','on','shrink','off');
+   topoplot(scalpmap,chanlocs,'electrodes','on','shrink','on');
                % 'interlimits','electrodes')
    axis square;
    hold on
    tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
    set(tl,'fontsize',13);
-   caxis([limits(5:6)]);
-
-   if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
-      cb=cbar;
-      pos = get(cb,'position');
-      set(cb,'position',[pos(1:2) 0.023 pos(4)]);
-   end
-   drawnow
+   endcaxis = max(endcaxis,max(abs(caxis)));
+   %caxis([limits(5:6)]);
+end;
+for n=1:tfpoints
+    axes(topoaxes(n));
+    caxis([-endcaxis endcaxis]);
+    if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
+        cb=cbar;
+        pos = get(cb,'position');
+        set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+    end
+    drawnow
 end
 
 if showchan>0
@@ -491,8 +508,7 @@ if showchan>0
                   'style', 'blank', 'emarkersize1chan', 10)
      axis('square')
 end
-
-
+axcopy;
 
 % end % topoplot loop
 
