@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/05/20 21:44:08  arno
+% implemementing lowmem for 2 conditions
+%
 % Revision 1.28  2003/05/16 15:55:44  arno
 % debuging ticks
 %
@@ -851,10 +854,11 @@ if iscell(X)
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
 		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3)*length(X) )'] };
           if strcmpi(g.lowmem, 'on')
-              for ind = 1:2:size(savecoher1,1)
-                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+              for ind = 1:2:size(alltfX1power,1)
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                               { alltfX1power(ind:ind+1,:,:) alltfX2power(ind:ind+1,:,:) }, {alltfX1(ind:ind+1,:,:) alltfX2(ind:ind+1,:,:)});
+                               { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) alltfX2(indarr,:,:)});
               end;     
           else
               [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
@@ -865,11 +869,12 @@ if iscell(X)
 		  alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed 
 		  alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,X)) instead of arg3(:,:,X))
           if strcmpi(g.lowmem, 'on')
-              for ind = 1:2:size(savecoher1,1)
-                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+              for ind = 1:2:size(alltfX1abs,1)
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                               { alltfX1power(ind:ind+1,:,:) alltfX2power(ind:ind+1,:,:) }, {alltfX1(ind:ind+1,:,:) ...
-                                      alltfX2(ind:ind+1,:,:)}, { alltfX1abs(ind:ind+1,:,:) alltfX2abs(ind:ind+1,:,:) });
+                               { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) ...
+                                      alltfX2(indarr,:,:)}, { alltfX1abs(indarr,:,:) alltfX2abs(indarr,:,:) });
               end;     
           else
               [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
@@ -878,12 +883,13 @@ if iscell(X)
 		 case 'phasecoher',
 		  formula = { formula{1} ['mean(arg2(:,:,X),3)'] }; 
           if strcmpi(g.lowmem, 'on')
-              for ind = 1:2:size(savecoher1,1)
-                  alltfX1norm = alltfX1(ind:ind+1,:,:)./sqrt(alltfX1(ind:ind+1,:,:).*conj(alltfX1(ind:ind+1,:,:)));
-                  alltfX2norm = alltfX2(ind:ind+1,:,:)./sqrt(alltfX2(ind:ind+1,:,:).*conj(alltfX2(ind:ind+1,:,:)));
-                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+              for ind = 1:2:size(alltfX1,1)
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  alltfX1norm = alltfX1(indarr,:,:)./sqrt(alltfX1(indarr,:,:).*conj(alltfX1(indarr,:,:)));
+                  alltfX2norm = alltfX2(indarr,:,:)./sqrt(alltfX2(indarr,:,:).*conj(alltfX2(indarr,:,:)));
+                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                               { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
+                               { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, { alltfX1norm alltfX2norm });
               end;     
           else
               alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));

@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/05/19 23:54:12  arno
+% lowmem for condstat
+%
 % Revision 1.48  2003/05/19 23:00:10  arno
 % debug last
 %
@@ -859,9 +862,10 @@ if iscell(X)
 		  formula = 'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X),3)) ./ sqrt(sum(arg3(:,:,X),3))';
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(savecoher1,1)
-                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
-                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) }, ...
-                     { Tfx1(ind:ind+1,:,:) Tfx2(ind:ind+1,:,:) }, { Tfy1(ind:ind+1,:,:) Tfy2(ind:ind+1,:,:) });
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  [Rdiff(indarr,:,:) coherimages(indarr,:,:) coher1(indarr,:,:) coher2(indarr,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(indarr,:,:) savecoher2(indarr,:,:) }, ...
+                     { Tfx1(indarr,:,:) Tfx2(indarr,:,:) }, { Tfy1(indarr,:,:) Tfy2(indarr,:,:) });
               end;     
           else
               [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
@@ -874,8 +878,9 @@ if iscell(X)
           if strcmpi(g.lowmem, 'on')
               size(savecoher1,1)
               for ind = 1:2:size(savecoher1,1)
-                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
-                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) } );
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  [Rdiff(indarr,:,:) coherimages(indarr,:,:) coher1(indarr,:,:) coher2(indarr,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(indarr,:,:) savecoher2(indarr,:,:) } );
               end;     
           else
               [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
@@ -888,8 +893,9 @@ if iscell(X)
 		  % sqrt(a.*conj(a)) is about twice faster than abs()
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(savecoher1,1)
-                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
-                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) } );
+                  if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
+                  [Rdiff(indarr,:,:) coherimages(indarr,:,:) coher1(indarr,:,:) coher2(indarr,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(indarr,:,:) savecoher2(indarr,:,:) } );
               end;     
           else
               [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
