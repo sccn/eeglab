@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/09 02:38:12  arno
+% bedugging epoch event consistency check
+%
 % Revision 1.5  2002/04/09 01:52:57  arno
 % adding check of event latencies
 %
@@ -195,12 +198,15 @@ res = [];
     else
         EEG.event = [];
     end;
-    if ~isfield(EEG, 'eventdescription'), EEG.eventdescription = {}; ...
-	  res = com; 
+    if ~isfield(EEG, 'eventdescription') | ~iscell(EEG.eventdescription)
+		EEG.eventdescription = cell(1, length(fieldnames(EEG.event)));
+		res = com; 
     else 
-      if length(EEG.eventdescription) > length(EEG.event)
-	EEG.eventdescription = EEG.eventdescription(1:length(EEG.event));
-      end;
+		if length(EEG.eventdescription) > length( fieldnames(EEG.event))
+		  EEG.eventdescription = EEG.eventdescription(1:length( fieldnames(EEG.event)));
+		elseif length(EEG.eventdescription) < length( fieldnames(EEG.event))
+			 EEG.eventdescription(end+1:length( fieldnames(EEG.event))) = {''};
+		end;
     end;
     
  	% deal with epoch arrays
