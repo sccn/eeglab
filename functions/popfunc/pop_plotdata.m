@@ -1,7 +1,7 @@
 % pop_plotdata() - Plot average of EEG channels or independent components in
 %                  a rectangular array. Else, (over)plot single trials.
 % Usage:
-%   >> avg = pop_plotdata(EEG, typeplot, indices, trials, title, singletrials);
+%   >> avg = pop_plotdata(EEG, typeplot, indices, trials, title, singletrials, ydir, ylimits);
 %
 % Inputs:
 %   EEG        - Input dataset 
@@ -15,6 +15,7 @@
 %                      0 plot average, 1 plot single trials {Default: 0}
 %   ydir       - [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) 
 %                {def command line-> pos-up; def GUI-> neg-up}
+%   ylimits    - [ymin ymax] plotting limits {default [0 0] -> data range}
 %
 % Outputs:
 %   avg        - [matrix] Data average
@@ -42,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2005/01/29 00:04:17  scott
+% added text entry for Vertical limits (after fixing this plotdata() option).
+%
 % Revision 1.17  2004/08/30 15:02:19  arno
 % typo
 %
@@ -99,11 +103,10 @@
 % 03-18-02 added title -ad & sm
 % 03-30-02 added single trial capacities -ad
 
-function [sigtmp, com] = pop_plotdata(EEG, typeplot, indices, trials, plottitle, singletrials, ydir);
+function [sigtmp, com] = pop_plotdata(EEG, typeplot, indices, trials, plottitle, singletrials, ydir,ylimits);
 
 
-ymin = 0; % default ylimits = data range
-ymax = 0;
+ylimits = [0 0];% default ylimits = data range
 
 % warning signal must be in a 3D form before averaging
 
@@ -123,28 +126,18 @@ end;
 
 if nargin <3
 	if typeplot % plot signal channels
-		result = inputdlg2({  'Channel number(s):' ...
-                                      'Plot title:' ...
-                                      'Vertical limits ([0 0]-> data range):'}, ...
-                                      'Plot single trials instead of average (yes|no)' ...
-                                   'Channels ERP in rect. array -- pop_plotdata()', 1, ...
-                                   {   ['1:' int2str(size(EEG.icaweights,1))] ...
-                                       [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ...
-                                       '0 0' ...
-                                       'no' ...
-                                   }, ...
+		result = inputdlg2({  'Channel number(s):'  'Plot title:'  'Vertical limits ([0 0]-> data range):' 'Plot single trials instead of average (yes|no)' }, ...
+                                      'Channels ERP in rect. array -- pop_plotdata()', 1, ...
+                                   {   ['1:' int2str(size(EEG.icaweights,1))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] '0 0' 'no' }, ...
                                    'pop_plotdata' );
 	else % plot components
 		result = inputdlg2({  'Component number(s):' ...
                                       'Plot title:' ...
-                                      'Vertical limits ([0 0]-> data range):'}, ...
+                                      'Vertical limits ([0 0]-> data range):' ...
                                       'Plot single trials instead of average (yes|no)' ...
-                                   'Component ERP in rect. array -- pop_plotdata()', 1, ...
-                                   {   ['1:' int2str(size(EEG.icaweights,1))] ...
-                                       [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ...
-                                       '0 0' ...
-                                       'no' ...
                                    }, ...
+                                   'Component ERP in rect. array -- pop_plotdata()', 1, ...
+                                   {   ['1:' int2str(size(EEG.icaweights,1))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] '0 0' 'no' }, ...
                                    'pop_plotdata' );
 	end;		
 	if length(result) == 0 return; end;
@@ -154,12 +147,10 @@ if nargin <3
  
 	singletrials = strcmp( lower(result{3}), 'yes');
 
-        ylimits = result{4};
+        ylimits = double(result{4});
         if length(ylimits) ~= 2
             ylimits = [0 0]; % use default if 2 values not given
         end
-        ymin = ylimits(1);
-        ymax = ylimits(2);
 end;	
 if ~(exist('trials') == 1)
 	trials = 1:EEG.trials;
@@ -211,6 +202,8 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 %%%%%%%%%%%%%%%%%%%%%%%%%% make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 sigtmp = reshape( sigtmp, size(sigtmp,1),  size(sigtmp,2)*size(sigtmp,3));
+ymin = ylimits(1);
+ymax = ylimits(2);
 
 if ~isempty(EEG.chanlocs) & typeplot
     plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, EEG.chanlocs(indices)); %'tmp.nam');
@@ -246,6 +239,8 @@ switch nargin
 	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(%s, %d, %s, [1:%d], ''%s'', %d);', inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials);
 	case 4, com = sprintf('pop_plotdata(%s, %d, %s, %s, ''%s'', %d);', inputname(1), typeplot, vararg2str(indices), vararg2str(trials), plottitle, singletrials);
 end;
+
+fprintf([com '\n']);
 return;
 
 function out = nan_mean(in, dim)
