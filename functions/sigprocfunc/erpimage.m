@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.173  2003/11/14 16:34:31  scott
+% debug same
+%
 % Revision 1.172  2003/11/14 16:32:55  scott
 % debug same
 %
@@ -2915,7 +2918,7 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
 %                           if signif is NaN, plot erp +/- stdev
 %                           else if signif, plot erp and signif(1,:)&signif(2,:) fill
 %                           else, plot erp alone
-  FILLCOLOR    = [1 .7 .7];
+  FILLCOLOR    = [.66 .76 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   if exist('signif') == 1  % (2,times) array giving upper and lower signif limits
