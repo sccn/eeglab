@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/31 16:38:50  arno
+% debugging
+%
 % Revision 1.9  2002/07/31 16:30:37  arno
 % special case for manual rejection
 %
@@ -96,13 +99,12 @@ else
 			'''To actually reject these epochs'', ''/Tools/Reject data epochs/Reject labelled epochs''));' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
-com2 = [com2 'clear tmprej tmprejE TMPREJ tmpcom tmprejE2;'];
 if ~exist('topcommand')
 	topcommand = [];
 end;
 
 % the first part is used to convert the eegplot output
-command = [  com2 topcommand 'clear tmprej tmprejE tmprejE2 TMPREJ;' ];
+command = [  com2 topcommand 'clear tmpcom tmprej tmprejE tmprejE2 TMPREJ;' ];
 
 if all(colrej == EEG.reject.rejmanualcol)
 	oldrej = [];  % for manual rejection, old rejection are
