@@ -5,20 +5,20 @@
 %   >> pop_topoplot( EEG, typeplot, items, title, options...);
 %
 % Inputs:
-%   EEG        - Input EEG dataset structure (see >> help eeglab)
-%   typeplot   - 1-> Plot ERP maps, 0-> plot components {default:1}.
-%   items      - [array] If typeplot==1 (ERP maps), within-epoch latencies 
-%                (ms) at which to plot the maps. If typeplot==0 (component
-%                maps), component indices to plot. In this case,
-%                negative map indices -> invert map polarity, or 
-%                NaN -> leave a blank subplot. (Ex: [1 -3 NaN 4])
-%   title      - Plot title.
-%   rowscols   - Vector of the form [m,n] giving [rows, cols] per page.
-%                If the number of maps exceeds m*n, multiple figures 
-%                are produced {default|0 -> one near-square page}.
-%   options    - topoplot() argument options. Separate using commas. 
-%                Example 'style', 'straight'. See >> help topoplot
-%                for further details. {default: none}
+%   EEG      - Input EEG dataset structure (see >> help eeglab)
+%   typeplot - 1-> Plot ERP maps, 0-> plot components {default:1}.
+%   items    - [array] If typeplot==1 (ERP maps), within-epoch latencies 
+%              (ms) at which to plot the maps. If typeplot==0 (component
+%              maps), component indices to plot. In this case,
+%              negative map indices -> invert map polarity, or 
+%              NaN -> leave a blank subplot. (Ex: [1 -3 NaN 4])
+%   title    - Plot title.
+%   rowscols - Vector of the form [m,n] giving [rows, cols] per page.
+%              If the number of maps exceeds m*n, multiple figures 
+%              are produced {default|0 -> one near-square page}.
+%   options  - topoplot() argument options. Separate using commas. 
+%              Example 'style', 'straight'. See >> help topoplot
+%              for further details. {default: none}
 %
 % Note:
 %   A new figure is created automatically only when the pop_up window is 
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/05/12 22:27:56  arno
+% verbose option off
+%
 % Revision 1.22  2003/03/12 03:20:41  arno
 % help button
 %
