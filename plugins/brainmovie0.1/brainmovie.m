@@ -116,6 +116,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/11/21 20:29:40  arno
+% positive and neg scale
+%
 % Revision 1.31  2002/11/21 19:44:25  arno
 % rescale image for ppm output
 %
@@ -854,6 +857,13 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
 	% -------------------------------------
 	%g.scalecoher = 2 * g.scalecoher / (g.xlimaxes(2)-g.xlimaxes(1));
 	%g.scalepower = 2 * g.scalepower / (g.xlimaxes(2)-g.xlimaxes(1));
+        
+    % if the two circle are too close and do not draw the line
+    % --------------------------------------------------------
+    if ((pos1(1) - pos2(1)) < 0.05*(g.xlimaxes(2) - g.xlimaxes(1))) & ...
+        ((pos1(2) - pos2(2)) < 0.05*(g.ylimaxes(2) - g.ylimaxes(1))), return;
+    end;
+    
 	crossfpowerabs = abs(crossfpower);
     switch lower(g.crossfcoh)
 		case 'on', tmpthick   = (crossfpowerabs-g.scalecoher(1))/(g.scalecoher(2)-g.scalecoher(1));	% determine thickness = coherence amplitude
