@@ -28,9 +28,9 @@
 %                included in the trial time window). These events can
 %                be in point or second but they must be in the same format
 %                as the events used for epoching.
-%   'alleventrange' - for event re-referencing, defined a time range
-%                [init end] in second or points centered on the events
-%                Default is 'timelim'.
+%   'alleventrange' - for event selection, defines a time range [start end] (in 
+%                seconds or data points) relative to the time-locking events. 
+%                Default is same as 'timelim'.
 %
 % Outputs:
 %   epocheddata - output (chan, frames, epochs)
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/04/26 00:45:21  arno
+% debug last
+%
 % Revision 1.9  2003/04/26 00:40:05  arno
 % testing for inf
 %
