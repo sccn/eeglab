@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.239  2003/05/12 16:16:11  scott
+% plugin "executing" -> plugin "adding"
+%
 % Revision 1.238  2003/05/12 15:58:15  arno
 % updated store call
 %
@@ -929,7 +932,7 @@ if nargin < 1 | exist('EEG') ~= 1
 	EEG = eeg_emptyset;
 	h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
     if get(0, 'screendepth') <= 8
-        disp('Warning: screen color depth too low, some colors will be inacurate in time-frequency plots');
+        disp('Warning: screen color depth too low, some colors will be inaccurate in time-frequency plots');
     end;
 end;
 
@@ -944,7 +947,7 @@ if nargin == 1
 			h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 		end;
 	elseif strcmp(onearg, 'besa');
-		disp('Besa option deprecated. Download the BESA plugin to activate the BESA menu.');
+		disp('Besa option deprecated. Download the BESA plugin to add the BESA menu.');
         h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
 	else
         h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
@@ -1340,7 +1343,7 @@ eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
 		if popask( strvcat('Remove all datasets except the present one ?', ...
-						   'Otherwise go back to the memory menu to unset dataset overwrite'))
+						   'Otherwise, under "File > Maximize memory" clear dataset overwrite'))
 			ALLEEG = []; CURRENTSET = 0;
 			h('ALLEEG = []; CURRENTSET = 0;');
 		else 
