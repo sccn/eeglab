@@ -43,7 +43,7 @@
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %  'actscale'  = ['on'|'off'] scale component scalp map by component activity at the
 %                designated point in time. Default 'off'.
-%  'pvaf'      = ['on'|'off'] display percentage of variance accounted for by each 
+%  'pvaf'      = ['on'|'off'] display percent variance accounted for by each 
 %                component over the interval selected by limcontrib. Default is 'on'
 %                pvaf(component) = 100-100*variance(data-component))/variance(data)
 %
@@ -53,7 +53,7 @@
 %  compframes    = frames of max variance
 %  comptimes     = times of max variance
 %  compsplotted  = components plotted
-%  pvaf          = percentage variance accounted for
+%  pvaf          = percent variance accounted for
 %
 % Notes:
 %  To label maps with other than component numbers, put 4-char strings into
@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/09/17 02:00:06  arno
+% debuging pvaf assignment when using compnums
+%
 % Revision 1.25  2003/07/30 01:56:06  arno
 % adding 'actscale' option and cbar
 %
@@ -492,13 +495,13 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 end 
 fprintf('\n');
 
-% print percentage variance accounted for
+% print percent variance accounted for
 % ---------------------------------------
 if strcmpi(g.pvaf, 'on')
     vardat = mean(mean((data(:,frame1:frame2).^2)));
     pvaf = 100-100*pvaf / vardat;
     for index =1:ncomps
-        fprintf('Component %d percentage variance accounted for: %6.2f\n', g.compnums(index), pvaf(index));
+        fprintf('Component %d percent variance accounted for: %6.2f\n', g.compnums(index), pvaf(index));
     end;
 end;
 %

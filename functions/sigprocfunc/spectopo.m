@@ -29,7 +29,7 @@
 %   'nfft'     = [integer] value to zero pad data to. Overwrites 'freqfac' above.
 %   'winsize'  = [integer] window size in data points {default: from data}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
-%   'percent'  = downsampling factor, or approximate percentage of the data to
+%   'percent'  = downsampling factor, or approximate percent of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
 %                the computation. From 0 to 100 {defaults: 100 from the command line, 
 %                or 20 from the pop_up window}.
@@ -77,7 +77,7 @@
 %                   the 'icacomps' parameter. Other component spectrum are filled  
 %                   with 0.
 %        contrib  = contribution of each component (if 'icamode' is 'normal', relative
-%                   variance, if 'icamode' is 'sub', percentage variance accounted for)
+%                   variance, if 'icamode' is 'sub', percent variance accounted for)
 %        specstd  = spectrum standard deviation in dB
 %
 % Notes: The old function call is still functional for backward compatibility
@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2003/12/03 02:44:27  arno
+% indenting
+%
 % Revision 1.77  2003/12/03 02:15:40  arno
 % use spec if pwelch absent
 %
@@ -715,7 +718,7 @@ if ~isempty(g.weights)
         if strcmp(g.icamode, 'normal')
             % note: maxdatadb = eegspecdBtoplot (RMS power of data)
             resvar(index)  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar(index));
+            fprintf('Component %d percent relative variance:%6.2f\n', g.icacomps(index), resvar(index));
         else
             if g.plotchan == 0
                 resvartmp = [];
@@ -724,11 +727,11 @@ if ~isempty(g.weights)
                 end;
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                fprintf('Component %d percentage variance accounted for:%6.2f ± %3.2f\n', ...
+                fprintf('Component %d percent variance accounted for:%6.2f ± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-                fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
+                fprintf('Component %d percent variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
             end;
         end;
     end;
