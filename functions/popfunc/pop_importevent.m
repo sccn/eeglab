@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/11/04 01:11:14  arno
+% fixing reading presentation file problem
+%
 % Revision 1.20  2003/11/04 00:10:49  arno
 % g.delim integer OK
 %
