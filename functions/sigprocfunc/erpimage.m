@@ -128,7 +128,7 @@
 %    outamps  = matrix of imaged amplitudes (from option 'plotamps')
 %   phsangls  = vector of sorted trial phases at the phase-sorting frequency
 %     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
-%    sortidx  = indices of sorted data epochs plotted
+%    sortidx  = indices of input data epochs in the sorting order
 %     erpsig  = trial average significance levels [2,frames]
 %
 % Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.234  2005/02/10 22:19:01  arno
+% debug auxvar re-alignment
+%
 % Revision 1.233  2005/02/10 02:38:50  arno
 % auxvar re-alignement
 %
