@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/05 16:36:45  arno
+% default plotting location
+%
 % Revision 1.3  2002/09/04 23:46:30  arno
 % debug
 %
@@ -160,7 +163,7 @@ if typecomp == 1
 else
 	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 'shading', 'interp', 'numcontour', 3); axis square;
 end;
-title([ basename fastif(typecomp, ' location', ' topography')], 'fontsize', 14); 
+title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 
 % plotting erpimage
 % -----------------
