@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/04/24 20:36:22  arno
+% implementing buttons
+%
 % Revision 1.16  2002/04/24 19:50:28  arno
 % updating parameters
 %
@@ -338,7 +341,7 @@ if popup
 		options = [ options ',''phase'',[' num2str(tmpphase) ']' ];
 	end;
 	
-	% coher rows
+	% coher row
 	% ----------
 	tmpcoher = [];
 	if result{19}
@@ -363,7 +366,7 @@ if popup
 		limits(7:8) = eval( [ '[' result{23} ']' ]);
 	end;
 
-	% options rows
+	% options row
 	% ------------
     if result{24}
 		if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
@@ -482,9 +485,13 @@ if length( options ) < 2
     options = '';
 end;
 
-varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+% varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+
 com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], titleplot, smooth, decimate %s);', outstr, options);
 eval(com)
+
+varargout{1} = [popcom 10 '% ' com];
 
 return;
 
