@@ -19,19 +19,19 @@
 %   struct - Events are organised as an array of structs with at
 %            least two fields ('type' and 'latency')
 %            (Ex: reaction_time may be type 1).
-%   array  - events are organised as an array, the first column
+%   array  - events are organized as an array, the first column
 %            representing the type, the second the latency and the
 %            other ones user-defined variables.
 %
 % Note: 1) The event structure is defined only for continuous data
 %          or epoched data derived from continuous data.
 %       2) The event 'struct' format is more comprehensible.
-%          For instance, to see all the properties of an event i,
-%          type >> EEG.event(i)
-%          Unfortunally, structures are awkward for expert users to deal
+%          For instance, to see all the properties of event 7,
+%          type >> EEG.event(7)
+%          Unfortunately, structures are awkward for expert users to deal
 %          with from the command line (Ex: To get an array of latencies,
 %           >> cell2mat({EEG.event(:).latency})')
-%          In array format, the same information is obtained by
+%          In array format, the same information is obtained by typing
 %           >> EEG.event(:,2)
 %       3) This function automatically updates the 'eventfield'
 %          cell array depending on the format.
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 2/06/02 modifed header - sm & ad
 % 2/08/02 add field input - ad
