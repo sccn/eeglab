@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/13 15:26:44  arno
+% updating colors
+%
 % Revision 1.4  2002/07/29 15:53:09  arno
 % same
 %
@@ -75,15 +78,23 @@ if nonmatlab
 	while ~feof(fid)
 		str = deblank(str(1:end-1));
 		
-		doc = { doc{:} str(1:end) };
-		str = fgets( fid );
+		if ~isppc & ~isunix % windows
+            doc = { doc{:} str(1:end-1) };    
+        else 
+            doc = { doc{:} str(1:end) };
+        end;
+        str = fgets( fid );
 	end;
 else
 	str = fgets( fid );
 	while (str(1) == '%')
 		str = deblank(str(1:end-1));
 		
-		doc = { doc{:} str(2:end) };
+		if ~isppc & ~isunix % windows
+            doc = { doc{:} str(1:end-1) };    
+        else 
+            doc = { doc{:} str(1:end) };
+        end;
 		str = fgets( fid );
 	end;
 end;
