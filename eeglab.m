@@ -66,6 +66,7 @@
 % realproba()     - compute observed probability (used by entropy)
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
+% reref()         - re-reference data
 % slider()        - graphic slider function
 % supergui()      - allow generation of advanced GUI
 % readlocs()      - read location files .loc, .sph, .xyz, .elp (uses readelp)
@@ -101,6 +102,7 @@
 % pop_readedf()   - read .EDF EEG data format (readedf())
 % pop_readbdf()   - read .BDF EEG data format (openbdf() and readbdf())
 % pop_headplot()  - plot a 3-D data scalp map (headplot())
+% pop_reref()     - re-reference data (reref())
 % pop_averef()    - convert data to average reference (averef())
 % pop_signalstat() - plot signal or component statistic (signalstat())
 %
@@ -177,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.195  2002/11/12 22:57:16  arno
+% adding check for extra channel
+%
 % Revision 1.194  2002/11/12 16:54:42  scott
 % TIP text edit
 %
@@ -897,7 +902,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
-	uimenu( fourth_m, 'Label', 'Average reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_averef(EEG,1);' e_store]);
+	uimenu( fourth_m, 'Label', 'Average reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_averef(EEG);' e_store]);
 	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
 	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset], 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove baseline'     , 'CallBack', [ checkepoch '[EEG LASTCOM] = pop_rmbase(EEG);' e_store]);
