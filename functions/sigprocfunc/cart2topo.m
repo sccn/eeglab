@@ -1,40 +1,34 @@
 % cart2topo() - convert xyz-cartesian channel coordinates 
-%               to polar topoplot coordinates. Input data
-%               are points on a sphere around a given
-%               [x y z] center or around (0,0,0) {default}.
+%               to polar topoplot() coordinates. Input data
+%               are points on a sphere centered at (0,0,0)
+%               or at optional input 'center'. This function
+%               is now DEPRECATED! See Important warning below.
 %
-% Usage:  >> [th r] = cart2topo(xyz);   % 3-column data
+% Usage:  >> [th r] = cart2topo(xyz);   % 3-column [x y z] position data
 %         >> [th r] = cart2topo(x,y,z); % separate x,y,z vectors
 %         >> [th r x y z] = cart2topo(xyz,'key', 'val', ...); 
 %         >> [th r x y z] = cart2topo(x,y,z,'key', 'val', ...); 
 %
 % Optional inputs:
-%    'center'  = [X Y Z] known center different from [0 0 0]
-%                Default is [0 0 0].
-%    'squeeze' = plotting  squeeze-in factor (0[default]->1). -1 optimize
-%                the squeeze factor automatically so that maximum radius
-%                is 0.5. 
-%    'optim'   = [0|1] find best fitting sphere center based on standard
-%                deviation of radius values.
+%    'center'  = [X Y Z] use a known sphere center {Default: [0 0 0]}
+%    'squeeze' = plotting squeeze factor (0[default]->1). -1 -> optimize
+%                the squeeze factor automatically so that maximum radius is 0.5. 
+%    'optim'   = [0|1] find the best-fitting sphere center minimizing the
+%                standard deviation of the radius values.
 %    'gui'     = ['on'|'off'] pops up a gui for optional arguments. 
 %                Default is off.
 %
 % Example: >> [th r] = cart2topo(xyz,[1 0 4]);
 %
 % Notes: topoplot() does not plot channels with radius>0.5
-%        Shrink radii to within this range to interpolate 
-%        all channels.
+%        Shrink radii to within this range to plot all channels.
 %        [x y z] are returned after the optimization of the center
-%        Radii are further squeezed in of factor squeeze
+%        and optionally squeezing r towards it by factor 'squeeze'
 %
 % Important: 
-%   (1) The completed chan.locs file must have four colums
-%   [channums th r chanlabels] and the chanlabels must all be 4-char 
-%   strings (with . for spaces). See >> topoplot example
-%   (2) cart2topo should not be used if elevation angle is smaller 
-%   than 0 (electrodes below zero plane) since it returns innacurate 
-%   results. In practice in EEGLAB, cart2topo is replaced by applying
-%   cart2sph() then sph2topo().
+%   DEPRECATED: cart2topo() should NOT be used if elevation angle is less than 0 
+%   (for electrodes below zero plane) since then it returns INNACURATE results. 
+%   SUBSTITUTE: Use cart2topo = cart2sph() -> sph2topo().
 %
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
@@ -60,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/06/30 15:19:40  arno
+% adding warning if z<0
+%
 % Revision 1.17  2003/06/30 15:13:23  arno
 % added warning
 %
