@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/03/25 23:09:29  arno
+% adding mesh tag to head mesh
+%
 % Revision 1.31  2004/03/25 19:43:13  arno
 % allowing to read custom mesh, fixed color bug
 %
@@ -199,46 +202,23 @@ if nargin < 1
     return
 end
 
-for index = 1: length(varargin)
-    switch index
-     case 1, p1 = varargin{index};
-     case 2, v1 = varargin{index};
-     case 3, p2 = varargin{index};
-     case 4, v2 = varargin{index};
-     case 5, p3 = varargin{index};
-     case 6, v3 = varargin{index};
-     case 7, p4 = varargin{index};
-     case 8, v4 = varargin{index};
-    end;
-end;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%% Set Defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-% mesh_file  = ['/home/scott/matlab/old' '/newupper.mat']; 
+DEFAULT_MESH = ['mhead.mat'];      % upper head model file (987K)
+%DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
+%DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
-mesh_file  = ['mhead.mat'];      % upper head model file (987K)
-%mesh_file  = '/home/arno/matlab/juliehiresmesh.mat';
 
-Lighting   = 'on';
-Maplimits  = 'absmax';
-Lights = [-125  125  80; ...
-           125  125  80; ...
-           125 -125 125; ...
-          -125 -125 125];    % default lights at four corners
-
-View       = [143 18];      % default viewpoint
-Colorbar   = 0;              % default no colorbar (Note: has tan top - bug)
-ColorbarAxes = 0;
+DEFAULT_LIGHTS = [-125  125  80; ...
+                  125  125  80; ...
+                  125 -125 125; ...
+                  -125 -125 125];    % default lights at four corners
 
 HeadCenter = [0 0 30];
-Cmap       = jet(64);        % default colormap
 FaceColor  = [.8 .55 .35]*1.1; % ~= ruddy Caucasian - pick your complexion!
-Electrodes = 'on';           % show electrode positions by default
 MAX_ELECTRODES = 1024;
-Elecnums   = 0;     % 0 is 'off; 1 is 'on'
-Elecnames  = 0;     % 0 is 'off; 1 is 'on'
 ElectDFac  = 1.06;  % plot electrode marker dots out from head surface
 NamesDFac  = 1.05;  % plot electrode names/numbers out from markers
 NamesColor = 'k'; % 'r';
@@ -247,11 +227,10 @@ MarkerColor= 'k';
 
 sqaxis     = 1;     % if non-zero, make head proportions anatomical
 title_font = 18;
-titl       = [];
-verbose    = 'on';
 if isstr(values)
-  values   = lower(values);
-  if strcmp(values,'setup')
+    values   = lower(values);
+    if strcmp(values,'setup')
+        
 %
 %%%%%%%%%%%%%%%%%%% Perform splining file setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -277,15 +256,26 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     [eloc_file labels Th Rd ind] = readlocs(eloc_file);
     fprintf('Headplot: using existing XYZ coordinates\n');
+    %for index = 1:length(eloc_file)
+    %    eloc_file(index).radius     = eloc_file(index).radius*1.4;
+    %    eloc_file(index).sph_radius = 1;
+    %end;
+    %eloc_file = convertlocs(eloc_file, 'topo2all');
     tmpX = { eloc_file.X };
     tmpY = { eloc_file.Y };
     tmpZ = { eloc_file.Z };
     indices = find(~cellfun('isempty', tmpX));
     ElectrodeNames = strvcat({ eloc_file.labels }); 
-    ElectrodeNames = ElectrodeNames(indices);
+    ElectrodeNames = ElectrodeNames(indices,:);
     Xe = cell2mat( tmpX(indices) )';
     Ye = cell2mat( tmpY(indices) )';
     Ze = cell2mat( tmpZ(indices) )';
+    newcoords = [ Ye Xe Ze ];
+    %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 1000, [6 0 45]);
+    %newcoords = transformcoords( [ Xe Ye Ze ], [0 0 -pi/6]);
+    Xe = newcoords(:,1);
+    Ye = newcoords(:,2);
+    Ze = newcoords(:,3);
     dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
     Xe = Xe./dists;
     Ye = Ye./dists;
@@ -297,7 +287,8 @@ if isstr(values)
     Xe = Xe(:);
     Ye = Ye(:);
     Ze = Ze(:);
-
+    %plotchans3d([ Xe Ye Ze], cellstr(ElectrodeNames)); return;
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculate g(x) for electrodes 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -348,6 +339,7 @@ if isstr(values)
     x = spherePOS(:,1);
     y = spherePOS(:,2);
     z = spherePOS(:,3);
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculate new electrode positions
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -360,9 +352,9 @@ if isstr(values)
             npoints = I(1:3);
             diffe = newPOS(npoints,:)-spherePOS(npoints,:);
             newElect(i,:) = elect+mean(diffe)*ElectDFac;
-            if Ze(i) < 0               % Plot superior electrodes only.
-                newElect(i,:) = [0 0 0]; % Mark lower electrodes  as having
-            end                        % an electrode position not to be plotted
+            %if Ze(i) < 0               % Plot superior electrodes only.
+            %    newElect(i,:) = [0 0 0]; % Mark lower electrodes  as having
+            %end                        % an electrode position not to be plotted
         end
     else 
         fprintf('Using original electrode locations on head...\n');
@@ -460,89 +452,21 @@ else
        return
    end
    spline_file = arg1;
-   nargs = nargin;
-   if nargs > 2
-       if ~(floor(nargs/2) == nargs/2)
-           error('headplot(): Cannot have an odd number of inputs.')
-       end
-       for i = 3:2:nargs
-           Param = eval(['p',int2str((i-3)/2 +1)]);
-           Value = eval(['v',int2str((i-3)/2 +1)]);
-           if ~isstr(Param)
-               error('headplot(): Parameters must be strings.')
-           end
-           switch lower(Param)
-            case 'cbar'
-             if isstr(Value)
-                 error('headplot(): Colorbar value must be 0 or axis handle.')
-             end
-             Colorbar = 1;
-             if size(Value,1) == 1 & size(Value,2) == 1
-                 ColorbarAxes = 0;
-             else
-                 ColorbarAxes = Value;
-             end
-            case 'lighting'
-             if ~isstr(Value)
-                 close; error('headplot(): Lighting value must be on or off.')
-             end
-             Value = lower(Value);
-             if ~strcmp(Value,'on') & ~strcmp(Value,'off')
-                 close; error('headplot(): Lighting value must be on or off.')
-             end
-             Lighting = lower(Value);
-            case 'maplimits'
-             Maplimits = Value;
-            case 'title'
-             titl = Value;
-            case 'lights'
-             Lights = Value;
-             if size(Lights,2) ~= 3
-                 close; error('headplot(): Light matrix must be (3,N).')
-             end
-            case 'view'
-             View = Value;
-            case 'meshfile'
-             mesh_file = Value;
-            case 'verbose'
-             if ~isstr(Value)
-                 close; error('headplot(): verbose value must be on or off.')
-             end
-             Value = lower(Value);
-             if ~strcmp(Value,'on') & ~strcmp(Value,'off')
-                 close; error('headplot(): verbose value must be on or off.')
-             end
-             verbose = Value;
-            case {'colormap','cmap'}
-             if size(Value,2) ~= 3
-                 close; error('Colormap must be an n x 3 matrix.')
-             end
-             Cmap = Value;
-            case {'electrodes','elec'}
-             if ~isstr(Value)
-                 close; error('headplot(): electrodes value must be on or off.')
-             elseif ~strcmp(Value,'on') & ~strcmp(Value,'off')
-                 close; error('headplot(): electrodes value must be on or off.')
-             end
-             Electrodes = Value;
-            case 'labels'
-             if isstr(Value)
-                 close; error(['headplot(): labels value must be 0, 1, or 2.'])
-             end
-             if Value>2 | Value<0 
-                 close; error(['headplot(): labels value must be 0, 1, or 2.'])
-             end
-             if Value == 1
-                 Elecnums = 1;
-             elseif Value == 2
-                 Elecnames = 1;
-             end
-            otherwise
-             fprintf('headplot(): Unknown Parameter %s\n',Param)
-             return
-           end
-       end
-  end 
+   
+   g = finputcheck( varargin, { ...
+       'cbar'       'real'   [0 Inf]     0; % Colorbar value must be 0 or axis handle.'
+       'lighting'   'string' { 'on' 'off' }  'on';
+       'verbose'    'string' { 'on' 'off' }  'on';
+       'maplimits'  { 'string' 'real' }  []  'absmax'; 
+       'title'      'string' []              '';
+       'lights'     'real'   []              DEFAULT_LIGHTS;
+       'view'       'real'   []              [143 18];
+       'colormap'   'real'   []              jet(64);
+       'meshfile'   'string' []              DEFAULT_MESH;
+       'electrodes' 'string' { 'on' 'off' }  'on';            
+       'orilocs'    { 'string' 'struct' } [] '';            
+       'labels'     'integer' [0 1 2]        0 }, 'headplot');
+   if isstr(g) error(g); end;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Open head mesh and electrode spline files
@@ -561,10 +485,10 @@ else
 
   % load mesh file
   % --------------
-  if ~exist(mesh_file)
-      error(sprintf('headplot(): mesh_file "%s" not found\n',mesh_file));
+  if ~exist(g.meshfile)
+      error(sprintf('headplot(): mesh file "%s" not found\n',g.meshfile));
   end
-  try, load(mesh_file,'-mat');
+  try, load(g.meshfile,'-mat');
   catch,
       POS  = load('mheadpos.txt', '-ascii');
       TRI1 = load('mheadtri1.txt', '-ascii'); % upper head
@@ -600,14 +524,14 @@ else
   HeadAxes = gca;
 
   W = zeros(1,size(POS,1));
-  m = size(Cmap,1);
-  if size(Maplimits) == [1,2]
-      amin = Maplimits(1);
-      amax = Maplimits(2);
-  elseif strcmp(Maplimits,'maxmin') | strcmp(Maplimits,'minmax')
+  m = size(g.colormap,1);
+  if size(g.maplimits) == [1,2]
+      amin = g.maplimits(1);
+      amax = g.maplimits(2);
+  elseif strcmp(g.maplimits,'maxmin') | strcmp(g.maplimits,'minmax')
       amin = min(min(abs(P)))*1.02; % 2% shrinkage keeps within color bounds
       amax = max(max(abs(P)))*1.02; 
-  elseif strcmp(Maplimits,'absmax')
+  elseif strcmp(g.maplimits,'absmax')
       amin = min(min(abs(P)))*1.02; % 2% shrinkage keeps within color bounds
       amax = max(max(abs(P)))*1.02; 
       amax = max(-amin, amax);
@@ -624,7 +548,7 @@ else
   %return;
 
   W(index1) = idx;
-  colormap(Cmap)
+  colormap(g.colormap)
   p1 = patch('Vertices',POS,'Faces',TRI1,'FaceVertexCdata',W(:),...
       'FaceColor','interp', 'cdatamapping', 'direct', 'tag', 'mesh');    %%%%%%%%% Plot scalp map %%%%%%%%%
   if exist('NORM') == 1 & ~isempty(NORM)
@@ -632,7 +556,7 @@ else
   end;
   
   if ~isempty(TRI2)
-      FCmap = [Cmap; Cmap(end,:); FaceColor; FaceColor; FaceColor];
+      FCmap = [g.colormap; g.colormap(end,:); FaceColor; FaceColor; FaceColor];
       colormap(FCmap)
       W = ones(1,size(POS,1))*(m+2);
       p2 = patch('Vertices',POS,'Faces',TRI2,'FaceColor','interp',...
@@ -647,15 +571,15 @@ else
   %%%%%%%%%%%%%%%%%%%%%%%%%
   % Draw colorbar - Note: uses enhanced cbar() function by Colin Humphries
   %%%%%%%%%%%%%%%%%%%%%%%%%      
-  if Colorbar==1                
-    BACKCOLOR = get(gcf,'Color');
-    if ColorbarAxes == 0       
-	  ColorbarHandle = cbar(0,3,[amin amax]); 
-    else
-	  ColorbarHandle = cbar(ColorbarAxes,3,[amin amax]); 
-    end
-    pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
-    set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
+  if ~isempty(g.cbar)
+      BACKCOLOR = get(gcf,'Color');
+      if g.cbar == 0       
+          ColorbarHandle = cbar(0,3,[amin amax]); 
+      else
+          ColorbarHandle = cbar(g.cbar,3,[amin amax]); 
+      end
+      pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
+      set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
   end
   axes(HeadAxes);
 
@@ -663,11 +587,11 @@ else
   % Turn on lights
   %%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if strcmp(Lighting,'on')
+  if strcmp(g.lighting,'on')
     set([p1 p2],'EdgeColor','none')
     
-    for i = 1:size(Lights,1)
-      hl(i) = light('Position',Lights(i,:),'Color',[1 1 1],...
+    for i = 1:size(g.lights,1)
+      hl(i) = light('Position',g.lights(i,:),'Color',[1 1 1],...
       'Style','infinite');
     end
     if ~isempty(p2)
@@ -683,8 +607,8 @@ else
   % Set viewpoint
   %%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if isstr(View)
-    switch lower(View)
+  if isstr(g.view)
+    switch lower(g.view)
       case {'front','f'}
         view(-180,30)
       case {'back','b'}
@@ -711,53 +635,48 @@ else
                   -125 -125 125; ...
                    0 10 -80]; % add light from below!
       otherwise
-        close; error(['headplot(): Invalid View value %s',View])
+        close; error(['headplot(): Invalid View value %s',g.view])
     end
   else
-    if ~isstr(View)
-      [h,a] = size(View);
-      if h~= 1 | a~=2
-          close; error('headplot(): View matrix size must be (1,2).')
+      if ~isstr(g.view)
+          [h,a] = size(g.view);
+          if h~= 1 | a~=2
+              close; error('headplot(): View matrix size must be (1,2).')
+          end
       end
-    end
-    view(View)   % set camera viewpoint
+      view(g.view)   % set camera viewpoint
   end
   
-  if strcmp(Electrodes,'on') % plot the electrode locations
+  if strcmp(g.electrodes,'on') % plot the electrode locations
    if exist('newElect')
     newNames = newElect*NamesDFac; % Calculate electrode label positions
-    if Elecnames | Elecnums
-      LineColor = MarkerColor; % 'y';
-    else
-      LineColor = MarkerColor;
-    end
     for i = 1:size(newElect,1)
-      if newElect(i,:) ~= [0 0 0]  % plot radial lines to electrode sites
-	    line([newElect(i,1) HeadCenter(1)],[newElect(i,2) HeadCenter(2)],...
-	            [newElect(i,3) HeadCenter(3)],'color',LineColor,'linewidth',1);
-
-        if Elecnums        % plot electrode numbers
-          t=text(newNames(i,1),newNames(i,2),newNames(i,3),int2str(i)); 
-          set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
-                    'HorizontalAlignment','center');
-
-        elseif Elecnames   % plot electrode names
-         if exist('ElectrodeNames')
-          name = sprintf('%s',ElectrodeNames(i,:));
-          t=text(newNames(i,1),newNames(i,2),newNames(i,3),name);
-          set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
-                    'HorizontalAlignment','center'); 
-         else
-           fprintf('Variable ElectrodeNames not read from spline file.\n');
-         end
-        else               % plot electrode markers
-          line(newElect(:,1),newElect(:,2),newElect(:,3),'marker',...
-                    '.','markersize',20,'color',MarkerColor,'linestyle','none');
+        if newElect(i,:) ~= [0 0 0]  % plot radial lines to electrode sites
+            line([newElect(i,1) HeadCenter(1)],[newElect(i,2) HeadCenter(2)],...
+                 [newElect(i,3) HeadCenter(3)],'color',MarkerColor,'linewidth',1);
+            
+            if g.labels == 1        % plot electrode numbers
+                t=text(newNames(i,1),newNames(i,2),newNames(i,3),int2str(i)); 
+                set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
+                      'HorizontalAlignment','center');
+                
+            elseif g.labels == 2   % plot electrode names
+                if exist('ElectrodeNames')
+                    name = sprintf('%s',ElectrodeNames(i,:));
+                    t=text(newNames(i,1),newNames(i,2),newNames(i,3),name);
+                    set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
+                          'HorizontalAlignment','center'); 
+                else
+                    fprintf('Variable ElectrodeNames not read from spline file.\n');
+                end
+            else               % plot electrode markers
+                line(newElect(:,1),newElect(:,2),newElect(:,3),'marker',...
+                     '.','markersize',20,'color',MarkerColor,'linestyle','none');
+            end
         end
-      end
     end
    else
-    fprintf('Variable newElect not read from spline file.\n');
+       fprintf('Variable newElect not read from spline file.\n');
    end
   end
 
@@ -765,7 +684,7 @@ else
   % Turn on rotate3d, allowing rotation of the plot using the mouse
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  if strcmp(verbose,'on')
+  if strcmp(g.verbose,'on')
     rotate3d on;   % Allow 3-D rotation of the plot by dragging the
   else             % left mouse button while cursor is on the plot
     rotate3d off
@@ -775,9 +694,9 @@ else
     axis image    % keep the head proportions human and as large as possible
   end
   % Add a plot title
-  if ~isempty(titl);
-    % title(['\n' titl],'fontsize',title_font);
-    title([titl],'fontsize',title_font); % Note: \n not interpreted by matlab-5.2
+  if ~isempty(g.title);
+    % title(['\n' g.title],'fontsize',title_font);
+    title([g.title],'fontsize',title_font); % Note: \n not interpreted by matlab-5.2
   end
 end
 
