@@ -23,6 +23,10 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/06/28 00:28:38  arno
+% (implmenting new header info
+% and rescaling to mircouV
+%
 
 function [eeg,ev,header] = read_erpss(filename)
   
@@ -158,8 +162,10 @@ function [eeg,ev,header] = read_erpss(filename)
             nlost = fread(fp,1,'uint16');
             nevents = fread(fp,1,'uint16');
             block_size_compress = fread(fp,1,'uint16');
-	    
+            %if cnt == 3, return; end;
+            
             % Read events
+            tmppos = ftell(fp);
             fseek(fp,48,0);
             for i=1:nevents,
                 samp_off = fread(fp,1,'uint8');
@@ -188,7 +194,7 @@ function [eeg,ev,header] = read_erpss(filename)
     
     % rescale to  uv
     % --------------
-    if isfield(header, 'rescaleuv')
+    if isfield(header, 'rescaleuv') & header.rescaleuv ~= 0
         disp('Rescaling data to microVolt');
         eeg = eeg*header.rescaleuv;
     end;
