@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/07/16 00:58:35  arno
+% debug legnd
+%
 % Revision 1.26  2003/07/16 00:38:14  arno
 % fixing ydir
 %
@@ -419,7 +422,7 @@ chans = length(channelnos);
   else % use default color order (no yellow!)
       tmpcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
-      g.colors = {g.colors{:} tmpcolors{:} tmpcolors{:}};  % make > 64 available
+      g.colors = {g.colors{:} tmpcolors{:}};  % make > 64 available
   end;
 %
 %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -490,10 +493,11 @@ chans = length(channelnos);
   msg = ['Plotting %d traces of %d frames with colors: '];
 
   for c=1:datasets
-      if iscell(g.colors{c})
-          msg = [msg  '''' g.colors{c}{1} ''' ' ];
+      cind = mod(c-1, length(g.colors))+1;
+      if iscell(g.colors{cind})
+          msg = [msg  '''' g.colors{cind}{1} ''' ' ];
       else
-          msg = [msg  '''' g.colors{c} ''' ' ];
+          msg = [msg  '''' g.colors{cind} ''' ' ];
       end;
   end
   msg = [msg '\n'];    % print starting info on screen . . .
@@ -656,8 +660,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         %
         %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-        if ~iscell( g.colors{P+1} ), tmpcolor = { g.colors{P+1} 'linewidth' LINEWIDTH };
-        else                         tmpcolor = g.colors{P+1};
+        Pind = mod(P+1-1, length(g.colors))+1;
+        if ~iscell( g.colors{Pind} ), tmpcolor = { g.colors{Pind} 'linewidth' LINEWIDTH };
+        else                          tmpcolor = g.colors{Pind};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
             plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
