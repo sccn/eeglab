@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/07/10 23:59:57  arno
+% implement itcmax
+%
 % Revision 1.37  2002/07/10 21:46:03  arno
 % adding phase argument
 %
@@ -998,7 +1001,8 @@ switch lower(g.plotitc)
 	h(9) = get(h(8),'Children');
 	set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
 	set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
-	set(h(8),'YLim',[0 coh_caxis(2)]); 
+	tmpcaxis = caxis;
+	set(h(8),'YLim',[0 tmpcaxis(2)]); 
 	title('ITC')
 
     %
