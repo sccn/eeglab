@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/04/30 18:38:21  arno
+% adding about button
+%
 % Revision 1.14  2002/04/18 16:19:38  scott
 % EEG.averef -sm
 %
@@ -276,7 +279,7 @@ for curfield = tmpfields'
 							  try, EEGOUT.data = load(varname, '-ascii');
 							  catch, error(['Pop_editset error: cannot read ascii file ''' varname ''' ']); 
 							  end;
-							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
