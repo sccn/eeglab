@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/12/06 03:43:23  arno
+% debuging event sorting
+%
 % Revision 1.15  2002/08/12 18:31:03  arno
 % questdlg2
 %
@@ -296,7 +299,7 @@ for curfield = 1:2:length(args)
                 error('Pop_editeventvals: not enough arguments to change field value');
             end;
             valstr = reformat(tmpargs{3}, strcmp(tmpargs{2}, 'latency'), EEG.trials > 1, tmpargs{1} );
-            eval([ 'EEG.event(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' valstr ';' ]);
+            eval([ 'EEG.event(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
 	   case 'add'
             tmpargs = args{ curfield+1 };
             allfields = fieldnames(EEG.event);
@@ -308,7 +311,7 @@ for curfield = 1:2:length(args)
             EEG.event(num+1:end) = EEG.event(num:end-1);
             for index = 1:length( allfields )
                 valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
-                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' valstr ';' ]);
+                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
 	        end;
 	   case 'changeevent'
             tmpargs = args{ curfield+1 };
@@ -319,7 +322,7 @@ for curfield = 1:2:length(args)
             end;
             for index = 1:length( allfields )
                 valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
-                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' valstr ';' ]);
+                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
 	        end;
 	end;
 end;
