@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.317  2004/07/09 23:42:46  arno
+% same
+%
 % Revision 1.316  2004/07/09 23:41:55  arno
 % update plugin
 %
@@ -1455,23 +1458,28 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     p = which('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
     dircontent1 = what(p);
-    dircontent2 = what( [ p 'plugins' ]);
-    dircontent  = { dircontent1.m{:} dircontent2.m{:} };
+    %dircontent2 = what( [ p 'plugins' ]);
+    %dircontent  = { dircontent1.m{:} dircontent2.m{:} };
+    dircontent  = dir([ p 'plugins' ]);
+    delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
+    dircontent  = { dircontent1.m{:} dircontent.name };
+
     for index = 1:length(dircontent)
 
         % find function
         % -------------
         funcname = '';
         if exist(dircontent{index}) == 7
-            addpath(dircontent{index});
-            tmpdir = dir(dircontent{index});
-            for tmpind = 1:length(tmpdir)
-                if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin'))
-                    funcname = tmpdir(tmpind).name;
-                    tmpind = length(tmpdir);
+            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+                addpath([ p 'plugins' delimiter dircontent{index} ]);
+                tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
+                for tmpind = 1:length(tmpdir)
+                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin'))
+                        funcname = tmpdir(tmpind).name(1:end-2);
+                        tmpind = length(tmpdir);
+                    end;
                 end;
             end;
-            p = p(1:findstr(p,'eeglab.m')-1);
         elseif ~isempty(findstr(dircontent{index}, 'eegplugin'))
             funcname = dircontent{index}(1:end-2); % remove .m
         end;
