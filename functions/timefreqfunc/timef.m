@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/07/11 18:19:30  arno
+% header typo
+%
 % Revision 1.42  2002/07/11 15:27:28  arno
 % debuging linear coherence
 %
@@ -833,7 +836,7 @@ else
   mbase = g.powbase;
 end
 if ~isnan( g.baseline ) & ~isnan( mbase )
-    P = 10 * (log10(P) - repmat(log10(mbase)',[1 g.timesout])); % convert to (10log10) dB
+    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 g.timesout])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
 end;
