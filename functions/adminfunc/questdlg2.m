@@ -1,25 +1,11 @@
-% questdlg2() - inputdlg function clone with coloring and help for 
+% questdlg2() - questdlg function clone with coloring and help for 
 %               eeglab().
 %
-% Usage:
-%   >> Answer = questdlg2(Prompt,Title,LineNo,DefAns,funcname);
-% 
-% Inputs:
-%   Same as inputdlg. Using the optional additionnal funcname parameter 
-%   the function will create a help button. The help message will be
-%   displayed using the pophelp() function.
-%
-% Output:
-%   Same as inputdlg
-%
-% Note: The advantage of this function is that the color of the window
-%       can be changed and that it display an help button. Edit 
-%       supergui to change window options. Also the parameter LineNo
-%       can only be one.
+% Usage: same as questdlg()
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 11 August 2002
 %
-% See also: supergui(), inputgui()
+% See also: inputdlg2(), errordlg2(), supergui(), inputgui()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -40,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 18:24:29  arno
+% debug
+%
 % Revision 1.2  2002/08/12 18:02:47  arno
 % debug
 %
