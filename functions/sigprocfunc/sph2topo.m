@@ -12,9 +12,9 @@
 %                   When az>0, horiz=0 -> right ear, 90 -> nose 
 %                   When az<0, horiz=0 -> left ear, -90 -> nose
 %   shrink_factor = radial scaling factor>=1 (Note: 1 -> plot edge 90 deg az
-%                   1.5 -> plot edge is +/-135 deg az {default 1}
-%   method        = [1|2], optional. 1 is standard, 2 is for
-%                   compatibility with cart2sph.
+%                   1.5 -> plot edge is +/-135 deg az {default 1`}
+%   method        = [1|2], optional. 1 is for Besa compatibility, 2 is for
+%                   compatibility with Matlab function cart2sph(). Default is 2
 %
 % Outputs:
 %   channo  = channel number (as in input)
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/02 00:52:36  arno
+% removing absolute value for compatibility
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
