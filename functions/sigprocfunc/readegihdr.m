@@ -1,4 +1,4 @@
-% readegihdr() - read header information from EGI (version 2 or 3) data file.
+% readegihdr() - read header information from EGI (versions 2,3,4,5,6,7) data file.
 %
 % Usage:
 %   >> [head] = readegihdr(fid)
@@ -9,7 +9,7 @@
 % Output:
 %   head - structure containing header information.
 %          Structure fields are:
-%           version     = 2, 3, or 5
+%           version     = 2,3,4,5,6,or 7
 %           samp_rate   = sampling rate in samples/s
 %           nchan       = number of EEG channels
 %           gain        = gain of amplifier
@@ -38,8 +38,8 @@ end;
     
 head.version = fread(fid,1,'integer*4');
 
-if ~(head.version == 2 | head.version == 3 | head.version == 5),
-        error('EGI Simple Binary Version 2, 3, and 5 supported only.');
+if ~( head.version >= 2 & head.version <= 7 ),
+        error('EGI Simple Binary Versions 2-7 supported only.');
 end;
 
 year = fread(fid,1,'integer*2');
@@ -56,9 +56,18 @@ head.gain = fread(fid,1,'integer*2');
 head.bits = fread(fid,1,'integer*2');
 head.range = fread(fid,1,'integer*2');
 
-head.segments = 1;
+head.samples = 0;
+head.segments = 0;
+head.segsamps = 0;
+head.eventtypes = 0;
+head.categories = 0;
+head.catname = {};
+head.eventcode = '';
 
-if (head.version > 2),
+switch (head.version)
+   case {2,4,6}
+        head.samples = fread(fid, 1 ,'integer*4');
+   case {3,5,7} 
         head.categories = fread(fid,1,'integer*2');
         if (head.categories),
                 for i=1:head.categories,
@@ -67,9 +76,11 @@ if (head.version > 2),
                 end
         end
         head.segments = fread(fid,1,'integer*2');
+        head.segsamps = fread(fid,1,'integer*4');
+   otherwise
+        error('Invalid EGI version');
 end
 
-head.segsamps = fread(fid,1,'integer*4');
 head.eventtypes = fread(fid,1,'integer*2');
 
 if isequal(head.eventtypes,0),
