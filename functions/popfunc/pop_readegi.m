@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/11/10 02:43:06  arno
+% add new pop up gui for epoch file
+%
 % Revision 1.11  2004/11/10 02:10:40  arno
 % reading chunks of data from the command line
 %
@@ -130,7 +133,34 @@ if ~isempty(Eventdata)
                              'nbtype', 1, 'delchan', 'on');
          Head.eventcode(end,:) = [];
     end;
+
+    % renaming event codes
+    % --------------------
+    try,
+        alltypes = { EEG.event.type };
+        if isstr(alltypes{1})
+            indepoc = strmatch('epoc', lower(alltypes), 'exact');
+            indtim  = strmatch('tim0', lower(alltypes), 'exact');
+        
+            % if epoc but no tim0 then epoc represent pauses in recording
+            if isempty(indtim) & ~isempty(indepoc)
+                for index = indepoc
+                    EEG.event(index).type = 'boundary';
+                end;
+            end;
+            % other wise if both non-empty data epochs
+            if ~isempty(indtim) & ~isempty(indepoc)
+                if rem(size(EEG.data,2) / (length(indepoc)+1),1) == 0
+                    EEG.event(index) = []; % remove epoch events
+                    EEG.trials       = length(indepoc)+1;
+                else
+                    disp('Warning: data epochs detected but wrong data size');
+                end;
+            end; 
+        end;
+     catch, disp('Warning: event renaming failed'); end;
 end;
+
 
 EEG = eeg_checkset(EEG, 'makeur');
 EEG = eeg_checkset(EEG, 'eventconsistency');
