@@ -4,9 +4,9 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, Jan 25 2002
 %
-% Note: this function overload the nnet toolbox function cell2mat, 
-% but does not have all its capacities. You can delete the current  
-% function if you have the toolbox.
+% Note: This function overloads the neuralnet toolbox function CELL2MAT,
+% but does not have all its capacities. Delete this version if you have 
+% the toolbox.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function M = cell2mat( C, varargin );
 
