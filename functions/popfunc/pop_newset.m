@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/02/03 01:46:42  scott
+% header edits -sm
+%
 % Revision 1.12  2002/12/04 19:11:35  arno
 % macOSX directory compatibility
 %
@@ -171,7 +174,9 @@ for ind = 1:2:length(args)
                         else
                             EEG = pop_saveset(EEG, args{ind+1});
                         end;
-	 case 'overwrite' , overWflag = 1;
+	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
+                            overWflag = 1; 
+                        end;
 	 otherwise, error(['pop_newset error: unrecognized key ''' args{ind} '''']); 
     end;
 end;
