@@ -1,18 +1,24 @@
-% pop_comments() - Ddd comments to an EEG dataset
+% pop_comments() - edit comments
 %
 % Usage:
-%   >> EEGOUT = pop_comments( EEGIN, comments );
+%   >> newcomments = pop_comments( oldcomments);
+%   >> newcomments = pop_comments( oldcomments, title, newcomments );
 %
 % Inputs:
-%   EEGIN      - input dataset
-%   comment    - character array
+%   oldcomments - old comments, string or cell array of strings
+%   title       - optional title window
+%   newcomments - new comments, string or cell array of strings
 %
 % Outputs:
-%   EEGOUT     - output dataset
+%   newcomments - new comments, string
+%
+% note: if new comments are given as input, there are simply
+%       converted and returned by the function, otherwise a
+%       window pops up.
 %
 % Example
-%   EEG = pop_comments( EEG, { 'This is the first line' '' ...
-%               'this is the third line' });  
+%  newc = pop_comments( { 'This is the first line' ' ' ...
+%               'this is the third line' }, 'Editing');  
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,30 +43,31 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 
 
-function [EEG, com] = pop_comments( EEG, comments );
+function [comments, com] = pop_comments( comments, plottitle, newcomments );
 
 com = '';
-if nargin < 1
-	help pop_comments;
-	return;
-end;	
-if nargin < 2
+if nargin < 3
 	figure('menubar', 'none', 'numbertitle', 'off', 'name', 'About this dataset -- pop_comment()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
 	set(gcf, 'userdata', 0);
-	title('Comments on current dataset');
-
-	axis off;
-
-	try, comments = EEG.comments;
-	catch, comments = [];
+	if exist('plottitle') ~=1, plottitle = ''; end;
+	if exist('comments') ~=1, comments = '';
+	elseif iscell(comments), comments = strvcat(comments{:}); 
 	end;
+	
+	h = title(plottitle);
+	set(h, 'fontweight', 'bold');
+	
+	axis off;
 
 	% create the buttons
 	% ------------------
@@ -100,15 +107,15 @@ if nargin < 2
 
 	close(gcf);
 else
-	try, comments = char(eval(comments));	catch, end; 
+  if iscell(newcomments)
+    comments = strvcat(newcomments{:});
+  end;
 end;	
- 
-EEG.comments = comments;
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
 
-com =sprintf('%s = pop_comments( %s, ''%s'');', inputname(1), inputname(1), array2str(comments));
+com =sprintf('EEG.comments = pop_comments('''', '''', %s);', str2str(comments));
 return;
  
 function str = array2str( array )
@@ -117,6 +124,14 @@ function str = array2str( array )
 		str = [ str '; [' num2str(double(array(index,:))) '] ' ];
 	end;
 	str = [ str ']' ];
+return;
+		 
+function str = str2str( array )
+	str = '';
+	for index = 1:size(array,1)
+		str = [ str ', ''' array(index,:) '''' ];
+	end;
+	str = [ 'strvcat(' str(2:end) ')'];
 return;
 		 
 
