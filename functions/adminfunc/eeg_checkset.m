@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/05/02 22:16:54  arno
+% speeding up event checks
+%
 % Revision 1.23  2002/05/01 18:58:08  luca
 % same
 %
@@ -529,7 +532,7 @@ if ~isempty( varargin)
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
 					  if ~valempt(indexevent)
-						  arraytmpinfo{allepochs(indexevent)} = allvalues(indexevent);
+						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
 					  end;
 				  end;
 				  % uniformize content for all epochs
@@ -556,7 +559,6 @@ if ~isempty( varargin)
 			  end;
 			  if strcmp(format, 'str')
 				  fprintf('eeg_checkset: uniformize value type of event field ''%s''\n', difffield{index});
-				  arraytmpinfo = cell(1,EEG.trials);
 				  % get the field content
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
