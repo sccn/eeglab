@@ -3,7 +3,6 @@
 %                    a normal ditribution fitted on trimmed data, a boxplot, and
 %                    the QQ-plot. The estimates value are printed in a panel and
 %                    can be read as output. See SIGNALSTAT.
-%
 % Usage:
 %   >>  OUTEEG = pop_signalstat( EEG, type ); % pops up
 %   >>  [M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh] = pop_signalstat( EEG, type, cnum );
@@ -40,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/12/03 18:47:21  arno
+% modify command output
+%
 % Revision 1.12  2003/11/18 16:19:42  scott
 % text labels
 %
