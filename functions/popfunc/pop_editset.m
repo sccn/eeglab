@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/05/21 20:47:02  scott
+% removed ; from evalin() commands -sm
+%
 % Revision 1.18  2002/05/01 01:23:44  luca
 % same
 %
@@ -280,7 +283,7 @@ for curfield = tmpfields'
 								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
 							 end;
                          end;
-        case 'data'    , varname = getfield(g, {1}, curfield{1});
+	    case 'data'    , varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
                             fprintf('Pop_editset: filename ''%s'' found for raw data\n', varname); 
                             switch lower(g.dataformat)
@@ -293,17 +296,22 @@ for curfield = tmpfields'
 							  try,
 								  x = whos('-file', varname);
 								  if length(x) > 1, 
-            error('Pop_editset error: .mat file must contain a single variable'); end;
-								  EEGOUT.data = load(varname, '-mat');
+									  error('Pop_editset error: .mat file must contain a single variable'); 
+								  end;
+								  tmpdata = load(varname, '-mat');									  
+								  EEGOUT.data = getfield(tmpdata,{1},x(1).name);
+								  clear tmpdata;
 							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
 							  end;
 							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
-							 case 'float32', if EEGOUT.nbchan == 0,
+							 case {'float32le' 'floatbe'}, 
+							  if EEGOUT.nbchan == 0,
 								  error(['Pop_editset error: to read float32 data you must first specify the number of channels']);
-							 end;     
-							 try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf]);
-							 catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
-							 end;
+							  end;     
+							  try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf], ...
+														   fastif(strcmp(g.dataformat, 'floatle'), 'ieee-le', 'ieee-be'));
+							  catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
+							  end;
 							 otherwise, error('Pop_editset error: unrecognized file format');
                             end;
                          else
