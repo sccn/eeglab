@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/12/17 23:19:51  arno
+% importing channel labels
+%
 % Revision 1.20  2003/10/30 19:38:39  arno
 % removing warnings
 %
@@ -214,7 +217,7 @@ for index = 1:length(r.electloc)
     names{index} = deblank(char(r.electloc(index).lab'));
     if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end;
 end;
-EEG.chanlocs  = struct('labels', cellstr(char(namechan)));
+EEG.chanlocs  = struct('labels', names);
 %EEG.chanlocs = readneurolocs( { names x y } );
 %disp('WARNING: Electrode locations imported from CNT files may not reflect true locations');
 
