@@ -11,42 +11,42 @@
 %  weights    = final weight matrix from runica() (=weights*sphere)
 %
 % Optional inputs:
-%  'chanlocs'  = [string] channel location file or structure. See >> topoplot example 
+%  'chanlocs'  = [string] channel location file or EEG.chanlocs structure. 
+%                  See >> topoplot example 
 %  'limits'    = [xmin xmax ymin ymax]  x values in ms 
-%                {def|[] or both y's 0 -> y data limits}
-%  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution 
-%                {def|[] or both y's 0 -> y data limits}
+%                  {def|[] or both y's 0 -> y data limits}
+%  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution
+%                  {def|[] or both y's 0 -> y data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
-%                ELSE n<0, the number largest-comp. maps  to plot (component with max
-%                variance) {default|[] -> 7}
+%                  ELSE n<0, the number largest-comp. maps  to plot (component with max
+%                  variance) {default|[] -> 7}
 %  'title'     = [string] plot title {default|[] -> none}
 %  'plotchans' = [integer array] data channels to use in computing envelopes 
-%                {default|[] -> all}
+%                  {default|[] -> all}
 %  'voffsets'  = [float array] vert. line extentions above the data max to disentangle
-%                plot lines (left->right heads, values in y-axis units) {def|[] -> none}
+%                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
 %  'colorfile' = [string] filename of file containing colors for envelopes, 3 chars
-%                per line, (. = blank). First color should be "w.." (white)
-%                Colorfile argument 'bold' uses default colors, all thick lines.
-%                {default|[] -> standard color order}
+%                  per line, (. = blank). First color should be "w.." (white)
+%                  Colorfile argument 'bold' uses default colors, all thick lines.
+%                  {default|[] -> standard color order}
 %  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
-%                solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
+%                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
 %  'vert'      = vector of times to plot vertical lines {default|[] -> none}
 %  'icawinv'   = [float array] inverse weigth matrix. By default computed by inverting
-%                the weight matrix (but if some components have been removed, then
-%                weight's pseudo-inverse matrix does not represent component's maps).
+%                  the weight matrix (but if some components have been removed, then
+%                  weight's pseudo-inverse matrix does not represent component's maps).
 %  'icaact'    = [float array] ICA component activity. By default computed using the
-%                weight matrix.
+%                  weight matrix.
 %  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
-%                envelope { Default -> 'avg' }
+%                  envelope { Default -> 'avg' }
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
-%                plotting.
+%                  plotting.
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %  'actscale'  = ['on'|'off'] scale component scalp map by component activity at the
-%                designated point in time. Default 'off'.
+%                  designated point in time. Default 'off'.
 %  'pvaf'      = ['on'|'off'] display percent variance accounted for by each 
-%                component over the interval selected by limcontrib. Default is 'on'
-%                pvaf(component) = 100-100*variance(data-component))/variance(data)
-%
+%                  component over the interval selected by limcontrib. Default is 'on'
+%                  pvaf(component) = 100-100*variance(data-component))/variance(data)
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
 %  compvars      = component max variances
@@ -80,6 +80,75 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2004/02/03 15:58:00  arno
+% no interpreter for title
+%
+% Revision 1.49  2004/01/29 16:56:30  scott
+% same
+%
+% Revision 1.48  2004/01/29 16:55:29  scott
+% same
+%
+% Revision 1.47  2004/01/29 16:54:41  scott
+% same
+%
+% Revision 1.46  2004/01/29 16:54:20  scott
+% same
+%
+% Revision 1.45  2004/01/29 16:50:45  scott
+% printout edit
+%
+% Revision 1.44  2004/01/29 16:44:56  scott
+% rm pvaf printout for now
+%
+% Revision 1.43  2004/01/29 16:39:45  scott
+% test for chanlocs file location and size
+%
+% Revision 1.42  2004/01/26 02:22:13  scott
+% same
+%
+% Revision 1.41  2004/01/26 02:10:24  scott
+% same
+%
+% Revision 1.40  2004/01/26 02:06:55  scott
+% same
+%
+% Revision 1.39  2004/01/26 02:05:23  scott
+% same
+%
+% Revision 1.38  2004/01/26 01:27:09  scott
+% same
+%
+% Revision 1.37  2004/01/26 01:19:58  scott
+% same
+%
+% Revision 1.36  2004/01/26 01:19:11  scott
+% same
+%
+% Revision 1.35  2004/01/26 01:16:59  scott
+% same
+%
+% Revision 1.34  2004/01/26 01:12:30  scott
+% same
+%
+% Revision 1.33  2004/01/26 01:11:06  scott
+% same
+%
+% Revision 1.32  2004/01/26 01:08:13  scott
+% same
+%
+% Revision 1.31  2004/01/26 00:53:17  scott
+% same
+%
+% Revision 1.30  2004/01/26 00:51:39  scott
+% same
+%
+% Revision 1.29  2004/01/26 00:47:52  scott
+% same
+%
+% Revision 1.28  2004/01/26 00:45:14  scott
+% improved listing of pvaf in Matlab command window
+%
 % Revision 1.27  2003/12/03 18:31:35  scott
 % percentage -> percent
 %
@@ -460,7 +529,7 @@ plotframes = ones(ncomps);
 maxproj = zeros(chans,ncomps);
 envdata = zeros(2,frames*(ncomps+1));
 envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); % first, plot the data envelope
-fprintf('Comparing projection sizes for components: ');
+fprintf('Comparing projection sizes for components:\n');
 compvars = zeros(1,ncomps);
     
 for c = 1:ncomps %%% find max variances and their frame indices %%%%%
@@ -479,14 +548,12 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 
   [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
   compvars(c)   = val;
-  
-  % compute pvaf
-  if strcmpi(g.pvaf,'on')
-      pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); % find max variance
-  end;
-  i = i+frame1-1;
 
-  if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped
+  % find variance in interval after removing component
+  pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
+
+  i = i+frame1-1;
+  if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped in plot
       ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
       [val,ix] = max(envdata(1,c*frames+ix));
       plotframes(c) = ix; % draw line from max non-clipped env maximum
@@ -495,16 +562,25 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
       plotframes(c) = i;
       maxproj(:,c)  = proj(:,i);
   end
-end 
+end %c
 fprintf('\n');
 
 % print percent variance accounted for
 % ---------------------------------------
+% compute pvaf
 if strcmpi(g.pvaf, 'on')
-    vardat = mean(mean((data(:,frame1:frame2).^2)));
-    pvaf = 100-100*pvaf / vardat;
+    fprintf('In the interval %.0f to %.0f ms:\n',x(frame1),x(frame2));
+    vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
+    pvaf = 100-100*pvaf/vardat;
+    [sortpvaf spx] = sort(pvaf);
+    k = 1;
     for index =1:ncomps
-        fprintf('Component %d percent variance accounted for: %6.2f\n', g.compnums(index), pvaf(index));
+        fprintf('   IC%d ',spx(index));
+        if spx(index)<100, fprintf(' '); end
+        if spx(index)<10, fprintf(' '); end
+        fprintf('pvaf: %6.2f%%   ', sortpvaf(index));
+        if rem(k,3)==0, fprintf('\n'); end;
+        k = k+1;
     end;
 end;
 %
@@ -515,7 +591,7 @@ x = xmin:sampint:xmax;                % make vector of x-values
 
 [compvars,compx] = sort(compvars');   % sort compnums on max variance
 compx        = compx(ncomps:-1:1);    % reverse order of sort
-compvarorder = g.compnums(compx);       % actual component numbers (output var)
+compvarorder = g.compnums(compx);     % actual component numbers (output var)
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames 
 compframes   = plotframes';           % frame of max variance in each comp (output var)
@@ -560,20 +636,27 @@ if length(g.plotchans) ~= chans
 end
 fprintf('Topo maps will show components: ');
 for t=1:ntopos
-  fprintf('%4d ',maporder(t));
+  fprintf('%4d  ',maporder(t));
 end
 fprintf('\n');
 fprintf('    with max variance at times: ');
 for t=1:ntopos
-  fprintf('%4.0f ',plottimes(t));
-end
-fprintf('\n');
-fprintf('                      = frames: ');
-for t=1:ntopos
-  fprintf('%4d ',plotframes(t));
+  fprintf('%4.0f  ',plottimes(t));
 end
 fprintf('\n');
 
+%fprintf('               or epoch frames: ');
+%for t=1:ntopos
+  %fprintf('%4d  ',frame1-1+plotframes(t));
+%end
+%fprintf('\n');
+%if strcmp(g.pvaf,'on')
+  %fprintf('  component pvaf in interval:  ');
+  %for t=1:ntopos
+    %fprintf('%4.2f ',pvaf(maporder(t)));
+  %end
+  %fprintf('\n');
+%end
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -810,6 +893,17 @@ if strcmpi(g.dispmaps, 'on')
     
     [tmp tmpsort] = sort(maporder);
     [tmp tmpsort] = sort(tmpsort);
+    if isstr(g.chanlocs)
+        if exist(g.chanlocs) ~= 2  % if no such file
+            fprintf('envtopo(): named channel location file not found.\n',chans);
+            return
+        end
+        eloc = readlocs(g.chanlocs);
+        if length(eloc) ~= chans
+            fprintf('envtopo(): %d channels not read from the named channel location file.\n',chans);
+            return
+        end
+    end
     for t=1:ntopos % left to right order 
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
@@ -819,12 +913,14 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(g.chanlocs)
-            if ~isempty(varargin) topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
-            else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+            if ~isempty(varargin) 
+                topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+            else 
+                topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
@@ -880,7 +976,8 @@ if strcmpi(g.dispmaps, 'on')
         
         axes(axall)
         set(axall,'Color',axcolor);
-        text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+        tmp = text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+	set(tmp, 'interpreter', 'none');
         text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
         text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
     end;
