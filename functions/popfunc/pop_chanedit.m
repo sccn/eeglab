@@ -1,4 +1,6 @@
-% pop_chanedit() - Edit channel locations (chanlocs) structure of an EEGLAB dataset
+% pop_chanedit() - Edit channel locations (chanlocs) structure of an EEGLAB dataset.
+%                  For channel location structure and file format, 
+%                  see >> help readlocs  % readlocs() function
 %
 % Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
 %                            'key2', value2, ... ); % dataset containing chanlocs
@@ -64,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/11/13 17:12:50  scott
+% help msg - changechan
+%
 % Revision 1.34  2002/11/13 16:57:24  scott
 % help msg
 %
