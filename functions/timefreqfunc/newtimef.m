@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/15 00:11:39  arno
+% title diff bug
+%
 % Revision 1.4  2002/10/09 18:31:50  arno
 % axcopy problem -> only try to execute it
 %
@@ -789,7 +792,7 @@ g.subitc = 'off';
 fprintf('\nProcessing trial (of %d):',trials);
 [alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
                                 'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
-                                g.type, 'subitc', g.subitc, 'wavelet', g.cycles); 
+                                g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio); 
 nb_points = size(alltfX,1);
 dispf     = find(freqs <= g.maxfreq);
 freqs = freqs(dispf);
