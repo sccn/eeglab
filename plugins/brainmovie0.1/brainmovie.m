@@ -83,7 +83,8 @@
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (one condition title per row)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
-% 'plotorder'   - [integer vector] component plot order from 1 to the number of components. 
+% 'plotorder'   - [integer vector] component plot order from 1 to the number of selected 
+%                 components. 
 %
 %Outputs to disk:
 % imageX      - brainmovie() saves a sequence of image files to disk (image0001.eps, ...)
@@ -119,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/12/04 22:43:56  arno
+% adding plotorder option
+%
 % Revision 1.35  2002/12/04 22:21:49  arno
 % changing default circfactor
 %
@@ -758,7 +762,7 @@ for indeximage = alltimepoints
 
 	% draw circles
 	% ------------
-	for index1 = g.plotorder(selected)
+	for index1 = g.plotorder
 		for tmpcond = 1:nbconditions
 			axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
 
