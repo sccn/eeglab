@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2002/11/13 19:57:40  arno
+% checkin shrink factor
+%
 % Revision 1.81  2002/11/13 19:21:09  arno
 % updating average reference flag
 %
@@ -406,7 +409,7 @@ end;
 if isstr(EEG.data)
 	fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
 	if fid == -1
-		errordlg2(['Can not open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
+		errordlg2(['Cannot open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
 	end;
 	fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
 	EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
