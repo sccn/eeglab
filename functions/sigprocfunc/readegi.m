@@ -2,11 +2,17 @@
 %	      Return header info, EEG data, and any event data.
 %
 % Usage:
-%   >> [head, TrialData, EventData] = readegi(filename)
+%   >> [head, TrialData, EventData] = readegi(filename, dataChunks)
 %
-% Inputs:
+% Required Input:
 %   filename = EGI data filename
 %
+% Optional Input:
+%   dataChunks = vector containing desired frame numbers(for unsegmented
+%                datafiles) or segments (for segmented files). If this
+%                input is empty or is not provided then all data will be
+%                returned.
+% 
 % Outputs:
 %   head = struct containing header info (see readegihdr() )
 %   TrialData = EEG channel data
@@ -38,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/12/07 00:32:13  arno
+% converting event codes to char
+%
 % Revision 1.11  2002/12/04 00:33:18  cooper
 % Added conversion of A/D units to microvolts.
 %
@@ -72,15 +81,23 @@
 % header ...
 %
 
-function  [head, TrialData, EventData] = readegi(filename)
+function  [head, TrialData, EventData] = readegi(filename, dataChunks)
 
-if nargin < 1,
+if nargin <1 | nargin >2,
     help readegi;
     return;
 end
 
 if nargout < 2 | nargout > 3,
 	error('2 or 3 output args required');
+end
+
+if ~exist('dataChunks','var')
+     dataChunks = [];
+end
+
+if ~isvector(dataChunks)
+     error('dataChunks must either be empty or a vector');
 end
 
 [fid,message] = fopen(filename,'rb','b');
@@ -105,11 +122,29 @@ end
 FrameVals = head.nchan + head.eventtypes;
 
 if (segmented)
-    TrialData = zeros(FrameVals,head.segsamps*head.segments);
-    readexpected = FrameVals*head.segsamps*head.segments; 
+
+    desiredSegments = dataChunks;
+    if isempty(desiredSegments),
+       desiredSegments = [1:head.segments];
+    end
+
+    nsegs = length(desiredSegments);
+
+    TrialData = zeros(FrameVals,head.segsamps*nsegs);
+    readexpected = FrameVals*head.segsamps*nsegs; 
+
 else
-    TrialData = zeros(FrameVals,head.samples);
-    readexpected = FrameVals*head.samples;
+
+    desiredFrames = dataChunks;
+    if isempty(desiredFrames),
+       desiredFrames = [1:head.samples];
+    end
+    
+    nframes = length(desiredFrames);
+
+    TrialData = zeros(FrameVals,nframes);
+    readexpected = FrameVals*nframes;
+
 end
 
 % get datatype from version number
@@ -126,27 +161,64 @@ end
 
 % read in epoch data
 readtotal = 0;
+j=0;
 if (segmented),
 
     for i=1:head.segments,
-	SegmentCatIndex(i) = fread(fid,1,'integer*2');
-	SegmentStartTime(i) = fread(fid,1,'integer*4');
+	segcatind = fread(fid,1,'integer*2');
+	segtime = fread(fid,1,'integer*4');
 
-	[TrialData(:,[1+(i-1)*head.segsamps:i*head.segsamps]), count] = ...
+	[tdata, count] = ...
 	   fread(fid,[FrameVals,head.segsamps],datatype);
 
-        readtotal = readtotal + count;
+       % check if this segment is one of our desired ones
+        if ismember(i,desiredSegments) 
+
+           j=j+1;
+           SegmentCatIndex(j) = segcatind;
+           SegmentStartTime(j) = segtime;
+ 
+           TrialData(:,[1+(j-1)*head.segsamps:j*head.segsamps]) = tdata;
+   
+           readtotal = readtotal + count;
+        end
+
+	if (j >= nsegs), break; end;
+
     end;
 
 else
     % read unsegmented data
-    [TrialData, readtotal] = fread(fid, [FrameVals,head.samples],datatype); 
+
+    % if dataChunks is empty, read all frames
+    if isempty(dataChunks)
+
+  [TrialData, readtotal] = fread(fid, [FrameVals,head.samples],datatype);     
+  
+    else   % grab only the desiredFrames
+           % This could take a while...
+
+    for i=1:head.samples,
+
+          [tdata, count] = fread(fid, [FrameVals,1],datatype);
+  
+        % check if this segment is a keeper
+	  if ismember(i,desiredSegments),
+	       j=j+1;
+               TrialData(:,j) = tdata;
+               readtotal = readtotal + count;
+          end
+
+          if (j >= nframes), break; end;
+
+       end
+    end
 end
 
 fclose(fid);
 
 if ~isequal(readtotal, readexpected)
-     error('Number of values read not equal to number given in header.');
+     error('Number of values read not equal to the number expected.');
 end 
 
 EventData = [];
@@ -163,3 +235,12 @@ end
 % convert event codes to char
 % ---------------------------
 head.eventcode = char(head.eventcode);
+
+
+%--------------------------- isvector() ---------------
+function retval = isvector(V)
+
+   s = size(V);
+   retval = ( length(s) < 3 ) & ( min(s) <= 1 );
+
+%------------------------------------------------------
