@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.305  2003/12/18 00:33:21  arno
+% debug last
+%
 % Revision 1.304  2003/12/18 00:32:34  arno
 % channel location detection
 %
@@ -1749,7 +1752,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
         set( g.val10, 'String', 'No');
     else
         if ~isfield(EEG.chanlocs, 'theta') | all(cellfun('isempty', { EEG.chanlocs.theta }))
-            set( g.val10, 'String', 'labels only');           
+            set( g.val10, 'String', 'No (labels only)');           
         else
             set( g.val10, 'String', 'Yes');
         end;
