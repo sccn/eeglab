@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/11/20 01:41:23  arno
+% do not plot for crossfdiff
+%
 % Revision 1.24  2002/11/20 01:13:47  arno
 % remove duplicate arguments
 %
@@ -652,9 +655,9 @@ if iscell(X)
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
-	figure; 
     
 	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        figure; 
         subplot(1,3,1); title(g.title{1});
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
