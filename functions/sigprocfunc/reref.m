@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/11/12 17:58:08  arno
+% Initial revision
+%
 % Revision 1.7  2002/09/05 00:30:23  scott
 % added meandata output -sm
 %
@@ -103,8 +106,8 @@ end;
 % check inputs
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
-                            'method'     'string'  { 'standard' 'withref' }  [];
-                            'refloc'     'cell'    []          [];
+                            'method'     'string'  { 'standard' 'withref' }  '';
+                            'refloc'     'cell'    []          {};
                             'elocs'      'struct'  []          [] });
 if isstr(g), error(g); end;
 
@@ -174,6 +177,7 @@ end;
 data = avematrix*data; % implement as a matrix multiply
 % there are faster methods but this one is the simpliest
 Elocs = g.elocs;
+data = reshape(data, size(data,1), dim2, dim3);
 
 % treat optional ica parameters
 % -----------------------------
