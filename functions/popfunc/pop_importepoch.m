@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/18 18:24:41  arno
+% typo can not
+%
 % Revision 1.3  2002/04/11 22:42:18  arno
 % debuging empty latency fields input array
 %
@@ -182,7 +185,7 @@ end;
 if ~isempty(EEG.event)
     if ~isfield(EEG.event, 'epoch')
         cleanevent = 1;
-        disp('Pop_importepoch: can not add events to a non-epoch event structure, erasing old epoch structure');
+        disp('Pop_importepoch: cannot add events to a non-epoch event structure, erasing old epoch structure');
     end;
 end;
 if cleanevent
