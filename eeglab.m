@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.350  2004/11/12 18:09:59  arno
+% debug last
+%
 % Revision 1.349  2004/11/12 18:09:20  arno
 % use EEGLAB_VERSION instead of LATEST
 %
@@ -1391,13 +1394,100 @@ if exist('icalab')
     disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
 end;
 
-% menu definition
-% --------------- 
-eeg_mainfig(onearg);
-W_MAIN = findobj('tag', 'EEGLAB');
-EEGUSERDAT = get(W_MAIN, 'userdata');
-set(W_MAIN, 'MenuBar', 'none');
-first_m = uimenu( W_MAIN, 'Label', 'File');
+    % looking for eeglab plugins
+    % --------------------------
+    p = which('eeglab.m');
+    p = p(1:findstr(p,'eeglab.m')-1);
+    dircontent1 = what(p);
+    dircontent  = dir([ p 'plugins' ]);
+    delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
+    dircontent  = { dircontent1.m{:} dircontent.name };
+
+    % BIOSIG plugin (not in plugin folder)
+    % ------------------------------------
+    path_biosig = [ p '..' delimiter 'biosig' delimiter 't200' ];
+    if exist(path_biosig) == 7
+        try,
+            addpath(path_biosig);
+            version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
+            version = loadtxt(version, 'convert', 'off');
+            version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
+            eval( [ 'vers =' funcname 'v' version '(gcf, trystrs, catchstrs);' ]);
+            biosigflag = 1;
+        catch
+            disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
+            disp([ '   ' lasterr] );
+            biosigflag = 0;
+        end;
+    end;        
+    
+    % scan plugin folder
+    % ------------------
+    for index = 1:length(dircontent)
+
+        % find function
+        % -------------
+        funcname = '';
+        if exist(dircontent{index}) == 7
+            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+                addpath([ p 'plugins' delimiter dircontent{index} ]);
+                tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
+                for tmpind = 1:length(tmpdir)
+                    % find plugin function in subfolder
+                    % ---------------------------------
+                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
+                        funcname = tmpdir(tmpind).name(1:end-2);
+                        tmpind = length(tmpdir);
+                    end;
+                    
+                    % spetial case of eeglab subfolder (for BIOSIG)
+                    % --------------------------------
+                    if strcmpi(tmpdir(tmpind).name, 'eeglab')
+                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
+                        tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
+                        for tmpind2 = 1:length(tmpdir2)
+                            if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
+                                    & tmpdir2(tmpind2).name(end) == 'm'
+                                funcname = tmpdir2(tmpind2).name(1:end-2);
+                                tmpind2  = length(tmpdir2);
+                                tmpind   = length(tmpdir);
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        else 
+            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+                funcname = dircontent{index}(1:end-2); % remove .m
+            end;
+        end;
+        
+        % execute function
+        % ----------------
+        if ~isempty(funcname)
+            vers = ''; % version
+            try,
+                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
+                disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
+           catch
+                try,
+                    eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                    disp(['eeglab: adding plugin function "' funcname '"' ]);    
+                catch
+                    disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
+                    disp([ '   ' lasterr] );
+                end;
+            end;
+        end;
+    end;
+
+    % menu definition
+    % --------------- 
+    eeg_mainfig(onearg);
+    W_MAIN = findobj('tag', 'EEGLAB');
+    EEGUSERDAT = get(W_MAIN, 'userdata');
+    set(W_MAIN, 'MenuBar', 'none');
+    first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data', 'tag', 'import data'); 
 	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
 	uimenu( neuromenu, 'Label', 'From EGI .RAW file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
@@ -1408,8 +1498,16 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Brain Vis. Anal. Matlab file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbva;' e_newnonempty ], 'Separator', 'on'); 
-        
-	importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
+    % BIOSIG MENUS
+    % ------------
+    combdf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
+    comedf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
+    combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
+    uimenu( menu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
+    uimenu( menu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
+    uimenu( menu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
+    
+    importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
 	uimenu( importepoch, 'Label', 'From Neuroscan .DAT file', 'CallBack', [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
 	importevent = uimenu( first_m, 'Label', 'Import event info', 'tag', 'import event'); 
@@ -1549,90 +1647,6 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     uimenu( help_m, 'Label', 'Tutorial (web)', 'CallBack', 'tutorial;');
     uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
-    % looking for eeglab plugins
-    % --------------------------
-    p = which('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    dircontent1 = what(p);
-    %dircontent2 = what( [ p 'plugins' ]);
-    %dircontent  = { dircontent1.m{:} dircontent2.m{:} };
-    dircontent  = dir([ p 'plugins' ]);
-    delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
-    dircontent  = { dircontent1.m{:} dircontent.name };
-
-    % BIOSIG plugin (not in plugin folder)
-    % ------------------------------------
-    path_biosig = which('eegplugin_biosig.m');
-    if ~isempty(path_biosig) & isempty(findstr(path_biosig, 'plugins'))
-        funcname = 'eegplugin_biosig';
-        try,
-            eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
-            disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
-        catch
-            disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
-            disp([ '   ' lasterr] );
-        end;
-    end;        
-    
-    % scan plugin folder
-    % ------------------
-    for index = 1:length(dircontent)
-
-        % find function
-        % -------------
-        funcname = '';
-        if exist(dircontent{index}) == 7
-            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
-                addpath([ p 'plugins' delimiter dircontent{index} ]);
-                tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
-                for tmpind = 1:length(tmpdir)
-                    % find plugin function in subfolder
-                    % ---------------------------------
-                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
-                        funcname = tmpdir(tmpind).name(1:end-2);
-                        tmpind = length(tmpdir);
-                    end;
-                    
-                    % spetial case of eeglab subfolder (for BIOSIG)
-                    % --------------------------------
-                    if strcmpi(tmpdir(tmpind).name, 'eeglab')
-                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
-                        tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
-                        for tmpind2 = 1:length(tmpdir2)
-                            if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
-                                    & tmpdir2(tmpind2).name(end) == 'm'
-                                funcname = tmpdir2(tmpind2).name(1:end-2);
-                                tmpind2  = length(tmpdir2);
-                                tmpind   = length(tmpdir);
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
-                funcname = dircontent{index}(1:end-2); % remove .m
-            end;
-        end;
-        
-        % execute function
-        % ----------------
-        if ~isempty(funcname)
-            vers = ''; % version
-            try,
-                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
-                disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
-           catch
-                try,
-                    eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
-                    disp(['eeglab: adding plugin function "' funcname '"' ]);    
-                catch
-                    disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
-                    disp([ '   ' lasterr] );
-                end;
-            end;
-        end;
-    end;
 
     % changing plugin menu color
     % --------------------------
