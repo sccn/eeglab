@@ -9,7 +9,7 @@
 %   filename = EGI data filename
 %
 % Outputs:
-%   head = struct containing header info (see readEGIhdr() )
+%   head = struct containing header info (see readegihdr() )
 %   TrialData = EEG channel data
 %   EventData = event codes
 %
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/14 17:49:51  arno
+% new cooper function
+%
 % Revision 1.3  2002/11/13 02:33:56  arno
 % help
 %
