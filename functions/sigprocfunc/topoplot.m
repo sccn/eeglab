@@ -26,11 +26,11 @@
 %                       'both'     -> plot both colored map and contour lines
 %                       'fill'     -> plot constant color between contour lines
 %                       'blank'    -> plot electrode locations only {default: 'both'}
+%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
+%                       options below. {default: 'off' -> mark electrode locations with points}. 
 %   'plotchans'       - vector of channel indices to interpolate in the head plot. Negative
 %                       integers reverse the data polarity. Grid chans, if any, are not included 
 %                       in plotchans (see 'gridplot' below). {default: [] -> plot all chans}
-%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
-%                       options below. {default: 'off' -> mark electrode locations with points}. 
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
@@ -38,6 +38,11 @@
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
+%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
+%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
+%   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
+%                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
+%                       values from electrodes shown in the plotting disk only. {default: 'on'}
 %   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
 %                       the electrode locations to minimize extrapolation.  {default: 'off'}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
@@ -68,11 +73,6 @@
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' = black}.
 % Plot detail options:
-%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
-%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
-%   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
-%                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
-%                       values from electrodes shown in the plotting disk only. {default: 'on'}
 %   'electcolor' {'k'}|'emarker' {'.'}|'emarkersize' {14}|'emarkersize1chan' {40}|'efontsize' {var}
 %                       electrode marking details and their {defaults}. 
 %   'shading'         - 'flat','interp'  {default: 'flat'}
@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.213  2004/10/27 16:39:06  arno
+% remove infinite and NaN values
+%
 % Revision 1.212  2004/10/09 22:26:18  scott
 % iv interp. value output, then output grid too -sm
 %
@@ -1107,8 +1110,8 @@ ally = y;
 
 Values(find(plotchans<0)) = -Values(find(plotchans<0)); % reverse indicated channel polarities
 
-intchans = intersect(intchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
-pltchans = intersect(pltchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
+intchans = intersect(intchans,abs(plotchans)); % plot only indicated 'plotchans' channels
+pltchans = intersect(pltchans,abs(plotchans)); % plot only indicated 'plotchans' channels
 fprintf('topoplot(): plotting %d channels\n',length(pltchans));
 
 if ~isempty(Values)
