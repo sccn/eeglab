@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/12 14:47:40  arno
+% color
+%
 % Revision 1.8  2002/08/12 14:30:55  arno
 % background
 %
@@ -171,9 +174,9 @@ end;
 %-----------------
 try, icadefs;
 catch,
-	GUIBACKCOLOR  =  [.8 .8 .8];     
-	GUIBUTTONCOLOR   = [.8 .8 .8];    
-	GUITEXTCOLOR     = [0 0 0];
+	GUIBACKCOLOR        =  [.8 .8 .8];     
+	GUIPOPBUTTONCOLOR   = [.8 .8 .8];    
+	GUITEXTCOLOR        = [0 0 0];
 end;
 
 hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
@@ -194,16 +197,16 @@ else
 end;
 
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
-set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
-set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'listbox');
-set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 
 return;
