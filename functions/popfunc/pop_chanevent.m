@@ -7,9 +7,9 @@
 % Graphic interface:
 %   "Event channel(s)" - [edit box] indices of event channel(s) to import.
 %                  Command line equivalent: chanindices.
-%   "Preprocessing transform" - [edit box] apply this
-%                  preprocessing formula to the selected data channel(s) X, 
-%                  transforming X into the formula output before edge
+%   "Preprocessing transform" - [edit box] apply this preprocessing
+%                  formula or function to the selected data channel(s) X, 
+%                  transforming X into the command output before edge
 %                  extraction. Command line equivalent 'oper'.
 %   "Edge type to extract" - [list box] extract events when the event
 %                  channel values go up ('leading'), down ('trailing')
@@ -38,7 +38,8 @@
 %                    In this command, the data channel(s) are designated by
 %                    (capital) X. For example, 'X>3' will test the value of X 
 %                    at each time point (returning 1 if the data channel value 
-%                    is larger than 3, and 0 otherwise).
+%                    is larger than 3, and 0 otherwise). You may also use 
+%                    any function (Ex: 'myfunction(X)').
 %   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
 %   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
 %   'nbtype'       - [1|NaN] setting this to 1 will force the program to 
@@ -78,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/03/04 18:19:51  arno
+% editing text
+%
 % Revision 1.29  2004/03/04 17:08:22  arno
 % programming new field oper, suppressing threshold
 %
