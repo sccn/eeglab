@@ -1,9 +1,12 @@
-% rmsave = return the RMS in each channel, epoch
+% rmsave() - return the RMS in each channel, epoch
 %
 % Usage:
 %         >> ave = rmsave(data,frames);
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Scott Makeig, CNL/Salk Institute, La Jolla, 9/98
 
