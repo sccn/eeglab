@@ -2,10 +2,16 @@
 %
 % Usage:
 %   >> [chanlist] = pop_chansel(chanstruct); % a window pops up
-%   >> [chanlist channames strallnames] = pop_chansel(chanstruct);
+%   >> [chanlist channames strallnames] = ...
+%                        pop_chansel(chanstruct, 'key', 'val', ...);
 %
 % Inputs:
 %   chanstruct     - channel structure. See readlocs()
+%
+% Optional input:
+%   'withindex'    - add index to each entry
+%   'select'       - selection of channel. Can take as input all the
+%                    outputs of this function.
 %
 % Output:
 %   chanlist  - indices of selected channels
@@ -33,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/11/10 16:48:02  arno
+% NEW CHANNEL SELECTOR
+%
 % Revision 1.12  2004/11/10 16:09:45  arno
 % nothing
 %
@@ -82,9 +91,31 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'   'string'  {'on' 'off'}   'off' });
+    g = finputcheck(varargin, { 'withindex'   'string'  {'on' 'off'}   'off';
+                                'select'      { 'cell' 'string' 'integer' } [] [] });
     if isstr(g), error(g); end;
     
+    % convert selection to integer
+    % ----------------------------
+    if isstr(g.select) & ~isempty(g.select)
+        g.select = parsetxt(g.select);
+    end;
+    if iscell(g.select) & ~isempty(g.select)
+        if isstr(g.select{1})
+            tmplower = lower( chans );
+            for index = 1:length(g.select)
+                matchind = strmatch(lower(g.select{index}), tmplower, 'exact');
+                if ~isempty(matchind), g.select{index} = matchind;
+                else error( [ 'Cannot find ''' g.select{index} '''' ] );
+                end;
+            end;
+        end;
+        g.select = [ g.select{:} ];
+    end;
+    if ~isnumeric( g.select ), g.select = []; end;
+    
+    % add index to channel name
+    % -------------------------
 	tmpstr = {chans};
     if isnumeric(chans{1})
         tmpstr = [ chans{:} ];
@@ -104,8 +135,23 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
             end;
         end;
     end;
-    [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift/Ctrl to', 'select several)'), 'ListString', tmpfieldnames);       
+    [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift/Ctrl to', 'select several)'), ...
+                                          'ListString', tmpfieldnames, 'initialvalue', g.select);       
     allchanstr = chans(chanlist);
+    
+    % get concatenated string (if index)
+    % -----------------------
+    if strcmpi(g.withindex, 'on')
+        if isnumeric(chans{1})
+            chanliststr = num2str(allchanstr);
+        else
+            chanliststr = '';
+            for index = 1:length(allchanstr)
+                chanliststr = [ chanliststr allchanstr{index} ' ' ];
+            end;
+            chanliststr = chanliststr(1:end-1);
+        end;
+    end;
        
     return;
     % old version
