@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/08/19 19:12:16  arno
+% debugging last
+%
 % Revision 1.29  2002/08/19 19:10:13  arno
 % figure bigger for MAC
 %
@@ -270,13 +273,17 @@ end;
 
 % for MAC (magnify figures that have edit fields)
 % -------
-if ~isunix & ~ispc
-	hh = findobj(allhandlers, 'style', 'edit');
-	if ~isempty(hh)
-		factmulty = factmulty*1.4;
+warning off;
+try, 
+	if isppc
+		hh = findobj(allhandlers, 'style', 'edit');
+		if ~isempty(hh)
+			factmulty = factmulty*1.4;
+		end;
 	end;
-end;
-	
+catch, end;
+warning on;	
+
 % scale and replace the figure in the screen
 % -----------------------------------------
 pos = get(gcf, 'position');
