@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/07/23 18:36:54  arno
+% adding more algos
+%
 % Revision 1.22  2003/07/22 16:19:32  arno
 % tfbss
 %
@@ -142,23 +145,31 @@ end;
 % find available algorithms
 % -------------------------
 allalgs   = { 'runica' 'binica' 'jader' 'jadeop' 'jade_td_p' 'MatlabshibbsR' 'fastica' ...
-              'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' 
+              'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' ...
               'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' }; % do not use egld_ica => too slow
 selectalg = {};
-stralg    = '';
+stralg{1} = 'ICA algorithm to use [ ';
+
+linenb    = 1;
+count     = 1;
 for index = 1:length(allalgs)
-    if exist(allalgs{index}) == 2
-        selectalg = { selectalg{:} allalgs{index} };
-        stralg    = [ stralg ' | '  allalgs{index} ];
+    if exist(allalgs{index}) == 2 | exist(allalgs{index}) == 6
+        selectalg          = { selectalg{:} allalgs{index} };
+        if mod(count+2, 8) == 0, linenb = linenb+1; stralg{linenb} = ''; end;
+        if count ~= 1
+             stralg{linenb} = [ stralg{linenb} ' | '  allalgs{index} ];
+        else stralg{linenb} = [ stralg{linenb}        allalgs{index} ];
+        end;
+        count               = count+1;
     end;
 end;
-stralg = stralg(3:end);
+stralg{linenb} = [ stralg{linenb} ' ] ' ];
     
 fig = [];
 if nargin < 2 
     % popup window parameters
     % -----------------------
-    promptstr    = { [ 'ICA algorithm to use [' stralg ' ]' ] ...
+    promptstr    = { strvcat(stralg{:}) ...
                      [ 'Commandline options (See algorithm help messages)' ] };
 	inistr       = { 'runica' '' };
 	result       = inputdlg2( promptstr, 'Run ICA decomposition -- pop_runica()', 1,  inistr, 'pop_runica');
