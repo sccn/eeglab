@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2002/08/21 17:56:20  arno
+% debug checks
+%
 % Revision 1.63  2002/08/21 17:46:26  arno
 % more reject field checks
 %
@@ -654,7 +657,7 @@ if ~isempty( varargin)
 		  end;
 		 case 'chanloc', 
 		  if isempty(EEG.chanlocs)
-			  errordlg2( strvact('Cannot process without channel location file.', ...
+			  errordlg2( strvcat('Cannot process without channel location file.', ...
 						 'Enter the name of the file via "/Edit/Edit dataset info".', ...
 						 'For the file format, enter ''>> help totoplot'' from the command line.'), 'Error');
 			  error('eeg_checkset: cannot process without channel location file.');
