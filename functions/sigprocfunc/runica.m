@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/10/23 15:48:45  arno
+% indents
+%
 % Revision 1.11  2003/10/19 17:14:15  scott
 % cosmetics, help msg
 %
@@ -231,7 +234,7 @@ block      = DEFAULT_BLOCK;          % heuristic default - may need adjustment!
 lrate      = DEFAULT_LRATE;
 annealdeg  = DEFAULT_ANNEALDEG;
 annealstep = 0;                      % defaults declared below
-nochange   = DEFAULT_STOP;
+nochange   = NaN;
 momentum   = DEFAULT_MOMENTUM;
 maxsteps   = DEFAULT_MAXSTEPS;
 
@@ -570,9 +573,13 @@ end;
 % 
 % adjust nochange if necessary
 %
-if nochange == DEFAULT_STOP & size(data,1) > 32
-    nochange = 1E-7;
-    nochangeupdated = 1; % for fprinting purposes
+if isnan(nochange) 
+    if ncomps > 32
+        nochange = 1E-7;
+        nochangeupdated = 1; % for fprinting purposes
+    else
+        nochange = DEFAULT_STOP;
+    end;
 else 
     nochangeupdated = 0;
 end;
