@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/07/08 15:37:02  arno
+% *** empty log message ***
+%
 % Revision 1.12  2003/05/23 23:16:47  arno
 % aded warning
 %
@@ -375,7 +378,7 @@ if strcmpi(g.distfit, 'on')
     
     % fitting with Ramber-Schmeiser distribution
     % ------------------------------------------
-    accarrayout = 1 - findfit(abs(Rbootout(:)), g.vals);
+    accarrayout = 1 - rsfit(abs(Rbootout(:)), g.vals);
     return;
     
     % fitting with normal distribution (deprecated)
