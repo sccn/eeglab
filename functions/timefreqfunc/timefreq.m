@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/01/02 20:01:39  arno
+% removing the complex transpose bug
+%
 % Revision 1.10  2002/10/18 14:43:35  arno
 % header
 %
@@ -218,6 +221,7 @@ if strcmpi(g.subitc, 'on')
     %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
 	tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
 end;
+%figure; imagesc(abs(sum(tmpall,3))); cbar;
 return;
 
 
