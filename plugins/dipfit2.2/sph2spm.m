@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/10 19:58:23  arno
+% adding header
+%
 
 function besa2SPM_result = besa2SPM;
 
@@ -81,12 +84,12 @@ if 0
 end;
    
 % adapted manualy from above for temporal electrodes (see factor 0.94
-% instead of 1.1889)
-% traditional([0.5588  -14.5541    1.8045    0.0004    0.0000   -1.5623    1.1889    0.94  132.6198])
+% instead of 1.1889 and x shift of -18.0041 instead of -14.5541)
+%traditional([0.5588  -18.0041    1.8045    0.0004    0.0000   -1.5623    1.1889    0.94  132.6198])
 
 besa2SPM_result = [
-     0.0101   -0.9400         0    0.5588
-    1.1889    0.0080    0.0530  -14.5541
+   0.0101   -0.9400         0    0.5588
+    1.1889    0.0080    0.0530  -18.0041
    -0.0005   -0.0000    1.1268    1.8045
          0         0         0    1.0000
           ];
