@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/05/14 17:43:10  arno
+% different concatenation
+%
 % Revision 1.2  2003/12/05 20:08:44  arno
 % debug output
 %
@@ -49,8 +52,11 @@ end;
 if ~isfield(EEG, 'history')
     EEG.history = '';
 end;
-try
-    EEG.history = [ EEG.history 10 command ];
-catch
-    EEG.history = strvcat(EEG.history, command);
+
+if ~isempty(command)
+    try
+        EEG.history = [ EEG.history 10 command ];
+    catch
+        EEG.history = strvcat(EEG.history, command);
+    end;
 end;
