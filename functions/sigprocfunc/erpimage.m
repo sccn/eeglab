@@ -114,7 +114,7 @@
 %   phsangls  = vector of sorted trial phases at the phase-sorting frequency
 %     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
 %    sortidx  = indices of sorted data epochs plotted
-%     erpsig  = trial average significance levels [lo high]
+%     erpsig  = trial average significance levels [2,frames]
 %
 % Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
 %
@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.145  2003/09/06 22:43:57  scott
+% add erpsig output
+%
 % Revision 1.144  2003/09/06 22:24:55  scott
 % debug last, add \n before first printed line "Plotting input...
 %
