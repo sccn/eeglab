@@ -25,7 +25,7 @@
 %  'freqparams' - [cell array] time-frequency decomposition parameters for
 %               timef and crossf. The first parameter must be the number of
 %               cycles. Default is { 3, 'winsize' 96, 'padratio', 4, 'maxfreq', 25,
-%               'alpha', 0.01 }.
+%               'alpha', 0.01, 'subitc', 'on' }.
 %  'diffmovie'  - ['on'|'off'] plot the difference movie or simply the movie for
 %               the given datasets. For the difference movies, there must only
 %               be two input datasets (ALLEEG length must be equal to 2). The movie
@@ -97,6 +97,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/19 23:15:41  arno
+% debugging
+%
 % Revision 1.1  2002/11/18 23:16:04  arno
 % Initial revision
 %
@@ -160,7 +163,8 @@ if isempty(g.freqparams)
                      'timesout' , min(200, ALLEEG(1).pnts), ...
                      'padratio', 4, ...
                      'maxfreq', 25, ...
-                     'alpha', 0.01 };
+                     'alpha', 0.01, ...
+                     'subitc', 'on' };
 end;
 g.freqparams = { ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ALLEEG(1).srate, ...
                  g.freqparams, ...
