@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.241  2003/05/14 15:15:50  arno
+% adding export menu
+%
 % Revision 1.240  2003/05/12 16:23:01  scott
 % edited text fprintfs
 %
@@ -989,6 +992,7 @@ e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),'
 e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_storeall        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist            = [e_catch 'h(LASTCOM);'];
+e_histdone        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''done''); end;' ];
 
 % build structures for plugins
 % ----------------------------
@@ -1031,9 +1035,9 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'From data channel'          , 'CallBack', [ check   '[EEG LASTCOM]= pop_chanevent(EEG);' e_store]); 
 	uimenu( importevent, 'Label', 'From Presentation .LOG file'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 	exportm = uimenu( first_m, 'Label', 'Export'); 
-	uimenu( exportm, 'Label', 'Data and ICA activity to text file', 'CallBack', [ check   'LASTCOM = pop_export(EEG);' e_hist ]);
-	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_hist ]); 
-	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_hist ]); 
+	uimenu( exportm, 'Label', 'Data and ICA activity to text file', 'CallBack', [ check   'LASTCOM = pop_export(EEG);' e_histdone ]);
+	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
+	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
