@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/03/19 18:16:23  arno
+% debug
+%
 % Revision 1.6  2003/11/27 02:44:15  arno
 % header typo
 %
@@ -82,7 +85,9 @@ while noteof
         if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
             if (tmpstr(1) == '%') & (tmpstr(2) == 'N')
                 eloc(index).labels =  strtok( tmpstr(3:end) );
-                tmpstr = fgetl(fid);
+                if isempty(tmpstr)
+                    tmpstr = fgetl(fid);
+                end;
                 tmp = sscanf(tmpstr, '%f');
                 eloc(index).X  = tmp(1); x(index) = tmp(1);
                 eloc(index).Y  = tmp(2); y(index) = tmp(2);
