@@ -9,7 +9,7 @@
 %                               Collects the 'timerange' command line input.
 %                               Empty or [] input -> Use whole epoch as baseline
 %    "Baseline points vector" - [edit box] Collects the 'pointrange' command line 
-%                               option (below). (Overwritten by 'timerange'). 
+%                               option (below). (Overwritten by 'timerange' above). 
 %                               Empty or [] input -> Use whole epoch as baseline
 % Inputs:
 %   EEG        - Input dataset
@@ -47,6 +47,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/02/27 03:04:30  scott
+% document options in help
+% .,
+%
 % Revision 1.16  2005/02/27 02:59:22  scott
 % make entries in ms as per documentation
 % added ability to use empty inputs -> use whole epoch for baseline
