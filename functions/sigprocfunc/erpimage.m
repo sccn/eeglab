@@ -146,7 +146,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Uses external toolbox functions: phasecoher(), rmbase(), cbar(), movav()
-% Uses included functions:         plot1erp(), phasedet()
+% Uses included functions:         plot1trace(), phasedet()
 
 % UNIMPLEMENTED - 'allcohers',[data2] -> image the coherences at each time & trial. 
 %                   Requires arg 'coher' with alpha significance. 
@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.177  2003/11/14 17:01:59  scott
+% bootstrap msg
+%
 % Revision 1.176  2003/11/14 16:58:02  scott
 % debug last
 %
@@ -2464,12 +2467,12 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                   gcapos(3) image_loy*gcapos(4)]);
     end
     if Erpstdflag == YES
-        plot1erp(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
+        plot1trace(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
-        plot1erp(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
+        plot1trace(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
     else
-        plot1erp(ax2,times,erp,limit); % plot ERP alone
+        plot1trace(ax2,times,erp,limit); % plot ERP alone
     end;
         
     if ~isnan(aligntime)
@@ -2656,9 +2659,9 @@ if ~isnan(coherfreq)
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
                 ampsiglims = [ampsiglims;-1*ampsiglims];
-        	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
         else
-        	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
         end
         
         if ~isnan(aligntime)
@@ -2752,9 +2755,9 @@ if ~isnan(coherfreq)
         end
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
-            coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims); % plot COHER
         else
-            coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
         end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
@@ -2911,6 +2914,8 @@ if strcmpi(noshow, 'no')
     % axcopy(gcf,eegstr);
 end;
 
+fprintf('Done.\n');
+
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
@@ -2921,9 +2926,9 @@ end;
 
 return
 %
-%%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
+function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev)
 %                           if signif is NaN, plot erp +/- stdev
 %                           else if signif, plot erp and signif(1,:)&signif(2,:) fill
 %                           else, plot erp alone
@@ -2934,12 +2939,12 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
     if ~isnan(signif);
       filltimes = [times times(end:-1:1)];
       if size(signif,1) ~=2 | size(signif,2) ~= length(times)
-         fprintf('plot1erp(): signif array must be size (2,frames)\n')
+         fprintf('plot1trace(): signif array must be size (2,frames)\n')
          return
       end
       fillsignif = [signif(1,:) signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
-      set(fillh,'edgecolor',FILLCOLOR+[.01 .01 0]); % make edges slightly highlighted
+      set(fillh,'edgecolor',FILLCOLOR-[.02 .02 0]); % make edges slightly highlighted
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
