@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/06/16 21:39:18  arno
+% checking urevent consistency
+%
 % Revision 1.32  2004/06/15 18:40:10  arno
 % debuging urevent number
 %
@@ -641,6 +644,7 @@ if nargin<2
             EEG       = userdata{1};
             disp('Checking event consistency...');
             EEG = eeg_checkset(EEG, 'eventconsistency');
+            EEG = eeg_checkset(EEG, 'checkur');
         end;
     else 
         com = '';
