@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2005/03/09 19:29:42  arno
+% updating GUI for channel location file
+%
 % Revision 1.117  2005/03/08 21:49:26  arno
 % deug plotrad
 %
@@ -558,7 +561,7 @@ if nargin < 3
     % lookup channel locations if necessary
     % -------------------------------------
     if ~all(cellfun('isempty', {chans.labels})) & all(cellfun('isempty', {chans.theta}))
-        [chans tmp2 com] = pop_chanedit(chans, 'lookupgui', []);
+        [chans params com] = pop_chanedit(chans, params, 'lookupgui', []);
         if ~isempty(com)
             totaluserdat = com;
         end;
@@ -757,7 +760,7 @@ if nargin < 3
 					{ 'Style', 'text', 'string', 'Plot radius (0.2-1, []=auto)'} ...
 					{ 'Style', 'edit', 'string', params.plotrad, 'tag', 'shrinkfactor' } ... %					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', ' Shrink to vertex', 'value', params.shrink } ...
 					{ 'Style', 'listbox',  'string', 'Nose along +X|Nose along -X|Nose along +Y|Nose along -Y', ...
-                      'tag' 'nose' 'value', noseparam 'callback' nosecallback } ...
+                      'tag' 'nose' 'value', noseparam 'callback' nosecallback 'listboxtop' noseparam } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3-D (XYZ)', 'callback', plot3d } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Read locations', 'callback', guireadlocs }, ...
 					{ 'Style', 'pushbutton', 'string', 'Read locs help', 'callback', 'pophelp(''readlocs.m'');' }, ...	
@@ -780,7 +783,7 @@ if nargin < 3
 			[results userdat returnmode] = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', 'Edit channel info -- pop_chanedit()', {}, 'noclose' );
 			if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
 		end; 
-		if length(results) == 0, return; end;
+		if length(results) == 0, com = ''; return; end;
 		
 		% transfer events back from global workspace
 		chans = evalin('base', 'chantmp');
@@ -1099,6 +1102,10 @@ else
                            chans(tmpdiff(end)).labels);
                end;
            end;
+           if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
+                   ~isempty(findstr(args{ curfield+1 }, '.elc'))
+               params.nosedir = '+Y';
+           end;
            
         case 'lookupgui'
          standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
@@ -1127,7 +1134,7 @@ else
             res = inputgui( { 1 [1 0.2] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', ...
                            [], 'normal', [3 1 1] );
             if ~isempty(res)
-                chans = pop_chanedit(chans, 'lookup', res{1});	
+                [chans params] = pop_chanedit(chans, params, 'lookup', res{1});	
                 com = { 'lookup' res{1} };
             end;
         end;
