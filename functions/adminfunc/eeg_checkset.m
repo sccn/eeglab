@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/08 20:49:26  arno
+% add check for the comments field
+%
 % Revision 1.2  2002/04/08 02:13:09  scott
 % improved wording of messages to user -sm
 %
@@ -186,7 +189,13 @@ res = [];
     else
         EEG.event = [];
     end;
-    if ~isfield(EEG, 'eventdescription'), EEG.eventdescription = {}; res = com; end;
+    if ~isfield(EEG, 'eventdescription'), EEG.eventdescription = {}; ...
+	  res = com; 
+    else 
+      if length(EEG.eventdescription) > length(EEG.event)
+	EEG.eventdescription = EEG.eventdescription(1:length(EEG.event));
+      end;
+    end;
     
  	% deal with epoch arrays
     % ----------------------
