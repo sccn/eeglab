@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/15 00:08:50  arno
+% g.frame -> frame
+%
 % Revision 1.3  2002/10/09 00:03:20  arno
 % debugging
 %
@@ -99,7 +102,7 @@ g.cycles = g.wavelet(1);
 if length(g.wavelet) >= 2
 	g.cyclesfact = g.wavelet(2);
 else 
-	g.cyclesfact = 0.5;
+	g.cyclesfact = 1; % default is 1 (no decrease)
 end;
 if (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
    error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
