@@ -29,20 +29,22 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
-function b = dftfilt(n,W,c,k,q)
+function b = dftfilt(len,maxfreq,cycle,oversmp,wavfact)
 
-f = 2*pi/n;						% Angular increment.
-w = j * c * [0:f:2*pi-f/2]';	% Column.
-x = 1:1/k:W*n/c;				% Row.
-b = exp(-w*x);					% Exponentiation of outer product.
+srate = 2*pi/len;						    % Angular increment.
+w = j * cycle * [0:srate:2*pi-srate/2]';	% Column.
+x = 1:1/oversmp:maxfreq*len/cycle;		    % Row.
+b = exp(-w*x);					            % Exponentiation of outer product.
 
 for i = 1:size(b,2),
-	m  = round(q*n*(i-1)/(i+k-1));	% Number of elements to discard.
-	mu = round(m/2);				% Number of upper elemnts.
-	ml = m-round(m/2);				% Number of lower elemnts.
-	b(:,i) = b(:,i) .* [zeros(mu,1) ; hanning(n-m) ; zeros(ml,1)];
-%	b(:,i) = b(:,i) .* [zeros(mu,1) ; ones(n-m,1) ; zeros(ml,1)];
+	m  = round(wavfact*len*(i-1)/(i+oversmp-1));	% Number of elements to discard.
+	mu = round(m/2);				                % Number of upper elemnts.
+	ml = m-round(m/2);				                % Number of lower elemnts.
+	b(:,i) = b(:,i) .* [zeros(mu,1) ; hanning(len-m) ; zeros(ml,1)];
 end
