@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/17 03:06:48  arno
+% Initial revision
+%
 
 function [vals, okornot, strval] = listdlg2(varargin);
 
@@ -48,7 +51,9 @@ try,  g.name;       catch, g.name = ''; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
-
+if isstr(g.liststring)
+	g.liststring = { g.liststring };
+end;
 allstr = '';
 for index = 1:length(g.liststring)
 	allstr = [ allstr '|' g.liststring{index} ];
@@ -56,8 +61,8 @@ end;
 allstr = allstr(2:end);
 
 geometry = {[1] [1 1]};
-geomvert = [length(g.liststring) 1];
-if ~strcmp(g.selectionmode, 'multiple')
+geomvert = [length(g.liststring)+1 1];
+if ~strcmp(g.selectionmode, 'multiple') | length(g.liststring) == 1
 	maxval = 2;
 	if isempty(g.initval), g.initval = 1; end;
 else
