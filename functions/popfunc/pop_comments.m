@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/05/14 17:16:18  hilit
+% chnaged the help message
+%
 % Revision 1.11  2003/05/09 22:04:46  arno
 % making the comments incremental
 %
@@ -177,8 +180,8 @@ if nargout > 1
             allsame = 0;
         end;
         if allsame
-            com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', ...
-                          cell2str(newccell(length(ccell)+1:end)));
+             com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', ...
+                         cell2str(newccell(length(ccell)+1:end)));
         else 
             com =sprintf('EEG.comments = pop_comments('''', '''', %s);', cell2str(newccell));     
         end;
@@ -207,7 +210,7 @@ function str = cell2str( array )
         if isempty(array{index})
             str = [ str ', '' ''' ];
         else
-            str = [ str ', ''' array{index} '''' ];
+            str = [ str ', ''' doublequotes(array{index}) '''' ];
         end;
 	end;
 	str = [ 'strvcat(' str(2:end) ')'];
@@ -221,4 +224,11 @@ function str = str2str( array )
 	str = [ 'strvcat(' str(2:end) ')'];
 return;
 		 
-
+function str = doublequotes( str )
+        quoteloc = findstr( str, '''');
+        if ~isempty(quoteloc)
+                for index = length(quoteloc):-1:1
+                        str = [ str(1:quoteloc(index)) str(quoteloc(index):end) ];
+                end;
+        end;
+return;
