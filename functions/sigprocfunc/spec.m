@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/12/03 02:36:32  arno
+% outputs
+%
 % Revision 1.3  2003/12/03 02:35:01  arno
 % for non power of 2 windows
 %
@@ -74,7 +77,6 @@ if nargin < 4
     win = nfft;
 else 
     win = pow2(nextpow2(win));
-end;
 end;
 if nargin < 5
     overlap = 0;
