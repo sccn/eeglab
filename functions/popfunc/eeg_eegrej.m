@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/05/24 20:56:35  arno
+% checking event consistency
+%
 % Revision 1.13  2004/05/14 21:12:51  arno
 % same
 %
@@ -111,6 +114,13 @@ eeg_options;
 EEG.pnts = size(EEG.data,2);
 EEG.xmax = EEG.xmax+EEG.xmin;
 
+% add boundary events
+% -------------------
+if ~isempty(boundevents)
+    EEG.event rmevent = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
+    EEG               = eeg_checkset(EEG, 'eventconsistency');
+end;
+
 % change event latencies
 % ----------------------
 if ~isempty(tmpalllatencies)
@@ -122,13 +132,6 @@ if ~isempty(tmpalllatencies)
 	for tmpindex = 1:length(EEG.event)
 		EEG.event = setfield(EEG.event, { tmpindex }, 'latency', tmpalllatencies(tmpindex));
 	end;
-end;
-
-% add boundary events
-% -------------------
-if ~isempty(boundevents)
-    EEG.event = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
-    EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
 EEG.icaact = [];
  
