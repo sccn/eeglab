@@ -38,6 +38,7 @@
 %                { Default: 0 }
 %  'shiftimgs' = [time vector] - shift time frequency images (for several subject) by the
 %                median reaction time of each subject (provided here).
+%  'title'     = [quoted string] plot title (default: provided). 
 %
 % Note:
 %  1) Additional topoplot() options can be used.
@@ -72,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2004/03/22 03:27:49  scott
+% removing topoplot shrink mode - topoplot default now shows all channels
+%
 % Revision 1.63  2003/09/11 18:59:34  arno
 % allowing image significance
 %
@@ -570,6 +574,9 @@ else
     else
         tl=title(['Signed channel average']);
     end;
+    if isfield(g, 'title') %user title
+        tl = title(g.title);
+    end
   set(tl,'fontsize',14);
 end
 
