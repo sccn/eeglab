@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/03/05 02:23:29  arno
+% adding chaninfo
+%
 % Revision 1.13  2003/03/12 06:28:05  scott
 % head edtis
 %
@@ -124,6 +127,7 @@ if exist('plottile') ~= 1
 end;
     
 if ~isempty(EEG.chanlocs)
+    if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 	SIGTMP = reshape(EEG.data, size(EEG.data,1), EEG.pnts, EEG.trials);
 	posi = round( (timerange(1)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
 	posf = round( (timerange(2)/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
