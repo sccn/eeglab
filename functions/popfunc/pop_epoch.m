@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/14 17:46:18  arno
+% debuging
+%
 % Revision 1.15  2002/08/13 21:27:41  arno
 % debug
 %
@@ -131,13 +134,13 @@ if nargin < 3
 	% popup window parameters
 	% -----------------------
    promptstr    = { strvcat('Enter time-locking event type(s) ([]=all):', ...
-                    '(use ''/Edit/Event values'' to scan type values)'), ...
-                    'Epoch [start, end] in seconds (e.g. [-1 2]):', ... 
-                    'Name of the new dataset:', ... 
-					'Out-of-bounds EEG rejection limits, [min max] ([]=none):'  };
+                    '(use ''Edit > Event values'' to scan type values)'), ...
+                    'Epoch [start, end] in seconds (ex: [-1 2]):', ... 
+                    'Name for the new dataset:', ... 
+					'Out-of-bounds EEG rejection limits ([min max], []=none):'  };
 
-   inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '"' ]), '' };
-   result       = inputdlg2( promptstr, 'Extract epochs -- pop_epochs', 1,  inistr, 'pop_epoch');
+   inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', [ EEG.setname ' epochs' ]), '' };
+   result       = inputdlg2( promptstr, 'Extract epochs -- pop_epoch()', 1,  inistr, 'pop_epoch');
    size_result  = size( result );
    if size_result(1) == 0 return; end;
    
@@ -232,7 +235,7 @@ EEG.trials = size(EEG.data,3);
 EEG.icaact = [];
 if ~isempty(EEG.setname)
 	if ~isempty(EEG.comments)
-		EEG.comments = strvcat(['Comment of parent dataset ' EEG.setname ': ----------'], EEG.comments);
+		EEG.comments = strvcat(['Parent dataset "' EEG.setname '": ----------'], EEG.comments);
 	end;
 	EEG.comments = strvcat(['Parent dataset: ' EEG.setname ], ' ', EEG.comments);
 end;
