@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/05/22 01:18:56  arno
+% header typo
+%
 % Revision 1.21  2003/05/02 17:57:42  arno
 % removing maxfreq
 %
@@ -175,7 +178,7 @@ end;
 
 [frame trials]= size(data);
 g = finputcheck(varargin, ...
-                { 'timesout'      'integer'  [0 Inf]                  200; ...
+                { 'timesout'      'real'     []                       200; ...
 				  'winsize'       'integer'  [0 Inf]                  max(pow2(nextpow2(frame)-3),4); ...
                   'tlimits'       'real'     []                       [0 frame/srate]; ...
                   'basevect'      'integer'  [0 Inf]                  []; ...
@@ -397,7 +400,7 @@ end
 % ---------------
 function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize);
     timevect = linspace(tlimits(1), tlimits(2), frames);
-    srate = 1000*(frames-1)/(tlimits(2)-tlimits(1));
+    srate    = 1000*(frames-1)/(tlimits(2)-tlimits(1));
     
     if length(timevar) == 1 
 
