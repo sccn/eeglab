@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.270  2003/11/25 22:57:21  arno
+% pluginmenucolor
+%
 % Revision 1.269  2003/11/25 22:55:08  arno
 % same
 %
@@ -1283,7 +1286,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     epochsub_m  = findobj('parent', importepoch);
     eventsub_m  = findobj('parent', importevent);
     exportsub_m = findobj('parent', exportm);
-    PLUGIN_COL = 'r';
+    icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(importsub_m) > 10, set(importsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
