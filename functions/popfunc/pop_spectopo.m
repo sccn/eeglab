@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/05/12 23:33:18  arno
+% verbose off, deteecting time limits
+%
 % Revision 1.37  2003/03/12 03:16:24  arno
 % help update
 %
@@ -380,7 +383,7 @@ if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EE
 		end;
 		spectopooptions = [ spectopooptions ',''boundaries'',[' int2str(round(boundaries)) ']']; 
 	end;		
-	fprintf('Pop_spectopo: finding continuous data discontinuities\n');
+	fprintf('Pop_spectopo: finding data discontinuities\n');
 end;
 
 % outputs
