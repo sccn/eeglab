@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/21 15:30:19  arno
+% updating message
+%
 % Revision 1.2  2002/10/21 15:22:17  arno
 % update.m
 %
@@ -100,7 +103,7 @@ timesout = g.timesout;
 function [interparray] = interpolate( array, timesin, timesout, method);
     interparray = zeros(size(array,1), length(timesout));
     for index = 1:size(array,1)
-        tmpa = [array(1,:) ; array(1,:)];
+        tmpa = [array(index,:) ; array(index,:)];
         
         [Xi,Yi,Zi] = griddata(timesin, [1 2]', tmpa, timesout, [1 2]', method); % Interpolate data
         interparray(index,:) = Zi(1,:);
