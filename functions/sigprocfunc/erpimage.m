@@ -140,6 +140,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2002/11/19 23:27:55  arno
+% debugging spectrum for very long epochs
+%
 % Revision 1.68  2002/11/09 21:19:57  scott
 % added example
 %
@@ -1023,7 +1026,7 @@ switch lower(renorm)
  case 'no',;
  otherwise,
   locx = findstr('x', lower(renorm))
-  if length(locx) ~= 1, error('erpimage: unrecognize renormalazing formula'); end;
+  if length(locx) ~= 1, error('erpimage: unrecognized renormalizing formula'); end;
   eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
 end;
 %
@@ -1263,10 +1266,10 @@ else
   end
 end
 
-if max(sortvar)<0
-   fprintf('Changing the sign of sortvar: making it positive.\n');
-   sortvar = -sortvar;
-end
+%if max(sortvar)<0
+%   fprintf('Changing the sign of sortvar: making it positive.\n');
+%   sortvar = -sortvar;
+%end
 %
 %%%%%%%%%%%%%%%%%%% Adjust decfactor if phargs or ampargs %%%%%%%%%%%%%%%%%%%%%
 %
