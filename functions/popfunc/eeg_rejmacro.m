@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/07/31 17:12:10  arno
+% [6~[6~[6~debugging
+%
 % Revision 1.11  2002/07/31 16:59:04  arno
 % debugging
 %
@@ -157,7 +160,7 @@ else
 end;
 eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500], 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol };
-if ~isempty(EEG.chanlocs)
+if ~isempty(EEG.chanlocs) & icacomp == 1
 	eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
 end;
 if ~reject
