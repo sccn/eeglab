@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/12/06 19:12:18  arno
+% mrirear debug
+%
 % Revision 1.22  2002/12/06 19:08:19  arno
 % plotorder debug
 %
@@ -368,6 +371,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
+    coordinates(:,1) = -coordinates(:,1);
     brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
                          'resolution', 'low', ...
                         'coordinates', coordinates, ...
@@ -383,7 +387,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
                         'crossfphaseunit', 'radian', ...
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
-                        'condtitle', alltitles };
+                        'condtitle', alltitles, 'diskscale', 0.5 };
 elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     
     % ------------------
@@ -397,6 +401,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
+    coordinates(:,2) = -coordinates(:,2);
     
     brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
                          'resolution', 'low', ...
@@ -413,7 +418,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
-                        'condtitle', alltitles };
+                        'condtitle', alltitles, 'diskscale', 0.5 };
 elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
     
     % ------------------
@@ -443,7 +448,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
-                        'condtitle', alltitles };
+                        'condtitle', alltitles, 'diskscale', 0.5 };
 elseif isstr(g.movparams)
     error('Movparams template can only be ''mritop'' and ''mriside''');
 else
