@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.206  2004/03/26 00:19:48  arno
+% minimum number of trials
+%
 % Revision 1.205  2004/03/26 00:18:11  arno
 % plot aligntime
 %
@@ -1488,7 +1491,7 @@ if any(isnan(sortvar))
 	fprintf('Removing %d trials with NaN sortvar values.\n', length(nanlocs));
 	data(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
-    if length(sortvar) < 4
+    if length(sortvar) < 4 & avewidth > 1
         error('Not enough trials');
     end;
 	if exist('data2') == 1
