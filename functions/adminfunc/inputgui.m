@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/03/12 02:44:36  arno
+% tow buttons
+%
 % Revision 1.22  2003/03/12 02:41:19  arno
 % adding help gui button
 %
