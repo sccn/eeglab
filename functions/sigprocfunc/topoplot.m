@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2004/02/15 16:07:46  scott
+% same
+%
 % Revision 1.73  2004/02/15 16:07:01  scott
 % same
 %
@@ -844,18 +847,18 @@ end;
 %
 %%%%%%%%%%%%%%%%%%%%% Plot head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
-l = 0:2*pi/100:2*pi; % circle vertices
-basex = 0.18*rmax;  
+circ = 0:2*pi/100:2*pi; % circle vertices
+basex = 0.18*rmax;      % nose width
 tip = rmax*1.15; base = rmax-.004;
-EarX = [.497 .510 .518 .5299 .5419 .54 .547 .532 .510 .489];
+EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-plot(cos(l).*rmax,sin(l).*rmax,...
+plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
-fprintf('%s, %3.2g\n',shrinkfactor,max(Rd));
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
-  plot(cos(l).*max(Rd),sin(l).*max(Rd),...
+fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
+  plot(cos(circ).*0.6,sin(circ).*0.6,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot skirt 
 end
 
