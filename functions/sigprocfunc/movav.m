@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/05/23 17:32:42  scott
+% *** empty log message ***
+%
 % Revision 1.10  2002/05/23 17:30:20  scott
 % *** empty log message ***
 %
@@ -83,7 +86,7 @@ function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin)
 
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
-verbose = 1;
+verbose = 0;  % If 1, output process info
 
 nanexist = 0;  
 if exist('nanmean')==2 % test for stat toolbox nan routines
