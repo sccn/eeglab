@@ -1,6 +1,7 @@
 % finputcheck() - check matlab function { 'key', 'val' } inputs
 %
-% Usage: >> struct = finputcheck( varargin, fieldlist, callingfunc );
+% Usage: >> struct = finputcheck( varargin, fieldlist );
+%        >> struct = finputcheck( varargin, fieldlist, callingfunc, mode );
 %
 % Input:
 %   varargin  - varargin arguement from a function call with 'key', 'val'
@@ -17,12 +18,24 @@
 %               the fifth column may contain the size (can be a cell array 
 %               of size), but is optional.
 %  callingfunc - calling function name for error messages. Default is none.
+%  mode        - ['ignore'|'error'] ignore keywords that are not specified in
+%                the filedlist cell array or generate an error. Default is
+%                'error'.
 %
 % Outputs:
 %   struct    - checked structure
 %
 % Note: in case of error, a string is returned with the error message
 %       instead of a structure.
+%
+% Example:
+%	finputcheck(varargin,
+%               { 'title'         'string'   []                       '';
+%				  'percent'       'real'     [0 1]                     1 ;
+%				  'elecamp'       'integer'  [1:10]                   [] });
+%   'title' is a string with no default value
+%   'percent' is a real number in between 0 and 1 and default value 1
+%   'elecamp' is an integer that can tak value between 1 and 10
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 July 2002
 
@@ -45,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/10 02:18:32  arno
+% header info
+%
 % Revision 1.2  2002/07/10 02:17:27  arno
 % debugging error message passing
 %
@@ -52,7 +68,7 @@
 % Initial revision
 %
 
-function g = finputcheck( vararg, fieldlist, callfunc )
+function g = finputcheck( vararg, fieldlist, callfunc, mode )
 
 	if nargin < 2
 		help finputcheck;
@@ -151,9 +167,12 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 	
 	% check if fields are defined
 	% ---------------------------
-	allfields = fieldnames(g);
-	for index=1:length(allfields)
-		if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
-			g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
+	if ~strcmp(mode, 'ignore')
+		allfields = fieldnames(g);
+		for index=1:length(allfields)
+			if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
+				g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
+			end;
 		end;
+	
 	end;
