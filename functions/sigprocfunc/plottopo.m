@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/24 18:21:35  scott
+% added vertcolor -sm
+%
 % Revision 1.3  2002/04/24 18:19:52  scott
 % [same] -sm
 %
@@ -598,8 +601,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
       if ~isnan(vert)
        if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
         ymean = (ymin+ymax)/2; 
-        vmin = ymean-2/3*(ymean-ymin);
-        vmax = ymean+2/3*(ymax-ymean);
+        vmin = ymean-0.5*(ymean-ymin);
+        vmax = ymean+0.5*(ymax-ymean);
         for v = vert
           plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
         end
@@ -637,6 +640,20 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   end  
   p=plot([xmin xmax],[0 0],'color',axislcolor); % draw horizontal axis 
   axis([xmin xmax ymin ymax]);        % set axis values
+  %
+  %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
+  %
+  if ~isnan(vert)
+   if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+    for v = vert
+      plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+    end
+   else
+    for v = vert
+      plot([v v],[0 ymax],'color',vertcolor); 
+    end
+   end
+  end
                                                
   % secondx = 200;                    % draw second vert axis 
   % axis('off');plot([secondx secondx],[ylo ymax],'color',axislcolor); 
