@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/07/22 01:12:22  arno
+% adding algos
+%
 % Revision 1.20  2003/06/29 02:02:30  arno
 % last revision backup
 %
@@ -241,7 +244,7 @@ switch lower(icatype)
      case 'tfbss' 
         if length(options) < 2
              size(tmpdata,1)
-             [tmp EEG.icaweights] = tfbss( tmpdata, size(tmpdata,1), 10, round(size(tmpdata,2)/2) );
+             [tmp EEG.icaweights] = tfbss( tmpdata, size(tmpdata,1), 4, round(size(tmpdata,2)/2) );
         else    
             eval(sprintf('[tmp EEG.icaweights] = tfbss( tmpdata %s );', options));
         end;
