@@ -29,6 +29,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/04/28 06:02:10  scott
+% othing
+% nothing
+%
 % Revision 1.10  2003/12/04 01:54:10  arno
 % updating paths
 %
@@ -112,7 +116,6 @@ end;
 chan_locs  = 'pnas_chan14.locs';
 chan_locs2 = 'pnas_chan.locs';
 
-if 0 % DETOUR
 
 figure
 set(gcf,'Color',BACKCOLOR);
@@ -387,10 +390,8 @@ figure('Position',pos+5.5*off);
 %  >> envtopo(data,weights,chan_locs,[limits],[compnums],...
 %                                   'title',[plotchans],[voffsets]);
 
-end % DETOUR
   envtopo(data(:,1:floor(0.6*frames)),weights*sphere,'chanlocs',chan_locs,...
          'limits', [0 995*0.6],'compnums',[2 3 4 6],'title', 'Largest Components');
-return
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
