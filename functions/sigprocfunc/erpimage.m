@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2003/07/26 17:14:12  scott
+% debug same
+%
 % Revision 1.123  2003/07/26 17:05:26  scott
 % debug auxvars warning, hide vert matrix option
 %
@@ -1203,7 +1206,7 @@ if any(isnan(sortvar))
 		data2(:,nanlocs) = [];
 	end;
 	if ~isempty(auxvar)
-		auxvar(nanlocs,:) = [];
+		auxvar(:,nanlocs) = [];
 	end
 	if ~isempty(verttimes)
 		if size(verttimes,1) == ntrials
