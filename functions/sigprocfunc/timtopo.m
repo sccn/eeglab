@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/03/04 18:09:45  scott
+% debug last -sm
+%
 % Revision 1.16  2003/03/04 18:07:29  scott
 % debug last -sm
 %
@@ -376,8 +379,9 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   axis([-1 1 -1 1]);
 
   to   = changeunits([0,-1],axtp,axall);
+  cla
+
   axes(axall);
-  axis off;
   l1 = plot([from(1) from(2)],[to(1) to(2)]);
 
   % data_y = 0.6*(voffsets(t)+maxdata-ymin)/height;
@@ -390,8 +394,6 @@ for t=1:ntopos % draw oblique lines through to the topoplots
 % 
 % % x_to was topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
 
-  axes(axtp)                             % topoplot axes
-  cla
 
 %  l1 = plot(...
 %     [0.12+0.76*(plottimes(t)-xmin)/width  ...
@@ -400,7 +402,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
 %            + 0.12+(max(data(plotchans,plotframes(t)))-ymin)/height*0.44 ...
 %      0.70],'b');
   hold on
-  set(gca,'Visible','off');
+  set(axall,'Visible','off');
   axis([0 1 0 1]);
 end
 %
