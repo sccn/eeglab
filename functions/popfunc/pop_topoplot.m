@@ -6,10 +6,11 @@
 %
 % Inputs:
 %   EEG        - Input dataset (see eeglab())
-%   typeplot   - 1=channels, 0=components {Default:1}
-%   items      - [array] If channels, epoch latencies (in ms) 
-%                to plot scalp maps. If components, component indices 
-%                to plot. Negative indices -> invert map polarity. 
+%   typeplot   - 1-> plot ERP maps, 0-> plot components {Default:1}
+%   items      - [array] If typoplot ERP maps, epoch latencies (in ms) 
+%                to plot the scalp maps. If typeplot components, 
+%                component indices to plot. In this case,
+%                negative indices -> invert map polarity; 
 %                NaN -> leave a blank subplot. (Ex: [1 -3 NaN 4])
 %   title      - plot title.
 %   rowscols   - Vector of the form [m,n] giving [rows, cols] per page.
@@ -47,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/17 22:26:05  scott
+% typo
+%
 % Revision 1.10  2002/08/17 22:24:15  scott
 % tyop
 %
@@ -114,9 +118,15 @@ if nargin < 3
 	        ['Plot geometry (rows,columns):' ...
 	        '(Default [] -> near square)'] ...
 	        '-> Scalp map plotting options (see >> help topoplot):' };
-	inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-	               [fastif(~isempty(EEG.setname), [EEG.setname ' ERP'], '') ] ...
-	               '' ['''electrodes'', ''off''' ] };
+        if typeplot
+	  inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
+	                 [fastif(~isempty(EEG.setname), [EEG.setname ' ERP'], '') ] ...
+	                 '' ['''electrodes'', ''off''' ] };
+        else
+	  inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
+	                 [fastif(~isempty(EEG.setname), [EEG.setname ' components'], '') ] ...
+	                 '' ['''electrodes'', ''off''' ] };
+        end
 	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'topoplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
