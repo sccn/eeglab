@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/06 03:47:44  arno
+% adding emarkersize1chan input
+%
 % Revision 1.2  2002/04/06 03:37:24  arno
 % adding single channel vector input
 %
@@ -258,13 +261,13 @@ if length(Vl) ~= 1 & length(Vl) ~= length(Th),
                length(Vl),length(Th));
 end
 
-ii = find(Rd <= 0.5);                     % interpolate on-head channels only
-Th = Th(ii);
-Rd = Rd(ii);
+enum = find(Rd <= 0.5);                     % interpolate on-head channels only
+Th = Th(enum);
+Rd = Rd(enum);
 if ~strcmp(STYLE,'blank')
-    Vl = Vl(ii);
+    Vl = Vl(enum);
 end;
-labels = labels(ii,:);
+labels = labels(enum,:);
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
@@ -412,7 +415,7 @@ elseif strcmp(ELECTROD,'numpoint')
   end
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(y(i)+0.01,x(i),num2str(i),'HorizontalAlignment','left',...
+    hh(i) = text(y(i)+0.01,x(i),num2str(enum(i)),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -421,7 +424,7 @@ elseif strcmp(ELECTROD,'numpoint')
   end
 elseif strcmp(ELECTROD,'numbers')
   for i = 1:size(labels,1)
-    text(y(i),x(i),int2str(i),'HorizontalAlignment','center',...
+    text(y(i),x(i),int2str(enum(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
