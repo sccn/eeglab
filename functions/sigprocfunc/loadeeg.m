@@ -32,8 +32,8 @@
 %   pnts         - Number of points per trial
 %   ntrials      - Number of trials
 %   srate        - Sampling rate (Hz)
-%   xmin         - Trial start time (ms)
-%   xmax         - Trial end time (ms)
+%   xmin         - Trial start latency (ms)
+%   xmax         - Trial end latency (ms)
 %
 % Example:
 %   % Load .eeg data into an array named 'signal' 
@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/05/14 16:54:34  arno
+% allowing to read 32-bits data files
+%
 % Revision 1.4  2003/02/28 19:47:15  arno
 % resolving ???
 %

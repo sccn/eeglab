@@ -1,5 +1,5 @@
 % crossf() - Returns estimates and plots event-related coherence (ERCOH) 
-%        between two input time series. A lower panel (optionally) shows 
+%        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel:
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
@@ -15,7 +15,7 @@
 %        computed (from a distribution of 'naccu' (200) surrogate baseline
 %        data epochs) for the baseline epoch, and non-significant features 
 %        of the output plots are zeroed (and shown in green). The baseline
-%        epoch is all windows with center times < the given 'baseline' value 
+%        epoch is all windows with center latencies < the given 'baseline' value 
 %        or, if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
@@ -26,7 +26,7 @@
 %       x       = first single-channel data set (1,frames*nepochs)      
 %       y       = second single-channel data set (1,frames*nepochs)     
 %       frames  = frames per epoch                                   {750}
-%       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
+%       tlimits = [mintime maxtime] (ms) epoch latency limits  {[-1000 2000]}
 %       srate   = data sampling rate (Hz)                            {250}
 %       cycles  = 0  -> Use FFTs (with constant window length) 
 %               = >0 -> Number of cycles in each analysis wavelet 
@@ -56,14 +56,14 @@
 %       'winsize'  = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                    if cycles >0: *longest* window length to use. This
 %                    determines the lowest output frequency  {~frames/8}
-%       'timesout' = Number of output times (int<frames-winsize) {def: 200}
+%       'timesout' = Number of output latencies (int<frames-winsize) {def: 200}
 %       'padratio' = FFTlength/winsize (2^k)                     {def: 2}
 %                    Multiplies the number of output frequencies by
 %                    dividing their spacing. When cycles==0, frequency
 %                    spacing is (low_frequency/padratio).
 %       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                    If cycles==0, all FFT frequencies are output.{def: 50}
-%       'baseline' = Coherence baseline end time (ms). NaN=no baseline  {NaN}
+%       'baseline' = Coherence baseline end latency (ms). NaN=no baseline  {NaN}
 %       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
 %
 %    Optional Bootstrap:
@@ -94,7 +94,7 @@
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
 %       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
 %       'title'     = Optional figure title {none}
-%       'vert'      = Times to mark with a dotted vertical line   {none}
+%       'vert'      = Latencies to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
 %       'axesfont'  = Axes font size                               {10}
@@ -103,7 +103,7 @@
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
 %       mcoh        = Vector of mean baseline coherence at each frequency
-%       timesout    = Vector of output times (window centers) (ms).
+%       timesout    = Vector of output latencies (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
@@ -162,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/08/05 22:06:49  scott
+% header edits
+%
 % Revision 1.61  2003/08/04 16:22:13  arno
 % marginal plot color
 %

@@ -2,7 +2,7 @@
 %              and/or aligned to an input sorting variable and smoothed across trials 
 %              with a moving-average.  (To return event-aligned data without plotting, 
 %              use eventlock()).  Optionally sort trials on value, amplitude or phase 
-%              within a specified time window. Optionally plot the ERP mean and std. dev.,
+%              within a specified latency window. Optionally plot the ERP mean and std. dev.,
 %              and moving-window spectral amplitude and inter-trial coherence at a
 %              selected or peak frequency. Click on individual figures parts to examine 
 %              them separately and zoom (using axcopy()).
@@ -18,8 +18,8 @@
 %              Example: sortvar may by subject response time in each epoch (in ms)
 %
 % Additional ordered inputs {with defaults}:
-%   times    - Vector of times (ms) (length(times) = frames) {Def|0: [0:frames-1]}
-%               ELSE [startms ntimes srate] Give start time (ms), time points 
+%   times    - Vector of latencies (ms) (length(times) = frames) {Def|0: [0:frames-1]}
+%               ELSE [startms ntimes srate] Give start latency (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz),
 %  'title'   - ['string'] Plot titla {default: none}
 %   avewidth - Number of trials to moving-average (NB: may be non-int) {Def|0->1}
@@ -29,12 +29,13 @@
 % Unordered options ('keyword',argument pairs):
 %
 % Optionally realign data epochs: 
-%   'align'  - [time] Time-lock data to sortvar. Plot sortvar as at time (ms)
-%               If time == Inf, plot at sortvar median {default: no align}
-%   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to times range.
-%               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
+%   'align'  - [latency] Time-lock data to sortvar. Plot sortvar as at latency (ms)
+%               If latency == Inf, plot at sortvar median {default: no align}
+%   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to epoch 
+%               latency range and plot. 'yes'= autoscale. Example of formula(x):
+%               '3*x+2'. {default: 'no'}
 %   'noplot' - Do not plot sortvar {default: Do plot sortvar if in times range}
-%   'noshow' - ['yes'|'no'] do not plot erpimage, simply return outputs {default: 'no'}
+%   'noshow' - ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Optionally sort input epochs: 
 %   'nosort' - Do not sort data epochs.
@@ -42,20 +43,24 @@
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a n-cycle
-%                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
-%                gives percent of trials to reject for low amplitude. Else, if in range
-%               [-100,0], gives percent of trials to reject for high amplitude;
-%               freq (Hz) is the phase-sorting frequency. With optional maxfreq,
-%               sort by phase at freq of max power in the data in range [freq,maxfreq]
-%               (Note: 'phasesort' arg freq overrides frequency specified in 'coher').
-%               With optional topphase, sort by phase, putting topphase (degrees, in 
-%               range [-180,180]) at the top of the image. NB: 'phasesort' now uses circular 
-%               smoothing. Use 'cycles' (below) for wavelet length. {Default: [0 25 8 13 180]}
-%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. See 'phasesort'.
+% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in 
+%                an n-cycle window centered at latency ms_center (ms). 
+%                Percentile (prct) in range [0,100] gives percent of trials 
+%                to reject for low amplitude. Else, if in range [-100,0], 
+%                percent of trials to reject for high amplitude; freq (Hz) 
+%                is the phase-sorting frequency. With optional maxfreq,
+%                sort by phase at freq of max power in the data in range 
+%                [freq,maxfreq] (Note: 'phasesort' arg freq overrides the 
+%                frequency specified in 'coher'). With optional topphase, 
+%                sort by phase, putting topphase (degrees, in range [-180,180]) 
+%                at the top of the image. NB: 'phasesort' now uses circular 
+%                smoothing. Use 'cycles' (below) for wavelet length. 
+%                {Default: [0 25 8 13 180]}
+%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. 
+%                See 'phasesort'.
 %
 % Plot time-varying spectral amplitude instead of potential:
-% 'plotamps' - Image amplitudes at each time and trial instead of potential values. 
+% 'plotamps' - Image amplitudes at each trial and latency instead of potential values. 
 %               NB: Currently Requires 'coher' (below) with alpha signif. {default: no}
 %
 % Specify plot parameters:
@@ -89,7 +94,7 @@
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
-%   'vert'   - [times_vector] Plot vertical dashed lines at specified times
+%   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
 %   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
 %   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
 %               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
@@ -148,12 +153,15 @@
 % Uses external toolbox functions: phasecoher(), rmbase(), cbar(), movav()
 % Uses included functions:         plot1trace(), phasedet()
 
-% UNIMPLEMENTED - 'allcohers',[data2] -> image the coherences at each time & trial. 
-%                   Requires arg 'coher' with alpha significance. 
-%                   Shows projection on grand mean coherence vector at each time 
-%                   and trial. {default: no}
+% UNIMPLEMENTED - 'allcohers',[data2] -> image the coherences at each latency & epoch. 
+%                 Requires arg 'coher' with alpha significance. 
+%                 Shows projection on grand mean coherence vector at each latency 
+%                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.179  2003/11/19 01:06:22  arno
+% including hanning function
+%
 % Revision 1.178  2003/11/16 17:48:00  scott
 % plot1erp() -> plot1trace(); printf "Done."
 %
