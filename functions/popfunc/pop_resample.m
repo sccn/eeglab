@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/08/03 01:33:03  arno
+% convert to double for Matlab 7
+%
 % Revision 1.11  2004/06/03 19:18:18  arno
 % taking into account boundaries for resampling
 %
@@ -133,13 +136,13 @@ if exist('resample') == 2
     fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
     for index1 = 1:size(EEG.data,1)
         fprintf('%d ', index1);	
-        sigtmp = squeeze (EEG.data(index1,:, :));
+        sigtmp = reshape(EEG.data(index1,:, :), oldpnts, EEG.trials);
         
         if index1 == 1
             tmpres = [];
             indices = [1];
             for ind = 1:length(bounds)-1
-                tmpres  = [ tmpres resample( double( sigtmp(bounds(ind):bounds(ind+1)-1) ), p, q ) ];
+                tmpres  = [ tmpres resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q ) ];
                 indices = [ indices length(tmpres)+1 ];
             end;
             if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
@@ -148,7 +151,7 @@ if exist('resample') == 2
             tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
         else
             for ind = 1:length(bounds)-1
-                tmpres(indices(ind):indices(ind+1)-1) = resample( double( sigtmp(bounds(ind):bounds(ind+1)-1) ), p, q );
+                tmpres(indices(ind):indices(ind+1)-1,:) = resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q );
             end;
         end;        
         tmpeeglab(index1,:, :) = tmpres;
