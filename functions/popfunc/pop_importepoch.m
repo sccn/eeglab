@@ -3,8 +3,7 @@
 %                  a window pops up to ask for the relevant parameter values.
 %
 % Usage:
-%   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, latencyfieldlist, ...
-%                                  timeunit, headerlines, cleanevents);
+%   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, 'key', 'val', ...);
 %
 % Inputs:
 %   EEG              - input dataset
@@ -12,13 +11,20 @@
 %                      organised in columns. It can be either an array or
 %                      a cell array of values.
 %   fieldlist        - cell array of name of each column in the file.
-%   latencyfieldlist - cell array of fields (defined previously) that 
+%
+% Optional inputs:
+%   'typefield'        - string indicating the name of the field to use for
+%                      the type of the time-locking event. By default the
+%                      time-locking events are assigned an event with
+%                      latency 0 and type 'tlock-event'.
+%   'latencyfields'    - cell array of fields (defined previously) that 
 %                      contain the latency of an event. These fields are 
 %                      transfered into the event structure of the input dataset.
-%   timeunit         - optional latency units in second. Default is that
+%   'timeunit'       - optional latency units in second. Default is that
 %                      latencies are expressed in time points unit.
-%   headerlines      - number of line in the file to skip. Default is 0.
-%   cleanevents      - [0|1], 1=clean the event array. Default is 1.
+%   'headerlines'    - number of line in the file to skip. Default is 0.
+%   'clearevents'    - ['on'|'off'], 'on'=clear the current event array. 
+%                      Default is 'on'.
 %
 % Output:
 %   EEGOUT - EEG dataset with modified event structure
@@ -46,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/22 00:01:40  arno
+% adding error message
+%
 % Revision 1.12  2002/08/06 21:55:36  arno
 % spelling
 %
@@ -89,62 +98,86 @@
 % 03/25/02 adding default event description -ad
 % 03/28/02 fixed latency calculation -ad
 
-function [EEG, com] = pop_importepoch( EEG, filename, fieldlist, latencyfieldlist, timeunit, headerlines, cleanevent);
+function [EEG, com] = pop_importepoch( EEG, filename, fieldlist, varargin);
+    
 com ='';
 if nargin < 1
     help pop_importepoch
     return;
 end;
 if nargin < 2
-    geometry    = { [ 1 1 1] [1.2 0.8] [0.8 1 1.2] [1.5 0.5 1.5] [1.5 0.5 1.5] [1.5 0.2 1.8]};
+    geometry    = { [ 1 1 1] [1] [1 1.135] [2.5 1 1] [2.5 1 1] [1] [1.5 0.5 1] [1.5 0.5 1] [1.5 0.17 1.36]};
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
                     'if filename ~=0,' ...
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];
-    helpstr = ['It is not necessary to define a latency field for epoch information.' 10 ...
+    helpstrtype = ['It is not necessary to define a type field for the time locking event.' 10 ...
+			   'By default it is defined as time 0 and type ''tlock-event'' for all epochs'];
+    helpstrlat  = ['It is not necessary to define a latency field for epoch information.' 10 ...
 			   'Actually all fields that contain latencies will be imported as different event types.' 10 ...
 			   'For instance, if entering ''rt'', events of type ''rt'' will be created and these events will have a latency'];
 	uilist = { ...
          { 'Style', 'text', 'string', 'Epoch file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''globfile'';' commandload ] }, ...
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'globfile' }, ...
-         ...
+         { }...
          { 'Style', 'text', 'string', 'All input field (column) names (ex: type latency)', 'fontweight', 'bold' }, { 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'text', 'string', '           Out of which', 'horizontalalignment', 'right', 'fontweight', 'bold', 'tooltipstring', helpstr },  ...
-		{ 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'text', 'string', 'contain latencies (ex: rt)', 'fontweight', 'bold', 'tooltipstring', helpstr }, ...
-         ...
-         { 'Style', 'text', 'string', 'File header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
+         { 'Style', 'text', 'string', '           Field name containing time locking event type(s)', 'horizontalalignment', 'right', ...
+                                      'fontweight', 'bold', 'tooltipstring', helpstrtype },  ...
+  		 { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', '(contextual help here)', 'tooltipstring', helpstrtype }, ...
+         { 'Style', 'text', 'string', '           Field name(s) containing latencies', 'horizontalalignment', 'right', ...
+           'fontweight', 'bold', 'tooltipstring', helpstrlat },  ...
+  		 { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', '(ex: rt)', 'tooltipstring', helpstrlat }, ...
+         { } ...
          { 'Style', 'text', 'string', 'Latency time unit (sec) Ex: 1E-3 = ms', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' }, { } ...         
-         { 'Style', 'text', 'string', 'Clean previous info (set=yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
+         { 'Style', 'text', 'string', 'File header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
+         { 'Style', 'text', 'string', 'Remove current epoch and event info (set=yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
     result = inputgui( geometry, uilist, 'pophelp(''pop_importepoch'');', 'Import epoch info (data epochs only) -- pop_importepoch()');
     if length(result) == 0, return; end;
 
     filename    = result{1};
     fieldlist   = parsetxt( result{2} );
-    latencyfieldlist = parsetxt( result{3} );
-    headerlines = eval( result{4} );
-    timeunit    = eval( result{5} );
-    cleanevent    = result{6};
+    options = {};
+    if ~isempty( result{3}), options = { options{:} 'typefield' result{3} }; end; 
+    if ~isempty( result{4}), options = { options{:} 'latencyfields' parsetxt( result{4} ) }; end; 
+    if ~isempty( result{5}), options = { options{:} 'timeunit' eval(result{5}) }; end; 
+    if ~isempty( result{6}), options = { options{:} 'headerlines' eval(result{6}) }; end; 
+    if ~result{7}, options = { options{:} 'clearevents' 'off'}; end; 
+else 
+    if ~isempty(varargin) & ~isstr(varargin{1})
+        % old call compatibility
+        options = { 'latencyfields' varargin{1} };
+        if nargin > 4
+            options = { options{:} 'timeunit' varargin{2} }; 
+        end; 
+        if nargin > 5
+            options = { options{:} 'headerlines' varargin{3} }; 
+        end; 
+        if nargin > 6
+            options = { options{:} 'clearevents' fastif(varargin{4}, 'on', 'off') }; 
+        end; 
+    else
+        options = varargin;
+    end;
 end;
 
-if exist('timeunit') ~= 1
-    timeunit = 1/EEG.srate;
-end;    
-if exist('headerlines') ~= 1
-    headerlines = 1;
-end;    
-if exist('cleanevent') ~= 1
-    cleanevent = 1;
-end;
-insertepoch = 1;
-if cleanevent == 0
-    insertepoch == 0;
-end;
-if ~isfield( EEG.event, 'epoch')
-    insertepoch = 1;
-end;    
+g = finputcheck( options, { 'typefield'     'string'   []       ''; ...
+                            'latencyfields' 'cell'     []       {}; ...
+                            'timeunit'      'real'     [0 Inf]  1/EEG.srate; ...
+                            'headerlines'   'integer'  [0 Inf]  0; ...
+                            'clearevents'   'string'   {'on' 'off'}  'on'}, 'pop_importepoch');
+if isstr(g), error(g); end;
+
+%g.insertepoch = 1;
+%if strcmpi(g.cleanevent, 'on')
+%    g.insertepoch == 0;
+%end;
+%if ~isfield( EEG.event, 'epoch')
+%    g.insertepoch = 1;
+%end;    
 
 % convert filename
 % ----------------
@@ -155,7 +188,7 @@ if isstr(filename)
 	if exist(filename) == 2 & evalin('base', ['exist(''' filename ''')']) == 1
 		disp('Pop_importepoch WARNING: FILE AND ARRAY WITH THE SAME NAME, LOADING FILE');
 	end;
-    values = load_file_or_array( filename, headerlines );
+    values = load_file_or_array( filename, g.headerlines );
 else
     values = filename;
     filename = inputname(2);
@@ -171,10 +204,11 @@ if ~iscell(fieldlist)
     otherfieldlist = { fieldlist };
     fieldlist = { fieldlist };
 end;
-if ~iscell(latencyfieldlist)
-    latencyfieldlist = { latencyfieldlist };
+if ~iscell(g.latencyfields)
+    g.latencyfields = { g.latencyfields };
 end;
-otherfieldlist = setdiff( fieldlist, latencyfieldlist);
+otherfieldlist = setdiff( fieldlist, g.latencyfields);
+otherfieldlist = setdiff( otherfieldlist, g.typefield);
 if size(values,1) ~= EEG.trials
     error('Pop_importepoch error: the number of row of the input file/array does not match the number of trials');
 end;    
@@ -195,7 +229,7 @@ else
     end;    
 end;
 
-if isempty( EEG.epoch)
+if isempty( EEG.epoch )
     error('Pop_importepoch: cannot process empty epoch structure');
 end;
 epochfield = fieldnames( EEG.epoch );
@@ -215,33 +249,47 @@ end;
 
 if ~isempty(EEG.event)
     if ~isfield(EEG.event, 'epoch')
-        cleanevent = 1;
+        g.clearevents = 'on';
         disp('Pop_importepoch: cannot add events to a non-epoch event structure, erasing old epoch structure');
     end;
 end;
-if cleanevent
+if strcmpi(g.clearevents, 'on')
     EEG.event = [];
 end;
            
+% add time locking event fields
+% -----------------------------
+if ~isempty(g.typefield)
+    if isempty(strmatch( g.typefield, epochfield )) 
+         error(['Pop_importepoch: type field ''' g.typefield ''' not found']);
+    end;
+end;
+for trial = 1:EEG.trials
+    EEG.event(end+1).epoch = trial; 
+    if ~isempty(g.typefield)
+        eval( ['EEG.event(end).type = EEG.epoch(trial).' g.typefield ';'] );
+    else 
+        EEG.event(end).type = 'tlock-event';
+    end;
+    eval( ['EEG.event(end).latency = EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+end;
+
 % add latency fields
 % ------------------
-for index = 1:length(latencyfieldlist)
-    if isempty(strmatch( latencyfieldlist{index}, epochfield )) 
-         error(['Pop_importepoch: field ''' latencyfieldlist{index} ''' not found']);
+for index = 1:length(g.latencyfields)
+    if isempty(strmatch( g.latencyfields{index}, epochfield )) 
+         error(['Pop_importepoch: latency field ''' g.latencyfields{index} ''' not found']);
     end;
-    for trial = 1:EEG.trials
-       if insertepoch, 
-            EEG.event(end+1).epoch = trial; 
-            eval( ['EEG.event(end).type = '''  latencyfieldlist{index} ''';'] );
-       else eval( ['EEG.event(end+1).type = '''  latencyfieldlist{index} ''';'] );
-       end;
-       eval( ['EEG.event(end).latency = (EEG.epoch(trial).' latencyfieldlist{index} '*timeunit-EEG.xmin)*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+    for trials = 1:EEG.trials
+        EEG.event(end+1).epoch = trials; 
+        eval( ['EEG.event(end).type = '''  g.latencyfields{index} ''';'] );
+        eval( ['EEG.event(end).latency = (EEG.epoch(trials).' g.latencyfields{index} '*g.timeunit-EEG.xmin)*EEG.srate+1+(trials-1)*EEG.pnts;' ] );
     end;
 end;
 
 % add non latency fields
 % ----------------------
-if ~isfield(EEG.event, 'epoch')
+if ~isfield(EEG.event, 'epoch') % no events added yet
     for trial = 1:EEG.trials
         EEG.event(end+1).epoch = trial;
     end;
@@ -265,6 +313,7 @@ end;
 
 % checking and updating events
 % ----------------------------
+EEG = pop_editeventvals( EEG, 'sort', { 'epoch', 0 } ); % resort fields
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate the output command
@@ -272,17 +321,8 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 if isempty(filename) & nargout == 2
     disp('Pop_importepoch: cannot generate command string'); return;
 else 
-	com = sprintf('%s = pop_importepoch( %s, ''%s'', { ', inputname(1), inputname(1), filename);
-	for i=1:length(fieldlist)
-		com = sprintf('%s ''%s'',', com, fieldlist{i} );
-	end;    
-	com = [ com(1:end-1) '} , { ' ];
-	for i=1:length(latencyfieldlist)
-		com = sprintf('%s ''%s'',', com, latencyfieldlist{i} );
-	end;    
-	com = [ com(1:end-1) '}'];
-	com = sprintf('%s, %d, %d, %d);', com, timeunit, headerlines, cleanevent);
-	return;
+	com = sprintf('%s = pop_importepoch( %s, ''%s'', %s);', inputname(1), inputname(1), ...
+                  filename, vararg2str( { fieldlist options{:} }));
 end;
 
 % interpret the variable name
