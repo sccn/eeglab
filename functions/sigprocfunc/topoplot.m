@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2004/03/19 19:05:26  scott
+% read string plotrad from channel locations structure
+%
 % Revision 1.159  2004/03/19 17:46:19  scott
 % added 'forcehead'; changed 'pointnumbers' and 'pointlabels' to 'ptnumbers', 'ptlabels'
 % but kept backwards compatibility. Allowed marking of multiple channel locations
@@ -657,7 +660,7 @@ if ~isstr(shrinkfactor)
     shrinkfactor = 0.5+0.5*shrinkfactor; 
 end;
 if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
-    plotrad = str2num(tmpeloc(1).plotrad); 
+    plotrad = tmpeloc(1).plotrad; 
     if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
        fprintf('Fixing plotting radius at value (%g) specified in the chan_locs.\n',plotrad);
     end
