@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 00:38:13  arno
+% details on fonts, size and formating
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %
@@ -125,7 +128,7 @@ commands = { ...
  };
 
 [textmenu nblines l] = getallmenus(findobj('tag', 'EEGLAB'));
-fontsize(1:length( textmenu )) = { 14 };
+fontsize(1:length( textmenu )) = { 15 };
 fontweight(1:length( textmenu )) = { 'normal' };
 for index = 1:length( textmenu )
     if textmenu(index,1) ~= 32, fontsize{ index } = fontsize{ index }+1; fontweight{ index } ='bold'; end;
@@ -143,5 +146,5 @@ end;
 
 textgui(textmenu(1:end-1,:), commands, 'title', strvcat(['Functions' ...
 	    ' called through the EEGLAB menu'],'(Click on blue text for help)'), ...
-            'fontsize', fontsize, 'fontweight', fontweight, 'fontname', 'times', 'linesperpage', 20 );
+            'fontsize', fontsize, 'fontweight', fontweight, 'fontname', 'times', 'linesperpage', 17 );
 return;
