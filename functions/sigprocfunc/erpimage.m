@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.172  2003/11/14 16:32:55  scott
+% debug same
+%
 % Revision 1.171  2003/11/14 16:27:27  scott
 % fill coher signif limits
 %
@@ -2922,7 +2925,7 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
          fprintf('plot1erp(): signif array must be size (2,frames)\n')
          return
       end
-      fillsignif = [signif(1,:) -1*signif(2,end:-1:1)];
+      fillsignif = [signif(1,:) signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
       set(fillh,'edgecolor',FILLCOLOR);
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
