@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.93  2004/06/02 22:15:42  arno
+%debug color problem
+%
 %Revision 1.92  2004/06/01 20:37:01  arno
 %fixing projection color
 %
@@ -460,6 +463,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     g.zoom = 1500;
     if ~isempty(g.color)
         g.color = strcol2real( g.color, jet(64) );
+    end;
+    if ~isempty(g.projcol)
+        g.projcol = strcol2real( g.projcol, jet(64) );
     end;
     
     % axis image and limits
