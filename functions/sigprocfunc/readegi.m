@@ -1,4 +1,4 @@
-% readegi() - read EGI Simple Binary (version 2 or 3) data file
+% readegi() - read EGI Simple Binary (version 2,3,or 5) data file
 %	      Return header info, EEG data, and any event data.
 %
 % Usage:
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/14 19:00:13  scott
+% help msg
+%
 % Revision 1.7  2002/11/14 18:01:20  arno
 % adding messave
 %
@@ -81,17 +84,35 @@ head = readegihdr(fid);
 FrameVals = head.nchan + head.eventtypes;
 TrialData = zeros(FrameVals,head.segsamps*head.segments);
 
+% get datatype from version number
+switch(head.version)
+   case {2, 3}
+      datatype = 'integer*2';
+   case 5,
+      datatype = 'float32';
+   otherwise,
+      error('Unknown data format');
+end
+
+% read in epoch data 
+totcount = 0;
 for i=1:head.segments,
-	if (head.version == 3),
+	if (head.version > 2),
 		SegmentCatIndex(i) = fread(fid,1,'integer*2');
 		SegmentStartTime(i) = fread(fid,1,'integer*4');
 	end
 
-	TrialData(:,[1+(i-1)*head.segsamps:i*head.segsamps]) = ...
-	   fread(fid,[FrameVals,head.segsamps],'integer*2');
+	[TrialData(:,[1+(i-1)*head.segsamps:i*head.segsamps]), count] = ...
+	   fread(fid,[FrameVals,head.segsamps],datatype);
+
+        totcount = totcount + count;
 end
 
 fclose(fid);
+
+if ~isequal(totcount,FrameVals*head.segsamps*head.segments)
+     error('Number of values read not equal to number given in header.');
+end 
 
 EventData = [];
 if (head.eventtypes > 0),
