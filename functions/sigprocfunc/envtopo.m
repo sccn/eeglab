@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/12/03 18:31:35  scott
+% percentage -> percent
+%
 % Revision 1.26  2003/09/17 02:00:06  arno
 % debuging pvaf assignment when using compnums
 %
@@ -500,8 +503,16 @@ fprintf('\n');
 if strcmpi(g.pvaf, 'on')
     vardat = mean(mean((data(:,frame1:frame2).^2)));
     pvaf = 100-100*pvaf / vardat;
-    for index =1:ncomps
-        fprintf('Component %d percent variance accounted for: %6.2f\n', g.compnums(index), pvaf(index));
+    pvafcomps = g.compnums;
+    [sortpvaf spx] = sort(pvaf);
+    spx = spx(end:-1:1);
+    sortpvaf = pvaf(spx);
+    for index =1:ncomps-ntopos
+        fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
+    end;
+    fprintf('Imaged componentsL\n")
+    for index =ncomps-ntopos+1:ncomps
+        fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
     end;
 end;
 %
