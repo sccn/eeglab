@@ -1,55 +1,53 @@
-% pop_eegthresh() - rejection of artifact by detecting abnormal values
-%               (i.e. standard) method.
-%
+% pop_eegthresh() - reject artifacts by detecting outlier values.  This has 
+%                   long been a standard method for selecting data to reject.
+%                   Applied either for electrode data or component activations.
 % Usage:
 %   >> pop_eegthresh( INEEG, typerej); % pop-up interactive window
 %   >> [EEG Indexes] = pop_eegthresh( INEEG, typerej, elec_comp, lowthresh, ...
 %                upthresh, starttime, endtime, superpose, reject);
 %
-% Graphical interface:
-%   "Electrode" - [edit box] electrodes or components (number) to take into
-%                 consideration for rejection. Same as the 'elec_comp'
+% Graphic interface:
+%   "Electrode|Component number(s)" - [edit box] number(s) of the electrode(s) or 
+%                 component(s) to take into consideration. Same as the 'elec_comp'
 %                 parameter from the command line.
-%   "Lower limit(s)" - [edit box] lower threshold limit in microV. Same as
-%                 the command line parameter 'lowthresh'.
-%   "Upper limit(s)" - [edit box] upper threshold limit in microV. Same as
-%                 the command line parameter 'upthresh'.
-%   "Start time(s)" - [edit box] starting time limit in second. Same as
-%                 the command line parameter 'starttime'.
-%   "End time(s)" - [edit box] ending time limit in second. Same as
-%                 the command line parameter 'endtime'.
-%   "Display with previous rejection" - [edit box] can be either YES or
-%                 NO. This edit box corresponds to the command line input
-%                 option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
-%                 box corresponds to the command line input option 'reject'.
+%   "Lower limit(s)" - [edit box] lower threshold limit(s) (in uV|std. dev.). 
+%                 Sets command line parameter 'lowthresh'.
+%   "Upper limit(s)" - [edit box] upper threshold limit(s) (in uV|std. dev.). 
+%                 Sets command line parameter 'upthresh'.
+%   "Start time(s)" - [edit box] starting time limit(s) (in seconds). 
+%                 Sets command line parameter 'starttime'.
+%   "End time(s)" - [edit box] ending time limit(s) (in seconds). 
+%                 Sets command line parameter 'endtime'.
+%   "Display with previously marked rejections?" - [edit box] either YES or
+%                 NO. This edit box sets command line option 'superpose'.
+%   "Reject marked trials?" - [edit box] either YES or NO. This edit box 
+%                 sets command line option 'reject'.
 %
 % Inputs:
-%   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
+%   INEEG      - input EEG dataset
+%   typerej    - type of rejection (0 = independent components; 1 = raw
 %              data). Default is 1. For independent components, before
-%              thresholding, the activity is normalized.
-%   elec_comp  - [e1 e2 ...] electrodes (number) or components to take 
+%              thresholding the activations are normalized (to have std. dev. 1).
+%   elec_comp  - [e1 e2 ...] electrode|component numbers to take 
 %              into consideration for rejection
-%   lowthresh  - lower threshold limit in microV (can be an array if 
-%              several electrodes; if less numbe  of values than number 
-%              of electrodes the last value is used for the remaining 
-%              electrodes). For independent component, this threshold is
-%              expressed in term of standard deviation. 
-%   upthresh   - upper threshold limit in microV (same syntax as lowthresh)
-%   starttime  - starting time limit in second (same syntax as lowthresh)
-%   endtime    - ending time limit in second (same syntax as lowthresh)
-%   superpose  - 0=do not superpose pre-labelling with previous
-%              pre-labelling (stored in the dataset). 1=consider both
-%              pre-labelling (using different colors). Default is 0.
-%   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 1.
-%
+%   lowthresh  - lower threshold limit (in uV|std. dev. For components, the 
+%              threshold(s) are in std. dev.). Can be an array if more than one 
+%              electrode|component number is given in elec_comp (above). 
+%              If fewer values than the number of electrodes|components, the 
+%              last value is used for the remaining electrodes|components. 
+%   upthresh   - upper threshold limit (in uV|std dev) (see lowthresh above)
+%   starttime  - rejection window start time(s) in seconds (see lowthresh above)
+%   endtime    - rejection window end time(s) in seconds (see lowthresh)
+%   superpose  - [0|1] 0=do not superpose rejection markings on previous
+%              rejection marks stored in the dataset: 1=show both current and
+%              previously marked rejections using different colors. {Default: 0}.
+%   reject     - [1|0] 0=do not actually reject the marked trials (but store the 
+%              marks: 1=immediately reject marked trials. {Default: 1}.
 % Outputs:
-%   Indexes    - index of rejected sweeps
-%     when eegplot is called, modifications are applied to the current 
-%     dataset at the end of the call of eegplot (when the user press the 
-%     button 'reject').
+%   Indexes    - index of rejected trials
+%     When eegplot() is called, modifications are applied to the current 
+%     dataset at the end of the call to eegplot() when the user presses 
+%     the 'Reject' button.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -74,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/12/17 18:16:03  arno
+% reject
+%
 % Revision 1.15  2003/12/17 18:12:55  arno
 % debug reject
 %
@@ -149,13 +150,13 @@ if nargin < 3
 
 	% which set to save
 	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
-					fastif(icacomp==0, 'Lower limit(s) (std: ex:-3 -4 -2):', 'Lower limit(s) (uV; ex:-20 -10 -15):'), ...
-					fastif(icacomp==0, 'Upper limit(s) (std: ex:3 4 2):', 'Upper limit (uV; ex:20 10 15):'), ...
-					'Start time(s) (s;ex -0.1 0.3):', ...
-					'End time(s) (s;ex 0.2):', ...
-                    'Display with previous rejection', ...
-         		    'Reject marked trial(s) (YES or NO)' };
+	promptstr   = { fastif(icacomp==0, 'Component (number(s), Ex: 2 4 5):', 'Electrode (number(s), Ex: 2 4 5):'), ...
+					fastif(icacomp==0, 'Lower limit(s) (std. dev,  Ex: -3 -2.5 -2):', 'Lower limit(s) (uV, Ex:-20 -10 -15):'), ...
+					fastif(icacomp==0, 'Upper limit(s) (std. dev, Ex: 2 2 2.5):', 'Upper limit(s) (uV, Ex: 20 10 15):'), ...
+					'Start time(s) (seconds, Ex -0.1 0.3):', ...
+					'End time(s) (seconds, Ex 0.2):', ...
+                    'Display with previously marked rejections? (YES or NO)', ...
+         		    'Reject marked trial(s)? (YES or NO)' };
 	inistr      = { fastif(icacomp==1, ['1:' int2str(EEG.nbchan)], '1:5'), ...
 					fastif(icacomp==1, '-10', '-20'),  ...
 					fastif(icacomp==1, '10', '20'), ...
