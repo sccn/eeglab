@@ -71,7 +71,7 @@
 %                     level. Show non-signif. output values in green       {0}
 %       'naccu'     = Number of bootstrap replications to accumulate       {200}
 %       'baseboot'  = Bootstrap baseline to subtract (1 -> use 'baseline'(see above)
-%                                                     0 -> use whole trial)   {0}
+%                                                     0 -> use whole trial) {1}
 %    Optional scalp map:
 %       'topovec'   = Scalp topography (map) to plot                       {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2004/03/01 02:25:06  arno
+% change help message
+%
 % Revision 1.69  2004/02/09 18:01:27  arno
 % debug multitaper
 %
@@ -501,7 +504,7 @@ try, g.plotitc;    catch, g.plotitc  = 'on'; end;
 try, g.detrep;     catch, g.detrep = 'off'; end;
 try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
-try, g.baseboot;   catch, g.baseboot = 0; end;
+try, g.baseboot;   catch, g.baseboot = 1; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
