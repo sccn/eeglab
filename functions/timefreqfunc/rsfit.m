@@ -2,11 +2,13 @@
 %             using Ramberg-Schmeiser distribution
 %
 % Usage: >> p = rsfit(x, val)
-%        >> [p c l chi2] = rsfit(x, val)
+%        >> [p c l chi2] = rsfit(x, val, plot)
 %
 % Input:
 %   x    - [float array] accumulation values
 %   val  - [float] value to test
+%   plot - [0|1|2] plot fit. Using 2, the function avoids creating
+%          a new figure. Default: 0.
 %
 % Output:
 %   p    - p value
@@ -42,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/07/10 00:12:52  arno
+% fix goodness of fit
+%
 % Revision 1.3  2003/07/10 00:00:43  arno
 % compute chi2 goodness of fit
 %
@@ -52,11 +57,14 @@
 % Initial revision
 %
 
-function [p, c, l, res] = rsfit(x, val)
+function [p, c, l, res] = rsfit(x, val, plotflag)
 
     if nargin < 2
         help rsfit;
         return;
+    end;
+    if nargin < 3
+        plotflag  = 0;
     end;
     
     % moments
@@ -111,7 +119,7 @@ function [p, c, l, res] = rsfit(x, val)
 
     % compute goodness of fit
     % -----------------------
-    if nargout > 3
+    if nargout > 3 | plotflag
 
         % histogram of value 12 bins
         % --------------------------
@@ -151,5 +159,29 @@ function [p, c, l, res] = rsfit(x, val)
         % value of X2
         % -----------
         res = sum(((expect - N).^2)./expect);
+        
+        % plot fit
+        % --------
+        if plotflag
+            if plotflag ~= 2, figure; end;
+            hist(x, 12);
+            
+            abscisia = (X(1:end-1)+X(2:end))/2;            
+            hold on; plot(abscisia, expect, 'r');
+        
+            % plot curve
+            % ----------
+            pval = linspace(0,1, 102); pval(1) = []; pval(end) = [];
+            rp   = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
+            fp   = l(2)*1./(l(3).*(pval.^(l(3)-1)) + l(4).*((1-pval).^(l(4)-1)));
+            [maxval index]  = max(expect);
+            [tmp closestind] = min(abs(rp - abscisia(index)));
+            fp = fp./fp(closestind)*maxval;
+            plot(rp, fp, 'g');
+            legend('Chi2 fit (some bin have been grouped)', 'Pdf', 'Data histogram'  );
+            xlabel('Bins');
+            ylabel('# of data point per bin');            
+            title (sprintf('Fit of distribution using Ramberg-Schmeiser distribution (Chi2 = %2.4g)', res));            
+        end;
     end;
     return
