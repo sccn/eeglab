@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/06/03 14:53:44  arno
+% remove count
+%
 % Revision 1.14  2004/06/03 14:51:12  arno
 % debug allepochvals
 %
@@ -225,7 +228,7 @@ if strcmp(fieldname, 'latency')
 		if length(allepochval{epoch}) == 1
 			epochval(epoch) = allepochval{epoch}(end);
 		else
-            if length(allepochval{epoch}) == 2
+            if length(allepochval{epoch}) == 2 & nargout < 2
                 disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ]); 
                 %, ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
             end;
