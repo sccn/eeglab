@@ -7,20 +7,23 @@
 %
 % Usage:
 %   >> [handlers, width, height ] = ...
-%             supergui( geometry, { arguments1 }, { arguments2 }... );
+%             supergui( geomx, geomy, { arguments1 }, { arguments2 }... );
 % 
 % Inputs:
-%   geometry   - array describing the geometry of the elements
-%                in the figure. For instance, [2 3 2] means that the
-%                figures will have 3 rows, with 2 elements in the first
-%                and last row and 3 elements in the second row.
-%                An other syntax is { [2 8] [1 2 3] } which means
-%                that figures will have 2 rows, the first one with 2
-%                elements of relative width 2 and 8 (20% and 80%). The
-%                second row will have 3 elements of relative size 1, 2 
-%                and 3.
-%   {argument} - GUI matlab element arguments. Ex { 'style', 
-%                'radiobutton', 'String', 'hello' }.
+%   geomx   - cell array describing the geometry of the elements
+%             in the figure. For instance, [2 3 2] means that the
+%             figures will have 3 rows, with 2 elements in the first
+%             and last row and 3 elements in the second row.
+%             An other syntax is { [2 8] [1 2 3] } which means
+%             that figures will have 2 rows, the first one with 2
+%             elements of relative width 2 and 8 (20% and 80%). The
+%             second row will have 3 elements of relative size 1, 2 
+%             and 3.
+%   geomy  - [array] describting geometry for the rows. For instance
+%            [1 2 1] means that the second row will be twice the height
+%            of the other ones. If [], all the lines have the same height.
+%  {argument} - GUI matlab element arguments. Ex { 'style', 
+%               'radiobutton', 'String', 'hello' }.
 %
 % Hint:
 %    use 'print -mfile filemane' to save a matlab file of the figure.
@@ -33,7 +36,7 @@
 %
 % Example:
 %    figure;   
-%    supergui( [1 1], { 'style', 'radiobutton', 'string', 'radio' }, ...
+%    supergui( [1 1], [], { 'style', 'radiobutton', 'string', 'radio' }, ...
 %        { 'style', 'pushbutton', 'string', 'push' });
 %      
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 2001
@@ -59,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/13 00:20:42  arno
+% same
+%
 % Revision 1.15  2002/08/13 00:20:22  arno
 % update position
 %
@@ -105,13 +111,13 @@
 % Initial revision
 %
 
-function [handlers, outheight, allhandlers] = supergui( geometry, varargin);
+function [handlers, outheight, allhandlers] = supergui( geomx, geomy, varargin);
 
 % handlers cell format
 % allhandlers linear format
 
 INSETX = 0.05; % x border absolute (5% of width)
-INSETY = 0.15;  % y border relative (50% of heigth)  
+INSETY = 0.01;  % y border relative (50% of heigth)  
 
 if nargin < 2
 	help supergui;
@@ -120,43 +126,77 @@ end;
 
 % converting the geometry formats
 % -------------------------------
-if ~iscell( geometry )
-	oldgeom = geometry;
-	geometry = {};
+if ~iscell( geomx )
+	oldgeom = geomx;
+	geomx = {};
 	for row = 1:length(oldgeom)
-		geometry = { geometry{:} ones(1, oldgeom(row)) };
+		geomx = { geomx{:} ones(1, oldgeom(row)) };
 	end;
-end;		
-
-% setting relative size in percent
-% --------------------------------
-for row = 1:length(geometry)
-	tmprow = geometry{row};
-	sumrow = sum(geometry{row});
-	geometry{row} = 1.05*geometry{row}/sumrow;
-	geometry{row} = geometry{row} - INSETX*(length(tmprow)-1)/length(tmprow);
 end;
-			
+if isempty(geomy)
+	geomy = ones(1, length(geomx));
+end;
+
+% setting relative width in percent
+% ---------------------------------
+for row = 1:length(geomx)
+	tmprow = geomx{row};
+	sumrow = sum(geomx{row});
+	geomx{row} = 1.05*geomx{row}/sumrow;
+	geomx{row} = geomx{row} - INSETX*(length(tmprow)-1)/length(tmprow);
+end;
+
+% setting relative height in percent
+% ---------------------------------
+sumcol = sum(geomy);
+geomy  = 1.06*geomy/sumcol;
+geomy  = geomy - INSETY*(length(geomy)-1)/length(geomy);
+
+% $$$ % counting rows
+% $$$ % -------------
+% $$$ nbrows = 0;
+% $$$ counter = 1; % count the elements
+% $$$ for row = 1:length(geomx)
+% $$$ 	nbrowtmp = 1;
+% $$$ 	for column = 1:length(tmprow)
+% $$$ 		currentelem = varargin{ counter };
+% $$$ 		if ~isempty(currentelem)
+% $$$ 			try, 
+% $$$ 				if size(currentelem,1) > 1
+% $$$ 			nbrowtmp = 2;
+% $$$ 		end;
+% $$$ 		counter = counter+1;
+% $$$ 	end;
+% $$$ 	nbrows = nbrow+nbrowtmp;
+% $$$ end;
+
+% get axis coordinates
+% --------------------
 set(gcf, 'menubar', 'none', 'numbertitle', 'off');		
 pos = get(gca,'position'); % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]; % allow to use normalized position [0 100] for x and y
 axis('off');
 
+% creating guis
+% -------------
 counter = 1; % count the elements
 outwidth = 0;
 outheight = 0;
-height = 1.05/(length(geometry)+1)*(1-INSETY);
-posy = 1 - height - 1/length(geometry)*INSETY;
+%height = 1.05/(length(geomx)+1)*(1-INSETY);
+%posy = 1 - height - 1/length(geomx)*INSETY;
 factmultx = 0;
-factmulty = 0;
-for row = 1:length(geometry)
+factmulty = 0; %zeros(length(geomx));
+posy = 1.0+INSETY;
+for row = 1:length(geomx)
 
 	% init
     posx = -0.05;
 	clear rowhandle;
-	tmprow = geometry{row};
-    
+	tmprow = geomx{row};
+    height = geomy(row);
+	posy = posy - height - INSETY;
+	
 	for column = 1:length(tmprow)
 
 		width  = tmprow(column);
@@ -173,15 +213,16 @@ for row = 1:length(geometry)
 			% this simply compute a factor so that all uicontrol will be visible
 			% ------------------------------------------------------------------
 			style = get(rowhandle(column), 'style');
+			set( rowhandle(column), 'units', 'pixels');			
+			curpos = get(rowhandle(column), 'position');
+			curext = get(rowhandle(column), 'extent');
 			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
-				set( rowhandle(column), 'units', 'pixels');			
-				curpos = get(rowhandle(column), 'position');
-				curext = get(rowhandle(column), 'extent');
 				factmultx = max(factmultx, curext(3)/curpos(3));
-				factmulty = max(factmulty, curext(4)/curpos(4));
-				set( rowhandle(column), 'units', 'normalized');			
 			end;
-			
+			if ~strcmp(style, 'pushbutton')
+				factmulty = max(factmulty, curext(4)/curpos(4));
+			end;
+			set( rowhandle(column), 'units', 'normalized');			
         else 
 			rowhandle(column) = 0;
 		end;
@@ -192,8 +233,11 @@ for row = 1:length(geometry)
 		posx   = posx + width + INSETX;
 		counter = counter+1;
 	end;
-	posy      = posy - height - 1/length(geometry)*INSETY; %compensate for inset 
+	%posy      = posy - height - 1/length(geomx)*INSETY; %compensate for inset 
 end;
+
+% recompute ordinates based on extet info
+% ---------------------------------------
 
 %scale and replace the figure in the screen
 pos = get(gcf, 'position');
