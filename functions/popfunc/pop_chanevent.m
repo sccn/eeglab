@@ -12,8 +12,8 @@
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
 %                    if the event channel go up ('leading'), down ('trailing')
 %                    or both ('both'). Default is 'both'.
-%   'delchan'      - ['yes'|'no'] delete channel from data { 'yes' }.
-%   'delevent'     - ['yes'|'no'] delete old events if any { 'yes' }.
+%   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
+%   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
 %   'nbtype'       - [1|NaN] setting this to one will force the program to 
 %                    consider all events as having the same type
 %
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/02 23:02:09  arno
+% debug delevent and 'both' options
+%
 % Revision 1.4  2002/08/22 21:13:36  arno
 % debug
 %
@@ -76,7 +79,7 @@ if nargin < 2
 			    ['If set, all transitions are considered the same,' 10 ...
 				 'if unset, each signal value is assigned a different type'] } ...
 			   { 'style' 'checkbox' 'value' 0 } { } };
-	result       = inputgui( geometry, strgui, 'pophelp(''popchanevent'');', 'Extract event from channel(s) - pop_chanevent()');
+	result       = inputgui( geometry, strgui, 'pophelp(''pop_chanevent'');', 'Extract event from channel(s) - pop_chanevent()');
 	
 	if length(result) == 0 return; end;
 	chans   = eval( [ '[' result{1} ']' ] );
@@ -85,14 +88,14 @@ if nargin < 2
 		case 2, g.edge = 'leading';
 		case 3, g.edge = 'trailing';
 	end;
-	if result{3}, g.delchan = 'yes'; else g.delchan  = 'no'; end;
-	if result{4}, g.delevent= 'yes'; else g.delevent = 'no'; end;
+	if result{3}, g.delchan = 'on'; else g.delchan  = 'off'; end;
+	if result{4}, g.delevent= 'on'; else g.delevent = 'off'; end;
 	if result{5}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
 else 
 	listcheck = { 'edge'     'string'     { 'both' 'leading' 'trailing'}     'both';
-				  'delchan'  'string'     { 'yes' 'no' }                     'yes';
-				  'delevent' 'string'     { 'yes' 'no' }                     'yes';
-				  'nbtype'   'integer'    [1 NaN]                            NaN };
+				  'delchan'  'string'     { 'on' 'off' }                     'on';
+				  'delevent' 'string'     { 'on' 'off' }                     'on';
+				  'nbtype'   'integer'    [1 NaN]                             NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
 end;
@@ -127,7 +130,7 @@ events = events(1:counte-1);
 
 % resort events
 % --------------
-if strcmp(g.delevent, 'yes')
+if strcmp(g.delevent, 'on')
 	EEG.event = events;
 else
 	for index = 1:length(events)
@@ -140,7 +143,7 @@ end;
 
 % delete channels
 % ---------------
-if strcmp(g.delevent, 'yes')
+if strcmp(g.delchan, 'on')
 	EEG = pop_select(EEG, 'nochannel', chans);
 end;
 
