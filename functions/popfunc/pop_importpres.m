@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/01/29 01:39:34  arno
+% debug history
+%
 % Revision 1.12  2004/01/29 01:35:57  arno
 % allow to import any field for type and latency
 %
@@ -118,13 +121,15 @@ else
     indtype    = [ indtype1 indtype2 1];
     indlatency = strmatch('time', lower(fields), 'exact');
     indlatency = [ indlatency 1 ];
-    uilist = { { 'style' 'text' 'string' 'Field containing event types' } ...
+    uilist = { { 'style' 'text' 'string' 'File field containing event types' } ...
                { 'style' 'list' 'string' strvcat(fields) 'value' indtype(1)  'listboxtop' indtype(1)} ...
-               { 'style' 'text' 'string' 'Field containing event latencies' } ...
+               { 'style' 'text' 'string' 'File field containing event latencies' } ...
                { 'style' 'list' 'string' strvcat(fields) 'value' indlatency(1) 'listboxtop' indlatency(1) } ...
                { } { 'style' 'text' 'string' 'Note: scroll list then click to select field' } };
     uigeom = { [2 1] [2 1] 1 1 };
     result = inputgui(uigeom, uilist, 'pophelp(''pop_importpres'')', 'Import presentation file - pop_importpres()');
+    if isempty(result), return; end;
+    
     indtype = result{1};
     indlat  = result{2};
     typefield = fields{indtype};
