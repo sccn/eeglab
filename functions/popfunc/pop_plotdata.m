@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/10/16 01:05:17  arno
+% using nan_mean
+%
 % Revision 1.10  2002/10/16 00:44:13  arno
 % remove nan plot
 %
@@ -115,10 +118,10 @@ if exist('singletrials') ~= 1
 end;    
 
 if EEG.trials > 1 & singletrials == 0
-    fprintf('Averaging...\n');
+    fprintf('Selecting trials and components...\n');
 	if typeplot == 1
-	   sigtmp = mean(EEG.data(indices,:,trials),3);
-	else
+	   sigtmp = nan_mean(EEG.data(indices,:,trials),3);
+ 	else
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
 	   end;   
@@ -170,15 +173,7 @@ switch nargin
 end;
 return;
 
-function out = nan_mean(in)
-
-   nans = find(isnan(in));
-   in(nans) = 0;
-   sums = sum(in);
-   nonnans = ones(size(in));
-   nonnans(nans) = 0;
-   nonnans = sum(nonnans);
-   nononnans = find(nonnans==0);
-   nonnans(nononnans) = 1;
-   out = sum(in)./nonnans;
-   out(nononnans) = NaN;
+function out = nan_mean(in, dim)
+    tmpin = in;
+    tmpin(find(isnan(in(:)))) = 0;
+    out = sum(tmpin, dim) ./ sum(~isnan(in),dim);
