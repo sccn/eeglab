@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/12/05 18:50:27  arno
+% remove trailing blanks
+%
 % Revision 1.28  2003/10/31 18:42:01  arno
 % removing extra spaces
 %
@@ -233,8 +236,12 @@ if mode == 0  % single datasets
 	EEG.filepath    = '';
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
-	command = sprintf('save(''%s'',''-MAT'',''EEG'');', [ curfilepath curfilename ]);
-	
+    try, save([ curfilepath curfilename ], '-mat', 'EEG');
+	catch, 
+        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+        catch, error('Pop_saveset: save error, check permissions on file or directory');
+	end;
+    
 	% Saving data as float or as Matlab
 	eeg_options;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
@@ -350,7 +357,9 @@ else
     end;
 	disp('Pop_saveset: saving datasets...');
 	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
-	catch, error('Pop_saveset: save error, check permissions on file or directory');
+	catch, 
+        try, save([ curfilepath curfilename ], '-V6', '-mat', 'ALLEEG');
+        catch, error('Pop_saveset: save error, check permissions on file or directory');
 	end;
     
     % delete .fdt files
