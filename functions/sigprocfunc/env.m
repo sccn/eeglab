@@ -1,17 +1,21 @@
-% env() - return envelope of rows of a data matrix.
-%
+% env() - return envelope of rows of a data matrix, or optionally
+%         of the data interpolated to a different sampling rate.
 % Usage:
-%   >> envdata = env( data, timelimits, timearray);
+%   >> envdata = env(data);
+%   >> envdata = env(data, timelimits, timearray);
 %
 % Inputs:
-%   data       - nbchannel x points data
-%   timelimits - timelimits (default: none)
-%   timearray  - time array to extrapolate data (default: none)
+%   data       - (nchannels,ntimepoints) data array
+%
+% Optional Inputs:
+%   timelimits - (start_time, end_time) timelimits (default: none required)
+%   timearray  - Optional times array to interpolate the data (default: none)
 %
 % Outputs:
-%   envdata    - The "envelope" of a multichannel data set is the maximum
-%                and minimum value at each time point, i.e.
-%                envdata = [rowmax;rowmin];
+%   envdata    - A (2,nchannels) array containing the "envelope" of 
+%                a multichannel data set = the maximum and minimum values,
+%                across all the channels, at each time point. That is,
+%                   >> envdata = [max(data');min(data')];
 %
 % Author: Scott Makeig & Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -36,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/05/30 17:26:21  arno
+% remove warning
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -51,10 +58,17 @@ mindata = min(data);
 % extrapolate these values if necessary
 % -------------------------------------
 if nargin > 2
+        timelimits = timelimits(:)';  % make row vector
+        if size(timelimit,2)~=2 | size(timelimits,2)~=2
+           error('timelimits array must be a [start_time, end_time] vector')
+        end
 	X = linspace(timelimits(1),timelimits(2),length(maxdata));   % x-axis description (row vector)
 	Y = ones(1,size(X,2));
-	Xi = [timearray];
-	Yi = ones(1,size(timearray,2));
+        if size(timearray,1)>1 & size(timearray,2)>1
+           error('timearray must be a vector')
+        end
+	Xi = timearray(:)';   % make a row vector
+	Yi = ones(1,length(timearray));
 
     warning off;
 	[tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'invdist');   % interpolate data
