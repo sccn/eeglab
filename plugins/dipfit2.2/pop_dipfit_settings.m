@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/03/16 02:32:39  arno
+% detect channels with no coordinates
+%
 % Revision 1.6  2005/03/11 16:07:07  arno
 % header
 %
@@ -164,24 +167,46 @@ com = '';
 dipfitdefs;
 
 if nargin < 2
+    
+    % detect DIPFIT1.0x structure
+    % ---------------------------
+    if isfield(EEG.dipfit, 'vol')
+        str = [ 'Dipoles structure from DIPFIT 1.02 detected.' ...
+                'Do you wish to keep or to erase old dipole information (and dipole locations)? ' ...
+                'If you keep the information, dipoles can still be localized etc... ' ];
+        
+        tmpButtonName=questdlg2( strmultiline(str, 60), 'Old DIPFIT structure', 'Keep', 'Erase', 'Keep');
+        if strcmpi(tmpButtonName, 'Keep'), return; end;       
+
+    elseif isfield(EEG.dipfit, 'hdmfile')
+        % detect previous DIPFIT structure
+        % --------------------------------
+        str = [ 'Dipoles information or settings already present in dataset. ' ...
+                'Do you wish to keep or to erase old dipole information (and dipole locations).' ];
+        tmpButtonName=questdlg2( strmultiline(str, 60), 'Old DIPFIT structure', 'Keep', 'Erase', 'Keep');
+        if strcmpi(tmpButtonName, 'Keep'), return; end;       
+    end;    
+    
     % define the callbacks for the buttons
-    cb_selectelectrodes = 'tmp = select_channel_list({EEG.chanlocs.label}, eval(get(findobj(gcbf, ''tag'', ''elec''), ''string''))); set(findobj(gcbf, ''tag'', ''elec''), ''string'',[''[''  num2str(tmp) '']''])'; % did not work
+    % -------------------------------------
+    cb_selectelectrodes = [ 'tmp = select_channel_list({EEG.chanlocs.label}, ' ...
+                            'eval(get(findobj(gcbf, ''tag'', ''elec''), ''string'')));' ...
+                            'set(findobj(gcbf, ''tag'', ''elec''), ''string'',[''[''  num2str(tmp) '']''])' ]; % did not work
     cb_selectelectrodes = 'set(findobj(gcbf, ''tag'', ''elec''), ''string'', int2str(pop_chansel({EEG.chanlocs.labels})));';
-    % cb_selectvolume     = '[fname, pname] = uigetfile(''*.*'', ''Load volume conductor''); fname = fullfile(pname, fname); tmp = strvcat(get(findobj(gcbf, ''tag'', ''vol''), ''string''), fname); set(findobj(gcbf, ''tag'', ''vol''), ''string'', tmp); set(findobj(gcbf, ''tag'', ''vol''), ''value'', size(tmp,1)); set(gcbf, ''userdata'', tmp)';
     cb_volmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ... 
                     'tmpind = get(gcbo, ''value'');' ... 
                     'set(findobj(gcbf, ''tag'', ''radii''),   ''string'', num2str(tmpdat{tmpind}.r,3));' ...
                     'set(findobj(gcbf, ''tag'', ''conduct''), ''string'', num2str(tmpdat{tmpind}.c,3));' ...
                     'clear tmpdat tmpind;' ];
-    cb_changeradii = [  'tmpdat = get(gcbf, ''userdata'');' ...
-                       'tmpdat.vol.r = str2num(get(gcbo, ''string''));' ...
-                       'set(gcf, ''userdata'', tmpdat)' ];
+    cb_changeradii   = [  'tmpdat = get(gcbf, ''userdata'');' ...
+                          'tmpdat.vol.r = str2num(get(gcbo, ''string''));' ...
+                          'set(gcf, ''userdata'', tmpdat)' ];
     cb_changeconduct = [  'tmpdat = get(gcbf, ''userdata'');' ...
-                       'tmpdat.vol.c = str2num(get(gcbo, ''string''));' ...
-                       'set(gcf, ''userdata'', tmpdat)' ];
-    cb_changeorigin = [  'tmpdat = get(gcbf, ''userdata'');' ...
-                       'tmpdat.vol.o = str2num(get(gcbo, ''string''));' ...
-                       'set(gcf, ''userdata'', tmpdat)' ];
+                          'tmpdat.vol.c = str2num(get(gcbo, ''string''));' ...
+                          'set(gcf, ''userdata'', tmpdat)' ];
+    cb_changeorigin  = [  'tmpdat = get(gcbf, ''userdata'');' ...
+                          'tmpdat.vol.o = str2num(get(gcbo, ''string''));' ...
+                          'set(gcf, ''userdata'', tmpdat)' ];
     % cb_fitelec = [ 'if get(gcbo, ''value''),' ...
     %                '  set(findobj(gcbf, ''tag'', ''origin''), ''enable'', ''off'');' ...
     %                'else' ...
@@ -284,13 +309,12 @@ options = finputcheck(options, { 'hdmfile'  'string'    []         '';
                                  'coordformat' 'string'    { 'MNI' 'spherical' } 'MNI' });
 if isstr(options), error(options); end;
 
-% convert to structure
-% options = cell2struct(options(2:2:end), options(1:2:end),2);
-% assign/update the EEG structure
-OUTEEG.dipfit.hdmfile  = options.hdmfile;
-OUTEEG.dipfit.mrifile  = options.mrifile;
-OUTEEG.dipfit.chanfile = options.chanfile;
-OUTEEG.dipfit.chansel  = options.chansel;
+OUTEEG = rmfield(OUTEEG, 'dipfit');
+OUTEEG.dipfit.hdmfile     = options.hdmfile;
+OUTEEG.dipfit.mrifile     = options.mrifile;
+OUTEEG.dipfit.chanfile    = options.chanfile;
+OUTEEG.dipfit.chansel     = options.chansel;
+OUTEEG.dipfit.coordformat = options.coordformat;
 if ~isempty(options.electrodes), OUTEEG.dipfit.chansel = options.electrodes; end;
 
 % removing channels with no coordinates
@@ -300,8 +324,6 @@ if length(indices) < length(EEG.chanlocs)
     disp('Warning: some channels contain no coordinate. They were removed from dipole fitting.');
     OUTEEG.dipfit.chansel = intersect( OUTEEG.dipfit.chansel, indices);
 end;
-
-OUTEEG.dipfit.coordformat = options.coordformat;
 
 % checking electrode configuration
 % --------------------------------
