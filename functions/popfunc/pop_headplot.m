@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/07/01 22:44:45  arno
+% detect if using old spline file
+%
 % Revision 1.24  2003/12/17 01:07:11  arno
 % debug last
 %
@@ -140,10 +143,10 @@ if nargin < 3
     if isfield(EEG, 'splinefile') & ~isempty(EEG.splinefile)
         splfile = dir(EEG.splinefile);
         byteperelec = splfile.bytes/EEG.nbchan;
-        if byteperelec < 20000, % old head plot file
+        if byteperelec/EEG.nbchan < 625, % old head plot file
             EEG.splinefile = [];
+            disp('Warning: old spline file version detected and removed; spline file has to be recomputed');
         end;
-        disp('Warning: old spline file version detected and removed; spline file has to be recomputed');
     end;
     if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
 		 ButtonName=questdlg2( strvcat('3D head plot need to generate a spline file', ...
