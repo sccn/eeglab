@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/16 16:29:36  arno
+% new revision
+%
 % Revision 1.3  2002/08/16 15:12:21  arno
 % after crash
 %
@@ -140,6 +143,10 @@ else
 	mode = 'files';
 end;	
 
+% remove . directory
+% ------------------
+rmpath('.');
+
 % write HTML file
 % ----------------
 fo = fopen([ outputdir g.outputfile], 'w');
@@ -148,10 +155,10 @@ if fo == -1, error(['can not open file ''' [ outputdir g.outputfile] '''']); end
 fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g.fontindex);
 
 if strcmp(mode, 'files')
-	makehelphtml( directorylist, fo, 'MAIN TITLE', STYLEHEADER, outputdir, mode, options );
+	makehelphtml( directorylist, fo, 'MAIN TITLE', STYLEHEADER, outputdir, mode, options, g.mainonly );
 else % direcotry
 	for index = 1:length( directorylist )
-		%makehelphtml( direct{ index }, fo, directorylist{index}{2}, STYLEHEADER, outputdir, mode, options );
+		makehelphtml( direct{ index }, fo, directorylist{index}{2}, STYLEHEADER, outputdir, mode, options, g.mainonly );
 	end;
 end;	
 fprintf( fo, '</FONT></BODY></HTML>');
@@ -171,6 +178,8 @@ if strcmp(mode, 'dir')
 		end;    
 	end;
 end;
+addpath('.');	
+
 
 return;
 
@@ -195,7 +204,7 @@ function filelist = scandir( dirlist )
 return;
 
 % ------------------------------ Function to generate help for a bunch of files -
-function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
+function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, mainonly);
 % files = cell array of string containing file names or
 %         cell array of 2-strings cell array containing titles and filenames
 % fo = output file
@@ -212,20 +221,21 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
 			    filelink = '';
 			end;
 			fprintf('Processing %s:%s\n', filename, filelink );
-			if ~isempty(filename)
-				try, if exist([ DEST filename]) == 2, delete([ DEST filename]); end; catch, end;
-
+			if ~isempty(filename)				
 				cd(DEST); help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
-				inputfile = which( filename);
-				try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
-				catch, fprintf('Cannot copy file %s\n', inputfile); end;
-
+				
+				if strcmp(mainonly,'off')
+					inputfile = which( filename);
+					try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
+					catch, fprintf('Cannot copy file %s\n', inputfile); end;
+				end;
+				
 				indexdot = find(filename == '.');
-				if isempty(filelink)
+				if ~isempty(filelink)
 					com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
 								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
 				else
-					com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
+					com = [ space2html([ filename(1:indexdot(end)-1) '()'], ...
 								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
 				end;
 			else 
@@ -242,9 +252,11 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
  			fprintf('Processing %s\n', files{index});
 			cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
 			fprintf( fo, '%s', com);
-			inputfile = which( files{index});
-			try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
-			catch, fprintf('Cannot copy file %s\n', inputfile); end;
+			if strcmp(mainonly,'off')
+				inputfile = which( files{index});
+				try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
+				catch, fprintf('Cannot copy file %s\n', inputfile); end;
+			end;
 		end;
 		fprintf(fo, '</table>' );
 	end;	
