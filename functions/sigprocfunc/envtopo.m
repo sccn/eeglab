@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2004/11/29 23:13:45  scott
+% compute variances accounted for ONLY from g.plotchans, if any
+%
 % Revision 1.82  2004/11/20 22:48:15  scott
 % fixed error detection using old-style argument list (no longer documented)
 %
@@ -693,11 +696,12 @@ for i=1:ncomps-1
       end
 
       if isempty(g.icaact)
-          proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
+          proj = g.icawinv(g.plotchans,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -sm 11/04
       else 
-          proj = g.icawinv(:,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 4/2004
-      end;
-      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode);
+          proj = g.icawinv(g.plotchans,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 11/04
+      end;                                                % now proj has only g.plotchans and g.compnums     
+
+      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode);
 
       [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2))); 
                                   % find max variance
@@ -709,14 +713,14 @@ for i=1:ncomps-1
                  g.pvaf = g.sortvar;
       end
       if strcmpi(g.pvaf, 'pvaf') | strcmpi('pvaf','on') | strcmpi(g.pvaf,'mv')
-              pvaf(c) = mean(mean((data(:,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2)); 
-      else % if 'pvaf' is 'rv' (or old 'off')
+              pvaf(c) = mean(mean((data(g.plotchans,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2)); 
+      else % if 'pvaf' is 'rv' (or, formerly, 'off')
               pvaf(c) = mean(mean(proj(:,limframe1:limframe2).^2));      
       end;
 
       maxi = maxi+limframe1-1;
       plotframes(c) = maxi;
-      maxproj(:,c)  = proj(:,maxi);
+      maxproj(:,c)  = proj(:,maxi); % Note: maxproj contains only g.plotchans -sm 11/04
       
       %    ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
       %    [val,ix] = max(envdata(1,c*frames+ix));
@@ -728,7 +732,7 @@ end % component c
 fprintf('\n');
 
 %
-%%%%%%%%%%%%%%% Compute and print component selection criterion %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Compute component selection criterion %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
 % compute pvaf
@@ -737,15 +741,13 @@ if ~xunitframes
 end
 vardat = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
 
-if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on')
+if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
     pvaf = 100-100*pvaf/vardat;
-    ot   = 'pvaf';
+    ot   = g.pvaf;
+    if strcmpi(ot,'on'), ot = 'pvaf'; end
 elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')
     pvaf = 100*pvaf/vardat;
     ot   = 'rv';
-elseif strcmpi(g.pvaf, 'mv')
-    pvaf = 100-100*pvaf/vardat;
-    ot   = 'mv';
 end;
 [sortpvaf spx] = sort(pvaf);
 sortpvaf = sortpvaf(end:-1:1);
@@ -847,19 +849,19 @@ if strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'pvaf')
    fprintf('\n');
 end
 
-sumproj = zeros(size(data));
+sumproj = zeros(size(data(g.plotchans,:)));
 for n = 1:ntopos
   if isempty(g.icaact)
-      sumproj = sumproj + g.icawinv(:,maporder(n))*weights(maporder(n),:)*data; % updated -ad 10/2002
+      sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*weights(maporder(n),:)*data; % updated -sm 11/04
   else 
-      sumproj = sumproj + g.icawinv(:,maporder(n))*g.icaact(maporder(n),:);     % updated -sm 4/2004
-  end;
+      sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*g.icaact(maporder(n),:);     % updated -sm 11/04
+  end;                                                              % Note: sumproj here has only g.plotchans
 end
 varproj = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
 if strcmpi(g.pvaf, 'on')
-      sumpvaf = mean(mean((data(g.plotchans,limframe1:limframe2)-sumproj(g.plotchans,limframe1:limframe2)).^2)); 
+      sumpvaf = mean(mean((data(g.plotchans,limframe1:limframe2)-sumproj(:,limframe1:limframe2)).^2)); 
   else
-      sumpvaf = mean(mean(sumproj(g.plotchans,limframe1:limframe2).^2));      
+      sumpvaf = mean(mean(sumproj(:,limframe1:limframe2).^2));      
   end;
 if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pv') | strcmpi(g.pvaf,'pvaf') | strcmpi(g.pvaf,'mv')
     sumpvaf = 100-100*sumpvaf/varproj;
@@ -904,7 +906,7 @@ else
 end
 
 if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
- sumenv = envelope(sumproj(g.plotchans,:), g.envmode);
+ sumenv = envelope(sumproj(:,:), g.envmode);
  if ~ylimset & max(sumenv) > ymax, ymax = max(curenv); end
  if ~ylimset & min(sumenv) < ymin, ymin = min(curenv); end
  if strcmpi(g.sumenv,'fill')  
@@ -1162,7 +1164,7 @@ if strcmpi(g.dispmaps, 'on')
     [tmp tmpsort] = sort(tmpsort);
     if isstr(g.chanlocs)
         if exist(g.chanlocs) ~= 2  % if no such file
-            fprintf('envtopo(): named channel location file not found.\n',chans);
+            fprintf('envtopo(): named channel location file ''%s'' not found.\n',g.chanlocs);
             return
         end
         eloc = readlocs(g.chanlocs);
@@ -1172,6 +1174,8 @@ if strcmpi(g.dispmaps, 'on')
             return
         end
     end
+    chanlocs = g.chanlocs(g.plotchans); % topoplot based on g.plotchans only! -sm 11/04
+
     for t=1:ntopos % left to right order 
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
@@ -1180,12 +1184,11 @@ if strcmpi(g.dispmaps, 'on')
         axes(axt)                             % topoplot axes
         cla
         
-        chanlocs = g.chanlocs(g.plotchans); % topoplot based on the selected data channels 
         if ~isempty(chanlocs)
             if ~isempty(varargin) 
-                figure(myfig);topoplot(maxproj(g.plotchans,t),chanlocs, varargin{:}); 
+                figure(myfig);topoplot(maxproj(:,t),chanlocs, varargin{:}); 
             else 
-                figure(myfig);topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
+                figure(myfig);topoplot(maxproj(:,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
