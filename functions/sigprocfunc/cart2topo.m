@@ -34,7 +34,7 @@
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: topo2sph(), sph2topo()
+% See also: topo2sph(), sph2topo(), cahncenter()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/05/02 00:33:14  arno
+% introduce minus
+%
 % Revision 1.8  2002/05/02 00:03:29  arno
 % updating header
 %
@@ -124,18 +127,6 @@ try, g.squeeze;    catch, g.squeeze = 0; end;
 try, g.center;     catch, g.center = [0 0 0]; end;
 try, g.gui;        catch, g.gui = 'off'; end;
 
-if strcmp(g.gui, 'on')
-    geometry = { [1 1  1.5 0.25] };
-    uilist = { { 'Style', 'text', 'string', 'Specify center', 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', '0 0 0'  } ...
-			   { 'Style', 'text', 'string', 'or optimize center location', 'fontweight', 'bold'   } ...
-			   { 'Style', 'checkbox', 'value', 0  } };
-    results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel locations -- cart2topo()' );
-	if isempty(results), return; end;
-	g.center  = eval( [ '[' results{1} ']' ] );
-	g.optim   = results{2};
-end;
-
 if g.squeeze>1
   fprintf('Warning: Squeeze must be less than 1.\n');
   return
@@ -151,48 +142,15 @@ x = -x(:); % minus os for consistency between measures
 y = -y(:);
 z = z(:);
 
-options = [];
-x = x - g.center(1);  % center the data
-y = y - g.center(2);
-z = z - g.center(3);
-center = g.center;
-radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
-wobble = std(radius);              % test if xyz values are on a sphere
-fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
-
-if  wobble/mean(radius) > 0.01 & g.optim==1
-	% Find center
-	% ----------------------------------------------
-	fprintf('Optimizing center position...\n');
-	kk=0;
-	while wobble/mean(radius) > 0.01 & kk<5
-		newcenter = fminsearch('spherror',center,options,x,y,z);
-		nx = x - newcenter(1);  % re-center the data
-		ny = y - newcenter(2);
-		nz = z - newcenter(3);
-		nradius = (sqrt(nx.^2+ny.^2+nz.^2));   % assume xyz values are on a sphere
-		newobble = std(nradius);   
-		if newobble<wobble
-			center=newcenter;
-			fprintf('Wobble too strong (%3.2g%%)! Re-centering data on (%g,%g,%g)\n',...
-					100*wobble/mean(radius),newcenter(1),newcenter(2),newcenter(3))
-			x = nx;  % re-center the data
-			y = ny;
-			z = nz;
-			radius=nradius;
-			wobble=newobble;
-			kk=kk+1;
-		else
-			kk=5;
-		end
-	end
-	fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
-			100*wobble/mean(radius),center(1),center(2), ...
-			center(3))
-	%else
-	%  fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
-	%              100*wobble/mean(radius),center(1),center(2),center(3))
-end
+if strcmp(g.gui, 'on')
+	[x y z newcenter] = chancenter(x, y, z, [], 1);
+else 
+	if g.optim == 1
+		[x y z newcenter] = chancenter(x, y, z, []);
+	else
+		[x y z newcenter] = chancenter(x, y, z, center);
+	end;
+end;
 
 x = x./radius; % make radius 1
 y = y./radius;
