@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2002/08/21 02:24:27  arno
+% change message
+%
 % Revision 1.61  2002/08/21 02:22:54  arno
 % debug
 %
@@ -562,33 +565,18 @@ if ~isfield(EEG, 'averef') | isempty(EEG.averef) EEG.averef = 'No'; res = com; e
 
 % create fields if absent
 % -----------------------
-
 if ~isfield(EEG, 'reject')					EEG.reject.rejjp = []; res = com; end;
-if ~isfield(EEG.reject, 'rejjp')			EEG.reject.rejjp = []; res = com; end;
-if ~isfield(EEG.reject, 'rejjpE')			EEG.reject.rejjpE = []; res = com; end;
-if ~isfield(EEG.reject, 'rejkurt')			EEG.reject.rejkurt = []; res = com; end;
-if ~isfield(EEG.reject, 'rejkurtE')			EEG.reject.rejkurtE = []; res = com; end;
-if ~isfield(EEG.reject, 'rejmanual')		EEG.reject.rejmanual = []; res = com; end;
-if ~isfield(EEG.reject, 'rejmanualE')		EEG.reject.rejmanualE = []; res = com; end;
-if ~isfield(EEG.reject, 'rejthresh')		EEG.reject.rejthresh = []; res = com; end;
-if ~isfield(EEG.reject, 'rejthreshE')		EEG.reject.rejthreshE = []; res = com; end;
-if ~isfield(EEG.reject, 'rejfreq')			EEG.reject.rejfreq = []; res = com; end;
-if ~isfield(EEG.reject, 'rejfreqE')			EEG.reject.rejfreqE = []; res = com; end;
-if ~isfield(EEG.reject, 'rejconst')			EEG.reject.rejconst = []; res = com; end;
-if ~isfield(EEG.reject, 'rejconstE')		EEG.reject.rejconstE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejjp')			EEG.reject.icarejjp = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejjpE')		EEG.reject.icarejjpE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejkurt')		EEG.reject.icarejkurt = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejkurtE')		EEG.reject.icarejkurtE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejmanual')		EEG.reject.icarejmanual = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejmanualE')	EEG.reject.icarejmanualE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejthresh')		EEG.reject.icarejthresh = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejthreshE')	EEG.reject.icarejthreshE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejfreq')		EEG.reject.icarejfreq = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejfreqE')		EEG.reject.icarejfreqE = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejconst')		EEG.reject.icarejconst = []; res = com; end;
-if ~isfield(EEG.reject, 'icarejconstE')		EEG.reject.icarejconstE = []; res = com; end;
 
+listf = { 'rejjp' 'rejkurt' 'rejmanual' 'rejthresh' 'rejconst', 'rejfreq' ...
+			   'icarejjp' 'icarejkurt' 'icarejmanual' 'icarejthresh' 'icarejconst', 'icarejfreq'};
+for index = 1:length(listf)	
+	if ~isfield(EEG.reject, listf{index}),	EEG.reject = setfield(EEG.reject, listf{index}, []); res = com; end;
+	elecfield = [listf{index} 'E'];
+	if ~isfield(EEG.reject, elecfield) | ...
+			(~isempty(getfield(EEG.reject, listf{index})) & isempty(getfield(EEG.reject, elecfield)))
+		EEG.reject = setfield(EEG.reject, elecfield, []); res = com; 
+	end;
+end;
 if ~isfield(EEG.reject, 'rejglobal')		EEG.reject.rejglobal = []; res = com; end;
 if ~isfield(EEG.reject, 'rejglobalE')		EEG.reject.rejglobalE = []; res = com; end;
 
