@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/10/17 02:35:46  arno
+% handles nan now
+%
 % Revision 1.12  2002/10/09 22:00:53  arno
 % upodating for new envtopo
 %
@@ -87,10 +90,10 @@ if nargin < 1
 	return;
 end;	
 if isempty( EEG.icasphere )
-	disp('Error: cannot plot without ICA weights. Use Tools/Run ICA.'); return;
+	disp('Error: cannot plot without ICA weights. Select Tools > Run ICA.'); return;
 end;
 if isempty(EEG.chanlocs)
-	fprintf('Cannot plot without channel locations. Use Edit/Dataset info.\n');
+	fprintf('Cannot plot without channel locations. Select Edit > Dataset info.\n');
 	return;
 end;
 if exist('envtitle') ~= 1
