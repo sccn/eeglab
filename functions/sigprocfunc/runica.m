@@ -30,7 +30,8 @@
 % 'anneal'    = annealing constant (0,1] (defaults -> 0.90, or 0.98, extended)
 %                         controls speed of convergence
 % 'annealdeg' = [N] degrees weight change for annealing (default -> 70)
-% 'stop'      = [f] stop training when weight-change < this (default -> 1e-6)
+% 'stop'      = [f] stop training when weight-change < this (default -> 1e-6
+%               if less than 33 channel and 1E-7 otherwise)
 % 'maxsteps'  = [N] max number of ICA training steps    (default -> 512)
 % 'bias'      = ['on'/'off'] perform bias adjustment    (default -> 'on')
 % 'momentum'  = [0<f<1] training momentum               (default -> 0)
@@ -94,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/09/18 23:43:50  arno
+% debug 'weight' input (would not sort component by variance and make some function crash
+%
 % Revision 1.7  2003/08/19 18:56:14  scott
 % added third output arg compvar -sm
 %
