@@ -1,32 +1,31 @@
-% eeglab() - EEGLAB (Version 4.0) - Graphic user interface environment for 
-%   electrophysiological data analtsis using the ICA EEG toolbox (Makeig et al., 
-%   CNL / The Salk Institute, 1997-2001), now the EEGLAB toolbox. Currently,
-%   EEGLAB is hosted (2002-) by the Swartz Center for Computational Neuroscience, 
-%   Institute for Neural Computation, University of California San Diego 
-%   (http://sccn.ucsd.edu/). Feedback from users welcome {arno,scott@sccn.ucsd.edu}.
+% eeglab() - EEGLAB (v4.0) Matlab graphic user interface environment for 
+%   electrophysiological data analysis incorporating the ICA EEG toolbox 
+%   (Makeig et al.) developed at CNL / The Salk Institute, 1997-2001. 
+%   Released 2002- as EEGLAB (Delorme, Makeig, et al.) at the Swartz Center 
+%   for Computational Neuroscience, Institute for Neural Computation, 
+%   University of California San Diego (http://sccn.ucsd.edu/). 
+%   User feedback welcome: email eeglab@sccn.ucsd.edu
 %
-% Author: Arnaud Delorme with Scott Makeig
+% Author: Arnaud Delorme, Scott Makeig, et al.
 %
 % Description:
 %   EEGLAB is Matlab software for processing continuous or epoched event-related 
-%   EEG or MEG data. It is designed for use either by novice or expert Matlab users. 
-%   In normal use, the EEGLAB graphic interface calls graphic functions via 
-%   pop-up argument windows. Its history mechanism can be used to write the
-%   resulting Matlab calls to disk for later incorporation into Matlab scripts. 
-%   A single structure, 'EEG,' contains all dataset parameters and may be accessed 
-%   and modified directly from the Matlab command line. 
+%   EEG or other physiological data. It is designed for use by both novice and 
+%   expert Matlab users. In normal use, the EEGLAB graphic interface calls 
+%   graphic functions via pop-up function windows. the EEGLAB history mechanism 
+%   can save the resulting Matlab calls to disk for later incorporation into 
+%   Matlab scripts.  A single data structure ('EEG') containing all dataset 
+%   parameters may be accessed and modified directly from the Matlab commandline. 
 %
-% Usage: 1) To redaw the graphic interface after updating datasets, simply type 
-%            >> eeglab redraw  % this will also scan for non-empty datasets
-%        2) To rebuild the graphic interface without erasing datasets, type 
-%            >> eeglab rebuild
-%        3) To restart EEGLAB from scratch, type 
-%            >> eeglab  % this will ignore loaded datasets
+% Usage: 1) To (re)start EEGLAB from scratch, type: 
+%            >> eeglab           % Ignores any loaded datasets
+%        2) To redaw and update the EEGLAB interface, type:
+%            >> eeglab redraw    % Scans for non-empty datasets
+%            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
 %
-% See:
-%    >> help eeg_checkset(), % gives the format of the EEG dataset structure
-%    Full documentation is available at http://sccn.ucsd.edu/eeglab/.
-%    The license under which the software is distributed with the code (license.txt)
+% See: license.txt: The software distribution license 
+%      http://sccn.ucsd.edu/eeglab/tutorial/: The EEGLAB tutorial
+%      >> help eeg_checkset(), % Shows the structure of the EEG dataset 
 %
 % Author: Arnaud Delorme (arno@salk.edu) with Scott Makeig (smakeig@ucsd.edu)
 %
@@ -35,7 +34,7 @@
 % eeglab()        - main graphic interface
 % license.tx      - GNU license
 % 
-% Functions recently added in EEGLAB: 
+% Functions recently added to EEGLAB: 
 % --------------------------------------------------------------------
 % cell2mat()      - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
@@ -180,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2002/08/13 17:12:15  scott
+% menu
+%
 % Revision 1.122  2002/08/13 17:10:37  scott
 % menu
 %
@@ -568,7 +570,7 @@ if nargin < 1
 	h('eeglab;');
 else
 	if strcmp(onearg, 'redraw')
-		W_MAIN = findobj('tag', 'EEGLAB');
+		W_MAIN = findobj('tag', 'EEGLAB (v4.0)');
 		if ~isempty(W_MAIN)
 			updatemenu;
 			return;
