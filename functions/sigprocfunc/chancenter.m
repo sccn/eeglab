@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/05/02 01:20:06  arno
+% Initial revision
+%
 % Revision 1.9  2002/05/02 00:33:14  arno
 % introduce minus
 %
@@ -85,7 +88,7 @@ if exist('gui') == 1
 			   { 'Style', 'text', 'string', 'or optimize center location', 'fontweight', 'bold'   } ...
 			   { 'Style', 'checkbox', 'value', 0  } };
     results = inputgui( geometry, uilist, 'pophelp(''chancenter'');', 'Convert channel locations -- chancenter()' );
-	if isempty(results), return; end;
+	if isempty(results), x=[]; return; end;
 	center  = eval( [ '[' results{1} ']' ] );
 	optim   = results{2};
 else 
