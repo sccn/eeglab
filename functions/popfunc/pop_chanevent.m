@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2004/06/16 16:09:05  arno
+% new option edge length
+%
 % Revision 1.35  2004/05/24 17:17:27  arno
 % extracting event duration
 %
@@ -312,20 +315,34 @@ for ci = chan
     % -------------
     tmpdiff =  diff(X);
     switch g.edge
-     case 'both'    , tmpevent = find( tmpdiff ~= 0);
-     case 'trailing', tmpevent = find( tmpdiff < 0);
-     case 'leading' , tmpevent = find( tmpdiff > 0); tmpdur = find( tmpdiff < 0);
+     case 'both'    , tmpevent1 = find( tmpdiff > 0)-1; tmpevent2 = find( tmpdiff < 0);
+     case 'trailing', tmpevent2 = find( tmpdiff < 0);
+     case 'leading' , tmpevent1 = find( tmpdiff > 0)-1; tmpdur = find( tmpdiff < 0);
     end;
     
     % fuse close events if necessary
     % ------------------------------
-    tmpclose = find( tmpevent(2:end)-tmpevent(1:end-1) < 3)+1;
-    tmpevent(tmpclose) = [];
+    if exist('tmpevent1')
+        tmpclose = find( tmpevent1(2:end)-tmpevent1(1:end-1) < g.edgelen)+1;
+        tmpevent1(tmpclose) = [];
+        tmpevent    = tmpevent1+1;
+        tmpeventval = tmpevent1+2;
+    end;
+    if exist('tmpevent2')
+        tmpclose = find( tmpevent2(2:end)-tmpevent2(1:end-1) < g.edgelen); % not +1
+        tmpevent2(tmpclose) = [];
+        tmpevent    = tmpevent2+1;
+        tmpeventval = tmpevent2;
+    end;
+    if exist('tmpevent1') & exist('tmpevent2')
+        tmpevent    = sort([ tmpevent1+1 tmpevent2+1]);
+        tmpeventval = sort([ tmpevent1+2 tmpevent2]);
+    end;
     
     % adjust edges for duration  if necessary
     % ---------------------------------------
     if strcmpi(g.duration, 'on')
-        tmpclose = find( tmpdur(2:end)-tmpdur(1:end-1) < 4); % not +1 (take out the first)
+        tmpclose = find( tmpdur(2:end)-tmpdur(1:end-1) < g.edgelen); % not +1 (take out the first)
         tmpdur(tmpclose) = [];
         if tmpdur(1) < tmpevent(1), tmpdur(1) = []; end;
         if length(tmpevent) > length(tmpdur), tmpdur(end+1) = EEG.pnts; end;
@@ -338,12 +355,11 @@ for ci = chan
     if isempty(tmpevent), 
         fprintf('No event found for channel %d\n', ci);
     else
-        tmpevent = tmpevent+1;
         for tmpi = 1:length(tmpevent)
             if ~isnan(g.nbtype)
                 events(counte).type    = g.typename;
             else
-                events(counte).type    = X(tmpevent(tmpi));
+                events(counte).type    = X(tmpeventval(tmpi));
             end;
             events(counte).latency = tmpevent(tmpi);
             if strcmpi(g.duration, 'on')
