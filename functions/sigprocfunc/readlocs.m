@@ -76,12 +76,12 @@
 %   '.loc' or '.locs': 
 %               polar coordinates. Notes: angle in degrees: right ear is 90, 
 %               left ear -90; head disk radius is 0.5. 
-%     Fields:   N    angle  radius    label
-%     Sample:   1    -18    .352       Fp1   
-%               2     18    .352       Fp2  
-%               3    -90    .181       C3
-%               4     90    .181       C4
-%                 ...
+%               Fields:   N    angle  radius    label
+%               Sample:   1    -18    .511       Fp1   
+%                         2     18    .511       Fp2  
+%                         3    -90    .256       C3
+%                         4     90    .256       C4
+%                           ...
 %               Note: In previous releases, channel labels had to contain exactly 
 %               four characters (spaces replaced by '.'). This format still works 
 %               but dots are no longer required.
@@ -89,12 +89,12 @@
 %               Matlab spherical coordinates. Notes: theta is the azimuthal/horizontal angle
 %               in deg.: 0 is toward nose, 90 rotated to left ear. Following this, perform
 %               the elevation (phi). Angles in degrees.
-%     Fields:   N    theta    phi    label
-%     Sample:   1      18     -2      Fp1
-%               2     -18     -2      Fp2
-%               3      90     44      C3
-%               4     -90     44      C4
-%                 ...
+%               Fields:   N    theta    phi    label
+%               Sample:   1      18     -2      Fp1
+%                         2     -18     -2      Fp2
+%                         3      90     44      C3
+%                         4     -90     44      C4
+%                           ...
 %   '.elp':     
 %               Polhemus-.'elp' cartesian coordinates. By default, an .elp extension is read
 %               as PolhemusX-elp in which 'X' on the Polhemus sensor is pointed toward the 
@@ -106,40 +106,45 @@
 %               (theta): 0 is toward right ear; 90 is toward nose, -90 toward occiput. 
 %               Angles are in degrees.  If labels are absent or weights are given in 
 %               a last column, readlocs() adjusts for this. Default labels are E1, E2, ...
-%     Fields:   label      phi  theta   
-%     Sample:   Fp1        -92   -72    
-%               Fp2         92    72   
-%               C3         -46    0  
-%               C4          46    0 
-%                 ...
+%               Fields:   label      phi  theta   
+%               Sample:   Fp1        -92   -72    
+%                         Fp2         92    72   
+%                         C3         -46    0  
+%                         C4          46    0 
+%                           ...
 %   '.xyz': 
-x               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose, 
+%               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose, 
 %               y is towards the left ear, and z towards the vertex.
-%     Fields:   label   x           y         z
-%     Sample:   Fp1    ????
-%               Fp2   ????
-%               C3   ????
-%               C4  ????
+%               Fields:   channum   x           y         z     label
+%               Sample:   1       .950        .308     -.035     Fp1
+%                         2       .950       -.308     -.035     Fp2
+%                         3        0           .719      .695    C3
+%                         4        0          -.719      .695    C4
+%                           ...
 %   '.sfp': 
-%               EGI-xyz cartesian coordinates. Notes: For EGI, x is toward right ear, 
+%               BESA/EGI-xyz cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
 %               cartesian coordinates to Matlab/EEGLAB xyz coordinates. 
-%     Fields:   label   x           y         z
-%     Sample:   Fp1   -0.8355   -0.2192   -0.5039      
-%               Fp2   -0.8355    0.2192    0.5039     
-%               C3     0.3956         0   -0.9184     
-%               C4     0.3956         0    0.9184    
-%                 ...
+%               Fields:   label   x           y          z
+%               Sample:   Fp1    -.308        .950      -.035    
+%                         Fp2     .308        .950      -.035  
+%                         C3     -.719        0          .695  
+%                         C4      .719        0          .695  
+%                           ...
 %   '.txt':   
 %               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
-%     Fields:   label   theta radius x   y   z sph_theta sph_phi custom ....
-%     Sample:   Fp1 
-%               Fp2
-%               C3 
-%               C4 
+%               Fields:   label  theta  radius   x      y      z    sph_theta   sph_phi  ...
+%               Sample:   Fp1     -18    .511   .950   .308  -.035   18         -2       ...
+%                         Fp2      18    .511   .950  -.308  -.035  -18         -2       ...
+%                         C3      -90    .256   0      .719   .695   90         44       ...
+%                         C4       90    .256   0     -.719   .695  -90         44       ...
+%                           ...
+%               The last columns of the file may contain any other defined field (gain,
+%               calib, type, custom).
 %
 % Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
 % (expanded from the ICA toolbox function)
+%
 % See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -161,6 +166,9 @@ x               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/12/29 22:00:10  arno
+% skipline -> skiplines
+%
 % Revision 1.28  2002/12/28 23:46:45  scott
 % header
 %
@@ -184,12 +192,8 @@ x               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose
 %
 % Revision 1.21  2002/12/24 02:51:22  arno
 % new version of readlocs
-% ,
 %
 
-% To DO: remove the cart2topo, use cart2sph and sph2topo instead
-% use chancenter to recenter data
-%
 
 function [eloc, labels, theta, radius] = readlocs( filename, varargin ); 
 
@@ -212,6 +216,7 @@ listtype = { ...
          'polhemusY' ...
          'besa' ...
          'xyz' ...
+         'sfp' ...
          'loc' ...
          'sph' ...
          'chanedit' ...
@@ -222,13 +227,14 @@ listimportformat = { ...
       { } ... % polhemus (specific non-columnar implementation)
       { } ... % polhemus (specific non-columnar implementation)
       { 'labels' 'sph_theta_besa' 'sph_phi_besa' } ... % BESA/EGI format
-      { 'labels' '-Y' 'X' 'Z' } ... % xyz format
+      { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
+      { 'labels' '-Y' 'X' 'Z' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
       { 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
 
 listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
-      'sph_radius' 'sph_theta_besa' 'sph_phi_besa' 'gain' 'calib' ...
+      'sph_radius' 'sph_theta_besa' 'sph_phi_besa' 'gain' 'calib' 'type' ...
       'X' 'Y' 'Z' '-X' '-Y' '-Z' 'custom1' 'custom2' 'custom3' 'custom4' 'not def' };
 
 listskipline = [ ...
@@ -328,7 +334,7 @@ if isstr(filename)
        % ---------------------------------
        indexbeg = 1;
        while isempty(array{indexbeg,1}) | ...
-               (isstr(array{indexbeg,1}) & array{indexbeg,1}(1) == '#' )
+               (isstr(array{indexbeg,1}) & array{indexbeg,1}(1) == '%' )
            indexbeg = indexbeg+1;
        end;
        array = array(indexbeg:end,:);
@@ -449,6 +455,7 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, 'sph_phi_besa'), str = lower(str); return; end;
 	if strcmpi(str, 'gain'), str = lower(str); return; end;
 	if strcmpi(str, 'calib'), str = lower(str); return; end;
+	if strcmpi(str, 'type') , str = lower(str); return; end;
 	if strcmpi(str, 'X'), str = upper(str); return; end;
 	if strcmpi(str, 'Y'), str = upper(str); return; end;
 	if strcmpi(str, 'Z'), str = upper(str); return; end;
@@ -459,5 +466,5 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, 'custum2'), return; end;
 	if strcmpi(str, 'custum3'), return; end;
 	if strcmpi(str, 'custum4'), return; end;
-   error(['Readlocs: undefined field ''' str '''']);
+    error(['Readlocs: undefined field ''' str '''']);
    
