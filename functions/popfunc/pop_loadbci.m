@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/09/15 23:40:49  arno
+% fixed strmatch
+%
 % Revision 1.18  2004/08/30 23:57:50  arno
 % same
 %
@@ -121,6 +124,15 @@ function [EEG, command] = pop_loadbci(filename, srate);
         tmpdata = fscanf(fid, '%d', Inf);
         tmpdata = reshape(tmpdata, length(fields), length(tmpdata)/length(fields));
         
+        EEG.data = tmpdata;
+        EEG.chanlocs = struct('labels', fields);
+        EEG.nbchan = size(EEG.data, 1);
+        EEG.pnts   = size(EEG.data, 2);
+        EEG.trials = 1;
+        EEG.srate  = srate;
+        EEG = eeg_checkset(EEG);
+        return;
+
         % data channel range
         % ------------------
         indices = strmatch('ch', fields);
@@ -131,7 +143,8 @@ function [EEG, command] = pop_loadbci(filename, srate);
         end;
         bci.signal = tmpdata(indices,:);
     end;
-
+    
+    
     % ask for which event to import
     % -----------------------------
     geom = {[0.7 0.7 0.7]};
