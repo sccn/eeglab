@@ -24,6 +24,7 @@
 %Optional 'keyword' parameters:
 % 'latency'   - plot only a subset of latencies. The time point closest to the 
 %               latency given are plotted. Default = empty, all latencies.
+% 'frames'    - vector of frame indices to compute
 % 'resolution'- ['low' or 'high'], 'high' -> multiply the size of the image by 3 
 %               for subsequent antialiasing and high quality movie generation 
 %               {default: 'low'}
@@ -106,6 +107,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/09/10 22:26:20  arno
+% same
+%
 % Revision 1.13  2002/09/10 22:25:14  arno
 % debug
 %
@@ -192,6 +196,7 @@ try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
 try, g.colmapcoh;       catch, g.colmapcoh = hot(64); end; 
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
+try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = []; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
@@ -362,7 +367,7 @@ end;
 currentphase   = zeros( length(selected), length(selected), nbconditions);
 tmp = ALLERSP{1,1};
 nwin = size(tmp,2);
-
+	
 %for index = 1:64
 %	circle(1+index,1, 0.5, g.colormaphsv(index, :));
 %end;
@@ -421,7 +426,11 @@ if ~isempty(g.latency)
 		alltimepoints = [ alltimepoints tmptimepoint];
 	end;	
 else 
-	alltimepoints = 1:nwin;
+	if isempty(g.frames)
+		alltimepoints = 1:nwin;
+	else
+		alltimepoints = g.frames;
+	end;
 end;
 
 % compute flashes latency
