@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/09/04 22:26:03  luca
+% removing EEG.epoch mistmatch error message -arno
+%
 % Revision 1.21  2002/08/19 22:22:55  arno
 % default output var
 %
@@ -234,8 +237,9 @@ fprintf('pop_epoch():%d epochs selected\n', length(alllatencies));
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
-	case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [ceil(lim(1)*EEG.srate) ceil(lim(2)*EEG.srate)], 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
-	case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, 'srate', EEG.srate, 'allevents', tmpeventlatency);
+ case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [lim(1) lim(2)]*EEG.srate, 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
+  tmptime = tmptime/EEG.srate;
+ case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, 'srate', EEG.srate, 'allevents', tmpeventlatency);
 	otherwise, disp('pop_epoch(): invalid event time format'); beep; return;
 end;
 alllatencies = alllatencies(indices);
@@ -243,8 +247,8 @@ fprintf('pop_epoch():%d epochs generated\n', length(indices));
 
 % update other fields
 % -------------------
-EEG.xmin = lim(1);
-EEG.xmax = lim(2)-1/EEG.srate;
+EEG.xmin = tmptime(1);
+EEG.xmax = tmptime(2);
 EEG.pnts = size(EEG.data,2);
 EEG.trials = size(EEG.data,3);
 EEG.icaact = [];
@@ -271,10 +275,7 @@ for index=1:EEG.trials
     for indexevent = epochevent{index}
 		newevent(count)         = EEG.event(indexevent);
         newevent(count).epoch   = index;
-        switch lower( g.timeunit )
-	       case 'points',	newevent(count).latency = newevent(count).latency - alllatencies(index) - lim(1)*EEG.srate + 1 + EEG.pnts*(index-1);
-	       case 'seconds',  newevent(count).latency = newevent(count).latency - alllatencies(index) - lim(1) + EEG.pnts*(index-1)/EEG.srate;
-        end;
+	    newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
 		count = count + 1;
     end;
 end;

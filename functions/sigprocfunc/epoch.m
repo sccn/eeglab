@@ -2,8 +2,8 @@
 %
 % Usage:
 %   >> epocheddata = epoch( data, events, timelim);
-%   >> [epocheddata, newtime, indices, rerefevent, rereflatencies] = ...
-%           epoch( data, events, timelim, 'key1', value1, 'key2', value2 );
+%   >> [epocheddata, newtime, indices, rerefevent, rereflatencies ] = ...
+%                      epoch( data, events, timelim, 'key1', value1, ... );
 %
 % Inputs:
 %   data       - input data (chan,frames). In the case, data is a 
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/06 23:04:23  luca
+% debugging latencies when epoch suppressed
+%
 % Revision 1.3  2002/06/28 01:50:11  arno
 % minor editing
 %
@@ -86,7 +89,7 @@
 % 03-12-02 add the 3D epoch option -ad
 % 03-27-02 change time limits -ad
 
-function [epochdat, newtime, indexes, alleventout, alllatencyout] = epoch( data, events, lim, varargin );
+function [epochdat, newtime, indexes, alleventout, alllatencyout, reallim] = epoch( data, events, lim, varargin );
 
 if nargin < 2
    help epoch;
@@ -109,18 +112,25 @@ try, g.verbose; 	     catch, g.verbose = 'on'; end;
 try, g.allevents; 	     catch, g.allevents = []; end;
 try, g.alleventrange; 	 catch, g.alleventrange = lim; end;
 
+% computing point limits
+% ----------------------
+reallim(1) = round(lim(1)*g.srate);   % compute offset
+reallim(2) = round(lim(2)*g.srate-1); % compute offset
+
 % epoching
 % --------
 fprintf('Epoching...\n');
-newdatalength = round(lim(2)*g.srate-1) - round(lim(1)*g.srate)+1;
+newdatalength = reallim(2)-reallim(1)+1;
+
 epochdat = zeros( size(data,1), newdatalength, length(events) );
 g.allevents =  g.allevents(:)';
 datawidth  = size(data,2)*size(data,3);
 dataframes = size(data,2);
 indexes = zeros(length(events),1);
 for index = 1:length(events)
-   posinit = round(events(index)*g.srate + lim(1)*g.srate); % compute offset
-   posend  = round(events(index)*g.srate + lim(2)*g.srate-1); % compute offset
+	pos0 = round(events(index)*g.srate); % offset of time locking event
+	posinit = pos0+reallim(1); % compute offset
+	posend  = pos0+reallim(2); % compute offset
    
    if floor((posinit-1)/dataframes) == floor((posend-1)/dataframes) & posinit >= 1 & posend <= datawidth % test if within boundaries
       epochdat(:,:,index) = data(:,posinit:posend);
@@ -137,20 +147,21 @@ for index = 1:length(events)
    % rereference events
    % ------------------
    if ~isempty(g.allevents)
-        posinit = events(index)*g.srate + g.alleventrange(1)*g.srate; % compute offset
-        posend  = events(index)*g.srate + g.alleventrange(2)*g.srate; % compute offset
+        posinit = pos0 + g.alleventrange(1)*g.srate; % compute offset
+        posend  = pos0 + g.alleventrange(2)*g.srate; % compute offset
         eventtrial = intersect( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate <= posend) );
         alleventout{index} = eventtrial;
-        alllatencyout{index} = g.allevents(eventtrial)*g.srate-events(index)*g.srate; 
+        alllatencyout{index} = g.allevents(eventtrial)*g.srate-pos0; 
    end;
 end;   
-newtime(1) = lim(1)/g.srate;
-newtime(2) = (lim(2)-1)/g.srate;
+newtime(1) = reallim(1)/g.srate;
+newtime(2) = reallim(2)/g.srate;
 
 indexes = find(indexes == 1);
 epochdat = epochdat(:,:,indexes);
 alleventout = alleventout(indexes);
 alllatencyout= alllatencyout(indexes);
+reallim = reallim*g.srate;
 return;
 
 %% GENERATION OF NAN IN ARRAYS (old implementation)
@@ -164,3 +175,6 @@ return;
 %   alllatencyout = alllatencyout(indexes,:) - 1000000;
 %end;
 
+function res = lat2point( lat, srate, pnts);
+
+res = lat*srate+1 + (epoch_array-1)*pnts;
