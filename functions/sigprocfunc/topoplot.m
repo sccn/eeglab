@@ -23,9 +23,9 @@
 %   'interplimits'    - 'electrodes' to furthest electrode; 'head' to edge of
 %                        head {default 'head'}
 %   'gridscale'       -  scaling grid size {default 67}
-%   'dipole'          -  [XI YI XE YE] plot dipole on the top of the scalp
-%                        map from coordinate XI,YI to coordinates XE, YE (head is radius one).
-%                        If several rows, plot one dipole per row.
+%   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
+%                        map from coordinate XI,YI to coordinates XE, YE, ZE (head is 
+%                        radius one). If several rows, plot one dipole per row.
 %   'dipnorm'         - ['on'|'off'] normlaize deipole length. { default = 'off'}.
 %   'diplen'          - [real] scale dipole lenght. { default = 1 }.
 %   'dipscale'        - [real] scale dipole size. { default = 1 }.
@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/11/05 20:35:21  arno
+% dipole options
+%
 % Revision 1.61  2003/11/05 19:44:32  arno
 % header text
 %
@@ -778,10 +781,10 @@ if ~isempty(DIPOLE)
     color = 'k';
     DIPOLE(:,1:4)   = DIPOLE(:,1:4)*0.5;
     DIPOLE(:,[2,4]) = - DIPOLE(:,[2,4]);
-    DIPOLE(:,3:4)   = DIPOLE(:,3:4)/200;
+    DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
     if strcmpi(DIPNORM, 'on')
         for index = size(DIPOLE,1)
-            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:4))*0.05;
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.05;
         end;
     end; 
     DIPOLE(:, 3:4) =  DIPOLE(:, 3:4)*DIPLEN;
