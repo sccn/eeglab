@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/05/06 21:57:49  arno
+% fixing coordinates for the 3 views
+%
 % Revision 1.44  2003/05/02 19:03:23  arno
 % same thing
 %
@@ -328,9 +331,9 @@ g.freqparams = { ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ALLEEG(1)
 nbconditions = length(ALLEEG);
 
 if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
-        ( strcmpi(g.mode, 'auto') & ~exist([g.tffolder g.tfname '_freqs']))
+        ( strcmpi(g.mode, 'auto') & ~exist([g.tffolder g.tfname '_freqs.mat']))
     if strcmpi(g.mode, 'auto')
-        fprintf('Auto mode: %s file does not exist, running time-freq. decomposition\n', [g.tffolder g.tfname '_freqs']);
+        fprintf('Auto mode: %s file does not exist, running time-freq. decomposition\n', [g.tffolder g.tfname '_freqs.mat']);
     end;
     if strcmp(g.confirm, 'on')
         disp('********** USER ATTENTION REQUIRED ************');
