@@ -34,7 +34,7 @@
 %
 %   Ex:  [EEGTARGETS,target_indices] = getevent(EEG,'type',[1 6 11 16 21]);
 %
-%        % Returns ONLY THOSE epochs containing the 5 specified
+%        % Returns ONLY THOSE epochs containing any of the 5 specified
 %          types of target events.
 %
 % Note: By default, if several optional inputs are given, the function
@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/09/05 16:33:28  arno
+% remove warning
+%
 % Revision 1.20  2002/08/28 00:57:19  arno
 % [Amodifying error message
 %
