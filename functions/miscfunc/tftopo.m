@@ -22,7 +22,8 @@
 %  'limits'    = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
 %                Omit, or use nan's to use tfdata limits. Ex: [nan nan -100 400];
 %  'signifs'   = Significance level(s) (e.g., from timef()), for zero'ing non-significant 
-%                tfdata. Size must be (1 or 2,freq, chans, subjects). If first dimension is
+%                tfdata. Size must be (1 or 2, freq, chans, subjects) or 
+%                (1 or 2, freq, times, chans, subjects). If first dimension is
 %                of size 1, tfdata is assumed to contain positive values   {default: none}
 %  'sigthresh' = [integer], i.e. [K L] after masking time-frequency decomposition using 
 %                'signifs' array, concatenate time/freq values only if more than K electrodes
@@ -71,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/08/28 17:41:21  arno
+% debuging the first dimension for significance
+%
 % Revision 1.61  2003/08/27 21:49:48  arno
 % fixing mode error
 %
@@ -348,7 +352,7 @@ if g.sigthresh(2) > size(tfdata,4)
 end;
 if ~isempty(g.signifs)
     if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
-            size(g.signifs,3) ~= size(tfdata,3)| size(g.signifs,3) ~= size(tfdata,3)
+            (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
         fprintf('tftopo(): error in ''signifs'' array size not compatible with data size.\n');
         return
     end
@@ -415,11 +419,21 @@ if ~isempty(g.signifs)
     fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
     for subject = 1:size(tfdata,4)
         for elec = 1:size(tfdata,3)
+            
             if size(g.signifs,1) == 2
-                tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
-                          (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+                if ndims(g.signifs) > ndims(tfdata)
+                    tmpfilt = (tfdata(:,:,elec,subject) >= squeeze(g.signifs(2,:,:,elec, subject))') | ...
+                              (tfdata(:,:,elec,subject) <= squeeze(g.signifs(1,:,:,elec, subject))');
+                else
+                    tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
+                              (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+                end;
             else
-                tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+                if ndims(g.signifs) > ndims(tfdata)
+                    tmpfilt = (tfdata(:,:,elec,subject) >= squeeze(g.signifs(1,:,:,elec, subject))');
+                else
+                    tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+                end;
             end;                
             tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
         end;
@@ -669,3 +683,4 @@ function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
     end;
 
     %tfdatnew = convn(tfdatnew, gauss2, 'same'); % is equivalent to the loop for slowlier
+
