@@ -11,7 +11,7 @@
 %                Default is 2-D polar coordinates (see >> help topoplot )
 %
 % Optional inputs:
-%   'filetype'  - ['loc'|'sph'|'sfp'|'xyz'|'polhemus'|'besa'|'chanedit'|'custom'] 
+%   'filetype'  - ['loc'|'sph'|'sfp'|'xyz'|'asc'|'polhemus'|'besa'|'chanedit'|'custom'] 
 %                 Type of the file to read. By default the file type is determined 
 %                 using the file extension (see below under File Formats):
 %                  'loc' - an EEGLAB 2-D polar coordinates channel locations file 
@@ -22,6 +22,7 @@
 %                  'sfp' - EGI cartesian coordinates (not Matlab cartesian - see below).
 %                  'xyz' - MATLAB/EEGLAB cartesian coordinates (Not EGI cartesian; 
 %                          z is toward nose; y is toward left ear; z is toward vertex).
+%                  'asc' - Neuroscan polar coordinate file.
 %                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded with 
 %                          'X' on sensor pointing to subject (see below and readelp()).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
@@ -123,6 +124,8 @@
 %                         3        0           .719      .695    C3
 %                         4        0          -.719      .695    C4
 %                           ...
+%   '.asc':     
+%               Neuroscan-.'asc' cartesian polar coordinates text file.
 %   '.sfp': 
 %               BESA/EGI-xyz cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
@@ -144,8 +147,8 @@
 %               The last columns of the file may contain any other defined field (gain,
 %               calib, type, custom).
 %
-% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
-% (expanded from the ICA toolbox function)
+% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002 (expanded from the ICA 
+%         toolbox function)
 %
 % See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
 
@@ -168,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/01/30 16:45:12  arno
+% debugging ced format
+%
 % Revision 1.37  2003/01/10 17:40:11  arno
 % removing trailing dots
 %
@@ -245,6 +251,7 @@ listtype = { ...
          'sfp' ...
          'loc' ...
          'sph' ...
+         'asc' ...
          'chanedit' ...
          'custom' };
    
@@ -256,6 +263,7 @@ listimportformat = { ...
       { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
       { 'labels' '-Y' 'X' 'Z' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
+      { } ... % ascii Neuroscan format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
       { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
 
@@ -268,6 +276,7 @@ listskipline = [ ...
    0 ... % polhemus, not applicable
    0 ... % polhemus, not applicable
    -1 ...  % besa
+   0 ...
    0 ...
    0 ...
    0 ...
@@ -307,6 +316,7 @@ if isstr(filename)
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';disp( [ 'WARNING: Polhemus carthesian coords "elp" file extension' ... 
                                        ' detected; if importing BESA spherical coords. force to type "besa" instead'] );
+        case 'asc', g.filetype = 'asc';
         case 'eps', g.filetype = 'besa';
         case 'sfp', g.filetype = 'sfp';
         otherwise, g.filetype =  ''; 
@@ -330,7 +340,9 @@ if isstr(filename)
    
    % import file
    % -----------
-   if strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
+   if strcmp(lower(g.filetype), 'asc')
+       eloc = readneurolocs( filename );
+   elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
            strcmp(lower(g.filetype), 'polhemus')
        [eloc labels X Y Z]= readelp( filename );
        if strcmp(lower(g.filetype), 'polhemusy')
