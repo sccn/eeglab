@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/11/13 00:54:49  arno
+% replace gcf by fig
+%
 % Revision 1.34  2002/10/23 15:06:40  arno
 % isppc -> computer
 %
@@ -247,7 +250,7 @@ for row = 1:length(geomx)
 			return;
 		end;		
 		if ~isempty(currentelem)
-			rowhandle(column) = uicontrol( 'unit', 'normalized', 'position', ...
+			rowhandle(column) = uicontrol(fig, 'unit', 'normalized', 'position', ...
 						                      [posx posy width height].*s+q, currentelem{:});
 						
 			% this simply compute a factor so that all uicontrol will be visible
