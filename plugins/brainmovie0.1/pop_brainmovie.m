@@ -28,6 +28,10 @@
 %               timef and crossf. The first parameter must be the number of
 %               cycles. Default is { 3, 'winsize' 96, 'padratio', 4, 'maxfreq', 25,
 %               'alpha', 0.01, 'subitc', 'on' }.
+%  'threshold'  - [ersp itc crossf] threshold for showing ersp, itc, and crossf.
+%               Default is [0.1 0.1 0.1].
+%  'continuity' - [integer] minimum number of significant contiguous frames. All
+%               sparse frames (below this number) are removed. Default is 3 frames.
 %  'diffmovie'  - ['on'|'off'] plot the difference movie or simply the movie for
 %               the given datasets. For the difference movies, there must only
 %               be two input datasets (ALLEEG length must be equal to 2). The movie
@@ -109,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/06/23 17:16:40  arno
+% remove debug message
+%
 % Revision 1.55  2003/06/23 17:16:11  arno
 % nothing
 %
@@ -306,6 +313,8 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'circfactor'  'real'          []                                       [];
                             'title'       'string'        []                                       '';
                             'freqs'       'real'          []                                       [];
+                            'continuity'  'integer'       [1 Inf]                                  [];
+                            'threshold'   'float'         [0 Inf]                                  [];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'makemovie'   'cell'          {}                                       {};
@@ -416,6 +425,9 @@ end;
 % threshold activities (so that lines do not flash)
 % -------------------------------------------------
 try, 
+    if ~isempty(g.continuity) | ~isempty(g.threshold)
+        error('go to thresholding');
+    end;
 	if exist([g.tffolder g.tfname]) == 2
         eval(['load -mat ' g.tffolder g.tfname '.thresh' ]);
 	else 
@@ -425,9 +437,12 @@ try,
         eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
     end;
 catch,
-	newERSP   = moviethresh( ALLERSP, 0.1, 3, 2);
-	newITC    = moviethresh( ALLITC , 0.1, 3, 2);
-	newCROSSF = moviethresh( ALLCROSSF, 0.1, 3, 2);
+    if isempty(g.continuity), g.continuity = 3; end;
+    if isempty(g.threshold),  g.threshold = [0.1 0.1 0.1]; end;
+    
+	newERSP   = moviethresh( ALLERSP, g.threshold(1), g.continuity, 2);
+	newITC    = moviethresh( ALLITC , g.threshold(2), g.continuity, 2);
+	newCROSSF = moviethresh( ALLCROSSF, g.threshold(3), g.continuity, 2);
 	newANGLE  = ALLCROSSFANGLE;
 	%newERSP   = ALLERSP;
 	%newITC    = ALLITC;
