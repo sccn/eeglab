@@ -48,7 +48,7 @@
 %                  a channel location file from disk. If called from the eeglab() menu or
 %                  pop_eegplot(), the channel labels of the dataset will be used. 
 %                  Command line equivalent: 'eloc_file'
-%    "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off (for time and/or
+%     "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off for time and
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
 %                  Else, draw a rectange in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2003/06/28 02:04:36  arno
+% debuging zoom and scale
+%
 % Revision 1.79  2003/05/23 16:05:47  arno
 % debug last
 %
