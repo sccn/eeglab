@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2004/01/29 16:56:30  scott
+% same
+%
 % Revision 1.48  2004/01/29 16:55:29  scott
 % same
 %
@@ -970,7 +973,8 @@ if strcmpi(g.dispmaps, 'on')
         
         axes(axall)
         set(axall,'Color',axcolor);
-        text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+        tmp = text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+	set(tmp, 'interpreter', 'none');
         text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
         text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
     end;
