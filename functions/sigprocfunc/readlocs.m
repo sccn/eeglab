@@ -31,6 +31,7 @@
 %               3    0.3956         0   -0.9184      C3
 %               4    0.3956         0    0.9184      C4
 %                 more lines ...
+%   '.txt' - read ascii files saved using pop_editchan()
 %   '.elp' - Polhemus coordinate file (uses readelp())
 %
 % Outputs:
@@ -68,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/01 01:15:31  arno
+% removing topo optimization
+%
 % Revision 1.2  2002/04/18 15:17:25  scott
 % editted help msg -sm
 %
@@ -134,6 +138,19 @@ if isstr(filename)
 			  eloc(index).radius = radius(index);
 			  eloc(index).labels = labels{index};
             end;
+	     case 'txt', 
+		    if isempty(array(end,1)), totlines = size( array, 1)-1; else totlines = size( array, 1); end;
+			for index = 2:totlines
+				if ~isempty(array{index,2}) eloc(index-1).labels  = array{index, 2}; end;
+				if ~isempty(array{index,3}) eloc(index-1).theta = array{index, 3}; end;
+				if ~isempty(array{index,4}) eloc(index-1).radius  = array{index, 4}; end;
+				if ~isempty(array{index,5}) eloc(index-1).X = array{index, 5}; end;
+				if ~isempty(array{index,6}) eloc(index-1).Y = array{index, 6}; end;
+				if ~isempty(array{index,7}) eloc(index-1).Z = array{index, 7}; end;
+				if ~isempty(array{index,8}) eloc(index-1).sph_theta = array{index, 8}; end;
+				if ~isempty(array{index,9}) eloc(index-1).sph_phi   = array{index, 9}; end;
+				if ~isempty(array{index,10}) eloc(index-1).sph_radius   = array{index, 10}; end;
+			end;
         otherwise, error('Readlocs(): unrecognized file extension');
     end;
     for index = 1:length( eloc )
