@@ -76,6 +76,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/18 01:46:00  arno
+% debugging new version
+%
 % Revision 1.2  2002/11/18 00:53:43  arno
 % new version
 %
@@ -108,12 +111,12 @@ for numcompo = 1:nbcompo
 	if iscell(data)
         [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
                                                       frames, tlimits, srate, cycle, varargin{:});   
-        ALLERSP1{numcompo,1}     = applyboot( ersp{1}, erspboot{1});
-        ALLERSP2{numcompo,1}     = applyboot( ersp{2}, erspboot{2});
-        ALLERSPDIFF{numcompo,1}  = applyboot( ersp{3}, erspboot{3});
-        ALLITC1{numcompo,1}      = applyboot( abs(itc{1}) , itcboot{1});
-        ALLITC2{numcompo,1}      = applyboot( abs(itc{2}) , itcboot{2});
-        ALLITCDIFF{numcompo,1}   = applyboot( abs(itc{3}) , itcboot{3});
+        ALLERSP{numcompo,1}     = applyboot( ersp{1}, erspboot{1});
+        ALLERSP{numcompo,2}     = applyboot( ersp{2}, erspboot{2});
+        ALLERSP{numcompo,3}     = applyboot( ersp{3}, erspboot{3});
+        ALLITC {numcompo,1}     = applyboot( abs(itc{1}) , itcboot{1});
+        ALLITC {numcompo,2}     = applyboot( abs(itc{2}) , itcboot{2});
+        ALLITC {numcompo,3}     = applyboot( abs(itc{3}) , itcboot{3});
     else
         [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
                                                       frames, tlimits, srate, cycle, varargin{:});   
@@ -138,12 +141,12 @@ for index1 = 1:nbcompo
                 [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
                                                                   { data1(index2,:) data2(index2,:)}, frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
-                ALLCROSSF1     { index1, index2 } = applyboot(abs(coh{1}), cohboot{1});
-                ALLCROSSF2     { index1, index2 } = applyboot(abs(coh{2}), cohboot{2});
-                ALLCROSSFDIFF  { index1, index2 } = applyboot(abs(coh{3}), cohboot{3});
-                ALLCROSSFANGLE1{ index1, index2 } = cohangles{1};
-                ALLCROSSFANGLE2{ index1, index2 } = cohangles{2};
-                ALLCROSSFANGLEDIFF{ index1, index2 } = cohangles{3};
+                ALLCROSSF      { index1, index2, 1 } = applyboot(abs(coh{1}), cohboot{1});
+                ALLCROSSF      { index1, index2, 2 } = applyboot(abs(coh{2}), cohboot{2});
+                ALLCROSSF      { index1, index2, 3 } = applyboot(abs(coh{3}), cohboot{3});
+                ALLCROSSFANGLE { index1, index2, 1 } = cohangles{1};
+                ALLCROSSFANGLE { index1, index2, 2 } = cohangles{2};
+                ALLCROSSFANGLE { index1, index2, 3 } = cohangles{3};
             else
                 [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
@@ -156,12 +159,6 @@ for index1 = 1:nbcompo
             end;
 		end;
 	end;
-end;
-if iscell(data)
-    ALLERSP    = { ALLERSP1    ALLERSP2    ALLERSPDIFF };
-    ALLITC     = { ALLITC1     ALLITC2     ALLITCDIFF  };
-    ALLCROSSF  = { ALLCROSSF1  ALLCROSSF2  ALLCROSSFDIFF  };
-    ALLCROSSFANGLE  = { ALLCROSSFANGLE1  ALLCROSSFANGLE2  ALLCROSSFANGLEDIFF  };
 end;
 
 return;
