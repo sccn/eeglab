@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2004/09/08 20:55:32  scott
+% same
+%
 % Revision 1.35  2004/09/08 02:46:47  scott
 % same
 %
@@ -702,7 +705,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
                     xmn = xdiff/2+xmin;
-                    figure(curfig);axis('off'),h=text(xmn,ymax+0.05*ymax,[channames(c,:)]); 
+                    figure(curfig);axis('off'),h=text(double(xmn),double(ymax+0.05*ymax),[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
                     set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
