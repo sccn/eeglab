@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2003/07/28 15:30:31  arno
+% default for EEG.ref
+%
 % Revision 1.102  2003/07/28 15:19:09  arno
 % detect reference electrode
 %
@@ -591,6 +594,9 @@ end;
             EEG.event(index).urevent = index;
         end;
     end;
+    if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'urevent')
+        EEG.urevent = rmfield(EEG.urevent, 'urevent');
+    end;
     
      % deal with epoch arrays
     % ----------------------
@@ -894,6 +900,9 @@ if ~isempty( varargin)
          case 'makeur', 
           if ~isempty(EEG.event)
               disp('eeg_checkset note: creating backup event table (urevent)');
+              if isfield(EEG. event, 'urevent'), 
+                  EEG.event = rmfield(EEG.event, 'urevent');
+              end;
               EEG.urevent = EEG.event;
               for index = 1:length(EEG.event)
                   EEG.event(index).urevent = index;
