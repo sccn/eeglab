@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/10 00:03:03  arno
+% debuging event consistency
+%
 % Revision 1.8  2002/04/09 21:02:05  arno
 % adding further check to eventconsistency
 %
@@ -485,6 +488,7 @@ if ~isempty( varargin)
 					% uniformize fields content for the different epochs
 					% --------------------------------------------------
 					difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
+					arraytmpinfo = {};
 					for index = 1:length(difffield)
 						% get the field content
 						% ---------------------
