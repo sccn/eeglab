@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2002/08/11 22:50:38  arno
+% change background
+%
 % Revision 1.104  2002/08/11 19:17:38  arno
 % removing eeg_const eeg_updatemenu
 %
@@ -700,7 +703,7 @@ eeglab('redraw');
 function eeg_mainfig;
 
 icadefs;
-COLOR = BACKCOLOR;
+COLOR = BACKEEGLABCOLOR;
 WINMINX         = 17;
 WINMAXX         = 260;
 WINYDEC			= 13;
