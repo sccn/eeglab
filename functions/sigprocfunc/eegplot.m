@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/07/31 16:53:36  arno
+% changing button size
+%
 % Revision 1.27  2002/07/31 16:08:35  arno
 % debugging epoch problem
 %
@@ -1173,10 +1176,10 @@ else
     orgspacing= g.spacing;
     if p1 == 1
       	g.spacing= g.spacing+ 0.1*orgspacing; % increase g.spacing(5%)
-    	elseif p1 == 2
-      		g.spacing= max(0,g.spacing-0.1*orgspacing); % decrease g.spacing(5%)
+	elseif p1 == 2
+		g.spacing= max(0,g.spacing-0.1*orgspacing); % decrease g.spacing(5%)
     end
-    if round(g.spacing) == 0
+    if round(g.spacing*100) == 0
         maxindex = min(10000, g.frames);  
         g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
     end;
