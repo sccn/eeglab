@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/09/05 15:38:39  arno
+% debug for new functions
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -278,7 +281,7 @@ figure('Position',pos+4*off);
 %   [projdata] = plotproj(data,weights,compnums, ...
 %                            title,limits,chanlist,channames,colors);
  [projdata] = plotproj(data(:,1:frames),weights*sphere,windex(1:10), ...
-               'First epoch (comps. 1-10)',limits,[1:10],'chan.nam');
+               'First epoch (comps. 1-10)',limits,[1:10],'chan.locs');
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
