@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 22:05:43  arno
+% making the function standalone
+% ,
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -52,9 +56,13 @@ if nargin < 2
 	return;
 end;
 if isempty(EEG(set_in).data)
-    disp('Pop_copyset error: cannot copy empty dataset'); return;
-end;    
-if nargin < 1
+    error('Pop_copyset error: cannot copy empty dataset'); return;
+end;
+if set_in == 0
+    error('Pop_copyset error: cannot copy dataset'); return;
+end;
+
+if nargin < 3
 	% which set to save
 	% -----------------
 	promptstr    = { 'Enter the destination dataset:' };
