@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2002/11/12 22:51:55  arno
+% adding a warning for additional reference electrode location
+%
 % Revision 1.77  2002/11/11 15:28:54  arno
 % besa check
 %
@@ -630,6 +633,13 @@ if ~isempty( EEG.chanlocs )
 	        EEG.chanlocs = [];
 	        res = com;
 	    end;
+        if ~isstr(EEG.chanlocs(1).labels)
+            for index = 1:length(EEG.chanlocs)
+                if ~isstr(EEG.chanlocs(index).labels)
+                    EEG.chanlocs(index).labels = int2str(EEG.chanlocs(index).labels);
+                end;
+            end;
+        end;
     end;
 end;
 
