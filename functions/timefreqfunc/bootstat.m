@@ -1,14 +1,18 @@
 % bootstat() - accumulate surrogate data to compare two conditions 
 %
 % Usage:
-%     >> [accarray, rsignif] = bootstat(arg1, arg2, formula, varargin ...);
+%     >> [rsignif,accarray] = bootstat(arg1, arg2, formula, varargin ...);
 %
 % Inputs:
-%    arg1    - [array] 2-D or 3-D array of values
-%    arg2    - [array] 2-D or 3-D array of values
+%    arg1    - [array] 1-D, 2-D or 3-D array of values
+%    arg2    - [array] 1-D, 2-D or 3-D array of values
 %    formula - [string] formula to compute the given measure. Takes arguments
 %              'arg1', 'arg2' as inputs and 'res' (result, by default) as 
-%              output. i.e.    'res = res + arg1 .* conj(arg2)'
+%              output. The formula has to iterative for more than 1-D arrays so
+%              shuffling can occur at each step while scanning the last dimension
+%              of the arrays. 
+%              For 1-D arrays: 'res = mean( arg1 .* arg2)'
+%              For 2-D or 3-D arrays: 'res = res + arg1 .* conj(arg2)'
 %
 % Optional inputs:
 %   'boottype '   - ['first'|'second'|'both'|'both2'] 
@@ -32,8 +36,8 @@
 %                 is 2 for 'both' and 1 for 'upper'). Default is 'both'.
 %   'basevect'    - [integer vector] time vector indices for baseline. Default 
 %                 is all time points.
-%   'accarray'    - accumulation array (from previous calls). Allows computing
-%                 only the 'rsignif' output.
+%   'accarray'    - accumulation array (from a previous call). Allows computing
+%                 the 'rsignif' output faster.
 %   'formulainit' - [string] for initializing variable. i.e. 'res = zeros(10,40);'
 %                 Default is initializing  'res = (size(arg1,3) x naccu)'
 %   'formulapost' - [string] after the accumulation. i.e. 'res = res /10;'
@@ -41,9 +45,9 @@
 %   'formulaout'  - [string] name of the computed variable. Default is 'res'.
 %
 % Outputs: 
-%    accres  - result for shuffled data
-%    res1    - result for first condition
-%    res2    - result for second condition
+%    rsignif    - significance arrays. 2 values (low high) for each points (use
+%                 'alpha' to change these limits).
+%    accarray   - result for accumulated values.
 %
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
@@ -69,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/01/06 19:46:21  arno
+% debugging new bootstrap
+%
 % Revision 1.5  2003/01/06 19:26:56  arno
 % implementing new bootstrap type
 %
@@ -110,46 +117,37 @@ if ~isstr(formula)
 	error('The first argument must be a string formula');
 end;
 
-Boot = finputcheck(varargin, ...
+g = finputcheck(varargin, ...
                 { 'dims'          'integer'  []                       []; ...
                   'naccu'         'integer'  [0 10000]                200; ...
                   'bootside'      {'cell' 'string'}   {'both' 'upper'}         'both'; ...
                   'basevect'      'integer'  []                       []; ...
                   'formulapost'   'string'   []                       ''; ...
-                  'formulainit'   'string'   []                       'res = zeros(nb_points,Boot.naccu);'; ...
+                  'formulainit'   'string'   []                       'res = zeros(nb_points,g.naccu);'; ...
                   'formulaout'    {'cell' 'string'} []                       'res'; ...
 				  'boottype'      'string'  {'first' 'second' 'both' 'times' 'trials' 'timestrials' 'timestrials2' 'both2'} 'both'; ...
 				  'alpha'         'real'     [0 1]                    0.05; ...
 				  'accarray'      'integer'  []                       NaN	});
-if isstr(Boot)
-	error(Boot);
+if isstr(g)
+	error(g);
 end;
-bootname = Boot.boottype;
+bootname = g.boottype;
 unitname = '';
-switch Boot.boottype
- case 'times',  Boot.boottype = 'first'; unitname = 'trials'; bootname = 'times';
- case 'trials', Boot.boottype = 'second'; unitname = 'times'; bootname = 'trials';
- case 'timestrials',  Boot.boottype = 'both'; unitname = 'trials'; bootname = 'timestrials';
- case 'timestrials2', Boot.boottype = 'both2'; unitname = 'trials'; bootname = 'timestrials';
+switch g.boottype
+ case 'times',  g.boottype = 'first'; unitname = 'trials'; bootname = 'times';
+ case 'trials', g.boottype = 'second'; unitname = 'times'; bootname = 'trials';
+ case 'timestrials',  g.boottype = 'both'; unitname = 'trials'; bootname = 'timestrials';
+ case 'timestrials2', g.boottype = 'both2'; unitname = 'trials'; bootname = 'timestrials';
 end;
-if ~iscell(Boot.formulaout)
-    Boot.formulaout = { Boot.formulaout };
+if ~iscell(g.formulaout)
+    g.formulaout = { g.formulaout };
 end;
-if ~iscell(Boot.bootside)
-    Boot.bootside = { Boot.bootside };
+if ~iscell(g.bootside)
+    g.bootside = { g.bootside };
 end;    
-if isempty(Boot.accarray)
-	Boot.accarray = NaN;
+if isempty(g.accarray)
+	g.accarray = NaN;
 end;
-
-%   Boot.Rboot       = zeros(nb_points,naccu);  % summed bootstrap coher
-%	Boot.boottype    = boottype;
-%	Boot.baselength  = baselength;
-%	Boot.baseboot    = baseboot;
-%	Boot.Coherboot   = Coherboot;
-%	Boot.naccu       = naccu;
-%	Boot.alpha       = alpha;
-%	Boot.rboot       = rboot;
 
 % function for bootstrap computation
 % ----------------------------------
@@ -159,22 +157,48 @@ end;
 %times     = size(oriarg1, 2);
 %nb_points = size(oriarg1, 3);
 
-if isempty(Boot.basevect)
-	Boot.basevect = 1:times;
+if isempty(g.basevect)
+	g.basevect = 1:times;
 end;
 
-fprintf('\nBootstrap baseline length is %d (out of %d) points\n', length(Boot.basevect), times);
+% vector of only one dimension
+% -----------------------------
+if size(oriarg1,1) == 1 | size(oriarg1,2) == 1
+    if isnan(g.accarray)
+        fprintf('Bootstrap type is 1-D\n');
+        fprintf('Processing %d bootstrap accumulation\n', g.naccu);
+        oriarg1 = oriarg1(g.basevect);
+        oriarg2 = oriarg2(g.basevect);
+        arg1 = oriarg1;
+        for index = 1:g.naccu
+            arg2 = shuffle(oriarg2);
+            eval([ formula ';' ]);
+            eval([ 'Rbootout(index) = ' g.formulaout{1} ';' ]);
+        end
+    else 
+        Rbootout = g.accarray;
+    end;
+    tmpsort = sort(abs(Rbootout));
+    i = g.alpha*g.naccu;
+    sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
+    if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
+    accarrayout = sigval;
+    return;
+end;    
 
-if isnan(Boot.accarray)
-	eval( Boot.formulainit );
-	if strcmpi( Boot.boottype, 'second') % get g.naccu bootstrap estimates for each time window
+% array of 2 or 3 dimensions
+% --------------------------
+fprintf('\nBootstrap baseline length is %d (out of %d) points\n', length(g.basevect), times);
+if isnan(g.accarray)
+	eval( g.formulainit );
+	if strcmpi( g.boottype, 'second') % get g.naccu bootstrap estimates for each time window
         fprintf('Bootstrap type is 3-D, shuffling oalong dimension 3 only.\n');
-		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu, unitname, times(end));
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, g.naccu, unitname, times(end));
 		
-		arg2 = zeros(nb_points, Boot.naccu);
-		arg1 = zeros(nb_points, Boot.naccu);
-        for index= 1:length(Boot.formulaout) 
-            eval( ['accarray' int2str(index) '= zeros(nb_points, Boot.naccu, times);'] );
+		arg2 = zeros(nb_points, g.naccu);
+		arg1 = zeros(nb_points, g.naccu);
+        for index= 1:length(g.formulaout) 
+            eval( ['accarray' int2str(index) '= zeros(nb_points, g.naccu, times);'] );
         end;
 		
 		for index=1:times % dim2
@@ -182,7 +206,7 @@ if isnan(Boot.accarray)
 			if rem(index,120) == 0, fprintf('\n'); end
 			for allt=1:trials % dim1
 				j=1;
-				while j<=Boot.naccu
+				while j<=g.naccu
 					t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
 					arg1(:,j) = oriarg1(:, index, t(1));
 					arg2(:,j) = oriarg2(:, index, t(2));
@@ -190,31 +214,31 @@ if isnan(Boot.accarray)
 					j = j+1;
 				end
 				eval([ formula ';' ]);
-				%Boot.Coherboot = cohercomp(Boot.Coherboot, tmpsX, tmpsY, 1, 1:Boot.naccu);
+				%g.Coherboot = cohercomp(g.Coherboot, tmpsX, tmpsY, 1, 1:g.naccu);
 			end;
-			if ~isempty(Boot.formulapost)
-				eval([ Boot.formulapost ';' ]);
+			if ~isempty(g.formulapost)
+				eval([ g.formulapost ';' ]);
 			end;
-			%Boot.Coherboot = cohercomppost(Boot.Coherboot);  % CHECK IF NECSSARY FOR ALL BOOT TYPE
-            for index2= 1:length(Boot.formulaout) 
-                eval([ 'accarray' int2str(index2) '(:,:,index) = ' Boot.formulaout{index2} ';' ]);
+			%g.Coherboot = cohercomppost(g.Coherboot);  % CHECK IF NECSSARY FOR ALL BOOT TYPE
+            for index2= 1:length(g.formulaout) 
+                eval([ 'accarray' int2str(index2) '(:,:,index) = ' g.formulaout{index2} ';' ]);
             end;
 		end;
-	elseif strcmpi(Boot.boottype, 'both') % handle timestrials bootstrap
+	elseif strcmpi(g.boottype, 'both') % handle timestrials bootstrap
         fprintf('Bootstrap type is 2-D, shuffling along dimension 2 and 3\n');
-		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
-        arg1 = zeros(nb_points, Boot.naccu);
-		arg2 = zeros(nb_points, Boot.naccu );
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, g.naccu,unitname,trials);
+        arg1 = zeros(nb_points, g.naccu);
+		arg2 = zeros(nb_points, g.naccu );
 		for allt=1:trials
 			if rem(allt,10) == 0,  fprintf(' %d',allt); end
 			if rem(allt,120) == 0, fprintf('\n'); end
 			
             j=1;
-			while j<=Boot.naccu
+			while j<=g.naccu
 				t = ceil(rand([1 2])*trials); % random ints [1,trials]
 				
-				s = ceil(rand([1 2])* length(Boot.basevect)); % random ints [1,times]
-				s = Boot.basevect(s);
+				s = ceil(rand([1 2])* length(g.basevect)); % random ints [1,times]
+				s = g.basevect(s);
 					
 				arg1(:,j) = oriarg1(:,s(1),t(1));
 				arg2(:,j) = oriarg2(:,s(2),t(2));
@@ -222,27 +246,27 @@ if isnan(Boot.accarray)
 			end
 			eval([ formula ';' ]);
 		end
-		if ~isempty(Boot.formulapost)
-			eval([ Boot.formulapost ';' ]);
+		if ~isempty(g.formulapost)
+			eval([ g.formulapost ';' ]);
 		end;
-        for index= 1:length(Boot.formulaout) 
-            eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
+        for index= 1:length(g.formulaout) 
+            eval([ 'accarray' int2str(index) ' = ' g.formulaout{index} ';' ]);
         end;
-	elseif strcmpi(Boot.boottype, 'both2') % handle timestrials bootstrap, shuffle time only once
+	elseif strcmpi(g.boottype, 'both2') % handle timestrials bootstrap, shuffle time only once
         fprintf('Bootstrap type is 2-D, shuffling along dimension 2 and 3 (once per accumulation for 3)\n');
-		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
-        arg1 = zeros(nb_points, Boot.naccu);
-		arg2 = zeros(nb_points, Boot.naccu );	
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, g.naccu,unitname,trials);
+        arg1 = zeros(nb_points, g.naccu);
+		arg2 = zeros(nb_points, g.naccu );	
         
-        s = ceil(rand([1 2])* length(Boot.basevect)); % random ints [1,times]
-        s = Boot.basevect(s);
+        s = ceil(rand([1 2])* length(g.basevect)); % random ints [1,times]
+        s = g.basevect(s);
         
         for allt=1:trials
 			if rem(allt,10) == 0,  fprintf(' %d',allt); end
 			if rem(allt,120) == 0, fprintf('\n'); end
 			
             j=1;
-			while j<=Boot.naccu
+			while j<=g.naccu
 				t = ceil(rand([1 2])*trials); % random ints [1,trials]
 				arg1(:,j) = oriarg1(:,s(1),t(1));
 				arg2(:,j) = oriarg2(:,s(2),t(2));
@@ -250,23 +274,23 @@ if isnan(Boot.accarray)
 			end
 			eval([ formula ';' ]);
 		end
-		if ~isempty(Boot.formulapost)
-			eval([ Boot.formulapost ';' ]);
+		if ~isempty(g.formulapost)
+			eval([ g.formulapost ';' ]);
 		end;
-        for index= 1:length(Boot.formulaout) 
-            eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
+        for index= 1:length(g.formulaout) 
+            eval([ 'accarray' int2str(index) ' = ' g.formulaout{index} ';' ]);
         end;
-	elseif strcmpi(Boot.boottype, 'first') % boottype is 'times'
+	elseif strcmpi(g.boottype, 'first') % boottype is 'times'
         fprintf('Bootstrap type is 2-D, shuffling along dimension 2 only\n');
-		fprintf('Processing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, Boot.naccu,unitname,trials);
-		arg1 = zeros(nb_points, Boot.naccu);
-		arg2 = zeros(nb_points, Boot.naccu );
+		fprintf('Processing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, g.naccu,unitname,trials);
+		arg1 = zeros(nb_points, g.naccu);
+		arg2 = zeros(nb_points, g.naccu );
 		for allt=1:trials
 			if rem(allt,10) == 0,  fprintf(' %d',allt); end
 			if rem(allt,120) == 0, fprintf('\n'); end
 			j=1;
-			while j<=Boot.naccu
-				goodbasewins = Boot.basevect; 
+			while j<=g.naccu
+				goodbasewins = g.basevect; 
 				ngdbasewins = length(goodbasewins);
 				s = ceil(rand([1 2])*ngdbasewins); % random ints [1,times]
 				s=goodbasewins(s);
@@ -277,15 +301,15 @@ if isnan(Boot.accarray)
 			end
 			eval([ formula ';' ]);
 		end
-		if ~isempty(Boot.formulapost)
-			eval([ Boot.formulapost ';' ]);
+		if ~isempty(g.formulapost)
+			eval([ g.formulapost ';' ]);
 		end;
-        for index= 1:length(Boot.formulaout) 
-            eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
+        for index= 1:length(g.formulaout) 
+            eval([ 'accarray' int2str(index) ' = ' g.formulaout{index} ';' ]);
         end;
 	end;
 end;
-for index= 1:length(Boot.formulaout) 
+for index= 1:length(g.formulaout) 
     eval( [ 'accarray = accarray' int2str(index) ';' ]);
     Rbootout{index} = accarray;
 	
@@ -297,17 +321,17 @@ for index= 1:length(Boot.formulaout)
 	accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
     
     % compute bootstrap significance level
-    i = round(Boot.naccu*Boot.alpha);
-    %rsignif = mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2); % significance levels for Rraw
-    if strcmpi(Boot.bootside{min(length(Boot.bootside), index)}, 'upper');
-        accarray        = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu,:),2));
+    i = round(g.naccu*g.alpha);
+    %rsignif = mean(accarray(:,g.naccu-i+1:g.naccu),2); % significance levels for Rraw
+    if strcmpi(g.bootside{min(length(g.bootside), index)}, 'upper');
+        accarray        = squeeze(mean(accarray(:,g.naccu-i+1:g.naccu,:),2));
 	else 
-        if strcmpi(Boot.boottype,'second') & ndims(accarray) ==3
+        if strcmpi(g.boottype,'second') & ndims(accarray) ==3
             accarraytmp        = squeeze(mean(accarray(:,1:i,:),2));
-            accarraytmp(:,:,2) = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu,:),2));
+            accarraytmp(:,:,2) = squeeze(mean(accarray(:,g.naccu-i+1:g.naccu,:),2));
             accarray = accarraytmp;
         else
-            accarray = [mean(accarray(:,1:i),2) mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2)];
+            accarray = [mean(accarray(:,1:i),2) mean(accarray(:,g.naccu-i+1:g.naccu),2)];
         end;
     end;
     accarrayout{index} = accarray;
