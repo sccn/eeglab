@@ -63,7 +63,9 @@
 % makehtml()      - generate html pages for directories (uses help2html)
 % mat2cell()      - matrix to cell (local)
 % pophelp()       - format the help header  !!!
-% realproba()     - compute observed probability (used by entropy)
+% readedf()       - read binary EEG EDF file
+% readegi()       - read binary EEG EGI file 
+% readegihdr()    - read binary EEG EGI file header
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
 % reref()         - re-reference data
@@ -87,6 +89,9 @@
 % pop_loadcnt()   - load Neuroscan .CNT data (lndcnt())
 % pop_loadeeg()   - load Neuroscan .EEG data (loadeeg())
 % pop_plotdata()  - plot data epochs in rectangular array (plotdata())
+% pop_readbdf()   - load binary BDF data file (readbdf())
+% pop_readedf()   - load binary EDF data file (readedf())
+% pop_readegi()   - load binary EGI data file (readegi())
 % pop_rejkurt()   - compute data kurtosis (rejkurt())
 % pop_rejtrend()  - reject EEG epochs showing linear trends  (rejtrend())
 % pop_resample()  - change data sampling rate (resample())
@@ -179,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.197  2002/11/13 17:03:06  arno
+% averef -> reref
+%
 % Revision 1.196  2002/11/13 02:40:35  arno
 % nothing
 %
@@ -862,10 +870,11 @@ set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
 	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
+	uimenu( neuromenu, 'Label', 'From EGI .RAW file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Biosemi .EDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From standard .BDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readbdf;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From standard .BDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readbdf;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 
