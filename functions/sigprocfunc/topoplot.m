@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2004/02/15 21:17:07  scott
+% omit QUAD_SKIRT option - not ready !
+%
 % Revision 1.132  2004/02/15 21:02:13  scott
 % same
 %
@@ -856,14 +859,13 @@ if exist('QUAD_SKIRT') % not-ready!!!
 %
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
-%  size([1:GRID_SCALE^2]') % DEBUG
-%  size(Thi(:)) % DEBUG
-%  size(Phi(:)) % DEBUG
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
-  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2)> GRID_SCALE*rmax*squeezefac & ...
+  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2) > rmax*squeezefac & ...
          abs(Thi)<pi/4);
   ii = find(mask == 0);
+size(ii)
   Zi(ii) = NaN;
+keyboard
 end
 end % exist
   
