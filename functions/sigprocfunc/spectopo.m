@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2003/12/03 19:30:27  arno
+% same
+%
 % Revision 1.81  2003/12/03 19:29:40  arno
 % more warnings if using spec()
 %
@@ -486,8 +489,8 @@ resvar = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 epoch_subset = 1:epochs;
 if g.percent ~= 1 & epochs > 1
-    nb = round( g.percent*epochs);
     epoch_subset = zeros(1,epochs);
+    nb = ceil( g.percent*epochs);
     while nb>0
         index = ceil(rand*epochs);
         if ~epoch_subset(index)
