@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.203  2004/05/14 23:41:09  arno
+% allowing negative shrink
+%
 % Revision 1.202  2004/05/14 23:29:32  arno
 % fixing toggle name/number
 %
@@ -1509,7 +1512,6 @@ if ~isempty(DIPOLE)
       PLOT_DIPOLE = 0;
     end
     if PLOT_DIPOLE
-    DIPOLE
       for index = 1:size(DIPOLE,1)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
         set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
