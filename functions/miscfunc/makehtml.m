@@ -1,5 +1,5 @@
-% makehtml() - function generating .html function index page and Matlab function help 
-%              pages composed automatically from formatted function help messages
+% makehtml() - generate .html function-index page and function help pages 
+%              composed automatically from formatted Matlab function help messages
 %
 % Usage: 
 %   >> makehtml(list, outputdir);
@@ -12,32 +12,33 @@
 %                  2) Cell array of filenames to convert and the text link 
 %                     on the summary page for them.
 %                      {{'filename1' 'link1'} {'filename2' 'link2'}} ...
-%                     Ex: ???
-%                  3) Cell array of 2-3 cell array elements containing
-%                     info to generate .html function index and help pages. 
-%                   Ex: { {'directory1' 'heading1' 'matlabfunc1'} ...
-%                         {'directory1' 'heading1' 'matlabfunc2'} }
+%                     Ex: 'link1' = 'Reject by kurtosis'
+%                  3) Cell array of 2 or 3 cell array elements containing
+%                     info to generate .html function-index and help pages. 
+%                   Ex: { {'directory1' 'heading1' 'dirindexfunc1'} ...
+%                         {'directory2' 'heading2' 'dirindexfunc2'} }
 %                   - 'directory': Function file directory name
-%                   - 'heading': Index page heading for the directory functions 
-%                   - 'matlabfunc': A Matlab function that will be
-%                       referenced in the index {default: all .m files in directory}
+%                   - 'heading': Index-file heading for the directory functions 
+%                   - 'dirindexfunc': A optional Matlab pop-up help function for
+%                     referencing the directory functions {default: none}
 %                  4) To scan several directories under the same heading, use 
-%                  {{{'directory1' 'directory2'} 'heading1' 'matlabfunc1' ... }
+%                  {{{'directory1' 'directory2'} 'heading1' 'dirindexfunc1' ... }
 %    outputdir   - Directory for output .html help files 
 %
 % Optional inputs:
 %   'outputfile' - Output file name. {default: 'index.html'}
-%   'header'     - Command to insert in the header of all .html files (i.e. javascript 
-%                  declaration or meta-tags). {default: javascript 'openhelp' function}
+%   'header'     - Command to insert in the header of all .html files (e.g., javascript 
+%                  declaration or meta-tag). {default: javascript 'openhelp()' 
+%                  function. See help2htm() code for details.}
 %   'footer'     - Command to insert at the end of all .html files (e.g., back
-%                  button. {default: reference back to the index file}
+%                  button. {default: reference back to the function-index file}
 %   'refcall'    - Syntax format to call references. {default: 
 %                  'javascript:openhelp(''%s.js'')'} Use '%s.html' for an .html link.     
 %   'font'       - Font name (default: 'Helvetica')
 %   'background' - Background image (Ex: 'img.jpg' -> '<body BACKGROUND="img.jpg">'). 
-%   'outputlink' - Help page calling command for the index page. {default: 
-%                  'javascript:openhelp(''%s.js'')'. 
-%                  Use '%s.html' for a standard .html page link.     
+%   'outputlink' - Help page calling command for the function index page. {default: 
+%                  'javascript:openhelp(''%s.js'')'.  Use '%s.html' to use a
+%                  standard .html page link instead.}    
 %   'fontindex'  - Font for the .html index file (default: 'Helvetica')
 %   'backindex'  - Background tag for the index file (c.f. 'background')
 %   'mainonly'   - ['on'|'off'] 'on' -> Generate the index page only.
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/09/07 22:11:58  scott
+% help msg -scott
+%
 % Revision 1.7  2002/08/17 20:12:55  arno
 % same
 %
