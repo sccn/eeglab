@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2002/10/17 00:42:13  arno
+% debug last
+%
 % Revision 1.53  2002/10/16 23:06:34  arno
 % default spacing 1
 %
@@ -412,6 +415,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    if ~iscell(g.colmodif)
    		g.colmodif = { g.colmodif };
    end;
+   if any(isnan(data(:))) & strcmpi(g.submean, 'on')
+       g.submean = 'nan';
+   end;
    
    % convert color to modify into array of float
    % -------------------------------------------
@@ -436,7 +442,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     if g.spacing > 10
       g.spacing = round(g.spacing);
     end
-    if g.spacing  == 0
+    if g.spacing  == 0 | isnan(g.spacing)
         g.spacing = 1;
     end;
   end
@@ -1070,8 +1076,9 @@ else
 
     % Plot data and update axes
     switch lower(g.submean) % subtract the mean ?
-    	case 'on', meandata = mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');  
-    	otherwise, meandata = zeros(1,g.chans);
+     case 'on', meandata = mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');  
+     case 'nan',meandata = nan_mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');
+     otherwise, meandata = zeros(1,g.chans);
 	 end;
     axes(ax1)
     cla
