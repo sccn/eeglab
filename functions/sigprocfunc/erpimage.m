@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.125  2003/07/26 17:16:50  scott
+% debug same
+%
 % Revision 1.124  2003/07/26 17:14:12  scott
 % debug same
 %
@@ -2135,6 +2138,7 @@ if strcmpi(noshow, 'no')
                 end                                                 
                 drawnow
             else % plot re-aligned zeros on sortvar-aligned data
+                auxcolor = auxcolors{c};
                 if TIMEX      % overplot realigned 0-time on image
                     plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
                 else
