@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 14:30:55  arno
+% background
+%
 % Revision 1.7  2002/08/12 01:17:42  arno
 % update colors
 %
@@ -192,9 +195,15 @@ end;
 
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
 set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
 set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'listbox');
+set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
+hh =findobj(allhandlers, 'parent', gcf, 'style', 'radio');
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
 
 return;
