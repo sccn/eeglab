@@ -79,6 +79,7 @@
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
 %       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
 %                     memory. Default 'off'.
+%       'verbose'   = ['on'|'off'] print text {'on'}
 %
 %    Optional Bootstrap Parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -164,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/12/03 02:31:34  arno
+% verbose
+%
 % Revision 1.46  2003/10/15 18:46:25  arno
 % *** empty log message ***
 %
