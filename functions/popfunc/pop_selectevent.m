@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/13 16:15:29  scott
+% text
+%
 % Revision 1.16  2002/08/12 18:36:10  arno
 % questdlg2
 %
@@ -378,7 +381,7 @@ if strcmp(g.select, 'remove')
 end;
 
 % checking if trying to remove boundary events (in continuous data)
-if isstr(EEG.event(1).type) & EEG.trials == 1 
+if isfield(EEG.event, 'type') & isstr(EEG.event(1).type) & EEG.trials == 1 
 	Ieventrem = setdiff([1:length(EEG.event)], Ievent );
 	boundaryindex = strmatch('boundary', { EEG.event(Ieventrem).type });
 	if ~isempty(boundaryindex)
