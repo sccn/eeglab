@@ -113,6 +113,10 @@
 %
 % See also: eeglab()
 
+% Undocumented option: 'spheres', 'on'|'off'   {default: 'off'} - plots
+%                     dipole markers as 3-D spheres. Does not yet interact
+%                     with gui buttons.
+
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) 2002 Arnaud Delorme
@@ -142,6 +146,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.74  2004/04/13 18:24:58  scott
+%nothing
+%
 %Revision 1.73  2004/04/12 23:40:50  arno
 %nothing
 %
@@ -391,6 +398,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'dipolesize' 'real'   [0 Inf]             30;
                                  'dipolelength' 'real' [0 Inf]             1;
                                  'sphere'    'real'     [0 Inf]            1;
+                                 'spheres'    'string'  {'on' 'off'}       'off';
                                  'image'     ''         []                 'besa' }, 'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
@@ -748,9 +756,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             % draw point
             hold on;
-            MAKE_SPHERES = 1;
-            if MAKE_SPHERES
-                spherecolors = g.color{index}
+            if strcmp(g.spheres,'on')
+                spherecolors = g.color{index};
                 SPHERE_FAC = 0.2;
                 [xs,ys,zs] = sphere;
                 options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
@@ -763,8 +770,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                         scolor);
                    shading interp
                    material shiny
-                   light
                 end
+                light
             else
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
