@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.26  2003/04/30 18:42:07  arno
+%calibrating roughtly the slice selection
+%
 %Revision 1.25  2003/04/30 16:19:28  arno
 %calibrating infants
 %
