@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/05/03 16:18:50  scott
+% icaweight -> icaweights -sm
+%
 % Revision 1.4  2002/04/11 00:58:12  arno
 % updating result size check
 %
@@ -70,13 +73,14 @@ if nargin < 2
 	if ~isempty(EEG.reject.gcompreject)
       components = find(EEG.reject.gcompreject == 1);
       components = components(:)';
-   	  promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
+      promptstr    = { ['Component list to subtract from data:'] };
+   	  %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
    else
       components = [];
-      promptstr    = { ['Components to subtract from data:'] };
+      promptstr    = { ['Component list to subtract from data:'] };
    end;
 	inistr       = { int2str(components) };
-	result       = inputdlg( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr, 'pop_subcomp');
 	if length(result) == 0 return; end;
 	components   = eval( [ '[' result{1} ']' ] );
 end;
