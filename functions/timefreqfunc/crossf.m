@@ -32,8 +32,11 @@
 %       frames  = frames per epoch                                   {750}
 %       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
 %       srate   = data sampling rate (Hz)                            {250}
-%       cycles  = If >0 -> Number of cycles in each analysis wavelet 
-%                 If==0 -> Use FFTs (constant window length 'winsize') {0}
+%       cycles      = is 0 -> Use FFTs (with constant window length) {0}
+%                     is >0 -> Number of cycles in each analysis wavelet 
+%                     is [wavcycles fact] -> wavelet cycles increase with frequency 
+%                     starting at wavcyle (0<fact<1, fact=1 no increase, fact=0
+%                     same as running FFT).
 %
 %    Optional Coherence Type:
 %       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
@@ -155,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/08/09 22:37:32  arno
+% debugging cyclefact
+%
 % Revision 1.42  2002/08/09 22:29:42  arno
 % implementing wavelet factor
 %
