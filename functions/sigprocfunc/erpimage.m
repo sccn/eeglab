@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2003/09/24 19:36:19  scott
+% fixed auxvar bug
+%
 % Revision 1.156  2003/09/24 18:56:22  scott
 % debug
 %
@@ -2896,7 +2899,9 @@ win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
 win = win .* repmat(hanning(length(nwin))',length(freq),1);
 %tmp =gcf; figure; plot(real(win)); figure(tmp);
 %fprintf('ANY NAN ************************* %d\n', any(any(isnan( data(nwin,:)))));
-resp = win * data(nwin,:);
+
+tmpdata = data(nwin,:) - repmat(mean(data(nwin,:), 2), [1 size(data,2)]);
+resp = win * tmpdata;
 ang = angle(resp);
 amp = abs(resp);
 
