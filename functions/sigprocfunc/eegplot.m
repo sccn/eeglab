@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2004/03/18 23:29:49  arno
+% nothing
+%
 % Revision 1.93  2004/03/18 01:51:34  arno
 % debug boundary
 %
@@ -1616,20 +1619,21 @@ else
 	return;
     
   case 'winelec'  % change channel window size
-   % get new window length with dialog box
+                  % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
    result = inputdlg2( { 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
    if size(result,1) == 0 return; end;
-
+   
    g.dispchans = eval(result{1});
    if g.dispchans<0 | g.dispchans>g.chans
-      g.dispchans =g.chans;
+       g.dispchans =g.chans;
    end;
-	set(gcf, 'UserData', g);
+   set(gcf, 'UserData', g);
    eegplot('updateslidder', fig);
-	eegplot('drawp',0);	
-	return;
+   eegplot('drawp',0);	
+   eegplot('scaleeye', [], fig);
+   return;
    
   case 'loadelect' % load channels
 	[inputname,inputpath] = uigetfile('*','Channel locations file');
