@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/11/19 03:05:22  arno
+% debuging calibration
+%
 % Revision 1.18  2003/06/28 00:28:38  arno
 % (implmenting new header info
 % and rescaling to mircouV
@@ -118,6 +121,8 @@ function [eeg,ev,header] = read_erpss(filename)
                 firstpass = 0;
             end; 
             totalsize = totalsize + block_size;
+        %else
+        %    fprintf('.');
         end
         totblocks = totblocks+1;
     end
