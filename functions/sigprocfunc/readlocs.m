@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/01/03 22:41:38  arno
+% autodetect format .sfp
+%
 % Revision 1.33  2003/01/03 22:38:39  arno
 % adding warning message
 %
@@ -288,10 +291,12 @@ if isstr(filename)
    if isempty(g.filetype)
        switch lower(fileextension),
         case {'loc' 'locs' }, g.filetype = 'loc';
-        case 'xyz', g.filetype = 'xyz'; disp('Warning: Matlab carthesian coords "xyz" file extension detected; if importing EGI cartesian coords. use type "sfp" instead');
+        case 'xyz', g.filetype = 'xyz'; disp( [ 'WARNING: Matlab carthesian coords "xyz" file extension' ... 
+                                       'detected; if importing EGI cartesian coords, force to type "sfp" instead'] );
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
-        case 'elp', g.filetype = 'polhemus';
+        case 'elp', g.filetype = 'polhemus';disp( [ 'WARNING: Polhemus carthesian coords "elp" file extension' ... 
+                                       'detected; if importing BESA spherical coords. force to type "besa" instead'] );
         case 'eps', g.filetype = 'besa';
         case 'sfp', g.filetype = 'sfp';
         otherwise, g.filetype =  ''; 
