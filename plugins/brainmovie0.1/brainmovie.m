@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/01/01 01:54:40  arno
+% debugging missing lines
+%
 % Revision 1.38  2002/12/05 15:55:39  arno
 % debugging plotorder
 %
@@ -917,10 +920,10 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
 		case 'on',  curphase = (crossfangle+180)/360; % phase from 1 to 0
 		case 'off', curphase = 0.5;
 	end;
-	%[ pos1(1) pos2(1) ] , [ pos1(2) pos2(2) ], tmpcolor, tmpthick, mod(curphase,1), 0
 	
 	if tmpthick > 0	
-         fprintf('(%d,%d)->(%d,%d) %3.2f: %3.2f %3.2f %3.2f\n', pos1(1), pos2(1), pos1(2), pos2(2), distance, crossfpower, crossfangle, circfact);
+         %fprintf('(%d,%d)->(%d,%d) %3.2f: %3.2f %3.2f %3.2f\n', pos1(1), pos2(1), pos1(2), ...
+         %                        pos2(2), distance, crossfpower, crossfangle, circfact);
         if circfact ~= 0
 			circpatch( [ pos1(1) pos2(1) ] , [ pos1(2) pos2(2) ], circfact, tmpcolor, g.resmult*tmpthick, 100, mod(curphase,1), 0);
 		else
