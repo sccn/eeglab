@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/07/25 17:36:34  arno
+% debugging
+%
 % Revision 1.40  2002/07/25 17:34:48  arno
 % adding message when removing ICA array
 %
@@ -433,7 +436,7 @@ end;
 			end;
 		else 
 			if ~isempty(EEG.icaact)
-				fprintf('eeg_checkset: removing ica activation matrix ...\n'); 
+				fprintf('eeg_checkset: removing ica activation matrix (see edit options) ...\n'); 
 			end;
 			EEG.icaact     = [];
 		end;
