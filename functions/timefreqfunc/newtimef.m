@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/10/15 23:02:28  arno
+% time limits warning
+%
 % Revision 1.10  2002/10/15 20:54:16  arno
 % title diff
 %
@@ -484,8 +487,8 @@ g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 
 % testing arguments consistency
 % -----------------------------
-if (~ischar(g.title))
-	error('Title must be a string.');
+if ~ischar(g.title) & ~iscell(g.title)
+	error('Title must be a string or a cell array.');
 end
 
 if (~isnumeric(g.winsize) | length(g.winsize)~=1 | g.winsize~=round(g.winsize))
