@@ -22,7 +22,7 @@
 % The help message of any function may be called from from the EEGLAB menu 
 % by opening the 'Help > EEGLAB' menu window. The help message of each function 
 % is then displayed. Note that many EEGLAB functions do not actually process 
-% data -- in particular, the 'pop_' functions. To understand their use, look 
+% data (in particular, the 'pop_' functions). To understand their use, look 
 % at the help message for the (non-pop) function they call which actually 
 % processes the data. For example, the menu item % "Plot > Channel ERP image" 
 % calls the function 'pop_erpimage()'. This function in turn serves as a 
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/13 18:54:14  scott
+% editing help message
+%
 % Revision 1.5  2002/08/13 16:25:40  scott
 % test
 %
