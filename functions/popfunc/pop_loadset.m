@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/22 01:41:31  arno
+% further checks
+%
 % Revision 1.11  2002/08/22 00:44:59  arno
 % compatibility with previous eeglab version
 %
@@ -88,14 +91,19 @@ if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
 	VAROUT = checkoldformat(TMPVAR.EEG);
+    if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
+    for index=1:length(VAROUT)
+        if isstr(VAROUT(index).data), VAROUT(index).filepath = inputpath; end;
+    end;
 else
 	VAROUT = checkoldformat(TMPVAR);
 	if ~isfield( VAROUT, 'data')
 		error('Pop_loadset: non-EEGLAB dataset file');
 	end;
+    if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
 end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
