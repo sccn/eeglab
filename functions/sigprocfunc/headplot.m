@@ -1,6 +1,5 @@
 % headplot() - plot a spherically-splined EEG field map on a semi-realistic 
 %              3-D head model. Rotate head using left mouse button.
-%
 % Example:
 %   >> headplot example   - show an example spherical 'eloc_angles' file
 %   >> headplot cartesian - show an example cartesian 'eloc_angles' file
@@ -51,6 +50,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) Colin Humphries and Scott Makeig, CNL / Salk Institute, Feb. 1998
+%
 % Spherical spline method: Perrin et al. (1989) Electroenceph clin Neurophys
 %
 % This program is free software; you can redistribute it and/or modify
@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/26 19:42:24  arno
+% /2 to sqrt in extentricity calculation (thanks to Tyler Lorig)
+%
 % Revision 1.15  2002/11/19 20:08:28  arno
 % allowing ascii and binary read of mhead
 %
