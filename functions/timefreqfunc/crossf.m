@@ -73,7 +73,7 @@
 %                      File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plot Features:
-%       'plotamps'  = ['on'|'off'], Plot coherence magnitude      {'on'}
+%       'plotamp'   = ['on'|'off'], Plot coherence magnitude      {'on'}
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
 %       'title'     = Optional figure title                       {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/12 00:41:37  arno
+% programming baseboot
+%
 % Revision 1.6  2002/04/11 02:39:34  arno
 % updated header message
 %
