@@ -6,10 +6,10 @@
 %   chans - channel EEGLAB structure
 %
 % Optional inputs:
-%   'convert'     - { conversion_type args } conversion type is 'xyz->polar'
-%                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph'. Args are
-%                   only relevant for 'cart2topo', 'sph2topo', 'topo2sph' and
-%                   can be found in the function having the same name.
+%   'convert'     - { conversion_type args } conversion type is 'cart2topo'
+%                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', 'chancenter'. 
+%                   Help can be found in the function having the same name. Args are
+%                   only relevant for 'chancenter'.
 %   'operation'   - string command for manipulating arrays. 'chan' is a full 
 %                   electrode info. Fields can be manipulated using 'labels', 'theta'
 %                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3D) or
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/05/01 19:38:38  arno
+% returning shrink factor
+%
 % Revision 1.5  2002/05/01 03:30:55  arno
 % editing interface
 %
@@ -112,8 +115,10 @@ if nargin < 2
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
 		operation = ['inputdlg({strvcat(''Enter operation (see help on previous page)''' ...
 					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Operation'', 1, { '''' });'];
-		uiconvert = { { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
-						['comtmp = {''convert'' {''cart2topo'' ''gui'' ''on''}};' endgui] }, ...
+		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
+						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
+						['comtmp = {''convert'' {''cart2topo'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'sph->polar', 'callback', ...
 						['comtmp = {''convert'' {''sph2topo'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'polar->sph', 'callback', ...
@@ -126,7 +131,6 @@ if nargin < 2
 						['comtmp = {''operation'' ' operation '};' endgui] }, ...
 					  {} { } { } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
-		uiconvert{1}{6}		  
 		for index = 1:length(allfields)
 			geometry = { geometry{:} [1.5 1 0.2 1] };
 			uilist   = { uilist{:}, ...
@@ -277,18 +281,26 @@ else
 			   method=args{curfield+1};
 			   extraargs = {''};
 		   end;
-		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'cart2topo')
+		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
 			   tmpButtonName=questdlg( ['This will modify fields in the channel structure' 10 ...
 					'Are you sure, you want to apply that function ?'], 'Confirmation', 'Cancel', 'Yes','Yes');
 			   if ~strcmp(tmpButtonName, 'Yes'), return; end;
 		   end;
 		   switch method
-			case 'cart2topo',
+			case 'chancenter',
 			 if isempty(extraargs)
-				 [th rd]=cart2topo([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})']);
+				 [X Y Z]=chancenter([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})'],[]);
 			 else
-				 [th rd]=cart2topo([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})'], extraargs{:});
+				 [X Y Z]=chancenter([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})'], extraargs{:});
 			 end;
+			 if isempty(X), return; end;
+			 for index = 1:length(chans)
+				 chans(index).X  = X(index);
+				 chans(index).Y  = Y(index);
+				 chans(index).Z  = Z(index);
+			 end;
+			case 'cart2topo',
+			 [th rd]=cart2topo([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})']);
 			 if isempty(th), return; end;
 			 for index = 1:length(chans)
 				 chans(index).theta  = th(index);
@@ -296,7 +308,7 @@ else
 			 end;
 			case 'sph2topo',
 			 disp('Warning: all radii considered to be one for this transformation');
-			 try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1) cell2mat({chans.sph_theta})' cell2mat({chans.sph_phi})'], 1, 2); % using method 2
+			 try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
 		     catch, error('Can not process empty values'); end;
 			 for index = 1:length(chans)
 				 chans(index).theta  = angle(index);
@@ -334,8 +346,8 @@ else
 			   try, theta  = cell2mat({chans.theta}); catch, theta(1:length(chans)) = NaN; end;
 			   try, radius = cell2mat({chans.radius}); catch, radius(1:length(chans)) = NaN; end;
 			   try, sph_theta  = cell2mat({chans.sph_theta}); catch, sph_theta(1:length(chans)) = NaN; end;
-			   try, sph_phi    = cell2mat({chans.sph_theta}); catch, sph_phi(1:length(chans)) = NaN; end;
-			   try, sph_radius = cell2mat({chans.sph_theta}); catch, sph_radius(1:length(chans)) = NaN; end;
+			   try, sph_phi    = cell2mat({chans.sph_phi}); catch, sph_phi(1:length(chans)) = NaN; end;
+			   try, sph_radius = cell2mat({chans.sph_radius}); catch, sph_radius(1:length(chans)) = NaN; end;
 			   eval(tmpoper);
 			   chans = struct('labels', { chans.labels }, 'X', mat2cell(X), 'Y', mat2cell(Y), 'Z', mat2cell(Z), ...
 							  'theta', mat2cell(theta), 'radius', mat2cell(radius), 'sph_theta', mat2cell(sph_theta), ...
