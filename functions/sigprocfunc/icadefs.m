@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/06/25 02:36:27  scott
+% removed outdated defs, clarified comments and layout -sm
+%
 % Revision 1.3  2002/05/01 18:22:55  arno
 % making binica available from everywhere
 %
@@ -53,7 +56,7 @@ end
                                        
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/icatutorial/'; % online version
 
-ICABINARY = 'ica_linux.bin'; % <=INSERT name of ica executable for binica.m
+ICABINARY = 'ica_linux'; % <=INSERT name of ica executable for binica.m
 
 % -----------------------------------------------------------
 % ------------- END OF PATH DEFINITION ----------------------
