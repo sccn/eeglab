@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/07/25 17:34:48  arno
+% adding message when removing ICA array
+%
 % Revision 1.39  2002/07/25 17:12:55  arno
 % debugging gcompreject
 %
@@ -411,11 +414,6 @@ end;
                     res = com;
                     EEG.icaact     = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
                     EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
-                else 
-					if ~isempty(EEG.icaact)
-	 	    			fprintf('eeg_checkset: removing ica activation matrix ...\n'); 
-					end;
-					EEG.icaact     = [];
 				end;
  			end;
             if isempty(EEG.icawinv)
@@ -433,6 +431,11 @@ end;
 				res = com;
 				EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);		
 			end;
+		else 
+			if ~isempty(EEG.icaact)
+				fprintf('eeg_checkset: removing ica activation matrix ...\n'); 
+			end;
+			EEG.icaact     = [];
 		end;
 	else
         if ~isempty( EEG.icaweights ), EEG.icaweights = []; res = com; end;
