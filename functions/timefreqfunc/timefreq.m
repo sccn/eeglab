@@ -98,6 +98,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/04/29 18:41:27  arno
+% debug computation
+% .,
+%
 % Revision 1.16  2003/04/29 01:08:44  arno
 % new version which can generate wavelets at any frequencies
 %
@@ -292,7 +296,7 @@ else % wavelet
     % apply filters
     % -------------
     for index = 1:length(g.indexout)
-        trialind = index/length(g.timesout)*trials;
+        trialind = round(index/length(g.timesout)*trials);
         if rem(trialind,10) == 0,  fprintf(' %d',trialind); end
         if rem(trialind,120) == 0, fprintf('\n'); end
         for freqind = 1:length(g.win)
