@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/04/23 16:53:24  arno
+% same
+%
 % Revision 1.33  2003/04/23 16:51:21  arno
 % same
 %
@@ -432,7 +435,8 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
-    coordinates(:,2) = -coordinates(:, 2); % remove X   
+    coordinates(:,2) = -coordinates(:,2);   
+    coordinates(:,1) = -coordinates(:,1);   
     
     brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
                          'resolution', 'low', ...
