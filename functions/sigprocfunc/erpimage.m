@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/07/26 16:18:32  arno
+% removing debugging messages
+%
 % Revision 1.26  2002/07/26 16:14:03  arno
 % removing trials with Nan values for sortvar, debugging 'vert'
 %
@@ -1271,7 +1274,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
 end %%%%%%%%%%%%%%%%%%%%%%%%%%% End image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~isempty(verttimes)
- if size(verttimes,1) ~= ntrials
+ if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
     return
  end;
