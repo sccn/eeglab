@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/07/23 22:23:41  arno
+% removing warning if icaact=[]
+%
 % Revision 1.35  2002/07/23 21:29:07  arno
 % empty icaact
 %
@@ -504,7 +507,9 @@ if ~isfield(EEG.reject, 'gcompreject')		EEG.reject.gcompreject = []; res = com; 
 if length(EEG.reject.gcompreject) ~= size(EEG.icaact,1)
 	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
 end;
-
+if isempty(EEG.reject.gcompreject)
+	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
+end;
 
 % component rejection
 % -------------------
