@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/08/25 00:25:20  arno
+% same
+%
 % Revision 1.34  2004/08/25 00:22:02  arno
 % same
 %
@@ -324,8 +327,7 @@ else % no interactive inputs
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
-        if isstr(args{index+1})                 args{index+1} = args{index+1}; % string 
-        else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
+        if isstr(args{index+1})   args{index+1} = args{index+1}; % string 
         end;
     end;                
 end;
