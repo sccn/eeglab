@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/06/03 18:28:28  arno
+% debug for empty field
+%
 % Revision 1.8  2004/04/28 15:59:15  arno
 % fixing command line call
 %
@@ -132,7 +135,7 @@ dlabel='Event values';
 if isempty(type)
     dlabel2=['All event statistics for ''' eventfield ''' info'];
 else
-    dlabel2=['Event' num2str(type) ' statistics for ''' eventfield ''' info'];
+    dlabel2=['Event ' vararg2str(type) ' statistics for ''' eventfield ''' info'];
 end; 
 
 % outputs
