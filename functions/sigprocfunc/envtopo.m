@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2004/07/30 01:26:14  arno
+% changed the figure to be the current figure
+%
 % Revision 1.62  2004/07/30 01:03:52  arno
 % changed text to double
 %
@@ -884,8 +887,8 @@ end
         axis([xmin xmax ymin ymax]);
     end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set(axe,'Color',axcolor);
-l= xlabel('Time (ms)');
-% l= xlabel('Time (ms)');
+l= xlabel('Time (s)');
+% l= xlabel('Time (s)');
 set(l,'FontSize',14,'FontWeight','Bold');
 if strcmpi(g.envmode, 'avg')
     l=ylabel('Potential (uV)');
