@@ -20,6 +20,8 @@
 %   decimate - factor to decimate ntrials out by (may be non-int) {def|0->1}
 %                If this is large (>sqrt(num. trials)), this many trials output.
 % Options:
+%   'renorm' - ['yes'|'no'|'formula(x)'] normalize sorting variable. 'yes'=auto.
+%              Ex for formula(x): '3*x+2'. Default is 'no'.
 %   'align'  - [time] -> time lock data to sortvar aligned to time in msec
 %              (time=Inf -> align to median sortvar) {default: no align}
 %   'nosort' - don't sort data on sortvar {default: sort}
@@ -51,7 +53,8 @@
 %      FOR MORE OUTPUT ARGS: amps,coher,cohsig,ampsig,outamps,phsangls,phsamp,sortidx
 %                  SEE:  >> erpimage moreargs
 %
-% Authors: Scott Makeig & Tzyy-Ping Jung, CNL/Salk Institute, La Jolla, 3-2-1998 
+% Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme, 
+%          CNL/Salk Institute, La Jolla, 3-2-1998 
 %
 % See also: erpimages(), phasecoher(), rmbase(), cbar(), movav()
 
@@ -82,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/25 17:08:03  arno
+% correcting error message
+%
 % Revision 1.11  2002/04/24 19:04:45  arno
 % further check for coherfreq
 %
@@ -143,7 +149,7 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been dropped from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
 %
 %%%%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,6 +209,7 @@ Limitflag = NO;     % plot whole times range by default
 Phaseflag = NO;     % don't sort by alpha phase
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
+Renormflag = NO;
 verttimes = [];
 NoTimeflag= NO;     % by default DO print "Time (ms)" below bottom axis
 Signifflag= NO;     % compute significance instead of receiving it
@@ -216,6 +223,7 @@ timelimits= nan;
 topomap   = [];     % topo map vector
 lospecHz  = [];     % spec lo frequency
 topphase = 180;     % default top phase for 'phase' option
+renorm    ='no';
 
 minerp = NaN; % default limits
 maxerp = NaN;
@@ -411,6 +419,9 @@ if nargin > 6
 		  lospecHz = Arg(1);
 		  hispecHz = Arg(2);
 		  Specflag = NO;
+	  elseif Renormflag == YES
+		  renorm = Arg;
+		  Renormflag = NO;
 	  elseif Alignflag == YES
 		  if length(Arg) ~= 1 
 			  help erpimage
@@ -543,6 +554,8 @@ if nargin > 6
           Phaseflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
+	  elseif strcmp(Arg,'renorm')
+		  Renormflag = YES;
 	  elseif strcmp(Arg,'noplot')|strcmp(Arg,'noshow')
 		  Noshow = YES;
 	  elseif strcmp(Arg,'caxis')
@@ -700,6 +713,21 @@ if exist('data2')
    data2=reshape(data2,frames,ntrials);
   end
 end
+%
+%%%%%%%%%%%%%%%%%%% Renormalize sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+renorm
+switch lower(renorm)
+ case 'yes',
+  disp('erpimage warning: *** sorting variable renormalized ***');
+  sortvar = (sortvar-min(sortvar)) / (max(sortvar) - min(sortvar)) * ...
+		   0.5 * (max(times) - min(times)) + min(times)*1000 + 0.4*(max(times) - min(times));
+ case 'no',;
+ otherwise,
+  locx = findstr('x', lower(renorm))
+  if length(locx) ~= 1, error('erpimage: unrecognize renormalazing formula'); end;
+  eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
+end;
 %
 %%%%%%%%%%%%%%%%%%% Align data to sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
