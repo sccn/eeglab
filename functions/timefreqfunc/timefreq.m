@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/04/30 00:07:25  arno
+% debug if window size changes
+%
 % Revision 1.18  2003/04/29 21:53:35  arno
 % rounding trials
 %
@@ -358,20 +361,30 @@ return;
 function [itcvals] = tfitc(tfdecomp, itctype);
 % first dimension are trials
 switch itctype
-   case 'coher',
+ case 'coher',
+  try,
       itcvals = sum(tfdecomp,3) ./ sqrt(sum(tfdecomp .* conj(tfdecomp),3) * size(tfdecomp,3));
-	  %g.ITC(:,times)      = g.ITC(:,times) + g.tmpalltimes; % complex coher.
-      %g.ITCcumul(:,times) = g.ITCcumul(:,times)+abs(g.tmpalltimes).^2;
-      %case 'coher',       g.ITC = g.ITC ./ sqrt(trials * g.ITCcumul);
-   case 'phasecoher2',
+  catch, % scan rows if out of memory
+      for index =1:size(tfdecomp,1)
+          itcvals(index,:) = sum(tfdecomp(index,:,:),3) ./ sqrt(sum(tfdecomp(index,:,:) .* conj(tfdecomp(index,:,:)),3) * size(tfdecomp,3));
+      end;
+  end;
+ case 'phasecoher2',
+  try,
       itcvals = sum(tfdecomp,3) ./ sum(sqrt(tfdecomp .* conj(tfdecomp)),3);
-      %g.ITC(:,times)      = g.ITC(:,times) + g.tmpalltimes; % complex coher.
-      %g.ITCcumul(:,times) = g.ITCcumul(:,times)+abs(g.tmpalltimes);
-      %case 'phasecoher2', g.ITC = g.ITC ./ g.ITCcumul;
-   case 'phasecoher',
+  catch, % scan rows if out of memory
+      for index =1:size(tfdecomp,1)
+          itcvals(index,:) = sum(tfdecomp(index,:,:),3) ./ sum(sqrt(tfdecomp(index,:,:) .* conj(tfdecomp(index,:,:))),3);
+      end;
+  end;
+ case 'phasecoher',
+  try,
       itcvals = sum(tfdecomp ./ sqrt(tfdecomp .* conj(tfdecomp)) ,3) / size(tfdecomp,3);
-      %g.ITC(:,times)      = g.ITC(:,times) + g.tmpalltimes ./ abs(g.tmpalltimes); % complex coher.
-      %case 'phasecoher',  g.ITC = g.ITC / trials; % complex coher.
+  catch, % scan rows if out of memory
+      for index =1:size(tfdecomp,1)
+          itcvals(index,:) = sum(tfdecomp(index,:,:) ./ sqrt(tfdecomp(index,:,:) .* conj(tfdecomp(index,:,:))) ,3) / size(tfdecomp,3);
+      end;
+  end;
 end % ~any(isnan())
 return;
 
