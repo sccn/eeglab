@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/10/30 19:23:54  arno
+% adding revision line
+%
 
 function [f,lab,ev2p] = load_scan41(filename,varargin)
 
@@ -396,7 +399,7 @@ if type == 'cnt'
               ev2 = [];
           end;
      else
-          disp('No !!! teeg <> 2 and teeg <> 1');
+          disp('Skipping event table (tag != 1,2 ; theoritically impossible)');
           ev2 = [];
       end     
 end 
