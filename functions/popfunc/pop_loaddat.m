@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/22 21:11:18  arno
+% same
+%
 % Revision 1.6  2002/08/22 21:08:21  arno
 % debug strvcat
 %
@@ -69,6 +72,7 @@ end;
 if nargin < 2 
 	% ask user
 	[filename, filepath] = uigetfile('*.DAT', 'Choose a DAT file -- pop_loaddat'); 
+    drawnow;
 	if filename == 0 return; end;
 	result       = inputdlg2( { strvcat('Code signifying no event in a trial ([]=none)', ...
 									 '(none=all latencies are imported)')}, ...
