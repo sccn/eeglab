@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/10/14 15:34:34  scott
+% improved help msg and testing for optional varible integrity -sm
+%
 % Revision 1.2  2003/05/30 17:26:21  arno
 % remove warning
 %
@@ -59,7 +62,7 @@ mindata = min(data);
 % -------------------------------------
 if nargin > 2
         timelimits = timelimits(:)';  % make row vector
-        if size(timelimit,2)~=2 | size(timelimits,2)~=2
+        if size(timelimits,2)~=2 | size(timelimits,2)~=2
            error('timelimits array must be a [start_time, end_time] vector')
         end
 	X = linspace(timelimits(1),timelimits(2),length(maxdata));   % x-axis description (row vector)
