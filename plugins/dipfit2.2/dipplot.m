@@ -148,6 +148,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.123  2005/04/01 20:02:07  arno
+%sagital -> sagittal
+%
 %Revision 1.122  2005/04/01 16:05:39  arno
 %fixing summary
 %
@@ -935,13 +938,16 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             hold on;
             if strcmpi(g.spheres,'on') % plot spheres
                 if strcmpi(g.projimg, 'on')
-                    tmpcolor = g.color{index} / 2;
-                    h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index}, 'proj', ...
-                                   [-dat.maxcoordelec(3) dat.maxcoordelec(2) -dat.maxcoordelec(1)]*97/100, 'projcol', tmpcolor);
-                    set(h(2:end), 'userdata', 'proj', 'tag', tag);
+                    disp('Warning: projections cannot be plotted for 3-D sphere');
+                    %tmpcolor = g.color{index} / 2;
+                    %h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index}, 'proj', ...
+                    %               [dat.imgcoords{1}(1) dat.imgcoords{2}(end) dat.imgcoords{3}(1)]*97/100, 'projcol', tmpcolor);
+  
+                    %set(h(2:end), 'userdata', 'proj', 'tag', tag);
                 else
-                    h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
+                    %h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
                 end;                    
+                h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
                 set(h(1), 'userdata', dipstruct, 'tag', tag);
             else % plot dipole markers
                h = plot3(xx,  yy,  zz); 
