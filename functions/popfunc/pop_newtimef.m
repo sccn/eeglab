@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/07 19:14:20  scott
+% worked on menu text, int2str(num) for topovec call -sm
+%
 % Revision 1.3  2002/04/06 03:43:36  arno
 % adding topoplot options
 %
@@ -100,9 +103,9 @@ if nargin < 3
     % ------------
     if ~isempty(EEG.chanlocs)
       if typeproc == 1
-	options = [options ', ''topovec'', int2str(num), ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', num, ''elocs'', EEG.chanlocs' ];
       else
-	options = [options ', ''topovec'', EEG.icawinv(:,int2str(num)), ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', EEG.icawinv(:,num), ''elocs'', EEG.chanlocs' ];
       end;
     end;
     
