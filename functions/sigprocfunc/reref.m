@@ -17,7 +17,8 @@
 % Optional inputs:
 %   'elocs'      - Electrode location structure (e.g., EEG.chanlocs).
 %   'icaweight'  - ICA weight matrix (Note: this should be weights*sphere)
-%   'method'     - ['standard'|'withref'] Include reference channel in output. 
+%   'method'     - ['standard'|'withref'] Include ('withref') reference channel 
+%                  in output. Default is 'standard'. 
 %   'refstate  ' - ['common'|'averef'] Current average reference state.
 %                  Use this parameter to re-reference data to a given channel if data
 %                  is already average referenced (by setting it to 'averef') 
@@ -64,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/06/11 00:10:27  arno
+% debug multiple references
+%
 % Revision 1.15  2002/11/15 03:00:17  arno
 % same
 %
@@ -147,7 +151,7 @@ end;
 % check inputs
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
-                            'method'     'string'  { 'standard' 'withref' }  '';
+                            'method'     'string'  { 'standard' 'withref' }  'standard';
                             'refstate'   'string'  { 'common' 'averef' }   'common';
                             'refloc'     'cell'    []          {};
                             'elocs'      {'integer' 'struct'}  []          [] });
