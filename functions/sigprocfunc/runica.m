@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/05/16 01:09:30  scott
+% typo
+%
 % Revision 1.17  2004/05/16 01:07:44  scott
 % disable new buggy fprintf (eval(ps)) feature - for emergency use -sm
 %
@@ -996,8 +999,8 @@ end
          ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
                      step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
       end % step > 2
-      fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n',
-                       step,      lrate,     degconst*angledelta);
+      fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+                       step,      lrate,     change, degconst*angledelta);
       % fprintf(ps,change);  % <---- BUG !!!!
      end; % if verbose
   %
