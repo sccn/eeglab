@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/07/20 01:44:12  arno
+% checking parameter
+%
 % Revision 1.10  2002/07/20 01:41:07  arno
 % percent update
 %
@@ -481,8 +484,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g);
 			if c==1 & e==epoch_subset(1)
 				eegspec = zeros(nchans,length(freqs));
 			end
-			%eegspec(c,:) = eegspec(c,:) + tmpspec';
-			eegspec(c,:) = eegspec(c,:) + log10(tmpspec');
+			eegspec(c,:) = eegspec(c,:) + tmpspec';
+			%eegspec(c,:) = eegspec(c,:) + log10(tmpspec');
 		end
 		fprintf('.')
 	end
