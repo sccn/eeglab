@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 23:50:38  arno
+% text
+%
 % Revision 1.7  2002/08/12 02:20:31  arno
 % debug
 %
@@ -99,7 +102,7 @@ else
 		end;
 	end;	
 end;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR, 'Name', ' timtopo()'); catch, end;
 
 if exist('plottile') ~= 1
     plottitle = ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ];
