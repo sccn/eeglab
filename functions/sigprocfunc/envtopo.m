@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2004/11/11 14:41:48  scott
+% made new 'times' option [minms, maxms]
+%
 % Revision 1.68  2004/11/11 14:25:24  scott
 % Added 'times' input (for pop_envtopo() use); made default component selection
 % method 'mv' (max variance). Changed 'pvaf' options to 'mv' 'rv' 'pv' (but left
@@ -281,7 +284,8 @@
 function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin);
 
 myfig =gcf;
-xframes = 0; % are xmin & xmax in frames?? (default no)
+xmin = 0; xmax = 0;
+xframes = 0; % tells - are xmin & xmax in frames?? (default no)
     
 if nargin < 2
    help envtopo
@@ -463,7 +467,6 @@ end;
 	if length(g.limits)>1
 	  limitset = 1;
 	end
-
 	%
 	%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
@@ -501,6 +504,9 @@ end;
           if g.limits(1)~=0 | g.limits(2)~=0 
 	     xmin = g.limits(1);
 	     xmax = g.limits(2);
+          elseif ~isempty(g.times)
+	     xmin = min(g.times);
+	     xmax = max(g.limits);
           end
           if g.limits(3)==0 & g.limits(4)==0 % compute y limits from data
 	     ymin = min(min(data));
@@ -705,7 +711,7 @@ npercol = ceil(ncomps/3);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-sampint = (xmax-xmin)/(frames-1);     % sampling interval = 1000/srate;
+sampint = (xmax-xmin)/(frames-1);     % sampling interval in sec
 times = xmin:sampint:xmax;            % make vector of times-values
 
 if strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
