@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/22 17:38:39  arno
+% correct title
+%
 % Revision 1.16  2002/08/22 17:01:14  arno
 % debugging for 1 plot
 %
@@ -204,10 +207,13 @@ for index = 1:size(arg2(:),1)
         if mod(index, rowcols(1)*rowcols(2)) == 1
             if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
         	figure;
-        end;    
-		pos = get(gcf,'Position');
+			pos = get(gcf,'Position');
+			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
+			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
+			set(gcf,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
+			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+       end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
-		set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 	end;
 
 	if ~isnan(arg2(index))
