@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/05/01 22:25:21  arno
+% no modif
+%
 % Revision 1.34  2002/05/01 21:23:24  arno
 % no changes
 %
@@ -566,7 +569,8 @@ else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%
     dispf = find(freqs <= g.maxfreq);
     freqs = freqs(dispf);
 
-	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,0.5);
+	%win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,0.5);
+	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,1);
 	P = zeros(size(win,2),g.timesout);       % summed power
 	R = zeros(size(win,2),g.timesout);       % mean coherence
 	PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
