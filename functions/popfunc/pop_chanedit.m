@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2004/03/19 19:04:53  scott
+% help message and plotrad gui text
+%
 % Revision 1.93  2004/03/18 01:41:01  arno
 % msgs
 %
@@ -933,9 +936,9 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
 	end;
 	if isfield(chans, 'shrink') 
 		shrinkorskirt = 1;
-        % if ~isstr(chans(1).shrink)
-        %    plotrad = 0.5 + 0.5*chans(1).shrink; % convert old values
-        % end;
+        if ~isstr(chans(1).shrink)
+            plotrad = 0.5 + 0.5*chans(1).shrink; % convert old values
+        end;
 		chans = rmfield(chans, 'shrink');
 	end;
     
