@@ -25,6 +25,9 @@
 %   'align'  - [time] -> time lock data to sortvar aligned to time in msec
 %              (time=Inf -> align to median sortvar) {default: no align}
 %   'nosort' - don't sort data on sortvar {default: sort}
+%   'valsort' - [startms endms direction] sort data on (mean) value 
+%              between startms and (optional) endms. Direction: 1 or -1
+%              If -1: plot max at bottom  {default: sort on sortvar}
 %   'noplot' - don't plot sortvar {default: plot if in times range}
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
 %              Can use NaN for missing items and omit late items; use
@@ -85,6 +88,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2002/10/13 23:56:54  scott
+% *** empty log message ***
+%
 % Revision 1.59  2002/10/13 23:55:47  scott
 % debugging valsort
 %
@@ -737,7 +743,7 @@ if nargin > 6
           if n > 1 & valargs(1) > valargs(2)
 			  		error('erpimage(): Value sorting time range must be increasing.');
           end
-          if n==3 & (~isnum(valargs(3)) | valargs(3)==0)
+          if n==3 & (~isnumeric(valargs(3)) | valargs(3)==0)
 			  		error('erpimage(): Value sorting direction must be +1 or -1.');
           end
           Valflag = NO;
@@ -1173,6 +1179,12 @@ elseif exist('valargs')
      sortval = data(stframe,:);
   end
   [sortval,sortidx] = sort(sortval);
+  if length(valargs)>2
+   if valargs(3) <0
+    sortidx = sortidx(end:-1:1); % plot largest values on top
+                                 % if direction < 0   
+   end
+  end
   data = data(:,sortidx);
   if ~isempty(auxvar)
     auxvar = auxvar(:,sortidx);
