@@ -3,8 +3,8 @@
 %              file for use with headplot()
 %
 % Usage: 
-%   >> [c h] = topo2sph('eloc_file','eloc_angles_file');
-%   >> [c h] = topo2sph( topoarray );
+%   >> [c h] = topo2sph('eloc_file','eloc_angles_file', method);
+%   >> [c h] = topo2sph( topoarray, method );
 %
 % Inputs:
 %   'eloc_file' = filename of polar 2-d electrode locations file used by topoplot()
@@ -13,6 +13,8 @@
 %                        for use in headplot().
 %   topoarray = polar array of 2-d electrode locations, with polar angle in the
 %               first column and radius in the second one.
+%   method        = [1|2], optional. 1 is for Besa compatibility, 2 is for
+%                   compatibility with Matla function cart2sph(). Default is 2.
 %
 % Outputs:
 %   c = coronal rotation
@@ -41,12 +43,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 3-16-00 changed name to topo2sph() for compatibility with cart2topo() -sm
 % 01-25-02 reformated help & license -ad 
 % 03-22-02 complete remodeling for returning arguments and taking arrays -ad 
 
-function [c, h] = topo2sph(eloc_locs,eloc_angles)
+function [c, h] = topo2sph(eloc_locs,eloc_angles, method)
 
 MAXCHANS = 1024;
 
@@ -54,7 +59,12 @@ if nargin < 1
     help topo2sph;
     return;
 end;
-    
+if nargin > 1 & ~isstr(eloc_angles)
+	method = eloc_angles;
+else
+	method = 2;
+end;
+
 if isstr(eloc_locs)
 	fid = fopen(eloc_locs);
 	if fid<1,
@@ -69,10 +79,9 @@ else
     E = [ ones(size(E,1),1) E ];
 end;
     
-if nargin > 1
+if nargin > 1 & isstr(eloc_angles)
 	if exist(eloc_angles)==2,
-	   fprintf('plo2sph(): eloc_angles file (%s) already exists.\n',eloc_angles);
-	   return
+	   fprintf('topo2sph: eloc_angles file (%s) already exists and will be erased.\n',eloc_angles);
 	end
 
 	fid = fopen(eloc_angles,'a');
@@ -82,26 +91,33 @@ if nargin > 1
 	end
 end;
 
-t = E(:,2); % theta
-r = E(:,3); % radius
-h = -t;  % horizontal rotation
-c = (0.5-r)*180;
+if method == 2
+	t = E(:,2); % theta
+	r = E(:,3); % radius
+	h = -t;  % horizontal rotation
+	c = (0.5-r)*180;
+else
+	for e=1:size(E,1)
+		% (t,r) -> (c,h)
+		
+		t = E(e,2); % theta
+		r = E(e,3); % radius
+		if t>=0
+			h(e) = 90-t; % horizontal rotation
+		else
+			h(e) = -(90+t);
+		end
+		if t~=0
+			c(e) = sign(t)*180*r; % coronal rotation
+		else
+			c(e) = 180*r;
+		end
+	end;
+end;
 
 for e=1:size(E,1)
-   % (t,r) -> (c,h)
 
-   %if t>=0
-   %   h(e) = 90-t; % horizontal rotation
-   %else
-   %   h(e) = -(90+t);
-   %end
-   %if t~=0
-   %   c(e) = sign(t)*180*r; % coronal rotation
-   %else
-   %   c(e) = 180*r;
-   %end
-
-   if nargin > 1
+   if nargin > 1 & isstr(eloc_angles)
         chan = E(e,4:7);
         fprintf('%d	%g	%g	%s\n',E(e,1),c(e),h(e),chan);
         fprintf(fid,'%d	%g	%g	%s\n',E(e,1),c(e),h(e),chan);
