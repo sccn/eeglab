@@ -40,7 +40,7 @@
 % compvar()       - compute component variance
 % convolve()      - smart conv2 (fewer boundary problems)
 % del2map()       - compute a surface Laplacian transform of the data
-% eegplot()       - scrolling multichannel data viewer (revised, with data rejection)
+% eegplot()       - scrolling multichannel data viewer (with data rejection)
 % eegplot2event() - process data rejection info from eegplot()
 % eegplot2trial() - process eegplot() rejection info
 % eegrej()        - reject portions of continuous eeg data
@@ -63,7 +63,7 @@
 % loadeeg()       - load neuroscan .EEG file
 % loadtxt()       - load text file
 % makehtml()      - generate html pages for directories (uses help2html)
-% mat2cell()      - matrix to cell, overwrite Matlab neural network toolbox function
+% mat2cell()      - matrix to cell (local)
 % pophelp()       - format the help header  !!!
 % realproba()     - compute observed probability (used by entropy)
 % rejepoch()      - reject trials based on a given statistical measure
@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2002/08/13 18:02:49  scott
+% help message and window title
+%
 % Revision 1.123  2002/08/13 17:12:15  scott
 % menu
 %
@@ -570,7 +573,7 @@ if nargin < 1
 	h('eeglab;');
 else
 	if strcmp(onearg, 'redraw')
-		W_MAIN = findobj('tag', 'EEGLAB (v4.0)');
+		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
 			updatemenu;
 			return;
@@ -781,7 +784,7 @@ W_MAIN = figure('Units','points', ...
 ... %	'Colormap','gray', ...
 	'PaperPosition',[18 180 576 432], ...
 	'PaperUnits','points', ...
-	'name', 'EEGLAB', ... 
+	'name', 'EEGLAB (v4.0)', ... 
 	'numbertitle', 'off', ...
 	'resize', 'off', ...
 	'Position',[545.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ], ...
