@@ -1,29 +1,27 @@
-% convertlocs() - Convert between frames for electrode locations
+% convertlocs() - Convert electrode locations between coordinate systems
+%                 using the structure of EEG.chanlocs.
 %
 % Usage: >> newchans = convertlocs( EEG, 'command');
 %
 % Input:
-%   chanlocs  - EEGLAB dataset or EEG.chanlocs structure
-%   'command' - Can be any of the following
-%               ['cart2topo'|'sph2topo'|'sphbesa2topo'|
+%   chanlocs  - EEGLAB EEG dataset OR EEG.chanlocs channel locations structure
+%   'command' - ['cart2topo'|'sph2topo'|'sphbesa2topo'|
 %               'sph2cart'|'topo2cart'|'sphbesa2cart'|
 %               'cart2sph'|'sphbesa2sph'|'topo2sph'|
 %               'cart2sphbesa'|'sph2sphbesa'|'topo2sphbesa'|
 %               'cart2all'|'sph2all'|'sphbesa2all'|'topo2all']
-%               to convert between the 4 coordinate frames
-%               3-D Carthesian (cart), Matlab spherical (sph)
-%               Besa spherical (sphbesa) and 2-D polar (topo)
-%               The command can also be 'auto'. Then the function
-%               find the most complex coordinate frame and constrain
-%               all the others to this one. By order, it first searches
-% 					 for carthesian ccordinates, then spherical and finaly
-%               polar. Default is 'auto'.
+%                 These command modes convert between four coordinate frames:
+%                    3-D cartesian (cart), Matlab spherical (sph),
+%                    Besa spherical (sphbesa), and 2-D polar (topo)
+%               'auto' -- Here, the function finds the most complex coordinate frame 
+%                 and constrains all the others to this one. It searches first for cartesian 
+%                 coordinates, then for spherical and finally for polar. Default is 'auto'.
 %
 % Outputs:
-%   newchans      - new EEGLAB channel locations structure
+%   newchans - new EEGLAB channel locations structure
 %
-% Ex:  CHANSTRUCT = convertlocs( CHANSTRUCT, 'cart2topo'
-%        % Convert Cathesian coordinates to topographical ones
+% Ex:  CHANSTRUCT = convertlocs( CHANSTRUCT, 'cart2topo');
+%      % Convert cartesian coordinates to 2-D polar (topographic). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002
 %
@@ -48,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/12/27 22:20:07  arno
+% same
+%
 % Revision 1.3  2002/12/27 22:18:26  arno
 % debugging besa coords
 %
