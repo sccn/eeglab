@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/24 21:45:18  scott
+% topovec bug -sm
+%
 % Revision 1.17  2002/04/24 21:43:00  scott
 % editing topovec code -sm
 %
@@ -393,7 +396,7 @@ end
 
 if isempty(g.topovec)
 	g.topovec = [];
-elseif (size(g.topovec,2))~=2)
+elseif size(g.topovec,2)~=2
 	error('tvec must be two column vectors.');
 end
 
@@ -653,8 +656,6 @@ for t=1:trials,
 	   end;
 	end
 end % t = trial
-abs(R(1:10))
-cumulXY(1:10)
 
 % handle trial bootstrap types
 % ----------------------------
