@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.330  2004/08/31 16:30:46  scott
+% dataset changes edits -sm
+%
 % Revision 1.329  2004/08/31 13:32:02  scott
 % changed the 'dataset inconsistency' message -sm
 % PS. Shouldnt the default be 'keep the changes'?
@@ -1752,24 +1755,6 @@ if ~option_keepdataset
 else
 	if isempty(ALLEEG) && ~isempty(EEG) & ~isempty(EEG.data)
 		ALLEEG = EEG;
-    else
-        if ~isempty(ALLEEG) && ~isequal(EEG, ALLEEG(CURRENTSET))
-            tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
-                                  'Dataset change detected', ...
-                      'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
-
-            if tmpanswer(1) == 'D' % delete changes
-                EEG = eeg_retrieve( ALLEEG, CURRENTSET);
-                h('EEG = eeg_retrieve( ALLEEG, CURRENTSET);');
-            elseif tmpanswer(1) == 'K' % keep changes
-                [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-                h('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-            else % make new dataset
-                [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
-                h(LASTCOM);
-                MAX_SET = max(length( ALLEEG ), length(EEGMENU));
-            end;
-        end;
 	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
@@ -1814,7 +1799,28 @@ end;
 if (isempty(EEG) | isempty(EEG.data)) & CURRENTSET ~= 0 & option_keepdataset
 	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
 	EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
-end;	
+end;
+% test if dataset has changed
+% ---------------------------
+if ~option_keepdataset
+    if ~isempty(ALLEEG) && ~isequal(EEG, ALLEEG(CURRENTSET))
+        tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
+                              'Dataset change detected', ...
+                              'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
+        
+        if tmpanswer(1) == 'D' % delete changes
+            EEG = eeg_retrieve( ALLEEG, CURRENTSET);
+            h('EEG = eeg_retrieve( ALLEEG, CURRENTSET);');
+        elseif tmpanswer(1) == 'K' % keep changes
+            [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+            h('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
+        else % make new dataset
+            [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
+            h(LASTCOM);
+            MAX_SET = max(length( ALLEEG ), length(EEGMENU));
+        end;
+    end;
+end;
 
 % print some informations on the main figure
 % ------------------------------------------
