@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.96  2004/06/09 16:27:11  arno
+%color debug
+%
 %Revision 1.95  2004/06/02 22:47:38  arno
 %debug color
 %
@@ -928,6 +931,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto axes %%%%%%%%%%%%%%%%%%%%%%%%%
             %
             if strcmpi(g.projlines, 'on')                
+                clear h;
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 h(1) = line( [xx xx]', [yy yy]', [zz -dat.maxcoord(1)]');
