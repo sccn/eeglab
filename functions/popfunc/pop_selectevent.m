@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/22 23:37:29  arno
+% temporary modification removed
+%
 % Revision 1.6  2002/04/22 23:36:53  arno
 % temporary modif
 %
@@ -140,13 +143,18 @@ if nargin<2
         % ----------------------------------------
         if index <= length( EEG.eventdescription )
              tmptext = EEG.eventdescription{ index };
-             if length(tmptext) > 15,    stringtext = [ tmptext(1:15) '...' ]; 
-             else                        stringtext = tmptext; 
-             end;
+			 if ~isempty(tmptext)
+				 if size(tmptext,1) > 15,    stringtext = [ tmptext(1,1:15) '...' ]; 
+				 else                        stringtext = tmptext(1,:); 
+				 end;
+			 else stringtext = 'no-description'; tmptext = 'no-description';
+			 end;
         else stringtext = 'no-description'; tmptext = 'no-description';
         end;
-        descrip = { 'string', stringtext, 'callback', ['questdlg([''' choptext( tmptext ) '''],''Description of field ' allfields{index} ''', ''OK'', ''OK'');' ] };
 
+		descrip = { 'string', stringtext, 'callback', ['questdlg(' vararg2str(tmptext) ...
+					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ] };
+	   ['questdlg(' vararg2str(tmptext) ',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ]
         % create the gui for this field
         % -----------------------------
         geometry = { geometry{:} [0.65 0.85 1.5 0.25 0.25 0.1] };
