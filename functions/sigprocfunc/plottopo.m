@@ -8,22 +8,31 @@
 %    >> plottopo(data,'chan_locs',frames,limits,title,channels,...
 %                                            axsize,colors,ydir,vert) 
 % Inputs:
-%   data       = data consisting of consecutive epochs of (chans,frames) 
-%  'chan_locs' = file of channel locations as in >> topoplot example   {grid}
-%                ELSE: [rows cols] grid size for rectangular matrix. Example: [6 4]
-%   frames     = time frames (points) per epoch {def|0 -> data length}
-%  [limits]    = [xmin xmax ymin ymax]  (x's in ms or Hz) {def|0 
-%                 (or both y's 0) -> use data limits)
-%  'title'     = plot title {def|0 -> none}
-%   channels   = vector of channel numbers to plot & label {def|0 -> all}
-%                   else, filename of ascii channel-name file
-%   axsize     = [x y] axis size {default [.07 .07]}
-%  'colors'    = file of color codes, 3 chars per line  
-%                ( '.' = space) {0 -> default color order}
-%   ydir       = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
-%   vert       = [vector] of times (in ms or Hz) to plot vertical lines {def none}
+%   data       = data consisting of consecutive epochs of (chans,frames)
+%                or (chans,frames,n)
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 3-2-98 
+% Optional inputs:
+%  'chanlocs'  = [struct] channel structure or file plot ERPs at channel 
+%                locations. See help readlocs() for data channel format.
+%  'geom'      = [rows cols] plot ERP in grid (overwrite previous option).
+%                Grid size for rectangular matrix. Example: [6 4].
+%  'frames'    = time frames (points) per epoch {def|0 -> data length}
+%  'limits'    = [xmin xmax ymin ymax]  (x's in ms or Hz) {def|0 
+%                 (or both y's 0) -> use data limits)
+%  'title'     = [string] plot title {def|'' -> none}
+%  'chan'      = vector of channel numbers to plot {def|0 -> all}
+%  'axsize'    = [x y] axis size {default [.07 .07]}
+%  'colors'    = [cell array] cell array of plot aspect. E.g. { 'k' 'k--' }
+%                for plotting the first curve in black and the second one
+%                in black dashed. Can also contain additional formating.
+%                { { 'k' 'fontweight' 'bold' } 'k--' } same as above but
+%                the first line is bolded.
+%  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> 1}
+%  'vert'      = [vector] of times (in ms or Hz) to plot vertical lines 
+%                {def none}
+%  'axsize'    = [x y] axis size {default [.07 .07]}
+%
+% Author: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3-2-98 
 %
 % See also: plotdata(), topoplot()
 
@@ -47,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/03/05 16:33:29  arno
+% default linewidth set to 1
+%
 % Revision 1.9  2003/03/05 16:27:53  arno
 % plotting lines after data
 %
@@ -86,22 +98,23 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-15-02 debuging chanlocs structure -ad & sm 
 
-function plottopo(data,chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
-
-if nargin < 1 | nargin > 10
-    help plottopo
-    return
-end
-
+%  'chan_locs' = file of channel locations as in >> topoplot example   {grid}
+%                ELSE: [rows cols] grid size for rectangular matrix. Example: [6 4]
+%   frames     = time frames (points) per epoch {def|0 -> data length}
+%  [limits]    = [xmin xmax ymin ymax]  (x's in ms or Hz) {def|0 
+%                 (or both y's 0) -> use data limits)
+%  'title'     = plot title {def|0 -> none}
+%   channels   = vector of channel numbers to plot & label {def|0 -> all}
+%                   else, filename of ascii channel-name file
+%   axsize     = [x y] axis size {default [.07 .07]}
+%  'colors'    = file of color codes, 3 chars per line  
+%                ( '.' = space) {0 -> default color order}
+%   ydir       = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
+%   vert       = [vector] of times (in ms or Hz) to plot vertical lines {def none}
 %
-%%%%%%%%%%%%% Extend the size of the plotting area in the window %%%%%%%%%%%%
-%
-  curfig = gcf;
-  h=figure(curfig);
-  set(h,'PaperUnits','normalized'); % use percentages to avoid US/A4 difference
-  set(h,'PaperPosition',[0.0235308 0.0272775 0.894169 0.909249]); % equivalent
-  orient portrait
-  axis('normal');
+
+function plottopo(data, varargin);
+    
 %
 %%%%%%%%%%%%%%%%%%%%% Graphics Settings - can be customized %%%%%%%%%%%%%%%%%%
 %
@@ -124,6 +137,50 @@ DEFAULT_AXHEIGHT = 0.07;
 DEFAULT_SIGN = 1;                         % Default - plot positive-up
 ISRECT = 0;                               % default
 ISSPEC = 0;                               % Default - not spectral data 
+    
+if nargin < 1 | nargin > 10
+    help plottopo
+    return
+end
+
+if length(varargin) == 1 | ( length(varargin) > 1 & ~isstr(varargin{2}))
+    options = { 'chanlocs' varargin{1} };
+    if nargin > 2, options = { options{:} 'frames' varargin{2} }; end;
+    if nargin > 3, options = { options{:} 'limits' varargin{3} }; end;
+    if nargin > 5, options = { options{:} 'chans'  varargin{5} }; end;
+    if nargin > 6, options = { options{:} 'axsize' varargin{6} }; end;
+    if nargin > 7, options = { options{:} 'colors' varargin{7} }; end;
+    if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end;
+    if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end;
+
+    if nargin > 4 & ~isequal(varargin{4}, 0), options = { options{:} 'title'  varargin{4} }; end;
+
+    %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
+else
+    options = varargin;
+end;
+g = finputcheck(options, { 'chanlocs'  {'struct' 'string'}     []          '';
+                    'frames'    'integer'               [1 Inf]     size(data,2);
+                    'chans'     'integer'               [1 Inf]     0;
+                    'geom'      'integer'               [1 Inf]     [];
+                    'limits'    'float'                 []          0;
+                    'title'     'string'                []          '';
+                    'axsize'    'float'                 [0 1]       [nan nan];
+                    'colors'    'cell'                  []          {};
+                    'ydir'      'integer'               [-1 1]      DEFAULT_SIGN;
+                    'vert'      'float'                 []          []});
+if isstr(g), error(g); end;
+data = reshape(data, size(data,1), size(data,2), size(data,3));    
+
+%
+%%%%%%%%%%%%% Extend the size of the plotting area in the window %%%%%%%%%%%%
+%
+  curfig = gcf;
+  h=figure(curfig);
+  set(h,'PaperUnits','normalized'); % use percentages to avoid US/A4 difference
+  set(h,'PaperPosition',[0.0235308 0.0272775 0.894169 0.909249]); % equivalent
+  orient portrait
+  axis('normal');
 
 icadefs; % read BACKCOLOR, MAXPLOTDATACHANS constant from icadefs.m
 set(gca,'Color',BACKCOLOR);               % set the background color
@@ -134,89 +191,46 @@ axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
 vertcolor = 'b';
 plotfile = 'plottopo.ps';
 ls_plotfile = 'ls -l plottopo.ps';
+
 %
 %%%%%%%%%%%%%%% Substitute defaults for missing parameters %%%%%%%%%%%%%%%%
 %
-
-if nargin < 10
-   vert = [];
-end
-if ~isempty(vert) & vert==0
-   vert = [];
-end
-SIGN = DEFAULT_SIGN;
-if nargin < 9
-   ydr = 0;
-end
-if ydr == -1
-   SIGN = -1;
-end
   
-if nargin < 8
-    colors = 0;
+axwidth  = g.axsize(1);
+axheight = g.axsize(2);
+
+if ~isempty(g.chans) & g.chans == 0
+   channelnos = 1:size(data,1);
+elseif ~isstr(g.chans)
+   channelnos = g.chans;
+else
+   channelnos = 1:size(data,1);
 end
 
-if nargin < 7,
-  axwidth  = nan; % DEFAULT_AXWIDTH;
-  axheight = nan; % DEFAULT_AXHEIGHT;
-elseif all(size(axsize) == [1 1]) & axsize(1) == 0
-  axwidth  = nan; % DEFAULT_AXWIDTH;
-  axheight = nan; % DEFAULT_AXHEIGHT;
-elseif all(size(axsize) == [1 2])
-  axwidth  = axsize(1);
-  axheight = axsize(2);
-  if axwidth > 1 | axwidth < 0 | axheight > 1 | axwidth < 0
-    help plottopo
-    return
-  end
-else
-  help plottopo
-  return
-end
-if nargin < 6
-   channels = 0;
-end
-if ~isempty(channels) & channels == 0
-   channelnos = 1:size(data,1);
-elseif ~isstr(channels)
-   channelnos = channels;
-else
-   channelnos = 1:size(data,1);
-end
-if nargin < 5
-    plottitle = 0; %CJH
-end
 limitset = 0;
-if nargin < 4,
-    limits = 0;
-elseif length(limits)>1
+if length(g.limits)>1
     limitset = 1;
 end
-if nargin < 3,
-    frames = 0;
-end
+
 if nargin < 2
-  chan_locs = '';
+  g.chanlocs = '';
 end
-if  isempty(chan_locs) | (isnumeric(chan_locs) & (chan_locs == 0))
-  chan_locs = '';
-end
-if isempty(chan_locs) 
-  n = ceil(sqrt(chans));
-  chan_locs = [n n];
+if isempty(g.chanlocs) & isempty(g.geom)
+  n = ceil(sqrt(length(channelnos)));
+  g.geom = [n n];
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Test parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if frames <=0,
-    frames = framestotal;    % default
+  if g.frames <=0,
+    g.frames = framestotal;    % default
     datasets=1;
-  elseif frames==1,
+  elseif g.frames==1,
     fprintf('plottopo: cannot plot less than 2 frames per trace.\n');
     return
     datasets=1;
   else
-    datasets = fix(framestotal/frames);        % number of traces to overplot
+    datasets = fix(framestotal/g.frames);        % number of traces to overplot
   end;
 
   if max(channelnos) > chans
@@ -227,7 +241,7 @@ end
   end
   if min(channelnos) < 1
     fprintf('plottopo(): min channel index (%g) < 1.\n',...
-                       min(channels));
+                       min(g.chans));
     return
   end;
   if length(channelnos)>MAXPLOTDATACHANS,
@@ -246,39 +260,39 @@ end
       return
   end;
 
-  if size(chan_locs,2)==2 % if grid plot
-    if isnan(axheight) % if not specified
-      axheight = gcapos(4)/(chan_locs(1)+1);
-      axwidth  = gcapos(3)/(chan_locs(2)+1);
-    end
-    % if chan_locs(2) > 5
-     %     axwidth = 0.66/(chan_locs(2)+1);
-    % end
+  if ~isempty(g.geom)
+      if isnan(axheight) % if not specified
+          axheight = gcapos(4)/(g.geom(1)+1);
+          axwidth  = gcapos(3)/(g.geom(2)+1);
+      end
+      % if chan_locs(2) > 5
+      %     axwidth = 0.66/(chan_locs(2)+1);
+      % end
   else
-     axheight = DEFAULT_AXHEIGHT;
-     axwidth =  DEFAULT_AXWIDTH;
+      axheight = DEFAULT_AXHEIGHT;
+      axwidth =  DEFAULT_AXWIDTH;
   end
     fprintf('Plotting data using axis size [%g,%g]\n',axwidth,axheight);
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if ~isstr(channels) 
+  if ~isstr(g.chans) 
     % channames = zeros(MAXPLOTDATACHANS,4);
-    % for c=1:length(channels),
-    %     channames(c,:)= sprintf('%4d',channels(c));
+    % for c=1:length(g.chans),
+    %     channames(c,:)= sprintf('%4d',g.chans(c));
     % end;
-    channames = num2str(channels(:));                   %%CJH
-  else % isstr(channels)
-    if ~isstr(channels)
+    channames = num2str(g.chans(:));                   %%CJH
+  else % isstr(g.chans)
+    if ~isstr(g.chans)
        fprintf('plottopo(): channel file name must be a string.\n');
        return
     end
-    chid = fopen(channels,'r');
+    chid = fopen(g.chans,'r');
     if chid <3,
-        fprintf('plottopo(): cannot open file %s.\n',channels);
+        fprintf('plottopo(): cannot open file %s.\n',g.chans);
         return
     else
-        fprintf('plottopo(): opened file %s.\n',channels);
+        fprintf('plottopo(): opened file %s.\n',g.chans);
     end;
 
     %%%%%%%
@@ -311,63 +325,61 @@ chans = length(channelnos);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if colors ~=0,
-    if ~isstr(colors)
-       fprintf('plottopo(): color file name must be a string.\n');
-       return
-    end
-    cid = fopen(colors,'r');
-    % fprintf('cid = %d\n',cid);
-    if cid <3,
-        fprintf('plottopo: cannot open file %s.\n',colors);
-        return
-    end;
-    colors = fscanf(cid,'%s',[3 MAXPLOTDATAEPOCHS]);
-    colors = colors';
-       [r c] = size(colors);
-    for i=1:r
-        for j=1:c
-            if colors(i,j)=='.',
-                colors(i,j)=' ';
-            end;
-        end;
-    end;
+  if isstr(g.colors)
+      cid = fopen(g.colors,'r');
+      % fprintf('cid = %d\n',cid);
+      if cid <3,
+          fprintf('plottopo: cannot open file %s.\n',g.colors);
+          return
+      end;
+      g.colors = fscanf(cid,'%s',[3 MAXPLOTDATAEPOCHS]);
+      g.colors = g.colors';
+      [r c] = size(g.colors);
+      for i=1:r
+          for j=1:c
+              if g.colors(i,j)=='.',
+                  g.colors(i,j)=' ';
+              end;
+          end;
+      end;
+      g.colors = cellstr(g.colors);
   else % use default color order (no yellow!)
-     colors =['b  ';'r  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  '];
-     colors = [colors; colors];  % make > 64 available
+      g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
+      g.colors = {g.colors{:} g.colors{:}};  % make > 64 available
   end;
-  for c=1:length(colors)   % make white traces black unless axis color is white
-    if colors(c,1)=='w' & axcolor~=[1 1 1]
-         colors(c,1)='k';
-    end
+  for c=1:length(g.colors)   % make white traces black unless axis color is white
+      if g.colors{c}(1)=='w' & axcolor~=[1 1 1]
+          g.colors{c}(1)='k';
+      end
   end
 %
 %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  if limits==0,      % == 0 or [0 0 0 0]
+  if g.limits==0,      % == 0 or [0 0 0 0]
     xmin=0;
-    xmax=frames-1;
+    xmax=g.frames-1;
     ymin=min(min(data));
     ymax=max(max(data));
   else
-    if length(limits)~=4,
+    if length(g.limits)~=4,
       fprintf( ...
        'plottopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
       return
     end;
-    xmin = limits(1);
-    xmax = limits(2);
-    ymin = limits(3);
-    ymax = limits(4);
+    xmin = g.limits(1);
+    xmax = g.limits(2);
+    ymin = g.limits(3);
+    ymax = g.limits(4);
   end;
 
   if xmax == 0 & xmin == 0,
-    x = (0:1:frames-1);
+    x = (0:1:g.frames-1);
     xmin = 0;
-    xmax = frames-1;
+    xmax = g.frames-1;
   else
-    dx = (xmax-xmin)/(frames-1);
-    x=xmin*ones(1,frames)+dx*(0:frames-1); % compute x-values
+    dx = (xmax-xmin)/(g.frames-1);
+    x=xmin*ones(1,g.frames)+dx*(0:g.frames-1); % compute x-values
   end;
   if xmax<=xmin,
       fprintf('plottopo() - xmax must be > xmin.\n')
@@ -386,7 +398,7 @@ chans = length(channelnos);
   xlabel = 'Time (ms)';
   if ISSPEC
     ISSPEC = 1;
-    SIGN = 1;
+    g.ydir = 1;
     fprintf('Plotting positive up. Assuming data are spectra.\n');
     xlabel = 'Freq (Hz)';
     ymin = 0;                        % plot positive-up
@@ -405,20 +417,17 @@ chans = length(channelnos);
   % clf;   % clear the current figure
 
   % print plottitle over (left) subplot 1
-  if plottitle==0,
-    plottitle = '';
-  end
-  h=gca;title(plottitle,'FontSize',TITLEFONTSIZE); % title plot and
+  h=gca;title(g.title,'FontSize',TITLEFONTSIZE); % title plot and
   hold on
   msg = ['Plotting %d traces of %d frames with colors: '];
 
   for c=1:datasets
-    msg = [msg  colors(c,:)];
+    msg = [msg  g.colors{c}];
   end
   msg = [msg ' -> \n'];    % print starting info on screen . . .
   fprintf('limits: [xmin,xmax,ymin,ymax] = [%4.1f %4.1f %4.2f %4.2f]\n',...
                 xmin,xmax,ymin,ymax);
-  fprintf(msg,datasets,frames);
+  fprintf(msg,datasets,g.frames);
 
   set(h,'YLim',[ymin ymax]);            % set default plotting parameters
   set(h,'XLim',[xmin xmax]);
@@ -432,10 +441,10 @@ chans = length(channelnos);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Read chan_locs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if size(chan_locs,2)==2 % plot in a rectangular grid
+if ~isempty(g.geom) % plot in a rectangular grid
    ISRECT = 1;
-   ht = chan_locs(1);
-   wd = chan_locs(2);
+   ht = g.geom(1);
+   wd = g.geom(2);
    if chans > ht*wd
       fprintf(...
     'topoplot(): (%d) channels to be plotted > grid size [%d %d]\n',...
@@ -474,35 +483,18 @@ if size(chan_locs,2)==2 % plot in a rectangular grid
    end
   
 else % read chan_locs file
-	% read the channel location file
-	% ------------------------------
-	[tmp channames Th Rd] = readlocs(chan_locs);
+     % read the channel location file
+     % ------------------------------
+	[tmp channames Th Rd] = readlocs(g.chanlocs);
 	channames = strvcat(channames{channelnos});
 	Th = pi/180*Th(channelnos);                 % convert degrees to radians
 	Rd = Rd(channelnos); 
 	
-%  fid = fopen(chan_locs);
-%  if fid<1,
-%    fprintf('plottopo(): cannot open chan_locs file "%s"\n',chan_locs)
-%    return
-%  end
-%  A = fscanf(fid,'%d %f %f %s',[7 MAXCHANS]);
-%  fclose(fid);
-%  A = A';
-  %channames = setstr(A(channelnos,4:7));
-  %idx = find(channames == '.');                     % some labels have dots
-  %channames(idx) = setstr(abs(' ')*ones(size(idx)));% replace them with spaces
-  %Th = pi/180*A(channelnos,2);                      % convert degrees to rads
-  %Rd = A(channelnos,3);
-  % ii = find(Rd <= 0.5); % interpolate on-head channels only
-  % Th = Th(ii);
-  % Rd = Rd(ii);
-
-  if length(channelnos) > length(Th),
-    error('plottopo(): data channels must be <= chan_locs channels')
-  end
-
-  [yvals,xvals] = pol2cart(Th,Rd); % translate from polar to cart. coordinates
+    if length(channelnos) > length(Th),
+        error('plottopo(): data channels must be <= ''chanlocs'' channels')
+    end
+    
+    [yvals,xvals] = pol2cart(Th,Rd); % translate from polar to cart. coordinates
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -554,7 +546,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             %
             NAME_OFFSET = -1;
             NAME_OFFSETY = -0.5;
-            if channels~=0,                               % print channames
+            if g.chans~=0,                               % print channames
                 if ISSPEC
                     axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');    % print before traces
@@ -563,7 +555,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     if ymin <= 0 & ymax >= 0,
                         yht = 0;
                     else
-                        yht = mean(SIGN*data(c,1+P*frames:1+P*frames+frames-1));
+                        yht = mean(g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
                     end
                     if ~ISRECT    % print before traces
                         axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
@@ -580,20 +572,20 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                         set(h,'FontSize',TICKFONTSIZE);            % choose font size
                     end % ISRECT
                 end % ~ISSPEC
-            end; % channels~=0
+            end; % g.chans~=0
         end; % P=0 
         %
         %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
             
-            plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
+            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1),g.colors{P+1},...
                  'linewidth',LINEWIDTH);   
-            ymn = min(SIGN*[ymax ymin]);
-            ymx = max(SIGN*[ymax ymin]);
+            ymn = min(g.ydir*[ymax ymin]);
+            ymx = max(g.ydir*[ymax ymin]);
             axis([xmin xmax ymn ymx]);          % set axis bounds
         else % ISSPEC
-            plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
+            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1),g.colors{P+1},...
                  'linewidth',LINEWIDTH);   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
@@ -616,16 +608,16 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         %
         %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
         %
-        if ~isnan(vert)
+        if ~isnan(g.vert)
             if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
                 ymean = (ymin+ymax)/2; 
                 vmin = ymean-0.5*(ymean-ymin);
                 vmax = ymean+0.5*(ymax-ymean);
-                for v = vert
+                for v = g.vert
                     plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
                 end
             else
-                for v = vert
+                for v = g.vert
                     plot([v v],[0 ymax],'color',vertcolor); 
                 end
             end
@@ -662,13 +654,13 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   %
   %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
   %
-  if ~isnan(vert)
+  if ~isnan(g.vert)
    if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-    for v = vert
+    for v = g.vert
       plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
     end
    else
-    for v = vert
+    for v = g.vert
       plot([v v],[0 ymax],'color',vertcolor); 
     end
    end
@@ -682,11 +674,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~ISSPEC % not spectral data
                                                     
     signx = xmin-0.15*xdiff;
-    axis('off');h=text(signx,SIGN*ymin,num2str(ymin,3)); % text ymin
+    axis('off');h=text(signx,g.ydir*ymin,num2str(ymin,3)); % text ymin
     set(h,'FontSize',TICKFONTSIZE);               % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    axis('off');h=text(signx,SIGN*ymax,['+' num2str(ymax,3)]);  % text +ymax
+    axis('off');h=text(signx,g.ydir*ymax,['+' num2str(ymax,3)]);  % text +ymax
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
