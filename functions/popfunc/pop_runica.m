@@ -1,5 +1,5 @@
-% pop_runica() - Run ICA decomposition on a dataset using runica() or (other
-%                ICA algorithms).
+% pop_runica() - Run ICA decomposition on an EEG dataset using runica(),
+%                binica(), or other ICA algorithm.
 %
 % Usage:
 %   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options );
@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/25 23:55:09  arno
+% interupt only for runica
+%
 % Revision 1.9  2002/10/25 23:52:01  arno
 % debugging for Mac
 %
