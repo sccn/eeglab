@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/09/14 17:14:54  arno
+% new file format
+%
 % Revision 1.23  2004/08/23 20:25:07  arno
 % better eerror msg
 %
@@ -128,7 +131,10 @@ end;
 
 % read only selected variables
 % ----------------------------
-if nargin > 2 && strcmpi(mode, 'info')
+if nargin < 3
+    mode = 'all';
+end; 
+if strcmpi(mode, 'info')
      options = { 'EEG' };
 else options = {};
 end;
@@ -160,7 +166,7 @@ if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
 	VAROUT = checkoldformat(TMPVAR.EEG);
-    if isstr(VAROUT.data) && ~strcmpi(VAROUT.data, 'EEGDATA');
+    if isstr(VAROUT.data) && ~strcmpi(VAROUT.data, 'EEGDATA')
         if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
             VAROUT.filepath = inputpath; 
             if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
@@ -179,7 +185,7 @@ if isfield(TMPVAR, 'EEG') %individual dataset
     
     % copy data to output variable if necessary
     % -----------------------------------------
-    if nargin > 2 && ~strcmpi(mode, 'info')
+    if ~strcmpi(mode, 'info')
         VAROUT.data = TMPVAR.EEGDATA;
     end;
     
