@@ -107,6 +107,22 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2003/09/25 00:50:14  arno
+% mapnorm
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+% adding comments for mapnorm
+%
 % Revision 1.73  2003/09/09 23:26:17  arno
 % change && to &
 %
@@ -644,7 +660,8 @@ if strcmpi(g.plot, 'on')
     axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',16);
-    yl=ylabel('Rel. Power (dB)');
+    % yl=ylabel('Rel. Power (dB)');
+    yl=ylabel('Power 10*Log(\muV²/Hz)');
     set(yl,'fontsize',16);
     set(gca,'fontsize',16)
     box off;
@@ -962,8 +979,10 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 		end;
 		for e=epoch_subset
 			if isempty(g.boundaries)
-				[tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
-									  winlength,g.overlap,fftlength,srate);
+				%[tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
+				%					  winlength,g.overlap,fftlength,srate);
+				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
+									  winlength,g.overlap);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 					specstd = zeros(nchans,length(freqs));
