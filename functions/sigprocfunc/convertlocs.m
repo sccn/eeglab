@@ -1,17 +1,17 @@
 % convertlocs() - Convert electrode locations between coordinate systems
-%                 using the structure of EEG.chanlocs.
+%                 using the EEG.chanlocs structure.
 %
 % Usage: >> newchans = convertlocs( EEG, 'command');
 %
 % Input:
-%   chanlocs  - EEGLAB EEG dataset OR EEG.chanlocs channel locations structure
+%   chanlocs  - An EEGLAB EEG dataset OR a EEG.chanlocs channel locations structure
 %   'command' - ['cart2topo'|'sph2topo'|'sphbesa2topo'| 'sph2cart'|'topo2cart'|'sphbesa2cart'|
 %               'cart2sph'|'sphbesa2sph'|'topo2sph'| 'cart2sphbesa'|'sph2sphbesa'|'topo2sphbesa'|
 %               'cart2all'|'sph2all'|'sphbesa2all'|'topo2all']
-%                These command modes convert between four coordinate frames: 3-D cartesian 
+%                These command modes convert between four coordinate frames: 3-D Cartesian 
 %                (cart), Matlab spherical (sph), Besa spherical (sphbesa), and 2-D polar (topo)
 %               'auto' -- Here, the function finds the most complex coordinate frame 
-%                 and constrains all the others to this one. It searches first for cartesian 
+%                 and constrains all the others to this one. It searches first for Cartesian 
 %                 coordinates, then for spherical and finally for polar. Default is 'auto'.
 %
 % Optional input
@@ -21,7 +21,7 @@
 %   newchans - new EEGLAB channel locations structure
 %
 % Ex:  CHANSTRUCT = convertlocs( CHANSTRUCT, 'cart2topo');
-%      % Convert cartesian coordinates to 2-D polar (topographic). 
+%      % Convert Cartesian coordinates to 2-D polar (topographic). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002
 %
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/12/17 00:44:36  arno
+% allowing channels with empty coordinates
+%
 % Revision 1.13  2003/12/06 02:11:39  arno
 % header
 %
@@ -108,24 +111,24 @@ if strcmp(command, 'auto')
     if isfield(chans, 'X') & ~isempty(chans(1).X)
         command = 'cart2all';
         if verbose
-            disp('Uniformize all coordinate frames using Carthesian coords');
+            disp('Make all coordinate frames uniform using Cartesian coords');
         end;
     else
         if isfield(chans, 'sph_theta') & ~isempty(chans(1).sph_theta)
             command = 'sph2all';
             if verbose
-                disp('Uniformize all coordinate frames using spherical coords');
+                disp('Make all coordinate frames uniform using spherical coords');
             end;
         else
             if isfield(chans, 'sph_theta_besa') & ~isempty(chans(1).sph_theta_besa)
                 command = 'sphbesa2all';
                 if verbose
-                    disp('Uniformize all coordinate frames using BESA spherical coords');
+                    disp('Make all coordinate frames uniform using BESA spherical coords');
                 end;
             else
                 command = 'topo2all';
                 if verbose
-                    disp('Uniformize all coordinate frames using polar coords');
+                    disp('Make all coordinate frames uniform using polar coords');
                 end;
             end;
         end;
@@ -239,7 +242,7 @@ case 'cart2sphbesa',
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
 case 'cart2sph',
     if verbose
-        disp('WARNING: in case XYZ center had not been optimized, optimize center');
+        disp('WARNING: If XYZ center has not been optimized, optimize it using Edit > Channel Locations');
 	end;
     X  = {chans.X};
     Y  = {chans.Y};
