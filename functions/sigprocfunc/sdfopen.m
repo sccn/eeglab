@@ -1,7 +1,6 @@
 % sdfopen() - Opens EDF/GDF/SDF files for reading and writing. The EDF format is specified 
 %             in [1], GDF in [2]. SDF is the SIESTA convention (see [3], pp.8-9); SDF uses 
 %             the EDF format.
-%
 % Usage:
 %       >> EDF     = sdfopen(Filename,'r' [,CHAN]);  % prepare to read CHAN channels
 %       >> EDF     = sdfopen(Filename,'r' [,CHAN [,MODE [,TSR]]]); % all arguments
@@ -9,10 +8,11 @@
 %       >> [S,EDF] = sdfread(EDF, SecRead, SecStart); % reads the opened EDF data file.
 %       >> [S,EDF] = sdfread(EDF, Inf); % reads the whole opened EDF data file.
 %
-% Inputs "CHAN":
-%      [int vector] Specifies the channel(s) to read. Else, a re-referencing matrix
-%                   [Default|0 -> read all channels].
-% Input "MODE": 
+% Inputs: 
+%      CHAN - [int vector] Specifies the channel(s) to read. Else, a re-referencing 
+%                  matrix. [Default|0 -> read all channels].
+%      MODE  -
+%
 %   'UCAL' [Default mode] Indicates that no calibration (re-scaling) to physical dim. 
 %                  is performed. Outputs are 16-bit integers. 
 % 
@@ -34,21 +34,20 @@
 %   'OVERFLOW'  - Performs overflow detection
 %   'Units_Blocks' - Requests the EDF-field arguments to SDFREAD in blocks 
 %                    [default is seconds]
-% Input "TSR":
-%         [optional] is the target sampling rate
-%         Currently only downsampling from 256 Hz or 200 Hz to 100 Hz is supported.  
-%         The details are described in the appendix of [4].
+%      TSR - [optional] The target (re)sampling rate. Currently, only downsampling 
+%            from 256 Hz or 200 Hz to 100 Hz is supported.  The details are described 
+%            in the appendix of [4].
 %
-% Outputs "EDF": 
-%         data structure read from the input file header.
-%         EDF.ErrNo   ~= 0  Indicates that an error occurred 
+% Outputs: 
+%         EDF - data structure read from the input file header.
+%           EDF.ErrNo   ~= 0  Indicates that an error occurred 
 %              1: First 8 bytes are not '0       ', violating the EDF spec.
 %              2: Invalid date (unable to guess correct date)
 %              4: Incorrect date information (later than current date) 
 %             16: Incorrect filesize: Header information does not match actual size
-%         EDF.FILE.FID = -1 indicates that file has not been opened
+%           EDF.FILE.FID = -1 indicates that file has not been opened
 %                           (for compatibility with former versions).
-%         EDF.WarnNo  ~=0 Indicates EDF structure problems
+%           EDF.WarnNo  ~=0 Indicates EDF structure problems
 %              1: ascii(0) in 1st header
 %              2: ascii(0) in 2nd header
 %              4: invalid SPR
@@ -223,7 +222,8 @@ IsGDF=strcmp(EDF.VERSION(1:3),'GDF');
 
 if IsGDF
         %EDF.T0=[str2num(H1(168+[1:4])) str2num(H1(168+[5 6])) str2num(H1(168+[7 8])) str2num(H1(168+[9 10])) str2num(H1(168+[11 12])) str2num(H1(168+[13:16]))/100 ];
-        if 1, % if strcmp(EDF.VERSION(4:8),' 0.12'); % in future versions the date format might change. 
+        if 1, % if strcmp(EDF.VERSION(4:8),' 0.12'); 
+	% Note: in future versions the date format might change. 
       		EDF.T0(1) = str2num( H1(168 + [ 1:4]));
 		EDF.T0(2) = str2num( H1(168 + [ 5 6]));
         	EDF.T0(3) = str2num( H1(168 + [ 7 8]));
