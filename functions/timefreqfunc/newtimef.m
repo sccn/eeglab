@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/01/11 00:38:02  cooper
+% fixed formula for linear coher.
+%
 % Revision 1.20  2003/01/10 19:54:29  arno
 % debugging linear coherence bootstrap for 2 conditions
 %
@@ -770,7 +773,7 @@ if iscell(X)
 		formula = {'log10(mean(arg1(:,:,X),3))'};
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
-		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3)*size(arg2,3) )'] };
+		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3)*length(X) )'] };
 		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
                                     { alltfX1power alltfX2power }, {alltfX1 alltfX2});
 		 case 'phasecoher2', % normalize first to speed up
