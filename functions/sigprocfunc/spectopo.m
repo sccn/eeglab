@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2005/02/03 00:23:44  arno
+% checking if array is empty
+%
 % Revision 1.92  2005/01/28 01:30:14  arno
 % omitting 0-channel for display (avoid crashes
 %
@@ -539,6 +542,7 @@ if g.percent ~= 1 & epochs > 1
     epoch_subset = find(epoch_subset == 1);
     fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
 end;
+g.chanlocs2 = g.chanlocs;
 if isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% compute data spectrum
@@ -555,7 +559,6 @@ if isempty(g.weights)
     end;
     
     tmpc = find(eegspecdB(:,1));
-    g.chanlocs2 = g.chanlocs;
     if length(tmpc) ~= size(eegspecdB,1)
         fprintf('\nWarning: channels [%s] have 0 value and are omitted for display', int2str(find(eegspecdB(:,1) == 0)));
         eegspecdB = eegspecdB(tmpc,:);
