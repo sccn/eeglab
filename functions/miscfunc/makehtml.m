@@ -35,7 +35,7 @@
 %   'refcall'    - Syntax format to call references. {default is  
 %                  'javascript:openhelp(''%s.js'')'} Use '%s.html' for an .html link.     
 %   'font'       - Font name (default: 'Helvetica')
-%   'background' - Background image (Ex: 'img.jpg' -> '<body BACKGROUND="img.jpg">'). 
+%   'background' - Background HTML body section. Include "<" and ">". 
 %   'outputlink' - Help page calling command for the function index page. {default is
 %                  'javascript:openhelp(''%s.js'')'.  Use '%s.html' to use a
 %                  standard .html page link instead.}    
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/01/28 19:51:11  arno
+% deleting destination filename
+%
 % Revision 1.14  2002/12/04 17:40:36  arno
 % mainheader option and tags for titles
 %
