@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/11/01 03:50:08  erik
+% same
+%
 % Revision 1.19  2002/11/01 03:47:40  erik
 % added test for locs_file string to readlocs call
 %
@@ -325,6 +328,9 @@ if isstr(loc_file)
 else % a locs struct
 	[tmpeloc labels Th Rd] = readlocs(loc_file);
 end
+if length(tmpelocs) == length(V1) + 1 % remove last channel if necessary (common reference channel)
+    tmpelocs(end) = [];
+end;
 if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
