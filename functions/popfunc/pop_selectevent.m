@@ -15,14 +15,16 @@
 %                      Ex: 'latency','400 < 700' Include all events with
 %                           latnecy in the range [400,700]
 %   'omitlatency' - [latency_range] latency range of the events to exclude
-%   'events'      - [events_range], indices of the events to include
-%   'omitevents'  - [events_range], indices of the events to exclude
+%   'event'       - [event_range], indices of the events to include
+%   'omitevent'   - [event_range], indices of the events to exclude
 %   'USER_VAR'    - [VAR_range], 'USER_VAR' is any user-defined field in
 %                   the event structure. Includes events with values of
 %                   field 'USER_VAR' in the specified range. Use [vector]
 %                   format for integers, 'min<max' format for real numbers.
 %   'omitUSER_VAR' - [VAR_range], 'USER_VAR' range of events to exclude
-%   'deleteothers' - ['yes'|'no'] 'yes' = Delete ALL epochs that do not include
+%   'select'       - ['keep'|'remove'] keep or remove selected events. Default
+%                    is 'keep'.
+%   'deleteepochs' - ['yes'|'no'] 'yes' = Delete ALL epochs that do not include
 %                   the specified events. {NOTE Default = 'yes'}.
 %                   This option is relevant only for epoched datasets derived
 %                   from continuous datasets.
@@ -61,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/05/03 02:49:53  arno
+% updating interface
+%
 % Revision 1.11  2002/05/03 02:42:11  arno
 % editing interface
 %
@@ -135,7 +140,7 @@ if nargin<2
          { 'Style', 'text', 'string', '  Field', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'To edit: Edit/Event info'  }, ...
          { 'Style', 'text', 'string', 'Ex: 2:4,5  OR  ''COND1''  OR  4.5 < 13'  }, ...
-         { 'Style', 'text', 'string', '    Remove range', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', '          non-range', 'fontweight', 'bold'  }, ...
          ...
          { 'Style', 'text', 'string', 'Event indices' }, ...
          { }, ...
@@ -171,9 +176,10 @@ if nargin<2
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } }; 
     end;
 
-    geometry = { geometry{:} [1]  [2 1] };
+    geometry = { geometry{:} [1]  [1 2] [2 1] };
     uilist   = { uilist{:} ...
         { }, ...
+        { 'Style', 'checkbox', 'string','Remove selected events',} { } ...
         { 'Style', 'checkbox', 'string','Remove epochs not referenced by any selected event', ...
 		  'tag', '10', 'fontweight', 'bold', 'value', 1  } { } };
 
@@ -199,13 +205,13 @@ if nargin<2
         if isempty(findstr(tmpres, '<')), 
             try, tmpres = eval( [ '[' tmpres ']' ] ); 
             catch, tmpres = parsetxt( tmpres ); end;
-			if iscell(tmpres), tmpres = { tmpres }; end;
         end;
         if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
         else                    args = { args{:}, [ 'omit' allfields{index}], tmpres }; 
         end;
     end;    
-    if results{end},  args = { args{:}, 'deleteothers', 'yes'}; end;
+    if results{end-1},  args = { args{:}, 'select', 'remove' }; end;
+    if results{end},    args = { args{:}, 'deleteepochs', 'yes'}; end;
 else % no interactive inputs
     args = varargin;
     for i=1:length(varargin)
@@ -213,25 +219,22 @@ else % no interactive inputs
     end;    
 end;
 
-% create structure
-% ----------------
-if ~isempty(args)
-   try, g = struct(args{:});
-   catch, error('Wrong syntax in function arguments'); end;
-else
-    g = [];
-end;
-
-% test the presence of variables
-% ------------------------------
-try, if isempty(g.event), g.event = [1:length(EEG.event)]; end; catch, g.event = [1:length(EEG.event)]; end;
-try, g.omitevent; 	 	 catch, g.omitevent = []; end;
-try, g.deleteothers; 	 catch, g.deleteothers = 'no'; end;
+% setting default for the structure
+% ---------------------------------
+fieldlist = { 'event'         'integer'     []                       [1:length(EEG.event)] ;
+			  'omitevent'     'integer'     []                       [] ;
+			  'deleteepochs'  'string'      { 'yes' 'no' }           'no' ;
+			  'select'        'string'      { 'keep' 'remove' }      'keep' };
 for index = 1:length(allfields) 
-   try, eval(['g.' allfields{index} ';']); catch, eval(['g.' allfields{index} '=[];' ]); end; 
-   try, eval(['g.omit' allfields{index} ';']); catch, eval(['g.omit' allfields{index} '=[];' ]); end; 
+	fieldlist{end+1, 1} = allfields{index};
+	fieldlist{end  , 2} = '';
+	fieldlist{end+1, 1} = [ 'omit' allfields{index} ];
+	fieldlist{end  , 2} = '';
 end;
-
+g = finputcheck( args, fieldlist, 'pop_selectevent');
+if isstr(g), error(g); end;
+if isempty(g.event), g.event = [1:length(EEG.event)]; end;
+	
 % select the events to keep
 % -------------------------
 Ievent = g.event;
@@ -241,13 +244,27 @@ for index = 1:length(allfields)
 
     % convert the value if the field is a string field
     % ------------------------------------------------
-	tmpvar = eval(['g.' allfields{index} ]);
-	if isstr(eval(['EEG.event(1).' allfields{index} ';' ])) & isnumeric(tmpvar) & ~isempty(tmpvar)
-		for tmpind = 1:length(tmpvar) 
-			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
+	tmpvar = getfield(g, {1}, allfields{index});
+	
+	if ~isempty(tmpvar)
+		if isnumeric(tmpvar)
+			if isstr(getfield( EEG.event, {1}, allfields{index}))
+				for tmpind = 1:length(tmpvar)
+					tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
+				end;
+				tmpvar = tmpvartmp;
+			end;
+		elseif isstr(tmpvar) & isempty( findstr(tmpvar, '<'))
+			if isnumeric(getfield( EEG.event, {1}, allfields{index}))
+				error(['numerical values must be entered for field ''' allfields{index} '''']);
+			end;
 		end;
-		tmpvar = tmpvartmp;
 	end;
+		
+	if isstr(tmpvar) & isempty( findstr(tmpvar, '<'))
+		tmpvar = { tmpvar };
+	end;
+	
 	if isstr(tmpvar) & isempty( findstr(tmpvar, '<'))
 		tmpvar = { tmpvar };
 	end;
@@ -255,14 +272,14 @@ for index = 1:length(allfields)
     % scan each field of EEG.event
     % ----------------------------
     if ~isempty( tmpvar )
-        if  iscell( tmpvar )
+        if  iscell( tmpvar ) % strings
             eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp; strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
             end;
             Ievent = intersect( Ievent, Ieventtmp );
-        elseif isstr( tmpvar )
+        elseif isstr( tmpvar ) % real range
             eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<')-1));
             max = eval(tmpvar(findstr(tmpvar, '<')+1:end));
@@ -277,7 +294,7 @@ for index = 1:length(allfields)
 			end;
 			Ieventlow  = find( tmpvarvalue >= min);
 			Ieventhigh = find( tmpvarvalue <= max);
-			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) )
+			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) );
         else
 			if strcmp(allfields{index}, 'latency')
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
@@ -342,11 +359,15 @@ for index = 1:length(allfields)
         end;
 	end;
 end;
+
 Ievent = setdiff( Ievent, Ieventrem);
+if strcmp(g.select, 'remove')
+	Ievent = setdiff( [1:length(EEG.event)], Ievent );
+end;
 
 % Events: delete epochs
 % ---------------------
-if strcmp( lower(g.deleteothers), 'yes') & EEG.trials > 1
+if strcmp( lower(g.deleteepochs), 'yes') & EEG.trials > 1
 	% ask for confirmation
 	% --------------------
 	Iepoch = ones(1, EEG.trials);
@@ -355,7 +376,7 @@ if strcmp( lower(g.deleteothers), 'yes') & EEG.trials > 1
 	end;
 	Iepoch = find(Iepoch == 0);
 	if nargin < 2 
-		ButtonName=questdlg([ 'Warning: ' num2str(length(Ievent)) ' events selected' 10 ...
+		ButtonName=questdlg([ 'Warning: keeping ' num2str(length(Ievent)) ' events' 10 ...
 					'Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ], ...
 							'Confirmation', ...
 							'No', 'Cancel', 'Yes','Yes');
@@ -375,7 +396,6 @@ else
 	end;
 	EEG.event = EEG.event(Ievent);
 end;
-
 event_indices = Ievent;
 
 % generate the output command
