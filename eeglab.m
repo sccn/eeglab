@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2002/07/08 19:23:31  arno
+% adding the import BCI menu command
+%
 % Revision 1.69  2002/06/25 14:36:31  arno
 % debugging no dataset error
 %
@@ -584,7 +587,6 @@ function eeg_mainfig;
 COLOR = [.56 .66 .90];
 colormap('gray');
 mat0 = colormap;
-close;
 WINMINX         = 17;
 WINMAXX         = 260;
 WINYDEC			= 13;
