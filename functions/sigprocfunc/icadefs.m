@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/03/21 15:34:57  scott
+% debug same
+%
 % Revision 1.23  2004/03/21 15:33:29  scott
 % made DEFAULT_ELOC = 'EEG.chanlocs'    for topoplot
 %
@@ -143,7 +146,7 @@ MAXEEGPLOTCHANS   = 264;  % maximum number of channels to plot in eegplot.m
 MAXTOPOPLOTCHANS  = 264;  % maximum number of channels to plot in topoplot.m
 
 DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL DEFAULT SRATE
-DEFAULT_ELOC  = 'EEG.chanlocs'; % default electrode location file for topoplot.m
+DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
 SC  =  ['binica.sc'];           % Master .sc script file for binica.m
