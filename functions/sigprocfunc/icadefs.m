@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/12 14:50:47  arno
+% [6~color
+%
 % Revision 1.11  2002/08/12 14:40:25  arno
 % color
 %
@@ -62,46 +65,26 @@
 % 01-24-02  added directory check -ad
 % 01-25-02  reformated help & license -ad 
 
-% -----------------------------------------------------------
-% ------------- START OF PATH DEFINITION --------------------
-% -----------------------------------------------------------
-if isunix
- ICADIR = [ '/home/scott/matlab/' ];    % <=INSERT Unix Matlab ICA dirname here
-                                        %    Include trailing /
- TUTDIR = ['/home/scott/matlab/tutorial'];% <=INSERT ica tutorial dirname here
+% ------------------------------------------------------
+% -------------- EEGLAB DEFINITION (V 4.0) -------------
+% ------------------------------------------------------
 
-else % assume Windows                  
- ICADIR = [ 'f:\scott\matlab\' ];       % <=INSERT PC matlab ICA dirname here
-                                        %    Include trailing /
- TUTDIR = ['f:\scott\matlab\tutorial']; % <=INSERT ica tutorial dirname here
-end
-                                       
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglab.html'; % online version
 
 ICABINARY = 'ica_linux'; % <=INSERT name of ica executable for binica.m
 
-% -----------------------------------------------------------
-% ------------- END OF PATH DEFINITION ----------------------
-% -----------------------------------------------------------
+% COLORS
+% ------
 
-SC  =  ['binica.sc'];           % Master .sc script file for binica.m
-                                % MATLAB will use first such file found
-                                % in its path of script directories.
-                                % Copy to pwd to alter ica defaults
+BACKCOLOR           = [.93 .96 1];    % Background figure color 
+BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
+GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
+GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
+GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
+GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
 
-GUIBACKCOLOR  =  [.846 .892 .956];     
-GUIBACKCOLOR  =  [.93 .96 1];     
-BACKCOLOR  =  [.93 .96 1];     
-BACKEEGLABCOLOR  = [.66 .76 1];    
-GUIBUTTONCOLOR   = [.66 .76 1];    
-GUITEXTCOLOR     = [0 0 0.4];
-
-GUIBUTTONCOLOR  =     [.66 .76 1]; 
-GUIPOPBUTTONCOLOR  =  [.93 .96 1];     
-GUIBACKCOLOR   = [.66 .76 1];    
-GUITEXTCOLOR     = [0 0 0.4];
-
-
+% THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
+% -------------------------------------------------------------
 
 MAXENVPLOTCHANS   = 256;  % maximum number of channels to plot in envproj.m
 MAXPLOTDATACHANS  = 256;  % maximum number of channels to plot in dataplot.m
@@ -113,10 +96,7 @@ DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL RATE
 DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
-
-if strcmp(ICADIR,'XXX/') | ~exist(ICADIR)
-    fprintf('===============================================\n');
-    fprintf('You have not set the ICADIR variable in icadefs.m\n');
-    fprintf('===============================================\n');
-    return
-end
+SC  =  ['binica.sc'];           % Master .sc script file for binica.m
+                                % MATLAB will use first such file found
+                                % in its path of script directories.
+                                % Copy to pwd to alter ica defaults
