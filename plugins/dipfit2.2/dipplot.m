@@ -115,6 +115,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.16  2003/04/11 17:26:45  arno
+%accurate plotting in fullMRI
+%
 %Revision 1.15  2003/04/10 17:37:18  arno
 %multi layer MRI plot
 %
@@ -631,7 +634,7 @@ function newsrc = convertbesaoldformat(src);
         % --------------
         if isempty(src(index).besaextori), src(index).besaextori = 1; end; % 20 mm
         newsrc(index).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
-        newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori];
+        newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori/300];
         
         % copy other fields
         % -----------------
