@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/03/17 02:29:24  arno
+% fixing history
+%
 % Revision 1.6  2005/03/17 02:24:49  arno
 % same
 %
@@ -183,7 +186,7 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     comsetting = [ trystrs.check_ica check_chans '[EEG LASTCOM]=pop_dipfit_settings(EEG);'    catchstrs.store_and_hist ]; 
     combatch   = [ check_dipfit check_chans  '[EEG LASTCOM] = pop_dipfit_gridsearch(EEG);'    catchstrs.store_and_hist ];
     comfit     = [ check_dipfitnocheck check_chans [ 'EEG = pop_dipfit_nonlinear(EEG); ' ...
-                        'LASTCOM = ''% History not supported for manual dipole fitting'';' ]  catchstrs.store_and_hist ];
+                        'LASTCOM = ''% === History not supported for manual dipole fitting ==='';' ]  catchstrs.store_and_hist ];
     complot    = [ check_dipfit check_chans 'LASTCOM = pop_dipplot(EEG);'                     catchstrs.add_to_hist ];
 
     
