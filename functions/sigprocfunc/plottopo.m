@@ -34,8 +34,9 @@
 %  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> 1}
 %  'vert'      = [vector] of times (in ms or Hz) to plot vertical lines 
 %                {def none}
-%  'regions'   = [float array] float array of size (n,2) each line defining 
-%                a time region [low high] to be highlighted.
+%  'regions'   = [cell array] cell array of size nchan. Each cell contains a
+%                float array of size (2,n) each column defining a time region 
+%                [low high] to be highlighted.
 %  'axsize'    = [x y] axis size {default [.07 .07]}
 %
 % Author: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3-2-98 
@@ -62,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/03/17 22:04:41  arno
+% allow to highlight regions of interest
+%
 % Revision 1.15  2003/03/16 02:59:30  arno
 % debug legend
 %
@@ -191,7 +195,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'limits'    'float'                 []          0;
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
-                    'regions'   'float'                 []          [];
+                    'regions'   'cell'                  []          [];
                     'colors'    'cell'                  []          {};
                     'legend'    'cell'                  []          {};
                     'showleg'   'string'                {'on' 'off'} 'on';
@@ -576,8 +580,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             %
             %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            for index=1:size(g.regions,1)
-                tmpreg = g.regions(index,:);
+            for index=1:size(g.regions{c},2)
+                tmpreg = g.regions{c}(:,index);
                 tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
                              [-100 -100 100 100], [1 1 0.9]); hold on;
                 set(tmph, 'edgecolor', [1 1 0.9]);
