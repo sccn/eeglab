@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2004/05/07 17:11:48  arno
+% checking event consistency
+%
 % Revision 1.49  2004/03/19 17:45:19  arno
 % including limits when selecting event boundaries
 %
@@ -253,9 +256,14 @@ if nargin<2
         % create the gui for this field
         % -----------------------------
         textfield = allfields{index};
-        if strcmpi(allfields{index}, 'latency')
+        if strcmp(allfields{index}, 'latency')
             if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
-            else textfield = [ textfield ' (ms)' ];
+            else textfield = [ textfield ' (s)' ];
+            end;
+        end;
+        if strcmp(allfields{index}, 'duration')
+            if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
+            else textfield = [ textfield ' (s)' ];
             end;
         end;
         geometry = { geometry{:} [0.55 0.65 1.3 0.1 0.22 0.1] };
@@ -406,6 +414,11 @@ for index = 1:length(allfields)
 											[EEG.xmin EEG.xmax], 1);
 				end;
 			end;
+			if strcmp(allfields{index}, 'duration')
+				if EEG.trials > 1, tmpvarvalue = tmpvarvalue*EEG.srate;
+                else               tmpvarvalue = tmpvarvalue*EEG.srate/1000;
+                end;
+            end;
 			Ieventlow  = find( tmpvarvalue >= min);
 			Ieventhigh = find( tmpvarvalue <= max);
 			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) );
@@ -456,6 +469,11 @@ for index = 1:length(allfields)
 											[EEG.xmin EEG.xmax], 1);
 				end;
 			end;
+			if strcmp(allfields{index}, 'duration')
+				if EEG.trials > 1, tmpvarvalue = tmpvarvalue*EEG.srate;
+                else               tmpvarvalue = tmpvarvalue*EEG.srate/1000;
+                end;
+            end;
             Ieventlow  = find( tmpvarvalue > min);
             Ieventhigh = find( tmpvarvalue < max);
             Ieventrem = union( Ieventrem, intersect( Ieventlow, Ieventhigh ) );
