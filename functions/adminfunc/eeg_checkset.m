@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2003/11/05 16:20:27  arno
+% homogenous -> homogeneous
+%
 % Revision 1.106  2003/11/04 15:47:48  scott
 % warning msg edits
 %
@@ -855,8 +858,8 @@ if ~isempty( varargin)
           end;
          case 'ica', 
           if isempty(EEG.icaweights)
-              if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
-                  errordlg2('eeg_checkset: ICA components must be derived before running that function'); 
+              if ~popask(strvcat('No ICA weights. Compute now?', '(then return to the function you just called)'))
+                  errordlg2('eeg_checkset: derive ICA components before running that function'); 
                   error('no ICA components'); return; 
               end;
               [EEG res] = pop_runica(EEG);
@@ -864,32 +867,32 @@ if ~isempty( varargin)
           end;
          case 'epoch', 
           if EEG.trials == 1
-              errordlg2(strvcat('Epochs must be extracted before running that function', 'Use Tools > Extract epochs'), 'Error');
-              error('eeg_checkset error: epochs must be extracted before running that function'); return
+              errordlg2(strvcat('Extract epochs before running that function', 'Use Tools > Extract epochs'), 'Error');
+              error('eeg_checkset error: extract epochs before running that function'); return
           end;
          case 'besa', 
           if ~isfield(EEG, 'sources')
-              errordlg2(strvcat('No dipole information', '1) Component maps must be exported: Tools > Localize ... BESA > Export ...' ...
-                                , '2) BESA must be run to localize the equivalent dipoles', ...
-                                '3) BESA dipoles must be imported: Tools > Localize ... BESA > Import ...'), 'Error');
+              errordlg2(strvcat('No dipole information', '1) Export component maps: Tools > Localize ... BESA > Export ...' ...
+                                , '2) Run BESA to localize the equivalent dipoles', ...
+                                '3) Import the BESA dipoles: Tools > Localize ... BESA > Import ...'), 'Error');
               error('eeg_checkset error: no BESA dipole information'); return
           end;
          case 'event', 
           if isempty(EEG.event)
-              errordlg2(strvcat('Cannot process if no events. First add events.', 'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
+              errordlg2(strvcat('Cannot process if no events. Add events.', 'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
               error('eeg_checkset: no events'); return;
           end;
          case 'chanloc', 
           if isempty(EEG.chanlocs)
-              errordlg2( strvcat('Cannot process without channel location file.', ...
-                         'Enter the name of the file via "Edit > Edit dataset info".', ...
+              errordlg2( strvcat('Cannot process dataset without channel location file.', ...
+                         'Enter the filename via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without channel location file.'); return;
           end;
          case 'chanlocs_homogeneous', 
           if isempty(EEG.chanlocs)
               errordlg2( strvcat('Cannot process without a channel location file.', ...
-                         'Enter the name of the file via "Edit > Edit dataset info".', ...
+                         'Enter the filename via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without a channel location file.'); return;
           end;
@@ -947,14 +950,14 @@ if ~isempty( varargin)
               try, allepochs = cell2mat( { EEG.event.epoch } );
                   removeevent = find( allepochs < 1 | allepochs > EEG.trials);
                   if ~isempty(removeevent)
-                      disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch number and were removed']);
+                      disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
                   end;
               catch, 
                   for indexevent = 1:length(EEG.event)
                       if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
                               | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
                           removeevent = [removeevent indexevent];
-                          disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
+                          disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has an invalid epoch number: removed']);
                       end;
                   end;
               end;
@@ -1061,7 +1064,7 @@ if ~isempty( varargin)
               end;    
           end;
           catch, errordlg2(['Warning: minor problem encountered when generating' 10 ...
-                        'the EEG.epoch structure (only used in custom scripting)']); return;
+                        'the EEG.epoch structure (used only in user scripts)']); return;
           end;
          otherwise, error('eeg_checkset: unknown option');
         end;        
