@@ -8,7 +8,7 @@
 %   confirm     - [0|1] ask for confirmation
 %
 % Inputs:
-%   EEGOUT      - output dataset
+%   EEGOUT      - output dataset (with variable EEG.rmave added)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/26 22:04:08  arno
+% debug
+%
 % Revision 1.8  2002/08/21 02:14:35  arno
 % debug
 %
@@ -83,14 +86,14 @@ end;
 
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 if ~isempty(EEG.icaweights)
-	disp('Pop_averef: converting ICA weight matrix to average reference (see >> help averef)');
-	[EEG.data EEG.icaweights EEG.icasphere] = averef(EEG.data,EEG.icaweights,EEG.icasphere);
+	disp('pop_averef(): converting ICA weight matrix to average reference (see >> help averef)');
+	[EEG.data EEG.icaweights EEG.icasphere EEG.rmave] = averef(EEG.data,EEG.icaweights,EEG.icasphere);
 	EEG.icawinv = [];
 	if size(EEG.icaweights,1) > EEG.nbchan
-		disp('Warning: channel may have been removed, component weights re-referencing may be is innacurate'); 
+		disp('Warning: one or more channels may have been removed; component weight re-referencing may be inaccurate'); 
 	end;
 	if size(EEG.icasphere,1) <  EEG.nbchan
-		disp('Warning: component may have been removed, component weights re-referencing could be innacurate'); 
+		disp('Warning: one or more components may have been removed; component weight re-referencing could be inaccurate'); 
 	end;
 else
 	EEG.data = averef(EEG.data);
