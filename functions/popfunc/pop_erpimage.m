@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/11 19:06:43  arno
+% adding option to default parameters
+%
 % Revision 1.2  2002/04/05 23:05:50  arno
 % Correct typo
 %
@@ -114,15 +117,20 @@ end;
 if nargin < 2	
 	typeplot = 1; %1=signal; 0=component
 end;
+popup = nargin < 3 | (nargin == 3 & (isstr(channel) | isempty(channel)));
 
-if nargin < 3 | (nargin == 3 & isstr(channel))
-
+if popup
 	% decode last command
 	% -------------------
-	if nargin == 3 & isstr(channel)
+	if nargin == 3
 		lastcom = channel;
 		indstr = findstr( lastcom, 'pop_erpimage');
-		if ~isempty( indstr )
+		if ~isempty( indstr ), defaults = 1;
+		else defaults = 0;
+		end;
+	else defaults = 0;
+	end;
+	if defaults
 			indstr = findstr( lastcom, ',');
 			chan_default   = lastcom(indstr(2)+1:indstr(3)-1);
 			title_default  = ''; %lastcom(indstr(3)+2:indstr(4)-2);
@@ -143,7 +151,6 @@ if nargin < 3 | (nargin == 3 & isstr(channel))
 			else
 				eloc_default    = 'no';
 			end;	
-		end;
 	else
 		chan_default = '1';
 		title_default = '';
@@ -181,7 +188,7 @@ if nargin < 3 | (nargin == 3 & isstr(channel))
 		renorm_default, ...
 		title_default, ...
 		eloc_default, ...
-		options_default };
+		options_default }
     
     help erpimage
     result       = inputdlg( promptstr, fastif( typeplot, 'Channel ERP image -- pop_erpimage()', ...
@@ -295,7 +302,7 @@ end;
 % outputs
 % -------
 outstr = '';
-if nargin >= 4 | (nargin == 3 & isstr(channel))
+if ~popup
     for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
     if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
 end;
@@ -305,7 +312,7 @@ end;
 if length( options ) < 2
     options = '';
 end;
-    options
+
 varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
 com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], titleplot, smooth, decimate %s);', outstr, options);
 eval(com)
