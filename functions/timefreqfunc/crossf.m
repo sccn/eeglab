@@ -152,6 +152,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/06/25 22:23:37  arno
+% NEW MODULAR VERSION WITH SUBITC
+%
 % Revision 1.24  2002/05/23 23:33:35  scott
 % remove subtraction of mean coherence -sm
 %
@@ -714,6 +717,7 @@ mbase = mean(abs(Coher.R(:,baseln)'));     % mean baseline coherence magnitude
 % ---------------
 plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
 Rangle = angle(Coher.R);
+R = abs(Coher.R);
 
 % ------------------
 % plotting functions
