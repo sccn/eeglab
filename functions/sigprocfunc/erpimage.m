@@ -1,63 +1,100 @@
-% erpimage() - Image single-trial ERPs optionally sorted on and/or aligned to 
-%              an input variable and smoothed by moving-average (Note: to
-%              return event-aligned data without plotting, use eventlock()).
-%              Click on axes to examine separately and zoom.
+% erpimage() - Image a collection of single-trial data epochs, optionally sorted on 
+%              and/or aligned to an input sorting variable and smoothed across trials 
+%              with a moving-average. Optionally sort trials on value, amplitude or
+%              phase within a specified window (NB: to return event-aligned data 
+%              without plotting, use eventlock()). Click on figure axes to examine 
+%              separately and zoom.
 % Usage:
 %   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
 %         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx] ...
-%            ...  
-%             = erpimage(data,sortvar,times,'title',avewidth,decimate,...
+%              ...  
+%                  = erpimage(data,sortvar,times,'title',avewidth,decimate,...
 %                             flag1,arg1,flag2,arg2,...);
-% Inputs:
-%   data     - single-channel data: format (1,frames*trials) or (frames,trials)
-%   sortvar  - vector variable to sort trials on (ntrials = length(sortvar))
-%              for example, >> sortvar = rts (in ms)
-%   times    - vector of times in ms (frames=length(times)){def|0->[0:frames-1]}
-%              else  [startms ntimes srate] = start time (ms), time points per epoch,
-%                sampling rate (Hz),
-%  'title'   - title string {default none}
-%   avewidth - ntrials in moving average window (may be non-int) {def|0->1}
-%   decimate - factor to decimate ntrials out by (may be non-int) {def|0->1}
-%                If this is large (>sqrt(num. trials)), this many trials output.
-% Options:
-%   'renorm' - ['yes'|'no'|'formula(x)'] normalize sorting variable. 'yes'=auto.
-%              Ex for formula(x): '3*x+2'. Default is 'no'.
-%   'align'  - [time] -> time lock data to sortvar aligned to time in msec
-%              (time=Inf -> align to median sortvar) {default: no align}
-%   'nosort' - don't sort data on sortvar {default: sort}
-%   'valsort' - [startms endms direction] sort data on (mean) value 
-%              between startms and (optional) endms. Direction: 1 or -1
-%              If -1: plot max at bottom  {default: sort on sortvar}
-%   'noplot' - don't plot sortvar {default: plot if in times range}
+% Necessary inputs:
+%   data     - [vector or matrix] Single-channel input data to image. 
+%               Formats (1,frames*trials) or (frames,trials)
+%   sortvar  - [vector] Variable to sort epochs on (length(sortvar) = nepochs)
+%              Example: sortvar may by subject response time in each epoch (in ms)
+%   times    - Vector of times (ms) (length(times) = frames) {def|0: [0:frames-1]}
+%               ELSE [startms ntimes srate] Give start time (ms), time points 
+%               (i.e. frames) per epoch, sampling rate (Hz),
+% Additional ordered inputs (with defaults):
+%  'title'   - ['string'] Plot titla {default: none}
+%   avewidth - Number of trials to moving-average (NB: may be non-int) {def|0->1}
+%   decimate - Factor to decimate ntrials out by (NB: may be non-int) {def|0->1}
+%               If this is large ( > sqrt(num. trials)), output this many trials.
+% Unordered 'keyword',arg options:
+%   'align'  - [time] Time-lock data to sortvar. Plot sortvar as at time (ms)
+%              If time == Inf, plot at sortvar median {default: no align}
+%   'noplot' - Do not plot sortvar {default: do plot sortvar if in times range}
+%   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to times range.
+%              and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
+%   'nosort' - Do not sort data on sortvar {default: do sort on sortvar}
+%  'valsort' - [startms endms direction] Sort data on (mean) value 
+%               between startms and (optional) endms. Direction is 1 or -1.
+%              If -1, plot max-value epoch at bottom {default: sort on sortvar}
+% 'phasesort' - [ms_center prct freq] Sort epochs by phase in a 3-cycle window 
+%                centered at time ms_center (ms). Percentile (prct) in range [0,100] 
+%                gives percent of trials to reject for low amplitude. Else, in range
+%               [-100,0] gives percent of trials to reject for high amplitude.
+%               minfreq (Hz) is the phase-sorting frequency. With optional maxfreq,
+%               sort by phase at freq of max power in the data in range [minfrq,maxfrq]
+%               (Note: phasesort freq overrides frequency specified in 'coher').
+%               With optional arg. topphase, sort by phase, putting topphase (deg. in 
+%               range [-180,180]) at the top of the image {default: [0 25 8 13 180]}
+%  'ampsort' - [center_ms prcnt minfreq maxfreq] Sort epochs by amplitude. See
+%               'phasesort' help above.
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
-%              Can use NaN for missing items and omit late items; use
-%              bamp to fix baseline amplitude.
-%   'caxis'  - [lo hi] -> set color axis limits {default: data bounds}
-%                else [fraction] = set caxis limits at (+/-)fraction*max(abs(data))
-%   'cbar'   - plot color bar to right of erp-image {default no}
-%   'erp'    - plot erp time average of the trials below the image
-%   'auxvar' - [matrix] -> plot auxiliary variable(s) for each trial as separate
-%              traces. To plot N traces, the auxvar matrix should be size (N,frames) 
-%              ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
-%              e.g. colorstrings = {'r','bo-','k:'} 
+%               PLot axes limits. Can use NaN for missing items and omit late items. 
+%               Use last input bamp to fix the baseline amplitude.
+%   'caxis'  - [lo hi] Set color axis limits ELSE [fraction] Set caxis limits at 
+%               (+/-)fraction*max(abs(data)) {default: data bounds}
+%   'cbar'   - Plot color bar to right of ERP-image {default no}
+%   'erp'    - Plot ERP time average of the trials below the image {default no}
+%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
+%               traces. To plot N traces, the auxvar matrix should be size (N,frames) 
+%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
+%               e.g. colorstrings = {'r','bo-','k:'} 
+%  'coher'   - [freq] Plot erp plus amp & coher at freq (Hz)
+%               [minfrq maxfrq] Same, but select frequency with max power
+%               in given range (NB: phasesort freq above overwrites these parameters).
+%               [minfrq maxfrq alpha] Add coher. signif. level line at alpha probability
+%               (alpha range: (0,0.1]) {default none}
+% 'plotamps' - Image amplitudes at each time & trial instead of potential values. 
+%               NB: Requires arg 'coher' with alpha signif. {default: image raw data}
+%   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
+%               See '>> topoplot example' for electrode location file structure.
+%   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
+%   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
+%               implicit in third arg times) {default: as in icadefs.m}
+%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
+%               levels to save computation time. {default: none}
+%   'vert'   - [times_vector] Plot vertical dashed lines at specified times
+%               ELSE  [times_matrix] Plot vertical dashed time series at times 
+%               specified by the columns of the 'vert' arg matrix. Matrix must  
+%               have ntrials rows (See also: auxvar).
+% 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
+% 'yerplabel' - ['string'] ERP ordinate axis label (default is uV)
 %
-% Note:
-%       FOR MORE INPUT ARGS: phase,coher,allamps,topo,spec,srate,signif,vert,noxlabel
-%                       SEE: >> erpimage moreargs 
-% Outputs:
-%   outdata   = (times,epochsout) data matrix (after smoothing)
-%   outvar    = (1,epochsout)  sortvar vector (after smoothing)
-%   outtrials = (1,epochsout)  smoothed trial numbers 
-%   limits    = (1,10) array, 1-9 as in 'limits' above, then analysis frequency (Hz)
-%   axhndls   = vector of 1-7 plot axes handles (img,cbar,erp,amp,coh,topo,spec)
-%   erp       = plotted ERP average
+% Optional outputs:
+%    outdata  = (times,epochsout) data matrix (after smoothing)
+%     outvar  = (1,epochsout)  sortvar vector (after smoothing)
+%   outtrials = (1,epochsout)  smoothed trial numbers
+%     limits  = (1,10) array, 1-9 as in 'limits' above, then analysis frequency (Hz) 
+%    axhndls  = vector of 1-7 plot axes handles (img,cbar,erp,amp,coh,topo,spec)
+%        erp  = plotted ERP average
+%       amps  = mean amplitude time course
+%      coher  = mean inter-trial phase coherence time course
+%     cohsig  = coherence significance level
+%     ampsig  = amplitude significance levels [lo high]
+%    outamps  = matrix of imaged amplitudes (from option 'allamps')
+%   phsangls  = vector of sorted trial phases at the phase-sorting frequency
+%     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
+%    sortidx  = indices of sorted data epochs plotted
 %
-% Note: 
-%      FOR MORE OUTPUT ARGS: amps,coher,cohsig,ampsig,outamps,phsangls,phsamp,sortidx
-%                  SEE:  >> erpimage moreargs
-%
+
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme, 
-%          CNL/Salk Institute, La Jolla, 3-2-1998 
+%          CNL/Salk Institute, La Jolla, 3-2-1998 -
 %
 % See also: erpimages(), phasecoher(), rmbase(), cbar(), movav()
 
@@ -88,6 +125,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2002/10/14 14:56:45  scott
+% working on ampsort
+%
 % Revision 1.61  2002/10/14 00:42:58  scott
 % added valsort direction and help msg -sm
 %
@@ -294,10 +334,10 @@
 % 04-05-02 corrected zero alignment problem (display only) -ad
 %
 % Known Bugs:
-% 'limits', [lotime hitime] does not work with 'erp'
+% 'limits', [lotime hitime] may not work with 'erp'
 % 'limits', [... loerp hierp] (still??) may leave "ghost" grey numbers 
 %       on the coher axis when printed (-djpeg or -depsc)
-% 'allcohers' - not fully implemented, and has been dropped from the help msg
+% 'allcohers' - not fully implemented, and has been omitted from the help msg
 
 function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
@@ -403,21 +443,6 @@ if nargin < 1
   return
 end
 
-if isstr(data) 
-   ans=strcmp(data,'moreargs');
-   if ans==1
-     more on
-     help erpimopt
-     more off
-     return
-   else
-     more on
-     help erpimage
-     more off
-     return
-   end
-end
-
 if nargin<2
   if size(data,1)==1 | size(data,2)==1
    fprintf('erpimage(): either specify times vector or size-(frames,trials) data.\n')
@@ -441,7 +466,7 @@ frames = floor(framestot/ntrials);
 if frames*ntrials ~= framestot
   help erpimage
   fprintf(...
-    '\nerpimage(); length of sortvar doesnt divide no. of data elements.\n')
+    '\nerpimage(); length of sortvar doesn''t divide number of data elements??\n')
   return
 end
 
@@ -452,12 +477,12 @@ if nargin < 5
   avewidth = 0;
 end
 if nargin<4
-  titl = '';
+  titl = ''; % default no title
 end
 if nargin<3
   times = NO;
 end
-if length(times) == 1 | times == NO,
+if length(times) == 1 | times == NO,  % make default times
    times = 0:frames-1;
    srate = 1000*(length(times)-1)/(times(length(times))-times(1));
    fprintf('Using sampling rate %g Hz.\n',srate);
@@ -468,7 +493,7 @@ elseif length(times) == 3
    times = mintime:1000/srate:mintime+(frames-1)*1000/srate;
    fprintf('Using sampling rate %g Hz.\n',srate);
 else
-   % could use default srate read from icadefs here...
+   % NB: might use default srate read from icadefs here...
    srate = 1000*(length(times)-1)/(times(end)-times(1));
 end
 if length(times) ~= frames
@@ -870,7 +895,7 @@ if exist('ampargs')
 	end
 	if length(ampargs)==4 & ampargs(4) > srate/2
 		ampargs(4) = srate/2;
-  fprintf('> Reducing max \'ampsort\' frequency to Nyquist (%g Hz)\n',srate/2)
+  fprintf('> Reducing max ''ampsort'' frequency to Nyquist (%g Hz)\n',srate/2)
 	end
 end
 if ~any(isnan(coherfreq))
@@ -1037,8 +1062,8 @@ if exist('phargs') == 1 % if phase-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by phase at %.2f Hz, window centered at %f3. ms.\n',...  
-			freq,phargs(1));
+	fprintf('Sorting data epochs by phase at %f4 Hz in a %d-cycle (%f4 ms) window centered at %f4. ms.\n',...  
+			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,phargs(1));
 	fprintf('Phase is computed using a filter of length %d frames.\n',...
 			length(winloc));
 	%
@@ -1110,7 +1135,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by amplitude at %.2f Hz in %d-cycle (%.0f-ms) window centered at %f3. ms.\n',...  
+	fprintf('Sorting data epochs by amplitude at %f4 Hz in %d-cycle (%f4-ms) window centered at %f4 ms.\n',...  
 			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
 	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
 			length(winloc));
