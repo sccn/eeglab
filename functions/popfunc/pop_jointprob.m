@@ -2,6 +2,7 @@
 %                   probability (i.e. probability of activity).
 %
 % Usage:
+%   >> pop_jointprob( INEEG, typerej) % popup
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_jointprob( INEEG, typerej, electrodes, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
@@ -57,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/26 16:40:54  arno
+% switching icacomp
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -211,5 +215,8 @@ nrej = sum(rej);
 com = [ com sprintf('Indexes = pop_jointprop( %s, %d, [%s], [%s], [%s], %d, %d);', ...
    inputname(1), icacomp, num2str(elecrange),  num2str(locthresh), ...
    num2str(globthresh), superpose, reject ) ]; 
+if nargin < 3 & nargout == 2
+	locthresh = com;
+end;
 
 return;

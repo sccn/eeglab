@@ -3,6 +3,7 @@
 %                 activity).
 %
 % Usage:
+%   >> pop_rejkurt( INEEG, typerej) % popup
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_rejkurt( INEEG, typerej, electrodes, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
@@ -56,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/26 16:38:49  arno
+% inverting icacomp
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -73,7 +77,7 @@ if nargin < 1
 end;  
 if nargin < 2
    icacomp = 1;
-end;  
+end;
 if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
@@ -210,5 +214,8 @@ nrej = sum(rej);
 com = [ com sprintf('Indexes = pop_rejkurt( %s, %d, [%s], [%s], [%s], %d, %d);', ...
    inputname(1), icacomp, num2str(elecrange),  num2str(locthresh), ...
    num2str(globthresh), superpose, reject ) ]; 
+if nargin < 3 & nargout == 2
+	locthresh = com;
+end;
 
 return;
