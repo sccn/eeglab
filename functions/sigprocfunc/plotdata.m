@@ -11,14 +11,14 @@
 %   frames     = time frames/points per epoch {default: 0 -> data length}
 %  [limits]    = [xmin xmax ymin ymax]  (x's in ms) 
 %                {default|0 (or both y's 0) -> use data limits)
-%  'title'     = plot title {defulat|0 -> none}
+%  'title'     = plot title {default|0 -> none}
 %  'channames' = channel location file or structure (see readlocs())
-%                {default -> channel numbers}
+%                {default|0 -> channel numbers}
 %  'colors'    = file of color codes, 3 chars per line  
 %                ( '.' = space) {default|0 -> default color order}
 %  'rtitle'    = right-side plot title {default|0 -> none}
 %   ydir       = y-axis polarity (1 -> pos-up; -1 -> neg-up) 
-%                {default -> set from default YDIR in 'icadefs.m'}             
+%                {default|0 -> set from default YDIR in 'icadefs.m'}             
 %
 % Authors: Scott Makeig, Arnaud Delorme, Tzyy-Ping Jung, 
 %          SCCN/INC/UCSD, La Jolla, 05-01-96 
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/11/22 18:14:26  scott
+% set ydir from YDIR in 'icadefs.m'; update help message
+%
 % Revision 1.12  2004/08/31 01:12:33  arno
 % fixed Matlab 7 bug
 %
@@ -140,7 +143,7 @@ SIGN = DEFAULT_SIGN; % set default ydir from YDIR in icadefs.m
 if nargin < 8
    ydr = [];
 end
-if ~isempty(ydir)  % override default from commandline 
+if ~isempty(ydr)& ydr ~=0  % override default from commandline 
  if ydr == 1
    SIGN = 1;
  else
