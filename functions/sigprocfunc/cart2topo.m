@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/06/30 15:13:23  arno
+% added warning
+%
 % Revision 1.16  2002/11/15 01:47:42  arno
 % function typo
 %
@@ -168,6 +171,10 @@ x = -x(:); % minus os for consistency between measures
 y = -y(:);
 z = z(:);
 
+if any(z < 0)
+    disp('WARNING: some electrodes lie below the z=0 plane, result may be innacurate')
+    disp('         Instead use cart2sph() then sph2topo().')
+end;
 if strcmp(g.gui, 'on')
 	[x y z newcenter] = chancenter(x, y, z, [], 1);
 else 
