@@ -12,51 +12,50 @@
 %
 % Inputs:
 %   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component 
-%   lastcom    - string containing last command (from LASTCOM) or from
-%                the function output.
+%   typeplot   - 1=channel, 0=component {default: ?}
+%   lastcom    - string containing previous pop_erpimage command 
+%                (from LASTCOM) or from the previous function call output.
 %
 % Commandline options:
-%   channel    - channel or component(s) number to plot
-%   projchan   - channel to project component to. If plotting channel
-%                this argument is ignored. If [], the ICA activity is
-%                plotted.
-%   title      - plot title
-%   smooth     - smoothing parameter (in terms of trial). Default is 5.
-%   decimate   - decimate parameter (i.e. number of lines to suppress
-%                to speed display). Default is 0.
-%   sortingtype  - Sorting event type(s) ([int vector]; []=all). See notes.
-%                It is either a string or an integer.
+%   channel    - Index of channel or component(s) to plot {default: 1}
+%   projchan   - Channel to back-project the selected component(s) to. 
+%                If plotting channel activity, this argument is ignored. 
+%                If [], the ICA component activation is plotted {default []}.
+%   title      - plot title {default: []}
+%   smooth     - Smoothing parameter (number of trials). Default is 5.
+%   decimate   - Decimate parameter (i.e. ratio of trials_in/trials_out). 
+%                  {Default: 0}
+%   sortingtype- Sorting event type(s) ([int vector]; []=all). See notes.
+%                Either a string or an integer.
 %   sortingwin - Sorting event window [start, end] in seconds ([]=whole epoch)
-%   sortingeventfield - Sorting field name. Default is none. 
+%   sortingeventfield - Sorting field name. {default: none}
 %   options    - erpimage() options. Default is none. Separate the options
 %                by commas. Example 'erp', 'cbar'. See erpimage() help 
 %                and >> erpimage moreargs for further details. 
 %
 % Outputs from pop-up: 
-%   string containing the command used to evaluate this plotting function
-%   (saved by eeglab() as LASTCOM) put it into 'lastcom' for restoring
-%   last input parameters as defaults in the pop-up window
+%   String containing the command used to evaluate this plotting function
+%   (saved by eeglab() as LASTCOM) put it into 'lastcom' input to restore
+%   last input parameters as defaults in a new pop_erpimage() pop-up window
 %
-% Outputs from command line:
-%   same as erpimage(), no outputs are returned when a
-%   window pops-up to ask for additional arguments
+% Outputs from commandline:
+%   Same as erpimage(). Note: No outputs are returned when a window pops-up 
+%   to ask for additional arguments
 %   
 % Notes:
 %   1) A new figure is created only when the pop_up window is called, 
-%   so you may call this command to draw topographic maps in a tiled 
-%   window. 
+%      so you may call this command to draw in sbplot() axes.
 %   2) To sort epochs, first define the event field to be used with
-%   the argument 'sortingeventfield' (for instance 'latency'). Then 
-%   because they may be several event with different latencies in a
-%   given epoch, it is possible to consider only a subsets of events
-%   using the 'sortingtype' argument and the 'sortingwin' argument. The 
-%   'sortingtype' argument selects events with definite types. The 
-%   'sortingwin' argument helps to define a specific time window in the 
-%   epoch to select events. For instance the epoch time range may be -1 
-%   to 2 seconds but one may want to select events only in the range 0 
-%   to 1 second. (these three parameters are forwarded to the function
-%   eeg_getepochevent() which contains more details).
+%      the argument 'sortingeventfield' (for instance 'latency'). Then 
+%      because they may be several event with different latencies in a
+%      given epoch, it is possible to consider only a subsets of events
+%      using the 'sortingtype' argument and the 'sortingwin' argument. The 
+%      'sortingtype' argument selects events with definite types. The 
+%      'sortingwin' argument helps to define a specific time window in the 
+%      epoch to select events. For instance the epoch time range may be -1 
+%      to 2 seconds but one may want to select events only in the range 0 
+%      to 1 second. (these three parameters are forwarded to the function
+%      eeg_getepochevent() which contains more details).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -81,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2002/08/23 18:31:26  arno
+% new features, complete gui reprogrammation with tags, new components only options
+%
 % Revision 1.65  2002/08/20 23:55:27  arno
 % updating text and tooltipstring
 %
