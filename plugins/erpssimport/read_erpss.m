@@ -36,7 +36,7 @@ function [eeg,ev,header] = read_erpss(filename)
         disp('File opened:');
     end
     
-    fseek(fp,8,-1);
+    fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
     
     cnt = 0;
