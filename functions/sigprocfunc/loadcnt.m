@@ -16,9 +16,9 @@
 %  'dataformat' - ['int16'|'int32'] default is 'int16' for 16-bit data.
 %                 Use 'int32' for 32-bit data.
 %  'blockread'  - [integer] by default it is automatically determined 
-%                 from the file header, though sometimes it fails, and
-%                 you may want to enter a value manually here (1 is the
-%                 most standard value).
+%                 from the file header, though sometimes it finds an 
+%                 incorect value, so you may want to enter a value manually 
+%                 here (1 is the most standard value).
 %
 % Outputs:
 %  cnt          - structure with the continuous data and other informations
@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/03/19 18:51:26  arno
+% allowing blockread option
+%
 % Revision 1.14  2003/11/05 16:38:08  arno
 % reading events for 32-bit data
 %
