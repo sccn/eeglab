@@ -115,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/11/21 01:04:55  arno
+% debugging colors
+%
 % Revision 1.25  2002/11/20 19:31:35  arno
 % new default for g.condtitle (I mean format)
 % new colors, still need some debugging
@@ -250,7 +253,8 @@ try, g.title;			catch, g.title = []; end;
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
 try, g.colmapcoh;       catch, 
     colormtmp = hot(64);
-    g.colmapcoh = colormtmp;
+    colormtmp(end,3) = (colormtmp(end,3)+colormtmp(end-1,3))/2; % white does not come out when the
+    g.colmapcoh = colormtmp;                                    % the figure is printed to ppm
     g.colmapcoh(:,1) =  colormtmp(:,2);
     g.colmapcoh(:,2) =  colormtmp(:,3);
     g.colmapcoh(:,3) =  colormtmp(:,1);
@@ -560,7 +564,7 @@ switch lower(g.caption)
       if any(ALLCROSSF{1,2,end}(:) < 0) % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcrossf, 'vert', '', g);
           ylabel('Cross-Coh' , 'fontweight', 'bold');
-          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
+          set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
       else
           cbar( [0 1], [0 1], g.colmapcrossf(length(g.colmapcrossf)/2:end,:), 'vert', '', g);
           ylabel('Cross-Coh' , 'fontweight', 'bold');
