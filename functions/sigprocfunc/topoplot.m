@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.161  2004/03/19 19:47:13  arno
+% remove str2num
+%
 % Revision 1.160  2004/03/19 19:05:26  scott
 % read string plotrad from channel locations structure
 %
@@ -706,6 +709,9 @@ end;
 % 
 if isempty(plotrad)
     plotrad = max(Rd)*1.015; % default plotting radius just outside lowest electrode
+    if plotrad>1
+       plotrad=1; % enforce plotting limit of 1 (bottom of head sphere)
+    end
     RESET_PLOTRAD=1;
 end;
 enum = find(Rd <= plotrad);           % interpolate plotted channels only
