@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/04/29 21:53:35  arno
+% rounding trials
+%
 % Revision 1.17  2003/04/29 18:41:27  arno
 % debug computation
 % .,
@@ -255,20 +258,21 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         g.winsize = max(g.winsize,length(g.win{index}));
     end;
 end;
-tmpall      = repmat(nan,[length(freqs) g.timesout trials]);
 
 % compute time vector
 % -------------------
 [ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize);
+tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
 % -------------------------------
 % compute time freq decomposition
 % -------------------------------
+fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 2*1000/srate*g.winsize);
 fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
         fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
 
-fprintf('Processing trial (of %d):',trials);
 if g.cycles(1) == 0
+    fprintf('Processing trial (of %d):',trials);
     for trial = 1:trials
         if rem(trial,10) == 0,  fprintf(' %d',trial); end
         if rem(trial,120) == 0, fprintf('\n'); end
@@ -295,10 +299,10 @@ else % wavelet
     
     % apply filters
     % -------------
+    fprintf('Processing time point (of %d):',length(g.timesout));
     for index = 1:length(g.indexout)
-        trialind = round(index/length(g.timesout)*trials);
-        if rem(trialind,10) == 0,  fprintf(' %d',trialind); end
-        if rem(trialind,120) == 0, fprintf('\n'); end
+        if rem(index,10) == 0,  fprintf(' %d',index); end
+        if rem(index,120) == 0, fprintf('\n'); end
         for freqind = 1:length(g.win)
             wav = g.win{freqind}; sizewav = size(wav,1)-1;
             %g.indexout(index), size(wav,1), g.freqs(freqind)
