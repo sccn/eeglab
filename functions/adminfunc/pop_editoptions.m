@@ -1,30 +1,35 @@
-% pop_editoptions() - Edit eeglab() options stored in the eeg_options()
-%                    Matlab file. With no argument, a window pops-up to
-%                    query the user about option values.
+% pop_editoptions() - Edit memory-saving eeglab() options stored in a file
+%                     'eeg_options.m'. With no argument, pop up a window 
+%                     to allow the user to set/unset these options. Store
+%                     user choices in a new 'eeg_options.m' file in the 
+%                     working directory.
 %
 % Usage: >> pop_editoptions;
 %        >> pop_editoptions( 'key1', value1, 'key2', value2, ...);
 %
 % Optional inputs:
-%   'option_computeica' - [0|1] If 1, compute the ICA component activity and
-%                   store it into a new variable. If 0, compute ICA activations
-%                   only when needed (only partially, if possible) and do not 
-%                   store the result). 0 may be used to process large datasets.
-%   'option_keepdataset' - [0|1]. If 1, keep datasets so that the user can undo 
-%                   any EEGLAB operations by returning to previous datasets.
-%                   The user may also work on several datasets at a time.
-%                   If 0, only one dataset is stored in memory, replacing the
-%                   input (EEG) dataset. 
+%   'option_computeica' - [0|1] If 1, compute the ICA component activitations and
+%                   store them in a new variable. If 0, compute ICA activations
+%                   only when needed (& only partially, if possible) and do not 
+%                   store the results). 
+%   'option_keepdataset' - [0|1]. If 1, keep datasets in memory so that the user 
+%                   can undo any EEGLAB operation by returning to the parent
+%                   dataset.  The user may work on several datasets at a time.
+%                   If 0, only one dataset is stored in memory, any changes 
+%                   overwriting the current (EEG) dataset. 
+%   NOTE: Turn OFF these options to work with very large datasets or on computers
+%                   with limited memory.
+%
 % Outputs:
 %   In the output workspace, variables 'option_computeica', 
-%   'option_keepdataset' and 'option_usedisk' are updated.
+%   'option_keepdataset' are updated, and a new 'eeg_options.m' file saved in
+%   the working directory.
 %
 % Note:
-%   Keep a copy of 'editoptions.m' in your working directory to overwrite system
-%   defaults (assuming that '.' is the first non-Matlab directory in your 
-%   MATLABPATH).
+%   Place a copy of 'eeg_options.m' in your working directory to overwrite system
+%   defaults (assuming the working directory is in your MATLABPATH - see path()).
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 09 March 2002
+% Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %
 % See also: eeg_options()
 
@@ -47,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/13 16:10:43  arno
+% debugging
+%
 % Revision 1.7  2002/08/13 00:31:31  scott
 % text
 %
