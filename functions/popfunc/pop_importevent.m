@@ -3,7 +3,7 @@
 %              parameter values.
 %
 % Usage: >> EEG = pop_importevent( EEG ); % pop-up window mode
-%        >> [EEG,eventindices] = pop_importevent( EEG, 'key1', 'value1', ...);
+%        >> EEG = pop_importevent( EEG, 'key1', 'value1', ...);
 %
 % Graphic interface:
 %   "Event indices" - [edit box] Enter indices of event to modify. 
@@ -54,9 +54,7 @@
 % Input:
 %   EEG      - input dataset
 %
-% Optional input
-%  'append'   - ['yes'|'no'] 'yes' = Append events to the current events in 
-%               the EEG dataset {default}: 'no' = Erase the previous events.
+% Optional file or array input:
 %  'event'    - [ 'filename'|array ] Filename of a text file, or name of s
 %               Matlab array in the global workspace containing an
 %               array of events in the folowing format: The first column
@@ -66,11 +64,15 @@
 %  'fields'   - [Cell array] List of the name of each user-defined column, 
 %               optionally followed by a description. Ex: { 'type', 'latency' }
 %  'skipline' - [Interger] Number of header rows to skip in the text file 
-%  'indices'  - {integer vector] Vector indicating the indices of the events to
-%               modify. 
 %  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
 %  'delim'    - [string] String of delimiting characters in the input file. 
 %               Default is tab|space.
+%
+% Optional oldevent input:
+%  'append'   - ['yes'|'no'] 'yes' = Append events to the current events in 
+%               the EEG dataset {default}: 'no' = Erase the previous events.
+%  'indices'  - {integer vector] Vector indicating the indices of the events to
+%               modify. 
 %  'align'    - [num] Align the first event latency to the latency of existing 
 %               event number (num), and check latency consistency. See also the 
 %               GUI help above.
@@ -79,7 +81,6 @@
 %
 % Outputs:
 %   EEG          - EEG dataset with updated event fields
-%   eventindices - Indexes of the appended events
 %
 % Example: >> [EEG, eventnumbers] = pop_importevent(EEG, 'event', ...
 %         'event_values.txt', 'fields', {'type', 'latency','condition' }, ...
@@ -93,7 +94,7 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002
 %
-% See also: pop_editeventfield(), eeg_eventformat(), pop_selectevent()
+% See also: importevent(), pop_editeventfield(), pop_selectevent()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -310,138 +311,7 @@ else % no interactive inputs
     end;                
 end;
 
-g = finputcheck( args, { 'fields'    'cell'     []         {};
-                         'skipline'  'integer'  [0 Inf]    0;
-                         'indices'   'integer'  [1 Inf]    [];
-                         'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         'yes';
-                         'timeunit'  'real'     [0 Inf]    1;
-                         'event'     { 'real' 'string' }     []    [];
-                         'align'     'integer'  []         NaN;
-                         'optimalign' 'string'  { 'on' 'off' }         'on';
-                         'delim'     {'integer' 'string'}   []         char([9 32])}, 'pop_importevent');
-if isstr(g), error(g); end;
-if ~isempty(g.indices), g.append = 'yes'; end;
-g.delim = char(g.delim);    
-
-% test the presence of variables
-% ------------------------------
-%try, g.fields; 	 	  catch, g.fields = {}; end;
-%try, g.skipline;      catch, g.skipline = 0; end;
-%try, g.indices;  g.append = '''yes'''; catch, g.indices = []; end;
-%try, g.append; 	      catch, g.append = '''yes'''; end;
-%try, g.timeunit; 	  catch, g.timeunit = 1; end;
-%try, g.align; 	      catch, g.align = NaN; end;
-%try, g.delim; 	      catch, g.delim = char([9 32]); end;
-
-% determine latency for old event alignment
-% -----------------------------------------
-g.align.val = g.align;
-if ~isnan(g.align.val)
-    if isempty(EEG.event)
-        error('Setevent: no pre-existing event, cannot perform alignment');
-    end;    
-    if ~isfield(EEG.event, 'latency')
-        error('Setevent: pre-existing events do not have a latency field for re-alignment');
-    end;    
-    switch g.append
-        case {'yes' '''yes'''}, disp('Setevent warning: using align, events should not be appended but erased');
-    end;
-    if g.align.val < 0
-        g.align.event = EEG.event(1).latency;
-    else
-        g.align.event = EEG.event(g.align.val+1).latency;
-    end
-    g.align.nbevent = length(EEG.event);
-    g.oldevents = EEG.event;
-    g.align.txt = sprintf([ 'Check alignment between pre-existing (old) and loaded event' ...
-                          ' latencies:\nOld event latencies (10 first): %s ...\n' ], ...
-                          int2str(cell2mat({ EEG.event(1:min(10, length(EEG.event))).latency })));
-else
-    g.oldevents = [];
-end;
-
-tmpfields = fieldnames(g);
-% scan all the fields of g
-% ------------------------
-for curfield = tmpfields'
-    if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
-    else                    allfields = {}; end;
-    switch lower(curfield{1})
-        case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
-        case 'event', % load an ascii file
-            switch g.append 
-                case { '''no''' 'no' } % ''no'' for backward compatibility
-                      EEG.event = load_file_or_array( g.event, g.skipline, g.delim );
-                      allfields = g.fields(1:min(length(g.fields), size(EEG.event,2)));
-                      EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
-					  % generate ori fields
-					  % -------------------
-					  for index = 1:length(EEG.event)
-						  EEG.event(index).init_index = index;
-						  EEG.event(index).init_time  = EEG.event(index).latency*g.timeunit;
-					  end;
-					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, ...
-                                                    g.timeunit, g.align, g.oldevents, g.optimalign);
-                case { '''yes''' 'yes' }
-                      % match existing fields
-                      % ---------------------
-                      tmparray = load_file_or_array( g.event, g.skipline, g.delim );
-                      if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(EEG.event); end;
-                      if length(g.indices) ~= size(tmparray,1)
-                            error('Set error: number of row in file does not match the number of event given as input'); 
-                      end;
-
-                      % add field
-                      % ---------
-                      g.fields = getnewfields( g.fields, size(tmparray,2)-length(g.fields));
-                      
-                      % add new values
-                      % ---------------------
-                      for eventfield = 1:size(tmparray,2)
-                          if isstr(tmparray{1,eventfield})
-                              for indtmp = 1:length(g.indices)
-                                  EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
-                              end;
-                          else EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices, cell2mat(tmparray(:,eventfield)));
-                          end;
-                      end;      
-					  % generate ori fields
-					  % -------------------
-					  offset = length(EEG.event)-size(tmparray,2);
-					  for index = 1:size(tmparray,2)
-						  EEG.event(index+offset).init_index = index;
-						  EEG.event(index+offset).init_time  = EEG.event(index+offset).latency*g.timeunit;
-					  end;
-                      EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, ...
-                                                    g.align, g.oldevents, g.optimalign);
-            end;
-      end;
-end;
-
-if isempty(EEG.event) % usefull 0xNB empty structure
-    EEG.event = [];
-end;
-
-% remove the events wit out-of-bound latencies
-% --------------------------------------------
-if isfield(EEG.event, 'latency')
-    try 
-        res = cellfun('isempty', { EEG.event.latency });
-        res = find(res);
-        if ~isempty(res)
-            fprintf( 'Pop_importevent warning: %d/%d have invalid latencies and were removed\n', ...
-                     length(res), length(EEG.event));
-            EEG.event( res ) = [];
-        end;
-    end;
-	alllatencies = cell2mat( { EEG.event.latency } );
-	I1 = find(alllatencies < 0);
-	I2 = find(alllatencies > EEG.pnts*EEG.trials);
-	if (length(I1) + length(I2)) > 0 
-	    fprintf('Setevent warning: %d/%d events had out-of-bounds latencies and were removed\n', length(I1) + length(I2), length(EEG.event));
-	    EEG.event(union(I1, I2)) = [];
-	end;
-end;
+EEG.event = importevent( [], EEG.event, EEG.srate, args{:});
 
 % generate ur variables
 % ---------------------
@@ -451,127 +321,3 @@ EEG = eeg_checkset(EEG, 'makeur');
 % generate the output command
 % ---------------------------
 com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vararg2str(args));
-
-% interpret the variable name
-% ---------------------------
-function array = load_file_or_array( varname, skipline, delim );
-    if isstr(varname) & exist(varname) == 2  % mean that it is a filename
-                                             % --------------------------
-        array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
-        
-    else % variable in the global workspace
-         % --------------------------
-         if isstr(varname)
-             array = evalin('base', varname);
-             if ~iscell(array)
-                 array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
-             end;    
-         else
-             array = varname;
-         end;
-    end;     
-return;
-
-% update latency values
-% ---------------------
-function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign);
-
-    % update time unit 
-    % ----------------
-    if ~isfield(event, 'latency'), 
-        if isfield(event, 'duration')
-            error('A duration field cannot be defined if a latency field has not been defined');
-        end;
-        return; 
-    end;
-    for index = indices
-        event(index).latency  = event(index).latency*srate*timeunit;
-        if isfield(event, 'duration')
-            event(index).duration = event(index).duration*srate*timeunit;
-        end;
-    end;
-
-    % alignment with old events
-    % -------------------------
-    if ~isnan( align.val )
-        if align.val >= 0, alignlatency = event(1).latency;
-        else               alignlatency = event(-align.val+1).latency;
-        end;
-        for index = indices
-             event(index).latency = event(index).latency-alignlatency+align.event;
-        end;
-        if length(event) ~= align.nbevent
-            disp([ 'Setevent warning: the number of pre-existing events do not correspond to the ' ...
-                   'number of event that were read, so their latencies may have been wrongly re-aligned' ]);
-        end;           
-        fprintf(align.txt);
-        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
-    end;
-    if strcmpi(optimalign, 'on') & ~isempty(oldevents)
-        newlat = cell2mat({ event.latency     });
-        oldlat = cell2mat({ oldevents.latency });
-       
-        newlat = repmat(newlat, [length(oldlat) 1]);
-        oldlat = repmat(oldlat', [1 size(newlat,2)]);
-        if align.val >= 0
-            newlat = newlat-newlat(1);
-            oldlat = oldlat-oldlat(1+align.val);
-        else
-            newlat = newlat-newlat(1-align.val);
-            oldlat = oldlat-oldlat(1);
-        end;
-        
-        newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
-        fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
-        if newfactor > 1.01 | newfactor < 0.99
-            disp('Difference is more than 1%, something is wrong; ignoring ratio');
-            newfactor = 1;
-        end;
-        
-        %diffarray = abs(newfactor*newlat-oldlat)';
-        %[allmins poss] = min(diffarray);
-        %figure; hist(allmins);
-    else
-        newfactor = 1;
-    end;
-    if ~isnan( align.val ) & newfactor ~= 1 
-        if align.val >= 0
-            latfirstevent = event(1).latency;
-        else
-            latfirstevent = event(-align.val+1).latency;
-        end;
-        for index = setdiff(indices, 1)
-            event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
-        end;
-        if ~isempty(oldevents)
-            fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
-            fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
-        end;
-    else
-        % must add one (because first sample point has latency 0
-        % ------------------------------------------------------
-        for index = indices
-            event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
-        end;
-    end;        
-
-         
-% create new field names
-% ----------------------
-function epochfield = getnewfields( epochfield, nbfields )
-   count = 1;
-   while nbfields > 0
-       if isempty( strmatch([ 'var' int2str(count) ], epochfield ) )
-               epochfield =  { epochfield{:} [ 'var' int2str(count) ] };
-               nbfields = nbfields-1;
-       else    count = count+1;
-       end;                    
-   end;     
-return;
-    
-function var = setstruct( var, fieldname, indices, values )
-    if exist('indices') ~= 1, indices = 1:length(var); end;
-    for index = 1:length(indices)
-        var = setfield(var, {indices(index)}, fieldname, values(index));
-    end;
-return;
