@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/18 19:16:19  arno
+% modifying gui
+%
 % Revision 1.6  2002/04/11 02:06:24  arno
 % adding event consistency check
 %
@@ -230,14 +233,16 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
         disp('Pop_epoch warning: bad event format with epoch dataset, removing events');
         EEG.event = [];
     else
-		if isfield(EEG.event, 'latency')
+		if isfield(EEG.event, 'epoch')
 			keepevent = [];
 			for indexevent = 1:length(EEG.event)
 				newindex = find( EEG.event(indexevent).epoch == g.trial );
 				if ~isempty(newindex)
 					keepevent = [keepevent indexevent];
-					EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
-					EEG.event(indexevent).epoch   = newindex;
+					if isfield(EEG.event, 'latency')
+						EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
+					end;
+					EEG.event(indexevent).epoch = newindex;
 				end;                
 			end;
 			diffevent = setdiff([1:length(EEG.event)], keepevent);
