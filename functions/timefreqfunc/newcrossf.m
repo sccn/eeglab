@@ -162,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/01/06 19:41:52  arno
+% implementing new bootstrap type
+%
 % Revision 1.38  2003/01/06 18:11:40  arno
 % shuffle along the 3rd dimension
 %
@@ -738,7 +741,7 @@ if iscell(X)
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
-                             shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
 	end;
 	%figure; imagesc(abs( sum( savecoher1 ./ abs(savecoher1), 3)) - abs( sum( savecoher2 ./ abs(savecoher2), 3)  )); cbar; return;
 	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
