@@ -17,8 +17,7 @@
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if n < 0, the number largest-comp. maps  to plot (component with max
 %                  variance) {default|[] -> 7}
-%  'times'     = vector of epoch latencies (ms) for each point in the input epoch(s) 
-%                  {default: from 'limits'}
+%  'times'     = starting and ending epoch latencies (in ms) {default: from 'limits'}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end latencies 
 %                  (in ms), min/max potential values (uV). If minmx & maxms = 0 -> get time limits
 %                  from 'times' or use 0:frames-1. If minuV and maxuV = 0 -> use data uV limits
@@ -88,6 +87,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2004/11/11 14:25:24  scott
+% Added 'times' input (for pop_envtopo() use); made default component selection
+% method 'mv' (max variance). Changed 'pvaf' options to 'mv' 'rv' 'pv' (but left
+% the backwards compatible meanings of 'on' 'off' and 'pvaf'. Tuned the help message
+% and printed messages.
+%
 % Revision 1.67  2004/11/11 07:20:57  scott
 % rescale [ymin,ymax] to include largest components considered -sm
 %
@@ -518,11 +523,9 @@ end;
 	  xmax = frames-1;
           fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
           xframes = 1;
-	elseif isempty(g.times)
+	else
 	  dt = (xmax-xmin)/(frames-1);
 	  times=xmin*ones(1,frames)+dt*(0:frames-1); % compute times-values
-        else
-          times = g.times;
 	end;
 	if xmax<=xmin,
 	  fprintf('envtopo() - maxms is not > minms.\n')
@@ -813,9 +816,8 @@ set(newaxes,'Color',BACKCOLOR); % set the background color
 delete(newaxes) %XXX
 
 % site the plot at bottom of the current axes
-axe = axes('Position',...
-               [pos(1) pos(2) pos(3) 0.6*pos(4)],...
-               'FontSize',16,'FontWeight','Bold');
+axe = axes('Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],...
+           'FontSize',16,'FontWeight','Bold');
 
 g.limits = get(axe,'Ylim');
 set(axe,'GridLineStyle',':')
@@ -824,7 +826,7 @@ set(axe,'Ygrid','on')
 axes(axe)
 set(axe,'Color',axcolor);
 
-fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax,ymin,ymax);
+% fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax,ymin,ymax);
 
 %
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
