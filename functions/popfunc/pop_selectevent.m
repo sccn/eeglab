@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/01 22:21:41  arno
+% debugging
+%
 % Revision 1.13  2002/07/10 02:16:41  arno
 % adding the 'select' input, the function check
 %
@@ -368,6 +371,16 @@ if strcmp(g.select, 'remove')
 	Ievent = setdiff( [1:length(EEG.event)], Ievent );
 end;
 
+% checking if trying to remove boundary events (in continuous data)
+if isstr(EEG.event(1).type) & EEG.trials == 1 
+	Ieventrem = setdiff([1:length(EEG.event)], Ievent );
+	boundaryindex = strmatch('boundary', { EEG.event(Ieventrem).type });
+	if ~isempty(boundaryindex)
+		Ievent = [ Ievent Ieventrem(boundaryindex)];
+	end;
+	Ievent = sort(Ievent);
+end;
+	
 % Events: delete epochs
 % ---------------------
 if strcmp( lower(g.deleteepochs), 'yes') & EEG.trials > 1
