@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/03/11 00:06:51  arno
+% edit box for sampling rate
+%
 % Revision 1.12  2003/06/19 16:16:16  arno
 % make ur
 %
@@ -94,7 +97,7 @@ if nargin < 1 & round(header.srate) == 0
     if length(result) == 0 return; end;
     srate   = eval( result{1} );
 elseif round(header.srate) ~= 0 
-    srate = header.srate
+    srate = header.srate;
 elseif nargin ~= 2
     disp('WARNING: Unknown sampling rate.Use menu "Edit > Dataset info" to enter it.');
     srate = NaN;
