@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.95  2004/06/02 22:47:38  arno
+%debug color
+%
 %Revision 1.94  2004/06/02 22:44:03  arno
 %projection color decoding
 %
@@ -452,7 +455,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
                                  'std'       'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
-                                 'projcol'   { 'string' 'real' }   []       [];
+                                 'projcol'   ''         []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
@@ -668,6 +671,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     if ~isempty(g.projcol)
         g.projcol = strcol2real( g.projcol, jet(64) );
+        g.projcol = g.color(mod(0:length(sources)-1, length(g.projcol)) +1);        
+    else
+        g.projcol = g.color;
+        for index = 1:length(g.color)
+            g.projcol{index} =  g.projcol{index}/2;
+        end;
     end;
     
     % build summarized figure
@@ -879,7 +888,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto images %%%%%%%%%%%%%%%%%%%%%%%%%
             %
             if strcmpi(g.projimg, 'on') & strcmpi(g.spheres, 'off')
-                tmpcolor = g.color{index} / 2;
+                tmpcolor = g.projcol{index};
                 
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
@@ -918,40 +927,26 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto axes %%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            if strcmpi(g.projlines, 'on')
-                if isstr(g.color{index})
-                    switch g.color{index}
-                     case 'y', g.color{index} = [1 1 0]; % yellow
-                     case 'm', g.color{index} = [1 0 1];
-                     case 'c', g.color{index} = [0 1 1];
-                     case 'r', g.color{index} = [1 0 0];
-                     case 'g', g.color{index} = [0 1 0];
-                     case 'b', g.color{index} = [0 0 1];
-                     case 'w', g.color{index} = [1 1 1];
-                     case 'k', g.color{index} = [0 0 0];
-                    end;
-                end;
-                tmpcolor = g.color{index};
-                
+            if strcmpi(g.projlines, 'on')                
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 h(1) = line( [xx xx]', [yy yy]', [zz -dat.maxcoord(1)]');
                 set(h(1), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 h(2) = line( [xx xx]', [yy dat.maxcoord(2)]', [zz zz]');
                 set(h(2), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 h(3) = line( [xx -dat.maxcoord(3)]', [yy yy]', [zz zz]');
                 set(h(3), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 if ~isempty(g.projcol)
-                    set(h, 'color', g.projcol);
+                    set(h, 'color', g.projcol{index});
                 end;
             end;
             %           
