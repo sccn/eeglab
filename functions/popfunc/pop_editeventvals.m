@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/12 18:31:03  arno
+% questdlg2
+%
 % Revision 1.14  2002/06/28 02:32:55  arno
 % disabling ori fields
 %
@@ -276,11 +279,11 @@ for curfield = 1:2:length(args)
 	        else
 	            events = EEG.event;
 	        end;       
-            try, eval(['tmparray = cell2mat( { EEG.event.' tmparg{1} ' } );']);
-            catch, eval(['tmparray = { EEG.event.' tmparg{1} ' };']);
+            try, eval(['tmparray = cell2mat( { events.' tmparg{1} ' } );']);
+            catch, eval(['tmparray = { events.' tmparg{1} ' };']);
 	        end;
 			if strcmp( tmparg{1}, 'latency') & EEG.trials > 1
-				tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
+				tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
 			end;
 	        [X I] = sort( tmparray );
 	        if dir1 == 1, I = I(end:-1:1); end;
