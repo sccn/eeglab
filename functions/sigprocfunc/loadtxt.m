@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/11/07 01:45:32  arno
+% adding nline argument
+%
 % Revision 1.3  2003/01/10 17:28:56  arno
 % debug last
 %
@@ -113,7 +116,7 @@ while isempty(inputline) | inputline~=-1
 			     end;
 	        case 'on',
 			     while ~isempty(deblank(inputline))
-			         [tmp inputline] = strtok(inputline, g.delim);
+			         [tmp inputline] = mystrtok(inputline, g.delim);
 			         tmp2 = str2num( tmp );
 			         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
 			         else                  array{linenb, colnb} = tmp2;
@@ -122,7 +125,7 @@ while isempty(inputline) | inputline~=-1
 			     end;
 	        case 'force',
 			     while ~isempty(deblank(inputline))
-			         [tmp inputline] = strtok(inputline, g.delim);
+			         [tmp inputline] = mystrtok(inputline, g.delim);
 			         array{linenb, colnb} = str2double( tmp );
 			         colnb = colnb+1;
 			     end;
@@ -139,3 +142,17 @@ end;
 if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end;
 if strcmp(g.convert, 'force'), array = cell2mat(array); end;
 fclose(fid); 
+
+% problem strtok do not consider tabulation
+% -----------------------------------------
+function [str, strout] = mystrtok(strin, delim);
+    if delim == 9 % tab
+        if length(strin) > 1 & strin(1) == 9 & strin(2) == 9 
+            str = '';
+            strout = strin(2:end);
+        else
+            [str, strout] = strtok(strin, delim);
+        end;
+    else
+        [str, strout] = strtok(strin, delim);
+    end;
