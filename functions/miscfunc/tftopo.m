@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/05/19 14:05:50  scott
+% testing -sm
+%
 % Revision 1.36  2002/05/19 14:00:45  scott
 % *** empty log message ***
 %
@@ -399,8 +402,10 @@ for n=1:tfpoints
                % 'interlimits','electrodes')
    axis square;
    hold on
-                topoplot(topomap,eloc_file,'electrodes','off', ...
+   if showchan>0
+                topoplot(showchan,eloc_file,'electrodes','off', ...
                                  'style', 'blank', 'emarkersize1chan', 10)
+   end
    tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
    set(tl,'fontsize',13);
    caxis([limits(5:6)]);
