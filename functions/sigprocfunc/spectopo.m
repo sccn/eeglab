@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 18:19:28  arno
+% adding 3D option
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -124,7 +127,7 @@ if percent ~= 1 & epochs > 1
         end;
     end;        
     epoch_subset = find(epoch_subset == 1);
-    fprintf('Selecting randomly %d epochs\n', length(epoch_subset));
+    fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
 end;
 fftlength = 2^round(log(srate)/log(2))*FREQFAC;
 fprintf('Computing spectra: ')
