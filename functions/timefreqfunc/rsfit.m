@@ -2,7 +2,7 @@
 %             using Ramberg-Schmeiser distribution
 %
 % Usage: >> p = rsfit(x, val)
-%        >> [p c l res] = rsfit(x, val)
+%        >> [p c l chi2] = rsfit(x, val)
 %
 % Input:
 %   x    - [float array] accumulation values
@@ -13,7 +13,7 @@
 %   c    - [mean var skewness kurtosis] distribution cumulants
 %   l    - [4x float vector] Ramberg-Schmeiser distribution best fit
 %          parameters.
-%   res  - [float] residual of the model fit
+%   chi2 - [float] chi2 for goodness of fit (based on 12 bins).
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/07/09 16:23:01  arno
+% adding error messages
+%
 % Revision 1.1  2003/07/08 15:59:53  arno
 % Initial revision
 %
@@ -100,4 +103,44 @@ function [p, c, l, res] = rsfit(x, val)
     [l1 l2 l3 l4] = rsadjust(l3, l4, xmean, xvar, xskew);
     l = [l1 l2 l3 l4];
     p = rsget(l, val);
+
+    % compute goodness of fit
+    % -----------------------
+    if nargout > 3
+
+        % histogram of value 12 bins
+        % --------------------------
+        [N X] = hist(x, 12);
+        interval = X(2)-X(1);
+        X = [X-interval/2 X(end)+interval/2]; % borders
+        
+        % regroup bin with less than 5 values
+        % -----------------------------------
+        for index = 1:length(N)-1
+            if N(index) < 5
+                N(index+1) = N(index+1) + N(index)
+                N(index)   = [];
+                X(index+1) = [];
+            end;
+        end;
+        for index = length(N):-1:2
+            if N(index) < 5
+                N(index-1) = N(index-1) + N(index)
+                N(index)   = [];
+                X(index) = [];
+            end;
+        end;
+        
+        % compute expected values
+        % -----------------------
+        for index = 1:length(X)-1
+            p1 = rsget( l, X(index+1));
+            p2 = rsget( l, X(index  ));
+            expect(index) = length(allvals)*(p1-p2);
+        end;
+        
+        % value of X2
+        % -----------
+        res = sum(((expect - N).^2)./expect)
+    end;
     return
