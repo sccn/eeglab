@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/14 01:29:17  arno
+% updating save
+%
 % Revision 1.5  2002/08/12 18:33:48  arno
 % questdlg2
 %
@@ -152,7 +155,7 @@ end;
 	
 % generate the output command
 % ---------------------------
-com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s)', inputname(1), inputname(2), inputname(3), inputname(1), inputname(2), inputname(3), vararg2str(args));
+com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s);', inputname(1), inputname(2), inputname(3), inputname(1), inputname(2), inputname(3), vararg2str(args));
 return;
 
 function num = popask( text )
