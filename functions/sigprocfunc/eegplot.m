@@ -20,6 +20,8 @@
 %                    [] -> Do not show channel labels 
 %                    {default|0 -> Show channel numbers [1:nchans]}
 %    'limits'     - [start end] Time limits for each epoch.
+%    'freqlimits' - [start end] Frequency limits for each epoch if plotting spectrum of
+%                   epoch instead of data (data has to contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
 %    'dispchans'  - [integer] Number of channels to display in window {default: 32}    ???
 %                    If < number of channels a vertical slider will allow scrolling. 
@@ -73,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/07/26 21:58:03  arno
+% same
+%
 % Revision 1.18  2002/07/26 21:57:21  arno
 % debugging x axis
 %
@@ -203,22 +208,23 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    		disp('Error: calling convention {''key'', value, ... } error'); return;
    end;	
 		 
-   try, g.srate; 			   catch, g.srate		= 256; 	end;
+   try, g.srate; 		    catch, g.srate		= 256; 	end;
    try, g.spacing; 			catch, g.spacing	= 0; 	end;
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
-   try, g.position; 		   catch, g.position	= [100 200 800 500]; 	end;
-   try, g.title; 			   catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
+   try, g.position; 	    catch, g.position	= [100 200 800 500]; 	end;
+   try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
    try, g.trialstag; 		catch, g.trialstag	= -1; 	end;
    try, g.winrej; 			catch, g.winrej		= []; 	end;
    try, g.command; 			catch, g.command	= ''; 	end;
    try, g.tag; 				catch, g.tag		= 'EEGPLOT'; end;
-   try, g.xgrid;			   catch, g.xgrid		= 'off'; end;
-   try, g.ygrid;			   catch, g.ygrid		= 'off'; end;
-   try, g.color;			   catch, g.color		= 'off'; end;
+   try, g.xgrid;		    catch, g.xgrid		= 'off'; end;
+   try, g.ygrid;		    catch, g.ygrid		= 'off'; end;
+   try, g.color;		    catch, g.color		= 'off'; end;
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
-   try, g.limits;			   catch, g.limits	    = [0 1]; end;
+   try, g.limits;		    catch, g.limits	    = [0 1]; end;
+   try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans = min(32, size(data,1)); end;
 
    if ndims(data) > 2
@@ -229,8 +235,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    for index=1:length(gfields)
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
-               'trialstag' 'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
-               'freq' 'submean' 'children' 'limits' 'dispchans' },;
+               'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -1028,7 +1034,9 @@ else
 	%			plot([tmptag-lowlim tmptag-lowlim], [0 1], 'b--');
    	%		end;	
     %	end;
-    %end;		
+    %end;
+	% compute Xticks
+	% --------------
     if g.trialstag(1) ~= -1
     	alltag = [];
        	for tmptag = lowlim:highlim
@@ -1049,7 +1057,7 @@ else
 		%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
 
 		nbdiv = 20/g.winlength; % approximative number of divisions
-		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5]]; % possible increments
+		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5 10 20]]; % possible increments
 		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
 
 		incrementtime  = divpossible(indexdiv);
@@ -1063,10 +1071,19 @@ else
 			end;
 			%tagpos  = [ tagpos [alltag(i):incrementpoint:(alltag(i+1)-1)]];
 			%tagtext = [ tagtext [g.limits(1):incrementtime:g.limits(2)] ];
-			tmptagpos = [alltag(i)+tagzerooffset:-incrementpoint:alltag(i)];
-			tagpos  = [ tagpos [tmptagpos(end:-1:2) alltag(i)+tagzerooffset:incrementpoint:(alltag(i+1)-1)]];
-			tmptagtext = [0:-incrementtime:g.limits(1)];
-			tagtext = [ tagtext [tmptagtext(end:-1:2) 0:incrementtime:g.limits(2)] ];
+			if ~isempty(g.freqlimits)
+				tagpos  = [ tagpos linspace(alltag(i),alltag(i+1)-1, nbdiv) ];
+				tagtext = [ tagtext round(linspace(g.freqlimits(1), g.freqlimits(2), nbdiv)) ];	
+			else
+				if tagzerooffset ~= 0
+					tmptagpos = [alltag(i)+tagzerooffset:-incrementpoint:alltag(i)];
+				else
+					tmptagpos = [];
+				end;
+				tagpos  = [ tagpos [tmptagpos(end:-1:2) alltag(i)+tagzerooffset:incrementpoint:(alltag(i+1)-1)]];
+				tmptagtext = [0:-incrementtime:g.limits(1)];
+				tagtext = [ tagtext [tmptagtext(end:-1:2) 0:incrementtime:g.limits(2)]];
+			end;
 		end;
      	set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
 			
