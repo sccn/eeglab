@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/05/19 13:34:12  scott
+% showchan==0 -> image signed st dev -sm
+%
 % Revision 1.31  2002/05/19 13:26:10  scott
 % adjusted channel label -sm
 %
@@ -323,7 +326,7 @@ else % showchan==0
   tfsign = sign(tfsign(:,:,round(nchans/2)));
 
   if exist('std')==2
-     tfave = tfsign.*std(abs(tfdat),3);
+     tfave = tfsign.*std(abs(tfdat),1,3);
   else
      tfave = tfsign.*mean(abs(tfdat),3);
   end
