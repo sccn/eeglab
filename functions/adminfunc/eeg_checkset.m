@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2002/11/11 15:28:54  arno
+% besa check
+%
 % Revision 1.76  2002/10/29 01:17:37  arno
 % implementing user abord
 %
@@ -622,7 +625,7 @@ if ~isempty( EEG.chanlocs )
 		end; 	
     end;
     if isstruct( EEG.chanlocs)
-        if length( EEG.chanlocs) ~= EEG.nbchan
+        if length( EEG.chanlocs) ~= EEG.nbchan & length( EEG.chanlocs) ~= EEG.nbchan+1
 			disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct: channel file/struct removed' ]); 
 	        EEG.chanlocs = [];
 	        res = com;
@@ -745,6 +748,15 @@ if ~isempty( varargin)
 						 'For the file format, enter ''>> help totoplot'' from the command line.'), 'Error');
 			  error('eeg_checkset: cannot process without channel location file.'); return;
 		  end;
+		 case 'chanlocsize', 
+		  if ~isempty(EEG.chanlocs)
+              if length(EEG.chanlocs) > EEG.nbchan
+                  questdlg2(strvcat('Warning: there is one more electrode location than', ...
+                                    'data channel. The last electrode is considered to be the', ...
+                                    'common reference. If it is not the case, please remove the', ...
+                                    'extra channel'), 'Warning', 'Ok', 'Ok');
+              end;    
+          end;
 		 case 'eventconsistency',		  
 		  if isempty(EEG.event), return; end;
 		  
