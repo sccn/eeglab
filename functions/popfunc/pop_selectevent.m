@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/08/28 00:57:19  arno
+% [Amodifying error message
+%
 % Revision 1.19  2002/08/19 21:57:55  arno
 % debug for MAC
 %
@@ -129,11 +132,12 @@
 
 function [EEG, event_indices, com] = pop_selectevent(EEG, varargin);
 
-com ='';
 if nargin < 1
    help pop_selectevent;
    return;
 end;	
+com ='';
+event_indices = [];
 
 % note that this function is also used for epochs
 % -----------------------------------------------
