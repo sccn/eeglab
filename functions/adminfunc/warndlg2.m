@@ -2,7 +2,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inpudlg2(), quesdlg2()
+% See also: inputdlg2(), questdlg2()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/12 18:57:14  arno
+% Initial revision
+%
 
 function warndlg2(Prompt, Title);
 
