@@ -10,9 +10,7 @@
 %
 % Optional inputs:
 %    'center'  = [X Y Z] known center different from [0 0 0]
-%                Enter [] if center not known, so the center
-%                will be automatically optimize (asuming electrodes
-%                location lie onto a sphere). Default is [0 0 0].
+%                Default is [0 0 0].
 %    'squeeze' = plotting  squeeze-in factor (0[default]->1). -1 optimize
 %                the squeeze factor automatically so that maximum radius
 %                is 0.5. 
@@ -57,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/26 20:32:49  arno
+% debugging center empty
+%
 % Revision 1.4  2002/04/26 20:31:23  arno
 % modifying gui
 %
