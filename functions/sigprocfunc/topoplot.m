@@ -136,6 +136,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.227  2004/12/17 06:49:57  scott
+% tested if isstruct or string chan_loc; worked on plotgrid - still unimplemented
+%
 % Revision 1.226  2004/12/10 21:00:17  scott
 % made 3rd output plotrad (by default). Documented reading of chanlocs.plotrad
 % if it exists.
@@ -1351,8 +1354,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          end
       end
     end
-    meshgrid(); % <==== incomplete
-    imagesc(gridvalues); % <==== incomplete
+    % meshgrid(); % <==== incomplete
+    % imagesc(gridvalues); % <==== incomplete
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
