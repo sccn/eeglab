@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/09 20:11:33  arno
+% eventdesciption advanced checking
+%
 % Revision 1.6  2002/04/09 02:38:12  arno
 % bedugging epoch event consistency check
 %
@@ -198,14 +201,19 @@ res = [];
     else
         EEG.event = [];
     end;
+	if isempty(EEG.event)
+		EEG.eventdescription = {};
+	end;
     if ~isfield(EEG, 'eventdescription') | ~iscell(EEG.eventdescription)
 		EEG.eventdescription = cell(1, length(fieldnames(EEG.event)));
 		res = com; 
     else 
-		if length(EEG.eventdescription) > length( fieldnames(EEG.event))
-		  EEG.eventdescription = EEG.eventdescription(1:length( fieldnames(EEG.event)));
-		elseif length(EEG.eventdescription) < length( fieldnames(EEG.event))
-			 EEG.eventdescription(end+1:length( fieldnames(EEG.event))) = {''};
+		if ~isempty(EEG.event)
+			if length(EEG.eventdescription) > length( fieldnames(EEG.event))
+				EEG.eventdescription = EEG.eventdescription(1:length( fieldnames(EEG.event)));
+			elseif length(EEG.eventdescription) < length( fieldnames(EEG.event))
+				EEG.eventdescription(end+1:length( fieldnames(EEG.event))) = {''};
+			end;
 		end;
     end;
     
