@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/06/12 00:23:55  arno
+% header typo, returns std
+%
 % Revision 1.59  2003/05/11 19:51:53  arno
 % debuging changeunitis
 %
@@ -398,6 +401,8 @@ if ~isempty(g.weights)
 		g.icacomps = [1:size(g.weights,1)];
 	end;
 end;
+compeegspecdB = [];
+resvar = NaN;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute channel spectra using psd()
