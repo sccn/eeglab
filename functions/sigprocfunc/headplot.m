@@ -91,6 +91,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/07/09 16:10:04  arno
+% debug
+% cbar
+%
 % Revision 1.41  2004/07/01 22:17:37  arno
 % rename mhead files
 %
@@ -356,7 +360,7 @@ if isstr(values)
     catch,
         POS  = load('mheadnewpos.txt', '-ascii');
         TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
-        TRI2 = load('mheadnewtri2.txt', '-ascii'); % lower head
+        try, TRI2 = load('mheadnewtri2.txt', '-ascii'); catch, end; % lower head
         index1 = load('mheadnewindex1.txt', '-ascii');
         center = load('mheadnewcenter.txt', '-ascii');
     end;
