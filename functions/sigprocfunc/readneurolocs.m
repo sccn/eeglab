@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/07/29 21:05:53  arno
+% handle cell array for channel locations
+%
 % Revision 1.3  2003/06/13 00:53:47  arno
 % debuging
 %
@@ -100,8 +103,8 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
         y = chans(:,4);    
     else
         names = filename{1};
-        x     = filename(2};
-        y     = filename(3};
+        x     = filename{2};
+        y     = filename{3};
     end;
     
     % find Cz and Fz
@@ -111,7 +114,16 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
         if ~isempty(indexcz), 
             centerx = x(indexcz);
             centery = y(indexcz);
-            error('Can not find Cz electrode, define the electrode index manually in readneurolocs()');
+        end;
+    end;
+    if exist('indexc3') ~= 1
+        indexc3 = strmatch( 'c3', lower(names'), 'exact' );
+        if exist('indexc4') ~= 1
+            indexc4 = strmatch( 'c4', lower(names'), 'exact' );
+            if exist('centerx') ~= 1 & ~isempty(indexc4) & ~isempty(indexc3)
+                centerx = (x(indexc3)+x(indexc4))/2;
+                centery = (y(indexc3)+y(indexc4))/2;
+            end;
         end;
     end;
     if exist('indexfz') ~= 1
@@ -121,16 +133,6 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
             if exist('centerx') ~= 1 & ~isempty(indexpz) & ~isempty(indexfz)
                 centerx = (x(indexfz)+x(indexpz))/2;
                 centery = (y(indexfz)+y(indexpz))/2;
-            end;
-        end;
-    end;
-    if exist('indexc3') ~= 1
-        indexc3 = strmatch( 'c3', lower(names'), 'exact' );
-        if exist('indexc4') ~= 1
-            indexpz = strmatch( 'c4', lower(names'), 'exact' );
-            if exist('centerx') ~= 1 & ~isempty(indexc4) & ~isempty(indexc3)
-                centerx = (x(indexc3)+x(indexc4))/2;
-                centery = (y(indexc3)+y(indexc4))/2;
             end;
         end;
     end;
