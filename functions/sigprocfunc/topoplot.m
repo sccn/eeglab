@@ -27,9 +27,7 @@
 %                        map from coordinate XI,YI to coordinates XE, YE. The
 %                        dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
-%                        Coordinates returned by besaplot can be used. Note that 
-%                        the dipole exact location has been tuned by hand and is 
-%                        not perfectly exact.
+%                        Coordinates returned by dipplot can be used.
 %   'maplimits'       - 'absmax' +/- the absolute-max 
 %                       'maxmin' scale to data range
 %                        [clim1,clim2] user-definined lo/hi
@@ -93,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/08/08 17:36:12  arno
+% shrink factor overwrite problem fixed
+%
 % Revision 1.59  2003/08/08 17:34:41  arno
 % -cos -> cos
 %
