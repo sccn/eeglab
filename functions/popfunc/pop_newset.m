@@ -18,7 +18,7 @@
 % Note: 1) this function take into account the content of eeg_options
 %       for dataset overwritting. If the dataset overwritting
 %       feature is set, the 'overwrite' arguement is ignored.
-%       2) this function calls eeg_store() which may modify the global
+%       2) this function calls eeg_store() which may modify the 
 %       variable ALLEEG containing all the dataset information.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 Arpil 2002
@@ -44,10 +44,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/26 02:46:37  arno
+% Initial revision
+%
 
 %   'aboutparent' - ['on'|'off'] insert reference to parent dataset in the comments
 
-function [ALLEEG, EEG, CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENSET, varargin);
+function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, CURRENSET, varargin);
 
 com = '';
 if nargin < 3
@@ -128,7 +131,7 @@ end;
 	
 % generate the output command
 % ---------------------------
-com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s)', inputname(1), inputname(2), inputname(3), inputname(1), inputname(2), inputname(3), vararg2str(args))
+com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s)', inputname(1), inputname(2), inputname(3), inputname(1), inputname(2), inputname(3), vararg2str(args));
 return;
 
 function num = popask( text )
