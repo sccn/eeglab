@@ -2,14 +2,29 @@
 %
 % Usage:
 %   >> pop_dipplot( EEG ); % pop up interactive window
-%   >> pop_dipplot( EEG, type, 'key1', 'val1', 'key2', 'val2', ...);
+%   >> pop_dipplot( EEG, type, comps, 'key1', 'val1', 'key2', 'val2', ...);
 %
 % Graphic interface:
-%   
+%   "Components" - [edit box] enter component number to plot. By
+%                all the localized components are plotted. Command
+%                line equivalent: components.
+%   "Use dipoles from" - [list box] use dipoles from BESA or from the
+%                DIPFIT toolbox. Command line equivalent: type.
+%   "Background image" - [list box] use BESA background image or average
+%                MRI image. Dipplot command line equivalent: 'image'.
+%   "Summary mode" - [Checkbox] when checked, plot the 3 views of the
+%                head model and dipole locations.
+%   "Normalized dipole length" - [Checkbox] normalize the length of
+%               all dipoles. Dipplot command line equivalent: 'normlen'.
+%   "Additionnal dipfit() options" - [checkbox] enter additionnal 
+%               sequence of 'key', 'val' argument in this edit box.
+%
 % Inputs:
-%   EEG        - Input dataset
-%   type       - ['DIPFIT'|'BESA'] use either 'DIPFIT' dipoles or
-%                'BESA' dipoles.
+%   EEG   - Input dataset
+%   type  - ['DIPFIT'|'BESA'] use either 'DIPFIT' dipoles or
+%           'BESA' dipoles.
+%   comps - [integer array] plot component indices. If empty
+%           all the localized components are plotted.
 %
 % Optional inputs:
 %   Same as dipplot().
@@ -37,8 +52,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/02/26 17:07:14  arno
+% Initial revision
+%
 
-function [com] = pop_dipplot( EEG, typedip, varargin);
+function [com] = pop_dipplot( EEG, typedip, comps, varargin);
 
 com ='';
 if nargin < 1
@@ -49,16 +67,20 @@ end;
 if nargin < 2
 	% popup window parameters
 	% -----------------------
-    if isfield(EEG, 'dipfit'), defaulttype = 1;
-    elseif isfield(EEG, 'sources'), defaulttype = 2;
+    if isfield(EEG, 'dipfit'), defaulttype = 2;
+    elseif isfield(EEG, 'sources'), defaulttype = 1;
     else error('No dipole information in dataset'); 
     end;
-    geometry = { [2 1] [2 1] [2.05 0.23 .75] [2 1] };
-    uilist = { { 'style' 'text' 'string' 'Use dipoles from (scroll, then click to select)' } ...
-               { 'style' 'listbox' 'string' 'DIPFIT|BESA' 'value' defaulttype } ...
+    geometry = { [2 1] [2 1] [2 1] [2.05 0.23 .75] [2.05 0.23 .75] [2 1] };
+    uilist = { { 'style' 'text' 'string' 'Components indices ([]=all)' } ...
+               { 'style' 'edit' 'string' '' } ...
+               { 'style' 'text' 'string' 'Use dipoles from (scroll, then click to select)' } ...
+               { 'style' 'listbox' 'string' 'BESA|DIPFIT' 'value' defaulttype } ...
                { 'style' 'text' 'string' 'Background image' } ...
-               { 'style' 'listbox' 'string' 'average MRI|BESA Head' } ...
+               { 'style' 'listbox' 'string' 'BESA Head|average MRI' } ...
                { 'style' 'text' 'string' 'Sumary mode' } ...
+               { 'style' 'checkbox' 'string' '' } {} ...
+               { 'style' 'text' 'string' 'Normalized dipole length' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Additionnal dipfit() options' } ...
                { 'style' 'edit' 'string' '' } };
@@ -69,22 +91,34 @@ if nargin < 2
 	% decode parameters
 	% -----------------
     options = {};
-    if result{1} == 1, typedip = 'DIPFIT';
+    if ~isempty(result{1}), comps = eval( [ '[' result{1} ']' ] ); else comps = []; end;
+    if result{2} == 2, typedip = 'DIPFIT';
     else               typedip = 'BESA';
     end;
-    options = { options{:} 'image' fastif(result{2} == 1, 'mri', 'besa') };
-    if result{1} == 1, options = { options{:} 'summary' 'on' }; end;
-    if ~isempty( result{4} ), options = { options{:} eval( [ '{' result{4} '}' ] ) }; end;
+    options = { options{:} 'image' fastif(result{3} == 2, 'mri', 'besa') };
+    if result{4} == 1, options = { options{:} 'summary' 'on' }; end;
+    if result{5} == 1, options = { options{:} 'normlen' 'on' }; end;
+    if ~isempty( result{6} ), options = { options{:} eval( [ '{' result{5} '}' ] ) }; end;
 else 
     options = varargin;
 end;
 
 if strcmpi(typedip, 'besa')
     if ~isfield(EEG, 'sources'), error('No BESA dipole information in dataset');end;
-    dipplot(EEG.sources, options{:});
+    if ~isempty(comps)
+        [tmp1 int] = intersect(cell2mat({EEG.sources.component}), comps);
+        if isempty(int), error ('Localization not found for selected components'); end;
+        dipplot(EEG.sources(int), options{:});
+    else
+        dipplot(EEG.sources, options{:});
+    end;      
 else 
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
-    dipplot(EEG.sources, options{:});
+    if ~isempty(comps)
+        dipplot(EEG.dipfit.model(comps), options{:});
+    else
+        dipplot(EEG.dipfit.model, options{:});
+    end;
 end;
     
 com = sprintf('pop_dipplot( %s, ''%s'', %s);', inputname(1), typedip, vararg2str(options));
