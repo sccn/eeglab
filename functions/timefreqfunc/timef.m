@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/08/12 01:47:29  arno
+% color
+%
 % Revision 1.46  2002/08/11 22:30:20  arno
 % color
 %
@@ -1135,3 +1138,11 @@ if g.plot
     axcopy(gcf);
 end;
 
+% syemtric hanning function
+function w = hanning(n)
+if ~rem(n,2)
+   w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
+else
+   w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
+end
+w = [w; w(end-1:-1:1)];
