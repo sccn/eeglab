@@ -19,6 +19,8 @@
 %               Default is 'auto' if there is no time-frequency 
 %               decomposition in the time-freq, use 'computemovie' otherwise
 %               uses 'movie' mode.
+%  'type'       - ['2D'|'3D'] movie type (2D calls brainmovie; 3D calls
+%               brainmovie3d. Default is '2D'.
 %  'comps'      - [integer vector] integer vector for computing the time-
 %               decompotion of ICA components and to include in the movie.
 %               By defaults, all the components are used.
@@ -107,6 +109,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/05/30 15:42:12  scott
+% header
+%
 % Revision 1.50  2003/05/30 02:05:38  arno
 % changing thresholds
 %
@@ -291,6 +296,7 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'makemovie'   'cell'          {}                                       {};
+                            'type'        'string'        { '2d' '3d' }                            '2d';
                             'eventprob'   ''              []                                       [] });
 if isstr(g), error(g); end;
 clear functions;
@@ -301,8 +307,8 @@ if strcmpi(g.diffmovie, 'on') &	length(ALLEEG) ~= 2
     error('For difference movies: need exactly to process 2 datasets');
 end;
 
-% cfunding components to show
-% ---------------------------
+% finding components to show
+% --------------------------
 if isempty(g.showcomps), g.showcomps = g.comps; end;
 for index = 1:length(g.showcomps)
     tmpshow(index) = find(g.showcomps(index) ==  g.comps);
@@ -452,9 +458,9 @@ if strcmpi(g.diffmovie, 'on')
     alltitles{3} = 'Cond1 - Cond2';
 end
 
-% pern10 movie parameters
-% -----------------------
-if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
+% movie parameters
+% ----------------
+if strcmpi(g.type, '2d') & isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         
     % -------------------
     % movie from the side
@@ -486,7 +492,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'condtitle', alltitles, 'diskscale', 0.5 };
-elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
+elseif strcmpi(g.type, '2d') & isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     
     % ------------------
     % movie from the top
@@ -519,7 +525,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
                         'condtitle', alltitles, 'diskscale', 0.5 };
-elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
+elseif strcmpi(g.type, '2d') & isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
     
     % ------------------
     % movie from the rear
@@ -551,9 +557,9 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
                         'condtitle', alltitles, 'diskscale', 0.5 };
-elseif isstr(g.movparams)
+elseif strcmpi(g.type, '2d') & isstr(g.movparams)
     error('Movparams template can only be ''mritop'' and ''mriside''');
-else
+elseif strcmpi(g.type, '2d')
     if isempty(g.coordinates)
         error('pop_brainmovie: if using a non-template plot, you must specify 2-D dipoles coordinates');
     end;
@@ -563,7 +569,24 @@ else
     brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
+else %%%%%%%%%%%%% 3D MOVIE PARAMS %%%%%%%%%%%%%%%%
+    disp('******************************** 3D MOVIE *******************************');
+    coordinates = founddipoles(ALLEEG, g.comps);
+    tmp = coordinates(:,1);
+    coordinates(:,1) =  -coordinates(:,2);
+    coordinates(:,2) =  tmp;
+    coordinates(:,3) =  -coordinates(:,3); % restore dipplot coordinates
+    brainmovieoptions = { 'condtitle' alltitles 'coordinates', coordinates, ...
+                        'circfactor', g.circfactor };
+    if iscell(g.movparams), brainmovieoptions = { brainmovieoptions{:} g.movparams{:}}; 
+    elseif strcmpi(g.movparams, 'mrirear'), brainmovieoptions = { brainmovieoptions{:} 'view', [0 -1 0] };
+    elseif strcmpi(g.movparams, 'mriside'), brainmovieoptions = { brainmovieoptions{:} 'view', [1 0 0] };
+    elseif strcmpi(g.movparams, 'mritop'),  brainmovieoptions = { brainmovieoptions{:} 'view', [0 0 1] };        
+    end;
 end;
+
+% additional options
+% ------------------
 if strcmp(g.oneframe, 'on')
    brainmovieoptions = { brainmovieoptions{:} 'frames' [1] };
 end;
@@ -625,8 +648,13 @@ if ~strcmpi(g.mode, 'compute')
         
         % Run brainmovie
         % --------------
-        brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                    brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+        if strcmpi(g.type, '3d')
+            brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
+                        brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+        else
+            brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
+                        brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+        end;            
         if strcmp(g.oneframe, 'on')
             disp('Only one frame generated');
             cd(origdir);
@@ -671,7 +699,7 @@ function cella = removedup(cella)
     
 % get dipoles location
 % --------------------
-function coordinates = founddipoles(ALLEEG, comps)
+function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
     if ~isfield(ALLEEG, 'sources')
         error('Field ''sources'' containing dipole location does not exist');
     end;
@@ -705,4 +733,5 @@ function coordinates = founddipoles(ALLEEG, comps)
         coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
         coordinates(index,2) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
         coordinates(index,3) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,3);
+        compdipoles(index)   = ALLEEG(indexeeg).sources(indexcomp(1));
     end;
