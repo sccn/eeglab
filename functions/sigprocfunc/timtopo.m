@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/03/04 17:36:26  scott
+% debug last -sm
+%
 % Revision 1.9  2003/03/04 17:21:43  scott
 % debug last -sm
 %
@@ -316,8 +319,7 @@ maxenv = max(matsel(data,frames,plotframes(t))); % max env val
   end
   l1 = plot([(plottimes(t)-xmin)/width  ...
                topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
-                 [data_y 0.70], ...
-            colors(linestyles(t)+1)); % 0.70 is bottom of topo maps
+                 [data_y 0.70]); % 0.70 is bottom of topo maps
 
 %  l1 = plot(...
 %     [0.12+0.76*(plottimes(t)-xmin)/width  ...
