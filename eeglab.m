@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.215  2003/01/29 23:07:53  arno
+% typo in readerpss in header
+%
 % Revision 1.214  2003/01/28 18:03:27  arno
 % removing channel location file constraint for spectopo
 %
@@ -836,7 +839,7 @@
 % 03-16-02 text interface editing -sm & ad 
 % 3/19/02 Help msg edited by sm 
 
-function eeglab( onearg )
+function [ALLEEG, EEG, CURRENTSET] = eeglab( onearg )
 eeg_options; 
 eeg_global;
 
