@@ -4,7 +4,7 @@
 %
 % Inputs:
 %         Movie    = Movie matrix returned by eegmovie()
-%         ntimes   = Number of times to display {0 -> -1000}
+%         ntimes   = Number of times to display {0 -> -10}
 %                    If ntimes < 0, movie will play forward|backward
 %         Colormap = Color map returned by eegmovie() {0 -> default}
 %
@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 10-31-97 changed test for user-defined colormap -ch & sm
 % 1-8-98 added '\n' at end, improved help msg -sm
@@ -46,10 +49,10 @@ if nargin<3
     Colormap = 0;
 end
 if nargin<2
-	ntimes = -1000;    % default to playing foward|backward endlessly
+	ntimes = -10;    % default to playing foward|backward endlessly
 end
 if ntimes == 0
-	ntimes = -1000;
+	ntimes = -10;
 end
 
 clf
