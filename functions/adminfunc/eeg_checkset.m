@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/08/08 21:08:34  arno
+% *** empty log message ***
+%
 % Revision 1.46  2002/07/30 22:05:24  arno
 % adding disprej field
 %
@@ -619,7 +622,7 @@ if ~isempty( varargin)
 						 'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
 			  error('eeg_checkset: cannot process without channel location file.');
 		  end;
-		 case 'eventconsistency',	
+		 case 'eventconsistency',		  
 		  if isempty(EEG.event), return; end;
 		  
 		  % remove the events which latency are out of boundary
@@ -718,6 +721,39 @@ if ~isempty( varargin)
 				  end;
 			  end;
 		  end;
+		  
+		  % build epoch structure
+		  maxlen = 0;
+		  EEG.epoch = [];
+		  EEG.epoch(1).event = [];	
+		  for index = 1:length(EEG.event)
+			  currentepoch = EEG.event(index).epoch;
+			  if currentepoch <= length(EEG.epoch)
+				  EEG.epoch(currentepoch).event = [ EEG.epoch(currentepoch).event index ];
+			  else
+				  EEG.epoch(currentepoch).event = [ index ];
+			  end;
+			  maxlen = max(length(EEG.epoch(currentepoch).event), maxlen);
+		  end;
+		  
+		  % copy event information into the epoch array
+		  % -------------------------------------------
+		  eventfields = fieldnames(EEG.event);
+		  eventfields = setdiff(eventfields, 'epoch');
+		  for fieldnum = 1:length(eventfields)
+			  eval( ['allfieldvals = { EEG.event.' eventfields{fieldnum} '};'] );
+			  for trial = 1:EEG.trials
+				  valfield = allfieldvals( EEG.epoch(trial).event );
+				  if strcmp(eventfields{fieldnum}, 'latency')
+					  valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+					  valfield = mat2cell(valfield);
+				  end;
+				  if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
+				  else            EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield);
+				  end;
+			  end;
+		  end;    
+		  
 		 otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
