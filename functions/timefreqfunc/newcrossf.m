@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/05/22 01:21:32  arno
+% detrending param name change
+%
 % Revision 1.51  2003/05/21 02:06:34  arno
 % debug for conditions
 %
@@ -748,30 +751,29 @@ if strcmpi(g.lowmem, 'on') & ~iscell(X) & length(X) ~= g.frame & (isempty(g.nfre
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
     YY = reshape(Y, 1, frame, length(Y)/g.frame);    
-    [coh,mcoh,timesout,freqsout] = newcrossf(XX(1,:,1), YY(1,:,1), frame, tlimits, Fs, varwin, 'plotamp', 'off', 'plotphase', 'off',varargin{:});
+    [coh,mcoh,times,freqs] = newcrossf(XX(1,:,1), YY(1,:,1), frame, tlimits, Fs, varwin, 'plotamp', 'off', 'plotphase', 'off',varargin{:});
     
     % scan all frequencies
-    for index = 1:length(freqsout)
+    for index = 1:length(freqs)
         if nargout < 6
-            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:)] = ...
-                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+            [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
                           'plotamp', 'off', 'plotphase', 'off',varargin{:});
         elseif nargout == 7 % requires RAM
-            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:), ...
-             allcoher(index,:,:)] = ...
-                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+            [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
+             coherresout(index,:,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
                           'plotamp', 'off', 'plotphase', 'off',varargin{:});
         else
-            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:), ...
-             allcoher(index,:,:),alltfX(index,:,:),alltfY(index,:,:)] = ...
-                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+            [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
+             coherresout(index,:,:),alltfX(index,:,:),alltfY(index,:,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
                           'plotamp', 'off', 'plotphase', 'off',varargin{:});
         end;
     end;
     
     % plot and return
-    coh = coh.*exp(j*cohangles);
-    plotall( coh, cohboot, timesout, freqsout, mcoh, g);
+    plotall(R.*exp(j*Rangle), Rbootout, times, freqs, mbase, g);
     return;
 end;    
 
@@ -822,11 +824,11 @@ if iscell(X)
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
-                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:}, 'lowmem', 'off');
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:});
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
-                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:}, 'lowmem', 'off');
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:});
 	end;
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
@@ -837,11 +839,11 @@ if iscell(X)
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
-                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:}, 'lowmem', 'off');
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
-                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:}, 'lowmem', 'off' );
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:} );
 	end;
 	%figure; imagesc(abs( sum( savecoher1 ./ abs(savecoher1), 3)) - abs( sum( savecoher2 ./ abs(savecoher2), 3)  )); cbar; return;
 	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
@@ -911,6 +913,7 @@ if iscell(X)
 														   { savecoher1 savecoher2 });
           end;
 		end;
+        
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
 		%Boot.Coherboot.R = coherimages;
 		%Boot = bootcomppost(Boot, [], [], []);
