@@ -1,18 +1,36 @@
-% readlocs() - read polar electrode positions (expanded from the ICA toolbox function)
+% readlocs() - read polar electrode positions (expanded from the ICA 
+%              toolbox function)
 %             
 % Usage:
-%   >> [eloc, labels, theta, radius] = readlocs( filename, elpmaindir );
+%   >> [eloc, labels, theta, radius] = readlocs( filename );
+%   >> [eloc, labels, theta, radius] = readlocs( filename, ...
+%                                          'key', 'val' );
 %
 % Inputs:
 %   filename   - name of the file containing the electrode locations
 %                and convert in polar coordinates
-% Optional:
-%   elpmaindir - ['X'|'Y'] Direction pointing toward the subject in 
+%
+% Optional inputs:
+%   'filetype'  - ['loc'|'sph'|'xyz'|'polhemus'|'besa'|'chanedit'] type of the 
+%                 file to be read. 
+%                  'loc' is the eeglab() format (see below)
+%                  'sph' is a matlab spherical coordinate file (spherical
+%                        coordinates in Matlab are different from Besa 
+%                        spherical coordinates).
+%                  'xyz' contain carhtesian coordinates of the electrodes
+%                  'polhemus' polhemus file (see readelp() )
+%                  'besa' besa coordinate file (contact author when
+%                         encountering problem to read such files)
+%                  'chanedit' files created by pop_chanedit()
+%   'skipline'  - [integer] number of lines to skip 
+%   'elecind'   - [integer array] indices of electrode to read 
+%   'maindir'   - ['X'|'Y'] Direction pointing toward the subject in 
 %                the Polhemus .elp file. Default is 'X'.  Used to 
 %                convert locations from cartesian to polar coordinates.
 %
-% Note on suported formats:
+% File formats:
 %   The extension of the file determines its type
+%   if filetype is not specified
 %   '.loc' or '.locs'   - polar format. Example:
 %               1    -18    .352       Fp1
 %               2     18    .352       Fp2
@@ -31,8 +49,9 @@
 %               3    0.3956         0   -0.9184      C3
 %               4    0.3956         0    0.9184      C4
 %                 more lines ...
-%   '.txt' - read ascii files saved using pop_editchan()
+%   '.txt' - read ascii files saved using pop_chanedit()
 %   '.elp' - Polhemus coordinate file (uses readelp())
+%   '.eps' - Besa coordinate file
 %
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
@@ -69,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/05/19 13:40:07  scott
+% turned off loadtxt 'verbose' -sm
+%
 % Revision 1.10  2002/05/18 19:03:58  scott
 % typo -sm
 %
@@ -100,25 +122,64 @@
 % Initial revision
 %
 
-function [eloc, labels, theta, radius] = readlocs( filename, elpmaindir ); 
+function [eloc, labels, theta, radius] = readlocs( filename, varargin ); 
 
 if nargin < 1
 	help readlocs;
 	return;
 end;
 
+g = [];
+if ~isempty(varargin)
+	for index=1:length(varargin)
+		if iscell(varargin{index})
+			varargin{index} = {varargin{index}};
+		end;
+	end;
+	try
+		g = struct(varargin{:});
+	catch
+		error('readlocs: error in ''key'', ''val'' sequence');
+	end;
+end;
+
+try, g.filetype = g.filetype;    catch, g.filetype = []; end;
+try, g.skipline;                 catch, g.skipline = 0; end;
+try, g.maindir;                  catch, g.maindir = 'X'; end;
+try, g.elecind;                  catch, g.elecind = []; end;
+g.filetype = lower( g.filetype );
+
+allfields = fieldnames(g);
+for index=1:length(allfields)
+	switch allfields{index}
+	 case { 'filetype' 'skipline' 'maindir' 'elecind' };
+	 otherwise, error(['readlocs: unknow option ''' allfields{index} '''']);
+	end;
+end;
+
 if isstr(filename)
 	% open file
 	% ---------
-	array = load_file_or_array( filename, 0);
+	array = load_file_or_array( filename, g.skipline);
 
     periods = find(filename == '.');
     fileextension = filename(periods(end)+1:end);
 
+	if isempty(g.filetype)
+		switch lower(fileextension),
+		 case {'loc' 'locs' }, g.filetype = 'loc';
+		 case 'xyz', g.filetype = 'xyz';
+		 case 'sph', g.filetype = 'sph';
+		 case 'txt', g.filetype = 'chanedit';
+		 case 'elp', g.filetype = 'polhemus';
+		 case 'eps', g.filetype = 'besa';
+		 otherwise, g.filetype = 'loc';
+		end;
+	end;
+	
 	% scan file
 	% ---------
-    switch lower(fileextension),
-        case { '' 'chanlocs'}, eloc = array; 
+    switch g.filetype,
         case 'xyz', 
 			for index = 1:size( array, 1)
 			  eloc(index).X = array{index, 2};
@@ -135,14 +196,14 @@ if isstr(filename)
 			  eloc(index).sph_radius = 1;
 			  eloc(index).labels  = array{index, 4};
 			end;  
-        case { 'loc' 'locs' }, 
+        case 'loc', 
 			for index = 1:size( array, 1)
 			  eloc(index).theta = array{index, 2};
 			  eloc(index).radius  = array{index, 3};
 			  eloc(index).labels  = array{index, 4};
 			  eloc(index).labels( find(eloc(index).labels == '.' )) = ' ';
 			end;
-        case 'elp', 
+        case 'polhemus' 
             [eloctmp labels X Y Z]= readelp( filename );
             if exist('elpmaindir') ~= 1, elpmaindir = 'X'; end;
  			if strcmp(lower(elpmaindir), 'x')
@@ -164,7 +225,7 @@ if isstr(filename)
 				  eloc(index).Z = Z(index);	
 			  end;
             end;
-	     case 'txt', 
+     	 case 'chanedit', 
 		    if isempty(array(end,1)), totlines = size( array, 1)-1; else totlines = size( array, 1); end;
 			for index = 2:totlines
 				if ~isempty(array{index,2}) eloc(index-1).labels  = array{index, 2}; end;
@@ -177,6 +238,21 @@ if isstr(filename)
 				if ~isempty(array{index,9}) eloc(index-1).sph_phi   = array{index, 9}; end;
 				if ~isempty(array{index,10}) eloc(index-1).sph_radius   = array{index, 10}; end;
 			end;
+	     case 'besa',
+	        indexbeg = 1;
+		    while isempty(array{indexbeg,1}) | isstr(array{indexbeg,1})
+				indexbeg = indexbeg+1;
+			end;
+			for index = indexbeg:size( array, 1)
+				shifted_i = index-indexbeg+1;
+				eloc(shifted_i).labels  = num2str(shifted_i);
+				eloc(shifted_i).besathloc  = array{index, 1};
+				eloc(shifted_i).besaphloc = array{index, 2};
+				[ tmp eloc(shifted_i).theta eloc(shifted_i).radius] ...
+					= sph2topo( [ 1 eloc(shifted_i).besathloc eloc(shifted_i).besaphloc] , 1, 1);
+			end;
+			eloc = rmfield(eloc, 'besathloc');
+			eloc = rmfield(eloc, 'besaphloc');
         otherwise, error('Readlocs(): unrecognized file extension');
     end;
     for index = 1:length( eloc )
@@ -196,6 +272,9 @@ else
         disp('Readlocs: input variable must be a string or a structure');
     end;        
 end;
+if ~isempty(g.elecind)
+	eloc = eloc(g.elecind);
+end;
 theta = cell2mat({ eloc.theta });
 radius  = cell2mat({ eloc.radius });
 labels = { eloc.labels };
@@ -210,6 +289,8 @@ function array = load_file_or_array( varname, skipline );
         array = loadtxt(varname,'verbose','off');
     else % variable in the global workspace
          % --------------------------
-         array = evalin('base', varname);
+         try, array = evalin('base', varname);
+	     catch, error('readlocs: can not find file or variable, check syntax');
+		 end;
     end;     
 return;
