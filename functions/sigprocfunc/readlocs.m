@@ -48,13 +48,14 @@
 %               This format still works but the dots are no longer
 %               required.
 %   '.sph':
-%               spherical coordinate file. Example
+%               spherical coordinate file in Besa/EGI standard. Example
 %               1    -63.36    -72      Fp1
 %               2     63.36    72       Fp2
 %               3     32.58    0        C3
 %               4     32.58    0        C4
 %                 more lines ...
 %   '.xyz': 
+%               Compatible with EGI carthesian data files
 %               cartesian coordinate file. Example
 %               1   -0.8355   -0.2192   -0.5039      Fp1
 %               2   -0.8355    0.2192    0.5039      Fp2
@@ -100,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/12/05 22:59:33  arno
+% reading egi.sph file
+%
 % Revision 1.18  2002/11/15 02:58:05  arno
 % header for web
 %
