@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/03/10 18:24:47  arno
+% ploting only one contribution
+%
 % Revision 1.14  2003/03/08 21:02:57  arno
 % debugging
 %
@@ -633,11 +636,11 @@ envx = [1;compx+1];
     end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 set(axe,'Color',axcolor);
-l= xlabel('time (ms)');
+l= xlabel('Time (ms)');
 % l= xlabel('Time (ms)');
 set(l,'FontSize',14,'FontWeight','Bold');
 if strcmpi(g.envmode, 'avg')
-    l=ylabel('potential (uV)');
+    l=ylabel('Potential (uV)');
 else 
     l=ylabel('RMS of uV');
 end;    
