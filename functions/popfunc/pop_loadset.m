@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/10/14 23:04:02  arno
+% default output
+%
 % Revision 1.13  2002/10/08 15:58:51  arno
 % debugging .fdt files
 %
@@ -85,6 +88,7 @@ VAROUT  = [];
 %eeg_emptyset;
 if nargin < 2  
 	[inputname, inputpath] = uigetfile('*.set*', 'Load dataset(s) -- pop_loadset()');
+    drawnow;
 	if inputname == 0 return; end;
 end;
 

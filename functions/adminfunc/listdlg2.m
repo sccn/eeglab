@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/21 18:13:37  arno
+% debug for one element only
+%
 % Revision 1.1  2002/08/17 03:06:48  arno
 % Initial revision
 %
@@ -90,6 +93,7 @@ okornot = 0;
 strval = '';
 vals = [];
 waitfor( fig, 'userdata');
+drawnow;
 try,
 	vals = get(h, 'value');
 	strval = '';

@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/10/14 00:46:31  arno
+% debugging .sets filename check
+%
 % Revision 1.11  2002/10/10 16:43:26  arno
 % debugging fdt files
 %
@@ -117,12 +120,14 @@ if nargin < 2
 			end;
 		end;
 		result = inputdlg2( {'Indices of the datasets to save'}, 'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
+        drawnow;
 		if length(result) == 0 return; end;
 		indices = eval( [ '[' result{1} ']' ] );
 		[curfilename, curfilepath] = uiputfile('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
 	else
 		[curfilename, curfilepath] = uiputfile('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
 	end;
+    drawnow;
 	if curfilename == 0 return; end;	
 else 
 	if mode == 1
