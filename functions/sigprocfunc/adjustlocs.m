@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/12/02 02:34:33  arno
+% Initial revision
+%
 
 function chanlocs = caliblocs( chanlocs, varargin)
     
@@ -138,7 +141,7 @@ function chanlocs = caliblocs( chanlocs, varargin)
     if strcmpi(g.autorotate, 'on') & isempty(g.rotate)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
-            locs1020 = readlocs('eeglab1020.ced', 'verbose', 'off');
+            locs1020 = readlocs('eeglab1020.ced');
         end;
                 
         % scan electrodes for horiz pos
@@ -163,7 +166,7 @@ function chanlocs = caliblocs( chanlocs, varargin)
     if strcmpi(g.autoscale, 'on') & isempty(g.hscale) & isempty(g.vscale)
         if exist('locs1020') ~= 1
             disp('Reading template 10-20 file');
-            locs1020 = readlocs('eeglab1020.ced', 'verbose', 'off');
+            locs1020 = readlocs('eeglab1020.ced');
         end;
         
         if strcmpi(g.uniform, 'off')
