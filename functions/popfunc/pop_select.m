@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/05/10 17:41:38  arno
+% fixing scroll dataset time unit
+%
 % Revision 1.34  2003/03/19 20:37:24  scott
 % printf->fprintf
 %
@@ -535,20 +538,6 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % generate command
 % ----------------
 com = sprintf('EEG = pop_select( %s,%s);', inputname(1), vararg2str(args));
-%for i=1:2:length(args);
-%    if iscell(args{i+1})
-%        com = sprintf('%s, ''%s'', { {', com, args{i} );
-%        tmpcell = args{i+1};
-%        tmpcell = tmpcell{1};
-%        for j=1:2:length(tmpcell);
-%            com = sprintf('%s ''%s'', [%s],', com, tmpcell{j}, num2str(tmpcell{j+1}) );
-%        end;
-%        com = sprintf('%s } } ', com(1:end-1));     
-%    else
-%        com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-%    end;       
-%end;
-%com = [com ');'];
 
 return;
 
