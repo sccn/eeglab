@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/05/02 19:12:21  arno
+% editing message
+%
 % Revision 1.7  2002/04/26 21:36:07  arno
 % correcting bug for the comments
 %
@@ -247,20 +250,21 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate the output command
 % ---------------------------
-if isempty(filename)
+if isempty(filename) & narargout == 2
     disp('Pop_importepoch: cannot generate command string'); return;
-end;    
-com = sprintf('%s = pop_importepoch( %s, ''%s'', { ', inputname(1), inputname(1), filename);
-for i=1:length(fieldlist)
-    com = sprintf('%s ''%s'',', com, fieldlist{i} );
-end;    
-com = [ com(1:end-1) '} , { ' ];
-for i=1:length(latencyfieldlist)
-    com = sprintf('%s ''%s'',', com, latencyfieldlist{i} );
-end;    
-com = [ com(1:end-1) '}'];
-com = sprintf('%s, %d, %d, %d);', com, timeunit, headerlines, cleanevent);
-return;
+else 
+	com = sprintf('%s = pop_importepoch( %s, ''%s'', { ', inputname(1), inputname(1), filename);
+	for i=1:length(fieldlist)
+		com = sprintf('%s ''%s'',', com, fieldlist{i} );
+	end;    
+	com = [ com(1:end-1) '} , { ' ];
+	for i=1:length(latencyfieldlist)
+		com = sprintf('%s ''%s'',', com, latencyfieldlist{i} );
+	end;    
+	com = [ com(1:end-1) '}'];
+	com = sprintf('%s, %d, %d, %d);', com, timeunit, headerlines, cleanevent);
+	return;
+end;
 
 % interpret the variable name
 % ---------------------------
