@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.275  2003/11/27 01:20:30  arno
+% debug path
+%
 % Revision 1.274  2003/11/27 01:18:00  arno
 % eeglab path
 %
@@ -1026,24 +1029,25 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 
 % add the paths
 % -------------
-p = which('eeglab.m');
-p = p(1:findstr(p,'eeglab.m')-1);
-if strcmpi(computer, 'pcwin') 
-    allpaths = [';' path ';' ];
-    tmpf = [ ';' p 'dipfit;' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ';' p 'sigprocfunc;' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ';' p 'popfunc;' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ';' p 'adminfunc;' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ';' p 'miscfunc;' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-else
-    allpaths = [':' path ':' ];
-    tmpf = [ ':' p 'dipfit:' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ':' p 'sigprocfunc:' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ':' p 'popfunc:' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ':' p 'adminfunc:' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    tmpf = [ ':' p 'miscfunc:' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+if ~exist('pop_erpimage') | ~exist('erpimage') | ~exist('eeg_checkset') | ~exist('dipfit_batch')
+    p = which('eeglab.m');
+    p = p(1:findstr(p,'eeglab.m')-1);
+    if strcmpi(computer, 'pcwin') 
+        allpaths = [';' path ';' ];
+        tmpf = [ ';' p 'dipfit;' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ';' p 'sigprocfunc;' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ';' p 'popfunc;' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ';' p 'adminfunc;' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ';' p 'miscfunc;' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    else
+        allpaths = [':' path ':' ];
+        tmpf = [ ':' p 'dipfit:' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ':' p 'sigprocfunc:' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ':' p 'popfunc:' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ':' p 'adminfunc:' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+        tmpf = [ ':' p 'miscfunc:' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    end;
 end;
-
 eeg_options; 
 eeg_global;
 
