@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/26 21:36:07  arno
+% correcting bug for the comments
+%
 % Revision 1.6  2002/04/22 21:42:58  arno
 % corrected returned command
 %
@@ -245,7 +248,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % generate the output command
 % ---------------------------
 if isempty(filename)
-    disp('Pop_importepoch: cannot generate command file'); return;
+    disp('Pop_importepoch: cannot generate command string'); return;
 end;    
 com = sprintf('%s = pop_importepoch( %s, ''%s'', { ', inputname(1), inputname(1), filename);
 for i=1:length(fieldlist)
