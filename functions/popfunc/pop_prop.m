@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/03/18 00:31:05  arno
+% remove skirt
+%
 % Revision 1.17  2004/02/23 15:45:00  scott
 % changed erpimage smoothing width to 1 when EEG.trials < 6
 %
@@ -157,7 +160,7 @@ if nargin < 1
 	return;   
 end;
 if nargin == 1
-	typecomp ==1;
+	typecomp = 1;
 end;
 if typecomp == 0 & isempty(EEG.icaweights)
    error('No ICA weights recorded for this set, first run ICA');
