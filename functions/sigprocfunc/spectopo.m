@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/03/14 16:17:56  arno
+% print pvaf in topoplot
+%
 % Revision 1.52  2003/02/26 03:00:34  arno
 % header edit
 %
@@ -662,7 +665,7 @@ if ~isempty(g.freq)
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
 		end;
 		pos = get(headax(realpos(f)),'position');
-		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/1.7];
+		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/2.5];
 		hold on;
 		if f<=length(g.freq)
 			colr = 'k';
