@@ -11,7 +11,7 @@
 % event-related spectral perturbation (ERSP) and inter-trial coherence (ITC)
 % of the input data.
 %
-% THE ERSP: 
+% The ERSP: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The ERSP (S. Makeig, Electroencephalogr Clin Neurophysiol 86:283-93, 1993) 
 % shows mean log event-loced deviations from epoch-mean (or baseline-mean) power
@@ -32,7 +32,7 @@
 % the left panel (green trace) also shows the bootstrap significant levels (+/-) 
 % at each frequency.
 %
-% THE ITC: 
+% The ITC: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (Inter-trial Coherence, cf. Tallon-Baudry et al., "Phase-locking factor")
 % The lower panel shows the degree of tendency for spectral phase at each
@@ -49,7 +49,7 @@
 % (blue trace) and, if bootstrap statistics are computed, the ITC significance 
 % limits at each frequency (green trace).
 %
-% ITC Derivation:
+% ITC Math Derivation:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % By definition, linear coherence is:
 %       R = mean(Fxy)/sqrt(mean(abs(Fxx))*mean(abs(Fyy)));
@@ -64,25 +64,16 @@
 %
 % USAGE:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 %   >> [ersp,itc,powbase,times,freqs,erspboot,itcboot]  ...
-%              = timef(data,frames,tlimits,srate,cycles,...
-%                        'key1',value1,'key2',value2, ... );        
+%                = timef(data,frames,tlimits,srate,cycles,...
+%                              'key1',value1,'key2',value2, ... );        
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTE:
+% * Left-click on subplots to view and zoom in separate windows (uses axcopy()).
 %
-% * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%   0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
-% * For the wavelet and FFT methods, output frequency spacing 
-%   is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
-%   NaN input values (such as returned by eventlock()) are ignored.
-% * If 'alpha' is given, then bootstrap statistics are computed 
-%   (from a distribution of 'naccu' surrogate data trials) and 
-%   non-significant features of the output plots are zeroed out 
-%   (i.e., plotted in green). 
-% * Given a 'topovec' topo vector and 'elocs' electrode location file,
-%   the figure also shows a topoplot() of the specified scalp map.
-% * Note: Left-click on subplots to view and zoom in separate windows.
-%
-% Required inputs:     Value                                 {default}
+% Required Inputs:     Value                                 {default}
 %   data        = Single-channel data vector (1,frames*ntrials) (required)
 %
 %   frames      = Frames per trial                        {750}
@@ -241,6 +232,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/30 14:56:23  scott
+% rewritten for new timef() format -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
