@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/05/04 01:47:29  arno
+% same
+%
 % Revision 1.29  2002/05/04 01:46:42  arno
 % still correctin eventconsistency
 %
@@ -537,25 +540,26 @@ if ~isempty( varargin)
 			  
 			  % uniformize fields content for the different epochs
 			  % --------------------------------------------------
-			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
-			  for index = 1:length(difffield)
-				  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
-				  valempt = cellfun('isempty', allvalues);
-				  arraytmpinfo = cell(1,EEG.trials);
-
-				  % get the field content
-				  % ---------------------
-				  for indexevent = 1:length(EEG.event)
-					  if ~valempt(indexevent)
-						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
-					  end;
-				  end;
-				  % uniformize content for all epochs
-				  % ---------------------------------
-				  for indexevent = 1:length(EEG.event)
-					  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{allepochs(indexevent)});
-				  end;
-			  end;
+			  % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
+% $$$ 			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
+% $$$ 			  for index = 1:length(difffield)
+% $$$ 			  	  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
+% $$$ 				  valempt = cellfun('isempty', allvalues);
+% $$$ 			 	  arraytmpinfo = cell(1,EEG.trials);
+% $$$ 
+% $$$ 				  % get the field content
+% $$$ 				  % ---------------------
+% $$$ 				  for indexevent = 1:length(EEG.event)
+% $$$ 					  if ~valempt(indexevent)
+% $$$ 						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
+% $$$ 					  end;
+% $$$ 				  end;
+% $$$ 				  % uniformize content for all epochs
+% $$$ 				  % ---------------------------------
+% $$$ 				  for indexevent = 1:length(EEG.event)
+% $$$ 					  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{allepochs(indexevent)});
+% $$$ 				  end;
+% $$$ 			  end;
 		  end;
 		  
 		  % uniformize fields (str or int) if necessary
