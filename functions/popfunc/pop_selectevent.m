@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/07/10 02:16:41  arno
+% adding the 'select' input, the function check
+%
 % Revision 1.12  2002/05/03 02:49:53  arno
 % updating interface
 %
@@ -292,8 +295,8 @@ for index = 1:length(allfields)
 											[EEG.xmin EEG.xmax], 1);
 				end;
 			end;
-			Ieventlow  = find( tmpvarvalue >= min);
-			Ieventhigh = find( tmpvarvalue <= max);
+			Ieventlow  = find( tmpvarvalue > min);
+			Ieventhigh = find( tmpvarvalue < max);
 			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) );
         else
 			if strcmp(allfields{index}, 'latency')
@@ -342,8 +345,8 @@ for index = 1:length(allfields)
 											[EEG.xmin EEG.xmax], 1);
 				end;
 			end;
-            Ieventlow  = find( tmpvarvalue >= min);
-            Ieventhigh = find( tmpvarvalue <= max);
+            Ieventlow  = find( tmpvarvalue > min);
+            Ieventhigh = find( tmpvarvalue < max);
             Ieventrem = union( Ieventrem, intersect( Ieventlow, Ieventhigh ) );
         else
 			if strcmp(allfields{index}, 'latency')
