@@ -130,6 +130,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.59  2003/10/30 03:25:17  arno
+%adding projection lines
+%
 %Revision 1.58  2003/10/29 23:44:38  arno
 %don't know
 %
@@ -487,7 +490,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % --------------------------------------------------
     if isfield(sources, 'rv') & ~isempty(g.rvrange)
         for index = length(sources):-1:1
-            if sources(index).rv < g.rvrange(1) | sources(index).rv > g.rvrange(2)
+            if sources(index).rv < g.rvrange(1)/100 | sources(index).rv > g.rvrange(2)/100
                 sources(index) = [];
             end;
         end;
