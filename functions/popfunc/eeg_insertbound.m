@@ -46,6 +46,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/05/06 17:42:32  arno
+% add checkevent input
+% .,
+%
 % Revision 1.8  2004/05/05 01:54:40  arno
 % removing debug message
 %
@@ -103,11 +107,15 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths, checkevent )
             if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
                 % find event succeding boundary
                 % ------------------------------
-                urlatency = eeg_urlatency(EEG.urevent, regions(tmpindex)-0.5);
-                alllats   = cell2mat( { newur.latency } ) - urlatency;
-                tmpind    = find( alllats > 0 );
-                [tmp tmpind2 ] = min(alllats(tmpind));
-                tmpind2        = tmpind(tmpind2);
+                if lengths(tmpindex) ~= 0
+                    urlatency = eeg_urlatency(EEG.urevent, regions(tmpindex)-0.5);
+                    alllats   = cell2mat( { newur.latency } ) - urlatency;
+                    tmpind    = find( alllats > 0 );
+                    [tmp tmpind2 ] = min(alllats(tmpind));
+                    tmpind2        = tmpind(tmpind2);
+                else
+                    tmpind2 = [];
+                end;
                 
                 % insert event at tmpind2
                 % -----------------------
