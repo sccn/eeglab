@@ -27,8 +27,6 @@
 % Note: tabulation are used as a delimiter.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, May 13, 2003
-%
-% See also: eeglab(), readegi(), readegihdr()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -49,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/05/22 03:44:58  scott
+% changed pop-up window text, header message and defaults
+%
 % Revision 1.1  2003/05/14 02:24:03  arno
 % Initial revision
 %
@@ -87,7 +88,7 @@ if nargin < 2
               { 'style' 'edit' 'string' '4' }, { }, { }, ...
               { 'style' 'text' 'string' 'Apply an expression to the output (see ''expr'' help):'} , ...
               { 'style' 'edit' 'string' '' } { } { } };
-   bcheck = [3 0.35 0.7 0.6];
+   bcheck = [1.7 0.25 0.7 0.6];
    uigeom = { [1 2 0.5] bcheck bcheck bcheck bcheck bcheck [3 0.7 0.8 0.6] [3 2 0.05 0.05] };
    result = inputgui( uigeom, uilist, 'pophelp(''pop_export'');', 'Export data - pop_export()' );
    if length( result ) == 0 return; end;
