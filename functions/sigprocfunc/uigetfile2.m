@@ -5,10 +5,10 @@
 % Inputs: Same as uigetfile
 %
 % Author: Arnaud Delorme & Hilit Serby, Scott Makeig, SCCN, UCSD, 2004
-%         thanks to inputs from Bas Kortmann
+%         Thanks to input from Bas Kortmann
 %
 % Copyright (C) Arnaud Delorme & Hilit Serby, Scott Makeig, SCCN, UCSD, 2004
-%
+
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/09/09 22:56:44  arno
+% Initial revision
+%
 
 function varargout = uigetfile2(varargin);
     
@@ -33,7 +36,7 @@ function varargout = uigetfile2(varargin);
     end;
     
     % remember old folder
-    %% search for the file which contains the latest used directory (== mat file)
+    %% search for the (mat) file which contains the latest used directory 
     % -------------------
     olddir = pwd;
     if exist(fullfile(getenv('TEMP'),'eeglab.cfg'))
@@ -42,7 +45,7 @@ function varargout = uigetfile2(varargin);
         if exist(Path) == 7, eval(s); end;
     end;
 
-    %% show the open dialog and save the latest directory to the file
+    %% Show the open dialog and save the latest directory to the file
     % ---------------------------------------------------------------
     [varargout{1} varargout{2}] = uigetfile(varargin{:});
     if varargout{1} ~= 0
