@@ -3,21 +3,40 @@
 %                 activity).
 %
 % Usage:
-%   >> pop_rejkurt( INEEG, typerej) % popup
+%   >> pop_rejkurt( INEEG, typerej) % pop-up interative window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
-%		= pop_rejkurt( INEEG, typerej, electrodes, ...
+%		= pop_rejkurt( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
 %
+% Graphical interface:
+%   "Electrode" - [edit box] electrodes or components (number) to take into
+%                 consideration for rejection. Same as the 'elec_comp'
+%                 parameter from the command line.
+%   "Single-channel limit" - [edit box] pkurtosis limit in terms of
+%                 standard-dev. Same as 'locthresh' command line
+%                 parameter.
+%   "All-channel limit" - [edit box] kurtosis limit in terms of
+%                 standard-dev (all channel regrouped). Same as 
+%                 'globthresh' command line parameter.
+%   "Display with previous rejection" - [edit box] can be either YES or
+%                 NO. This edit box corresponds to the command line input
+%                 option 'superpose'.
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
+%                 box corresponds to the command line input option 'reject'.
+%   "visualization type" - [edit box] can be either REJECTRIALS or EEGPLOT.
+%                 This edit box corresponds to the command line input
+%                 option 'vistype'.
+% 
 % Inputs:
 %   INEEG      - input dataset
 %   typerej    - type of rejection (0 = independent components; 1 = eeg
 %              data). Default is 1. For independent components, before
 %              thresholding, the activity is normalized for each 
 %              component.
-%   electrodes - [e1 e2 ...] electrodes (number) to take into 
+%   elec_comp  - [e1 e2 ...] electrodes (number) to take into 
 %              consideration for rejection
-%   locthresh  - activity kurtosis thresholds in terms of standard-dev.
-%   globthresh - global threshold (for all electrodes of a trial).
+%   locthresh  - activity kurtosis limit in terms of standard-dev.
+%   globthresh - global limit (for all channel). Same unit as above.
 %   superpose  - 0=do not superpose pre-labelling with previous
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
@@ -57,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/14 00:57:48  arno
+% debugging
+%
 % Revision 1.12  2002/08/14 00:51:47  arno
 % debug multi-elec
 %
