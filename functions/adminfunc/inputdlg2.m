@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/12 02:16:43  arno
+% help debug
+%
 % Revision 1.1  2002/08/12 02:13:42  arno
 % Initial revision
 %
@@ -61,9 +64,13 @@ end;
 geometry = {};
 listgui = {};
 for index = 1:length(Prompt)
-	geometry = { geometry{:} [ 1 1 ]};
+	if length(Prompt) == 1
+		geometry = { geometry{:} [ 1] [1 ]};
+	else
+		geometry = { geometry{:} [ 1 1 ]};
+	end;
 	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
-				   { 'Style', 'edit', 'string', DefAns{index} } };
+				{ 'Style', 'edit', 'string', DefAns{index} } };
 end;
 
 result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title);
