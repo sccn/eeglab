@@ -8,7 +8,7 @@
 % Outputs:
 %   data     - Data array [nchans samples]
 %   events   - Event information structure:
-%              events.sample_offset[]: Event offsets in samples 
+%              events.sample_offset[]: Event offsets in samples
 %                                      from the first sample (0)
 %              events.event_code[]     Event codes (integers: 1-128)
 %   datasize - Data size information structure:
@@ -107,7 +107,7 @@ function [eeg,ev,header] = read_erpss(filename)
                 cond_code = fread(fp,1,'uint8');
                 ev_code = fread(fp,1,'uint16');
                 ev_cnt = ev_cnt + 1;
-                ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128;
+                ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128+1; %+1 for Matlab 
                 ev(ev_cnt).event_code = ev_code;
             end
             fseek(fp,4*(110-nevents),0);
@@ -124,3 +124,4 @@ function [eeg,ev,header] = read_erpss(filename)
     
     fclose(fp);
     header.nframes = size(eeg,2);
+        
