@@ -12,21 +12,28 @@
 %  'lddur'      - duration of segment to load, default = whole file
 %  'ldnsamples' - number of samples to load, default = whole file, 
 %                 overrides lddur
-%  'avgref'     - ['yes'|'no'] average reference. Default 'no'.
-%  'avrefchan'  - reference channels. Default none.  
+%  'scale'      - ['on'|'off'] scale data to microvolt (default:'on')
+%  'dataformat' - ['int16'|'int32'] default is 'int16' for 16-bit data.
+%                 Use 'int32' for 32-bit data.
 %
 % Outputs:
 %  cnt          - structure with the continuous data and other informations
+%               cnt.header
+%               cnt.electloc
+%               cnt.data
+%               cnt.tag
+%
+% Authors:   Sean Fitzgibbon, Arnaud Delorme, 2000-
+%
+% Note: function original name was load_scan41.m
 %
 % Known limitations: 
 %  For more see http://www.cnl.salk.edu/~arno/cntload/index.html    
-%
-% Authors: Andrew James & Arnaud Delorme 2000-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) 2000 Andrew James, CERCO, Toulouse, France 
-% Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) 2000 Sean Fitzgibbon, <psspf@id.psy.flinders.edu.au>
+% Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -42,261 +49,379 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2003/07/25 00:42:41  arno
-% *** empty log message ***
-%
-% Revision 1.5  2003/07/22 15:42:48  arno
-% allow type 0
-%
-% Revision 1.4  2003/04/10 17:56:09  arno
-% removing debuging message
-%
-% Revision 1.3  2003/04/10 17:50:11  arno
-% adding error message
-%
-% Revision 1.2  2002/10/22 23:53:23  arno
-% fopen ieee-le for Mac
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% original function by a.c.james 2000-2001
-% 'blockread' by arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2001
+function [f,lab,ev2p] = load_scan41(filename,varargin)
 
-function r=loadcnt(file, varargin)
-
-if nargin < 1
-	help loadcnt;
-	return;
-end;	
-
-% defaults
-[datdir,name,ext]=fileparts(file);
 if ~isempty(varargin)
-	r=struct(varargin{:});
+	 r=struct(varargin{:});
+else r = []; 
 end;
 
-% add defaults
-warning off;
-try, r.t1; catch, r.t1=0; end
-warning on;
-try, r.avrefchan; catch, r.avrefchan=[]; end
-try, r.blockread; catch, r.blockread=1; end
-try, r.avgref;    catch, r.avgref='non'; end
+try, r.t1;         catch, r.t1=0; end
+try, r.sample1;    catch, r.sample1=[]; end
+try, r.lddur;      catch, r.lddur=[]; end
+try, r.ldnsamples; catch, r.ldnsamples=[]; end
+try, r.scale;      catch, r.scale='on'; end
+try, r.dataformat;  catch, r.dataformat='int16'; end
 
-if ~any(file=='.'), file=[file '.cnt']; end
+sizeEvent1 = 8  ; %%% 8  bytes for Event1  
+sizeEvent2 = 19 ; %%% 19 bytes for Event2 
 
-disp(['Loading file ' file ' ...'])
+type='cnt';
+if nargin ==1 
+    scan=0;
+end     
 
-f=fopen(file, 'rb', 'ieee-le');
-if f==-1, error([file ' not found']), end
+fid = fopen(filename,'r');
+disp(['Loading file ' filename ' ...'])
 
-r.filename=file;
-r.rev=freadat(f, 0, 20, 'text');
-i=find(r.rev==0); try, r.rev(i(1):end)=''; end
+h.rev               = fread(fid,12,'char');
+h.nextfile          = fread(fid,1,'long');
+h.prevfile          = fread(fid,1,'long');
+h.type              = fread(fid,1,'char');
+h.id                = fread(fid,20,'char');
+h.oper              = fread(fid,20,'char');
+h.doctor            = fread(fid,20,'char');
+h.referral          = fread(fid,20,'char');
+h.hospital          = fread(fid,20,'char');
+h.patient           = fread(fid,20,'char');
+h.age               = fread(fid,1,'short');
+h.sex               = fread(fid,1,'char');
+h.hand              = fread(fid,1,'char');
+h.med               = fread(fid,20, 'char');
+h.category          = fread(fid,20, 'char');
+h.state             = fread(fid,20, 'char');
+h.label             = fread(fid,20, 'char');
+h.date              = fread(fid,10, 'char');
+h.time              = fread(fid,12, 'char');
+h.mean_age          = fread(fid,1,'float');
+h.stdev             = fread(fid,1,'float');
+h.n                 = fread(fid,1,'short');
+h.compfile          = fread(fid,38,'char');
+h.spectwincomp      = fread(fid,1,'float');
+h.meanaccuracy      = fread(fid,1,'float');
+h.meanlatency       = fread(fid,1,'float');
+h.sortfile          = fread(fid,46,'char');
+h.numevents         = fread(fid,1,'int');
+h.compoper          = fread(fid,1,'char');
+h.avgmode           = fread(fid,1,'char');
+h.review            = fread(fid,1,'char');
+h.nsweeps           = fread(fid,1,'ushort');
+h.compsweeps        = fread(fid,1,'ushort');
+h.acceptcnt         = fread(fid,1,'ushort');
+h.rejectcnt         = fread(fid,1,'ushort');
+h.pnts              = fread(fid,1,'ushort');
+h.nchannels         = fread(fid,1,'ushort');
+h.avgupdate         = fread(fid,1,'ushort');
+h.domain            = fread(fid,1,'char');
+h.variance          = fread(fid,1,'char');
+h.rate              = fread(fid,1,'ushort');
+h.scale             = fread(fid,1,'double');
+h.veogcorrect       = fread(fid,1,'char');
+h.heogcorrect       = fread(fid,1,'char');
+h.aux1correct       = fread(fid,1,'char');
+h.aux2correct       = fread(fid,1,'char');
+h.veogtrig          = fread(fid,1,'float');
+h.heogtrig          = fread(fid,1,'float');
+h.aux1trig          = fread(fid,1,'float');
+h.aux2trig          = fread(fid,1,'float');
+h.heogchnl          = fread(fid,1,'short');
+h.veogchnl          = fread(fid,1,'short');
+h.aux1chnl          = fread(fid,1,'short');
+h.aux2chnl          = fread(fid,1,'short');
+h.veogdir           = fread(fid,1,'char');
+h.heogdir           = fread(fid,1,'char');
+h.aux1dir           = fread(fid,1,'char');
+h.aux2dir           = fread(fid,1,'char');
+h.veog_n            = fread(fid,1,'short');
+h.heog_n            = fread(fid,1,'short');
+h.aux1_n            = fread(fid,1,'short');
+h.aux2_n            = fread(fid,1,'short');
+h.veogmaxcnt        = fread(fid,1,'short');
+h.heogmaxcnt        = fread(fid,1,'short');
+h.aux1maxcnt        = fread(fid,1,'short');
+h.aux2maxcnt        = fread(fid,1,'short');
+h.veogmethod        = fread(fid,1,'char');
+h.heogmethod        = fread(fid,1,'char');
+h.aux1method        = fread(fid,1,'char');
+h.aux2method        = fread(fid,1,'char');
+h.ampsensitivity    = fread(fid,1,'float');
+h.lowpass           = fread(fid,1,'char');
+h.highpass          = fread(fid,1,'char');
+h.notch             = fread(fid,1,'char');
+h.autoclipadd       = fread(fid,1,'char');
+h.baseline          = fread(fid,1,'char');
+h.offstart          = fread(fid,1,'float');
+h.offstop           = fread(fid,1,'float');
+h.reject            = fread(fid,1,'char');
+h.rejstart          = fread(fid,1,'float');
+h.rejstop           = fread(fid,1,'float');
+h.rejmin            = fread(fid,1,'float');
+h.rejmax            = fread(fid,1,'float');
+h.trigtype          = fread(fid,1,'char');
+h.trigval           = fread(fid,1,'float');
+h.trigchnl          = fread(fid,1,'char');
+h.trigmask          = fread(fid,1,'short');
+h.trigisi           = fread(fid,1,'float');
+h.trigmin           = fread(fid,1,'float');
+h.trigmax           = fread(fid,1,'float');
+h.trigdir           = fread(fid,1,'char');
+h.autoscale         = fread(fid,1,'char');
+h.n2                = fread(fid,1,'short');
+h.dir               = fread(fid,1,'char');
+h.dispmin           = fread(fid,1,'float');
+h.dispmax           = fread(fid,1,'float');
+h.xmin              = fread(fid,1,'float');
+h.xmax              = fread(fid,1,'float');
+h.automin           = fread(fid,1,'float');
+h.automax           = fread(fid,1,'float');
+h.zmin              = fread(fid,1,'float');
+h.zmax              = fread(fid,1,'float');
+h.lowcut            = fread(fid,1,'float');
+h.highcut           = fread(fid,1,'float');
+h.common            = fread(fid,1,'char');
+h.savemode          = fread(fid,1,'char');
+h.manmode           = fread(fid,1,'char');
+h.ref               = fread(fid,10,'char');
+h.rectify           = fread(fid,1,'char');
+h.displayxmin       = fread(fid,1,'float');
+h.displayxmax       = fread(fid,1,'float');
+h.phase             = fread(fid,1,'char');
+h.screen            = fread(fid,16,'char');
+h.calmode           = fread(fid,1,'short');
+h.calmethod         = fread(fid,1,'short');
+h.calupdate         = fread(fid,1,'short');
+h.calbaseline       = fread(fid,1,'short');
+h.calsweeps         = fread(fid,1,'short');
+h.calattenuator     = fread(fid,1,'float');
+h.calpulsevolt      = fread(fid,1,'float');
+h.calpulsestart     = fread(fid,1,'float');
+h.calpulsestop      = fread(fid,1,'float');
+h.calfreq           = fread(fid,1,'float');
+h.taskfile          = fread(fid,34,'char');
+h.seqfile           = fread(fid,34,'char');
+h.spectmethod       = fread(fid,1,'char');
+h.spectscaling      = fread(fid,1,'char');
+h.spectwindow       = fread(fid,1,'char');
+h.spectwinlength    = fread(fid,1,'float');
+h.spectorder        = fread(fid,1,'char');
+h.notchfilter       = fread(fid,1,'char');
+h.headgain          = fread(fid,1,'short');
+h.additionalfiles   = fread(fid,1,'int');
+h.unused            = fread(fid,5,'char');
+h.fspstopmethod     = fread(fid,1,'short');
+h.fspstopmode       = fread(fid,1,'short');
+h.fspfvalue         = fread(fid,1,'float');
+h.fsppoint          = fread(fid,1,'short');
+h.fspblocksize      = fread(fid,1,'short');
+h.fspp1             = fread(fid,1,'ushort');
+h.fspp2             = fread(fid,1,'ushort');
+h.fspalpha          = fread(fid,1,'float');
+h.fspnoise          = fread(fid,1,'float');
+h.fspv1             = fread(fid,1,'short');
+h.montage           = fread(fid,40,'char');
+h.eventfile         = fread(fid,40,'char');
+h.fratio            = fread(fid,1,'float');
+h.minor_rev         = fread(fid,1,'char');
+h.eegupdate         = fread(fid,1,'short');
+h.compressed        = fread(fid,1,'char');
+h.xscale            = fread(fid,1,'float');
+h.yscale            = fread(fid,1,'float');
+h.xsize             = fread(fid,1,'float');
+h.ysize             = fread(fid,1,'float');
+h.acmode            = fread(fid,1,'char');
+h.commonchnl        = fread(fid,1,'uchar');
+h.xtics             = fread(fid,1,'char');
+h.xrange            = fread(fid,1,'char');
+h.ytics             = fread(fid,1,'char');
+h.yrange            = fread(fid,1,'char');
+h.xscalevalue       = fread(fid,1,'float');
+h.xscaleinterval    = fread(fid,1,'float');
+h.yscalevalue       = fread(fid,1,'float');
+h.yscaleinterval    = fread(fid,1,'float');
+h.scaletoolx1       = fread(fid,1,'float');
+h.scaletooly1       = fread(fid,1,'float');
+h.scaletoolx2       = fread(fid,1,'float');
+h.scaletooly2       = fread(fid,1,'float');
+h.port              = fread(fid,1,'short');
+h.numsamples        = fread(fid,1,'ulong');
+h.filterflag        = fread(fid,1,'char');
+h.lowcutoff         = fread(fid,1,'float');
+h.lowpoles          = fread(fid,1,'short');
+h.highcutoff        = fread(fid,1,'float');
+h.highpoles         = fread(fid,1,'short');
+h.filtertype        = fread(fid,1,'char');
+h.filterdomain      = fread(fid,1,'char');
+h.snrflag           = fread(fid,1,'char');
+h.coherenceflag     = fread(fid,1,'char');
+h.continuoustype    = fread(fid,1,'char');
+h.eventtablepos     = fread(fid,1,'long');
+h.continuousseconds = fread(fid,1,'float');
+h.channeloffset     = fread(fid,1,'long');
+h.autocorrectflag   = fread(fid,1,'char');
+h.dcthreshold       = fread(fid,1,'uchar');
 
-r.nchannels=freadat(f, 370, 1, 'ushort');
-numsamples=freadat(f, 864, 1, 'long');  % not accurate, see calculation below
-samplespos=900 + 75*r.nchannels;
-event.tablepos=freadat(f, 886, 1, 'long');
-r.nsamples=(event.tablepos - samplespos)/(2*r.nchannels);
-r.rate=freadat(f, 376, 1, 'ushort');
-r.channeloffset=freadat(f, 932, 1, 'long');
-r.dt=1/r.rate;
-r.scale=freadat(f, 378, 1, 'double');
-r.ampsensitivity=freadat(f, 438, 1, 'float');
-r.refelectrode=freadat(f, 540, 10, 'text');
-r.blockread   =freadat(f, 900-6, 1, 'long')/2;
-if all(r.refelectrode==0), 
-   %%disp('No reference electrode set in file, setting to CZ')
-   r.refelectrode(1:2)='CZ'; 
+for n = 1:h.nchannels
+    e(n).lab            = fread(fid,10,'char');
+    e(n).reference      = fread(fid,1,'char');
+    e(n).skip           = fread(fid,1,'char');
+    e(n).reject         = fread(fid,1,'char');
+    e(n).display        = fread(fid,1,'char');
+    e(n).bad            = fread(fid,1,'char');
+    e(n).n              = fread(fid,1,'ushort');
+    e(n).avg_reference  = fread(fid,1,'char');
+    e(n).clipadd        = fread(fid,1,'char');
+    e(n).x_coord        = fread(fid,1,'float');
+    e(n).y_coord        = fread(fid,1,'float');
+    e(n).veog_wt        = fread(fid,1,'float');
+    e(n).veog_std       = fread(fid,1,'float');
+    e(n).snr            = fread(fid,1,'float');
+    e(n).heog_wt        = fread(fid,1,'float');
+    e(n).heog_std       = fread(fid,1,'float');
+    e(n).baseline       = fread(fid,1,'short');
+    e(n).filtered       = fread(fid,1,'char');
+    e(n).fsp            = fread(fid,1,'char');
+    e(n).aux1_wt        = fread(fid,1,'float');
+    e(n).aux1_std       = fread(fid,1,'float');
+    e(n).senstivity     = fread(fid,1,'float');
+    e(n).gain           = fread(fid,1,'char');
+    e(n).hipass         = fread(fid,1,'char');
+    e(n).lopass         = fread(fid,1,'char');
+    e(n).page           = fread(fid,1,'uchar');
+    e(n).size           = fread(fid,1,'uchar');
+    e(n).impedance      = fread(fid,1,'uchar');
+    e(n).physicalchnl   = fread(fid,1,'uchar');
+    e(n).rectify        = fread(fid,1,'char');
+    e(n).calib          = fread(fid,1,'float');
 end
 
-% reading all parameters
-% ----------------------
-%a = freadat(f, 0, 1, 'short');
-%for i=1:470
-%	a = freadat(f, [], 1, 'short');
-%	fprintf('offset %3d value %3d\n', i*2, a);
-%	%if mod(i, 10) == 0, fprintf('\n'); end;  	
-%end;	
+% finding if 32-bits of 16-bits file
+% ----------------------------------
+begdata = ftell(fid);
+enddata = h.eventtablepos;   % after data
+if strcmpi(r.dataformat, 'int16')
+     nums    = (enddata-begdata)/h.nchannels/2;
+else nums    = (enddata-begdata)/h.nchannels/4;
+end;
 
-% channel parameters
-chandat=freadat(f, 900, [75 r.nchannels], 'char');
-r.chan.names=setstr(chandat(1:9,:))';
-r.chan.reference=chandat(11,:);
-r.chan.gain=chandat(1+63,:);
-r.chan.baseline=freadat(f, 900+47, [1 r.nchannels], 'short', 75);
-r.chan.sensitivity=freadat(f, 900+59, [1 r.nchannels], 'float', 75);
-r.chan.calib=freadat(f, 900+71, [1 r.nchannels], 'float', 75);
-r.microvoltscalar=r.chan.sensitivity.*r.chan.calib/204.8;
+% number of sample to read
+% ------------------------
+if ~isempty(r.sample1)
+   r.t1      = r.sample1/h.rate;
+else 
+   r.sample1 = r.t1*h.rate;
+end;
+if strcmpi(r.dataformat, 'int16')
+     startpos = r.t1*h.rate*2*h.nchannels;
+else startpos = r.t1*h.rate*4*h.nchannels;
+end;
+if isempty(r.ldnsamples)
+     if ~isempty(r.lddur)
+          r.ldnsamples = round(r.lddur*h.rate); 
+     else r.ldnsamples = nums; 
+     end;
+end;
 
-r.nevent=0;
-fseek(f, event.tablepos, 'bof');
-r.event.type=fread(f, 1, 'char');
-event.size=fread(f, 1, 'long');
-%event.offset=fread(f, 1, 'long')
-
-if r.event.type==1
-    event.bytes =8;
-    r.nevent    = event.size/event.bytes;
-elseif r.event.type==2
-    event.bytes = 19;
-    r.nevent    = event.size/event.bytes;
-else
-    event.bytes = 19;
-    r.nevent    = 0;
-    disp('Warning: event type is 0 (potential problem)');
-end
-
-r.event.stimtype=freadat(f, event.tablepos+9, r.nevent, 'short', event.bytes);  % stimtype
-r.event.keyboard=freadat(f, event.tablepos+9+2, r.nevent, 'uchar', event.bytes);  % keyboard
-r.event.keypadaccept=freadat(f, event.tablepos+9+3, r.nevent, 'uchar', event.bytes);  % keypadaccept
-offset=freadat(f, event.tablepos+9+4, r.nevent, 'long', event.bytes);   % offset
-r.event.frame=(offset-samplespos)/(r.nchannels*2);  % samplenumber
-r.event.time=r.event.frame/r.rate;
-
-try,
-   if r.ldheaderonly==1
-      return
-   end
-end
-
-try,
-   sample1=r.sample1;
-   r.t1=r.sample1*r.dt;
-catch,
-   try 
-      startstim=r.startstim;   % startstim = [stimtype occurrence]
-      j=find(r.event.stimtype==startstim(1)); 
-      if length(startstim)>1
-         j=j(startstim(2)); 
-      else
-         j=j(1); 
-      end
-      r.t1=r.event.time(j); 
-   end
-   sample1=round(r.t1/r.dt);   % first sample to read, zero-based
-end
-startpos=samplespos+sample1*2*r.nchannels;
-
-try, ldnsamples=r.ldnsamples; catch, try, ldnsamples=round(r.lddur/r.dt); catch, ldnsamples=r.nsamples; end, end
-try, ldchan=r.ldchan; catch, ldchan=[1:r.nchannels]; end
-if ~isempty(ldchan) & ldchan==-1, ldchan=[1:r.nchannels]; end
-r.ldchan=ldchan;
-
-% clip events to read window
-i=~(sample1<=r.event.frame & r.event.frame<sample1+ldnsamples);
-r.nevent=sum(~i);
-r.event.stimtype(i)=[];
-r.event.keyboard(i)=[];
-r.event.keypadaccept(i)=[];
-r.event.frame(i)=[];
-r.event.time(i)=[];
-
-try, ldraw=r.ldraw; catch, ldraw=0; end;
-
-if ~isempty(ldchan)
-   if length(ldchan)==r.nchannels
-      % all channels
-
-	  if r.blockread <= 1
-      	  dat=freadat(f, startpos, [r.nchannels ldnsamples], 'short');
+disp('Reading data .....')
+if type == 'cnt' 
+  
+      % while (ftell(fid) +1 < h.eventtablepos)
+      %d(:,i)=fread(fid,h.nchannels,'int16');
+      %end
+      fseek(fid, startpos, 0);
+	  if h.channeloffset <= 1
+      	  dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);
  	  else
-     	  dat = zeros( length(ldchan), ldnsamples);
-      	  dat(:, 1:r.blockread) = freadat(f, startpos, [r.blockread r.nchannels], 'short')';
+          h.channeloffset = h.channeloffset/2;
+          % reading data in blocks
+     	  dat = zeros( h.nchannels, r.ldnsamples);
+      	  dat(:, 1:h.channeloffset) = fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
 
 		  counter = 1;	
- 		  while counter*r.blockread < ldnsamples
-              tmp    = freadat(f, [], [r.blockread r.nchannels], 'short')';
-              maxind = counter*r.blockread+r.blockread;
-              dat(:, counter*r.blockread+1:maxind) = tmp;
+ 		  while counter*h.channeloffset < r.ldnsamples
+              dat(:, counter*h.channeloffset+1:counter*h.channeloffset+h.channeloffset) = ...
+                  fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
               counter = counter + 1;
 		  end;
 	  end;	
-
-      r.dat=zeros( size(dat,2), length(ldchan));
-      if ldraw
-         r.dat=int16(dat)';
+      
+      %ftell(fid)
+      if strcmpi(r.scale, 'on')
+          disp('Scaling data .....')
+          %%% scaling to microvolts
+          for i=1:h.nchannels
+              bas=e(i).baseline;sen=e(i).senstivity;cal=e(i).calib;
+              mf=sen*(cal/204.8);
+              dat(i,:)=(dat(i,:)-bas).*mf;
+          end
+      end     
+      
+      fseek(fid, h.eventtablepos, 'bof');      
+      disp('Reading Event Table...')
+      eT.teeg   = fread(fid,1,'uchar');
+      eT.size   = fread(fid,1,'ulong');
+      eT.offset = fread(fid,1,'ulong');
+      
+      if eT.teeg==2
+          nevents=eT.size/sizeEvent2;
+          ev2(nevents).stimtype  = [];
+          for i=1:nevents
+              ev2(i).stimtype      = fread(fid,1,'ushort');
+              ev2(i).keyboard      = fread(fid,1,'char');
+              ev2(i).keypad_accept = fread(fid,1,'char');
+              ev2(i).offset        = fread(fid,1,'long');
+              ev2(i).type          = fread(fid,1,'short'); 
+              ev2(i).code          = fread(fid,1,'short');
+              ev2(i).latency       = fread(fid,1,'float');
+              ev2(i).epochevent    = fread(fid,1,'char');
+              ev2(i).accept        = fread(fid,1,'char');
+              ev2(i).accuracy      = fread(fid,1,'char');
+          end     
+      elseif eT.teeg==1
+          nevents=eT.size/sizeEvent1;
+          ev2(nevents).stimtype  = [];
+          for i=1:nevents
+              ev2(i).stimtype      = fread(fid,1,'ushort');
+              ev2(i).keyboard      = fread(fid,1,'char');
+              ev2(i).keypad_accept = fread(fid,1,'char');
+              ev2(i).offset        = fread(fid,1,'long');
+          end;
       else
-         for j=1:length(ldchan)
-            baseline=r.chan.baseline(ldchan(j));
-            if baseline==0
-               r.dat(:,j)=r.microvoltscalar(ldchan(j))*dat(j,:)';
-            else
-               r.dat(:,j)=r.microvoltscalar(ldchan(j))*(dat(j,:)-baseline)';
-            end
-         end
-      end
-      
-      
-      if ~isempty(r.avrefchan)
-         avref=0;
-         for j=1:length(r.avrefchan)
-            avref=avref + r.dat(:, r.avrefchan(j));
-         end
-         avref=1/length(r.avrefchan)*avref;
-         
-         for j=1:length(r.chan)
-            r.dat(:,j)=r.dat(:,j)-avref;
-         end
-      end
-      
-   else
-       r.dat=zeros(ldnsamples, length(ldchan));
-       for j=1:length(ldchan)
-           dat=freadat(f, startpos+(ldchan(j)-1)*2, ldnsamples, 'short', (r.nchannels-1)*2);
-           r.dat(:,j)=r.microvoltscalar(ldchan(j))*(dat'-r.chan.baseline(ldchan(j)));
-       end
-   end
-end
+          disp('No !!! teeg <> 2 and teeg <> 1');
+          ev2 = [];
+      end     
+end 
 
-fclose(f);
-r.dat = r.dat';
+fseek(fid, -1, 'eof');
+t = fread(fid,'char');
 
-% average referencing
-% the reference electrode is equal to sum(r,1)/(elec+1)
-% -------------------
-switch lower(r.avgref)
-	case 'yes', 
-		r.dat = r.dat-ones(r.nchannels,1)*sum(r.dat,1)/(r.nchannels+1);
+f.header   = h;
+f.electloc = e;
+f.data     = dat;
+f.Teeg     = eT;
+f.event    = ev2;
+f.tag=t;
+
+%%%% channels labels
+for i=1:h.nchannels
+  plab=sprintf('%c',f.electloc(i).lab);
+  if i>1 
+   lab=str2mat(lab,plab);
+  else 
+   lab=plab;  
+  end  
+end  
+
+%%%% to change offest in bytes to points 
+if ~isempty(ev2)
+    ev2p=ev2; 
+    ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
+    for i=1:nevents 
+        ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+    end     
+    f.event = ev2p;
 end;
 
-disp done
-return;
+frewind(fid);
+fclose(fid);
 
-function y=freadat(f, byte, siz, prec, offset)
-
-if nargin<5, 
-   skip=0; 
-else
-   switch prec
-   case 'double', s=8;
-   case 'float', s=4;
-   case 'long', s=4;
-   case 'ulong', s=4;
-   case 'int16', s=2;
-   case 'short', s=2;
-   case 'ushort', s=2;
-   case 'uchar', s=1;
-   case 'char', s=1;
-   case 'text', s=1;
-   case 'schar', s=1;
-   end
-   skip=offset-s;
-end
-
-if ~isempty(byte)
-	fseek(f, byte, 'bof');
-end;
-
-if ~strcmp(prec, 'text')
-   y=fread(f, siz, prec, skip);
-   %y1=fread(f, siz, 'uint8', skip);
-   %y2=fread(f, siz, 'uint8', skip);
-   %y = y1 + 256*y2;
-else
-   y=setstr(fread(f, siz, 'char', skip)');
-end
 
