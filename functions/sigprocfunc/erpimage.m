@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2002/10/13 23:41:57  scott
+% debug ampargs
+%
 % Revision 1.51  2002/10/13 23:41:11  scott
 % debug ampargs
 %
@@ -1142,6 +1145,7 @@ elseif exist('valargs')
   sortval = mean(data(stframe:endframe,:));
   [sortval,sortidx] = sort(sortval);
   data = data(:,sortidx);
+  fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
   if ~isempty(auxvar)
     auxvar = auxvar(:,sortidx);
   end
