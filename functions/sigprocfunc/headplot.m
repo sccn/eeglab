@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/02/08 16:31:41  scott
+% trying newupper.mat again for 252 channels
+%
 % Revision 1.24  2004/02/08 15:31:36  scott
 % try to plot whole head
 %
@@ -162,7 +165,7 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-mesh_file  = [/home/scott/matlab/old' '/newupper.mat']; % whole head model file (183K)
+mesh_file  = ['/home/scott/matlab/old' '/newupper.mat']; % whole head model file (183K)
 % mesh_file  = ['mhead.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
