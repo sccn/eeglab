@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.284  2003/12/02 17:27:36  arno
+% still debuging path
+%
 % Revision 1.283  2003/12/02 17:25:09  arno
 % debuging path add
 %
@@ -1057,8 +1060,8 @@ eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 myaddpath( eeglabpath, 'readeetraklocs.m', 'sigprocfunc');
 myaddpath( eeglabpath, 'eeg_checkset.m',   'adminfunc');
-myaddpath( eeglabpath, 'pop_readbci.m',    'popfunc');
-myaddpath( eeglabpath, 'tftopo.m',         'miscfunc');
+myaddpath( eeglabpath, 'pop_loadbci.m',    'popfunc');
+myaddpath( eeglabpath, 'icademo.m',        'miscfunc');
 myaddpath( eeglabpath, 'VolumeMNI.bin',    'datafiles');
 eeg_options; 
 eeg_global;
@@ -1707,12 +1710,12 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         tmpp = tmpp(1:end-length(functionname));
         if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
         if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
-        disp([ tmpp '     |        ' tmpnewpath '(' num2str(~strcmpi(tmpnewpath, tmpp)) ')' ]);
+        %disp([ tmpp '     |        ' tmpnewpath '(' num2str(~strcmpi(tmpnewpath, tmpp)) ')' ]);
         if ~strcmpi(tmpnewpath, tmpp)
             addpath(tmpnewpath);
         end;
     else
-        disp([ 'Adding new path ' tmpnewpath ]);
+        %disp([ 'Adding new path ' tmpnewpath ]);
         addpath(tmpnewpath);
     end;
     
