@@ -1,5 +1,5 @@
 % pop_topoplot() - Plot scalp map(s) in a figure window. If number of 
-%                  arguments is 2, Pop-up an interactive query window.
+%                  arguments is 2, pop-up an interactive query window.
 %
 % Usage:
 %   >> pop_topoplot( EEG, typeplot, latencies, title, options...);
@@ -47,6 +47,9 @@ $   called or when more than one page of maps are plotted. Thus, this
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/17 22:15:51  scott
+% *** empty log message ***
+%
 % Revision 1.6  2002/08/13 17:49:37  arno
 % debug color
 %
