@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/10/11 02:20:31  arno
+% shift colorbar to left for 1 plot
+%
 % Revision 1.29  2003/10/11 02:11:42  arno
 % debuging for empty option
 %
@@ -176,11 +179,11 @@ if nargin < 3
 	        '-> Scalp map plotting options (see >> help topoplot):' };
     if typeplot
         inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-                         [fastif(~isempty(EEG.setname), [EEG.setname ' ERP'], '') ] ...
+                         [fastif(~isempty(EEG.setname), [EEG.setname], '') ] ...
                          '' ['''electrodes'', ''off''' ] };
     else
         inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-                         [fastif(~isempty(EEG.setname), [EEG.setname ' components'], '') ] ...
+                         [fastif(~isempty(EEG.setname), [EEG.setname], '') ] ...
                          '' ['''electrodes'', ''off''' ] };
     end
 	result       = inputdlg2( txt, ...
@@ -326,6 +329,7 @@ if nbgraph== 1,
    com = 'figure;'; 
 end;
 set(allobj(1:countobj-1), 'visible', 'on');
+topotitle
 
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
