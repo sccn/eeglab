@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2002/10/13 23:33:10  scott
+% valsort debug
+%
 % Revision 1.47  2002/10/13 23:28:18  scott
 % added Ampflag, Valflag defaults -sm
 %
@@ -1117,9 +1120,8 @@ else
   if ~isempty(auxvar)
     auxvar = auxvar(:,sortidx);
   end
-end
 %
-%%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Sort trials on (mean) value %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 else 
   [sttime stframe] = min(times-valargs(1));
