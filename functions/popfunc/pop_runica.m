@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/02/05 01:50:52  arno
+% call for acsobiro
+%
 % Revision 1.38  2004/02/05 01:37:51  arno
 % same
 %
@@ -283,7 +286,7 @@ switch lower(icatype)
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
         else % if defined 'options'
-            if rank(tmpdata) == size(EEG.data,1), 
+            if rank(tmpdata) == size(EEG.data,1) | ~isempty(findstr('pca', options))
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s );', options));
             else
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s, ''pca'', %d );', options, tmprank));
