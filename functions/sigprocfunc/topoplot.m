@@ -39,6 +39,12 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
+%   'plotgrid'        - {channels,values} or {channels, values, position} where channels is 
+%                       a list of grid channel numbers, values is a list of channel values, 
+%                       and position (if either 'l' or 'r') indicates which side of the head 
+%                       to plot the grid, or if 'o', plot the grid only. {default location is
+%                       to the left of the head}. The channels vector should be in topographic 
+%                       order from top-left rightward. {default: no grid plot}
 % Dipole plotting:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
@@ -112,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.206  2004/09/10 00:53:08  hilit
+% converted input arguments to text() to double
+%
 % Revision 1.205  2004/07/07 22:21:30  arno
 % debug shrink
 %
@@ -568,6 +577,8 @@ icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC and BA
 if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
    BACKCOLOR = [.93 .96 1];  % EEGLAB standard
 end
+plotgrid = 'off';
+gridpos = 'l';          % default grid position left of head
 noplot  = 'off';
 handle = [];
 Zi = [];
@@ -816,6 +827,19 @@ if nargs > 2
           if isstr(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
                error('''gridscale'' value must be integer > 32.\n');
           end
+         case 'plotgrid'
+           if ~iscell(Value)
+               error('''plotgrid'' value must be a cell array\n');
+           end
+           if length(a)<2
+               error('''plotgrid'' value must be a cell array of length 2 or 3\n');
+           end
+           gridchans = Value{1};
+           gridvals  = Value{2};
+           if length(a)>2
+               gridpos   = Value{3};
+           end
+           error('''plotgrid'' option not yet implemented.\n');
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
     end
