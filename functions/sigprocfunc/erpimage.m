@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.102  2003/05/06 15:58:51  scott
+% header edits
+%
 % Revision 1.101  2003/05/06 15:54:15  scott
 % edit header
 %
@@ -561,7 +564,7 @@ lospecHz  = [];     % spec lo frequency
 topphase = 180;     % default top phase for 'phase' option
 renorm    = 'no';
 noshow    = 'no';
-rmerp     = 'no';
+Rmerp     = 'no';
 
 minerp = NaN; % default limits
 maxerp = NaN;
