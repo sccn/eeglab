@@ -15,7 +15,7 @@
 %           the figure also shows a topoplot() of the specified scalp map.
 %         * Note: Left-click on subplots to view and zoom in separate windows.
 % Usage: 
-%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
+%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot,itcphase] = ...
 %                timef(data,frames,tlimits,srate,cycles,...
 %                        'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
@@ -39,7 +39,6 @@
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
 %                      ('coher') or phase coherence ('phasecoher') also known
 %                      as the phase coupling factor           {'phasecoher'}.
-%
 %    Optional detrending:
 %       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
 %       'detrep'    = ['on'|'off'], Detrend data across trials  {'off'}
@@ -104,6 +103,7 @@
 %            freqs  = Vector of frequency bin centers (in Hz).
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
+%          itcphase = Matrix (nfreqs,timesout) of ITC phase (in radians).
 %
 % Plot description:
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2004/11/02 22:47:52  scott
+% nothing
+%
 % Revision 1.75  2004/10/19 18:33:44  hilit
 % typo in the help message
 %
@@ -398,16 +401,18 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,times,freqs,Pboot,Rboot,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,times,freqs,Pboot,Rboot,Rphase,PA] = timef(X,frame,tlimits,Fs,varwin,varargin);
 
 % Note: PA is output of 'phsamp','on' 
 
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
-% ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is coherence.
-%        But here, we consider    Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
+% ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is linear coherence.
+%        But here, we consider:  Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
 %        Giving, R = |Sum(Pxx)|/Sum(|Pxx|), the inter-trial coherence (ITC)
-%        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
+%        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996),
+%        the ITC is the phase coherence between the data time series and the
+%        time-locking event time series.
 
 % Constants set here:
 ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
@@ -422,10 +427,10 @@ DEFAULT_TIMLIM = [-1000 2000];	% Time range of g.frames (ms)
 DEFAULT_FS	= 250;			% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;			% Fixed window length or fixed number of cycles.
-								% =0: fix window length to that determined by nwin
-								% >0: set window length equal to varwin cycles
-								%     Bounded above by winsize, which determines
-								%     the min. freq. to be computed.
+				% =0: fix window length to that determined by nwin
+				% >0: set window length equal to varwin cycles
+				%     Bounded above by winsize, which determines
+				%     the min. freq. to be computed.
 DEFAULT_OVERSMP	= 2;			% Number of times to oversample frequencies 
 DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= '';			% Figure title
@@ -436,6 +441,10 @@ DEFAULT_MARKTIME= NaN;
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
 TITLE_FONT      = 8;
+
+if nargout>7
+   Rphase = []; % initialize in case Rphase asked for, but ITC not computed
+end
 
 if (nargin < 1)
 	help timef
@@ -980,6 +989,12 @@ else
 end;
 
 Rsign = sign(imag(R));
+if nargout > 7
+   Rphase = rem(phase(R),2*pi);
+   Rphase(find(Rphase>pi))  = 2*pi-Rphase;
+   Rphase(find(Rphase<-pi)) = -2*pi-Rphase;
+end
+
 R = abs(R); % convert coherence vector to magnitude
 
 if ~isnan(g.alpha) % if bootstrap analysis included . . .
@@ -1211,7 +1226,7 @@ switch lower(g.plotitc)
 	tick = get(h(11),'YTick');
 	set(h(11),'YTick',[tick(1) ; tick(length(tick))])
 	set(h(11),'View',[90 90])
-    set(h(11),'TickLength',[0.020 0.025]);
+        set(h(11),'TickLength',[0.020 0.025]);
 	xlabel('Frequency (Hz)')
 	ylabel('ERP')
     %
@@ -1227,7 +1242,7 @@ switch lower(g.plotitc)
 		end;
 		    axis('square')
 	end
-end; %switch
+end; % switch
 
 if g.plot
 	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
