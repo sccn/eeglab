@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/20 01:41:07  arno
+% percent update
+%
 % Revision 1.9  2002/07/20 01:35:14  arno
 % percent from 0 to 100
 %
@@ -171,6 +174,9 @@ else
 end;
 if g.percent > 1
 	g.percent = g.percent/100; % make it from 0 to 1
+end;
+if ~isempty(g.freq) & isempty(g.chanlocs)
+	error('spectopo: need channel location file');
 end;
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
