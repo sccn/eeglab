@@ -4,10 +4,10 @@
 % Usage: 
 %         >> [data,events,header] = read_erpss(filename);
 % Inputs:
-%   filename - Name of uncompressed ERPSS data file (including extension) 
+%   filename - Name of ERPSS data file (including extension) 
 %
 % Outputs:
-%   data     - Data array [nchans samples]
+%   data     - Data array [nchans samples]. Data is rescaled to microVolt.
 %   events   - Event information structure:
 %              events.sample_offset[]: Event offsets in samples
 %                                      from the first sample (0)
@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/12/10 17:00:03  arno
+% comment
+%
 % Revision 1.19  2003/11/19 03:05:22  arno
 % debuging calibration
 %
