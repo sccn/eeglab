@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/05/19 14:12:53  scott
+% *** empty log message ***
+%
 % Revision 1.40  2002/05/19 14:12:08  scott
 % *** empty log message ***
 %
@@ -434,14 +437,15 @@ for n=1:tfpoints
    axis([0 1 0 1]);
    axis off;
 
-   if showchan>0
-     axes(topoaxes(n));
-     topoplot(showchan,chanlocs,'electrodes','off', ...
-                  'style', 'blank', 'emarkersize1chan', 10)
-   end
-
    drawnow
 end
+
+if showchan>0
+     sbplot(3,3,1,'ax',imgax);
+     topoplot(showchan,chanlocs,'electrodes','off', ...
+                  'style', 'blank', 'emarkersize1chan', 10)
+end
+
 
 % for n=1:tfpoints
 
