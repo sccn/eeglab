@@ -1,4 +1,4 @@
-% epoch() - epoching continuous eeg data array.
+% epoch() - Extract epochs time locked to specified events from continuous EEG data.
 %
 % Usage:
 %   >> epocheddata = epoch( data, events, timelim);
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/01/14 00:34:25  arno
+% typo in header
+%
 % Revision 1.6  2003/01/14 00:28:45  arno
 % adding more checks if 'allevents' is empty
 %
