@@ -27,7 +27,7 @@
 %                 experimental events. See notes. {default: 'off'}
 %
 %    Optional Detrend:
-%      'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
+%      'detrend' = ['on'|'off'], Linearly detrend each data epoch  {'off'}
 %
 %    Optional FFT/DFT:
 %      'tlimits'  = [min max] time limits in ms.
@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/05/02 17:57:42  arno
+% removing maxfreq
+%
 % Revision 1.20  2003/05/02 17:34:12  arno
 % implementing ITC option for very big arrays
 %
