@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2003/12/04 22:33:54  arno
+% urevent remove
+%
 % Revision 1.113  2003/12/04 17:45:12  arno
 % debug urevent (made Matlab 5.3 crash systematically)
 %
@@ -662,7 +665,7 @@ end;
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
             if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
-                  if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ')' ...
+                  if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) ')' 10 ...
                    'does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
                    'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                     error('eeg_checkset error: user abort');
