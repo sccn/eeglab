@@ -37,6 +37,7 @@
 %                'electcolor'       - detail
 %                'emarker'          - detail
 %                'emarkersize'      - detail
+%                'emarkersize1chan' - detail
 %  
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -69,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 03:37:24  arno
+% adding single channel vector input
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -207,6 +211,8 @@ if nargs > 2
 	ECOLOR = Value;
       case {'emarkersize','emsize'}
 	EMARKERSIZE = Value;
+      case 'emarkersize1chan'
+        EMARKERSIZE1CHAN= Value;
       case {'efontsize','efsize'}
 	EFSIZE = Value;
       case 'shading'
@@ -331,7 +337,11 @@ else % style 'blank'
   end;
   
   if length(Vl) == 1
+    if exist('EMARKERSIZE1CHAN') == 1
+      hp2 = plot(y(Vl),x(Vl),'.','Color', 'red', 'markersize', EMARKERSIZE1CHAN);
+    else
       hp2 = plot(y(Vl),x(Vl),'.','Color', 'red', 'markersize', 40);
+    end;
   end;
 end
 
