@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/08/31 02:12:56  arno
+% typo
+%
 % Revision 1.16  2004/02/12 23:09:19  scott
 % same
 %
@@ -127,11 +130,11 @@ if locutoff < 0 | hicutoff < 0,
 end
 
 if locutoff>nyq,
-    error('locutoff cannot be > srate/2');
+    error('Low cutoff frequency cannot be > srate/2');
 end
 
-if hicutoff>=nyq
-   hicutoff = 0; 
+if hicutoff>nyq
+    error('High cutoff frequency cannot be > srate/2');
 end
 
 if nargin<6
