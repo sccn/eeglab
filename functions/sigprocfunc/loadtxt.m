@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/01/29 01:35:35  arno
+% debug numerical conversion
+%
 % Revision 1.5  2003/11/19 19:28:16  arno
 % now reading empty tabs
 %
@@ -114,6 +117,12 @@ while isempty(inputline) | inputline~=-1
 	     switch g.convert
 	        case 'off',
 			     while ~isempty(deblank(inputline))
+			         % 07/29/04 Petr Janata added following line to
+			         % mitigate problem of strtok ignoring leading
+			         % delimiters and deblanking residue in the event
+			         % of only space existing between delimiters
+			         inputline = strrep(inputline,[g.delim g.delim],[g.delim ' ' g.delim]);
+                     
 			         [array{linenb, colnb} inputline] = strtok(inputline, g.delim);
 			         colnb = colnb+1;
 			     end;
