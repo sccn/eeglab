@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/17 01:03:34  scott
+% font change, OK -> SAVE
+%
 % Revision 1.8  2002/08/12 01:23:16  arno
 % update colors
 %
@@ -78,7 +81,9 @@ com = '';
 if exist('comments') ~=1, comments = '';
 elseif iscell(comments), comments = strvcat(comments{:}); 
 end;
-newcomments = comments;
+if nargin < 3
+    newcomments = comments;
+end;
 if nargin < 3
 	try, icadefs;
 	catch,
