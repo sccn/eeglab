@@ -94,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/16 04:14:54  arno
+% debuging flashes
+%
 % Revision 1.6  2002/07/16 04:02:01  arno
 % adding color to the flashes
 %
@@ -413,8 +416,6 @@ if ~isempty(g.flashes)
 	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', []); set (gcf, 'visible', g.visible);
 	hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch, 'facecolor', 'w');
 	posf = 0; % used as a counter to preserve color
-	allflashes
-	flashescol
 end;	
 
 % draw captions if necessary
