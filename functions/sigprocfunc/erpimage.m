@@ -125,6 +125,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2002/10/14 16:07:29  scott
+% removed moreargs - consolidated help message -sm
+%
 % Revision 1.62  2002/10/14 14:56:45  scott
 % working on ampsort
 %
@@ -1195,12 +1198,11 @@ elseif exist('valargs')
      endframe = stframe;
      endtime = times(endframe);
   end
-  if length(valargs)==1
-     fprintf('Sorting data on value at time %f ms.\n',sttime);
+  if length(valargs)==1 | sttime == endtime
+     fprintf('Sorting data on value at time %f4 ms.\n',sttime);
   elseif length(valargs)>1
-     fprintf('Sorting data on mean value between %g and %g ms.\n',...
+     fprintf('Sorting data on mean value between %f4 and %f4 ms.\n',...
             sttime,endtime);
-     fprintf('Frames: %d to %d\n',stframe,endframe);
   end
   if endframe>stframe
      sortval = mean(data(stframe:endframe,:));
