@@ -5,7 +5,8 @@
 % Usage:
 %   >>  eloc = readlocs( filename );
 %   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
-%   >>  [eloc, labels, theta, radius, indices] = readlocs( filename, 'key', 'val', ... );
+%   >>  [eloc, labels, theta, radius, indices, chaninfo] = ...
+%                                               readlocs( filename, 'key', 'val', ... );
 %
 % Inputs:
 %   filename   - Name of the file containing the electrode locations
@@ -32,6 +33,13 @@
 %                           see below).
 %                  'chanedit' - EEGLAB channel location file created by pop_chanedit().
 %                  'custom' - Ascii file with columns in user-defined 'format' (see below).
+%   'importmode' - ['eeglab'|'native'] for location files containing 3-D cartesian electrode
+%                  coordinates, import either in EEGLAB format (nose pointing toward +X). 
+%                  This may not always be possible since EEGLAB might not be able to 
+%                  determine the nose direction for scanned electrode files. 'native' import
+%                  original carthesian coordinates (user can then specify the position of
+%                  the nose when calling the topoplot() function; in EEGLAB the position
+%                  of the nose is stored in the EEG.chaninfo structure). Default is 'eeglab'.
 %   'format'    - [cell array] Format of a 'custom' channel location file (see above).
 %                          Default, if no file type is defined. The cell array contains
 %                          labels defining the meaning of each column of the input file:
@@ -78,6 +86,7 @@
 %   theta       - vector (in degrees) of polar angles of the electrode locations.
 %   radius      - vector of polar-coordinate radii (arc_lengths) of the electrode locations 
 %   indices     - indices, k, of channels with non-empty 'locs(k).theta' coordinate
+%   chaninfo    - structure containing global channel information
 %
 % File formats:
 %   If 'filetype' is unspecified, the file extension determines its type.
@@ -181,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2005/03/08 23:19:24  arno
+% using old function to read asa format
+%
 % Revision 1.69  2005/03/04 23:17:22  arno
 % use fieldtrip readeetrack
 %
@@ -330,78 +342,102 @@ end;
 
 % to add a new channel format
 % ---------------------------
-% 1) add the format name at the end of the listtype variable list
-% 2) enter the column type in a new list at the end of the listimportformat variable
-% 3) enter the number of lines to skip at the end of the listskiplines array
+% 1) Add a new element to the structure chanformat
+% 2) enter type name for file format, type string (short) and description
+% 3) enter the column types in the importformat field
+% 4) enter the number of lines to skip in the skipline field
 % Note: these infos are also used by writelocs() and pop_readlocs() but
 % you do not have to edit these functions.
 
-listtype = { ...
-   		 'polhemus' ...
-         'polhemusX' ...
-         'polhemusY' ...
-         'besa' ...
-         'xyz' ...
-         'sfp' ...
-         'loc' ...
-         'sph' ...
-         'asc' ...
-         'dat' ...
-         'elc' ...
-         'chanedit' ...
-         'custom' };
-   
-listimportformat = { ...
-   	{ } ... % polhemus (specific non-columnar implementation)	
-      { } ... % polhemus (specific non-columnar implementation)
-      { } ... % polhemus (specific non-columnar implementation)
-      { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' } ... % BESA/EGI format
-      { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
-      { 'labels' '-Y' 'X' 'Z' } ... % sfp format
-      { 'channum' 'theta' 'radius' 'labels' } ... % loc format
-      { 'channum' 'sph_theta' 'sph_phi' 'labels' } ... % sph format
-      { } ... % ascii Neuroscan format
-      { } ... % ascii Neuroscan format
-      { } ... % eetrak format
-      { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
+chanformat(1).type         = 'polhemus';
+chanformat(1).typestring   = 'Polhemus native .elp file';
+chanformat(1).description  = [ 'Polhemus native coordinate file containing scanned electrode positions. ' ...
+                               'User must select the direction ' ...
+                               'for the nose after importing the data file.' ];
+chanformat(1).importformat = 'readelp() function';
+% ---------------------------------------------------------------------------------------------------
+chanformat(2).type         = 'besa';
+chanformat(2).typestring   = 'BESA spherical .elp file';
+chanformat(2).description  = [ 'BESA spherical coordinate file. Note that BESA spherical coordinates ' ...
+                               'are different from Matlab spherical coordinates' ];
+chanformat(2).importformat = { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(3).type         = 'xyz';
+chanformat(3).typestring   = 'Matlab .xyz file';
+chanformat(3).description  = [ 'Standard 3-D cartesian coordinate files with electrode labels in ' ...
+                               'the first column and X, Y, and Z coordinates in columns 2, 3, and 4' ];
+chanformat(3).importformat = { 'labels' '-Y' 'X' 'Z' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(4).type         = 'sfp';
+chanformat(4).typestring   = 'BESA or EGI 3-D cartesian .sfp file';
+chanformat(4).description  = [ 'Standard BESA 3-D cartesian coordinate files with electrode labels in ' ...
+                               'the first column and X, Y, and Z coordinates in columns 2, 3, and 4.' ...
+                               'Coordinates are re-oriented to fit the EEGLAB standard of having the ' ...
+                               'nose along the +X axis.' ];
+chanformat(4).importformat = { 'labels' '-Y' 'X' 'Z' };
+chanformat(4).skipline     = -1;
+% ---------------------------------------------------------------------------------------------------
+chanformat(5).type         = 'loc';
+chanformat(5).typestring   = 'EEGLAB polar .loc file';
+chanformat(5).description  = [ 'EEGLAB polar .loc file' ];
+chanformat(5).importformat = { 'channum' 'theta' 'radius' 'labels' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(6).type         = 'sph';
+chanformat(6).typestring   = 'Matlab .sph spherical file';
+chanformat(6).description  = [ 'Standard 3-D spherical coordinate files in Matlab format' ];
+chanformat(6).importformat = { 'channum' 'sph_theta' 'sph_phi' 'labels' };
+% ---------------------------------------------------------------------------------------------------
+chanformat(7).type         = 'asc';
+chanformat(7).typestring   = 'Neuroscan polar .asc file';
+chanformat(7).description  = [ 'Neuroscan polar .asc file, automatically recentered to fit EEGLAB standard' ...
+                               'of having ''Cz'' at (0,0).' ];
+chanformat(7).importformat = 'readneurolocs';
+% ---------------------------------------------------------------------------------------------------
+chanformat(8).type         = 'dat';
+chanformat(8).typestring   = 'Neuroscan 3-D .dat file';
+chanformat(8).description  = [ 'Neuroscan 3-D cartesian .dat file. Coordinates are re-oriented to fit ' ...
+                               'the EEGLAB standard of having the nose along the +X axis.' ];
+chanformat(8).importformat = 'readneurolocs';
+% ---------------------------------------------------------------------------------------------------
+chanformat(9).type         = 'elc';
+chanformat(9).typestring   = 'ASA .elc 3-D file';
+chanformat(9).description  = [ 'ASA .elc 3-D coordinate file containing scanned electrode positions. ' ...
+                               'User must select the direction ' ...
+                               'for the nose after importing the data file.' ];
+chanformat(9).importformat = 'readeetraklocs';
+% ---------------------------------------------------------------------------------------------------
+chanformat(10).type         = 'chanedit';
+chanformat(10).typestring   = 'EEGLAB complete 3-D file';
+chanformat(10).description  = [ 'EEGLAB file containing polar, cartesian 3-D, and spherical 3-D ' ...
+                               'electrode locations.' ];
+chanformat(10).importformat = { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' ...
+                               'sph_radius' };
+chanformat(10).skipline     = 2;
+% ---------------------------------------------------------------------------------------------------
+chanformat(11).type         = 'custom';
+chanformat(11).typestring   = 'Custom file format';
+chanformat(11).description  = 'Custom ASCII file format where user can define content for each file columns.';
+chanformat(11).importformat = '';
+% ---------------------------------------------------------------------------------------------------
+% ----- ADD MORE FORMATS HERE -----------------------------------------------------------------------
+% ---------------------------------------------------------------------------------------------------
 
 listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
       'sph_radius' 'sph_theta_besa' 'sph_phi_besa' 'gain' 'calib' 'type' ...
       'X' 'Y' 'Z' '-X' '-Y' '-Z' 'custom1' 'custom2' 'custom3' 'custom4' 'ignore' 'not def' };
 
-listskipline = [ ...
-   0 ... % polhemus, not applicable
-   0 ... % polhemus, not applicable
-   0 ... % polhemus, not applicable
-   -1 ...  % besa
-   0 ...
-   0 ...
-   0 ...
-   0 ...
-   0 ...
-   0 ...
-   0 ...
-   1 ]; % skip the 2 lines header for the chanedit format
-
-% ------------------------------------------------------
+% ----------------------------------
 % special mode for getting the infos
 % ----------------------------------
 if isstr(filename) & strcmp(filename, 'getinfos')
-   eloc = listtype;
-   labels = listimportformat;
-   theta = listcolformat;
-   radius = listskipline;
-   return;
-elseif isstr(filename) & strcmp(filename, 'getinfoswrite')
-   eloc = listtype([4:8,10]);
-   labels = listimportformat([4:8,10]);
-   theta = listcolformat([4:8,10]);
-   radius = listskipline([4:8,10]);
+   eloc = chanformat;
+   labels = listcolformat;
    return;
 end;
 
 g = finputcheck( varargin, ...
    { 'filetype'	   'string'  {}                 '';
+     'importmode'  'string'  { 'eeglab' 'native' } 'eeglab';
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');
@@ -443,10 +479,10 @@ if isstr(filename)
    % ---------------------------
    if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') ...
            & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') & ~strcmpi(g.filetype, 'dat')
-      indexformat = strmatch(lower(g.filetype), lower(listtype), 'exact');
-      g.format = listimportformat{indexformat};
+      indexformat = strmatch(lower(g.filetype), { chanformat.type }, 'exact');
+      g.format = chanformat(indexformat).importformat;
       if isempty(g.skiplines)
-         g.skiplines = listskipline(indexformat);
+         g.skiplines = chanformat(indexformat).skipline;
       end;
       if isempty(g.filetype) 
          error( ['readlocs() error: The filetype cannot be detected from the \n' ...
@@ -484,6 +520,7 @@ if isstr(filename)
    else      
        % importing file
        % --------------
+       if isempty(g.skiplines), g.skiplines = 0; end;
        array = load_file_or_array( filename, max(g.skiplines,0));
        if size(array,2) < length(g.format)
            fprintf(['readlocs() warning: Fewer columns in the input than expected.\n' ...
