@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/09/03 21:35:27  arno
+% removing oridata completelly
+%
 % Revision 1.43  2002/09/03 21:15:23  scott
 % go back to averaging urdata instead of oridata -sm
 %
@@ -442,18 +445,6 @@ if decfactor > ntrials
   fprintf('Setting variable decfactor to max %d.\n',ntrials)
   decfactor = ntrials;  
 end
-
-if decfactor > sqrt(ntrials) % if large, output this many trials
-  n = 1:ntrials;
-  if exist('phargs') & length(phargs)>1
-    if phargs(2)>0
-      n = n(ceil(phargs(2)*ntrials)+1:end); % trials after rejection
-    elseif phargs(2)<0
-      n = n(1:floor(phargs(2)*length(n)));  % trials after rejection
-    end
-  end
-  decfactor = length(n)/decfactor;
-end
 %
 %%%%%%%%%%%%%%%%% Collect optional args %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -651,6 +642,58 @@ if nargin > 6
 			  topphase = phargs(5);
           end
           Phaseflag = NO;
+	  elseif Ampflag == YES
+          n = length(Arg);
+          if n > 4
+			  error('erpimage(): Too many arguments for keyword ''ampsort''');
+          end
+          ampargs = Arg;
+		  
+          if ampargs(3) < 0
+              error('erpimage(): Invalid negative argument for keyword ''ampsort''');
+          end
+          if n>=4
+			  		if ampargs(4) < 0
+				  		error('erpimage(): Invalid negative argument for keyword ''ampsort''');
+			  		end
+          end
+          
+          if min(ampargs(1)) < times(1) | max(ampargs(1)) > times(end)
+			  		error('erpimage(): time for amplitude sorting filter out of bounds.');
+          end
+
+          if ampargs(2) >= 100 | ampargs(2) < -100
+			  		error('%-argument for keyword ''ampsort'' must be (-100;100)');
+          end
+          
+          if length(ampargs) == 4 & ampargs(3) > ampargs(4)
+			  		error('erpimage(): Amplitude sorting frequency range must be increasing.');
+          end
+          Ampflag = NO;
+
+	  elseif Valflag == YES % sort by potential value in a given window
+          % Usage: 'valsort',[mintime,maxtime,direction]
+          n = length(Arg);
+          if n > 3
+			  error('erpimage(): Too many arguments for keyword ''valsort''');
+          end
+          valargs = Arg;
+		  
+          if min(valargs(1)) < times(1) | max(valargs(1)) > times(end)
+			  		error('erpimage(): start time for value sorting out of bounds.');
+          end
+          if n > 1
+           if min(valargs(2)) < times(1) | max(valargs(2)) > times(end)
+			  		error('erpimage(): end time for value sorting out of bounds.');
+           end
+          end
+          if n >= 1 & valargs(1) > valargs(2)
+			  		error('erpimage(): Value sorting time range must be increasing.');
+          end
+          if n==3 & (~isnum(valargs(3)) | valargs(3)==0)
+			  		error('erpimage(): Value sorting direction must be +1 or -1.');
+          end
+          Valflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
 	  elseif strcmp(Arg,'renorm')
@@ -679,6 +722,10 @@ if nargin > 6
 		  Limitflag = YES;
 	  elseif (strcmp(Arg,'phase') | strcmp(Arg,'phasesort'))
 		  Phaseflag = YES;
+	  elseif (strcmp(Arg,'ampsort') 
+		  Ampflag = YES;
+	  elseif (strcmp(Arg,'valsort') 
+		  Valflag = YES;
 	  elseif strcmp(Arg,'auxvar')
 		  Auxvarflag = YES;
 	  elseif strcmp(Arg,'yerplabel')
@@ -754,6 +801,19 @@ if exist('phargs')
 	if length(phargs)==5 & (phargs(5)>180 | phargs(5) < -180)
 		fprintf('\nerpimage(): coher topphase (%g) out of range.\n',topphase);
 		return
+	end
+end
+if exist('ampargs')
+	if ampargs(3) > srate/2
+		fprintf('erpimage(): amplitude-sorting frequency must be less than Nyquist rate.');
+	end
+	if frames < DEFAULT_CYCLES*srate/ampargs(3)
+		fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
+				ampargs(3),DEFAULT_CYCLES);
+		return
+	end
+	if length(ampargs)==4 & ampargs(4) > srate/2
+		ampargs(4) = srate/2;
 	end
 end
 if ~any(isnan(coherfreq))
@@ -889,7 +949,7 @@ if ~isnan(aligntime)
   data = aligndata;                       % now data is aligned to sortvar
 end 
 %
-%%%%%%%%%%%%%%% Sort the data on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort
 	if length(phargs) >= 4 % find max frequency in specified band
@@ -968,10 +1028,78 @@ if exist('phargs') == 1 % if phase-sort
 		auxvar = auxvar(:,sortidx);
 	end
 
+if exist('ampargs') == 1 % if amplitude-sort
+	if length(ampargs) == 4 % find max frequency in specified band
+		[pxx,freqs] = psd(data(:),1024,srate,frames,0);
+		
+		pxx = 10*log10(pxx);
+		n = find(freqs >= ampargs(3) & freqs <= ampargs(4));
+		if ~length(n)
+			freq = ampargs(3);
+		end
+		[dummy maxx] = max(pxx(n));
+		freq = freqs(n(maxx));
+	else
+		freq = ampargs(3); % else use specified frequency
+	end
+	
+	[dummy minx] = min(abs(times-ampargs(1)));
+	winlen = floor(3*srate/freq);
+	%winloc = minx-[winlen:-1:0]; % ending time version
+	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
+	winloc = winloc(find(winloc>0 & winloc<=frames));
+	
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+	
+	fprintf('Sorting data epochs by amplitude at %.2f Hz in window centered at %f3. ms.\n',...  
+			freq,ampargs(1));
+	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
+			length(winloc));
+	%
+	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	ampargs(2) = ampargs(2)/100; % convert rejection rate from % to fraction
+	[tmp n] = sort(phsamp); % sort amplitudes
+	if ampargs(2)>=0
+		n = n(ceil(ampargs(2)*length(n))+1:end); % if rej 0, select all trials
+		fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
+			length(n),100*(1-ampargs(2)));
+		
+	else % ampargs(2) < 0
+		ampargs(2) = 1+ampargs(2); % subtract from end
+		n = n(1:floor(ampargs(2)*length(n)));
+		fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
+                      length(n),ampargs(2)*100);
+	end
+	%
+	% Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	data = data(:,n); % amp-sort the data, removing rejected-amp trials
+	phsamp = phsamp(n);           % amp-sort the amps
+	phaseangles = phaseangles(n); % amp-sort the phaseangles
+	sortvar = sortvar(n);         % amp-sort the trial indices
+	ntrials = length(n);          % number of trials retained
+	%
+	% Sort remaining data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	[phsamp sortidx] = sort(phsamp); % sort trials on amplitude
+	data    =  data(:,sortidx);                % sort data by amp
+	phaseangles  =  phaseangles(sortidx);      % sort angles by amp
+	sortvar = sortvar(sortidx);                % sort input sortvar by amp
+	
+	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
+	sortidx = n(sortidx); % return original trial indices in final sorted order
+	if ~isempty(auxvar)
+		auxvar = auxvar(:,sortidx);
+	end
+
 elseif Nosort == YES
   fprintf('Not sorting data on input sortvar.\n');
   sortidx = 1:ntrials;	
-else
+%
+%%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+else 
   fprintf('Sorting data on input sortvar.\n');
   [sortvar,sortidx] = sort(sortvar);
   data = data(:,sortidx);
@@ -979,9 +1107,53 @@ else
     auxvar = auxvar(:,sortidx);
   end
 end
+%
+%%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+else 
+  [sttime stframe] = min(times-valargs(1));
+  if length(valargs)>1
+     [endtime endframe] = min(times-valargs(2));
+  else
+     endframe = stframe;
+  end
+  if length(valargs)==1
+     fprintf('Sorting data on value at time %f ms.\n',sttime);
+  elseif length(valargs)>1
+     fprintf('Sorting data on mean value between %f and %f ms.\n',...
+            sttime,endtime);
+  end
+  sortval = mean(data(stframe:endframe,:)');
+  [sortval,sortidx] = sort(sortval);
+  data = data(:,sortidx);
+  if ~isempty(auxvar)
+    auxvar = auxvar(:,sortidx);
+  end
+end
+
 if max(sortvar)<0
    fprintf('Changing the sign of sortvar: making it positive.\n');
    sortvar = -sortvar;
+end
+%
+%%%%%%%%%%%%%%%%%%% Adjust decfactor if phargs or ampargs %%%%%%%%%%%%%%%%%%%%%
+%
+if decfactor > sqrt(ntrials) % if large, output this many trials
+  n = 1:ntrials;
+  if exist('phargs') & length(phargs)>1
+    if phargs(2)>0
+      n = n(ceil(phargs(2)*ntrials)+1:end); % trials after rejection
+    elseif phargs(2)<0
+      n = n(1:floor(phargs(2)*length(n)));  % trials after rejection
+    end
+  elseif exist('ampargs') & length(ampargs)>1
+    if ampargs(2)>0
+      n = n(ceil(ampargs(2)*ntrials)+1:end); % trials after rejection
+    elseif ampargs(2)<0
+      n = n(1:floor(ampargs(2)*length(n)));  % trials after rejection
+    end
+  end
+  decfactor = length(n)/decfactor;
 end
 % 
 %%%%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1413,6 +1585,9 @@ if TIMEX
  else
   if exist('phargs')
     l=ylabel('Phase-sorted Trials');
+    l=ylabel('Trials');
+  elseif exist('ampargs')
+    l=ylabel('Amplitude-sorted Trials');
     l=ylabel('Trials');
   else
     l=ylabel('Sorted Trials');
