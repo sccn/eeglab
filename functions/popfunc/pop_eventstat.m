@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/23 22:16:37  luca
+% NaNs are omitted, changed message
+%
 % Revision 1.2  2002/08/19 23:54:15  arno
 % adding latency range
 %
@@ -96,6 +99,9 @@ end;
 % ---------------------------------------------------------
 typevals = eeg_getepochevent(EEG, type, latrange, eventfield);
 typevals=typevals(~isnan(typevals));
+if isempty(typevals)
+    error('No such events found. See Edit > Event values to confirm event type.');
+end;
 dlabel='Event values';
 dlabel2=['Event' vararg2str(type) ' statistics for ''' eventfield ''' info'];
 
