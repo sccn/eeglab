@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/02 21:27:01  arno
+% reject button debugging
+%
 % Revision 1.2  2002/04/30 18:16:33  arno
 % conidtional REJECT button apparition
 %
@@ -256,9 +259,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % Prepare figure and axes
   % %%%%%%%%%%%%%%%%%%%%%%%%
   
+if ~isstr(data) | (isstr(data) & data(1:5) == 'nofig' )
     figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
       'MenuBar','none','tag', g.tag ,'Position',ORIGINAL_POSITION, 'numbertitle', 'off');
+end
 
 	pos = get(gcf,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
@@ -1115,7 +1120,20 @@ else
   case 'noui'
       eegplot( varargin{:} );
 
-      % suppres menu bar
+      % suppress menu bar
+      set(gcf, 'menubar', 'figure');
+
+      % find button and text
+      obj = findobj(gcf, 'style', 'pushbutton'); delete(obj);
+      obj = findobj(gcf, 'style', 'edit'); delete(obj);
+      obj = findobj(gcf, 'style', 'text'); 
+      objscale = findobj(obj, 'tag', 'thescale');
+      delete(setdiff(obj, objscale));
+ 
+  case 'nofig'
+      eegplot( varargin{:} );
+
+      % suppress menu bar
       set(gcf, 'menubar', 'figure');
 
       % find button and text
