@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2002/08/13 00:30:14  scott
+% text
+%
 % Revision 1.116  2002/08/13 00:14:46  scott
 % menu text
 %
@@ -723,7 +726,7 @@ help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
 help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
     uimenu( help_subm2, 'Label', 'Dataset structure', 'CallBack', 'pophelp(''eeg_checkset'');');
 	uimenu( help_subm2, 'Label', 'Admin functions', 'callback', 'eeg_helpadmin;');	
-uimenu( help_m, 'Label', 'Send us feedback', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+uimenu( help_m, 'Label', 'Report bugs, etc.', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
