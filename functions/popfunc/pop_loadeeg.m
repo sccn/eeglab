@@ -4,9 +4,11 @@
 % Usage:
 %   >> EEG = pop_loadeeg; % pop-up data entry window
 %   >> EEG = pop_loadeeg( filename, filepath, range_chan, range_trials, ...
-%                  range_typeeeg, range_response); % no pop-up window
+%                  range_typeeeg, range_response, format); % no pop-up window
 %
 % Graphic interface:
+%   "Data precision in bits..." - [edit box] data binary format length
+%                in bits. Command line equivalent: 'format'
 %   "Enter trial range subset" - [edit box] integer array. 
 %                Command line equivalent: 'range_trials'
 %   "Enter type range subset" - [edit box] integer array. 
@@ -20,13 +22,16 @@
 %   filename       - ['string'] file name
 %   filepath       - ['string'] file path
 %   range_chan     - [integer array] Import only selected electrodes
-%                    Ex: 3,4:10; {Default: import all}
-%   range_trials   - [integer array] Import only selected trials {Default: 
-%                    import all}
+%                    Ex: 3,4:10; {Default: [] -> import all}
+%   range_trials   - [integer array] Import only selected trials
+%                    { Default: [] -> import all}
 %   range_typeeeg  - [integer array] Import only trials of selected type
-%                    {Default: import all}
+%                    {Default: [] -> import all}
 %   range_response - [integer array] Import only trials with selected 
-%                    response values {Default: import all}
+%                    response values {Default: [] -> import all}
+%   format         - ['short'|'int32'] data binary format (Neuroscan 4.3
+%                    saves data as 'int32'; earlier versions save data as
+%                    'short'. Default is 'short'.
 % Outputs:
 %   EEG            - eeglab() data structure
 %
@@ -53,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/05/14 16:55:49  arno
+% adding format to history
+%
 % Revision 1.11  2003/05/14 16:54:52  arno
 % allowing to read 32-bits data files
 %
