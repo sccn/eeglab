@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/02/02 20:06:37  arno
+% error msg
+%
 % Revision 1.14  2005/02/02 20:05:15  arno
 % returning segment category indices
 %
@@ -169,6 +172,7 @@ end
 % read in epoch data
 readtotal = 0;
 j=0;
+SegmentCatIndex = [];
 if (segmented),
 
     for i=1:head.segments,
