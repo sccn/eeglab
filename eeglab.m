@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.184  2002/10/29 17:05:00  arno
+% menu select event
+%
 % Revision 1.183  2002/10/28 02:25:16  arno
 % debug h -> hh
 %
@@ -874,10 +877,10 @@ if besamenu
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Localize dipoles using BESA');
 	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaexport(EEG);']);
 	uimenu( fourth_sub3, 'Label', 'Import dipoles'   , 'CallBack', [ check 'EEG = besaimport(EEG);' e_store]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles BESA'   , 'CallBack', [ 'besaplot(EEG.sources);']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles MRI'  , 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary MRI', 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles as in BESA'   , 'CallBack', [ 'besaplot(EEG.sources);']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'  , 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on MRI', 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
 end;
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
