@@ -18,6 +18,8 @@
 %   elecrej    - array of 0 and 1 depicting rejected electrodes in 
 %                all trials (size nbelectrodes x sweeps )
 %
+% Note: if colorin is used, colorout is ignored
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: eegplot(), eeg_multieegplot(), eegplot2event(), eeglab()
@@ -41,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/15 15:07:18  arno
+% debug for no colors
+%
 % Revision 1.5  2002/07/30 21:59:45  arno
 % still debugging
 %
@@ -69,7 +74,7 @@ end;
 % --------------------------------------
 TMPREJINIT(:,3:5) = round(TMPREJINIT(:,3:5)*100)/100;
 TMPREJ = [];
-if exist('color') == 1
+if exist('color') == 1 & ~isempty(color) 
 	color    = round(color*100)/100;
 	for index = 1:size(color,1)
    		tmpcol1 = TMPREJINIT(:,3) + 255*TMPREJINIT(:,4) + 255*255*TMPREJINIT(:,5);
@@ -101,7 +106,8 @@ end;
 tmprejelec   = [];
 tmpsig 	    = zeros(1,sweeps);
 if ~isempty(TMPREJ)
-   nbchan = size(TMPREJ,2)-5;
+    nbchan = size(TMPREJ,2)-5;
+    TMPREJ(find(TMPREJ(:,1) == 1),1) = 0;
 	tmpsig = TMPREJ(:,1)''/pnts+1;
 	I = find(tmpsig == round(tmpsig));
 	tmprejelec   = zeros( nbchan, sweeps);
