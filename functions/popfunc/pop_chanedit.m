@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2003/12/18 01:08:20  arno
+% channel location lookup
+%
 % Revision 1.77  2003/12/17 01:35:58  arno
 % debug plot3d for empty chans
 %
@@ -792,7 +795,7 @@ else
                    chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                    chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
                end;
-               tmpdiff = setdiff([1:length(chans)], ind1);
+               tmpdiff = setdiff([1:length(chans)], ind2);
                if ~isempty(tmpdiff)
                    fprintf('Channel lookup: no location for ');
                    for index = 1:(length(tmpdiff)-1)
