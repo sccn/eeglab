@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/06/02 18:21:18  arno
+% debuging finding boundary length
+%
 % Revision 1.18  2004/06/02 17:30:06  arno
 % returning index to old event
 %
@@ -130,7 +133,7 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
                 
                 % find event succeding boundary
                 % ------------------------------
-                alllats   = cell2mat( { eventout.latency } ) - regions(tmpindex)-0.5;
+                alllats   = cell2mat( { eventout.latency } ) - regions(tmpindex)+0.5;
                 tmpind    = find( alllats > 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
                 tmpind2        = tmpind(tmpind2);
