@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/23 15:36:43  arno
+% header comment
+%
 % Revision 1.14  2002/08/17 18:20:22  scott
 % help msg update
 %
@@ -293,6 +296,11 @@ if ~isempty(g.elecind)
 end;
 theta = cell2mat({ eloc.theta });
 radius  = cell2mat({ eloc.radius });
+if isnumeric(eloc(1).labels)
+    for index = 1:length(eloc)
+        eloc(index).labels = int2str(eloc(index).labels);
+    end;
+end;
 labels = { eloc.labels };
 
 return;
