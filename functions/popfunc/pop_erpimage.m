@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2002/08/30 17:49:23  arno
+% same
+%
 % Revision 1.69  2002/08/30 17:47:34  arno
 % debug
 %
@@ -415,8 +418,12 @@ if popup
 	channel   	 = eval( [ '[' res.chan ']' ]);
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
-	options = '';
-    if isempty(titleplot)
+	if typeplot
+		options = '';
+    else 
+		options = [options ',''yerplabel'',''''' ];
+	end;
+	if isempty(titleplot)
         titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
     end;
 	smooth       = eval(res.smooth);

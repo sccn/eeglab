@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/08/30 18:18:09  arno
+% same
+%
 % Revision 1.40  2002/08/30 18:14:08  arno
 % same
 %
@@ -295,6 +298,8 @@ Phaseflag = NO;     % don't sort by alpha phase
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
 Renormflag = NO;
+yerplabel = '\muV';
+yerplabelflag = NO;
 verttimes = [];
 NoTimeflag= NO;     % by default DO print "Time (ms)" below bottom axis
 Signifflag= NO;     % compute significance instead of receiving it
@@ -593,6 +598,9 @@ if nargin > 6
 	  elseif Vertflag == YES
           verttimes = Arg;
           Vertflag = NO;
+	  elseif yerplabelflag == YES
+          yerplabel = Arg;
+          yerplabelflag = NO;
 	  elseif Signifflag == YES
 		  signifs = Arg; % [low_amp hi_amp coher]
 		  if length(signifs) ~= 3
@@ -668,6 +676,8 @@ if nargin > 6
 		  Phaseflag = YES;
 	  elseif strcmp(Arg,'auxvar')
 		  Auxvarflag = YES;
+	  elseif strcmp(Arg,'yerplabel')
+		  yerplabelflag = YES;
 	  elseif strcmp(Arg,'srate')
 		  Srateflag = YES;
 	  elseif strcmp(Arg,'vert') |  strcmp(Arg,'verttimes')
@@ -1636,7 +1646,7 @@ end
  set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
 
  ynum = 0.7*(limit(3)+limit(4))/2;
- t=text(ytextoffset,ynum,'\muV','Rotation',90);
+ t=text(ytextoffset,ynum,yerplabel,'Rotation',90);
  set(t,'HorizontalAlignment','center','FontSize',LABELFONT)
 
  set(ax2,'Fontsize',TICKFONT);
