@@ -33,6 +33,7 @@
 %    'command'    - Matlab command to evaluate when the 'REJECT' button is clicked 
 %                    (see Outputs below). The 'REJECT' button is displayed only when 
 %                    'command' is non-empty.
+%    'butlabel'   - reject button label. Default is REJECT.
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
 %                    for rejection, each row indicating a different period. 
 %                    [start end] Period limits; [R G B] Marking color; 
@@ -76,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/07/30 19:37:49  arno
+% debug wincolor
+%
 % Revision 1.22  2002/07/30 19:22:57  arno
 % creating new argument for selecting colors
 %
@@ -237,6 +241,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans = min(32, size(data,1)); end;
    try, g.wincolor; 		catch, g.wincolor = [ 0.8345 1 0.9560]; end;
+   try, g.butlabel; 		catch, g.butlabel = 'REJECT'; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -528,7 +533,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 						'Units', 'normalized', ...
 						'Position',posbut(12,:), ...
 						'Tag','Accept',...
-						'string','REJECT', 'callback', acceptcommand);
+						'string',g.butlabel, 'callback', acceptcommand);
   end;
   u(13) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
