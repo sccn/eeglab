@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/30 21:57:32  arno
+% debugging
+%
 % Revision 1.3  2002/07/30 21:46:53  arno
 % *** empty log message ***
 %
@@ -61,7 +64,7 @@ end;
 
 % only take into account specific colors
 % --------------------------------------
-TMPREJINIT(:,1:3) = round(TMPREJINIT(:,1:3)*100)/100;
+TMPREJINIT(:,3:5) = round(TMPREJINIT(:,3:5)*100)/100;
 color    = round(color*100)/100;
 colorout = round(colorout*100)/100;
 TMPREJ = [];
