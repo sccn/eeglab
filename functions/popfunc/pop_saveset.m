@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/10/15 16:59:57  arno
+% drawnow for windows
+%
 % Revision 1.12  2002/10/14 00:46:31  arno
 % debugging .sets filename check
 %
@@ -136,6 +139,12 @@ else
 		curfilepath = curfilename;
 		curfilename = inarg;
 	end;
+end;
+
+if ~isempty(curfilepath)
+    if curfilepath(end) ~= ':' & curfilepath(end) ~= '/' & curfilepath(end) ~= '\'
+        error('Last character of filepath must be a directory delimiter');
+    end;
 end;
 
 % currentfilename without the .set
