@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.201  2004/01/24 21:53:38  scott
+% same
+%
 % Revision 1.200  2004/01/24 21:43:59  scott
 % *** empty log message ***
 %
@@ -3049,6 +3052,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
   if ~isempty(winloc)
     fillwinx = [winloc winloc(end:-1:1)];
     hannwin = makehanning(length(winloc));
+    hannwin = hannwin./max(hannwin); % make max = 1
     hannwin = hannwin(:)'; % make row vector
     if ~isempty(axlimits) & sum(isnan(axlimits))==0
        % fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
