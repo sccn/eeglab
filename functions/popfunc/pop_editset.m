@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/05/01 01:22:56  luca
+% same
+%
 % Revision 1.16  2002/05/01 01:21:18  luca
 % transpose bug
 %
@@ -327,7 +330,7 @@ for curfield = tmpfields'
 				      		eval( ['EEGOUT.data = ' varname ';' ]);
 				      		try, evalin('base', commandrestore); catch, end;
 				      		warning on;
-                            if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+                            if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
                          end;
          otherwise, error(['Pop_editset error: unrecognized field ''' curfield{1} '''']); 
     end;
