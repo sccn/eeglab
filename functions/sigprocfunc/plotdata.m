@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/16 15:54:22  arno
+% nothing
+%
 % Revision 1.5  2002/10/13 23:54:18  arno
 % implmenting nan_mean
 %
@@ -416,8 +419,8 @@ end
         %
         if ~ISSPEC
             
-            %ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
-            %ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
+            ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
+            ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
             plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(P+1));   
             
             if SIGN > 0
