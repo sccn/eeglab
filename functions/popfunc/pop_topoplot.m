@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 16:31:20  arno
+% inputdlg2
+%
 % Revision 1.4  2002/08/12 01:46:44  arno
 % color
 %
@@ -104,15 +107,14 @@ if nargin < 3
 	inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
 	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
 	               '' ['''electrodes'', ''off''' ] };
-    help topoplot;
-	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'pop_topoplot');
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'topoplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
 	topotitle    = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
 	options      = [ ',' result{4} ];
-	if size(arg2(:),1) == 1, figure; end;
+	if size(arg2(:),1) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -123,7 +125,6 @@ else
 		end;
 	end;	
 end;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')  
@@ -166,10 +167,10 @@ for index = 1:size(arg2(:),1)
             if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
         	figure;
         	pos = get(gcf,'Position');
-	        set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
         end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
 	end;
+	set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 
 	if ~isnan(arg2(index))
 		if typeplot
