@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/07/25 17:39:14  arno
+% allowing to plot more trials
+%
 % Revision 1.8  2003/03/05 16:32:02  arno
 % plotting lines after data
 %
@@ -381,10 +384,11 @@ end
             
             ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
             ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
+            if ymin == ymax, ymin = ymin-1; ymax = ymax+1; end;
             plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
             
             if SIGN > 0
-                axis([xmin xmax ymin ymax]);           % set axis bounds (pos up)
+                axis([xmin xmax ymin ymax]);          % set axis bounds (pos up)
             else
                 axis([xmin xmax -1*ymax -1*ymin]);     % set axis bounds (neg up)
             end
