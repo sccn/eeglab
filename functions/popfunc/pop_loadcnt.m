@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 02:40:59  arno
+% inputdlg2
+%
 % Revision 1.2  2002/08/06 21:33:30  arno
 % spelling
 %
@@ -53,6 +56,7 @@ if nargin < 1
 
 	% ask user
 	[filename, filepath] = uigetfile('*.CNT', 'Choose a CNT file -- pop_loadcnt()'); 
+    drawnow;
 	if filename == 0 return; end;
 
 	% popup window parameters

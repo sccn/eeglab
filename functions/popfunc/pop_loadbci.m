@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 16:33:37  arno
+% inputdlg2
+%
 % Revision 1.5  2002/07/11 17:18:15  arno
 % updating header
 %
@@ -55,6 +58,7 @@ command = '';
 if nargin < 1
 	% ask user
 	[filename, filepath] = uigetfile('*.*', 'Choose a BCI file -- pop_loadbci'); 
+    drawnow;
 	if filename == 0 return; end;
 	filename = [filepath '/' filename];
 	promptstr    = { 'Sampling rate' };
