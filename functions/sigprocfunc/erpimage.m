@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.193  2004/01/24 21:10:31  scott
+% same
+%
 % Revision 1.192  2004/01/24 21:08:29  scott
 % same
 %
@@ -774,7 +777,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % Initialize optional output variables:
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
-auxvar = []; erpsig = []; winloc = []
+auxvar = []; erpsig = []; winloc = [];
 
 YES = 1;  % logical variables
 NO  = 0;
@@ -1547,7 +1550,6 @@ if exist('phargs') == 1 % if phase-sort
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
         tmprange = find(winloc>0 & winloc<=frames);
         winloc = winloc(tmprange); % sorting window times
-  fprintf('winloc phase\n')
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -1639,8 +1641,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
         tmprange = find(winloc>0 & winloc<=frames);
-        winloc = winloc(tmprange); % sorting window times
-  fprintf('winloc amp\n')
+        winloc = winloc(tmprange); % sorting window frames
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -1744,7 +1745,6 @@ elseif exist('valargs')
         auxvar = auxvar(:,sortidx);
     end
     winloc = [sttime,endtime];
-  fprintf('winloc value\n')
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -2529,14 +2529,13 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                   gcapos(3) image_loy*gcapos(4)]);
     end
     fprintf('Plotting the ERP trace below the ERP image\n');
-    size(winloc)
     if Erpstdflag == YES
-        plot1trace(ax2,times,erp,limit, [], stdev,[],winloc); % plot ERP +/-stdev
+        plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
-        plot1trace(ax2,times,erp,limit,erpsig,[],winloc); % plot ERP and 0+/-alpha threshold
+        plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
     else
-        plot1trace(ax2,times,erp,limit,[],[],winloc); % plot ERP alone
+        plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
     end;
         
     if ~isnan(aligntime)
@@ -2719,15 +2718,14 @@ if ~isnan(coherfreq)
         end
         
         fprintf('Plotting the ERSP amplitude trace below the ERP\n');
-        size(winloc)
         fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
         fprintf('     relative to baseamp: %g dB\n',baseamp);
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
                 ampsiglims = [ampsiglims;-1*ampsiglims];
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],winloc); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],times(winloc)); % plot AMP
         else
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],winloc); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],times(winloc)); % plot AMP
         end
         
         if ~isnan(aligntime)
@@ -2820,13 +2818,12 @@ if ~isnan(coherfreq)
             mincoh = 0;
         end
         fprintf('Plotting the ITC trace below the ERSP\n');
-        size(winloc)
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],winloc); 
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],times(winloc)); 
                                                                            % plot COHER, fill sorting window
         else
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],winloc); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],times(winloc)); % plot COHER
         end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
@@ -3020,6 +3017,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
        fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
+    set(fillh,'edgecolor',FILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
   end
   if ~isempty(signif);% (2,times) array giving upper and lower signif limits
       filltimes = [times times(end:-1:1)];
