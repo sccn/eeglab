@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/04 23:35:29  arno
+% menu text
+%
 % Revision 1.1  2005/03/04 23:34:36  arno
 % Initial revision
 %
@@ -132,6 +135,7 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
         p = which('eegplugin_dipfit2_0');
         p = p(1:findstr(p,'eegplugin_dipfit2_0.m')-1);
         addpath([ p 'dipfit2.0' ] );
+        addpath([ p '..' p(end) '..' p(end) 'fieldtrip-*' ] );
     end;
 
     % find tools menu
