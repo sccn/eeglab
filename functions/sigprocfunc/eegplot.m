@@ -157,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2003/07/14 23:03:57  arno
+% handling numerical types
+%
 % Revision 1.83  2003/07/12 02:13:47  arno
 % fixing color, implementing dash
 %
@@ -1032,7 +1035,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
      'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
      'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
      'clear tmpg;' ]);
-  uimenu('Parent',figh,'Label', 'help', 'callback', 'pophelp(''eegplot'');');
+  uimenu('Parent',figh,'Label', 'Help', 'callback', 'pophelp(''eegplot'');');
 
   % Events %%%%%%%%
   zm = uimenu('Parent',m(2),'Label','Events');
