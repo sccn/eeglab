@@ -2,9 +2,9 @@
 %             contributing or specified components. Click on individual topoplots to examine
 %             separately (using axcopy()).
 % Usage:
-%     >> envtopo(data,weights);
-%     >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
-%                                   = envtopo(data, weights, 'key1', val1, ...);
+%            >> envtopo(data,weights);
+%            >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
+%                                       = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data       = single data epoch (chans,frames)
 %  weights    = ICA weight matrix (= weights*sphere)
@@ -41,7 +41,7 @@
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
 %                  plotting.
 %  'sumenv'    = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections 
-%                  of the selected components, else 'on' -> show the envelope only {default: 'fill'}
+%                  of the selected components; 'on' -> show the envelope only {default: 'fill'}
 %  'actscale'  = ['on'|'off'] scale component scalp maps by maximum component activity in the
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
 %                  +/-max(abs(map value)) {default: 'off'}
@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2004/05/04 05:24:10  scott
+% debug setting g.limits(2) to ms
+%
 % Revision 1.58  2004/04/28 06:00:53  scott
 % debug 'compnums',[2 3 4 6] etc
 %
@@ -277,7 +280,7 @@ else
 	else              g.chanlocs = [];
 	end;
 	if nargin > 4,	  g.limits = varargin{2};
-	else              g.limits = [];
+	else              g.limits = 0; % [];
 	end;
 	if nargin > 5,    g.compnums = varargin{3};
 	else              g.compnums = [];
@@ -422,15 +425,19 @@ end;
 	%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
 	if length(g.limits) < 2
-          if g.limits==0,         % == 0 
-	    xmin = 0;
-	    xmax = frames-1;  % use dummy times
-          else
-	    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
-            return
-          end
-        end
-        if length(g.limits) == 2 
+            if g.limits == 0,         
+	      xmin = 0;
+	      xmax = frames-1;  % use dummy times
+            else
+	      fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
+              if isempty(g.limits) disp empty
+              else g.limits
+              end
+              return
+            end
+	     ymin = min(min(data));
+	     ymax = max(max(data));
+        elseif length(g.limits) == 2 
 	     xmin = g.limits(1);
 	     xmax = g.limits(2);
 	     ymin = min(min(data));
@@ -453,6 +460,9 @@ end;
           end
         else
 	    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
+            if isempty(g.limits) disp empty
+            else g.limits
+            end
             return
 	end;
 
