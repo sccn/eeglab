@@ -56,7 +56,7 @@
 %                           'gain'      [real > 1] channel gain. 
 %                           'custom1'   custom field #1.
 %                           'custom2', 'custom3', 'custom4' more custom fields.
-%   'skipline'  - [integer] Number of header lines to skip (in 'custom' file types only).
+%   'skiplines' - [integer] Number of header lines to skip (in 'custom' file types only).
 %                 All characters following '%' will be treated as comments and ignored.
 %   'readchans' - [integer array] indices of electrodes to read. Default is all.
 %   'center'    - [(1,3) real array or 'auto'] of xyz coordinates for conversion to 
@@ -161,6 +161,9 @@ x               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/12/28 23:46:45  scott
+% header
+%
 % Revision 1.27  2002/12/28 02:02:35  scott
 % header details
 %
@@ -199,7 +202,7 @@ end;
 % ---------------------------
 % 1) add the format name at the end of the listtype variable list
 % 2) enter the column type in a new list at the end of the listimportformat variable
-% 3) enter the number of lines to skip at the end of the listskipline array
+% 3) enter the number of lines to skip at the end of the listskiplines array
 % Note: these infos are also used by writelocs() and pop_readlocs() but
 % you do not have to edit these functions.
 
@@ -251,7 +254,7 @@ end;
 
 g = finputcheck( varargin, ...
    { 'filetype'	'string'	 listtype '';
-     'skipline'   'integer' [0 Inf] 			[];
+     'skiplines'   'integer' [0 Inf] 			[];
      'elecind'    'integer' [1 Inf]				[];
      'format'		'cell'	 []					{} }, 'readlocs');
 if isstr(g), error(g); end;  
@@ -280,8 +283,8 @@ if isstr(filename)
    if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') 
       indexformat = strmatch(lower(g.filetype), listtype, 'exact');
       g.format = listimportformat{indexformat};
-      if isempty(g.skipline)
-         g.skipline = listskipline(indexformat);
+      if isempty(g.skiplines)
+         g.skiplines = listskipline(indexformat);
       end;
       if isempty(g.filetype) 
          error( ['Readlocs error: filetype can not be detected from' ...
@@ -305,7 +308,7 @@ if isstr(filename)
    else      
        % importing file
        % --------------
-       array = load_file_or_array( filename, max(g.skipline,0));
+       array = load_file_or_array( filename, max(g.skiplines,0));
        if size(array,2) < length(g.format)
            fprintf('Readlocs warning: # of columns in file inferior to # format entries');
        elseif size(array,2) > length(g.format)
@@ -314,7 +317,7 @@ if isstr(filename)
        
        % removing lines BESA
        % -------------------
-       if g.skipline == -1
+       if g.skiplines == -1
            if isempty(array{1,2})
                disp('BESA header detected, skipping 3 lines');
                array = load_file_or_array( filename, -2);
@@ -417,12 +420,12 @@ return;
 
 % interpret the variable name
 % ---------------------------
-function array = load_file_or_array( varname, skipline );
-	 if isempty(skipline),
-       skipline = 0;
+function array = load_file_or_array( varname, skiplines );
+	 if isempty(skiplines),
+       skiplines = 0;
     end;
     if exist( varname ) == 2
-        array = loadtxt(varname,'verbose','off','skipline',skipline);
+        array = loadtxt(varname,'verbose','off','skipline',skiplines);
     else % variable in the global workspace
          % --------------------------
          try, array = evalin('base', varname);

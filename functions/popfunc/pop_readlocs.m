@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/12/28 23:10:39  scott
+% header
+%
 % Revision 1.5  2002/12/27 20:37:48  scott
 % minor header edit -sm
 %
@@ -193,7 +196,7 @@ if nargin < 1
       if strcmp(res, 'preview')
          try, 
             tmplocs = readlocs( filename, 'filetype', tmpformatstr, ...
-             'skipline', tmpheader, 'format', tmpcolstr);
+             'skiplines', tmpheader, 'format', tmpcolstr);
          	figure; topoplot([],tmplocs, 'style', 'blank', 'electrodes', 'labelpoint');
          catch,
             errordlg2(strvcat('Error while importing locations:', lasterr), 'Error');
@@ -207,7 +210,7 @@ if nargin < 1
    % importing files
    % ---------------
    tmplocs = readlocs( filename, 'filetype', tmpformatstr, ...
-             'skipline', tmpheader, 'format', tmpcolstr);
+             'skiplines', tmpheader, 'format', tmpcolstr);
    
 else 
 	tmplocs = readlocs( filename, varargin{:});	   
