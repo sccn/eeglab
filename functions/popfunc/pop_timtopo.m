@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/15 01:41:26  scott
+% Can not -> cannot
+%
 % Revision 1.10  2002/08/17 19:23:19  scott
 % menu item text
 %
@@ -91,7 +94,7 @@ if nargin < 3
 			         'NaN', ...
 	                 ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ], ...
 			         ''  };
-	result       = inputdlg2( promptstr, 'ERP data and scalp maps -- pop_timtopo()', 1, inistr, 'timtopo');
+	result       = inputdlg2( promptstr, 'ERP data and scalp maps -- pop_timtopo()', 1, inistr, 'pop_timtopo');
 	if size(result,1) == 0 return; end;
 	timerange    = eval( [ '[' result{1} ']' ] );
 	topotime     = eval( [ '[' result{2} ']' ] );
