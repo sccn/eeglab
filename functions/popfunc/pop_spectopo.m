@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/12 22:31:03  arno
+% edit
+%
 % Revision 1.21  2002/08/12 01:43:54  arno
 % color
 %
@@ -129,7 +132,7 @@ end;
 
 if nargin < 3
 	if dataflag
-		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] };
+		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1]};
 		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include in the analysis [min max]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
 						 { 'style' 'text' 'string' 'Percent of input data to sample (1 to 100):'}, ...
@@ -138,6 +141,8 @@ if nargin < 3
 						 { 'style' 'edit' 'string' '10 20 30' }, ...
 						 { 'style' 'text' 'string' 'Apply to EEG|ERP|BOTH:'}, ...
 						 { 'style' 'edit' 'string' 'EEG' }, ...
+						 { 'style' 'text' 'string' 'Frequency time range (default is auto):'}, ...
+						 { 'style' 'edit' 'string' '' }, ...
 						 { 'style' 'text' 'string' 'Scalp map plotting options: See >> help topoplot' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
 		if EEG.trials == 1
@@ -152,15 +157,17 @@ if nargin < 3
 		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
 		if EEG.trials ~= 1
 			processflag = result{4};
-			if ~isempty(result{5}),    options = [ options ',' result{5} ]; end;
+			if ~isempty(result{5}),    options = [ options ', ''freqrange'',[' result{5} ']' ]; end;
+			if ~isempty(result{6}),    options = [ options ',' result{6} ]; end;
 		else 
-			if ~isempty(result{4}),    options = [ options ',' result{4} ]; end;
+			if ~isempty(result{4}),    options = [ options ', ''freqrange'',[' result{4} ']' ]; end;
+			if ~isempty(result{5}),    options = [ options ',' result{5} ]; end;
 		end;
 	else
 		if isempty(EEG.chanlocs)
 			error('Pop_spectopo: cannot plot component contribution without channel locations');
 		end;
-		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 0.18 0.78] [2 1]  };
+		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 0.18 0.78] [2 1] [2 1] };
 		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include in the analysis [min max]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
 						 { 'style' 'text' 'string' 'Percent of input data to sample (1 to 100):'}, ...
@@ -185,6 +192,8 @@ if nargin < 3
 						 ['Either compute the spectra of the components'' activity (set)' 10 ...
 						 'or the spectra of the data minus every single slected component (unset)']}, ...
 						 { 'style' 'checkbox' 'value' 1 } { }, ...
+						 { 'style' 'text' 'string' 'Frequency time range (default is auto):'}, ...
+						 { 'style' 'edit' 'string' '' }, ...
 						 { 'style' 'text' 'string' 'Scalp map plotting options: See >> help topoplot' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
 		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
@@ -197,7 +206,8 @@ if nargin < 3
 		if ~isempty(result{6})   , options = [ options ', ''nicamaps'', ' result{6} ]; end;
 		if ~isempty(result{7})   , options = [ options ', ''icamaps'', [' result{7} ']' ]; end;
 		if ~result{8}, options = [ options ', ''icamode'', ''sub''' ]; end;
-		if ~isempty(result{9}), options      =  [ options ',' result{9} ]; end;
+		if ~isempty(result{9}),    options = [ options ', ''freqrange'',[' result{9} ']' ]; end;
+		if ~isempty(result{10}), options      =  [ options ',' result{10} ]; end;
 	end;		
 	figure;
 else
