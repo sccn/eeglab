@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2002/10/19 23:07:24  arno
+% implement more exact limits at very low freq.
+%
 % Revision 1.55  2002/10/17 18:45:09  arno
 % implementing nan
 %
@@ -1118,7 +1121,6 @@ else
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
     set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
-    return
 
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
