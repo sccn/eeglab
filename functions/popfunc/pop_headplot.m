@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/05/12 16:11:18  arno
+% debuging output command
+%
 % Revision 1.21  2003/05/12 15:59:46  arno
 % debug last
 %
@@ -253,6 +256,8 @@ end;
 	
 % plot the graphs
 % ---------------
+chanind = find(~cellfun('isempty', (EEG.chanlocs.X }));
+
 counter = 1;
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
@@ -271,9 +276,9 @@ for index = 1:size(arg2(:),1)
 	if ~isnan(arg2(index))
 		if typeplot
 			if length( options ) < 2
-    			headplot( SIGTMPAVG(:,index), EEG.splinefile, 'maplimits', maplimits);
+    			headplot( SIGTMPAVG(chanind,index), EEG.splinefile, 'maplimits', maplimits);
 		    else	
-			     eval( [ 'headplot( SIGTMPAVG(:,index), EEG.splinefile, ''maplimits'', maplimits ' options ');' ] );
+			     eval( [ 'headplot( SIGTMPAVG(chanind,index), EEG.splinefile, ''maplimits'', maplimits ' options ');' ] );
 			end;
 			if nbgraph == 1, title( topotitle );
 			else title([int2str(arg2(index)) ' ms']);
@@ -281,15 +286,15 @@ for index = 1:size(arg2(:),1)
 		else
 			if length( options ) < 2
 			    if arg2(index) < 0
-			         headplot( -EEG.icawinv(:, -arg2(index)), EEG.splinefile);
+			         headplot( -EEG.icawinv(chanind, -arg2(index)), EEG.splinefile);
 		        else	
-			         headplot( EEG.icawinv(:, arg2(index)), EEG.splinefile);
+			         headplot( EEG.icawinv(chanind, arg2(index)), EEG.splinefile);
 	            end;    			
 			else	
 			    if arg2(index) < 0
-			         eval( [ 'headplot(  -EEG.icawinv(:, -arg2(index)), EEG.splinefile ' options ');' ] );
+			         eval( [ 'headplot(  -EEG.icawinv(chanind, -arg2(index)), EEG.splinefile ' options ');' ] );
 	            else
-			         eval( [ 'headplot(  EEG.icawinv(:, arg2(index)), EEG.splinefile ' options ');' ] );
+			         eval( [ 'headplot(  EEG.icawinv(chanind, arg2(index)), EEG.splinefile ' options ');' ] );
 	            end;    			
 			end;
 			if nbgraph == 1, title( topotitle );
