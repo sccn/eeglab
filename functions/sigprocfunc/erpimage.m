@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2003/03/15 18:01:34  scott
+% help msg
+%
 % Revision 1.81  2003/03/13 03:20:33  scott
 % restoring
 %
@@ -2000,7 +2003,7 @@ if Erpflag == YES
        end                                                 
      end
   end
-end
+ end
 
  ydelta = 1/10*(limit(2)-limit(1)); 
  ytextoffset = limit(1)-1.1*ydelta;
