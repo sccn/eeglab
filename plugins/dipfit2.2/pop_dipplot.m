@@ -139,7 +139,7 @@ if nargin < 3
                { 'style' 'listbox' 'string' fastif(strcmpi(typedip, 'dipfit'), 'Average MRI', 'average MRI|BESA head') } ...
                { 'style' 'text' 'string' 'Plot dipoles within RV (%) range ([min max])' } ...
                { 'style' 'edit' 'string' '' } ...
-               { 'style' 'text' 'string' 'Plot summary mode' } ...
+               { 'style' 'text' 'string' 'Plot sumary mode' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Plot edges' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
@@ -196,13 +196,15 @@ if strcmpi(typedip, 'besa')
     end;      
 else 
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
+
+    % components to plot
+    % ------------------
     if ~isempty(comps)
         if ~isfield(EEG.dipfit.model, 'component')
             for index = comps(:)'
                 EEG.dipfit.model(index).component = index;
             end;
         end;
-        dipplot(EEG.dipfit.model(comps), 'sphere', max(EEG.dipfit.vol.r), options{:});
     else
         % find localized dipoles
         comps = [];
@@ -212,7 +214,14 @@ else
                 EEG.dipfit.model(index2).component = index2;
             end;
         end;        
-        dipplot(EEG.dipfit.model(comps), 'sphere', max(EEG.dipfit.vol.r), options{:});
+    end;
+    
+    % plotting
+    % --------
+    if ~isempty(findstr(EEG.dipfit.hdmfile, 'BESA'))
+        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'sph2spm', sph2spm, options{:});
+    else
+        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, options{:});
     end;
 end;
     
