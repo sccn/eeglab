@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/10/29 16:35:29  arno
+% moving sphere options
+%
 % Revision 1.13  2003/10/29 16:29:53  arno
 % updating command output
 %
@@ -166,7 +169,7 @@ else
                 EEG.dipfit.model(index).component = index;
             end;
         end;
-        dipplot(EEG.dipfit.model(comps),  'sphere' max(EEG.dipfit.vol.r), options{:});
+        dipplot(EEG.dipfit.model(comps), 'sphere', max(EEG.dipfit.vol.r), options{:});
     else
         % find localized dipoles
         comps = [];
@@ -176,7 +179,7 @@ else
                 EEG.dipfit.model(index2).component = index2;
             end;
         end;        
-        dipplot(EEG.dipfit.model(comps),  'sphere' max(EEG.dipfit.vol.r), options{:});
+        dipplot(EEG.dipfit.model(comps), 'sphere', max(EEG.dipfit.vol.r), options{:});
     end;
 end;
     
