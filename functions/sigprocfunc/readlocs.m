@@ -181,12 +181,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.67  2005/01/13 22:58:38  arno
-% same
-%
-% Revision 1.66  2005/01/13 22:55:50  arno
-% do not select string in theta
-%
 % Revision 1.65  2004/10/27 01:01:05  arno
 % msg format
 %
@@ -464,7 +458,12 @@ if isstr(filename)
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(g.filetype, 'elc')
-       eloc = readeetraklocs( filename );
+       eloc = read_asa_elc( filename ); %readeetraklocs( filename );
+       %eloc = struct('labels', eloc.label, 'Y', mat2cell(-eloc.pnt(:,1)'), 'X', ...
+       %                        mat2cell(eloc.pnt(:,2)'), 'Z', mat2cell(eloc.pnt(:,3)'));
+       eloc = struct('labels', eloc.label, 'X', mat2cell(eloc.pnt(:,1)'), 'Y', ...
+                               mat2cell(eloc.pnt(:,2)'), 'Z', mat2cell(eloc.pnt(:,3)'));
+       eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
@@ -605,13 +604,6 @@ else
     else
         disp('readlocs(): input variable must be a string or a structure');
     end;        
-end;
-
-% remove string in theta
-% ----------------------
-tmpinds = find(cellfun('length',{ eloc.theta}) > 1);
-for ind = tmpinds
-    eloc(ind).theta = [];
 end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
