@@ -112,8 +112,12 @@ function [eeg,ev,header] = read_erpss(filename)
             end
             fseek(fp,4*(110-nevents),0);
             data = fread(fp,nchans*block_size,'int16');
-            eeg(:,totalsize+1:totalsize+block_size) = reshape(data,nchans,block_size); % concatenate data blocks
-            totalsize = totalsize + block_size;
+            try, 
+                eeg(:,totalsize+1:totalsize+length(data)/nchans) = reshape(data,nchans,length(data)/nchans); % concatenate data blocks
+                totalsize = totalsize + length(data)/nchans;
+            catch,
+                fprintf('\nWarning: block %d truncated, skipped\n', cnt);
+            end;
         end
     end
     fprintf('\n');
