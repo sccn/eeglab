@@ -1,30 +1,30 @@
-% sdfread() -  Loads selected seconds of an EDF File (European Data Format for Biosignals)
-%
+% sdfread() -  Reads selected seconds of an EDF File (European Data Format for Biosignals)
+%              The EFG data and header format is specified in [1].
 % Usage:
-%   [S,EDF] = sdfread(EDF [,NoS [,StartPos]] )
+%   [S,EDF] = sdfread(EDF [,SecRead [,StartSec]] )
 %
 % Inputs:
-%   EDF      = open EDF file structure returned by sdfopen();  ?????
-%   NoS      = Number of seconds to read, default = 1 (second)
-%   StartPos = Starting position. If not provided, the data is read
-%              continously from the EDF file. Value 'Inf' reads to file end.
-%              No repositioning of the file pointer is performed.
+%   EDF      = Opened EDF file header structure returned by sdfopen();  
+%   SecRead  = Number of seconds to read. Inf reads the whole file. Default is 1 (sec). 
+%   StartSec = Starting position in seconds. If not provided, the data is read
+%              continously from the EDF file. No file pointer repositioning is performed.
 %
 % Example:
-%   EDF=sdfopen(Filename,'r',CHAN,ReRefMx,TSR,OFCHK);
-%   [S,EDF] = sdfread(EDF, NoS, StartPos) % read NoS seconds of data from StartPos
-% 
-%   [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur); % Reads all the file data
-%   [S,EDF] = sdfread(EDF, inf);              % as does this
+%          >> EDF     = sdfopen(Filename,'r',CHAN,ReRefMx,TSR,OFCHK); % see sdfopen() 
+% % then
+%          >> [S,EDF] = sdfread(EDF, SecRead, StartSec) % Read SecRead secs. of data 
+%                                                       % beginning at StartSec, else
+%          >> [S,EDF] = sdfread(EDF, Inf);              % Read the whole file data, or
+%          >> [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur); % equivalent.
 %
 % Note:
-% 1) Ver > 0.75 requests NoS and StartPos in seconds. 
+% 1) Ver > 0.75 requests SecRead and StartSec in seconds. 
 %    Previously (Ver <0.76) the units were Records. 
 % 2) In this version, modified for eeglab(), sdfseek, sdftell, 
 %    sdfeof and dt have been included in the code of the function.
 %
 % Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
-%         eeglab format and subfunctions inserted in the code, Arnaud Delorme, 27 Dec 2002)
+%         EEGLAB format and subfunctions inserted in the code, Arnaud Delorme, 27 Dec 2002)
 %
 % See also: fread, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
 
@@ -32,6 +32,12 @@
 %	a.schloegl@ieee.org	
 %	Version 0.85
 %	24. Jun. 2002
+
+% References:
+% [1] Bob Kemp, Alpo Värri, Agostinho C. Rosa, Kim D. Nielsen and John Gade.
+%     A simple format for exchange of digitized polygraphic recordings.
+%     Electroencephalography and Clinical Neurophysiology, 82 (1992) 391-393.
+% See also: http://www.medfac.leidenuniv.nl/neurology/knf/kemp/edf/edf_spec.htm
 
 % .changelog
 % 13022002  V0.84    minor bug fixed

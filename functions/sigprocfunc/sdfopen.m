@@ -1,75 +1,95 @@
-% sdfopen() - Opens EDF/GDF/SDF files for reading and writing. 
-%             The EDF format is specified in [1], GDF in [2].
-%             SDF is the SIESTA convention about polygraphic recordings (see [3], pp.8-9). 
-%             SDF used the EDF format.
+% sdfopen() - Opens EDF/GDF/SDF files for reading and writing. The EDF format is specified 
+%             in [1], GDF in [2]. SDF is the SIESTA convention (see [3], pp.8-9); SDF uses 
+%             the EDF format.
 %
 % Usage:
-%   EDF=sdfopen(Filename,'r' [,CHAN [,Mode [,TSR]]]);
-%   [S,EDF]=sdfread(EDF, NoR, StartPos)
+%       >> EDF     = sdfopen(Filename,'r' [,CHAN]);  % prepare to read CHAN channels
+%       >> EDF     = sdfopen(Filename,'r' [,CHAN [,MODE [,TSR]]]); % all arguments
+% % then
+%       >> [S,EDF] = sdfread(EDF, SecRead, SecStart); % reads the opened EDF data file.
+%       >> [S,EDF] = sdfread(EDF, Inf); % reads the whole opened EDF data file.
 %
 % Inputs:
-% CHAN defines the selected Channels or a re-referencing matrix
-%
-% Mode=='SIESTA' indicates that #1 - #6 is rereferenced to (M1+M2)/2           
-% Mode=='AFIR' indicates that Adaptive FIR filtering is used for ECG removing
-%			Implements Adaptive FIR filtering for ECG removal in EDF/GDF-tb.
-% 			based on the Algorithm of Mikko Koivuluoma <k7320@cs.tut.fi>
-%                 A delay of EDF.AFIR.delay number of samples has to be considered. 
-% Mode=='SIESTA+AFIR' for both
-% Mode=='UCAL' [default]
-%                 indicates that no calibration (re-scaling) to Physical Dim. is used. 
-%                 The output are 16bit interger numbers. 'UCAL' overrides 'SIESTA'
-% Mode=='RAW' One column represents one EDF-block
-% Mode=='Notch50Hz' Implements a simple FIR-notch filter for 50Hz
-% Mode=='RECG' Implements ECG minimization with regression analysis
-% Mode=='TECG' Implements ECG minimization with template removal (Test status)
-% Mode=='HPF0.0Hz'  Implements a high-pass filter (with the zero at z=+1, i.e. a differentiator 
-%                     In this case a Notch-filter and/or sub-sampling is recommended. 
-% Mode=='TAUx.yS' compensates time-constant of x.y seconds
-% Mode=='EOG[hvr]' produces HEOG, VEOG and/or REOG output (CHAN not considered)
+% CHAN [int vector] Specifies the channel(s) to read. Else, a re-referencing matrix
+%                   [Default|0 -> read all channels].
+% MODE 
+%      == 'UCAL' [Default mode] Indicates that no calibration (re-scaling) to physical dim. 
+%                  is performed. Outputs are 16-bit integers. 
 % 
-% Mode=='OVERFLOW' overflow detection
-% Mode=='Units_Blocks' requests the arguments in SDFREAD in Blocks [default is seconds]
-%
+%      == 'SIESTA' Indicates that channels #1-#6 are re-referenced to (M1+M2)/2          
+%                 (Note: 'UCAL' overrides 'SIESTA')
+%      == 'AFIR' Indicates that Adaptive FIR filtering is used for ECG removal.
+%		   Implements Adaptive FIR filtering for ECG removal in EDF/GDF-tb.
+% 		   based on the algorithm of Mikko Koivuluoma <k7320@cs.tut.fi>
+%                  A delay of EDF.AFIR.delay number of samples has to be considered. 
+%      == 'SIESTA+AFIR' Does both.
+%      == 'RAW' One column represents one EDF-block
+%      == 'Notch50Hz' Implements a simple FIR-notch filter at 50 Hz
+%      == 'RECG' Implements ECG minimization with regression analysis
+%      == 'TECG' Implements ECG minimization with template removal (test status)
+%      == 'HPF0.0Hz' Implements a high-pass filter (with zero at z=+1, i.e. a differentiator).
+%                  In this case, a notch-filter and/or sub-sampling is recommended. 
+%      == 'TAUx.yS' Compensates time-constant of x.y seconds
+%      == 'EOG[hvr]' Produces HEOG, VEOG and/or REOG output (CHAN not considered)
+%      == 'OVERFLOW' Performs overflow detection
+%      == 'Units_Blocks' Requests the EDF-field arguments to SDFREAD in blocks 
+%                 [default is seconds]
 % TSR [optional] is the target sampling rate
-%         Currently only downsampling from 256 and 200 to 100Hz is supported.  
+%         Currently only downsampling from 256 Hz or 200 Hz to 100 Hz is supported.  
 %         The details are described in the appendix of [4].
 %
-% EDF.ErrNo~=0  indicates that an error occured.
-% For compatibility to former versions, 
-%    EDF.FILE.FID=-1 indicates that file has not been opened.
+% Outputs: 
+%         EDF  - data structure read from the input file header.
+%         EDF.ErrNo   ~= 0  Indicates that an error occurred 
+%              1: First 8 bytes are not '0       ', violating the EDF spec.
+%              2: Invalid date (unable to guess correct date)
+%              4: Incorrect date information (later than current date) 
+%             16: Incorrect filesize: Header information does not match actual size
+%         EDF.FILE.FID = -1 indicates that file has not been opened
+%                           (for compatibility with former versions).
+%         EDF.WarnNo  ~=0 Indicates EDF structure problems
+%              1: ascii(0) in 1st header
+%              2: ascii(0) in 2nd header
+%              4: invalid SPR
+%              4: invalid samples_per_record-values
+%              8: date not in EDF-format (tries to guess correct date, see also E2)
+%             16: invalid number_of-channels-value
+%             32: invalid value of the EDF header length
+%             64: invalid value of block_duration
+%            128: Polarity of #7 probably inverted  
 %
-% Opening of an EDF/SDF File for writing:
-% [EDF]=sdfopen(EDF,'w') is equal to  
-% [EDF]=sdfopen(EDF.FileName,'w',EDF.Dur,EDF.SampleRate);
-% At least EDF.FileName, EDF.NS, EDF.Dur and EDF.EDF.SampleRate must be defined
+% Example: 
+%      To open an EDF/SDF file for writing:
+%      >> [EDF] = sdfopen(EDF,'w') % or equivalently
+%      >> [EDF] = sdfopen(EDF.FileName,'w',EDF.Dur,EDF.SampleRate);
+%
+% Note: Fields EDF.FileName, EDF.NS, EDF.Dur and EDF.EDF.SampleRate must be defined.
 % 
-% Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (header reworked for 
-%         eeglab format, Arnaud Delorme, 27 Dec 2002)
+% Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
+%         EEGLAB format, Arnaud Delorme, 27 Dec 2002)
 %
 % See also: fopen, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
 
-
 % References: 
-% [1] Bob Kemp, Alpo Värri, Agostinho C. Rosa, Kim D. Nielsen and John Gade
+% [1] Bob Kemp, Alpo Värri, Agostinho C. Rosa, Kim D. Nielsen and John Gade.
 %     A simple format for exchange of digitized polygraphic recordings.
 %     Electroencephalography and Clinical Neurophysiology, 82 (1992) 391-393.
-% see also: http://www.medfac.leidenuniv.nl/neurology/knf/kemp/edf/edf_spec.htm
+% See also: http://www.medfac.leidenuniv.nl/neurology/knf/kemp/edf/edf_spec.htm
 %
-% [2] Alois Schlögl, Oliver Filz, Herbert Ramoser, Gert Pfurtscheller
+% [2] Alois Schlögl, Oliver Filz, Herbert Ramoser, Gert Pfurtscheller.
 %     GDF - A GENERAL DATAFORMAT FOR BIOSIGNALS
-%     Technical Report, Department for Medical Informatics, Universtity of Technology, Graz (1999)
-% see also: http://www-dpmi.tu-graz.ac.at/~schloegl/matlab/eeg/gdf4/tr_gdf.ps
+%     Technical Report, Department for Medical Informatics, 
+%     Universtity of Technology, Graz (1999)
+% See also: http://www-dpmi.tu-graz.ac.at/~schloegl/matlab/eeg/gdf4/tr_gdf.ps
 %
 % [3] The SIESTA recording protocol. 
-% see http://www.ai.univie.ac.at/siesta/protocol.html
+% See http://www.ai.univie.ac.at/siesta/protocol.html
 % and http://www.ai.univie.ac.at/siesta/protocol.rtf 
 %
 % [4] Alois Schlögl
 %     The electroencephalogram and the adaptive autoregressive model: theory and applications. 
 %     (ISBN 3-8265-7640-3) Shaker Verlag, Aachen, Germany.
-% see also: "http://www.shaker.de/Online-Gesamtkatalog/Details.idc?ISBN=3-8265-7640-3"
-
+% See also: "http://www.shaker.de/Online-Gesamtkatalog/Details.idc?ISBN=3-8265-7640-3"
 
 % Testing state
 %
@@ -77,19 +97,18 @@
 % EDF=sdfopen(EDF,'r+'); EDF=sdfclose(EDF); 
 % 
 % (2a) Minimal requirements for opening an EDF-File
-% EDF.FileName='file.edf'; % define filename
-% EDF.NS = 5; % fix number of channels
-% EDF=sdfopen(EDF,'w');
-%     write file
-%     define header somewhen before 
-% EDF=sdfclose(EDF); % writes the corrected header information
+%       EDF.FileName='file.edf'; % define filename
+%       EDF.NS = 5; % fix number of channels
+%       EDF=sdfopen(EDF,'w');
+%           write file
+%           define header somewhen before 
+%       EDF=sdfclose(EDF); % writes the corrected header information
 % 
 % (2b) Minimal requirements for opening an EDF-File
-% EDF=sdfopen('file.edf','w',N); % N number of channels
-%      .. do anything, e.g define header
-% EDF=sdfopen(EDF,'w+'); % writes Header information
-%
-%
+%       EDF=sdfopen('file.edf','w',N); % N number of channels
+%            .. do anything, e.g define header
+%       EDF=sdfopen(EDF,'w+'); % writes Header information
+
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License
 % as published by the Free Software Foundation; either version 2
@@ -103,21 +122,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-% EDF.WarnNo   1: ascii(0) in 1st header
-%              2: ascii(0) in 2nd header
-%              4: invalid SPR
-%              4: invalid samples_per_record-values
-%              8: date not in EDF-format (tries to guess correct date, see also E2)
-%             16: invalid number_of-channels-value
-%             32: invalid value of the EDF header length
-%             64: invalid value of block_duration
-%            128: Polarity of #7 probably inverted  
-%
-% EDF.ErrNo    1: first 8 bytes different to '0       ', this violates the EDF spec.
-%              2: Invalid date (unable to guess correct date)
-%              4: Incorrect date information (later than actual date) 
-%             16: incorrect filesize, Header information does not match actual size
 
 function [EDF,H1,h2]=sdfopen(arg1,arg2,arg3,arg4,arg5,arg6)
 
