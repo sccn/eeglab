@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/10 17:56:52  arno
+% debuging function and history
+%
 % Revision 1.8  2003/04/10 17:35:29  arno
 % header and history
 %
@@ -135,7 +138,6 @@ end;
 
 EEG.data            = r.dat;
 EEG.filename        = filename;
-EEG.filepath        = filepath;
 EEG.setname 		= 'CNT file';
 EEG.nbchan          = r.nchannels; 
 I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
