@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/23 17:41:13  arno
+% implementing new option
+%
 % Revision 1.13  2002/08/14 18:17:11  arno
 % new supergui arg
 %
@@ -148,6 +151,7 @@ end;
 % create figure and wait for return
 % ---------------------------------
 waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+drawnow; % for windows
 
 result = {};
 userdat = [];
