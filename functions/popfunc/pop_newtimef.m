@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/02/13 00:01:04  arno
+% background color
+%
 % Revision 1.23  2003/02/01 00:22:09  arno
 % adding title with electrode name
 %
@@ -230,7 +233,7 @@ if popup
 	if ~result{8}
 		options = [ options ', ''plotitc'', ''off''' ];
 	end;
-	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
+	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
 	options = [];
 	for i=1:length( varargin )
