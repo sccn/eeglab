@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/06/01 21:35:01  arno
+% debug command line call
+%
 % Revision 1.5  2004/06/01 21:29:16  arno
 % save local hisotry
 %
@@ -67,7 +70,6 @@ if nargin < 3
 	if curfilename == 0 return; end;
 end;
 
-disp('Saving the EEGLAB session command history...');
 
 fid = fopen( [ curfilepath curfilename ], 'w');
 if fid == -1
@@ -76,11 +78,13 @@ end;
 fprintf(fid, '%% EEGLAB history file generated on the %s\n', date);
 fprintf(fid, '%% ------------------------------------------------\n');
 if iscell(allcoms)
+    disp('Saving the EEGLAB session command history...');
     for index = length(allcoms):-1:1
         fprintf(fid, '%s\n', allcoms{index});
     end;
     fprintf(fid, 'eeglab redraw;\n');
 else
+    disp('Saving the current EEG dataset command history...');
     fprintf(fid, '%s\n', allcoms);
 end;
 fclose(fid);
