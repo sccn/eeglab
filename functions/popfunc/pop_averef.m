@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 18:25:49  arno
+% questdlg2
+%
 % Revision 1.4  2002/08/12 16:22:53  arno
 % questdlg2
 %
@@ -69,14 +72,14 @@ if nargin < 2 | confirm == 1
 	 confirm = 0;
 end;
 
-EEG.data = reshape(EEG.data, EEG. nbchan, EEG.pnts*EEG.trials);
+EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 if ~isempty(EEG.icaweights)
 	disp('Pop_averef: converting ICA weight matrix to average reference (see >> help averef)');
 	[EEG.data EEG.icaweights EEG.icasphere] = averef(EEG.data,EEG.icaweights,EEG.icasphere);
 else
 	EEG.data = averef(EEG.data);
 end;	
-EEG.data = reshape(EEG.data, EEG. nbchan, EEG.pnts, EEG.trials);
+EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 EEG.averef = 'Yes';
 EEG.icaact = [];
 EEG = eeg_checkset(EEG);

@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/19 19:06:52  arno
+% debugging
+%
 % Revision 1.17  2002/08/13 16:15:29  scott
 % text
 %
@@ -327,7 +330,7 @@ for index = 1:length(allfields)
     % scan each field of EEG.event (omit)
     % -----------------------------------
     tmpvar = eval(['g.omit' allfields{index} ]);
-	if isstr(eval(['EEG.event(1).' allfields{index} ';' ])) & isnumeric(tmpvar) & ~isempty(tmpvar)
+	if eval(['isstr(EEG.event(1).' allfields{index} ')' ]) & isnumeric(tmpvar) & ~isempty(tmpvar)
 		for tmpind = 1:length(tmpvar) 
 			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
 		end;
