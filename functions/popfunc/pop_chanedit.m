@@ -19,7 +19,8 @@
 %                   azimuth and radius. Ex: 'chans(3) = chans(14)', 'X = -X' or a multi- 
 %                   step transform with steps separated by ';': 'TMP = X; X = Y; Y = TMP'
 %   'changechan'  - {num value1 value2 value3 ...} Change the values of all fields 
-%                   for the given channel num.
+%                   for the given channel num: mimimally {num label theta radius}.
+%                    (Ex: 'changechan' {12 'PXz' -90 0.30})
 %   'changefield' - {num field value} Change field value for channel number num. 
 %                   Ex: {34 'theta' 320.4}.
 %   'add'         - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
@@ -63,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/11/13 16:57:24  scott
+% help msg
+%
 % Revision 1.33  2002/11/13 14:57:54  scott
 % help msg edit
 %
