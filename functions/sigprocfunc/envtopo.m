@@ -17,7 +17,8 @@
 %  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution 
 %                {def|[] or both y's 0 -> y data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
-%                ELSE n<0, the number largest-comp. maps to plot {default|[] -> 7}
+%                ELSE n<0, the number largest-comp. maps  to plot (component with max
+%                variance) {default|[] -> 7}
 %  'title'     = [string] plot title {default|[] -> none}
 %  'plotchans' = [integer array] data channels to use in computing envelopes 
 %                {default|[] -> all}
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/02/27 02:52:24  arno
+% typo
+%
 % Revision 1.9  2002/10/25 18:47:33  luca
 % sign of comparison typo - ad
 %
