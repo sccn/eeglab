@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/11/02 23:45:40  arno
+% fixing electrode labels
+%
 % Revision 1.30  2004/07/07 19:08:06  arno
 % adding history for rejected epochs
 %
@@ -261,7 +264,10 @@ if ~isempty(EEG.chanlocs) & icacomp == 1
     end;
 else 
     if exist('elecrange')
-        eegplotoptions = { eegplotoptions{:}  'eloc_file', struct('labels', mat2cell(elecrange)) };
+        for index = 1:length(elecrange)
+            tmpstruct(index).labels = int2str(elecrange(index));
+        end;
+        eegplotoptions = { eegplotoptions{:}  'eloc_file' tmpstruct };
     end;
 end;
 if ~reject
