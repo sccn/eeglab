@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2004/05/22 00:00:00  arno
+% nothing
+%
 % Revision 1.97  2004/05/21 17:54:46  arno
 % allowing to use EEG as input
 %
@@ -855,7 +858,7 @@ else
 		   end;
            
 		  case 'lookup'
-           tmplocs = readlocs('Standard-10-20-Cap81.ced', 'filetype', 'chanedit');
+           tmplocs = readlocs('Standard-10-5-Cap385.sfp', 'filetype', 'sfp');
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
                [ind2 ind3] = sort(ind2);
