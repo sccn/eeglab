@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2003/12/02 22:43:38  arno
+% forcing compatibility with urchan
+%
 % Revision 1.66  2003/12/02 19:25:38  arno
 % debug readlocs and chanedit
 %
@@ -489,7 +492,7 @@ if nargin < 2
 				returnmode = 'no';
 			end;	
 			evalin('base', 'clear comtmp');
-			chans = checkchans(chans);
+			chans = checkchans(chans, fields);
 		end;
 		
 		% handle arguments
