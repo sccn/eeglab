@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2002/07/25 17:41:39  arno
+% debugging
+%
 % Revision 1.87  2002/07/25 17:27:03  arno
 % check all datasets after editing options
 %
@@ -585,7 +588,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_sub2, 'Label', 'Reject by spectra',        'CallBack', [ checkepochica '[EEG LASTCOM] = pop_rejspec(EEG, 0);' e_store]);
 	uimenu( fourth_sub2, 'Label', 'Reject labeled epochs', 'separator', 'on', 'CallBack', [ checkepochica ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); h(LASTCOM);' ...
-	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1); eeg_store; h(LASTCOM); eeglab(''redraw'');' ]);
+	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1);' e_newset ]);
    
 third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
