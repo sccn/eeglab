@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/06/25 00:50:17  arno
+% debugging several event selection
+%
 % Revision 1.7  2002/06/25 00:46:39  arno
 % adding eventconsistency check
 %
@@ -214,22 +217,29 @@ if ~isempty(EEG.setname)
 end;
 EEG.setname = g.newname;
 
+% count the number of events to duplicate and duplicate them
+% ----------------------------------------------------------
+totlen = 0;
+for index=1:EEG.trials, totlen = totlen + length(epochevent{index}); end;
+EEG.event(1).epoch = 0;          % create the epoch field (for assignment consistency afterwards)
+newevent(totlen) = EEG.event(1); % reserv array
+
 % modify the event structure accordingly (latencies and add epoch field)
 % ----------------------------------------------------------------------
 allevents = [];
-newevent = EEG.event;
+count = 1;
 for index=1:EEG.trials
-    allevents = union( allevents, epochevent{index});
     for indexevent = epochevent{index}
-        newevent(indexevent).epoch   = index;
+		newevent(count)         = EEG.event(indexevent);
+        newevent(count).epoch   = index;
         switch lower( g.timeunit )
-	       case 'points',	newevent(indexevent).latency = EEG.event(indexevent).latency - alllatencies(index) - lim(1)*EEG.srate + 1 + EEG.pnts*(index-1);
-	       case 'seconds',  newevent(indexevent).latency = EEG.event(indexevent).latency - alllatencies(index) - lim(1) + EEG.pnts*(index-1)/EEG.srate;
+	       case 'points',	newevent(count).latency = newevent(count).latency - alllatencies(index) - lim(1)*EEG.srate + 1 + EEG.pnts*(index-1);
+	       case 'seconds',  newevent(count).latency = newevent(count).latency - alllatencies(index) - lim(1) + EEG.pnts*(index-1)/EEG.srate;
         end;
+		count = count + 1;
     end;
 end;
 EEG.event = newevent;
-EEG.event = EEG.event(allevents); % remove events that were not in the selection
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % include the event latencies into EEG.epoch
@@ -249,15 +259,15 @@ end;
 % copy event information into the epoch array
 % -------------------------------------------
 switch lower(g.epochinfo)
-    case 'yes', eventfields = fieldnames(EEG.event);
-                for fieldnum = 1:length(eventfields)
-                   for trial = 1:EEG.trials
-                        %['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]
-                        if maxlen == 1, eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} ';' ]);
-                        else            eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]);
-                        end;
-    			   end;
-				end;    
+ case 'yes', eventfields = fieldnames(EEG.event);
+  for fieldnum = 1:length(eventfields)
+	  for trial = 1:EEG.trials
+		  %['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]
+		  if maxlen == 1, eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} ';' ]);
+		  else            eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]);
+		  end;
+	  end;
+  end;    
 end;
 
 % generate text command
