@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2004/11/13 06:47:25  scott
+% debugged yaxis limits selection
+%
 % Revision 1.74  2004/11/12 18:38:35  scott
 % help msg details
 %
@@ -546,6 +549,11 @@ if min(g.compnums) < 0
 	    MAXTOPOS = -g.compnums;
 	    g.compnums = 1:wtcomps;
     end
+end
+
+g.subcomps = abs(g.subcomps); % don't pass negative channel numbers
+if min(g.subcomps)<1 | max(g.subcomps) > chans
+    error('Keyword ''subcomps'' argument out of bounds');
 end
 
 %
