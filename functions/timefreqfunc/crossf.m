@@ -1,5 +1,5 @@
-% crossf() - Returns estimates and plots event-related coherence (ERCOH) changes
-%        between two input time series (x,y). A lower panel (optionally) shows 
+% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
+%        between two input time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
@@ -15,95 +15,94 @@
 %        computed (from a distribution of 'naccu' (200) surrogate baseline
 %        data epochs) for the baseline epoch, and non-significant features 
 %        of the output plots are zeroed (and shown in green). The baseline
-%        epoch is all windows with center times < the 'baseline' value or, 
-%        if 'baseboot' is 1, the whole epoch. 
+%        epoch is all windows with center times < the given 'baseline' value 
+%        or, if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
 %                       = crossf(x,y,frames,tlimits,srate,cycles, ...
 %                                        'key1', 'val1', 'key2', val2' ...);
 %
 % Required inputs:
-%       x       = first single-channel data  (1,frames*nepochs)      {none}
-%                 or cell array of two single-channel data for comparing
-%                 two conditions.
-%       y       = second single-channel data (1,frames*nepochs)      {none}
-%                 or cell array of two single-channel data for comparing
-%                 two conditions.
+%       x       = first single-channel data set (1,frames*nepochs)      
+%                 Else, cell array of two single-channel data for estimating
+%                 coherence differences between two conditions.
+%       y       = second single-channel data set (1,frames*nepochs)     
+%                 Else, cell array of two single-channel data sets for 
+%                 estimating coherence differences between two conditions.
 %       frames  = frames per epoch                                   {750}
 %       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
 %       srate   = data sampling rate (Hz)                            {250}
-%       cycles      = is 0 -> Use FFTs (with constant window length) {0}
-%                     is >0 -> Number of cycles in each analysis wavelet 
-%                     is [wavcycles fact] -> wavelet cycles increase with frequency 
-%                     starting at wavcyle (0<fact<1, fact=1 no increase, fact=0
-%                     same as running FFT).
+%       cycles  = 0  -> Use FFTs (with constant window length) 
+%               = >0 -> Number of cycles in each analysis wavelet 
+%               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
+%                 of wavelet cycles expands with frequency from cycles
+%                 If expfactor = 1, no expansion; if = 0, constant
+%                 window length (as in FFT)            {default cycles: 0}
 %
 %    Optional Coherence Type:
 %       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
 %                 ('coher') or phase coherence ('phasecoher') also known
-%                 as phase coupling factor' { 'phasecoher' }.
-%       'shuffle' = integer indicating the number of time to  
-%                 compute the (phase) coherence using shuffle trials 
-%                 in order to obtain the amplitude or phase coherence 
-%                 time locked to the stimulus { 0 }. 
-%       'subitc' = ['on'|'off'] subtract stimulus locked inter trial coherence 
-%                 from X and Y. This allows to visualize intrinsic 
-%                 synchronisation of X and Y (and not synchronization due
-%                 to common synchronization to the stimulus) { 'off' }. See notes.
+%                 as phase coupling factor' {default: 'phasecoher'}.
+%       'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
+%                 from x and y. This computes the  'intrinsic' coherence
+%                 x and y not arising from common synchronization to 
+%                 experimental events. See notes. {default: 'off'}
+%       'shuffle' = integer indicating the number of estimates to compute
+%                 bootstrap coherence based on shuffled trials. This estimates
+%                 the coherence arising only from time locking of x and y
+%                 to experimental events (opposite of 'subitc'). {default: 0}. 
 %
 %    Optional Detrend:
-%       'detret' = ['on'|'off'], Detrend data within epochs.   {'off'}
-%       'detrep' = ['on'|'off'], Detrend data across trials    {'off'}
+%       'detret' = ['on'|'off'], Linearly detrend data within epochs. {'off'}
+%       'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
 %
 %    Optional FFT/DFT:
-%       'winsize' = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                   if cycles >0: *longest* window length to use. This
-%                   determines the lowest output frequency  {~frames/8}
-%       'timesout' = Number of output times (int<frames-winsize) {200}
-%       'padratio' = FFTlength/winsize (2^k)                     {2}
-%                   Multiplies the number of output frequencies by
-%                   dividing their spacing. When cycles==0, frequency
-%                   spacing is (low_frequency/padratio).
-%       'maxfreq' = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
-%                   If cycles==0, all FFT frequencies are output.
+%       'winsize'  = If cycles==0: data subwindow length (fastest, 2^n<frames);
+%                    if cycles >0: *longest* window length to use. This
+%                    determines the lowest output frequency  {~frames/8}
+%       'timesout' = Number of output times (int<frames-winsize) {def: 200}
+%       'padratio' = FFTlength/winsize (2^k)                     {def: 2}
+%                    Multiplies the number of output frequencies by
+%                    dividing their spacing. When cycles==0, frequency
+%                    spacing is (low_frequency/padratio).
+%       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
+%                    If cycles==0, all FFT frequencies are output.{def: 50}
 %       'baseline' = Coherence baseline end time (ms). NaN=no baseline  {NaN}
-%       'powbase'  = Baseline spectrum to log-subtract.          {from data}
-%       'memory'   = ['low'|'high'] decrease memory use ('low')  {'high'}
+%       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
 %
 %    Optional Bootstrap:
-%       'alpha'    = If non-0, compute Two-tailed bootstrap significance prob.
+%       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
 %                    level. Show non-signif output values as green. {0}
 %       'naccu'    = Number of bootstrap replications to compute {200}
-%       'baseboot' = Bootstrap extend (0=same as 'baseline'; 1=whole epoch). 
-%                    If no baseline is given (NaN), bootstrap extend is the 
-%                    whole epoch {0}
 %       'boottype' = ['times'|'timestrials'] Bootstrap type: Either shuffle
-%                    windows ('times') or windows and trials
-%                    ('timestrials')                             {'times'}
-%       'rboot'    = Bootstrap coherence limits (e.g., from crossf()) {from data}
-%                    Be sure that the bootstrap type is identical to
-%                    the one used to obtain bootstrap coherence limits.
+%                    windows ('times') or windows and trials ('timestrials')
+%                    Option 'timestrials' requires more memory {default 'times'}
+%       'memory'   = ['low'|'high'] 'low' -> decrease memory use {default: 'high'}
+%       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
+%                    If no baseline is given (NaN), extent of bootstrap shuffling 
+%                    is the whole epoch                         {default: 0}
+%       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
+%                    The bootstrap type should be identical to that used
+%                    to obtain the input limits. {default: compute from data}
 % Optional Scalp Map:
 %       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {[]}
 %                    ELSE (c1,c2), plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
-%                    File should be ascii in format of  >> topoplot example   
+%                    File should be ascii in format of >> topoplot example   
 %
 % Optional Plot and Compute Features:
-%       'compute'   = ['matlab'|'C'] use C sub-routine to speed up the
-%                     computation {'matlab'}
+%       'compute'   = ['matlab'|'C'] Use C sub-routine to speed up the
+%                     computation                      {default 'matlab'}
 %       'plotamp'   = ['on'|'off'], Plot coherence magnitude       {'on'}
-%       'maxamp'    = [real] set the maximum for the amp. scale    { auto }
+%       'maxamp'    = [real] Set the maximum for the amp. scale    {auto}
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
-%       'plotbootsub' = ['on'|'off'], Plot coherence for shuffled trials
-%                    if made available using 'bootsub'           {'on'}
+%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
 %       'title'     = Optional figure title. If two conditions are given
 %                     as input, title can be a cell array with 2 string
 %                     elements {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
-%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
 %       'axesfont'  = Axes font size                               {10}
 %       'titlefont' = Title font size                              {8}
 %
@@ -118,21 +117,20 @@
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
-%        3) The standard bootstrap method should be 'both' but it uses lots 
-%           of memory, so the 'times' method may be prefered in some cases.
+%        3) The 'boottype' should be ideally 'timesframes', but this creates high 
+%           memory demands, so the 'times' method must be used in many cases.
 %        4) If 'boottype' is 'trials', the average of the complex bootstrap
-%           is subtracted from the coherence in order to compensate for
-%           phase differences (the average is also subtracted from the 
-%           bootstrap distribution). For other bootstraps, this is not
-%           necessary since the phase is random.
+%           is subtracted from the coherence to compensate for phase differences 
+%           (the average is also subtracted from the bootstrap distribution). 
+%           For other bootstraps, this is not necessary since the phase is random.
 %        5) If baseline is non-NaN, the baseline is subtracted from
 %           the complex coherence. On the left hand side of the coherence
 %           amplitude image, the baseline is displayed as a magenta line
 %           (if no baseline is selected, this curve represents the average
 %           coherence at every given frequency).
 %        6) If a out-of-memory error occurs, set the 'memory' option to 'low'
-%           (computation time might be slow; only the 'times' bootstrap can
-%           be used in this mode).
+%           (Makes computation time slower; Only the 'times' bootstrap method 
+%           can be used in this mode).
 %
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
@@ -158,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2002/08/14 21:06:33  arno
+% hanning debug
+%
 % Revision 1.47  2002/08/14 21:02:54  arno
 % implementing hanning funciton
 %
@@ -399,7 +400,7 @@ end
 if (nargin < 6)
    varwin = DEFAULT_VARWIN;
 elseif (~isnumeric(varwin) | length(varwin)>2)
-   error('crossf(): Value of cycles must be a number.');
+   error('crossf(): Value of cycles must be a number or a (1,2) vector.');
 elseif (varwin < 0)
    error('crossf(): Value of cycles must be either zero or positive.');
 end
@@ -572,7 +573,7 @@ case { 'times' 'timestrials' 'trials'},;
 otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
 end;    
 if (~isnumeric(g.shuffle))
-   error('Shuffle type must be numeric');
+   error('Shuffle argument type must be numeric');
 end;
 switch g.memory
 case { 'low', 'high' },;
@@ -611,7 +612,7 @@ if iscell(X)
 		g.title = { 'Condition 1', 'Condition 2', 'Condition 2 - condition 1' };
 	end;
 	
-	fprintf('Running crosff on condition 1 *********************\n');
+	fprintf('Running crossf on condition 1 *********************\n');
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
@@ -629,12 +630,12 @@ if iscell(X)
 	% asking user for memory limitations
 	%if ~strcmp(g.noinput, 'yes')
 	%	tmp = whos('Tfx1');
-	%	fprintf('This function will require an additionnal %d bytes, do you wish\n', tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
-	%	res = input('to coninue (y/n) (use ''noinput'' option to disable message):', 's');
+	%	fprintf('This function will require an additional %d bytes, do you wish\n', tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
+	%	res = input('to continue (y/n) (use ''noinput'' option to disable message):', 's');
 	%	if res == 'n', return; end;
 	%end;
 
-	fprintf('\nRunning crosff on condition 2 *********************\n');
+	fprintf('\nRunning crossf on condition 2 *********************\n');
 	subplot(1,3,2); title(g.title{2});
 	if ~strcmp(g.type, 'coher')
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = crossf(X{2}, Y{2}, ...
@@ -721,7 +722,7 @@ end;
 % shuffle trials if necessary
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if g.shuffle ~= 0
-   fprintf('Data shuffled\n');
+   fprintf('x and y data trials being shuffled %d times\n',g.shuffle);
    XX = reshape(X, 1, frame, length(X)/g.frame);
    YY = Y;
    X = [];
@@ -783,7 +784,7 @@ end;
 dispf     = find(Tfx.freqs <= g.maxfreq);
 
 %%%%%%%%%%%%%%
-% reserv space
+% reserve space
 %%%%%%%%%%%%%%
 %R  = zeros(tfx.nb_points,g.timesout);       % mean coherence
 %RR = repmat(nan,tfx.nb_points,g.timesout); % initialize with nans
@@ -817,7 +818,7 @@ if ~isnan(g.baseline)
       fprintf('Using times in under %d ms for baseline\n', g.baseline);
    end;
 else 
-   fprintf('No baseline is been used\n');	
+   fprintf('No baseline time range specified.\n');	
 end;
 fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
 if g.cycles==0
