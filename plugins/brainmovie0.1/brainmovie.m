@@ -115,6 +115,10 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/11/20 19:31:35  arno
+% new default for g.condtitle (I mean format)
+% new colors, still need some debugging
+%
 % Revision 1.24  2002/11/19 01:01:59  arno
 % nothing
 %
@@ -250,11 +254,10 @@ try, g.colmapcoh;       catch,
     g.colmapcoh(:,1) =  colormtmp(:,2);
     g.colmapcoh(:,2) =  colormtmp(:,3);
     g.colmapcoh(:,3) =  colormtmp(:,1);
-    g.colmapcoh = [ hot; g.colmapcoh(end:-1:1,:) ];
+    g.colmapcoh = [ g.colmapcoh; colormtmp(end:-1:1,:)];
 end; 
 try, g.colmapcrossf; catch,
     g.colmapcrossf = jet(64);
-    g.colmapcrossf = g.colmapcrossf([end:-1:1],:);
 	%g.colmapcrossf = hsv(64); 
 	%g.colmapcrossf = [ g.colmapcrossf(55:end,:); 
 	%g.colmapcrossf(1:54,:)]; g.colmapcrossf = g.colmapcrossf(linspace(64, 1, 64),:); % reorganize the colormap
@@ -533,15 +536,9 @@ switch lower(g.caption)
   xlimnorm = (1-maxcoordx)/(maxcoordx/nbconditions) * g.xlimaxes;
   ylimnorm = 0.45/(1-ordinate) * g.ylimaxes;
   switch g.power, case 'on',
-      if any(ALLCROSSF{1,2,end}(:) < 0) % negative ITCs (difference only) ?
-          c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
-                      'ylim', ylimnorm,'visible', g.visible );
-          scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
-      else
-          c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
-                      'ylim', ylimnorm,'visible', g.visible );
-          scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
-      end;
+      c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
+                  'ylim', ylimnorm,'visible', g.visible );
+      scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
       axis off;
   end;
   switch g.itc, case 'on',
@@ -558,16 +555,22 @@ switch lower(g.caption)
       end; 
   end;
   switch g.crossf, case 'on',
-	  c(3) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.47 , (1-maxcoordx)/4, 0.14].*s+q, ...
-				  'visible', g.visible );
-	  cbar( [0 1], [0 1], g.colmapcrossf, 'vert', '', g);
-	  ylabel('Cross-Coh' , 'fontweight', 'bold');
-	  set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
-	  switch g.crossfphasespeed, case 'on',
-		  c(4) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.69,(1-maxcoordx)/2, 0.25 ].*s+q, ...
-					  'visible', g.visible );
-		  scalecoher([0.02 1], [0.04 0.96], 5, g); % see function at the end
-	  end;
+      c(3) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.47 , (1-maxcoordx)/4, 0.14].*s+q, ...
+                  'visible', g.visible );
+      if any(ALLCROSSF{1,2,end}(:) < 0) % negative ITCs (difference only) ?
+          cbar( [-1 1], [-1 1], g.colmapcrossf, 'vert', '', g);
+          ylabel('Cross-Coh' , 'fontweight', 'bold');
+          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
+      else
+          cbar( [0 1], [0 1], g.colmapcrossf(length(g.colmapcrossf)/2:end,:), 'vert', '', g);
+          ylabel('Cross-Coh' , 'fontweight', 'bold');
+          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);      
+      end;
+      switch g.crossfphasespeed, case 'on',
+          c(4) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.69,(1-maxcoordx)/2, 0.25 ].*s+q, ...
+                      'visible', g.visible );
+          scalecoher([0.02 1], [0.04 0.96], 5, g); % see function at the end
+      end;
   end;
  case 'off', maxcoordx = 1;
 end;	
@@ -651,7 +654,6 @@ for indeximage = alltimepoints
                         set(t,'VerticalAlignment','top', 'fontsize', 15);
 		end;  
 	end;
-    return;
 
 	% draw the images if necessary
 	% ----------------------------
@@ -750,23 +752,21 @@ for indeximage = alltimepoints
 				ylabel(g.envylabel, 'fontweight', 'bold', 'fontsize', 12*g.resmult);
 			end;
 
-                        % draw vertical lines if needed
-                        % -----------------------------
+            % draw vertical lines if needed
+            % -----------------------------
 			if ~isempty(g.envvert)
 				if length(g.envvert) > 1,
-                                       verts = g.envvert{ tmpcond };
-                                else   verts = g.envvert{1};
-                                end
+                    verts = g.envvert{ tmpcond };
+                else   verts = g.envvert{1};
+                end
 				
 				for v=verts,
-                                        if isstruct(v),
-                                             ev = v;
-                                        else
-				             ev.time = v;  ev.color = 'k'; ev.style = '-';
-                                        end
-                                         
+                    if isstruct(v), ev = v;
+                    else,           ev.time = v;  ev.color = 'k'; ev.style = '-';
+                    end
+                    
 					phandle = plot([ev.time ev.time], [minordinate maxordinate], ev.style, 'linewidth', g.resmult);
-                                        set(phandle,'color',ev.color);
+                    set(phandle,'color',ev.color);
 				end;
 			end;
 		end;
@@ -779,6 +779,9 @@ for indeximage = alltimepoints
         eval(command2);
     else
         hgsave(sprintf('image%4.4d.fig', indeximage));
+        if strcmp(g.visible, 'on')
+            drawnow;
+        end;
     end;
 end;		 
 return;
@@ -798,7 +801,7 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 		tmpsize = 0.05 *  tmpsize * (g.xlimaxes(2)-g.xlimaxes(1))+0.1;
 
 		switch lower(g.itc)
-			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2-ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
+			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2+ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
 			case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
 			%case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
 			%case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
