@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.168  2003/11/13 02:28:12  scott
+% debug
+%
 % Revision 1.167  2003/11/13 02:26:25  scott
 % debug
 %
@@ -2626,8 +2629,7 @@ if ~isnan(coherfreq)
         fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
         fprintf('     relative to baseamp: %g dB\n',baseamp);
         if Cohsigflag
-                ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times)); ...
-                              repmat(-ampsig(2)+mean(ampsig),1,length(times))];
+                ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
         else
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
