@@ -14,6 +14,8 @@
 %   title      - Plot title. {Default: []}.
 %   singletrials - [0|1], Plot average or overplot single trials 
 %                      0 plot average, 1 plot single trials {Default: 0}
+%   ydir       - [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) 
+%                {def command line-> pos-up; def GUI-> neg-up}
 %
 % Outputs:
 %   avg        - [matrix] Data average
@@ -41,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/05/10 02:33:10  arno
+% output command simplification
+%
 % Revision 1.13  2003/03/12 03:20:02  arno
 % help button update
 %
@@ -103,6 +108,7 @@ if exist('plottitle') ~= 1
 end;
 
 if nargin <3
+    uilist = 
 	if typeplot
 		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Plot ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname),'',[ EEG.setname ' ERP'])] 'no'}, 'pop_plotdata' );
 	else
