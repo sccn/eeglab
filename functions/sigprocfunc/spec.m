@@ -21,6 +21,13 @@
 %       strongly recommend to use the psd function if you have access
 %       to it.
 %
+% Known problems: 
+%  1) normalization formula was determined manually by comparing
+%     with the output of the psd function on about 100 examples.
+%  2) In case only one time window is necessary, the overlapping factor 
+%     will be increased so that at least 2 windows are presents (the 
+%     timef function cannot use a single time window).
+%
 % Author: Arnaud Delorme, SCCN, Dec 2, 2003
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -42,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/12/03 02:57:04  arno
+% same
+%
 % Revision 1.6  2003/12/03 02:56:37  arno
 % timesout min
 %
