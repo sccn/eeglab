@@ -2,12 +2,21 @@
 %
 % Usage:
 %   >> data = averef(data);
+%   >> [data W] = averef(data, W);
+%   >> [data W S] = averef(data, W, S);
 %
-% Notes:
-%   Input and output data are (chans,frames*epochs) matrices of EEG 
-%   or MEG data
+% Inputs & outputs:
+%   data - 2D data (chans,frames*epochs) matrices of EEG or MEG data
+%   W    - ICA weigth matrix
+%   S    - ICA sphere matrix
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1999 
+% Note: the weight martix returned by ICA also have to be average
+%       referenced:
+%       because ICAACT = W*DATA, DATA = INV(W)*ICAACT 
+%       as R=averef matrix, average reference data is R*DATA
+%       so R*DATA = (R*INV(W))*ICA and NEW_W = INV(R*INV(W))
+%
+% Authors: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1999 
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -28,11 +37,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 12/16/99 Corrected denomiator on the suggestion of Ian Nimmo-Smith, Cambridge UK
 % 01-25-02 reformated help & license -ad 
 
-function data = averef(data)
+function [data, W, S] = averef(data, W, S)
 
 if nargin<1
   help averef
@@ -48,5 +60,17 @@ end
 % data = avematrix*data; % implement as a matrix multiply
 % else (faster?)
 
-  data = data - ones(chans,1)*sum(data)/chans;
+data = data - ones(chans,1)*sum(data)/chans;
 
+% treat optional ica parameters
+if nargin == 2
+	winv = pinv(W);
+	avematrix = eye(chans)-ones(chans)*1/chans;
+	W = pinv(avematrix*winv);
+end;
+if nargin == 3
+	winv = pinv(W*S);
+	avematrix = eye(chans)-ones(chans)*1/chans;
+	W = pinv(avematrix*winv);
+	S = eye(size(W,1), size(W,1));
+end;
