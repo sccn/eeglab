@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/09/18 22:47:06  arno
+% adding frames output
+%
 % Revision 1.5  2003/08/06 14:42:19  arno
 % *** empty log message ***
 %
@@ -593,16 +596,16 @@ end;
 % --------------------------
 switch lower(g.caption)
  case 'on' , 
-  xlimnorm = (1-maxcoordx)/(maxcoordx/nbconditions) * g.xlimaxes;
+  xlimnorm = (1.1-maxcoordx)/(maxcoordx/nbconditions) * g.xlimaxes;
   ylimnorm = 0.45/(1-ordinate) * g.ylimaxes;
   switch g.power, case 'on',
-      c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
+      c(1) = axes('position', [maxcoordx, -0.1,    (1.1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
                   'ylim', ylimnorm,'visible', g.visible );
       scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
       axis off;
   end;
   switch g.itc, case 'on',
-	  c(2) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.29 , (1-maxcoordx)/2, 0.14].*s+q, ...
+	  c(2) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.29 , (1.1-maxcoordx)/2, 0.14].*s+q, ...
 				  'visible', g.visible, 'color', 'none' );
       if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcoh, 'vert', 'circle', g);
@@ -616,7 +619,7 @@ switch lower(g.caption)
       axis off;
   end;
   switch g.crossf, case 'on',
-      c(3) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.47 , (1-maxcoordx)/4, 0.14].*s+q, ...
+      c(3) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.47 , (1.1-maxcoordx)/4, 0.14].*s+q, ...
                   'visible', g.visible );
       if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcrossf, 'vert', '', g);
@@ -628,7 +631,7 @@ switch lower(g.caption)
           set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);      
       end;
       switch g.crossfphasespeed, case 'on',
-          c(4) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.69,(1-maxcoordx)/2, 0.25 ].*s+q, ...
+          c(4) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.69,(1.1-maxcoordx)/2, 0.25 ].*s+q, ...
                       'visible', g.visible );
           scalecoher([0.02 1], [0.04 0.96], 5, g); % see function at the end
       end;
