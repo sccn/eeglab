@@ -21,7 +21,7 @@
 %
 % Note:
 %   A new figure is created automatically only when the pop_up window is 
-$   called or when more than one page of maps are plotted. Thus, this 
+%   called or when more than one page of maps are plotted. Thus, this 
 %   command may be used to draw topographic maps in a figure sub-axis.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
@@ -47,6 +47,9 @@ $   called or when more than one page of maps are plotted. Thus, this
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/17 22:21:02  scott
+% help msg and menu text
+%
 % Revision 1.8  2002/08/17 22:16:19  scott
 % editing help msg
 %
