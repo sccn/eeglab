@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/11/14 22:49:44  arno
+% debugging command line call
+%
 % Revision 1.44  2002/11/09 18:49:28  arno
 % adding text in gui
 %
@@ -207,7 +210,7 @@ if nargin<2
          { 'Style', 'text', 'string', 'If set, select', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', '  Field', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'To edit: Edit > Event fields'  }, ...
-         { 'Style', 'text', 'string', 'Ex: ''Target'' or 2:4,5  or  4.5 <= 13'  }, ...
+         { 'Style', 'text', 'string', 'Ex: "Target" or 2:4,5  or  4.5 <= 13'  }, ...
          { 'Style', 'text', 'string', 'all BUT these', 'fontweight', 'bold'  }, ...
          ...
          { 'Style', 'text', 'string', 'Event indices' }, ...
@@ -285,7 +288,7 @@ if nargin<2
     for index = 1:length(allfields) 
         tmpres = results{2*index+1};
         if isempty(findstr(tmpres, '<=')), 
-            try, tmpres = eval( [ '[' tmpres ']' ] ); 
+            try, tmpres = eval( [ '[' tmpres ']' ] );
             catch, tmpres = parsetxt( tmpres ); end;
         end;
         if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
@@ -347,7 +350,7 @@ for index = 1:length(allfields)
     % convert the value if the field is a string field
     % ------------------------------------------------
 	tmpvar = getfield(g, {1}, allfields{index});
-	
+    
 	if ~isempty(tmpvar)
 		if isnumeric(tmpvar)
 			if isstr(getfield( EEG.event, {1}, allfields{index}))
