@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/01/29 16:44:32  arno
+% fix icademo bug
+%
 % Revision 1.30  2004/01/29 00:58:04  arno
 % allowing to plot channels with no coordinates
 %
@@ -448,9 +451,7 @@ chans = length(channelnos);
     ymax=max(max(data));
   else
     if length(g.limits)~=4,
-      fprintf( ...
-       'plottopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
-      return
+      error('plottopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
     end;
     xmin = g.limits(1);
     xmax = g.limits(2);
