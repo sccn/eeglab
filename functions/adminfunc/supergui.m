@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/08/19 19:10:13  arno
+% figure bigger for MAC
+%
 % Revision 1.28  2002/08/17 02:38:42  arno
 % debugging
 %
@@ -267,7 +270,7 @@ end;
 
 % for MAC (magnify figures that have edit fields)
 % -------
-if isppc
+if ~isunix & ~ispc
 	hh = findobj(allhandlers, 'style', 'edit');
 	if ~isempty(hh)
 		factmulty = factmulty*1.4;
