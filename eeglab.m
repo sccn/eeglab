@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.156  2002/08/22 17:13:48  arno
+% debug eeglab besa
+%
 % Revision 1.155  2002/08/21 17:56:21  arno
 % add menu to export rejections
 %
@@ -658,11 +661,11 @@ function eeglab( onearg )
 eeg_options; 
 eeg_global;
 
+evalin('base', 'eeg_global;');
 if nargin < 1 | exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
 	eeg_global;
 	EEG = eeg_emptyset;
-	evalin('base', 'eeg_global;');
 	h('eeglab;');
 end;
 
@@ -681,7 +684,6 @@ if nargin == 1
 		clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
 		eeg_global;
 		EEG = eeg_emptyset;
-		evalin('base', 'eeg_global;');
 		h('eeglab besa;');
 		disp('Besa menu activated');
 	else
@@ -1019,6 +1021,8 @@ EEGUSERDAT = get(W_MAIN, 'userdata');
 H_MAIN  = EEGUSERDAT{1};
 EEGMENU = EEGUSERDAT{2};
 if exist('CURRENTSET') ~= 1, CURRENTSET = 0; end;
+if isempty(ALLEEG), ALLEEG = []; end;
+if isempty(EEG), EEG = []; end;
 
 % test if the menu is present  
 try
