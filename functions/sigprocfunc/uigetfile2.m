@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/12/08 19:40:40  hilit
+% eeglab.cfg is now saved to the /tmp folder only
+%
 % Revision 1.6  2004/12/02 00:26:23  hilit
 % missing a closing end
 %
@@ -81,6 +84,7 @@ function varargout = uigetfile2(varargin);
                 end
             end
             if isunix
+                eval(['cd ' tmp_fld]);
                 system('chmod 777 eeglab.cfg');
             end
         end;
