@@ -67,7 +67,7 @@
 %               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
 %               given range (NB: phasesort freq (above) overwrites these parameters).
 %               ELSE [minfrq maxfrq alpha] Add coher. signif. level line at 
-%               probability alpha (range: (0,0.1]) {Default: none}
+%               probability alpha (range: [0,0.1]) {Default: none}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg times) {default: as in icadefs.m}
 % Add other features to plot:
@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2003/01/31 23:23:34  arno
+% adding erpstd for ploting standard deviation of ERP
+%
 % Revision 1.70  2003/01/02 16:55:02  scott
 % allowed sortvars to be negative -sm
 %
