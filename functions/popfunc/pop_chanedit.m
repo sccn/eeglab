@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/12/02 17:54:34  arno
+% conversion of coordinates
+%
 % Revision 1.62  2003/12/02 17:15:08  arno
 % adding insert & append button
 %
@@ -544,7 +547,7 @@ else
              disp('Note: automatically convert XYZ coordinates to spherical and polar');
              chans = convertlocs(chans, 'cart2all');
             otherwise
-             chans = convertlocs(chans, lower(args{curfield}));
+             chans = convertlocs(chans, lower(args{curfield}), 'verbose', 'on');
 		   end;
            if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
            if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
