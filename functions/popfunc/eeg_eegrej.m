@@ -6,10 +6,10 @@
 %
 % Inputs:
 %   INEEG      - input dataset
-%   regions    - array of regions to suppress. [beg end] x number of 
+%   regions    - array of regions to suppress. number x [beg end]  of 
 %                regions. 'beg' and 'end' are expressed in term of points
 %                in the input dataset. Size of the array is
-%                2xnumber of regions.
+%                number x 2 of regions.
 %
 % Outputs:
 %   INEEG      - output dataset with updated data, events latencies and 
@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/15 02:14:07  arno
+% diabling rejection on
+% disk
+%
 % Revision 1.5  2002/10/22 17:16:53  arno
 % debug command line call
 %
@@ -72,13 +76,17 @@ if isfield(EEG.event, 'latency'),
 else tmpalllatencies = []; 
 end;
 
+% handle regions from eegplot
+% ---------------------------
+if size(regions,2) > 2, regions = regions(:, 3:4); end;
+
 eeg_options; 
 [EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( EEG.data, ...
-												  regions(:,3:4), EEG.xmax-EEG.xmin, tmpalllatencies);
+												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
 % the string option has been disable since it was causing problems
 % ----------------------------------------------------------------
 %[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
-%												  regions(:,3:4), EEG.xmax-EEG.xmin, tmpalllatencies);
+%												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
 EEG.pnts = size(EEG.data,2);
 EEG.xmax = EEG.xmax+EEG.xmin;
 
@@ -108,5 +116,5 @@ if ~isempty(boundevents)
 end;
 EEG.icaact = [];
 
-com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions(:,3:4) })); 
+com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions })); 
 return;
