@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/07/30 17:53:22  arno
+% adding color for rejection
+%
 % Revision 1.44  2002/07/29 16:42:00  arno
 % debugging
 %
@@ -536,7 +539,8 @@ if ~isfield(EEG.reject, 'rejconstcol')		EEG.reject.rejconstcol  = [0.6940    1.0
 if ~isfield(EEG.reject, 'rejjpcol')		    EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
 if ~isfield(EEG.reject, 'rejkurtcol')		EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end;
 if ~isfield(EEG.reject, 'rejfreqcol')		EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end;
-
+if ~isfield(EEG.reject, 'disprej')		    EEG.reject.disprej      = { }; end;
+	
 if ~isfield(EEG, 'stats')			EEG.stats.jp = []; res = com; end;
 if ~isfield(EEG.stats, 'jp')		EEG.stats.jp = []; res = com; end;
 if ~isfield(EEG.stats, 'jpE')		EEG.stats.jpE = []; res = com; end;
