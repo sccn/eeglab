@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/12 16:32:22  arno
+% inputdlg2
+%
 % Revision 1.10  2002/08/12 02:46:45  arno
 % inputdlg2
 %
@@ -96,13 +99,13 @@ end;
 
 if nargin < 3
     if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
-		 ButtonName=questdlg2( ['3D head plot need to generate a spline file' 10 ...
-		                      'the first time it is called (and for every new channel' 10 ...
-		                      'location file. Do you want to generate this file now ?'], ...
-		              'Spline file', 'Cancel', 'Load an existing file', 'Yes','Yes');
+		 ButtonName=questdlg2( strvcat('3D head plot need to generate a spline file', ...
+		                      'the first time it is called (and for every new channel', ...
+		                      'location file). Do you want to generate this file now ?'), ...
+		                      'Spline File', 'Cancel', 'Load file', 'Yes','Yes');
 		 switch lower(ButtonName),
 		      case 'cancel', return;
-		      case 'load an existing file', 
+		      case 'load file', 
 				    [filename, filepath] = uigetfile('*.spl', 'Load a spline file');
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
