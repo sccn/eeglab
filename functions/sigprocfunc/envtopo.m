@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2004/03/03 21:26:02  arno
+% debugging sorting of components; relative variance; text output
+%
 % Revision 1.52  2004/03/03 18:54:29  arno
 % retreive version 1.50
 %
@@ -534,17 +537,19 @@ fprintf('In the interval %.0f to %.0f ms:\n',x(frame1),x(frame2));
 vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
 if strcmpi(g.pvaf, 'on')
     pvaf = 100-100*pvaf/vardat;
+    ot   = 'pvaf';
 else 
     pvaf = 100*pvaf/vardat;
+    ot   = 'rv';
 end;
 [sortpvaf spx] = sort(pvaf);
 sortpvaf = sortpvaf(end:-1:1);
 spx      = spx(end:-1:1);
 npercol = ceil(ncomps/3);
 for index =1:npercol
-    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index), sortpvaf(index)); catch, end;
-    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index+npercol), sortpvaf(index+npercol)); catch, end;
-    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index+2*npercol), sortpvaf(index+2*npercol)); catch, end;
+    try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index)          , ot, sortpvaf(index)); catch, end;
+    try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index+npercol)  , ot, sortpvaf(index+npercol)); catch, end;
+    try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index+2*npercol), ot, sortpvaf(index+2*npercol)); catch, end;
     fprintf('\n');
 end;
 
