@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/10/23 15:21:23  arno
+% saving error fixed
+%
 % Revision 1.29  2002/10/16 16:17:13  arno
 % debug command line call
 %
@@ -307,11 +310,9 @@ if nargin < 2
 		chans = evalin('base', 'chantmp');
 		%evalin('base', 'clear chantmp');
 		totaluserdat = { totaluserdat{:} userdat{:}};
-        'here'
 		if evalin('base', 'exist(''comtmp'')') == 1
 			tmpcom = evalin('base', 'comtmp');
 			try, 
-                tmpcom
 				chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
                 if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
                     tmpcom = { tmpcom{1} tmpcom{2}{1} };
