@@ -167,6 +167,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.230  2004/11/30 22:39:40  hilit
+% fixing 'erpstd' option
+%
 % Revision 1.229  2004/11/30 06:24:19  scott
 % help msg
 %
@@ -1462,7 +1465,7 @@ if ~exist('srate') | srate <= 0
 	return
 end
 if ~isempty(auxvar)
-	% whos auxvar
+% whos auxvar
     if size(auxvar,1) ~= ntrials & size(auxvar,2) ~= ntrials
 		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
                            ntrials);
@@ -1676,7 +1679,7 @@ end;
 %
 %%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if exist('phargs') == 1 % if phase-sort
+if exist('phargs') == 1 % if phase-sort the data trials
 	if length(phargs) >= 4 & phargs(3) ~= phargs(4) % find max frequency in specified band
           if exist('psd') == 2 % requires Signal Processing Toolbox
             fprintf('Computing data spectrum using psd().\n');
@@ -1705,56 +1708,66 @@ if exist('phargs') == 1 % if phase-sort
        winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
        tmprange = find(winloc>0 & winloc<=frames);
        winloc = winloc(tmprange); % sorting window times
-       [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
        winlocs = winloc;
+       %
+       %%%%%%%%%%%%%%%%%%%% Compute phsamp and phaseangles %%%%%%%%%%%%%%%%%%%%
+       %
+       [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+% hist(phaseangles,50);
+% return
 	
-    if length(tmprange) ~=  winlen+1
-        filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
-        timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
-        phaseangles = phaseangles + 2*pi*(timecenter-phargs(1))*freq;
-        fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
-        fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
-                filtersize, 1000/freq*filtersize, timecenter);
-        fprintf(...
-  '    Filter length is %d; Phase has been linearly interpolated to latency at %1.0f ms.\n', ...
-                        length(winloc), phargs(1));
-    else
-        fprintf(...
+	%
+	% Print facts on commandline %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+       if length(tmprange) ~=  winlen+1
+         filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
+         timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
+         phaseangles = phaseangles + 2*pi*(timecenter-phargs(1))*freq;
+         fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
+         fprintf(...
+    '    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
+              filtersize, 1000/freq*filtersize, timecenter);
+         fprintf(...
+    '    Filter length is %d; Phase has been linearly interpolated to latency at %1.0f ms.\n', ...
+              length(winloc), phargs(1));
+       else
+         fprintf(...
   'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...
-			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
-        fprintf('Phase is computed using a wavelet of %d frames.\n',length(winloc));
-    end;
+	     freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
+         fprintf('Phase is computed using a wavelet of %d frames.\n',length(winloc));
+        end;
 	%
 	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
 	phargs(2) = phargs(2)/100; % convert rejection rate from % to fraction
-	[tmp n] = sort(phsamp); % sort amplitudes
-	if phargs(2)>=0
-	  n = n(ceil(phargs(2)*length(n))+1:end); % if rej 0, select all trials
+        amprej = phargs(2);
+	[tmp ampsortidx] = sort(phsamp); % sort amplitudes
+	if amprej>=0
+	  ampsortidx = ampsortidx(ceil(amprej*length(ampsortidx))+1:end); % if amprej==0, select all trials
 	  fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
-	     length(n),100*(1-phargs(2)));
-	else % phargs(2) < 0
-	   phargs(2) = 1+phargs(2); % subtract from end
-	   n = n(1:floor(phargs(2)*length(n)));
+	     length(ampsortidx),100*(1-amprej));
+	else % amprej < 0
+	   amprej = 1+amprej; % subtract from end
+	   ampsortidx = ampsortidx(1:floor(amprej*length(ampsortidx)));
 	   fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
-                      length(n),phargs(2)*100);
+                      length(ampsortidx),amprej*100);
 	end
 	%
 	% Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	data = data(:,n); % amp-sort the data, removing rejected-amp trials
-	phsamp = phsamp(n);           % amp-sort the amps
-	phaseangles = phaseangles(n); % amp-sort the phaseangles
-	sortvar = sortvar(n);         % amp-sort the trial indices
-	ntrials = length(n);          % number of trials retained
+	data = data(:,ampsortidx); % amp-sort the data, removing rejected-amp trials
+	phsamp = phsamp(ampsortidx);           % amp-sort the amps
+	phaseangles = phaseangles(ampsortidx); % amp-sort the phaseangles
+	sortvar = sortvar(ampsortidx);         % amp-sort the trial indices
+	ntrials = length(ampsortidx);          % number of trials retained
 	if ~isempty(auxvar)
-	   auxvar = auxvar(:,n);
+	   auxvar = auxvar(:,ampsortidx);
         end
 	%
 	% Sort remaining data by phase angle %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	topphase = topphase/360*2*pi; % convert from degrees to radians
 	phaseangles = -phaseangles;
+	topphase = (topphase/360)*2*pi; % convert from degrees to radians
 	ip = find(phaseangles>topphase);
 	phaseangles(ip) = phaseangles(ip)-2*pi; % rotate so topphase at top of plot
 	
@@ -1762,13 +1775,14 @@ if exist('phargs') == 1 % if phase-sort
 	data    =  data(:,sortidx);                % sort data by phase
 	phsamp  =  phsamp(sortidx);                % sort amps by phase
 	sortvar = sortvar(sortidx);                % sort input sortvar by phase
-	phaseangles = -phaseangles; % Note: phsangles now descend from pi 
 	if ~isempty(auxvar)
 	   auxvar = auxvar(:,sortidx);
 	end
+	phaseangles = -phaseangles; % Note: phsangles now descend from pi 
+        % TEST auxvar = 360 + (1000/256)*(256/5)*phaseangles/(2*pi); % plot phase+360 in ms for test
 	
 	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
-	sortidx = n(sortidx); % return original trial indices in final sorted order
+	sortidx = ampsortidx(sortidx); % return original trial indices in final sorted order
 %
 % %%%%%%%%%%%%%%% Sort data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3310,21 +3324,22 @@ function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs
 % phasedet() - function used in erpimage.m
 %              Constructs a complex filter at frequency freq
 %
-
 function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq)
 % Typical values:
 %   frames = 768;
-%   srate = 256;
+%   srate = 256; % Hz
 %   nwin = [200:300];
-%   freq = 10;
+%   freq = 10; % Hz
     
 data = reshape(data,[frames prod(size(data))/frames]);
-% number of cycles depend on window size 
+% number of cycles depends on window size 
 % number of cycles automatically reduced if smaller window
-% note: as the number of cycle changes, the frequency shifts a little
-%       this has to be fixed
+% Note: as the number of cycles changes, the frequency shifts 
+%       a little -- this should be fixed
+
 win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
 win = win .* repmat(makehanning(length(nwin))',length(freq),1);
+
 %tmp =gcf; figure; plot(real(win)); figure(tmp);
 %fprintf('ANY NAN ************************* %d\n', any(any(isnan( data(nwin,:)))));
 
