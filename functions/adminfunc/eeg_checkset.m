@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/05/03 01:33:58  luca
+% debuging new event check
+%
 % Revision 1.24  2002/05/02 22:16:54  arno
 % speeding up event checks
 %
@@ -548,7 +551,7 @@ if ~isempty( varargin)
 		  allfields = fieldnames(EEG.event);
 		  for index = 1:length(allfields)
 			  eval(['allvalues = { EEG.event.' allfields{index} ' };']);
-			  valreal = cellfun('isreal', allvalues);
+			  valreal = cellfun('isclass', allvalues, 'double');
 			  
 			  format = 'ok';
 			  if ~all(valreal) % all valreal ok
