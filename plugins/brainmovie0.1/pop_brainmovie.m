@@ -109,6 +109,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/06/23 17:16:11  arno
+% nothing
+%
 % Revision 1.54  2003/06/23 17:11:32  arno
 % nothing
 %
@@ -664,9 +667,7 @@ if ~strcmpi(g.mode, 'compute')
             end;
             brainmovieoptions = { brainmovieoptions{:} 'scalepower' [tmpmin tmpmax] };
         end;
-            
-        tmp = g.showcomps
-        
+                    
         % Run brainmovie
         % --------------
         if strcmpi(g.type, '3d')
