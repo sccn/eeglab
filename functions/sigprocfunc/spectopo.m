@@ -3,35 +3,61 @@
 %              plot the relative topographic distribution of power.
 %              Uses Matlab psd() from signal processing toolbox.
 % Usage:
-%        >> [spectra,freqs] = spectopo(data,frames,srate,freqs,chanlocs,...
-%                           limits,title,freqfaq, percent, 'key1', 'value1' ...);
+%        >> [spectra,freqs] = spectopo(data, frames, srate, 'key1', 'val1' ...
+%                                                           'key2', 'val2' ...);
+%
 % Inputs:
-%        data   = 2D (nchans,frames*epochs); % can be single-epoch
+%       data   = 2D (nchans,frames*epochs); % can be single-epoch
 %                 or 3D (nbchan,frames,epochs)
-%        frames = frames per epoch {0 -> data length}
-%        srate  = sampling rate per channel (Hz)
-%        freqs  = vector of frequencies for topoplot() scalp maps (Hz)
-%        chanlocs = electrode locations file (format: >> topoplot example)
+%       frames = frames per epoch {0 -> data length}
+%       srate  = sampling rate per channel (Hz)
 %
 % Optional inputs:
-%        limits  = axis limits [xmin xmax ymin ymax cmin cmax]
-%                  To use data limtis, omit final values or use nan's
-%                  i.e. [-100 900 nan nan -10 10], [-100 900]
-%                  Note that default color limits are symmetric around 0 and are
-%                  different for each head {defaults: all nans}
-%        title   = quoted plot title {default: none}
-%        freqfac = int power of 2 => approximate frequencies/Hz {default: 4}
-%        percent = downsampling factor or approximate percentage of the data to
-%                  keep while computing spectra. Downsampling can help to speed up
-%                  the computation. From 0 to 1 {default: 1}
-%        'reref','averef'= convert input data to average reference 
-%then/or 'key','val' = optional topoplot() arguments (see topoplot())
+%   'freq'     = [float vector (Hz)] vector of frequencies for topoplot() scalp maps
+%                of power at all channels, or single frequency to plot component 
+%                contributions at a single channel ('plotchan').
+%   'chanlocs' = electrode locations file (format: >> topoplot example)
+%   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax]
+%                To use data limtis, omit final values or use nan's
+%                i.e. [-100 900 nan nan -10 10], [-100 900]
+%                Note that default color limits are symmetric around 0 and are
+%                different for each head {defaults: all nans}
+%   'title'    = [quoted string] plot title {default: none}
+%   'freqfac'  = [int power of 2] approximate frequencies/Hz to compute {default: 4}
+%   'percent'  = downsampling factor or approximate percentage of the data to
+%                keep while computing spectra. Downsampling can be used to speed up
+%                the computation. From 0 to 1 {default: 1}.
+%   'reref'    = ['averef'|'off'] convert input data to average reference 
+%                Default is 'off'. 
+%
+% Plot component contributions:
+%   'weights'  = ICA unmixing matrix. 'freq' must contain a single frequency.
+%                ICA maps of the N (='nicamaps') components that account for the most
+%                power at the selected frequency ('freq') are plotted along with
+%                the spectra of the selected channel ('plotchan') and components
+%                ('icacomps').
+%   'plotchan' = [integer] channel at which to compute independent conmponent
+%                contributions at the selected frequency ('freq'). {[]=channel with
+%                higest power at 'freq').If 0, plot RMS power at all channels. 
+%   'nicamaps' = [integer] number of ICA component maps to plot (Default 4).
+%   'icacomps' = [integer array] indices of ICA component spectra to plot ([]=all).
+%   'icamaps'  = [integer array] force plotting of selected ica compoment maps ([]=the
+%                'nicamaps' largest).
+%
+% Topoplot options:
+%    opther 'key','val' options are propagated to topoplot() for map display
+%    (see help topoplot())
 %
 % Outputs:
 %        spectra = (nchans,nfreqs) power spectra (average over epochs) in dB
 %        freqs   = frequencies of spectra (Hz)
 %
-% Authors: Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
+% Notes: The old function call is still function for backward compatibility
+%        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
+%                               chanlocs, limits, titl, freqfac, percent);
+%
+% Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
+%          SCCN/INC/UCSD, La Jolla, 3/01 
 %
 % See also: timtopo(), envtopo(), tftopo(), topoplot()
 
@@ -53,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/18 16:00:46  arno
+% adding option for not plotting channels
+%
 % Revision 1.6  2002/07/07 22:44:49  scott
 % *** empty log message ***
 %
@@ -82,7 +111,8 @@
 
 % Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
 
-function [eegspecdB,freqs]=spectopo(data,frames,srate,headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
+function [eegspecdB,freqs]=spectopo(data,frames,srate,varargin) 
+	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
 FREQFAC  = 4;  % approximate frequencies/Hz (default)
@@ -91,67 +121,77 @@ if nargin<3
    help spectopo
    return
 end
-if nargin < 4
-	headfreqs = [];
-end;
-if nargin < 5
-	if ~isempty(headfreqs)
-		error('need channel location map');
-	end;
-end;
-
-averef_flag = 0;
-if nargin > 9
-   if strcmp(varargin(1),'reref') 
-     if strcmp(varargin(2),'averef')
-        averef_flag = 1;
-        varargin(1) = [];
-        varargin(1) = []; % remove the two args from list
-     else
-        error('only reref choice is averef');
-     end
-   end
-end
-
-if nargin<8
-  freqfac = FREQFAC;
-end
-
-if nargin<7
-  titl = []; % default no title
-end
-
-if nargin<6
-  limits = [nan nan nan nan nan nan]; % defaults from data 
-end
-
-if nargin<9
-  percent = 1; % defaults sample 100% of the data 
+if nargin <= 3 | isstr(varargin{1})
+	% 'key' 'val' sequency
+	fieldlist = { 'freq'         'real'     []                       [] ;
+				  'chanlocs'      ''         []                       [] ;
+				  'title'         'string'   []                       '';
+				  'limits'        'real'     []                       [nan nan nan nan nan nan];
+				  'freqfac'       'integer'  []                        FREQFAC;
+				  'percent'       'real'     [0 1]                     1 ;
+				  'reref'         'string'   { 'averef' 'no' }         'no' ;
+				  'weights'       'real'     []                       [] ;
+				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
+				  'nicamaps'      'integer'  []                       4 ;
+				  'icacomps'      'integer'  []                       [] ;
+				  'icamaps'       'integer'  []                       [] };
+	
+	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignoreextras');
+	if isstr(g), error(g); end;
 else
-    percent = max(percent, 0);
-    percent = min(percent, 1);
-end
+	if nargin > 3,    g.freq = varargin{1};
+	else              g.freq = [];
+	end;
+	if nargin > 4,	  g.chanlocs = varargin{2};
+	else              g.chanlocs = [];
+	end;
+	if nargin > 5,    g.limits = varargin{3};
+	else              g.limits = [nan nan nan nan nan nan];
+	end;
+	if nargin > 6,    g.title = varargin{4};
+	else              g.title = '';
+	end;
+	if nargin > 7,    g.freqfac = varargin{5};
+	else              g.freqfac = FREQFAC;
+	end;
+	if nargin > 8,    g.percent = varargin{6};
+	else              g.percent = 1;
+	end;
+	if nargin > 10,    g.reref = 'averef';
+	else               g.reref = 'no';
+	end;
+	g.weights = [];
+	g.icamaps = [];
+end;
+
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
 
-if ~isempty(headfreqs) & min(headfreqs)<0
+if ~isempty(g.freq) & min(g.freq)<0
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
 end
-nchans = size(data,1);
 epochs = round(size(data,2)/frames);
 if frames*epochs ~= size(data,2)
    error('Spectopo: non-integer number of epochs');
 end
-
+if ~isempty(g.weights)
+	g.icawinv = pinv(g.weights); % maps
+	if ~isempty(g.icacomps)
+		g.weights = g.weights(g.icacomps, :);
+		g.icawinv = g.icawinv(:,g.icacomps);
+	else 
+		g.icacomps = [1:size(g.weights,1)];
+	end;
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute channel spectra using psd()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 epoch_subset = 1:epochs;
-if percent ~= 1 & epochs > 1
-    nb = round( percent*epochs);
+if g.percent ~= 1 & epochs > 1
+    nb = round( g.percent*epochs);
     epoch_subset = zeros(1,epochs);
     while nb>0
         index = ceil(rand*epochs);
@@ -163,75 +203,109 @@ if percent ~= 1 & epochs > 1
     epoch_subset = find(epoch_subset == 1);
     fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
 end;
-fftlength = 2^round(log(srate)/log(2))*FREQFAC;
-fprintf('Computing spectra: ')
-for c=1:nchans
-  for e=epoch_subset
-    if averef_flag
-      [tmpspec,freqs] = psd(averef(matsel(data,frames,0,c,e)),fftlength,...
-                                    srate,fftlength/2,fftlength/8);
-    else
-      [tmpspec,freqs] = psd(matsel(data,frames,0,c,e),fftlength,...
-                                    srate,fftlength/2,fftlength/8);
-    end
-     if c==1 & e==epoch_subset(1)
-       eegspec = zeros(nchans,length(freqs));
-     end
-     eegspec(c,:) = eegspec(c,:) + tmpspec';
-  end
-  fprintf('.')
-end
-eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
-fprintf('\n')
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute axis and caxis limits
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if length(limits)<1 | isnan(limits(1))
-   limits(1) = LOPLOTHZ;
-end
-
-if ~isempty(headfreqs)
-	if length(limits)<2 | isnan(limits(2))
-		maxheadfreq = max(headfreqs);
-		if rem(maxheadfreq,5) ~= 0
-			limits(2) = 5*ceil(maxheadfreq/5);
+if isempty(g.weights)
+	% computing data spectrum
+	fprintf('Computing spectra: ')
+	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
+	fprintf('\n');
+else
+	% computing data spectrum
+	if isempty(g.plotchan) | g.plotchan == 0
+		fprintf('Computing spectra: ')
+		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
+		fprintf('\n');
+	else
+		fprintf('Computing spectra at specified channel: ')
+		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
+		fprintf('\n');
+	end;
+	
+	% selecting channel and spectrum
+	if isempty(g.plotchan) % find channel of minimum power
+		[tmp indexfreq] = min(abs(g.freq-freqs));
+		[tmp g.plotchan] = min(eegspecdB(:,indexfreq));
+		fprintf('Maximum power found at channel %d\n', g.plotchan);
+	end;
+	if g.plotchan == 0
+		fprintf('Averaging power at all channels\n');
+		eegspecdBtoplot = mean(eegspecdB, 1);
+	else 
+		eegspecdBtoplot = eegspecdB(g.plotchan, :);
+	end;
+	
+	% computing component spectra
+	fprintf('Computing spectra: ')
+	[compeegspecdB freqs] = spectcomp( g.weights*data, frames, srate, epoch_subset, g);
+	fprintf('\n');
+	
+	% selecting components to plot
+	if isempty(g.icamaps)
+		% weight power by channel projection weight
+		if g.plotchan == 0
+			compeegspecdB = repmat(mean(g.weights, [1 size(compeegspecdB,2)])) .* compeegspecdB;
 		else
-			limits(2) = maxheadfreq*1.1;
+			compeegspecdB = repmat(g.weights(:,g.plotchan), [1 size(compeegspecdB,2)]) .* compeegspecdB;
+		end;
+		
+		[tmp indexfreq] = min(abs(g.freq-freqs));
+		g.icafreqsval   = compeegspecdB(:, indexfreq);
+		[g.icafreqsval g.icamaps] = sort(g.icafreqsval);
+		g.icamaps = g.icamaps(end:-1:1);
+		if g.nicamaps < length(g.icamaps), g.icamaps = g.icamaps(1:g.nicamaps); end;
+	else 
+		[tmp indexfreq] = min(abs(g.freq-freqs));
+		g.icafreqsval   = compeegspecdB(g.icamaps, indexfreq);
+	end;
+end;
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Compute axis and caxis g.limits
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if length(g.limits)<1 | isnan(g.limits(1))
+   g.limits(1) = LOPLOTHZ;
+end
+
+if ~isempty(g.freq)
+	if length(g.limits)<2 | isnan(g.limits(2))
+		maxheadfreq = max(g.freq);
+		if rem(maxheadfreq,5) ~= 0
+			g.limits(2) = 5*ceil(maxheadfreq/5);
+		else
+			g.limits(2) = maxheadfreq*1.1;
 		end
 	end
 	
-	headfreqs = sort(headfreqs);          % Determine topoplot frequencies
-	freqidx = zeros(1,length(headfreqs)); % Do not interpolate between freqs
-	for f=1:length(headfreqs)
-		[tmp fi] = min(abs(freqs-headfreqs(f)));
+	g.freq = sort(g.freq);          % Determine topoplot frequencies
+	freqidx = zeros(1,length(g.freq)); % Do not interpolate between freqs
+	for f=1:length(g.freq)
+		[tmp fi] = min(abs(freqs-g.freq(f)));
 		freqidx(f)=fi;
 	end
 else 
-	limits(2) = 50;
+	g.limits(2) = 50;
 end;
 
-[tmp maxfreqidx] = min(abs(limits(2)-freqs)); % adjust max frequency
-[tmp minfreqidx] = min(abs(limits(1)-freqs)); % adjust min frequency
+[tmp maxfreqidx] = min(abs(g.limits(2)-freqs)); % adjust max frequency
+[tmp minfreqidx] = min(abs(g.limits(1)-freqs)); % adjust min frequency
 
-if length(limits)<3|isnan(limits(3))
-  limits(3) = min(min(eegspecdB(:,minfreqidx:maxfreqidx)));
+if length(g.limits)<3|isnan(g.limits(3))
+  g.limits(3) = min(min(eegspecdB(:,minfreqidx:maxfreqidx)));
 end
-if length(limits)<4|isnan(limits(4))
-  limits(4) = max(max(eegspecdB(:,minfreqidx:maxfreqidx)));
+if length(g.limits)<4|isnan(g.limits(4))
+  g.limits(4) = max(max(eegspecdB(:,minfreqidx:maxfreqidx)));
 end
-dBrange = limits(4)-limits(3);   % expand range a bit beyond data limits
-limits(3) = limits(3)-dBrange/7;
-limits(4) = limits(4)+dBrange/7;
+dBrange = g.limits(4)-g.limits(3);   % expand range a bit beyond data g.limits
+g.limits(3) = g.limits(3)-dBrange/7;
+g.limits(4) = g.limits(4)+dBrange/7;
 
-if length(limits)<5 % default caxis plotting limits
-  limits(5) = nan;
+if length(g.limits)<5 % default caxis plotting g.limits
+  g.limits(5) = nan;
 end
-if length(limits)<6 
-  limits(6) = nan;
+if length(g.limits)<6 
+  g.limits(6) = nan;
 end
 
-if isnan(limits(5))+isnan(limits(6)) == 1
+if isnan(g.limits(5))+isnan(g.limits(6)) == 1
    fprintf('spectopo(): limits 5 and 6 must either be given or nan\n');
    return
 end
@@ -239,28 +313,39 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot spectrum of each channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if ~isempty(headfreqs)
+if ~isempty(g.freq)
 	specaxes = sbplot(3,4,[5 12]); 
 end;
-% plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)','b','LineWidth',2);
-pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
+
+if isempty(g.weights)
+	pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
+else 
+	pl=plot(freqs(1:maxfreqidx),eegspecdBtoplot(:,1:maxfreqidx)');
+end;
 set(pl,'LineWidth',2);
 set(gca,'TickLength',[0.02 0.02]);
-
-axis([freqs(minfreqidx) freqs(maxfreqidx) limits(3) limits(4)]);
-
+axis([freqs(minfreqidx) freqs(maxfreqidx) g.limits(3) g.limits(4)]);
 xl=xlabel('Frequency (Hz)');
 set(xl,'fontsize',16);
 yl=ylabel('Rel. Power (dB)');
 set(yl,'fontsize',16);
 set(gca,'fontsize',16)
 box off;
+if ~isempty(g.weights)
+	set(pl, 'linewidth', 2, 'color', 'k');
+	hold on;
+	pl2=plot(freqs(1:maxfreqidx),compeegspecdB(:,1:maxfreqidx)');
+	newaxis = axis;
+	newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
+	newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
+	axis(newaxis);
+end;
 
-if ~isempty(headfreqs)
+if ~isempty(g.freq)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	for f=1:length(headfreqs)
+	for f=1:length(g.freq)
 		hold on; 
 		plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
 			 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
@@ -270,18 +355,22 @@ if ~isempty(headfreqs)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot connecting lines using changeunits()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	headax = zeros(1,length(headfreqs));
-	for f=1:length(headfreqs) 
-		headax(f) = sbplot(3,length(headfreqs),f);
+	headax = zeros(1,length(g.freq));
+	for f=1:length(g.freq)+length(g.icamaps)
+		headax(f) = sbplot(3,length(g.freq)+length(g.icamaps),f);
 		axis([-1 1 -1 1]);
 	end
 	large = sbplot(1,1,1);
-	for f=1:length(headfreqs)
-		from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],...
-						   specaxes,large);
+	for f=1:length(g.freq)+length(g.icamaps)
+		if f>length(g.freq) % special case of ica components
+			from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
+			%g.icafreqsval contain the sorted frequency values at the specified frequency
+		else 
+			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
+		end;
 		to = changeunits([0,0],headax(f),large);
 		hold on;
-		plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
+		li(f) = plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
 		axis([0 1 0 1]);
 		axis off;
 	end;
@@ -290,18 +379,18 @@ if ~isempty(headfreqs)
 	% Plot heads using topoplot()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Plotting scalp distributions: ')
-	for f=1:length(headfreqs) 
+	for f=1:length(g.freq)
 		axes(headax(f));
 		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
-		if isnan(limits(5)),     maplimits = 'absmax';
-		else                     maplimits = [limits(5) limits(6)];
+		if isnan(g.limits(5)),     maplimits = 'absmax';
+		else                       maplimits = [g.limits(5) g.limits(6)];
 		end;
 		if ~isempty(varargin)
-			topoplot(topodata,chanlocs,'maplimits',maplimits, varargin{:}); 
+			topoplot(topodata,g.chanlocs,'maplimits',maplimits, varargin{:}); 
 		else
-			topoplot(topodata,chanlocs,'maplimits',maplimits); 
+			topoplot(topodata,g.chanlocs,'maplimits',maplimits); 
 		end
-		if f<length(headfreqs)
+		if f<length(g.freq)
 			tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
 		else
 			tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
@@ -313,6 +402,23 @@ if ~isempty(headfreqs)
 	end;
 	fprintf('\n');
 
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot independant components
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	if ~isempty(g.weights)
+		% use headaxe from 2 to end (reserved earlier)
+		set(li(1), 'linewidth', 3); % make the line with the scalp topoplot thicker than others
+		for index = 1:length(g.icamaps)
+			axes(headax(index+1));
+			compnum = g.icamaps(index);
+			topoplot(g.icawinv(:,compnum),g.chanlocs,varargin{:}); 
+			tl=title(int2str(compnum));
+			set(tl,'fontsize',16);
+			axis square;
+			drawnow
+		end;
+	end;
+
 	%%%%%%%%%%%%%%%%
 	% Plot color bar
 	%%%%%%%%%%%%%%%%
@@ -320,7 +426,7 @@ if ~isempty(headfreqs)
 	pos = get(cb,'position');
 	set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
 	set(cb,'fontsize',12);
-	if isnan(limits(5))
+	if isnan(g.limits(5))
 		ticks = get(cb,'ytick');
 		[tmp zi] = find(ticks == 0);
 		ticks = [ticks(1) ticks(zi) ticks(end)];
@@ -332,8 +438,8 @@ end;
 %%%%%%%%%%%%%%%%
 % Draw title
 %%%%%%%%%%%%%%%%
-if ~isempty(titl)
-  tl = textsc(titl,'title');
+if ~isempty(g.title)
+  tl = textsc(g.title,'title');
   set(tl,'fontsize',15)
 end
 
@@ -341,3 +447,35 @@ end
 % Turn on axcopy
 %%%%%%%%%%%%%%%%
 axcopy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% function computing spectrum
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g);
+	nchans = size(data,1);
+	fftlength = 2^round(log(srate)/log(2))*g.freqfac;
+	for c=1:nchans
+		for e=epoch_subset
+			if strcmp(g.reref, 'averef')
+				[tmpspec,freqs] = psd(averef(matsel(data,frames,0,c,e)),fftlength,...
+									  srate,fftlength/2,fftlength/8);
+			else
+				[tmpspec,freqs] = psd(matsel(data,frames,0,c,e),fftlength,...
+									  srate,fftlength/2,fftlength/8);
+			end
+			if c==1 & e==epoch_subset(1)
+				eegspec = zeros(nchans,length(freqs));
+			end
+			%eegspec(c,:) = eegspec(c,:) + tmpspec';
+			eegspec(c,:) = eegspec(c,:) + log10(tmpspec');
+		end
+		fprintf('.')
+	end
+	epochs = round(size(data,2)/frames);
+	eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
+	%eegspecdB = 10*eegspec/epochs; % convert power to dB
+	return;
+% Before the linear summation was used 
+% ------------------------------------
+% eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
+% and in the loop eegspec(c,:) = eegspec(c,:) + tmpspec'
