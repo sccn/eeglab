@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.44  2003/07/21 22:04:09  arno
+%debug for Matlab 5.3
+%
 %Revision 1.43  2003/07/21 21:55:14  arno
 %fixing MNI brain for distribution
 %
