@@ -34,8 +34,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/11/26 17:00:56  arno
+% Initial revision
+%
 
-function chanlocs = readeetraklocs( filename)
+function chanlocs = readeetraklocs( filename )
     
     if nargin < 1
         help readeetraklocs;
