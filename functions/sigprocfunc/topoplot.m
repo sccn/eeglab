@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.240  2005/01/07 19:55:47  scott
+% remove traces of 'gridpos'
+%
 % Revision 1.239  2005/01/06 19:27:17  scott
 % implemented 'gridplot' | 'plotgrid' option
 %
@@ -897,6 +900,7 @@ if nargs > 2
               & ~strcmpi(ELECTRODES,'on') ...
               & ~strcmp(ELECTRODES,'labels') ...
               & ~strcmpi(ELECTRODES,'numbers') ...
+              & ~strcmpi(ELECTRODES,'labelpoint') ...
               & ~strcmpi(ELECTRODES,'numpoint') 
                 error('Unknown value for keyword ''electrodes''');
          end
