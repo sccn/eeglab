@@ -51,7 +51,9 @@
 %       'shuffle' = integer indicating the number of estimates to compute
 %                 bootstrap coherence based on shuffled trials. This estimates
 %                 the coherence arising only from time locking of x and y
-%                 to experimental events (opposite of 'subitc'). {default: 0}. 
+%                 to experimental events (opposite of 'subitc'). For cell array 
+%                 input, one may provide a cell array, for exemple { 1 0 }.
+%                 { default 0: no shuffling }.
 %
 %    Optional Detrend:
 %       'detret' = ['on'|'off'], Linearly detrend data within epochs. {'off'}
@@ -156,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/01/04 02:43:28  arno
+% catch error for fully non-significan image
+%
 % Revision 1.35  2003/01/04 02:16:21  arno
 % implementing optional different subitc option for different conditions
 %
@@ -588,7 +593,6 @@ g.plotphase  = lower(g.plotphase);
 g.plotbootsub = lower(g.plotbootsub);
 g.subitc     = lower(g.subitc);
 g.plotamp    = lower(g.plotamp);
-g.shuffle    = lower(g.shuffle);
 g.compute    = lower(g.compute);
 g.AXES_FONT  = 10;
 g.TITLE_FONT = 14;
@@ -643,7 +647,7 @@ switch g.boottype
 case { 'times' 'timestrials' 'trials'},;
 otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
 end;    
-if (~isnumeric(g.shuffle))
+if ~isnumeric(g.shuffle) & ~iscell(g.shuffle)
    error('Shuffle argument type must be numeric');
 end;
 switch g.compute
@@ -671,14 +675,18 @@ if iscell(X)
 	end;
     % deal with titles
     % ----------------
-	for index = 1:2:length(vararginori)
+	for index = length(vararginori)-1:-2:1
 		if index<=length(vararginori) % needed: if elemenets are deleted
 			if strcmp(vararginori{index}, 'title') , vararginori(index:index+1) = []; end;
 			if strcmp(vararginori{index}, 'subitc'), vararginori(index:index+1) = []; end;
+			if strcmp(vararginori{index}, 'shuffle'), vararginori(index:index+1) = []; end;
 		end;
 	end;
     if ~iscell(g.subitc)
         g.subitc = { g.subitc g.subitc };
+    end;
+    if ~iscell(g.shuffle)
+        g.shuffle = { g.shuffle g.shuffle };
     end;
 	if iscell(g.title) 
 		if length(g.title) <= 2,
@@ -697,12 +705,15 @@ if iscell(X)
         figure; 
         subplot(1,3,1); 
 	end;
+
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
-				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, 'subitc', g.subitc{1}, vararginori{:});
+				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:});
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
-				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, 'subitc', g.subitc{1},  vararginori{:});
+				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:});
 	end;
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
@@ -712,10 +723,12 @@ if iscell(X)
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
-				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, 'subitc', g.subitc{2}, vararginori{:});
+				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
-				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, 'subitc', g.subitc{2}, vararginori{:});
+				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
+                             shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
 	end;
 	%figure; imagesc(abs( sum( savecoher1 ./ abs(savecoher1), 3)) - abs( sum( savecoher2 ./ abs(savecoher2), 3)  )); cbar; return;
 	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
