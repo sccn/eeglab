@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/24 21:11:18  scott
+% added topoplots to plot -sm
+%
 % Revision 1.4  2002/04/10 01:27:12  arno
 % padratio=4 default
 %
@@ -167,11 +170,9 @@ tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
 %
 if ~isempty(EEG.chanlocs)
   if typeproc == 1
-      options = [options ', ''topovec'', ' int2str([num1 num2]) ', ...
-               ''elocs'', EEG.chanlocs' ];
+      options = [options ', ''topovec'', ' int2str([num1 num2]) ', ''elocs'', EEG.chanlocs' ];
   else
-      options = [options ', ''topovec'', EEG.icawinv(:,' int2str([num1 num2]) ...
-               '), ''elocs'', EEG.chanlocs' ];
+      options = [options ', ''topovec'', EEG.icawinv(:,' int2str([num1 num2]) '), ''elocs'', EEG.chanlocs' ];
   end;
 end;
 %
