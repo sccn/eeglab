@@ -10,7 +10,7 @@
 %   fieldlist - 3 or 4 columns cell array with one row per variable. The first
 %               column contain the variable name, the second one the type, 
 %                the third the accepted value range and the fourth one the 
-%               defaultvalue. Ex:
+%               defaultvalue. For instance
 %                  { 'varanme1' { 'value1' 'value2' } 'defaultvaluevar1' }
 %                  { 'varanme2' { int1 int2 } 'defaultvaluevar2' }
 %                  etc...
@@ -30,9 +30,9 @@
 %       instead of a structure.
 %
 % Example:
-%	finputcheck(varargin,
-%               { 'title'         'string'   []                       '';
-%                 'percent'       'real'     [0 1]                     1 ;
+%	finputcheck(varargin, ...
+%               { 'title'         'string'   []                       ''; ...
+%                 'percent'       'real'     [0 1]                     1 ; ...
 %                 'elecamp'       'integer'  [1:10]                   [] });
 %   'title' is a string with no default value
 %   'percent' is a real number in between 0 and 1 and default value 1
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/09/30 15:29:23  arno
+% autorizing cell arrays for types
+%
 % Revision 1.10  2002/09/30 00:42:08  arno
 % debug input arguments
 %
