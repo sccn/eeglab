@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/12 23:22:47  arno
+% header typo
+%
 % Revision 1.3  2002/11/12 19:08:02  arno
 % debugging
 %
@@ -131,7 +134,7 @@ data = reshape(data, dim1, dim2*dim3);
 if isempty(ref)
     if strcmp(g.method, 'withref')
         avematrix = eye(chans)-ones(chans)*1/(chans+1);
-        avematrix(end+1,:) = -1; % common reference channel
+        avematrix(end+1,:) = -1/(chans+1); % common reference channel
         if ~isempty(g.elocs)
             if (length(g.elocs) == chans) & ~isempty(g.refloc)
                 g.elocs(end+1).labels = g.refloc{1};
