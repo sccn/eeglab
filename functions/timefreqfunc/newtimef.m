@@ -45,7 +45,9 @@
 %    Optional FFT/DFT Parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: *longest* window length to use. This
-%                      determines the lowest output frequency  {~frames/8}
+%                      determines the lowest output frequency. Note that this
+%                     parameter is overwritten if the minimum frequency requires
+%                     a longer time window {~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes) {200}
 %       'padratio'  = FFT-length/winframes (2^k)                    {2}
 %                      Multiplies the number of output frequencies by
@@ -154,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/06/18 00:37:02  arno
+% debuging lowmem
+%
 % Revision 1.35  2003/06/17 23:19:12  arno
 % j -> jj
 %
