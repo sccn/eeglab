@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.48  2003/07/31 23:37:07  arno
+%adding property to structure attatched to dipole
+%
 %Revision 1.47  2003/07/31 23:30:05  arno
 %*** empty log message ***
 %
@@ -445,12 +448,23 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         end;
     end;
     
+    % color array
+    % -----------
+    if isempty(g.color)
+        g.color = { 'g' 'b' 'r' 'm' 'c' 'y' };
+        if strcmp(BACKCOLOR, 'w'), g.color = { g.color{:} 'k' }; end;
+    end;
+    g.color = g.color(mod(0:length(sources)-1, length(g.color)) +1);
+    if ~iscell(g.color)
+        error('dipplot: ''color'' must be a cell array');
+    end;
+    
     % build summarized figure
     % -----------------------
     if strcmp(g.summary, 'on')
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength, ...
-                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image };
+                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen };
         axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off;
         axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off;
         axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off;
@@ -483,16 +497,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         axis off;
         return;
     end;
-    
-    if isempty(g.color)
-        g.color = { 'g' 'b' 'r' 'm' 'c' 'y' };
-        if strcmp(BACKCOLOR, 'w'), g.color = { g.color{:} 'k' }; end;
-    end;
-    g.color = g.color(mod(0:length(sources)-1, length(g.color)) +1);
-    if ~iscell(g.color)
-        error('dipplot: ''color'' must be a cell array');
-    end;
-    
+        
     % plot head graph in 3D
     % ---------------------
     if strcmp(g.gui, 'on')
