@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/12/10 18:15:11  arno
+% msg
+%
 % Revision 1.39  2003/11/24 20:58:50  arno
 % debug last modif
 %
@@ -291,13 +294,6 @@ if length(g.freqs) == 2
         g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
         if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end;
     end;
-    
-    if strcmpi(g.freqscale, 'log')
-        g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
-        g.freqs = exp(g.freqs);
-    else
-        g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
-    end;
 end;
 
 % find closest freqs for FFT
@@ -306,6 +302,13 @@ if g.cycles == 0
     tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
     if g.freqs(1)==g.freqs(2), g.freqs = g.freqs(1); 
     else g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
+    end;
+else 
+    if strcmpi(g.freqscale, 'log')
+        g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
+        g.freqs = exp(g.freqs);
+    else
+        g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
     end;
 end;
 g.nfreqs = length(g.freqs);
