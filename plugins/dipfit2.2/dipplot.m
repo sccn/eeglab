@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.84  2004/05/05 15:25:41  scott
+%typo
+%
 %Revision 1.83  2004/05/05 15:24:50  scott
 %typo
 %,
@@ -427,7 +430,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'spheres'    'string'  {'on' 'off'}       'off';
                                  'spheresize'  'real'   [0 Inf]             5;
                                  'links'       'real'   []                  [];
-                                 'image'       'string' []                 'mri' }, ...
+                                 'image'       { 'string' 'real'} []                 'mri' }, ...
                                                                                     'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
