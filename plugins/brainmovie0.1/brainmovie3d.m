@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/07/03 00:23:01  arno
+% Initial revision
+%
 
 function brainmovie3d(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
     
@@ -760,8 +763,8 @@ for indeximage = alltimepoints
     % -----------------
     lighting phong;
     material shiny;
-    for index = 1:length(c), axes(c(index)); end;
-    axes(c(1)); setfont(gca, 'color', 'w');
+    %for index = 1:length(c), axes(c(index)); end;
+    %axes(c(1)); setfont(gca, 'color', 'w');
 
 	% save the file for a movie
 	% -------------------------
