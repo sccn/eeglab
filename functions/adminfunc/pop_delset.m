@@ -34,6 +34,9 @@
 % uses the global variable ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/23 19:09:45  arno
+% debuging for pop_delset standalone call
+%
 % Revision 1.2  2002/04/23 19:00:30  arno
 % making delset.m standalone
 %
@@ -87,5 +90,5 @@ for i = set_in
 	end;
 end;
     
-command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), int2str(set_in));
+command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), inputname(1), int2str(set_in));
 return;
