@@ -148,8 +148,8 @@
 % eeg_rejsuperpose()   - use by rejmenu to superpose all rejections
 % eeg_rejmacro()       - used by all rejection functions
 % pop_rejmenu()        - rejection menu (with all rejection methods visible)
-% eeg_retrieve()       - retrieve dataset from ALLSET
-% eeg_store()          - store dataset into ALLSET
+% eeg_retrieve()       - retrieve dataset from ALLEEG
+% eeg_store()          - store dataset into ALLEEG
 % eeg_updatemenu()     - update eeglab() gui
 %
 % Help functions:
@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2002/07/13 00:12:26  arno
+% debugging close
+%
 % Revision 1.71  2002/07/12 23:59:42  arno
 % removing close satatement when creating a new eeglab
 %
@@ -877,7 +880,7 @@ end;
 
 if (isempty(EEG) | isempty(EEG.data)) & CURRENTSET ~= 0 & option_keepdataset
 	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
-	EEG = eeg_retrieve(ALLSET, CURRENTSET);	
+	EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;	
 
 % print some informations on the main figure
