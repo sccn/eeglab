@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/01/26 00:47:52  scott
+% same
+%
 % Revision 1.28  2004/01/26 00:45:14  scott
 % improved listing of pvaf in Matlab command window
 %
@@ -510,12 +513,16 @@ if strcmpi(g.pvaf, 'on')
     [sortpvaf spx] = sort(pvaf);
     spx = spx(end:-1:1);
     sortpvaf = pvaf(spx);
+    k = 1;
     for index =1:ncomps-ntopos
-        fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
+        fprintf('   IC%d pvaf: %6.2f%%      ', pvafcomps(index),sortpvaf(index));
+        if rem(k,3)==0
+          fprintf('\n')
+        end
     end;
-    fprintf('Imaged componentsL\n')
+    fprintf('\nHighest-contributing %d components:\n',ntopos)
     for index =ncomps-ntopos+1:ncomps
-        fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
+        fprintf('  IC%d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
     end;
 end;
 %
