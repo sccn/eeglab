@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2004/10/08 19:03:14  hilit
+% added 'title' option
+%
 % Revision 1.64  2004/03/22 03:27:49  scott
 % removing topoplot shrink mode - topoplot default now shows all channels
 %
@@ -563,7 +566,7 @@ hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 axes(imgax)
 xl=xlabel('Time (ms)');
-set(xl,'fontsize',16);
+set(xl,'fontsize',12);
 set(gca,'yaxislocation','left')
 if g.showchan>0
    % tl=title(['Channel ',int2str(g.showchan)]);
@@ -577,13 +580,13 @@ else
     if isfield(g, 'title') %user title
         tl = title(g.title);
     end
-  set(tl,'fontsize',14);
+  set(tl,'fontsize',12);
 end
 
 yl=ylabel(['Frequency (Hz)']);
-set(yl,'fontsize',16);
+set(yl,'fontsize',12);
 
-set(gca,'fontsize',14)
+set(gca,'fontsize',12)
 set(gca,'ydir','normal');
 
 for indtime = g.vert
