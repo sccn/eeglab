@@ -5,7 +5,7 @@
 %
 % Note: About EDF -> www.biosemi.com/faq/file_format.htm
 %
-% Author: Alois Schloegl
+% Author: Alois Schloegl, 5.Nov.1998
 %
 % See also: readedf()
 

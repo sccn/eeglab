@@ -1,12 +1,17 @@
-function [DAT,S]=readbdf(DAT,Records,Mode)
-% [DAT,signal]=readedf(EDF_Struct,Records)
-% Loads selected Records of an EDF File (European Data Format for Biosignals) into MATLAB
-% <A HREF="http://www.medfac.leidenuniv.nl/neurology/knf/kemp/edf.htm">About EDF</A> 
+% readedf() -  Loads selected Records of an EDF File 
+%              (European Data Format for Biosignals) into MATLAB
 %
-% Records1	List of Records for Loading
-% Mode		0 	default
-%		1 	No AutoCalib
-%		Mode+2	Concatanated (channels with lower sampling rate if more than 1 record is loaded)
+% Usage: [DAT,signal] = readedf(EDF_Struct,Records)
+%
+% Notes:
+%   Records1	List of Records for Loading
+%   Mode		0 	default
+%	        	1 	No AutoCalib
+%	Mode+2	Concatanated (channels with lower sampling rate if more than 1 record is loaded)
+%
+% Author: Alois Schloegl, 03.02.1998
+%
+% See also: openedf()
 
 %	Version 2.11
 %	03.02.1998
@@ -35,6 +40,7 @@ function [DAT,S]=readbdf(DAT,Records,Mode)
 % T.S. Lorig Sept 6, 2002
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+function [DAT,S]=readbdf(DAT,Records,Mode)
 if nargin<3 Mode=0; end;
  
 EDF=DAT.Head; 
