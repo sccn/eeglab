@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/04/28 23:01:13  arno
+% *** empty log message ***
+%
 % Revision 1.1  2003/04/28 22:46:49  arno
 % Initial revision
 %
@@ -54,11 +57,11 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
     if length(cycles) == 1
         cycles = cycles*ones(size(freqs));
     elseif length(cycles) == 2
-        if nargin == 5 & strcmpi(cycleinc, 'linear') % cycleinc
-            cycles = linspace(cycles(1), cycles(2), length(freqs));
-        else
+        if nargin == 4 & strcmpi(cycleinc, 'log') % cycleinc
             cycles = linspace(log(cycles(1)), log(cycles(2)), length(freqs));
             cycles = exp(cycles);
+        else
+            cycles = linspace(cycles(1), cycles(2), length(freqs));
         end;
     end;
     
@@ -73,7 +76,7 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
         winlen = cycles(index)*srate/freqs(index);
         winlenint = floor(winlen);
         if mod(winlenint,2) == 1, winlenint = winlenint+1; end; 
-        winval = linspace(-winlenint/2, winlenint/2, winlenint+1);        
+        winval = linspace(winlenint/2, -winlenint/2, winlenint+1);        
         
         win = exp(2i*pi*freqs(index)*winval/srate);
         wavelet{index} = win .* hanning(length(winval))';
@@ -100,4 +103,23 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
     abs4 = linspace(-floor(length(wav4)),floor(length(wav4)), length(wav4)); 
     hold on; plot(abs4, real(wav4), 'm');
     
+    % more testing
+    % ------------
+    freqs = exp(linspace(0,log(10),10));
+    win = dftfilt2(freqs, [3 10], 256, 'linear'); size(win)
     
+    freqs = [12.0008   13.2675   14.5341   15.8007   17.0674   18.3340   19.6007   20.8673   22.1339   23.4006   24.6672   25.9339   27.2005 28.4671   29.7338   31.0004   32.2670   33.5337   34.8003   36.0670   37.3336   38.6002   39.8669   41.1335   42.4002   43.6668 44.9334   46.2001   47.4667 ...
+             48.7334   50.0000];
+    
+    win = dftfilt2(freqs, [3 12], 256, 'linear'); size(win)
+    winsize = 0;
+    for index = 1:length(win)
+        winsize = max(winsize,length(win{index}));
+    end;
+    allwav = zeros(winsize, length(win));
+    for index = 1:length(win)
+        wav1 = win{index};
+        abs1 = linspace(-(length(wav1)-1)/2,(length(wav1)-1)/2, length(wav1));
+        allwav(abs1+(winsize+1)/2,index) = wav1(:);
+    end;
+    figure; imagesc(imag(allwav));
