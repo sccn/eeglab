@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.206  2003/01/03 22:09:15  arno
+% nothing
+%
 % Revision 1.205  2002/11/18 02:39:43  arno
 % allowing pop_rmbase to baseline portion of continuous data
 %
@@ -1088,32 +1091,31 @@ H_MAIN(1) = uicontrol('Parent',W_MAIN, ...
 	'Style','frame', ...
    'Tag','Frame1');
 
-geometry = { [1] [1] [1] [1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1] };
+geometry = { [1] [1] [1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1] };
 listui = { { 'style', 'text', 'string', 'Parameters of the current set', 'tag', 'win0' } { } ...
-		   { 'style', 'text', 'tag', 'win1', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win2', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win3', 'string', 'Channels per frame'} ...
-		   { 'style', 'text', 'tag', 'val3', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win4', 'string', 'Frames per epoch'} ...
-		   { 'style', 'text', 'tag', 'val4', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win5', 'string', 'Epochs'} ...
-		   { 'style', 'text', 'tag', 'val5', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win6', 'string', 'Events'} ...
-		   { 'style', 'text', 'tag', 'val6', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win7', 'string', 'Sampling rate (Hz)' } ...
-		   { 'style', 'text', 'tag', 'val7', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win8', 'string', 'Epoch start (sec)' } ...
-		   { 'style', 'text', 'tag', 'val8', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win9', 'string', 'Epoch end (sec)' } ...
-		   { 'style', 'text', 'tag', 'val9', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win10', 'string', 'Average reference' } ...
-		   { 'style', 'text', 'tag', 'val10', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win11', 'string', 'Channel locations'} ...
-		   { 'style', 'text', 'tag', 'val11', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win12', 'string', 'ICA weights'  } ...
-		   { 'style', 'text', 'tag', 'val12', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win13', 'string', 'Dataset size (Mb)' } ...
-		   { 'style', 'text', 'tag', 'val13', 'string', ' ' } {} };
+		   { 'style', 'text', 'tag', 'win1', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win2', 'string', 'Channels per frame', 'userdata', 'datinfo'} ...
+		   { 'style', 'text', 'tag', 'val2', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win3', 'string', 'Frames per epoch', 'userdata', 'datinfo'} ...
+		   { 'style', 'text', 'tag', 'val3', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win4', 'string', 'Epochs', 'userdata', 'datinfo'} ...
+		   { 'style', 'text', 'tag', 'val4', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win5', 'string', 'Events', 'userdata', 'datinfo'} ...
+		   { 'style', 'text', 'tag', 'val5', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win6', 'string', 'Sampling rate (Hz)', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'val6', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win7', 'string', 'Epoch start (sec)', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'val7', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win8', 'string', 'Epoch end (sec)', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'val8', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win9', 'string', 'Average reference', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'val9', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win10', 'string', 'Channel locations', 'userdata', 'datinfo'} ...
+		   { 'style', 'text', 'tag', 'val10', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win11', 'string', 'ICA weights', 'userdata', 'datinfo'  } ...
+		   { 'style', 'text', 'tag', 'val11', 'string', ' ', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'win12', 'string', 'Dataset size (Mb)', 'userdata', 'datinfo' } ...
+		   { 'style', 'text', 'tag', 'val12', 'string', ' ', 'userdata', 'datinfo' } {} };
 supergui(gcf, geometry, [], listui{:});
 geometry = { [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] };
 listui = { { } ...
@@ -1268,63 +1270,69 @@ end;
 % ------------------------------------------
 g = myguihandles(gcf);
 if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
-	hh = findobj('parent', gcf, 'userdata', 'fullline');
-	set(hh, 'visible', 'off');
+	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
+	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
 	
-	if CURRENTSET == 0
-		set( g.win0, 'String', sprintf('Parameters of %s dataset', ...
-										  fastif(EEG.trials > 1, 'epoched', 'continuous')));	
-	else  
-		set( g.win0, 'String', sprintf('Parameters of %s dataset %d', ...
-										  fastif(EEG.trials > 1, 'epoched', 'continuous'), CURRENTSET));	
+	if CURRENTSET == 0, strsetnum = '';
+	else                strsetnum = ['#' int2str(CURRENTSET) ': '];
 	end;
+    maxchar = 28;
+    if ~isempty( EEG.setname )
+        if length(EEG.setname) > maxchar+2
+             set( g.win0, 'String', [strsetnum EEG.setname(1:min(maxchar,length(EEG.setname))) '...' ]);
+        else set( g.win0, 'String', [strsetnum EEG.setname ]);
+        end;
+    else
+        set( g.win0, 'String', [strsetnum '(no dataset name)' ] );
+    end;
+
 	% set( g.win3, 'String', '');
 	% set( g.win3, 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
-	set( g.win1, 'String', sprintf('Dataset name: %s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
+	%set( g.win1, 'String', sprintf('Dataset name: %s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
     fullfilename = [ EEG.filepath EEG.filename];
 	if ~isempty(fullfilename)
 		if length(fullfilename) > 30
-			set( g.win2, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
+			set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
 		else
-			set( g.win2, 'String', sprintf('Filename: %s\n', fullfilename));
+			set( g.win1, 'String', sprintf('Filename: %s\n', fullfilename));
 		end;        	
 	else
-		set( g.win2, 'String', sprintf('Filename: none\n'));
+		set( g.win1, 'String', sprintf('Filename: none\n'));
 	end;
-	set( g.win3, 'String', 'Channels per frame');
-	set( g.win4, 'String', 'Frames per epoch');
-	set( g.win5, 'String', 'Epochs');
-	set( g.win6, 'String', 'Events');
-	set( g.win7, 'String', 'Sampling rate (Hz)');
-	set( g.win8, 'String', 'Epoch start (sec)');
-	set( g.win9, 'String', 'Epoch end (sec)');
-	set( g.win10, 'String', 'Average reference');
-	set( g.win11, 'String', 'Channel locations');
-	set( g.win12, 'String', 'ICA weights');
-	set( g.win13, 'String', 'Dataset size (Mb)');
+	set( g.win2, 'String', 'Channels per frame');
+	set( g.win3, 'String', 'Frames per epoch');
+	set( g.win4, 'String', 'Epochs');
+	set( g.win5, 'String', 'Events');
+	set( g.win6, 'String', 'Sampling rate (Hz)');
+	set( g.win7, 'String', 'Epoch start (sec)');
+	set( g.win8, 'String', 'Epoch end (sec)');
+	set( g.win9, 'String', 'Average reference');
+	set( g.win10, 'String', 'Channel locations');
+	set( g.win11, 'String', 'ICA weights');
+	set( g.win12, 'String', 'Dataset size (Mb)');
 	
-	set( g.val3, 'String', int2str(fastif(isempty(EEG.data), 0, size(EEG.data,1))));
-	set( g.val4, 'String', int2str(EEG.pnts));
-	set( g.val5, 'String', int2str(EEG.trials));
-	set( g.val6, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
-	set( g.val7, 'String', int2str( round(EEG.srate)) );
+	set( g.val2, 'String', int2str(fastif(isempty(EEG.data), 0, size(EEG.data,1))));
+	set( g.val3, 'String', int2str(EEG.pnts));
+	set( g.val4, 'String', int2str(EEG.trials));
+	set( g.val5, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
+	set( g.val6, 'String', int2str( round(EEG.srate)) );
 	if round(EEG.xmin) == EEG.xmin & round(EEG.xmax) == EEG.xmax
-		set( g.val8, 'String', sprintf('%d\n', EEG.xmin));
-		set( g.val9, 'String', sprintf('%d\n', EEG.xmax));
+		set( g.val7, 'String', sprintf('%d\n', EEG.xmin));
+		set( g.val8, 'String', sprintf('%d\n', EEG.xmax));
 	else 
-		set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmin));
-		set( g.val9, 'String', sprintf('%6.3f\n', EEG.xmax));
+		set( g.val7, 'String', sprintf('%6.3f\n', EEG.xmin));
+		set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmax));
 	end;
-	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
-	%set( g.val9, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
-	set( g.val10, 'String', fastif(strcmpi(EEG.ref, 'common'), 'No', 'Yes'));
-	set( g.val11, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
-	set( g.val12, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
+	%set( g.val7, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
+	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
+	set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'common'), 'No', 'Yes'));
+	set( g.val10, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
+	set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
 	tmp = whos('EEG');
-	set( g.val13, 'String', num2str(round(tmp.bytes/1E6*10)/10));
+	set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
 else
-	hh = findobj('parent', gcf, 'userdata', 'fullline');
-	set(hh, 'visible', 'on');
+	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
+	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'off');
 	set( g.win0, 'String', 'No current dataset');
 	set( g.mainwin1, 'String', '- Create a new or load an existing dataset:');
 	set( g.mainwin2, 'String', '   Use "File > Import data"           (new)'); 
