@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/07/01 22:10:58  arno
+% using julie's head
+%
 % Revision 1.5  2004/07/01 22:10:19  arno
 % renormalize
 %
@@ -230,8 +233,7 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-DEFAULT_MESH = ['/data/common/matlab/miscfunc/arno/mhead.mat'];      % upper head model file (987K)
-DEFAULT_MESH = ['/home/arno/matlab/headplot/mhead2.mat'];      % upper head model file (987K)
+DEFAULT_MESH = ['mhead.mat'];      % upper head model file (987K)
 %DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
 %DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
