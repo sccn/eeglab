@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/06/02 17:38:41  arno
+% index of index problem
+%
 % Revision 1.17  2004/06/02 17:26:53  arno
 % index to old event
 %
@@ -141,8 +144,14 @@ if ~isempty(tmpalllatencies)
 
 	tmpnanloc = find(isnan(tmpalllatencies));
 	EEG.event(indold(tmpnanloc)) = [];
-	fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
-			length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
+    
+    if length(EEG.event) > length(indold)
+        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', length(EEG.event)-length(indold));
+    end;
+    if length(tmpnanloc) > 0
+        fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', ...
+                length(tmpnanloc));
+    end;
 end;
 EEG.icaact = [];
  
