@@ -2,15 +2,20 @@
 %
 % Usage:
 %   >> EEGOUT = pop_importpres( EEGIN, filename );
-%   >> EEGOUT = pop_importpres( EEGIN, filename, typefield, align );
+%   >> EEGOUT = pop_importpres( EEGIN, filename, typefield, ...
+%                                  latfield, durfield, align, 'key', 'val', ... );
 %
 % Inputs:
 %   EEGIN          - input dataset
 %   filename       - file name
 %   typefield      - [string] type field name. Default is 'code'.
 %   latfield       - [string] latency field name. Default is 'time'.
+%   durfield       - [string] duration field name. Default is 'none'.
 %   align          - [integer] alignment with preexisting events
 %                    see pop_importevent().
+%   'key','val'    - This function calls pop_importevent(). These are
+%                    optional arguments for this function (for event 
+%                    alignment for instance).
 % 
 % Outputs:
 %   EEGOUT         - data structure
@@ -19,9 +24,12 @@
 %          this function will recalculate the latency of the events
 %          in the Presentation file, so that they match the one
 %          of the pre-existing events.
-%       2) This function calls pop_importevent()
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2002
+%
+% Note: this function is backward compatible (before the input
+%       'durfield' was introduced) and can take 'align' as the 
+%       5th paramter (instead of 6th parameter).
 %
 % See also: eeglab(), pop_importevent()
 
@@ -44,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/03/19 00:48:16  arno
+% propagate varargin
+%
 % Revision 1.14  2004/01/29 01:51:16  arno
 % debug cancel button
 %
@@ -87,7 +98,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, align, varargin); 
+function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, durfield, align, varargin); 
 command = '';
 
 if nargin < 1 
@@ -95,8 +106,21 @@ if nargin < 1
     return
 end;
 
+% decode input (and backward compatibility)
+% -----------------------------------------
 if nargin < 5
-    align = 0;
+    durfield = '';
+end;
+if nargin >= 5 & ~isstr(durfield)
+    if nargin >= 6
+        varargin = { align varargin{:} };
+    end;
+    align = durfield;
+    durfield = '';
+else
+    if nargin < 6
+        align = 0;
+    end;
 end;
 
 if nargin < 2 
@@ -118,25 +142,37 @@ if nargin > 1
     end;
     indtype  = strmatch(lower(typefield), lower(fields));
     indlat   = strmatch(lower(latfield) , lower(fields));
+    if ~isempty(durfield)
+         inddur   = strmatch(lower(durfield) , lower(fields));
+    else inddur = 0;
+    end;
 else
     indtype1   = strmatch('event type', lower(fields));
     indtype2   = strmatch('code', lower(fields));
     indtype    = [ indtype1 indtype2 1];
     indlatency = strmatch('time', lower(fields), 'exact');
     indlatency = [ indlatency 1 ];
-    uilist = { { 'style' 'text' 'string' 'File field containing event types' } ...
+    uilist = { { 'style' 'text' 'string' [ 'File field containing event types' 10 '' ] } ...
                { 'style' 'list' 'string' strvcat(fields) 'value' indtype(1)  'listboxtop' indtype(1)} ...
-               { 'style' 'text' 'string' 'File field containing event latencies' } ...
+               { 'style' 'text' 'string' [ 'File field containing event latencies' 10 '' ] } ...
                { 'style' 'list' 'string' strvcat(fields) 'value' indlatency(1) 'listboxtop' indlatency(1) } ...
-               { } { 'style' 'text' 'string' 'Note: scroll list then click to select field' } };
-    uigeom = { [2 1] [2 1] 1 1 };
-    result = inputgui(uigeom, uilist, 'pophelp(''pop_importpres'')', 'Import presentation file - pop_importpres()');
+               { 'style' 'text' 'string' [ 'File field containing event durations' 10 '' ] } ...
+               { 'style' 'list' 'string' strvcat({ 'None' fields{:} }) 'value' 1 'listboxtop' 1 } ...
+               { } { 'style' 'text' 'string' 'Note: scroll lists then click to select field' } };
+    uigeom = { [2 1] [2 1] [2 1] 1 1 };
+    result = inputgui(uigeom, uilist, 'pophelp(''pop_importpres'')', 'Import presentation file - pop_importpres()', ...
+                      [], 'normal', [2 2 2 1 1]);
     if isempty(result), return; end;
     
     indtype = result{1};
     indlat  = result{2};
+    inddur  = result{3}-1;
     typefield = fields{indtype};
     latfield  = fields{indlat};
+    if inddur ~= 0
+         durfield  = fields{inddur};
+    else durfield  = '';
+    end;
 end;
 if isempty(indtype)
     error(['Could not detect field ''' typefield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
@@ -148,6 +184,9 @@ disp(['Replacing field ''' typefield ''' by ''type'' for EEGLAB compatibility'])
 disp(['Replacing field ''' latfield  ''' by ''latency'' for EEGLAB compatibility']);
 fields{indtype} = 'type';
 fields{indlat}  = 'latency';
+if inddur ~= 0
+    fields{inddur}  = 'duration';
+end;
 
 % regularizing field names
 % ------------------------
@@ -186,6 +225,6 @@ if isempty(EEG.event), align = NaN; end;
 EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields, varargin{:});
 
-command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield align })); 
+command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield durfield align })); 
 
 return;
