@@ -6,17 +6,18 @@
 %     
 % Inputs:            
 %   INEEG    - Input EEG dataset
-%   typeproc - Type of processing: 1 process two raw-data channels,
-%              0 process ICA components
+%   typeproc - Type of processing: 
+%                1 = process two raw-data channels,
+%                0 = process ICA components
 %   num1     - First component or channel number
 %   num2     - Second component or channel number
 %   tlimits  - [mintime maxtime] (in ms) Sub-epoch time limits
-%   cycles   -  >0 -> Number of cycles in each analysis wavelet 
+%   cycles   - >0 -> Number of cycles in each analysis wavelet 
 %               0 -> Use FFTs (with constant window length)
 %
-% Optional inputs: same as the crossf() function.
+% Optional inputs: As for crossf().  See >> help crossf
 %    
-% Outputs: same as crossf(), no outputs are returned when a
+% Outputs: Same as crossf(). No outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 11 March 2002
@@ -42,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/10 01:27:12  arno
+% padratio=4 default
+%
 % Revision 1.3  2002/04/09 19:28:43  arno
 % modifying argument passing
 %
@@ -158,6 +162,19 @@ end;
 tmpsig1 = reshape( tmpsig1, 1, size(tmpsig1,2)*size(tmpsig1,3));
 tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
 
+% add topoplot
+% ------------
+%
+if ~isempty(EEG.chanlocs)
+  if typeproc == 1
+      options = [options ', ''topovec'', ' int2str([num1 num2]) ', ...
+               ''elocs'', EEG.chanlocs' ];
+  else
+      options = [options ', ''topovec'', EEG.icawinv(:,' int2str([num1 num2]) ...
+               '), ''elocs'', EEG.chanlocs' ];
+  end;
+end;
+%
 % outputs
 % -------
 outstr = '';
