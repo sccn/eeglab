@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.188  2002/11/09 18:33:08  scott
+% BESA menu item edit
+%
 % Revision 1.187  2002/11/09 18:24:45  scott
 % BESA menu item titles
 %
@@ -804,6 +807,7 @@ checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM
 checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' e_try];
 checkepoch        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' e_try];
 checkevent        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' e_try];
+checkbesa         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa''); h(''% no history yet for BESA dipole localization'');' e_try];
 checkepochica     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica''); h(LASTCOM);' e_try];
 checkplot         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM);' e_try];
 checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' e_try];
@@ -884,12 +888,12 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 
 if besamenu
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Locate dipoles using BESA');
-	uimenu( fourth_sub3, 'Label', 'Export components to BESA'   , 'CallBack', [ 'besaexport(EEG);']);
-	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'   , 'CallBack', [ check 'EEG = besaimport(EEG);' e_store]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles on BESA head'   , 'CallBack', [ 'besaplot(EEG.sources);']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'  , 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on MRI', 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
+	uimenu( fourth_sub3, 'Label', 'Export components to BESA'     , 'CallBack', [ checkbesa 'besaexport(EEG);' e_hist ]);
+	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'      , 'CallBack', [ checkbesa 'EEG = besaimport(EEG);' e_store]);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles on BESA head'     , 'CallBack', [ checkbesa 'besaplot(EEG.sources);' e_hist]);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'      , 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''image'', ''mri'');' e_hist]);
+	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');' e_hist]);
+	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on MRI'    , 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');' e_hist]);
 end;
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
