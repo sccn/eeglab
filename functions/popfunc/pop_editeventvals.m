@@ -27,7 +27,7 @@
 % Ex:  EEG = pop_editeventvals(EEG,'changefield', { 1 'type' 'target'});
 %        % set field type of event number 1 to 'target'
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2002
+% Author: Arnaud Delorme & Hilit Serby, SCCN, UCSD, 15 March 2002
 %
 % See also: pop_selectevent(), pop_importevent()
 
@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2004/06/17 19:36:47  arno
+% adding check ur to the GUI
+%
 % Revision 1.33  2004/06/16 21:39:18  arno
 % checking urevent consistency
 %
