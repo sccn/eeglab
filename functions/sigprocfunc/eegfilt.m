@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/23 23:40:59  arno
+% implementing notch filter
+%
 % Revision 1.4  2002/08/09 14:55:36  arno
 % update transition band
 %
@@ -163,7 +166,7 @@ else
  help eegfilt
  return
 end
-if revfilt
+if ~isempty(revfilt) & revfilt
     m = ~m;
 end;
 
