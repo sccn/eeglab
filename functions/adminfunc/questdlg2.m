@@ -3,6 +3,10 @@
 %
 % Usage: same as questdlg()
 %
+% Warning: 
+% Case of button text and result might be changed by the function
+%         
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 11 August 2002
 %
 % See also: inputdlg2(), errordlg2(), supergui(), inputgui()
@@ -26,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/15 14:35:52  arno
+% default case for buttons
+%
 % Revision 1.7  2002/08/14 18:17:00  arno
 % new supergui arg
 %
@@ -68,8 +75,6 @@ listui = {{ 'Style', 'text', 'string' Prompt }};
 
 geometry = { geometry{:} ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
-    varargin{index} = lower(varargin{index});
-    varargin{index}(1) = upper(varargin{index}(1));
 	listui = {listui{:} { 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
