@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/04/23 16:41:14  arno
+% flipping back y and x
+%
 % Revision 1.29  2003/04/23 16:39:42  arno
 % flipping coordinate sign
 % ,
@@ -390,7 +393,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
-    coordinates(:,1) = -coordinates(:,1);
+
     brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
                          'resolution', 'low', ...
                         'coordinates', coordinates, ...
@@ -420,7 +423,6 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
-    coordinates(:,2) = -coordinates(:,2);
     
     brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
                          'resolution', 'low', ...
@@ -616,6 +618,6 @@ function coordinates = founddipoles(ALLEEG, comps)
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
         end;            
         coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
-        coordinates(index,2) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
+        coordinates(index,2) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
         coordinates(index,3) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,3);
     end;
