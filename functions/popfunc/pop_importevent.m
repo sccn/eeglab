@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/12/11 19:42:45  arno
+% debuging auto alignment
+%
 % Revision 1.26  2003/12/11 02:54:10  arno
 % automatic alignment
 %
@@ -279,7 +282,7 @@ if nargin<2
 
 	    % handle alignment 
 	    % ----------------     
-	    if ~isempty(eval(results{end-1})), if eval(results{end-1}) ~= 0,  args = { args{:}, 'align', eval(results{end-1}) }; end; end;
+	    if ~isempty(eval(results{end-1})), if ~isnan(eval(results{end-1})),  args = { args{:}, 'align', eval(results{end-1}) }; end; end;
 	    if ~results{end} ~= 0,  args = { args{:}, 'optimalign', 'off' }; end;
         
 else % no interactive inputs
@@ -473,7 +476,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         fprintf(align.txt);
         fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
     end;
-    if strcmpi(optimalign, 'on')
+    if strcmpi(optimalign, 'on') & ~isempty(oldevents)
         newlat = cell2mat({ event.latency     });
         oldlat = cell2mat({ oldevents.latency });
        
@@ -500,7 +503,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
     else
         newfactor = 1;
     end;
-    if ~isnan( align.val ) & newfactor ~= 1
+    if ~isnan( align.val ) & newfactor ~= 1 
         if align.val >= 0
             latfirstevent = event(1).latency;
         else
@@ -509,8 +512,10 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         for index = setdiff(indices, 1)
             event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
         end;
-        fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
-        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
+        if ~isempty(oldevents)
+            fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
+            fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
+        end;
     else
         for index = indices
             event(index).latency = round(event(index).latency*newfactor);
