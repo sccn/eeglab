@@ -1,8 +1,7 @@
 % read_erpss() - read an uncompressed ERPSS-format file (.RAW or .RDF) 
-%
+%                
 % Usage: 
-%   >> [data,events,datasize] = read_erpss(filename);
-%
+%         >> [data,events,datasize] = read_erpss(filename);
 % Inputs:
 %   filename - Name of uncompressed ERPSS data file (including extension) 
 %
@@ -16,8 +15,8 @@
 %              datasize.nchans   Number of channels
 %              datasize.nframes  Number of data frames (i.e., samples, timepoints)
 %
-% Notes: ERPSS format was developed by Jonathan Hansen at the Hillyard ERP lab 
-%        of UCSD (http://sdepl.ucsd.edu/erpss/).
+% Notes: ERPSS format was developed by Jonathan Hansen at the Hillyard lab 
+%              at UCSD (http://sdepl.ucsd.edu/erpss/).
 %
 % Authors: Jeng-Ren Duann, Arnaud Delorme, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov
