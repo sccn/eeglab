@@ -43,6 +43,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/06/29 01:25:09  arno
+% adding besa compatibility
+% ,
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -113,6 +117,8 @@ else
 			c(e) = 180*r;
 		end
 	end;
+	t = t';
+	r = r';
 end;
 
 for e=1:size(E,1)
