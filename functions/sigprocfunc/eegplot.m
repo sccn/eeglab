@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2002/10/22 17:25:56  arno
+% add max for selecting regions
+%
 % Revision 1.60  2002/10/22 17:12:38  arno
 % debug 0 limit
 %
@@ -516,7 +519,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'YColor',DEFAULT_AXIS_COLOR);
 
   if isstr(g.eloc_file) | isstruct(g.eloc_file)  % Read in electrode names
-     eegplot('setelect', g.eloc_file, ax1);
+      if isstruct(g.eloc_file) & length(g.eloc_file) > size(data,1)
+          g.eloc_file(end) = []; % common reference channel location
+      end;
+      eegplot('setelect', g.eloc_file, ax1);
   end;
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1388,7 +1394,7 @@ else
     end
     
 	[tmp YLabels] = readlocs(eloc_file);
-	YLabels = strvcat(YLabels);
+    YLabels = strvcat(YLabels);
     
     YLabels = flipud(str2mat(YLabels,' '));
     set(axeshand,'YTickLabel',YLabels)
