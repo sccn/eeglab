@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 16:01:24  scott
+% editted msgs -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -73,8 +76,7 @@ end;
 if nargin < 2 
     % popup window parameters
     % -----------------------
-    promptstr    = { [ 'ICA algorithm to use [ runica | binica | jader | fastICA ]' 10 ...
-                       '' ] ...
+    promptstr    = { [ 'ICA algorithm to use [ runica | binica | jader | fastICA ]' ] ...
                       ['Commandline options (See algorithm help messages)']};
 	inistr       = { 'runica' '' };
 	result       = inputdlg( promptstr, 'Run ICA decomposition -- pop_runica()', 1,  inistr);
