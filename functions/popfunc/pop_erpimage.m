@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2002/10/15 16:39:36  scott
+% default title with channel name
+%
 % Revision 1.77  2002/10/15 15:08:17  scott
 % *** empty log message ***
 %
@@ -439,9 +442,8 @@ if popup
 	% ---------
 	limits(1:8)  = NaN;
 	channel   	 = eval( [ '[' res.chan ']' ]);
-        if typeplot == 1
-          chanlabel = {EEG.chanlocs.labels};
-          chanlabel = chanlabel(channel);
+        if typeplot == 1 % if channel plot
+          chanlabels = {EEG.chanlocs.labels};
         end
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
@@ -451,7 +453,7 @@ if popup
 		options = [options ',''yerplabel'',''''' ];
 	end;
 	if isempty(titleplot)
-        titleplot = [ fastif( typeplot, '', 'Comp. ') fastif( typeplot, chanlabel,int2str(channel)) ' ERP image'];
+        titleplot = [ fastif( typeplot, '', 'Comp. ') fastif( typeplot, chanlabels(channel),int2str(channel)) ' ERP image'];
     end;
 	smooth       = eval(res.smooth);
     if res.plotmap
