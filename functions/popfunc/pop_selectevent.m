@@ -73,43 +73,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.40  2002/10/29 22:44:30  scott
-% text
-%
-% Revision 1.39  2002/10/29 22:43:23  scott
-% text
-%
-% Revision 1.38  2002/10/29 22:40:51  scott
-% text
-%
-% Revision 1.37  2002/10/29 22:39:58  scott
-% text
-%
-% Revision 1.36  2002/10/29 22:38:15  scott
-% text
-%
-% Revision 1.35  2002/10/29 22:37:09  scott
-% text
-%
-% Revision 1.34  2002/10/29 22:36:33  scott
-% text
-%
-% Revision 1.33  2002/10/29 22:36:02  scott
-% text
-%
-% Revision 1.32  2002/10/29 22:33:26  scott
-% text
-%
-% Revision 1.31  2002/10/29 22:31:57  scott
-% text
-%
-% Revision 1.30  2002/10/29 22:30:55  scott
-% text
-%
-% Revision 1.29  2002/10/29 22:30:08  scott
-% text
-%
-% Revision 1.28  2002/10/29 22:25:59  scott
+% Revision 1.28-40  2002/10/29 22:25:59  scott
 % text
 %
 % Revision 1.27  2002/10/29 17:27:17  arno
@@ -226,11 +190,11 @@ if isfield(EEG, 'tmpevent') & strmatch('event', allfields)
 end;   
  
 if nargin<2
-    geometry = { [0.8 1 2.3 0.6 ] [0.8 1.1 2.0 0.8 ] [0.65 0.85 1.3 0.45 0.25 0.1] };
+    geometry = { [0.6 1.3 2.0 0.8 ] [0.6 1.3 2.0 0.8 ] [0.55 0.65 1.3 0.1 0.22 0.1] };
     uilist = { ...
          { 'Style', 'text', 'string', 'Selection', 'horizontalalignment', 'center', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Field Descriptions', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Selection Range (value, list or real range "min <= max")', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', 'Selection (value, list or real range "min<=max")', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'If set, select', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', '  Field', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'To edit: Edit > Event fields'  }, ...
@@ -263,19 +227,18 @@ if nargin<2
 
         % create the gui for this field
         % -----------------------------
-        geometry = { geometry{:} [0.65 0.85 1.3 0.45 0.25 0.1] };
+        textfield = allfields{index};
+        if strcmpi(allfields{index}, 'latency')
+            if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
+            else textfield = [ textfield ' (ms)' ];
+            end;
+        end;
+        geometry = { geometry{:} [0.55 0.65 1.3 0.1 0.22 0.1] };
         uilist   = { uilist{:}, ...
-         { 'Style', 'text', 'string', [allfields{index} ] }, ...
+         { 'Style', 'text', 'string', textfield }, ...
          { 'Style', 'pushbutton', descrip{:}, 'horizontalalignment', 'left' }, ...
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
-        if strcmpi(allfields{index}, 'latency')
-            if EEG.trials > 1
-                uilist{end-2} = { 'Style', 'text', 'string', '<- in ms' };
-            else
-                uilist{end-2} = { 'Style', 'text', 'string', '(s)' };	   
-            end;
-        end;
     end;
 
     geometry = { geometry{:} [1] [1.3 2] };
@@ -284,12 +247,12 @@ if nargin<2
         { 'Style', 'checkbox', 'string','Select all events NOT selected above',} { } ...
         };
 
-    geometry = { geometry{:} [1] [0.9 0.5 1 0.5] [2 1] };
+    geometry = { geometry{:} [1] [2 1 1] [2 1 1] [2 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string', 'Rename selected event(s) types as type:' } ...
-                { 'Style', 'edit', 'string', '' } ...
+                { 'Style', 'edit', 'string', '' } { } ...
                 { 'Style', 'text', 'string', 'Retain old event type name(s) in (new) field named:' } ...
-                { 'Style', 'edit', 'string', '' } ...
+                { 'Style', 'edit', 'string', '' } { } ...
                 { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events', ...
                 'value', fastif(EEG.trials>1, 0, 1) } { } };
 
