@@ -137,7 +137,6 @@
 % Non-GUI functions use for handling the EEG structure:
 % ----------------------------------------------------
 % eeg_checkset()       - check dataset parameter consistency
-% eeg_consts()         - constants definition
 % pop_delset()         - delete dataset
 % pop_editoptions()    - edit the option file
 % eeg_emptyset()       - empty dataset
@@ -152,7 +151,6 @@
 % pop_rejmenu()        - rejection menu (with all rejection methods visible)
 % eeg_retrieve()       - retrieve dataset from ALLEEG
 % eeg_store()          - store dataset into ALLEEG
-% eeg_updatemenu()     - update eeglab() gui
 %
 % Help functions:
 % --------------
@@ -182,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2002/08/11 17:37:47  arno
+% same
+%
 % Revision 1.102  2002/08/11 17:37:23  arno
 % header
 %
@@ -499,7 +500,6 @@
 function eeglab( onearg )
 eeg_options; 
 eeg_global;
-eeg_consts;
 COLOR = [.56 .66 .90];
 
 if nargin < 1
@@ -919,7 +919,7 @@ h19 = uicontrol('Parent',W_MAIN, ...
 
 function updatemenu();
 eeg_global;
-eeg_consts;
+
 W_MAIN = findobj('tag', 'EEGLAB');
 EEGUSERDAT = get(W_MAIN, 'userdata');
 H_MAIN  = EEGUSERDAT{1};
