@@ -44,16 +44,19 @@
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %  'actscale'  = ['on'|'off'] scale component scalp map by component activity at the
 %                  designated point in time. Default 'off'.
-%  'pvaf'      = ['on'|'off'] display percent variance accounted for by each 
-%                  component over the interval selected by limcontrib. Default is 'on'
+%  'pvaf'      = ['on'|'off'] use percent variance accounted ('on') or relative variance
+%                  ('off') to select component contributing the most over the interval 
+%                  selected by limcontrib. Default is 'on'
 %                  pvaf(component) = 100-100*variance(data-component))/variance(data)
+%                  rv(component)   = 100*variance(component)/variance(data)
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
 %  compvars      = component max variances
 %  compframes    = frames of max variance
 %  comptimes     = times of max variance
 %  compsplotted  = components plotted
-%  pvaf          = percent variance accounted for
+%  pvaf/rv       = percent variance accounted for or relative variance (see 'pvaf'
+%                  input)
 %
 % Notes:
 %  To label maps with other than component numbers, put 4-char strings into
@@ -80,19 +83,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2004/03/03 18:54:29  arno
+% retreive version 1.50
+%
 % Revision 1.50  2004/02/03 15:58:00  arno
 % no interpreter for title
 %
 % Revision 1.49  2004/01/29 16:56:30  scott
-% same
-%
-% Revision 1.48  2004/01/29 16:55:29  scott
-% same
-%
-% Revision 1.47  2004/01/29 16:54:41  scott
-% same
-%
-% Revision 1.46  2004/01/29 16:54:20  scott
 % same
 %
 % Revision 1.45  2004/01/29 16:50:45  scott
@@ -105,45 +102,6 @@
 % test for chanlocs file location and size
 %
 % Revision 1.42  2004/01/26 02:22:13  scott
-% same
-%
-% Revision 1.41  2004/01/26 02:10:24  scott
-% same
-%
-% Revision 1.40  2004/01/26 02:06:55  scott
-% same
-%
-% Revision 1.39  2004/01/26 02:05:23  scott
-% same
-%
-% Revision 1.38  2004/01/26 01:27:09  scott
-% same
-%
-% Revision 1.37  2004/01/26 01:19:58  scott
-% same
-%
-% Revision 1.36  2004/01/26 01:19:11  scott
-% same
-%
-% Revision 1.35  2004/01/26 01:16:59  scott
-% same
-%
-% Revision 1.34  2004/01/26 01:12:30  scott
-% same
-%
-% Revision 1.33  2004/01/26 01:11:06  scott
-% same
-%
-% Revision 1.32  2004/01/26 01:08:13  scott
-% same
-%
-% Revision 1.31  2004/01/26 00:53:17  scott
-% same
-%
-% Revision 1.30  2004/01/26 00:51:39  scott
-% same
-%
-% Revision 1.29  2004/01/26 00:47:52  scott
 % same
 %
 % Revision 1.28  2004/01/26 00:45:14  scott
@@ -550,7 +508,11 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
   compvars(c)   = val;
 
   % find variance in interval after removing component
-  pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
+  if strcmpi(g.pvaf, 'on')
+      pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
+  else
+      pvaf(c) = mean(mean(proj(:,frame1:frame2).^2));      
+  end;
 
   i = i+frame1-1;
   if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped in plot
@@ -568,28 +530,33 @@ fprintf('\n');
 % print percent variance accounted for
 % ---------------------------------------
 % compute pvaf
+fprintf('In the interval %.0f to %.0f ms:\n',x(frame1),x(frame2));
+vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
 if strcmpi(g.pvaf, 'on')
-    fprintf('In the interval %.0f to %.0f ms:\n',x(frame1),x(frame2));
-    vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
     pvaf = 100-100*pvaf/vardat;
-    [sortpvaf spx] = sort(pvaf);
-    k = 1;
-    for index =1:ncomps
-        fprintf('   IC%d ',spx(index));
-        if spx(index)<100, fprintf(' '); end
-        if spx(index)<10, fprintf(' '); end
-        fprintf('pvaf: %6.2f%%   ', sortpvaf(index));
-        if rem(k,3)==0, fprintf('\n'); end;
-        k = k+1;
-    end;
+else 
+    pvaf = 100*pvaf/vardat;
 end;
+[sortpvaf spx] = sort(pvaf);
+sortpvaf = sortpvaf(end:-1:1);
+spx      = spx(end:-1:1);
+npercol = ceil(ncomps/3);
+for index =1:npercol
+    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index), sortpvaf(index)); catch, end;
+    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index+npercol), sortpvaf(index+npercol)); catch, end;
+    try, fprintf('   IC%d\tpvaf: %6.2f%%\t',spx(index+2*npercol), sortpvaf(index+2*npercol)); catch, end;
+    fprintf('\n');
+end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 sampint = (xmax-xmin)/(frames-1);     % sampling interval = 1000/srate;
 x = xmin:sampint:xmax;                % make vector of x-values
 
-[compvars,compx] = sort(compvars');   % sort compnums on max variance
+%[compvars,compx] = sort(compvars');   % sort compnums on max variance
+[tmp,compx]  = sort(pvaf');   % sort compnums on max variance
+
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvarorder = g.compnums(compx);     % actual component numbers (output var)
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
@@ -900,7 +867,7 @@ if strcmpi(g.dispmaps, 'on')
         end
         eloc = readlocs(g.chanlocs);
         if length(eloc) ~= chans
-            fprintf('envtopo(): %d channels not read from the named channel location file.\n',chans);
+            fprintf('envtopo() error: %d channels not read from the named channel location file.\n',chans);
             return
         end
     end
@@ -921,6 +888,8 @@ if strcmpi(g.dispmaps, 'on')
             axis square
             if strcmpi(g.pvaf, 'on')
                 set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+            else
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
