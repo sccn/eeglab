@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/08/20 23:32:01  arno
+% debug filtering between boundaries
+%
 % Revision 1.23  2003/12/03 18:31:32  arno
 % implementing eegfiltfft
 %
@@ -241,7 +244,7 @@ else
     end;
 	% Note: reshape does not reserve new memory while EEG.data(:,:) does
 end;	
-
+EEG.icaact = [];
 
 com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
 			num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ) );
