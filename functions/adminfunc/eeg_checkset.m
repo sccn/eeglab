@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2002/08/12 00:13:44  arno
+% same
+%
 % Revision 1.51  2002/08/12 00:05:44  arno
 % changing manual color
 %
@@ -564,7 +567,7 @@ if ~isfield(EEG.reject, 'rejglobalE')		EEG.reject.rejglobalE = []; res = com; en
 
 % default colors for rejection
 % ----------------------------
-if ~isfield(EEG.reject, 'rejmanualcol')		EEG.reject.rejmanualcol = [1.0000    0.987     0.783]; res = com; end;
+if ~isfield(EEG.reject, 'rejmanualcol')		EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end;
 if ~isfield(EEG.reject, 'rejthreshcol')		EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end;
 if ~isfield(EEG.reject, 'rejconstcol')		EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end;
 if ~isfield(EEG.reject, 'rejjpcol')		    EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
