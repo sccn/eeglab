@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/24 04:14:46  scott
+% header edit -sm
+%
 % Revision 1.4  2003/01/24 02:14:16  arno
 % changing delimiter to 9
 %
@@ -62,7 +65,7 @@ end;
 
 if nargin < 2 
 	% ask user
-	[filename, filepath] = uigetfile('*', 'Choose a Presentation file -- pop_importpres()'); 
+	[filename, filepath] = uigetfile('*.log;*.LOG', 'Choose a Presentation file -- pop_importpres()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
