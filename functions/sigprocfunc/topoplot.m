@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2004/03/18 17:05:20  arno
+% fixed plotrad
+%
 % Revision 1.154  2004/03/18 16:36:53  arno
 % debug shrink and plotrad
 %
@@ -667,8 +670,8 @@ end;
 enum = find(Rd <= plotrad);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): %d/%d electrodes not shown (radius>0.5)\n', ...
-                   length(enum)-length(Rd),length(Rd));    
+        fprintf('topoplot(): %d/%d electrodes NOT shown (radius>plotrad)\n', ...
+                   length(enum)-length(Rd),length(Rd),plotrad);    
     end; 
 end;	
 if ~isempty(Vl)
@@ -697,6 +700,14 @@ end;
 Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
+
+if ~isstr(plotrad) & (plotrad < MINPLOTRAD | plotrad> 1.0)
+   error('argument plotrad must be between 0.15 and 1.0');
+end
+if ~isstr(plotrad) & (plotrad < 0.5)
+  fprintf('topoplot(): not plotting nose or ears since plotrad < 0.5\n');
+end
+
 
 % squeeze all to 0.5
 % ------------------
@@ -997,20 +1008,23 @@ if isstr('plotrad') % if 'skirt' mode
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
    set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);         % hide the disk edge jaggies 
   end
-  plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
+    plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
-  plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
+  if plotrad>=0.5
+    plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
-  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
-  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
-
+    plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
+    plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
+  end
 else % no 'skirt'
-  plot(cos(circ).*rmax,sin(circ).*rmax,...
+    plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head
-  plot([basex;0;-basex],[base;tip;base],...
+  if plotrad>=0.5
+    plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
-  plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
-  plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
+    plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
+    plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
+  end
 end
 
 %
