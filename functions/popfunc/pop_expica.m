@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/05/22 15:04:30  arno
+% header typo
+%
 % Revision 1.2  2003/05/14 15:28:19  arno
 % sphere matrixc
 %
@@ -69,9 +72,9 @@ end;
 % save datas
 % ----------
 if strcmpi(whichica, 'inv')
-    tmpmat = EEG.icawinv;
+    tmpmat = double(EEG.icawinv);
 else
-    tmpmat = EEG.icaweights*EEG.icasphere;
+    tmpmat = double(EEG.icaweights*EEG.icasphere);
 end;
 save(filename, '-ascii', 'tmpmat');
 
