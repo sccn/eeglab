@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/14 16:44:54  arno
+% beep update
+%
 % Revision 1.1  2002/08/12 18:48:22  arno
 % Initial revision
 %
@@ -38,7 +41,11 @@
 
 function errordlg2(Prompt, Title);
 
-disp(char(7));
+if exist('beep') == 5
+	beep;
+else
+	disp(char(7));
+end;
 if nargin <2
 	Title = 'Error';
 end;
