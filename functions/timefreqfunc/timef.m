@@ -54,7 +54,6 @@
 %                      If cycles==0, all FFT frequencies are output.      {50}
 %       'baseline'  = Spectral baseline end-time (in ms).                 {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
-%       '
 %
 %    Optional Multitaper Parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
@@ -127,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/03/12 20:09:28  scott
+% header edits -sm
+%
 % Revision 1.52  2003/01/08 23:37:52  arno
 % add discalimer about linear coherence bug
 %
