@@ -94,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/07/16 19:30:16  arno
+% making a smaller flash
+%
 % Revision 1.8  2002/07/16 04:15:43  arno
 % same
 %
@@ -417,7 +420,9 @@ if ~isempty(g.flashes)
 		allflashes = [ allflashes tmptimepoint];
 	end;
 	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', [], 'box', 'off'); set (gcf, 'visible', g.visible);
-	hpatch = patch([ 0.02 .11 .11 0.02], [0.05 0.05 0.925 0.925], [0.5 0.5 0.5]); 
+	%hpatch = patch([ 0.02 .11 .11 0.02], [0.05 0.05 0.925 0.925], [0.5 0.5 0.5]); lateral
+	%hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); full
+	hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.92 0.92 1 1], [0.5 0.5 0.5]); %up
 	set(hpatch, 'facecolor', 'w', 'edgecolor', 'none');
 	xlim([0 1]); ylim([0 1]);
 	posf = 0; % used as a counter to preserve color
