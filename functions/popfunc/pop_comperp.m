@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/11/18 16:35:40  scott
+% Enter ... -> ...
+%
 % Revision 1.20  2003/11/04 15:29:53  arno
 % returning empty pvalues if alpha not set
 %
@@ -291,10 +294,14 @@ for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)));
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     elseif isempty(TMPEEG.icaact)
-    else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
-                                                 size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
-                  erp1ind(:,:,index)  = mean(tmpica,3);
-                  erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
+        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
+        erp1ind(:,:,index)  = mean(tmpica,3);
+    else          
+        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
+        erp1ind(:,:,index)  = mean(tmpica,3);
+        erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
     end;
     addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname ' (n=' int2str(TMPEEG.trials) ')' ];
     clear TMPEEG;
