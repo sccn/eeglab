@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2002/08/13 18:12:57  scott
+% allow longer datset name to print on main window
+%
 % Revision 1.126  2002/08/13 18:06:54  scott
 % title
 %
@@ -1016,7 +1019,10 @@ if ~option_keepdataset
 			return;
 		end;
 	end;
+	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'off');
 	CURRENTSET = 0;
+else
+	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
 
 while( index <= MAX_SET)
