@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/07/24 17:54:03  arno
+% changing message
+%
 % Revision 1.23  2003/07/24 16:15:55  arno
 % deleting old .fdt files
 %
@@ -212,7 +215,7 @@ else
 end;
 
 if mode == 0  % single datasets
-	disp('Pop_saveset: extended datasets syntax check...');
+	disp('Pop_saveset: Performing extended dataset syntax check...');
 	EEG = eeg_checkset(EEG, 'eventconsistency');
 	EEG.filename    = curfilename;
 	EEG.filepath    = '';
@@ -226,7 +229,7 @@ if mode == 0  % single datasets
 		tmpdata = EEG.data;
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
-            disp('Saving dataset...');
+            disp('             Saving dataset...');
 			eval(command);
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
