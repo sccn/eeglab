@@ -44,7 +44,7 @@
 %                  float data files (little endian or big endian byte ordering).
 %                  Data must be organised as (channels, timepoints) i.e. 
 %                  channels = rows and timepoints = columns or (channels, timepoints, 
-%                  epochs). For convenience, The data file is transposed if the number
+%                  epochs). For convenience, the data file is transposed if the number
 %                  of rows is larger than the number of columns.
 %   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode 
 %                  locations (see >> help readlocs for file format).
@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/24 16:26:39  arno
+% resolving ???
+%
 % Revision 1.16  2003/02/22 16:58:02  scott
 % header edits, with ??? -sm
 %
