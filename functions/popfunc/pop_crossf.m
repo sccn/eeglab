@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/09 22:32:26  arno
+% updating for wavelet facotr
+%
 % Revision 1.13  2002/07/30 00:21:26  arno
 % new gui and history
 %
@@ -188,7 +191,7 @@ if popup
 	if ~result{9}
 		options = [ options ', ''plotitc'', ''off''' ];
 	end;
-	figure;
+    figure('color', [1 1 1]);
 else
 	options = [];
 	for i=1:length( varargin )

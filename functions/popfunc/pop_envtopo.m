@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/25 17:46:33  scott
+% added 'electrodes','off' default -sm
+%
 % Revision 1.3  2002/04/25 17:40:30  scott
 % edited help msg and added com to history -sm
 %
@@ -94,7 +97,7 @@ if nargin < 3
 	if ~isempty( result{3} ), compnums = eval( [ '[' result{3} ']' ] ); end;
 	envtitle     = result{4};
 	options      =  [ ',' result{5} ];
-	figure;
+	figure('color', [1 1 1]);
 else
 	options = [];
 	for i=1:length( varargin )
