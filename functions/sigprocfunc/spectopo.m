@@ -27,7 +27,7 @@
 %   'percent'  = downsampling factor or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
 %                the computation. From 0 to 100 {default: 100}.
-%   'maxfreq'  = [float] maximum frequency to plot. Overwrite limits x axis.
+%   'freqrange' = [min max] frequency range to plot. Overwrite limits x axis.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                Default is 'off'. 
 %   'boundaries' = data point indices indicating discontinuities in the signal
@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/08/11 18:44:56  arno
+% [A[Amoving main title
+%
 % Revision 1.27  2002/08/11 18:27:36  arno
 % making subplot possible
 %
@@ -192,7 +195,7 @@ if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequency
 	fieldlist = { 'freq'          'real'     []                        [] ;
 				  'chanlocs'      ''         []                        [] ;
-				  'maxfreq'       'real'     [1 srate/2]               [] ;
+				  'freqrange'     'real'     [0 srate/2]               [] ;
 				  'memory'        'string'   {'low' 'high'}           'high' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
@@ -209,7 +212,7 @@ if nargin <= 3 | isstr(varargin{1})
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
-	if ~isempty(g.maxfreq), g.limits(2) = g.maxfreq; end;
+	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end;
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2
 			error('spectopo: for computing component contribution, one must specify a (single) frequency');
