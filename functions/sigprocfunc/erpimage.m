@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2002/10/13 23:51:22  scott
+% edit valsort fprint
+%
 % Revision 1.57  2002/10/13 23:49:43  scott
 % *** empty log message ***
 %
@@ -1161,12 +1164,13 @@ elseif exist('valargs')
             sttime,endtime);
      fprintf('Frames: %d to %d\n',stframe,endframe);
   end
-  fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
-  sortval = mean(data(stframe:endframe,:));
-  fprintf('Size of sortval = [%d,%d]\n',size(sortval,1),size(sortval,2));
+  if endframe>stframe
+     sortval = mean(data(stframe:endframe,:));
+  else
+     sortval = data(stframe,:);
+  end
   [sortval,sortidx] = sort(sortval);
   data = data(:,sortidx);
-  fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
   if ~isempty(auxvar)
     auxvar = auxvar(:,sortidx);
   end
