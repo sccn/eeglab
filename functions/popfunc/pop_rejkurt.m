@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/07 22:39:14  arno
+% same
+%
 % Revision 1.6  2002/08/07 22:35:56  arno
 % editing
 %
@@ -149,10 +152,10 @@ end;
 % compute the joint probability
 % -----------------------------
 if icacomp == 1
-	fprintf('Computing joint probability for channels...\n');
+	fprintf('Computing kurtosis for channels...\n');
 	[ EEG.stats.kurtE rejE ] = rejkurt( EEG.data, locthresh, EEG.stats.kurtE, 1); 
 
-	fprintf('Computing global joint probability...\n');
+	fprintf('Computing all-channel kurtosis...\n');
 	tmpdata = permute(EEG.data, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
 	[ EEG.stats.kurt rej ] = rejkurt( tmpdata, globthresh, EEG.stats.kurt, 1); 
