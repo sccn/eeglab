@@ -164,6 +164,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/10/15 18:46:25  arno
+% *** empty log message ***
+%
 % Revision 1.45  2003/10/15 18:45:11  arno
 % *** empty log message ***
 %
@@ -614,6 +617,7 @@ try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.outputformat;  catch, g.outputformat = 'new'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
+try, g.verbose;    catch, g.verbose = 'on'; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -624,6 +628,10 @@ if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
 
 % testing arguments consistency
 % -----------------------------
+switch lower(g.verbose)
+    case { 'on', 'off' }, ;
+    otherwise error('verbose must be either on or off');
+end;
 if ~ischar(g.title) & ~iscell(g.title)
 	error('Title must be a string or a cell array.');
 end
@@ -661,7 +669,7 @@ if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
 elseif (g.maxfreq <= 0)
 	error('Value of maxfreq must be positive.');
 elseif (g.maxfreq > Fs/2)
-	fprintf(['Warning: value of maxfreq reduced to Nyquist rate' ...
+	myprintf(g.verbose, ['Warning: value of maxfreq reduced to Nyquist rate' ...
 		 ' (%3.2f)\n\n'], Fs/2);
 	g.maxfreq = Fs/2;
 end
@@ -687,18 +695,18 @@ end;
 if (~isnumeric(g.alpha) | length(g.alpha)~=1)
 	error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
-	fprintf('Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
+	myprintf(g.verbose, 'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
-	fprintf('  Increasing the number of bootstrap iterations to %d\n',g.naccu);
+	myprintf(g.verbose, '  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
 if g.alpha>0.5 | g.alpha<=0
     error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
    if g.baseboot > 0
-     fprintf('Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
+     myprintf(g.verbose, 'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
    else
-     fprintf('Bootstrap analysis will use data in all subwindows.\n')
+     myprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
    end
 end
 if ~isnumeric(g.vert)
@@ -856,14 +864,14 @@ if iscell(X)
 		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
 	end;
 	
-	fprintf('Running newtimef on condition 1 *********************\n');
-	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
-	fprintf('      number of time points or number of frequencies\n');
-	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
+	myprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
+	myprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
+	myprintf(g.verbose, '      number of time points or number of frequencies\n');
+	myprintf(g.verbose, '      (the ''coher'' options takes 3 times more memory than other options)\n');
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
-	fprintf('\nRunning newtimef on condition 2 *********************\n');
+	myprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
@@ -881,7 +889,7 @@ if iscell(X)
 			Pboot1 = Pboot1 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
 			Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
         end;
-        fprintf('\nSubtracting common baseline\n');
+        myprintf(g.verbose, '\nSubtracting common baseline\n');
     end;
 	
     % plotting
@@ -993,18 +1001,18 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%
 % display text to user (computation perfomed only for display)
 %%%%%%%%%%%%%%%%%%%%%%
-fprintf('Computing Event-Related Spectral Perturbation (ERSP) and\n');
+myprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher',  fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
-    case 'phasecoher2', fprintf('  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
-    case 'coher',       fprintf('  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher',  myprintf(g.verbose, '  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher2', myprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
+    case 'coher',       myprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
 end;
-fprintf('  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
-fprintf('Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
-fprintf('  %1.0 ms after the timelocking event.\n',g.tlimits(2));
+myprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
+myprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
+myprintf(g.verbose, '  %1.0 ms after the timelocking event.\n',g.tlimits(2));
 if ~isnan(g.alpha)
-  fprintf('Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
-  fprintf('  non-significant values will be plotted in green\n');
+  myprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
+  myprintf(g.verbose, '  non-significant values will be plotted in green\n');
 end
 
 % -----------------------------------------
@@ -1052,17 +1060,17 @@ else
    baseln = 1:length(timesout); % use all times as baseline
 end
 if ~isnan(g.alpha) & length(baseln)==0
-  fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
+  myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
 elseif ~isnan(g.alpha) & g.baseboot
-  fprintf('   %d bootstrap windows in baseline (times<%g).\n',...
+  myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
           g.baseline,length(baseln))
 end
 if isnan(g.powbase)
-  fprintf('Computing the mean baseline spectrum\n');
+  myprintf(g.verbose, 'Computing the mean baseline spectrum\n');
   mbase = mean(P(:,baseln),2)';
 else
-  fprintf('Using the input baseline spectrum\n');
+  myprintf(g.verbose, 'Using the input baseline spectrum\n');
   mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
@@ -1172,7 +1180,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
     end;    
 
     if g.plot
-        fprintf('\nNow plotting...\n');
+        myprintf(g.verbose, '\nNow plotting...\n');
         set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
         colormap(jet(256));
         pos = get(gca,'position');
@@ -1463,3 +1471,8 @@ function [X, frame] = reshapeX(X, frame)
     else
         frame = size(X,1);
     end 
+
+function myprintf(verbose, varargin)
+    if strcmpi(verbose, 'on')
+        fprintf(varargin{:});
+    end;
