@@ -60,14 +60,13 @@
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
 %               It has three fields 'labels', 'theta' and 'radius'.
-%   labels    - names of the electrodes
+%   labels    - cell array of strings giving the  names of the electrodes
 %   theta     - vector of polar angles of the electrodes in degrees
 %   radius    - vector of polar norms of the electrodes
 %
 % Note: the function cart2topo() is used to convert cartesian to polar
 %       coordinates. By default the current function uses cart2topo()
-%       options to recompute the best center and optimize the squeezing
-%       parameter.
+%       options to recompute the best center coordinates.
 %
 % Author: Arnaud Delorme & Scott Makeig CNL / Salk Institute, 28 Feb 2002
 %
@@ -92,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/07/02 00:30:23  arno
+% updating header
+%
 % Revision 1.12  2002/07/02 00:26:28  arno
 % updating for reading besa .elp files
 %
