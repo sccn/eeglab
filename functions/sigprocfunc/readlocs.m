@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/03/04 20:04:44  arno
+% adding neuroscan .asc format
+%
 % Revision 1.38  2003/01/30 16:45:12  arno
 % debugging ced format
 %
@@ -432,8 +435,10 @@ if isstr(filename)
    else 
        % remove trailing '.'
        for index = 1:length(eloc)
-           tmpdots = find( eloc(index).labels == '.' );
-           eloc(index).labels(tmpdots) = [];
+           if isstr(eloc(index).labels)
+               tmpdots = find( eloc(index).labels == '.' );
+               eloc(index).labels(tmpdots) = [];
+           end;
        end;
    end;
    
