@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.163  2003/11/13 01:58:10  scott
+% same
+%
 % Revision 1.162  2003/11/13 01:47:13  scott
 % make erpalpha fill less saturated
 %
@@ -2877,9 +2880,11 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
   ERPZEROWIDTH = 2;
   if exist('signif') == 1 
     if ~isnan(signif);
+      fillcolor = [1 .7 .7];
       filltimes = [times times(end:-1:1)];
       fillsignif = [signif -1*signif(end:-1:1)];
-      [fill] = fill(filltimes,fillsignif, [1 .7 .7]); hold on    % plot 0+alpha
+      fillh = fill(filltimes,fillsignif, fillcolor); hold on    % plot 0+alpha
+      set(fillh,'edgecolor',fillcolor);
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
