@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/10/15 23:02:31  arno
+% time limits warning
+%
 % Revision 1.13  2002/10/15 22:59:34  arno
 % debugging time
 %
@@ -446,9 +449,6 @@ elseif (~isnumeric(varwin) | length(varwin)>2)
 elseif (varwin < 0)
    error('crossf(): Value of cycles must be either zero or positive.');
 end
-if g.tlimits(2)-g.tlimits(1) < 30
-    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
-end;
 
 % consider structure for these arguments
 % --------------------------------------
@@ -586,6 +586,9 @@ end;
 if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
 		& ~strcmpi(g.condboot, 'complex')
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
+end;
+if g.tlimits(2)-g.tlimits(1) < 30
+    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
 end;
 
 
