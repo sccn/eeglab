@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/03/17 02:17:41  arno
+% fixing history
+%
 % Revision 1.3  2005/03/10 18:17:02  arno
 % no warning backtrace
 %
@@ -135,6 +138,7 @@ if nargin < 2
   warning backtrace off;  
   EEGOUT = dipfit_gridsearch(EEG, 'component', select, 'xgrid', xgrid, 'ygrid', ygrid, 'zgrid', zgrid, options{:});
   warning backtrace on;
+  EEGOUT.dipfit.model  = dipfit_reject(EEGOUT.dipfit.model, reject);
 
   % FIXME reject is not being used at the moment
   disp('Done');
