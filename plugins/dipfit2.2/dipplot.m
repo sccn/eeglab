@@ -144,6 +144,10 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.83  2004/05/05 15:24:50  scott
+%typo
+%,
+%
 %Revision 1.82  2004/05/05 15:24:00  scott
 %working on sphere coloring -> ????????
 %
@@ -834,7 +838,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
                    set(sf,'cdatamapping','direct');
                    set(sf,'facecolor','g');  % <========= this has no effect !?!?! Why not ????
-                   set(sf) % <========== doesnt show the set() changes made above ????
+                   % set(sf) % <========== doesnt show the set() changes made above ????
 
                    shading interp;
                    material shiny;
