@@ -1,11 +1,12 @@
 % imagesclogy() - make an imagesc(0) plot with log y-axis values (ala semilogy())
 %
-% Usage:  >> imagesclogy(times,freqs,data);
+% Usage:  >> imagesclogy(times,freqs,data,clim);
 %
 % Input:
 %   times = vector of x-axis values
 %   freqs = vector of y-axis values (LOG spaced)
 %   data  = matrix of size (freqs,times)
+%   clim  = optional color limit
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 4/2003 
 
@@ -26,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/04/29 18:27:44  arno
+% Initial revision
+%
 
 function imagesclogy(times,freqs,data)
 
@@ -58,7 +62,11 @@ function imagesclogy(times,freqs,data)
   border  = mean(newfreqs(2:end)-newfreqs(1:end-1))/2; % automatically added to the borders in imagesc
   newfreqs = linspace(realborders(1)+border, realborders(2)-border, length(freqs));
   
-  imagesc(times,newfreqs,data);
+  if nargin == 4
+      imagesc(times,newfreqs,data,clim);
+  else 
+      imagesc(times,newfreqs,data);
+  end;
   set(gca, 'yscale', 'log');
   
   % puting labels
