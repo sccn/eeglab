@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/07/26 21:57:21  arno
+% debugging x axis
+%
 % Revision 1.17  2002/07/24 01:37:20  arno
 % debugging submean
 %
@@ -1051,7 +1054,7 @@ else
 
 		incrementtime  = divpossible(indexdiv);
 		incrementpoint = divpossible(indexdiv)/1000*g.srate;
-		tagzerooffset  = -g.limits(1)/1000*g.srate
+		tagzerooffset  = -g.limits(1)/1000*g.srate;
 
 		for i=1:length(alltag)-1
 			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
