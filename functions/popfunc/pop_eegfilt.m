@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/28 17:39:07  arno
+% nothing
+%
 % Revision 1.18  2003/07/22 17:36:44  arno
 % subtract DC for small portion of data
 %
@@ -119,8 +122,8 @@ end;
 if nargin < 3
 	% which set to save
 	% -----------------
-   	promptstr = { 'Lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
-   				  'Higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
+   	promptstr = { 'Highpass: lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
+   				  'Lowpass: higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
    				  strvcat('Notch filter the data. Give the notch range, i.e. [45 55] for 50 Hz)', ...
                   '(this option overwrites the low and high edge limits given above)'), ...
                   'Filter length in points (default: see >> help pop_eegfilt)' };
