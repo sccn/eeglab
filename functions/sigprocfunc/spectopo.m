@@ -40,6 +40,7 @@
 %                component, this parameter can contain its map, so the spectrum amplitude 
 %                will be scaled by the component RMS power.
 %   'boundaries' = data point indices indicating discontinuities in the signal
+%   'plot'       = ['on'|'off'] 'off' disable plotting. Default is 'on'.
 %
 % Plot component contributions:
 %   'weights'  = ICA unmixing matrix. 'freq' must contain a single frequency.
@@ -105,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/06/12 00:41:17  arno
+% same
+%
 % Revision 1.61  2003/06/12 00:31:15  arno
 % debug last
 %
@@ -316,6 +320,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'chanlocs'      ''         []                        [] ;
 				  'freqrange'     'real'     [0 srate/2]               [] ;
 				  'memory'        'string'   {'low' 'high'}           'high' ;
+				  'plot'          'string'   {'on' 'off'}             'on' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
@@ -588,53 +593,57 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot spectrum of each channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-mainfig = gca; axis off;
-if ~isempty(g.freq)
-	specaxes = sbplot(3,4,[5 12], 'ax', mainfig); 
+if strcmpi(g.plot, 'on')
+    mainfig = gca; axis off;
+    if ~isempty(g.freq)
+        specaxes = sbplot(3,4,[5 12], 'ax', mainfig); 
+    end;
+    
+    if isempty(g.weights)
+        pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
+    else 
+        pl=plot(freqs(1:maxfreqidx),eegspecdBtoplot(:,1:maxfreqidx)');
+    end;
+    set(pl,'LineWidth',2);
+    set(gca,'TickLength',[0.02 0.02]);
+    axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
+    xl=xlabel('Frequency (Hz)');
+    set(xl,'fontsize',16);
+    yl=ylabel('Rel. Power (dB)');
+    set(yl,'fontsize',16);
+    set(gca,'fontsize',16)
+    box off;
 end;
-
-if isempty(g.weights)
-	pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
-else 
-	pl=plot(freqs(1:maxfreqidx),eegspecdBtoplot(:,1:maxfreqidx)');
-end;
-set(pl,'LineWidth',2);
-set(gca,'TickLength',[0.02 0.02]);
-axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
-xl=xlabel('Frequency (Hz)');
-set(xl,'fontsize',16);
-yl=ylabel('Rel. Power (dB)');
-set(yl,'fontsize',16);
-set(gca,'fontsize',16)
-box off;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   plot component contribution   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colrs = {'r','b','g','m','c'}; % component spectra trace colors
 if ~isempty(g.weights)
-    if strcmpi(g.icamode, 'sub')
-        set(pl,'LineWidth',5, 'color', 'k');
-    else 
-        set(pl, 'linewidth', 2, 'color', 'k');
-    end;
+    if strcmpi(g.plot, 'on')
+        if strcmpi(g.icamode, 'sub')
+            set(pl,'LineWidth',5, 'color', 'k');
+        else 
+            set(pl, 'linewidth', 2, 'color', 'k');
+        end;
+        
+        hold on;
+        for f=1:length(g.icamaps)
+            colr = colrs{mod((f-1),5)+1};
+            pl2=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)',colr);
+        end
+        othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
+        if ~isempty(othercomps)
+            pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
+        end;
+        if length(g.limits)<3|isnan(g.limits(3))
+            newaxis = axis;
+            newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
+            newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
+            axis(newaxis);
+        end;
+	end;
     
-	hold on;
-	for f=1:length(g.icamaps)
-		colr = colrs{mod((f-1),5)+1};
-		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)',colr);
-    end
-	othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
-	if ~isempty(othercomps)
-		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
-	end;
-	if length(g.limits)<3|isnan(g.limits(3))
-		newaxis = axis;
-		newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
-		newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
-		axis(newaxis);
-	end;
-	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% indicate component contribution %
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -672,7 +681,7 @@ if ~isempty(g.weights)
     
 end;
 
-if ~isempty(g.freq)
+if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot vertical lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -823,13 +832,12 @@ if ~isempty(g.freq)
 	else 
 		plotcolbar(g);
 	end;
-
 end;
 
 %%%%%%%%%%%%%%%%
 % Draw title
 %%%%%%%%%%%%%%%%
-if ~isempty(g.title)
+if ~isempty(g.title) & strcmpi(g.plot, 'on')
 	axes(mainfig);
 	tl = text(-0.1,1.06,g.title);
 	set(tl,'fontsize',15)
@@ -846,8 +854,9 @@ end;
 %%%%%%%%%%%%%%%%
 % Turn on axcopy
 %%%%%%%%%%%%%%%%
-axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
-
+if strcmpi(g.plot, 'on')
+    axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
+end;
 
 %%%%%%%%%%%%%%%%
 % Plot color bar
@@ -948,7 +957,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     
     n = length(epoch_subset);
 	eegspecdB = eegspec/n; % convert power to dB
-    if n>0
+    if n>1
          specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % convert power to dB
     else specstd   = [];
     end;
