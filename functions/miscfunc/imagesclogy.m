@@ -1,12 +1,18 @@
 % imagesclogy() - make an imagesc(0) plot with log y-axis values (ala semilogy())
 %
-% Usage:  >> imagesclogy(times,freqs,data,clim);
+% Usage:  >> imagesclogy(times,freqs,data);
+% Usage:  >> imagesclogy(times,freqs,data,clim,xticks,yticks,'key','val',...);
 %
-% Input:
+% Inputs:
 %   times = vector of x-axis values
 %   freqs = vector of y-axis values (LOG spaced)
 %   data  = matrix of size (freqs,times)
-%   clim  = optional color limit
+%
+% Optional inputs:
+%   clim   = optional color limit
+%   xticks = graduation for x axis
+%   yticks = graduation for y axis
+%   ...    = 'key', 'val' properties for figure
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 4/2003 
 
@@ -27,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/04/30 22:57:40  arno
+% debug scale
+%
 % Revision 1.3  2003/04/29 18:32:44  arno
 % debug
 % last
@@ -38,7 +47,7 @@
 % Initial revision
 %
 
-function imagesclogy(times,freqs,data,clim)
+function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
 
   if size(data,1) ~= length(freqs)
       fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
@@ -69,18 +78,26 @@ function imagesclogy(times,freqs,data,clim)
   border  = mean(newfreqs(2:end)-newfreqs(1:end-1))/2; % automatically added to the borders in imagesc
   newfreqs = linspace(realborders(1)+border, realborders(2)-border, length(freqs));
   
-  if nargin == 4
+  if nargin == 4 & isempty(clim)
       imagesc(times,newfreqs,data,clim);
   else 
       imagesc(times,newfreqs,data);
   end;
   set(gca, 'yscale', 'log');
   
-  % puting labels
-  % -------------
-  divs = linspace(log(freqs(1)), log(freqs(end)), 10);
-  set(gca, 'ytickmode', 'manual');
-  divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+  % puting ticks
+  % ------------
+  if nargin >= 5, set(gca, 'xtick', xticks); end;
+  if nargin >= 6
+      divs = yticks;
+  else 
+      divs = linspace(log(freqs(1)), log(freqs(end)), 10);
+      divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
+  end;
+  set(gca, 'ytickmode', 'manual');
   set(gca, 'ytick', divs);
   
+  % additional properties
+  % ---------------------
+  set(gca, varargin{:}, 'xaxislocation', 'bottom', 'box', 'off', 'ticklength', [0.03 0.01]);
