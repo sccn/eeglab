@@ -200,6 +200,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2004/04/29 16:55:26  arno
+% implementing amplitude correlation
+%
 % Revision 1.65  2004/04/29 00:59:28  arno
 % implementing amplitude correlation
 %
@@ -1450,19 +1453,20 @@ case 'on'
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
    if setylim
-       if strcmp(g.angleunit,'ms')  % convert to ms
-           Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(:)',1,length(times)); 
-           maxangle = max(max(abs(Rangle)));
-       else
-           Rangle = Rangle*180/pi; % convert to degrees
-           maxangle = 180; % use full-cycle plotting 
-       end
-       Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
-       
        if strcmpi(g.type, 'amp') % currrently -1 to 1
            maxangle = max(abs(g.amplag)) * mean(times(2:end) - times(1:end-1));
-           Rangle  = Rangle * maxangle;
+           Rangle   = Rangle * maxangle;
+           maxangle = maxangle+5; % so that the min and the max does not mix
+       else
+           if strcmp(g.angleunit,'ms')  % convert to ms
+               Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(:)',1,length(times)); 
+               maxangle = max(max(abs(Rangle)));
+           else
+               Rangle = Rangle*180/pi; % convert to degrees
+               maxangle = 180; % use full-cycle plotting 
+           end           
        end;
+       Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
        
        if ~strcmpi(g.freqscale, 'log')
            imagesc(times,freqs,Rangle,[-maxangle maxangle]); % plot the coherence phase angles
