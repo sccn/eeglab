@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.276  2003/11/27 01:26:43  arno
+% path
+%
 % Revision 1.275  2003/11/27 01:20:30  arno
 % debug path
 %
@@ -1029,25 +1032,12 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 
 % add the paths
 % -------------
-if ~exist('pop_erpimage') | ~exist('erpimage') | ~exist('eeg_checkset') | ~exist('dipfit_batch')
-    p = which('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    if strcmpi(computer, 'pcwin') 
-        allpaths = [';' path ';' ];
-        tmpf = [ ';' p 'dipfit;' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ';' p 'sigprocfunc;' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ';' p 'popfunc;' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ';' p 'adminfunc;' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ';' p 'miscfunc;' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    else
-        allpaths = [':' path ':' ];
-        tmpf = [ ':' p 'dipfit:' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ':' p 'sigprocfunc:' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ':' p 'popfunc:' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ':' p 'adminfunc:' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-        tmpf = [ ':' p 'miscfunc:' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
-    end;
-end;
+eeglabpath = which('eeglab.m');
+eeglabpath = eeglabpath(1:end-length('eeglab.m'));
+myaddpath( eeglabpath, 'readeetraklocs.m', 'sigprocfunc');
+myaddpath( eeglabpath, 'eeg_checkset.m',   'adminfunc');
+myaddpath( eeglabpath, 'pop_readbci.m',    'popfunc');
+myaddpath( eeglabpath, 'tftopo.m',         'miscfunc');
 eeg_options; 
 eeg_global;
 
@@ -1684,3 +1674,18 @@ function g = myguihandles(fig)
 			g = setfield(g, get(hh(index), 'tag'), hh(index));
 		end;
 	end;
+
+% find a function path and add path if not present
+% ------------------------------------------------
+function myaddpath(eeglabpath, functionname, pathtoadd);
+
+    tmpp = which(functionname);
+    if ~isempty(tmpp)
+        tmpp = tmpp(1:end-length(functionname));
+        if ~strcmpi([ eeglabpath pathtoadd ], tmpp)
+            addpath([ eeglabpath pathtoadd ]);
+        end;
+    else
+        addpath(pathtoadd);
+    end;
+    
