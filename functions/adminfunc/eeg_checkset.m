@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2002/11/15 18:40:54  arno
+% adding another test if chanlocs empty
+%
 % Revision 1.84  2002/11/15 02:11:04  arno
 % debugging for single dataset
 %
@@ -758,7 +761,7 @@ if ~isempty( varargin)
 			  end;
 			  [EEG res] = pop_runica(EEG);
 			  res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
-		  else, return; end;
+		  end;
 		 case 'epoch', 
 		  if EEG.trials == 1
 			  errordlg2(strvcat('Epochs must be extracted before running that function', 'Use /Tools/Extract epochs'), 'Error');
