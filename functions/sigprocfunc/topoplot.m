@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2004/02/15 20:24:07  scott
+% same
+%
 % Revision 1.116  2004/02/15 20:23:39  scott
 % same
 %
@@ -811,7 +814,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 %
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi-rmax*squeezefac,Yi,Zi);
-  [tmp,Thi,Rdi] = sph2topo(1:length(Xi),Thi,Phi);
+  [tmp,Thi,Rdi] = sph2topo([[1:length(Xi)]',Thi(:),Phi(:)]);
   skirt_mask = (sqrt(Xi.^2+Yi.^2)> rmax*squeezefac & ...
          abs(Thi)<pi/2);
   ii = find(mask == 0);
