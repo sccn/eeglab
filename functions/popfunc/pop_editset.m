@@ -22,11 +22,11 @@
 %   "ICA weights array or text file" - [edit box] Import ICA weights from other 
 %                  decompositions (e.g., same data, different conditions). 
 %                  To use the ICA weights from another loaded dataset (n), enter 
-%                  "ALLEEG(n).icaweights". Command line equivalent: 'icaweights'
+%                  ALLEEG(n).icaweights. Command line equivalent: 'icaweights'
 %   "ICA sphere array or text file" - [edit box] Import ICA sphere matrix. 
 %                  Infomax ICA decompositions may be defined by a sphere matrix 
 %                  and an unmixing weight matrix (see above).  To use the sphere 
-%                  matrix from another loaded dataset (n), enter "ALLEEG(n).icasphere" 
+%                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
 %                  Command line equivalent: 'icasphere'.
 %   "Averaged referenced data" - [checkbox] Re-reference data to average reference 
 %                  by checking the checkbox. Transform back to common reference 
@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/02/25 01:00:53  scott
+% header edit -sm
+%
 % Revision 1.33  2003/02/24 16:26:38  arno
 % resolving ???
 %

@@ -10,9 +10,9 @@
 %   "Electrode" - [edit box] electrodes or components (number) to take into
 %                 consideration for rejection. Same as the 'elec_comp'
 %                 parameter from the command line.
-%   "Lower limit(s) - [edit box] lower threshold limit in microV. Same as
+%   "Lower limit(s)" - [edit box] lower threshold limit in microV. Same as
 %                 the command line parameter 'lowthresh'.
-%   "Upper limit(s) - [edit box] upper threshold limit in microV. Same as
+%   "Upper limit(s)" - [edit box] upper threshold limit in microV. Same as
 %                 the command line parameter 'upthresh'.
 %   "Start time(s)" - [edit box] starting time limit in second. Same as
 %                 the command line parameter 'starttime'.
@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/02/18 22:29:05  arno
+% update header for GUI
+%
 % Revision 1.10  2002/08/12 21:50:24  arno
 % text
 %
