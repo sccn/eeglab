@@ -1,4 +1,4 @@
-% bootstat() - accumulate surrogate data to compare two conditions 
+% bootstat() - accumulate surrogate data to assess significance
 %
 % Usage:
 %     >> [rsignif,accarray] = bootstat(arg1, arg2, formula, varargin ...);
@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/08/06 14:42:58  arno
+% *** empty log message ***
+%
 % Revision 1.17  2003/07/09 22:04:00  arno
 % rouding i to remove warning
 %
@@ -141,7 +144,7 @@
 % -------------------------------------
 
 % *************************************
-% to do: implement the fitting of the psd with as 4th order
+% fitting of the psd with as 4th order
 % polynomial using the kurtosis of the distribution
 % See: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. 
 % A probability distribution and its uses in fitting data. Technimetrics, 
