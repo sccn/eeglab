@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.186  2004/01/24 20:42:05  scott
+% same
+%
 % Revision 1.185  2004/01/24 20:40:23  scott
 % plotting sorting window
 %
@@ -2981,8 +2984,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
   WINFILLCOLOR    = [.66 .76 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
-  if exist('signif') == 1  % (2,times) array giving upper and lower signif limits
-    if ~isempty(signif);
+  if ~isempty(signif);% (2,times) array giving upper and lower signif limits
       filltimes = [times times(end:-1:1)];
       if size(signif,1) ~=2 | size(signif,2) ~= length(times)
          fprintf('plot1trace(): signif array must be size (2,frames)\n')
@@ -3002,12 +3004,11 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
       set(fillh,'edgecolor',FILLCOLOR-[.02 .02 0]); % make edges slightly highlighted
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
-    end
-    if exist('stdev') == 1
+  end
+  if ~isempty(stdev) == 1
       [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
       [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
-    end
-  end;
+  end
   [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
   if ~isempty(axlimits) & sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
