@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/10 00:08:28  arno
+% debuging event consistency
+%
 % Revision 1.9  2002/04/10 00:03:03  arno
 % debuging event consistency
 %
@@ -430,30 +433,7 @@ if ~isempty( varargin)
                                'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
                     error('eeg_checkset: cannot process without channel location file.');
                 end;
-            case 'eventconsistency',
-                % uniformize fields (str or int) if necessary
-                % -------------------------------------------
-                allfields = fieldnames(EEG.event);
-                for indexfield=1:length(allfields)
-                    fieldformat{indexfield} = 'int';
-                    for index = 1:length(EEG.event)
-                        if isstr(getfield(EEG.event, { index }, allfields{indexfield}))
-                            fieldformat{indexfield} = 'str';
-                            index = length(EEG.event);
-                        end;
-                    end;
-                end;
-                for indexfield=1:length(allfields)
-                    if strcmp( fieldformat{indexfield}, 'str') 
-	                    for index = 1:length(EEG.event)
-	                        fieldcontent = getfield(EEG.event, { index }, allfields{indexfield});
-	                        if ~isstr(fieldcontent)
-	                            EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(fieldcontent) );
-	                        end;
-	                    end;
-                    end;
-                end;
-				
+            case 'eventconsistency',				
 				% remove the events which latency are out of boundary
 				% ---------------------------------------------------
 				if isfield(EEG.event, 'latency')
@@ -488,16 +468,12 @@ if ~isempty( varargin)
 					% uniformize fields content for the different epochs
 					% --------------------------------------------------
 					difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
-					arraytmpinfo = {};
+					arraytmpinfo = cell(EEG.trials, length(difffield));
 					for index = 1:length(difffield)
 						% get the field content
 						% ---------------------
 						for indexevent = 1:length(EEG.event)
-							if size(arraytmpinfo,1) >= EEG.event(indexevent).epoch & size(arraytmpinfo,2) >= index
-								if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
-									arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
-								end;
-							else
+							if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
 								arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
 							end;
 						end;
@@ -508,6 +484,30 @@ if ~isempty( varargin)
 				        end;
 				    end;
 				end;
+				
+                % uniformize fields (str or int) if necessary
+                % -------------------------------------------
+                allfields = fieldnames(EEG.event);
+                for indexfield=1:length(allfields)
+                    fieldformat{indexfield} = 'int';
+                    for index = 1:length(EEG.event)
+                        if isstr(getfield(EEG.event, { index }, allfields{indexfield}))
+                            fieldformat{indexfield} = 'str';
+                            index = length(EEG.event);
+                        end;
+                    end;
+                end;
+                for indexfield=1:length(allfields)
+                    if strcmp( fieldformat{indexfield}, 'str') 
+	                    for index = 1:length(EEG.event)
+	                        fieldcontent = getfield(EEG.event, { index }, allfields{indexfield});
+	                        if ~isstr(fieldcontent)
+	                            EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(fieldcontent) );
+	                        end;
+	                    end;
+                    end;
+                end;
+
             otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
