@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/08 00:23:22  arno
+% editing
+%
 % Revision 1.15  2002/08/08 00:22:36  arno
 % adding colmodif option
 %
@@ -110,8 +113,8 @@ if reject
 else
 	com2 = [com2 ...
 		    'disp(''warning: manual modification were not saved in the history'');' ...
-			' warndlg(strvcat(''Epochs labeled for rejection have been noted'',' ...
-			'''To actually reject these epochs, use'', ''Tools/Reject data epochs/Reject labeled epochs''));' ...
+			' warndlg2(strvcat(''Epochs labeled for rejection have been noted'',' ...
+			'''To actually reject these epochs, use'', ''Tools/Reject data epochs/Reject labeled epochs''), ''Warning'');' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
 if ~exist('topcommand')
