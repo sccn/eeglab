@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2002/10/20 00:13:46  arno
+% still debuging very low freqs
+%
 % Revision 1.58  2002/10/19 23:18:57  arno
 % debug lim at very low frequencies
 %
@@ -973,7 +976,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
              '    if g.winrej(end,1) > g.winrej(end,2)' ... % reverse values if necessary
              '       g.winrej(end, 1:2) = [g.winrej(end,2) g.winrej(end,1)];' ...
              '    end;' ...
-			 '    if g.trialstag == -1' ... % find nearest trials boundaries if necessary
+			 '    g.winrej(end,1) = max(1, g.winrej(end,1));' ...
+             '    if g.trialstag == -1' ... % find nearest trials boundaries if necessary
 			 '      I1 = find((g.winrej(end,1) >= g.winrej(1:end-1,1)) & (g.winrej(end,1) <= g.winrej(1:end-1,2)) );' ... 
 			 '      if ~isempty(I1)' ...
 			 '		    g.winrej(I1,2) = max(g.winrej(I1,2), g.winrej(end,2));' ... % extend epoch
@@ -1507,7 +1511,7 @@ else
       else
           Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'))-1;
           g.winlength = (tmpxlim(2) - tmpxlim(1))/g.srate;	
-          Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.srate;
+          Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1)-1)/g.srate;
           Eposition = round(Eposition*1000)/1000;
           set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
       end;  
