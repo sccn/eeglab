@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/22 22:58:30  arno
+% adding extra output parameters
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -188,7 +191,7 @@ while (str(1) == '%')
   			tilehtml = str(1:i2d); 
   			newtitle = 1;
 	        oldvarname = varname;
-        		oldvartext = vartext;
+			oldvartext = vartext;
         	if i2d < length(str)
          			vartext = formatstr(str(i2d+1:end), g.refcall);
          	else	vartext = [];
@@ -205,7 +208,7 @@ while (str(1) == '%')
             newvar = 1;
             oldvarname = varname;
             oldvartext = vartext;
-            varname = tok1;
+            varname = formatstr( tok1, g.refcall);
             strrm = deblank(strrm);            % remove tail blanks
             strrm = deblank(strrm(end:-1:1));	% remove initial blanks 
            	strrm = formatstr( strrm(end:-1:1), g.refcall);
@@ -341,7 +344,8 @@ function tokout = functionformat( tokin, refcall );
 		i1 = findstr( refcall, '%s');
 		i2 = findstr( refcall(i1(1):end), '''');
 		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end;
-		filename  = [ realtokin refcall(i1+2:i1+i2-2)];
+		filename  = [ realtokin refcall(i1+2:i1+i2-2)]; % concatenate filename and extension
+		disp(filename)
 		if exist( filename ) % do not make link if the file does not exist 
 			tokout =  sprintf( [ '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
 		end;
@@ -354,6 +358,8 @@ function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'fu
 		realtokin = tokin( 1:findstr( tokin, '()' )-1);
 		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end;
 		test = 1;
+		if realtokin(1) == '(', realtokin = realtokin(2:end); end;
+		if realtokin(1) == ',', realtokin = realtokin(2:end); end;
 	end;
 return;
 
