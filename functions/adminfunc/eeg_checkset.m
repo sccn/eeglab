@@ -1,7 +1,7 @@
-% eeg_checkset() - check consistency of dataset fields.
+% eeg_checkset() - check consistency of EEGLAB dataset fields.
 %
 % Structure of an EEG dataset under EEGLAB:
-%	EEG.data     	- data array (chans x frames x epochs)
+%	EEG.data     	- three-dimensional data array (chans, frames, epochs)
 %	EEG.setname  	- name of the dataset
 %	EEG.filename 	- filename of the dataset
 %	EEG.filepath    - filepath of the dataset
@@ -21,10 +21,11 @@
 %	EEG.icaweights  - weight array returned by ICA
 %	EEG.icawinv     - inverse ICA weight matrix giving the projected
 %                         activity of the components at the electrodes.
+%                         NOTE: Any linear unmixing matrix may be used.
 % Event and epoch structures:	
 %       EEG.event       - event structure (any number of events per epoch)
 %       EEG.epoch       - epoch structure (one structure per epoch)
-%       --> See the web page dealing with this issue     
+%   --> See the web page http://sccn.ucsd.edu/eeglab/xxx.html for details
 %
 % Variables used for manual and semi-automatic data rejection:
 %	EEG.stats.kurtc         - component kurtosis values
@@ -77,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/20 18:45:02  arno
+% editing error message
+%
 % Revision 1.18  2002/04/18 16:14:25  scott
 % EEG.averef = 'No' by default -sm
 %
