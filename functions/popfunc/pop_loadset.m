@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/02/10 21:31:55  arno
+% path debug
+%
 % Revision 1.21  2004/02/09 01:31:43  arno
 % input path, head edit...
 %
@@ -123,7 +126,11 @@ catch,
     try
         TMPVAR = load([ inputpath '/' inputname ], '-mat');
     catch,
-        TMPVAR = load([ inputpath '\' inputname ], '-mat');
+        try, 
+            TMPVAR = load([ inputpath '\' inputname ], '-mat');
+        catch,
+            error([ inputname ': File not found' ]);
+        end;
     end;        
 end;
 
