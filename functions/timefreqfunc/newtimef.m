@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/07/09 21:33:17  arno
+% timesout - > ntimesout for timefreq call
+%
 % Revision 1.39  2003/06/27 01:01:48  arno
 % updating timesout help
 %
@@ -1334,7 +1337,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 
       h(7) = gca;
       h(8) = cbar('vert');
-      h(9) = get(h(8),'Children');
+      %h(9) = get(h(8),'Children'); % make the function crash
       set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
       set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
 	  if setylim
