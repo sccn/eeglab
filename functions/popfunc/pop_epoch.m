@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/08/17 20:07:22  scott
+% help message
+%
 % Revision 1.19  2002/08/17 19:53:02  scott
 % Epoch [min,max] -> Epoch limits [min,max]
 % ,
@@ -122,11 +125,12 @@
 
 function [EEG, indices, com] = pop_epoch( EEG, events, lim, varargin );
 
-com = '';
 if nargin < 1
    help pop_epoch;
 	return;
 end;	
+com = '';
+indices = [];
 
 if isempty(EEG.event)
    disp('Cannot epoch data with no events'); beep;
