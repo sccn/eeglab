@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/08/05 23:28:50  arno
+% fixed tlimit problem
+%
 % Revision 1.24  2003/05/12 02:15:36  arno
 % remove debug msg
 %
@@ -290,12 +293,12 @@ if length( options ) < 2
 end;
 varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
-if is_sccn
-    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-else 
+%if is_sccn
+%    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
+%else 
     com = sprintf( '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
  
-end;
+%end;
 eval(com)
 
 return;
