@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/07/10 01:03:19  arno
+% Initial revision
+%
 
 function g = finputcheck( vararg, fieldlist, callfunc )
 
@@ -51,11 +54,13 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 	end;
 	if nargin < 3
 		callfunc = '';
+	else 
+		callfunc = [callfunc ' ' ];
 	end;
 
 	NAME = 1;
 	TYPE = 2;
-	VALS = 3
+	VALS = 3;
 	DEF  = 4;
 	SIZE = 5;
 	
@@ -70,7 +75,7 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 		try
 			g = struct(vararg{:});
 		catch
-			error([ callfunc 'error: bad ''key'', ''val'' sequence' ]); 
+			g = [ callfunc 'error: bad ''key'', ''val'' sequence' ]; return;
 		end;
 	end;
 	
@@ -87,23 +92,23 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 		switch fieldlist{index, TYPE}
 		 case { 'integer' 'real' 'boolean' }, 
 		  if ~isnumeric(tmpval)
-			error([ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be numeric' ]); 
+			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be numeric' ]; return;
 		  end;
 		  if strcmp(fieldlist{index, TYPE}, 'boolean')
 			  if tmpval ~=0 & tmpval ~= 1
-				  error([ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be 0 or 1' ]); 
+				  g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be 0 or 1' ]; return;
 			  end;  
 		  else 
 			  if strcmp(fieldlist{index, TYPE}, 'integer')
 				  if ~isempty(fieldlist{index, VALS})
 					  if ~ismember(tmpval, fieldlist{index, VALS})
-						  error([ callfunc 'error: wrong value for argument ''' fieldlist{index, NAME} '''' ]); 
+						  g = [ callfunc 'error: wrong value for argument ''' fieldlist{index, NAME} '''' ]; return;
 					  end;
 				  end;
 			  else % real
 				  if ~isempty(fieldlist{index, VALS})
 					  if tmpval < fieldlist{index, VALS}(1) | tmpval > fieldlist{index, VALS}(2)
-						  error([ callfunc 'error: value out of range for argument ''' fieldlist{index, NAME} '''' ]); 
+						  g = [ callfunc 'error: value out of range for argument ''' fieldlist{index, NAME} '''' ]; return;
 					  end;
 				  end;
 			  end;
@@ -112,24 +117,24 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 		  
 		 case 'string'
 		  if ~isstr(tmpval)
-			error([ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a string' ]); 
+			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a string' ]; return;
 		  end;
 		  if ~isempty(fieldlist{index, VALS})
-			  if isempty(strmatch(lower(tmpval)), fieldlist{index, VALS})
-				  error([ callfunc 'error: wrong value for argument''' fieldlist{index, NAME} '''' ]); 
+			  if isempty(strmatch(lower(tmpval), fieldlist{index, VALS}))
+				  g = [ callfunc 'error: wrong value for argument''' fieldlist{index, NAME} '''' ]; return;
 			  end;
 		  end;
 
 		  
 		 case 'cell'
 		  if ~isstr(tmpval)
-			error([ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a cell array' ]); 
+			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a cell array' ]; return;
 		  end;
 		  
 		  
 		 case 'struct'
 		  if ~isstr(tmpval)
-			error([ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a structure' ]); 
+			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a structure' ]; return;
 		  end;
 		  
 		  
@@ -141,10 +146,8 @@ function g = finputcheck( vararg, fieldlist, callfunc )
 	% check if fields are defined
 	% ---------------------------
 	allfields = fieldnames(g);
-	allowedfields =  fieldlist(:, 1)';
 	for index=1:length(allfields)
-		switch allfields{index}
-		 case allowedfields;
-		 otherwise, error([ callfunc 'error: undefined argument ''' fieldlist{index, NAME} '''']);
+		if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
+			g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
 		end;
 	end;
