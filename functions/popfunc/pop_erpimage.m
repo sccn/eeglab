@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/04/26 21:41:27  arno
+% phase/coher consistency chack
+%
 % Revision 1.23  2002/04/25 18:18:24  arno
 % debugging spec
 %
@@ -485,9 +488,9 @@ else
     % ---------------------------------------------------------
     eeg_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
-		tmpsig = ['EEG.icacat(' int2str(channel) ', :)'];
+		tmpsig = ['EEG.icaact(' int2str(channel) ', :)'];
 	else
-		tmpsig = ['EEG.icacat(' int2str(channel) ', :)'];
+		tmpsig = ['EEG.icaact(' int2str(channel) ', :)'];
         tmpsig = ['EEG.icaweights(' int2str(channel) ',:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
     end;
 end;
