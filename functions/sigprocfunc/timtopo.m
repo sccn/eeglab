@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/03/05 03:04:52  scott
+% head_sep
+%
 % Revision 1.57  2003/03/05 03:03:43  scott
 % topowidth
 %
@@ -374,7 +377,6 @@ else
 end
 
 head_sep = 0.2;
-pos
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth> 0.25*pos(4) % dont make too high
   topowidth = 0.25*pos(4);
@@ -531,7 +533,6 @@ for t=1:ntopos
     end
   end
   topostring = [ 'topoplot(data(:,plotframes(t)),chan_locs' topoargs ');']; % plot the scalp map 
-  topostring
   eval(topostring);
   %
   % ELSE make a 3-D headplot
