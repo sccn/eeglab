@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/14 18:41:37  arno
+% edit text
+%
 % Revision 1.16  2002/08/14 17:46:18  arno
 % debuging
 %
@@ -134,7 +137,7 @@ if nargin < 3
 	% popup window parameters
 	% -----------------------
    promptstr    = { strvcat('Enter time-locking event type(s) ([]=all):', ...
-                    '(use ''Edit > Event values'' to scan type values)'), ...
+                    'Select ''Edit > Event values'' to see type values.'), ...
                     'Epoch [start, end] in seconds (ex: [-1 2]):', ... 
                     'Name for the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits ([min max], []=none):'  };
