@@ -135,6 +135,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/12/24 02:51:22  arno
+% new version of readlocs
+% ,
+%
 
 % To DO: remove the cart2topo, use cart2sph and sph2topo instead
 % use chancenter to recenter data
@@ -244,101 +248,95 @@ if isstr(filename)
    % import file
    % -----------
    if strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
-         strcmp(lower(g.filetype), 'polhemus')
-	      [eloctmp labels X Y Z]= readelp( filename );
- 			if strcmp(lower(g.filetype), 'polhemusy')
-             [theta radius X Y Z] = cart2topo( Y', X', Z','optim',1);  
-         else
-             [theta radius X Y Z] = cart2topo( X', Y', Z','optim',1);  
-         end;
-         for index = 1:length( eloctmp )
-			  eloc(index).labels = labels{index};
-			  eloc(index).theta  = theta(index);
-			  eloc(index).radius = radius(index);
-			  if strcmp(lower(g.filetype), 'polhemusy')
-				  eloc(index).X = Y(index);
-				  eloc(index).Y = X(index);	
-				  eloc(index).Z = Z(index);	
-			  else
-				  eloc(index).X = X(index);
-				  eloc(index).Y = Y(index);	
-				  eloc(index).Z = Z(index);	
-			  end;
-         end;
-	else      
-      % importing file
-      % --------------
-      array = load_file_or_array( filename, g.skipline);
-      if size(array,2) < length(g.format)
-      	fprintf('Readlocs warning: # of columns in file inferior to # format entries');
-   	elseif size(array,2) > length(g.format)
-      	fprintf('Readlocs warning: # of columns in file superior to # format entries');
-   	end;
-      
-      % removing comments and empty lines
-      % ---------------------------------
-      indexbeg = 1;
-      while isempty(array{indexbeg,1}) | ...
-            (isstr(array{indexbeg,1}) & array{indexbeg,1}(1) == '#' )
-				indexbeg = indexbeg+1;
-      end;
-      array = array(indexbeg:end,:);
-      
-      % converting file
-      % ---------------
-   	for indexcol = 1:min(size(array,2), length(g.format))
-      	for indexrow = 1:size( array, 1)
-         	eval ( [ 'eloc(indexrow).' g.format{indexcol} '= array{indexrow, indexcol};' ]);   
-      	end;
-   	end;
+           strcmp(lower(g.filetype), 'polhemus')
+       [eloctmp labels X Y Z]= readelp( filename );
+       if strcmp(lower(g.filetype), 'polhemusy')
+           tmp = X; X = Y; Y = Z;
+       end;
+       for index = 1:length( eloctmp )
+           eloc(index).labels = labels{index};
+           eloc(index).theta  = theta(index);
+           eloc(index).radius = radius(index);
+           if strcmp(lower(g.filetype), 'polhemusy')
+               eloc(index).X = Y(index);
+               eloc(index).Y = X(index);	
+               eloc(index).Z = Z(index);	
+           else
+               eloc(index).X = X(index);
+               eloc(index).Y = Y(index);	
+               eloc(index).Z = Z(index);	
+           end;
+       end;
+       elocs = convertlocs(elocs, 'cart2all');
+   else      
+       % importing file
+       % --------------
+       array = load_file_or_array( filename, g.skipline);
+       if size(array,2) < length(g.format)
+           fprintf('Readlocs warning: # of columns in file inferior to # format entries');
+       elseif size(array,2) > length(g.format)
+           fprintf('Readlocs warning: # of columns in file superior to # format entries');
+       end;
+       
+       % removing comments and empty lines
+       % ---------------------------------
+       indexbeg = 1;
+       while isempty(array{indexbeg,1}) | ...
+               (isstr(array{indexbeg,1}) & array{indexbeg,1}(1) == '#' )
+           indexbeg = indexbeg+1;
+       end;
+       array = array(indexbeg:end,:);
+       
+       % converting file
+       % ---------------
+       for indexcol = 1:min(size(array,2), length(g.format))
+           [str mult] = checkformat(g.format{indexcol});
+           for indexrow = 1:size( array, 1)
+               eval ( [ 'eloc(indexrow).'  str '= mult*array{indexrow, indexcol};' ]);   
+           end;
+       end;
    end;
    
    % handling BESA coordinates
    % -------------------------
    if isfield(eloc, 'sph_phi_besa') & isfield(eloc, 'sph_theta_besa')
-		for index = 1:length(eloc)
-			[ tmp eloc(index).theta eloc(index).radius] ...
-				= sph2topo( [ 1 eloc(index).sph_phi_besa eloc(index).sph_theta_besa] , 1, 1);
-      end;
-      fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
-      fprintf('          to avoid confusion (these field can though be exported)\n');   
-		eloc = rmfield(eloc, 'sph_phi_besa');
-		eloc = rmfield(eloc, 'sph_theta_besa');
-   end;
-   
+       eloc = convertlocs(eloc, 'sphbesa2all');
+       fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
+       fprintf('          to avoid confusion (these field can be exported though)\n');   
+       eloc = rmfield(eloc, 'sph_phi_besa');
+       eloc = rmfield(eloc, 'sph_theta_besa');  
    % converting XYZ coordinates to polar
    % -----------------------------------
-   if isfield(eloc, 'sph_phi_besa') & isfield(eloc, 'sph_theta_besa')
-      	[theta radius X Y Z] = cart2topo( Y', X', Z','optim',1);  
-         for index = 1:length( eloc )
-			  eloc(index).labels = labels{index};
-			  eloc(index).theta  = theta(index);
-			  eloc(index).radius = radius(index);
-			  eloc(index).X = X(index);
-			  eloc(index).Y = Y(index);	
-			  eloc(index).Z = Z(index);	
-			end;
+   elseif isfield(eloc, 'X')
+       eloc = convertlocs(eloc, 'cart2all');  
+   elseif isfield(eloc, 'X')
+       eloc = convertlocs(eloc, 'sph2all');  
+   else 
+       eloc = convertlocs(eloc, 'topo2all');  
    end;
    
    % inserting labels if no labels
    % -----------------------------
    if ~isfield(eloc, 'labels')
-      fprintf('Readlocs: Automatically inserting electrode labels\n');
-      for index = 1:length(eloc)
-         eloc(index).labels = [ 'E' int2str(index) ];
-      end;
+       fprintf('Readlocs: Automatically inserting electrode labels\n');
+       for index = 1:length(eloc)
+           eloc(index).labels = [ 'E' int2str(index) ];
+       end;
    end;
    
    % resorting electrodes if number not-sorted
    % -----------------------------------------
    if isfield(eloc, 'channum')
-      allchannum = cell2mat( { eloc.channum } );
-      if any( sort(allchannum) ~= allchannum )
-         fprintf('Readlocs: Resorting channel number based on ''channum'' column indices\n');
-         [tmp newindices] = sort(allchannum);
-         eloc = eloc(newindices);
-      end;
-		eloc = rmfield(eloc, 'channum');      
+       if ~isnumeric(eloc(1).channum)
+           error('Channel numbers must be numeric');
+       end;
+       allchannum = cell2mat( { eloc.channum } );
+       if any( sort(allchannum) ~= allchannum )
+           fprintf('Readlocs: Resorting channel number based on ''channum'' column indices\n');
+           [tmp newindices] = sort(allchannum);
+           eloc = eloc(newindices);
+       end;
+       eloc = rmfield(eloc, 'channum');      
    end;
 else
     if isstruct(filename)
@@ -395,9 +393,9 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, 'X'), str = upper(str); return; end;
 	if strcmpi(str, 'Y'), str = upper(str); return; end;
 	if strcmpi(str, 'Z'), str = upper(str); return; end;
-	if strcmpi(str, '-X'), str = upper(str); mult = -1; return; end;
-	if strcmpi(str, '-Y'), str = upper(str); mult = -1; return; end;
-	if strcmpi(str, '-Z'), str = upper(str); mult = -1; return; end;
+	if strcmpi(str, '-X'), str = upper(str(2:end)); mult = -1; return; end;
+	if strcmpi(str, '-Y'), str = upper(str(2:end)); mult = -1; return; end;
+	if strcmpi(str, '-Z'), str = upper(str(2:end)); mult = -1; return; end;
 	if strcmpi(str, 'custum1'), return; end;
 	if strcmpi(str, 'custum2'), return; end;
 	if strcmpi(str, 'custum3'), return; end;
