@@ -3,22 +3,25 @@
 %               are points on a sphere around a given
 %               [x y z] center or around (0,0,0) {default}.
 %
-% Usage:        >> [th r] = cart2topo(xyz);   % 3-column data
-%               >> [th r] = cart2topo(x,y,z); % separate x,y,z vectors
-%
-%               >> [th r] = cart2topo(x,y,z,center,squeeze,optim); 
+% Usage:  >> [th r] = cart2topo(xyz);   % 3-column data
+%         >> [th r] = cart2topo(x,y,z); % separate x,y,z vectors
+%         >> [th r] = cart2topo(xyz,'key', 'val', ...); 
+%         >> [th r] = cart2topo(x,y,z,'key', 'val', ...); 
 %
 % Optional inputs:
+%    'center'  = [X Y Z] known center different from [0 0 0]
+%                Enter [] if center not known, so the center
+%                will be automatically optimize (asuming electrodes
+%                location lie onto a sphere). Default is [0 0 0].
+%    'squeeze' = plotting  squeeze-in factor (0[default]->1). -1 optimize
+%                the squeeze factor automatically so that maximum radius
+%                is 0.5. 
+%    'optim'   = find best fitting sphere center based on standard
+%                deviation of radius values.
+%    'gui'     = ['on'|'off'] pops up a gui for optional arguments. 
+%                Default is off.
 %
-%    center  = [ X Y Z] known center different from [0 0 0]
-%
-%    For the following options put center = [] if center not known:
-%
-%    squeeze = plotting  squeeze-in factor (0[default]->1). -1 optimize
-%              the squeeze facto automatically.
-%    optim   = 1: find best fitting sphere center
-%
-% Example:      >> [th r] = cart2topo(xyz,[1 0 4]);
+% Example: >> [th r] = cart2topo(xyz,[1 0 4]);
 %
 % Notes: topoplot() does not plot channels with radius>0.5
 %        Shrink radii to within this range to interpolate 
@@ -30,7 +33,8 @@
 %   [channums th r chanlabels] and the chanlabels must all be 4-char 
 %   strings (with . for spaces). See >> topoplot example
 %
-% Authors: Scott Makeig&Luca Finelli, SCCN/INC/UCSD, La Jolla, 11/1999-03/2002 
+% Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
+%          La Jolla, 11/1999-03/2002 
 %
 % See also: topo2sph(), sph2topo()
 
@@ -53,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 3-16-00 improved help message -sm
 % 1-25-02 put spherror subfunction inside cart2topo -ad
@@ -63,73 +70,86 @@
 % 03-31-02 center fitting is optional
 % 04-01-02 automatic squeeze calculation -ad & sm
  
-function [th,r] = cart2topo(x,y,z,center,squeeze,optim)
+function [th,r] = cart2topo(x,varargin)
 
-if nargin<3
+if nargin<1
     help cart2topo
     return;
 end;
+if nargin >= 2
+	if ~isstr(varargin{1})
+		y = varargin{1};
+		z = varargin{2};
+		varargin = varargin(3:end);
+	end;
+end;
+if exist('y') ~= 1 
+	if size(x,2)==3 % separate 3-column data
+		z = x(:,3);
+		y = x(:,2);
+		x = x(:,1);
+	else
+		error('Unsufficient data in first argument');
+	end
+end;
 
-if nargin<6
-  optim=0;
-end
+g = [];
+if ~isempty(varargin)
+    try, g = struct(varargin{:}); 
+    catch, error('Argument error in the {''param'', value} sequence'); end; 
+end;
 
-if nargin<5
-  squeeze=0;
-end
+try, g.optim;      catch, g.optim = 0; end;
+try, g.squeeze;    catch, g.squeeze = 0; end;
+try, g.center;     catch, g.center = [0 0 0]; end;
+try, g.gui;        catch, g.gui = 'off'; end;
 
-if exist('squeeze') & (squeeze>1)
+if strcmp(g.gui, 'on')
+    geometry = { [2 1 0.1] [2 1 0.1 ] [2 0.2 0.9] };
+    uilist = { { 'Style', 'text', 'string', 'Center ([] for optimization)', 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', '0 0 0'  } { } ...
+			   { 'Style', 'text', 'string', 'Squeeze (0=no squeezing)', 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', '0' } { } ...
+			   { 'Style', 'text', 'string', 'Optim (set=recursive center optimization)', 'fontweight', 'bold'   } ...
+			   { 'Style', 'checkbox', 'value', 0  } { } };
+    results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel location -- cart2topo()' );
+	if isempty(results), return; end;
+	g.center  = eval( [ '[' results{1} ']' ] );
+	g.squeeze = eval( [ '[' results{2} ']' ] );
+	g.optim   = results{3};
+end;
+
+if g.squeeze>1
   fprintf('Warning: Squeeze must be less than 1.\n');
   return
 end
 
-if size(x,2)==3 % separate 3-column data
-   if nargin>1
-     center = y;
-   end
-   z = x(:,3);
-   y = x(:,2);
-   x = x(:,1);
-end
-
-if exist('center') & (~isempty(center) & size(center,2) ~= 3)
+if ~isempty(g.center) & size(g.center,2) ~= 3
   fprintf('Warning: Center must be [x y z].\n');
   return
 end
 
-if size(x,2)>1 % convert to columns
-   x = x'
-end
-
-if nargin>1
-  if size(y,2)>1
-    x = x'
- end
-end
-
-if nargin>2
-  if size(z,2)>1
-   x = x';
-  end
-end
+% convert to columns
+x = x(:);
+y = y(:);
+z = z(:);
 
 options = [];
-if ~exist('center') | isempty(center)
-
-% Find center
-% ----------------------------------------------
-  fprintf('Optimising center position...\n');
-  center = fminsearch('spherror',[0 0 0],options,x,y,z);
-  fprintf('Best center is [%g,%g,%g].\n',center(1),center(2),center(3));
+if isempty(g.center)
+	% Find center
+	% ----------------------------------------------
+	fprintf('Optimising center position...\n');
+	g.center = fminsearch('spherror',[0 0 0],options,x,y,z);
+	fprintf('Best center is [%g,%g,%g].\n',g.center(1),g.center(2),g.center(3));
 end
-x = x - center(1);  % center the data
-y = y - center(2);
-z = z - center(3);
+x = x - g.center(1);  % center the data
+y = y - g.center(2);
+z = z - g.center(3);
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
 wobble = std(radius);              % test if xyz values are on a sphere
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 
-if  wobble/mean(radius) > 0.01 & optim==1
+if  wobble/mean(radius) > 0.01 & g.optim==1
   kk=0;
   while wobble/mean(radius) > 0.01 & kk<5
     newcenter = fminsearch('spherror',center,options,x,y,z);
@@ -175,11 +195,11 @@ for n=1:size(x,1)
 end
 
 r = r/pi;        % scale r to max 0.500
-if squeeze < 0
-    squeeze = 1 - 0.5/max(r); %(2*max(r)-1)/(2*rmax);
-    fprintf('Electrodes will be squeezed to show all using squeezing act of %2.3g\n', squeeze);
+if g.squeeze < 0
+    g.squeeze = 1 - 0.5/max(r); %(2*max(r)-1)/(2*rmax);
+    fprintf('Electrodes will be squeezed to show all using squeezing act of %2.3g\n', g.squeeze);
 end;
-r = r-squeeze*r; % squeeze electrodes in squeeze*100% to have all inside
+r = r-g.squeeze*r; % squeeze electrodes in squeeze*100% to have all inside
 
 for n=1:size(x,1)
   if abs(y(n))<1e-6
