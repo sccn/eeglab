@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2004/02/17 20:05:04  arno
+% remove ICA weights if invalid
+%
 % Revision 1.117  2003/12/17 23:25:39  arno
 % different check for chanlocs
 %
@@ -1050,7 +1053,7 @@ if ~isempty( varargin)
                   end;
               end;
               if strcmp(format, 'str')
-                  fprintf('eeg_checkset: value format of event field ''%s'' made uniform\n', allfields{index});
+                  fprintf('eeg_checkset note: value format of event field ''%s'' made uniform\n', allfields{index});
                   % get the field content
                   % ---------------------
                   for indexevent = 1:length(EEG.event)
