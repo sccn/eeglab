@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/05/19 14:07:12  scott
+% *** empty log message ***
+%
 % Revision 1.38  2002/05/19 14:06:40  scott
 % *** empty log message ***
 %
@@ -405,14 +408,11 @@ for n=1:tfpoints
                % 'interlimits','electrodes')
    axis square;
    hold on
-   if showchan>0
-                topoplot(showchan,chanlocs,'electrodes','off', ...
-                                 'style', 'blank', 'emarkersize1chan', 10)
-   end
    tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
    set(tl,'fontsize',13);
    caxis([limits(5:6)]);
-   if n==tfpoints % & (mod(tfpoints,2)~=0)
+
+   if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
       cb=cbar;
       pos = get(cb,'position');
       set(cb,'position',[pos(1:2) 0.023 pos(4)]);
@@ -430,6 +430,12 @@ for n=1:tfpoints
    set(mk,'markerfacecolor',LINECOLOR);
    axis([0 1 0 1]);
    axis off;
+
+   if showchan>0
+     topoplot(showchan,chanlocs,'electrodes','off', ...
+                  'style', 'blank', 'emarkersize1chan', 10)
+   end
+
    drawnow
 end
 
