@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/09/22 21:29:56  hilit
+% save EEG.filepath as current path
+%
 % Revision 1.36  2004/09/14 17:04:32  arno
 % saving 2 separate ariables
 %
@@ -195,9 +198,9 @@ if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
         drawnow;
 		if length(result) == 0 return; end;
 		indices = eval( [ '[' result{1} ']' ] );
-		[curfilename, curfilepath] = uiputfile('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
+		[curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
 	else
-		[curfilename, curfilepath] = uiputfile('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
+		[curfilename, curfilepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
 	end;
     drawnow;
 	if curfilename == 0 return; end;	
