@@ -43,6 +43,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/12/03 03:19:23  arno
+% allow to use interpolation
+% instead of resample
+%
 % Revision 1.7  2003/09/29 23:45:07  arno
 % reinitializing urevent if crash
 %
@@ -103,7 +107,7 @@ oldpnts   = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
-if exist('resample') == 2
+if exist('resample') == 3
     fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
     for index1 = 1:size(EEG.data,1)
         fprintf('%d ', index1);	
@@ -120,9 +124,9 @@ if exist('resample') == 2
     fprintf('\n');	
     EEG.srate   = EEG.srate*p/q;
 else
-    disp('This method of resampling extrimelly slow');
+    disp('This method of resampling uses the griddata function and is extremelly slow');
     disp('To speed it up, use the signal processing toolbox (automatically detected)');
-    disp('or reprogram this function using the spline interpolation (see >> help spline)');
+    disp('or reprogram this function using spline interpolation (see >> help spline)');
     EEG.srate   = (round(EEG.pnts*p/q)-1)/(EEG.xmax-EEG.xmin);
     fprintf('resampling data %3.4f Hz\n', EEG.srate);
     tmpeeglab = myresample(EEG.data, EEG.pnts, round(EEG.pnts*p/q));
