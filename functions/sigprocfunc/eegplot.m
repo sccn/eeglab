@@ -157,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2003/07/12 02:13:47  arno
+% fixing color, implementing dash
+%
 % Revision 1.82  2003/07/12 01:23:46  arno
 % now handling events
 %
@@ -1180,8 +1183,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % --------------------------
   if ~isempty(g.event)
       if ~isfield(g.event, 'type') | ~isfield(g.event, 'latency'), g.event = []; end;
+  end;
       
-      [g.eventtypes tmpind indexcolor] = unique({g.event.type});
+  if ~isempty(g.event)
+      if isstr(g.event(1).type)
+           [g.eventtypes tmpind indexcolor] = unique({g.event.type});
+      else [g.eventtypes tmpind indexcolor] = unique(cell2mat({g.event.type}));
+      end;
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
       g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};  
       g.eventtypecolors = g.eventcolors(mod([1:length(g.eventtypes)]-1 ,length(g.eventcolors))+1);
