@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/01/28 21:06:32  scott
+% added test for NCHANS in locs file -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -64,7 +67,12 @@ if isstr( filename )
 	locations = locations';
 	Th = pi/180*locations(:,2);  % convert degrees to rads
 	Rd = locations(:,3);
-	ii = find(Rd <= MAX_RADIUS); % interpolate on-scalp channels only
+	% ii = find(Rd <= MAX_RADIUS); % interpolate on-scalp channels only
+        if max(abs(Rd))>0.5
+          Rd = Rd/(2*max(abs(Rd))); % shrink to max radius = 0.5
+          fprintf('gradplot(): Shrinking radio from max %4.3f to 0.5\n',...
+                          max(abs(Rd)));
+        end
 	Th = Th(ii);
 	Rd = Rd(ii);
 	[x,y] = pol2cart(Th,Rd);
