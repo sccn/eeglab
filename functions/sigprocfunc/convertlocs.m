@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/05/13 23:18:00  arno
+% adding verbose option
+%
 % Revision 1.6  2002/12/27 22:59:47  arno
 % adding warning message
 %
@@ -78,7 +81,7 @@ end;
 if nargin < 2
    command = 'auto';
 end;
-if nargin == 4 & strmpi(varargin{2}, 'off')
+if nargin == 4 & strcmpi(varargin{2}, 'off')
     verbose = 0;
 else
     verbose = 1;
