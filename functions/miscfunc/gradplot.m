@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/01/28 21:38:40  scott
+% added auto-shrink ... -sm
+%
 % Revision 1.2  2004/01/28 21:06:32  scott
 % added test for NCHANS in locs file -sm
 %
@@ -73,8 +76,8 @@ if isstr( filename )
           fprintf('gradplot(): Shrinking radio from max %4.3f to 0.5\n',...
                           max(abs(Rd)));
         end
-	Th = Th(ii);
-	Rd = Rd(ii);
+	% Th = Th(ii);
+	% Rd = Rd(ii);
 	[x,y] = pol2cart(Th,Rd);
         if length(x) ~= NCHANS
          fprintf(...
