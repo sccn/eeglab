@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/12 18:01:34  arno
+% Initial revision
+%
 
 function [result] = questdlg2(Prompt,Title,varargin);
 
@@ -58,10 +61,10 @@ end;
 for index = 1:length(varargin)
 	if length(varargin) == 1
 		geometry = { geometry{:} [ 1 1 1] };
-		listgui = {listgui{:} { } { 'Style', 'text', 'string', Prompt(index,1) } { } };
+		listgui = {listgui{:} { } { 'Style', 'pushbutton', 'string',varargin{index}  } { } };
 	else
 		geometry = { geometry{:} ones(1,length(varargin)) };
-		listgui = {listgui{:} { 'Style', 'text', 'string', Prompt(index,1) }};
+		listgui = {listgui{:} { 'Style', 'pushbutton', 'string',varargin{index}  } };
 	end;
 end;
 
