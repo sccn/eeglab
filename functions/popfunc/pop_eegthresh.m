@@ -2,7 +2,8 @@
 %               (i.e. standard) method.
 %
 % Usage:
-%   >> Indexes = pop_eegthresh( INEEG, typerej, elec_comp, negthresh, ...
+%   >> pop_eegthresh( INEEG, typerej); % pops-up
+%   >> [EEG Indexes] = pop_eegthresh( INEEG, typerej, elec_comp, negthresh, ...
 %                posthresh, starttime, endtime, superpose, reject);
 %
 % Inputs:
@@ -55,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/26 16:48:32  arno
+% switching icacomp
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -125,16 +129,18 @@ else
 end;
 
 if any(starttime < EEG.xmin) 
-	fprintf('Warning : starttime inferior to minimum time, adjusted'); 
+ fprintf('Warning : starttime inferior to minimum time, adjusted\n'); 
 	starttime(find(starttime < EEG.xmin)) = EEG.xmin; 
 end;
 if any(endtime   > EEG.xmax) 
-	fprintf('Warning : starttime inferior to minimum time, adjusted'); 
+	fprintf('Warning : endtime superior to maximum time, adjusted\n'); 
 	endtime(find(endtime > EEG.xmax)) = EEG.xmax;
 end;
 
 if icacomp == 1
-	[I1 Irej NS Erej] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+	[I1 Irej NS Erejtmp] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+    tmpelecIout = zeros(EEG.nbchan, EEG.trials);
+    tmpelecIout(elecrange,Irej) = Erejtmp;
 else
     % test if ICA was computed
     % ------------------------
@@ -145,21 +151,15 @@ else
         icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
-	[Irej Erejtmp] = eegthresh( icaacttmp, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
-    Erej = zeros(size(EEG.icaweights,1), size(EEG.trials,2));
-    Erej(elecrange,:) = Erejtmp;
+	[I1 Irej NS Erejtmp] = eegthresh( icaacttmp, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+    tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
+    tmpelecIout(elecrange,Irej) = Erejtmp;
 end;
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
-fprintf('%d/%d trials rejected\n', size(I2(:), 1), EEG.trials);
+fprintf('%d/%d trials rejected\n', length(Irej), EEG.trials);
 tmprejectelec = zeros( 1, EEG.trials);
-tmprejectelec(I2) = 1;
-if icacomp == 1
-   tmpelecIout = zeros(EEG.nbchan, EEG.trials);
-else
-   tmpelecIout = zeros(size(EEG.icaweight,1), EEG.trials);
-end;
-tmpelecIout(elecrange, I2) = tmprej;
+tmprejectelec(Irej) = 1;
 
 if calldisp
     if icacomp == 1 macrorej  = 'EEG.reject.rejthresh';
@@ -178,9 +178,14 @@ if calldisp
     end;	
 end;
 
-com = sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
-   num2str(posthresh), num2str(starttime ) , num2str(endtime), superpose, reject ); 
+%com = sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
+%   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
+%   num2str(posthresh), num2str(starttime ) , num2str(endtime), superpose, reject ); 
+com = [ com sprintf('%s = pop_eegthresh(%s,%s);', inputname(1), ...
+		inputname(1), vararg2str({icacomp,elecrange,negthresh,posthresh,starttime,endtime,superpose,reject})) ]; 
+if nargin < 3
+	I1 = com;
+end;
 
 return;
 
