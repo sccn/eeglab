@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2002/11/15 01:11:59  arno
+% debugging incallback
+%
 % Revision 1.64  2002/11/14 17:03:41  arno
 % debugging multiple window selection
 %
@@ -362,7 +365,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.spacing; 			catch, g.spacing	= 0; 	end;
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
-   try, g.position; 	    catch, g.position	= [100 200 800 500]; 	end;
+   try, g.position; 	    catch, g.position	= ORIGINAL_POSITION; 	end;
    try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
    try, g.trialstag; 		catch, g.trialstag	= -1; 	end;
    try, g.winrej; 			catch, g.winrej		= []; 	end;
@@ -496,7 +499,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
-      'MenuBar','none','tag', g.tag ,'Position',ORIGINAL_POSITION, 'numbertitle', 'off');
+      'MenuBar','none','tag', g.tag ,'Position',g.position, 'numbertitle', 'off');
 
   pos = get(gcf,'position'); % plot relative to current axes
   q = [pos(1) pos(2) 0 0];
@@ -708,7 +711,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 			'close(gcbf);'] );
 
   set(u,'Units','Normalized')
-  set(gcf, 'position', g.position);
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Set up uimenus
