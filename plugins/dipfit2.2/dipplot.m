@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.115  2005/03/18 17:52:05  arno
+%fixing summary mode
+%
 %Revision 1.114  2005/03/18 17:14:26  arno
 %fixing besa coordinates
 %.,
@@ -1066,6 +1069,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
              'clear tmpuserdat;' ...
              'dipplot(gcbf);' ];
     viewstring = fastif(dat.axistight, 'Loose view', 'Tight view');
+    enmesh     = fastif(isempty(g.meshdata) & strcmpi(g.coordformat, 'MNI'), 'off', 'on');
     
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'fontweight', 'bold', 'string', 'No controls', 'callback', ...
@@ -1079,7 +1083,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', viewstring, 'callback', cbview);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.25 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', cbmesh);
+                  'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', cbmesh, 'enable', enmesh);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.3 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', 'Display:','fontweight', 'bold' );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.35 .15 .02], 'tag', 'tmp',...
