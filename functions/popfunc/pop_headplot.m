@@ -1,36 +1,34 @@
-% pop_headplot() - plot spherically-splined EEG field map on a semi-realistic 
-%                  3-D head model.
+% pop_headplot() - plot a spherically-splined EEG field map on 
+%                  a semi-realistic 3-D head model.
 % Usage:
-%   >> EEGOUT = pop_headplot( EEG, typeplot, 
+%   >> EEGOUT = pop_headplot( EEG, typeplot, ...
 %                    latencies/components, title, rowscols, 'key', 'val' ...);
-%
 % Inputs:
-%   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component (default:1)
-%   latencies/components  - array of latencies (in msec)
-%                at which the head should be plotted.  
-%                For components: array of index of components to plot.
-%   title      - plot title.
+%   EEG        - EEG dataset structure
+%   typeplot   - 1=channel, 0=component {Default: 1}
+%   latencies/components  - If channels, array of epoch mean latencies (in ms),
+%                Else, for components, array of component indices to plot.
+%   title      - Plot title
 %   rowscols   - Vector of the form [m,n] where m is total vertical tiles and n 
-%                is horizontal tiles per page. If the number of maps exceeds m*n,
-%                multiple figures will be produced {def|0 -> one near-square page}.
+%                horizontal tiles per page. If the number of maps exceeds m*n,
+%                multiple figures will be produced {def|0 -> 1 near-square page}
 %
 % Optional inputs:
-%   'setup'    - ['setupfile.spl'] make the headplot spline file
-%   'load'     - ['setupfile.spl'] load the headplot spline file
-%   others...  - all headplot options. See >> help headplot
+%   'setup'    - ['setupfile.spl'] Make the headplot spline file
+%   'load'     - ['setupfile.spl'] Load the headplot spline file
+%   others...  - All headplot options. See >> help headplot
 %
 % Output:
-%   EEGOUT - EEG dataset with potentially modified splinefile name.
+%   EEGOUT - EEG dataset, possibly with modified splinefile. 
 %
 % Note:
 %   A new figure is created only when the pop_up window is called or when
-%   several channel/components are plotted, so you may call this command 
-%   to draw topographic maps in a tiled window.     
+%   several channels/components are plotted. Thus, you may call this command 
+%   to draw 3-D topographic maps in a tiled figure.     
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 March 2002
 %
-% See also: eeglab(), headplot()
+% See also: headplot(), eegplot()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -51,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/03/12 03:21:38  arno
+% help button
+%
 % Revision 1.15  2002/10/15 17:03:37  arno
 % drawnow
 %
