@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/12/24 17:32:33  scott
+% help msg and text output edits
+%
 % Revision 1.31  2003/12/05 00:19:52  arno
 % history in dataset
 %
@@ -270,6 +273,11 @@ else % case of a single trial (continuous data)
     if ~isempty(EEG.chanlocs) & icacomp
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
     end;
+end;
+
+if EEG.nbchan > 100
+    disp('pop_eegpot warning: baseline subtraction disabled to speed up display');
+    eegplotoptions = { eegplotoptions{:} 'submean' 'off' };
 end;
 
 if icacomp == 1
