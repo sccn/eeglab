@@ -1,18 +1,18 @@
-% vararg2str() - transform arguments into string for
-%                evaluation using the eval command
+% vararg2str() - transform arguments into string for evaluation 
+%                using the eval() command
 %
 % Usage:
 %   >> strout = vararg2str( allargs );
 %   >> strout = vararg2str( allargs, inputnames, inputnum, nostrconv );
 %
 % Inputs:
-%   allargs    - cell array containing all arguments
-%   inputnames - cell array of input names for these argument if any
-%   inputnum   - vector of indices for all input. If present, the
-%                output in the string may is replaced by varargin{num}.
-%                include NaN in the vector to avoid specific parameters
-%                to be converted in this way.
-%   nostrconv  - Vector of 0 and 1 indicating where string 
+%   allargs    - Cell array containing all arguments
+%   inputnames - Cell array of input names for these arguments, if any.
+%   inputnum   - Vector of indices for all inputs. If present, the
+%                string output may by replaced by varargin{num}.
+%                Include NaN in the vector to avoid specific parameters
+%                being converted in this way.
+%   nostrconv  - Vector of 0s and 1s indicating where the string 
 %                should be not be converted.
 %
 % Outputs:
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 01:37:03  arno
+% doubling the quotes in string
+%
 % Revision 1.1  2002/04/10 00:33:44  arno
 % Initial revision
 %
