@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/04/29 15:01:58  scott
+% debugging -sm
+%
 % Revision 1.28  2002/04/29 14:58:56  scott
 % debugging -sm
 %
@@ -752,8 +755,8 @@ switch g.phsamp
 size(cumulX)
 size(PA)
   for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
-    PA(j,:,:) = PA(j,:,:) ./ cumulX;
 disp phsamp4
+    PA(j,:,:) = PA(j,:,:) ./ cumulX;
   end
 end
 
