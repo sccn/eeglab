@@ -38,9 +38,9 @@
 %               Dipole colors will rotate through the given colors if
 %               the number given is less than the number of dipoles to plot.
 %               A single number will be used as color index in the jet colormap.
-%  'view'     - 3-D viewing angle in cartesian coords.,
-%               [0 0 1] gives a sagittal view, [0 -1 0] a view from the rear;
-%               [1 0 0] gives a view from the side of the head.
+%  'view'     - 3-D viewing angle in cartesian coordinates: [0 0 1] gives a axial 
+%               (top) view; [0 -1 0] gives a coronal (rear) view; [1 0 0] gives 
+%               a sagittal (side) view of the head. {default:[0 0 1],top|axial}
 %  'mesh'     - ['on'|'off'] Display spherical mesh. {Default is 'on'}
 %  'axistight' - ['on'|'off'] For MRI only, display the closest MRI
 %               slide. {Default is 'off'}
@@ -146,6 +146,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.104  2004/11/20 02:32:43  scott
+%help msg edits:   carthesian -> Cartesian
+%
 %Revision 1.103  2004/11/11 02:34:15  arno
 %fixing dipnames
 %
@@ -449,7 +452,7 @@
 
 function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
-    DEFAULTVIEW = [0 0 1];
+    DEFAULTVIEW = [0 0 1]; % default to 'top' (axial) view
         
     if nargin < 1
         help dipplot;
@@ -534,7 +537,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     elseif isstr(g.image)
         fid = fopen('VolumeMNI.bin', 'rb', 'ieee-le');
         if fid == -1
-            error('Cannot find MRI data file');
+            errorstr=sprintf('Cannot find MRI data file "VolumeMNI.bin"');
+            error(errorstr);
         end;
         V = double(fread(fid, [108 129*129], 'uint8'))/255;
         V = reshape(V, 108, 129, 129);
