@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/09/21 16:48:37  hilit
+% changed from && -> &
+%
 % Revision 1.26  2004/09/14 17:36:31  arno
 % debug new reading mode
 %
@@ -130,7 +133,7 @@ if nargin < 2
     inputpath = '';
 end;
 if nargin < 1
-	[inputname, inputpath] = uigetfile('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
+	[inputname, inputpath] = uigetfile2('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
 end;
