@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % graphic interface INFOS
 % 03/18/02 debugging variable passing - ad & lf
@@ -110,6 +113,11 @@ end;
 % ----------------
 fprintf('Pop_importepoch: Loading file or array...\n');
 if isstr(filename)
+	% check filename
+	% --------------
+	if exist(filename) == 2 & evalin('base', ['exist(''' filename ''')']) == 1
+		disp('Pop_importepoch WARNING: FILE AND ARRAY WITH THE SAME NAME, LOADING FILE');
+	end;
     values = load_file_or_array( filename, headerlines );
 else
     values = filename;
@@ -243,7 +251,7 @@ function array = load_file_or_array( varname, skipline );
         if exist(varname) ~= 2, error( [ 'Set error: no filename ' varname ] ); end;
 
 		fid=fopen(varname,'r','ieee-le');
-		if fid<0, error( ['Set error: file ' varname ' found but error while opening file\n'] ); end;  
+		if fid<0, error( ['Set error: file ''' varname ''' found but error while opening file'] ); end;  
 
 		for index=1:skipline	fgetl(fid); end; % skip lines ---------
         inputline = fgetl(fid);
