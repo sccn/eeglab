@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/07/11 18:20:21  arno
+% maxamp debug
+%
 % Revision 1.32  2002/07/11 18:16:00  arno
 % implmenting maxamp
 %
@@ -807,7 +810,7 @@ case 'on'
    
    imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % plot the coherence image
    if ~isempty(g.maxamp)
-	   caxis([0 g.maxamp]);
+	   caxis([-g.maxamp g.maxamp]);
    end;
    tmpscale = caxis;
    
