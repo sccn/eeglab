@@ -1,6 +1,7 @@
-% timef() - Returns estimates and plots of mean event-related (log) spectral
+% timef() - Returns estimates and plots of mean event-related spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
+%
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
 %           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
 %         * For the wavelet and FFT methods, output frequency spacing 
@@ -32,16 +33,16 @@
 %                     standard wavelets; factor=0 -> fixed epoch length, as in FFT.
 %                     Else, 'mtaper' -> multitaper decomposition 
 %
-%    Optional Inter-Irial Coherence Type:
+%    Optional Inter-Irial Coherence (ITC) type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
 %                      ('coher') or phase coherence ('phasecoher') also known
 %                      as the phase coupling factor           {'phasecoher'}.
 %
-%    Optional Detrending:
+%    Optional detrending:
 %       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
 %       'detrep'    = ['on'|'off'], Detrend data across trialsk {'off'}
 %
-%    Optional FFT/DFT Parameters:
+%    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: *longest* window length to use. This
 %                      determines the lowest output frequency       {~frames/8}
@@ -55,7 +56,7 @@
 %       'baseline'  = Spectral baseline end-time (in ms).                 {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
 %
-%    Optional Multitaper Parameters:
+%    Optional multitaper parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
 %                      (N is the time resolution and W the frequency resolution; 
 %                      maximum taper number is 2NW-1). Overwrites 'winsize' and 'padratio'. 
@@ -65,18 +66,18 @@
 %                      recommended (as multiwavelets are not implemented). 
 %                      Uses Matlab functions DPSS, PMTM.      {no multitaper}
 %
-%    Optional Bootstrap Parameters:
+%    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                     level. Show non-signif. output values in green       {0}
 %       'naccu'     = Number of bootstrap replications to accumulate       {200}
 %       'baseboot'  = Bootstrap baseline to subtract (0 -> use 'baseline'(see above)
 %                                                     1 -> use whole trial)   {0}
-%    Optional Scalp Map:
+%    Optional scalp map:
 %       'topovec'   = Scalp topography (map) to plot                       {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
 %
-%    Optional Plotting Parameters:
+%    Optional plotting parameters:
 %       'ploterps'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
 %       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
@@ -100,19 +101,20 @@
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %
 % Plot description:
-%   Assuming both 'plotersp' and 'plotitc' options are set (default), the upper plot
-%   represents data's ERSP (Event-Related Spectral Perturbation) with baseline activity 
-%   subtracted (use "'baseline', NaN" to prevent the function from removing the baseline) 
-%   and the lower plot represents data's ITC (Inter-Trial Coherence). 
-%   Click on any plot to pop up a new window
-%   -- Upper left marginal plot represents the average power during the baseline period
-%      (blue) and when significance is set, the threshold for significance 
-%      (green-black dotted).
-%   -- Upper horizontal marginal plot (under ERSP image) indicates the maximum (green) and
-%      minimum (blue) relative to baseline power across all frequencies.
-%   -- Lower left marginal plot indicates average ITC during the whole time range (blue)
-%      and when significance is set, the significance threshold (green-black dotted).
-%   -- Lower horizontal marginal plot (under ITC image) indicates the ERP.  
+%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
+%   presents the data ERSP (Event-Related Spectral Perturbation) in dB, with mean baseline 
+%   spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent timef() from 
+%   removing the baseline. The lower panel presents the data ITC (Inter-Trial Coherence). 
+%   Click on any plot axes to pop up a new window (using 'axcopy()')
+%   -- Upper left marginal panel presents the mean spectrm during the baseline period
+%      (blue), and when significance is set, the significance threshold at each frequency
+%      (dotted green-black trace).
+%   -- The marginal panel under the ERSP image shows the maximum (green) and minimum 
+%      (blue) ERSP values relative to baseline power at each frequency.
+%   -- The lower left marginal panel shows mean ITC across the imaged time range (blue),
+%      and when significance is set, the significance threshold (dotted green-black).
+%   -- The marginal panel under the ITC image shows the ERP (which is produced by ITC 
+%      across the data spectral pass band).
 %
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
@@ -142,6 +144,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/08/04 16:38:36  arno
+% plot description and curve color
+%
 % Revision 1.59  2003/08/04 14:40:51  arno
 % description of plot
 %
