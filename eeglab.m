@@ -16,8 +16,11 @@
 %   directly from the Matlab command line. Computations are carried out
 %   using functions from the ICA/EEG toolbox (now the EEGLAB toolbox). 
 %
-% Note: To redaw the graphic interface without erasing datasets, simply
-%       type >> eeglab redraw
+% Note: 1) To redaw the graphic interface after updating datasets, simply
+%       type >> eeglab redraw (this might also scan for an non-empty dataset)
+%       2) To rebuild the graphic interface without erasing datasets, 
+%       type >> eeglab rebuild
+%       3) to restart from scratch >> eeglab
 %
 % See first:
 %    eeg_checkset(), for the structure of EEG datasets
@@ -173,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/04/23 21:34:20  arno
+% updating pop_savesets.m
+%
 % Revision 1.29  2002/04/23 20:56:39  arno
 % full reprogramming of the functionfurther updates of pop_delset call
 %
@@ -279,7 +285,12 @@ if nargin < 1
 	evalin('base', 'eeg_global;');
 	h('eeglab;');
 else
-	h('eeglab redraw;');
+	if strcmp(onearg, 'redraw')
+		updatemenu;
+		return;
+	else 
+		h('eeglab rebuild;');
+	end;
 end;
   
 % checking strings
@@ -296,10 +307,14 @@ checkplot         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM)
 checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
-e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), EEG = EEGTMP; clear EEGTMP; eeg_store; disp(''Done.''); end; eeg_updatemenu;'];
-e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store; disp(''Done.''); end; eeg_updatemenu;'];
-e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); disp(''Done.''); end; eeg_updatemenu;'];
-e_hist            = [e_catch 'h(LASTCOM); eeg_updatemenu;'];
+
+storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
+storenewcall = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');';
+
+e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), EEG = EEGTMP; clear EEGTMP;' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_hist            = [e_catch 'h(LASTCOM); eeglab(''redraw'');'];
 
 % menu definition
 % --------------- 
@@ -336,7 +351,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'About this dataset'    , 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store]);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
-	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[LASTCOM] = pop_copyset; h(LASTCOM); eeg_updatemenu;' e_hist], 'Separator', 'on');
+	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[LASTCOM] = pop_copyset; h(LASTCOM); eeglab(''redraw'');' e_hist], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Append datasets', 'CallBack', [ check      '[EEG LASTCOM] = pop_mergeset(ALLEEG);' e_newset]);
 	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist]);
 		
@@ -373,7 +388,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_sub2, 'Label', 'Reject by spectra',        'CallBack', [ checkepochica '[EEG LASTCOM] = pop_rejspec(EEG, 0);' e_store]);
 	uimenu( fourth_sub2, 'Label', 'Reject labeled epochs', 'separator', 'on', 'CallBack', [ checkepochica ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); h(LASTCOM);' ...
-	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1); eeg_store; h(LASTCOM); eeg_updatemenu;' ]);
+	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1); eeg_store; h(LASTCOM); eeglab(''redraw'');' ]);
    
 third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
@@ -423,11 +438,11 @@ help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
-eeg_updatemenu;
+eeglab('redraw');
 
 % REMOVED MENUS
 	%uimenu( fourth_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
-	%uimenu( fourth_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;');
+	%uimenu( fourth_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
 
 % --------------------
 % draw the main figure
@@ -616,4 +631,148 @@ h19 = uicontrol('Parent',W_MAIN, ...
 	'Position',[ BORDEREXT  (WINYDEC*NBLINES-3*WINYDEC/4)  (WINMINX+WINMAXX+2*BORDERINT) BORDERINT], ...
 	'Style','frame', ...
 	'Tag','Frame2');
+
+% eeglab(''redraw'')() - Update EEGLAB menus based on values of global variables.
+%
+% Usage: >> eeglab(''redraw'')( );
+%
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+%
+% See also: eeg_global(), eeglab()
+
+% WHEN THIS FUNCTION WAS SEPARATED
+% Revision 1.21  2002/04/23 19:09:25  arno
+% adding automatic dataset search
+% Revision 1.20  2002/04/18 20:02:23  arno
+% retrIeve
+% Revision 1.18  2002/04/18 16:28:28  scott
+% EEG.averef printed as 'Yes' or 'No' -sm
+% Revision 1.16  2002/04/18 16:03:15  scott
+% editted "Events/epoch info (nb) -> Events  -sm
+% Revision 1.14  2002/04/18 14:46:58  scott
+% editted main window help msg -sm
+% Revision 1.10  2002/04/18 03:02:17  scott
+% edited opening instructions -sm
+% Revision 1.9  2002/04/11 18:23:33  arno
+% Oups, typo which crashed EEGLAB
+% Revision 1.8  2002/04/11 18:07:59  arno
+% adding average reference variable
+% Revision 1.7  2002/04/11 17:49:40  arno
+% corrected operator precedence problem
+% Revision 1.6  2002/04/11 15:36:55  scott
+% added parentheses to final ( - & - ), line 84. ARNO PLEASE CHECK -sm
+% Revision 1.5  2002/04/11 15:34:50  scott
+% put isempty(CURRENTSET) first in line ~80 -sm
+% Revision 1.4  2002/04/11 15:31:47  scott
+% added test isempty(CURRENTSET) line 78 -sm
+% Revision 1.3  2002/04/11 01:41:27  arno
+% checking dataset ... and inteligent menu update
+% Revision 1.2  2002/04/09 20:47:41  arno
+% introducing event number into gui
+
+function updatemenu();
+eeg_global;
+eeg_consts;
+W_MAIN = findobj('tag', 'EEGLAB');
+EEGUSERDAT = get(W_MAIN, 'userdata');
+H_MAIN  = EEGUSERDAT{1};
+EEGMENU = EEGUSERDAT{2};
+
+% test if the menu is present  
+try
+	figure(W_MAIN);
+	set_m   = findobj( 'parent', W_MAIN, 'Label', 'Datasets');
+catch, return; end;
+
+index = 1;
+indexmenu = 1;
+MAX_SET = max(length( ALLEEG ), length(EEGMENU));
+	
+while( index <= MAX_SET)
+	try
+		set( EEGMENU(index), 'Label', '------');
+	catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;	
+	set( EEGMENU(index), 'Enable', 'on' );
+	try, ALLEEG(index).data;
+		if ~isempty( ALLEEG(index).data)
+       		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
+			set( EEGMENU(index), 'Label', menutitle);
+			set( EEGMENU(index), 'CallBack', ['com = ''EEG = eeg_retrieve(ALLEEG, ' int2str(index) ...
+					'); CURRENTSET = ' int2str(index) ';''; eval(com); h(com); eeglab(''redraw'');' ]);
+			set( EEGMENU(index), 'Enable', 'on' );
+		end;
+	catch, end;	
+	index = index+1;
+end;
+hh = findobj( 'parent', set_m, 'Label', '------');
+set(hh, 'Enable', 'off');
+EEGUSERDAT{2} = EEGMENU;
+set(W_MAIN, 'userdata', EEGUSERDAT);
+
+eeg_options;
+if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET | CURRENTSET == 0 | isempty(ALLEEG(CURRENTSET).data))
+	CURRENTSET = 0;
+	for index = 1:length(ALLEEG)
+		if ~isempty(ALLEEG(index).data)
+			CURRENTSET = index;
+			break;
+		end;
+	end;
+	if CURRENTSET ~= 0
+		h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
+		EEG = eeg_retrieve(ALLEEG, CURRENTSET);
+	end;
+end;
+
+if (isempty(EEG) | isempty(EEG.data)) & CURRENTSET ~= 0 & option_keepdataset
+	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
+	EEG = eeg_retrieve(ALLSET, CURRENTSET);	
+end;	
+
+% print some informations on the main figure
+% ------------------------------------------
+if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
+  set( H_MAIN(2), 'String', sprintf('Parameters of %s dataset %d', ...
+            fastif(EEG.trials > 1, 'epoched', 'continuous'), CURRENTSET));
+  % set( H_MAIN(3), 'String', '');
+  set( H_MAIN(3), 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
+  fullfilename = [ EEG.filepath EEG.filename];
+  if ~isempty(fullfilename)
+    if length(fullfilename) > 15
+    	set( H_MAIN(4), 'String', sprintf('Filename          \t\t...%s\n', fullfilename(max(1,length(fullfilename)-15):end) ));
+    else
+    	set( H_MAIN(4), 'String', sprintf('Filename          \t\t%s\n', fullfilename));
+    end;        	
+  else
+	set( H_MAIN(4), 'String', sprintf('Filename              \t\tnone\n'));
+  end;
+  set( H_MAIN(5), 'String', sprintf('Channels per frame\t\t%d\n', fastif(isempty(EEG.data), 0, size(EEG.data,1))));
+  set( H_MAIN(6), 'String', sprintf('Frames per epoch   \t\t%d\n', EEG.pnts));
+  set( H_MAIN(7), 'String', sprintf('Epochs             \t\t%d\n', EEG.trials));
+  set( H_MAIN(8), 'String', sprintf('Events\t\t\t\t%s\n', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event)))));
+  set( H_MAIN(9), 'String', sprintf('Sampling rate (Hz) \t\t%d  \n', EEG.srate));
+  set( H_MAIN(10), 'String', sprintf('Epoch start (sec)\t\t%.3f\n', EEG.xmin));
+  set( H_MAIN(11), 'String', sprintf('Epoch end (sec)  \t\t%.3f\n', EEG.xmax));
+  set( H_MAIN(12), 'String', sprintf('Average reference \t\t%s\n', fastif(strcmp(EEG.averef,'Yes'), 'Yes', 'No')));
+  set( H_MAIN(13), 'String', sprintf('Channel locations \t\t%s\n', fastif(isempty(EEG.chanlocs), 'No', 'Yes')));
+  set( H_MAIN(14), 'String', sprintf('ICA weights       \t\t%s\n', fastif(isempty(EEG.icasphere), 'No', 'Yes')));
+  set( H_MAIN(15), 'String', '');
+else
+  set( H_MAIN(2), 'String', 'No current dataset');
+  set( H_MAIN(3), 'String', '- Create a new or load an existing dataset:');
+  set( H_MAIN(4), 'String', '   Use "/File/Import data"           (new)'); 
+  set( H_MAIN(5), 'String', '   Or  "/File/Load existing dataset" (old)');
+  set( H_MAIN(6), 'String', '- If new,');
+  set( H_MAIN(7), 'String', '  "/File/Import epoch info" (data epochs), else');
+  set( H_MAIN(8), 'String', '  "/File/Import event info" (continuous data)');
+  set( H_MAIN(9),'String',  '  "/Edit/Dataset info" (add/edit dataset info)');
+  set( H_MAIN(10),'String', '  "/File/Save dataset" (save dataset)');
+  set( H_MAIN(11),'String', '- Prune data: "/Edit/Select data"');
+  set( H_MAIN(12),'String', '- Reject data: "/Tools/Reject continuous data"');
+  set( H_MAIN(13),'String', '- Epoch data: "/Tools/Extract epochs"');
+  set( H_MAIN(14),'String', '- Remove baseline: "/Tools/Remove baseline"');
+  set( H_MAIN(15),'String', '- Run ICA:    "/Tools/Run ICA"');
+end;
+
+return;
 
