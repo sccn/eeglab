@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/02 00:36:08  arno
+% update condstat, debug
+%
 % Revision 1.1  2002/10/01 16:09:52  arno
 % Initial revision
 %
@@ -125,7 +128,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
    g.nb_points = g.padratio*g.winsize/2;   
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
    freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
-   g.win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,g.cyclesfact);
+   g.win = dftfilt(g.winsize,g.maxfreq/srate,g.cycles,g.padratio,g.cyclesfact);
    g.nb_points = size(g.win,2);
 end;
 %tmpall      = repmat(nan,[trials g.timesout g.nb_points]);
