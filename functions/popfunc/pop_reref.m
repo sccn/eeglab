@@ -36,8 +36,9 @@
 % Optional inputs:
 %   'method'    - ['standard'|'withref'] can be either 'standard' or 'withref' 
 %                 to recompute the old reference potential. See also reref().
-%   'refloc'    - old common reference location (can also be included as
-%                 the last channel of the EEG.chanlocs struture
+%   'refloc'    - [cell array] old common reference name polar location 
+%                 (can also be included as the last channel of the EEG.chanlocs 
+%                 struture). i.e. { 'cz' 0 0 }
 %
 % Inputs:
 %   EEGOUT      - output dataset
@@ -65,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/02/17 02:53:22  arno
+% reformating text for new functionality in help2html
+%
 % Revision 1.7  2003/02/16 23:30:20  arno
 % adding GUI info
 %
