@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2003/03/12 03:15:48  arno
+% adding help menu
+%
 % Revision 1.74  2003/02/20 20:56:38  scott
 % header edit -sm
 %
@@ -454,7 +457,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    		if ~isempty( varargin ), g=struct(varargin{:}); 
    		else g= []; end;
    catch
-   		disp('Error: calling convention {''key'', value, ... } error'); return;
+   		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
    end;	
 		 
    try, g.srate; 		    catch, g.srate		= 256; 	end;
