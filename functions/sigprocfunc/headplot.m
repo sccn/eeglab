@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/05/12 02:14:45  arno
+% older version
+%
 % Revision 1.27  2004/02/09 19:39:53  scott
 % returning to part-head view
 %
@@ -540,6 +543,8 @@ else
           elseif Value == 2
               Elecnames = 1;
           end
+        case 'meshfile'
+          mesh_file = Value;
         otherwise
           fprintf('headplot(): Unknown Parameter %s\n',Param)
           return
