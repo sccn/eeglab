@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/07/14 01:47:23  arno
+% testing amps limits
+%
 % Revision 1.17  2002/05/23 16:59:09  scott
 % replaced nanmean with nan_mean() -sm
 %
@@ -1604,6 +1607,9 @@ if ~isnan(coherfreq)
                baseamp);
       amps = amps-baseamp;
     end
+    if Cohsigflag
+		ampsig = ampsig - baseamp;
+	end;
    end % ~Allampsflag
 
    axis('off') % rm ERP axes axis and labels
@@ -1633,18 +1639,18 @@ if ~isnan(coherfreq)
    end
 
    if Cohsigflag
-     if ampsig(2)-baseamp>maxamp
-       if ampsig(2)-baseamp>0
-        maxamp = 1.01*(ampsig(2)-baseamp);
+     if ampsig(2)>maxamp
+       if ampsig(2)>0
+        maxamp = 1.01*(ampsig(2));
        else
-        maxamp = 0.99*(ampsig(2)-baseamp);
+        maxamp = 0.99*(ampsig(2));
        end
      end
-     if ampsig(1)-baseamp< minamp
-       if ampsig(1)-baseamp<0
-        maxamp = 1.01*(ampsig(1)-baseamp);
+     if ampsig(1)< minamp
+       if ampsig(1)<0
+        maxamp = 1.01*(ampsig(1));
        else
-        maxamp = 0.99*(ampsig(1)-baseamp);
+        maxamp = 0.99*(ampsig(1));
        end
      end
    end
@@ -1693,9 +1699,9 @@ if ~isnan(coherfreq)
 
    if Cohsigflag % plot amplitude significance levels
      hold on
-      plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)]-baseamp,'r',...
+      plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)],'r',...
                   'linewidth',SIGNIFWIDTH);
-      plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)]-baseamp,'r',...
+      plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)],'r',...
                   'linewidth',SIGNIFWIDTH);
    end
 
