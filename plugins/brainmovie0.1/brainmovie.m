@@ -115,6 +115,10 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/11/19 00:35:58  arno
+% new default for frames
+% output format (fig). actually default is still '.eps'
+%
 % Revision 1.20  2002/11/18 23:17:17  arno
 % test if circfactor is empty
 %
@@ -227,7 +231,7 @@ try, g.caption;			catch, g.caption = 'on'; end;
 try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
-try, g.framesout;	    catch, g.framesout = []; end; 
+try, g.framesout;	    catch, g.framesout = 'eps'; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
