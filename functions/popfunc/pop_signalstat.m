@@ -44,6 +44,7 @@ function varargout = pop_signalstat( EEG, typeproc, cnum, percent );
 
 com = ''; % this initialization ensure that the function will return something
           % if the user press the cancel button            
+varargout{1} = '';
 
 % display help if not enough arguments
 % ------------------------------------
@@ -76,6 +77,14 @@ elseif (nargin < 3 & typeproc==0)
 	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
     percent      = eval( [ '[' result{2} ']' ] );
 end;
+
+if length(cnum) ~= 1 | (cnum-floor(cnum)) ~= 0
+	error('pop_signalstat(): Component index must be a single integer');
+end
+
+if cnum < 1 | cnum > EEG.nbchan
+   error('pop_signalstat(): Component index out of range');
+end;   
 
 % call function signalstat() either on raw data or ICA data
 % ---------------------------------------------------------
