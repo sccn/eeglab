@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.244  2005/01/25 01:32:53  scott
+% help msg
+%
 % Revision 1.243  2005/01/10 20:26:34  scott
 % adjust color limits for 'gridplot'
 %
@@ -1031,7 +1034,7 @@ if nargs > 2
                error('''plotchans'' values must be > 0');
            end
            % if max(abs(plotchans))>max(Values) | max(abs(plotchans))>length(Values) -sm ???
-         case {'whitebk','whiteback'}
+         case {'whitebk','whiteback','forprint'}
             whitebk = Value;
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
@@ -1250,7 +1253,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
         if strcmpi(VERBOSE,'on')
             fprintf('    %g%% shrink  applied.');
             if abs(headrad-rmax) > 1e-2
-                fprintf(' Cartoon head is not anatomically correct.\n');
+                fprintf(' Warning: With these settings, the drawn cartoon head is not anatomically correct.\n');
             else
                 fprintf('\n');
             end
@@ -1285,13 +1288,13 @@ end
 % 
 
 if strcmp(plotgrid,'on')
-     plotchans(gchans) = [];   % remove grid chans from head plotchans   <==== wrong! ???
+     plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
 end
 
 allx = x;
 ally = y;
 
-Values = abs(Values); % reverse indicated channel polarities
+plotchans = abs(plotchans); % reverse indicated channel polarities
 
 intchans = intersect(intchans,plotchans); % interpolate using only the 'intchans' channels
 pltchans = intersect(pltchans,plotchans); % plot using only indicated 'plotchans' channels
