@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/07/15 18:49:43  arno
+% debug remaning problems
+%
 % Revision 1.12  2003/07/15 18:40:07  arno
 % debugging difference ...
 %
@@ -211,7 +214,10 @@ g = finputcheck( options, ...
                    'diffavg'  'string'  {'on' 'off'}     'on';
                    'addall'   'string'  {'on' 'off'}     'off';
                    'suball'   'string'  {'on' 'off'}     'off';
-                   'diffall'  'string'  {'on' 'off'}     'off';
+                   'allerps'  'string'  {'on' 'off'}     'off';
+                   'std'      'string'  {'on' 'off' 'none'}     'none';
+                   'diffonly' 'string'  {'on' 'off' 'none'}     'none';
+                   'diffall'  'string'  {'on' 'off' 'none'}     'none';
                    'lowpass'  'float'    [0 Inf]         [];
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave' 'rms'}    'ave';
@@ -220,6 +226,24 @@ if isstr(g), error(g); end;
 
 figure;
 try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
+
+% backward compatibility of param
+% -------------------------------
+if ~strcmpi(g.diffonly, 'none')
+    if strcmpi(g.diffonly, 'off'), g.addavg = 'on'; g.subavg = 'on'; end;
+end;
+if ~strcmpi(g.allerps, 'none')
+    if isempty(datsub)
+         g.addall  = g.allerps;
+    else g.diffall = g.allerps;
+    end;
+end;
+if ~strcmpi(g.std, 'none')
+    if isempty(datsub)
+         g.addstd  = g.std;
+    else g.diffstd = g.std;
+    end;
+end;
 
 % check consistency
 % -----------------
