@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/10/29 16:29:53  arno
+% updating command output
+%
 % Revision 1.12  2003/10/29 16:12:19  arno
 % default sphere for dipfit
 %
@@ -157,14 +160,13 @@ if strcmpi(typedip, 'besa')
     end;      
 else 
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
-    options = { options{:} 'sphere' max(EEG.dipfit.vol.r) };
     if ~isempty(comps)
         if ~isfield(EEG.dipfit.model, 'component')
             for index = comps(:)'
                 EEG.dipfit.model(index).component = index;
             end;
         end;
-        dipplot(EEG.dipfit.model(comps), options{:});
+        dipplot(EEG.dipfit.model(comps),  'sphere' max(EEG.dipfit.vol.r), options{:});
     else
         % find localized dipoles
         comps = [];
@@ -174,7 +176,7 @@ else
                 EEG.dipfit.model(index2).component = index2;
             end;
         end;        
-        dipplot(EEG.dipfit.model(comps), options{:});
+        dipplot(EEG.dipfit.model(comps),  'sphere' max(EEG.dipfit.vol.r), options{:});
     end;
 end;
     
