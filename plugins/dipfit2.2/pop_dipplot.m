@@ -8,8 +8,6 @@
 %   "Components" - [edit box] enter component number to plot. By
 %                all the localized components are plotted. Command
 %                line equivalent: components.
-%   "Use dipoles from" - [list box] use dipoles from BESA or from the
-%                DIPFIT toolbox. Command line equivalent: type.
 %   "Background image" - [list box] use BESA background image or average
 %                MRI image. Dipplot command line equivalent: 'image'.
 %   "Summary mode" - [Checkbox] when checked, plot the 3 views of the
@@ -35,6 +33,9 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
+%   "Use dipoles from" - [list box] use dipoles from BESA or from the
+%                DIPFIT toolbox. Command line equivalent: type.
+
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/03/11 23:35:27  arno
+% typo
+%
 % Revision 1.2  2003/03/11 23:34:07  arno
 % adding doc and options
 %
@@ -70,16 +74,17 @@ end;
 if nargin < 3
 	% popup window parameters
 	% -----------------------
-    if isfield(EEG, 'dipfit'), defaulttype = 2;
-    elseif isfield(EEG, 'sources'), defaulttype = 1;
-    else error('No dipole information in dataset'); 
-    end;
+    varstr = '';;
+    if isfield(EEG, 'dipfit'), varstr = 'DIPFIT|'; typedip = 'dipfit'; end;
+    if isfield(EEG, 'sources'), varstr = [varstr 'BESA|']; typedip = 'besa';end;
+    if isempty(varstr), error('No dipole information in dataset'); end;
+    
     geometry = { [2 1] [2 1] [2 1] [2.05 0.23 .75] [2.05 0.23 .75] [2 1] };
     uilist = { { 'style' 'text' 'string' 'Components indices ([]=all)' } ...
                { 'style' 'edit' 'string' '' } ...
                { 'style' 'text' 'string' 'Use dipoles from (scroll, then click to select)' } ...
-               { 'style' 'listbox' 'string' 'BESA|DIPFIT' 'value' defaulttype } ...
-               { 'style' 'text' 'string' 'Background image' } ...
+               { 'style' 'listbox' 'string' varstr(1:end-1) 'value' 1 } ...
+               { 'style' 'text' 'string' 'Background image (click to select)' } ...
                { 'style' 'listbox' 'string' 'BESA Head|average MRI' } ...
                { 'style' 'text' 'string' 'Sumary mode' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
@@ -87,7 +92,10 @@ if nargin < 3
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Additionnal dipfit() options' } ...
                { 'style' 'edit' 'string' '' } };
-               
+     
+    if length(varstr) < 7,
+        uilist(3:4) = []; geometry(2) = [];
+    end;
 	result = inputgui( geometry, uilist, 'pophelp(''pop_dipplot'')', 'Plot dipoles - pop_dipplot');
 	if length(result) == 0 return; end;
 
@@ -95,13 +103,18 @@ if nargin < 3
 	% -----------------
     options = {};
     if ~isempty(result{1}), comps = eval( [ '[' result{1} ']' ] ); else comps = []; end;
-    if result{2} == 2, typedip = 'DIPFIT';
-    else               typedip = 'BESA';
+    if length(varstr) >= 7,
+        if result{2} == 2, typedip = 'DIPFIT';
+        else               typedip = 'BESA';
+        end;
+        ind = 3;
+    else
+        ind = 2;
     end;
-    options = { options{:} 'image' fastif(result{3} == 2, 'mri', 'besa') };
-    if result{4} == 1, options = { options{:} 'summary' 'on' }; end;
-    if result{5} == 1, options = { options{:} 'normlen' 'on' }; end;
-    if ~isempty( result{6} ), options = { options{:} eval( [ '{' result{5} '}' ] ) }; end;
+    options = { options{:} 'image' fastif(result{ind} == 2, 'mri', 'besa') };
+    if result{ind+1} == 1, options = { options{:} 'summary' 'on' }; end;
+    if result{ind+2} == 1, options = { options{:} 'normlen' 'on' }; end;
+    if ~isempty( result{ind+3} ), options = { options{:} eval( [ '{' result{ind+3} '}' ] ) }; end;
 else 
     options = varargin;
 end;
