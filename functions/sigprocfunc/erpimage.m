@@ -110,6 +110,9 @@
 %               as separate traces. Else, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
 %               (See also: 'vert' above). {default: none}
+%   'sortvarpercent' - [float vector] plot percentiles for the sorting variable
+%               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
+%               and the 90th percentile.
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Get uV with '\muV'
@@ -169,6 +172,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.241  2005/03/07 22:55:21  arno
+% fixing error
+%
 % Revision 1.240  2005/03/07 21:19:40  arno
 % chaninfo
 %
@@ -1021,6 +1027,8 @@ topphase = 180;     % default top phase for 'phase' option
 renorm    = 'no';
 noshow    = 'no';
 Rmerp     = 'no';
+percentiles = [];
+percentileflag = NO;
 
 minerp = NaN; % default limits
 maxerp = NaN;
@@ -1199,6 +1207,9 @@ if nargin > 6
 	  elseif Alignflag == YES
 		  aligntime = Arg;
 		  Alignflag = NO;
+	  elseif percentileflag == YES
+		  percentiles = Arg;
+		  percentileflag = NO;
 	  elseif Limitflag == YES
 		  %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
 		  if size(Arg,1) ~= 1 | size(Arg,2) < 2 ...
@@ -1409,6 +1420,8 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
+	  elseif strcmp(Arg,'percentile')
+		  percentileflag = YES;
 	  elseif strcmp(Arg,'showwin')
 		  Showwin = YES;
 	  elseif strcmp(Arg,'renorm')
@@ -2069,7 +2082,7 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
         if ~exist('phargs') % if not phase-sorted trials
            [data,outtrials] = movav(data,1:ntrials,avewidth,decfactor); 
            % Note: movav() here sorts using square window
-           [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+           [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor);
         else % if phase-sorted trials, use circular / wrap-around smoothing
            backhalf  = floor(avewidth/2);
            fronthalf = floor((avewidth-1)/2);
@@ -2092,6 +2105,9 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
             % outtrials = 1:ntrials;
            end
         end
+        for index=1:length(percentiles)
+            outpercent{index} = compute_percentile( sortvar, percentiles(index), outtrials, avewidth);
+        end;
         if ~isempty(auxvar)
           if ~exist('phargs') % if not phase-sorted trials
             [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
@@ -2323,6 +2339,9 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
               [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
             end
         end
+        for index=1:length(percentiles)
+            outpercent{index} = compute_percentile( sortvar, percentiles(index), outtrials, avewidth);
+        end;
         fprintf('Output allamps data will be %d frames by %d smoothed trials.\n',...
                                       frames,length(outtrials));
 
@@ -2718,7 +2737,17 @@ if strcmpi(noshow, 'no')
             end % aligntime
         end % c
     end % auxvar
+    if exist('outpercent')
+        for index = 1:length(outpercent)
+            if isnan(aligntime) % plot auxvar on un-aligned data
+                figure(curfig); plot(outpercent{index},outtrials,'k','LineWidth',SORTWIDTH); 
+            else
+                figure(curfig); plot(aligntime-outpercent{index},outtrials,'k','LineWidth',SORTWIDTH); 
+            end;
+        end;
+    end;
 end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Plot colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3482,4 +3511,18 @@ else
    w = 0.5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
    w = [w; w(end-1:-1:1)];
 end
+%
+%%%%%%%%%%%%%%%%%%%%%%% function compute_percentile() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+function outpercent = compute_percentile(sortvar, percent, outtrials, winsize);
+    ntrials = length(sortvar);
+    sortvar = [ sortvar sortvar sortvar ];
+    winvals = [round(-winsize/2):round(winsize/2)];
+    outpercent = zeros(size(outtrials));
+    for index = 1:length(outtrials)
+        sortvarval = sortvar(outtrials(index)+ntrials+winvals);
+        sortvarval = sort(sortvarval);
+        outpercent(index) = sortvarval(round((length(winvals)-1)*percent)+1);
+    end;
+    
 
