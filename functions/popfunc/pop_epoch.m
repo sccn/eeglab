@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/06/28 02:15:37  arno
+% considering events in different epochs
+%
 % Revision 1.8  2002/06/25 00:50:17  arno
 % debugging several event selection
 %
@@ -245,7 +248,8 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % include the event latencies into EEG.epoch
 % ------------------------------------------
 maxlen = 0;
-EEG.epoch(1).event = [];
+EEG.epoch = [];
+EEG.epoch(1).event = [];	
 for index = 1:length(EEG.event)
     currentepoch = EEG.event(index).epoch;
     if currentepoch <= length(EEG.epoch)
