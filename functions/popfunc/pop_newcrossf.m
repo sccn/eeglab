@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/05/12 02:15:36  arno
+% remove debug msg
+%
 % Revision 1.23  2003/04/22 21:34:58  arno
 % run newcrossf at SCCN
 %
@@ -245,7 +248,7 @@ end;
 if isempty(tlimits)
 	tlimits = [EEG.xmin, EEG.xmax];
 end;	
-pointrange1 = max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1);
+pointrange1 = round(max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1));
 pointrange2 = min((tlimits(2)/1000-EEG.xmin)*EEG.srate, EEG.pnts);
 pointrange = [pointrange1:pointrange2];
 
