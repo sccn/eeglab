@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/10/29 22:54:46  scott
+% text .
+%
 % Revision 1.16  2002/10/29 17:19:18  arno
 % rework box size
 % s
@@ -128,7 +131,7 @@ if nargin < 2
                     'end;' ...
                     'clear filename filepath tagtest;' ];
     helpstrtype = ['It is not necessary to define a type field for the time-locking event.' 10 ...
-			   'By default it is defined as time 0 and type ''TLE'' for all epochs'];
+			   'By default it is defined as type ''TLE'' at time 0 for all epochs'];
     helpstrlat  = ['It is not necessary to define a latency field for epoch information.' 10 ...
 			   'All fields that contain latencies will be imported as different event types.' 10 ...
 			   'For instance, if field ''RT'' contains latencies,' 10 ...
