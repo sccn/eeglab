@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/11 22:28:54  arno
+% adding new dataset name
+%
 % Revision 1.2  2002/04/10 02:42:22  arno
 % debuging event selection
 %
@@ -176,7 +179,7 @@ fprintf('Pop_epoch:%d epochs selected\n', length(alllatencies));
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
-	case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [lim(1)*EEG.srate lim(2)*EEG.srate], 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
+	case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [ceil(lim(1)*EEG.srate) ceil(lim(2)*EEG.srate)], 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
 	case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, 'srate', EEG.srate, 'allevents', tmpeventlatency);
 	otherwise, disp('Pop_epoch error: invalid event time format'); beep; return;
 end;
@@ -207,7 +210,7 @@ for index=1:EEG.trials
     for indexevent = epochevent{index}
         newevent(indexevent).epoch   = index;
         switch lower( g.timeunit )
-	       case 'points',	newevent(indexevent).latency = EEG.event(indexevent).latency - alllatencies(index) - lim(1)*EEG.srate + EEG.pnts*(index-1);
+	       case 'points',	newevent(indexevent).latency = EEG.event(indexevent).latency - alllatencies(index) - lim(1)*EEG.srate + 1 + EEG.pnts*(index-1);
 	       case 'seconds',  newevent(indexevent).latency = EEG.event(indexevent).latency - alllatencies(index) - lim(1) + EEG.pnts*(index-1)/EEG.srate;
         end;
     end;
