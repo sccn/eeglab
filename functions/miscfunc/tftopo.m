@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/05/19 13:26:10  scott
+% adjusted channel label -sm
+%
 % Revision 1.30  2002/05/19 03:04:46  scott
 % *** empty log message ***
 %
@@ -319,7 +322,11 @@ else % showchan==0
   tfsign = sort(tfdat,3);
   tfsign = sign(tfsign(:,:,round(nchans/2)));
 
-  tfave = tfsign.*mean(abs(tfdat),3);
+  if exist('std')==2
+     tfave = tfsign.*std(abs(tfdat),3);
+  else
+     tfave = tfsign.*mean(abs(tfdat),3);
+  end
   cmax = max(max(abs(tfave)));
   cmin = -cmax; % make symmetrical
   imagesc(times(tftimes),freqs(tffreqs),tfave);
@@ -335,7 +342,11 @@ set(gca,'yaxislocation','left')
 if showchan>0
    tl=title(['Channel ',int2str(showchan)]);
 else
-   tl=title(['All-channel Mean          ']);
+  if exist('std')==2
+   tl=title(['Signed channel st. dev.']);
+  else
+   tl=title(['Signed channel mean']);
+  end
 end
 set(tl,'fontsize',14);
 yl=ylabel(['Frequency (Hz)     Chan ',int2str(showchan)]);
