@@ -52,6 +52,7 @@
 %                                       positive = rotating from vertex (0) towards right ear.
 %                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle; 
 %                                       positive = rotating from right ear (0) toward nose.
+%                           'ignore'    ignore column
 %     The input file may also contain other channel information fields
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
 %                           'calib'     [real near 1.0] channel calibration value.
@@ -172,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/07/16 18:52:21  arno
+% allowing file type locs
+%
 % Revision 1.48  2003/06/30 15:00:43  arno
 % fixing inputcheck problem
 %
@@ -300,7 +304,7 @@ listimportformat = { ...
 
 listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
       'sph_radius' 'sph_theta_besa' 'sph_phi_besa' 'gain' 'calib' 'type' ...
-      'X' 'Y' 'Z' '-X' '-Y' '-Z' 'custom1' 'custom2' 'custom3' 'custom4' 'not def' };
+      'X' 'Y' 'Z' '-X' '-Y' '-Z' 'custom1' 'custom2' 'custom3' 'custom4' 'ignore' 'not def' };
 
 listskipline = [ ...
    0 ... % polhemus, not applicable
@@ -455,8 +459,10 @@ if isstr(filename)
                eloc(index).radius         = 1;
            end;           
        end;
-       eloc = convertlocs(eloc, 'sphbesa2all');
-       eloc = convertlocs(eloc, 'topo2all'); % problem with some EGI files (not BESA files)
+       try
+           eloc = convertlocs(eloc, 'sphbesa2all');
+           eloc = convertlocs(eloc, 'topo2all'); % problem with some EGI files (not BESA files)
+       catch, disp('Warning: coordinate conversion failed'); end;
        fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
        fprintf('          to avoid confusion (these field can be exported though)\n');   
        eloc = rmfield(eloc, 'sph_phi_besa');
@@ -465,11 +471,17 @@ if isstr(filename)
        % converting XYZ coordinates to polar
        % -----------------------------------
    elseif isfield(eloc, 'X')
-       eloc = convertlocs(eloc, 'cart2all');  
+       try
+           eloc = convertlocs(eloc, 'cart2all');  
+       catch, disp('Warning: coordinate conversion failed'); end;
    elseif isfield(eloc, 'sph_theta')
-       eloc = convertlocs(eloc, 'sph2all');  
+       try
+           eloc = convertlocs(eloc, 'sph2all');  
+       catch, disp('Warning: coordinate conversion failed'); end;
    else 
-       eloc = convertlocs(eloc, 'topo2all');  
+       try
+           eloc = convertlocs(eloc, 'topo2all');  
+       catch, disp('Warning: coordinate conversion failed'); end;
    end;
    
    % inserting labels if no labels
@@ -513,15 +525,25 @@ end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
-theta = cell2mat({ eloc.theta });
-radius  = cell2mat({ eloc.radius });
-if isnumeric(eloc(1).labels)
-    for index = 1:length(eloc)
+if nargout > 2
+    theta = cell2mat({ eloc.theta });
+end;
+if nargout > 3
+    radius  = cell2mat({ eloc.radius });
+end;
+%tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
+%disp('Converting channel labels to string');
+for index = 1:length(eloc)
+    if ~isstr(eloc(index).labels)
         eloc(index).labels = int2str(eloc(index).labels);
     end;
 end;
-labels = { eloc.labels };
-
+if nargout > 1
+    labels = { eloc.labels };
+end;
+if isfield(eloc, 'ignore')
+    eloc = rmfield(eloc, 'ignore');
+end;
 return;
 
 % interpret the variable name
@@ -544,24 +566,25 @@ return;
 % ------------------
 function [str, mult] = checkformat(str)
 	mult = 1;
-	if strcmpi(str, 'labels'), str = lower(str); return; end;
-	if strcmpi(str, 'channum'), str = lower(str); return; end;
-	if strcmpi(str, 'theta'), str = lower(str); return; end;
-	if strcmpi(str, 'radius'), str = lower(str); return; end;
-	if strcmpi(str, 'sph_theta'), str = lower(str); return; end;
-	if strcmpi(str, 'sph_phi'), str = lower(str); return; end;
-	if strcmpi(str, 'sph_radius'), str = lower(str); return; end;
+	if strcmpi(str, 'labels'),         str = lower(str); return; end;
+	if strcmpi(str, 'channum'),        str = lower(str); return; end;
+	if strcmpi(str, 'theta'),          str = lower(str); return; end;
+	if strcmpi(str, 'radius'),         str = lower(str); return; end;
+	if strcmpi(str, 'ignore'),         str = lower(str); return; end;
+	if strcmpi(str, 'sph_theta'),      str = lower(str); return; end;
+	if strcmpi(str, 'sph_phi'),        str = lower(str); return; end;
+	if strcmpi(str, 'sph_radius'),     str = lower(str); return; end;
 	if strcmpi(str, 'sph_theta_besa'), str = lower(str); return; end;
-	if strcmpi(str, 'sph_phi_besa'), str = lower(str); return; end;
-	if strcmpi(str, 'gain'), str = lower(str); return; end;
-	if strcmpi(str, 'calib'), str = lower(str); return; end;
-	if strcmpi(str, 'type') , str = lower(str); return; end;
-	if strcmpi(str, 'X'), str = upper(str); return; end;
-	if strcmpi(str, 'Y'), str = upper(str); return; end;
-	if strcmpi(str, 'Z'), str = upper(str); return; end;
-	if strcmpi(str, '-X'), str = upper(str(2:end)); mult = -1; return; end;
-	if strcmpi(str, '-Y'), str = upper(str(2:end)); mult = -1; return; end;
-	if strcmpi(str, '-Z'), str = upper(str(2:end)); mult = -1; return; end;
+	if strcmpi(str, 'sph_phi_besa'),   str = lower(str); return; end;
+	if strcmpi(str, 'gain'),           str = lower(str); return; end;
+	if strcmpi(str, 'calib'),          str = lower(str); return; end;
+	if strcmpi(str, 'type') ,          str = lower(str); return; end;
+	if strcmpi(str, 'X'),              str = upper(str); return; end;
+	if strcmpi(str, 'Y'),              str = upper(str); return; end;
+	if strcmpi(str, 'Z'),              str = upper(str); return; end;
+	if strcmpi(str, '-X'),             str = upper(str(2:end)); mult = -1; return; end;
+	if strcmpi(str, '-Y'),             str = upper(str(2:end)); mult = -1; return; end;
+	if strcmpi(str, '-Z'),             str = upper(str(2:end)); mult = -1; return; end;
 	if strcmpi(str, 'custum1'), return; end;
 	if strcmpi(str, 'custum2'), return; end;
 	if strcmpi(str, 'custum3'), return; end;
