@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/09/14 17:21:36  arno
+% debug last
+%
 % Revision 1.24  2004/09/14 17:14:54  arno
 % new file format
 %
@@ -185,7 +188,7 @@ if isfield(TMPVAR, 'EEG') %individual dataset
     
     % copy data to output variable if necessary
     % -----------------------------------------
-    if ~strcmpi(mode, 'info')
+    if ~strcmpi(mode, 'info') && isfield(TMPVAR, 'EEGDATA')
         VAROUT.data = TMPVAR.EEGDATA;
     end;
     
