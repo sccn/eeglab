@@ -26,7 +26,7 @@
 %   'freqfac'  = [int power of 2] approximate frequencies/Hz to compute {default: 4}
 %   'percent'  = downsampling factor or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
-%                the computation. From 0 to 1 {default: 1}.
+%                the computation. From 0 to 100 {default: 100}.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                Default is 'off'. 
 %
@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/20 01:17:10  arno
+% new version with component plotting options
+%
 % Revision 1.7  2002/07/18 16:00:46  arno
 % adding option for not plotting channels
 %
@@ -128,7 +131,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
-				  'percent'       'real'     [0 1]                     1 ;
+				  'percent'       'real'     [0 100]                  100 ;
 				  'reref'         'string'   { 'averef' 'no' }         'no' ;
 				  'weights'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
@@ -154,8 +157,8 @@ else
 	if nargin > 7,    g.freqfac = varargin{5};
 	else              g.freqfac = FREQFAC;
 	end;
-	if nargin > 8,    g.percent = varargin{6};
-	else              g.percent = 1;
+	if nargin > 8,    g.percent = varargin{6}*100;
+	else              g.percent = 100;
 	end;
 	if nargin > 10,    g.reref = 'averef';
 	else               g.reref = 'no';
@@ -163,6 +166,7 @@ else
 	g.weights = [];
 	g.icamaps = [];
 end;
+g.percent = g.percent/100; % make it from 0 to 1
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
