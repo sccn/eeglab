@@ -89,7 +89,7 @@
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] = same, but select frequency with max power in 
-%               given range (Note: 'phasesort' freq (above) overwrites these parameters).
+%               given range (Note: the 'phasesort' freq (above) overwrites these parameters).
 %               ELSE [minfrq maxfrq alpha] = plot coher. signif. level line at 
 %               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.226  2004/11/12 23:02:10  scott
+% making spectral peak estimates more consistent
+%
 % Revision 1.225  2004/11/05 18:36:54  arno
 % debug && removal
 %
@@ -2114,12 +2117,15 @@ end
 if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
 	% find max frequency in specified band
     if exist('psd') == 2 % from Signal Processing Toolbox
-        [pxx,tmpfreq] = psd(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+        [pxx,tmpfreq] = psd(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
     else % from EEGLABA
-        [pxx,tmpfreq] = spec(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+        [pxx,tmpfreq] = spec(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
     end;
 	pxx = 10*log10(pxx);
 	n = find(tmpfreq >= coherfreq(1) & tmpfreq <= coherfreq(2));
+        % [tmpfreq(n) pxx(n)]
+        % coherfreqs = coherfreq; % save for debugging spectrum plotting
+
 	if ~length(n)
 		coherfreq = coherfreq(1);
 	end
@@ -2322,13 +2328,15 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
     end
     if alpha>0
         fprintf('Computing and plotting %g coherence significance level...\n',alpha);
-        %[amps,cohers,cohsig,ampsig,allcohers] = ...
-        %crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+
+        % [amps,cohers,cohsig,ampsig,allcohers] = ...
+        %   crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+
         fprintf('Inter-Trial Coherence significance level: %g\n',cohsig);
         fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
     else
-        %[amps,cohers,cohsig,ampsig,allcohers] = ...
-        % crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+        % [amps,cohers,cohsig,ampsig,allcohers] = ...
+        %    crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
     end
     if ~exist('allcohers')
         fprintf('erpimage(): allcohers not returned....\n')
@@ -3170,10 +3178,11 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
                            max(1024,pow2(ceil(log2(frames)))),srate,frames,0,0.05);
         % [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0,0.05);
     else
-        [pxx,tmpfreq] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+        [Pxx,tmpfreq] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
                                    max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
         % [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0);
     end;
+
     figure(curfig);plot(F,10*log10(Pxx));
     goodfs = find(F>= lospecHz & F <= hispecHz);
     maxgfs = max(10*log10(Pxx(goodfs)));
