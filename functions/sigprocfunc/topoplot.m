@@ -100,6 +100,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.163  2004/03/20 18:20:14  scott
+% created 'headrad' (removed 'forcehead'). Now uses only 'plotrad' and 'headrad'
+% to set plotting scales. 'shrink' mode disabled temporarily
+%
 % Revision 1.162  2004/03/19 21:57:58  scott
 % do not plot channels with arc_length > 1
 %
@@ -465,6 +469,10 @@ end
 nargs = nargin;
 if nargs < 2
   loc_file = DEFAULT_ELOC;
+  if ~exist(loc_file)
+      fprintf('default locations file "%s" not found - specify chan_locs in topoplot() call.\n',loc_file)
+      error(' ')
+  end
 end
 if nargs == 1
   if isstr(Values)
@@ -489,8 +497,9 @@ if nargs == 1
                'angles point to the right hemisphere, and negative to the left.\n',...
                'The model head sphere has a circumference of 2; the vertex\n',...
                '(Cz) has arc_length 0. Locations with arc_length > 0.5 are below\n',...
-               'head center and are plotted outside the head cartoon. The option\n'....
-               'plotrad controls how much of this lower-head "skirt" is shown.\n',...
+               'head center and are plotted outside the head cartoon.\n'....
+               'Option plotrad controls how much of this lower-head "skirt" is shown.\n',...
+               'Option headrad controls if and where the cartoon head will be drawn.\n',...
                ])
       return
     end
@@ -575,26 +584,28 @@ if nargs > 2
 	 case 'emarker'
 	  EMARKER = Value;
 	 case 'shrink'
-    SHRINKSET = 1;        % flag 'shrink' set
+	  SHRINKSET = 1;        % flag 'shrink' set
 	  shrinkfactor = Value;
 	 case 'plotrad'
 	  plotrad = Value;
-     if isstr(plotrad)
-        error('plotrad argument should be a number 0.15<x<1.0');
-     end
-   case 'headrad'
-    headrad = Value;
-    if isstr(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
-       headrad = 0;       % undocumented 'no head' alternatives
-    end
-    if isempty(headrad) % [] -> none also
-       headrad = 0;
-    end
-    if ~isstr(headrad) & ~(headrad==0) & (headrad<0.15 | headrad>1)
-        error('bad value for headrad');
-    elseif  ~strcmpi(headrad,'rim')
-        error('bad value for headrad');
-    end
+          if isstr(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
+	     error('plotrad argument should be a number between 0.15 and 1.0');
+	  end
+	case 'headrad'
+	  headrad = Value;
+	  if isstr(headrad) & ( strcmpi(headrad,'off') | strcmpi(headrad,'none') )
+	    headrad = 0;       % undocumented 'no head' alternatives
+	  end
+	  if isempty(headrad) % [] -> none also
+	    headrad = 0;
+	  end
+	  if ~isstr(headrad) 
+	    if ~(headrad==0) & (headrad < MINPLOTRAD | headrad>1)
+	      error('bad value for headrad');
+	    end
+	  elseif  ~strcmpi(headrad,'rim')
+	    error('bad value for headrad');
+	  end
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
 	 case {'contourcolor','ccolor'}
@@ -686,19 +697,20 @@ if isempty(plotrad) & isfield(tmpeloc, 'plotrad'),
     if isstr(plotrad)                        % plotrad shouldn't be a string
         plotrad = str2num(plotrad)           % just checking
     end
+    if plotrad < MINPLOTRAD | plotrad > 1.0
+       fprintf('Bad value (%g) for plotrad.\n');
+       error(' ');
+    end
     if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
        fprintf('Plotting radius plotrad (%g) set from EEG.chanlocs.\n',plotrad);
     end
 end;
 if isempty(plotrad) 
-  plotrad = max(Rd)*1.02;    % default: just outside the outermost electrode location
-end
-if plotrad > 1               % don't plot channels with Rd > 1 (below head)
-  plotrad = 1;
-end
+  plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
+end                                           % don't plot channels with Rd > 1 (below head)
 
-if ~isstr(plotrad) & (plotrad < MINPLOTRAD | plotrad > 1.0)
-   error('argument plotrad must be between 0.15 and 1.0');
+if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
+   error('plotrad must be between 0.15 and 1.0');
 end
 
 % plotrad now set
@@ -706,7 +718,6 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%% Set radius of head cartoon %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-
 if isempty(headrad)  % never set -> defaults
   if plotrad >= 0.5
      headrad = 0.5;  % (anatomically correct)
@@ -723,6 +734,11 @@ end
 
 % headrad now set
 
+if headrad ~= 0.5 & strcmpi(VERBOSE, 'on')
+   fprintf('NB: Plotting map using: plotrad %-4.3g,',plotrad);
+   fprintf(    ' headrad %-4.3g\n',headrad);
+   fprintf('    The cartoon head is NOT anatomically correct (headrad 0.5).\n')
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -767,22 +783,15 @@ end % SHRINKSET
 %
 %%%%%%%%%%%%%%%%%%%%% Find plotting channels  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
-
 enum = find(Rd <= plotrad); % only interpolate and plot channels inside potting radius
-if length(enum) < length(Rd)
-    if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): %d of %d electrodes not shown (radius>plotrad)\n', ...
-                   length(enum)-length(Rd),length(Rd),plotrad);    
-    end; 
-end;	
 
+if length(enum) < length(Rd) & strcmpi(VERBOSE, 'on')
+        fprintf('Not using or showing the outermost %d of the %d electrodes.\n', ...
+                   length(Rd)-length(enum),length(Rd));    
+end;	
 %
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
-
-Th = Th(enum);              % eliminate channels outside the ploting area
-Rd = Rd(enum);
-labels = labels(enum,:);
 
 if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
@@ -802,21 +811,20 @@ if ~isempty(Values)
 	end;	
 end;   % now channel parameters and values all refer to plotting channels only
 
+Th = Th(enum);              % eliminate channels outside the ploting area
+Rd = Rd(enum);
+labels = labels(enum,:);
+
 %
 %%%%%%%%%%%%%%% Squeeze channel locations to <= rmax %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 
 squeezefac = rmax/plotrad;          
-Rd = Rd*squeezefac;   % squeeze electrode arc_lengths towards the vertex
-     	                % to plot all inside the head cartoon
-       % Now outermost channel will be plotted just inside rmax
+Rd = Rd*squeezefac;       % squeeze electrode arc_lengths towards the vertex
+                          % to plot all inside the head cartoon
+% Note: Now outermost channel will be plotted just inside rmax
 
 [x,y] = pol2cart(Th,Rd);  % transform from polar to cartesian coordinates
-
-if squeezefac<0.92    % instead of default larger AXHEADFAC (size of head in axes)
-    AXHEADFAC = 1.05; % do not leave room for external ears if head cartoon
-                      % shrunk enough by the 'skirt' option
-end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -897,6 +905,12 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   hold on
   h = gca; % uses current axes
 
+                          % instead of default larger AXHEADFAC 
+  if squeezefac<0.92 & plotrad-headrad > 0.05  % (size of head in axes)
+    AXHEADFAC = 1.05;     % do not leave room for external ears if head cartoon
+                          % shrunk enough by the 'skirt' option
+  end
+
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
 
   %
@@ -976,7 +990,6 @@ end;
 %%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if headrad > 0                         % if cartoon head to be plotted
-
   circ  = 0:2*pi/100:2*pi;             % 101 circle vertices
   basex = 0.18*rmax;                   % nose width
   tip   = rmax*1.15; 
@@ -985,16 +998,16 @@ if headrad > 0                         % if cartoon head to be plotted
   EarY  = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
   if headrad == plotrad                       % plot head outline at plot rim
-     hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
+     brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
-     set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);      % hide the disk edge jaggies 
-
-  else                                        % else plot head *inside* circle
-    plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
-      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   
+     set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);      % hide the disk edge jaggies 
   end
 
-  sf    = rmax*headrad/plotrad;               % squeeze the model ears and nose by this
+  plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
+      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
+
+  sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
+                                                                 % by this factor
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
          'Color',HCOLOR,'LineWidth',HLINEWIDTH);                % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)   % plot left ear
