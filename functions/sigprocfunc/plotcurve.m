@@ -160,7 +160,7 @@ if ~isempty(regions)
             tmpreg(1) = times(index);
             in_a_region = 1;
         end;
-        if (~regions(index) & in_a_region) | index == length(regions)
+        if (~regions(index) | index == length(regions)) & in_a_region
             tmpreg(2) = times(index);
             in_a_region = 0;
             if strcmpi(highlightmode, 'background')
