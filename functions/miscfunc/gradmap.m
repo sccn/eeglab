@@ -7,6 +7,7 @@
 %    map      - level of activity (size: nbelectrodes x nbChannel)
 %    filename - filename (.loc file) countaining the coordinates
 %               of the electrodes, or array countaining complex positions 		 
+%               Can also be a EEGLAB channel structure.
 %    draw     - integer, if not nul draw the gradient (default:0)
 %
 % Output:
@@ -38,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 % adapted from a version by Scott Makeig et Marissa Wicklein
 
