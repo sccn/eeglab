@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/15 14:45:12  arno
+% display warning
+%
 % Revision 1.8  2002/10/15 14:35:52  arno
 % default case for buttons
 %
@@ -90,6 +93,7 @@ end;
 [tmp tmp2 allobj] = supergui( fig, geometry, [cr 1], listui{:} );
 
 waitfor( fig, 'userdata');
+drawnow;
 try,
 	result = get(fig, 'userdata');
 	close(fig);
