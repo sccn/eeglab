@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/11/12 21:41:16  arno
+% fixed channel selectio
+%
 % Revision 1.2  2004/03/04 19:30:14  arno
 % email
 %
@@ -92,7 +95,12 @@ if nargin < 2
     end;
 end;
 
-c = setdiff([1:length(chanlocs)], omitchans);
+% remove channels
+% ---------------
+c = setdiff([1:length(chanlocs)], union(omitchans, cellfun('isempty', { chanlocs.theta })));
+
+% optimize center
+% ---------------
 [X Y Z newcenter]= chancenter(cell2mat({chanlocs(c).X})', cell2mat({chanlocs(c).Y})', cell2mat({chanlocs(c).Z})', center);
 for index = 1:length(c)
     chanlocs(c(index)).X  = X(index);
