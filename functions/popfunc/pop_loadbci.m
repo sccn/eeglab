@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/06/26 17:23:55  arno
+% new version with menu
+%
 % Revision 1.9  2003/04/10 18:05:22  arno
 % default argument
 %
@@ -178,9 +181,9 @@ catch
         end;
         count = count+1;
     end;
-    indeximport
-    corresp
-    adjust
+    %indeximport
+    %corresp
+    %adjust
     
     % find block size
     % ---------------
@@ -190,15 +193,21 @@ catch
     if length(blocksize) > 1, error('Error in determining block size'); 
     else                      fprintf('Blocksize: %d\n', blocksize); end;
     
-    % segregate type and latency
-    % --------------------------
+    % find types
+    % ----------
     tmpcorresp = find(corresp);
+    indexcorresp    =  corresp(tmpcorresp);
+    indexcorrespval =  indeximport(tmpcorresp);
     if length(tmpcorresp) ~= length(intersect(corresp, indeximport))
         disp('Warning: correspondance problem, some information will be lost');
     end;
-    indexcorresp =  indeximport(tmpcorresp);
+    
+    % remove type from latency array
+    % ------------------------------
     indeximport(tmpcorresp) = [];
     adjust(tmpcorresp)      = [];
+    indexcorresp
+    indeximport
     
 	% process events
 	% --------------
@@ -208,7 +217,7 @@ catch
 	for index = 1:length(indeximport)
 		tmpevent = find( diff(tmpdata(indeximport(index), :)) ~= 0);
 		tmpevent = tmpevent+1;
-        tmpcorresp = find(indexcorresp == indeximport(index));
+        tmpcorresp = find(indexcorresp == indeximport(index))
         if adjust(index)
              fprintf('Latency of event ''%s'' adjusted\n', colnames{ indeximport(index) });
         else fprintf('WARNING: Latency of event ''%s'' not adjusted (latency uncertainty %2.1f ms)\n', ...
@@ -219,7 +228,7 @@ catch
             curlatency  = tmpdata(indeximport(index), tmpi);
 			if curlatency % non zero
                 if ~isempty(tmpcorresp)
-                    events(counte).type = colnames{ indexcorresp(tmpcorresp) };
+                    events(counte).type = char(tmpdata( indexcorrespval(tmpcorresp), tmpi ));
                 else 
                     events(counte).type = colnames{ indeximport(index) };
                 end;
@@ -227,7 +236,9 @@ catch
                     baselatency = tmpdata(indexsource, tmpi); % note that this is the first bin a block
                     realtmpi    = tmpi+blocksize;             % jump to the end of the block+1
                     if curlatency < baselatency, curlatency = curlatency+65536; end; % in ms
+                    dsaf
                     events(counte).latency = realtmpi+(curlatency-baselatency)/1000*srate;
+                    (curlatency-baselatency)/1000*srate
                     % there is still a potentially large error between baselatency <-> realtmpi
                 else
                     events(counte).latency = tmpi+(blocksize-1)/2;
@@ -242,6 +253,7 @@ catch
 	EEG.srate  = srate;
 	EEG = eeg_checkset(EEG);
 	EEG.event = events(1:counte-1);	
+	EEG = eeg_checkset( EEG, 'eventconsistency' );
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 	
 	% add up or down events
@@ -276,3 +288,15 @@ end;
 
 command = sprintf('EEG = pop_loadbci(''%s'', %f);',filename, srate); 
 return;
+
+% testing: show data and latency
+tmparray = EEG.data;
+types = unique( {EEG.event(:).type} );
+for index = 1:length(types)
+    tmparray(end+1,:) = 0;
+    for index2 = 1:length(EEG.event)
+        if strcmpi(EEG.event(index2).type, types{index})
+            tmparray(round(EEG.event(index2).latency)) = 1;
+        end;
+    end;
+end;
