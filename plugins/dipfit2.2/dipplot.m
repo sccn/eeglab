@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.91  2004/06/01 18:48:31  arno
+%fixing spheres
+%
 %Revision 1.90  2004/06/01 16:53:35  scott
 %spherecolor now works (undocumented) but gives weird color palette ??
 %
@@ -452,9 +455,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                                                                     'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
-    %if strcmpi(g.spheres,'on')
-    %   g.gui = 'off';
-    %end 
+    g.color = strcol2real( g.color, jet(64) );
     
     % axis image and limits
     % ---------------------
@@ -843,8 +844,15 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             hold on;
             if strcmpi(g.spheres,'on') % plot spheres
-                h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
-                set(h, 'userdata', dipstruct, 'tag', tag);
+                if strcmpi(g.projimg, 'on')
+                    tmpcolor = g.color{index} / 2;
+                    h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index}, 'proj', ...
+                                   [-dat.maxcoord(3) dat.maxcoord(2) -dat.maxcoord(1)]*97/100, 'projcol', tmpcolor);
+                    set(h(2:end), 'userdata', 'proj', 'tag', tag);
+                else
+                    h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
+                end;                    
+                set(h(1), 'userdata', dipstruct, 'tag', tag);
                 lighting phong;
                 material shiny;
                 camlight left;
@@ -856,19 +864,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto images %%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            if strcmpi(g.projimg, 'on')
-                if isstr(g.color{index})
-                    switch g.color{index}
-                     case 'y', g.color{index} = [1 1 0]; % yellow
-                     case 'm', g.color{index} = [1 0 1];
-                     case 'c', g.color{index} = [0 1 1];
-                     case 'r', g.color{index} = [1 0 0];
-                     case 'g', g.color{index} = [0 1 0];
-                     case 'b', g.color{index} = [0 0 1];
-                     case 'w', g.color{index} = [1 1 1];
-                     case 'k', g.color{index} = [0 0 0];
-                    end;
-                end;
+            if strcmpi(g.projimg, 'on') & strcmpi(g.spheres, 'off')
                 tmpcolor = g.color{index} / 2;
                 
                 % project onto z axis
@@ -1348,3 +1344,26 @@ function scalegca(factor)
     ylim( [ yl(1)-yf yl(2)+yf ]);
     zlim( [ zl(1)-zf zl(2)+zf ]);
     
+function color = strcol2real(colorin, colmap)
+    if ~iscell(colorin)
+        for index = 1:length(colorin)
+            color{index} = colmap(colorin(index),:);
+        end;
+    else
+        color = colorin;
+        for index = 1:length(colorin)
+            if isstr(colorin{index})
+                switch colorin{index}
+                 case 'r', color{index} = [1 0 0];
+                 case 'g', color{index} = [0 1 0];
+                 case 'b', color{index} = [0 0 1];
+                 case 'c', color{index} = [0 1 1];
+                 case 'm', color{index} = [1 0 1];
+                 case 'y', color{index} = [1 1 0];
+                 case 'k', color{index} = [0 0 0];
+                 case 'w', color{index} = [1 1 1];
+                 otherwise, error('Unknown color');
+                end;
+            end;
+        end;
+    end;
