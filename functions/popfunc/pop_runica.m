@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/07/26 00:53:32  arno
+% computing matrix rank and reducing number of comps accordingly
+%
 % Revision 1.25  2003/07/24 23:27:24  arno
 % debuging ng_ol
 %
@@ -206,9 +209,9 @@ switch lower(icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
-        tmprank = rank(tmpdata(:,1:100));
+        tmprank = rank(tmpdata(:,floor(size(tmpdata,2)/2)));
         if rank(tmpdata) < size(EEG.data,1), 
-            disp(['Warning: data rank lower than number of channel, number of component reduced to' int2str(tmprank) ]);
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels.']);
         end;
         if length(options) < 2
             if rank(tmpdata) == size(EEG.data,1), 
@@ -216,7 +219,7 @@ switch lower(icatype)
             else 
                 [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
-        else    
+        else % if there are defined 'options'   
             if rank(tmpdata) == size(EEG.data,1), 
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
             else
@@ -228,14 +231,14 @@ switch lower(icatype)
             error('Pop_runica: binica can now only be used under specific UNIX OS');
         end;
         icadefs;
-        fprintf(['Warning: if the binary function does not work, check that you have added the\n' ...
-                 'binary file location (in the eeglab directory) to you BIN Unix directory (.cshrc file)\n']);
+        fprintf(['Warning: if the binary ICA function does not work, check that you have added the\n' ...
+                 'binary file location (in the EEGLAB directory) to your Unix /bin directory (.cshrc file)\n']);
         if exist(ICABINARY) ~= 2
-            error('Pop_runica: binary ica program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
+            error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
-        tmprank = rank(tmpdata(:,1:100));
+        tmprank = rank(tmpdata(:,floor(size(tmpdata,2)/2)));
         if rank(tmpdata) < size(EEG.data,1), 
-            disp(['Warning: data rank lower than number of channel, number of component reduced to' int2str(tmprank) ]);
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels.']);
         end;
         if length(options) < 2
             if rank(tmpdata) == size(EEG.data,1), 
@@ -243,7 +246,7 @@ switch lower(icatype)
             else 
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
-        else    
+        else % if defined 'options'
             if rank(tmpdata) == size(EEG.data,1), 
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s );', options));
             else
