@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/07/03 16:07:22  arno
+% disable axis redrawing
+%
 % Revision 1.1  2003/07/03 00:23:01  arno
 % Initial revision
 %
@@ -796,7 +799,8 @@ function [tmpsize, tmpcolor, handles] = drawcircle( tmpcoord, tmpersp, tmpitc, g
 			case 'off', tmpsize = 0.5;
 		end;	
 		tmpsize = 0.05 *  tmpsize * (g.xlimaxes(2)-g.xlimaxes(1))+0.1;
-
+        if isnan(tmpitc), tmpitc = 0; end;
+        
 		switch lower(g.itc)
 			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2+ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
 			case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
