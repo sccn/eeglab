@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/04/24 22:13:51  arno
+% typo
+%
 % Revision 1.15  2003/04/24 22:13:17  arno
 % removing 0 warning
 %
@@ -170,11 +173,11 @@ if EEG.trials == 1
             catch, end;
 			for n=1:length(boundaries)-1
 				try
-                    fprintf('Processing data portion %d to %d\n',boundaries(n),boundaries(n+1)); 
+                    fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
 						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
-					fprintf('\nFilter error: data portion too small (remains unfiltered)\n');
+					fprintf('\nFilter error: continuous data portion too narrow (remains unfiltered)\n');
 				end;
 			end
             try, warning on MATLAB:divideByZero
