@@ -33,6 +33,11 @@
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
+%   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
+%                       shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
@@ -82,11 +87,6 @@
 % See also: timtopo(), envtopo()
 
 % Deprecated but still usable;
-%   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
-%                       shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
 
@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.177  2004/03/25 22:26:45  arno
+% same thing
+%
 % Revision 1.176  2004/03/25 22:24:41  arno
 % fixing shrinkfactor bug
 %
@@ -818,15 +821,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
-    if strcmpi(VERBOSE,'on')
-        fprintf('     Using specified ''shrink'' (deprecated). Recommended: ''intrad'', ''headrad'', ''plotrad''.\n');
-    end
     
     if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
-        if strcmpi(VERBOSE,'on')
-            fprintf('Use of EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
-        end
         shrinkfactor = tmpeloc(1).shrink;
+        if strcmpi(VERBOSE,'on')
+            if isstr(shrinkfactor)
+                fprintf('Automatically shrinking coordinates\n');
+            else                
+                fprintf('Automatically shrinking coordinates by 3.2f\n', shrinkfactor);
+            end;
+        end
     end;
     
     if isstr(shrinkfactor)
