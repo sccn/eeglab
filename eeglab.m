@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.315  2004/07/02 18:17:23  arno
+% saving a dataset is recorded in dataset history
+%
 % Revision 1.314  2004/06/01 21:25:54  arno
 % history save
 %
@@ -1452,17 +1455,40 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     dircontent2 = what( [ p 'plugins' ]);
     dircontent  = { dircontent1.m{:} dircontent2.m{:} };
     for index = 1:length(dircontent)
-        if ~isempty(findstr(dircontent{index}, 'eegplugin'))
-            if exist(dircontent{index}) == 7
-                addpath(dircontent{index})
-                funcname = dircontent{index};
-                disp(['eeglab: adding plugin "' funcname '" (see >> help ' funcname ')' ]);    
-            else 
-                funcname = dircontent{index}(1:end-2);
-                disp(['eeglab: adding plugin "' funcname '" (see >> help ' funcname ')' ]);    
+
+        % find function
+        % -------------
+        funcname = '';
+        if exist(dircontent{index}) == 7
+            addpath(dircontent{index});
+            tmpdir = dir(dircontent{index});
+            for tmpind = 1:length(tmpdir)
+                if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin'))
+                    funcname = tmpdir(tmpind).name;
+                    tmpind = length(tmpdir);
+                end;
             end;
-            eval( [ funcname '(gcf, trystrs, catchstrs)' ], ...
-                 ['disp(''eeglab: error while adding plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
+            p = p(1:findstr(p,'eeglab.m')-1);
+        elseif ~isempty(findstr(dircontent{index}, 'eegplugin'))
+            funcname = dircontent{index}(1:end-2); % remove .m
+        end;
+        
+        % execute function
+        % ----------------
+        if ~isempty(funcname)
+            vers = ''; % version
+            try,
+                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs)' ]);
+                disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
+           catch
+                try,
+                    eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                    disp(['eeglab: adding plugin function "' funcname '"' ]);    
+                catch
+                    disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
+                    disp([ '   ' lasterr] );
+                end;
+            end;
         end;
     end;
 
