@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/06 03:43:36  arno
+% adding topoplot options
+%
 % Revision 1.2  2002/04/05 23:59:06  arno
 % correcting figure title
 %
@@ -73,8 +76,8 @@ if nargin < 3
 	promptstr    = { fastif(typeproc, 'Channel number:', 'Component number:') ...
 					 'Epoch time range [min max] (msec)' ...
 	                 'Wavelet cycles (0->FFT, see >> help timef)' ...
-	                 ['Compute inter-trial amplitude coherence (coher)' 10 'or inter-trial phase coherence (phase locking factor)(phasecoher)'] ...
-	                 'Compute bootstrap significance level (Ex: 0.01 -> 1%)' ...
+	                 ['Compute linear inter-trial coherence (coher)' 10 'OR inter-trial phase coherence (phasecoher)'] ...
+	                 'Bootstrap significance level (Ex: 0.01 -> 1%)' ...
 	                 'Optional timef parameters (see >> help timef)' };
 	inistr       = {  '1' ...
 					  [ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ] ...
@@ -97,9 +100,9 @@ if nargin < 3
     % ------------
     if ~isempty(EEG.chanlocs)
       if typeproc == 1
-	options = [options ', ''topovec'', num, ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', int2str(num), ''elocs'', EEG.chanlocs' ];
       else
-	options = [options ', ''topovec'', EEG.icawinv(:,num), ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', EEG.icawinv(:,int2str(num)), ''elocs'', EEG.chanlocs' ];
       end;
     end;
     
