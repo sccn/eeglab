@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2003/11/04 01:15:06  arno
+% makeur message made clearer
+%
 % Revision 1.104  2003/09/22 23:45:24  arno
 % debug urevent
 %
@@ -592,7 +595,7 @@ end;
     % ---------------------------------
     if ~isempty(EEG.event) & ~isfield(EEG, 'urevent')
         EEG.urevent = EEG.event;
-        disp('eeg_checkset note: creating backup event table (urevent)');
+        disp('eeg_checkset note: creating the original event table (EEG.urevent)');
         for index = 1:length(EEG.event)
             EEG.event(index).urevent = index;
         end;
@@ -870,7 +873,7 @@ if ~isempty( varargin)
           end;
          case 'event', 
           if isempty(EEG.event)
-              errordlg2(strvcat('Cannot process if no events. First add events.', 'Use File > Import event info or > Import epoch info'), 'Error');
+              errordlg2(strvcat('Cannot process if no events. First add events.', 'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
               error('eeg_checkset: no events'); return;
           end;
          case 'chanloc', 
@@ -882,10 +885,10 @@ if ~isempty( varargin)
           end;
          case 'chanlocs_homogenous', 
           if isempty(EEG.chanlocs)
-              errordlg2( strvcat('Cannot process without channel location file.', ...
+              errordlg2( strvcat('Cannot process without a channel location file.', ...
                          'Enter the name of the file via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
-              error('eeg_checkset: cannot process dataset without channel location file.'); return;
+              error('eeg_checkset: cannot process dataset without a channel location file.'); return;
           end;
           if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(1).X)
               EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
@@ -904,9 +907,9 @@ if ~isempty( varargin)
           if ~isempty(EEG.event)
               if isfield(EEG. event, 'urevent'), 
                   EEG.event = rmfield(EEG.event, 'urevent');
-                  disp('eeg_checkset note: re-creating backup event table (urevent)');
+                  disp('eeg_checkset note: re-creating the original event table (EEG.urevent)');
               else
-                  disp('eeg_checkset note: creating backup event table (urevent)');
+                  disp('eeg_checkset note: creating the original event table (EEG.urevent)');
               end;
               EEG.urevent = EEG.event;
               for index = 1:length(EEG.event)
@@ -1054,8 +1057,8 @@ if ~isempty( varargin)
                   end;
               end;    
           end;
-          catch, errordlg2(['warning: minor problem encountered when generating' 10 ...
-                        'epoch information (only useful for users using command line scripts)']); return;
+          catch, errordlg2(['Warning: minor problem encountered when generating' 10 ...
+                        'the EEG.epoch structure (only used in custom scripting)']); return;
           end;
          otherwise, error('eeg_checkset: unknown option');
         end;        
