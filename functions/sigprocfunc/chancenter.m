@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/03 00:49:44  arno
+% editing header
+%
 % Revision 1.2  2002/05/02 01:31:31  arno
 % cancel button
 %
@@ -78,6 +81,8 @@
 % 04-01-02 automatic squeeze calculation -ad & sm
  
 function [x,y,z,newcenter] = chancenter(x,y,z, center, gui)
+
+optim = 0;
 
 if nargin<4
     help chancenter
