@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2004/02/06 17:19:51  arno
+% select at least one epoch
+%
 % Revision 1.82  2003/12/03 19:30:27  arno
 % same
 %
@@ -991,8 +994,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     end;
     if exist('pwelch') == 2, usepwelch = 1; else usepwelch=0; end;
     if ~usepwelch
-        disp('');
-        disp('Signal processing toolbox absent: spectrum computed using spec() function');
+        fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using spec() function\n');
+        disp('Note: spec() emulates psd() not pwelch() so results scale will differ if SPT present');
         disp('THIS FUNCTION (SPEC()) RETURNS INNACURATE POWER OVER FILTERED REGIONS');
     end;
     fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
@@ -1026,7 +1029,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 					specstd = zeros(nchans,length(freqs));
 				end
 				eegspec(c,:) = eegspec(c,:) + tmpspec';
-				specstd(c,:) = eegspec(c,:) + tmpspec'.^2;
+				specstd(c,:) = specstd(c,:) + tmpspec'.^2;
 			else
 				for n=1:length(g.boundaries)-1
                     if g.boundaries(n+1) - g.boundaries(n) >= winlength % ignore segments of less than winlength
