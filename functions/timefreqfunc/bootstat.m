@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/04/14 20:36:14  scott
+% edited help message
+%
 % Revision 1.20  2003/12/09 22:29:07  arno
 % typo in text
 %
@@ -185,6 +188,12 @@ if isstr(g)
 end;
 bootname = g.boottype;
 unitname = '';
+if 2/g.alpha > g.naccu 
+    if strcmpi(g.distfit, 'off') | ~((size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1)
+        g.naccu = 2/g.alpha; 
+        fprintf('Adjusting naccu to compute alpha value');
+    end;
+end;
 switch g.boottype
  case 'times',  g.boottype = 'first'; unitname = 'trials'; bootname = 'times';
  case 'trials', g.boottype = 'second'; unitname = 'times'; bootname = 'trials';
@@ -231,7 +240,7 @@ if (size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1
     else 
         Rbootout = g.accarray;
     end;
-    tmpsort = sort(abs(Rbootout));
+    tmpsort = sort(Rbootout);
     i = round(g.alpha*g.naccu);
     sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
     if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
@@ -394,20 +403,26 @@ end; % 2-D or 3-D
 
 % fit to distribution (currently only for 1-D data)
 if strcmpi(g.distfit, 'on')
-    if length(g.vals) ~= 1
+    if length(g.vals) > 1
         error('For fitting, vals must contain exactly one value');
     end;
     
     % fitting with Ramberg-Schmeiser distribution
     % -------------------------------------------
-    accarrayout = 1 - rsfit(abs(Rbootout(:)), g.vals);
-    if ~isempty(g.correctp)
-        if length(g.correctp) == 2
-            accarrayout = correctfit(accarrayout, 'gamparams', [g.correctp 0]); % no correction for p=0
-        else
-            accarrayout = correctfit(accarrayout, 'gamparams', g.correctp);
+    if ~isempty(g.vals)
+        accarrayout = 1 - rsfit(abs(Rbootout(:)), g.vals);
+        if ~isempty(g.correctp)
+            if length(g.correctp) == 2
+                accarrayout = correctfit(accarrayout, 'gamparams', [g.correctp 0]); % no correction for p=0
+            else
+                accarrayout = correctfit(accarrayout, 'gamparams', g.correctp);
+            end;
         end;
-    end;
+    else
+        [p c l chi2] = rsfit(Rbootout(:),0);
+        pval = g.alpha;   accarrayout(1) = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
+        pval = 1-g.alpha; accarrayout(2) = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);        
+    end;        
     return;
     
     % fitting with normal distribution (deprecated)
