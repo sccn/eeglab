@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/01/05 18:55:12  arno
+% testing
+%
 % Revision 1.11  2003/01/02 20:01:39  arno
 % removing the complex transpose bug
 %
@@ -138,6 +141,7 @@ g = finputcheck(varargin, ...
 				  'mtaper'        'real'     []                        []; ...
 				  'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher'; ...
 				  'subitc'        'string'   {'on' 'off'}              'off'	});
+if isstr(g), error(g); end;
 
 % checkin parameters
 % ------------------
