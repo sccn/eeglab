@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2004/09/21 16:51:59  hilit
+% change && -> &
+%
 % Revision 1.100  2004/09/03 16:14:17  arno
 % add option to hide event duration
 %
@@ -1727,7 +1730,7 @@ else
       return
     end
     
-	[tmp YLabels] = readlocs(eloc_file);
+	YLabels = { eloc_file.labels };
     YLabels = strvcat(YLabels);
     
     YLabels = flipud(str2mat(YLabels,' '));
