@@ -737,7 +737,7 @@ while (any(axnotdone)),
 	curpage = page(ii);
 	% get axes limits and aspect ratio
 	axl = [get(curax,'XLim'); get(curax,'YLim'); get(curax,'ZLim')];
-	ar = get(curax,'AspectRatio');
+	ar = get(curax,'DataAspectRatio');
 	% get axes size in pixels (points)
 	u = get(curax,'Units');
 	axposoldunits = get(curax,'Position');
