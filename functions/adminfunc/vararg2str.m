@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/05/10 19:08:51  arno
+% replacing comma by space
+%
 % Revision 1.8  2003/05/10 19:05:38  arno
 % allowing numerical non integer to form small compact list
 %
@@ -193,7 +196,7 @@ function str = contarray( array )
 		skip = 0;
         indent = array(2) - array(1);
 		for index = 2:length(array)
-            if array(index) ~= array(index-1)+indent
+            if array(index) ~= array(index-1)+indent | indent == 0
 				if skip <= 1
 					if skip == 0
                         str = [str ' ' num2str(array(index))];
