@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/05/02 21:56:27  arno
+% adding low mem option
+%
 % Revision 1.26  2003/05/02 17:58:56  arno
 % do not pass on maxfreq to timefreq
 %
@@ -1155,17 +1158,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           else
               plot(freqs,E,'LineWidth',g.linewidth)
           end
-          axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
-          set(h(5),'TickLength',[0.020 0.025]);
-      
-          set(h(5),'View',[90 90])
-          tick = get(h(5),'YTick');
-          if (length(tick)>1)
-              set(h(5),'YTick',[tick(1) ; tick(end-1)])
-          end
-          set(h(5),'View',[90 90])
-          xlabel('Frequency (Hz)')
-          ylabel('dB')
+          axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])     
       else
           if ~isnan(g.alpha)
               semilogx(freqs,Pboot(:,:)'+[E;E],'LineWidth',g.linewidth)
