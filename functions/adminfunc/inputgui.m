@@ -1,9 +1,9 @@
-% inputgui() - a comprehensive gui automatic builder. This function help
-%              to create GUI very fast without bothering about the 
+% inputgui() - A comprehensive gui automatic builder. This function helps
+%              to create GUI very quickly without bothering about the 
 %              positions of the elements. After creating a geometry, 
-%              elements just place themselves into the predefined 
-%              locations. It is especially usefull for figure where you
-%              intend to put text button and descriptions.
+%              elements just place themselves in the predefined 
+%              locations. It is especially useful for figures in which 
+%              you intend to put text buttons and descriptions.
 %
 % Usage:
 %   >> [ outparam ] = inputgui( geometry, listui );
@@ -19,7 +19,7 @@
 %   help       - optional help command 
 %   title      - optional figure title
 %   userdat    - optional userdata input for the figure
-%   mode       - ['normal'|'noclose'|fignumber], either wait for user to press
+%   mode       - ['normal'|'noclose'|fignumber]. Either wait for user to press
 %                OK or CANCEL ('normal'), return without closing window
 %                input ('noclose'), or process an existing 
 %                window which number is given as input (fignumber). 
@@ -28,18 +28,18 @@
 %                supergui()
 %
 % Output:
-%   outparam   - list of outputs. The function scan all lines and
+%   outparam   - list of outputs. The function scans all lines and
 %                add up an output for each interactive uicontrol, i.e
 %                edit box, radio button, checkbox and listbox.
 %   userdat    - 'userdata' value of the figure.
-%   strhalt    - the funciton returns when the 'userdata' field of the
-%                button with the tag 'ok' is modified. This return the
+%   strhalt    - the function returns when the 'userdata' field of the
+%                button with the tag 'ok' is modified. This returns the
 %                new value of this field.
 %   outstruct  - returns outputs as a structure (only tagged ui controls
 %                are considered). The field name of the structure is
 %                the tag of the ui and contain the ui value or string.
 %
-% Note: the function also add three buttons at the bottom of each 
+% Note: the function also adds three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
 %       is provided) and 'OK'.
 %
@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/13 00:53:43  arno
+% replace gcf by fig
+%
 % Revision 1.17  2002/11/13 00:49:31  arno
 % tag the figure
 % /
