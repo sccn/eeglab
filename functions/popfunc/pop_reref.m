@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/11/05 16:24:17  arno
+% homogenous -> homogeneous
+%
 % Revision 1.25  2003/10/14 17:03:08  arno
 % vararg2str for optional arguments
 %
@@ -378,13 +381,16 @@ EEG.nbchan  = size(EEG.data,1);
 
 EEG = eeg_checkset(EEG);
 if ~isempty(EEG.chanlocs)
-    EEG = eeg_checkset(EEG, 'chanlocs_homogeneous');
-    if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(end).X)
-        tmp = convertlocs(EEG.chanlocs(end), 'topo2all');
-        fieldtmp = fieldnames(tmp);
-        for index = 1:length(fieldtmp)
-            tmpval = getfield(tmp, fieldtmp{index});
-            EEG.chanlocs(end) = setfield(EEG.chanlocs(end), fieldtmp{index}, tmpval);
+    if length(options) > 1 & strcmpi(options{1}, 'refloc') | ...
+            length(options) > 3 & strcmpi(options{3}, 'refloc')
+        EEG = eeg_checkset(EEG, 'chanlocs_homogeneous');
+        if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(end).X)
+            tmp = convertlocs(EEG.chanlocs(end), 'topo2all');
+            fieldtmp = fieldnames(tmp);
+            for index = 1:length(fieldtmp)
+                tmpval = getfield(tmp, fieldtmp{index});
+                EEG.chanlocs(end) = setfield(EEG.chanlocs(end), fieldtmp{index}, tmpval);
+            end;
         end;
     end;
 end;
