@@ -10,7 +10,7 @@
 % Usage:
 %        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
 %        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
-%        >>  [h val_or_grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...);
+%        >>  [h grid_or_val [grid]]= topoplot(datavector, chan_locs, 'Param1','Value1', ...);
 %
 % Required Inputs:
 %   datavector        - single vector of channel values. Else, if a vector of selected 
@@ -93,6 +93,7 @@
 %         h           - plot axes handle
 %         grid_or_val - interpolated data image matrix (off-head points = NaN).  
 %                       ELSE, interpolated value at single input 'noplot' channel location, if any.
+%         [grid]      - IF interpolated value above, then the interpolated image grid
 % Chan_locs format:
 %    See >> topoplot 'example'
 %
@@ -126,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.211  2004/10/08 21:34:25  scott
+% same -sm
+%
 % Revision 1.210  2004/10/08 21:32:09  scott
 % help message clarification on outputs -sm
 %
@@ -588,7 +592,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,Zi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi,grid] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1168,6 +1172,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   mask = (sqrt(Xi.^2 + Yi.^2) <= rmax); % mask outside the plotting circle
   ii = find(mask == 0);
   Zi(ii) = NaN;                         % mask non-plotting voxels with NaNs
+  grid = Zi;
 
   %
   %%%%%%%%%% Return interpolated value at designated scalp location %%%%%%%%%%
