@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/14 00:51:50  arno
+% debug multi-elec
+%
 % Revision 1.14  2002/08/12 21:51:17  arno
 % same
 %
@@ -232,11 +235,11 @@ if calldisp
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( EEG.data(elecrange,:), EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
+				rejstatepoch( EEG.data(elecrange,:,:), EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off'  );
 		else 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( tmpdata(elecrange,:), EEG.stats.icajpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icajp, ...
+				rejstatepoch( tmpdata(elecrange,:,:), EEG.stats.icajpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icajp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off' );
 		end;		
 		nrej = n;
