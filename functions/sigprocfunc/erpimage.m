@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/07/14 02:23:16  arno
+% same
+%
 % Revision 1.19  2002/07/14 01:58:00  arno
 % same
 %
@@ -1233,7 +1236,7 @@ if ~isempty(verttimes)
  elseif size(verttimes,1) ~= ntrials
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
     return
- else
+ end;
   if size(verttimes,1) == 1
     fprintf('Plotting %d lines at times: ',size(verttimes,2));
   else
@@ -1275,7 +1278,7 @@ if ~isempty(verttimes)
        end
      end
   end
- end
+ %end
   fprintf('\n');
 end
 
