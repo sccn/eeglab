@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2004/09/03 16:02:21  arno
+% toggle event duration ploting
+%
 % Revision 1.98  2004/07/28 15:49:22  arno
 % remove warning for Matlab 7
 %
@@ -574,7 +577,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' 'events' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
+               'ploteventdur' 'butlabel' 'scale' 'events' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -615,10 +619,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    switch lower(g.scale)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
-   end;	
-   switch lower(g.ploteventdur)
-	   case { 'on' 'off' };
-	   otherwise disp('Error: ploteventdur must be either ''on'' or ''off'''); return;
    end;	
    
    if ~iscell(g.color)
