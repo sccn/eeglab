@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/12/04 00:33:18  cooper
+% Added conversion of A/D units to microvolts.
+%
 % Revision 1.10  2002/12/03 21:50:16  cooper
 % readegi now compatible with EGI Simple Binary
 % datafile versions 2,3,4,5,6, & 7.
@@ -156,3 +159,7 @@ end
 if ( head.bits ~= 0 & head.range ~= 0 )
        TrialData = (head.range/(2^head.bits))*TrialData;
 end
+
+% convert event codes to char
+% ---------------------------
+head.eventcode = char(head.eventcode);
