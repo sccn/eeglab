@@ -23,8 +23,26 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/17 02:34:52  arno
+% Initial revision
+%
 
 function out = nan_mean(in, dim)
+
+    if nargin < 1
+        help nan_mean;
+        return;
+    end;
+    if nargin < 2
+        if size(in,1) ~= 1
+            dim = 1;
+        elseif size(in,2) ~= 1
+            dim = 2;
+        else 
+            dim = 3; 
+        end;
+    end;
     tmpin = in;
     tmpin(find(isnan(in(:)))) = 0;
     out = sum(tmpin, dim) ./ sum(~isnan(in),dim);
+    
