@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/12/24 01:27:55  arno
+% debug for 'pca' option
+%
 % Revision 1.14  2002/12/05 03:12:06  arno
 % fixing fig problem
 %
@@ -141,7 +144,7 @@ switch lower(icatype)
     case 'runica' 
         if nargin < 2
             fig = figure('visible', 'off');
-            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
+            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interrupt runica' }, ...
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
