@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2005/03/16 02:47:26  arno
+% fixing transform when some channels do not have coordinates
+%
 % Revision 1.120  2005/03/11 18:48:56  arno
 % lookup button
 %
@@ -757,10 +760,10 @@ if nargin < 3
         lookuplocs = [ '[chantmp chaninfo comtmp] = pop_chanedit(chantmp, chaninfo, ''lookupgui'', []);' endgui ];
        
         switch upper(params.nosedir)
-            case nosevals{1}, noseparam = 1;
-            case nosevals{2}, noseparam = 2;
-            case nosevals{3}, noseparam = 3;
-            case nosevals{4}, noseparam = 4;
+            case '+X', noseparam = 1;
+            case '-X', noseparam = 2;
+            case '+Y', noseparam = 3;
+            case '-Y', noseparam = 4;
             otherwise, error('Wrong value for nose direction');
         end;
 		geometry = { geometry{:} [1] [0.9 1.3 0.6 1.1 0.9] [1] [1 1 1 1 1]};
