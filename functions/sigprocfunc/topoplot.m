@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2004/02/15 16:45:42  scott
+% same
+%
 % Revision 1.81  2004/02/15 16:44:31  scott
 % same
 %
@@ -554,8 +557,9 @@ Th = pi/180*Th;                              % convert degrees to radians
 
 squeezefac=1;
 if isstr(shrinkfactor)
-	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) | strcmp(lower(shrinkfactor), ...
-                       'force')
+	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) ...
+                   | strcmp(lower(shrinkfactor),'force') ...
+                         | strcmp(lower(shrinkfactor),'skirt') 
 		squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
 		if strcmpi(VERBOSE, 'on')
                    fprintf(...
@@ -566,7 +570,8 @@ if isstr(shrinkfactor)
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g\n', shrinkfactor);
+        fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
+                                                                      shrinkfactor);
 	end;
     Rd = Rd*(1-shrinkfactor); % squeeze electrodes by shrinkfactor*100% to plot all inside head
     squeezefac = 1-shrinkfactor;
