@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.235  2005/02/11 03:27:38  arno
+% help msg
+%
 % Revision 1.234  2005/02/10 22:19:01  arno
 % debug auxvar re-alignment
 %
@@ -1813,7 +1816,11 @@ elseif exist('ampargs') == 1 % if amplitude-sort
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
           end;
 	  pxx = 10*log10(pxx);
-	  n = find(freqs >= abs(ampargs(3)) & freqs <= abs(ampargs(4)));
+      if ampargs(3) == ampargs(4)
+          [tmp n] = min(freqs - ampargs(3));
+      else
+          n = find(freqs >= abs(ampargs(3)) & freqs <= abs(ampargs(4)));
+      end;
 	  if ~length(n)
 		  freq = mean([abs(ampargs(3)),abs(ampargs(4))]);
 	  end
