@@ -115,6 +115,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.18  2003/04/19 00:46:41  arno
+%correcting projection
+%
 %Revision 1.17  2003/04/19 00:37:43  arno
 %changing dipole size for BESA
 %
@@ -650,7 +653,7 @@ function newsrc = convertbesaoldformat(src);
         
         % convert format
         % --------------
-        if isempty(src(index).besaextori), src(index).besaextori = 1; end; % 20 mm
+        if isempty(src(index).besaextori), src(index).besaextori = 300; end; % 20 mm
         newsrc(index).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
         newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori/300];
         
