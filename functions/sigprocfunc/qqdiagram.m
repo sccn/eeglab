@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/22 01:01:13  luca
+% Initial revision
+%
 
 function qqdiagram( x , y, pk )
 
@@ -111,7 +114,7 @@ if nargin ==1
     text(xlim(1), mean(y)+rangey/50,' Mean < X > ')
 	plot([xqrt1  xqrt3],[yqrt1 yqrt3],'k.','MarkerSize',10)
 	set(gca,'YLim',[ymin ymax])
-	xlabel('Standard Normal Quantiles [Std.Dev.]')
+	xlabel('Standard Normal Quantiles')
 	ylabel('X Quantiles')
 else
 	% For normally distributed data, the slope of the plot line is equal to the ratio
