@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/10/26 20:26:50  arno
+% help msg
+%
 % Revision 1.19  2002/10/11 22:15:59  arno
 % header
 %
@@ -269,9 +272,9 @@ if nbgraph== 1, com = 'figure;'; end;
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
 if length( options ) < 2
-	com = [com sprintf('pop_topoplot(%s,%d,[%s], ''%s'', [%s]);', inputname(1), typeplot, sprintf('%d ',arg2), topotitle, int2str(rowcols) )];
+	com = [com sprintf('pop_topoplot(%s,%d, %s);', inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}))];
 else
-	com = [com sprintf('pop_topoplot(%s,%d,[%s], ''%s'', [%s] %s);', inputname(1), typeplot, sprintf('%d ',arg2), topotitle, int2str(rowcols), options )];
+	com = [com sprintf('pop_topoplot(%s,%d, %s %s);', inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}), options)];
 end;
 return;
 
