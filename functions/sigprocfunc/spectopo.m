@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2004/04/28 14:46:54  scott
+% added license() call to test for pwelch availability -sm
+%
 % Revision 1.85  2004/04/28 14:36:51  scott
 % added commandline tests; edited help msg
 %
@@ -1003,7 +1006,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	else
         fftlength = g.nfft;
     end;
-    if exist('pwelch') == 2 & license('test','Signal_Toolbox'), 
+    if exist('pwelch') == 2 % & license('test','Signal_Toolbox'), 
        usepwelch = 1; 
     else 
        usepwelch=0; 
