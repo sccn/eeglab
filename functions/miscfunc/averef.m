@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> data = averef(data);
-%   >> [data_out W_out] = averef(data,W);
+%   >> [data_out W_out S_out meandata] = averef(data,W);
 %
 % Inputs:
 %   data - 2D data matrix (chans,frames*epochs) 
@@ -10,6 +10,8 @@
 % Outputs:
 %   data_out - Input data converted to average reference.
 %   W_out    - ICA weight matrix converted to average reference
+%   S_out    - ICA sphere matrix converted to eye()
+%   meandata - (1,dataframes) mean removed from each data frame (point)
 %
 % Note: If 2 args, also converts the weight matrix W to average reference:
 %         If ica_act = W*data, then data = inv(W)*ica_act; 
@@ -38,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/21 02:08:19  arno
+% nothing
+%
 % Revision 1.5  2002/08/21 02:03:32  arno
 % debugging ica averef
 %
@@ -57,7 +62,7 @@
 % 12/16/99 Corrected denomiator on the suggestion of Ian Nimmo-Smith, Cambridge UK
 % 01-25-02 reformated help & license -ad 
 
-function [data, W, S] = averef(data, W, S)
+function [data, W, S, meandata] = averef(data, W, S)
 
 if nargin<1
   help averef
@@ -73,7 +78,8 @@ end
 % data = avematrix*data; % implement as a matrix multiply
 % else (faster?)
 
-data = data - ones(chans,1)*sum(data)/chans;
+meandata = sum(data)/chans;
+data = data - ones(chans,1)*meandata;
 
 % treat optional ica parameters
 if nargin == 2
