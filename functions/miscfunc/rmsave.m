@@ -4,6 +4,9 @@
 %         >> ave = rmsave(data,frames);
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/09/03 15:24:59  arno
+% header update
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -12,10 +15,14 @@
 
 function ave = rmsave(data,frames)
 
-if nargin<2
+if nargin<1
   help rmsave
   return
 end
+if nargin<2
+	frames = size(data,2); 
+	data = reshape(data, size(data,1), size(data,2)*size(data,3));
+end;
 
 chans = size(data,1);
 datalength = size(data,2);
