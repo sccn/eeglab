@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/06/23 17:19:32  arno
+% nothing
+%
 % Revision 1.54  2003/06/11 18:02:00  arno
 % color error in drawcircle
 %
@@ -387,7 +390,7 @@ if isempty(g.circfactor), g.circfactor = ones( nbcomponents, nbcomponents )*0.01
     
 % check size of inputs
 % --------------------
-%try
+try
 	if ~all(size(ALLERSP) == size(ALLITC))
 		disp('Error: ERSP and ITC cells array must be the same size'); return;
 	end;	
