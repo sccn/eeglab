@@ -134,6 +134,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/10/08 23:59:03  arno
+% removing s to framesfolder
+%
 % Revision 1.9  2003/10/08 23:55:12  arno
 % fix framefolder
 %
@@ -392,11 +395,13 @@ end;
 if size(g.circfactor,1) ~= size(g.circfactor,2)
 	disp('Error: Circfactor must be a square matrix'); return;
 end;
-if size(g.circfactor,1) ~= size(g.coordinates,1)
-	disp('Error: Circfactor must have the same number of rows as the number of rows of coordinates'); return;
-end;
-if nbcomponents ~= size(g.coordinates,1)
-	disp('Error: The array of selected components must have length nrows of the array coordinates'); return;
+if ~iscell(g.coordinates)
+    if size(g.circfactor,1) ~= size(g.coordinates,1)
+        disp('Error: Circfactor must have the same number of rows as the number of rows of coordinates'); return;
+    end;
+    if nbcomponents ~= size(g.coordinates,1)
+        disp('Error: The array of selected components must have length nrows of the array coordinates'); return;
+    end;
 end;
 if ~isstr(g.envylabel)
 	disp('Error: envelope label must be a string'); return;
@@ -446,21 +451,6 @@ nwin = size(tmp,2);
 % optional resqure of all coordinates
 % -----------------------------------
 g.magnify = g.magnify/4;
-if strcmp(lower(g.square), 'on') 
-    disp('Square option disabled');
-%	for index = selected
-%    	if length(selected) > 1
-%			g.coordinates( index,1) = (g.coordinates( index,1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-%			g.coordinates( index,2) = (g.coordinates( index,2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-%		end;
-%	end;
-%	g.rthistloc(1) = (g.rthistloc(1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-%	g.rthistloc(2) = (g.rthistloc(2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-%	g.rthistloc(3) = g.rthistloc(3)/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-%	g.rthistloc(4) = g.rthistloc(4)/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-%	g.xlimaxes = [0 1]/g.magnify;
-%	g.ylimaxes = [0 1]/g.magnify;
-end;
 
 % compute RT distribution
 % -----------------------
@@ -553,19 +543,30 @@ end;
 ordinate = 0.2;
 max_ordinate = 1-1.4*ordinate;   % makes space at top for figure title  
 maxcoordx    = 1.1-1/nbconditions/4;
+coords = g.coordinates;
+g.coordinates = {};
 for i=1:nbconditions
 	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q );
-    gr = [ 0.3 0.3 0.3 ];
-    g.dipplotopt = { 'gui', 'off', 'image', 'mri', 'color', { gr gr gr gr gr gr gr gr gr } };
     
     % plot 3d head
     % ------------
-    for index = 1:size(g.coordinates, 1);
-        dipstruct(index).posxyz = g.coordinates(index,:);
-        dipstruct(index).momxyz = [0 0 0];
-        dipstruct(index).component = index;
-        dipstruct(index).rv = 0.1;
-    end;
+    gr = [ 0.3 0.3 0.3 ];
+    g.dipplotopt = { 'gui', 'off', 'image', 'mri', 'color', { gr gr gr gr gr gr gr gr gr } };
+    if iscell(coords)
+        for index = 1:size(coords{1}, 1);
+            dipstruct(index).posxyz = coords{1}(index,:);
+            dipstruct(index).momxyz = [0 0 0];
+            dipstruct(index).component = index;
+            dipstruct(index).rv = 0.1;
+        end;
+    else
+        for index = 1:size(coords, 1);
+            dipstruct(index).posxyz = coords(index,:);
+            dipstruct(index).momxyz = [0 0 0];
+            dipstruct(index).component = index;
+            dipstruct(index).rv = 0.1;
+        end;
+    end;        
     dipplot( dipstruct, 'view', g.view, g.dipplotopt{:}); axis off;
     
     %surface([-2 -2; -2 -2]*g.maxc, [-20 20; -20 20]*g.maxc,[-20 -20; 20 20]*g.maxc, repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
@@ -583,14 +584,14 @@ for i=1:nbconditions
         htmp = findobj(gca, 'tag', [ 'dipole' int2str(index) ]);
         for dipindex = 1:length(htmp)
             tmpstruct = get(htmp(dipindex), 'userdata');
-            if isstruct(tmpstruct) % look for dipole location
-                 g.coordinates(index, :) = tmpstruct.pos3d;
+            if isstruct(tmpstruct) % look for dipole location % THIS DOES NOT WORK
+                 g.coordinates{i}(index, :) = tmpstruct.pos3d;
             end;
         end;
         delete(htmp);
     end;
-    %g.coordinates(:,1) = -g.coordinates(:,1);
-    %g.coordinates(:,2) = -g.coordinates(:,2);
+    %h = plot3(g.coordinates{i}(:, 1),  g.coordinates{i}(:, 2),  g.coordinates{i}(:, 3), 'r.', 'markersize', 30); 
+    %dsaf
     xltmp = xlim;
     yltmp = ylim;
     g.dimratio = (xltmp(2) - xltmp(1)) / (yltmp(2) - yltmp(1));
@@ -720,7 +721,7 @@ for indeximage = alltimepoints
 						
 						if strcmp(lower(g.crossfphaseunit), 'radian'), tmpangle = tmpangle/pi*180; end;
                         %fprintf('%d-%d -> power %1.1f\n', index1, index2, tmppower);
-						drawconnections( g.coordinates( index1,: ), g.coordinates( index2,: ), ...
+						drawconnections( g.coordinates{tmpcond}( index1,: ), g.coordinates{tmpcond}( index2,: ), ...
 							tmppower, tmpangle, g.circfactor(index1, index2), g);
 					end;	
 				end;	
@@ -739,7 +740,7 @@ for indeximage = alltimepoints
 			tmptimef = ALLITC{ index1, tmpcond};
 			tmpitc = mean(tmptimef( FREQS, indeximage)); % color is ITC
 			%index1, tmpitc, tmppow,
-            drawcircle( g.coordinates( index1,: ), tmppow, tmpitc, g);
+            drawcircle( g.coordinates{tmpcond}( index1,: ), tmppow, tmpitc, g);
 		end;
 	end;
 			
