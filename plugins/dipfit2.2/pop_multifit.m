@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/10 19:40:59  arno
+% new version compatible with fieldtrip
+%
 % Revision 1.1  2005/03/10 19:02:25  arno
 % Initial revision
 %
@@ -254,7 +257,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                 EEG.dipfit.model(i).active = [1];
                 EEG.dipfit.model(i).select = [1];
             end;
-            warning backtrace on;
+            warning backtrace off;
             try,
                 if g.dipoles == 2,
                     EEG.dipfit.model(i) = dipfit_nonlinear(EEG, 'component', i, 'symetry', defaultconstraint);
