@@ -6,7 +6,7 @@
 %            % remove basevector mean for each channel and epoch
 %
 % Inputs:
-%   data       - data matrix (chans,frames*epochs);
+%   data       - data matrix (chans,frames*epochs) or (chans, frames, epochs);
 %   frames     - data points per epoch {[]|0|default->data length}
 %   basevector - vector of baseline frames per epoch
 %                 Ex 1:128 {[]|0|default->whole epoch}
@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 07-30-97 converted to rmbase() -sm
 % 09-30-97 fixed! -sm
@@ -71,7 +74,13 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 		fprintf('rmbase(): input data is empty.\n\n');
 		return
 	end
-
+    
+	reshape_flag=0;
+	if ndims(data) == 3,
+		data = reshape(data, size(data,1), size(data,2)*size(data,3));
+	    reshape_flag=1;
+	end	
+	
 	[chans framestot]= size(data);
 	if frames ==0,
 		frames = framestot;
@@ -100,3 +109,8 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 		dataout(:,(e-1)*frames+1:e*frames) = ...
                 data(:,(e-1)*frames+1:e*frames) - diff;
     end;
+
+	if reshape_flag
+      	dataout = reshape(dataout, size(data,1), size(data,2), size(data,3));
+	end
+	
