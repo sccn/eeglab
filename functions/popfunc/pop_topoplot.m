@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2004/09/15 19:05:14  hilit
+% undo previous change
+%
 % Revision 1.55  2004/09/15 18:58:41  hilit
 %
 % Revision 1.54  2004/09/13 19:31:00  arno
@@ -371,13 +374,15 @@ for index = 1:size(arg2(:),1)
             if length(EEG.dipfit.model) >= index
                 curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
-                if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
-                    options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
-                    dipoleplotted = 1;
-                else
-                    if  any(curpos(1,:) ~= 0)
-                        options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                if ~isempty(curpos)
+                    if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
+                        options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
                         dipoleplotted = 1;
+                    else
+                        if any(curpos(1,:) ~= 0)
+                            options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                            dipoleplotted = 1;
+                        end;
                     end;
                 end;
                 if nbgraph ~= 1
