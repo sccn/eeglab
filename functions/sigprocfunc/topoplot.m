@@ -107,6 +107,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.183  2004/03/31 02:53:35  scott
+% made blanking ring and head filled rings; made default electrodes 'off' iff chans>64; made contour color
+% dark grey; adjusted nose and ear shapes
+%
 % Revision 1.182  2004/03/31 02:08:07  scott
 % *** empty log message ***
 %
@@ -1176,13 +1180,13 @@ f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],HEADCOLOR,'edgecolor',HEA
 %
 %%%%%%%%%%%%%%%%%%% Plot ears and nose %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  base  = rmax-.004;
+  base  = rmax-.0046;
   basex = 0.18*rmax;                   % nose width
   tip   = 1.15*rmax; 
   tiphw = .04*rmax;                    % nose tip half width
   tipr  = .01*rmax;                    % nose tip rounding
   q = .04; % ear lengthening
-  EarX  = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489-.01]; % rmax = 0.5
+  EarX  = [.497-.005  .510  .518  .5299 .5419  .54    .547   .532   .510   .489-.005]; % rmax = 0.5
   EarY  = [q+.0555 q+.0775 q+.0783 q+.0746 q+.0555 -.0055 -.0932 -.1313 -.1384 -.1199];
   sf    = headrad/plotrad;                                          % squeeze the model ears and nose 
                                                                     % by this factor
