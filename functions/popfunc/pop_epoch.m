@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/06 21:35:13  arno
+% spelling
+%
 % Revision 1.10  2002/07/21 17:17:15  arno
 % debugging extract epochs from epochs
 %
@@ -275,6 +278,18 @@ switch lower(g.epochinfo)
 		  end;
 	  end;
   end;    
+end;
+
+% check for boundary events
+% -------------------------
+disp('Pop_epoch: checking for EEG discontinuity in epochs');
+boundaryindex = strmatch('boundary', { EEG.event.type });
+if ~isempty(boundaryindex)
+	indexepoch = [];
+	for tmpindex = boundaryindex
+		indexepoch = [indexepoch EEG.event(tmpindex).epoch ];
+	end;
+	EEG = pop_select(EEG, 'notrial', indexepoch);
 end;
 
 % generate text command
