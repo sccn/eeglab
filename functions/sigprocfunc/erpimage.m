@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.162  2003/11/13 01:47:13  scott
+% make erpalpha fill less saturated
+%
 % Revision 1.161  2003/11/10 23:40:32  scott
 % fill the bootstrap limits behind the erp if erpalpha
 %
@@ -2876,7 +2879,7 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
     if ~isnan(signif);
       filltimes = [times times(end:-1:1)];
       fillsignif = [signif -1*signif(end:-1:1)];
-      [fill] = fill(filltimes,fillsignif, [0.7 0 0]); hold on    % plot 0+alpha
+      [fill] = fill(filltimes,fillsignif, [1 .7 .7]); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
