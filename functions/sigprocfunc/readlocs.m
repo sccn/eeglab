@@ -76,7 +76,7 @@
 %   labels      - cell array of strings giving the  names of the electrodes
 %   theta       - vector of polar angles for the electrodes (in degrees).
 %   radius      - vector of polar coordinate radius values for the electrodes
-%   indices     - indices of channels with non-empty coordinates
+%   indices     - indices, k, of channels with non-empty 'locs(k).theta' coordinate
 %
 % File formats:
 %   If 'filetype' is unspecified, the file extension determines its type.
@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2004/02/24 17:17:32  arno
+% dbug message
+%
 % Revision 1.61  2004/01/01 19:12:08  scott
 % help message edits
 %
@@ -591,7 +594,7 @@ if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
 if nargout > 2
-    tmptheta = { eloc.theta };
+    tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
     indices = find(~cellfun('isempty', tmptheta));
     theta = cell2mat(tmptheta(indices));
 end;
