@@ -5,7 +5,7 @@
 %   >> CHANLOCS = readneurolocs( filename, plot, czindex, fzindex, c3index );
 %
 % Inputs:
-%   filename       - file name or matlab cell array
+%   filename       - file name or matlab cell array { names x_coord y_coord }
 %
 % Optional inputs:
 %   plot           - [0|1] if 1, plot the electrode locations. Default 0.
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/07/29 21:25:20  arno
+% debug C3-C4
+%
 % Revision 1.4  2003/07/29 21:05:53  arno
 % handle cell array for channel locations
 %
