@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.46  2003/07/24 17:08:03  arno
+%making component number for dipfit
+%
 %Revision 1.45  2003/07/22 01:10:06  arno
 %*** empty log message ***
 %
