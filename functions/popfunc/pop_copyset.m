@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 16:12:32  arno
+% updating messages
+%
 % Revision 1.2  2002/04/23 22:05:43  arno
 % making the function standalone
 % ,
@@ -55,7 +58,7 @@ if nargin < 2
 	help pop_copyset;
 	return;
 end;
-if isempty(EEG(set_in).data)
+if isempty(ALLEEG(set_in).data)
     error('Pop_copyset error: cannot copy empty dataset'); return;
 end;
 if set_in == 0
@@ -65,9 +68,9 @@ end;
 if nargin < 3
 	% which set to save
 	% -----------------
-	promptstr    = { 'Enter the destination dataset:' };
+	promptstr    = { 'Enter the destination dataset:'};
 	inistr       = { int2str(set_in+1) };
-	result       = inputdlg( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr, 'pop_copyset');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	set_out   	 = eval( result{1} );
