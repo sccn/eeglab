@@ -6,7 +6,8 @@
 %        >> tftopo(tfdata,times,freqs,timefreqs,showchan,chanlocs,...
 %                                                  limits,signifs,selchans)
 % Inputs:
-%   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef(), one for each channel
+%   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef() (or any other
+%               time/freq matrix), one for each channel.
 %   times     = Vector of times in msec from timef()
 %   freqs     = Vector of frequencies in Hz from timef() 
 %   timefreqs = Vector of time/frequency points to show topoplot() maps for
@@ -43,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/30 20:53:35  scott
+% debugging showchans==0 option -sm
+%
 % Revision 1.10  2002/04/30 20:47:39  scott
 % *** empty log message ***
 %
@@ -241,14 +245,19 @@ if showchan>0
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
 else
-  tfave = blockave(...
-            abs(...
-               matsel(tfdata,...
-                        length(times),...
-                           mmidx(1):mmidx(2),...
-                              mmidx(3):mmidx(4),...
-                                 showchan)),length([mmidx(1):mmidx(2)]));
-  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),tfave);
+  tftimes = mmidx(1):mmidx(2);
+  tffreqs = mmidx(3):mmidx(4);
+  tfdat = matsel(tfdata,...
+            length(times),...
+              tftimes,...             
+                tffreqs,...
+                  showchan);
+
+  tfdat = reshape(tfdat,length(tffreqs),length(tftimes),nchans);
+  tfsign = sort(tfdata,3);
+  tfsign = sign(tfsign,:,:,round(nchans/2));
+  tfave = blockave(abs(tfdata,length(tftimes))
+  imagesc(times(tftimes),freqs(tffreqs),tfave);
 end
 hold on;
 axis([limits(1:4)]);
