@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/01/03 01:42:31  arno
+% more details on default percentage
+%
 % Revision 1.46  2002/11/19 18:55:59  arno
 % spectopo now returning component spectrum
 %
@@ -754,7 +757,7 @@ function plotcolbar(g)
 			[tmp zi] = find(ticks == 0);
 			ticks = [ticks(1) ticks(zi) ticks(end)];
 			set(cb,'ytick',ticks);
-			set(cb,'yticklabel',{'-','','+'});
+			set(cb,'yticklabel',strvcat({'-','','+'}));
 		end
 	catch, end; % in a single channel is plotted
 
