@@ -19,6 +19,7 @@
 %  'frames'    = time frames (points) per epoch {def|0 -> data length}
 %  'limits'    = [xmin xmax ymin ymax]  (x's in ms or Hz) {def|0 
 %                 (or both y's 0) -> use data limits)
+%  'ylim'      = [ymin ymax] y axis limits. Overwrite option above.
 %  'title'     = [string] plot title {def|'' -> none}
 %  'chan'      = vector of channel numbers to plot {def|0 -> all}
 %  'axsize'    = [x y] axis size {default [.07 .07]}
@@ -63,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/03/17 23:33:28  arno
+% debuging regions of interest
+%
 % Revision 1.17  2003/03/17 23:05:05  arno
 % debuging regions
 %
@@ -196,6 +200,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'chans'     'integer'               [1 Inf]     0;
                     'geom'      'integer'               [1 Inf]     [];
                     'limits'    'float'                 []          0;
+                    'ylim'      'float'                 []          [];
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
                     'regions'   'cell'                  []          [];
@@ -228,6 +233,9 @@ end
 nolegend = 0;
 if isempty(g.legend), nolegend = 1; end;
 
+if ~isempty(g.ylim)
+    g.limits(3:4) = g.ylim;
+end;
 limitset = 0;
 if length(g.limits)>1
     limitset = 1;
