@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/10/08 22:54:16  arno
+% updating for 3 conditions
+%
 % Revision 1.6  2003/09/18 22:47:06  arno
 % adding frames output
 %
@@ -551,8 +554,8 @@ for i=1:nbconditions
         dipstruct(index).component = index;
         dipstruct(index).rv = 0.1;
     end;
-    [tmp g.coordinates(:,1) g.coordinates(:,2) g.coordinates(:,3) ] = ...
-        dipplot( dipstruct, 'view', g.view, g.dipplotopt{:}); axis off;
+    dipplot( dipstruct, 'view', g.view, g.dipplotopt{:}); axis off;
+    
     %surface([-2 -2; -2 -2]*g.maxc, [-20 20; -20 20]*g.maxc,[-20 -20; 20 20]*g.maxc, repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
     %surface([-20 20; -20 20]*g.maxc,[2 2; 2 2]*g.maxc, [-20 -20; 20 20]*g.maxc,     repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
 
@@ -574,6 +577,8 @@ for i=1:nbconditions
         end;
         delete(htmp);
     end;
+    %g.coordinates(:,1) = -g.coordinates(:,1);
+    %g.coordinates(:,2) = -g.coordinates(:,2);
     xltmp = xlim;
     yltmp = ylim;
     g.dimratio = (xltmp(2) - xltmp(1)) / (yltmp(2) - yltmp(1));
