@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2002/10/09 00:11:41  arno
+% debug read float data file
+%
 % Revision 1.71  2002/09/23 16:42:24  arno
 % adding comments
 %
@@ -378,7 +381,7 @@ if isstr(EEG.data)
 	if fid == -1
 		errordlg2(['Can not open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
 	end;
-	fprintf('Reading float file ''%s''...', [EEG.filepath EEG.data]);
+	fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
 	EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
 end;
 
