@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/01 18:22:55  arno
+% making binica available from everywhere
+%
 % Revision 1.2  2002/04/09 02:17:27  arno
 % adding comments for unused variables
 %
@@ -36,42 +39,41 @@
 
 % -----------------------------------------------------------
 % ------------- START OF PATH DEFINITION --------------------
+% -----------------------------------------------------------
 if isunix
- ICADIR = [ '/home/scott/matlab/' ];   % <=INSERT Unix Matlab ICA dirname here
-else                                   %    Include trailing /
- ICADIR = [ 'f:\scott\matlab\' ];      % <=INSERT PC matlab ICA dirname here
-end                                    %    Include trailing /
-                                       % Change this if you install the
-TUTDIR = '/home/scott/matlab/tutorial';% toolbox tutorial elsewere. If
-                                       % you choose not to install the tutorial
-                                       % leave this as is.
-TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/icatutorial/';
-ICABINARY = 'ica_linux.bin'; % <=INSERT path of ica executable for binica.m
+ ICADIR = [ '/home/scott/matlab/' ];    % <=INSERT Unix Matlab ICA dirname here
+                                        %    Include trailing /
+ TUTDIR = ['/home/scott/matlab/tutorial'];% <=INSERT ica tutorial dirname here
 
+else % assume Windows                  
+ ICADIR = [ 'f:\scott\matlab\' ];       % <=INSERT PC matlab ICA dirname here
+                                        %    Include trailing /
+ TUTDIR = ['f:\scott\matlab\tutorial']; % <=INSERT ica tutorial dirname here
+end
+                                       
+TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/icatutorial/'; % online version
+
+ICABINARY = 'ica_linux.bin'; % <=INSERT name of ica executable for binica.m
+
+% -----------------------------------------------------------
 % ------------- END OF PATH DEFINITION ----------------------
 % -----------------------------------------------------------
 
-SC  =  ['binica.sc'];           % master .sc file for binica.m
+SC  =  ['binica.sc'];           % Master .sc script file for binica.m
+                                % MATLAB will use first such file found
+                                % in its path of script directories.
+                                % Copy to pwd to alter ica defaults
 
-%ENVCOLORS  = [ ICADIR 'envproj.col' ]; % default color-order
-ENVCOLORS  = [ 'envproj.col' ]; % default color-order
-% THIS ENVCOLORS IS NOT USED BY ANY PROGRAM ANY MORE
-%                                        filename for envproj.m here.
-
-%PROJCOLORS = [ ICADIR 'white1st.col' ];% default color-order
-PROJCOLORS = [ 'white1st.col' ];% default color-order
-% THIS PROJCOLORS IS NOT USED BY ANY PROGRAM ANY MORE
-%                                         filename for plotproj.m here.
-BACKCOLOR  = [0.8 0.8 0.8];            % background color for plotting
+BACKCOLOR  = [0.8 0.8 0.8];     % grey background color for plotting
 
 MAXENVPLOTCHANS   = 256;  % maximum number of channels to plot in envproj.m
 MAXPLOTDATACHANS  = 256;  % maximum number of channels to plot in dataplot.m
-                          %         and functions that use it.
 MAXPLOTDATAEPOCHS = 256;  % maximum number of epochs to plot in dataplot.m
 MAXEEGPLOTCHANS   = 256;  % maximum number of channels to plot in eegplot.m
 MAXTOPOPLOTCHANS  = 256;  % maximum number of channels to plot in topoplot.m
+
+DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL RATE
 DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
-DEFAULT_SRATE = 256.0175; % default sampling rate
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
 if strcmp(ICADIR,'XXX/') | ~exist(ICADIR)
