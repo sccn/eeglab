@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 18:49:20  arno
+% header
+%
 % Revision 1.3  2002/08/12 18:24:29  arno
 % debug
 %
@@ -47,12 +50,8 @@ end;
 fig = figure;
 set(gcf, 'name', Title);
 
-geometry = {};
-listui = {};
-for index = 1:size(Prompt,1)
-	geometry = { geometry{:} [1] };
-	listui = {listui{:} { 'Style', 'text', 'string', Prompt(index,:) }};
-end;
+geometry = {[1]};
+listui = {{ 'Style', 'text', 'string' Prompt }};
 
 geometry = { geometry{:} ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
@@ -63,7 +62,7 @@ for index = 1:length(varargin)-1 % ignoring default val
 	end;
 end;
 
-[tmp tmp2 allobj] = supergui( geometry, listui{:} );
+[tmp tmp2 allobj] = supergui( geometry, [size(Prompt,1) 1], listui{:} );
 
 waitfor( fig, 'userdata');
 try,
