@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/09/18 22:44:22  arno
+% adding frames output for brainmovie
+%
 % Revision 1.59  2003/09/15 21:41:20  arno
 % adapting for dipfit dipoles
 %
@@ -624,6 +627,7 @@ else %%%%%%%%%%%%% 3D MOVIE PARAMS %%%%%%%%%%%%%%%%
     elseif strcmpi(g.movparams, 'mriside'), brainmovieoptions = { brainmovieoptions{:} 'view', [1 0 0] };
     elseif strcmpi(g.movparams, 'mritop'),  brainmovieoptions = { brainmovieoptions{:} 'view', [0 0 1] };        
     end;
+    if ~isempty(g.framefolder), brainmovieoptions = { brainmovieoptions{:}, 'framefolder', g.framefolder }; end;
 end;
 
 % additional options
@@ -676,8 +680,10 @@ if ~strcmpi(g.mode, 'compute')
             brainmovieoptionsfinal{end+1} = [ g.title ' ' num2str(freqs(freqindex),2) ' Hz         ' ]; 
         end;
         
-        [tmp1 tmp2] = mkdir('/', g.framefolder(2:end) );
-        cd(g.framefolder);
+        if strcmpi(g.type, '2d')
+            [tmp1 tmp2] = mkdir('/', g.framefolder(2:end) );
+            cd(g.framefolder);
+        end;
         
 		% Compute the MIN/MAX power 
 		%--------------------------
@@ -773,8 +779,8 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
     end;
     
     if ~isfield(tmpstruct, 'posxyz') | ~isfield(tmpstruct, 'component')
-        fprintf('No 3-D coordinates found, running besaplot ...\n');
-        tmpstruct = besaplot(tmpstruct, 'sphere', spheresize);
+        fprintf('No 3-D coordinates found, running dipplot ...\n');
+        tmpstruct = dipplot(tmpstruct, 'sphere', spheresize, 'normlen', 'on');
         close;
     end;
     
@@ -789,8 +795,11 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ...
                    ': only considering the first one']);
         end;            
+        %coordinates(index,1) =  tmpstruct(indexcomp(1)).posxyz(1,1)/spheresize;
+        %coordinates(index,2) =  tmpstruct(indexcomp(1)).posxyz(1,2)/spheresize;
+        %coordinates(index,3) =  tmpstruct(indexcomp(1)).posxyz(1,3)/spheresize;        
         coordinates(index,1) =  tmpstruct(indexcomp(1)).posxyz(1,2)/spheresize;
         coordinates(index,2) = -tmpstruct(indexcomp(1)).posxyz(1,1)/spheresize;
-        coordinates(index,3) = -tmpstruct(indexcomp(1)).posxyz(1,3)/spheresize;
+        coordinates(index,3) = -tmpstruct(indexcomp(1)).posxyz(1,3)/spheresize;        
         compdipoles(index)   =  tmpstruct(indexcomp(1));
     end;
