@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/05/02 01:36:46  arno
+% debuging returned values
+%
 % Revision 1.12  2002/05/02 01:33:18  arno
 % returning XYZ
 %
@@ -162,7 +165,7 @@ else
 	end;
 end;
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
-xx=x; yy=y; zz=z;
+xx=-x; yy=-y; zz=z;
 x = x./radius; % make radius 1
 y = y./radius;
 z = z./radius;
