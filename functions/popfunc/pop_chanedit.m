@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/10/23 15:51:35  arno
+% more bug fixed
+%
 % Revision 1.30  2002/10/23 15:21:23  arno
 % saving error fixed
 %
@@ -331,7 +334,7 @@ if nargin < 2
 		if strcmp(returnmode, 'retuninginputui')
 			ingui = 0;
 			if nbchan ~= 0 & nbchan ~= length(chans)
-				if popask(strvcat(['The number of channel (' int2str(length(chans)) ') does not correspond to the'], ...
+				if ~popask(strvcat(['The number of channel (' int2str(length(chans)) ') does not correspond to the'], ...
 								  ['initial number of channel (' int2str(nbchan) '), so the channel information'], ...
 								  'may be removed if this function was called from EEGLAB'))
 					ingui = 1;
