@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2003/11/16 17:48:00  scott
+% plot1erp() -> plot1trace(); printf "Done."
+%
 % Revision 1.177  2003/11/14 17:01:59  scott
 % bootstrap msg
 %
@@ -3072,3 +3075,14 @@ function out = nan_std(in)
    
     out = sqrt((sum(in.^2)-sum(in).^2./nonnans)./(nonnans-1));
     out(nononnans) = NaN;
+
+% syemtric hanning function
+function w = hanning(n)
+if ~rem(n,2)
+   w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
+   w = [w; w(end:-1:1)];
+else
+   w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
+   w = [w; w(end-1:-1:1)];
+end
+
