@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.277  2003/11/27 20:00:57  arno
+% still working on path
+%
 % Revision 1.276  2003/11/27 01:26:43  arno
 % path
 %
@@ -1686,6 +1689,6 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
             addpath([ eeglabpath pathtoadd ]);
         end;
     else
-        addpath(pathtoadd);
+        addpath([ eeglabpath pathtoadd ]);
     end;
     
