@@ -98,6 +98,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.159  2004/03/19 17:46:19  scott
+% added 'forcehead'; changed 'pointnumbers' and 'pointlabels' to 'ptnumbers', 'ptlabels'
+% but kept backwards compatibility. Allowed marking of multiple channel locations
+% without requiring an explicit 'style','blank'. Allowed [] data -> plot channel
+% locations. Improved help message and 'example' text. Switched order of plotting
+% of head border, electrodes and head cartoon. Made head cartoon not appear by
+% default when plotrad<0.5 or 'shrink' is severe (but see 'forcehead'). -sm
+%
 % Revision 1.158  2004/03/19 02:33:40  scott
 % plotting head, ears and/or skirt as appropriate from plotrad and shrink args
 %
@@ -422,7 +430,7 @@ SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = 'off';   % shrinking mode
 forcehead = 'off';      % by default, do not force plotting of the head cartoon
                         %   when anatomically inappropriate
-plotrad      = [];      % plotting radius( [] = aurto )
+plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 DIPOLE  = [];           % dipole defaults
 DIPNORM   = 'off';
@@ -649,7 +657,10 @@ if ~isstr(shrinkfactor)
     shrinkfactor = 0.5+0.5*shrinkfactor; 
 end;
 if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
-   plotrad = tmpeloc(1).plotrad; 
+    plotrad = str2num(tmpeloc(1).plotrad); 
+    if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
+       fprintf('Fixing plotting radius at value (%g) specified in the chan_locs.\n',plotrad);
+    end
 end;
 
 labels = strvcat(labels);
@@ -849,7 +860,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   h = gca; % uses current axes
 
   if ~isstr(plotrad) & squeezefac<0.92
-    AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
+    AXHEADFAC = 1.05; % do not leave room for external ears if head cartoon
                       % shrunk enough by the 'skirt' option
   end
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
@@ -939,7 +950,7 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 if isstr('plotrad') % if 'skirt' mode
   sf = squeezefac;
-  if sf < 0.98 | strcmpi(forcehead,'on')
+  if sf < 1 | strcmpi(forcehead,'on')
    hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
    set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);        % hide the disk edge jaggies 
