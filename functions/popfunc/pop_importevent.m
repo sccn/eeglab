@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/12/11 02:54:10  arno
+% automatic alignment
+%
 % Revision 1.25  2003/11/19 19:28:46  arno
 % nothing
 %
@@ -471,34 +474,43 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
     end;
     if strcmpi(optimalign, 'on')
-       newlat = cell2mat({ event.latency     });
-       oldlat = cell2mat({ oldevents.latency });
+        newlat = cell2mat({ event.latency     });
+        oldlat = cell2mat({ oldevents.latency });
        
-       newlat = repmat(newlat, [length(oldlat) 1]);
-       oldlat = repmat(oldlat', [1 size(newlat,2)]);
-       newlat = newlat-newlat(1);
-       oldlat = oldlat-oldlat(1);
-       
-       newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
-       fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
-       if newfactor > 1.01 | newfactor < 0.99
-           disp('Difference is more than 1%, something is wrong; ignoring ratio');
-           newfactor = 1;
-       end;
-       
-       %diffarray = abs(newfactor*newlat-oldlat)';
-       %[allmins poss] = min(diffarray);
-       %figure; hist(allmins);
+        newlat = repmat(newlat, [length(oldlat) 1]);
+        oldlat = repmat(oldlat', [1 size(newlat,2)]);
+        if align.val >= 0
+            newlat = newlat-newlat(1);
+            oldlat = oldlat-oldlat(1+align.val);
+        else
+            newlat = newlat-newlat(1-align.val);
+            oldlat = oldlat-oldlat(1);
+        end;
+        
+        newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
+        fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
+        if newfactor > 1.01 | newfactor < 0.99
+            disp('Difference is more than 1%, something is wrong; ignoring ratio');
+            newfactor = 1;
+        end;
+        
+        %diffarray = abs(newfactor*newlat-oldlat)';
+        %[allmins poss] = min(diffarray);
+        %figure; hist(allmins);
     else
         newfactor = 1;
     end;
-    if ~isnan( align.val )
-        latfirstevent = event(1).latency;
+    if ~isnan( align.val ) & newfactor ~= 1
+        if align.val >= 0
+            latfirstevent = event(1).latency;
+        else
+            latfirstevent = event(-align.val+1).latency;
+        end;
         for index = setdiff(indices, 1)
             event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
         end;
         fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
-        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(oldevents))).latency }))));
+        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
     else
         for index = indices
             event(index).latency = round(event(index).latency*newfactor);
