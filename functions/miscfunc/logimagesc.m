@@ -7,6 +7,9 @@
 %   freqs = vector of y-axis values
 %   data  = matrix of size (freqs,times)
 %
+% Optional Input:
+%   plot = ['on'|'off'] plot image or return output (default 'on').
+%
 % Note: Entering text() onto the image requires specifying (x,log(y)).
 
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 4/2000 
@@ -28,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/09 17:37:28  arno
+% set NaNs to 0
+%
 % Revision 1.2  2002/09/27 17:24:22  scott
 % help msg -sm
 %
@@ -38,7 +44,7 @@
 % 08-07-00 made ydir normal -sm
 % 01-25-02 reformated help & license -ad 
 
-function [lgfreqs,datout] = logimagesc(times,freqs,data)
+function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
 
   if size(data,1) ~= length(freqs)
       fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
@@ -63,12 +69,21 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data)
   datout = griddata(mesht,meshf,data,times,lgfreqs);
   datout(find(isnan(datout(:)))) = 0;
   
-  imagesc(times,freqs,data);
-  nt = ceil(min(freqs)); % new tick - round up min freq to int-hz
-  yt=get(gca,'ytick');
-  yl=get(gca,'yticklabel');
-
-  imagesc(times,lgfreqs,datout);
-  set(gca,'ydir','normal')
-  set(gca,'ytick',log([nt yt]));
-  set(gca,'yticklabel',{int2str(nt) yl});
+  if ~isempty(varargin)
+      plot = varargin{2};
+  else
+      plot = 'on';
+  end
+  
+  if strcmp(plot, 'on')
+      imagesc(times,freqs,data);
+      nt = ceil(min(freqs)); % new tick - round up min freq to int-hz
+      yt=get(gca,'ytick');
+      yl=get(gca,'yticklabel');
+      
+      imagesc(times,lgfreqs,datout);
+      set(gca,'ydir','normal')
+      set(gca,'ytick',log([nt yt]));
+      set(gca,'yticklabel',{int2str(nt) yl});
+  end
+  
