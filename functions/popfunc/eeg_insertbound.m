@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/06/02 17:30:06  arno
+% returning index to old event
+%
 % Revision 1.17  2004/06/02 17:19:45  arno
 % do not remove nested boundary events
 %
@@ -145,7 +148,7 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
                     eventout(tmpind2).type     = 'boundary';
                 end;
                 eventout(tmpind2).latency  = regions(tmpindex)-0.5;
-                eventout(tmpind2).duration = 0; % just to create field
+                eventout(tmpind2).duration = lengths(tmpindex); % just to create field
                 
                 [ tmpnest addlength ] = findnested(eventout, tmpind2);
                 % We use to remove nested event (tmpnest) but this
