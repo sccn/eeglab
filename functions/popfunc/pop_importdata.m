@@ -26,14 +26,14 @@
 %   "ICA weights array or text file" - [edit box] Use this option to import
 %                  ICA weights from other decompositions (for instance: same
 %                  data, different conditions). To use the ICA weights from
-%                  another loaded dataset (n) enter "ALLEEG(n).icaweights"
+%                  another loaded dataset (n) enter 'ALLEEG(n).icaweights'
 %                  in this edit box. Command line equivalent: 'icaweights'
 %   "ICA sphere array or text file" - [edit box] Import an ICA sphering matrix. 
 %                  For computational reasons, an ICA decomposition may be defined 
 %                  by a sphere matrix and an unmixing (weight) matrix (above).
 %                  To use the ICA weights from another loaded dataset (n)
 %                  enter "ALLEEG(n).icasphere". If no sphering matrix, enter 
-%                  "eye(EEG.nbchan)". Command line equivalent: 'icasphere'.
+%                  'eye(EEG.nbchan)'. Command line equivalent: 'icasphere'.
 % Optional inputs:
 %   'setname'    - ['string'] Name of the new EEGLAB dataset
 %   'data'       - ['varname'|'filename'] Data variable or file name to import.
@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/02/25 00:52:56  scott
+% header edit -sm
+%
 % Revision 1.17  2003/02/24 16:26:39  arno
 % resolving ???
 %
