@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2002/08/12 18:37:13  arno
+% questdlg2
+%
 % Revision 1.108  2002/08/12 16:13:24  arno
 % same
 %
@@ -541,7 +544,7 @@ colordef white
 % checking strings
 % ----------------
 e_try = 'try,';
-e_catch = 'catch, errordlg(lasterr, ''EEGLAB error''); end;';
+e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); end;';
 nocheck           = e_try;
 check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' e_try];
 checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' e_try];

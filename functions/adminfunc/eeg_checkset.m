@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2002/08/12 18:51:58  arno
+% errordlg2
+%
 % Revision 1.54  2002/08/12 18:39:23  arno
 % questdlg2
 %
@@ -295,7 +298,7 @@ end;
 
 if ~isempty( varargin)
     if isempty(EEG.data)
-        helpdlg('Empty dataset -> File / Import data or File / Load existing dataset', 'Error');
+        errordlg2('Empty dataset -> File / Import data or File / Load existing dataset', 'Error');
         error('eeg_checkset: empty dataset');
     end;    
 end;
@@ -635,9 +638,9 @@ if ~isempty( varargin)
 		  end;
 		 case 'chanloc', 
 		  if isempty(EEG.chanlocs)
-			  errordlg( ['Cannot process without channel location file.' 10 ...
-						 'Enter the name of the file via "/Edit/Edit dataset info".' 10 ...
-						 'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
+			  errordlg2( strvact('Cannot process without channel location file.', ...
+						 'Enter the name of the file via "/Edit/Edit dataset info".', ...
+						 'For the file format, enter ''>> help totoplot'' from the command line.'), 'Error');
 			  error('eeg_checkset: cannot process without channel location file.');
 		  end;
 		 case 'eventconsistency',		  
