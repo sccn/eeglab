@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.359  2005/02/02 20:25:37  arno
+% menu
+%
 % Revision 1.358  2004/11/17 18:29:43  arno
 % put BVA import in plugin
 %
@@ -1600,7 +1603,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     help_m  = uimenu( W_MAIN, 'Label', 'Help');
     uimenu( help_m, 'Label', 'About EEGLAB', 'CallBack', 'pophelp(''eeglab'');');
     uimenu( help_m, 'Label', 'About EEGLAB help', 'CallBack', 'pophelp(''eeg_helphelp'');');
-    uimenu( help_m, 'Label', 'EEGLAB license', 'CallBack', 'pophelp(''license.txt'', 1);');
+    uimenu( help_m, 'Label', 'EEGLAB license', 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     uimenu( help_m, 'Label', 'EEGLAB menus', 'CallBack', 'eeg_helpmenu;','separator','on');
     help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
     uimenu( help_subm1, 'Label', 'Toolbox functions', 'CallBack', 'pophelp(''ica'');');
