@@ -22,7 +22,7 @@
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  {default|[]|[0 0] -> data limits}
+%                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> data limits}
 %  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv', 
 %                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative 
 %                  variance, where:                                      {default: 'mv'}
@@ -39,7 +39,7 @@
 %                  {default|[] -> standard Matlab color order}
 %  'fillcomp'   = int_vector>0 -> fill the numbered component envelope(s) with 
 %                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
-%  'vert'       = vector of times to plot vertical lines {default|[] -> none}
+%  'vert'       = vector of times (in ms) at which to plot vertical dashed lines {default|[] -> none}
 %  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
 %                  the weight matrix (but if some components have been removed, then
 %                  weight's pseudo-inverse matrix does not represent component's maps).
@@ -88,6 +88,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2004/11/17 02:27:10  scott
+% made xmin xmax in 'limits' arg control the times plotted
+% changed key 'pvaf' to 'sortvar' ('pvaf' retained for backwards compatiability)
+% documented the mean(data,3) option - was undocumented
+%
 % Revision 1.77  2004/11/13 19:29:10  scott
 % print which components subtracted
 %
@@ -317,7 +322,11 @@ all_bold = 0;
 BOLD_COLORS = 1;    % 1 = use solid lines for first 5 components plotted
                     % 0 = use std lines according to component rank only
 FILL_COMP_ENV = 0;  % default no fill
+FILLCOLOR   = [.815 .94 1]; % use lighter blue for better env visibility
+% FILLCOLOR = [.66 .76 1];
 MAXTOPOS = 20;      % max topoplots to plot
+VERTWEIGHT = 2.0;  % lineweight of specified vertical lines
+LIMCONTRIBWEIGHT = 1.2; % lineweight of limonctrib vertical lines
 
 myfig =gcf;         % remember the current figure (for Matlab 7.0.0 bug)
 xmin = 0; xmax = 0;
@@ -341,14 +350,14 @@ if nargin <= 2 | isstr(varargin{1})
 				  'fillcomp'      'integer'  []                       0 ;  % no fill
 				  'colorfile'     'string'   []                       '' ; % deprecated usage
 				  'colors'        'string'   []                       '' ; % new usage
-				  'compnums'      'integer'  []                       -7; ...
-				  'subcomps'      'integer'  []                       []; ...
-				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
-				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
-				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'}  []; ...
-				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; ...
-				  'actscale'      'string'   {'on' 'off'}             'off'; ...
-				  'limcontrib'    'real'     []                       0;  ...
+				  'compnums'      'integer'  []                       -7; 
+				  'subcomps'      'integer'  []                       []; 
+				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
+				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
+				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  ''; % deprecated
+				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; 
+				  'actscale'      'string'   {'on' 'off'}             'off'; 
+				  'limcontrib'    'real'     []                       0;  
                                   'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
@@ -398,6 +407,9 @@ if ndims(data) == 3
 end;
 [chans,frames] = size(data);
 
+if ~isempty(g.vert)
+   g.vert = g.vert/1000; % convert from ms to s
+end
 %
 %%%%%% Collect information about the gca, then delete it %%%%%%%%%%%%%
 %
@@ -486,7 +498,7 @@ if any(g.limcontrib ~= 0)
     limframe1  = round((g.limcontrib(1)-xmin)*srate)+1;
     limframe2  = round((g.limcontrib(2)-xmin)*srate)+1;
     g.vert(end+1) =  g.limcontrib(1);
-    g.vert(end+2) =  g.limcontrib(2);
+    g.vert(end+1) =  g.limcontrib(2);
 else
     limframe1 = 1;
     limframe2 = frames;
@@ -865,7 +877,6 @@ else
 end
 
 if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
- FILLCOLOR = [.66 .76 1];
  sumenv = envelope(sumproj(g.plotchans,:), g.envmode);
  if ~ylimset & max(sumenv) > ymax, ymax = max(curenv); end
  if ~ylimset & min(sumenv) < ymin, ymin = min(curenv); end
@@ -963,10 +974,12 @@ end
         if c==1 & ~isempty(g.vert)
             for v=1:length(g.vert)
                 vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--'); % plot specified vertical lines
-                if ~any(g.limcontrib ~= 0)        % if any 
-                    set(vl,'linewidth',2.5);
-                elseif v>= length(g.vert)-1;
-                    set(vl,'linewidth',1.2);
+                if any(g.limcontrib ~= 0) & v>= length(g.vert)-1;
+                    set(vl,'linewidth',LIMCONTRIBWEIGHT);
+                    set(vl,'linestyle',':');
+                else
+                    set(vl,'linewidth',VERTWEIGHT);
+                    set(vl,'linestyle','--');
                 end
             end
         end
@@ -1208,7 +1221,7 @@ if strcmpi(g.dispmaps, 'on')
         axes(axall)
         set(axall,'Color',axcolor);
         tmp = text(0.50,1.05,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
-	set(tmp, 'interpreter', 'none');
+        set(tmp, 'interpreter', 'none');
         text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
         text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
     end;
