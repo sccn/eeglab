@@ -107,7 +107,7 @@
 % - The gcf object stores the handle of the dipole that is currently
 %     being modified
 
-function [sources, x, y, z, xe, ye, ze] = dipplot( sources, varargin )
+function [sources, x, y, z, xo, yo, zo] = dipplot( sources, varargin )
     
     DEFAULTVIEW = [0 0 1];
         
@@ -583,7 +583,7 @@ function h = myezplot3(strX, strY, strZ, range);
 function newsrc = convertbesaoldformat(src);
     newsrc = [];
     count = 1;
-    if ~isfield(src, 'besaextori'), src.besaextori = []; end;
+    if ~isfield(src, 'besaextori'), src(1).besaextori = []; end;
     for index = 1:length(src)
         countdip = 1;
         
