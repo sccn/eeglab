@@ -41,6 +41,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/01/24 19:41:35  arno
+% debugging ?
+% /
+%
 % Revision 1.11  2003/01/16 18:30:35  arno
 % allowing merging between dataset with different event structures
 %
@@ -210,7 +214,7 @@ else
 	end;
 
 	if ~isempty(INEEG2.event)
-        INEEG1.pnts = size(EEG.data,2);
+        INEEG1.pnts = size(INEEG1.data,2) / INEEG1.trials;
         INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
     end;
 end;
