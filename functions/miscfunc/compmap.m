@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Colin Humphries, CNL / Salk Institute, Aug, 1996
 %    03-97 revised -CH
@@ -256,7 +259,7 @@ for i = (1:pages)
   end
 
   % ax = axes('Units','Normal','Position',[.5 .06 .32 .05],'Visible','Off');
-  gca = curaxes;
+  axes(curaxes);
   set(gca,'Visible','off','Units','normalized');
   curpos = get(gca,'position');
   ax = axes('Units','Normalized','Position',...
