@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/02/17 02:43:43  arno
+% reformating text for new functionality in help2html
+%
 % Revision 1.10  2003/02/16 23:10:43  arno
 % adding GUI info
 %
@@ -148,13 +151,16 @@ if EEG.trials == 1
 		else
 			options{4} = 0;
 			disp('Pop_eegfilt:finding continuous data boundaries');
-			boundaries = [0 round(boundaries-0.5) EEG.pnts];
+			tmplat = cell2mat({EEG.event.latency});
+            boundaries = tmplat(boundaries);
+            boundaries = [0 round(boundaries-0.5) EEG.pnts];
 			for n=1:length(boundaries)-1
 				try
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
 						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
-					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter cannot be applied\n', boundaries(n),boundaries(n+1));
+					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter cannot be applied\n', ...
+                            boundaries(n),boundaries(n+1));
 					disp('Pop_eegfilt: Filter being applied over the whole time range (ignoring discontinuities)');
 				end;
 			end
