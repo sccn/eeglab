@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/05/13 22:30:57  arno
+% unicoord
+%
 % Revision 1.7  2003/05/13 22:10:26  arno
 % debuging writing display
 %
@@ -134,7 +137,8 @@ g = finputcheck( varargin, ...
 if isstr(g), error(g); end;  
 
 if strcmpi(g.unicoord, 'on')
-    chans = convertlocs(chans, 'auto');
+    disp('Uniformizing coordinates');
+    chans = convertlocs(chans, 'auto', 'verbose', 'off');
 end;
 
 % select channels
