@@ -1,19 +1,22 @@
 % pop_rmbase() - remove channel baseline means from an epoched or 
 %                continuous EEG dataset. Calls rmbase().
 % Usage:
-%   >> OUTEEG = pop_rmbase( EEG ); % first pop up an interactive window
+%   >> OUTEEG = pop_rmbase( EEG ); % pop up an interactive arg entry window
 %   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange); % call rmbase()
 %
 % Graphic interface:
 %    "Baseline latency range" - [edit box] Latency range for the baseline in ms.
 %                               Collects the 'timerange' command line input.
+%                               Empty or [] input -> Use whole epoch as baseline
 %    "Baseline points vector" - [edit box] Collects the 'pointrange' command line 
-%                               option. (Overwritten by the timerange option above). 
+%                               option (below). (Overwritten by 'timerange'). 
+%                               Empty or [] input -> Use whole epoch as baseline
 % Inputs:
 %   EEG        - Input dataset
 %   timerange  - [min_ms max_ms] Baseline latency range in milliseconds.
-%   pointrange - [min:max] Baseline points vector (overwritten by timerange).
-%
+%                                Empty or [] input -> Use whole epoch as baseline
+%   pointrange - [min:max]       Baseline points vector (overwritten by timerange).
+%                                Empty or [] input -> Use whole epoch as baseline
 % Outputs:
 %   OUTEEG     - Output dataset
 %
@@ -44,6 +47,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/02/27 02:59:22  scott
+% make entries in ms as per documentation
+% added ability to use empty inputs -> use whole epoch for baseline
+%
 % Revision 1.15  2004/12/16 23:21:13  arno
 % header in ms
 %
