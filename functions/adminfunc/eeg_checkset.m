@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2002/09/23 16:15:00  arno
+% debug floatread
+%
 % Revision 1.69  2002/09/23 16:08:57  arno
 % check for EEG.data empty
 %
@@ -368,7 +371,7 @@ end;
 % read data if necessary
 % ----------------------
 if isstr(EEG.data)
-	fid = fopen(EEG.data, 'r', 'ieee-le');
+	fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
 	if fid == -1
 		errordlg2(['Can not open data file ''' EEG.data ''', check directory'], 'error');
 	end;
