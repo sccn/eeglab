@@ -51,9 +51,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.50  2004/09/13 18:45:48  hilit
-% added a figure(curfig)
-%
 % Revision 1.49  2004/09/13 18:21:02  arno
 % debug ploting for Matlab 7
 %
@@ -287,7 +284,7 @@ if nargin < 3
         catch, error('Invalid scalp map options'); end;
     end;        
     if length(arg2) == 1, 
-      curfig = figure;  
+      figure; curfig=gcf; 
       try, icadefs; 
          set(curfig, 'color', BACKCOLOR); 
       catch, end; 
@@ -344,6 +341,7 @@ end;
 counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
+curfig = gcf;
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
@@ -395,7 +393,6 @@ for index = 1:size(arg2(:),1)
     %fprintf('Printing to figure %d.\n',curfig);
     if ~isnan(arg2(index))
 		if typeplot
-            figure(curfig);
             if nbgraph > 1, axes(curax); end;
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
@@ -450,7 +447,7 @@ end;
 set(allobj(1:countobj-1), 'visible', 'on');
 
 figure(curfig);
-axcopy(curfig, 'set(curfig, ''''units'''', ''''pixels''''); postmp = get(curfig, ''''position''''); set(curfig, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
+axcopy(curfig, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
 com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
                    inputname(1), typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
