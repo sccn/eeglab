@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/10/29 16:40:35  arno
+% text
+%
 % Revision 1.24  2002/10/29 16:14:18  arno
 % debug continuous data call
 %
@@ -226,7 +229,7 @@ if nargin<2
     geometry = { geometry{:} [1] [1 2] };
     uilist   = { uilist{:} ...
         { }, ...
-        { 'Style', 'checkbox', 'string','Select event NOT selected above',} { } ...
+        { 'Style', 'checkbox', 'string','Select all events NOT selected above',} { } ...
         };
 	if isfield(EEG.event, 'latency')
 		if EEG.trials > 1
@@ -517,7 +520,7 @@ for index =1:2:length(args)
 		argsout = { argsout{:} args{index}  args{index+1}};
 	end;
 end;
-com = sprintf('EEG = pop_selectevent( %s, %s)', inputname(1), vararg2str(argsout));
+com = sprintf('EEG = pop_selectevent( %s, %s);', inputname(1), vararg2str(argsout));
 
 % chop the text so that it fits into the description window
 % ---------------------------------------------------------
