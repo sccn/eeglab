@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/08 02:13:09  scott
+% improved wording of messages to user -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -299,6 +302,7 @@ end;
 
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
+if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
 
 % create fields if absent
 % -----------------------
