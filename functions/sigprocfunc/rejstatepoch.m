@@ -84,6 +84,9 @@
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function [ Irej, Irejdetails, n, threshold, thresholdg] = rejstatepoch( signal, ...
 		rej, varargin); % pnts, th_E, th_rejg, command, commandplot, typetitle, E, rejg);
@@ -214,7 +217,7 @@ if ~isstr( signal )
 	% ACCEPT button
 	% -------------
 	command = 'fprintf(''Rejection indices has been put in the matrix TMPREJ\n'')'; 
-	haccept  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'ACCEPT', 'Units','Normalized','Position', posaccept.*s+q, ...
+	haccept  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'UPDATE', 'Units','Normalized','Position', posaccept.*s+q, ...
 					'callback', [	'set(gcbo, ''userdata'', 1);' ... %signal to signify termination 
 									'TMPEEG = get(gcbf, ''userdata'');' ...
 									'TMPREJ = TMPEEG{3};' ...
