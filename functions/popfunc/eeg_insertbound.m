@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/05/04 23:05:02  arno
+% debug length
+%
 % Revision 1.2  2004/05/04 19:01:08  arno
 % removing nested urevent boundarie
 %
@@ -138,7 +141,7 @@ function [ indnested, addlen ] = removenestedur(newur, ind);
     tmpind = ind+1;
     
     while tmpind < length(newur) & ...
-        newur(tmpind).latency < newut(ind).latency+newur(ind).length
+        newur(tmpind).latency < newur(ind).latency+newur(ind).length
         if strcmpi(newur(tmpind).type, 'boundary')
             indnested = [ indnested tmpind ];
             addlen    = addlen + newur(tmpind).length;
