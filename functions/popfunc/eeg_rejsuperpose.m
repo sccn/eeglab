@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 function [EEG, com] = eeg_rejsuperpose( EEG, typerej, Rmanual, Rthres, Rconst, ...
                               Rent, Rkurt, Rfreq, Rothertype);
@@ -112,7 +115,7 @@ EEG.reject.rejglobal = rejglobal;
 EEG.reject.rejglobalE = rejglobalE;
 
 com =sprintf('%s = eeg_rejsuperpose( %s, %d, %d, %d, %d, %d, %d, %d, %d);', ...
-	  ~typerej, Rmanual, Rthres, Rconst, Rent, Rkurt, Rfreq, Rothertype);
+	  inputname(1), inputname(1), ~typerej, Rmanual, Rthres, Rconst, Rent, Rkurt, Rfreq, Rothertype);
 
 return;
 
