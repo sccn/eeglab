@@ -1,4 +1,9 @@
-function  [TrialData] = EGIread(filename)
+% readegi() - reads in version 2 and 3 of EGI Simple Binary data files
+%
+% Usage:
+%   >> ?? = readegi( filename );
+%
+% Inputs:
 % [TrialData] = EGIread(filename)
 % reads in version 2 and 3 of EGI Simple Binary data files,
 % filename = EGI data filename
@@ -10,7 +15,38 @@ function  [TrialData] = EGIread(filename)
 % Segments = # of epochs
 % NEvent = number of events
 %
+% Outputs:
+%   OUTEEG         - EEGLAB data structure
+%
+% Author: 
 
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) 2002 , Salk Institute, arno@salk.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
+
+function  [TrialData] = readegi(filename)
+
+if nargin < 2
+    help readegi;
+    return;
+end;
+    
 [fid,message] = fopen(filename,'rb','b');
 if (fid == 0),
    error(message);
