@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/11 02:10:27  arno
+% correcting typo
+%
 % Revision 1.7  2002/04/09 00:24:55  arno
 % editing latest modifications
 %
@@ -498,7 +501,7 @@ for ti=times
 end
 ERPtimes = ERPtimes(ERPindices); % subset of ERP frames on t/f window centers
 
-if g.baseboot
+if ~isempty(find(times < g.baseline))
    baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
 else
    baseln = 1:length(times); % use all times as baseline
