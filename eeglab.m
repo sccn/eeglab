@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.202  2002/11/15 03:17:20  arno
+% remove old functions from header
+%
 % Revision 1.201  2002/11/14 23:33:44  arno
 % merging .EDF and .BDF menu lines
 %
@@ -1019,6 +1022,7 @@ help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
 help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
     uimenu( help_subm2, 'Label', 'Dataset structure', 'CallBack', 'pophelp(''eeg_checkset'');');
 	uimenu( help_subm2, 'Label', 'Admin functions', 'callback', 'eeg_helpadmin;');	
+uimenu( help_m, 'Label', 'Tutorial (web)', 'CallBack', 'tutorial;');
 uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
