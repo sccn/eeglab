@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/03/05 02:34:32  scott
+% topoplot
+%
 % Revision 1.45  2003/03/05 02:33:01  scott
 % topoplot
 %
@@ -495,7 +498,7 @@ for t=1:ntopos
 topoargs
     end
   end
-  topoplot(data(:,plotframes(t)),chan_locs, topoargs); % plot the scalp map 
+  eval(['topoplot(data(:,plotframes(t)),chan_locs,' topoargs ');']; % plot the scalp map 
   %
   % ELSE make a 3-D headplot
   %
