@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 00:37:46  arno
+% multiple lines for title
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -79,8 +82,6 @@ try g.fontname; catch g.fontname = 'courier'; end;
 try g.fontsize; catch g.fontsize = 12; end;    
 try g.fontweight; catch g.fontweight = 'normal'; end;    
 try g.linesperpage; catch g.linesperpage = 20; end;    
-
-%reformat( 'salut comment ca va, moi ca va bien et toi comment ca va. Ba ca va bien. Bref tout le monde va bien', 12)
 
 if isempty( helparray )
 	helparray = cell(1,200);
@@ -145,9 +146,9 @@ end;
 maxlen = length(g.title);
 for i=1:nblines
 	if iscell(textmenu)	tmptext = textmenu{i};
-	else				tmptext = textmenu(i,:);
+	else			tmptext = textmenu(i,:);
 	end;
-	ordinate      = topordi-topordi*(i+addlines)/divider;
+	ordinate      = topordi-topordi*(i-1+addlines)/divider;
 	currentheight = topordi/divider;
 
 	if isempty(helparray{i})
