@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/12 16:00:13  arno
+% do not adapt size for edit windows
+%
 % Revision 1.11  2002/08/12 15:57:04  arno
 % size calculation
 %
@@ -160,7 +163,7 @@ for row = 1:length(geometry)
 			
 			% this simply compute a factor so that all uicontrol will be visible
 			% ------------------------------------------------------------------
-			if ~strcmp(get(rowhandle(column), 'edit'))
+			if ~strcmp(get(rowhandle(column), 'style'), 'edit')
 				set( rowhandle(column), 'units', 'pixels');			
 				curpos = get(rowhandle(column), 'position');
 				curext = get(rowhandle(column), 'extent');
