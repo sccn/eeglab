@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2002/05/03 00:10:42  arno
+% special case for channel editing
+%
 % Revision 1.67  2002/05/02 23:09:04  arno
 % channel menu
 %
@@ -859,7 +862,9 @@ if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET | CUR
 	end;
 	if CURRENTSET ~= 0
 		h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
-		EEG = eeg_retrieve(ALLEEG, CURRENTSET);
+		EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
+	else 
+		EEG = eeg_emptyset;
 	end;
 end;
 
