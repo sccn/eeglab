@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/14 01:39:30  scott
+% figure name plottopo()
+%
 % Revision 1.8  2002/08/12 22:27:52  arno
 % change title
 %
@@ -95,7 +98,7 @@ if nargin < 2
 	plottitle    = result{2};
 	singletrials = strcmp( lower(result{3}), 'yes');
 	vert         = eval( [ '[' result{4} ']' ] );
-    figure;
+    figure('name', ' plottopo()');
 	if ~isempty(vert)
 		options ={ EEG.chanlocs, EEG.pnts, [EEG.xmin EEG.xmax 0 0]*1000, plottitle, channels, [.07 .07],0,1,vert };
 	else 
@@ -118,7 +121,6 @@ if singletrials
 else
     plottopo( mean(EEG.data,3), options{:} );
 end;
-set(gcf, 'color', [1 1 1], 'name', ' plottopo()');
 
 if ~isempty(options(6:end))
 	com = sprintf('figure; pop_plottopo(%s, [%s], ''%s'', %d %s);', ...
