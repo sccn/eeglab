@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/03/04 18:34:07  scott
+% cbar text
+%
 % Revision 1.25  2003/03/04 18:32:59  scott
 % cbar text -sm
 %
@@ -475,8 +478,8 @@ axes(axall)
 set(axall,'Color',axcolor);
 text(0.50,1.01,titl,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
 
-text(0.96,0.695,'+','FontSize',16,'HorizontalAlignment','Center');
-text(0.96,0.625,'-','FontSize',16,'HorizontalAlignment','Center');
+text(0.966,0.695,'+','FontSize',16,'HorizontalAlignment','Center');
+text(0.966,0.625,'-','FontSize',16,'HorizontalAlignment','Center');
 
 axes(axall)
 set(axall,'layer','top'); % bring component lines to top
