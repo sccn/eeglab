@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2002/11/18 18:21:21  arno
+% nicer aspect ratio
+%
 % Revision 1.90  2002/11/13 18:30:04  scott
 % same
 %
@@ -480,9 +483,8 @@ if popup
 	channel   	 = eval( [ '[' res.chan ']' ]);
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
-	if typeplot
-		options = '';
-    else 
+    options = '';
+	if ~typeplot
 		options = [options ',''yerplabel'',''''' ];
 	end;
 	if isempty(titleplot)
