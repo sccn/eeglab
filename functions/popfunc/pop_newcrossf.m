@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/24 21:53:09  scott
+% [same] -sm
+%
 % Revision 1.8  2002/04/24 21:37:25  scott
 % editing topovec call -sm
 %
@@ -112,23 +115,22 @@ if nargin < 3
 
    % add title
    % ---------
-  if isempty( strmatch(  '''title''', result{7}))
-	  switch lower(result{5})
-	     case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-	         ' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
-	     otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-	         ' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
-    end;
-	end;
-	if ~isempty( result{6} )
-		options      = [ options ', ''alpha'',' result{6} ];
-	end;
-	if ~isempty( result{7} )
-		  options = [ options ',' result{7} ];
-	else 	
-	end;
+   if isempty( strmatch(  '''title''', result{7}))
+	   switch lower(result{5})
+		case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+					' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
+		otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+					' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
+	   end;
+   end;
+   if ~isempty( result{6} )
+	   options      = [ options ', ''alpha'',' result{6} ];
+   end;
+   if ~isempty( result{7} )
+	   options = [ options ',' result{7} ];
+   end;
 
-	figure;
+   figure;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -167,7 +169,7 @@ else
  	    else
             tmpsig1 = (EEG.icaweights(num1,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
             tmpsig2 = (EEG.icaweights(num2,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
-      end;
+		end;
 	else
 		error('You must run ICA first');
 	end;	
