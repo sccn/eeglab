@@ -1,57 +1,57 @@
-% tftopo()  - Generates a figure showing a selected image (e.g., an ERSP or ITC) from 
-%             a supplied set of images for every scalp channel, plus topoplot() scalp 
-%             maps at specified (x,y) (e.g., time,frequency) points.  Else, images the 
-%             signed (selected) channel std(). Inputs may be outputs of timef(); else,
-%             e.g., can be used to image a set of smoothed erpimage() images.
+% tftopo()  - Generate a figure showing a selected image (e.g., an ERSP, ITC or ERP image) 
+%             from a supplied set of images, one for each scalp channel. Plots topoplot() 
+%             scalp maps of value distributions at specified (x,y) (e.g., time, frequency) 
+%             image points.  Else, images the signed (selected) between-channel std(). 
+%             Inputs may be outputs of timef(), crossf(), or erpimage().
 % Usage:
-%        >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
+%             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
-%   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef() (or any other
-%               time/freq matrix), one for each channel. Size (time,freq,chans) or
-%               (time,freq,chans,subjects) for grand RMS.
-%   times     = Vector of times in msec from timef()
-%   freqs     = Vector of frequencies in Hz from timef() 
+%   tfdata    = Set of time/freq images, one for each channel. Matrix size: (time,freq,chans). 
+%               Else, (time,freq,chans,subjects) for grand mean RMS plotting.
+%   times     = Vector of image x-values (e.g., times in msec from timef()).
+%   freqs     = Vector of image y-values (e.g., frequencies in Hz from timef()).
 %
 % Optional inputs:
-%  'timefreqs' = Array of time/frequency points to show topoplot() maps for
-%                Format: size (nrows,2), each row [ms Hz]
-%  'showchan'  = [integer] Channel number of tfdata to image, or 0
-%                {default=0 -> image the median-signed st. dev. across channels} 
+%  'timefreqs' = Array of time/frequency points at which to plot topoplot() maps.
+%                Size: (nrows,2), each row given the [ms Hz] location of one point.
+%  'showchan'  = [integer] Channel number of the tfdata to image. Else 0 to image
+%                the (median-signed) RMS values across channels. {default: 0}
 %  'chanlocs'  = ['string'|structure] Electrode locations file (for format see 
-%                >> topoplot example) or structure             {default none}
+%                >> topoplot example) or EEG.chanlocs structure   {default: none}
 %  'limits'    = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
-%                Omit, or use nan's to use tfdata limits. Ex: [nan nan -100 400];
-%  'signifs'   = Significance level(s) (e.g., from timef()), for zero'ing non-significant 
-%                tfdata. Size must be (1 or 2, freq, chans, subjects) or 
-%                (1 or 2, freq, times, chans, subjects). If first dimension is
-%                of size 1, tfdata is assumed to contain positive values   {default: none}
-%  'sigthresh' = [integer], i.e. [K L] after masking time-frequency decomposition using 
-%                'signifs' array, concatenate time/freq values only if more than K electrodes
-%                have non-0 (significant) values. If several subject, the second value L
-%                is used to concatenate subject in the same fashion. Default is [1 1].
-%  'selchans'  = Channels to include in topoplot() scalp maps (and image std()) {default: all}
-%  'smooth'    = [pow2] magnification and smoothing factor. Only in power of 2 (Default: 1}.
-%  'mode'      = ['rms'|'ave'] average dB power ('ave') or return root-mean-square ('rms')
-%                {Default: 'rms' }
-%  'logfreq'   = ['on'|'off'] use logarithmic base for frequencies { Default: 'off' }
-%  'vert'      = [times vector] -> plot vertical dashed lines at specified times in ms.
-%                { Default: 0 }
-%  'shiftimgs' = [time vector] - shift time frequency images (for several subject) by the
-%                median reaction time of each subject (provided here).
-%  'title'     = [quoted string] plot title (default: provided). 
+%                Omit, or use NaN's to use the input data limits. Ex: [nan nan -100 400];
+%  'signifs'   = Matrix of significance level(s) (e.g., from timef()) to zero out non-signif. 
+%                tfdata points. Matrix size must be ([1|2], freqs, chans, subjects) if
+%                the same threshold for all time points at each frequency, else
+%                ([1|2], freqs, times, chans, subjects). If first dimension is of size 1, 
+%                data is assumed to contain positive values only {default: none}
+%  'sigthresh' = [K L] After masking time-frequency decomposition using the 'signifs' array
+%                (above), concatenate time/freq values for which no more than K electrodes
+%                have non-0 (significant) values. If several subjects, the second value L
+%                is used to concatenate subjects in the same way. {default: [1 1]}
+%  'selchans'  = Channels to include in the topoplot() scalp maps (and image values) {default: all}
+%  'smooth'    = [pow2] magnification and smoothing factor. power of 2 (default: 1}.
+%  'mode'      = ['rms'|'ave'] ('rms') return root-mean-square, else ('ave') average power
+%                {default: 'rms' }
+%  'logfreq'   = ['on'|'off'] plot log frequencies {default: 'off'}
+%  'vert'      = [times vector] (in msec) plot vertical dashed lines at specified times 
+%                {default: 0}
+%  'shiftimgs' = [resposne_times_vector] - shift time/frequency images from several subjects 
+%                each subject's response time {default: no shift} 
+%  'title'     = [quoted_string] plot title (default: provided_string). 
 %
-% Note:
-%  1) Additional topoplot() options can be used.
-%  2) For topoplot maps, the average power (not masked by significance is used (instead
-%     of the root-mean-square (RMS) for averaging electrode activity).
-%  3) If several subjects (4-D tfdata input) RMS is first computed across electrodes
-%     then across subjects.
+% Notes:
+%  1) Additional topoplot() optional arguments can be used.
+%  2) In the topoplot maps, average power (not masked by significance) is used 
+%     instead of the (signed and masked) root-mean-square (RMS) values used in the image.
+%  3) If tfdata from several subjects is used (via a 4-D tfdata input), RMS power is first 
+%     computed across electrodes, then across the subjects.
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
 % See also: timef(), topoplot(), spectopo(), timtopo(), envtopo(), changeunits()
 
-% hidden parameter: 'shiftimgs' = array with one value per subject for shifting in time
+% hidden parameter: 'shiftimgs' = array with one value per subject for shifting in time the
 %                                 time/freq images. Had to be inserted in tftopo because
 %                                 the shift happen after the smoothing
 
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2004/10/08 19:14:35  hilit
+% changed the font size of figure title and axes to 12
+%
 % Revision 1.65  2004/10/08 19:03:14  hilit
 % added 'title' option
 %
