@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2002/10/29 23:33:27  arno
+% same
+%
 % Revision 1.84  2002/10/29 23:32:44  arno
 % debugging channel name when no channel location file
 %
@@ -452,7 +455,7 @@ if popup
 												  'This allow to plot component activity in microvolt'] };
 		uilist{7} = { 'Style', 'edit', 'string', getkeyval(lastcom, 4), 'tag', 'projchan' };
 	end;
-    [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
+    [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''erpimage'');', ...
 							 fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'));
 	if isempty(oldres), return; end;
 
@@ -523,7 +526,7 @@ if popup
 		options = [options ',''cbar'''];
 	end;
 	if res.caxis
-		options = [options ',''caxis'', ' res.caxis ];
+		options = [options ',''caxis'',  [' res.caxis ']' ];
 	end;
 	
 	% event rows
