@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2002/10/15 15:08:17  scott
+% *** empty log message ***
+%
 % Revision 1.76  2002/10/15 14:48:55  scott
 % removed erpimopt, added 'Color limits' help
 %
@@ -436,6 +439,10 @@ if popup
 	% ---------
 	limits(1:8)  = NaN;
 	channel   	 = eval( [ '[' res.chan ']' ]);
+        if typeplot == 1
+          chanlabel = {EEG.chanlocs.labels};
+          chanlabel = chanlabel(channel);
+        end
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
 	if typeplot
@@ -444,7 +451,7 @@ if popup
 		options = [options ',''yerplabel'',''''' ];
 	end;
 	if isempty(titleplot)
-        titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
+        titleplot = [ fastif( typeplot, '', 'Comp. ') fastif( typeplot, chanlabel,int2str(channel)) ' ERP image'];
     end;
 	smooth       = eval(res.smooth);
     if res.plotmap
