@@ -39,6 +39,7 @@
 %                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
 %                    to reject (1); its length must be the number of data channels. 
 %    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
+%    'wincolor'   - [color] color used when selecting EEG.
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
 %    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
 %    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
@@ -75,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/07/30 17:15:06  arno
+% adding multiple window plotting
+%
 % Revision 1.20  2002/07/30 15:16:41  arno
 % debugging frequency axis
 %
@@ -229,6 +233,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.limits;		    catch, g.limits	    = [0 1]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans = min(32, size(data,1)); end;
+   try, g.wincolor; 		catch, g.wincolor = [ 0.8345 1 0.9560]; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -309,7 +314,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % ------------ 
   g.incallback = 0;
   g.winstatus = 1;
-  g.wincolor = [ 0.8345 1 0.9560];
   g.setelectrode  = 0;
   [g.chans,g.frames,tmpnb] = size(data);   
   g.frames = g.frames*tmpnb;
