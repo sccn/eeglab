@@ -1,17 +1,36 @@
-% loadeeg() - load binary eeg file in neuroscan format.
+% loadeeg() - load binary ".EEG" file in neuroscan format.
 %
 % Usage:
+% >> signal = loadeeg( filename );
 % >> [signal, accept, typeeeg, rt, response, chan_names, pnts, ...
-%    nsweeps, rate, xmin, xmax] = loadeeg( filename, chanlist, ...
-%      TrialList, typerange, acceptype, rtrange, responsetype)
+%    ntrials, srate, xmin, xmax] = loadeeg( filename, chanlist, ...
+%      triallist, typerange, accepttype, rtrange, responsetype)
 %
 % Inputs:
-%      filename    - input Neuroscan .avg file      
+%   filename     - [string] input Neuroscan .eeg file      
+%   chanlist     - [integer array] only import selected electrodes
+%                  (ex: 3,4:10; default all) 
+%   triallist    - [integer array] only import selected trials (default all)
+%   typerange    - [integer array] only import trials with selected type
+%                  (default all)
+%   accepttype   - [integer array] only import trials with the selected
+%                  accept field values (default all)
+%   rtrange      - [float array] range [min max] for reaction time (default all)
+%   responsetype - [integer array] only import trials with selected responses
+%                  values (default all)
 %
 % Outputs:
-%      signal	   - output signal	
-%      variance    - variance of the signal 
-%      chan_names  - array that represent the name of the electrodes
+%   signal     - output signal (size trials x points)	
+%   accept     - values for the accept field (size trials) 
+%   typeeeg    - values for the accept type (size trials) 
+%   rt         - values for the accept rt (size trials) 
+%   response   - values for the accept response (size trials) 
+%   chan_names - string array with channel names of the electrodes
+%   pnts       - number of points per trial
+%   ntrials    - number of trials
+%   srate      - sampling rate
+%   xmin       - trial's starting time in ms
+%   xmax       - trial's ending time in ms
 %
 % Example:
 %   % load data into the array named 'signal' 
@@ -19,9 +38,11 @@
 %   %plot the signal for the first electrode of the first sweep
 %   plot( signal(1,:) );	  		
 %
+% Author: Arnaud Delorme, CNL, Salk Institute, 2001
+%
 % See also: pop_loadeeg(), eeglab()
 
-% .eeg binary file organization
+% .eeg binary file format
 %   data are organised into an array of Number_of_electrode x (Number_of_points_per_trial*Number_of_sweeps)
 %   for a file with 32 electrodes, 700 points per trial and 300 sweeps, the resulting array is 
 %   of 32 collumn and 700*300 rows (300 consecutive blocs of 700 points) 	 	
@@ -45,12 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-
-% update date 		version		remark
-%	1062001		0.0		primitive version	
-%	1102001		1.0		fully working version	
-%	1112001		1.1		more parameters	
-%	1115001		1.2		fix bugs	
+% Revision 1.1  2002/04/05 17:39:45  arno
+% Initial revision
+%
 
 function [signal, accept, typeeeg, rt, response, chan_names, pnts, ....
 	nsweeps, rate, xmin, xmax]=loadeeg( FILENAME, chanlist, ...
@@ -128,12 +146,12 @@ buf_size = chan * pnts ;			% size in shorts
 
 % set tags for conditions
 % -----------------------
-if size(chanlist)  == size('all')	chanlist = [1:chan]; end;
-if size(TrialList) == size('all')	trialtagI     = 1; else trialtagI     = 0; end;
-if size(acceptype) == size('all')	acceptagI     = 1; else acceptagI     = 0; end;
-if size(typerange) == size('all')	typetagI      = 1; else typetagI      = 0; end;
-if size(responsetype) == size('all')	responsetagI  = 1; else responsetagI  = 0; end;
-if size(rtrange)      == size('all')	rttagI        = 1; else rttagI        = 0; end;
+if isstr(chanlist) & strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
+if isstr(TrialList) & strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
+if isstr(acceptype) & strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
+if isstr(typerange) & strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
+if isstr(responsetype) & strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
+if isstr(rtrange) & strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
 
 count_selected = 1;
 fprintf('Reserving array (can take some time)\n');
