@@ -19,7 +19,7 @@
 %   'maplimits'       - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
 %                       'maxmin'   -> scale colors to the data range (makes green mid-range); 
 %                       [lo.hi]    -> use user-definined lo/hi limits {default: 'absmax'}
-%   'style'           - 'straight' -> plot colored map only
+%   'style'           - 'map'      -> plot colored map only
 %                       'contour'  -> plot contour lines only
 %                       'both'     -> plot both colored map and contour lines
 %                       'fill'     -> plot constant color between contour lines
@@ -33,11 +33,8 @@
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
-%   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
-%                       shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
+%   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
+%                       the electrode locations to minimize extrapolation.  {default: 'off'}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
@@ -55,7 +52,7 @@
 %   'dipscale'        - [real] scale dipole size {default: 1}.
 %   'dipsphere'       - [real] size of the dipole sphere. {default: 85 mm}.
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
-%                       {default: 'k' -> black}.
+%                       {default: 'k' = black}.
 % Plot detail options:
 %   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
 %                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
@@ -69,20 +66,28 @@
 %   'numcontour'      - number of contour lines {default: 6}
 %   'ccolor'          - color of the contours {default: dark grey}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
-%   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix (default: 67)
-%   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {101}
+%   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix {default: 67}
+%   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
+%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
+%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Outputs:
 %         h           - plot axes handle
 %         grid/val    - interpolated data image matrix (off-head points = NaN).  
 %                       ELSE, interpolated value at single input 'noplot' channel location, if any.
-%
 % Chan_locs format:
 %    See >> topoplot 'example'
 %
+% Notes: - To change the plot map masking ring to a new figure background color,
+%            >> set(findobj(gca,'type','patch'),'facecolor',get(gcf,'color'))
+%        - Topoplots may be rotated. From the commandline >> view([deg 90]) {default: [0 90])
+%
 % Authors: Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
-%          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 ->
+%          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 -
 %
 % See also: timtopo(), envtopo()
 
@@ -107,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.186  2004/03/31 05:15:05  scott
+% *** empty log message ***
+%
 % Revision 1.185  2004/03/31 05:06:27  scott
 % implementing 'conv' (undocumented)
 %
@@ -523,9 +531,9 @@ EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
 EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
-HLINEWIDTH = 2;         % default linewidth for head, nose, ears
-BLANKINGRINGWIDTH = .03;% width of the blanking ring 
-HEADRINGWIDTH     = .01;% width of the cartoon head ring
+HLINEWIDTH = 3;         % default linewidth for head, nose, ears
+BLANKINGRINGWIDTH = .035;% width of the blanking ring 
+HEADRINGWIDTH    = .007;% width of the cartoon head ring
 SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = [];      % shrink mode (dprecated)
 intrad       = [];      % default interpolation square is to outermost electrode (<=1.0)
@@ -534,6 +542,7 @@ headrad      = [];      % default plotting radius for cartoon head is 0.5
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 VERBOSE = 'on';
 MASKSURF = 'off';
+CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
@@ -613,6 +622,9 @@ if nargs > 2
     switch lower(Param)
          case 'conv'
            CONVHULL = lower(Value);
+           if ~strcmp(CONVHULL,'on') & ~strcmp(CONVHULL,'off')
+             error('Value of ''conv'' must be ''on'' or ''off''.');
+          end
 	 case 'colormap'
 	  if size(Value,2)~=3
           error('Colormap must be a n x 3 matrix')
@@ -1062,6 +1074,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
 
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC);
                           % specify size of head axes in gca
+
+  unsh = (GRID_SCALE+1)/GRID_SCALE; % un-shrink the effects of 'interp' SHADING
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1072,8 +1086,13 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map and contours %%%%%%%%%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
-    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
+    if strcmp(SHADING,'interp')
+       tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi)),Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
+    else % SHADING == 'flat'
+       tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
+               'EdgeColor','none','FaceColor',SHADING);                    
+    end
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
@@ -1083,9 +1102,15 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  elseif strcmp(STYLE,'straight')
-    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
-	'FaceColor',SHADING);
+  elseif strcmp(STYLE,'straight') | strcmp(STYLE,'map') % 'straight' was former arg
+
+      if strcmp(SHADING,'interp') % 'interp' mode is shifted somehow... but how?
+         tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi)),Zi,'EdgeColor','none',...
+                  'FaceColor',SHADING);
+      else
+         tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
+                 'FaceColor',SHADING);
+      end
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
@@ -1138,49 +1163,66 @@ if exist('handle') ~= 1
 end;
 
 %
-%%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-if headrad > 0                         % if cartoon head to be plotted
+%%%%%%%%%%%%%%%%%%% Plot filled ring to mask jagged grid boundary %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-
-
 hwidth = HEADRINGWIDTH;                   % width of head ring 
 hin  = squeezefac*headrad*(1- hwidth/2);  % inner head ring radius
 
-rwidth = BLANKINGRINGWIDTH;               % width of blanking outer ring
-rin =  rmax*(1-rwidth/2);                 % inner ring radius
+if strcmp(SHADING,'interp')
+  rwidth = BLANKINGRINGWIDTH*1.3;             % width of blanking outer ring
+else
+  rwidth = BLANKINGRINGWIDTH;         % width of blanking outer ring
+end
+rin    =  rmax*(1-rwidth/2);              % inner ring radius
 if hin>rin
   rin = hin;                              % dont blank inside the head ring
 end
 
-if exist('CONVHULL')
+if strcmp(CONVHULL,'on') %%%%%%%%% mask outside the convex hull of the electrodes %%%%%%%%%
   cnv = convhull(x,y);
-  startang = atan2(x(cnv(1)),y(cnv(1)));
-  circ = linspace(0+startang,2*pi+startang,CIRCGRID);
-  rx = sin(circ); 
-  ry = cos(circ); 
   cnvfac = round(CIRCGRID/length(cnv)); % spline interpolate the convex hull
   if cnvfac < 1, cnvfac=1; end;
+  CIRCGRID = cnvfac*length(cnv);
 
-  xx =spline(linspace(0,1,length(cnv)+1), [x(cnv) x(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
-  yy =spline(linspace(0,1,length(cnv)+1), [y(cnv) y(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
-  ringx = [[ry(:)' ry(1) ]*(rin+rwidth)  [yy]*1.02];
-  ringy = [[rx(:)' rx(1) ]*(rin+rwidth)  [xx]*1.02];
-  ringh2= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+  startangle = atan2(x(cnv(1)),y(cnv(1)));
+  circ = linspace(0+startangle,2*pi+startangle,CIRCGRID);
+  rx = sin(circ); 
+  ry = cos(circ); 
+
+  x = x(:)';  % make x a row vector
+  y = y(:)';  % make y a row vector
+  xx =spline(linspace(0,1,3*length(cnv)), [x(cnv) x(cnv) x(cnv)], ...
+                                      linspace(0,1,3*length(cnv)*cnvfac));
+  yy =spline(linspace(0,1,3*length(cnv)), [y(cnv) y(cnv) y(cnv)], ...
+                                      linspace(0,1,3*length(cnv)*cnvfac));
+
+  xx = xx*1.02; yy = yy*1.02;           % extend spline outside electrode marks
+  splrad = sqrt(xx.^2+yy.^2);           % arc radius of spline points (yy,xx)
+  oob = find(splrad >= rin);            %  enforce an upper bound on xx,yy
+  xx(oob) = rin*xx(oob)./splrad(oob);   % max radius = rin
+  yy(oob) = rin*yy(oob)./splrad(oob);   % max radius = rin
+
+  ringy = [[ry(:)' ry(1) ]*(rin+rwidth) yy(CIRCGRID+1:2*CIRCGRID) yy(CIRCGRID+1)];
+  ringx = [[rx(:)' rx(1) ]*(rin+rwidth) xx(CIRCGRID+1:2*CIRCGRID) xx(CIRCGRID+1)];
+
+  ringh2= patch(ringy,ringx,ones(size(ringy)),BACKCOLOR,'edgecolor','none'); hold on
+
+  % plot(ry*rmax,rx*rmax,'b') % debugging line
+
+else %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% mask the jagged border around rmax %%%%%%%%%%%%%%%5%%%%%%
+
+  circ = linspace(0,2*pi,CIRCGRID);
+  rx = sin(circ); 
+  ry = cos(circ); 
+  ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
+  ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
+
+  ringh= patch(ringx,ringy,ones(size(ringx)),BACKCOLOR,'edgecolor','none'); hold on
+  % plot(ry*rmax,rx*rmax,'b') % debugging line
 end
 
-circ = linspace(0,2*pi,CIRCGRID);
-rx = sin(circ); 
-ry = cos(circ); 
-ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
-ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
-ringh= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
-
-
-%f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
-%f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
+  %f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+  %f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
 
 % Former line-style border smoothing - width did not scale with plot
 %  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
@@ -1188,11 +1230,16 @@ ringh= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
 %  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
 
 %
+%%%%%%%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+if headrad > 0                         % if cartoon head to be plotted
+%
 %%%%%%%%%%%%%%%%%%% Plot head outline %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 headx = [[rx(:)' rx(1) ]*(hin+hwidth)  [rx(:)' rx(1)]*hin];
 heady = [[ry(:)' ry(1) ]*(hin+hwidth)  [ry(:)' ry(1)]*hin];
-ringh= fill(headx,heady,HEADCOLOR,'edgecolor',HEADCOLOR); hold on
+
+ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR); hold on
 
 % rx = sin(circ); rX = rx(end:-1:1);
 % ry = cos(circ); rY = ry(end:-1:1);
