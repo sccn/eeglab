@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -47,7 +50,8 @@
 function [EEG, command] = pop_loadeeg(filename, filepath, range_chan, range_sweeps, range_typeeeg, range_response); 
 
 command = '';
-if nargin < 6 
+
+if nargin < 2
 
 	% ask user
 	[filename, filepath] = uigetfile('*.eeg', 'Choose an EEG file -- pop_loadeeg()'); 
@@ -55,31 +59,27 @@ if nargin < 6
 
 	% popup window parameters
 	% -----------------------
-	promptstr    = { 'Enter trialrange:', ...
-					 'Enter the type range:', ...
-					 'Enter electrodes:', ...
-					 'Enter response range:'};
-	inistr       = { 'all', 'all', 'all', 'all' };
+	promptstr    = { 'Enter trialrange subset:', ...
+					 'Enter the type range subset:', ...
+					 'Enter electrodes subset:', ...
+					 'Enter response range subset:'};
+	inistr       = { '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
 	result       = inputdlg( promptstr, pop_title, 1,  inistr);
 	if size( result,1 ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
-	if size(result{1}) == size('all')	range_sweeps = 'all';
-	else								range_sweeps = eval( [ '[' result{1} ']' ] );
-	end;
-	if size(result{2}) == size('all')	range_typeeeg  = 'all';
-	else								range_typeeeg  = eval( [ '[' result{2}  ']' ] );
-	end;
-	if size(result{3}) == size('all')	range_chan = 'all';
-	else								range_chan = eval( [ '[' result{3}  ']' ] );
-	end;
-	if size(result{4}) == size('all')	range_response  = 'all';
-	else								range_response  = eval( [ '[' result{4}  ']' ] );
-	end;
-
+	range_sweeps    = eval( [ '[' result{1} ']' ] );
+	range_typeeeg   = eval( [ '[' result{2}  ']' ] );
+	range_chan      = eval( [ '[' result{3}  ']' ] );
+	range_response  = eval( [ '[' result{4}  ']' ] );
 end;
+
+if ~exist('range_chan')   | isempty(range_chan)      , range_chan     = 'all'; end;
+if ~exist('range_sweeps') | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
+if ~exist('range_typeeg') | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
+if ~exist('range_response') | isempty(range_response), range_response     = 'all'; end;
 
 % load datas
 % ----------
@@ -90,14 +90,11 @@ EEG.filename        = filename;
 EEG.filepath        = filepath;
 EEG.setname 		= 'rawdatas';
 EEG.nbchan          = size(EEG.data,1);
-EEG.epoch       = eeg_epochformat([rt(:) eegtype(:) eegresp(:) accept(:)], 'struct', {'eventlatency', 'type', 'response', 'accept'});
 EEG = eeg_checkset(EEG);
+EEG = pop_importepoch( EEG, [rt(:)*1000 eegtype(:) accept(:) eegresp(:)], { 'RT' 'type' 'accept' 'response'}, {'RT'}, 1E-3, 0, 1);
 
-command = sprintf('EEG = pop_loadeeg(''%s'', ''%s'', %s, %s, %s, %s);', filename, filepath, ...
-			fastif(isstr(range_chan), [ '''' range_chan '''' ], [ '[' num2str(range_chan) ']' ]), ...
-			fastif(isstr(range_sweeps), [ '''' range_sweeps '''' ], [ '[' num2str(range_sweeps) ']' ]), ...
-			fastif(isstr(range_typeeeg), [ '''' range_typeeeg '''' ], [ '[' num2str(range_typeeeg) ']' ]), ...
-			fastif(isstr(range_response), [ '''' range_response '''' ], [ '[' num2str(range_response) ']' ])); 
+command = sprintf('EEG = pop_loadeeg(''%s'', ''%s'', %s);', filename, filepath, ...
+			vararg2str({range_chan range_sweeps range_typeeeg range_response }));
 
 return;
 
