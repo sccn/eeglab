@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/30 21:59:45  arno
+% still debugging
+%
 % Revision 1.4  2002/07/30 21:57:32  arno
 % debugging
 %
@@ -65,10 +68,9 @@ end;
 % only take into account specific colors
 % --------------------------------------
 TMPREJINIT(:,3:5) = round(TMPREJINIT(:,3:5)*100)/100;
-color    = round(color*100)/100;
-colorout = round(colorout*100)/100;
 TMPREJ = [];
 if exist('color') == 1
+	color    = round(color*100)/100;
 	for index = 1:size(color,1)
    		tmpcol1 = TMPREJINIT(:,3) + 255*TMPREJINIT(:,4) + 255*255*TMPREJINIT(:,5);
    		tmpcol2 = color(index,1)+255*color(index,2)+255*255*color(index,3);   
@@ -84,6 +86,7 @@ else
 	% remove other specific colors
 	% ----------------------------
 	if exist('colorout') == 1
+		colorout = round(colorout*100)/100;
 		for index = 1:size(colorout,1)
 			tmpcol1 = TMPREJ(:,3) + 255*TMPREJ(:,4) + 255*255*TMPREJ(:,5);
 			tmpcol2 = colorout(index,1)+255*colorout(index,2)+255*255*colorout(index,3);   
