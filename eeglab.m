@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.311  2004/03/25 15:44:08  arno
+% version option
+%
 % Revision 1.310  2004/03/13 03:04:21  arno
 % history
 %
@@ -1161,6 +1164,11 @@ end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
 eeg_options; 
+if nargin == 1 &  strcmp(onearg, 'redraw')
+    if evalin('base', 'exist(''EEG'')', '0') == 1
+        evalin('base', 'warning off; eeg_global; warning on;');
+    end;
+end;
 eeg_global;
 
 % for the history function
