@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/12/03 02:35:01  arno
+% for non power of 2 windows
+%
 % Revision 1.2  2003/12/03 02:19:41  arno
 % optional plotting
 %
@@ -87,22 +90,21 @@ timesout = floor(length(X)/(win-overlap));
                                         'plotersp', 'off', 'plotitc', 'off', 'baseline', NaN, 'verbose', 'off');
 
 ersp = 10.^(ersp/10); % back to amplitude
-spec = mean(ersp,2)*2.7/win; % this formula is a best approximation (I couldn't find the actual one)
+power = mean(ersp,2)*2.7/win; % this formula is a best approximation (I couldn't find the actual one)
                              % in practice the difference with psd is less than 0.1 dB
-spec = 10*log10(spec);
+power = 10*log10(power);
 if nargout < 1
     hold on;
-    h = plot(freqs, spec);
+    h = plot(freqs, power);
     set(h, 'linewidth', 2);
 end;
 return;
 
-%figure;
-%stdv = std(ersp, [], 2);
-
-h = plot(freqs, spec+stdv, 'r:');
+figure;
+stdv = std(ersp, [], 2);
+h = plot(freqs, power+stdv, 'r:');
 set(h, 'linewidth', 2);
-h = plot(freqs, spec-stdv, 'r:');
+h = plot(freqs, power-stdv, 'r:');
 set(h, 'linewidth', 2);
 xlabel('Frequency (Hz)');
 ylabel('Power (log)');
