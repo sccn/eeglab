@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/12 21:50:49  arno
+% text
+%
 % Revision 1.12  2002/08/12 02:42:10  arno
 % inputdlg2
 %
@@ -230,7 +233,7 @@ else
 	rejtmp = max(rejE(elecrange,:),[],1);
 	rej = rejtmp | rej;
 	nrej =  sum(rej);
-	fprintf('%d trials rejected\n', nrej);
+	fprintf('%d trials marked for rejection\n', nrej);
 end;
 if ~isempty(rej)
 	if icacomp	== 1
