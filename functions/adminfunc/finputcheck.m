@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/07/26 00:21:17  arno
+% allowing cell array for values
+%
 % Revision 1.16  2003/06/30 02:10:10  arno
 % strmatch exact
 %
@@ -173,7 +176,13 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
                 end;
                 if ~isstr(res{it}), testres = 1; end;
             end;
-            if testres == 0, g = strvcat(res{:}); return; end;
+            if testres == 0,
+                g = [];
+                for tmpi = 1:length(res)
+                    g = [ g res{tmpi} 10 ];
+                end;
+                return; 
+            end;
         end;
 	end;
     
