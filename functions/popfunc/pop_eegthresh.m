@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/12/04 23:18:01  arno
+% adding code to actually reject trials
+%
 % Revision 1.13  2003/06/03 22:07:52  arno
 % fixing when thresholding ICA using 1 electrode
 %
@@ -241,7 +244,7 @@ else
             EEG.reject.icarejthreshE = rejE;
         end;
     end;
-    if reject
+    if ~exist('reject') | reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
     end;
 end;
