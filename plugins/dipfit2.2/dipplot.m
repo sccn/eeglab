@@ -143,6 +143,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.77  2004/04/30 18:48:53  scott
+%made default image 'mri' - debugged sphers/cylinders
+%
 %Revision 1.76  2004/04/29 15:35:32  scott
 %adding cylinders for spheres pointers
 %
@@ -760,7 +763,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
 
-            else % plot dipole direction cylinders with end cap patch
+            elseif g.dipolelength>0 % plot dipole direction cylinders with end cap patch
               thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
               CYLWIDTH = 1.6; CYLLEN = 24;
               for k=1:length(xx)
@@ -773,7 +776,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 cax =caxis;
                 s1 = surf(cx,cy,cz); % makes red
                 set(s1,'cdatamapping','direct','FaceColor','r');
-                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); % c = 'r'
+                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); % c='r'
               end
             end
 
