@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 01:42:46  arno
+% colors
+%
 % Revision 1.7  2002/08/11 22:19:37  arno
 % *** empty log message ***
 %
@@ -65,7 +68,7 @@
 function [EEG, com] = pop_selectcomps( EEG, compnum, fig );
 
 COLREJ = '[1 0.6 0.6]';
-COLACC = '[0.6 1 0.6]';
+COLACC = '[0.75 1 0.75]';
 PLOTPERFIG = 35;
 
 com = '';
@@ -147,7 +150,7 @@ for ri = compnum
 
 		% plot the button
 		% ---------------
-		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)], 'backgroundcolor', GUIBUTTONCOLOR);
+		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)]);
 		command = sprintf('pop_compprop( %s, %d, 0, %3.15f);', inputname(1), ri, button);
 		set( button, 'callback', command );
 	end;
