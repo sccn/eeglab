@@ -63,6 +63,7 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
+%   'drawaxis'        - ['on'|'off'] draw axis on the top left corner.
 %
 % Plot detail options:
 %   'emarker'         - Matlab marker char | {markerchar color size linewidth} char, else cell array 
@@ -155,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.247  2005/03/07 17:11:19  arno
+% implement chaninfo
+%
 % Revision 1.246  2005/01/28 17:26:10  arno
 % fix typo
 %
@@ -789,6 +793,7 @@ MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours f
 VERBOSE = 'off';
 MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
+DRAWAXIS = 'off';
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
@@ -904,6 +909,8 @@ if nargs > 2
       if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end;
       if isfield(CHANINFO, 'plotrad'), plotrad      = CHANINFO.plotrad; end;
       if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end;          
+	 case 'drawaxis'
+	  DRAWAXIS = Value;
 	 case 'maplimits'
 	  MAPLIMITS = Value;
 	 case 'masksurf'
@@ -1387,6 +1394,29 @@ ally    = ally*squeezefac;
 else % if strcmpi(STYLE,'grid')
    intx = rmax; inty=rmax;
 end % if ~strcmpi(STYLE,'grid')
+
+%
+%%%%%%%%%%%%%%%% rotate channels based on chaninfo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if strcmpi(lower(NOSEDIR), '+x')
+     rotate = 0;
+else
+    if strcmpi(lower(NOSEDIR), '+y')
+        rotate = 3*pi/2;
+    elseif strcmpi(lower(NOSEDIR), '-x')
+        rotate = pi;
+    else rotate = pi/2;
+    end;
+    allcoords = (inty + intx*sqrt(-1))*exp(sqrt(-1)*rotate);
+    intx = imag(allcoords);
+    inty = real(allcoords);
+    allcoords = (ally + allx*sqrt(-1))*exp(sqrt(-1)*rotate);
+    allx = imag(allcoords);
+    ally = real(allcoords);
+    allcoords = (y + x*sqrt(-1))*exp(sqrt(-1)*rotate);
+    x = imag(allcoords);
+    y = real(allcoords);
+end;
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1994,6 +2024,32 @@ if ~isempty(DIPOLE)
 end;
 
 end % if ~ 'gridplot'
+
+%
+%%%%%%%%%%%%% Plot axis orientation %%%%%%%%%%%%%%%%%%%%
+%
+if strcmpi(DRAWAXIS, 'on')
+    axes('position', [0 0.85 0.08 0.1]);
+    axis off;
+    coordend1 = sqrt(-1)*3;
+    coordend2 = -3;
+    coordend1 = coordend1*exp(sqrt(-1)*rotate);
+    coordend2 = coordend2*exp(sqrt(-1)*rotate);
+    
+    line([5 5+round(real(coordend1))]', [5 5+round(imag(coordend1))]', 'color', 'k');
+    line([5 5+round(real(coordend2))]', [5 5+round(imag(coordend2))]', 'color', 'k');
+    if round(real(coordend2))<0
+         text( 5+round(real(coordend2))*1.2, 5+round(imag(coordend2))*1.2-2, '+Y');
+    else text( 5+round(real(coordend2))*1.2, 5+round(imag(coordend2))*1.2, '+Y');
+    end;
+    if round(real(coordend1))<0
+         text( 5+round(real(coordend1))*1.2, 5+round(imag(coordend1))*1.2+1.5, '+X');
+    else text( 5+round(real(coordend1))*1.2, 5+round(imag(coordend1))*1.2, '+X');
+    end;
+    set(gca, 'xlim', [0 10], 'ylim', [0 10]);
+end;
+    
+
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
