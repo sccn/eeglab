@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/07/01 22:12:35  arno
+% change default mesh
+%
 % Revision 1.39  2004/07/01 22:10:58  arno
 % using julie's head
 %
@@ -233,7 +236,7 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-DEFAULT_MESH = ['mhead.mat'];      % upper head model file (987K)
+DEFAULT_MESH = ['mheadnew.mat'];      % upper head model file (987K)
 %DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
 %DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
@@ -348,11 +351,11 @@ if isstr(values)
     end
     try, load(g.meshfile,'-mat');
     catch,
-        POS  = load('mheadpos.txt', '-ascii');
-        TRI1 = load('mheadtri1.txt', '-ascii'); % upper head
-        TRI2 = load('mheadtri2.txt', '-ascii'); % lower head
-        index1 = load('mheadindex1.txt', '-ascii');
-        center = load('mheadcenter.txt', '-ascii');
+        POS  = load('mheadnewpos.txt', '-ascii');
+        TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
+        TRI2 = load('mheadnewtri2.txt', '-ascii'); % lower head
+        index1 = load('mheadnewindex1.txt', '-ascii');
+        center = load('mheadnewcenter.txt', '-ascii');
     end;
     if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
     if exist('TRI2')   ~= 1, TRI2 = []; end;
@@ -532,11 +535,11 @@ else
   end
   try, load(g.meshfile,'-mat');
   catch,
-      POS  = load('mheadpos.txt', '-ascii');
-      TRI1 = load('mheadtri1.txt', '-ascii'); % upper head
-      TRI2 = load('mheadtri2.txt', '-ascii'); % lower head
-      index1 = load('mheadindex1.txt', '-ascii');
-      center = load('mheadcenter.txt', '-ascii');
+      POS  = load('mheadnewpos.txt', '-ascii');
+      TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
+      TRI2 = load('mheadnewtri2.txt', '-ascii'); % lower head
+      index1 = load('mheadnewindex1.txt', '-ascii');
+      center = load('mheadnewcenter.txt', '-ascii');
   end;
   if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
   if exist('TRI2')   ~= 1, TRI2 = []; end;
