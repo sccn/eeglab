@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/12/06 02:44:39  arno
+% adding event import
+%
 % Revision 1.3  2002/12/05 02:50:25  arno
 % debugging event reading
 %
@@ -76,7 +79,7 @@ EEG.xmin            = 0;
 % --------------------
 if ~isempty(Eventdata)
     for index = 1:size(Eventdata,2)
-        EEG = pop_chanevent( EEG, EEG.nbchan-size(Eventdata,1)+index, ...
+        EEG = pop_chanevent( EEG, EEG.nbchan-size(Eventdata,1)+index, 'edge', 'leading', ...
                              'delevent', 'off', 'typename', Head.eventcode(index,:));
     end;
 end;
