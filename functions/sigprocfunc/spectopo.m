@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/10/04 16:07:16  arno
+% adding icawinv parameter
+%
 % Revision 1.34  2002/09/05 00:07:40  arno
 % raising channel plot when plotting components
 %
@@ -213,7 +216,7 @@ if nargin<3
    return
 end
 if nargin <= 3 | isstr(varargin{1})
-	% 'key' 'val' sequency
+	% 'key' 'val' sequence
 	fieldlist = { 'freq'          'real'     []                        [] ;
 				  'chanlocs'      ''         []                        [] ;
 				  'freqrange'     'real'     [0 srate/2]               [] ;
