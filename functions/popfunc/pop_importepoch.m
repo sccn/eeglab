@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/02/28 15:40:34  scott
+% header edit -sm
+%
 % Revision 1.20  2002/11/15 00:51:21  arno
 % debugging TLE latencies, add more feedback to the user
 %
@@ -289,20 +292,22 @@ end;
            
 % add time locking event fields
 % -----------------------------
-fprintf('Pop_importepoch: adding automatically Time Locking Event (TLE) events\n');
-if ~isempty(g.typefield)
-    if isempty(strmatch( g.typefield, epochfield )) 
-         error(['Pop_importepoch: type field ''' g.typefield ''' not found']);
-    end;
-end;
-for trial = 1:EEG.trials
-    EEG.event(end+1).epoch = trial; 
+if EEG.xmin <= 0
+    fprintf('Pop_importepoch: adding automatically Time Locking Event (TLE) events\n');
     if ~isempty(g.typefield)
-        eval( ['EEG.event(end).type = EEG.epoch(trial).' g.typefield ';'] );
-    else 
-        EEG.event(end).type = 'TLE';
+        if isempty(strmatch( g.typefield, epochfield )) 
+            error(['Pop_importepoch: type field ''' g.typefield ''' not found']);
+        end;
     end;
-    eval( ['EEG.event(end).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+    for trial = 1:EEG.trials
+        EEG.event(end+1).epoch = trial; 
+        if ~isempty(g.typefield)
+            eval( ['EEG.event(end).type = EEG.epoch(trial).' g.typefield ';'] );
+        else 
+            EEG.event(end).type = 'TLE';
+        end;
+        eval( ['EEG.event(end).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+    end;
 end;
 
 % add latency fields
