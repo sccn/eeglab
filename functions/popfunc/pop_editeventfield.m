@@ -2,7 +2,7 @@
 %              EEG dataset is the only inputs, a window pops up to ask for 
 %              the relevant parameter values.
 %
-% Usage: >> [EEG,eventnumbers] = pop_editeventfield( EEG, 'key1', 'value1', ...);
+% Usage: >> [EEG] = pop_editeventfield( EEG, 'key1', 'value1', ...);
 %
 % Input:
 %   EEG      - input dataset
@@ -30,7 +30,6 @@
 %
 % Outputs:
 %   EEG          - dataset with updated event field
-%   eventnumbers - indexes of the appended events
 %
 % Example: [EEG, eventnumbers] = pop_editeventfield(EEG, 'type', 1, ...
 %                         'sleepstage', 'sleepstage_values.txt', ...
@@ -71,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/08 21:55:09  arno
+% not edited
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -110,7 +112,7 @@ if nargin<2
          { 'Style', 'text', 'string', 'Append events?', 'fontweight', 'bold' } };
         geometry    = { [ 1 1.1 0.2 1 0.2] [ 1.2 1 1.7 0.3] };
         uilist = { uilist{:} {} {} {} ...
-         { 'Style', 'edit' } ...
+         { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] } ...
          { 'Style', 'checkbox', 'string', 'Yes/No', 'value', 1 }, ...
          { 'Style', 'text', 'string', 'NB: No = overwrite events' }, { }, { }, ...   
          { 'Style', 'text', 'string', 'Edit fields:', 'fontweight', 'bold'  }, ...
@@ -137,7 +139,7 @@ if nargin<2
 	    end;
 	    geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] [1] [1 2 0.6 1.3 1.5] };
 	    uilist   = { uilist{:}, ...
-	         { 'Style', 'edit', 'string', '' }, ...
+	         { 'Style', 'edit', 'string', ''}, ...
 	         { 'Style', 'edit', 'string', '' }, ...
 	         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'newfield' }, ...
 	         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''newfield'';' commandload ] }, ...
@@ -157,17 +159,17 @@ if nargin<2
 	    % -----------------
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
-	    if results{2} == 0       , args = { args{:}, 'append', '''no''' }; end;
+	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
 	    
 	    % dealing with existing fields
 	    %-----------------------------
 	    for index = 1:length(allfields) 
 	        if results{2+index*3} == 1, args = { args{:}, allfields{index}, [] };
 	        else if ~isempty( results{1+index*3} )
-	                if exist(results{1+index*3}) == 2,  args = { args{:}, allfields{index}, [ '''' results{1+index*3} '''' ] }; % file
+	                if exist(results{1+index*3}) == 2,  args = { args{:}, allfields{index}, [ results{1+index*3} ] }; % file
 	                else                              args = { args{:}, allfields{index}, results{1+index*3} }; end;
 	             end;
-     	         if ~isempty( results{index*3} ), args = { args{:}, [ allfields{index} 'info' ], [ '''' results{index*3} '''' ] }; end;
+     	         if ~isempty( results{index*3} ), args = { args{:}, [ allfields{index} 'info' ], [ results{index*3} ] }; end;
 	        end;     
 	    end;
 	    
@@ -176,16 +178,16 @@ if nargin<2
 	    sub = 4;
 	    if ~isempty( results{end-sub} )
 	        if ~isempty( results{end-sub+2} )
-	            if exist(results{end-sub+2}) == 2,  args = { args{:}, results{end-sub}, [ '''' results{end-sub+2} '''' ] }; % file
+	            if exist(results{end-sub+2}) == 2,  args = { args{:}, results{end-sub}, [ results{end-sub+2} ] }; % file
 	            else                                args = { args{:}, results{end-sub}, results{end-sub+2} }; end;
-	            if ~isempty( results{end-sub+1} ),  args = { args{:}, [ results{end-sub} 'info' ], [ '''' results{end-sub+1} '''' ] }; end;
+	            if ~isempty( results{end-sub+1} ),  args = { args{:}, [ results{end-sub} 'info' ], [ results{end-sub+1} ] }; end;
 	        else
 	            disp(['The new field' results{end-sub} ' was ignored since no input data were given for it.' ]);
 	        end;
 	    end;  
         % handle rename 
         % -------------
-        if results{end-1} ~= 1, args = { args{:}, 'rename', [ '''' allfields{results{end-1}-1} '->' results{end} '''' ] }; end;  
+        if results{end-1} ~= 1, args = { args{:}, 'rename', [ allfields{results{end-1}-1} '->' results{end} ] }; end;  
         args
 else % no interactive inputs
     args = varargin;
@@ -196,12 +198,12 @@ else % no interactive inputs
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
-        if isstr(args{index+1})                 args{index+1} = [ '''' args{index+1} '''' ]; % string 
+        if isstr(args{index+1})                 args{index+1} = args{index+1}; % string 
         else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
         end;
     end;                
 end;
-     
+
 % create structure
 % ----------------
 if ~isempty(args)
@@ -215,8 +217,8 @@ g
 % test the presence of variables
 % ------------------------------
 try, g.skipline;      catch, g.skipline = 0; end;
-try, g.indices;  g.append = '''yes'''; catch, g.indices = []; end;
-try, g.append; 	      catch, g.append = '''yes'''; end;
+try, g.indices;  g.append = 'yes'; catch, g.indices = []; end;
+try, g.append; 	      catch, g.append = 'yes'; end;
 try, g.timeunit; 	  catch, g.timeunit = 1; end;
 try, g.align; 	      catch, g.align = NaN; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
@@ -232,8 +234,8 @@ for curfield = tmpfields'
        case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
        case 'rename',
             if isempty( findstr(g.rename, '->') ), disp('Set warning: bad syntax for rename'); end;
-            oldname = g.rename(2:findstr(g.rename, '->')-1);
-            newname = g.rename(findstr(g.rename, '->')+2:end-1);
+            oldname = g.rename(2:findstr(g.rename, '->'));
+            newname = g.rename(findstr(g.rename, '->')+2:end);
             indexmatch = strmatch(oldname, allfields);
             if isempty(indexmatch), disp('Set warning: name not found for rename'); 
             else
@@ -268,13 +270,13 @@ for curfield = tmpfields'
 	                 end;    
 	            else % interpret
 		            switch g.append 
-		                case '''no'''
+		                case 'no'
 		                      EEG.event = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      allfields = { curfield{1} };
                               EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
                               EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
-		                 case'''yes''' % match existing fields
-		                           % ---------------------
+		                 case 'yes' % match existing fields
+		                            % ---------------------
 		                      tmparray = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      if isempty(g.indices) g.indices = [1:size(tmparray(:),1)] + length(EEG.event); end;
 		                      
@@ -282,9 +284,10 @@ for curfield = tmpfields'
 		                      if isempty(indexmatch) % no match
 		                          disp(['Set: field ''' curfield{1} ''' not found, creating new field']);
 		                      end;
-		                      tmparray
 		                      EEG.event = setstruct(EEG.event, curfield{1}, g.indices, cell2mat(tmparray));     
-                              EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
+							  if strcmp(curfield{1}, 'latency')
+								  EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
+							  end;
 		             end;
 	            end;
 	        end;    
@@ -294,18 +297,7 @@ end;
 if isempty(EEG.event) % usefull 0xNB empty structure
     EEG.event = [];
 end;
-
-% remove the events which latency are out of boundary
-% ---------------------------------------------------
-if isfield(EEG.event, 'latency')
-	alllatencies = cell2mat( { EEG.event.latency } );
-	I1 = find(alllatencies < 0);
-	I2 = find(alllatencies > EEG.pnts*EEG.trials);
-	if (length(I1) + length(I2)) > 0 
-	    fprintf('Setevent warning: %d/%d events had out-of-bounds latencies and were removed\n', length(I1) + length(I2), length(EEG.event));
-	    EEG.event(union(I1, I2)) = [];
-	end;
-end;
+EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate the output command
 % ---------------------------
@@ -329,9 +321,8 @@ com = [com ');'];
 % interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if varname(1) == '''', % mean that it is a filename
-                          % --------------------------
-        varname = eval(varname);
+	if exist(varname) == 2 % mean that it is a filename
+                           % --------------------------
         array = loadtxt( varname );
         
     else % variable in the global workspace
