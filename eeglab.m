@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.182  2002/10/25 23:45:17  arno
+% debug last
+%
 % Revision 1.181  2002/10/25 23:40:05  arno
 % h -> hh
 %
@@ -985,7 +988,7 @@ FONTSIZE        = 11;
 hh = findobj('tag', 'EEGLAB');
 if ~isempty(hh)
     disp('EEGLAB warning: there can be only one EEGLAB window, closing old one');
-    close(h);
+    close(hh);
 end;
 
 W_MAIN = figure('Units','points', ...
