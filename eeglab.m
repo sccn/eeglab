@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.231  2003/03/14 22:39:41  arno
+% auto baseline removal after epoch extraction
+%
 % Revision 1.230  2003/03/14 03:20:34  arno
 % adding menu to compare 2 envtopo
 %
@@ -1079,7 +1082,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	topo_m = uimenu( third_m, 'Label', 'ERP map series');
 		uimenu( topo_m, 'Label', 'In 2-D'     , 'CallBack', [ checkplot      'LASTCOM = pop_topoplot(EEG, 1);' e_hist]);
 		uimenu( topo_m, 'Label', 'In 3-D'     , 'CallBack', [ checkplot      '[EEG LASTCOM] = pop_headplot(EEG, 1);' e_store]);
-	uimenu( third_m, 'Label', 'Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_compareerps(ALLEEG);' e_hist]);
+	uimenu( third_m, 'Label', 'Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_comperp(ALLEEG);' e_hist]);
 
     uimenu( third_m, 'Label', 'Component activations (scroll)', 'CallBack', [ checkica  '[LASTCOM] = pop_eegplot(EEG, 0, 0, 0);' e_hist],'Separator', 'on');
 	uimenu( third_m, 'Label', 'Component spectra and maps' , 'CallBack', [ checkicaplot   'LASTCOM = pop_spectopo(EEG, 0);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
