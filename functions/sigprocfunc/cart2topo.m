@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/23 01:31:37  erik
+% edited msgs -sm
+%
 % Revision 1.2  2002/04/21 19:46:15  arno
 % reprogrammed with optional arguments and gui
 %
@@ -108,13 +111,11 @@ try, g.center;     catch, g.center = [0 0 0]; end;
 try, g.gui;        catch, g.gui = 'off'; end;
 
 if strcmp(g.gui, 'on')
-    geometry = { [2 1 0.1] [2 1 0.1 ] [2 0.2 0.9] };
-    uilist = { { 'Style', 'text', 'string', 'Center ([] for optimization)', 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', '0 0 0'  } { } ...
-			   { 'Style', 'text', 'string', 'Squeeze (0=no squeezing)', 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', '0' } { } ...
-			   { 'Style', 'text', 'string', 'Optim (set=recursive center optimization)', 'fontweight', 'bold'   } ...
-			   { 'Style', 'checkbox', 'value', 0  } { } };
+    geometry = { [1 1  1.5 0.25] };
+    uilist = { { 'Style', 'text', 'string', 'Specify center', 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', '0 0 0'  } ...
+			   { 'Style', 'text', 'string', 'or optimize center location', 'fontweight', 'bold'   } ...
+			   { 'Style', 'checkbox', 'value', 0  } };
     results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel locations -- cart2topo()' );
 	if isempty(results), return; end;
 	g.center  = eval( [ '[' results{1} ']' ] );
