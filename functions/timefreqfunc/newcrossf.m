@@ -1,4 +1,7 @@
-% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
+% WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
+%           you must contact Arnaud Delorme (arno@salk.edu) for terms of use
+%
+% newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
@@ -184,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/08/08 22:25:28  arno
+% *** empty log message ***
+%
 % Revision 1.61  2003/08/04 16:22:00  arno
 % marginal plot colors
 %
@@ -570,7 +576,7 @@ disp('WARNING: this function is not part of the EEGLAB toolbox and should not be
 disp('         you must contact Arnaud Delorme (arno@salk.edu) for terms of use');
 
 if (nargin < 2)
-   help crossf
+   help newcrossf
    return
 end
 coherresout = [];
