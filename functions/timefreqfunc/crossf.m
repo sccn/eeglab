@@ -1,100 +1,102 @@
-% crossf() - Returns estimates and plot of event-related coherence (ERC) changes
-%            between data from two input channels. The lower panel gives the
-%            coherent phase difference between the processes. In this panel, for Ex.
-%               -90 degrees (blue) means xdata leads ydata by a quarter cycle.
-%                90 degrees (orange) means ydata leads xdata by a quarter cycle.
+% crossf() - Returns estimates and plots event-related coherence (ERCOH) changes
+%            between two input time series (x,y). A lower panel (optionally) shows 
+%            the coherence phase difference between the processes. In this panel: 
+%               -90 degrees (blue)   means x leads y by a quarter cycle.
+%                90 degrees (orange) means y leads x by a quarter cycle.
 %            Click on each subplot to view separately and zoom in/out.
 %
 % Function description:
 %            Uses EITHER fixed-window, zero-padded FFTs (faster) OR constant-Q 
-%            0-padded DFTs (better sensitivity), both Hanning-tapered. Output 
-%            frequency spacing is the lowest frequency (srate/winsize) divided 
-%            by the padratio.
+%            0-padded wavelet DFTs (better sensitivity), both Hanning-tapered. 
+%            Output frequency spacing is the lowest frequency ('srate'/'winsize') 
+%            divided by the 'padratio'.
 %
-%            If 'alpha' is given, then bootstrap statistics are 
-%            computed (from a distribution of 200 (g.naccu) surrogate baseline
+%            If an 'alpha' value is given, then bootstrap statistics are 
+%            computed (from a distribution of 200 ('naccu') surrogate baseline
 %            data epochs) for the baseline epoch, and non-significant features 
-%            of the output plots are zeroed (e.g., plotted in green). Baseline
-%            epoch is all windows with center times < 'baseline' or the whole
-%            epoch if 'baseboot' is set to 1.
-%
+%            of the output plots are zeroed (e.g., plotted in green). The baseline
+%            epoch is all windows with center times < the 'baseline' value or, 
+%            if 'baseboot' is 1, the whole epoch. 
 % Usage: 
-%      >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] = crossf(xdata,ydata,...
-%                                              frames,tlimits,titl,          ...
-%                                              srate,cycles,winsize,timesout,...
+%        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
+                       = crossf(x,y,frames,tlimits,titl,          ...
+%                                    srate,cycles,winsize,timesout,...
 %                                              padratio,maxfreq,alpha,verts);
 %
-% Inputs:
-%       xdata       = first single-channel (1,frames*nepochs) data  {none}
-%       ydata       = second single-channel (1,frames*nepochs) data {none}
-%       frames      = frames per epoch                        {768}
-%       tlimits     = [mintime maxtime] (ms) epoch time limits {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                 {256}
-%       cycles      = >0 -> Number of cycles in each analysis wavelet 
-%                     =0 -> Use FFTs (with constant window length) {0}
-%    Optional crossf type:
-%       'type'      = ['coher'|'phasecoher'], compute either the coherence
-%                     ('coher') or the phase coherence ('phasecoher') also known
-%                     as the phase coupling factor of the two data inputs. Default
-%                     is 'phasecoher' { 'phasecoher' }.
+% Required inputs:
+%       x           = first single-channel data  (1,frames*nepochs)      {none}
+%       y           = second single-channel data (1,frames*nepochs)      {none}
+%       frames      = frames per epoch                                   {750}
+%       tlimits     = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
+%       srate       = data sampling rate (Hz)                            {250}
+%       cycles      = If >0 -> Number of cycles in each analysis wavelet 
+%                     If==0 -> Use FFTs (constant window length 'winsize') {0}
+%
+%    Optional Coherence Type:
+%       'type'      = ['coher'|'phasecoher'] Compute either linear coherence
+%                      ('coher') or phase coherence ('phasecoher') also known
+%                      as phase coupling factor' { 'phasecoher' }.
 %    Optional Detrend:
-%       'detret'    = ['on'|'off'], Detrend data in time.     {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across epochs (trials) {'off'}
+%       'detret'    = ['on'|'off'], Detrend data within epochs.   {'off'}
+%       'detrep'    = ['on'|'off'], Detrend data across trials    {'off'}
+%
 %    Optional FFT/DFT:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                     if cycles >0: *longest* window length to use. This
-%                     determines the lowest output frequency  {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winframes) {200}
-%       'padratio'  = FFT-length/winframes (2^k)              {2}
-%                     Multiplies the number of output frequencies by
-%                     dividing their spacing. When cycles==0, frequency
-%                     spacing is (low freq/padratio).
+%                      if cycles >0: *longest* window length to use. This
+%                      determines the lowest output frequency  {~frames/8}
+%       'timesout'  = Number of output times (int<frames-winsize) {200}
+%       'padratio'  = FFTlength/winsize (2^k)                     {2}
+%                      Multiplies the number of output frequencies by
+%                      dividing their spacing. When cycles==0, frequency
+%                      spacing is (low_frequency/padratio).
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
-%                     If cycles==0, all FFT frequencies are output.
-%       'baseline'  = ERSP baseline end time (ms).            {0}
-%       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%                      If cycles==0, all FFT frequencies are output.
+%       'baseline'  = Coherence baseline end time (ms).           {0}
+%       'powbase'   = Baseline spectrum to log-subtract.          {from data}
+%
 %    Optional Bootstrap:
 %       'alpha'     = If non-0, compute Two-tailed bootstrap significance prob. 
-%                     level. Show non-signif output values as green. {0}
+%                      level. Show non-signif output values as green. {0}
 %       'naccu'     = Number of bootstrap replications to compute {200}
-%       'boottype'  = ['trial'|'time'|'both'] Bootstrap type, either shuffle
-%                     trial but not time ('trial'), time but not trial ('time'
-%                     or both ('both') { 'time' }
 %       'baseboot'  = Bootstrap baseline subtract (0=same as 'baseline';
-%                     1=whole epoch) {0}
-%       'topovec'   = Scalp topography (map) to plot          {[]}
-%       'elocs'     = Electrode location file for scalp map   {no default}
-%                     File should be ascii in format of  >> topoplot example   
-%    Optional Plot:
-%       'plotamps'  = ['on'|'off'], Plot amplitude            {'on'}
-%       'plotphase' = ['on'|'off'], Plot phase                {'off'}
-%       'title'     = Optional figure title                   {none}
-%       'marktimes' = Times to mark with a dotted vertical line{def|NaN->none}
+%                      1=whole epoch)                              {0}
+%       'boottype'  = ['trials'|'times'|'both'] Bootstrap type: Either shuffle
+%                      trials but not windows ('trials'), windows but not trials
+%                      ('times') or both ('both')                  {'times' }
+%    Optional Scalp Map:
+%       'topovec'   = Scalp topography (map) to plot              {[]}
+%       'elocs'     = Electrode location file for scalp map       {none}
+%                      File should be ascii in format of  >> topoplot example   
+%
+%    Optional Plot Features:
+%       'plotamps'  = ['on'|'off'], Plot coherence magnitude      {'on'}
+%       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
+%       'title'     = Optional figure title                       {none}
+%       'marktimes' = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'cmax'      = maximum amplitude for color scale  { use data limits }
-%       'angleunit' = angle plotting units 'ms' for milliseconds or 'deg' for
-%                     degree of angle                         { 'deg' }
-%       'pboot'     = Bootstrap power limits (from timef()){def|NaN->from data}
-%       'rboot'     = Bootstrap ITC limits (from timef())  {def|NaN->from data}
-%       'axesfont'  = Font size for the axes                  {10}
-%       'titlefont' = Font size for the title                 {8}
+%       'cmax'      = Maximum amplitude for color scale  { use data limits }
+%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
+%       'pboot'     = Bootstrap power limits (e.g., from timef()) {from data}
+%       'rboot'     = Bootstrap coherence limits (e.g., from timef()) {from data}
+%       'axesfont'  = Axes font size                               {10}
+%       'titlefont' = Title font size                              {8}
 %
 % Outputs: 
-%       coh         = between-channel coherency changes (nfreqs,timesout)
-%       mcoh        = vector of mean baseline coherence at each frequency
-%       timesout    = vector of output times (subwindow centers) in ms.
-%       freqsout    = vector of frequency bin centers in Hz.
-%       cohboot     = [2,nfreqs] matrix of [lower;upper] coh significance diffs.
-%       cohangle    = coherency angles (nfreqs,timesout) 
+%       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
+%       mcoh        = Vector of mean baseline coherence at each frequency
+%       timesout    = Vector of output times (window centers) (ms).
+%       freqsout    = Vector of frequency bin centers (Hz).
+%       cohboot     = Matrix (2,nfreqs) of [lower;upper] coh signif. limits
+%       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
 % Note: when cycles==0, nfreqs is total number of FFT frequencies.
 %
-% Authors: Sigurd Enghoff, Scott Makeig & Arnaud Delorme
+% Authors: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          SCCN/INC/UCSD, La Jolla, 1998-2002 
 %
 % See also: timef()
 
-% Copyright (C) 8/1/98 Sigurd Enghoff, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD
+% Copyright (C) 8/1/98 Sigurd Enghoff, Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -111,6 +113,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 11-20-98 defined g.linewidth constant -sm
 % 04-01-99 made number of frequencies consistent -se
@@ -136,9 +141,9 @@ function [R,mbase,times,freqs,Rboot,Rangle,Rsignif] = crossf(X, Y, frame, tlimit
 
 % Commandline arg defaults:
 DEFAULT_ANGLEUNITS = 'deg';     % angle plotting units - 'ms' or 'deg'
-DEFAULT_EPOCH	= 768;			% Frames per epoch
+DEFAULT_EPOCH	= 750;			% Frames per epoch
 DEFAULT_TIMELIM = [-1000 2000];	% Time range of epochs (ms)
-DEFAULT_FS		= 256;			% Sampling frequency (Hz)
+DEFAULT_FS		= 250;			% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;			% Fixed window length or base on cycles.
 								% =0: fix window length to nwin
@@ -158,13 +163,13 @@ if (nargin < 2)
 end
 
 if (min(size(X))~=1 | length(X)<2)
-	fprintf('crossf(): xdata must be a row or column vector.\n');
+	fprintf('crossf(): x must be a row or column vector.\n');
     return
 elseif (min(size(Y))~=1 | length(Y)<2)
-	fprintf('crossf(): ydata must be a row or column vector.\n');
+	fprintf('crossf(): y must be a row or column vector.\n');
     return
 elseif (length(X) ~= length(Y))
-	fprintf('crossf(): xdata and ydata must have same length.\n');
+	fprintf('crossf(): x and y must have same length.\n');
     return
 end
 
@@ -230,7 +235,7 @@ try, g.powbase;    catch, g.powbase = nan; end;
 try, g.pboot;      catch, g.pboot = nan; end;
 try, g.rboot;      catch, g.rboot = nan; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
-try, g.plotphase;  catch, g.plotphase  = 'off'; end;
+try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.detrep;     catch, g.detrep = 'off'; end;
 try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
@@ -240,7 +245,7 @@ try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
-try, g.boottype;   catch, g.boottype = 'time'; end; 
+try, g.boottype;   catch, g.boottype = 'times'; end; 
 
 % testing arguments consistency
 % -----------------------------
@@ -322,8 +327,8 @@ switch g.type
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 switch g.boottype
-    case { 'trial', 'time', 'both' },;
-    otherwise error('Boot type must be either ''trial'', ''time'' or ''both''');
+    case { 'trials', 'times', 'both' },;
+    otherwise error('Boot type must be either ''trials'', ''times'' or ''both''');
 end;    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -345,7 +350,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
            cumulYboot = zeros(g.padratio*g.winsize/2,g.naccu);
     end;
     switch g.boottype
-        case 'trial'
+        case 'trials'
 	       Rboot = zeros(g.padratio*g.winsize/2, g.timesout,g.naccu); % summed bootstrap coher
            cumulXboot = zeros(g.padratio*g.winsize/2, g.timesout, g.naccu);
            cumulYboot = zeros(g.padratio*g.winsize/2, g.timesout, g.naccu);
@@ -366,7 +371,7 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
            cumulYboot = zeros(size(win,2),g.naccu);
     end;        
     switch g.boottype
-        case 'trial'
+        case 'trials'
 	       Rboot = zeros(size(win,2), g.timesout,g.naccu); % summed bootstrap coher
            cumulXboot = zeros(size(win,2), g.timesout, g.naccu);
            cumulYboot = zeros(size(win,2), g.timesout, g.naccu);
@@ -381,7 +386,7 @@ if g.baseboot
 else   baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
    if isempty(baseln)
        baseln = 1:length(times); % use all times as baseline
-       disp('Baseline bootstrap empty, now adjusted to whole epoch');
+       disp('Bootstrap baseline empty, using the whole epoch');
    end;     
 end
 dispf = find(freqs <= g.maxfreq);
@@ -486,7 +491,7 @@ for t=1:trials,
 	end % time window
 	
 	if ~isnan(g.alpha) 
-	   if strcmp(g.boottype, 'time') % get g.naccu bootstrap estimates for each trial
+	   if strcmp(g.boottype, 'times') % get g.naccu bootstrap estimates for each trial
         j=1;
 		while j<=g.naccu
            s = ceil(rand([1 2])*g.timesout); % random ints [1,g.timesout]
@@ -514,7 +519,7 @@ end % t = trial
 
 % handle specific bootstrap types
 % -------------------------------
-if ~isnan(g.alpha) & ~strcmp(g.boottype, 'time')
+if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times')
     fprintf('\nProcessing bootstrap (of %d):',trials);
     for allt=1:trials
 		if (rem(allt,10) == 0)
@@ -526,7 +531,7 @@ if ~isnan(g.alpha) & ~strcmp(g.boottype, 'time')
 	    j=1;
 	    while j<=g.naccu
 	        switch g.boottype
-	            case 'trial',
+	            case 'trials',
 	                t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
 	                tmpsX = alltmpsX{t(1)};
 	                tmpsY = alltmpsY{t(2)};
@@ -601,7 +606,7 @@ mbase = mean(R(:,baseln)');     % mean baseline coherence magnitude
 
 if ~isnan(g.alpha) % if bootstrap analysis included . . .
     switch g.boottype
-	    case 'trial',
+	    case 'trials',
 			i = round(g.naccu*g.alpha);
 			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
 			Rboot = sort(Rboot,3);  
@@ -635,7 +640,7 @@ switch lower(g.plotamp)
 	RR = R;
 	if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
         switch g.boottype
-	       case 'trial',
+	       case 'trials',
 	          size(RR)
 	          size(Rboot)
 		      RR(find((RR > Rbootplus) & (RR < Rbootminus))) = 0;
@@ -686,7 +691,7 @@ switch lower(g.plotamp)
 	h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
 	Emax = max(R(dispf,:)); % mean coherence at each time point
 	Emin = min(R(dispf,:)); % mean coherence at each time point
-	if ~isnan(g.alpha) & strcmp(g.boottype, 'trial') % plot bootstrap significance limits (base mean +/-)
+	if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') % plot bootstrap significance limits (base mean +/-)
 	    plot(times,Rboottime([1 2],:),'g','LineWidth',g.linewidth); hold on;
 	    plot(times,Rsigniftime,'k:','LineWidth',g.linewidth);
 		plot(times,Emax,'b');
