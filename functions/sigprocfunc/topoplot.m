@@ -82,9 +82,10 @@
 %
 % Outputs:
 %         h           - plot axes handle
-%         grid_or_val - interpolated data image matrix (off-head points = NaN).  
-%                       ELSE, interpolated value at single input 'noplot' channel location, if any.
-%         [grid]      - IF interpolated value above, then the interpolated image grid
+%         grid_or_val - [matrix] the interpolated data image (with off-head points = NaN).  
+%                       ELSE, single interpolated value at the specified 'noplot' arg channel 
+%                       location ([rad theta]), if any.
+%         [grid]      - IF interpolated value returned above, then the interpolated image grid
 % Chan_locs format:
 %    See >> topoplot 'example'
 %
@@ -129,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.215  2004/11/09 19:25:08  arno
+% move plotgrid help outsie of header since unimplemented
+%
 % Revision 1.214  2004/10/27 17:34:35  scott
 % help msg adjust -sm
 %
@@ -1117,7 +1121,7 @@ Values(find(plotchans<0)) = -Values(find(plotchans<0)); % reverse indicated chan
 
 intchans = intersect(intchans,abs(plotchans)); % plot only indicated 'plotchans' channels
 pltchans = intersect(pltchans,abs(plotchans)); % plot only indicated 'plotchans' channels
-fprintf('topoplot(): plotting %d channels\n',length(pltchans));
+% fprintf('topoplot(): plotting %d channels\n',length(pltchans));
 
 if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
@@ -1194,7 +1198,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   mask = (sqrt(Xi.^2 + Yi.^2) <= rmax); % mask outside the plotting circle
   ii = find(mask == 0);
   Zi(ii) = NaN;                         % mask non-plotting voxels with NaNs
-  grid = Zi;
+  grid = [];
 
   %
   %%%%%%%%%% Return interpolated value at designated scalp location %%%%%%%%%%
@@ -1210,6 +1214,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
+        grid = Zi;
         Zi = chanval;  % return interpolated value instead of Zi
       end
   end
