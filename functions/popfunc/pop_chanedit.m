@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/05/02 23:16:44  scott
+% editting -sm
+%
 % Revision 1.8  2002/05/02 23:12:17  arno
 % editing text
 %
@@ -162,7 +165,7 @@ if nargin < 2
 						  '''), ''string'', num2str(chantmp(valnum).' allfields{index} '));' ];
 		end;
 		callpart2 = [ callpart2 'set(findobj(''parent'', gcf, ''tag'', ''scantitle''), ' ...
-					  '''string'', [''Channel Num (out of '' int2str(length(chantmp)) '')'']);' ]; 
+					  '''string'', [''Channel number (of '' int2str(length(chantmp)) '')'']);' ]; 
 		callpart2 = [ callpart2 'clear valnum;' ];
 		
 		uilist   = { uilist{:}, ...
