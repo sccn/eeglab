@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/11/15 02:44:32  arno
+% same
+%
 % Revision 1.11  2002/11/15 02:43:54  arno
 % header for web
 %
@@ -129,7 +132,7 @@ try, g.background;  catch, g.background = '<body bgcolor="#fcffff">'; end;
 %try, g.background;  catch, g.background = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
 try, g.refcall;     catch, g.refcall = 'javascript:openhelp(''%s.html'')'; end;
 try, g.font;        catch, g.font = 'Helvetica'; end;
-try, g.footer;      catch, g.footer = '<A HREF ="indexfunc.html">Back to functions</A>';  end;
+try, g.footer;      catch, g.footer = '<A HREF ="index.html">Back to functions</A>';  end;
 try, g.outputlink;  catch, g.outputlink = [ '<tr><td VALIGN=TOP ALIGN=RIGHT NOSAVE><A HREF="javascript:openhelp(''%s.html'')">%s</A></td><td>%s</td></tr>' ];  end;
 
 options = { 'footer', g.footer, 'background', g.background, ...
