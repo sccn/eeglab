@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/05/26 23:47:03  arno
+% updating the urevent structure
+%
 % Revision 1.28  2004/04/05 16:14:16  arno
 % allowing one element value
 %
@@ -215,8 +218,15 @@ if nargin<2
 				tmplines = find(description == 10);
 				if ~isempty(tmplines), description = description(1:tmplines(1)-1); end;
 	        catch, end;
+            if strcmp(allfields{index}, 'latency')
+                tmpfield = [ allfields{index} '(s)' ];
+            elseif strcmp(allfields{index}, 'duration')
+                tmpfield = [ allfields{index} '(s)' ];
+            else
+                 tmpfield = allfields{index};
+            end;
 	        uilist   = { uilist{:}, ...
-	         { 'Style', 'text', 'string', allfields{index} }, ...
+	         { 'Style', 'text', 'string', tmpfield }, ...
 	         { 'Style', 'pushbutton', 'string', description, 'callback', ...
 			 [ 'tmpuserdata = get(gcf, ''userdata'');' ...
 			   'tmpuserdata{' int2str(index) '} = pop_comments(tmpuserdata{' int2str(index) '}, ''Comments on event field: ' allfields{index} ''');' ...
@@ -404,16 +414,18 @@ for curfield = tmpfields'
 							  end;
  							  if strcmp(curfield{1}, 'duration')
                                   for indtmp = 1:length(EEG.event)
-                                      EEG.event(indtmp) = EEG.event(indtmp).duration/EEG.srate;
+                                      EEG.event(indtmp).duration = EEG.event(indtmp).duration/EEG.srate;
                                   end;
 							  end;
                               if isfield(EEG, 'urevent')
                                   disp('pop-editeventfield: updating urevent structure');
-                                  for indtmp = g.indices(:)'
-                                      tmpval      = getfield (EEG.event, curfield{1}, indtmp);
-                                      EEG.urevent = setfield (EEG.urevent, curfield{1}, EEG.event(indtmp).urevent, tmpval);
+                                  try
+                                      for indtmp = g.indices(:)'
+                                          tmpval      = getfield (EEG.event, {indtmp}, curfield{1});
+                                          EEG.urevent = setfield (EEG.urevent, {EEG.event(indtmp).urevent}, curfield{1}, tmpval);
+                                      end;
                                   catch,
-                                      error('Warning: problem while updating event structure');
+                                      disp('Warning: problem while updating urevent structure');
                                   end;
                               end;
 		             end;
