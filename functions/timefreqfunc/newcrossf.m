@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/05/29 00:23:00  arno
+% debug last
+%
 % Revision 1.55  2003/05/29 00:17:24  arno
 % allow 3D inputs
 %
@@ -523,7 +526,7 @@
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
 
-function [R,mbase,times,freqs,Rbootout,Rangle, coherresout, alltfX, alltfY] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
+function [R,mbase,timesout,freqs,Rbootout,Rangle, coherresout, alltfX, alltfY] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
@@ -766,29 +769,29 @@ if strcmpi(g.lowmem, 'on') & ~iscell(X) & length(X) ~= g.frame & (isempty(g.nfre
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
     YY = reshape(Y, 1, frame, length(Y)/g.frame);    
-    [coh,mcoh,times,freqs] = newcrossf(XX(1,:,1), YY(1,:,1), frame, tlimits, Fs, varwin, 'plotamp', 'off', 'plotphase', 'off',varargin{:});
+    [coh,mcoh,timesout,freqs] = newcrossf(XX(1,:,1), YY(1,:,1), frame, tlimits, Fs, varwin, 'plotamp', 'off', 'plotphase', 'off',varargin{:});
     
     % scan all frequencies
     for index = 1:length(freqs)
         if nargout < 6
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         elseif nargout == 7 % requires RAM
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
              coherresout(index,:,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         else
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
              coherresout(index,:,:),alltfX(index,:,:),alltfY(index,:,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         end;
     end;
     
     % plot and return
-    plotall(R.*exp(j*Rangle), Rbootout, times, freqs, mbase, g);
+    plotall(R.*exp(j*Rangle), Rbootout, timesout, freqs, mbase, g);
     return;
 end;    
 
@@ -837,11 +840,11 @@ if iscell(X)
 	end;
 
     if ~strcmp(g.type, 'coher') & nargout < 9
-		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
+		[R1,mbase,timesout,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
                           'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:});
 	else
-		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
+		[R1,mbase,timesout,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
                           'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:});
 	end;
@@ -852,11 +855,11 @@ if iscell(X)
         subplot(1,3,2);
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
-		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
+		[R2,mbase,timesout,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
                             'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
 	else
-		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
+		[R2,mbase,timesout,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
                             'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:} );
 	end;
@@ -875,7 +878,7 @@ if iscell(X)
         end;
         g.title = g.title{3};
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-            plotall(Rdiff, [], times, freqs, mbase, g);
+            plotall(Rdiff, [], timesout, freqs, mbase, g);
         end;
         Rbootout = [];
 	else 
@@ -935,7 +938,7 @@ if iscell(X)
 		g.title = g.title{3};
 		g.boottype = 'trials';
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-            plotall(Rdiff, coherimages, times, freqs, mbase, g);
+            plotall(Rdiff, coherimages, timesout, freqs, mbase, g);
         end;
         
         % outputs
@@ -1010,7 +1013,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 
     fprintf('\nProcessing first input\n');
 	X = reshape(X, g.frame, trials);
-	[alltfX freqs times] = timefreq(X, g.srate, spectraloptions{:});
+	[alltfX freqs timesout] = timefreq(X, g.srate, spectraloptions{:});
     fprintf('\nProcessing second input\n');
 	Y = reshape(Y, g.frame, trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
@@ -1061,7 +1064,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		
 		if ~isnan(g.alpha)
             if g.baseboot == 0
-                baselnboot = find(times < g.baseline);
+                baselnboot = find(timesout < g.baseline);
             else
                 baselnboot = [];
             end;
@@ -1082,18 +1085,18 @@ end;
 % baseline
 %%%%%%%%%%
 if ~isnan(g.baseline)
-   baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
+   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
    if isempty(baseln)
-      baseln = 1:length(times); % use all times as baseline
+      baseln = 1:length(timesout); % use all times as baseline
       disp('Bootstrap baseline empty, using the whole epoch');
    end;
    baselength = length(baseln);
 else
-   baseln = 1:length(times); % use all times as baseline
-   baselength = length(times); % used for bootstrap
+   baseln = 1:length(timesout); % use all times as baseline
+   baselength = length(timesout); % used for bootstrap
 end;
 if ~isnan(g.baseline)
-   if length(baseln) == length(times), fprintf('\nUsing full time range as baseline\n');
+   if length(baseln) == length(timesout), fprintf('\nUsing full time range as baseline\n');
    else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
    end;
 else fprintf('\nNo baseline time range specified.\n');	
@@ -1102,7 +1105,7 @@ mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
 
 % plot everything
 % ---------------
-plotall( coherres, Rbootout, times, freqs, mbase, g);
+plotall( coherres, Rbootout, timesout, freqs, mbase, g);
 
 % proces outputs
 % --------------
