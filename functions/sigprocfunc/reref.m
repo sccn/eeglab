@@ -8,9 +8,8 @@
 % Inputs:
 %   data - 2-D data matrix (chans,frames*epochs) 
 %   refchan  - reference channel number(s) -- two possibilities here:
-%          1) [] - compute average reference. If the 'withref' method
-%             is set, the function recomputes the common reference potential 
-%             while averaging.
+%          1) [] - if data state (see 'refstate' below) is 'common' compute 
+%             average reference, otherwise undo average reference.
 %          2) 1 <= num <= size(data,1): re-reference to channel num. If the 
 %             'withref' method is set, the function computes the previous 
 %             common reference channel.
@@ -19,10 +18,10 @@
 %   'elocs'      - Electrode location structure (e.g., EEG.chanlocs).
 %   'icaweight'  - ICA weight matrix (Note: this should be weights*sphere)
 %   'method'     - ['standard'|'withref'] Include reference channel in output. 
-%   'refstate  ' - ['common'|'averef'|'averefwithref'| Current average reference state.
+%   'refstate  ' - ['common'|'averef'] Current average reference state.
 %                  Use this parameter to re-reference data to a given channel if data
-%                  is already average referenced (by setting it to 'averef' or 
-%                  'averefwithref'). Default is 'common'.
+%                  is already average referenced (by setting it to 'averef') 
+%                  Default is 'common'.
 %   'refloc'     - Reference channel location -- a cell array with name and 
 %                  polar coordinates of the channel, { 'label' theta radius }. 
 %                  For 3-D location, include the reference as the last channel 
@@ -37,11 +36,7 @@
 %
 % Notes: 1) The average reference calculation implements two methods 
 %           (from www.egi.com/Technotes/AverageReference.pdf)
-%           (a) standard: V'i = (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
-%           (b) withref:  V'i = (Vi-Vref) - sum(Vi-Vref)/(number_of_electrodes+1)
-%           Method (b) also allows computing the potential of the common
-%           reference. Note that the common reference can also be included
-%           when re-referencing data.
+%            V'i = (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
 %        2) 'icaweight' conversion of the weight matrix W to average reference:
 %        If ica_act = W*data, then data = inv(W)*ica_act; 
 %        If R*data is the average-referenced data, 
@@ -69,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/13 20:29:41  arno
+% debugging
+%
 % Revision 1.7  2002/11/13 15:12:21  scott
 % help msg
 %
@@ -129,7 +127,7 @@ end;
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'method'     'string'  { 'standard' 'withref' }  '';
-                            'refstate'   'string'  { 'common' 'averef' 'averefwithref' }   'common';
+                            'refstate'   'string'  { 'common' 'averef' }   'common';
                             'refloc'     'cell'    []          {};
                             'elocs'      'struct'  []          [] });
 if isstr(g), error(g); end;
@@ -149,46 +147,30 @@ data = reshape(data, dim1, dim2*dim3);
 % compute potential of reference
 % ------------------------------
 if isempty(ref)
-    if strcmp(g.refstate, 'averef') | strcmp(g.refstate, 'averefwithref')
-        fprintf('Data is already average referenced\n');
-        return;
-    end;
-    if strcmp(g.method, 'withref')
-        avematrix = eye(chans)-ones(chans)/(chans+1);
-        avematrix(end+1,:) = -1/(chans+1); % common reference channel
-        if ~isempty(g.elocs)
-            if (length(g.elocs) == chans) & ~isempty(g.refloc)
-                g.elocs(end+1).labels = g.refloc{1};
-                g.elocs(end  ).theta  = g.refloc{2};
-                g.elocs(end  ).radius = g.refloc{3};
-            elseif length(g.elocs) ~= chans+1
-                error('No location for old common reference, can not introduce it as a new channel');
-            end;
-        end;        
-        meandata = sum(data)/(chans+1);
+    avematrix = eye(chans)-ones(chans)*1/chans;    
+    if strcmp(g.refstate, 'averef')
+        fprintf('Undoing average reference\n');
+        avematrix = pinv(avematrix);
     else 
-        avematrix = eye(chans)-ones(chans)*1/chans;    
-        % electrode structure remain unchanged except if reference electrode is present
-        if ~isempty(g.elocs) & length(g.elocs) > chans
-            g.elocs(end) = [];
-        end;
-        meandata = sum(data)/chans;
+        fprintf('Computing average reference\n');
     end;
+    % electrode structure remain unchanged except if reference electrode is present
+    if ~isempty(g.elocs) & length(g.elocs) > chans
+        g.elocs(end) = [];
+    end;
+    meandata = sum(data)/chans;
 else % common re-reference
      % -------------------
     
     % compute the inverse average transformation matrix
     % -------------------------------------------------
     if strcmp(g.refstate, 'averef')
-        invavematrix = eye(chans-1)-ones(chans-1)*1/chans;
-        invavematrix(end+1,:) = -1/chans; % common reference channel
-        chans = chans -1;
-    elseif strcmp(g.refstate, 'averefwithref')
+        fprintf('Undoing average reference\n');
         invavematrix = eye(chans)-ones(chans)/chans;        
-        'here'
     else 
         invavematrix = [];
     end;
+    fprintf('Re-referencing data\n');
     if strcmp(g.method, 'withref')
         if length(ref) > 1
             % dealing with multiple references
