@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/07/28 17:50:18  arno
+% same
+%
 % Revision 1.39  2003/07/28 17:49:12  arno
 % ref text
 %
@@ -350,7 +353,9 @@ for curfield = tmpfields'
                          end;    
         case 'srate'   , EEGOUT.srate = getfield(g, {1}, curfield{1});
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
-                         if exist( varname ) == 2
+                         if isempty(varname)
+                             EEGOUT.chanlocs = [];
+                         elseif exist( varname ) == 2
                             fprintf('Pop_editset: channel locations file ''%s'' found\n', varname); 
                             EEGOUT.chanlocs = readlocs(varname);
                          else
