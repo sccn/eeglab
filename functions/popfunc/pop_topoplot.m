@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/11/06 01:54:14  arno
+% adding dipole plot
+%
 % Revision 1.33  2003/11/05 20:35:54  arno
 % plot dipoles
 %
@@ -306,19 +309,23 @@ for index = 1:size(arg2(:),1)
 	% add dipole location if present
     % ------------------------------
     options = outoptions;
+    dipoleplotted = 0;
     if plotdip & typeplot == 0
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
             if length(EEG.dipfit.model) >= index
                 curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
                 if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
+                    options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
+                    dipoleplotted = 1;
                 else
                     if  any(curpos(1,:) ~= 0)
                         options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
-                        if nbgraph ~= 1
-                            options = { 'dipscale' 0.6 options{:} };
-                        end;
+                        dipoleplotted = 1;
                     end;
+                end;
+                if nbgraph ~= 1
+                    options = { 'dipscale' 0.6 options{:} };
                 end;
             end;
         end;
@@ -340,9 +347,11 @@ for index = 1:size(arg2(:),1)
             else
                 tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
             end;    			
-			if nbgraph == 1, title( [ 'IC ' int2str(arg2(index)) ' from ' topotitle] );
-			else title(['' int2str(arg2(index))]);
+			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
+			else             texttitle = ['' int2str(arg2(index))];
 			end;
+            if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
+            title(texttitle);
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
