@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/19 00:13:29  scott
+% changed default plays 1000 -> 10
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -69,7 +72,7 @@ else
  fprintf('Movie will play slowly once, then %d times faster forwards and backwards.\n',-ntimes);
 end
 if abs(ntimes) > 7
-	fprintf('   Hit Cntrl-C to abort:  ');
+	fprintf('   Close figure to abort:  ');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%% Show the movie %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
