@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/01 18:22:36  arno
+% making binica available from everywhere
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -71,7 +74,7 @@ if ~exist('SC')
   return
 end;
 if exist(SC) ~= 2
-  fprintf('binica: ica source file ''%s'' is not matlab path, check\n', SC);
+  fprintf('binica: No ica source file ''%s'' is in your Matlab path, check...\n', SC);
   return
 else
 	SC = which(SC);
