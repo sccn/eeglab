@@ -107,8 +107,8 @@
 %                      [R G B] = specifies the marking color; 
 %                      [e1 e2 e3 ...] = a (1,nchans) logical [0|1] vector giving 
 %                         channels (1) to mark and (0) to not mark for rejection.
-%    'color'      - ['on'|'off'|cell array] Plot channels with different colors 
-%                   Entering a nested RGB cell array ({{'r' 'b' 'g'}}), channels will 
+%    'color'      - ['on'|'off'|cell array] Plot channels with different colors.
+%                   Entering a RGB cell array {'r' 'b' 'g'}, channels will 
 %                   be plotted using the cell-array color elements. {default: 'off'}. 
 %    'wincolor'   - [color] Color mark data stretches or epochs  
 %                   {default: [ 0.8345 1 0.956]}
@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2003/05/23 15:11:13  arno
+% allowing cell array of color as input
+%
 % Revision 1.76  2003/03/13 03:04:16  scott
 % commenting error msg
 %
