@@ -43,14 +43,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/07/29 23:43:44  arno
+% Initial revision
+%
 
-function txt = getkeyval(lastcom, var, default, mode)
+function txt = getkeyval(lastcom, var, mode, default)
     % mode can be present for 0 and 1 if the variable is present
 	if nargin < 4
 		default = '';
-	end;
-	if nargin < 3
-		mode = [];
 	end;
 	if isempty(lastcom)
 		txt = default; return;
