@@ -52,6 +52,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/06/11 18:35:45  arno
+% generate specific error
+% for wrong event latencies
+%
 % Revision 1.6  2003/02/27 20:25:30  arno
 % taking the round of regions
 %
@@ -127,7 +131,7 @@ for i=1:size(regions,1)
 		boundevents(index) = boundevents(index) - (regions(i,2)-regions(i,1)+1);
     end;
 end;
-boundevents = boundevents+0.5;
+boundevents = boundevents+1.5;
 
 if isstr(indata)
   disp('Using disk to reject data');
