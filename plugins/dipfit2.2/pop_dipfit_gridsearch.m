@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/10 18:02:19  arno
+% add "Done"
+%
 % Revision 1.1  2005/03/10 18:01:59  arno
 % Initial revision
 %
@@ -125,7 +128,10 @@ if nargin < 2
   end;
   
   % perform batch fit with single dipole for all selected channels and components
+  % warning off;
+  warning backtrace off;  
   EEGOUT = dipfit_gridsearch(EEG, 'component', select, 'xgrid', xgrid, 'ygrid', ygrid, 'zgrid', zgrid, options{:});
+  warning backtrace on;
 
   % FIXME reject is not being used at the moment
   disp('Done');
