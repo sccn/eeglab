@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2003/11/19 22:55:31  arno
+% changing unit
+%
 % Revision 1.74  2003/09/25 00:50:14  arno
 % mapnorm
 %
@@ -661,7 +664,7 @@ if strcmpi(g.plot, 'on')
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',16);
     % yl=ylabel('Rel. Power (dB)');
-    yl=ylabel('Power 10*Log(\muV²/Hz)');
+    yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
     set(yl,'fontsize',16);
     set(gca,'fontsize',16)
     box off;
