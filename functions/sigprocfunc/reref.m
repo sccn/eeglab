@@ -36,11 +36,11 @@
 %
 % Notes: 1) The average reference calculation implements two methods 
 %           (from www.egi.com/Technotes/AverageReference.pdf)
-%            V'i = (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
+%            V'i= (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
 %        2) 'icaweight' conversion of the weight matrix W to average reference:
 %        If ica_act = W*data, then data = inv(W)*ica_act; 
 %        If R*data is the average-referenced data, 
-%        R*data=(R*inv(W))*ica_act and Wout = inv(R*inv(W));
+%        R*data= (R*inv(W))*ica_act and Wout = inv(R*inv(W));
 %        The average-reference ICA maps are the columns of inv(Wout).
 %
 % Authors: Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1999-2002 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/15 02:59:34  arno
+% header for web
+%
 % Revision 1.13  2002/11/15 01:44:44  scott
 % can not -> cannot
 %
