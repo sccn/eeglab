@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/21 00:00:10  scott
+% 'Import Matlab data array' -> 'Import data file or Matlab array' -sm
+%
 % Revision 1.18  2002/04/20 17:19:56  arno
 % adding Done to callbacks
 %
@@ -276,9 +279,9 @@ set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
 	uimenu( neuromenu, 'Label', 'Import data file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'Read .SMA datafile (Snapmaster)'       ,     'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'Read .CNT datafile (Neuroscan continuous)',  'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'Read .EEG datafile (Neuroscan epochs)'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'Read .SMA data file (Snapmaster)'       ,     'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'Read .CNT data file (Neuroscan continuous)',  'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'Read .EEG data file (Neuroscan epochs)'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info'); 
     uimenu( importepoch, 'Label', 'Import Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
 	uimenu( importepoch, 'Label', 'Import .DAT info file (Neuroscan epochs)', 'CallBack', [ check   'eeg_global; [EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
