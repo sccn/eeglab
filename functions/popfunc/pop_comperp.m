@@ -21,6 +21,9 @@
 %   'chans'    - [integer array] Vector of channel or component indices. 
 %                {default: all}.
 %   'title'    - [string] Plot title. {default: none}
+%   'tlim'     - [min max] sub-time window in ms to plot data. Default: whole 
+%                time range.
+%   'ylim'     - [min max] y-axis limits. Default: auto.
 %   'alpha'    - [float] Apply t-test for p=alpha (0<alpha<1). Use paired if
 %                t-test datasub is not empty (two-tailed). If data is empty,
 %                use t-test against a 0 mean dataset with same variance (two-
@@ -78,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/01/30 16:05:16  arno
+% text in legend
+%
 % Revision 1.24  2003/12/04 17:49:06  arno
 % same
 %
@@ -252,6 +258,8 @@ g = finputcheck( options, ...
                    'diffonly' 'string'  {'on' 'off' 'none'}     'none';
                    'allerps'  'string'  {'on' 'off' 'none'}     'none';
                    'lowpass'  'float'    [0 Inf]         [];
+                   'tlim'     'float'    []              [];
+                   'ylim'     'float'    []              [];
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave' 'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
@@ -390,11 +398,24 @@ if ~isempty(g.lowpass)
 end;
 if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
 
+% select time range
+% -----------------
+if ~isempty(g.tlim)
+    pointrange = round(eeg_lat2point(g.tlim/1000, [1 1], srate, [xmin xmax]));
+    g.tlim     = eeg_point2lat(pointrange, [1 1], srate, [xmin xmax]);
+    erptoplot  = reshape(erptoplot, size(erptoplot,1), pnts, size(erptoplot,2)/pnts);
+    erptoplot  = erptoplot(:,[pointrange(1):pointrange(2)],:);
+    pnts       = size(erptoplot,2);
+    erptoplot  = reshape(erptoplot, size(erptoplot,1), pnts*size(erptoplot,3));    
+    xmin = g.tlim(1);
+    xmax = g.tlim(2);
+end;
+
 % plot data
 % ---------
 plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
           'limits', [xmin xmax 0 0]*1000, 'title', g.title, 'colors', colors, ...
-          'chans', g.chans, 'legend', legend, 'regions', regions, g.tplotopt{:});
+          'chans', g.chans, 'legend', legend, 'regions', regions, 'ylim', g.ylim, g.tplotopt{:});
 times = linspace(xmin, xmax, pnts);
 
 if nargin < 3 & nargout == 1
