@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.240  2005/03/07 21:19:40  arno
+% chaninfo
+%
 % Revision 1.239  2005/02/15 02:38:39  arno
 % same
 %
@@ -1167,9 +1170,9 @@ if nargin > 6
 		  Coherflag = NO;
 		  Erpflag = YES;  % plot amp, coher below erp time series
 	  elseif Topoflag == YES;
-		  if length(Arg) ~= 2
+		  if length(Arg) < 2
 			  help erpimage
-			  fprintf('\nerpimage(): topo arg must be a list of length 2.\n');
+			  fprintf('\nerpimage(): topo arg must be a list of length 2 or 3.\n');
 			  return
 		  end
 		  topomap = Arg{1};
