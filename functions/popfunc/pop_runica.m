@@ -61,15 +61,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/10/22 18:10:36  arno
+% typo in gui
+%
 % Revision 1.30  2003/10/15 00:36:33  arno
 % same
 %
 % Revision 1.29  2003/10/15 00:35:41  arno
-% fastica
-%
-%
-%
-%
 % debug fastica
 %
 % Revision 1.28  2003/09/02 21:40:59  lee
@@ -484,11 +482,13 @@ if option_computeica
     EEG.icaact    = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
     EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
 end;
+
 if nargin < 2
-    if length(options < 2)
+    if length(options) < 2
         com = sprintf('%s = pop_runica(%s, ''%s'');', inputname(1), inputname(1), icatype);
     else
         com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1), icatype, options);
     end;
 end;
+com
 return;
