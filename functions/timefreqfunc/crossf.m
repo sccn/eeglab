@@ -19,7 +19,7 @@
 %            if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
-                       = crossf(x,y,frames,tlimits,titl,          ...
+%                       = crossf(x,y,frames,tlimits,titl,          ...
 %                                    srate,cycles,winsize,timesout,...
 %                                              padratio,maxfreq,alpha,verts);
 %
@@ -113,6 +113,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/07 02:24:36  scott
+% worked on hlpe message, changed some defaults -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
