@@ -26,13 +26,13 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
 %                       'head', to edge of head {default 'head'}.
-%   'plotrad'         - [float] plotting radius. (See >> topoplot example). If 
-%                       plotrad > 0.5, plot electrodes in lower head in a circular 
-%                       'skirt' outside the cartoon head outline. {default: max of 0.5 
-%                       and outermost channel radius)}. 
-%   'shrink'          - ['on'|'off'|'force'|factor] 'on': If max channel radius > 0.5, 
+%   'plotrad'         - [0.15<=float<=1.0] plotting radius. (See >> topoplot example). If 
+%                       plotrad > 0.5, plot electrodes in lower head (with arc_length>0.5)
+%                       in a circular 'skirt' outside the cartoon head outline. 
+%                       {default: max of 0.5 and the max channel arc_length)}. 
+%   'shrink'          - ['on'|'off'|'force'|factor] 'on': If max channel arc_length > 0.5, 
 %                        normalize electrode polar coordinates to make the maximum
-%                        radius 0.5 (to plot all locations). 'force': Normalize radius 
+%                        arc_length 0.5 (to plot all locations). 'force': Normalize arc_length 
 %                        so the channel max is 0.5. 'factor': Apply a specified shrink
 %                        factor (range (0,1), fraction of the maximum).
 %                        {default = chan_locs 'shrink' value, if any, else 'off'}
@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.156  2004/03/19 00:30:08  scott
+% plotrad minmax
+%
 % Revision 1.155  2004/03/18 17:05:20  arno
 % fixed plotrad
 %
@@ -413,6 +416,7 @@ HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = 'off';   % shrinking mode
 plotrad      = [];      % plotting radius( [] = aurto )
+MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 DIPOLE  = [];           % dipole defaults
 DIPNORM   = 'off';
 DIPSPHERE = 85;
@@ -441,26 +445,26 @@ if nargs == 1
                'an ascii file consisting of the following four columns:\n',...
                ' channel_number degrees arc_length channel_name\n\n',...
                'Example:\n',...
-               ' 1               -18    .352       Fp1.\n',...
-               ' 2                18    .352       Fp2.\n',...
-               ' 5               -90    .181       C3..\n',...
-               ' 6                90    .181       C4..\n',...
-               ' 7               -90    .500       A1..\n',...
-               ' 8                90    .500       A2..\n',...
-               ' 9              -142    .231       P3..\n',...
-               '10               142    .231       P4..\n',...
-               '11                 0    .181       Fz..\n',...
-               '12                 0    0          Cz..\n',...
-               '13               180    .181       Pz..\n\n',...
-               'The model head sphere has a diameter of 1.\n',...
-               'The vertex (Cz) has arc length 0. Channels with arc \n',...
-               'lengths > 0.5 are not plotted nor used for interpolation.\n'...
-               'Zero degrees is towards the nasion. Positive angles\n',...
-               'point to the right hemisphere; negative to the left.\n',...
-               'Channel names should each be four chars, padded with\n',...
-               'periods (in place of spaces).\n'])
+               ' 1               -18    .352       Fp1 \n',...
+               ' 2                18    .352       Fp2 \n',...
+               ' 5               -90    .181       C3  \n',...
+               ' 6                90    .181       C4  \n',...
+               ' 7               -90    .500       A1  \n',...
+               ' 8                90    .500       A2  \n',...
+               ' 9              -142    .231       P3  \n',...
+               '10               142    .231       P4  \n',...
+               '11                 0    .181       Fz  \n',...
+               '12                 0    0          Cz  \n',...
+               '13               180    .181       Pz  \n\n',...
+               'The model head sphere has a circumference of +/-1.\n',...
+               'The vertex (Cz) has 0 arc_length. Channels with arc_length > 0.5\n',...
+               '(i.e., below head center) are plotted outside the head cartoon\n',...
+               '(unless the shrink option is set). The plotrad option\n',...
+               'controls how much of this lower-head "skirt" is shown. In\n',...
+               'topoplot() coordinates, 0 deg. is towards the nasion. Positive\n',...
+               'angles point to the right hemisphere; negative to the left.\n',...
+               ])
       return
-
     end
   end
 end
@@ -648,32 +652,36 @@ if isstr(shrinkfactor) % if shrink arg is a string option
         if shrinkfactor > 1
             shrinkfactor = 1;
         elseif strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radii shrunk towards vertex by (head radius %2.3g) to plot all\n', ...
+            fprintf('topoplot(): electrode arc_lengths shrunk by (1 -> %2.3g) to plot all\n', ...
                 shrinkfactor);
         end;
 		Rd = Rd*shrinkfactor; % squeeze electrodes by (squeezefac*100)%
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): electrode radii shrunk towards vertex (head radius %2.3g)\n', ...
+        fprintf('topoplot(): electrode arc_lengths shrunk by (1 -> %2.3g)\n',...
                                                                       shrinkfactor);
 	end;
     Rd = Rd/shrinkfactor*rmax; % squeeze electrodes by (squeezefac*100)% 
                         % to fit inside plotting circle
 end;
 
-% skirt mode
+% (default) skirt mode
 % ----------
 if isempty(plotrad)
     plotrad = max(Rd);
+    RESET_PLOTRAD=1;
 end;
-enum = find(Rd <= plotrad);                     % interpolate on-head channels only
+enum = find(Rd <= plotrad);                     % interpolate plotted channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): %d/%d electrodes NOT shown (radius>plotrad)\n', ...
                    length(enum)-length(Rd),length(Rd),plotrad);    
     end; 
 end;	
+if exist('RESET_PLOTRAD') & plotrad<rmax
+  plotrad=rmax;
+end
 if ~isempty(Vl)
 	if length(Vl) == length(Th)
 		Vl = Vl(enum);
@@ -705,7 +713,10 @@ if ~isstr(plotrad) & (plotrad < MINPLOTRAD | plotrad> 1.0)
    error('argument plotrad must be between 0.15 and 1.0');
 end
 if ~isstr(plotrad) & (plotrad < 0.5)
-  fprintf('topoplot(): not plotting nose or ears since plotrad < 0.5\n');
+  fprintf('topoplot(): not plotting nose or ears since plotrad (%5.4g) < 0.5\n',plotrad);
+end
+if ~isstr(shrinkfactor) & (shrinkfactor < 1.0)
+  fprintf('topoplot(): not plotting nose or ears since shrinkfactor (%5.4g) < 1\n',shrinkfactor);
 end
 
 
@@ -718,12 +729,6 @@ else
     Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
 end;	                % to plot all inside the head cartoon
 
-
-if exist('QUAD_SKIRT') % not ready yet!!!
-  if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-   Th = skirt_Th(Th,Rd,rmax*squeezefac);  % rotate the angles of the electrodes in the 'skirt'
-  end
-end
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 %
@@ -807,22 +812,6 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   end
   delta = xi(2)-xi(1); % length of grid entry
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
-%
-if exist('QUAD_SKIRT') % not-ready!!!
- if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-  [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
-  [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
-  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2) > rmax*squeezefac & ...
-         abs(Thi)<pi/4);
-  ii = find(mask == 0);
-  size(ii)
-  Zi(ii) = NaN;
-  keyboard
- end
-end % exist
-  
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%
   %
@@ -917,7 +906,17 @@ end;
 %
 % %%%%%%%%%%%%%%%%%%% Plot electrodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if strcmp(ELECTRODES,'on') 
+plotrad
+for i = 1:size(labels,1)
+  if abs(Rd(i)-plotrad)<0.001   % move electrodes at plotting edge in slightly to show
+    x(i) = x(i)*0.99;
+    y(i) = y(i)*0.99;
+  end
+end
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations only %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if strcmp(ELECTRODES,'on')   % plot electrodes as spots
   if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -933,13 +932,20 @@ if strcmp(ELECTRODES,'on')
    end
   end
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
-elseif strcmp(ELECTRODES,'labels')
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%% print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
     for i = 1:size(labels,1)
     text(y(i),x(i),labels(i,:),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
-elseif strcmp(ELECTRODES,'labelpoint')
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations plus labels %%%%%%%%%%%%%%%%%%%
+%
+elseif strcmp(ELECTRODES,'labelpoint') 
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -961,7 +967,10 @@ elseif strcmp(ELECTRODES,'labelpoint')
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
-elseif strcmp(ELECTRODES,'numpoint')
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
+%
+elseif strcmp(ELECTRODES,'numpoint') 
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -983,6 +992,9 @@ elseif strcmp(ELECTRODES,'numpoint')
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
+%
+%%%%%%%%%%%%%%%%%%%%%%%%% print electrode numbers only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
     text(y(i),x(i),int2str(enum(i)),'HorizontalAlignment','center',...
@@ -1000,7 +1012,6 @@ tip = rmax*1.15; base = rmax-.004;
 EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-
 if isstr('plotrad') % if 'skirt' mode
   sf = squeezefac;
   if sf < 0.99
@@ -1010,20 +1021,24 @@ if isstr('plotrad') % if 'skirt' mode
   end
     plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
-  if plotrad>=0.5
+  if plotrad>=0.5 
+   if isstr(shrinkfactor) | shrinkfactor==1
     plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
     plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
     plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
+   end
   end
 else % no 'skirt'
     plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head
-  if plotrad>=0.5
+  if plotrad>=0.5  
+   if isstr(shrinkfactor) | shrinkfactor==1
     plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
     plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
     plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
+   end
   end
 end
 
