@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/05/22 06:06:28  marissa
+% changed line 1047 to remove nonexistent variable 'baseall'
+%
 % Revision 1.15  2002/05/20 17:58:53  scott
 % adding fprintf info about ampsig plotting -sm
 %
@@ -1434,7 +1437,7 @@ if Erpflag == YES
     end;
  end;
  xticklabel = strvcat(xticklabel);
- erp=nanmean(data');           % compute erp average, ignoring nan's
+ erp=nan_mean(data');           % compute erp average, ignoring nan's
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
@@ -1952,3 +1955,21 @@ end
 pt = [0 100*((1:i)-0.5)./i 100];
 sortdata = [min(data); sortdata; max(data)];
 prctl = interp1(pt,sortdata,pc);
+%
+%%%%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% nan_mean() - take the column means of a matrix, ignoring NaN values
+% 
+function out = nan_mean(in)
+
+   nans = find(isnan(in));
+   in(nans) = 0;
+   sums = sum(in);
+   nonnans = ones(size(in));
+   nonnans(nans) = 0;
+   nonnans = sum(nonnans);
+   nononnans = find(nonnans==0);
+   nonnans(nononnans) = 1;
+   out = sum(in)./nonnans;
+   out(nononnans) = NaN;
