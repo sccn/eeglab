@@ -1,30 +1,35 @@
-% pop_importepoch() - Export epoch information to the event structure array
-%                  of an EEG dataset. If the dataset is the only input, 
-%                  a window pops up to ask for the relevant parameter values.
+% pop_importepoch() - Export epoch and/or epoch event information to the event 
+%                     structure array of an EEG dataset. If the dataset is 
+%                     the only input, a window pops up to ask for the relevant 
+%                     parameter values.
 %
 % Usage:
 %   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, 'key', 'val', ...);
 %
 % Inputs:
-%   EEG              - input dataset
-%   filename         - name of a file or an array with epoch information
-%                      organised in columns. It can be either an array or
-%                      a cell array of values.
-%   fieldlist        - cell array of name of each column in the file.
+%   EEG              - Input EEG dataset
+%   filename         - Name of a file or an array with epoch and/or epoch event
+%                      information organised in columns. It may be either 
+%                      an array or a cell array. 
+%   fieldlist        - {cell array} Name of each column in the file.
 %
 % Optional inputs:
-%   'typefield'        - string indicating the name of the field to use for
-%                      the type of the time-locking event. By default the
-%                      time-locking events are assigned an event with
-%                      latency 0 and type 'tlock-event'.
-%   'latencyfields'    - cell array of fields (defined previously) that 
-%                      contain the latency of an event. These fields are 
-%                      transfered into the event structure of the input dataset.
-%   'timeunit'       - optional latency units in second. Default is that
-%                      latencies are expressed in time points unit.
-%   'headerlines'    - number of line in the file to skip. Default is 0.
-%   'clearevents'    - ['on'|'off'], 'on'=clear the current event array. 
-%                      Default is 'on'.
+%   'typefield'      - ['string'] Name of the field containing the type(s)
+%                      of the epoch time-locking events (at time 0). 
+%                      By default, all the time-locking events are assigned 
+%                      type 'TLE' (for "time-locking event"). 
+%   'latencyfields'  - {cell array} Field names that contain the latency 
+%                      of an event. These fields are transferred into 
+%                      events whose type will be the same as the name of
+%                      the latency field. (Ex: field RT -> type 'RT' events).
+%   'timeunit'       - [float] Optional unit for latencies relative to seconds. 
+%                      Ex: sec -> 1, msec -> 1e-3. Default: assume latencies 
+%                      are in time points (relative to the time-zero time point 
+%                      in the epoch). 
+%   'headerlines'    - [int] Number of header lines in the input file to ignore. 
+%                      {Default 0}.
+%   'clearevents'    - ['on'|'off'], 'on'-> clear the current event array. 
+%                      {Default 'on'}
 %
 % Output:
 %   EEGOUT - EEG dataset with modified event structure
@@ -52,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/10/28 20:35:12  arno
+% new version, different syntax, different text (added optional type)
+%
 % Revision 1.13  2002/08/22 00:01:40  arno
 % adding error message
 %
@@ -112,17 +120,18 @@ if nargin < 2
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];
-    helpstrtype = ['It is not necessary to define a type field for the time locking event.' 10 ...
-			   'By default it is defined as time 0 and type ''tlock-event'' for all epochs'];
+    helpstrtype = ['It is not necessary to define a type field for the time-locking event.' 10 ...
+			   'By default it is defined as time 0 and type ''TLE'' for all epochs'];
     helpstrlat  = ['It is not necessary to define a latency field for epoch information.' 10 ...
-			   'Actually all fields that contain latencies will be imported as different event types.' 10 ...
-			   'For instance, if entering ''rt'', events of type ''rt'' will be created and these events will have a latency'];
+			   'All fields that contain latencies will be imported as different event types.' 10 ...
+			   'For instance, if field ''RT'' contains latencies,' 10 ...
+                           'events of type ''RT'' will be created with latencies given in the RT field'];
 	uilist = { ...
          { 'Style', 'text', 'string', 'Epoch file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''globfile'';' commandload ] }, ...
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'globfile' }, ...
          { }...
-         { 'Style', 'text', 'string', 'All input field (column) names (ex: type latency)', 'fontweight', 'bold' }, { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', 'File input field (col.) names (Include: type latency)', 'fontweight', 'bold' }, { 'Style', 'edit', 'string', '' }, ...
          { 'Style', 'text', 'string', '           Field name containing time locking event type(s)', 'horizontalalignment', 'right', ...
                                       'fontweight', 'bold', 'tooltipstring', helpstrtype },  ...
   		 { 'Style', 'edit', 'string', '' }, ...
@@ -130,11 +139,11 @@ if nargin < 2
          { 'Style', 'text', 'string', '           Field name(s) containing latencies', 'horizontalalignment', 'right', ...
            'fontweight', 'bold', 'tooltipstring', helpstrlat },  ...
   		 { 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'text', 'string', '(ex: rt)', 'tooltipstring', helpstrlat }, ...
+         { 'Style', 'text', 'string', '(Ex: RT)', 'tooltipstring', helpstrlat }, ...
          { } ...
-         { 'Style', 'text', 'string', 'Latency time unit (sec) Ex: 1E-3 = ms', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' }, { } ...         
-         { 'Style', 'text', 'string', 'File header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
-         { 'Style', 'text', 'string', 'Remove current epoch and event info (set=yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
+         { 'Style', 'text', 'string', 'Latency time unit rel. to seconds. Ex: ms -> 1E-3', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' }, { } ...         
+         { 'Style', 'text', 'string', 'Number of file header lines to ignore', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
+         { 'Style', 'text', 'string', 'Remove current epoch and event info (set = yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
     result = inputgui( geometry, uilist, 'pophelp(''pop_importepoch'');', 'Import epoch info (data epochs only) -- pop_importepoch()');
     if length(result) == 0, return; end;
 
@@ -210,7 +219,7 @@ end;
 otherfieldlist = setdiff( fieldlist, g.latencyfields);
 otherfieldlist = setdiff( otherfieldlist, g.typefield);
 if size(values,1) ~= EEG.trials
-    error('Pop_importepoch error: the number of row of the input file/array does not match the number of trials');
+    error('Pop_importepoch() error: the number of rows in the input file/array does not match the number of trials');
 end;    
 
 % create epoch array info
@@ -269,7 +278,7 @@ for trial = 1:EEG.trials
     if ~isempty(g.typefield)
         eval( ['EEG.event(end).type = EEG.epoch(trial).' g.typefield ';'] );
     else 
-        EEG.event(end).type = 'tlock-event';
+        EEG.event(end).type = 'TLE';
     end;
     eval( ['EEG.event(end).latency = EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
 end;
