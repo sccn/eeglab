@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/05/19 23:00:10  arno
+% debug last
+%
 % Revision 1.47  2003/05/19 22:55:47  arno
 % implementing lowmem option for bootstrap
 %
@@ -728,7 +731,7 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs)
+if strcmpi(g.lowmem, 'on') & ~iscell(X) & length(X) ~= g.frame & (isempty(g.nfreqs) | g.nfreqs ~= 1)
     
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
@@ -807,11 +810,11 @@ if iscell(X)
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
-                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:});
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1}, vararginori{:}, 'lowmem', 'off');
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, ...
-                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:});
+                          'shuffle', g.shuffle{1}, 'subitc', g.subitc{1},  vararginori{:}, 'lowmem', 'off');
 	end;
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
@@ -822,11 +825,11 @@ if iscell(X)
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
-                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:}, 'lowmem', 'off');
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, ...
-                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:});
+                            'shuffle', g.shuffle{2}, 'subitc', g.subitc{2}, vararginori{:}, 'lowmem', 'off' );
 	end;
 	%figure; imagesc(abs( sum( savecoher1 ./ abs(savecoher1), 3)) - abs( sum( savecoher2 ./ abs(savecoher2), 3)  )); cbar; return;
 	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
@@ -869,6 +872,7 @@ if iscell(X)
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
           if strcmpi(g.lowmem, 'on')
+              size(savecoher1,1)
               for ind = 1:2:size(savecoher1,1)
                   [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
                       'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) } );
