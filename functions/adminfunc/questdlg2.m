@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/13 17:29:35  arno
+% new superguicall
+%
 % Revision 1.4  2002/08/12 18:49:20  arno
 % header
 %
@@ -46,7 +49,11 @@ if nargin < 2
    help questdlg2;
    return;
 end;
-	
+if Prompt(end) == 10, Prompt(end) = []; end;
+if Prompt(end) == 10, Prompt(end) = []; end;
+if Prompt(end) == 10, Prompt(end) = []; end;
+if Prompt(end) == 10, Prompt(end) = []; end;
+
 fig = figure;
 set(gcf, 'name', Title);
 
@@ -62,7 +69,12 @@ for index = 1:length(varargin)-1 % ignoring default val
 	end;
 end;
 
-[tmp tmp2 allobj] = supergui( geometry, [size(Prompt,1) 1], listui{:} );
+cr = length(find(Prompt == char(10)))+1;
+if cr == 1
+	cr = size(Prompt,1);
+end;
+
+[tmp tmp2 allobj] = supergui( geometry, [cr 1], listui{:} );
 
 waitfor( fig, 'userdata');
 try,
