@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.219  2003/02/03 22:30:29  arno
+% adding output command call to history
+%
 % Revision 1.218  2003/02/03 22:24:45  arno
 % removing output if no output
 %
@@ -864,6 +867,9 @@ if nargin < 1 | exist('EEG') ~= 1
 	eeg_global;
 	EEG = eeg_emptyset;
 	h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
+    if get(0, 'screendepth') <= 8
+        disp('Warning: screen color depth too low, some colors will be inacurate in time-frequency plots');
+    end;
 end;
 
 besamenu = 0;
