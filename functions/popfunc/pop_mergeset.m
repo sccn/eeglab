@@ -2,14 +2,14 @@
 %                  a window pops up to ask for other arguments.
 % Usage:
 %   >> OUTEEG = pop_mergeset( INEEG1, INEEG2, keepall);
-%   >> OUTEEG = pop_mergeset( ALLEEG ); % pop_up window
 %   >> OUTEEG = pop_mergeset( ALLEEG, indices, keepall);
+%   >> OUTEEG = pop_mergeset( ALLEEG ); % use a pop_up window
 %
 % Inputs:
 %  INEEG1  - first input dataset
 %  INEEG2  - second input dataset
-%  ALLEEG  - array of dataset structure
-%  indices - indices of dataset to merge. 
+%  ALLEEG  - array of dataset structures
+%  indices - indices of datasets to merge. 
 %  keepall - [0|1] 0 -> remove or 1 -> preserve ICA activations 
 %            of the first dataset and recompute the activations 
 %            of the merged data.
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/11/18 16:50:36  scott
+% text
+%
 % Revision 1.13  2003/01/24 19:43:50  arno
 % same
 %
@@ -92,15 +95,15 @@ if nargin < 1
 	return;
 end;
 if isempty(INEEG1)
-	error('Pop_merge: need at least 2 datasets');
+	error('Pop_merge: needs at least two datasets');
 end;
 if nargin < 2 & length(INEEG1) == 1
-	error('Pop_merge: need at least 2 datasets');
+	error('Pop_merge: needs at least two datasets');
 end;
 
 if nargin == 1
 	promptstr    = { 'Dataset indices to merge', ...
-					 'Preserve ICA of the first dataset ?' };
+					 'Preserve ICA weights of the first dataset ?' };
 	inistr       = { '1', 'no' };
 	result       = inputdlg2( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr, 'pop_mergeset');
 	size_result  = size( result );
