@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/18 16:14:25  scott
+% EEG.averef = 'No' by default -sm
+%
 % Revision 1.17  2002/04/18 02:37:54  scott
 % [same] -sm
 %
@@ -447,7 +450,7 @@ if ~isempty( varargin)
 		 case 'event', 
 		  if isempty(EEG.event)
 			  errordlg([ 'Cannot process if no events. First add events.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
-			  error('eeg_checkset: data epochs must be extracted before running that function');
+			  error('eeg_checkset: no events');
 		  end;
 		 case 'chanloc', 
 		  if isempty(EEG.chanlocs)
