@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/04/10 17:56:09  arno
+% removing debuging message
+%
 % Revision 1.3  2003/04/10 17:50:11  arno
 % adding error message
 %
@@ -139,14 +142,17 @@ event.size=fread(f, 1, 'long');
 %event.offset=fread(f, 1, 'long')
 
 if r.event.type==1
-    event.bytes=8;
+    event.bytes =8;
+    r.nevent    = event.size/event.bytes;
 elseif r.event.type==2
-    event.bytes=19;
+    event.bytes = 19;
+    r.nevent    = event.size/event.bytes;
 else
-    error('File format error');
+    event.bytes = 19;
+    r.nevent    = 0;
+    disp('Warning: event type is 0 (potential problem)');
 end
 
-r.nevent=event.size/event.bytes;
 r.event.stimtype=freadat(f, event.tablepos+9, r.nevent, 'short', event.bytes);  % stimtype
 r.event.keyboard=freadat(f, event.tablepos+9+2, r.nevent, 'uchar', event.bytes);  % keyboard
 r.event.keypadaccept=freadat(f, event.tablepos+9+3, r.nevent, 'uchar', event.bytes);  % keypadaccept
@@ -239,11 +245,11 @@ if ~isempty(ldchan)
       end
       
    else
-      r.dat=zeros(ldnsamples, length(ldchan));
-      for j=1:length(ldchan)
-         dat=freadat(f, startpos+(ldchan(j)-1)*2, ldnsamples, 'short', (r.nchannels-1)*2);
-         r.dat(:,j)=r.microvoltscalar(ldchan(j))*(dat'-r.chan.baseline(ldchan(j)));
-      end
+       r.dat=zeros(ldnsamples, length(ldchan));
+       for j=1:length(ldchan)
+           dat=freadat(f, startpos+(ldchan(j)-1)*2, ldnsamples, 'short', (r.nchannels-1)*2);
+           r.dat(:,j)=r.microvoltscalar(ldchan(j))*(dat'-r.chan.baseline(ldchan(j)));
+       end
    end
 end
 
