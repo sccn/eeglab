@@ -3,16 +3,51 @@
 % Usage:
 %   >> OUTEEG = pop_select(INEEG, 'key1', value1, 'key2', value2 ...);
 %
+% Graphic interface:
+%   "Time range" - [edit box] time range [low high] in ms. For data epochs,
+%                  it is not possible to remove a slice of time (i.e. 
+%                  either low=0 or high=max time). For continuous data
+%                  several intervals can be separated by commas. For 
+%                  instance "0 10; 12 100" will remove the portion of data
+%                  from 10 to 12 and from 100 to the maximal time.
+%                  Command line equivalent: 'time' and 'notime'
+%   "Time range" - [checkbox] by checking the checkbox, the regions
+%                  selected will be removed. Command line equivalent: 'time' 
+%                  [unchecked] and 'notime' [checked]
+%   "Frame range" - [edit box] select frame vector instead of time range.
+%                  the same restriction as for time range applies. Note that
+%                  for continuous data, unlike in the "Time range" edit box  
+%                  it is not possible to enter several portion of data.
+%                  Command line equivalent: 'point' and 'nopoint'
+%   "Frame range" - [checkbox] see "Time range" checkbox. Command line 
+%                  equivalent: 'point' [unchecked] and 'nopoint' [checked]
+%   "Epoch range" - [edit box] select data epoch indices. This checkbox is
+%                  only visible for data epochs. 
+%                  Command line equivalent: 'trial' and 'notrial'
+%   "Epoch range" - [checkbox] invert epoch selection. Command line
+%                  equivalent: 'trial' [unchecked] and 'notrial' [checked]
+%   "Channel rangee" - [edit box] select data channel indices.
+%                  Command line equivalent: 'channel' and 'nochannel'
+%   "Channel range" - [checkbox] invert channel selection. Command line
+%                  equivalent: 'channel' [unchecked] and 'nochannel' [checked]
+%   "Scroll dataset" - [button] call the eegplot function to scroll
+%                  channel activities.
+%
 % Inputs:
 %   INEEG         - input dataset
 %
 % Optional inputs
-%   'time'        - time range to include [min max] in milliseconds 
-%   'notime'      - time range to exclude [min max] in milliseconds.
+%   'time'        - time range to include [min max] in milliseconds. For
+%                   continuous data, can be [min max] x n to select 
+%                   several regions.
+%   'notime'      - time range to exclude [min max] in milliseconds.For
+%                   continuous data, can be [min max] x n to select 
+%                   several regions.
 %                   It is not possible however to create a "gap" in the
 %                   the middle of data trials.
-%   'point'       - frame vector to include in points,
-%                   the time range is recalculated automatically.
+%   'point'       - frame vector to include in points. The vector must
+%                   continuous so the time range is recalculated 
+%                   automatically.
 %   'nopoint'     - frame vector to exclude in points. If points and
 %                   time is set, only the point vector is taken into
 %                   account.
@@ -52,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/02/27 03:16:02  arno
+% debugging for continuous dataset (time selection)
+%
 % Revision 1.21  2003/01/14 00:28:21  arno
 % implementing new time selection (using the epoch function)
 %
