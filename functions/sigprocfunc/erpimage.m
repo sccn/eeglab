@@ -38,7 +38,7 @@
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 3-cycle 
+% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 
 %                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
 %                gives percent of trials to reject for low amplitude. Else if in range
 %               [-100,0], gives percent of trials to reject for high amplitude.
@@ -142,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2003/04/23 01:05:55  arno
+% changing default cycle for coherence
+%
 % Revision 1.84  2003/04/18 17:20:13  arno
 % noshow option
 %
