@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/10 18:04:50  arno
+% default argument
+%
 % Revision 1.8  2003/04/10 18:03:54  arno
 % default filters
 %
@@ -84,7 +87,7 @@ else
     EEG.filename = filename;
 end;
 EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
-EEG = eeg_checkset(EEG);
+EEG = eeg_checkset(EEG, 'eventconsistency');
 
 command = sprintf('EEG = pop_read_erpss(''%s'');',filename); 
 return;
