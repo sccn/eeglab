@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2003/03/07 22:11:58  scott
+% debugging axcopy call
+%
 % Revision 1.76  2003/03/07 22:09:47  scott
 % typo
 %
@@ -2351,7 +2354,7 @@ limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
 %   
 eegstr = 'img=get(gca,''''children''''); if (strcmp(img(end),''''type''''),''''image''''), img=get(img(end),''''CData''''); times=get(img(end),''''Xdata''''); clf; args = [''''limits'''' '''','''' times(1) '''','''' times(end)]; if exist(''''EEG'''')==1, args = [args '''','''' ''''srate'''' '''','''' EEG.srate]; end eegplot(img,args); end';
 % axcopy(gcf,eegstr);
-axcopy(gcf,'gca')
+axcopy(gcf,'fprintf(''''%g\n'''',gca)')
 
 % turn on popup zoom windows
 
