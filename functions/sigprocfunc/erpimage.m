@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2003/07/21 21:38:32  scott
+% debug
+%
 % Revision 1.114  2003/07/21 21:36:36  scott
 % debug
 %
@@ -2026,7 +2029,7 @@ if strcmpi(noshow, 'no')
             fprintf('Overplotting sorted sortvar on data.\n');
         end
         hold on; 
-        if TIMEX      % overplot aligned sortvar on image
+        if TIMEX      % overplot re-aligned 0 time on image
             plot([aligntime aligntime],[min(outtrials) max(outtrials)],'k','LineWidth',SORTWIDTH);
         else
             plot([[min(outtrials) max(outtrials)],aligntime aligntime],'k','LineWidth',SORTWIDTH);
@@ -2034,7 +2037,10 @@ if strcmpi(noshow, 'no')
         fprintf('Overplotting realigned times-zero on data.\n');
         hold on; 
         
-        if TIMEX      % overplot realigned 0-time on image
+        if TIMEX      % overplot realigned sortvar on image
+aligntime
+size(outsort)
+size(outtrials)
             plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
         else
             plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
