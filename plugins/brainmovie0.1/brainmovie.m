@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/04/24 01:56:43  arno
+% fixing coordinate problem
+%
 % Revision 1.43  2003/04/23 02:11:07  arno
 % dotted thicker
 %
@@ -474,7 +477,7 @@ if size(g.circfactor,1) ~= size(g.circfactor,2)
 	disp('Error: Circfactor must be a square matrix'); return;
 end;
 if size(g.circfactor,1) ~= size(g.coordinates,1)
-	disp('Error: Circfactor must have the same number of rows as the length of coordinates'); return;
+	disp('Error: Circfactor must have the same number of rows as the number of rows of coordinates'); return;
 end;
 if nbcomponents ~= size(g.coordinates,1)
 	disp('Error: The array of selected components must have length nrows of the array coordinates'); return;
