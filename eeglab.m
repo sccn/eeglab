@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.177  2002/10/23 15:33:56  arno
+% put warning for chan edit
+%
 % Revision 1.176  2002/10/15 17:18:46  arno
 % visible off and on
 %
@@ -822,7 +825,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'About this dataset', 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store]);
 	uimenu( second_m, 'Label', 'Channel locations'   , 'CallBack', [ 'disp(''IMPORTANT: Close the channel editing window to import channels'');' ...
                         'disp(''WARNING: the number of channel information must match the number of'');' ... 
-                        'disp(''         data channels (otherwise channel''s info is ignored)'');' ...
+                        'disp(''         data channels (otherwise channel''''s info is ignored)'');' ...
                         'disp(''TIP: to edit channel info only type "chanlocs = pop_chanedit([]);" from the command line'');' ...
     '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
