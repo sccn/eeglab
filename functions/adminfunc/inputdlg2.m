@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 16:17:49  arno
+% 2 lines
+%
 % Revision 1.3  2002/08/12 16:03:48  arno
 % [Avertical gui if only 1 input
 %
@@ -68,14 +71,12 @@ geometry = {};
 listgui = {};
 for index = 1:length(Prompt)
 	if length(Prompt) == 1
-		geometry = { geometry{:} [ 1] [1] [1 ]};
-		listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
-				{ 'Style', 'text', 'string', 'test'} { 'Style', 'edit', 'string', DefAns{index} } };
+		geometry = { geometry{:} [ 1] [1 ]};
 	else
 		geometry = { geometry{:} [ 1 1 ]};
-		listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
-				{ 'Style', 'edit', 'string', DefAns{index} } };
 	end;
+	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
+				{ 'Style', 'edit', 'string', DefAns{index} } };
 end;
 
 result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title);
