@@ -65,6 +65,7 @@
 % pophelp()       - format the help header  !!!
 % readedf()       - read binary EEG EDF file
 % readegi()       - read binary EEG EGI file 
+% readerpss()     - read ERPSS data 
 % readegihdr()    - read binary EEG EGI file header
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
@@ -89,6 +90,7 @@
 % pop_loadcnt()   - load Neuroscan .CNT data (lndcnt())
 % pop_loadeeg()   - load Neuroscan .EEG data (loadeeg())
 % pop_plotdata()  - plot data epochs in rectangular array (plotdata())
+% pop_read_erpss() - read ERPSS data (read_erpss())
 % pop_readegi()   - load binary EGI data file (readegi())
 % pop_rejkurt()   - compute data kurtosis (rejkurt())
 % pop_rejtrend()  - reject EEG epochs showing linear trends  (rejtrend())
@@ -179,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.212  2003/01/17 16:03:17  arno
+% fixing window update problem for delete
+%
 % Revision 1.211  2003/01/10 01:15:28  arno
 % do not redaw eeglab when only plotting
 %
@@ -913,6 +918,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From .BDF and Biosemi .EDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
 
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
