@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.145  2004/02/25 15:19:38  scott
+% not allowing shrink to be negative
+%
 % Revision 1.144  2004/02/23 16:55:51  scott
 % don't let ears go outside axes if shrink is 'skirt' but shrink factor is 0 or small
 %
@@ -927,10 +930,10 @@ EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 
-if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt') % if 'skirt' mode
   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot ksirt outline
-  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+5); % hide the disk edge jaggiess with BACKCOLOR
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
+  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);         % hide the disk edge jaggies 
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
@@ -1009,8 +1012,8 @@ axis off
 axis square; % keep head round!
 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%
-%
+%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%%%%
+% NOT IN USE
 function [newTh] = skirt_Th(Th,Rd,maxr)
    pi2 = pi/2;
    q1 = find(Th>=0 & Th<pi/2 & Rd>maxr); % electrodes to move
