@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/05/16 15:55:44  arno
+% debuging ticks
+%
 % Revision 1.27  2003/05/02 21:56:27  arno
 % adding low mem option
 %
@@ -734,7 +737,7 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs)
+if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(X)
     
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
@@ -794,11 +797,11 @@ if iscell(X)
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
     [P1,R1,mbase1,times,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
-                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:});
+                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
 	fprintf('\nRunning newtimef on condition 2 *********************\n');
     [P2,R2,mbase2,times,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
-                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:});
+                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
     % recompute baselines for power
     % -----------------------------
@@ -847,20 +850,47 @@ if iscell(X)
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
 		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3)*length(X) )'] };
-		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                                    { alltfX1power alltfX2power }, {alltfX1 alltfX2});
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+                      condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                               { alltfX1power(ind:ind+1,:,:) alltfX2power(ind:ind+1,:,:) }, {alltfX1(ind:ind+1,:,:) alltfX2(ind:ind+1,:,:)});
+              end;     
+          else
+              [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                                                       { alltfX1power alltfX2power }, {alltfX1 alltfX2});
+          end; 
 		 case 'phasecoher2', % normalize first to speed up
 		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X),3)'] }; 
 		  alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed 
 		  alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,X)) instead of arg3(:,:,X))
-		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                                    { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+                      condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                               { alltfX1power(ind:ind+1,:,:) alltfX2power(ind:ind+1,:,:) }, {alltfX1(ind:ind+1,:,:) ...
+                                      alltfX2(ind:ind+1,:,:)}, { alltfX1abs(ind:ind+1,:,:) alltfX2abs(ind:ind+1,:,:) });
+              end;     
+          else
+              [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                                                       { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
+          end; 
 		 case 'phasecoher',
-		  alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));
-		  alltfX2norm = alltfX2./sqrt(alltfX2.*conj(alltfX2)); % maybe have to suppress preprocessing -> lot of memory
 		  formula = { formula{1} ['mean(arg2(:,:,X),3)'] }; 
-		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
-                                                   { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  alltfX1norm = alltfX1(ind:ind+1,:,:)./sqrt(alltfX1(ind:ind+1,:,:).*conj(alltfX1(ind:ind+1,:,:)));
+                  alltfX2norm = alltfX2(ind:ind+1,:,:)./sqrt(alltfX2(ind:ind+1,:,:).*conj(alltfX2(ind:ind+1,:,:)));
+                  [resdiff(ind:ind+1,:,:) resimages(ind:ind+1,:,:) res1(ind:ind+1,:,:) res2(ind:ind+1,:,:)] = ...
+                      condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                               { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
+              end;     
+          else
+              alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));
+              alltfX2norm = alltfX2./sqrt(alltfX2.*conj(alltfX2)); % maybe have to suppress preprocessing -> lot of memory
+              [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
+                                                       { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
+          end; 
 		end;
         
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
