@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.82  2004/05/05 15:24:00  scott
+%working on sphere coloring -> ????????
+%
 %Revision 1.81  2004/05/05 01:17:27  scott
 %added spheresize
 %
@@ -822,7 +825,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                         ys*g.spheresize+yy(q),...
                         zs*g.spheresize+zz(q),...
                    'cdatamapping','direct',...
-                   'facecolor',spherecolor)  % draw the 3-D sphere - last arg pairs NOT SET ????
+                   'facecolor',spherecolor); % draw the 3-D sphere - last arg pairs NOT SET ????
 
                   options = {'FaceColor','texturemap', 'EdgeColor','none', ...
                               'CDataMapping','direct','tag','img', 'facelighting','none' };
