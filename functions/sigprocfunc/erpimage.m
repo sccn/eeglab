@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2003/11/13 02:32:42  scott
+% fill the dB signif limits
+%
 % Revision 1.169  2003/11/13 02:29:51  scott
 % debug
 %
@@ -2445,6 +2448,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     if Erpstdflag == YES
         plot1erp(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
+        erpsig = [erpsig;-erpsig];
         plot1erp(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
     else
         plot1erp(ax2,times,erp,limit); % plot ERP alone
@@ -2633,6 +2637,7 @@ if ~isnan(coherfreq)
         fprintf('     relative to baseamp: %g dB\n',baseamp);
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
+                ampsiglims = [ampsiglims;-ampsiglims];
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
         else
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
@@ -2727,7 +2732,12 @@ if ~isnan(coherfreq)
         if isnan(mincoh)
             mincoh = 0;
         end
-        coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
+        if Cohsigflag % plot coherence significance level
+            cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
+            coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims); % plot COHER
+        else
+            coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
+        end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
             % x=median sort value
@@ -2773,11 +2783,11 @@ if ~isnan(coherfreq)
         set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
         drawnow
         
-        if Cohsigflag % plot coherence significance level
-            hold on
-            plot([timelimits(1) timelimits(2)],[cohsig cohsig],'r',...
-                 'linewidth',SIGNIFWIDTH);
-        end
+        %if Cohsigflag % plot coherence significance level
+            %hold on
+            %plot([timelimits(1) timelimits(2)],[cohsig cohsig],'r',...
+                 %'linewidth',SIGNIFWIDTH);
+        %end
         
         set(ax4,'Box','off','color',BACKCOLOR);
         set(ax4,'Fontsize',TICKFONT);
@@ -2897,15 +2907,15 @@ return
 %
 function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
 %                           if signif is NaN, plot erp +/- stdev
-%                           else if signif, plot erp and +/-signif
+%                           else if signif, plot erp and signif(1,:)&signif(2,:) fill
 %                           else, plot erp alone
   FILLCOLOR    = [1 .7 .7];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
-  if exist('signif') == 1 
+  if exist('signif') == 1  % (2,times) array giving upper and lower signif limits
     if ~isnan(signif);
       filltimes = [times times(end:-1:1)];
-      fillsignif = [signif -1*signif(end:-1:1)];
+      fillsignif = [signif(1,:) -1*signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
       set(fillh,'edgecolor',FILLCOLOR);
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
