@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.269  2003/11/25 22:55:08  arno
+% same
+%
 % Revision 1.268  2003/11/25 22:54:05  arno
 % polugin menu color
 %
@@ -1281,11 +1284,11 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     eventsub_m  = findobj('parent', importevent);
     exportsub_m = findobj('parent', exportm);
     PLUGIN_COL = 'r';
-    if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGIN_COL); end;
-    if length(importsub_m) > 10, set(importsub_m(1:end-10), 'foregroundcolor', PLUGIN_COL); end;
-    if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGIN_COL); end;
-    if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGIN_COL); end;
-    if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGIN_COL); end;
+    if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(importsub_m) > 10, set(importsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
