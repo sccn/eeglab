@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/11/27 02:44:15  arno
+% header typo
+%
 % Revision 1.5  2002/12/27 23:25:45  scott
 % edit header msg -sm
 %
@@ -75,22 +78,23 @@ index = 1;
 tmpstr = fgetl(fid);
 noteof = 1;
 while noteof
-  if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
-    if (tmpstr(1) == '%') & (tmpstr(2) == 'N')
-      tmpstr = deblank( tmpstr(end:-1:3) );
-      eloc(index).labels = deblank(tmpstr(end:-1:1));
-      tmpstr = fgetl(fid);
-      tmp = sscanf(tmpstr, '%f');
-      eloc(index).X  = tmp(1); x(index) = tmp(1);
-      eloc(index).Y  = tmp(2); y(index) = tmp(2);
-      eloc(index).Z  = tmp(3); z(index) = tmp(3);
-      index = index + 1;
+    if ~isempty(deblank(tmpstr))
+        if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
+            if (tmpstr(1) == '%') & (tmpstr(2) == 'N')
+                eloc(index).labels =  strtok( tmpstr(3:end) );
+                tmpstr = fgetl(fid);
+                tmp = sscanf(tmpstr, '%f');
+                eloc(index).X  = tmp(1); x(index) = tmp(1);
+                eloc(index).Y  = tmp(2); y(index) = tmp(2);
+                eloc(index).Z  = tmp(3); z(index) = tmp(3);
+                index = index + 1;
+            end;
+        end;
     end;
-  end;
-  tmpstr = fgetl(fid);
-  if ~isstr(tmpstr) & tmpstr == -1
-    noteof = 0;
-  end;  
+    tmpstr = fgetl(fid);
+    if ~isstr(tmpstr) & tmpstr == -1
+        noteof = 0;
+    end;  
 end;  
 
 names = { eloc.labels };
