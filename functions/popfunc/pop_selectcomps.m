@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/09/04 23:24:34  arno
+% updating pop_compprop -> pop_prop
+%
 % Revision 1.11  2002/08/19 22:05:37  arno
 % removing comment
 %
@@ -160,7 +163,7 @@ for ri = compnum
 		% plot the button
 		% ---------------
 		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)]);
-		command = sprintf('pop_prop( %s, 1, %d, %3.15f);', inputname(1), ri, button);
+		command = sprintf('pop_prop( %s, 0, %d, %3.15f);', inputname(1), ri, button);
 		set( button, 'callback', command );
 	end;
 	set( button, 'backgroundcolor', eval(fastif(EEG.reject.gcompreject(ri), COLREJ,COLACC)), 'string', int2str(ri)); 	
