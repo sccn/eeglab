@@ -13,7 +13,8 @@
 %   title      - plot title
 %
 % Optional inputs:
-%   'key','val' - optional topoplot() arguments (see >> help topoplot())
+%   'key','val' - optional spectopo() and topoplot() arguments 
+%                 (see >> help topoplot())
 %
 % Outputs: Same as envtopo(). When nargin < 3, a query window pops-up 
 %          to ask for additional arguments and no outputs are returned.
@@ -41,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/05 01:52:51  arno
+% adapt to new syntax (but still using old convension)
+%
 % Revision 1.9  2002/10/05 01:07:12  arno
 % debugging function call
 %
