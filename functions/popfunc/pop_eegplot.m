@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/15 19:52:53  arno
+% do not plot channel names for ICA continuous data
+%
 % Revision 1.17  2002/11/12 19:20:26  arno
 % warning for rejecting continuous data
 %
@@ -189,7 +192,7 @@ else % case of a single trial (continuous data)
                              'boundary markers in the event table).'), 'Warning', 'Cancel', 'Continue', 'Continue');
         if strcmpi(res, 'Cancel'), return; end;
     end; 
-    eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500] };
+    eegplotoptions = { 'winlength', 5 };
     if ~isempty(EEG.chanlocs) & icacomp
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
     end;
