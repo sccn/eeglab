@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2004/01/06 17:00:37  arno
+% header typo
+%
 % Revision 1.65  2003/12/03 02:32:41  arno
 % verbose option
 %
@@ -496,6 +499,7 @@ try, g.type;       catch, g.type = 'phasecoher'; end;
 try, g.phsamp;     catch, g.phsamp = 'off'; end;
 try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
+try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
 
 % testing arguments consistency
@@ -1020,6 +1024,9 @@ switch lower(g.plotersp)
     else
         imagesc(times,freqs(dispf),PP(dispf,:));
     end;
+	if ~isempty(g.erspmax)
+		caxis([-g.erspmax g.erspmax]);
+	end;
     
 	hold on
 	plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % plot time 0
