@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/09/17 02:13:53  arno
+% allow automatic run
+%
 % Revision 1.6  2003/09/16 23:34:21  arno
 % debug channel location
 %
@@ -446,11 +449,15 @@ figure('Position',pos+9*off);
 
 % [Movie,Colormap] = eegmovie(data,srate,elec_locs,title,movieframes,minmax);
 
+try,
   [Movie,Colormap] = eegmovie(data(:,313:412),srate,chan_locs,...
                                               'Demo of eegmovie()',75:85,0);
 % Display the movie slowly, then 5 times forward/back
 %
   seemovie(Movie,-5,Colormap); 
+catch,
+    disp('Problem generating movie');
+end;
 
 if ~exist('icademoauto')
     fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
