@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/07/26 02:11:02  arno
+% debugging max limits
+%
 % Revision 1.20  2002/07/26 01:15:49  arno
 % adding percentage of variance
 %
@@ -435,15 +438,21 @@ if ~isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% indicate component contribution %
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	maxdatadb = max(eegspecdBtoplot(:,freqidx(1)));
-	[tmp indexfreq] = min(abs(g.freq-freqs));
-	for index = 1:length(g.icacomps)
-		if strcmp(g.icamode, 'normal')
-			resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-		else
-			resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+	if g.plotchan ~= 0
+		maxdatadb = max(eegspecdBtoplot(:,freqidx(1)));
+		[tmp indexfreq] = min(abs(g.freq-freqs));
+		for index = 1:length(g.icacomps)
+			if strcmp(g.icamode, 'normal')
+				resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+				fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
+			else
+				resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+				fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar);
+			end;
 		end;
-		fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
+	else
+		fprintf(['Warning: can not compute component percentage contribution\n' ...
+				 'when considering global power (i.e. when using ''plotchan'', 0)\n');
 	end;
 end;
 
