@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2003/09/08 15:12:50  arno
+% & -> &&
+%
 % Revision 1.70  2003/09/02 20:40:40  scott
 % help msg
 %
@@ -962,7 +965,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                     if g.boundaries(n+1) - g.boundaries(n) >= winlength % ignore segments of less than winlength
                         [tmpspec,freqs] =  pwelch(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
                                                winlength,g.overlap,fftlength,srate);
-                        if c==1 && n==1 & e==epoch_subset(1)
+                        if exist('eegspec') ~= 1
                             eegspec = zeros(nchans,length(freqs));
                             specstd = zeros(nchans,length(freqs));
                         end
