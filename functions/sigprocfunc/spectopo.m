@@ -24,8 +24,8 @@
 %        percent = downsampling factor or approximate percentage of the data to
 %                  keep while computing spectra. Downsampling can help to speed up
 %                  the computation. From 0 to 1 {default: 1}
-%        'key','val' = optional topoplot() arguments (see topoplot())
-% and/or 'reref','averef'= convert input data to average reference 
+%        'reref','averef'= convert input data to average reference 
+%then/or 'key','val' = optional topoplot() arguments (see topoplot())
 %
 % Outputs:
 %        spectra = (nchans,nfreqs) power spectra (average over epochs) in dB
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/07 22:38:27  scott
+% adding 'reref','averef' option -sm
+%
 % Revision 1.3  2002/04/21 00:38:25  scott
 % 'Selecting randomly' -> 'Randomly selecting' -sm
 %
