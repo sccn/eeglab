@@ -8,6 +8,7 @@
 %    EEG.filepath     - filepath of the dataset
 %    EEG.chanlocs     - structure array containing names and positions 
 %                       of the channels on the scalp
+%    EEG.urchanlocs   - original chanlocs structure
 %    EEG.pnts         - number of time points (data frames) per epoch (trial).
 %                       OR if data is continuous, total number of time points
 %    EEG.nbchan       - number of channels
@@ -92,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2003/11/18 16:42:30  scott
+% text labels
+%
 % Revision 1.107  2003/11/05 16:20:27  arno
 % homogenous -> homogeneous
 %
@@ -760,6 +764,13 @@ if ~isempty( EEG.chanlocs )
             end;
         end;
     end;
+end;
+if ~isfield(EEG, 'urchanlocs')
+    EEG.urchanlocs = EEG.chanlocs
+    %for index = 1:length(EEG.chanlocs)
+    %    EEG.chanlocs(index).urchan = index;
+    %end;
+    disp('Note: creating backup chanlocs structure (urchanlocs)');
 end;
 
 % check reference
