@@ -2,20 +2,36 @@
 %              directories 
 %
 % Usage: 
-%   >> makehtml( directorylist, outputdir, titlelist, matlabhelp);
-%   >> makehtml( directorylist, outputdir, titlelist, matlabhelp, ...
+%   >> makehtml( list, outputdir);
+%   >> makehtml( list, outputdir, ...
 %               'key1', val1, 'key2', val2, ...);
 %
 % Input:
-%    directorylist - list (cell array) of directory names. if nested lists,
-%                    the functions of the directories in the nested lists
-%                    are regroupeg 
-%    outputdir     - output HTML directory
-%    titlelist     - list of title for each directory
-%    matlabhelp    - list of filenames to generate matlab help pop-up index.
-%                    Default []: no help files generated   
+%    list        - 1) list (cell array) of filenames to convert. Ex:
+%                     { 'filename1' 'filename2' 'filename3' }
+%                  2) cell array of filenames to convert and the text link 
+%                     on the summary page for them. For option 1, as a default
+%                     the filename without the extension is used.
+%                    { { 'filename1' 'link1' } ...
+%                      { 'filename2' 'link2' } }
+%                  3) cell array of 2-3 cell array elements containing
+%                  info to generate directory HTML and matlab page. Ex
+%                  { { 'directory1' 'title1' 'matlabfunc1' } ...
+%                    { 'directory1'''title1' 'matlabfunc2' } }
+%                  'directory' is the directory name
+%                  'title' is the title that will be given the directory on
+%                    the web page.
+%                  'matlabfunc' is the name for a matlab function that will be
+%                    created to sumarized the directory content (note that only
+%                    one web page is created by several matlab files can be created
+%                    It can be left empty.
+%                  To scan several direcotry under the same title use convention
+%                  { { { 'directory1' 'direcotory2 } 'title1' 'matlabfunc1' }
+%                  List can also contains filenames
+%    outputdir   - output HTML directory
 %
 % Optional inputs:
+%   'outputfile' - output file name. Default is 'index.html'.
 %   'header'     - command to insert in the header of all HTML files (i.e. javascript 
 %                  declaration or meta-tags). Default: javascript 'openhelp' function. 
 %   'footer'     - command to insert at the end of all HTML files (i.e. back
@@ -30,14 +46,16 @@
 %                  standard HTML link.     
 %   'fontindex'  - font of the HTML index file (default: 'Helvetica')
 %   'backindex'  - background tag for the index file
+%   'mainonly'   - ['on'|'off'] only generate main page. Default is OFF and
+%                  generate all web pages.
 %   
 % Author: Arnaud Delorme, CNL / Salk Institute, 2002
 %
-% Example: 
-%  makehtml({ 'adminfunc', 'popfunc', { 'toolbox', 'toolbox2' }}, ...
-%   '/home/www/eeglab/eeglab/allfunctions', ...
-%   { 'Admin functions', 'Interactive (pop_) functions', 'Signal processing functions' }, ...
-%   { 'adminfunc/eeg_helpadmin.m', 'adminfunc/eeg_helppop.m', 'adminfunc/eeg_helpsigproc.m' });          
+% Example used for generating EEGLAB help menus:
+%  makehtml({ { 'adminfunc' 'Admin functions' 'adminfunc/eeg_helpadmin.m' } ...
+%             { 'popfunc', 'Interactive (pop_) functions' 'adminfunc/eeg_helppop.m' } ...
+%             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
+%            '/home/www/eeglab/allfunctions');          
 %
 % See also: help2html()
 
@@ -58,27 +76,18 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 01:58:16  arno
+% debugging destination of html files
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
 
-function makehtml( directorylist, outputdir, titlelist, matlabhelp, varargin );
+function makehtml( directorylist, outputdir, varargin );
 
-if nargin < 3
+if nargin < 2
     help makehtml;
     return;
-end;
-    
-if nargin < 4
-    matlabhelp = [];
-else
-    if length(directorylist) ~= length( matlabhelp ),
-        error( 'the directory list and the matlab help file list must have the same length');
-    end;    
-end;
-
-if length(directorylist) ~= length( titlelist ),
-     error( 'the directory list and the title list must have the same length');
 end;
     
 if outputdir(end) ~= '/', outputdir(end+1) = '/'; end; 
@@ -89,6 +98,8 @@ else
     g = [];
 end;
     
+try, g.mainonly;    catch, g.mainonly = 'off'; end;
+try, g.outputfile;  catch, g.outputfile = 'index.html'; end;
 try, g.fontindex;   catch, g.fontindex = 'Helvetica'; end;
 try, g.backindex;   catch, g.backindex = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
 try, g.header;      catch, g.header = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 'self.window.location = fnc;' 10 '}' 10  '//--></script>' ]; end;
@@ -99,7 +110,7 @@ try, g.footer;      catch, g.footer = '<A HREF ="indexfunc.html">Back to functio
 try, g.outputlink;  catch, g.outputlink = [ '<tr><td VALIGN=TOP ALIGN=RIGHT NOSAVE><A HREF="javascript:openhelp(''%s.html'')">%s</A></td><td>%s</td></tr>' ];  end;
 
 options = { 'footer', g.footer, 'background', g.background, ...
-		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink };
+		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink, 'outputonly', g.mainonly };
 
 % ------------------------------------------- 
 % scrips which generate a web page for eeglab
@@ -109,29 +120,37 @@ OPENWIN = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10
             'self.window.location = fnc;' 10 '}' 10 '//--></script>'];
 ORIGIN      = pwd;
 
-% get files
-% ---------
-if ~isempty( matlabhelp)
-    for index = 1:length( matlabhelp )
-        try, delete(matlabhelp{index}); catch, end; % delete previous files   
-    end;
-end;   
-
-% scan directories
-% ----------------
-for index = 1:length( directorylist )
-    direct{ index } = scandir( directorylist{index} );
-end;    
+% determine mode
+% --------------
+if iscell(directorylist{1}) & exist(directorylist{1}{1}) == 7
+	fprintf('First cell array element is not a file\n');
+	fprintf('Scanning directories...\n');
+	mode = 'dir';
+	% scan directories
+	% ----------------
+	for index = 1:length( directorylist )
+		direct{ index } = scandir( directorylist{index}{1} );
+	end;    
+else
+	fprintf('First cell array element has been identified as a file\n');
+	fprintf('Scanning all files...\n');
+	mode = 'files';
+end;	
 
 % write HTML file
 % ----------------
-fo = fopen([ outputdir 'indexfunc.html'], 'w');
+fo = fopen([ outputdir g.outputfile], 'w');
+if fo == -1, error(['can not open file ''' [ outputdir g.outputfile] '''']); end;
+
 fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g.fontindex);
 
-for index = 1:length( direct )
-    makehelphtml( direct{ index }, fo, titlelist{ index }, STYLEHEADER, outputdir, options );
-end;
-
+if strcmp(mode, 'files')
+	makehelphtml( directorylist, fo, 'MAIN TITLE', STYLEHEADER, outputdir, mode, options );
+else % direcotry
+	for index = 1:length( directorylist )
+		%makehelphtml( direct{ index }, fo, directorylist{index}{2}, STYLEHEADER, outputdir, mode, options );
+	end;
+end;	
 fprintf( fo, '</FONT></BODY></HTML>');
 fclose( fo );
 if isunix
@@ -142,11 +161,13 @@ end;
 % ------------------------------
 % Generate help files for EEGLAB
 % ------------------------------
-if ~isempty( matlabhelp )
-    for index = 1:length( matlabhelp )
-        makehelpmatlab( matlabhelp{index}, direct{ index }, titlelist{ index }); 
-    end;
-end;    
+if strcmp(mode, 'dir')
+	for index = 1:length( directorylist )
+		if length(directorylist{index}) > 2
+			makehelpmatlab( directorylist{index}{3}, direct{ index },directorylist{index}{2}); 
+		end;    
+	end;
+end;
 
 return;
 
@@ -171,17 +192,44 @@ function filelist = scandir( dirlist )
 return;
 
 % ------------------------------ Function to generate help for a bunch of files -
-function makehelphtml( files, fo, title, STYLEHEADER, DEST, options);
-        tmpdir = pwd;
+function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
+% files = cell array of string containing file names or
+%         cell array of 2-strings cell array containing titles and filenames
+% fo = output file
+% title = title of the page or section	
+	tmpdir = pwd;
 	fprintf(fo, STYLEHEADER, title );
 	fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
 	for index = 1:length(files)
-		fprintf('Processing %s\n', files{index});
-		cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
-		fprintf( fo, '%s', com);
-		inputfile = which( files{index});
-		try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
-        catch, fprintf('Cannot copy file %s\n', inputfile); end;
+		if strcmp(mode, 'files') % processing subtitle and File
+			if iscell(files{index})
+				filename = files{index}{1};
+			    filelink = files{index}{2};
+			else
+				filename = files{index};
+			    filelink = '';
+			end;
+			fprintf('Processing %s:%s\n', filename, filelink );
+			if ~isempty(filename)
+				try, if exist([ DEST filename]) == 2, delete([ DEST filename]); end; catch, end;
+
+				cd(DEST); com = help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
+
+				inputfile = which( filename);
+				try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
+				catch, fprintf('Cannot copy file %s\n', inputfile); end;
+			else 
+				com = [ '<H3>' filelink '</H3><BR>' ];
+			end;
+			fprintf( fo, '%s', com);
+		else % Processing file only
+ 			fprintf('Processing %s\n', files{index});
+			cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
+			fprintf( fo, '%s', com);
+			inputfile = which( files{index});
+			try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
+			catch, fprintf('Cannot copy file %s\n', inputfile); end;
+		end;
 	end;	
 	fprintf(fo, '</table>' );
 return;
@@ -204,6 +252,9 @@ function makehelpmatlab( filename, directory, titlewindow);
 	fprintf(fo, ['textgui( text, command,' ...
 	'''fontsize'', 15, ''fontname'', ''times'', ''linesperpage'', 18, ', ...
 	'''title'',strvcat( ''%s'', ''(Click on blue text for help)''));\n'], titlewindow);
+	fprintf(fo, 'icadefs; set(gcf, ''COLOR'', BACKCOLOR);');
+	fprintf(fo, 'h = findobj(''parent'', gcf, ''style'', ''slider'');');
+	fprintf(fo, 'set(h, ''backgroundcolor'', GUIBACKCOLOR);');
 	fprintf(fo, 'return;\n');
 	fclose( fo );
 return
