@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.259  2003/10/29 19:06:26  arno
+% text typo
+%
 % Revision 1.258  2003/10/29 19:02:59  arno
 % clearing variable h
 %
@@ -1063,6 +1066,12 @@ trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
 catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
+
+% detecting icalab
+% ----------------
+if exist('icalab')
+    disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
+end;
 
 % menu definition
 % --------------- 
