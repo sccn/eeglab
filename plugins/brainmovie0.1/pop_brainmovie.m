@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/12/19 19:29:13  arno
+% size
+%
 % Revision 1.62  2003/10/21 19:24:32  arno
 % optimizing brainmovie3d
 %
@@ -729,7 +732,7 @@ if ~strcmpi(g.mode, 'compute')
         else outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
         end;
         if strcmpi(g.quality, 'ultrafast')
-            unix(sprintf('mkavi -file %s.avi image*.ppm', outname));
+            unix(sprintf('mkavi -file %s.avi %s/image*.ppm', outname, g.framefolder));
         else
             g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
             makemovie( { 'image' min(allframes) max(allframes) 4 }, g.makemovie{:});
