@@ -711,7 +711,9 @@ end;
 ud = [start stop len baseangle tipangle wid page crossdir ends];
 
 % Set Page defaults
-page = (~isnan(page))&(page);
+if isnan(page)
+    page = ~isnan(page);
+end;
 
 % Get axes limits, range, min; correct for aspect ratio and log scale
 axm      = zeros(3,narrows);
