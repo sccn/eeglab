@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2003/12/20 01:42:33  arno
+% same
+%
 % Revision 1.65  2003/12/20 01:41:05  arno
 % size
 %
@@ -636,7 +639,7 @@ else %%%%%%%%%%%%% 3D MOVIE PARAMS %%%%%%%%%%%%%%%%
     coordinates(:,2) =  tmp;
     coordinates(:,3) =  -coordinates(:,3); % restore dipplot coordinates
     brainmovieoptions = { 'condtitle' alltitles 'coordinates', coordinates, ...
-                        'circfactor', g.circfactor, 'size', [699 699] };
+                        'circfactor', g.circfactor, 'size', [698 698] };
     if iscell(g.movparams), brainmovieoptions = { brainmovieoptions{:} g.movparams{:}}; 
     elseif strcmpi(g.movparams, 'mrirear'), brainmovieoptions = { brainmovieoptions{:} 'view', [0 -1 0] };
     elseif strcmpi(g.movparams, 'mriside'), brainmovieoptions = { brainmovieoptions{:} 'view', [1 0 0] };
