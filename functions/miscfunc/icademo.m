@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/04/28 06:03:13  scott
+% restoring full function
+%
 % Revision 1.11  2004/04/28 06:02:10  scott
 % othing
 % nothing
@@ -390,7 +393,7 @@ figure('Position',pos+5.5*off);
 %  >> envtopo(data,weights,chan_locs,[limits],[compnums],...
 %                                   'title',[plotchans],[voffsets]);
 
-  envtopo(data(:,1:floor(0.6*frames)),weights*sphere,'chanlocs',chan_locs,...
+  envtopo(data(:,1:floor(0.6*frames)),weights*sphere,'chanlocs',readlocs(chan_locs),...
          'limits', [0 995*0.6],'compnums',[2 3 4 6],'title', 'Largest Components');
 
 if ~exist('icademoauto')
