@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -105,21 +108,29 @@ if ~isfield( EEG, 'data')
 	EEG.event      = [ ones(1, length(I)); EEG.rt(I) ]'; % type is 1, meaing reaction time
 	EEG = rmfield( EEG, {'accept', 'eegtype', 'eegresp', 'accept' });
 	
-	EEG.event = eeg_eventformat(EEG.event, 'struct', {'type', 'latency'});
+	if EEG.trials > 1
+		if size(EEG.event,1) == EEG.trials
+			EEG.event = eeg_eventformat([  EEG.event [1:EEG.trials]'], 'struct', {'type', 'latency' 'epoch' });
+		else
+			EEG.event = eeg_eventformat( EEG.event, 'struct', {'type', 'latency'});
+		end;
+	else
+		EEG.event = eeg_eventformat([ ones(length(EEG.trials)) EEG.event], 'struct', {'type', 'latency'});
+	end;
+	
 	EEG.epoch = eeg_epochformat(EEG.epoch, 'struct', { 'rt' 'type' 'resp' 'accept' });
-	EEG = eeg_checkset(EEG);
-else
-  % check modified fields
-  % ---------------------
-  if isfield(EEG,'icadata')
+end;
+
+% check modified fields
+% ---------------------
+if isfield(EEG,'icadata')
     EEG.icaact = EEG.icadata;
     EEG = rmfield(EEG, 'icadata');
-  end;  
-  if isfield(EEG,'poschan')
+end;  
+if isfield(EEG,'poschan')
     EEG.chanlocs = EEG.poschan;
     EEG = rmfield(EEG, 'poschan');
-  end;  
-end;
+end;  
 
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
