@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/03/05 18:50:20  arno
+% adding doc for new button
+%
 % Revision 1.31  2003/03/05 18:47:28  arno
 % [Aadding channel selection window
 %
@@ -332,7 +335,7 @@ if ~isempty( g.notime )
             error('Wrong notime range. Remember that it is not possible to remove a slice of time for data epochs.');
         end;
     end;
-    if max(g.notime(:)) > EEG.xmax | min(g.notime(:)) < 0
+    if max(g.notime(:)) > EEG.xmax | min(g.notime(:)) < EEG.xmin
         error('Time/point range out of data limits');
     end;
 end;
@@ -340,7 +343,7 @@ if ~isempty(g.time)
     if size(g.time,2) ~= 2
         error('Time/point range must contain 2 columns exactly');
     end;
-    if max(g.time(:)) > EEG.xmax | min(g.time(:)) < 0
+    if max(g.time(:)) > EEG.xmax | min(g.time(:)) < EEG.xmin
         error('Time/point range out of data limits');
     end;
 end;
