@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.66  2004/02/23 19:09:05  arno
+%*** empty log message ***
+%
 %Revision 1.65  2004/01/28 15:26:14  arno
 %detecting empty dipoles
 %
@@ -632,6 +635,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 tmp = sources(index).posxyz(2,:);
                 sources(index).posxyz(2,:) = sources(index).posxyz(1,:);
                 sources(index).posxyz(1,:) = tmp;
+                tmp = sources(index).momxyz(2,:);
+                sources(index).momxyz(2,:) = sources(index).momxyz(1,:);
+                sources(index).momxyz(1,:) = tmp;
             end;
         end;
         
@@ -643,7 +649,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             xo = sources(index).momxyz(dip,1)*g.dipolelength;
             yo = sources(index).momxyz(dip,2)*g.dipolelength;
             zo = sources(index).momxyz(dip,3)*g.dipolelength;
-
+            dsaf
+            
             % copy for output
             % ---------------
             XX(index) = -y;
