@@ -1,6 +1,6 @@
 % crossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input time series. A lower panel (optionally) shows 
-%        the coherence phase difference between the processes. In this panel: 
+%        the coherence phase difference between the processes. In this panel 
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
 %        Click on any subplot to view separately and zoom in/out.
@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2002/11/15 01:45:06  scott
+% can not -> cannot
+%
 % Revision 1.52  2002/10/24 15:08:12  arno
 % debugging plot scalp map for channel
 %

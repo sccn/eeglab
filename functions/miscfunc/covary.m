@@ -1,6 +1,6 @@
-%  covary - For vectors, covary(X) returns the variance of X.
-%           For matrices, covary(X)is a row vector containing the
-%           variance of each column of X.
+%  covary() - For vectors, covary(X) returns the variance of X.
+%             For matrices, covary(X)is a row vector containing the
+%             variance of each column of X.
 %
 % Notes:          
 %   covary(X) normalizes by N-1 where N is the sequence length.  
@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
