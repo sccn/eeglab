@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/02/26 02:20:07  scott
+% header edits -sm
+%
 % Revision 1.17  2003/02/26 02:12:42  arno
 % always forcing filepath to []
 %
@@ -210,7 +213,7 @@ if mode == 0  % single datasets
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
 			eval(command);
-			floatwrite( tmpdata, [EEG.filepath EEG.data], 'ieee-le');
+			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
 			error('Pop_saveset: saving error, check permission on file or directory');
 		end;
