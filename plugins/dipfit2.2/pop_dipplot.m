@@ -13,7 +13,7 @@
 %               instance. Dipplot() command line equivalent: 'image'.
 %   "Summary mode" - [Checkbox] when checked, plot the 3 views of the
 %                head model and dipole locations. Dipplot() equivalent 
-%               is 'summary'.
+%               is 'summary' and 'num'.
 %   "Plot edges" - [Checkbox] plot edges at the intersection between
 %               MRI slices. Diplot() equivalent is 'drawedges'.
 %   "Plot closest MRI slide" - [Checkbox] plot closest MRI slice to
@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/03/18 17:17:08  arno
+% fixing call to use MRI etc...
+%
 % Revision 1.27  2005/03/17 19:18:51  arno
 % fix typo
 %
@@ -216,7 +219,7 @@ if nargin < 2
     if ~isempty(result{1}), comps = eval( [ '[' result{1} ']' ] ); else comps = []; end;
     if ~isempty(result{2}), options = { options{:} 'rvrange' eval(  [ '[' result{2} ']' ] ) }; end;
     options = { options{:} 'mri' result{3} };
-    if result{4} == 1, options = { options{:} 'summary'   'on' }; end;
+    if result{4} == 1, options = { options{:} 'summary'   'on' 'num' 'on' }; end;
     if result{5} == 1, options = { options{:} 'drawedges' 'on' }; end;
     if result{6} == 1, options = { options{:} 'cornermri' 'on' 'axistight' 'on' }; end;
     if result{7} == 1, options = { options{:} 'projimg'   'on' }; end;
