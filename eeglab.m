@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.297  2003/12/05 00:17:03  arno
+% history in datasets
+%
 % Revision 1.296  2003/12/04 03:08:27  arno
 % plugin msg
 %
@@ -1266,7 +1269,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Dataset info'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_editset(EEG);' e_store]);
 	uimenu( second_m, 'Label', 'Event fields'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store]);
 	uimenu( second_m, 'Label', 'Event values'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);' e_store]);
-	uimenu( second_m, 'Label', 'About this dataset', 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store]);
+	uimenu( second_m, 'Label', 'About this dataset', 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store_nh]);
 	uimenu( second_m, 'Label', 'Channel locations'   , 'CallBack', [ 'disp(''IMPORTANT: Close the channel editing window to import channels'');' ...
                         'disp(''WARNING: The number of channel locations must match the number of'');' ... 
                         'disp(''         data channels (otherwise channel locations are ignored)'');' ...
