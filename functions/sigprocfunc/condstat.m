@@ -29,7 +29,7 @@
 %    res1     - result for first condition
 %    res2     - result for second condition
 %
-% Authors: Arnaud Delorme, Lars Kai Hansen & Scott Makeig
+% Authors: Arnaud Delorme & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
 % See also: timef(), crossf()
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/01/02 16:51:38  scott
+% header edits -sm
+%
 % Revision 1.5  2003/01/02 04:23:12  cooper
 % fixed type
 % typo, not type
