@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/10 19:43:28  arno
+% typo
+%
 % Revision 1.2  2005/03/10 19:40:59  arno
 % new version compatible with fieldtrip
 %
@@ -208,7 +211,8 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     if strcmpi(g.model, 'BESA'), ind = 1; else ind = 2; end;
     dipfitdefs;
-    if isempty(g.settings), g.settings = { 'electrodes', [1:EEG.nbchan] }; end;
+	[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
+    if isempty(g.settings), g.settings = { 'electrodes', indices }; end;
     g.settings = { g.settings{:} 'hdmfile'     template_models{ind}{1} ...
                                  'coordformat' template_models{ind}{2} ...
                                  'mrifile'     template_models{ind}{3} ...
