@@ -18,7 +18,7 @@
 % build their own EEGLAB macros by copying and pasting commands from the 
 % EEGLAB history (from h()) into their own Matlab script files.
 %
-% Using the EEGLAB help: =========== ???????? =========================
+% Understanding EEGLAB help windows: ===================================
 % From the EEGLAB menu, it is possible to call up the help message of any 
 % function that is called from the menu by opening the '/Help/EEGLAB' menu window.
 % The help message of each function that is called is then displayed.
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/21 01:04:56  scott
+% edited help msg -sm
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %
