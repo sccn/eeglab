@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/10/29 17:07:07  arno
+% text editing
+%
 % Revision 1.25  2002/10/29 16:40:35  arno
 % text
 %
@@ -181,7 +184,7 @@ if isfield(EEG, 'tmpevent') & strmatch('event', allfields)
 end;   
  
 if nargin<2
-    geometry = { [0.8 1 2.3 0.6 ] [0.8 1.1 1.8 1 ] [0.65 0.85 1.5 0.25 0.25 0.1] };
+    geometry = { [0.8 1 2.3 0.6 ] [0.8 1.1 1.8 1 ] [0.65 0.85 1.3 0.45 0.25 0.1] };
     uilist = { ...
          { 'Style', 'text', 'string', 'Selection', 'horizontalalignment', 'center', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Field Description', 'fontweight', 'bold'  }, ...
@@ -218,28 +221,28 @@ if nargin<2
 
         % create the gui for this field
         % -----------------------------
-        geometry = { geometry{:} [0.65 0.85 1.5 0.25 0.25 0.1] };
+        geometry = { geometry{:} [0.65 0.85 1.3 0.45 0.25 0.1] };
         uilist   = { uilist{:}, ...
          { 'Style', 'text', 'string', [allfields{index} '(s)'] }, ...
          { 'Style', 'pushbutton', descrip{:}, 'horizontalalignment', 'left' }, ...
          { 'Style', 'edit', 'string', '' }, ...
-         { }, { 'Style', 'checkbox', 'string', '    ' },{ } }; 
+         { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
+        if strcmpi(allfields{index}, 'latency')
+            if EEG.trials > 1
+                uilist{end-2} = { 'Style', 'text', 'string', '(ms)' };
+            else
+                uilist{end-2} = { 'Style', 'text', 'string', '(s)' };	   
+            end;
+        end;
     end;
 
-    geometry = { geometry{:} [1] [1 2] };
+    geometry = { geometry{:} [1] [1.3 2] };
     uilist   = { uilist{:} ...
         { }, ...
         { 'Style', 'checkbox', 'string','Select all events NOT selected above',} { } ...
         };
-	if isfield(EEG.event, 'latency')
-		if EEG.trials > 1
-			uilist{end} = { 'Style', 'text', 'string', 'NOTE: Latency unit is milliseconds' };
-		else
-			uilist{end} = { 'Style', 'text', 'string', 'NOTE: Latency unit is seconds' };	   
-		end;
-	end;
 
-    geometry = { geometry{:} [1] [1 0.5 1 0.5] [2 1] };
+    geometry = { geometry{:} [1] [0.9 0.5 1 0.5] [2 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string', 'Rename selected event(s) types as:' } ...
                 { 'Style', 'edit', 'string', '' } ...
