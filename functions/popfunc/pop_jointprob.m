@@ -2,23 +2,41 @@
 %                   probability (i.e. probability of activity).
 %
 % Usage:
-%   >> pop_jointprob( INEEG, typerej) % popup
+%   >> pop_jointprob( INEEG, typerej) % pop-up interative window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
-%		= pop_jointprob( INEEG, typerej, electrodes, ...
+%		= pop_jointprob( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
 %
+% Graphical interface:
+%   "Electrode" - [edit box] electrodes or components (number) to take into
+%                 consideration for rejection. Same as the 'elec_comp'
+%                 parameter from the command line.
+%   "Single-channel limit" - [edit box] probability of activity limit in 
+%                 terms of standard-dev. Same as 'locthresh' command line
+%                 parameter.
+%   "All-channel limit" - [edit box] probability of activity limit in 
+%                 terms of standard-dev (all channel regrouped). Same as 
+%                 'globthresh' command line parameter.
+%   "Display with previous rejection" - [edit box] can be either YES or
+%                 NO. This edit box corresponds to the command line input
+%                 option 'superpose'.
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
+%                 box corresponds to the command line input option 'reject'.
+%   "visualization type" - [edit box] can be either REJECTRIALS or EEGPLOT.
+%                 This edit box corresponds to the command line input
+%                 option 'vistype'.
+% 
 % Inputs:
 %   INEEG      - input dataset
 %   typerej    - type of rejection (0 = independent components; 1 = eeg
 %              data). Default is 1. For independent components, before
 %              thresholding, the activity is normalized for each 
 %              component.
-%   electrodes - [e1 e2 ...] electrodes (number) to take into 
+%   elec_comp  - [e1 e2 ...] electrodes or component (number) to take into 
 %              consideration for rejection
-%   locthresh  - electrodes probability of activity thresholds in terms
-%              of standard-dev.
-%   globthresh - global threshold (where all electrode activity are 
-%              regrouped).
+%   locthresh  - probability of activity limit in terms of standard-dev.
+%   globthresh - global limit (where all electrode activity are 
+%              regrouped). Same units as above.
 %   superpose  - 0=do not superpose pre-labelling with previous
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
@@ -58,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/20 22:25:39  arno
+% debug rej_statepoch call
+%
 % Revision 1.15  2002/08/14 00:51:50  arno
 % debug multi-elec
 %
@@ -138,7 +159,7 @@ if nargin < 3
 					[ fastif(icacomp, 'Single-channel', 'Single-component') ' limit (standard deviation: ex: 3 4 2):'], ...
 					[ fastif(icacomp, 'All-channel', 'All-component') ' limit (standard deviation: ex: 3 4 2):'], ...
                		'Display with previous rejection', ...
-         			'Actually reject marked trial(s) (YES or NO)', ...
+         			'Reject marked trial(s) (YES or NO)', ...
          			'visualization type (REJECTRIALS|EEGPLOT)' };
 	inistr      = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
 					fastif(icacomp, '3', '5'),  ...
