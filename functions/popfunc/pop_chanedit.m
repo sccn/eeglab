@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2003/12/05 22:54:08  arno
+% debug transform
+%
 % Revision 1.70  2003/12/05 18:25:45  arno
 % ?
 %
@@ -492,7 +495,7 @@ if nargin < 2
                 if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
                     tmpcom = { tmpcom{1} tmpcom{2}{1} };
                 end;
-                if iscell(tmpcom{2}) & isstr(tmpcom{2}{1}) & strcmpi(tmpcom{2}{1}, 'chancenter')
+                if iscell(tmpcom{2}) & (length(tmpcom{2}) > 0) & isstr(tmpcom{2}{1}) & strcmpi(tmpcom{2}{1}, 'chancenter')
                     tmpcom = { tmpcom{1} { tmpcom{2}{1} tmpcom{2}{2} 0 } };
                 end;
                 totaluserdat = { totaluserdat{:} tmpcom{:} };
