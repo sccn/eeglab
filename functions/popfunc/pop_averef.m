@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/09/05 00:31:12  scott
+% added EEG.rmave to output dataset - to allow re-referencing -sm
+%
 % Revision 1.9  2002/08/26 22:04:08  arno
 % debug
 %
@@ -103,5 +106,5 @@ EEG.averef = 'Yes';
 EEG.icaact = [];
 EEG = eeg_checkset(EEG);
 
-com = sprintf('pop_averef( %s, %d);', inputname(1), confirm);
+com = sprintf('%s = pop_averef( %s, %d);', inputname(1), inputname(1), confirm);
 return;
