@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/09/20 01:10:56  arno
+% add try, catch clause for movie
+%
 % Revision 1.7  2003/09/17 02:13:53  arno
 % allow automatic run
 %
@@ -92,18 +95,9 @@ if v(1) < 5
   fprintf('Not all segments may work for Matlab version 4.\n')
 end
 
-tmpdir = which('runica');
-tmpdir2 = [ tmpdir(1:end-8) 'locfiles' tmpdir(end-8) ];
-chan_locs  = [ tmpdir2 'chan14.locs'];
-chan_locs2 = [ tmpdir2 'chan.locs'];
-if isempty(which(chan_locs))
-    chan_locs  = [ tmpdir(1:end-8) 'chan14.locs']
-    chan_locs2 = [ tmpdir(1:end-8) 'chan.locs'];
-    if isempty(which(chan_locs))
-        error('could not find channel location file ''chan14.locs'' (place file in EEGLAB dir)');
-    end;
-end;
 % name of channel locations file
+chan_locs  = 'chan14.locs';
+chan_locs2 = 'chan.locs';
 
 figure
 set(gcf,'Color',BACKCOLOR);
