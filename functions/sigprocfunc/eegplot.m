@@ -40,6 +40,8 @@
 %                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
 %                    to reject (1); its length must be the number of data channels. 
 %    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
+%    'colmodif'   - cell array of window colors that can be marked/unmarked. Default
+%                   is current color only.
 %    'wincolor'   - [color] color used when selecting EEG.
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
 %    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
@@ -77,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/08/07 17:38:26  arno
+% debugging
+%
 % Revision 1.28  2002/07/31 16:53:36  arno
 % changing button size
 %
@@ -254,9 +259,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;		    catch, g.limits	    = [0 1]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
-   try, g.dispchans; 		catch, g.dispchans = min(32, size(data,1)); end;
-   try, g.wincolor; 		catch, g.wincolor = [ 0.8345 1 0.9560]; end;
-   try, g.butlabel; 		catch, g.butlabel = 'REJECT'; end;
+   try, g.dispchans; 		catch, g.dispchans  = min(32, size(data,1)); end;
+   try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
+   try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
+   try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -266,7 +272,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    for index=1:length(gfields)
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
-               'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
+               'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
@@ -314,6 +320,16 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	if length(g.dispchans) > size(data,1)
 		g.dispchans = size(data,1);
    end;
+   if ~iscell(g.colmodif)
+   		g.colmodif = { g.colmodif };
+   end;
+   
+   % convert color to modify into array of float
+   % -------------------------------------------
+   for index = 1:length(g.colmodif)
+	   tmpcolmodif(index) = g.colmodif{index}(1) + g.colmodif{index}(2)*10 + g.colmodif{index}(3)*100;
+   end;
+   g.colmodif = tmpcolmodif;
    
    [g.chans,g.frames, tmpnb] = size(data);
    g.frames = g.frames*tmpnb;
@@ -774,7 +790,12 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     		 '      tmpelec = min(max(tmpelec, 1), g.chans);' ...
 			 '      g.winrej(lowlim,tmpelec+5) = ~g.winrej(lowlim,tmpelec+5);' ... % set the electrode
 			 '    else' ...  % remove mark
-			 '      g.winrej = [ g.winrej(1:lowlim-1,:)'' g.winrej(lowlim+1:end,:)'']''; ' ...
+			 '      for tmpi = lowlim''' ...
+			 '          tmpcolor = g.winrej(tmpi,3)+10*g.winrej(tmpi,4)+100*g.winrej(tmpi,5);' ...
+		     '          if any(tmpcolor == g.colmodif);' ...
+			 '              g.winrej = [ g.winrej(1:tmpi-1,:)'' g.winrej(tmpi+1:end,:)'']''; ' ...
+			 '          end;' ...
+			 '      end;' ...
 			 '    end;' ...
 			 '  else' ...
 			 '    if g.trialstag ~= -1' ... % find nearest trials boundaries if epoched data
@@ -791,7 +812,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   			 '  set(gcbf,''UserData'', g);' ...
 			 '  eegplot(''drawp'', 0);' ...  % redraw background
              'end;' ...
-             'clear g hhdat hh tmpelec tmppos ax2 ESpacing lowlim Allwin Fs winlength EPosition ax1 I1' ];
+             'clear g hhdat hh tmpelec tmppos ax2 ESpacing lowlim Allwin Fs winlength EPosition ax1 I1 tmpi' ];
 			 		
   % motion button: move windows or display current position (channel, g.time and activation)
   commandmove = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
