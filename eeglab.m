@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2002/08/13 23:51:33  arno
+% debug CURRENSET (T missing)
+%
 % Revision 1.129  2002/08/13 23:17:54  arno
 % error message update
 % .,
@@ -1016,6 +1019,7 @@ index = 1;
 indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU));
 	
+clear functions;
 eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
