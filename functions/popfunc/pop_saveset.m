@@ -1,25 +1,24 @@
-% pop_saveset() - save dataset(s) structure
+% pop_saveset() - save one or more EEG dataset structure(s)
 %
 % Usage:
-%   >> pop_saveset( EEG ); % pop_up
-%   >> pop_saveset( ALLEEG ); % pop_up
-%   >> EEG = pop_saveset( EEG, filename, filepath);
+%   >> pop_saveset( EEG ); % use an interactive pop-up window 
+%   >> pop_saveset( ALLEEG ); % use pop-up window
+%   >> EEG = pop_saveset( EEG, filename, filepath); % non pop-up
 %   >> ALLEEG = pop_saveset( ALLEEG, indices, filename, filepath);
 %
 % Inputs:
-%   EEG        - dataset structure
-%   ALLEEG     - array of dataset structure
-%   indices    - indices of datasets to save from ALLEEG
-%                structure
-%   filename   - name of the file to save (optional)
-%   filepath   - path of the file to save (optional)
+%   EEG        - EEG dataset structure
+%   ALLEEG     - array of dataset structures
+%   indices    - indices of datasets in the ALLEEG structure to save 
+%   filename   - name of the file to save to (optional)
+%   filepath   - path of the file to save to (optional)
 %
 % Outputs:
-%   EEG        - dataset after extended syntax check
-%   ALLEEG     - datasets after extended syntax check
+%   EEG        - saved dataset (after extensive syntax checks)
+%   ALLEEG     - saved datasets (after extensive syntax checks)
 %
-% Note: individual dataset should be save with '.set' file extension
-%       and multiple datasets with '.sets' file extension
+% Note: An individual dataset should be saved with a '.set' file extension
+%       and multiple datasets with a '.sets' file extension
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -44,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/26 02:12:42  arno
+% always forcing filepath to []
+%
 % Revision 1.16  2002/11/15 01:40:45  scott
 % Can not -> cannot
 %
