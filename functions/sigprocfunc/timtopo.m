@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/03/04 18:20:01  scott
+% debug last -sm
+%
 % Revision 1.20  2003/03/04 18:15:06  scott
 % debug last -sm
 %
@@ -366,7 +369,7 @@ axis([0 1 0 1])
   set(gca,'Visible','off');
 
 for t=1:ntopos % draw oblique lines through to the topoplots 
-  maxdata = max(matsel(data,frames,plotframes(t))); % max data value at plotframe
+  maxdata = max(data(:,plotframes(t))); % max data value at plotframe
 
   head_sep = 1.2;
   axtp = axes('Units','Normalized','Position',...
@@ -389,7 +392,6 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   from = changeunits([plottimes(t),maxdata],axdata,axall);
   to   = changeunits([0,-1],axtp,axall);
   delete(axtp);
-
   axes(axall);
   l1 = plot([from(1) to(1)],[from(2) to(2)]);
 
