@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/23 18:09:58  arno
+% new interupt button
+%
 % Revision 1.7  2002/08/23 15:04:29  scott
 % help msg
 %
@@ -127,7 +130,7 @@ switch lower(icatype)
             eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
         end;
      case 'binica'
-        if ~isunix
+        if ~isunix | strcmp(computer, 'MAC')
             error('Pop_runica: binica can now only be used under UNIX');
         end;
         icadefs;
