@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/27 01:04:12  scott
+% added handling of 3-d tftopo data -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -78,7 +81,7 @@ end
 if dim(tftopo)==2
    nchans = round(size(tfdata,2)/length(times));
 elseif dim(tftopo)==3
-   tftopo=tftopo(:);
+   tftopo=tftopo(:,:); % convert to 2-d
 else
    help tftopo
    return
