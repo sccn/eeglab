@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/02/27 00:38:58  arno
+% typo
+%
 % Revision 1.14  2003/02/03 20:01:58  arno
 % debugging overwrite option call from the command line
 %
@@ -191,7 +194,7 @@ end;
 	
 % generate the output command
 % ---------------------------
-com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s);', inputname(1), inputname(2), inputname(3), inputname(1), inputname(2), inputname(3), vararg2str(args));
+com = sprintf( '[ALLEEG EEG %s] = pop_newset(ALLEEG, EEG, %s, %s);', inputname(3), inputname(3), vararg2str(args));
 return;
 
 function num = popask( text )
