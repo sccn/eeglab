@@ -163,7 +163,11 @@ if ~progressive | comp == 1 % pare out omitchans and artcomps from EEG.data
   pvall = var(EEG.data(:,:)',varwts);
 end
 
-pvcomp =  var(EEG.icawinv(chans,comps)*EEG.icaact(comps,:)', varwts);
+chans
+comps
+size(EEG.icawinv(chans,comps))
+size(EEG.icaact(comps,:)')
+pvcomp =  var((EEG.icawinv(chans,comps)*EEG.icaact(comps,:))', varwts);
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% compute percent variance %%%%%%%%%%%%%%%
