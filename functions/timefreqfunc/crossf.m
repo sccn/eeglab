@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2002/11/15 01:54:52  arno
+% header for web
+%
 % Revision 1.53  2002/11/15 01:45:06  scott
 % can not -> cannot
 %
@@ -988,9 +991,6 @@ end;
 % compute angles
 % --------------
 Rangle = angle(R);
-if g.cycles ~= 0
-   Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
-end
 R = abs(R);
 % if ~isnan(g.baseline)
 % 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
