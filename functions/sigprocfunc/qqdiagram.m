@@ -5,11 +5,13 @@
 %               against the quantiles of a Gaussian distribution ('Normal plot').
 %               Two black dots indicate the lower and upper quartiles.
 %               If the data in X and Y belong the same distribution the plot will be linear.
+%               In this case,the red and black reference lines (.-.-.-.-) will overlap.
 %               This will be true also if the data in X and Y belong to two distributions with
 %               the same shape, one distribution being rescaled and shifted with respect to the
 %               other.
 %               If only X is given, a line is plotted to indicate the mean of X, and a segment
-%               is plotted to indicate the standard deviation of X.
+%               is plotted to indicate the standard deviation of X. If the data in X are normally
+%               distributed, the red and black reference lines (.-.-.-.-) will overlap.
 %
 % Usage:
 %   >>  ah  =  qqdiagram( x, y, pk );
@@ -47,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/22 02:05:17  luca
+% added some ;
+%
 % Revision 1.2  2002/08/22 01:48:39  luca
 % changed label
 %
@@ -92,14 +97,27 @@ else
     yy=quantile(y(~isnan(y)),pk);
 end
 
+% QQ diagram
+plot(xx,yy,'+')
+hold on
+
+% x-axis range
+maxx=max(xx);
+minx=min(xx);
+rangex=maxx-minx;
+xmin=minx-rangex/50;
+xmax=maxx+rangex/50;
+
 % Quartiles
 xqrt1=quantile(x,0.25); xqrt3=quantile(x,0.75);
 yqrt1=quantile(y,0.25); yqrt3=quantile(y,0.75);
 
-plot(xx,yy,'+')
-hold on
+plot([xqrt1 xqrt3],[yqrt1 yqrt3],'k-','LineWidth',2); % IQR range
 
-% Dawing the line
+% Drawing the line
+sigma=(yqrt3-yqrt1)/(xqrt3-xqrt1);
+cy=(yqrt1 + yqrt3)/2;
+	
 if nargin ==1
     maxy=max(y);
     miny=min(y);
@@ -107,7 +125,11 @@ if nargin ==1
 	ymin=miny-rangey/50;
 	ymax=maxy+rangey/50;
 	
-	plot([(miny-mean(y))/std(y) (maxy-mean(y))/std(y)],[miny maxy],'r-.')
+	plot([(miny-cy)/sigma (maxy-cy)/sigma],[miny maxy],'r-.') % the line
+    % For normally distributed data, the slope of the plot line
+    % is equal to the ratio of the standard deviation of the distributions
+	plot([0 (maxy-mean(y))/std(y)],[mean(y) maxy],'k-.') % the ideal line
+	
 	xlim=get(gca,'XLim');
 	plot([1 1],[ymin  (mean(y)+std(y))],'k--')
 	plot([1 1],[mean(y)  (mean(y)+std(y))],'k-','LineWidth',2)
@@ -116,20 +138,15 @@ if nargin ==1
 	plot(xlim,[mean(y) mean(y)],'k--')
     text(xlim(1), mean(y)+rangey/50,' Mean < X > ')
 	plot([xqrt1  xqrt3],[yqrt1 yqrt3],'k.','MarkerSize',10)
-	set(gca,'YLim',[ymin ymax])
+	set(gca,'XLim',[xmin xmax],'YLim',[ymin ymax])
 	xlabel('Standard Normal Quantiles')
 	ylabel('X Quantiles')
 else
-	% For normally distributed data, the slope of the plot line is equal to the ratio
-	% of the standard deviation of the distributions
-	sigma=(yqrt3-yqrt1)/(xqrt3-xqrt1); 
-	cx=(xqrt1 + xqrt3)/2;
-	cy=(yqrt1 + yqrt3)/2;
-	maxy=cy+sigma*(max(x)-cx);
+    cx=(xqrt1 + xqrt3)/2;
+    maxy=cy+sigma*(max(x)-cx);
 	miny=cy-sigma*(cx-min(x));
 	
-	plot([xqrt1 xqrt3],[yqrt1 yqrt3],'k-','LineWidth',2); % IQR range
-	plot([min(x) max(x)],[miny maxy],'r-.');
+	plot([min(x) max(x)],[miny maxy],'r-.'); % the line
     xlabel('X Quantiles');
     ylabel('Y Quantiles');
 end
