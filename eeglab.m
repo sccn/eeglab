@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.324  2004/08/25 17:51:21  arno
+% debug last change
+%
 % Revision 1.323  2004/08/25 17:27:16  arno
 % better history
 %
@@ -1733,6 +1736,23 @@ if ~option_keepdataset
 else
 	if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
 		ALLEEG = EEG;
+    else
+        if ~isequal(EEG, ALLEEG(CURRENTSET))
+            tmpanswer = questdlg2(strvcat('The current dataset ("EEG" variable) is not identical with the one saved in memory', ...
+                                          ' (variable "ALLEEG(CURRENSET)"). What should done with the current dataset (EEG variable)?', ' '), ...
+                                  'Dataset inconsistency', ...
+                      'Ignore it, use archive', 'Overwrite arhive', 'Create a new dataset', 'Create a new dataset');
+            if tmpanswer(1) == 'I'
+                EEG = eeg_retrieve( ALLEEG, CURRENTSET);
+                h('EEG = eeg_retrieve( ALLEEG, CURRENTSET);');
+            elseif tmpanswer(1) == 'O'
+                [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+                h('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
+            else
+                [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
+                h(LASTCOM);
+            end;
+        end;                                       '
 	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
