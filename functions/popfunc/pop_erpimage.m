@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2002/08/31 17:00:47  arno
+% add yerplabel option
+%
 % Revision 1.70  2002/08/30 17:49:23  arno
 % same
 %
@@ -647,7 +650,7 @@ if length( options ) < 2
 end;
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
-popcom = sprintf('figure; pop_erpimage(%s,[%s],%d,%d,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), projchan, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d, [%s],%d,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), projchan, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
 com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
