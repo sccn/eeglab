@@ -128,8 +128,8 @@
 %                         3        0           .719      .695    C3
 %                         4        0          -.719      .695    C4
 %                           ...
-%   '.asc':     
-%               Neuroscan-.'asc' cartesian polar coordinates text file.
+%   '.asc', '.dat':     
+%               Neuroscan-.'asc' or '.dat' cartesian polar coordinates text file.
 %   '.sfp': 
 %               BESA/EGI-xyz cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2003/11/27 00:38:13  arno
+% conversion elc
+%
 % Revision 1.53  2003/11/27 00:31:30  arno
 % debuging elc format
 %
@@ -302,6 +305,8 @@ listtype = { ...
          'loc' ...
          'sph' ...
          'asc' ...
+         'dat' ...
+         'elc' ...
          'chanedit' ...
          'custom' };
    
@@ -315,6 +320,8 @@ listimportformat = { ...
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
       { 'channum' 'sph_theta' 'sph_phi' 'labels' } ... % sph format
       { } ... % ascii Neuroscan format
+      { } ... % ascii Neuroscan format
+      { } ... % eetrak format
       { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
 
 listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
@@ -326,6 +333,8 @@ listskipline = [ ...
    0 ... % polhemus, not applicable
    0 ... % polhemus, not applicable
    -1 ...  % besa
+   0 ...
+   0 ...
    0 ...
    0 ...
    0 ...
@@ -351,18 +360,21 @@ elseif isstr(filename) & strcmp(filename, 'getinfoswrite')
 end;
 
 g = finputcheck( varargin, ...
-   { 'filetype'	'string' { listtype{:} '' 'locs' } '';
+   { 'filetype'	   'string'  {}                 '';
      'skiplines'   'integer' [0 Inf] 			[];
-     'elecind'    'integer' [1 Inf]				[];
-     'format'		'cell'	 []					{} }, 'readlocs');
+     'elecind'     'integer' [1 Inf]	    	[];
+     'format'	   'cell'	 []					{} }, 'readlocs');
 if isstr(g), error(g); end;  
 
 if isstr(filename)
    
    % format auto detection
-	% ---------------------
+	% --------------------
+   if strcmpi(g.filetype, 'autodetect'), g.filetype = ''; end;
+   g.filetype = strtok(g.filetype);
    periods = find(filename == '.');
    fileextension = filename(periods(end)+1:end);
+   g.filetype = lower(g.filetype);
    if isempty(g.filetype)
        switch lower(fileextension),
         case {'loc' 'locs' }, g.filetype = 'loc';
@@ -373,6 +385,7 @@ if isstr(filename)
         case 'elp', g.filetype = 'polhemus';disp( [ 'WARNING: Polhemus carthesian coords "elp" file extension' ... 
                                        ' detected; if importing BESA spherical coords. force to type "besa" instead'] );
         case 'asc', g.filetype = 'asc';
+        case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
         case 'eps', g.filetype = 'besa';
         case 'sfp', g.filetype = 'sfp';
@@ -386,8 +399,8 @@ if isstr(filename)
    % assign format from filetype
    % ---------------------------
    if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') ...
-           & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') 
-      indexformat = strmatch(lower(g.filetype), listtype, 'exact');
+           & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') & ~strcmpi(g.filetype, 'dat') 
+      indexformat = strmatch(g.filetype, listtype, 'exact');
       g.format = listimportformat{indexformat};
       if isempty(g.skiplines)
          g.skiplines = listskipline(indexformat);
@@ -400,18 +413,20 @@ if isstr(filename)
    
    % import file
    % -----------
-   if strcmp(lower(g.filetype), 'asc')
+   if strcmp(g.filetype, 'asc') | strcmp(g.filetype, 'dat')
        eloc = readneurolocs( filename );
-   elseif strcmp(lower(g.filetype), 'elc')
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
+   elseif strcmp(g.filetype, 'elc')
        eloc = readeetraklocs( filename );
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
-           strcmp(lower(g.filetype), 'polhemus')
+           strcmp(g.filetype, 'polhemus')
        try, 
            [eloc labels X Y Z]= readelp( filename );
        catch, error('Error while reading Polhemus (for BESA .elp file force file type to BESA)'); end;
-       if strcmp(lower(g.filetype), 'polhemusy')
+       if strcmp(g.filetype, 'polhemusy')
            tmp = X; X = Y; Y = TMP;
        end;
        for index = 1:length( eloc )
