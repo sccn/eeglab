@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/15 17:07:19  arno
+% drawnow
+%
 % Revision 1.7  2002/10/10 17:08:29  arno
 % output command ';'
 %
@@ -145,7 +148,17 @@ for ind = 1:2:length(args)
 	 case 'setname'   , EEG.setname = args{ind+1};
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1;
-	 case 'save'      , EEG = pop_saveset(EEG, args{ind+1}, '');
+	 case 'save'      , if isunix, dirindices = find(args{ind+1} == '/');
+                        elseif isppc, dirindices = find(args{ind+1} == ':');
+                        else dirindices = find(args{ind+1} == '\');
+                        end;
+                        args{ind+1}(dirindices(end)+1:end)
+                        args{ind+1}(1:dirindices(end))
+                        if ~isempty(dirindices)
+                            EEG = pop_saveset(EEG, args{ind+1}(dirindices(end)+1:end), args{ind+1}(1:dirindices(end)));
+                        else
+                            EEG = pop_saveset(EEG, args{ind+1});
+                        end;
 	 case 'overwrite' , overWflag = 1;
 	 otherwise, error(['pop_newset error: unrecognized key ''' args{ind} '''']); 
     end;
