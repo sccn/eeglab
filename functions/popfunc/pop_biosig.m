@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/11/12 18:22:11  arno
+% Initial revision
+%
 % Revision 1.1  2004/09/12 02:03:47  arnodelorme
 % Adding EEGLAB folder with EEGLAB interface files
 %
@@ -137,6 +140,20 @@ if isfield(H, 'EVENT')
             EEG.event(index).latency = H.EVENT.POS(index);
         end;
     end;
+    if isfield(H.EVENT, 'DUR')
+        if any( [ H.EVENT.DUR ] )
+            for index = 1:length( H.EVENT.DUR )
+                EEG.event(index).duration = H.EVENT.DUR(index);
+            end;
+        end;
+    end;
+    if isfield(H.EVENT, 'CHN')
+        if any( [ H.EVENT.CHN ] )
+            for index = 1:length( H.EVENT.CHN )
+                EEG.event(index).chanindex = H.EVENT.CHN(index);
+            end;
+        end;
+    end;            
 else 
     disp('Warning: no event found. Events might be embeded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
