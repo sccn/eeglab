@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/01/16 18:10:56  arno
+% debugging for PCA
+%
 % Revision 1.7  2002/08/12 18:36:35  arno
 % questdlg2
 %
@@ -77,18 +80,23 @@ if nargin < 2
 	% popup window parameters
 	% -----------------------
 	if ~isempty(EEG.reject.gcompreject)
-      components = find(EEG.reject.gcompreject == 1);
-      components = components(:)';
-      promptstr    = { ['Component list to subtract from data:'] };
-   	  %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
-   else
-      components = [];
-      promptstr    = { ['Component list to subtract from data:'] };
-   end;
-	inistr       = { int2str(components) };
+        components = find(EEG.reject.gcompreject == 1);
+        components = components(:)';
+        promptstr    = { ['Component list to subtract from data:'] };
+        %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
+    else
+        components = [];
+        promptstr    = { ['Component list to subtract from data:'] };
+    end;
+    promptstr    = { ['Component list to subtract from data:'] 'Component list to keep (overwrite previous option)' };
+	inistr       = { int2str(components) '' };
 	result       = inputdlg2( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr, 'pop_subcomp');
 	if length(result) == 0 return; end;
 	components   = eval( [ '[' result{1} ']' ] );
+    if ~isempty(result{2}), 
+        components   = eval( [ '[' result{2} ']' ] );
+        components  = setdiff([1:size(EEG.icaweights,1)], components);
+    end;
 end;
  
 if isempty(components)
@@ -137,8 +145,8 @@ end;
 EEG.data  = compproj;
 EEG.setname = 'ICA filtered';
 EEG.icaact = [];
+EEG.icawinv    = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
 EEG.icaweights = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
-EEG.icawinv = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
 
 com = sprintf('%s = pop_subcomp( %s, [%s], %d);', inputname(1), inputname(1), ...
    int2str(components), plotag);
