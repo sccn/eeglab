@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/07/16 04:51:07  arno
+% *** empty log message ***
+%
 % Revision 1.36  2002/07/12 23:11:03  arno
 % dftfilt->1
 %
@@ -584,7 +587,7 @@ if ~strcmp(lower(g.compute), 'c')
    Coher     = coherinit(Tfx.nb_points, trials, g.timesout, g.type);
    Coherboot = coherinit(Tfx.nb_points, trials, g.naccu   , g.type);
    Boot      = bootinit( Coherboot, Tfx.nb_points, g.timesout, g.naccu, baselength, g.baseboot, g.boottype, g.alpha, g.rboot);
-   freqs = Tfx.freqs;
+   freqs = Tfx.freqs
 else
    freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
 end;
