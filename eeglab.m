@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.346  2004/10/04 21:55:05  hilit
+% plugin paths are now added to the end of the path
+%
 % Revision 1.345  2004/09/14 16:33:28  arno
 % debug delete dataset
 %
@@ -1551,7 +1554,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     % BIOSIG plugin (not in plugin folder)
     % ------------------------------------
     path_biosig = which('eegplugin_biosig.m');
-    if ~isempty(path_biosig) && isempty(findstr(path_biosig, 'plugins'))
+    if ~isempty(path_biosig) & isempty(findstr(path_biosig, 'plugins'))
         funcname = 'eegplugin_biosig';
         try,
             eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
@@ -1588,7 +1591,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                         tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
                         for tmpind2 = 1:length(tmpdir2)
                             if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
-                                    && tmpdir2(tmpind2).name(end) == 'm'
+                                    & tmpdir2(tmpind2).name(end) == 'm'
                                 funcname = tmpdir2(tmpind2).name(1:end-2);
                                 tmpind2  = length(tmpdir2);
                                 tmpind   = length(tmpdir);
@@ -1832,7 +1835,7 @@ if ~option_keepdataset
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'off');
 	CURRENTSET = 0;
 else
-	if isempty(ALLEEG) && ~isempty(EEG) & ~isempty(EEG.data)
+	if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
 		ALLEEG = EEG;
 	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
@@ -1882,7 +1885,7 @@ end;
 % test if dataset has changed
 % ---------------------------
 if option_keepdataset
-    if ~isempty(ALLEEG) && CURRENTSET~= 0 && ~isequal(EEG.data, ALLEEG(CURRENTSET).data) 
+    if ~isempty(ALLEEG) & CURRENTSET~= 0 & ~isequal(EEG.data, ALLEEG(CURRENTSET).data) 
         % the above comparison does not work for ome structures
         tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
                               'Dataset change detected', ...
