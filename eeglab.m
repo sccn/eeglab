@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.226  2003/02/28 17:48:34  arno
+% do not return output var for eeglab redraw
+%
 % Revision 1.225  2003/02/25 01:20:07  scott
 % header edit -sm
 %
@@ -1117,8 +1120,13 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
     dircontent = what(p);
     for index = 1:length(dircontent.m)
         if ~isempty(findstr(dircontent.m{index}, 'eegplugin'))
+            if exist(dircontent.m{index}) == 7
+                addpath(dircontent.m{index})
+                disp(['eeglab: executing plugin "' funcname '" (path added)' ]);    
+            else 
+                disp(['eeglab: executing plugin "' funcname '"' ]);    
+            end;
             funcname = dircontent.m{index}(1:end-2);
-            disp(['eeglab: executing plugin "' funcname '"' ]);
             eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
                  ['disp(''eeglab: error while executing plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
