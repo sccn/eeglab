@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/19 20:08:28  arno
+% allowing ascii and binary read of mhead
+%
 % Revision 1.14  2002/11/19 19:45:09  arno
 % back to original
 %
@@ -289,13 +292,15 @@ if isstr(values)
     onemat = ones(enum,1);
     G = zeros(enum,enum);
     for i = 1:enum
-      ei = onemat-((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
-        (Ze(i)*onemat-Ze).^2)/2;
-      gx = zeros(1,enum);
-      for j = 1:enum
-        gx(j) = calcgx(ei(j));
-      end
-      G(i,:) = gx;
+        ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
+                         (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
+        %ei = onemat-((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
+        %             (Ze(i)*onemat-Ze).^2)/2;
+        gx = zeros(1,enum);
+        for j = 1:enum
+            gx(j) = calcgx(ei(j));
+        end
+        G(i,:) = gx;
     end
     fprintf('Calculating splining matrix...\n')
 
@@ -357,7 +362,8 @@ if isstr(values)
       X = x(j);
       Y = y(j);
       Z = z(j);
-      ei = onemat-((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2)/2;
+      ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); %default /2  no sqrt
+      %ei = onemat-((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2)/2;
       for i = 1:length(ei)
         gx(j,i) = calcgx(ei(i));  
       end
