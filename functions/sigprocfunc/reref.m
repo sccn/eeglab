@@ -19,10 +19,11 @@
 %   'icaweight'  - ICA weight matrix (Note: this should be weights*sphere)
 %   'method'     - ['standard'|'withref'] Include ('withref') reference channel 
 %                  in output. Default is 'standard'. 
-%   'refstate  ' - ['common'|'averef'] Current average reference state.
+%   'refstate  ' - ['common'|'averef'|integer] Current average reference.
 %                  Use this parameter to re-reference data to a given channel if data
-%                  is already average referenced (by setting it to 'averef') 
-%                  Default is 'common'.
+%                  is already average referenced (by setting it to 'averef').
+%                  Integer designates channel reference indices.
+%                  Default is 'common'. 
 %   'refloc'     - Reference channel location -- a cell array with name and 
 %                  polar coordinates of the channel, { 'label' theta radius }. 
 %                  For 3-D location, include the reference as the last channel 
@@ -69,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/26 00:01:32  arno
+% brand new function
+%
 % Revision 1.17  2003/07/02 01:07:41  arno
 % debug input check
 %
@@ -159,7 +163,7 @@ end;
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'method'     'string'  { 'standard' 'withref' }  'standard';
-                            'refstate'   'string'  { 'common' 'averef' }     'common';
+                            'refstate'   { 'string' 'integer' } { { 'common' 'averef' } [1 size(data,1)] }     'common';
                             'exclude'    'integer' [1 size(data,1)]          [];
                             'refloc'     'cell'    []                        {};
                             'keepref'    'string'  {'on' 'off' }             'off';
@@ -195,9 +199,12 @@ end;
 
 % compute average reference matrix
 % --------------------------------
-if ~strcmp(g.refstate, 'averef')
+if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
     
     if strcmpi(g.method, 'withref')
+        if ~isstr(g.refstate) & length(g.refstate) > 1
+            error('Cannot include old reference if multiple references had been used');
+        end;
         disp('Note: old reference electrode included in average reference computation');
         avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans-1); % reference is a relrevant channel i.e. Cz
         avematrix(end+1,:) = -1/(nbchans-1);                           % potential for the new electrode (previously ref)
@@ -212,8 +219,12 @@ if ~strcmp(g.refstate, 'averef')
         end;
         rerefchansout(end+1) = chans+1;
     else
-        disp('Note: old reference electrode not included in average reference computation');
-        avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
+        disp('Note: old reference (unless present in dataset) electrode not included in average reference computation');
+        if length(g.refstate) > 1
+            avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
+        else
+            avematrix = eye(nbchans)-ones(nbchans)*1/(nbchans-length(g.refstate)+1); % case of multiple references
+        end;            
         if length(g.elocs) > chans
             g.elocs(end) = []; % discard info
         end;
@@ -230,13 +241,14 @@ if ~isempty(ref)
     
     fprintf('Re-referencing data\n');
     for index = 1:length(ref)
-        refmatrix(:,ref) = -1/length(ref);
+        refmatrix(:,ref(index)) = refmatrix(:,ref(index))-1/length(ref);
     end;
     fprintf('Warning: reference channels have been removed\n');
     if length(ref) > 1 
         if strcmpi(g.keepref, 'off')
             refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
             refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
+            rerefchansout = setdiff(rerefchansout, ref);
 
             if ~isempty(g.elocs)
                 g.elocs(ref) = [];
@@ -262,8 +274,6 @@ end;
 
 % there are faster methods but this one is the simpliest
 
-rerefchansout
-rerefchans
 data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % implement as a matrix multiply
 if strcmpi(g.keepref, 'off')
     data = data(setdiff(1:size(data,1), ref),:);
