@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/07/17 23:42:32  scott
+% nothing
+%
 % Revision 1.44  2003/07/17 23:13:03  scott
 % rm debug message
 %
@@ -232,12 +235,13 @@ shrinkfactor = 'off';
 DIPOLE = [];
 VERBOSE = 'on';
 
-%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%% Handle arguments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 if nargin< 1
    help topoplot;
    return
 end
-
 nargs = nargin;
 if nargs < 2
   loc_file = DEFAULT_ELOC;
@@ -371,7 +375,8 @@ end
 if r>1 & c>1,
   error('topoplot(): input data must be a single vector');
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %fid = fopen(loc_file);
 %if fid<1,
 %  fprintf('topoplot(): cannot open chan_locs file (%s).\n',loc_file);
@@ -385,10 +390,11 @@ end
 %labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
 %Th = pi/180*A(:,2);                              % convert degrees to radians
 %Rd = A(:,3);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% read the channel location file
-% ------------------------------
+%
+%%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
+% 
 if isstr(loc_file)
 	[tmpeloc labels Th Rd] = readlocs(loc_file,'filetype','loc');
 else % a locs struct
@@ -410,10 +416,12 @@ Th = pi/180*Th;                              % convert degrees to radians
 %end
 
 if isstr(shrinkfactor)
-	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
+	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), ...
+                       'force')
 		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
 		if strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g to show all\n', squeeze);
+            fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to show all\n', ...
+                       squeeze);
         end;
 		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
 	end;	
@@ -421,28 +429,29 @@ else
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g\n', shrinkfactor);
 	end;
-    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes in squeeze*100% to have all inside
+    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes by squeeze*100% to have all inside
 end;
 	  
 enum = find(Rd <= 0.5);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', length(enum)-length(Rd),length(Rd));    
+        fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', ...
+                   length(enum)-length(Rd),length(Rd));    
     end; 
 end;	
 if ~isempty(Vl)
 	if length(Vl) == length(Th)
 		Vl = Vl(enum);
-	else
-		if strcmp(STYLE,'blank')
+	else if strcmp(STYLE,'blank')
             tmpVl=[];
             cc=1;
             for kk=1:length(Vl)
                 tmpind = find(enum == Vl(kk));
                 if isempty(tmpind)
                     if strcmpi(VERBOSE, 'on')
-                        disp( [ 'Topoplot warning: some channel are not visible (use the "Edit' ...
-                                ' > Channel locations" to modify the shrink factor).' ] );
+                        disp( [ ...
+    'topoplot() Warning: one or more channels are not visible (use "Edit' ...
+    ' > Channel locations" to modify the montage shrink factor).' ] );
                     end;
                 else
                     tmpVl(cc) = tmpind;
@@ -455,39 +464,44 @@ if ~isempty(Vl)
 end;
 Th = Th(enum);
 Rd = Rd(enum);
-
 labels = labels(enum,:);
-
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
 
 if ~strcmp(STYLE,'blank')
-  % find limits for interpolation
+  %
+  %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
   if strcmp(INTERPLIMITS,'head')
     xmin = min(-.5,min(x)); xmax = max(0.5,max(x));
     ymin = min(-.5,min(y)); ymax = max(0.5,max(y));
-  else
+  else % interplimits = rectangle containing electrodes
     xmin = max(-.5,min(x)); xmax = min(0.5,max(x));
     ymin = max(-.5,min(y)); ymax = min(0.5,max(y));
   end
   
+  %
+  %%%%%%%%%%%%%%%%%%%%%%% Interpolate scalp map data %%%%%%%%%%%%%%%%%%%%
+  %
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
-  
-  % fprintf('running griddata()...\n');
-  [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
-  
-  % Take data within head
+  [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % interpolate data
+  %
+  %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%
+  %
   mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
   ii = find(mask == 0);
   Zi(ii) = NaN;
-  
+  %
+  %%%%%%%%%%%%%%%%%%%%%%% Return interpolated image only  %%%%%%%%%%%%%%%%%
+  %
    if strcmpi(noplot, 'on') 
        fprintf('topoplot(): no plot requested.\n')
        return;
    end
-
-  % calculate colormap limits
+  %
+  %%%%%%%%%%%%%%%%%%%% Calculate colormap limits %%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
   m = size(colormap,1);
   if isstr(MAPLIMITS)
     if strcmp(MAPLIMITS,'absmax')
@@ -506,10 +520,11 @@ if ~strcmp(STYLE,'blank')
   end
   delta = xi(2)-xi(1); % length of grid entry
   
-  % Draw topoplot on head
-   cla
-   hold on
-
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%
+  %
+  cla  % clear current axis
+  hold on
   if strcmp(STYLE,'contour')
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
   elseif strcmp(STYLE,'both')
@@ -522,11 +537,11 @@ if ~strcmp(STYLE,'blank')
   elseif strcmp(STYLE,'fill')
     contourf(Xi,Yi,Zi,CONTOURNUM,'k');
   else
-    error('Invalid style')
+    error('topoplot(): Invalid style')
   end
   caxis([amin amax]) % set coloraxis
 
-else % style 'blank'
+else % if style 'blank'
    if strcmpi(noplot, 'on') 
        fprintf('topoplot(): no plot requested.\n')
        return;
@@ -535,6 +550,8 @@ else % style 'blank'
    cla
    hold on
    set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+   pos = get(gca,position);
+   fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(ELECTRODES,'labelpoint') |  strcmp(ELECTRODES,'numpoint')
     text(-0.6,-0.6, ...
@@ -560,14 +577,18 @@ end
 
 handle = gca;
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%% Draw Head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%% Draw head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 l = 0:2*pi/100:2*pi;
 basex = .18*rmax;  
 tip = rmax*1.15; base = rmax-.004;
 EarX = [.497 .510 .518 .5299 .5419 .54 .547 .532 .510 .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-% Plot Electrodes
+%
+% %%%%%%%%%%%%%%%%%%% Plot electrodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 if strcmp(ELECTRODES,'on') 
   if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
@@ -640,8 +661,9 @@ elseif strcmp(ELECTRODES,'numbers')
   end
 end
 
-% plot dipole on the top of the plot
-% ----------------------------------
+%
+%%%%%%%%%%%%%%%%%%%%%% Plot dipole on top of the plot %%%%%%%%%%%%%%%%%%%%%
+%
 if ~isempty(DIPOLE)
     hold on;
     color = 'k';
@@ -662,19 +684,21 @@ if ~isempty(DIPOLE)
     end;
 end;
 
-% Plot Head, Ears, Nose
-% ---------------------
+%
+%%%%%%%%%%%%%%%%%%%%% Plot Head, Ears, Nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 plot(cos(l).*rmax,sin(l).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
 plot([.18*rmax;0;-.18*rmax],[base;tip;base],...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH);
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH); % plot nose
    
-plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)
-plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)   
+plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)  % plot left ear
+plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot right ear
 
 hold off
 axis off
 axis square;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; % set std background color
 
