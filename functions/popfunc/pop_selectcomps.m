@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/11 22:19:37  arno
+% *** empty log message ***
+%
 % Revision 1.6  2002/07/26 23:57:37  arno
 % same
 %
@@ -95,11 +98,16 @@ end;
 if isempty(EEG.reject.gcompreject)
 	EEG.reject.gcompreject = zeros( size(EEG.icawinv,2));
 end;
+try, icadefs; 
+catch, 
+	BACKCOLOR = [0.8 0.8 0.8];
+	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
+end;
 
 % set up the figure
 % -----------------
 if ~exist('fig')
-	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off', 'color', [1 1 1]);
+	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off', 'color', BACKCOLOR);
 	set(gcf,'MenuBar', 'none');
 	pos = get(gcf,'Position');
 	set(gcf,'Position', [pos(1) 20 800 800]);
@@ -139,7 +147,7 @@ for ri = compnum
 
 		% plot the button
 		% ---------------
-		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)]);
+		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)], 'backgroundcolor', GUIBUTTONCOLOR);
 		command = sprintf('pop_compprop( %s, %d, 0, %3.15f);', inputname(1), ri, button);
 		set( button, 'callback', command );
 	end;
@@ -151,20 +159,20 @@ end;
 % draw the bottom button
 % ----------------------
 if ~exist('fig')
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Cancel', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Cancel', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[-10 -10 15 4].*s+q, 'callback', 'close(gcf); fprintf(''Operation cancelled\n'')' );
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Set threhsolds', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Set threhsolds', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[10 -10 15 4].*s+q, 'callback', 'pop_icathresh(EEG); pop_selectcomps( EEG, gcbf);' );
 	if isempty( EEG.stats.compenta	), set(hh, 'enable', 'off'); end;	
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'See comp. stats', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'See comp. stats', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[30 -10 15 4].*s+q, 'callback',  ' ' );
 	if isempty( EEG.stats.compenta	), set(hh, 'enable', 'off'); end;	
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'See projection', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'See projection', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[50 -10 15 4].*s+q, 'callback', ' ', 'enable', 'off'  );
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Help', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Help', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[70 -10 15 4].*s+q, 'callback', 'hthelp(''pop_selectcomps'');' );
 	command = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);''); close(gcf)'
-	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'OK', 'Units','Normalized', ...
+	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'OK', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[90 -10 15 4].*s+q, 'callback',  command);
 			% sprintf(['eeg_global; if %d pop_rejepoch(%d, %d, find(EEG.reject.sigreject > 0), EEG.reject.elecreject, 0, 1);' ...
 		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
