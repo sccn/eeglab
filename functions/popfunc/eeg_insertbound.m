@@ -1,7 +1,8 @@
 % eeg_insertbound() - insert boundary event in EEGLAB event structure.
 %
 % Usage:
-%   >> eventout = eeg_insertbound( eventin, pnts, latency, abslatency, duration);
+%   >> [eventout indold] = eeg_insertbound( eventin, pnts, ...
+%                                           latency, abslatency, duration);
 %
 % Inputs:
 %   eventin    - EEGLAB event structure
@@ -15,6 +16,7 @@
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
+%   indold     - old event indices (in returned array)
 %
 % Notes:
 %   1) This function performs the following: add boundary events to the 
@@ -44,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/06/02 17:19:45  arno
+% do not remove nested boundary events
+%
 % Revision 1.16  2004/06/01 21:46:18  arno
 % NaN when concatenating datasets
 %
@@ -97,7 +102,7 @@
 % Initial revision
 %
 
-function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
+function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
     
     if nargin < 2
         help eeg_insertbound;
@@ -112,6 +117,7 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
     end;
     
     eventout = eventin;
+    indold   = 1:length(eventin);
 	for tmpindex = 1:length(boundevents)
         if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= pnts
             
@@ -133,6 +139,7 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
                     tmp = eventout(end);
                     eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
                     eventout(tmpind2) = tmp;
+                    indold(tmpind2:end) = indold(tmpind2:end)+1;
                 else
                     tmpind2 = length(eventout)+1;
                     eventout(tmpind2).type     = 'boundary';
