@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/09/20 18:18:42  hilit
+% added round() on pointrange2 so, the indices will be integers and not double
+%
 % Revision 1.26  2003/08/08 22:17:03  arno
 % comment is_sccn
 %
@@ -174,7 +177,7 @@ if popup
 			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotersp','present',0), 'string', ...
 				 'Plot coherence amplitude', 'tooltipstring', ...
 				 'Plot coherence ampltitude image in the upper panel' } ...
-			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotitc','present',0), 'string', ...
+			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotphase','present',0), 'string', ...
 				 'Plot coherence phase', 'tooltipstring', ...
 				 'Plot coherence phase image in the lower panel' } ...
 			 };
@@ -231,7 +234,7 @@ if popup
 		options = [ options ', ''plotersp'', ''off''' ];
 	end;
 	if ~result{9}
-		options = [ options ', ''plotitc'', ''off''' ];
+		options = [ options ', ''plotphase'', ''off''' ];
 	end;
     figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; 
 else
