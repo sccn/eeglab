@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.262  2003/11/25 18:58:38  arno
+% adding ant file format
+%
 % Revision 1.261  2003/11/17 20:23:20  arno
 % plot/compare menu
 %
@@ -1097,7 +1100,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ANT .CNT file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeep;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From ANT .AVR file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg_avr;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From ANT .AVR file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg_avg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
     if exist('sload') == 2  & exist('daqread') == 2 % detect BIOSIG
         disp('BIOSIG detected; Additional import menu inserted');
