@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/29 15:51:06  arno
+% debugging
+%
 % Revision 1.2  2002/07/29 15:50:15  arno
 % can also read non-matlab files
 %
@@ -69,7 +72,7 @@ if nonmatlab
 	while ~feof(fid)
 		str = deblank(str(1:end-1));
 		
-		doc = { doc{:} str(2:end) };
+		doc = { doc{:} str(1:end) };
 		str = fgets( fid );
 	end;
 else
