@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2004/02/13 02:36:21  arno
+% updating location after chancenter
+%
 % Revision 1.87  2004/02/13 00:10:31  arno
 % implementing new history for channel recentering
 %
