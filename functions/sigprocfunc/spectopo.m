@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/07/24 17:47:55  arno
+% making it nicer for components
+%
 % Revision 1.14  2002/07/20 19:21:21  arno
 % debugging
 %
@@ -237,12 +240,14 @@ if g.percent ~= 1 & epochs > 1
     fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
 end;
 if isempty(g.weights)
-	% computing data spectrum
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% compute data spectrum
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing spectra: ')
 	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
 	fprintf('\n');
 else
-	% computing data spectrum
+	% compute data spectrum
 	if isempty(g.plotchan) | g.plotchan == 0
 		fprintf('Computing spectra: ')
 		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
@@ -253,7 +258,9 @@ else
 		fprintf('\n');
 	end;
 	
-	% selecting channel and spectrum
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% select channel and spectrum
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.plotchan) % find channel of minimum power
 		[tmp indexfreq] = min(abs(g.freq-freqs));
 		[tmp g.plotchan] = min(eegspecdB(:,indexfreq));
@@ -266,7 +273,9 @@ else
 		eegspecdBtoplot = eegspecdB;
 	end;
 	
-	% computing component spectra
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% compute component spectra
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing component spectra: ')
 	if g.plotchan ~= 0
 		newweights = diag(g.icawinv(g.plotchan,:)) * g.weights;
@@ -279,8 +288,10 @@ else
 		[compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
 	end;
 	fprintf('\n');
-	
-	% selecting components to plot
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% select components to plot
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.icamaps)
 		% weight power by channel projection weight		
 		[tmp indexfreq] = min(abs(g.freq-freqs));
@@ -295,9 +306,9 @@ else
 	end;
 end;
 	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute axis and caxis g.limits
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if length(g.limits)<1 | isnan(g.limits(1))
    g.limits(1) = LOPLOTHZ;
 end
@@ -368,10 +379,15 @@ yl=ylabel('Rel. Power (dB)');
 set(yl,'fontsize',16);
 set(gca,'fontsize',16)
 box off;
+
+colrs = {'r','b','g','m','c'}; % component spectra trace colors
 if ~isempty(g.weights)
 	set(pl, 'linewidth', 2, 'color', 'k');
 	hold on;
-	pl2=plot(freqs(1:maxfreqidx),compeegspecdB(:,1:maxfreqidx)');
+  for f=1:length(g.icamaps)
+    colr = colrs{mod((f-1),5)+1};
+	  pl2=plot(freqs(1:maxfreqidx),compeegspecdB(f,1:maxfreqidx)',colr);
+  end
 	newaxis = axis;
 	newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
 	newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
@@ -382,12 +398,22 @@ if ~isempty(g.freq)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	for f=1:length(g.freq)
+  if isempty(g.weights)
+	 for f=1:length(g.freq)
 		hold on; 
 		plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
 			 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
 			 'k','LineWidth',2.5);
-	end;
+	 end;
+  else
+	 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	 % Plot vertical line at comp analysis freq
+	 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   mincompdB = min([min(eegspecdB(:,freqidx(1))) min(compeegspecdB(:,freqidx(1)))]);
+   maxcompdB = max([max(eegspecdB(:,freqidx(1))) max(compeegspecdB(:,freqidx(1)))]);
+   hold on;
+	 plot([freqs(freqidx(1)) freqs(freqidx(1))],[mincompdB maxcompdB],'k');
+  end
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot connecting lines using changeunits()
@@ -405,34 +431,41 @@ if ~isempty(g.freq)
 	end
 	large = sbplot(1,1,1);
 	
-	% relative positions on plot
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% compute relative positions on plot
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if  ~isempty(g.weights)
 		freqnormpos = tmpmainpos(1) + tmpmainpos(3)*(freqs(freqidx(1))-g.limits(1))/(g.limits(2)-g.limits(1));
 		for index = 1:length(g.icamaps)+1
 			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
 		end;
 	else 
-		realpos = 1:length(g.freq);
+		realpos = 1:length(g.freq); % indices giving order of plotting positions
 	end;
 	
 	for f=1:length(g.freq)+length(g.icamaps)
 		if f>length(g.freq) % special case of ica components
 			from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
-			%g.icafreqsval contain the sorted frequency values at the specified frequency
+			%g.icafreqsval contains the sorted frequency values at the specified frequency
 		else 
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
 		end;
 		pos = get(headax(realpos(f)),'position');
 		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/1.7];
 		hold on;
-		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
+    if f<=length(g.freq)
+      colr = 'k';
+    else
+      colr = colrs{mod((f-2),5)+1};
+    end
+		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',2);
 		axis([0 1 0 1]);
 		axis off;
 	end;
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot heads using topoplot()
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Plotting scalp distributions: ')
 	for f=1:length(g.freq)
 		axes(headax(realpos(f)));
