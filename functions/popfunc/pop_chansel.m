@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/11/10 16:09:45  arno
+% nothing
+%
 % Revision 1.11  2003/08/05 18:20:05  arno
 % same
 %
@@ -67,19 +70,46 @@
 % Initial revision
 %
 
-function [chanlist,chanliststr, allchanstr] = pop_chansel(chans); 
+function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin); 
     
     if nargin < 1
         help pop_chansel;
         return;
     end;
-    if isempty(chans), disp('No channel structure loaded'); return; end;
+    if isempty(chans), disp('Empty input'); return; end;
+    if ~iscell(chans), error('Can only process cell array'); end;
     chanlist    = [];
     chanliststr = {};
     allchanstr  = '';
     
-    % get infos from readlocs
-    % -----------------------
+    g = finputcheck(varargin, { 'withindex'   'string'  {'on' 'off'}   'off' });
+    if isstr(g), error(g); end;
+    
+	tmpstr = {chans};
+    if isnumeric(chans{1})
+        tmpstr = [ chans{:} ];
+        tmpfieldnames = cell(1, length(tmpstr));
+        for index=1:length(tmpstr), 
+            if strcmpi(g.withindex, 'on')
+                tmpfieldnames{index} = [ num2str(index) '  -  ' num2str(tmpstr(index)) ]; 
+            else
+                tmpfieldnames{index} = num2str(tmpstr(index)); 
+            end;
+        end;
+    else
+        tmpfieldnames = chans;
+        if strcmpi(g.withindex, 'on')
+            for index=1:length(tmpfieldnames), 
+                tmpfieldnames{index} = [ num2str(index) '  -  ' tmpfieldnames{index} ]; 
+            end;
+        end;
+    end;
+    [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift/Ctrl to', 'select several)'), 'ListString', tmpfieldnames);       
+    allchanstr = chans(chanlist);
+       
+    return;
+    % old version
+    % -----------
     updatefields = [ 'tmpdata = get(gcf, ''userdata'');' ...
                      'tmpobj = findobj(gcf, ''tag'', ''list2'');' ...
                      'set(tmpobj, ''string'', strvcat(tmpdata{2}));' ...
@@ -98,7 +128,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans);
                     '   length(tmpdata{2}) > 1,' ...
                     '   set(tmpobj, ''value'', get(tmpobj, ''value'')-1);' ...
                     'end;' ...
-                    'try, tmpdata{2}(get(tmpobj, ''value'')) = [];' ...
+                   'try, tmpdata{2}(get(tmpobj, ''value'')) = [];' ...
                     'catch, end;' ...
                     'set(gcbf, ''userdata'', tmpdata);' ...
                     updatefields ];                      
