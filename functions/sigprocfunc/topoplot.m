@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.132  2004/02/15 21:02:13  scott
+% same
+%
 % Revision 1.131  2004/02/15 21:01:27  scott
 % same
 %
@@ -759,8 +762,10 @@ Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
 
+if exist('QUAD_SKIRT') % not ready yet!!!
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
    Th = skirt_Th(Th,Rd,rmax*squeezefac);  % rotate the angles of the electrodes in the 'skirt'
+end
 end
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
@@ -845,6 +850,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   end
   delta = xi(2)-xi(1); % length of grid entry
 
+if exist('QUAD_SKIRT') % not-ready!!!
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
 %
@@ -859,6 +865,7 @@ if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrin
   ii = find(mask == 0);
   Zi(ii) = NaN;
 end
+end % exist
   
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%
