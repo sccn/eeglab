@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/02/21 00:36:09  scott
+% header edit -sm
+%
 % Revision 1.6  2002/07/22 22:57:54  arno
 % swap 2 first colors
 %
@@ -132,7 +135,7 @@ ls_plotfile = 'ls -l plottopo.ps';
 if nargin < 10
    vert = [];
 end
-if vert==0
+if ~isempty(vert) & vert==0
    vert = [];
 end
 SIGN = DEFAULT_SIGN;
@@ -150,10 +153,10 @@ end
 if nargin < 7,
   axwidth  = nan; % DEFAULT_AXWIDTH;
   axheight = nan; % DEFAULT_AXHEIGHT;
-elseif size(axsize) == [1 1] & axsize(1) == 0
+elseif all(size(axsize) == [1 1]) & axsize(1) == 0
   axwidth  = nan; % DEFAULT_AXWIDTH;
   axheight = nan; % DEFAULT_AXHEIGHT;
-elseif size(axsize) == [1 2]
+elseif all(size(axsize) == [1 2])
   axwidth  = axsize(1);
   axheight = axsize(2);
   if axwidth > 1 | axwidth < 0 | axheight > 1 | axwidth < 0
@@ -167,7 +170,7 @@ end
 if nargin < 6
    channels = 0;
 end
-if channels == 0
+if ~isempty(channels) & channels == 0
    channelnos = 1:size(data,1);
 elseif ~isstr(channels)
    channelnos = channels;
@@ -189,7 +192,7 @@ end
 if nargin < 2
   chan_locs = '';
 end
-if (isnumeric(chan_locs) & (chan_locs == 0)) | isempty(chan_locs) 
+if  isempty(chan_locs) | (isnumeric(chan_locs) & (chan_locs == 0))
   chan_locs = '';
 end
 if isempty(chan_locs) 
@@ -249,7 +252,7 @@ end
      axheight = DEFAULT_AXHEIGHT;
      axwidth =  DEFAULT_AXWIDTH;
   end
-    fprintf('\nPlotting data using axis size [%g,%g]\n',axwidth,axheight);
+    fprintf('Plotting data using axis size [%g,%g]\n',axwidth,axheight);
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -378,7 +381,7 @@ chans = length(channelnos);
   if ISSPEC
     ISSPEC = 1;
     SIGN = 1;
-    fprintf('\nPlotting positive up. Assuming data are spectra.\n');
+    fprintf('Plotting positive up. Assuming data are spectra.\n');
     xlabel = 'Freq (Hz)';
     ymin = 0;                        % plot positive-up
   end;
@@ -401,14 +404,13 @@ chans = length(channelnos);
   end
   h=gca;title(plottitle,'FontSize',TITLEFONTSIZE); % title plot and
   hold on
-  msg = ['\nPlotting %d traces of %d frames with colors: '];
+  msg = ['Plotting %d traces of %d frames with colors: '];
 
   for c=1:datasets
     msg = [msg  colors(c,:)];
   end
   msg = [msg ' -> \n'];    % print starting info on screen . . .
-  fprintf(...
-    '\nlimits: [xmin,xmax,ymin,ymax] = [%4.1f %4.1f %4.2f %4.2f]\n',...
+  fprintf('limits: [xmin,xmax,ymin,ymax] = [%4.1f %4.1f %4.2f %4.2f]\n',...
                 xmin,xmax,ymin,ymax);
   fprintf(msg,datasets,frames);
 
@@ -430,7 +432,7 @@ if size(chan_locs,2)==2 % plot in a rectangular grid
    wd = chan_locs(2);
    if chans > ht*wd
       fprintf(...
-    '\ntopoplot(): (%d) channels to be plotted > grid size [%d %d]\n',...
+    'topoplot(): (%d) channels to be plotted > grid size [%d %d]\n',...
                            chans,ht,wd);
       return
    end
@@ -515,7 +517,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 
   Axes = [];
   for P=0:datasets-1, %  for each data epoch
-      fprintf('\ntrace %d: ',P+1);
+      fprintf('trace %d: ',P+1);
 
     for c=1:chans, %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -620,8 +622,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 
      fprintf(' %d',c); % finished with channel plot
     end; % c, chans / subplot
+    fprintf('\n');
   end; % P / epoch
-  fprintf('\n');
+
   %
   %%%%%%%%%%%%%%%%%%%%% Make time and amp cal bar %%%%%%%%%%%%%%%%%%%%%%%%%
   %
