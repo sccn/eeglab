@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2003/12/17 00:45:57  arno
+% adding E prefix to electrodes
+%
 % Revision 1.115  2003/12/11 17:59:41  arno
 % msg
 %
@@ -915,15 +918,17 @@ if ~isempty( varargin)
               error('eeg_checkset: no events'); return;
           end;
          case 'chanloc', 
-          if isempty(EEG.chanlocs)
-              errordlg2( strvcat('Cannot process dataset without channel location file.', ...
+          if isempty(EEG.chanlocs) | ~isfield(EEG.chanlocs, 'theta') | ...
+                  all(cellfun('isempty', { EEG.chanlocs.theta }))
+              errordlg2( strvcat('Cannot process dataset without channel location information.', ...
                          'Enter the filename via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without channel location file.'); return;
           end;
          case 'chanlocs_homogeneous', 
-          if isempty(EEG.chanlocs)
-              errordlg2( strvcat('Cannot process without a channel location file.', ...
+          if isempty(EEG.chanlocs) | ~isfield(EEG.chanlocs, 'theta') | ...
+                  all(cellfun('isempty', { EEG.chanlocs.theta }))
+              errordlg2( strvcat('Cannot process without a channel location information.', ...
                          'Enter the filename via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without a channel location file.'); return;
