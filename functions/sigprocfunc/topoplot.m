@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/07/18 01:18:12  scott
+% debug last
+%
 % Revision 1.46  2003/07/18 01:17:34  scott
 % formatting, debug axes size message
 %
@@ -471,7 +474,11 @@ labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
 
-if ~strcmp(STYLE,'blank')
+  pos = get(gca,'position');
+  fprintf('0 - Current axes size %g,%g\n',pos(3),pos(4));
+if ~strcmpi(STYLE,'blank') % if draw scalp map
+  pos = get(gca,'position');
+  fprintf('1 - Current axes size %g,%g\n',pos(3),pos(4));
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -528,6 +535,10 @@ if ~strcmp(STYLE,'blank')
   %
   cla  % clear current axis
   hold on
+  set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+  pos = get(gca,'position');
+  fprintf('Current axes size %g,%g\n',pos(3),pos(4));
+
   if strcmp(STYLE,'contour')
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
   elseif strcmp(STYLE,'both')
@@ -545,6 +556,9 @@ if ~strcmp(STYLE,'blank')
   caxis([amin amax]) % set coloraxis
 
 else % if style 'blank'
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%%%% Draw blank head %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
    if strcmpi(noplot, 'on') 
        fprintf('topoplot(): no plot requested.\n')
        return;
