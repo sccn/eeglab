@@ -144,6 +144,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2003/04/25 22:30:40  arno
+% interpolating phase value
+%
 % Revision 1.95  2003/04/25 18:04:31  arno
 % nothing
 %
@@ -1279,14 +1282,25 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	winlen = floor(DEFAULT_CYCLES*srate/freq);
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
-	winloc = winloc(find(winloc>0 & winloc<=frames));
+    tmprange = find(winloc>0 & winloc<=frames);
+    winloc = winloc(tmprange);
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %1.1f-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
-			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
-	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
-			length(winloc));
+    if length(tmprange) ~=  winlen+1
+        filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
+        timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
+        phaseangles = phaseangles + 2*pi*(timecenter-phargs(1))*freq;
+        fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
+        fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
+                filtersize, 1000/freq*filtersize, timecenter);
+        fprintf('    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', length(winloc), phargs(1));
+    else
+        fprintf('Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
+			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
+        fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
+    end;
+
 	%
 	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
