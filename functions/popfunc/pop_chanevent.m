@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/07/28 15:36:11  arno
+% typo
+%
 % Revision 1.38  2004/07/27 22:47:54  arno
 % debug history
 %
@@ -278,6 +281,8 @@ if nargin < 2
 	if ~result{6}, options = { options{:} 'delchan'  'off'}; end;
 	if ~result{7}, options = { options{:} 'delevent' 'off'}; end;
 	if result{8},  options = { options{:} 'nbtype'  1}; end;
+else
+    options = varargin;
 end;
 listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
               'edgelen'   'integer'    [1 Inf]                            1;
@@ -287,7 +292,7 @@ listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both'
               'duration'  'string'     { 'on' 'off' }                     'off';
               'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
               'nbtype'    'integer'    [1 NaN]                             NaN };
-g = finputcheck( varargin, listcheck, 'pop_chanedit');
+g = finputcheck( options, listcheck, 'pop_chanedit');
 if isstr(g), error(g); end;
 
 % check inut consistency
