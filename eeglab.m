@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.217  2003/02/03 17:15:02  arno
+% adding ALLCOM output
+%
 % Revision 1.216  2003/02/03 17:09:59  arno
 % adding outputs to EEGLAB
 %
@@ -1073,6 +1076,9 @@ uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
 eeglab('redraw');
+if nargout < 1
+    clear ALLEEG;
+end;
 
 % REMOVED MENUS
 	%uimenu( fourth_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
