@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/20 00:05:38  arno
+% adding test for plotting a large number of components
+%
 % Revision 1.14  2002/08/19 22:20:21  arno
 % 10 -> strvcat
 %
@@ -146,7 +149,7 @@ if nargin < 3
 	topotitle    = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
 	options      = [ ',' result{4} ];
-	if size(arg2(:),1) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
+	if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -198,11 +201,11 @@ for index = 1:size(arg2(:),1)
         if mod(index, rowcols(1)*rowcols(2)) == 1
             if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
         	figure;
-        	pos = get(gcf,'Position');
         end;    
+		pos = get(gcf,'Position');
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
+		set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 	end;
-	set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 
 	if ~isnan(arg2(index))
 		if typeplot
