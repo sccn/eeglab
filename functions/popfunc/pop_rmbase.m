@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/08/18 16:45:01  arno
+% ms -> s
+%
 % Revision 1.12  2003/07/18 14:50:28  scott
 % commenting, editting help message
 %
@@ -125,12 +128,20 @@ elseif nargin < 2 & EEG.trials == 1
     pointrange = [1:EEG.pnts];
 end;
 
-if exist('pointarange') ~= 1 | isempty(pointrange)
+if exist('pointrange') ~= 1
+    if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
+        error('pop_rmbase(): Bad time range');
+    end;
+    pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
+end;
+
+if isempty(pointrange)
     if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
     end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
 end;	
+
 if (min(pointrange) < 1) | (max( pointrange ) > EEG.pnts)  
    error('pop_rmbase(): Wrong point range');
 end;
