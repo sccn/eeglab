@@ -14,6 +14,7 @@
 %   'comments'    - 'string' string of comments
 %   'overwrite'   - ['on'|'off'] overwrite parent dataset
 %   'save'        - 'filename' save the dataset
+%   'retrieve'    - dataset number, retrieve a dataset
 %
 % Note: 1) this function take into account the content of eeg_options
 %       for dataset overwritting. If the dataset overwritting
@@ -44,13 +45,16 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/26 02:51:26  arno
+% adding com parameter
+%
 % Revision 1.1  2002/04/26 02:46:37  arno
 % Initial revision
 %
 
 %   'aboutparent' - ['on'|'off'] insert reference to parent dataset in the comments
 
-function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, CURRENSET, varargin);
+function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, CURRENTSET, varargin);
 
 com = '';
 if nargin < 3
@@ -95,17 +99,19 @@ if nargin < 4                 % if several arguments, assign values
 	if ~option_keepdataset, uilist{9} = { uilist{9}{:} 'enable', 'off'}; end;
     [result userdat] = inputgui( geometry, uilist, 'pophelp(''pop_newset'');', ...
 								  fastif(isempty(EEG.data), 'Import dataset info -- pop_newset()', 'Edit dataset info -- pop_newset()'), userdat);
-    if length(result) == 0, return; end;
-
-	args = { 'setname', result{1} };
-	if ~isempty(result{2}) 
-		args = { args{:} 'save', result{2} };
-	end;
-	if ~strcmp(EEG.comments, userdat{1})
-		args = { args{:} 'comments', userdat{1} };
-	end;
-	if userdat{3} == 1
-		args = { args{:} 'overwrite' 'on' };
+    if length(result) == 0,
+		args = { 'retrieve', CURRENTSET };
+	else 
+		args = { 'setname', result{1} };
+		if ~isempty(result{2}) 
+			args = { args{:} 'save', result{2} };
+		end;
+		if ~strcmp(EEG.comments, userdat{1})
+			args = { args{:} 'comments', userdat{1} };
+		end;
+		if userdat{3} == 1
+			args = { args{:} 'overwrite' 'on' };
+		end;
 	end;
 else % no interactive inputs
     args = varargin;
@@ -118,13 +124,14 @@ for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1};
 	 case 'comments'  , EEG.comments = args{ind+1};
+	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1;
 	 case 'save'      , EEG = pop_saveset(EEG, args{ind+1}, '');
 	 case 'overwrite' , overWflag = 1;
 	 otherwise, error(['pop_newset error: unrecognized key ''' args{ind} '''']); 
     end;
 end;
 if overWflag
-	[ALLEEG, EEG] = eeg_store( ALLEEG, EEG, CURRENSET);
+	[ALLEEG, EEG] = eeg_store( ALLEEG, EEG, CURRENTSET);
 else
 	[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
 end;
