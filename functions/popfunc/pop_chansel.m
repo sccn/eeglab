@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/08/05 18:17:49  arno
+% assign default arguments
+%
 % Revision 1.9  2003/05/14 18:12:32  arno
 % typo
 %
@@ -123,7 +126,9 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans);
    chanliststr = chanliststr(indices);
    
    % generate all channel name string
-   allchanstr = chanliststr{1};
-   for index = 2:length(chanliststr)
-       allchanstr = [ allchanstr ' ' chanliststr{index} ];
+   if ~isempty(chanliststr)
+       allchanstr = chanliststr{1};
+       for index = 2:length(chanliststr)
+           allchanstr = [ allchanstr ' ' chanliststr{index} ];
+       end;
    end;
