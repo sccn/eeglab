@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/12 18:30:05  arno
+% quesdlg2
+%
 % Revision 1.20  2002/08/12 16:43:01  arno
 % debug inputdlg2
 %
@@ -284,7 +287,7 @@ if nargin < 2
 				chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
 				totaluserdat = { totaluserdat{:} tmpcom };
 			catch
-				errordlg(lasterr, 'Channel locations error');
+				errordlg2(lasterr, 'Channel locations error');
 				returnmode = 'no';
 			end;	
 			evalin('base', 'clear comtmp');

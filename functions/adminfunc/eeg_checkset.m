@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2002/08/12 18:39:23  arno
+% questdlg2
+%
 % Revision 1.53  2002/08/12 00:16:46  arno
 % same
 %
@@ -622,12 +625,12 @@ if ~isempty( varargin)
 		  else, return; end;
 		 case 'epoch', 
 		  if EEG.trials == 1
-			  errordlg([ 'Epochs must be extracted before running that function' 10 'Use /Tools/Extract epochs'], 'Error');
+			  errordlg2(strvcat('Epochs must be extracted before running that function', 'Use /Tools/Extract epochs'), 'Error');
 			  error('eeg_checkset: epochs must be extracted before running that function');
 		  end;
 		 case 'event', 
 		  if isempty(EEG.event)
-			  errordlg([ 'Cannot process if no events. First add events.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
+			  errordlg2(strvcat('Cannot process if no events. First add events.', 'Use /File/Import event info or /Import epoch info'), 'Error');
 			  error('eeg_checkset: no events');
 		  end;
 		 case 'chanloc', 
