@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 05-25-96 added chanlist, nargin tests, rearranged variable order -sm
 % 07-29-96 debugged, added chanlist channames option -sm
@@ -77,9 +80,9 @@ DEFAULT_TITLE = 'plotproj()';
 %
 
 if nargin < 8,
-    colors = PROJCOLORS;
+    colors = 'white1st.col';
 elseif colors==0,
-    colors = PROJCOLORS;
+    colors = 'white1st.col';
 end
 
 if nargin < 7,
@@ -128,10 +131,8 @@ end;
 if size(compnums,1)>1,        % handle column of compnums !
     compnums = compnums';
 end;
-if length(compnums) > MAXPLOTDATACHANS,
-    fprintf(...
-  'plotproj(): cannot plot more than %d channels of data at once.\n',...
-         MAXPLOTDATACHANS);
+if length(compnums) > 256,
+    fprintf('plotproj(): cannot plot more than %d channels of data at once.\n',256);
     return
 end;
 
