@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/13 21:27:41  arno
+% debug
+%
 % Revision 1.14  2002/08/12 16:28:13  arno
 % inputdlg2
 %
@@ -263,13 +266,15 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % check for boundary events
 % -------------------------
 disp('Pop_epoch: checking for EEG discontinuity in epochs');
-boundaryindex = strmatch('boundary', { EEG.event.type });
-if ~isempty(boundaryindex)
-	indexepoch = [];
-	for tmpindex = boundaryindex
-		indexepoch = [indexepoch EEG.event(tmpindex).epoch ];
+if ~isempty(EEG.event) & isstr(EEG.event(1).type)
+	boundaryindex = strmatch('boundary', { EEG.event.type });
+	if ~isempty(boundaryindex)
+		indexepoch = [];
+		for tmpindex = boundaryindex
+			indexepoch = [indexepoch EEG.event(tmpindex).epoch ];
+		end;
+		EEG = pop_select(EEG, 'notrial', indexepoch);
 	end;
-	EEG = pop_select(EEG, 'notrial', indexepoch);
 end;
 
 % generate text command
