@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2004/02/14 23:24:05  arno
+% implement erspmax
+%
 % Revision 1.53  2004/01/06 17:01:06  arno
 % header typo
 %
@@ -1044,6 +1047,7 @@ end
 % -----------------------------------------
 % detrend over epochs (trials) if requested
 % -----------------------------------------
+X = reshape(X, g.frame, prod(size(X))/g.frame);
 if strcmpi(g.rmerp, 'on')
     X = X - mean(X,2)*ones(1, length(X(:))/g.frame);
 end;        
@@ -1277,7 +1281,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       set(h(3),'Position',[.95 ordinate1 .05 height].*s+q)
       title('ERSP (dB)')
 
-      E = [min(P(:,:));max(P(:,:))];
+      E = [min(P(:,:),[],1);max(P(:,:),[],1)];
       h(4) = subplot('Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal ERSP means
                                                                 % below the ERSP image
       plot(times,E,[0 0],...
@@ -1303,14 +1307,22 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
               plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
               plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
           end
-          axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])     
+          if freqs(1) ~= freqs(end)
+              axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          else
+              ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
+          end;
       else
           semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
               semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
               semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
           end
-          axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          if freqs(1) ~= freqs(end)
+              axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          else
+              ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
+          end;
           set(h(5),'View',[90 90])
           divs = linspace(log(freqs(1)), log(freqs(end)), 10);
           set(gca, 'xtickmode', 'manual');
@@ -1431,18 +1443,34 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           if ~isnan(g.alpha)
               plot(freqs,Rboot,'g', 'LineWidth',g.linewidth)
               plot(freqs,Rboot,'k:','LineWidth',g.linewidth)
-              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
+              else
+                  ylim([min(E)-max(E)/3 max(Rboot)+max(Rboot)/3]);
+              end;
           else
-              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
+              else
+                  ylim([ min(E)-max(E)/3 max(E)+max(E)/3]);
+              end;
           end
       else
           semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
               semilogx(freqs,Rboot(:),'g', 'LineWidth',g.linewidth)
               semilogx(freqs,Rboot(:),'k:','LineWidth',g.linewidth)
-              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
+              else
+                  ylim([min(E)-max(E)/3 max(Rboot)+max(Rboot)/3]);
+              end;
           else 
-              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
+              else
+                  ylim([min(E)-max(E)/3 max(E)+max(E)/3]);
+              end;
           end
           divs = linspace(log(freqs(1)), log(freqs(end)), 10);
           set(gca, 'xtickmode', 'manual');
