@@ -28,9 +28,13 @@
 %        Radii are further squeezed in of factor squeeze
 %
 % Important: 
-%   The completed chan.locs file must have four colums
+%   (1) The completed chan.locs file must have four colums
 %   [channums th r chanlabels] and the chanlabels must all be 4-char 
 %   strings (with . for spaces). See >> topoplot example
+%   (2) cart2topo should not be used if elevation angle is smaller 
+%   than 0 (electrodes below zero plane) since it returns innacurate 
+%   results. In practice in EEGLAB, cart2topo is replaced by applying
+%   cart2sph() then sph2topo().
 %
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
@@ -56,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/15 01:47:42  arno
+% function typo
+%
 % Revision 1.15  2002/05/02 01:42:22  arno
 % debugging center
 %
