@@ -1,4 +1,4 @@
-% pop_editset() - Edit dataset info. 
+% pop_editset() - Edit EEGLAB EEG dataset structure fields.
 %
 % Usage:
 %   >> EEGOUT = pop_editset( EEG, 'key', val,...);
@@ -8,33 +8,34 @@
 %
 % Optional inputs:
 %   'setname'    - Name of the dataset
-%   'data'       - ['varname'|'filename'] Import a file or variable
-%                   into an EEGLAB EEG structure 
-%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
+%   'data'       - ['varname'|'filename'] Import data from a file 
+%                   or Matlab variable into an EEGLAB EEG structure 
+%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
 %                  The data file is transposed if the number of rows is larger
-%                  than the number of columns. Note: for type 'float32le' and
-%                  'float32be' (little endian and big endian byte ordering), data
-%                  must be organised in the format (channels x timepoints x epochs).
-%   'chanlocs'   - ['varname'|'filename'] Import a file containing channel locations 
+%                  than the number of columns. Note: for types 'float32le' and
+%                  'float32be' (little endian or big endian byte ordering), data
+%                  must be organised as (channels x timepoints x epochs).
+%   'chanlocs'   - ['varname'|'filename'] Import a channel locations file.
 %                  (See >> help readlocs for file format).
-%   'nbchan'     - Number of channels in data
-%   'xmin'       - Starting time (in seconds)
-%   'averef'     - ['Yes'|'No'] averaged referenced data
-%   'pnts'       - Number of points per epoch in the data (for epoched data only)
-%   'srate'      - Data sampling rate
-%   'icaweight'  - ICA weight matrix. By default, the sphering matrix is set to
-%                   the identity matrix if it is empty.
-%   'icasphere'  - ICA sphering matrix
-%   'comments'   - Command string for the current dataset
+%   'nbchan'     - [int] Number of data channels. 
+%   'xmin'       - [real] Data start time (in seconds).
+%   'averef'     - ['Yes'|'No'] 'Yes' if data are average-reference. 
+%   'pnts'       - [int] Number of data points per epoch (epoched data only)
+%   'srate'      - [real Hz] Data sampling rate. 
+%   'icaweight'  - [matrix] ICA weight matrix. 
+%   'icasphere'  - [matrix] ICA sphere matrix. By default, the sphere matrix 
+%                  is initialized to the identity matrix if it is empty.
+%   'comments'   - [string] About the dataset.
 % 
 % Outputs:
 %   EEGOUT       - Modified dataset structure
 %
 % Note:
-%   To create a new dataset, type 
-%   >> EEG = pop_editset( eeg_emptyset );
-%   To erase a variable, use '[]'. The folowing command suppresses channel locations.
-%   Ex: EEG = pop_editset( EEG, 'chanlocs', '[]');
+%   To create a new dataset:
+%   >> EEG = pop_editset( eeg_emptyset ); % eeg_emptyset() returns an empty dataset
+%
+%   To erase a variable, use '[]'. The following suppresses channel locations:
+%   >> EEG = pop_editset( EEG, 'chanlocs', '[]');
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -59,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/01/22 22:43:53  scott
+% edit header -sm
+%
 % Revision 1.28  2002/11/14 18:29:03  arno
 % new average reference
 %
