@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.355  2004/11/12 18:37:30  arno
+% same
+%
 % Revision 1.354  2004/11/12 18:36:57  arno
 % same
 %
@@ -1401,12 +1404,16 @@ catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
 catchstrs.new_non_empty          = e_newnonempty;
 
-% detecting icalab
-% ----------------
-if exist('icalab')
-    disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
-end;
+    % create eeglab figure
+    % --------------------
+    eeg_mainfig(onearg);
 
+    % detecting icalab
+    % ----------------
+    if exist('icalab')
+        disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
+    end;
+    
     % BIOSIG plugin (not in plugin folder)
     % ------------------------------------
     p = which('eeglab.m');
@@ -1426,11 +1433,10 @@ end;
             disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
             disp([ '   ' lasterr] );
         end;
-    end;        
+    end;            
     
     % menu definition
     % --------------- 
-    eeg_mainfig(onearg);
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
@@ -1606,24 +1612,6 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
     dircontent  = { dircontent1.m{:} dircontent.name };
 
-    % BIOSIG plugin (not in plugin folder)
-    % ------------------------------------
-    path_biosig = [ p '..' delimiter 'biosig' delimiter 't200' ];
-    if exist(path_biosig) == 7
-        try,
-            addpath(path_biosig);
-            version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
-            version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
-            version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
-            disp(['eeglab: adding "BIOSIGv' version '" plugin' ]);
-            biosigflag = 1;
-        catch
-            disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
-            disp([ '   ' lasterr] );
-            biosigflag = 0;
-        end;
-    end;        
-    
     % scan plugin folder
     % ------------------
     for index = 1:length(dircontent)
