@@ -10,7 +10,7 @@
 %                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', 'chancenter'. 
 %                   Help can be found in the function having the same name. Args are
 %                   only relevant for 'chancenter'.
-%   'operation'   - string command for manipulating arrays. 'chan' is a full 
+%   'formula'     - string command for manipulating arrays. 'chan' is a full 
 %                   electrode info. Fields can be manipulated using 'labels', 'theta'
 %                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3D) or
 %                   'sph_theta', 'sph_phi', 'sph_radius' for spherical horizontal angle, 
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/05/02 01:46:03  arno
+% debugging for full consistency
+%
 % Revision 1.6  2002/05/01 19:38:38  arno
 % returning shrink factor
 %
@@ -113,8 +116,8 @@ if nargin < 2
 		tmpstr = sprintf('Edit channels info');
 		uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
-		operation = ['inputdlg({strvcat(''Enter operation (see help on previous page)''' ...
-					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Operation'', 1, { '''' });'];
+		formula = ['inputdlg({strvcat(''Enter formula (see help on previous page)''' ...
+					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Formula'', 1, { '''' });'];
 		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
 						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
@@ -127,8 +130,8 @@ if nargin < 2
 						['comtmp = {''convert'' {''sph2cart'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->sph'  , 'callback', ...
 						['comtmp = {''convert'' {''cart2sph'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'operation ', 'callback', ...
-						['comtmp = {''operation'' ' operation '};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'Axes formula', 'callback', ...
+						['comtmp = {''formula'' ' formula '};' endgui] }, ...
 					  {} { } { } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
@@ -336,7 +339,7 @@ else
 				 chans(index).sph_radius    = radius(index);
 			 end;
 		   end;
-		  case 'operation'
+		  case 'formula'
 		   tmpoper = args{curfield+1};
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
 		   if isempty(findstr(tmpoper, 'chans'))
