@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/07 21:53:11  scott
+% typo
+%
 % Revision 1.5  2003/03/07 21:52:28  scott
 % adding spaces
 %
@@ -81,7 +84,7 @@ for a=1:length(hndl)                    % make all axes visible
     else
         command_dbl = double(command);
         % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
-        set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(' char(command_dbl) ')']);
+        set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' char(command_dbl) ''')']);
     end;        
 end
 figure(fig);
@@ -89,7 +92,7 @@ if exist('command') ~= 1
     set(hndl(a),'ButtonDownFcn','copyaxis');
 else
     % set(hndl,'ButtonDownFcn',['copyaxis(''' command ''')']);
-    set(hndl,'ButtonDownFcn',['copyaxis(' char(command_dbl) ')']);
+    set(hndl,'ButtonDownFcn',['copyaxis(''' char(command_dbl) ''')']);
 end;        
 %set(hndl,'ButtonDownFcn','copyaxis');
 %if ~exist('noticks')
