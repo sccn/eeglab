@@ -26,13 +26,14 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
 %                       'head', to edge of head {default 'head'}.
-%   'shrink'           - ['on'|'off'|'force'|factor] 'on': If maximum radius > 0.5, 
+%   'shrink'           - ['on'|'off'|'force'|'skirt'|factor] 'on': If max radius > 0.5, 
 %                        normalize electrode polar coordinates to make the maximum
-%                        radius 0.5 (to plot all locations). 'force': normalize radius 
-%                        so the maximum is 0.5. 'factor': apply a normalizing
-%                        factor (percentage of the maximum) {default = 'off'}.
-%                        Note that the chan_locs structure may have an optional
-%                        shrink field (same format as this parameter).
+%                        radius 0.5 (to plot all locations). 'force': Normalize radius 
+%                        so the maximum is 0.5. 'factor': Apply a normalizing
+%                        factor (percentage of the maximum) 'skirt': Plot cartoon head
+%                        at the usual 0.5 radius and show lower locations as a 'skirt' 
+%                        outside the head boundary. {default = chan_locs structure 'shrink' 
+%                        if any. else 'off'}
 %   'colormap'        -  (n,3) any size colormap
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
 %                        map from coordinate XI,YI to coordinates XE, YE, ZE (head 
@@ -95,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2004/02/15 17:29:25  scott
+% same
+%
 % Revision 1.93  2004/02/15 17:28:41  scott
 % same
 %
@@ -379,7 +383,7 @@ AXHEADFAC = 1.3;        % axes to head scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
-CCOLOR = [0.65 0.65 1.0]; % default contour color
+CCOLOR = [0 0 1];       % default contour color
 ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = 'on';      % default 'electrodes': on|off|label
 EMARKER = '.';
