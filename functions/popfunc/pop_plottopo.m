@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/12 03:18:58  arno
+% help button
+%
 % Revision 1.11  2003/02/21 00:33:09  scott
 % edit header
 %
@@ -129,11 +132,11 @@ else
 end;
 
 if ~isempty(options(6:end))
-	com = sprintf('figure; pop_plottopo(%s, [%s], ''%s'', %d %s);', ...
-				  inputname(1), int2str(channels), plottitle, singletrials, vararg2str(options(6:end)));
+	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d %s);', ...
+				  inputname(1), vararg2str(channels), plottitle, singletrials, vararg2str(options(6:end)));
 else
-	com = sprintf('figure; pop_plottopo(%s, [%s], ''%s'', %d);', ...
-				  inputname(1), int2str(channels), plottitle, singletrials);
+	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d);', ...
+				  inputname(1), vararg2str(channels), plottitle, singletrials);
 end;
 
 return;
