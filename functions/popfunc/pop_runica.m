@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/05/20 15:48:19  arno
+% debug fastica call
+%
 % Revision 1.40  2004/03/22 22:15:39  arno
 % pca option for binica
 %
@@ -289,10 +292,11 @@ switch lower(icatype)
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
         else % if defined 'options'
+            tmpoptions = eval( [ '{' options '}' ]);
             if rank(tmpdata) == size(EEG.data,1) | ~isempty(findstr('pca', options))
-                eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s );', options));
+                [EEG.icaweights,EEG.icasphere] = binica( tmpdata, tmpoptions{:}  );
             else
-                eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s, ''pca'', %d );', options, tmprank));
+                [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'pca', tmprank, tmpoptions{:}  );
             end;
         end;
      case 'jader' 
