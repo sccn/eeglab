@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2004/05/04 05:35:25  scott
+% finished debugging limits
+%
 % Revision 1.59  2004/05/04 05:24:10  scott
 % debug setting g.limits(2) to ms
 %
@@ -448,7 +451,7 @@ end;
 	elseif length(g.limits) == 4
 	  xmin = g.limits(1);
 	  xmax = g.limits(2);
-          if glimits(3)==0 & g.limits(4)==0 % compute y limits from data
+          if g.limits(3)==0 & g.limits(4)==0 % compute y limits from data
 	     ymin = min(min(data));
 	     ymax = max(max(data));
 	     datarange = ymax-ymin;
