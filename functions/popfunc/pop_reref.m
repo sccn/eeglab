@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/07/02 01:05:34  arno
+% debug msg
+%
 % Revision 1.9  2003/06/11 00:06:16  arno
 % header message
 %
@@ -190,7 +193,6 @@ end;
 
 % include ICA or not
 % ------------------
-optionscall
 if ~isempty(EEG.icaweights)
     optionscall = { optionscall{:} 'icaweight' EEG.icaweights*EEG.icasphere }; 
     [EEG.data EEG.chanlocs EEG.icaweights EEG.icasphere] = reref(EEG.data, ref, optionscall{:});
