@@ -5,16 +5,15 @@
 %   >> headplot cartesian - show an example cartesian 'eloc_angles' file
 %
 % Usage (do once):
-%   >> headplot('setup',['eloc_angles'],['splinefile'],['comment'],['type'])
+%   >> headplot('setup',['elocs'],['splinefile'],['comment'],['type'])
 %
 % Inputs: 
-%   'eloc_angles' - file of electrode locations in spherical (or cartesian) coords
+%   'elocs'       - file of electrode locations in cartesian coords
 %                   or channel location structure.
-%                   cf. functions: readlocs(), convertlocs() and topo2sph()
+%                   cf. functions: readlocs(), convertlocs()
 %   'splinefile'  - name of spline file to save splining info into
 %   'comment'     - optional string vector containing info for spline file
-%   'type'        - type of electrode location file ('cartesian' or default
-%                     'spherical')
+%   'type'        - type is obsolete, it must be cartesian.
 %
 % General usage:
 %   >> headplot(values,'spline_file','Param','Value',...)
@@ -69,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/02/24 15:39:03  arno
+% header msg
+%
 % Revision 1.27  2004/02/09 19:39:53  scott
 % returning to part-head view
 %
@@ -219,11 +221,6 @@ if isstr(values)
     fprintf('Setting up splining matrix.\n');
     
     eloc_file = arg1;
-    if nargin==5
-       loctype = p2;
-    else
-       loctype = 'spherical';
-    end
     spline_file = p1;
     if nargin >= 4
       comment = v1;
@@ -236,13 +233,7 @@ if isstr(values)
 	    if fid == -1
 	      error(['headplot(): Error opening file: ',eloc_file])
 	    end
-	    if strcmp(loctype,'spherical')
-	      A = fscanf(fid,'%d %f %f  %s',[7 MAX_ELECTRODES]);  
-	    elseif strcmp(loctype,'cartesian')
-	      A = fscanf(fid,'%d %f %f %f %s',[8 MAX_ELECTRODES]);  
-	    else
-	      error(['headplot: unknown electrode location file type.\n']);
-	    end
+        A = fscanf(fid,'%d %f %f %f %s',[8 MAX_ELECTRODES]);  
 	    fclose(fid);
 	    fprintf(['Electrode file ',eloc_file,' opened.\n'])
 	    A = A';
@@ -253,11 +244,7 @@ if isstr(values)
 	    %%%%%%%%%%%%%%%%%%%%%%%%%%%
 	    ElectrodeNames = zeros(size(A,1),4);
 	    for r = 1:size(ElectrodeNames,1)
-	    if strcmp(loctype,'spherical')
-	      ElectrodeNames(r,:) = sprintf('%s',A(r,4:7));
-	    elseif strcmp(loctype,'cartesian')
-	      ElectrodeNames(r,:) = sprintf('%s',A(r,5:8));
-	    end
+            ElectrodeNames(r,:) = sprintf('%s',A(r,5:8));
 	      for c=1:4
 	        if ElectrodeNames(r,c) == '.'
 	          ElectrodeNames(r,c) = ' ';
@@ -272,21 +259,16 @@ if isstr(values)
 	    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	    % Convert from spherical coords to Cartesian
 	    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	    if strcmp(loctype,'spherical')
-	      Th  = pi/180*A(:,2);
-	      Phi = pi/180*A(:,3);
-	      Xe = sin(Th).*cos(Phi);
-	      Ye = sin(Th).*sin(Phi);
-	      Ze = cos(Th);
-	    elseif strcmp(loctype,'cartesian')
-	      Xe = A(:,2);
-	      Ye = A(:,3);
-	      Ze = A(:,4);
-	      dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-	      Xe = Xe./dists;
-	      Ye = Ye./dists;
-	      Ze = Ze./dists;
-	    end
+        Xe = A(:,2);
+        Ye = A(:,3);
+        Ze = A(:,4);
+        dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
+        Xe = Xe./dists;
+        Ye = Ye./dists;
+        Ze = Ze./dists;
+		Xetmp = Xe;
+		Xe = -Ye;
+		Ye = Xetmp;
     else
 	    %%%%%%%%%%%%%%%%%%%%%
 	    % Electrode structure
