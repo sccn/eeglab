@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.205  2002/11/18 02:39:43  arno
+% allowing pop_rmbase to baseline portion of continuous data
+%
 % Revision 1.204  2002/11/15 18:33:07  arno
 % updating besa checks
 %
@@ -1278,7 +1281,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	% set( g.win3, 'String', '');
 	% set( g.win3, 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
 	set( g.win1, 'String', sprintf('Dataset name: %s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
-	fullfilename = [ EEG.filepath EEG.filename];
+    fullfilename = [ EEG.filepath EEG.filename];
 	if ~isempty(fullfilename)
 		if length(fullfilename) > 30
 			set( g.win2, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
