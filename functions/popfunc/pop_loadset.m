@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/04/10 17:57:44  arno
+% filter for file read
+%
 % Revision 1.17  2003/02/26 02:34:34  arno
 % debug if file changed on disk
 %
@@ -111,12 +114,17 @@ if isfield(TMPVAR, 'EEG') %individual dataset
     if isstr(VAROUT.data), 
         if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
             VAROUT.filepath = inputpath; 
+            if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
+                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                VAROUT.data = [ inputname(1:end-3) 'fdt' ];
+            end;
         else 
             VAROUT.filepath = '';
-        end;
-        if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
-            disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
-            VAROUT.data = [ inputname(1:end-3) 'fdt' ];
+            tmpinputname = [ inputpath inputname ];
+            if length(tmpinputname) > 3 & ~strcmp(tmpinputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(tmpinputname(end-2:end), 'set')
+                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                VAROUT.data = [ tmpinputname(1:end-3) 'fdt' ];
+            end;
         end;
     end;
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
