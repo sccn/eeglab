@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/02/18 22:46:01  arno
+% same
+%
 % Revision 1.14  2003/02/18 22:41:47  arno
 % updaing header for GUI
 %
@@ -275,6 +278,9 @@ if ~isempty(rej)
 		EEG.reject.icarejkurt = rej;
 		EEG.reject.icarejkurtE = rejE;
 	end;
+    if reject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end;
 end;
 nrej = sum(rej);
 

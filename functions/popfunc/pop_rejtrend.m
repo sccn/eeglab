@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/02/18 22:43:06  arno
+% same.
+%
 % Revision 1.12  2003/02/18 22:20:21  arno
 % update header for GUI
 % /
@@ -226,6 +229,9 @@ if ~isempty(rej)
 		EEG.reject.icarejconst = rej;
 		EEG.reject.icarejconstE = rejE;
 	end;
+    if reject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end;
 end;
 
 %com = sprintf('Indexes = pop_rejtrend( %s, %d, [%s], %s, %s, %s, %d, %d);', ...

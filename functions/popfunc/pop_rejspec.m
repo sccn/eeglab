@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/02/18 22:50:06  arno
+% updating header for GUI
+%
 % Revision 1.19  2003/01/10 01:10:45  arno
 % change default position
 %
@@ -261,6 +264,9 @@ if ~isempty(rej)
 		EEG.reject.icarejfreq = rej;
 		EEG.reject.icarejfreqE = rejE;
 	end;
+    if reject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end;
 end;
 
 % store variables if necessary
