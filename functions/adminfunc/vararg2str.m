@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/01/28 18:47:33  arno
+% alowing to find non unitary intervals
+%
 % Revision 1.3  2002/04/21 00:52:30  scott
 % edited help -sm
 %
@@ -180,8 +183,12 @@ function str = contarray( array )
         indent = array(2) - array(1);
 		for index = 2:length(array)
 			if array(index) ~= array(index-1)+indent
-				if skip == 0
-					str = [str ' ' num2str(array(index))];
+				if skip <= 1
+					if skip == 0
+                        str = [str ',' num2str(array(index))];
+                    else
+                        str = [str ',' num2str(array(index-1)) ',' num2str(array(index))];
+                    end;
 				else
                     if indent == 1
                         str = [str ':' num2str(array(index-1)) ',' num2str(array(index))];
@@ -196,10 +203,12 @@ function str = contarray( array )
 			end;
 		end;
 		if array(index) == array(index-1)+indent
-            if indent == 1
-                str = [str ':' num2str(array(index)) ];
-            else
-                str = [str ':' num2str(indent) ':' num2str(array(index)) ];
+            if skip ~= 0      
+                if indent == 1
+                    str = [str ':' num2str(array(index)) ];
+                else
+                    str = [str ':' num2str(indent) ':' num2str(array(index)) ];
+                end;
             end;
 		end;
 	else
