@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.339  2004/09/12 02:12:03  arno
+% eeglab subpath for plugin
+%
 % Revision 1.338  2004/08/31 22:05:32  arno
 % add comment
 %
@@ -1560,8 +1563,10 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     end;
                 end;
             end;
-        elseif ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
-            funcname = dircontent{index}(1:end-2); % remove .m
+        else 
+            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+                funcname = dircontent{index}(1:end-2); % remove .m
+            end;
         end;
         
         % execute function
