@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/03/05 19:47:15  arno
+% adding done message
+%
 % Revision 1.19  2003/03/03 21:35:59  arno
 % correcting save location problem
 %
@@ -150,7 +153,7 @@ if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
     drawnow;
 	if curfilename == 0 return; end;	
 else 
-	if mode == 1
+	if mode == 1 | isnumeric(inarg)
 		indices = inarg;
         if nargin < 4
             curfilepath = '';
