@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.204  2004/06/10 19:11:53  arno
+% remove debug msg
+%
 % Revision 1.203  2004/05/14 23:41:09  arno
 % allowing negative shrink
 %
@@ -943,7 +946,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
     end;
     
     if isstr(shrinkfactor)
-        if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force')  
+        if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force') | strcmpi(shrinkfactor, 'auto')  
             if strcmpi(VERBOSE,'on')
                 fprintf('     Shrink flag -> plotting cartoon head at plotrad\n');
             end
