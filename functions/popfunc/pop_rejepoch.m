@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/08/25 17:25:49  arno
+% better history
+%
 % Revision 1.8  2003/12/09 22:01:52  arno
 % debug reject trials
 %
@@ -81,7 +84,7 @@ if nargin < 3
    confirm = 1;
 end;
    
-if all(ismember(sort(unique(tmprej)), [0 1])) && any(~tmprej)
+if all(ismember(sort(unique(tmprej)), [0 1])) & any(~tmprej)
     format0_1 = 1;
     fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
 else 
