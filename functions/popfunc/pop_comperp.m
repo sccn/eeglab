@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/07/15 21:14:40  arno
+% changed name of dataset
+%
 % Revision 1.14  2003/07/15 21:12:33  arno
 % added backward compatibility
 %
@@ -217,10 +220,10 @@ g = finputcheck( options, ...
                    'diffavg'  'string'  {'on' 'off'}     'on';
                    'addall'   'string'  {'on' 'off'}     'off';
                    'suball'   'string'  {'on' 'off'}     'off';
-                   'allerps'  'string'  {'on' 'off'}     'off';
+                   'diffall'  'string'  {'on' 'off'}     'off';
                    'std'      'string'  {'on' 'off' 'none'}     'none';
                    'diffonly' 'string'  {'on' 'off' 'none'}     'none';
-                   'diffall'  'string'  {'on' 'off' 'none'}     'none';
+                   'allerps'  'string'  {'on' 'off' 'none'}     'none';
                    'lowpass'  'float'    [0 Inf]         [];
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave' 'rms'}    'ave';
