@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2002/07/24 23:33:20  scott
+% editing "On same axis (with maps)" -sm
+%
 % Revision 1.83  2002/07/24 16:47:29  arno
 % debugging
 %
@@ -949,9 +952,9 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	set( H_MAIN(6), 'String', sprintf('Frames per epoch   \t\t%d\n', EEG.pnts));
 	set( H_MAIN(7), 'String', sprintf('Epochs             \t\t%d\n', EEG.trials));
 	set( H_MAIN(8), 'String', sprintf('Events\t\t\t\t%s\n', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event)))));
-	set( H_MAIN(9), 'String', sprintf('Sampling rate (Hz) \t\t%d  \n', EEG.srate));
-	set( H_MAIN(10), 'String', sprintf('Epoch start (sec)\t\t%.3f\n', EEG.xmin));
-	set( H_MAIN(11), 'String', sprintf('Epoch end (sec)  \t\t%.3f\n', EEG.xmax));
+	set( H_MAIN(9), 'String', sprintf('Sampling rate (Hz) \t\t%d  \n', round(EEG.srate)));
+	set( H_MAIN(10), 'String', sprintf('Epoch start (sec)\t\t%6.2f\n', EEG.xmin));
+	set( H_MAIN(11), 'String', sprintf('Epoch end (sec)  \t\t%6.2f\n', EEG.xmax));
 	set( H_MAIN(12), 'String', sprintf('Average reference \t\t%s\n', fastif(strcmp(EEG.averef,'Yes'), 'Yes', 'No')));
 	set( H_MAIN(13), 'String', sprintf('Channel locations \t\t%s\n', fastif(isempty(EEG.chanlocs), 'No', 'Yes')));
 	set( H_MAIN(14), 'String', sprintf('ICA weights       \t\t%s\n', fastif(isempty(EEG.icasphere), 'No', 'Yes')));
