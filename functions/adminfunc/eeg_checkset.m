@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2002/11/13 19:21:09  arno
+% updating average reference flag
+%
 % Revision 1.80  2002/11/13 17:41:11  arno
 % editing chanlocs warning -sm
 %
@@ -644,6 +647,11 @@ if ~isempty( EEG.chanlocs )
                 if ~isstr(EEG.chanlocs(index).labels)
                     EEG.chanlocs(index).labels = int2str(EEG.chanlocs(index).labels);
                 end;
+            end;
+        end;
+        if isfield(EEG.chanlocs, 'shrink') & isempty(EEG.chanlocs(end).shrink)
+            for index = 1:length(EEG.chanlocs)
+                EEG.chanlocs(index).shrink = EEG.chanlocs(1).shrink;
             end;
         end;
     end;
