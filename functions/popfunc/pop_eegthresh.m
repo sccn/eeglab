@@ -43,7 +43,7 @@
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
 %   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 0.
+%              labels. 1=reject labelled trials. Default is 1.
 %
 % Outputs:
 %   Indexes    - index of rejected sweeps
@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/12/17 18:12:55  arno
+% debug reject
+%
 % Revision 1.14  2003/12/04 23:18:01  arno
 % adding code to actually reject trials
 %
@@ -137,6 +140,9 @@ if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must run ICA first'); return;
 	end;
+end;
+if exist('reject') ~= 1
+    reject = 1;
 end;
 
 if nargin < 3
@@ -244,7 +250,7 @@ else
             EEG.reject.icarejthreshE = rejE;
         end;
     end;
-    if ~exist('reject') | reject == 1
+    if reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
     end;
 end;

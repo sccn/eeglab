@@ -46,7 +46,7 @@
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
 %   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 0.
+%              labels. 1=reject labelled trials. Default is 1.
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/12/04 23:27:46  arno
+% reject trials
+%
 % Revision 1.20  2003/02/18 22:50:06  arno
 % updating header for GUI
 %
@@ -166,6 +169,9 @@ if icacomp == 0
     	end % switch
 	end;
 end;	
+if exist('reject') ~= 1
+    reject = 1;
+end;
 if nargin < 3
 
 	% which set to save
