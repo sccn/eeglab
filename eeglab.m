@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2002/08/22 21:12:36  arno
+% typo
+%
 % Revision 1.157  2002/08/22 17:18:21  arno
 % more checks
 %
@@ -947,7 +950,7 @@ listui = { { 'style', 'text', 'string', 'Parameters of the current set', 'tag', 
 		   { 'style', 'text', 'tag', 'val11', 'string', ' ' } ...
 		   { 'style', 'text', 'tag', 'win12', 'string', 'ICA weights'  } ...
 		   { 'style', 'text', 'tag', 'val12', 'string', ' ' } ...
-		   { 'style', 'text', 'tag', 'win13', 'string', ' ' } ...
+		   { 'style', 'text', 'tag', 'win13', 'string', 'Dataset size (MB)' } ...
 		   { 'style', 'text', 'tag', 'val13', 'string', ' ' } {} };
 supergui(gcf, geometry, [], listui{:});
 geometry = { [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] [1] };
@@ -1136,7 +1139,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	set( g.win10, 'String', 'Average reference');
 	set( g.win11, 'String', 'Channel locations');
 	set( g.win12, 'String', 'ICA weights');
-	set( g.win13, 'String', ' ');
+	set( g.win13, 'String', 'Dataset size (MB)');
 	
 	set( g.val3, 'String', int2str(fastif(isempty(EEG.data), 0, size(EEG.data,1))));
 	set( g.val4, 'String', int2str(EEG.pnts));
@@ -1148,7 +1151,8 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	set( g.val10, 'String', EEG.averef);
 	set( g.val11, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
 	set( g.val12, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
-	set( g.val13, 'String', '');
+	tmp = whos('EEG');
+	set( g.val13, 'String', num2str(round(tmp.bytes/1E6*100)/100));
 else
 	h = findobj('parent', gcf, 'userdata', 'fullline');
 	set(h, 'visible', 'on');
