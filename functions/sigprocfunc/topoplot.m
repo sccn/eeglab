@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.176  2004/03/25 22:24:41  arno
+% fixing shrinkfactor bug
+%
 % Revision 1.175  2004/03/24 16:35:25  scott
 % added 'cricgrid' plotting detail argument
 %
@@ -815,44 +818,40 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
-  if strcmpi(VERBOSE,'on')
-    fprintf('     Using specified ''shrink'' (deprecated). Recommended: ''intrad'', ''headrad'', ''plotrad''.\n');
-  end
-
-if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
     if strcmpi(VERBOSE,'on')
-       fprintf('Use of EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
+        fprintf('     Using specified ''shrink'' (deprecated). Recommended: ''intrad'', ''headrad'', ''plotrad''.\n');
     end
-    if isfield(tmpeloc, 'shrink')
-        shrinkfactor = tmpeloc.shrink;
-    else
-        shrinkfactor = 0;
-    end;
-end;
-
-if isstr(shrinkfactor)
-  if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force')  
-      if strcmpi(VERBOSE,'on')
-         fprintf('     Shrink flag -> plotting cartoon head at plotrad\n');
-      end
-      headrad = plotrad; % plot head around outer electrodes, no matter if 0.5 or not
-  end
-else % apply shrinkfactor
-    if shrinkfactor < 0 | shrinkfactor > 1-1e-3
-        error('shrink factor out of bounds [0,.999)')
-    else
-        plotrad = rmax/(1-shrinkfactor);
-        headrad = plotrad;  % make deprecated 'shrink' mode plot 
+    
+    if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
         if strcmpi(VERBOSE,'on')
-           fprintf('    %g%% shrink  applied.');
-           if abs(headrad-rmax) > 1e-2
-             fprintf(' Cartoon head is not anatomically correct.\n');
-           else
-             fprintf('\n');
-           end
+            fprintf('Use of EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
+        end
+        shrinkfactor = tmpeloc(1).shrink;
+    end;
+    
+    if isstr(shrinkfactor)
+        if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force')  
+            if strcmpi(VERBOSE,'on')
+                fprintf('     Shrink flag -> plotting cartoon head at plotrad\n');
+            end
+            headrad = plotrad; % plot head around outer electrodes, no matter if 0.5 or not
+        end
+    else % apply shrinkfactor
+        if shrinkfactor < 0 | shrinkfactor > 1-1e-3
+            error('shrink factor out of bounds [0,.999)')
+        else
+            plotrad = rmax/(1-shrinkfactor);
+            headrad = plotrad;  % make deprecated 'shrink' mode plot 
+            if strcmpi(VERBOSE,'on')
+                fprintf('    %g%% shrink  applied.');
+                if abs(headrad-rmax) > 1e-2
+                    fprintf(' Cartoon head is not anatomically correct.\n');
+                else
+                    fprintf('\n');
+                end
+            end
         end
     end
-end
 end; % if shrink
       
 %
