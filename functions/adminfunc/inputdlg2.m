@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 16:18:28  arno
+% removing last modif
+%
 % Revision 1.4  2002/08/12 16:17:49  arno
 % 2 lines
 %
@@ -69,8 +72,19 @@ end;
 
 geometry = {};
 listgui = {};
+
+% determine if vertical or horizontal
+% -----------------------------------
+geomvert = [];
 for index = 1:length(Prompt)
-	if length(Prompt) == 1
+	geomvert = [geomvert size(Prompt{index},1) 1];  % default is vertical geometry
+end;
+if all(geomvert == 1) & length(Prompt) > 1
+	geomvert = []; % horizontal
+end;
+
+for index = 1:length(Prompt)
+	if ~isempty(geomvert) % vertical
 		geometry = { geometry{:} [ 1] [1 ]};
 	else
 		geometry = { geometry{:} [ 1 1 ]};
@@ -79,4 +93,4 @@ for index = 1:length(Prompt)
 				{ 'Style', 'edit', 'string', DefAns{index} } };
 end;
 
-result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title);
+result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title, [], 'normal', geomvert);
