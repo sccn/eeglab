@@ -1,6 +1,6 @@
-% chancenter() - 
+% chancenter() - recenter cartesian X,Y,Z channel coordinates
 %
-% Usage:  >> [x y z newcenter] = chancenter(x,y,z,center,gui); % separate x,y,z vectors
+% Usage:  >> [x y z newcenter] = chancenter(x,y,z,center,gui); 
 %
 % Optional inputs:
 %    x,y,z     = 3D coordintates of the channels
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/02 01:31:31  arno
+% cancel button
+%
 % Revision 1.1  2002/05/02 01:20:06  arno
 % Initial revision
 %
