@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2004/04/25 16:44:41  scott
+% converted limits and limcontrib inputs back to ms (for compatibility with pop_envtopo)
+%
 % Revision 1.56  2004/04/25 16:20:41  scott
 % clarified that input times are in sec, not ms; cleaned up commandline info -sm
 %
@@ -389,13 +392,21 @@ end;
 	end
 	ncomps = length(g.compnums);
 	for i=1:ncomps-1
+          if g.compnums(i) == 0
+	       fprintf('Removing component number 0 in compnums.\n');
+	       g.compnums(i)=[];
+          elseif g.compnums(i)>wtcomps
+	       fprintf('compnums(%d) > number of comps (%d)?\n',i,wtcomps);
+	       return
+          end
 	  for j=i+1:ncomps
 	    if g.compnums(i)==g.compnums(j)
-	       fprintf('Cannot repeat component number (%d) in compnums.\n',g.compnums(i));
-	       return
-	    end
+	       fprintf('Removing repeated component number (%d) in compnums.\n',g.compnums(i));
+	       g.compnums(j)=[];
+            end
 	  end
 	end
+
 	limitset = 0;
 	if isempty(g.limits)
 	  g.limits = 0;
@@ -407,23 +418,39 @@ end;
 	%
 	%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	if g.limits==0,      % == 0 or [0 0 0 0]
-	  xmin = 0;
-	  xmax = frames-1;
-	  ymin = min(min(data));
-	  ymax = max(max(data));
-	  datarange = ymax-ymin;
-	  ymin = ymin-0.05*datarange;
-	  ymax = ymax+0.05*datarange;
-	else
-	  if length(g.limits)~=4,
-	    fprintf('envtopo: limits should be 0 or an array [minms maxms minuV maxuV].\n');
-	    return
-	  end;
+	if length(g.limits) < 2
+          if g.limits==0,         % == 0 
+	    xmin = 0;
+	    xmax = frames-1;  % use dummy times
+          else
+	    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
+            return
+          end
+        end
+        if length(g.limits) == 2 
+	     xmin = g.limits(1);
+	     xmax = g.limits(2);
+	     ymin = min(min(data));
+	     ymax = max(max(data));
+	     datarange = ymax-ymin;
+	     ymin = ymin-0.05*datarange;
+	     ymax = ymax+0.05*datarange;
+	elseif length(g.limits) == 4
 	  xmin = g.limits(1);
 	  xmax = g.limits(2);
-	  ymin = g.limits(3);
-	  ymax = g.limits(4);
+          if glimits(3)==0 & g.limits(4)==0 % compute y limits from data
+	     ymin = min(min(data));
+	     ymax = max(max(data));
+	     datarange = ymax-ymin;
+	     ymin = ymin-0.05*datarange;
+	     ymax = ymax+0.05*datarange;
+          else
+	     ymin = g.limits(3);
+	     ymax = g.limits(4);
+          end
+        else
+	    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
+            return
 	end;
 
 	if xmax == 0 & xmin == 0,
@@ -658,7 +685,7 @@ fprintf('\n');
 if strcmp(g.pvaf,'on')
    fprintf('    component pvaf in interval:  ');
    for t=1:ntopos
-     fprintf('%4.2f ',pvaf(maporder(t)));
+     fprintf('%4.2f ',pvaf(t));
    end
    fprintf('\n');
 end
@@ -666,9 +693,9 @@ end
 sumproj = zeros(size(data));
 for n = 1:ntopos
   if isempty(g.icaact)
-      sumproj = sumproj + g.icawinv(:,g.compnums(maporder(n)))*weights(g.compnums(maporder(n)),:)*data; % updated -ad 10/2002
+      sumproj = sumproj + g.icawinv(:,maporder(n))*weights(maporder(n),:)*data; % updated -ad 10/2002
   else 
-      sumproj = sumproj + g.icawinv(:,g.compnums(maporder(n)))*g.icaact(g.compnums(maporder(n)),:);     % updated -sm 4/2004
+      sumproj = sumproj + g.icawinv(:,maporder(n))*g.icaact(maporder(n),:);     % updated -sm 4/2004
   end;
 end
 varproj = mean(mean((data(g.plotchans,frame1:frame2).^2))); % find data variance in interval
