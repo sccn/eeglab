@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/01/04 02:16:21  arno
+% implementing optional different subitc option for different conditions
+%
 % Revision 1.34  2003/01/02 21:24:02  cooper
 % more fixes to lin coher formula.
 %
@@ -701,7 +704,6 @@ if iscell(X)
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
 				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, 'subitc', g.subitc{1},  vararginori{:});
 	end;
-	
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
 	fprintf('\nRunning crossf on condition 2 *********************\n');
@@ -715,8 +717,10 @@ if iscell(X)
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
 				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, 'subitc', g.subitc{2}, vararginori{:});
 	end;
+	%figure; imagesc(abs( sum( savecoher1 ./ abs(savecoher1), 3)) - abs( sum( savecoher2 ./ abs(savecoher2), 3)  )); cbar; return;
+	%figure; imagesc(abs( R2 ) - abs( R1)  ); cbar; return;
 	R2 = R2.*exp(j*Rangle2/180*pi);
-
+    
     if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
         subplot(1,3,3);
 	end;
@@ -1032,7 +1036,9 @@ case 'on'
    map(151,:) = map(151,:)*0.9; % tone down the (0=) green!
    colormap(map);
    
-   imagesc(times,freqs(dispf),RR(dispf,:),max(max(RR(dispf,:)))*[-1 1]); % plot the coherence image
+   try, imagesc(times,freqs(dispf),RR(dispf,:),max(max(RR(dispf,:)))*[-1 1]); % plot the coherence image
+   catch, imagesc(times,freqs(dispf),RR(dispf,:),[-1 1]); end;
+   
    if ~isempty(g.maxamp)
 	   caxis([-g.maxamp g.maxamp]);
    end;
