@@ -57,6 +57,7 @@
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
 %                  +/-max(abs(map value)) {default: 'off'}
 %  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
+%  'topoplotkey','val' = any optional arguments for topoplot.
 %
 % Outputs:
 %  compvarorder = component numbers in decreasing order of max variance in data
@@ -91,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2005/01/25 19:54:00  scott
+% adjusted cbar location and text, adjusted help msg
+%
 % Revision 1.86  2004/12/17 16:46:22  scott
 % adjusting and correcting help message
 %
@@ -385,7 +389,8 @@ if nargin <= 2 | isstr(varargin{1})
 				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv';  
 				  'actscale'      'string'   {'on' 'off'}             'off'; 
 				  'limcontrib'    'real'     []                       0;  
-                                  'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
+				  'topoarg'    'real'     []                       0;  
+                  'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
 	if isstr(g), error(g); end;
