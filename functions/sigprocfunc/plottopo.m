@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/07/16 00:23:22  arno
+% debug ydir
+%
 % Revision 1.22  2003/07/15 18:37:29  arno
 % debug color
 %
@@ -717,6 +720,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
     else
       p=plot([xmin xmin],[ymn ymx],'color','k'); % draw vert axis at zero
     end
+    if g.ydir == -1
+        set(gca, 'ydir', 'reverse');
+    end;
     axis([xmin xmax ymn ymx]);        % set axis values
     hold on
     %set(p, 'Clipping','off');        % center text
