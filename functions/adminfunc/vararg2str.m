@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/05/10 19:05:38  arno
+% allowing numerical non integer to form small compact list
+%
 % Revision 1.7  2003/05/10 18:58:21  arno
 % allowing NaN in numerical integer array
 %
@@ -193,15 +196,15 @@ function str = contarray( array )
             if array(index) ~= array(index-1)+indent
 				if skip <= 1
 					if skip == 0
-                        str = [str ',' num2str(array(index))];
+                        str = [str ' ' num2str(array(index))];
                     else
-                        str = [str ',' num2str(array(index-1)) ',' num2str(array(index))];
+                        str = [str ' ' num2str(array(index-1)) ' ' num2str(array(index))];
                     end;
 				else
                     if indent == 1
-                        str = [str ':' num2str(array(index-1)) ',' num2str(array(index))];
+                        str = [str ':' num2str(array(index-1)) ' ' num2str(array(index))];
                     else
-                        str = [str ':' num2str(indent) ':' num2str(array(index-1)) ',' num2str(array(index))];
+                        str = [str ':' num2str(indent) ':' num2str(array(index-1)) ' ' num2str(array(index))];
                     end;
 				end;
 				skip = 0;
@@ -215,7 +218,7 @@ function str = contarray( array )
                 if indent == 1
                     str = [str ':' num2str(array(index)) ];
                 elseif indent == 0
-                    str = [str ',' num2str(array(index)) ];
+                    str = [str ' ' num2str(array(index)) ];
                 else
                     str = [str ':' num2str(indent) ':' num2str(array(index)) ];
                 end;
@@ -225,7 +228,7 @@ function str = contarray( array )
         if length(array) < 10
             str = num2str(array(1));
             for index = 2:length(array)
-                str = [str ',' num2str(array(index)) ];
+                str = [str ' ' num2str(array(index)) ];
             end;
         else        
             str = num2str(double(array));
