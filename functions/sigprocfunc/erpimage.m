@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2002/10/13 23:41:11  scott
+% debug ampargs
+%
 % Revision 1.50  2002/10/13 23:37:01  scott
 % debug valsort
 %
@@ -1123,7 +1126,7 @@ elseif Nosort == YES
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on (mean) value %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-elseif exist(valargs)
+elseif exist('valargs')
   [sttime stframe] = min(times-valargs(1));
   if length(valargs)>1
      [endtime endframe] = min(times-valargs(2));
