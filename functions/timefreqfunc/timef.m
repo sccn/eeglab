@@ -1,4 +1,4 @@
-% timef() - Returns estimates and plots of event-related (log) spectral
+% timef() - Returns estimates and plots of mean event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
@@ -22,15 +22,15 @@
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
-%       frames      = Frames per trial                        {750}
-%       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                 {250}
-%       cycles      = is 0 -> Use FFTs (with constant window length) {0}
-%                     is >0 -> Number of cycles in each analysis wavelet 
-%                     is [wavcycles fact] -> wavelet cycles increase with frequency 
-%                     starting at wavcyle (0<fact<1, fact=1 no increase, fact=0
-%                     same as running FFT).
-%                     OR multitaper decomposition (with 'mtaper').
+%       frames      = Frames per trial                               {750}
+%       tlimits     = [mintime maxtime] (ms) Epoch time limits    {[-1000 2000]}
+%       srate       = data sampling rate (Hz)                        {250}
+%       cycles      = If 0 -> Use FFTs (with constant window length) {0}
+%                     If >0 -> Number of cycles in each analysis wavelet 
+%                     If [wavecycles factor] -> wavelet cycles increase with frequency 
+%                     beginning at wavecyles (0<factor<1; factor=1 -> no increase,
+%                     standard wavelets; factor=0 -> fixed epoch length, as in FFT.
+%                     Else, 'mtaper' -> multitaper decomposition 
 %
 %    Optional Inter-Irial Coherence Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
@@ -44,15 +44,15 @@
 %    Optional FFT/DFT Parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: *longest* window length to use. This
-%                      determines the lowest output frequency  {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winframes) {200}
-%       'padratio'  = FFT-length/winframes (2^k)                    {2}
+%                      determines the lowest output frequency       {~frames/8}
+%       'timesout'  = Number of output times (int<frames-winframes)       {200}
+%       'padratio'  = FFT-length/winframes (2^k)                          {2}
 %                      Multiplies the number of output frequencies by
 %                      dividing their spacing. When cycles==0, frequency
 %                      spacing is (low_freq/padratio).
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
-%                      If cycles==0, all FFT frequencies are output. {50}
-%       'baseline'  = Spectral baseline end-time (in ms).            {0}
+%                      If cycles==0, all FFT frequencies are output.      {50}
+%       'baseline'  = Spectral baseline end-time (in ms).                 {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
 %       '
 %
@@ -68,30 +68,28 @@
 %
 %    Optional Bootstrap Parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
-%                      level. Show non-signif. output values as green.   {0}
-%       'naccu'     = Number of bootstrap replications to accumulate     {200}
-%       'baseboot'  = Bootstrap baseline subtract (0 -> use 'baseline';
-%                                                  1 -> use whole trial) {0}
+%                     level. Show non-signif. output values in green       {0}
+%       'naccu'     = Number of bootstrap replications to accumulate       {200}
+%       'baseboot'  = Bootstrap baseline to subtract (0 -> use 'baseline'(see above)
+%                                                     1 -> use whole trial)   {0}
 %    Optional Scalp Map:
-%       'topovec'   = Scalp topography (map) to plot                     {none}
+%       'topovec'   = Scalp topography (map) to plot                       {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plotting Parameters:
-%       'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
-%       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
+%       'ploterps'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
+%       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
 %       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
-%       'itcmax'    = [real] set the ITC maximum for the scale       { auto }
-%       'title'     = Optional figure title                              {none}
+%       'itcmax'    = [real] set the ITC maximum for the scale             {auto }
+%       'title'     = Optional figure title                                {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
-%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1) {2}
-%       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from timef())     {from data}
-%       'axesfont'  = Axes text font size                                {10}
-%       'titlefont' = Title text font size                               {8}
-%       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
-%                     in ms.
-%                     
+%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)  {2}
+%       'pboot'     = Bootstrap power limits (e.g., from timef())    {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from timef())      {from data}
+%       'axesfont'  = Axes text font size                                  {10}
+%       'titlefont' = Title text font size                                 {8}
+%       'vert'      = [times_vector] -> plot vertical dashed lines at given times in ms.
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
@@ -105,7 +103,7 @@
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
 % Know problems:
-%   Significant mask fails for linear coherence.
+%   Significance masking fails for linear coherence.
 %
 % See also: crossf()
  
@@ -129,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/01/08 23:37:52  arno
+% add discalimer about linear coherence bug
+%
 % Revision 1.51  2002/11/15 03:04:07  arno
 % header for web
 %

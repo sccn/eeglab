@@ -4,21 +4,21 @@
 %   >> val = getkeyval( keyvalstr, varname, mode, defaultval);   
 %     
 % Inputs:            
-%   keyvalstr - string containing 'key', 'val' arguments
-%   varname   - string for the name of the variable or index
-%               of the value to retreive (assuming arguments are
-%               separated by comas).
-%   mode      - if the value extracted is an integer array, the
-%               'mode' variable can contain subset of indexes to return.
-%               If mode is 'present', then either 0 or 1 is return 
-%               depending on wether the variable is present.
+%   keyvalstr  - string containing 'key', 'val' arguments
+%   varname    - string for the name of the variable or index
+%                of the value to retrieve (assuming arguments are
+%                separated by comas).
+%   mode       - if the value extracted is an integer array, the
+%                'mode' variable can contain a subset of indexes to return.
+%                If mode is 'present', then either 0 or 1 is returned
+%                depending on wether the variable is present.
 %   defaultval - default value if the varible is not found
 %
 % Outputs:
 %   val  - a value for the variable
 %
-% Note: this function is helpfull for finding argument in string command
-%       stored into history.
+% Note: this function is helpful for finding arguments in string commands
+%       stored in command history.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 29 July 2002
 %
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/03/12 19:21:05  arno
+% handle setial case
+%
 % Revision 1.4  2002/08/21 18:55:23  arno
 % same
 %
