@@ -155,6 +155,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.120  2003/07/22 16:03:06  scott
+% phasesort help message
+%
 % Revision 1.119  2003/07/22 15:40:26  scott
 % adding circular smoothing to phase-sorted, allamps plots -sm
 %
@@ -2115,7 +2118,7 @@ if strcmpi(noshow, 'no')
             end
         end
         for c=1:size(auxvar,1)
-            if isnan(aligntime) % plot sortvar on un-aligned data
+            if isnan(aligntime) % plot auxvar on un-aligned data
                 auxcolor = auxcolors{c};
                 if TIMEX      % overplot auxvar
                     plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH); 
