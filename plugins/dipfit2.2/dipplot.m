@@ -73,6 +73,8 @@
 %               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
 %               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
 %               first elipsoid is 2 standard-dev and the lines are thicker.
+%  'dipnames' - [cell array] cell array of string with a name for each dipole (or
+%               pair of dipole).
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
 %   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
@@ -145,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.100  2004/06/15 17:57:06  arno
+%do not know
+%
 %Revision 1.99  2004/06/11 00:16:12  arno
 %change light
 %
@@ -466,6 +471,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'num'       'string'   { 'on' 'off' }     'off';
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
                                  'std'       'cell'     []                  {};
+                                 'dipname'   'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
                                  'projcol'   ''         []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
@@ -708,13 +714,23 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             for index = 1:length(sources)
                 if index~=1 
                     if sources(index).component ~= sources(index-1).component
-                        textforgui(colorcount) = { sprintf(...
-             'Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                        if isempty(g.dipname)
+                            textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', ...
+                                                        sources(index).component, 100*sources(index).rv) };
+                        else
+                            textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
+                                                               g.dipname{index}, 100*sources(index).rv) };
+                        end;
                         colorcount = colorcount+1;
                     end;
                 else 
-                    textforgui(colorcount) = { sprintf(...
-             'Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                    if isempty(g.dipname)
+                        textforgui(colorcount) = { sprintf( 'Component %d (R.V. %3.2f)', ...
+                                                        sources(index).component, 100*sources(index).rv) };
+                    else
+                        textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
+                                                           g.dipname{index}, 100*sources(index).rv) };
+                    end;
                     colorcount = colorcount+1;
                 end;
             end;
@@ -865,8 +881,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
             dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
             dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
-            dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
-                                                             sources(index).rv*100);
+            if isempty(g.dipname)
+                dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
+                                           sources(index).rv*100);
+            else
+                dipstruct.rv     = sprintf('C %d (%3.2f)',g.dipname{index}, sources(index).rv*100);
+            end;
             if ~strcmpi(g.spheres,'on') % plot disk markers
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
