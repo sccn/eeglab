@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/05/09 23:52:25  arno
+% debug auto mode
+%
 % Revision 1.45  2003/05/06 21:57:49  arno
 % fixing coordinates for the 3 views
 %
@@ -338,7 +341,7 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
     if strcmp(g.confirm, 'on')
         disp('********** USER ATTENTION REQUIRED ************');
         r = input('Are you sure you want to compute time-frequency decompositions (y/n):', 's');
-        if r(1) == 'n', disp('Cancelling movie call'); return; end;
+        if isempty(r) | r(1) == 'n', disp('Cancelling movie call'); return; end;
     end;
     
 	% compute timef and crossf for all components
