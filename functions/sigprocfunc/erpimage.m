@@ -167,6 +167,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.229  2004/11/30 06:24:19  scott
+% help msg
+%
 % Revision 1.228  2004/11/22 17:57:37  scott
 % read YDIR from icadefs.m to set the direction of the ERP trace axes
 %
@@ -2746,9 +2749,9 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     fprintf('Plotting the ERP trace below the ERP image\n');
     if Erpstdflag == YES
         if Showwin
-          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],times(winlocs)); % plot ERP +/-stdev
+          tmph = plot1trace(ax2,times,erp,limit, [], stdev,times(winlocs)); % plot ERP +/-stdev
         else
-          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],[]); % plot ERP +/-stdev
+          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[]); % plot ERP +/-stdev
         end
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
