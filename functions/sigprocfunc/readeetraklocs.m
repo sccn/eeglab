@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/11/27 00:20:37  arno
+% nothing
+%
 % Revision 1.1  2003/11/26 17:00:56  arno
 % Initial revision
 %
@@ -51,11 +54,26 @@ function chanlocs = readeetraklocs( filename )
         
     % get label names
     % ---------------
-    labels = locs(end,:);
+    indlabels = [];
+    indpos    = [];
+    for ind = 1:size(locs,1)
+        if isstr(locs{ind,1}) 
+            if strcmpi(locs{ind,1}, 'Labels')
+                indlabels = ind;
+            end;
+            if strcmpi(locs{ind,1}, 'Positions')
+                indpos = ind;
+            end;
+        end;
+    end;
+    if isempty(indpos) | isempty(indlabels)
+        error('Could not find ''Labels'' or ''Position'' tag in electrode file');
+    end;
     
     % get positions
     % -------------
-    positions = locs(4:end-2,1:3);
+    positions = locs(indpos+1:indlabels-1,1:3);
+    labels    = locs(indlabels+1:end,:);
         
     % create structure
     % ----------------
