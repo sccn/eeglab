@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2004/03/24 17:47:10  arno
+% more debug msg
+%
 % Revision 1.57  2003/09/18 22:45:28  arno
 % adding frames output to brainmovie
 %
@@ -525,7 +528,6 @@ end;
 if ~isstr(g.envylabel)
 	disp('Error: envelope label must be a string'); return;
 end;	
-dasf
 if ~isempty(g.envelope)
 	if (size( g.envelope,1 ) ~=2) | (size( g.envelope,2 ) ~= length(times)) | (size( g.envelope,3 ) ~= nbconditions)
 		fprintf('Error: Enveloppe array does not have the right size (%s), instead of (%s) i.e. 2 x %d (number of time points) x %d (number of conditions)\n', int2str([2 length(times) nbconditions]), int2str(size( g.envelope)), length(times), nbconditions); return;
