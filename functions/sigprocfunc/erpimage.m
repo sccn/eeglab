@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.237  2005/02/14 01:35:49  arno
+% [Amore debugging
+%
 % Revision 1.236  2005/02/14 01:32:47  arno
 % debuging ampsort
 %
@@ -2370,6 +2373,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         end
         drawnow
         hold on
+        data = allamps;
     end;
     
 elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
