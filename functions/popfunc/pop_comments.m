@@ -9,6 +9,8 @@
 %   title       - optional window title (string)
 %   newcomments - new comments (string or cell array of strings)
 %                 to assign (during commandline calls only)
+%   concat      - [0|1] 1 concatenate the newcomments to the old one.
+%                 Default is 0.
 %
 % Outputs:
 %   newcomments - new comments, string
@@ -44,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/04/09 23:28:12  arno
+% debuging command line call
+%
 % Revision 1.9  2002/08/17 01:03:34  scott
 % font change, OK -> SAVE
 %
@@ -75,7 +80,7 @@
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 
 
-function [newcomments, com] = pop_comments( comments, plottitle, newcomments );
+function [newcomments, com] = pop_comments( comments, plottitle, newcomments, concat );
 
 com = '';
 if exist('comments') ~=1, comments = '';
@@ -143,30 +148,71 @@ if nargin < 3
 
 	close(gcf);
 else
-  if iscell(newcomments)
-    newcomments = strvcat(newcomments{:});
-  end;
+    if iscell(newcomments)
+        newcomments = strvcat(newcomments{:});
+    end;
+    if nargin > 3 & concat == 1
+        newcomments = strvcat(comments, newcomments);
+    end;
 end;	
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
-if ~strcmp( comments, newcomments)
-  com =sprintf('EEG.comments = pop_comments('''', '''', %s);', str2str(newcomments));
+if nargout > 1
+    if ~strcmp( comments, newcomments)
+
+        ccell    = str2cell( comments );
+        newccell = str2cell( newcomments );
+        
+        if length(ccell) < length(newccell)
+            allsame = 1;
+            for index = 1:length(ccell)
+                if ~strcmp(ccell{index}, newccell{index}), allsame = 0; end;
+            end;
+        else
+            allsame = 0;
+        end;
+        if allsame
+            com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', ...
+                          cell2str(newccell(length(ccell)+1:end)));
+        else 
+            com =sprintf('EEG.comments = pop_comments('''', '''', %s);', cell2str(newccell));     
+        end;
+    end;  
 end;
 return;
  
-function str = array2str( array )
+function scell = str2cell( str )
+	scell = cellstr(str);
+	for index = 1:length(scell)
+        scell{index} = deblank(scell{index});
+	end;
+return;
+
+function array = str2array( str )
 	str = '[';
 	for index = 1:size(array,1)
 		str = [ str '; [' num2str(double(array(index,:))) '] ' ];
 	end;
 	str = [ str ']' ];
 return;
-		 
+
+function str = cell2str( array )
+	str = '';
+	for index = 1:length(array)
+        if isempty(array{index})
+            str = [ str ', '' ''' ];
+        else
+            str = [ str ', ''' array{index} '''' ];
+        end;
+	end;
+	str = [ 'strvcat(' str(2:end) ')'];
+return;		 
+
 function str = str2str( array )
 	str = '';
 	for index = 1:size(array,1)
-		str = [ str ', ''' array(index,:) '''' ];
+		str = [ str ', ''' deblank(array(index,:)) ' ''' ];
 	end;
 	str = [ 'strvcat(' str(2:end) ')'];
 return;
