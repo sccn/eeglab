@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/03/12 03:20:02  arno
+% help button update
+%
 % Revision 1.12  2002/10/16 01:15:07  arno
 % nan_mean
 %
@@ -171,8 +174,8 @@ else
 end;
 
 switch nargin
-	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(%s, %d, [%s], [1:%d], ''%s'', %d);', inputname(1), typeplot, num2str(indices), EEG.trials, plottitle, singletrials);
-	case 4, com = sprintf('pop_plotdata(%s, %d, [%s], [%s], ''%s'', %d);', inputname(1), typeplot, num2str(indices), num2str(trials), plottitle, singletrials);
+	case {0, 1, 2, 3}, com = sprintf('pop_plotdata(%s, %d, %s, [1:%d], ''%s'', %d);', inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials);
+	case 4, com = sprintf('pop_plotdata(%s, %d, %s, %s, ''%s'', %d);', inputname(1), typeplot, vararg2str(indices), vararg2str(trials), plottitle, singletrials);
 end;
 return;
 
