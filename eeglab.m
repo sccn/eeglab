@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.148  2002/08/17 20:38:49  scott
+% Plot > ERP plots -> Plot > Averaged ERP
+%
 % Revision 1.147  2002/08/17 18:52:55  scott
 % Reject epochs using ICA -> Reject data using ICA
 %
@@ -786,8 +789,8 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 		uimenu( ERP_m, 'Label', 'Plus scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'In scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'In rect. array'     , 'CallBack', [ checkepoch     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 1); clear tmpeeg;' e_hist]);
-	topo_m = uimenu( third_m, 'Label', 'ERP maps');
-		uimenu( topo_m, 'Label', 'As scalp maps'     , 'CallBack', [ checkplot      'LASTCOM = pop_topoplot(EEG, 1);' e_hist]);
+	topo_m = uimenu( third_m, 'Label', 'ERP map series');
+		uimenu( topo_m, 'Label', 'As 2-D scalp maps'     , 'CallBack', [ checkplot      'LASTCOM = pop_topoplot(EEG, 1);' e_hist]);
 		uimenu( topo_m, 'Label', 'As 3-D head plots'     , 'CallBack', [ checkplot      '[EEG LASTCOM] = pop_headplot(EEG, 1);' e_store]);
 	uimenu( third_m, 'Label', 'Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_compareerps(ALLEEG);' e_hist]);
 
