@@ -46,13 +46,13 @@
 %	EEG.reject.eegkurtg     - deprecated
 %
 % Usage:
-%   >> [EEGOUT, res] = eeg_checkset( EEG );
+%       >> [EEGOUT, res] = eeg_checkset( EEG );
 %
 % Inputs:
-%   EEG        - dataset structure
+%       EEG        - dataset structure
 %
 % Outputs:
-%   EEGOUT     - output dataset
+%       EEGOUT     - output dataset
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 01-26-02 chandeg events and trial condition format -ad
@@ -109,44 +112,44 @@ com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
 res = [];
 % verify the type of the variables
 % --------------------------------
-	% signal dimensions -------------------------
+	% data dimensions -------------------------
 	if size(EEG.data,1) ~= EEG.nbchan
- 	  disp( [ 'eeg_checkset warning: number of column in signal array (' int2str(size(EEG.data,1)) ...
- 	  ') does not match the number of channels (' int2str(EEG.nbchan) '), corrected' ]); 
+ 	  disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,1)) ...
+ 	  ') does not match the number of channels (' int2str(EEG.nbchan) '): corrected' ]); 
  	  res = com;
  	  EEG.nbchan = size(EEG.data,1);
 	end;	
 
 	if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
       if mod(size(EEG.data,2), EEG.pnts) ~= 0
-           if popask( [ 'eeg_checkset error: the number of frames does not divide the number of column in signal.'  10 ...
-                          'Do you want to EEGLAB to fix that ?' 10 '(press Cancel to fix the problem from the command line)']) 
+           if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
+                          'Should EEGLAB attempt to adjust?' 10 '(press Cancel to fix the problem from the command line)']) 
                 res = com;
                 EEG.pnts = size(EEG.data,2);
                 EEG = eeg_checkset(EEG);
                 return;
             else
-              	 error( 'eeg_checkset error: number of points do not divide the number of column in signal');
+              	 error( 'eeg_checkset error: number of points does not divide the number of columns in data');
             end;  	  
       else
         if EEG.trials > 1
-       		disp( 'eeg_checkset warning: number of dimensions in signal increased to 3'); 
+       		disp( 'eeg_checkset note: number of dimensions in data increased to 3'); 
        	    res = com;
        	end;    
        	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);		 
       end;    
 	end;
 
-	% size of signal -----------
+	% size of data -----------
 	if size(EEG.data,3) ~= EEG.trials 
- 	  disp( ['eeg_checkset warning: 3rd dimension in signal array (' int2str(size(EEG.data,3)) ...
+ 	  disp( ['eeg_checkset warning: 3rd dimension size of data (' int2str(size(EEG.data,3)) ...
  	  			') does not match the number of epochs (' int2str(EEG.trials) '), corrected' ]); 
  	  res = com;
  	  EEG.trials = size(EEG.data,3);
 	end;	
 	if size(EEG.data,2) ~= EEG.pnts 
- 	  disp( [ 'eeg_checkset warning: number of column in signal array (' int2str(size(EEG.data,2)) ...
- 	  	') does not match the number of points (' int2str(EEG.pnts) '), corrected' ]); 
+ 	  disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
+ 	  	') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
  	  res = com;
  	  EEG.pnts = size(EEG.data,2);
 	end;	
@@ -167,8 +170,8 @@ res = [];
     if ~isfield(EEG, 'event'), EEG.event = []; res = com; end;
     if ~isempty(EEG.event)
         if EEG.trials > 1 & ~isfield(EEG.event, 'epoch')
-             if popask( [ 'eeg_checkset error: the event info structure does not contain any ''epoch'' field.'  ...
-                          'Do you want to remove all events ?' 10 '(press Cancel to fix the problem from the command line)']) 
+             if popask( [ 'eeg_checkset error: the event info structure does not contain an ''epoch'' field.'  ...
+                          'Should EEGLAB remove all events ?' 10 '(press Cancel to fix the problem from the command line)']) 
                 res = com;
                 EEG.event = [];
                 EEG = eeg_checkset(EEG);
@@ -192,7 +195,7 @@ res = [];
         end;   
         if l ~= EEG.trials
              if popask( [ 'eeg_checkset error: the number of epoch indices in the epoch array/struct (' ...
-                   int2str(l) ') is different from the actual number of epochs (' int2str(EEG.trials) ').' 10 ...
+                   int2str(l) ') is different from the number of epochs in the data (' int2str(EEG.trials) ').' 10 ...
                    'Do you want to remove them ?' 10 '(press Cancel to fix the problem from the command line)']) 
                 res = com;
                 EEG.epoch = [];
@@ -211,27 +214,27 @@ res = [];
 	if ~isempty(EEG.icasphere)
 		if ~isempty(EEG.icaweights)
 			if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
- 	  			if popask( [ 'eeg_checkset error: number of column in weights array (' int2str(size(EEG.icaweights,2)) 10
- 	  			') does not match the number of rows in sphere (' int2str(size(EEG.icasphere,1)) ')' 10 ...
- 	  			'Do you want to remove them ?' 10 '(press Cancel to fix the problem from the command line)']) 
+ 	  			if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10
+ 	  			') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
+ 	  			'Should EEGLAB clear these matrices?' 10 '(press Cancel to fix the problem from the command line)']) 
                     res = com;
                     EEG.icasphere = [];
                     EEG.icaweights = [];
                     EEG = eeg_checkset(EEG);
                     return;
                 else
-                    error('eeg_checkset error: invalid weight and sphere array size');
+                    error('eeg_checkset error: invalid weight and sphere array sizes');
                 end;    
 			end;
 			if size(EEG.icasphere,2) ~= size(EEG.data,1)
- 	  			disp( [ 'eeg_checkset warning: number of column in ica matrix (' int2str(size(EEG.icasphere,2)) ...
- 	  			') does not match the number of rows in signal (' int2str(size(EEG.data,1)) ')' ]); 
+ 	  			disp( [ 'eeg_checkset warning: number of columns in ica matrix (' int2str(size(EEG.icasphere,2)) ...
+ 	  			') does not match the number of rows in data (' int2str(size(EEG.data,1)) ')' ]); 
                 res = com;
 			end;
 			if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
                 eeg_options; % changed from eeglaboptions 3/30/02 -sm
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
-	 	  			if popask( [ 'eeg_checkset error: number of column in sphere array (' int2str(size(EEG.icasphere,2)) 10
+	 	  			if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
 	 	  			') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
 	 	  			'Do you want to remove them ?' 10 '(press Cancel to fix the problem from the command line)']) 
 	                    res = com;
@@ -244,7 +247,7 @@ res = [];
 	                end;    
                 end;
                 if option_computeica
- 	    			fprintf('eeg_checkset warning: recalculate ica matrix\n'); 
+ 	    			fprintf('eeg_checkset: recomputing ica activation matrix ...\n'); 
                     res = com;
                     EEG.icaact     = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
                     EEG.icaact    = reshape( EEG.icaact, EEG.nbchan, EEG.pnts, EEG.trials);
@@ -255,12 +258,12 @@ res = [];
                 res = com;
 			end;     
 		else
- 	  		disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting' ]); 
+ 	  		disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
             res = com;
  	  		EEG.icasphere = [];
 		end;
 		if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
- 	  		disp( [ 'eeg_checkset warning: number of dimensions in independent component array increased to 3' ]); 
+ 	  		disp( [ 'eeg_checkset note: number of dimensions in independent component array increased to 3' ]); 
             res = com;
 			EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);		
 		end;
@@ -275,7 +278,7 @@ res = [];
 if ~isempty( EEG.chanlocs )
     if ~isstruct( EEG.chanlocs)
 		if exist( EEG.chanlocs ) ~= 2
-			disp( [ 'eeg_checkset warning: channel file does not exist or is not in matlab path, removed' ]); 
+			disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
 	        EEG.chanlocs = [];
 	        res = com;
         else
@@ -287,7 +290,7 @@ if ~isempty( EEG.chanlocs )
     end;
     if isstruct( EEG.chanlocs)
         if length( EEG.chanlocs) ~= EEG.nbchan
-			disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct, channel file/struct removed' ]); 
+			disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct: channel file/struct removed' ]); 
 	        EEG.chanlocs = [];
 	        res = com;
 	    end;
@@ -366,7 +369,7 @@ if ~isempty( varargin)
 	                       'Confirmation', 'Cancel', 'Yes','Yes');
 	                           
 	               switch lower(ButtonName),
-	                   case 'cancel', error('eeg_checkset: ICA components must be computed before running that function'); 
+	                   case 'cancel', error('eeg_checkset: ICA components must be derived before running that function'); 
                    end;
                    [EEG res] = pop_runica(EEG);
                    res = [ inputnames(1) ' = eeg_checkset('  inputnames(1) '); ' res ];
@@ -378,15 +381,15 @@ if ~isempty( varargin)
                 end;
             case 'event', 
                 if isempty(EEG.event)
-                    errordlg([ 'Can not process if no event. First add event.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
-                    error('eeg_checkset: epochs must be extracted before running that function');
+                    errordlg([ 'Cannot process if no events. First add events.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
+                    error('eeg_checkset: data epochs must be extracted before running that function');
                 end;
             case 'chanloc', 
                 if isempty(EEG.chanlocs)
-                    errordlg( ['Can not process without channel location file.' 10 ...
-                               'Enter the name of the file in /Edit/Edit dataset info.' 10 ...
+                    errordlg( ['Cannot process without channel location file.' 10 ...
+                               'Enter the name of the file via "/Edit/Edit dataset info".' 10 ...
                                'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
-                    error('eeg_checkset: can not process without channel location file.');
+                    error('eeg_checkset: cannot process without channel location file.');
                 end;
             case 'eventconsistency',
                 % uniformize fields (str or int) if necessary
@@ -423,7 +426,7 @@ if ~isempty( varargin)
                         if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
                             | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
                             removeevent = [removeevent indexevent];
-                            disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number, removed']);
+                            disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
 				        end;
 				    end;
 				    EEG.event(removeevent) = [];
