@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/04 17:11:51  scott
+% edit to work in subplot axes -sm
+%
 % Revision 1.5  2002/11/15 03:07:45  arno
 % header for web
 %
@@ -312,6 +315,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
+head_sep = 1.2;
 for t=1:ntopos
 %  axt = axes('Units','Normalized','Position',...
 %                 [topoleft+(t-1)*6*topowidth/5 0.68 topowidth topowidth*1.2]);
