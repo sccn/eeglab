@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/11/10 16:51:25  arno
+% remove dbug message
+%
 % Revision 1.8  2004/11/10 16:48:20  arno
 % nothing
 %
@@ -63,12 +66,12 @@ for index = 1:length(varargin)
 end;
 g = struct(varargin{:});
 
-try,  g.promptstring; catch, g.promptstring = ''; end;
-try,  g.liststring; catch, error('''liststring'' must be defined'); end;
+try,  g.promptstring;  catch, g.promptstring = ''; end;
+try,  g.liststring;    catch, error('''liststring'' must be defined'); end;
 try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end;
-try,  g.listsize;   catch, g.listsize = []; end;
-try,  g.initval;    catch, g.initval = []; end;
-try,  g.name;       catch, g.name = ''; end;
+try,  g.listsize;      catch, g.listsize = []; end;
+try,  g.initialvalue;  catch, g.initialvalue = []; end;
+try,  g.name;          catch, g.name = ''; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
@@ -88,11 +91,11 @@ if ~strcmp(g.selectionmode, 'multiple') | ...
     (iscell(g.liststring) & length(g.liststring) == 1) | ...
     (isstr (g.liststring) & size  (g.liststring,1) == 1)
 	maxval = 2;
-	if isempty(g.initval), g.initval = 1; end;
+	if isempty(g.initialvalue), g.initialvalue = 1; end;
 else
 	maxval = length(g.liststring)+1;
 end;
-listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'value', g.initval, 'min', 1, 'max', maxval } ...
+listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'value', g.initialvalue, 'min', 1, 'max', maxval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
 		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
 
