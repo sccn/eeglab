@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/11/10 02:10:40  arno
+% reading chunks of data from the command line
+%
 % Revision 1.10  2003/09/22 23:42:19  arno
 % debuging urevent
 %
@@ -70,18 +73,36 @@ function [EEG, command] = pop_readegi(filename, datachunks);
     
 EEG = [];
 command = '';
+disp('Warning: this function can only import continuous files or');
+disp('         epoch files with only one length for data epochs');
 if nargin < 1 
 	% ask user
 	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose an EGI RAW file -- pop_readegi()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
+
+    fid = fopen(filename, 'rb', 'b');
+    if fid == -1, error('Cannot open file'); end;
+    head = readegihdr(fid);
+    fclose(fid);
+    
+    if head.segments ~= 0
+        promptstr    = { sprintf('Segment/frame number (default:1:%d)', head.segments) };
+        inistr       = { '' };
+        result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
+        if length(result) == 0 return; end;
+        datachunks   = eval( [ '['  result{1} ']' ] );
+    else
+        datachunks   = [];
+        disp('Only one segment, cannot read portion of the file');
+    end;
 end;
 
 % load datas
 % ----------
 EEG = eeg_emptyset;
-if nargin > 1
+if exist('datachunks')
     [Head EEG.data Eventdata] = readegi( filename, datachunks);
 else
     [Head EEG.data Eventdata] = readegi( filename);
@@ -100,15 +121,21 @@ EEG.xmin            = 0;
 
 % importing the events
 % --------------------
+EEG = eeg_checkset(EEG);
 if ~isempty(Eventdata)
     orinbchans = EEG.nbchan;
     for index = size(Eventdata,1):-1:1
         EEG = pop_chanevent( EEG, orinbchans-size(Eventdata,1)+index, 'edge', 'leading', ...
                              'delevent', 'off', 'typename', Head.eventcode(index,:), ...
                              'nbtype', 1, 'delchan', 'on');
+         Head.eventcode(end,:) = [];
     end;
 end;
-EEG = eeg_checkset(EEG);
-command = sprintf('EEG = pop_readegi(''%s'');', filename); 
+
+EEG = eeg_checkset(EEG, 'makeur');
+EEG = eeg_checkset(EEG, 'eventconsistency');
+if nargin < 1 
+    command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks}) ); 
+end;
 
 return;
