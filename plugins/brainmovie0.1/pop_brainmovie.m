@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/12/06 18:47:10  arno
+% plotting movie from the rear
+%
 % Revision 1.20  2002/12/05 15:49:42  arno
 % debuging plotorder
 %
@@ -359,6 +362,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         [tmp plotorder] = sort( coordinates(:,1) );
         coordinates = coordinates(:, [2 3]); % remove X
     else
+        plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
     brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
@@ -387,6 +391,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         [tmp plotorder] = sort( coordinates(:,3) );
         coordinates = coordinates(:, [1 2]); % remove Z
     else
+        plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
     
@@ -416,6 +421,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
         [tmp plotorder] = sort( coordinates(:,2) );
         coordinates = coordinates(:, [1 3]); % remove Z
     else
+        plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
     
