@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/12/01 02:32:36  arno
+% Initial revision
+%
 
 function [chanlocs, labels, positions] = readneurodat(filename);
     
@@ -51,20 +54,17 @@ tmp = loadtxt(filename);
 % -----------------
 [tmp2 tmpind] = sort(cell2mat(tmp(:,1))');
 tmp = tmp(tmpind,:);
-if size(tmp,2) == 4
-    tmp = tmp(:,2:4);
-end;
 
 % convert to polar coordinates
 % ----------------------------
 %figure; plot(cell2mat(tmp(:,2)), cell2mat(tmp(:,3)), '.');
-[phi,theta] = cart2pol(cell2mat(tmp(:,2)), cell2mat(tmp(:,3)));
+[phi,theta] = cart2pol(cell2mat(tmp(:,end-1)), cell2mat(tmp(:,end)));
 theta = theta/513.1617*44;
 phi   = phi/pi*180;
 
 % convert to other types of coordinates
 % -------------------------------------
-labels = tmp(:,1)';
+labels = tmp(:,end-2)';
 chanlocs = struct('labels', labels, 'sph_theta_besa', mat2cell(theta)', 'sph_phi_besa', mat2cell(phi)');
 chanlocs = convertlocs( chanlocs, 'sphbesa2all');
 for index = 1:length(chanlocs)
