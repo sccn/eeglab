@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 add eeglab options -ad
@@ -64,7 +67,7 @@ end;
 
 if nargin <3
 	if typeplot
-		result = inputdlg( {'Channels number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP in channel array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] ['ERP in channel array' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'} );
+		result = inputdlg( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP in channel array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] ['ERP in channel array' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'} );
 	else
 		result = inputdlg( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP component array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] ['Component ERPs' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'} );
 	end;		
