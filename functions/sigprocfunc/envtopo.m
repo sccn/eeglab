@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2005/03/31 16:06:45  arno
+% header
+%
 % Revision 1.87  2005/01/25 19:54:00  scott
 % adjusted cbar location and text, adjusted help msg
 %
@@ -518,8 +521,8 @@ times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 %%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
 %
 ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(data)); % begin by setting limits from data
-ymax = max(max(data));
+ymin = min(min(data(plotchans,:))); % begin by setting limits from data
+ymax = max(max(data(plotchans,:)));
 if length(g.limits) == 4 
      if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
 	 ymin = g.limits(3);
@@ -938,7 +941,7 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
     set(p,'EdgeColor',FILLCOLOR);
     hold on
     %
-    % Overplot the data envelope again so it is not covered by the fill()'d component
+    % Overplot the data envelope so it is not covered by the fill()'d component
     %
     p=plot(times,matsel(envdata,frames,0,1,1),colors(mapcolors(1),1));% plot the max
     set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
