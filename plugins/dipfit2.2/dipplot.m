@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.61  2003/10/31 19:50:38  arno
+%reordering 2 dipoles, delete old edges
+%
 %Revision 1.60  2003/10/31 18:59:41  arno
 %divide rvrange by 100
 %
@@ -516,7 +519,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % -----------------------
     if strcmp(g.summary, 'on')
         figure;
-        options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength, ...
+        options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen };
         axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
         axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
