@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2004/11/09 02:05:11  arno
+% same
+%
 % Revision 1.137  2004/11/09 02:02:38  arno
 % debug events for Matlab 7
 %
@@ -587,19 +590,26 @@ end;
 % read data if necessary
 % ----------------------
 if isstr(EEG.data)
-    fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
+    filename = EEG.data;
+    fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
     if fid == -1
-        disp(['file ' [EEG.filepath EEG.data] ' not found, trying local folder']);
+        disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
         fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
-            errordlg2(['Cannot open data file ''' [EEG.data] ''''], 'error');
+            errordlg2(['Cannot open data file ''' filename ''''], 'error');
             error('File not found');
         end;
-        fprintf('Reading float file ''%s''...\n', [EEG.data]);
+        fprintf('Reading float file ''%s''...\n', filename);
     else 
-        fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
+        fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
     end;
     EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+    if length(filename) > 3
+        if strcmpi(filename(end-2:end), 'dat')
+            EEG.data = EEG.data';
+        end;
+    end;
+    fclose(fid);
 end;
 if isnumeric(EEG.data)
     v = version;
