@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2002/08/13 18:06:54  scott
+% title
+%
 % Revision 1.125  2002/08/13 18:06:21  scott
 % title
 %
@@ -1069,7 +1072,8 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 										  fastif(EEG.trials > 1, 'epoched', 'continuous'), CURRENTSET));	
 	end;
 	% set( H_MAIN(3), 'String', '');
-	set( H_MAIN(3), 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
+	% set( H_MAIN(3), 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
+	set( H_MAIN(3), 'String', sprintf('Dataset name\t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
 	fullfilename = [ EEG.filepath EEG.filename];
 	if ~isempty(fullfilename)
 		if length(fullfilename) > 15
