@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/11/09 18:49:28  arno
+% adding text in gui
+%
 % Revision 1.43  2002/11/09 17:32:59  scott
 % "Rename..." legend edit
 %
@@ -336,7 +339,7 @@ end;
 
 % select the events to keep
 % -------------------------
-Ievent = g.event;
+Ievent    = g.event;
 Ieventrem = g.omitevent;
 
 for index = 1:length(allfields)
@@ -508,7 +511,7 @@ if strcmp( lower(g.deleteepochs), 'on') & EEG.trials > 1
                             ' (out of ' int2str(EEG.trials) ') un-referenced epochs ?' ]), ...
 							'Confirmation', ...
 							 'Cancel', 'Ok','Ok');
-	else ButtonName = 'Yes'; end;
+	else ButtonName = 'ok'; end;
 	
 	switch lower(ButtonName),
 	 case 'cancel', return; 
