@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/05/13 22:27:10  arno
+% debug for pop_chanedit
+%
 % Revision 1.3  2003/05/13 22:10:43  arno
 % debuging
 %
@@ -166,16 +169,19 @@ end;
 
 % execute writelocs
 % -----------------
-writelocs(chans, filename, options{:});
+writelocs(chans, filename, 'unicoord', 'off', options{:});
 
 % generate history
 % ----------------
 if isempty(inputname(1)) % not a variable name -> probably the structure from pop_chanedit
+    writelocs(chans, filename, 'unicoord', 'off', options{:});
    com = sprintf('pop_writelocs( EEG.chanlocs, ''%s'', %s);', filename, vararg2str(options));
 else
     if strcmpi(inputname(1), 'chantmp')
+        % do not write file (yet)
         com = sprintf('pop_writelocs( chans, ''%s'', %s);', filename, vararg2str(options));
     else
+        writelocs(chans, filename, 'unicoord', 'off', options{:});
         com = sprintf('pop_writelocs( %s, ''%s'', %s);', inputname(1), filename, vararg2str(options));
     end;
 end;
