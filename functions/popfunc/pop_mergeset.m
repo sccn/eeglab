@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/02/21 03:14:05  arno
+% fixing urevent boundaries
+%
 % Revision 1.18  2004/02/21 00:23:04  arno
 % urevent update
 %
@@ -194,6 +197,7 @@ else
                 disp('Adding a discontinuity event and urevent between datasets');
                 INEEG1.urevent(end+1).type    = 'boundary';
                 INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;
+                INEEG1.event(end  ).urevent   = length(INEEG1.urevent);            
             else 
                 disp('Adding a discontinuity event between datasets');
             end; 
