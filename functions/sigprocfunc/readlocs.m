@@ -42,6 +42,10 @@
 %               3    -90    .181       C3
 %               4     90    .181       C4
 %                 more lines ...
+%               Note that in previous releases, the channel labels
+%               had to contain 4 characters (spaces replaced by '.').
+%               This format still works but the dots are no longer
+%               required.
 %   '.sph' - spherical coordinate file. Example:
 %               1    -63.36    -72      Fp1
 %               2     63.36    72       Fp2
@@ -91,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/17 18:20:22  scott
+% help msg update
+%
 % Revision 1.13  2002/07/02 00:30:23  arno
 % updating header
 %
