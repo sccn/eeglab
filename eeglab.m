@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.247  2003/07/28 17:55:44  arno
+% changing test for reference
+%
 % Revision 1.246  2003/07/28 15:21:16  arno
 % remove averef
 %
@@ -1147,7 +1150,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
 	   uimenu( ERPC_m, 'Label', 'With component maps', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(EEG);' e_hist]);
-	   uimenu( ERPC_m, 'Label', 'With comp. maps (compare)', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(ALLEEG);' e_hist]);
+	   uimenu( ERPC_m, 'Label', 'With comp. maps (compare)', 'CallBack', [ checkica 'if length(ALLEEG) == 1, error(''Need at least 2 datasets''); end; LASTCOM = pop_envtopo(ALLEEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 	uimenu( third_m, 'Label', 'Plot/Compare comp. ERPs'      , 'CallBack', [ checkepochica     'LASTCOM = pop_comperp(ALLEEG, 0);' e_hist]);
 
