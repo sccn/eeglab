@@ -45,6 +45,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/27 00:42:10  arno
+% implementing findstr
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -53,13 +56,8 @@ function str = h( command, str );
 
 mode = 1; % mode = 1, full print, mode = 0, truncated print
 
-try
-	eeg_global;
-	eeg_consts;
-catch
-	global LASTCOM;
-	global ALLCOM;
-end;
+global LASTCOM;
+global ALLCOM;
 
 if nargin < 1
 	if isempty(ALLCOM)
