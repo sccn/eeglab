@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2003/11/06 01:40:31  arno
+% diporient
+%
 % Revision 1.63  2003/11/06 01:00:57  arno
 % adjusting corrdinates
 % for dipole
@@ -787,8 +790,13 @@ end
 if ~isempty(DIPOLE)
     hold on;
     color = 'k';
+    % invert x and y from dipplot
+    tmp = DIPOLE;
+    DIPOLE(:,1) = -tmp(:,2);
+    DIPOLE(:,2) =  tmp(:,1);
+    DIPOLE(:,3) = -tmp(:,4);
+    DIPOLE(:,4) =  tmp(:,3);
     DIPOLE(:,1:4)   = DIPOLE(:,1:4)*0.5;
-    DIPOLE(:,[2,4]) = - DIPOLE(:,[2,4]);
     DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
     if strcmpi(DIPNORM, 'on')
         for index = size(DIPOLE,1)
