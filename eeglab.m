@@ -1,24 +1,27 @@
-% eeglab() - EEGLAB (Version 3.0) - Graphic user interface environment using the 
-%   ICA EEG toolbox (Makeig et al., CNL / The Salk Institute, 1997-2001), now the 
-%   EEGLAB toolbox. EEGLAB is hosted by the Swartz Center for Computational 
-%   Neuroscience, Institute for Neural Computation, University of California 
-%   San Diego (http://sccn.ucsd.edu/).
+% eeglab() - EEGLAB (Version 3.0) - Graphic user interface environment for 
+%   electrophysiological data analtsis using the ICA EEG toolbox (Makeig et al., 
+%   CNL / The Salk Institute, 1997-2001), now the EEGLAB toolbox. Currently,
+%   EEGLAB is hosted (2002-) by the Swartz Center for Computational Neuroscience, 
+%   Institute for Neural Computation, University of California San Diego 
+%   (http://sccn.ucsd.edu/). Feedback from users welcome {arno,scott@sccn.ucsd.edu}.
+%
+% Author: Arnaud Delorme with Scott Makeig
 %
 % Description:
 %   EEGLAB is Matlab software for processing continuous or epoched event-related 
 %   EEG or MEG data. It is designed for use either by novice or expert Matlab users. 
 %   In normal use, the EEGLAB graphic interface calls graphic functions via 
 %   pop-up argument windows. Its history mechanism can be used to write the
-%   resulting Matlab calls to disk for incorporation into Matlab scripts. 
+%   resulting Matlab calls to disk for later incorporation into Matlab scripts. 
 %   A single structure, 'EEG,' contains all dataset parameters and may be accessed 
 %   and modified directly from the Matlab command line. 
 %
-% Note: 1) To redaw the graphic interface after updating datasets, simply type 
-%            >> eeglab redraw % this will also scan for non-empty datasets
-%       2) To rebuild the graphic interface without erasing datasets, type 
+% Usage: 1) To redaw the graphic interface after updating datasets, simply type 
+%            >> eeglab redraw  % this will also scan for non-empty datasets
+%        2) To rebuild the graphic interface without erasing datasets, type 
 %            >> eeglab rebuild
-%       3) To restart EEGLAB from scratch, type 
-%            >> eeglab % this will ignore loaded datasets
+%        3) To restart EEGLAB from scratch, type 
+%            >> eeglab  % this will ignore loaded datasets
 %
 % See:
 %    >> help eeg_checkset(), % gives the format of the EEG dataset structure
@@ -177,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2002/04/30 18:34:30  scott
+% *** empty log message ***
+%
 % Revision 1.53  2002/04/30 18:33:50  scott
 % same
 %
