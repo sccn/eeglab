@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/19 22:22:55  arno
+% default output var
+%
 % Revision 1.20  2002/08/17 20:07:22  scott
 % help message
 %
@@ -276,6 +279,7 @@ for index=1:EEG.trials
     end;
 end;
 EEG.event = newevent;
+EEG.epoch = [];
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % check for boundary events
