@@ -26,7 +26,7 @@
 %                      define a type field for the time-locking event (TLE). By 
 %                      default it is defined as type ''TLE'' at time 0 for all 
 %                      epochs. Command line equivalent: 'typefield'.
-%  "Field name(s) containing latencies" - [edit box] enter columns name(s)
+%  "Field name(s) containing event latencies" - [edit box] enter columns name(s)
 %                      containing latency information. It is not necessary to 
 %                      define a latency field for epoch information. All fields 
 %                      that contain latencies will be imported as different event 
@@ -34,6 +34,15 @@
 %                      events of type 'RT' will be created with latencies given 
 %                      in the RT field. See notes. Command line 
 %                      equivalent: 'latencyfields'.
+%  "Field name(s) containing event durations" - [edit box] enter columns name(s)
+%                      containing duration information. It is not necessary to 
+%                      define a latency field for epoch information, but if you
+%                      do, a duration field (or 0) must be entered for each 
+%                      latency field you define. For instance if the latency fields
+%                      are "'rt1' 'rt2'", then you must have duration fields
+%                      "'dr1' 'dr2'". If duration is not defined for event latency
+%                      'tr1', you may enter "0 'rt2'". Command line 
+%                      equivalent: 'durationfields'.
 %  "Latency time unit rel. to seconds" - [edit box] specify the time unit for 
 %                      latency columns defined above. Command line 
 %                      equivalent: 'timeunit'.
@@ -61,6 +70,8 @@
 %                      of an event. These fields are transferred into 
 %                      events whose type will be the same as the name of
 %                      the latency field. (Ex: field RT -> type 'RT' events).
+%   'durationfields'  - {cell array} Field names that contain the duration 
+%                      of an event. See also graphic interface help above.
 %   'timeunit'       - [float] Optional unit for latencies relative to seconds. 
 %                      Ex: sec -> 1, msec -> 1e-3. Default: Assume latencies 
 %                      are in time points (relative to the time-zero time point 
@@ -105,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/04/29 21:16:09  arno
+% current -> old
+%
 % Revision 1.27  2004/01/30 19:33:28  arno
 % testing existence of eventdescription
 %
@@ -202,7 +216,7 @@ if nargin < 1
     return;
 end;
 if nargin < 2
-    geometry    = { [ 1 1 1.86] [1] [1 0.9] [2.5 1 0.6] [2.5 1 0.6] [1] [1.5 0.5 1] [1.5 0.5 1] [1.5 0.17 1.36]};
+    geometry    = { [ 1 1 1.86] [1] [1 0.66] [2.5 1 0.6] [2.5 1 0.6] [2.5 1 0.6] [1] [1.5 0.5 1] [1.5 0.5 1] [1.5 0.17 1.36]};
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
                     'if filename ~=0,' ...
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
@@ -214,20 +228,28 @@ if nargin < 2
 			   'All fields that contain latencies will be imported as different event types.' 10 ...
 			   'For instance, if field ''RT'' contains latencies, events of type ''RT''' 10 ...
                            'will be created with latencies given in the RT field'];
+    helpstrdur  = ['It is not necessary to define a duration for each event (default is 0).' 10 ...
+			   'However if a duration is defined, a corresponding latency must be defined too' 10 ...
+               '(in the edit box above). For each latency field, you have define a duration field.' 10 ...
+               'if no duration field is defined for a specific event latency, enter ''0'' in place of the duration field' ];
 	uilist = { ...
          { 'Style', 'text', 'string', 'Epoch file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''globfile'';' commandload ] }, ...
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'globfile' }, ...
          { }...
-         { 'Style', 'text', 'string', 'File input field (col.) names (not type or latency)', 'fontweight', 'bold' }, { 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'text', 'string', '           Field name containing time-locking event type(s)', 'horizontalalignment', 'right', ...
-                                      'fontweight', 'bold', 'tooltipstring', helpstrtype },  ...
-  		 { 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'text', 'string', 'NOTE', 'tooltipstring', helpstrtype }, ...
-         { 'Style', 'text', 'string', '           Field name(s) containing latencies', 'horizontalalignment', 'right', ...
+         { 'Style', 'text', 'string', 'File input field (col.) names', 'fontweight', 'bold' }, { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', '           Field name(s) containing event latencies', 'horizontalalignment', 'right', ...
            'fontweight', 'bold', 'tooltipstring', helpstrlat },  ...
   		 { 'Style', 'edit', 'string', '' }, ...
          { 'Style', 'text', 'string', '(Ex: RT)', 'tooltipstring', helpstrlat }, ...
+         { 'Style', 'text', 'string', '           Field name(s) containing event durations', 'horizontalalignment', 'right', ...
+           'fontweight', 'bold', 'tooltipstring', helpstrdur },  ...
+  		 { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', 'NOTE', 'tooltipstring', helpstrdur }, ...
+         { 'Style', 'text', 'string', '           Field name containing time-locking event type(s)', 'horizontalalignment', 'right', ...
+                                      'tooltipstring', helpstrtype },  ...
+  		 { 'Style', 'edit', 'string', '' }, ...
+         { 'Style', 'text', 'string', 'NOTE', 'tooltipstring', helpstrtype }, ...
          { } ...
          { 'Style', 'text', 'string', 'Latency time unit rel. to seconds. Ex: ms -> 1E-3', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' }, { } ...         
          { 'Style', 'text', 'string', 'Number of file header lines to ignore', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
@@ -238,11 +260,12 @@ if nargin < 2
     filename    = result{1};
     fieldlist   = parsetxt( result{2} );
     options = {};
-    if ~isempty( result{3}), options = { options{:} 'typefield' result{3} }; end; 
-    if ~isempty( result{4}), options = { options{:} 'latencyfields' parsetxt( result{4} ) }; end; 
-    if ~isempty( result{5}), options = { options{:} 'timeunit' eval(result{5}) }; end; 
-    if ~isempty( result{6}), options = { options{:} 'headerlines' eval(result{6}) }; end; 
-    if ~result{7}, options = { options{:} 'clearevents' 'off'}; end; 
+    if ~isempty( result{3}), options = { options{:} 'latencyfields' parsetxt( result{3} ) }; end; 
+    if ~isempty( result{4}), options = { options{:} 'durationfields' parsetxt( result{4} ) }; end; 
+    if ~isempty( result{5}), options = { options{:} 'typefield' result{5} }; end; 
+    if ~isempty( result{6}), options = { options{:} 'timeunit' eval(result{6}) }; end; 
+    if ~isempty( result{7}), options = { options{:} 'headerlines' eval(result{7}) }; end; 
+    if ~result{8}, options = { options{:} 'clearevents' 'off'}; end; 
 else 
     if ~isempty(varargin) & ~isstr(varargin{1})
         % old call compatibility
@@ -261,20 +284,26 @@ else
     end;
 end;
 
-g = finputcheck( options, { 'typefield'     'string'   []       ''; ...
-                            'latencyfields' 'cell'     []       {}; ...
-                            'timeunit'      'real'     [0 Inf]  1/EEG.srate; ...
-                            'headerlines'   'integer'  [0 Inf]  0; ...
-                            'clearevents'   'string'   {'on' 'off'}  'on'}, 'pop_importepoch');
+g = finputcheck( options, { 'typefield'      'string'   []       ''; ...
+                            'latencyfields'  'cell'     []       {}; ...
+                            'durationfields' 'cell'     []       {}; ...
+                            'timeunit'       'real'     [0 Inf]  1/EEG.srate; ...
+                            'headerlines'    'integer'  [0 Inf]  0; ...
+                            'clearevents'    'string'   {'on' 'off'}  'on'}, 'pop_importepoch');
 if isstr(g), error(g); end;
 
-%g.insertepoch = 1;
-%if strcmpi(g.cleanevent, 'on')
-%    g.insertepoch == 0;
-%end;
-%if ~isfield( EEG.event, 'epoch')
-%    g.insertepoch = 1;
-%end;    
+% check duration field
+% --------------------
+if ~isempty(g.durationfields)
+    if length(g.durationfields) ~= length(g.latencyfields) 
+        error( [ 'If duration field(s) are defined, their must be as many duration' 10 ...
+              'fields as there are latency fields (or enter 0 instead of a field for no duration' ]);
+    end;
+else
+    for index = 1:length(g.latencyfields) 
+        g.durationfields{index} = 0;
+    end;
+end;
 
 % convert filename
 % ----------------
@@ -301,13 +330,11 @@ if ~iscell(fieldlist)
     otherfieldlist = { fieldlist };
     fieldlist = { fieldlist };
 end;
-if ~iscell(g.latencyfields)
-    g.latencyfields = { g.latencyfields };
-end;
 otherfieldlist = setdiff( fieldlist, g.latencyfields);
 otherfieldlist = setdiff( otherfieldlist, g.typefield);
 if size(values,1) ~= EEG.trials
-    error('Pop_importepoch() error: the number of rows in the input file/array does not match the number of trials');
+    error( [ 'Pop_importepoch() error: the number of rows in the input file/array does' 10 ... 
+             'not match the number of trials. Maybe you forgot to specify the file header length?' ]);
 end;    
 
 % create epoch array info
@@ -375,7 +402,8 @@ if EEG.xmin <= 0
         else 
             EEG.event(end).type = 'TLE';
         end;
-        eval( ['EEG.event(end).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+        EEG.event(end).latency  = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
+        EEG.event(end).duration = 0;
     end;
 end;
 
@@ -386,9 +414,14 @@ for index = 1:length(g.latencyfields)
          error(['Pop_importepoch: latency field ''' g.latencyfields{index} ''' not found']);
     end;
     for trials = 1:EEG.trials
-        EEG.event(end+1).epoch = trials; 
-        eval( ['EEG.event(end).type = '''  g.latencyfields{index} ''';'] );
-        eval( ['EEG.event(end).latency = (EEG.epoch(trials).' g.latencyfields{index} '*g.timeunit-EEG.xmin)*EEG.srate+1+(trials-1)*EEG.pnts;' ] );
+        EEG.event(end+1).epoch  = trials; 
+        EEG.event(end).type     = g.latencyfields{index};
+        EEG.event(end).latency  = (getfield(EEG.epoch(trials), g.latencyfields{index})*g.timeunit-EEG.xmin)*EEG.srate+1+(trials-1)*EEG.pnts;
+        if g.durationfields{index} ~= 0 & g.durationfields{index} ~= '0'
+            EEG.event(end).duration = getfield(EEG.epoch(trials), g.durationfields{index})*g.timeunit*EEG.srate;
+        else
+            EEG.event(end).duration = 0;
+        end;
     end;
 end;
 
@@ -414,6 +447,7 @@ if ~isfield(EEG, 'eventdescription' ) | isempty( EEG.eventdescription )
     EEG.eventdescription{strmatch('epoch', allfields, 'exact')} = 'Epoch number';
 	if ~isempty(strmatch('type', allfields)), EEG.eventdescription{strmatch('type', allfields)} = 'Event type'; end;
 	if ~isempty(strmatch('latency', allfields)), EEG.eventdescription{strmatch('latency', allfields)} = 'Event latency'; end;
+	if ~isempty(strmatch('duration', allfields)), EEG.eventdescription{strmatch('duration', allfields)} = 'Event duration'; end;
 end;
 
 % checking and updating events
