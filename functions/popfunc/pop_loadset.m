@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/02/09 01:31:43  arno
+% input path, head edit...
+%
 % Revision 1.20  2003/07/16 18:26:19  arno
 % automatically updating filename
 %
@@ -104,13 +107,13 @@ function [VAROUT, command] = pop_loadset( inputname, inputpath);
 command = '';
 VAROUT  = [];
 %eeg_emptyset;
+if nargin < 2
+    inputpath = '';
+end;
 if nargin < 1
 	[inputname, inputpath] = uigetfile('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
-end;
-if nargin < 2
-    inputpath = '';
 end;
 
 fprintf('Pop_loadset: loading file %s ...\n', inputname);
