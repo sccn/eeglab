@@ -7,30 +7,30 @@
 %   EEG             - dataset structure
 %
 % Optional inputs:
-%   'setname'    - string with the name of the dataset
-%   'data'       - ['varname'|'filename'] import a file or variable
-%                  into the EEG structure of EEGLAB.
-%   'dataformat' - ['array|matlab|ascii|float32'] format of the input data file. The
-%                  data file is transposed if the number of row is greater than
-%                  the number of columns. Note that for 'float32', data must
-%                  be organised in the format channels x ndata.
-%   'chanlocs'   - ['varname'|'filename'] import a file containing
-%                  electrodes locations (see >> help readlocs for file format).
-%   'nbchan'     - number of channel in data
-%   'xmin'       - starting time in second
-%   'pnts'       - number of point per frame in the data (for epoched data only)
-%   'srate'      - data sampling rate
-%   'icaweight'  - ica weight matrix. By default, the sphering matrix is set to
-%                  the identity matrix if it is empty.
-%   'icasphere'  - ica sphering matrix
+%   'setname'    - Name of the dataset
+%   'data'       - ['varname'|'filename'] Import a file or variable
+%                   into the EEG structure of EEGLAB.
+%   'dataformat' - ['array|matlab|ascii|float32'] Format of the input data file. The
+%                   data file is transposed if the number of rows is larger than
+%                   the number of columns. Note that for 'float32', data must
+%                   be organised in the format channels x times.
+%   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode locations 
+%                  (See >> help readlocs for file format).
+%   'nbchan'     - Number of channels in data
+%   'xmin'       - Starting time (in seconds)
+%   'pnts'       - Number of points per epoch in the data (for epoched data only)
+%   'srate'      - Data sampling rate
+%   'icaweight'  - ICA weight matrix. By default, the sphering matrix is set to
+%                   the identity matrix if it is empty.
+%   'icasphere'  - ICA sphering matrix
 % 
 % Outputs:
-%   EEGOUT      - modified dataset structure
+%   EEGOUT       - modified dataset structure
 %
 % Note:
 %   To create a new dataset, type 
 %   >> EEG = pop_editset( eeg_emptyset );
-%   To erase a variable, use '[]'. The folowing command suppress channel locations
+%   To erase a variable, use '[]'. The folowing command suppresses channel locations.
 %   Ex: EEG = pop_editset( EEG, 'chanlocs', '[]');
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 
@@ -86,10 +89,10 @@ if nargin < 2                 % if several arguments, assign values
          ...
          { 'Style', 'text', 'string', 'Data file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { } ...
-         { 'Style', 'text', 'string', 'EEG.data' }, ...
          { }, ...
+         { 'Style', 'text', 'string', 'EEG.data' }, ...
          ...
-         { 'Style', 'text', 'string', 'Number of channel:', 'horizontalalignment', 'right', 'fontweight', 'bold' }, {},  { 'Style', 'text', 'string', num2str(EEG.nbchan) }, { 'Style', 'text', 'string', '(EEG.nbchan)' } ...
+         { 'Style', 'text', 'string', 'Channels in data:', 'horizontalalignment', 'right', 'fontweight', 'bold' }, {},  { 'Style', 'text', 'string', num2str(EEG.nbchan) }, { 'Style', 'text', 'string', '(EEG.nbchan)' } ...
          { 'Style', 'text', 'string', 'Time points per epoch (0=continuous data):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, { },  { 'Style', 'edit', 'string', num2str(EEG.pnts) }, {'Style', 'text', 'string', '(EEG.pnts)' } ...
          { 'Style', 'text', 'string', 'Data sampling rate (Hz):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, { },  { 'Style', 'edit', 'string', num2str(EEG.srate) }, {'Style', 'text', 'string', '(EEG.srate)' },...
          { 'Style', 'text', 'string', 'Epoch start time (sec):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, { }, { 'Style', 'edit', 'string', num2str(EEG.xmin) }, {'Style', 'text', 'string', '(EEG.xmin)' },...
