@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/03/07 21:50:45  scott
+% trying char(double(string)) to avoid nested '''' -sm
+%
 % Revision 1.3  2002/12/05 22:55:37  arno
 % header
 %
@@ -75,7 +78,7 @@ for a=1:length(hndl)                    % make all axes visible
     else
         commanddbl = double(command);
         % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
-        set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis('char(command_dbl)')']);
+        set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(' char(command_dbl) ')']);
     end;        
 end
 figure(fig);
@@ -83,7 +86,7 @@ if exist('command') ~= 1
     set(hndl(a),'ButtonDownFcn','copyaxis');
 else
     % set(hndl,'ButtonDownFcn',['copyaxis(''' command ''')']);
-    set(hndl,'ButtonDownFcn',['copyaxis('char(command_dbl)')']);
+    set(hndl,'ButtonDownFcn',['copyaxis(' char(command_dbl) ')']);
 end;        
 %set(hndl,'ButtonDownFcn','copyaxis');
 %if ~exist('noticks')
