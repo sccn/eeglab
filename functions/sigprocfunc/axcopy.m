@@ -1,10 +1,10 @@
 % axcopy() - Copy a Matlab figure axis and its graphic objects to a new pop-up window 
 %            using the left mouse button.
 %
-% Usage:  >> selaxiscopy
-%         >> selaxiscopy(fig)
-%         >> selaxiscopy('noticks')
-%         >> selaxiscopy(fig, command)
+% Usage:  >> axcopy
+%         >> axcopy(fig)
+%         >> axcopy('noticks')
+%         >> axcopy(fig, command)
 %
 % Notes:
 %   1) Clicking the left mouse button on a Matlab figure axis copies the graphic objects 
@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/09 20:50:26  scott
+% help msg
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
