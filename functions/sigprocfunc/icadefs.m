@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2004/07/07 22:22:53  arno
+% add shrink warning
+%
 % Revision 1.25  2004/03/21 15:43:50  scott
 % changing back - EEG not imported from workspace to functions.
 %
@@ -119,6 +122,7 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
                             % If none, use []
 SHRINKWARNING = 1;          % warn user about the shrink factor
+YDIR = 1;                   % positive up = 1; negative up = -1
 
 % COLORS
 % ------
