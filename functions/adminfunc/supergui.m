@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/13 18:50:54  arno
+% same
+%
 % Revision 1.20  2002/08/13 18:50:31  arno
 % vert align
 %
@@ -248,10 +251,15 @@ for row = 1:length(geomx)
 	%posy      = posy - height - 1/length(geomx)*INSETY; %compensate for inset 
 end;
 
-% recompute ordinates based on extet info
-% ---------------------------------------
+% adjustments
+% -----------
+factmultx = factmultx+0.1; % because some text was still hidden
+if factmultx < 0.3
+	factmultx = 0.3;
+end;
 
-%scale and replace the figure in the screen
+% scale and replace the figure in the screen
+% -----------------------------------------
 pos = get(gcf, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
