@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/13 18:15:36  arno
+% debugging for new function format
+%
 % Revision 1.4  2002/09/06 19:48:40  arno
 % updating eegplot calls
 %
@@ -84,8 +87,16 @@ if v(1) < 5
 end
 
 tmpdir = which('runica');
-tmpdir = [ tmpdir(1:end-8) 'locfiles' tmpdir(end-8) ];
-chan_locs = [ tmpdir 'chan14.locs'];
+tmpdir2 = [ tmpdir(1:end-8) 'locfiles' tmpdir(end-8) ];
+chan_locs  = [ tmpdir2 'chan14.locs'];
+chan_locs2 = [ tmpdir2 'chan.locs'];
+if isempty(which(chan_locs))
+    chan_locs  = [ tmpdir(1:end-8) 'chan14.locs']
+    chan_locs2 = [ tmpdir(1:end-8) 'chan.locs'];
+    if isempty(which(chan_locs))
+        error('could not find channel location file ''chan14.locs'' (place file in EEGLAB dir)');
+    end;
+end;
 % name of channel locations file
 
 figure
@@ -149,7 +160,7 @@ fprintf('        of %d chans by %d frames using plotdata()...\n\n', ...
                                size(data,1),size(data,2));
 figure('Position',pos+off/2); % #2a
 
-  plotdata(data,frames,[0 995 -10 10],'ERP Data',[ tmpdir 'chan.locs'],0,'(2 conditions)');
+  plotdata(data,frames,[0 995 -10 10],'ERP Data', chan_locs2 ,0,'(2 conditions)');
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
@@ -294,7 +305,7 @@ figure('Position',pos+4*off);
 %   [projdata] = plotproj(data,weights,compnums, ...
 %                            title,limits,chanlist,channames,colors);
  [projdata] = plotproj(data(:,1:frames),weights*sphere,windex(1:10), ...
-               'First epoch (comps. 1-10)',limits,[1:10],[ tmpdir 'chan.locs']);
+               'First epoch (comps. 1-10)',limits,[1:10], chan_locs2 );
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
