@@ -161,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.208  2004/05/07 04:47:17  scott
+% made sotvar = [] work
+%
 % Revision 1.207  2004/03/26 00:21:06  arno
 % same
 %
@@ -1009,11 +1012,6 @@ if avewidth > ntrials
   fprintf('Setting variable avewidth to max %d.\n',ntrials)
   avewidth = ntrials;  
 end
-if decfactor < 1
-  help erpimage
-  fprintf('\nerpimage(): Variable decfactor cannot be < 1.\n')
-  return
-end
 if decfactor > ntrials
   fprintf('Setting variable decfactor to max %d.\n',ntrials)
   decfactor = ntrials;  
@@ -1819,6 +1817,12 @@ end
 %
 %%%%%%%%%%%%%%%%%%% Adjust decfactor if phargs or ampargs %%%%%%%%%%%%%%%%%%%%%
 %
+if decfactor < 0
+    decfactor = -decfactor;
+    invdec = 1;
+else
+    invdec = 0;
+end;
 if decfactor > sqrt(ntrials) % if large, output this many trials
     n = 1:ntrials;
     if exist('phargs') & length(phargs)>1
@@ -1834,7 +1838,11 @@ if decfactor > sqrt(ntrials) % if large, output this many trials
             n = n(1:floor(ampargs(2)*length(n)));  % trials after rejection
         end
     end
-    decfactor = length(n)/decfactor;
+    if invdec
+        decfactor = (length(n)-avewidth)/decfactor;
+    else
+        decfactor = length(n)/decfactor;
+    end;
 end
 
 % 
