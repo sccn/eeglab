@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/25 01:48:19  arno
+% changing inputaname to EEG
+%
 % Revision 1.2  2002/04/26 21:27:36  arno
 % updating call to eeg_store
 %
@@ -63,7 +66,10 @@ if reject
 		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);' ...
 	       'eeglab(''redraw''); end;'], 'EEG', 'EEG'); ] ;
 else
-	com2 = [com2 '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
+	com2 = [com2 ...
+			' warndlg(strvcat(''Epoched labelled for rejection have been stored'',' ...
+			'''To actually reject these epochs'', ''/Tools/Reject data epochs/Reject labelled epochs''));' ...
+			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
 
 if ~exist('topcommand')
