@@ -1,15 +1,15 @@
 % spectopo() - Plot the mean log spectrum of a set of data epochs at
 %              all channels as a bundle of traces. At specified frequencies,
 %              plot the relative topographic distribution of power.
-%              Uses Matlab pwelch() from signal processing toolbox.
+%              Uses pwelch() from the Matlab signal processing toolbox.
 % Usage:
 %        >> spectopo(data, frames, srate);
 %        >> [spectra,freqs,speccomp,contrib,specstd] = ...
 %                     spectopo(data, frames, srate, 'key1', 'val1', 'key2', 'val2' ...);
 %
 % Inputs:
-%       data   = 2D (nchans,frames*epochs); % can be single-epoch
-%                 or 3D (nbchan,frames,epochs)
+%       data   = If 2-D (nchans,frames*epochs); % can be single-epoch
+%                 else, 3-D (nchans,frames,epochs)
 %       frames = frames per epoch {0 -> data length}
 %       srate  = sampling rate per channel (Hz)
 %
@@ -24,23 +24,23 @@
 %                Note that default color limits are symmetric around 0 and are
 %                different for each head {defaults: all nans}
 %   'title'    = [quoted string] plot title {default: none}
-%   'freqfac'  = [integer] number of time to oversample, vertical frequency resolution 
-%                {default: 2}
-%   'nfft'     = [integer] value to zero pad data to. Overwrite previous option.
+%   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
+%   'nfft'     = [integer] value to zero pad data to. Overwrites 'freqfac' above.
 %   'winsize'  = [integer] window size in data points {default: from data}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
-%   'percent'  = downsampling factor or approximate percentage of the data to
+%   'percent'  = downsampling factor, or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
-%                the computation. From 0 to 100 {default: 100 from the command line and
-%                20 if using the pop_up window}.
-%   'freqrange'  = [min max] frequency range to plot. Overwrite limits x axis.
+%                the computation. From 0 to 100 {defaults: 100 from the command line, 
+%                or 20 from the pop_up window}.
+%   'freqrange'  = [min max] frequency range to plot. Changes x-axis limits. 
 %   'reref'      = ['averef'|'off'] convert input data to average reference 
-%                  Default is 'off'.
-%   'mapnorm'    = [float vector] in case 'data' contain the activity of an independant 
-%                component, this parameter can contain its map, so the spectrum amplitude 
-%                will be scaled by the component RMS power.
-%   'boundaries' = data point indices indicating discontinuities in the signal
-%   'plot'       = ['on'|'off'] 'off' disable plotting. Default is 'on'.
+%                  {default: 'off'}
+%   'mapnorm'    = [float vector] if 'data' contain the activity of an independant 
+%                component, this parameter should contain its scalp map. In this case
+%                the spectrum amplitude will be scaled by component RMS scalp power.
+%                Useful for comparing component strengths.
+%   'boundaries' = data point indices of discontinuities in the signal
+%   'plot'       = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
 %
 % Plot component contributions:
 %   'weights'  = ICA unmixing matrix. 'freq' must contain a single frequency.
@@ -50,13 +50,13 @@
 %                ('icacomps').
 %   'plotchan' = [integer] channel at which to compute independent conmponent
 %                contributions at the selected frequency ('freq'). {[]=channel with
-%                higest power at 'freq').If 0, plot RMS power at all channels. 
-%   'nicamaps' = [integer] number of ICA component maps to plot (Default 4).
+%                higest power at 'freq'). If 0, plot RMS power at all channels. 
+%   'nicamaps' = [integer] number of ICA component maps to plot (default: 4).
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([]=all).
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectrum of
 %                individual ICA components, the function computes the spectrum of
-%                the data minus their contribution { default: 'normal' }
-%   'icamaps'  = [integer array] force plotting of selected ica compoment maps ([]=the
+%                the data minus their contributions {default: 'normal'}
+%   'icamaps'  = [integer array] force plotting of selected ICA compoment maps ([]=the
 %                'nicamaps' largest).
 %   'icawinv'  = [float array] inverse weigth matrix. By default computed by inverting
 %                the weight matrix (but if some components have been removed, then
@@ -69,7 +69,7 @@
 %    (see help topoplot())
 %
 % Outputs:
-%        spectra  = (nchans,nfreqs) power spectra (average over epochs) in dB
+%        spectra  = (nchans,nfreqs) power spectra (mean power over epochs), in dB
 %        freqs    = frequencies of spectra (Hz)
 %        speccomp = component spectra (ncomps,nfreqs). Warning, only the function  
 %                   only computes the spectrum of the components given as input using 
@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2003/08/12 16:55:23  arno
+% update comments
+%
 % Revision 1.68  2003/08/12 16:52:55  arno
 % pwelch
 %
@@ -756,7 +759,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	for f=1:length(g.freq)+length(g.icamaps)
 		if ~isempty(g.weights)
-			if f>length(g.freq) % special case of ica components
+			if f>length(g.freq) % special case of ICA components
 				from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
 				%g.icafreqsval contains the sorted frequency values at the specified frequency
 			else 
