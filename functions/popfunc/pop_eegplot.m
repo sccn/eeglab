@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/05/12 15:33:41  arno
+% same
+%
 % Revision 1.24  2003/05/12 15:32:00  arno
 % reject continuous data debug
 % for command line
@@ -174,17 +177,18 @@ if nargin < 3 & EEG.trials > 1
 
 	% which set to save
 	% -----------------
-    promptstr    = { 'Add to previously marked rejections (yes/no)', ...
-         	         'Reject marked trials (yes/no)', ...
-						 };
-	inistr       = { 'yes', 'no' };
-	result       = inputdlg2( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
-								'Reject epochs by visual inspection -- pop_eegplot()'), 1,  inistr, 'pop_eegplot');
+    uilist       = { { 'style' 'text' 'string' 'Add to previously marked rejections (checked=yes)'} , ...
+         	         { 'style' 'checkbox' 'string' '' 'value' 1 } , ...
+                     { 'style' 'text' 'string' 'Reject marked trials (checked=yes)'} , ...
+         	         { 'style' 'checkbox' 'string' '' 'value' 0 } };
+    result = inputgui( { [ 2 0.2] [ 2 0.2]} , uilist, 'pophelp(''pop_eegplot'');', ...
+                       fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
+								'Reject epochs by visual inspection -- pop_eegplot()'));
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    
-   switch lower(result{1}), case 'yes', superpose=1; end;
-   switch lower(result{2}), case 'no', reject=0; end;
+   if result{1}, superpose=1; end;
+   if ~result{2}, reject=0; end;
 
 end;
 
