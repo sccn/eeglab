@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/12/24 01:26:19  arno
+% adding 'plot' option
+%
 % Revision 1.19  2002/11/13 17:06:44  scott
 % hj
 % help msg
