@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.132  2003/08/24 04:20:26  scott
+% same
+%
 % Revision 1.131  2003/08/24 04:19:58  scott
 % added fprintf
 %
@@ -2812,9 +2815,8 @@ function [out, outalpha]  = nan_mean(in,alpha)
      end
      booterps = sort(abs(booterps));
      alpha = 1+floor(alpha*NBOOT);
-     outalpha = booterps(alpha,:);
-    end
-
+     outalpha = booterps(end+1-alpha,:);
+   end
    out(nononnans) = NaN;
 
 function out = nan_std(in)
