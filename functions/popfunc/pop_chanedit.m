@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2003/12/05 18:25:45  arno
+% ?
+%
 % Revision 1.69  2003/12/05 18:20:21  arno
 % same thing
 %
@@ -584,8 +587,8 @@ else
              chans = convertlocs(chans, lower(args{curfield}), 'verbose', 'on');
 		   end;
 		  case 'transform'
-		   tmpoper = args{curfield+1};
-		   if isempty(tmpoper), return; end;
+		   try, tmpoper = args{curfield+1}; catch, return; end;
+		   if isempty(deblank(tmpoper)), return; end;
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
            tmpoper = [ tmpoper ';' ];
 		   if isempty(findstr(tmpoper, 'chans'))
