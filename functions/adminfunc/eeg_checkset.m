@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2004/11/17 02:08:58  arno
+% save filename
+%
 % Revision 1.141  2004/11/17 02:07:18  arno
 % debug last
 %
@@ -812,6 +815,9 @@ end;
                 if option_computeica
                      fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
                     res = com;
+                    % Make compatible with Matlab 7
+                    EEG.icaweights = double(EEG.icaweights);
+                    EEG.icawinv = double(icawinv);
                     if any(isnan(EEG.data(:)))
                         fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
                         tmpindices = find(~isnan(EEG.data(1,:)));
