@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/12/10 23:09:32  hilit
+% correcting the chmod option
+%
 % Revision 1.7  2004/12/08 19:40:40  hilit
 % eeglab.cfg is now saved to the /tmp folder only
 %
@@ -58,16 +61,19 @@ function varargout = uigetfile2(varargin);
     % -------------------
     olddir = pwd;
     try,
-        tmp_fld = getenv('TEMP');
-        if isempty(tmp_fld) & isunix
-            if exist('/tmp') == 7
-                tmp_fld = '/tmp';
+        eeg_options;
+        if option_rememberfolder
+            tmp_fld = getenv('TEMP');
+            if isempty(tmp_fld) & isunix
+                if exist('/tmp') == 7
+                    tmp_fld = '/tmp';
+                end;
             end;
-        end;
-        if exist(fullfile(tmp_fld,'eeglab.cfg'))
-            load(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
-            s = ['cd([''' Path '''])'];
-            if exist(Path) == 7, eval(s); end;
+            if exist(fullfile(tmp_fld,'eeglab.cfg'))
+                load(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
+                s = ['cd([''' Path '''])'];
+                if exist(Path) == 7, eval(s); end;
+            end;
         end;
     catch, end;
 
@@ -75,18 +81,20 @@ function varargout = uigetfile2(varargin);
     % ---------------------------------------------------------------
     [varargout{1} varargout{2}] = uigetfile(varargin{:});
     try,
-        if varargout{1} ~= 0
-            Path = varargout{2};
-            try, save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat','-V6'); % Matlab 7
-            catch, 
-                try,  save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
-                catch, error('uigetfile2: save error, out of space or file permission problem');
+        if option_rememberfolder
+            if varargout{1} ~= 0
+                Path = varargout{2};
+                try, save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat','-V6'); % Matlab 7
+                catch, 
+                    try,  save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
+                    catch, error('uigetfile2: save error, out of space or file permission problem');
+                    end
                 end
-            end
-            if isunix
-                eval(['cd ' tmp_fld]);
-                system('chmod 777 eeglab.cfg');
-            end
+                if isunix
+                    eval(['cd ' tmp_fld]);
+                    system('chmod 777 eeglab.cfg');
+                end
+            end;
         end;
     catch, end;
     cd(olddir) 
