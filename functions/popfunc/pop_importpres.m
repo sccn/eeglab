@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/01/29 01:35:57  arno
+% allow to import any field for type and latency
+%
 % Revision 1.11  2003/12/11 19:52:42  arno
 % allowing different alignments
 %
@@ -175,6 +178,6 @@ if isempty(EEG.event), align = NaN; end;
 EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields);
 
-command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield align })); 
+command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield align })); 
 
 return;
