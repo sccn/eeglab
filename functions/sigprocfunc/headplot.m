@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/11/19 19:34:00  arno
+% mhead.dat -> mhead
+%
 % Revision 1.12  2002/11/19 19:30:37  arno
 % mhead -> mhead.dat
 %
@@ -127,7 +130,7 @@ end
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
 % mesh_file  = [ICADIR '/newupper.mat']; % whole head model file (183K)
-mesh_file  = ['mhead'];      % upper head model file (987K)
+mesh_file  = ['mhead.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
