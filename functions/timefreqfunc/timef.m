@@ -28,6 +28,7 @@
 %       cycles      = >0 -> Number of cycles in each analysis wavelet 
 %                     =0 -> Use FFTs (with constant window length) {0}
 %                           OR multitaper decomposition (with 'mtaper').
+%                     
 %
 %    Optional Inter-Irial Coherence Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
@@ -51,6 +52,7 @@
 %                      If cycles==0, all FFT frequencies are output. {50}
 %       'baseline'  = Spectral baseline end-time (in ms).            {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%       '
 %
 %    Optional Multitaper Parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
@@ -122,6 +124,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/07/22 14:28:56  arno
+% debugging input baseline spectrum
+%
 % Revision 1.43  2002/07/11 18:19:30  arno
 % header typo
 %
@@ -358,7 +363,7 @@ end
 
 if (nargin < 5)
 	varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)~=1)
+elseif (~isnumeric(varwin) | length(varwin)>2)
 	error('Value of cycles must be a number.');
 elseif (varwin < 0)
 	error('Value of cycles must be zero or positive.');
@@ -373,7 +378,12 @@ end;
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
-g.cycles  = varwin;
+g.cycles  = varwin(1);
+if length(varwin)>1
+	g.cyclesfact = varwin(2);
+else 
+	g.cyclesfact = 1;
+end;
 
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
@@ -602,7 +612,7 @@ else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%
     freqs = freqs(dispf);
 
 	%win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,0.5);
-	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,1);
+	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,g.cyclesfact);
 	P = zeros(size(win,2),g.timesout);       % summed power
 	R = zeros(size(win,2),g.timesout);       % mean coherence
 	PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN

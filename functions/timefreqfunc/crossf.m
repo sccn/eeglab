@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/07/26 00:27:56  arno
+% significance for all plots
+%
 % Revision 1.40  2002/07/25 23:05:15  arno
 % implementing condition comparison
 %
@@ -374,7 +377,7 @@ end
 
 if (nargin < 6)
    varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)~=1)
+elseif (~isnumeric(varwin) | length(varwin)>2)
    error('crossf(): Value of cycles must be a number.');
 elseif (varwin < 0)
    error('crossf(): Value of cycles must be either zero or positive.');
@@ -442,7 +445,12 @@ end;
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
-g.cycles  = varwin;
+g.cycles  = varwin(1);
+if length(varwin)>1
+	g.cyclesfact = varwin(2);
+else 
+	g.cyclesfact = 1;
+end;
 g.type       = lower(g.type);
 g.boottype   = lower(g.boottype);
 g.detrep     = lower(g.detrep);
@@ -1161,7 +1169,7 @@ if (Tf.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
    Tf.nb_points = padratio*winsize/2;   
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
    Tf.freqs = srate*cycles/winsize*[2:2/padratio:winsize]/2;
-   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,1);
+   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,g.cyclesfact);
    Tf.nb_points = size(Tf.win,2);
 end;
 Tf.tmpalltimes = zeros(Tf.nb_points, timesout);
