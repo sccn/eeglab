@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -148,7 +151,7 @@ if ~exist('fig')
 	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'OK', 'Units','Normalized', ...
 			'Position',[90 -10 15 4].*s+q, 'callback',  'eeg_store(CURRENTSET); close(gcf);');
 			% sprintf(['eeg_global; if %d pop_rejepoch(%d, %d, find(EEG.reject.sigreject > 0), EEG.reject.elecreject, 0, 1);' ...
-		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retreive(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
+		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
 end;
 
 if length(compnum) == EEG.nbchan
