@@ -51,15 +51,15 @@
 %
 % ITC Math Derivation:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% By definition, linear coherence is:
+% By definition, linear coherence is
 %       R = mean(Fxy)/sqrt(mean(abs(Fxx))*mean(abs(Fyy)));
 % where Fxy is the cross-spectrum (FxFy*) and Fxx and Fyy the autospectra of  
-% processes x and y.  We define the phase coherence to be:
+% processes x and y.  We define the phase coherence to be
 %       R = mean(Fxy/(abs(Fxx))*abs(Fyy));  % mean of individually normed Fxy
 % To derive the ITC, we consider y to be a stimulus-locked process 
 % such that, at each time and frequency, angle(Fyy) = 0 and abs(Fyy) = 1.
 % Thus Pxy = Pxx, and the (complex) inter-trial phase coherence between x and
-% the constant stimulus-locked process y is:
+% the constant stimulus-locked process y is
 %       ITC = mean(Pxx/abs(Pxx));
 %
 % USAGE:
@@ -73,7 +73,7 @@
 % NOTE:
 % * Left-click on subplots to view and zoom in separate windows (uses axcopy()).
 %
-% Required Inputs:     Value                                 {default}
+% Required Inputs:
 %   data        = Single-channel data vector (1,frames*ntrials) (required)
 %
 %   frames      = Frames per trial                        {750}
@@ -232,6 +232,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/30 15:00:04  scott
+% further edits -sm
+%
 % Revision 1.2  2002/04/30 14:56:23  scott
 % rewritten for new timef() format -sm
 %

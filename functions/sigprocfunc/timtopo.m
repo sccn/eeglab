@@ -2,7 +2,7 @@
 %
 % Usage:
 %  >> timtopo(data,'chan_locs')
-%  >> timtopo(data,'chan_locs',[limits],[plottimes]','title',[plotchans],
+%  >> timtopo(data,'chan_locs',[limits],[plottimes]','title',[plotchans], ...
 %                 [voffsets], 'key', 'val', ...);
 %
 % Inputs:
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/28 00:52:30  arno
+% allow to plot NaN with other latencies
+%
 % Revision 1.3  2002/08/27 00:20:54  arno
 % debugging colorbar->cbar (for menus)
 %

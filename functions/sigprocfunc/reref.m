@@ -7,7 +7,7 @@
 %
 % Inputs:
 %   data - 2-D data matrix (chans,frames*epochs) 
-%   refchan  - reference channel number(s) -- two possibilities here:
+%   refchan  - reference channel number(s) -- two possibilities here
 %          1) [] - if data state (see 'refstate' below) is 'common' compute 
 %             average reference, otherwise undo average reference.
 %          2) 1 <= num <= size(data,1): re-reference to channel num. If the 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/11/15 01:44:44  scott
+% can not -> cannot
+%
 % Revision 1.12  2002/11/15 01:41:04  arno
 % header for web
 %

@@ -3,12 +3,14 @@
 % Usage: >> Y = shuffle(X)
 %        >> [Y = shuffle(X, DIM)
 % 
-% Inputs: X   - input array
-%         DIM - dimension index (default is firt non-singleton dimention)
+% Inputs: 
+%   X   - input array
+%   DIM - dimension index (default is firt non-singleton dimention)
 %
-% Outputs: Y - shuffled array
-%          I - forward indices (Y = X(I) if 1D)
-%          J - reverse indices (X(J) = Y if 1D)
+% Outputs: 
+%    Y - shuffled array
+%    I - forward indices (Y = X(I) if 1D)
+%    J - reverse indices (X(J) = Y if 1D)
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD USA, Dec 2000
 

@@ -20,7 +20,7 @@
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed information about timef
 %
-% Required inputs:     Value                                 {default}
+% Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
 %       frames      = Frames per trial                        {750}
 %       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2002/10/18 16:49:53  arno
+% win' -> transpose(win)
+%
 % Revision 1.49  2002/08/14 21:07:05  arno
 % hanning debug
 %

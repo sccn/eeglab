@@ -36,7 +36,8 @@
 % File formats:
 %   The extension of the file determines its type
 %   if filetype is not specified
-%   '.loc' or '.locs'   - polar format. Example:
+%   '.loc' or '.locs':
+%               polar format. Example
 %               1    -18    .352       Fp1
 %               2     18    .352       Fp2
 %               3    -90    .181       C3
@@ -46,20 +47,24 @@
 %               had to contain 4 characters (spaces replaced by '.').
 %               This format still works but the dots are no longer
 %               required.
-%   '.sph' - spherical coordinate file. Example:
+%   '.sph':
+%               spherical coordinate file. Example
 %               1    -63.36    -72      Fp1
 %               2     63.36    72       Fp2
 %               3     32.58    0        C3
 %               4     32.58    0        C4
 %                 more lines ...
-%   '.xyz' - cartesian coordinate file. Example:
+%   '.xyz': 
+%               cartesian coordinate file. Example
 %               1   -0.8355   -0.2192   -0.5039      Fp1
 %               2   -0.8355    0.2192    0.5039      Fp2
 %               3    0.3956         0   -0.9184      C3
 %               4    0.3956         0    0.9184      C4
 %                 more lines ...
-%   '.txt' - read ascii files saved using pop_chanedit()
-%   '.elp' - Polhemus coordinate file (uses readelp())
+%   '.txt':   
+%               read ascii files saved using pop_chanedit()
+%   '.elp':     
+%               Polhemus coordinate file (uses readelp())
 %
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
@@ -95,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/15 01:46:21  scott
+% can not -> cannot
+%
 % Revision 1.16  2002/11/12 23:39:57  arno
 % convert numerical labels to string
 %
