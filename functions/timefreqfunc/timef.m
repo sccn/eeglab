@@ -20,7 +20,7 @@
 %                        'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed information about timef
-%        some default values are not relevant if this function is called from
+%        Some default values are not relevant if this function is called from
 %           pop_timef()
 %
 % Required inputs:     
@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2004/10/19 18:33:44  hilit
+% typo in the help message
+%
 % Revision 1.74  2004/08/31 00:28:24  arno
 % help msg
 %
