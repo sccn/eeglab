@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2004/09/21 16:54:51  hilit
+% change && -> &
+%
 % Revision 1.134  2004/09/03 16:14:04  arno
 % debug event duration
 %
@@ -594,7 +597,7 @@ if isstr(EEG.data)
 end;
 if isnumeric(EEG.data)
     v = version;
-    if ~isempty(findstr(v, 'R11')) || ~isempty(findstr(v, 'R12')) || ~isempty(findstr(v, 'R13'))
+    if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
         EEG.data = double(EEG.data);
     else
         EEG.data = single(EEG.data);
