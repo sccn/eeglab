@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/05/19 14:00:45  scott
+% *** empty log message ***
+%
 % Revision 1.35  2002/05/19 13:57:54  scott
 % *** empty log message ***
 %
@@ -387,6 +390,27 @@ for n=1:tfpoints
    end
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   % Plot scalp map using topoplot()
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   axes(topoaxes(n));
+   scalpmap = matsel(tfdata,length(times),tfpidx(n,1),tfpidx(n,2),selchans)';
+   topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
+               'electrodes','on','shrink','off');
+               % 'interlimits','electrodes')
+   axis square;
+   hold on
+                topoplot(topomap,eloc_file,'electrodes','off', ...
+                                 'style', 'blank', 'emarkersize1chan', 10)
+   tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
+   set(tl,'fontsize',13);
+   caxis([limits(5:6)]);
+   if n==tfpoints % & (mod(tfpoints,2)~=0)
+      cb=cbar;
+      pos = get(cb,'position');
+      set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+   end
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    % Plot connecting lines using changeunits()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    from = changeunits([timefreqs(n,:)],imgax,wholeax);
@@ -398,27 +422,10 @@ for n=1:tfpoints
    set(mk,'markerfacecolor',LINECOLOR);
    axis([0 1 0 1]);
    axis off;
+   drawnow
 end
 
-for n=1:tfpoints
+% for n=1:tfpoints
 
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Plot scalp map using topoplot()
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   axes(topoaxes(n));
-   scalpmap = matsel(tfdata,length(times),tfpidx(n,1),tfpidx(n,2),selchans)';
-   topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
-               'electrodes','on','shrink','off');
-               % 'interlimits','electrodes')
-   axis square;
-   tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
-   set(tl,'fontsize',13);
-   caxis([limits(5:6)]);
-   if n==tfpoints % & (mod(tfpoints,2)~=0)
-      cb=cbar;
-      pos = get(cb,'position');
-      set(cb,'position',[pos(1:2) 0.023 pos(4)]);
-   end
-   drawnow
-end % topoplot loop
+% end % topoplot loop
 
