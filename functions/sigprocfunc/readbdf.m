@@ -10,7 +10,7 @@
 %                                             if more than 1 record is loaded)
 % Output:
 %       DAT    - EDF data structure
-%       signal - 
+%       signal - output signal
 %
 % Author: Alois Schloegl, 03.02.1998, updated T.S. Lorig Sept 6, 2002 for BDF read
 %
