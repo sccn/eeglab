@@ -1,14 +1,13 @@
-% strmultiline() - interactively filter EEG dataset data using eegfilt()
+% strmultiline() - format a long string as a multi-line string. 
 %
 % Usage:
 %   >> strout = strmultiline( strin, maxlen, delimiter);
 %
 % Inputs:
-%   strin     - one line string
+%   strin     - one-line string
 %   maxlen    - maximum line length
 %   delimiter - enter 10 here to separate lines with character 10. Default is
 %               empty: lines are on different rows of the returned array.
-%
 % Outputs:
 %   strout    - string with multiple line
 %
@@ -35,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/09 19:15:22  arno
+% Initial revision
+%
 
 function strout = strmultiline( strin, maxlen, delimiter);
 

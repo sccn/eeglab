@@ -1,11 +1,11 @@
 % eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
-%             The current version (3) allows vertical scrolling through channels 
-%             and manual marking/unmarking of data stretches or epochs for rejection.
+%             Now allows vertical scrolling through channels and manual marking 
+%             and unmarking of data stretches or epochs for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
 %      else
-%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface
-%
+%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface;
+%                                                         % use for plotting
 % Menu items:
 %    "Figure > print" - [menu] Print figure in portrait or landscape.
 %    "Figure > Edit figure" - [menu] Remove menus and buttons and call up the standard
@@ -54,6 +54,7 @@
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
 %     "Settings > Events" - [menu] Toggle event on or off (assuming events have been 
 %                  given as input). Press "legend" to pop up a legend window for events.
+%
 % Display window interface:
 %    "Activity plot" - [main window] This axis displays the channel activities.  For 
 %                  continuous data, the time axis shows time in seconds. For epoched
@@ -88,8 +89,8 @@
 %                    ascii channel labels. Else,
 %                   [vector of integers] -> Show specified channel numbers. Else,
 %                   [] -> Do not show channel labels {default|0 -> Show [1:nchans]}
-%    'limits'     - [start end] Time limits for data epochs in ms (for labelling 
-%                   purpose only).
+%    'limits'     - [start end] Time limits for data epochs in ms (for labeling 
+%                   purposes only).
 %    'freqlimits' - [start end] If plotting epoch spectra instead of data, frequency 
 %                   limits of the display. (Data should contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
@@ -105,7 +106,7 @@
 %    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
 %                   clicked. The 'REJECT' button is visible only if this parameter is 
 %                   not empty. As explained in the "Output" section below, the variable 
-%                   'TMPREJ' contains the rejected windows (see also functions 
+%                   'TMPREJ' contains the rejected windows (See also: functions 
 %                   eegplot2event() and eegplot2trial()).
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
@@ -113,20 +114,21 @@
 %                      [start end] = period limits (in frames from beginning of data); 
 %                      [R G B] = specifies the marking color; 
 %                      [e1 e2 e3 ...] = a (1,nchans) logical [0|1] vector giving 
-%                         channels (1) to mark and (0) to not mark for rejection.
+%                         channels (1) to mark and (0) not mark for rejection.
 %    'color'      - ['on'|'off'|cell array] Plot channels with different colors.
-%                   Entering a RGB cell array {'r' 'b' 'g'}, channels will 
-%                   be plotted using the cell-array color elements. {default: 'off'}. 
-%    'wincolor'   - [color] Color mark data stretches or epochs  
-%                   {default: [ 0.8345 1 0.956]}
-%    'events'     - [struct] EEGLAB event structure.
+%                   If an RGB cell array {'r' 'b' 'g'}, channels will be plotted 
+%                   using the cell-array color elements in cyclic order {default:'off'}. 
+%    'wincolor'   - [color] Color to use to mark data stretches or epochs {default: 
+%                   [ 0.8345 1 0.956] is the default marking color}
+%    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
 %    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
 %                    keeping track of several simultaneous eegplot() windows). 
 %    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
-%                    the dependent window. Allows comparison of two concurrent datasets.
+%                    the dependent window. Allows comparison of two concurrent datasets,
+%                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
@@ -134,7 +136,7 @@
 %                    The command specified in the 'command' keyword argument can use 
 %                    this variable. (See eegplot2trial() and eegplot2event()). 
 %
-% Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/UCSD , 1998-2001
+% Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/INC/UCSD, 1998-2001
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
 
@@ -161,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2005/03/11 17:39:31  arno
+% adding ';' to command
+%
 % Revision 1.104  2005/01/31 23:21:55  arno
 % header
 %
@@ -495,9 +500,8 @@
 % 8-15-00 v2.3 turned on SPACING_EYE and added int vector input for eloc_file -sm
 % 12-16-00 added undocumented figure position arg (if not 'noui') -sm
 
-% internal variables structure
-% All in g except for Eposition and Eg.spacingwhich are inside the boxes
-%
+% Note for programmers - Internal variable structure:
+% All in g. except for Eposition and Eg.spacingwhich are inside the boxes
 % gcf
 %    1 - winlength
 %    2 - srate 

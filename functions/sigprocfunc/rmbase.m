@@ -3,8 +3,7 @@
 % Usage:
 %       >> [dataout] = rmbase(data); % remove whole-data channel means
 %       >> [dataout datamean] = rmbase(data,frames,basevector);
-%            % remove basevector mean for each channel and epoch
-%
+%            % remove mean of basevector from each channel and epoch
 % Inputs:
 %   data       - data matrix (chans,frames*epochs) or (chans, frames, epochs);
 %   frames     - data points per epoch {[]|0|default->data length}
@@ -30,14 +29,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/04/25 18:33:22  arno
+% small typo for basevector
+%
 % Revision 1.3  2002/10/13 23:04:24  arno
 % using nan_mean instead of mean
 %
 % Revision 1.2  2002/07/22 21:37:32  luca
 % now accept 3-D data matrix -lf
 % now accept 3-D data matrix -lf.
-%
-%
 %
 % help
 %

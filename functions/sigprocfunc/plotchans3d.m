@@ -1,18 +1,18 @@
-% plotchans3d() -  Plots the 3D configuration from a Polhemus ELP
-%                  file. The axis of the cartesian coordinate system are
+% plotchans3d() -  Plots the 3-D configuration from a Polhemus ELP
+%                  file. The axes of the Cartesian coordinate system are
 %                  plotted. The nose is plotted as a bold red segment.
-%
 % Usage:
-%        >> plotchans3d( elpfile, zs)
-%        >> plotchans3d( [X,Y,Z], elecnames, zs)
+%        >> plotchans3d( elpfile, zs);
+%        >> plotchans3d( [X,Y,Z], elecnames, zs);
 %
 % Inputs:
-%        elpfile = ELP file from Polhemus.
-%        [X,Y,Z] = array of 3D coordinates
-%        elecnames = cell array containing the name of the electrodes
+%        elpfile - Polhemus ELP (electrode position) file 
+%        [X,Y,Z] - array of 3-D coordinates
+%        elecnames - cell array containing the names of the electrodes
 %
 % Optional input:
-%        zs = vector of electrode subset to print labels
+%        zs - vector of electrode indices giving the subset to print labels for 
+%             in the plot
 %
 % Author: Luca A. Finelli, SCCN/INC/UCSD, La Jolla, 02/2002
 %  
@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/12/02 00:32:15  arno
+% axis equal
+%
 % Revision 1.6  2002/10/23 18:39:52  arno
 % debug
 %

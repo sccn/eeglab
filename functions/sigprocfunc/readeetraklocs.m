@@ -1,6 +1,5 @@
-% readeetraklocs() - read 3-d location files saved using the EETrak
+% readeetraklocs() - read 3-D location files saved using the EETrak
 %                    digitizing software.
-%
 % Usage:
 %   >> CHANLOCS = readeetraklocs( filename );
 %
@@ -8,8 +7,8 @@
 %   filename       - [string] file name
 %
 % Outputs:
-%   CHANLOCS       - EEGLAB channel location data structure. See
-%                    help readlocs()
+%   CHANLOCS       - EEGLAB channel location data structure. 
+%                    See help readlocs()
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, Nov 2003
 %
@@ -34,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/08 23:18:01  arno
+% making function compatible with Robert's files
+%
 % Revision 1.2  2003/11/27 00:20:37  arno
 % nothing
 %
