@@ -6,8 +6,9 @@
 %        >> [spectra,freqs] = spectopo(data,frames,srate,freqs,chanlocs,...
 %                           limits,title,freqfaq, percent, 'key1', 'value1' ...);
 % Inputs:
-%        data   = (nchans,frames*epochs); % can be single-epoch
-%        frames = frames per epoch {0 -> whole data length}
+%        data   = 2D (nchans,frames*epochs); % can be single-epoch
+%                 or 3D (nbchan,frames,epochs)
+%        frames = frames per epoch {0 -> data length}
 %        srate  = sampling rate per channel (Hz)
 %        freqs  = vector of frequencies for topoplot() scalp maps (Hz)
 %        chanlocs = electrode locations file (format: >> topoplot example)
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 3-20-01 added limits arg -sm
 % 01-25-02 reformated help & license -ad 
@@ -90,7 +94,7 @@ else
     percent = max(percent, 0);
     percent = min(percent, 1);
 end
-
+data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
