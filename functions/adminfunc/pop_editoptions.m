@@ -1,5 +1,5 @@
-% pop_editoptions() - Edit memory-saving eeglab() options stored in a file
-%                     'eeg_options.m'. With no argument, pop up a window 
+% pop_editoptions() - Edit memory-saving eeglab() options. These are stored in 
+%                     a file 'eeg_options.m'. With no argument, pop up a window 
 %                     to allow the user to set/unset these options. Store
 %                     user choices in a new 'eeg_options.m' file in the 
 %                     working directory.
@@ -7,25 +7,25 @@
 % Usage: >> pop_editoptions;
 %        >> pop_editoptions( 'key1', value1, 'key2', value2, ...);
 %
-% Graphic interface:
-%   "Precompute ICA activations" - [checkbox] if checked, ICA activativity
-%                   time courses are precomputed (this requires memory). 
+% Graphic interface inputs:
+%   "Precompute ICA activations" - [checkbox] If set, all the ICA activation
+%                   time courses are precomputed (this requires more RAM). 
 %                   Command line equivalent: option_computeica.
-%   "Retain parent dataset" - [checkbox] if checked, EEGLAB can retain 
-%                   several datasets in memory. Command line 
-%                   equivalent: option_keepdataset.
-%   "Store data in the .set file" - [checkbox] if checked, datasets are saved as
-%                   standard Matlab files (this requires disk space). When this option
-%                   is UNchecked, the raw data for a dataset is saved as a stream of 32-bit 
-%                   floats in a separate binary file to save disk space. As of Matlab 4.51, 
-%                   the order of the data in the binary file is as in the transpose of the 
-%                   data (i.e., as in EEG.data', frames by channels). This allows quick 
-%                   reading of single channels from the data, e.g. when working with clusters 
-%                   of components across datasets. The stored files have the extension 
-%                   .dat instead of the previous, non-transposed .fdt. Both file types 
+%   "Retain parent dataset" - [checkbox] If set, EEGLAB will retain parents of 
+%                   new datasets in memory (requiring more RAM). 
+%                   Command line equivalent: option_keepdataset.
+%   "Store data in the .set or .dat file" - [checkbox] Set -> dataset data (EEG.data) are 
+%                   saved in the EEG structure in the standard Matlab dataset (.set) file. 
+%                   Unset -> The EEG.data are saved as a transposed stream of 32-bit 
+%                   floats in a separate binary file. As of Matlab 4.51, the order 
+%                   of the data in the binary file is as in the transpose of EEG.data 
+%                   (i.e., as in EEG.data', frames by channels). This allows quick 
+%                   reading of single channels from the data, e.g. when comparing 
+%                   channels across datasets. The stored files have the extension 
+%                   .dat instead of the pre-4.51, non-transposed .fdt. Both file types 
 %                   are read by the dataset load function. Command line equivalent: 
 %                   option_savematlab.
-% Optional inputs:
+% Commandline keywords:
 %   'option_computeica' - [0|1] If 1, compute the ICA component activitations and
 %                   store them in a new variable. If 0, compute ICA activations
 %                   only when needed (& only partially, if possible) and do not
@@ -35,20 +35,19 @@
 %                   dataset.  The user may work on several datasets at a time.
 %                   If 0, only one dataset is stored in memory, any changes 
 %                   overwriting the current (EEG) dataset. 
-%   'option_savematlab' - [0|1] If 1, datasets are saved as Matlab files. If 0,
-%                   raw data is saved in a separate 32-bit float file to save disk space.
-%            
-%   NOTE: Turn OFF these options to work with very large datasets or on computers
-%                   with limited memory.
-%
+%   NOTE: Turn OFF the options above when working with very large datasets or on 
+%                   computers with limited memory.
+%   'option_savematlab' - [0|1] If 1, datasets are saved as single Matlab .set files. 
+%                   If 0, dataset data are saved in separate 32-bit binary float 
+%                   .dat files.  See the corresponding GUI option above for details. 
 % Outputs:
 %   In the output workspace, variables 'option_computeica', 'option_keepdataset',
 %   and 'option_savematlab'  are updated, and a new 'eeg_options.m' file may be
-%   saved in the working directory.
-%
-% Note:
-%   Place a copy of 'eeg_options.m' in your working directory to overwrite system
-%   defaults (assuming the working directory is in your MATLABPATH - see path()).
+%   written to the working directory. The copy of 'eeg_options.m' placed in your 
+%   working directory overwrites system defaults whenever EEGLAB operates in this
+%   directory (assuming your working directory is in your MATLABPATH - see path()).
+%   To adjust these options system-wide, edit the master "eeg_options.m" file in the
+%   EEGLAB directory heirarchy.
 %
 % Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %
@@ -73,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/11/21 02:45:57  scott
+% help message - new transposed binary file option
+%
 % Revision 1.19  2003/07/31 22:28:41  arno
 % *** empty log message ***
 %
