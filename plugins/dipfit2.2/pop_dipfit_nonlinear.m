@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/03/17 19:17:55  arno
+% remove image mri
+%
 % Revision 1.4  2005/03/17 02:21:56  arno
 % com not supported
 %
@@ -150,6 +153,7 @@ elseif nargin==1
   cb_plotdip         = 'pop_dipfit_nonlinear(EEG, ''dialog_plotcomponent'', gcbf);';
   cb_flip1           = 'pop_dipfit_nonlinear(EEG, ''dialog_flip'', gcbf, 1);';
   cb_flip2           = 'pop_dipfit_nonlinear(EEG, ''dialog_flip'', gcbf, 2);';
+  cb_sym             = [ 'set(findobj(gcbf, ''tag'', ''dip2sel''), ''value'', 1);' cb_checkinput ];
   
   % vertical layout for each line 
   geomvert  =   [1 1 1 1 1 1 1 1 1]; 
