@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/21 20:51:29  scott
+% removed ; from evalin() calls -sm
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -83,7 +86,7 @@ end;
 newevents = [];
 if exist('eventtimes') == 1 
     if ~isempty(eventtimes)
-	    rmevent = find( reject(eventtimes) == 1);
+	    rmevent = find( reject(round(eventtimes)) == 1);
 	    eventtimes(rmevent) = NaN;
 	    newevents = eventtimes;
 	    for i=1:size(regions,1)
