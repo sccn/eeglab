@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.232  2005/01/21 16:45:27  scott
+% help msg
+%
 % Revision 1.231  2005/01/04 18:38:41  scott
 % function phasedet() is FAILING! just touching up phase sorting code
 %
@@ -1666,6 +1669,9 @@ if isstr(aligntime) | ~isnan(aligntime)
                 aligndata(:,t) = data(:,t);
             end 
         end % end trial
+        if ~isempty(auxvar)
+            auxvar = auxvar+shifts;
+        end;
         fprintf('Shifted epochs by %d to %d frames.\n',min(shifts),max(shifts));
         data = aligndata;                       % now data is aligned to sortvar
     else
