@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/12 16:37:24  arno
+% inputdlg2
+%
 % Revision 1.18  2002/08/02 15:41:23  arno
 % adding file format input
 %
@@ -340,7 +343,7 @@ else
 			   extraargs = {''};
 		   end;
 		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
-			   tmpButtonName=questdlg( ['This will modify fields in the channel structure' 10 ...
+			   tmpButtonName=questdlg2( ['This will modify fields in the channel structure' 10 ...
 					'Are you sure, you want to apply that function ?'], 'Confirmation', 'Cancel', 'Yes','Yes');
 			   if ~strcmp(tmpButtonName, 'Yes'), return; end;
 		   end;
@@ -397,6 +400,7 @@ else
 		   end;
 		  case 'transform'
 		   tmpoper = args{curfield+1};
+		   if isempty(tmpoper), return; end;
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
 		   if isempty(findstr(tmpoper, 'chans'))
 			   try, X = cell2mat({chans.X}); catch, X(1:length(chans)) = NaN; end;
