@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2003/08/24 04:17:42  scott
+% same
+%
 % Revision 1.129  2003/08/24 04:17:17  scott
 % same
 %
@@ -2195,6 +2198,7 @@ erp = [];
 if Erpflag == YES 
   if exist('erpalpha')
     [erp erpalpha] = nan_mean(urdata',erpalpha);   
+    fprintf('   Mean erpalpha: %g\n,mean(erpalpha));
   else
     [erp] = nan_mean(urdata');   % compute erp average, ignoring nan's
   end
