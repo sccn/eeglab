@@ -77,6 +77,34 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/07/16 01:38:07  scott
+% help topoplot
+% help topoplot
+%
+% return
+%
+%
+%
+%
+% whos
+%
+%
+% exit
+%
+%
+% exit
+% reutnr
+% return
+% k
+% debug off
+% :vi
+%
+%
+%
+%
+% quit
+% stop
+%
 % Revision 1.51  2003/07/10 18:30:03  arno
 % debuging rotate axis cancelation
 %
@@ -584,7 +612,17 @@ else
 			   if isstr(tmpargs)
 				   chans = readlocs(tmpargs); 
 			   else
-				   if ~isempty(tmpargs{1}), 
+                   if ~isempty(tmpargs{1}),
+                       % test if string == []
+                       % --------------------
+                       if length(tmpargs) > 2 & length( tmpargs{3} ) > 2
+                           tmpstr = deblank(tmpargs{3});
+                           tmpstr = deblank(tmpstr(end:-1:1));
+                           if tmpstr(1) == ']' && tmpstr(end) == '['
+                               tmpargs = tmpargs(1);
+                           end;
+                       end;
+                       
 					   chans = readlocs(tmpargs{:});
 				   end;
 			   end;
