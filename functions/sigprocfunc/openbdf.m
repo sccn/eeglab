@@ -1,7 +1,13 @@
-function [DAT,H1]=openbdf(FILENAME)
-% EDF=openedf(FILENAME)
-% Opens an EDF File (European Data Format for Biosignals) in MATLAB (R)
-% <A HREF="http://www.medfac.leidenuniv.nl/neurology/knf/kemp/edf.htm">About EDF</A> 
+% openbdf() - Opens an EDF File (European Data Format for Biosignals) in MATLAB (R)
+% 
+% Usage:
+%   >> EDF=openedf(FILENAME)
+%
+% Note: About EDF -> www.biosemi.com/faq/file_format.htm
+%
+% Author: Alois Schloegl
+%
+% See also: readedf()
 
 %	Copyright (C) 1997-1998 by Alois Schloegl
 %	a.schloegl@ieee.org
@@ -33,7 +39,9 @@ function [DAT,H1]=openbdf(FILENAME)
 
 
 % Name changed for bdf files Sept 6,2002  T.S. Lorig
+% Header updated for EEGLAB format (update web link too) - Arnaud Delorme 14 Oct 2002
 
+function [DAT,H1]=openbdf(FILENAME)
 SLASH='/';		% defines Seperator for Subdirectories
 BSLASH=setstr(92);
 
