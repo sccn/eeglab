@@ -1,4 +1,4 @@
-% pop_eegfilt() - filter dataset
+% pop_eegfilt() - interactively filter EEG dataset data using eegfilt()
 %
 % Usage:
 %   >> eegout = pop_eegfilt( eegin, locutoff, hicutoff, filtorder);
@@ -8,8 +8,8 @@
 %   locutoff  - lower edge of the frequency pass band (Hz)  {0 -> lowpass}
 %   hicutoff  - higher edge of the frequency pass band (Hz) {0 -> highpass}
 %   filtorder - length of the filter in points {default 3*fix(srate/locutoff)}
-%   revfilt   - [0|1] reverse filter polarity. Default is 0.
-%
+%   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter). 
+%                     Default is 0 (bandpass).
 % Outputs:
 %   eegout   - output dataset
 %
@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/01/24 00:23:35  arno
+% debugged revfilt parameter
+%
 % Revision 1.7  2002/11/15 01:45:53  scott
 % can not -> cannot
 %
@@ -68,15 +71,15 @@ if nargin < 1
 	return;
 end;	
 if isempty(EEG.data)
-    disp('Pop_eegfilt() error: cannot filter empty dataset'); return;
+    disp('Pop_eegfilt() error: cannot filter an empty dataset'); return;
 end;    
 if nargin < 3
 	% which set to save
 	% -----------------
    	promptstr = { 'Lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
    				  'Higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
-   				  strvcat('Notch filter (provide range, i.e. [45 55] for 50 Hz)', ...
-                  '(this option overwrite the low and high edge limits above)'), ...
+   				  strvcat('Notch filter the data. Give the notch range, i.e. [45 55] for 50 Hz)', ...
+                  '(this option overwrites the low and high edge limits given above)'), ...
                   'Filter length in points (default: see >> help pop_eegfilt)' };
 	inistr       = { '0', '0', '', '' };
    	result       = inputdlg2( promptstr, 'Filter the data -- pop_eegfilt()', 1,  inistr, 'pop_eegfilt');
@@ -143,7 +146,7 @@ if EEG.trials == 1
 else
 	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 	EEG.data = eegfilt( EEG.data, options{:});
-	% note: reshape does not reserv new memory while EEG.data(:,:) does
+	% Note: reshape does not reserve new memory while EEG.data(:,:) does
 end;	
 
 com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
