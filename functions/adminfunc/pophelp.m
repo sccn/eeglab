@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/03/12 02:59:32  arno
+% adding pop and eponymous help
+%
 % Revision 1.8  2002/11/15 02:47:39  arno
 % header for web
 %
@@ -66,19 +69,20 @@ if nargin <2
 	nonmatlab = 0;
 end;
 
-doc1 = readfunc(funct);
-if length(funct) > 4 & strcmpi(funct(1:4), 'pop')
+doc1 = readfunc(funct, nonmatlab);
+if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
 	try,
-		doc2 = readfunc(funct(5:end));
+		doc2 = readfunc(funct(5:end), nonmatlab);
 		doc1 = { doc1{:} ' _________________________________________________________________ ' ...
 					   ' ' ...
                        ' The ''pop'' function above calls the eponymous Matlab function below, ' ...
                        ' which may contain more information for some parameters. '...
 					   ' ' ...
 					   ' _________________________________________________________________ ' ...
+                       ' ' ...
 				doc2{:} };
 	catch, end;
-else 
+end;
 
 textgui(doc1);
 h = findobj('parent', gcf, 'style', 'slider');
@@ -101,7 +105,7 @@ doc = {};
 if nonmatlab	
 	fid = fopen( funct, 'r');
 else
-	if f	indstr( funct, '.m')
+	if findstr( funct, '.m')
 		fid = fopen( funct, 'r');
 	else
 		fid = fopen( [funct '.m'], 'r');
