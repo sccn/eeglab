@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/05/02 23:12:17  arno
+% editing text
+%
 % Revision 1.7  2002/05/02 01:46:03  arno
 % debugging for full consistency
 %
@@ -113,7 +116,7 @@ if nargin < 2
 		% add field values
 		% ----------------
 		geometry = { 1 };
-		tmpstr = sprintf('Edit channels info');
+		tmpstr = sprintf('Edit channel information:');
 		uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
 		formula = ['inputdlg({strvcat(''Enter formula (see help on previous page)''' ...
