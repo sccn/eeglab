@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/04/23 21:29:49  arno
+% removing filepath
+%
 % Revision 1.9  2003/04/10 17:56:52  arno
 % debuging function and history
 %
@@ -95,9 +98,10 @@ if nargin < 1
 
 	% popup window parameters
 	% -----------------------
-   promptstr    = { 'Enter block size for CNT file (1 or 40):' ...
-                    'loadcnt() ''key'', ''val'' params' };
-	inistr       = { '1'  '' };
+    promptstr    = { 'Enter block size for CNT file (1 or 40):' ...
+                     'Time interval in seconds (i.e. [0 100]; default all):' ...
+                     'loadcnt() ''key'', ''val'' params' };
+	inistr       = { '1'  '' '' };
 	pop_title    = sprintf('Load a CNT dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
@@ -106,7 +110,11 @@ if nargin < 1
 	% -----------------
     blockread = eval( result{1} );
     options = [ ', ''blockread'', ' int2str(blockread) ];
-    if ~isempty(result{2}), options = [ options ',' result{2} ]; end;
+    if ~isempty(result{2}), 
+        timer =  eval( [ '[' result{2} ']' ]);
+        options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
+    end;   
+    if ~isempty(result{3}), options = [ options ',' result{3} ]; end;
 else
 	options = [];
 	for i=1:length( varargin )
