@@ -25,6 +25,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/09/04 23:21:18  arno
+% updating menu help
+%
 % Revision 1.9  2002/08/16 16:27:28  arno
 % new version with HTML menu generation
 %      
@@ -128,7 +131,7 @@ allmenus = { ...
 '   Channel spectra and maps' 'pop_spectopo'       ... %    Channel spectra and maps      
 '   Channel properties' 'pop_prop'       ... %    Component properties      
 '   Channel ERP image' 'pop_erpimage'       ... %    Channel ERP image      
-'   ERP plots' ''      ...
+'   Channel ERPs' ''      ...
 '      With scalp maps' 'pop_timtopo'        ... %       ERP and scalp maps      
 '      In scalp array' 'pop_plottopo'       ... %       ERP in scalp array      
 '      In rect. array' 'pop_plotdata'       ... %       ERP in rect. array      
