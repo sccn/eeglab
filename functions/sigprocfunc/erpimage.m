@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.205  2004/03/26 00:18:11  arno
+% plot aligntime
+%
 % Revision 1.204  2004/02/24 23:04:40  arno
 % fixed vertical lines in ERP when RT-aligned
 %
@@ -1485,7 +1488,7 @@ if any(isnan(sortvar))
 	fprintf('Removing %d trials with NaN sortvar values.\n', length(nanlocs));
 	data(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
-    if length(sortvar) < 3
+    if length(sortvar) < 4
         error('Not enough trials');
     end;
 	if exist('data2') == 1
