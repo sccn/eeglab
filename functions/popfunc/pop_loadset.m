@@ -1,11 +1,15 @@
 % pop_loadset() - load a dataset (pop out window if no arguments)
 %
 % Usage:
-%   >> EEGOUT = pop_loadset( filename, filepath);
+%   >> EEGOUT = pop_loadset( filename );
+%   >> EEGOUT = pop_loadset( filename, filepath, mode);
 %
 % Inputs:
 %   filename  - [string] file name
 %   filepath  - [string] file path (optional)
+%   mode      - ['all', 'info'] load all data associated with the
+%               dataset or only the dataset information without importing
+%               data. Default is 'all'.
 %
 % Output
 %   EEGOUT - EEG data structure from EEGLAB
@@ -36,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/08/23 20:25:07  arno
+% better eerror msg
+%
 % Revision 1.22  2004/02/10 21:31:55  arno
 % path debug
 %
@@ -105,7 +112,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [VAROUT, command] = pop_loadset( inputname, inputpath);
+function [VAROUT, command] = pop_loadset( inputname, inputpath, mode);
 
 command = '';
 VAROUT  = [];
@@ -119,26 +126,41 @@ if nargin < 1
 	if inputname == 0 return; end;
 end;
 
+% read only selected variables
+% ----------------------------
+if nargin > 2 && strcmpi(mode, 'info')
+     options = { 'EEG' };
+else options = {};
+end;
+
+% read file
+% ---------
 fprintf('Pop_loadset: loading file %s ...\n', inputname);
 try
-    TMPVAR = load([ inputpath inputname ], '-mat');
+    TMPVAR = load([ inputpath inputname ], '-mat', options{:});
 catch,
     try
-        TMPVAR = load([ inputpath '/' inputname ], '-mat');
+        TMPVAR = load([ inputpath '/' inputname ], '-mat', options{:});
     catch,
         try, 
-            TMPVAR = load([ inputpath '\' inputname ], '-mat');
+            TMPVAR = load([ inputpath '\' inputname ], '-mat', options{:});
         catch,
             error([ inputname ': File not found' ]);
         end;
     end;        
 end;
 
+% variable not found
+% ------------------
+if isempty(TMPVAR)
+    error('No dataset info associated with this file');
+end;
+
 if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
 	VAROUT = checkoldformat(TMPVAR.EEG);
-    if isstr(VAROUT.data), 
+    if isstr(VAROUT.data) && ~strcmpi(VAROUT.data, 'EEGDATA');
         if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
             VAROUT.filepath = inputpath; 
             if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
@@ -154,7 +176,14 @@ if isfield(TMPVAR, 'EEG') %individual dataset
             end;
         end;
     end;
-    VAROUT.filename = [ inputname(1:end-3) 'set' ];
+    
+    % copy data to output variable if necessary
+    % -----------------------------------------
+    if nargin > 2 && ~strcmpi(mode, 'info')
+        VAROUT.data = TMPVAR.EEGDATA;
+    end;
+    
+    VAROUT.filename = [ inputname(1:end-3) 'set' ];    
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
