@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2004/11/05 03:39:53  scott
+% nothing
+%
 % Revision 1.64  2004/08/03 22:01:47  arno
 % time in seconds
 %
@@ -291,7 +294,8 @@ if nargin <= 2 | isstr(varargin{1})
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
 	if isstr(g), error(g); end;
-else
+
+else % old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
 	end;
@@ -334,7 +338,9 @@ end
 %%%%%%%%%%%%%%%%% convert limits and limcontrib times to seconds from ms %%%%%%%
 %
 g.limits(1) = g.limits(1)/1000;
-if length(g.limits)>1, g.limits(2) = g.limits(2)/1000; end;
+if length(g.limits)>1, 
+    g.limits(2) = g.limits(2)/1000; 
+end;
 g.limcontrib = g.limcontrib/1000;
 
 uraxes = gca; % the original figure or subplot axes
@@ -356,7 +362,7 @@ end;
 
 % computing sublimits
 % -------------------
-if any(g.limcontrib ~= 0) & any(g.limits ~= 0)
+if any(g.limcontrib ~= 0) & length(g.limits)>1 & any(g.limits([1 2]) ~= 0) % if limcontrib and time limits specified 
     sratems = (size(data,2)-1)/(g.limits(2)-g.limits(1));
     frame1  = round((g.limcontrib(1)-g.limits(1))*sratems)+1;
     frame2  = round((g.limcontrib(2)-g.limits(1))*sratems)+1;
@@ -440,20 +446,23 @@ end;
 	%
 	%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
-	if length(g.limits) < 2
-            if g.limits == 0,         
+	if length(g.limits) < 2 % 'limits',0
+             if g.limits == 0,         
 	      xmin = 0;
 	      xmax = frames-1;  % use dummy times
-            else
+             else
 	      fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
-              if isempty(g.limits) disp empty
-              else g.limits
+              if isempty(g.limits) 
+                  disp empty
+              else 
+                  g.limits
               end
               return
-            end
+             end
 	     ymin = min(min(data));
 	     ymax = max(max(data));
-        elseif length(g.limits) == 2 
+
+        elseif length(g.limits) == 2  % 'limits',[a b]
 	     xmin = g.limits(1);
 	     xmax = g.limits(2);
 	     ymin = min(min(data));
@@ -461,7 +470,8 @@ end;
 	     datarange = ymax-ymin;
 	     ymin = ymin-0.05*datarange;
 	     ymax = ymax+0.05*datarange;
-	elseif length(g.limits) == 4
+
+	elseif length(g.limits) == 4 % 'limits', [a b c d]
 	  xmin = g.limits(1);
 	  xmax = g.limits(2);
           if g.limits(3)==0 & g.limits(4)==0 % compute y limits from data
@@ -712,7 +722,7 @@ end
 fprintf('\n');
 
 if strcmp(g.pvaf,'on')
-   fprintf('    component pvaf in interval:  ');
+   fprintf('    Component pvaf in interval:  ');
    for t=1:ntopos
      fprintf('%4.2f ',pvaf(t));
    end
@@ -740,24 +750,22 @@ else
     sumpvaf = 100*sumpvaf/varproj;
     ot   = 'rv';
 end;
-fprintf('    summed component %s in interval: %4.2f %%\n',ot,sumpvaf);
+fprintf('    Summed component %s in interval: %4.2f%%\n',ot,sumpvaf);
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
 BACKCOLOR = [0.7 0.7 0.7];
 newaxes=axes('position',pos);
 axis off
-%set(newaxes,'Units','Normalized','Position',...
-%           [0 0 1 1],'FontSize',16,'FontWeight','Bold','Visible','off');
 set(newaxes,'FontSize',16,'FontWeight','Bold','Visible','off');
 set(newaxes,'Color',BACKCOLOR); % set the background color
 delete(newaxes) %XXX
 
 % site the plot at bottom of the current axes
-%axe = axes('Units','Normalized','Position',...
 axe = axes('Position',...
                [pos(1) pos(2) pos(3) 0.6*pos(4)],...
                'FontSize',16,'FontWeight','Bold');
+
 g.limits = get(axe,'Ylim');
 set(axe,'GridLineStyle',':')
 set(axe,'Xgrid','off')
@@ -765,7 +773,7 @@ set(axe,'Ygrid','on')
 axes(axe)
 set(axe,'Color',axcolor);
 
-% fprintf('Using limits [%g,%g,%g,%g]\n',xmin,xmax,ymin,ymax);
+fprintf('Using limits [%g,%g,%g,%g]\n',xmin,xmax,ymin,ymax);
 
 %
 %%%%%%%%%%%%%%%%% plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
