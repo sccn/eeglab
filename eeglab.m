@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.295  2003/12/04 02:05:59  arno
+% resources
+%
 % Revision 1.294  2003/12/04 01:47:08  arno
 % still adding paths
 %
@@ -1371,10 +1374,10 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
             if exist(dircontent{index}) == 7
                 addpath(dircontent{index})
                 funcname = dircontent{index};
-                disp(['eeglab: adding plugin "' funcname '" (path added; see help ' funcname ')' ]);    
+                disp(['eeglab: adding plugin "' funcname '" (see >> help ' funcname ')' ]);    
             else 
                 funcname = dircontent{index}(1:end-2);
-                disp(['eeglab: adding plugin "' funcname '" (see help ' funcname ')' ]);    
+                disp(['eeglab: adding plugin "' funcname '" (see >> help ' funcname ')' ]);    
             end;
             eval( [ funcname '(gcf, trystrs, catchstrs)' ], ...
                  ['disp(''eeglab: error while adding plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
