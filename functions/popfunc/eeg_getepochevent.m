@@ -1,5 +1,5 @@
-% eeg_getepochevent() - Return event field values for all events of one or more types
-%
+% eeg_getepochevent() - Return dataset event field values for all events 
+%                                of one or more specified types
 % Usage:
 %       >> epochval = eeg_getepochevent( EEG, types);
 %       >> epochval = eeg_getepochevent( EEG, types, timewin, fieldname);
@@ -8,16 +8,17 @@
 %   EEG       - Input dataset
 %
 % Optional inputs:
-%   types     - Cell array of a subset of event types. 
-%               {} is all type events. Note: this requires that 
+%   types     - Cell array of a subset of event types; 
+%               {} is all types of events. Note: Requires that 
 %               a field named 'type' is defined in 'EEG.event'.
 %   timewin   - Event time window [start, end] in milliseconds
 %               (default []=whole epoch).
-%   fieldname - Name of the field to return the values for. Default 
-%               field is the event 'latency' in seconds
-%               (though internally this is stored in frames)
+%   fieldname - Name of the field to return the values for. 
+%               Default field is 'EEG.event.latency' in seconds
+%               (though internally this information is stored in 
+%               real frames).
 % Outputs:
-%   epochval  - A value of the selected field for each epoch; this is
+%   epochval  - A value of the selected field for each epoch. This is
 %               NaN if no selected event occurred during the epoch.
 %               Latencies are measured in msec relative to epoch onset.
 %
@@ -64,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/15 16:29:35  arno
+% update message
+%
 % Revision 1.8  2002/07/27 00:24:26  arno
 % updating header
 %
@@ -112,19 +116,19 @@ if nargin <5
 end;
 
 if isempty(EEG.event)
-    disp('Getepochevent: no event structure, abord'); return;
+    disp('Getepochevent: no event structure, aborting.'); return;
 end;
     
 % check if EEG.epoch contain references to events
 % -----------------------------------------------
 if ~isfield( EEG.event, 'epoch' )
-    disp('Getepochevent: no epoch indices in events, abord'); return;
+    disp('Getepochevent: no epoch indices in events, aborting.'); return;
 end;
     
 % check if EEG.epoch and EEG.event contains 'latency' field
 % ------------------------------------------
 if ~isfield( EEG.event, fieldname)
-    disp(['Getepochevent: no ''' fieldname ''' field in events, abord']); return;
+    disp(['Getepochevent: no ''' fieldname ''' field in events, aborting.']); return;
 end;
 
 % deal with empty types
