@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/12/17 01:04:24  arno
+% process empty coordinates
+%
 % Revision 1.18  2003/12/05 18:10:20  arno
 % loading files differently for windows
 %
@@ -133,7 +136,7 @@
 % 01-25-02 reformated help & license, added links -ad 
 % 03-21-02 added readlocs and the use of eloc input structure -ad 
 
-function [] = headplot(values,arg1,p1,v1,p2,v2,p3,v3)
+function [W] = headplot(values,arg1,p1,v1,p2,v2,p3,v3)
 
 if nargin < 1
     help headplot
