@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.342  2004/09/13 01:26:57  arno
+% BIOSIG not in plugin folder
+%
 % Revision 1.341  2004/09/13 01:17:33  arno
 % same
 %
@@ -1539,8 +1542,8 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     % BIOSIG plugin (not in plugin folder)
     % ------------------------------------
     path_biosig = which('eegplugin_biosig.m');
-    if isempty(strmatch('plugins', path_biosig))
-        funcname = 'eegplugin_biosig.m';
+    if isempty(findstr(path_biosig, 'plugins'))
+        funcname = 'eegplugin_biosig';
         try,
             eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
             disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
