@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 text interface editing -sm & ad 
@@ -71,7 +74,7 @@ if typeplot == 0 & isempty(EEG.icasphere)
    disp('Error: no ICA data for this set, first run ICA'); return;
 end;   
 if isempty(EEG.chanlocs)
-   disp('Error: can not plot topography without channel location file'); return;
+   disp('Error: cannot plot topography without channel location file'); return;
 end;   
 
 if nargin < 3

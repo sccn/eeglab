@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 %PROBLEM: when the % is set and we change manually yhe threshold,
 % the software comes back to the percentage rejection
@@ -113,7 +116,7 @@ end;
 tagmenu = 'pop_icathresh';
 
 if ~isempty( findobj('tag', tagmenu))
-	error('can not open two identical windows, close the first one first');
+	error('cannot open two identical windows, close the first one first');
 end;
 
 % the current rejection will be stored in userdata of the figure

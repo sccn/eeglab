@@ -30,7 +30,7 @@
 %
 % Remark:
 %   The exact values of joint-probability depend on the size of a time 
-%   step and thus can not be considered as absolute.
+%   step and thus cannot be considered as absolute.
 %
 % See also: realproba()
 
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function [jp, rej] = jointprob( signal, threshold, oldjp, normalize, discret );
 

@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/10 22:39:47  arno
+% removing debuging comment
+%
 % Revision 1.3  2002/04/10 00:37:47  arno
 % debuging string event selection
 %
@@ -95,7 +98,7 @@ end;
 
 I = [];
 if isempty(EEG.event)
-    disp('Getevent: can not deal with empty event structure');
+    disp('Getevent: cannot deal with empty event structure');
     return;
 end;   
 

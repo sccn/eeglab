@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 03:08:57  arno
+% reprogrammed event selection
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -121,7 +124,7 @@ for indextype=1:length(type)
          if ~isempty(str2num(type{indextype}))   
 			 type{indextype} = str2num(type{indextype}); 
 		 else
-			 error('eeg_getepochevent: string type can not be found in numeric event type array');
+			 error('eeg_getepochevent: string type cannot be found in numeric event type array');
 		 end;		 
 	 elseif isnumeric(type{indextype}) & isstr(EEG.event(1).type)
 		  type{indextype} = num2str(type{indextype});

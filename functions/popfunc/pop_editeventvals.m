@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/18 15:34:07  scott
+% editted help msg -sm
+%
 % Revision 1.4  2002/04/18 15:29:23  scott
 % [same] -sm
 %
@@ -77,7 +80,7 @@ if nargin < 1
 end;	
 
 if isempty(EEG.event)
-    disp('Getevent: can not deal with empty event structure');
+    disp('Getevent: cannot deal with empty event structure');
     return;
 end;   
 

@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/11 22:42:18  arno
+% debuging empty latency fields input array
+%
 % Revision 1.2  2002/04/11 19:37:51  arno
 % additional warning for file and array with the same name
 %
@@ -159,7 +162,7 @@ else
 end;
 
 if isempty( EEG.epoch)
-    error('Pop_importepoch: can not process empty epoch structure');
+    error('Pop_importepoch: cannot process empty epoch structure');
 end;
 epochfield = fieldnames( EEG.epoch );
 

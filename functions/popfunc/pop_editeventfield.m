@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/09 03:51:32  arno
+% modifying input comments and history
+%
 % Revision 1.3  2002/04/09 01:41:49  arno
 % debuging array passage, change default
 %
@@ -94,7 +97,7 @@ if nargin < 1
 end;	
 
 if isempty(EEG.data)
-    disp('Setevent error: can not process empty dataset'); return;
+    disp('Setevent error: cannot process empty dataset'); return;
 end;    
 
 I = [];
