@@ -1,29 +1,29 @@
-% sdfread() -  Loads selected Seconds of an EDF File (European Data Format for Biosignals)
+% sdfread() -  Loads selected seconds of an EDF File (European Data Format for Biosignals)
 %
 % Usage:
 %   [S,EDF] = sdfread(EDF [,NoS [,StartPos]] )
 %
 % Inputs:
-%   NoS      = Number of seconds, default = 1 (second)
-%   StartPos = Starting position, if not provided the following data is read
-%              continously from the EDF file. 
-%              no reposition of file pointer is performed
+%   EDF      = open EDF file structure returned by sdfopen();  ?????
+%   NoS      = Number of seconds to read, default = 1 (second)
+%   StartPos = Starting position. If not provided, the data is read
+%              continously from the EDF file. Value 'Inf' reads to file end.
+%              No repositioning of the file pointer is performed.
 %
 % Example:
 %   EDF=sdfopen(Filename,'r',CHAN,ReRefMx,TSR,OFCHK);
-%   [S,EDF] = sdfread(EDF, NoS, StartPos)
+%   [S,EDF] = sdfread(EDF, NoS, StartPos) % read NoS seconds of data from StartPos
 % 
-%   [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur) and
-%   [S,EDF] = sdfread(EDF, inf) 
-%   reads til the end
+%   [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur); % Reads all the file data
+%   [S,EDF] = sdfread(EDF, inf);              % as does this
 %
 % Note:
-% 1) Ver > 0.75 requests NoS and StartPos in seconds. Previously (Ver <0.76) the units 
-%    were Records. 
-% 2) In this version, modified for eeglab(), sdfseek, sdftell, sdfeof and dt have been
-%    included in the code of the function.
+% 1) Ver > 0.75 requests NoS and StartPos in seconds. 
+%    Previously (Ver <0.76) the units were Records. 
+% 2) In this version, modified for eeglab(), sdfseek, sdftell, 
+%    sdfeof and dt have been included in the code of the function.
 %
-% Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (header reworked for 
+% Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
 %         eeglab format and subfunctions inserted in the code, Arnaud Delorme, 27 Dec 2002)
 %
 % See also: fread, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
@@ -51,9 +51,10 @@ end;
 SDF_TB_TOGGLE_CHECK = SDF_TB_TOGGLE_CHECK+1;
 EDF.AS.TOGGLE = EDF.AS.TOGGLE+1;
 
-OptiMEM=1;             % if you get low of memory (your CPU starts swapping), set this to one
+OptiMEM=1;             % if you get low on memory (so your CPU starts swapping), 
+                       % set this to one
 OptiSPEED=~OptiMEM;
-MAX_BLOCK_NUMBER=16;	% %%max. # of blocks in case of OptiMEM
+MAX_BLOCK_NUMBER=16;	% max. # of blocks in case of OptiMEM
 
 GDF=strcmp(EDF.VERSION(1:3),'GDF');
 
