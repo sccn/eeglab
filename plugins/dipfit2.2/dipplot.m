@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.43  2003/07/21 21:55:14  arno
+%fixing MNI brain for distribution
+%
 %Revision 1.42  2003/07/16 18:39:14  arno
 %nothing
 %
@@ -316,7 +319,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         if fid == -1
             error('Cannot find MRI data file');
         end;
-        V = fread(fid, [108 129*129], 'uint8=>double')/255;
+        V = double(fread(fid, [108 129*129], 'uint8'))/255;
         V = reshape(V, 108, 129, 129);
         fclose(fid);
         
