@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/01/03 22:47:00  arno
+% typo in warning messages
+%
 % Revision 1.35  2003/01/03 22:45:48  arno
 % adding another warning message
 %
@@ -409,6 +412,12 @@ if isstr(filename)
        fprintf('Readlocs: Automatically inserting electrode labels\n');
        for index = 1:length(eloc)
            eloc(index).labels = [ 'E' int2str(index) ];
+       end;
+   else 
+       % remove trailing '.'
+       for index = 1:length(eloc)
+           tmpdots = find( eloc(index).labels == '.' );
+           eloc(index).labels(tmpdots) = [];
        end;
    end;
    
