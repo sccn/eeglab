@@ -110,6 +110,8 @@
 % - The gcf object stores the handle of the dipole that is currently
 %     being modified
 
+%$Log: not supported by cvs2svn $
+
 function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
     
     DEFAULTVIEW = [0 0 1];
