@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2003/12/02 19:25:38  arno
+% debug readlocs and chanedit
+%
 % Revision 1.65  2003/12/02 18:02:06  arno
 % chancenter history
 %
@@ -288,16 +291,18 @@ if nargin < 1
 end;	
 
 nbchan = length(chans);
-[chans shrinkfact]= checkchans(chans);
+allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' };
+[chans shrinkfact]= checkchans(chans, allfields);
 
-allfields = fieldnames(chans);
 if nargin < 2
 	totaluserdat = {};
 	ingui = 1;
 	guimodif = 0;
 	while ingui
-		commentfields = { 'Channel label ("label")', 'Polar angle ("theta")', 'Polar radius ("radius")', 'Cartesian X ("X")', 'Cartesian Y ("Y")', 'Cartesian Z ("Z")', ...
-						  'Spherical horiz. angle ("sph_theta")', 'Spherical azimuth angle ("sph_phi")', 'Spherical radius ("sph_radius")' };
+		commentfields = { 'Channel label ("label")', 'Polar angle ("theta")', 'Polar radius ("radius")', ...
+                          'Cartesian X ("X")', 'Cartesian Y ("Y")', 'Cartesian Z ("Z")', ...
+						  'Spherical horiz. angle ("sph_theta")', 'Spherical azimuth angle ("sph_phi")', ...
+                          'Spherical radius ("sph_radius")' };
 		% transfer channel to global workspace
 		global chantmp;
 		chantmp = chans;
@@ -309,8 +314,10 @@ if nargin < 2
 		tmpstr = sprintf('Channel information ("field_name"):');
 		uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
-		transform = ['inputdlg2({''Enter transform: (Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc.'' }, ''Transform'', 1, { '''' }, ''pop_chanedit'');'];
-        guicenter = [ '[tmpX tmpY tmpZ newcenter tmpoptim]=chancenter(cell2mat({chanstmp.X})'', cell2mat({chanstmp.Y})'', cell2mat({chanstmp.Z})'',[]);' ...
+		transform = [ 'inputdlg2({''Enter transform: (Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc.'' }, ' ...
+                      '''Transform'', 1, { '''' }, ''pop_chanedit'');'];
+        guicenter = [ '[tmpX tmpY tmpZ newcenter tmpoptim]=chancenter(cell2mat({chanstmp.X})'', ' ...
+                      '               cell2mat({chanstmp.Y})'', cell2mat({chanstmp.Z})'',[]);' ...
                       'chanstmp = pop_chanedit(chanstmp, ''convert'', { ''chancenter'' newcenter 0 });' ...
                       'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
                       'if tmpoptim, newcenter = []; end;' ...
@@ -567,8 +574,6 @@ else
             otherwise
              chans = convertlocs(chans, lower(args{curfield}), 'verbose', 'on');
 		   end;
-           if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
-           if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
 		  case 'transform'
 		   tmpoper = args{curfield+1};
 		   if isempty(tmpoper), return; end;
@@ -681,6 +686,9 @@ else
 		 end;
 	 end;
 end;
+
+if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
+if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
 return;
 
 function str = commandwarning(str);
@@ -705,39 +713,15 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
-function [chans, shrinkfact]= checkchans(chans);
+function [chans, shrinkfact]= checkchans(chans, fields);
 	shrinkfact = 'off';
 	if isfield(chans, 'shrink'), 
 		shrinkfact = chans(1).shrink; 
 		chans = rmfield(chans, 'shrink');
         if isstr(shrinkfact) & ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
 	end;
-    try, allfields = fieldnames(chans); catch, allfields = []; end;
-	newstruct{1}  = 'labels';
-	newstruct{3}  = 'theta';
-	newstruct{5}  = 'radius';
-	newstruct{7}  = 'X';
-	newstruct{9}  = 'Y';
-	newstruct{11} = 'Z';
-	newstruct{13} = 'sph_theta';
-	newstruct{15} = 'sph_phi';
-	newstruct{17} = 'sph_radius';
-	newstruct{18} = [];
-	for index = 1:length(allfields)
-		switch allfields{index}
-		 case 'labels', pos=1;
-		 case 'theta',  pos=3;
-		 case 'radius', pos=5;
-		 case 'X',      pos=7;
-		 case 'Y',      pos=9;
-		 case 'Z',      pos=11;
-		 case 'sph_theta',    pos=13;
-		 case 'sph_phi',      pos=15;
-		 case 'sph_radius',   pos=17;
-		 otherwise, pos = -1;
-		end;
-		if pos ~= -1
-			newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
-		end;
-	end;
-	chans = struct(newstruct{:});
+    for index = 1:length(fields)
+        if ~isfield(chans, fields{index})
+            chans = setfield(chans, {1}, fields{index}, []);
+        end;
+    end;
