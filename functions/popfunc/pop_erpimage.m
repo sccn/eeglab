@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/04/25 17:52:03  arno
+% modifying renorm
+%
 % Revision 1.19  2002/04/25 16:05:57  scott
 % adding blank line above history entry -sm
 %
@@ -497,7 +500,9 @@ end;
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
 popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
-com = sprintf('%s erpimage( %s, %s, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options)
+com = sprintf('%s erpimage( %s, %s, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
+disp('Command executed by pop_erpimage:');
+disp(' '); disp(com); disp(' ');
 eval(com)
 
 varargout{1} = [10 popcom 10 '% ' com];
