@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/09/07 23:08:28  scott
+% help msg -sm & ad
+%
 % Revision 1.14  2002/09/07 22:14:54  scott
 % help msg -scott
 %
@@ -251,7 +254,7 @@ while (str(1) == '%')
 	  % not a title
 	  % ------------
          % scan lines
-         [tok1 strrm] = strtok( str );
+         [tok1 strrm] = mystrtok( str );
          [tok2 strrm] = strtok( strrm );
 
          if ~isempty(tok2) & ( tok2 == '-' | tok2 == '=') % new variable 
@@ -301,10 +304,10 @@ while (str(1) == '%')
 				alltext{indexout} = oldvartext;
 				indexout = indexout + 1;
            		fprintf( fo, [ '</tr>' g.normrow g.normcol1 g.var '</td>\n' ], oldvarname);
-           		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], oldvartext);
+           		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], finalformat(oldvartext));
        	 	else
        			if ~isempty(oldvartext)
-           			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], oldvartext);	
+           			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], finalformat(oldvartext));	
        			end;
          	end;	 	
          	newvar = 1;
@@ -339,18 +342,25 @@ while (str(1) == '%')
 			   if exist( imagename ) % do not make link if the file does not exist 
 					fprintf(fo, [ g.normrow g.doublecol ...
 								'<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
-								' height=150 width=200></A></CENTER></td></tr>' ]);
-		       end;
+								' width=400></A></CENTER></td></tr>' ]);
+		       else
+                   imagename = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.gif' ];
+                   if exist( imagename ) % do not make link if the file does not exist 
+                       fprintf(fo, [ g.normrow g.doublecol ...
+                                     '<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
+                                     ' width=600></A></CENTER></td></tr>' ]);
+                   end;
+               end;
             end;             
    		elseif ~isempty(oldvarname)
 			allvars{indexout} = oldvarname;
 			alltext{indexout} = oldvartext;
 			indexout = indexout + 1;
        		fprintf( fo, [ '</tr>' g.normrow g.normcol1 g.var '</td>\n' ], oldvarname);
-       		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], oldvartext);
+       		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], finalformat(oldvartext));
    	 	else
    			if ~isempty(oldvartext)
-       			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], oldvartext);	
+       			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], finalformat(oldvartext));	
    			end;
          end;      
       end;	
@@ -396,7 +406,25 @@ function strout = formatstr( str, refcall );
 			[tok1 strrm] = strtok( strrm );
 		end;
 return;	
- 
+
+% final formating
+function str = finalformat(str); % bold text in bracket
+    tmploc = sort(union(find(str == '['), find(str == ']')));
+    if ~isempty(tmploc)
+        if mod(length(tmploc),2) ~= 0, str, error('Opening but no closing bracket'); end;
+        for index = length(tmploc):-2:1
+            str = [ str(1:tmploc(index-1)) '<b>' str(tmploc(index-1)+1:tmploc(index)-1) '</b>' str(tmploc(index):end) ];
+        end;
+    end;
+
+    %tmploc = find(str == '"');
+    %if ~isempty(tmploc)
+    %    if mod(length(tmploc),2) ~= 0, str, error('Opening but no closing parenthesis'); end;
+    %    for index = length(tmploc):-2:1
+    %        str = [ str(1:tmploc(index-1)-1) '<b>' str(tmploc(index-1)+1:tmploc(index)-1) '</b>' str(tmploc(index)+1:end) ];
+    %    end;
+    %end;
+    
 function tokout = functionformat( tokin, refcall );
 	tokout = tokin;	% default
 	[test, realtokin, tail, beg] = testfunc1( tokin );
@@ -443,3 +471,15 @@ function [test, realtokin, tail] = testfunc2( tokin ) % test if is string is 'FU
 		realtokin = lower(realtokin);
 	end;
 return;	
+
+function [tok, str] = mystrtok(str)
+    
+    [tok str] = strtok(str);
+    if tok(1) == '"'
+        while tok(end) ~= '"'
+            [tok2 str] = strtok(str);
+            if isempty(tok2), tok, error('can not find closing quote ''"'' in previous text'); end;
+            tok = [tok ' ' tok2];
+        end;
+    end;
+    
