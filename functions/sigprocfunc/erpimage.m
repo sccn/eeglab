@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.203  2004/01/24 22:01:23  scott
+% *** empty log message ***
+%
 % Revision 1.202  2004/01/24 21:58:33  scott
 % same
 %
@@ -2562,27 +2565,31 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     fprintf('Plotting the ERP trace below the ERP image\n');
     if Erpstdflag == YES
         if Showwin
-          plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
+          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
         else
-          plot1trace(ax2,times,erp,limit, [], stdev,[],[]); % plot ERP +/-stdev
+          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],[]); % plot ERP +/-stdev
         end
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
         if Showwin
-          plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
+          tmph = plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
         else
-          plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
+          tmph = plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
         end
     else
         if Showwin
-          plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
+          tmph = plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
         else
-          plot1trace(ax2,times,erp,limit,[],[],[]); % plot ERP alone
+          tmph = plot1trace(ax2,times,erp,limit,[],[],[]); % plot ERP alone
         end
     end;
-        
+    
     if ~isnan(aligntime)
-        line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
+        line([aligntime aligntime],[limit(3:4)*1.1],'Color','k','LineWidth',ZEROWIDTH); % x=median sort value
+        % remove y axis
+        if length(tmph) > 1
+            delete(tmph(end));
+        end;
     end
     
     set(ax2,'Xtick',xtick);        % use same Xticks as erpimage above
@@ -3092,6 +3099,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
                  'linewidth',ERPZEROWIDTH); % y=zero-line
     l2=line([0 0],[axlimits(3:4)*1.1],'Color','k',...
                  'linewidth',ERPZEROWIDTH); % x=zero-line
+    plot_handle = [plot_handle l1 l2];
   end
 %
 %%%%%%%%%%%%%%%%%%% function phasedet() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
