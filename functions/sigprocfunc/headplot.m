@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/08/02 00:24:10  scott
+% nothing
+%
 % Revision 1.16  2002/11/26 19:42:24  arno
 % /2 to sqrt in extentricity calculation (thanks to Tyler Lorig)
 %
@@ -315,7 +318,7 @@ if isstr(values)
        fprintf('            Change file name in headplot.m.\n');
        return
     end
-    try, eval(['load ',mesh_file,' -mat']);
+    try, load(mesh_file,'-mat');
     catch,
         POS  = load('mheadpos.txt', '-ascii');
         TRI1 = load('mheadtri1.txt', '-ascii');
@@ -531,7 +534,7 @@ else
            spline_file);
        return
   end
-  eval(['load ',spline_file, ' -mat'])
+  load(spline_file, '-mat');
 
   if ~exist(mesh_file)
 	  close;
