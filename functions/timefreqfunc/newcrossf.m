@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/11/20 01:13:47  arno
+% remove duplicate arguments
+%
 % Revision 1.23  2002/10/24 22:15:13  cooper
 % Fixed timesout ~= size(RR,2) bug in plotall().
 %
@@ -650,8 +653,11 @@ if iscell(X)
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
 	figure; 
-	subplot(1,3,1); title(g.title{1});
-	if ~strcmp(g.type, 'coher') & nargout < 9
+    
+	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        subplot(1,3,1); title(g.title{1});
+	end;
+    if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ', vararginori{:});
 	else
@@ -662,8 +668,10 @@ if iscell(X)
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
 	fprintf('\nRunning crossf on condition 2 *********************\n');
-	subplot(1,3,2); title(g.title{2});
-	if ~strcmp(g.type, 'coher') & nargout < 9
+	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        subplot(1,3,2); title(g.title{2});
+	end;
+    if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
 	else
@@ -672,15 +680,19 @@ if iscell(X)
 	end;
 	R2 = R2.*exp(j*Rangle2/180*pi);
 
-	subplot(1,3,3); title(g.title{3});
-	if isnan(g.alpha)
+    if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+        subplot(1,3,3); title(g.title{3});
+	end;
+    if isnan(g.alpha)
         switch(g.condboot)
             case 'abs',  Rdiff = abs(R1)-abs(R2);
             case 'angle',  Rdiff = angle(R1)-angle(R2);
             case 'complex',  Rdiff = R1-R2;
         end;
         g.title = ' ';
-		plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+        if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+            plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+        end;
         Rbootout = [];
 	else 
 		% preprocess data and run compstat
@@ -709,8 +721,10 @@ if iscell(X)
 		%Boot = bootcomppost(Boot, [], [], []);
 		g.title = '';
 		g.boottype = 'trials';
-		plotall(Rdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
-
+        if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+            plotall(Rdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
+        end;
+        
         % outputs
         Rbootout = {Rbootout1 Rbootout2 coherimages};
 	end;
