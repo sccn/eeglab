@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/25 18:29:07  arno
+% change 3d rotate options
+%
 % Revision 1.3  2002/04/18 15:49:09  scott
 % editted msgs -sm
 %
@@ -201,7 +204,7 @@ for index = 1:size(arg2(:),1)
 			if length( options ) < 2
     			headplot( SIGTMPAVG(:,index), EEG.splinefile);
 		    else	
-			     eval( [ 'headplot( SIGTMPAVG(:,index), EEG.splinefile, '', ''' options ');' ] );
+			     eval( [ 'headplot( SIGTMPAVG(:,index), EEG.splinefile, ' options ');' ] );
 			end;
 			if nbgraph == 1, title( topotitle );
 			else title([int2str(arg2(index)) ' ms']);
