@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/06/25 00:52:27  arno
+% debuging ICA info copy
+%
 % Revision 1.5  2002/04/23 20:08:39  arno
 % full reprogramming of the function for standalone
 %
@@ -148,7 +151,15 @@ else
 		INEEG1.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
 	end;
 
-	INEEG1.epoch = [];
+	if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch')
+		try 
+			INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
+		catch
+			disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
+		end;
+	else
+		INEEG1.epoch =[];
+	end;
 
 	if INEEG1.trials > 1 | INEEG2.trials > 1
 		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
