@@ -10,7 +10,7 @@
 % Graphic interface for EEG data (dataflag = 1):
 %   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
 %                      in computing the spectra (by default the whole epoch or data).
-%                      spectopo() equivalent: 'timerange'
+%                      Command line equivalent: 'timerange'
 %   "Percent data to sample" - [edit box] Percentage of data to use in
 %                      computing the spectra (low % speeds up the computation).
 %                      spectopo() equivalent: 'percent'
@@ -19,7 +19,7 @@
 %                      spectopo() equivalent: 'freqs'
 %   "Apply to EEG|ERP|BOTH" - [edit box] Plot spectra of the 'EEG', 'ERP' or of 'BOTH'.
 %                      NOTE: This edit box does not appear for continuous data.
-%                      spectopo() equivalent: 'process'
+%                      Command line equivalent: 'process'
 %   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
 %                      spectopo() equivalent: 'freqrange'
 %   "Scalp map options" - [edit box] 'key','val','key',... sequence of arguments 
@@ -29,7 +29,7 @@
 % Graphic interface for components (dataflag = 0):
 %   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
 %                      in computing the spectra (by default the whole epoch or data).
-%                      spectopo() equivalent: 'timerange'
+%                      Command line equivalent: 'timerange'
 %   "Frequency (Hz) to analyze" - [edit box] Single frequency (Hz) at which to plot 
 %                      component contributions. spectopo() equivalent: 'freqs'
 %   "Electrode number to analyze" - [edit box] 1-nchans --> Plot component contributions 
@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/02/26 17:42:11  scott
+% header edits -sm
+%
 % Revision 1.34  2003/02/26 17:40:35  scott
 % header edits -sm
 %
