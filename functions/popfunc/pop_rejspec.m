@@ -2,25 +2,44 @@
 %                 thresholding of frequencies in the data.
 %
 % Usage:
-%   >>  pop_rejspec(INEEG, typerej); % pops-up
-%   >> [OUTEEG, Indexes] = pop_rejspec( INEEG, typerej, electrodes, ...
-%         negthresh, posthresh, startfreq, endfreq, superpose, reject);
+%   >>  pop_rejspec(INEEG, typerej); % pop-up interactive windo mode
+%   >> [OUTEEG, Indexes] = pop_rejspec( INEEG, typerej, elec_comp, ...
+%         lowthresh, upthresh, startfreq, endfreq, superpose, reject);
 %
+% Graphical interface:
+%   "Electrode" - [edit box] electrodes or components (number) to take into
+%                 consideration for rejection. Same as the 'elec_comp'
+%                 parameter from the command line.
+%   "Low frequency" - [edit box] lower threshold limit in dB. Same as
+%                 the command line parameter 'lowthresh'.
+%   "High frequency" - [edit box] upper threshold limit in dB. Same as
+%                 the command line parameter 'upthresh'.
+%   "Start time(s)" - [edit box] starting frequency in Hz. Same as
+%                 the command line parameter 'startfreq'.
+%   "End time(s)" - [edit box] ending frequency in Hz. Same as
+%                 the command line parameter 'endfreq'.
+%   "Display with previous rejection" - [edit box] can be either YES or
+%                 NO. This edit box corresponds to the command line input
+%                 option 'superpose'.
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
+%                 box corresponds to the command line input option 'reject'.
+%
+% 
 % Inputs:
 %   INEEG      - input dataset
 %   typerej    - type of rejection (0 = independent components; 1 = eeg
 %              data). Default is 1. For independent components, before
 %              thresholding, the activity is renormalized for each 
 %              component.
-%   electrodes - [e1 e2 ...] electrodes (number) to take into 
+%   elec_comp  - [e1 e2 ...] electrodes or components (number) to take into 
 %              consideration for rejection
-%   negthresh  - negative threshold limit in mV (can be an array if 
+%   lowthresh  - lower threshold limit in mV (can be an array if 
 %              several electrodes; if less numbe  of values than number 
 %              of electrodes the last value is used for the remaining 
 %              electrodes)
-%   posthresh  - positive threshold limit in mV (same syntax as negthresh
-%   startfreq  - starting frequency in Hz (same syntax  as negthresh)
-%   endfreq    - ending frequency in Hz (same syntax  as negthresh).
+%   upthresh  - upper threshold limit in mV (same syntax as lowthresh)
+%   startfreq  - starting frequency in Hz (same syntax  as lowthresh)
+%   endfreq    - ending frequency in Hz (same syntax  as lowthresh).
 %              Starfreq and endfreq define the frequncy range for
 %              rejection.
 %   superpose  - 0=do not superpose pre-labelling with previous
@@ -59,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/01/10 01:10:45  arno
+% change default position
+%
 % Revision 1.18  2002/11/15 19:07:24  arno
 % updating default position (eegplot)
 %
@@ -151,7 +173,7 @@ if nargin < 3
 					'Low frequency(s) (Hz):', ...
 					'High frequency(s) (Hz):', ...
                		'Display with previous rejection', ...
-         			'Actually reject marked trial (YES or NO)' };
+         			'Reject marked trial (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
 					'-10', ...
 					'10', ...
