@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.223  2004/09/06 18:15:52  scott
+% final? time/freq window sorting debug -sm
+%
 % Revision 1.222  2004/09/03 19:02:22  scott
 % fixed fprintf ...s -sm
 %
@@ -1655,7 +1658,7 @@ end;
 %%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort
-	if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency in specified band
+	if length(phargs) >= 4 & phargs(3) ~= phargs(4) % find max frequency in specified band
         if exist('psd') == 2 % requires Singla Processing Toolbox
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
         else

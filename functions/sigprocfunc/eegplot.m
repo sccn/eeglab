@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2004/09/03 16:14:17  arno
+% add option to hide event duration
+%
 % Revision 1.99  2004/09/03 16:02:21  arno
 % toggle event duration ploting
 %
@@ -1550,8 +1553,8 @@ else
             
             % draw duration is not 0
             % ----------------------
-            if g.ploteventdur && ~isempty(g.eventlatencyend) ...
-                    && g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
+            if g.ploteventdur & ~isempty(g.eventlatencyend) ...
+                    & g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
                 tmplatend = g.eventlatencyend(event2plot(index))-lowlim-1;
                 if tmplatend ~= 0, 
                     tmplim = ylim;

@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.134  2004/09/03 16:14:04  arno
+% debug event duration
+%
 % Revision 1.133  2004/08/25 18:21:34  arno
 % debug last change
 %
@@ -1156,7 +1159,7 @@ if ~isempty( varargin)
           allf = fieldnames(EEG.event);
           for index = 1:length(allfields)
               clear tmpval; tmpval = getfield(EEG.event,{ 1 },allf{index});
-              if isnumeric(tmpval) && ~isa(tmpval, 'double')
+              if isnumeric(tmpval) & ~isa(tmpval, 'double')
                   for indexevent = 1:length(EEG.event)
                       EEG.event = setfield(EEG.event, { indexevent }, allf{index},  double(tmpval) );
                   end;
