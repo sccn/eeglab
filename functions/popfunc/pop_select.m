@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/05/01 01:58:50  arno
+% removing extra gui parameters
+%
 % Revision 1.9  2002/04/30 18:27:11  arno
 % adding scroll button
 %
@@ -171,6 +174,14 @@ try, g.channel;	 catch, g.channel = [1:EEG.nbchan]; end;
 try, g.nochannel;	 catch, g.nochannel = []; end;
 try, g.trialcond;	 catch, g.trialcond = []; end;
 try, g.notrialcond;	 catch, g.notrialcond = []; end;
+
+allfields = fieldnames(g);
+for index = 1:length(allfields)
+	switch allfields{index}
+	 case { 'time' 'notime' 'trial' 'notrial' 'point' 'nopoint' 'channel' 'nochannel' 'trialcond' 'notrialcond' };
+	 otherwise disp('pop_select error: unrecognized option'); beep; return;
+	end;
+end;
 
 if isempty( g.point ) &  isempty( g.nopoint )
     if ~isempty( g.time )
