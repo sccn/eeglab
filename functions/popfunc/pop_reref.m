@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/07/02 01:06:00  arno
+% remove debug msg
+%
 % Revision 1.10  2003/07/02 01:05:34  arno
 % debug msg
 %
@@ -174,9 +177,9 @@ for index = 1:length(options)
 end;
 if nargin < 2
     if length(ref) > 1 | (~isempty(ref) & withref == 0 & strcmp(EEG.ref, 'common'))
-        res = questdlg2(strvcat('Using multiple reference, or using a single reference', ...
-                                'without including the old reference reduce the dimensionality', ...
-                                'of the data and prevent from re-referencing later on.', ...
+        res = questdlg2(strvcat('Using multiple references, or using a single reference', ...
+                                'without including the old reference reduces the dimensionality', ...
+                                'of the data and prevents from re-referencing later on.', ...
                                 'Do you want to continue ?'), 'warning', 'Cancel', 'Yes', 'yes');
         if strcmpi(res, 'Cancel'), return; end;
     end;
