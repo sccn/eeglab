@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/07/23 21:32:58  arno
+% debugging not same size
+%
 % Revision 1.26  2002/05/01 23:43:05  arno
 % additional test
 %
@@ -522,6 +525,7 @@ com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.p
 disp('Command executed by pop_erpimage:');
 disp(' '); disp(com); disp(' ');
 eval(com)
+popcom
 
 if ~popup
 	varargout{1} = [popcom 10 '% Call: ' com];
