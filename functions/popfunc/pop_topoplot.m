@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/17 22:30:28  scott
+% ERP/components
+%
 % Revision 1.11  2002/08/17 22:26:05  scott
 % typo
 %
@@ -110,8 +113,7 @@ if nargin < 3
 	if typeplot
 		txt = sprintf(['Plotting ERP scalp maps at these latencies:' 10 ' (range: %d to %d ms, NaN -> empty):'], round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
-		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
-		txt = sprintf('Plotting scalp maps at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...
