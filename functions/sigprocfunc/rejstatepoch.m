@@ -84,6 +84,9 @@
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/11 22:17:09  arno
+% color
+%
 % Revision 1.3  2002/08/07 23:17:24  arno
 % editing text
 %
@@ -165,10 +168,10 @@ if ~isstr( signal )
 	end;
 	if isempty(g.labels)
 		for index = 1:size(g.rej,1)
-			g.labels(index,:) = sprintf('%2d', index);
+			g.labels(index,:) = sprintf('%3d', index);
 		end;
 		if ~isempty(g.rejglob)
-			g.labels(index+2,:) = 'g.';
+			g.labels(index+2,:) = 'g..';
 		end;
 	end;		
 			
@@ -181,7 +184,8 @@ if ~isstr( signal )
 
 	% plot the buttons
 	% ----------------
-	figure('color', [1 1 1]);
+	try, icadefs; catch, GUIBUTTONCOLOR = [0.8 0.8 0.8]; BACKCOLOR = [0.8 0.8 0.8]; end; 
+	figure('color', BACKCOLOR);
 	set(gcf, 'name', 'Rejectrials');
 	pos = get(gca,'position'); % plot relative to current axes
 	set( gca, 'tag', 'mainaxis');
@@ -201,17 +205,17 @@ if ~isstr( signal )
 	% CANCEL button
 	% -------------
 	h  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Cancel', 'Units','Normalized','Position',...
-			[-15 -6 15 6].*s+q, 'callback', 'close(gcf);');
+			[-15 -6 15 6].*s+q, 'callback', 'close(gcf);', 'backgroundcolor', GUIBUTTONCOLOR);
 
 	% Entropy component text and threshold
 	% ------------------------------------
-    makebutton( 'Single-channel', 'Plotwin'  ,  [3 -6 27 6].*s+q, [30 -6 15 6].*s+q, 3, g.threshold); 
-    makebutton( 'All-channel', 'Plotwin'     ,  [50 -6  27 6].*s+q, [77 -6  15 6].*s+q, 4, g.thresholdg); 
+    makebutton( 'Single-channel', 'Plotwin'  ,  [3 -6 27 6].*s+q, [30 -6 15 6].*s+q, 3, g.threshold, GUIBUTTONCOLOR); 
+    makebutton( 'All-channel', 'Plotwin'     ,  [50 -6  27 6].*s+q, [77 -6  15 6].*s+q, 4, g.thresholdg, GUIBUTTONCOLOR); 
 
 	% EEGPLOT button
 	% --------------
 	if ~isempty(g.plotcom)
-			h  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'EEGPLOT', 'Units','Normalized','Position',[95 -2 15 6].*s+q, ...
+			h  = uicontrol(gcf, 'backgroundcolor', GUIBUTTONCOLOR, 'Style', 'pushbutton', 'string', 'EEGPLOT', 'Units','Normalized','Position',[95 -2 15 6].*s+q, ...
 					'callback',['TMPEEG = get(gcbf, ''userdata'');' ...
 								'TMPREJ = TMPEEG{3};' ...
 								'TMPREJELEC = TMPEEG{4};' ...
@@ -223,7 +227,7 @@ if ~isstr( signal )
 	% ACCEPT button
 	% -------------
 	command = 'fprintf(''Rejection indices has been put in the matrix TMPREJ\n'')'; 
-	haccept  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'UPDATE', 'Units','Normalized','Position', posaccept.*s+q, ...
+	haccept  = uicontrol(gcf, 'backgroundcolor', GUIBUTTONCOLOR, 'Style', 'pushbutton', 'string', 'UPDATE', 'Units','Normalized','Position', posaccept.*s+q, ...
 					'callback', [	'set(gcbo, ''userdata'', 1);' ... %signal to signify termination 
 									'TMPEEG = get(gcbf, ''userdata'');' ...
 									'TMPREJ = TMPEEG{3};' ...
@@ -407,8 +411,8 @@ function plotstat( id );
 
 return;
 
-function makebutton( string, ax, pos1, pos2, userindex, init );
-	h  = uicontrol(gcf, 'Style', 'radiobutton', 'string', string, 'value', fastif(init == 0, 0, 1), 'Units','Normalized', 'Position', pos1, ...
+function makebutton( string, ax, pos1, pos2, userindex, init, GUIBUTTONCOLOR );
+	h  = uicontrol(gcf , 'backgroundcolor', GUIBUTTONCOLOR, 'Style', 'radiobutton', 'string', string, 'value', fastif(init == 0, 0, 1), 'Units','Normalized', 'Position', pos1, ...
 					'callback', [ 'textresh = findobj(''parent'', gcbf, ''tag'', ''' string ''');' ...
 								  'checkstatus = get(gcbo, ''value'');' ...
 								  'ax = findobj(''parent'', gcbf, ''tag'', ''' ax ''');' ...
@@ -423,7 +427,7 @@ function makebutton( string, ax, pos1, pos2, userindex, init );
 								  'set(ax, ''userdata'' , tmpdat);' ...
 								  'rejstatepoch(''draw'');' ...
 								  'clear tmpdat ax checkstatus textresh;'  ] );
-	h  = uicontrol(gcf, 'Style', 'edit', 'tag', string, 'string', num2str(init), 'enable', fastif(init == 0, 'off', 'on'), 'Units','Normalized', 'Position', pos2, ...
+	h  = uicontrol(gcf, 'Style', 'edit', 'backgroundcolor', [1 1 1], 'tag', string, 'string', num2str(init), 'enable', fastif(init == 0, 'off', 'on'), 'Units','Normalized', 'Position', pos2, ...
 					'callback', [ 	'ax = findobj(''parent'', gcbf, ''tag'', ''' ax ''');' ...
 								    'tmpdat = get(ax, ''userdata'');' ...
 									'tmpdat{' int2str(userindex) '} = str2num(get(gcbo, ''string''));' ...
