@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2002/08/21 17:46:26  arno
+% more reject field checks
+%
 % Revision 1.62  2002/08/21 02:24:27  arno
 % change message
 %
@@ -572,9 +575,11 @@ listf = { 'rejjp' 'rejkurt' 'rejmanual' 'rejthresh' 'rejconst', 'rejfreq' ...
 for index = 1:length(listf)	
 	if ~isfield(EEG.reject, listf{index}),	EEG.reject = setfield(EEG.reject, listf{index}, []); res = com; end;
 	elecfield = [listf{index} 'E'];
-	if ~isfield(EEG.reject, elecfield) | ...
-			(~isempty(getfield(EEG.reject, listf{index})) & isempty(getfield(EEG.reject, elecfield)))
-		EEG.reject = setfield(EEG.reject, elecfield, []); res = com; 
+	if ~isfield(EEG.reject, elecfield),     EEG.reject = setfield(EEG.reject, elecfield, []); res = com; end;
+	% check if electrode array is empty with rejection array is not
+    if ~isempty(getfield(EEG.reject, listf{index})) & isempty(getfield(EEG.reject, elecfield))
+		nbchan = fastif( strcmp(listf{index}, 'ica'), size(EEG.icaweights,1), EEG.nbchan);
+		EEG.reject = setfield(EEG.reject, elecfield, zeros(nbchan, length(getfield(EEG.reject, listf{index})))); res = com;
 	end;
 end;
 if ~isfield(EEG.reject, 'rejglobal')		EEG.reject.rejglobal = []; res = com; end;
