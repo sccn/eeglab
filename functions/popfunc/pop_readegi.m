@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/14 23:35:36  arno
+% header
+%
 % Revision 1.1  2002/11/13 02:34:22  arno
 % Initial revision
 %
@@ -55,7 +58,7 @@ EEG = eeg_emptyset;
 
 [Head EEG.data Eventdata] = readegi( filename );
 if ~isempty(Eventdata) & length(Eventdata) == size(EEG.data,2)
-    EEG.data(end+1,:) = Eventdata;
+    EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
 EEG.filename        = filename;
 EEG.filepath        = '';
