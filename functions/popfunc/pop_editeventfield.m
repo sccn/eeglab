@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/20 23:38:12  arno
+% can not remove epoch field
+%
 % Revision 1.17  2002/08/14 16:32:34  arno
 % constrain description to 1 line
 %
@@ -203,7 +206,7 @@ if nargin<2
                 { 'Style', 'listbox', 'string', listboxtext }, ...
                 { 'Style', 'text', 'string', 'as', 'fontweight', 'bold' }, ...
                 { 'Style', 'edit', 'string', '' } ...
-                fastif(isunix,{ 'Style', 'text', 'string', 'Click on selected field name!','fontweight','bold' },{ })};
+                fastif(isunix,{ 'Style', 'text', 'string', 'Click on selected field!','fontweight','bold' },{ })};
 
         [results userdat ]= inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', ...
 									  'Edit event field(s) -- pop_editeventfield()', EEG.eventdescription );
