@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2002/07/12 23:59:42  arno
+% removing close satatement when creating a new eeglab
+%
 % Revision 1.70  2002/07/08 19:23:31  arno
 % adding the import BCI menu command
 %
@@ -585,8 +588,6 @@ eeglab('redraw');
 function eeg_mainfig;
 
 COLOR = [.56 .66 .90];
-colormap('gray');
-mat0 = colormap;
 WINMINX         = 17;
 WINMAXX         = 260;
 WINYDEC			= 13;
@@ -605,7 +606,7 @@ if ~isempty(h)
 end;
 
 W_MAIN = figure('Units','points', ...
-	'Colormap',mat0, ...
+... %	'Colormap','gray', ...
 	'PaperPosition',[18 180 576 432], ...
 	'PaperUnits','points', ...
 	'name', 'EEGLAB', ... 
