@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/10/15 21:18:52  arno
+% bilateral difference
+%
 % Revision 1.10  2002/10/15 21:10:32  arno
 % title
 %
@@ -756,7 +759,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
     fprintf('\nProcessing trial for first input (of %d):',trials);
 	X = reshape(X, g.frame, trials);
 	[alltfX freqs times] = timefreq(X, g.srate, spectraloptions{:});
-	fprintf('\nProcessing trial for second input (of %d):',trials);
+	times(1)
+    times(end)
+    fprintf('\nProcessing trial for second input (of %d):',trials);
 	Y = reshape(Y, g.frame, trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
 	nb_points = size(alltfX,1);
