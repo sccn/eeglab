@@ -2,10 +2,10 @@
 %              and/or aligned to an input sorting variable and smoothed across trials 
 %              with a moving-average.  (To return event-aligned data without plotting, 
 %              use eventlock()).  Optionally sort trials on value, amplitude or phase 
-%              within a specified latency window. Optionally plot the ERP mean and std. dev.,
-%              and moving-window spectral amplitude and inter-trial coherence at a
-%              selected or peak frequency. Click on individual figures parts to examine 
-%              them separately and zoom (using axcopy()).
+%              within a specified latency window. Optionally plot the ERP mean and 
+%              std. dev.and moving-window spectral amplitude and inter-trial coherence 
+%              at aselected or peak frequency. Click on individual figures parts to 
+%              examine them separately and zoom (using axcopy()).
 % Usage:
 %   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
 %         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx,erpsig] ...
@@ -46,7 +46,7 @@
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
 % 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in 
-%                an n-cycle window centered at latency ms_center (ms). 
+%                an 3-cycle window centered at latency ms_center (ms). 
 %                Percentile (prct) in range [0,100] gives percent of trials 
 %                to reject for low amplitude. Else, if in range [-100,0], 
 %                percent of trials to reject for high amplitude; freq (Hz) 
@@ -59,11 +59,13 @@
 %                smoothing. Use 'cycles' (below) for wavelet length. 
 %                {Default: [0 25 8 13 180]}
 %  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. 
-%                See 'phasesort'. If ms_center is 'Inf', then sorting
+%                (See 'phasesort' above). If ms_center is 'Inf', then sorting
 %                is by mean power across the time window specified by 'winsort' below.
-%                If arg 'freq' above is <0, sort by mean power in the range [freq maxfreq].
+%                If third arg freq is < 0, sort by mean power in the range 
+%                [abs(freq) maxfreq].
 %  'sortwin' - [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
-%                by mean amplitude across window centers shifted from start_ms to end_ms by 10 ms.
+%                by mean amplitude across window centers shifted from start_ms 
+%                to end_ms by 10 ms.
 %  'showwin' - Show sorting window behind ERP trace. {default: don't show sorting window}
 %
 % Plot time-varying spectral amplitude instead of potential:
@@ -75,8 +77,8 @@
 %               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items 
 %               and omit late items. Use last input, bamp, to fix the baseline amplitude.
 %               {default: from data}
-%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
-%               levels to save computation time. {default: none}
+%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use precomputed significance 
+%               thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
 %   'caxis'  - [lo hi] Set color axis limits. Else [fraction] Set caxis limits at 
 %               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
 %
@@ -90,9 +92,9 @@
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               Else [minfrq maxfrq] = same, but select frequency with max power in 
-%               given range (Note: the 'phasesort' freq (above) overwrites these parameters).
-%               Else [minfrq maxfrq alpha] = plot coher. signif. level line at 
-%               probability alpha (range: [0,0.1]) {default: no coher, no alpha level}
+%               given range. (Note: the 'phasesort' freq (above) overwrites these 
+%               parameters). Else [minfrq maxfrq alpha] = plot coher. signif. level line 
+%               at probability alpha (range: [0,0.1]) {default: no coher, no alpha level}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg, times) {default: as defined in icadefs.m}
 %   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
@@ -123,7 +125,7 @@
 %      coher  = mean inter-trial phase coherence time course
 %     cohsig  = coherence significance level
 %     ampsig  = amplitude significance levels [lo high]
-%    outamps  = matrix of imaged amplitudes (from option 'allamps')
+%    outamps  = matrix of imaged amplitudes (from option 'plotamps')
 %   phsangls  = vector of sorted trial phases at the phase-sorting frequency
 %     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
 %    sortidx  = indices of sorted data epochs plotted
@@ -167,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.231  2005/01/04 18:38:41  scott
+% function phasedet() is FAILING! just touching up phase sorting code
+%
 % Revision 1.230  2004/11/30 22:39:40  hilit
 % fixing 'erpstd' option
 %
@@ -2139,10 +2144,10 @@ end
 %%%%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
-	% find max frequency in specified band
+	% find max frequency in specified band - should use Matlab pwelch()?
     if exist('psd') == 2 % from Signal Processing Toolbox
         [pxx,tmpfreq] = psd(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
-    else % from EEGLABA
+    else % substitute from EEGLAB
         [pxx,tmpfreq] = spec(urdata(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
     end;
 	pxx = 10*log10(pxx);
