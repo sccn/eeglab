@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/16 00:25:58  arno
+% also generate a string with all channels names
+%
 % Revision 1.7  2003/04/16 00:16:43  arno
 % returning channel names
 %
@@ -61,7 +64,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans);
         help pop_chansel;
         return;
     end;
-    if isempty(chans), dips('No channel structure loaded'); return; end;
+    if isempty(chans), disp('No channel structure loaded'); return; end;
     
     % get infos from readlocs
     % -----------------------
