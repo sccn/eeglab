@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/05/13 23:13:23  arno
+% verbose off for convertlocs
+%
 % Revision 1.8  2003/05/13 22:30:57  arno
 % unicoord
 %
@@ -132,7 +135,7 @@ g = finputcheck( varargin, ...
                    'header'       'string'   { 'on' 'off' } 	'off';
                    'customheader' 'string'   [] 					'';
                    'elecind'      'integer'  [1 Inf]				[];
-                   'unicoord'     'string'   { 'on' 'off' } 	'off'; 
+                   'unicoord'     'string'   { 'on' 'off' } 	'on'; 
                    'format'		  'cell'	 []					{} }, 'writelocs');
 if isstr(g), error(g); end;  
 
