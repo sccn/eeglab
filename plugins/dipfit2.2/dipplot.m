@@ -115,6 +115,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.19  2003/04/19 00:55:53  arno
+%correct normalized dipole length
+%
 %Revision 1.18  2003/04/19 00:46:41  arno
 %correcting projection
 %
@@ -647,40 +650,40 @@ function h = myezplot3(strX, strY, strZ, range);
 function newsrc = convertbesaoldformat(src);
     newsrc = [];
     count = 1;
+    countdip = 1;
     if ~isfield(src, 'besaextori'), src(1).besaextori = []; end;
     for index = 1:length(src)
-        countdip = 1;
         
         % convert format
         % --------------
         if isempty(src(index).besaextori), src(index).besaextori = 300; end; % 20 mm
-        newsrc(index).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
-        newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori/300];
+        newsrc(count).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
+        newsrc(count).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori/300];
         
         % copy other fields
         % -----------------
         if isfield(src, 'rv')
-            newsrc(index).rv = src(index).rv;
+            newsrc(count).rv = src(index).rv;
         end;
         if isfield(src, 'elecrv')
-            newsrc(index).rvelec = src(index).elecrv;
+            newsrc(count).rvelec = src(index).elecrv;
         end;
         if isfield(src, 'component')
-            newsrc(index).component = src(index).component;
-            if index ~= 1 & src(index).component == src(index-1).component
+            newsrc(count).component = src(index).component;
+            if index ~= length(src) & src(index).component == src(index+1).component
                 countdip = countdip + 1;
             else
-                count = count + 1;
+                count = count + 1; countdip = 1;
             end;
         else
-            count = count + 1;
+            count = count + 1; countdip = 1;
         end;
     end; 
 
 function src = computexyzforbesa(src);
     
     for index = 1:length( src )
-        for index2 = size( src(index).possph, 1 )
+        for index2 = 1:size( src(index).possph, 1 )
 
             % compute coordinates
             % -------------------
