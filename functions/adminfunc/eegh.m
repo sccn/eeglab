@@ -20,7 +20,6 @@
 % Global variables used:
 %   LASTCOM   - last command
 %   ALLCOM    - all the commands   
-%   EEG       - EEG structure
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2001
 %
@@ -50,6 +49,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/03/13 02:40:58  arno
+% only adding history once
+%
 % Revision 1.7  2003/12/05 20:06:32  arno
 % eeg_hist call
 %
@@ -76,9 +78,13 @@ function str = h( command, str );
 
 mode = 1; % mode = 1, full print, mode = 0, truncated print
 
-global LASTCOM;
 global ALLCOM;
-global EEG;
+
+if nargin == 2
+    fprintf('2: %s\n', command);
+elseif nargin == 1
+    fprintf('1: %s\n', command);
+end;
 
 if nargin < 1
 	if isempty(ALLCOM)
@@ -105,7 +111,8 @@ elseif nargin == 1
 		else	
 			ALLCOM = { command ALLCOM{:}};
 		end;	
-		LASTCOM         = command;
+        global LASTCOM;
+		LASTCOM  = command;
 	else	
 		if command == 0
 			ALLCOM = [];
@@ -138,6 +145,8 @@ else % nargin == 2
     else
         % warning also some code present in eeg_store and pop_newset
         h(command); % add to history
-        EEG = eeg_hist(EEG, command);
+        if ~isempty(command)
+            str = eeg_hist(str, command);
+        end;
     end;
 end;
