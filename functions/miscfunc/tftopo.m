@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/27 01:19:33  scott
+% same -sm
+%
 % Revision 1.5  2002/04/27 01:13:46  scott
 % same -sm
 %
@@ -266,7 +269,8 @@ for n=1:tfpoints
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    axes(topoaxes(n));
    scalpmap = matsel(tfdata,length(times),tfpidx(n,1),tfpidx(n,2),selchans)';
-   topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)]);
+   topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
+               'electrodes','off','shrink','off');
                % 'interlimits','electrodes')
    axis square;
    tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
