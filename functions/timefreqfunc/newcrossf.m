@@ -43,9 +43,13 @@
 %                 window length (as in FFT)            {default cycles: 0}
 %
 %    Optional Coherence Type:
-%       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
-%                 ('coher') or phase coherence ('phasecoher') also known
-%                 as phase coupling factor' {default: 'phasecoher'}.
+%       'type'  = ['coher'|'phasecoher'|'amp'] Compute either linear coherence
+%                 ('coher'), phase coherence ('phasecoher') also known
+%                 as phase coupling factor', or amplitude correlations ('amp')
+%                 {default: 'phasecoher'}. Note that for amplitude correlation,
+%                 the significance threshold is computed using the corrcoef
+%                 function, so can be set arbitrary low without increase in
+%                 computation load.
 %       'subitc' = ['on'|'off'] Subtract stimulus locked Inter-Trial Coherence 
 %                 from x and y. This computes the  'intrinsic' coherence
 %                 x and y not arising from common synchronization to 
@@ -191,6 +195,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2003/11/26 18:10:22  scott
+% help message
+%
 % Revision 1.63  2003/10/15 18:46:01  arno
 % *** empty log message ***
 %
@@ -730,6 +737,15 @@ end;
 
 % testing arguments consistency
 % -----------------------------
+if strcmpi(g.title, DEFAULT_TITLE)
+    switch g.type
+     case 'coher',       g.title	= 'Event-Related Coherence';			% Figure title
+     case 'phasecoher',  g.title	= 'Event-Related Phase Coherence';		
+     case 'phasecoher2', g.title	= 'Event-Related Phase Coherence 2';			
+     case 'amp'  ,       g.title	= 'Event-Related Amplitude Correlation';		
+    end;
+end;
+
 if ~ischar(g.title) & ~iscell(g.title) 
    error('Title must be a string or a cell array.');
 end
@@ -775,8 +791,8 @@ case { 'ms', 'deg' },;
 otherwise error('Angleunit must be either ''deg'' or ''ms''');
 end;    
 switch g.type
-case { 'coher', 'phasecoher' 'phasecoher2' },;
-otherwise error('Type must be either ''coher'' or ''phasecoher''');
+case { 'coher', 'phasecoher' 'phasecoher2' 'amp' },;
+otherwise error('Type must be either ''coher'', ''phasecoher'', or ''amp''');
 end;    
 switch g.boottype
 case { 'times' 'timestrials' 'timestrials2' 'trials'},;
@@ -936,12 +952,15 @@ if iscell(X)
               [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
                  'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
           end; 
+          
+         case 'amp' % amplitude correlation
+		  error('Cannot compute difference of amplitude correlation images yet');
+          
          case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
           if strcmpi(g.lowmem, 'on')
-              size(savecoher1,1)
               for ind = 1:2:size(savecoher1,1)
                   if ind == size(savecoher1,1), indarr = ind; else indarr = [ind:ind+1]; end;
                   [Rdiff(indarr,:,:) coherimages(indarr,:,:) coher1(indarr,:,:) coher2(indarr,:,:)] = condstat(formula, g.naccu, g.alpha, ...
@@ -1045,8 +1064,11 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% compute time frequency decompositions
 	% -------------------------------------
     spectraloptions = { 'ntimesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
-                g.detrend, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
+                g.detrend, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
                 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
+    if ~strcmpi(g.type, 'amp')
+        spectraloptions = { spectraloptions{:} 'itctype' g.type };
+    end;
 
     fprintf('\nProcessing first input\n');
 	X = reshape(X, g.frame, trials);
@@ -1063,10 +1085,38 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	 case 'coher',
 	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(alltfX .* conj(alltfY), 3) ./ sqrt( sum(abs(alltfX).^2,3) .* sum(abs(alltfY).^2,3) );
+     
+     case 'amp'
+      alltfX = abs(alltfX);
+      alltfY = abs(alltfY);      
+      corr  = zeros(length(freqs), length(timesout));
+      alpha = zeros(length(freqs), length(timesout));
+      disp('Computing 0 ms lag amplitude correlation, please wait...');
+      for i1 = 1:length(freqs)
+          for i2 = 1:length(timesout)
+              if ~isnan(g.alpha)
+                  [tmp1 tmp2] = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2,:)) );
+                  coherres(i1,i2)   = tmp1(1,2);
+                  alpha(i1,i2)      = tmp2(1,2);
+              else
+                  tmp1 = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2,:)) );
+                  coherres(i1,i2)   = tmp1(1,2);
+              end;
+          end;
+      end;
+      % apply significance mask
+      if ~isnan(g.alpha)
+          tmpind = find(alpha(:) > g.alpha);
+          coherres(tmpind) = 0;
+          g.alpha = NaN;
+      end;
+      coherresout = [];
+      
 	 case 'phasecoher2',
 	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(coherresout, 3) ./ sum(abs(coherresout),3);
-	 case 'phasecoher',
+	 
+     case 'phasecoher',
 	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum( coherresout ./ abs(coherresout), 3) / trials;
 	end;
@@ -1084,6 +1134,16 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
 						  'cumulY = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
 		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ...
+						  'cumulX = cumulX + arg1.*conj(arg1);' ...
+						  'cumulY = cumulY + arg2.*conj(arg2);' ];
+		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
+		 case 'amp',
+		  formulainit = [ 'ampX   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+                          'ampY   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+						  'cumulY = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
+		  formula =     [ 'ampX   = ampX + arg1.*conj(arg2);' ...
+                          'ampY   = ampY + arg1.*conj(arg2);' ...
 						  'cumulX = cumulX + arg1.*conj(arg1);' ...
 						  'cumulY = cumulY + arg2.*conj(arg2);' ];
 		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
