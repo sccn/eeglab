@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/09 00:24:55  arno
+% editing latest modifications
+%
 % Revision 1.6  2002/04/09 00:21:17  arno
 % adding vertical bars
 %
@@ -298,7 +301,7 @@ elseif (g.winsize <= 0)
 elseif (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
 	error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > g.frame)
-	error('Value of winsize must be less than g.frame length.');
+	error('Value of winsize must be less than frame length.');
 end
 
 if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesout))
