@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2004/09/14 17:04:32  arno
+% saving 2 separate ariables
+%
 % Revision 1.35  2004/08/18 21:30:16  arno
 % debug last
 %
@@ -252,7 +255,7 @@ if mode == 0  % single datasets
 	fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
 	EEG = eeg_checkset(EEG, 'eventconsistency');
 	EEG.filename    = curfilename;
-	EEG.filepath    = '';
+	EEG.filepath    = curfilepath;
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
     
