@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/29 15:53:09  arno
+% same
+%
 % Revision 1.3  2002/07/29 15:51:06  arno
 % debugging
 %
@@ -86,4 +89,16 @@ else
 end;
 
 textgui(doc);
+h = findobj('parent', gcf, 'style', 'slider');
+try, icadefs; catch, 
+	GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
+	GUITEXTCOLOR   = 'k'; 
+end;
+set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+h = findobj('parent', gcf, 'style', 'pushbutton');
+set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+h = findobj('parent', gca);
+set(h, 'color', GUITEXTCOLOR);
+set(gcf, 'color', BACKCOLOR);
+
 return;
