@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/03/05 02:40:00  scott
+% topowidth
+%
 % Revision 1.48  2003/03/05 02:36:31  scott
 % same
 %
@@ -347,6 +350,7 @@ end
 
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
+topowidth
 if pos(2)+ 0.66*pos(4) + topowidth>0.95 % dont make too high
   topowidth = 0.95-(pos(2)+0.66*pos(4));
 end
