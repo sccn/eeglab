@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/04/17 21:52:40  arno
+% can now process 1-D arrays
+%
 % Revision 1.6  2003/01/06 19:46:21  arno
 % debugging new bootstrap
 %
@@ -339,3 +342,13 @@ end;
 
 if length(Rbootout) == 1, Rbootout = Rbootout{1}; end;
 if length(accarrayout) == 1, accarrayout = accarrayout{1}; end;
+return;
+
+% not used: normal fit of the distribution
+% ----------------------------------------
+[mu sigma] = normfit(Rbootout);
+p = 1 - normcdf(value, mu, sigma); % cumulative density distribution
+
+% formula of normal distribution
+% y = 1/sqrt(2) * exp( -(x-mu).^2/(sigma*sigma*2) ) / (sqrt(pi)*sigma);
+
