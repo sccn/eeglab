@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/03/05 03:17:01  scott
+% typo
+%
 % Revision 1.61  2003/03/05 03:16:41  scott
 % typo
 %
@@ -392,10 +395,10 @@ if topowidth> 0.25*pos(4) % dont make too high
 end
 halfn = floor(ntopos/2);
 if rem(ntopos,2) == 1  % odd number of topos
-   topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep) + 0.5)*topowidth;
+   % topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep) + 0.5)*topowidth;
    topoleft = pos(3)/2 - (ntopos/2+halfn*head_sep)*topowidth;
 else % even number of topos
-   topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep))*topowidth;
+   % topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep))*topowidth;
    topoleft = pos(3)/2 - ((halfn)+(halfn-1)*head_sep)*topowidth;
 end
 if 0
@@ -511,8 +514,9 @@ axis([0 1 0 1])
 for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(data(:,plotframes(t))); % max data value at plotframe
 
+       % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
   axtp = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
+       [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
                        topowidth*(1+head_sep)]); % this will be the topoplot axes
@@ -535,8 +539,9 @@ end
 
 for t=1:ntopos
 
+       % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
   axtp = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
+       [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
                        topowidth*(1+head_sep)]);
