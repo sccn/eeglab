@@ -15,8 +15,10 @@
 %                   field in event num. (Ex: {34 'latency' 320.4})
 %   'changeevent' - {num value1 value2 value3 ...} Change the values of
 %                   all fields in event num.
-%   'add'         - {num value1 value2 value3 ...} Insert event before
-%                   event num having the specified values.
+%   'add','append' - {num value1 value2 value3 ...} Insert event before
+%                   event num, and assign value to structure fields.
+%   'insert'       - {num value1 value2 value3 ...} Insert event after
+%                   event num, and assign value to structure fields.
 %   'delete'      - vector of indices of events to delete
 %
 % Outputs:
@@ -48,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/06/15 17:05:29  arno
+% avoid infinite recursion with eeg_checkset
+%
 % Revision 1.30  2004/06/14 21:38:31  arno
 % handling insert urevent after boundary
 %
@@ -164,9 +169,8 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         % ---------
         userdata  = get(gcf, 'userdata');
         EEG       = userdata{1};
-        eventtmp  = userdata{2};
-        oldcom    = userdata{3};
-        allfields = fieldnames(eventtmp);
+        oldcom    = userdata{2};
+        allfields = fieldnames(EEG.event);
         tmpind    = strmatch('urevent', allfields);
         allfields(tmpind) = [];
         
@@ -174,6 +178,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         % -------------
         objevent  = findobj('parent', gcf, 'tag', 'numval');
         valnum    = str2num(get(objevent, 'string'));
+        shift     = 0;
     
     else % command line    
         
@@ -183,7 +188,6 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
             return;
         end;   
         
-        eventtmp  = EEG.event;
         allfields = fieldnames(EEG.event);
         tmpind = strmatch('urevent', allfields);
         allfields(tmpind) = [];
@@ -206,7 +210,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       shift     = tmparg;
       valnum    = valnum + shift;
       if valnum < 1,                valnum = 1;                end;
-      if valnum > length(eventtmp), valnum = length(eventtmp); end;
+      if valnum > length(EEG.event), valnum = length(EEG.event); end;
       set(objevent, 'string', num2str(valnum,3));
 
       % update fields
@@ -214,21 +218,21 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       for index = 1:length(allfields) 
           
           enable = 'on';
-          if strcmp( allfields{index}, 'latency') & ~isempty(eventtmp(valnum).latency)
-              if isfield(eventtmp, 'type') & strcmpi(eventtmp(valnum).type, 'boundary'), enable = 'off'; end;
-              if isfield(eventtmp, 'epoch')
-                   value = eeg_point2lat( eventtmp(valnum).latency, eventtmp(valnum).epoch, ...
+          if strcmp( allfields{index}, 'latency') & ~isempty(EEG.event(valnum).latency)
+              if isfield(EEG.event, 'type') & strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end;
+              if isfield(EEG.event, 'epoch')
+                   value = eeg_point2lat( EEG.event(valnum).latency, EEG.event(valnum).epoch, ...
                                           EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
-              else value = (eventtmp(valnum).latency-1)/EEG.srate+EEG.xmin;
+              else value = (EEG.event(valnum).latency-1)/EEG.srate+EEG.xmin;
               end;
-          elseif strcmp( allfields{index}, 'duration') & ~isempty(eventtmp(valnum).duration)
-              if isfield(eventtmp, 'type') & strcmpi(eventtmp(valnum).type, 'boundary'), enable = 'off'; end;
-              if isfield(eventtmp, 'epoch')
-                   value = eventtmp(valnum).duration/EEG.srate*1000; % milliseconds
-              else value = eventtmp(valnum).duration/EEG.srate;      % seconds
+          elseif strcmp( allfields{index}, 'duration') & ~isempty(EEG.event(valnum).duration)
+              if isfield(EEG.event, 'type') & strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end;
+              if isfield(EEG.event, 'epoch')
+                   value = EEG.event(valnum).duration/EEG.srate*1000; % milliseconds
+              else value = EEG.event(valnum).duration/EEG.srate;      % seconds
               end;
           else
-              value = getfield( eventtmp(valnum), allfields{index});
+              value = getfield( EEG.event(valnum), allfields{index});
           end;
           
           % update interface
@@ -240,16 +244,27 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       % update original
       % --------------- 
       tmpobj = findobj('parent', gcf, 'tag', 'original');
-      if isfield(eventtmp, 'urevent') & eventtmp(valnum).urevent ~= valnum
-           set(tmpobj, 'string', [ 'originally ' int2str(eventtmp(valnum).urevent)], ...
+      if isfield(EEG.event, 'urevent') & EEG.event(valnum).urevent ~= valnum
+           set(tmpobj, 'string', [ 'originally ' int2str(EEG.event(valnum).urevent)], ...
                        'horizontalalignment', 'center');
       else set(tmpobj, 'string', ' '); 
       end;
+      return; % NO NEED TO SAVE ANYTHING
           
      case { 'append' 'insert' 'add' }, % **********************************************************
 
       if gui
           shift     = tmparg; % shift is for adding before or after the event
+
+          % update commands
+          % ---------------
+          tmpcell    = cell(1,1+length(fieldnames(EEG.event))); 
+          tmpcell{1} = valnum;
+          if shift
+              oldcom     = { oldcom{:} 'insert', tmpcell };
+          else
+              oldcom     = { oldcom{:} 'append', tmpcell };
+          end;
       else
           if strcmpi(lower(varargin{indfield}), 'insert')
                shift = 1;
@@ -260,24 +275,24 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       
       % find ur index
       % -------------
-      if isfield(eventtmp, 'epoch'), curepoch = eventtmp(valnum).epoch; end;
-      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+      valnum    = valnum   + shift;
+      if isfield(EEG.event, 'epoch'), curepoch = EEG.event(valnum).epoch; end;
+      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
           % find non empty urvalnum
           urvalnum = [];
           count = 0;
           while isempty(urvalnum)
-              tmpindex = mod(valnum+count-1, length(eventtmp)+1)+1;
-              urvalnum = eventtmp(valnum+count).urevent;
+              tmpindex = mod(valnum+count-1, length(EEG.event)+1)+1;
+              urvalnum = EEG.event(valnum+count).urevent;
               count = count+1;
           end;
           if isfield(EEG.urevent, 'epoch'), urcurepoch = EEG.urevent(urvalnum).epoch; end;
-          urvalnum = urvalnum + shift;
+          urvalnum = urvalnum;
       end;
-      valnum    = valnum   + shift;
       
       % update urevents
       % ---------------
-      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
           EEG.urevent(end+3)            = EEG.urevent(end);
           EEG.urevent(urvalnum+1:end-2) = EEG.urevent(urvalnum:end-3);
           EEG.urevent(urvalnum)         = EEG.urevent(end-1);
@@ -287,67 +302,44 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       
       % update events
       % -------------
-      eventtmp(end+3)          = eventtmp(end);
-      eventtmp(valnum+1:end-2) = eventtmp(valnum:end-3);
-      eventtmp(valnum)         = eventtmp(end-1);
-      eventtmp                 = eventtmp(1:end-2);
-      if isfield(eventtmp, 'epoch'), eventtmp(valnum).epoch = curepoch; end;      
-      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
-          eventtmp(valnum).urevent = urvalnum;
-          for index = valnum+1:length(eventtmp)
-              eventtmp(index).urevent = eventtmp(index).urevent+1;
+      EEG.event(end+3)          = EEG.event(end);
+      EEG.event(valnum+1:end-2) = EEG.event(valnum:end-3);
+      EEG.event(valnum)         = EEG.event(end-1);
+      EEG.event                 = EEG.event(1:end-2);
+      if isfield(EEG.event, 'epoch'), EEG.event(valnum).epoch = curepoch; end;      
+      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+          EEG.event(valnum).urevent = urvalnum;
+          for index = valnum+1:length(EEG.event)
+              EEG.event(index).urevent = EEG.event(index).urevent+1;
           end;
       end;
       
       % update type field
       % -----------------
       for tmpind = 1:length(allfields)
-          eventtmp = checkconsistency(eventtmp, valnum, allfields{tmpind});
+          EEG.event = checkconsistency(EEG.event, valnum, allfields{tmpind});
       end;
       
-      if gui
-          % update gui
-          % ----------
-          userdata{2} = eventtmp;
-          set(gcf, 'userdata', userdata);
-          pop_editeventvals('goto', shift);
-          
-          % update commands
-          % ---------------
-          tmpcell    = cell(1,1+length(fieldnames(eventtmp))); 
-          tmpcell{1} = valnum;
-          oldcom     = { oldcom{:} 'append', tmpcell };
-      else
+      if ~gui
           % update field values if command line
           % -----------------------------------
           if any(~cellfun('isempty', tmparg(2:end)))
-              EEG.event = eventtmp;
               for ind=2:length(tmparg)
                   if ind-1 <= length(allfields) & ~strcmpi(allfields{ind-1}, 'urevent') % do not include urevent 
                       EEG = pop_editeventvals(EEG, 'changefield', { valnum allfields{ind-1} tmparg{ind} });
                   end;
               end;
-              eventtmp = EEG.event;
           end;
       end;
       
      case 'delete', % **********************************************************
       
-      eventtmp(valnum) = []; 
+      EEG.event(valnum) = []; 
       
       if gui, 
           
-          valnum           = min(valnum,length(eventtmp));
+          valnum           = min(valnum,length(EEG.event));
           set(objevent, 'string', num2str(valnum)); 
-
-          % update gui
-          % ----------
-          userdata{2} = eventtmp;
-          set(gcf, 'userdata', userdata);
-          pop_editeventvals('goto', 0);
-          
-          set(gcf, 'userdata', userdata);
-          pop_editeventvals('goto', 0);
           
           % update commands
           % ---------------
@@ -363,6 +355,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           objfield = findobj('parent', gcf, 'tag', field);
           editval     = get(objfield, 'string');
           if ~isempty(editval) & ~isempty(str2num(editval)), editval = str2num(editval); end;
+
+          % update history
+          % --------------
+          oldcom = { oldcom{:} 'changefield' { valnum field editval }};
       
       else % command line case
           
@@ -374,16 +370,15 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           
       % latency and duration case
       % -------------------------
-      editvalori  = editval;
       if strcmp( field, 'latency') & ~isempty(editval)
-          if isfield(eventtmp, 'epoch')
-               editval = eeg_lat2point( editval, eventtmp(valnum).epoch, ...
+          if isfield(EEG.event, 'epoch')
+               editval = eeg_lat2point( editval, EEG.event(valnum).epoch, ...
                                        EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
           else editval = (editval- EEG.xmin)*EEG.srate+1;
           end;
       end;
       if strcmp( field, 'duration') & ~isempty(editval)
-          if isfield(eventtmp, 'epoch')
+          if isfield(EEG.event, 'epoch')
                editval = editval/1000*EEG.srate; % milliseconds
           else editval = editval*EEG.srate;      % seconds
           end;
@@ -391,13 +386,13 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       
       % adapt to other formats
       % ----------------------
-      eventtmp(valnum) = setfield(eventtmp(valnum), field, editval);
-      eventtmp = checkconsistency(eventtmp, valnum, field);
+      EEG.event(valnum) = setfield(EEG.event(valnum), field, editval);
+      EEG.event = checkconsistency(EEG.event, valnum, field);
       
       % update urevents
       % ---------------
-      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
-          urvalnum  = eventtmp(valnum).urevent;
+      if isfield(EEG, 'urevent') & isfield(EEG.event, 'urevent')
+          urvalnum  = EEG.event(valnum).urevent;
           
           % latency case
           % ------------
@@ -408,16 +403,16 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
                   
                   % find closest event latency
                   % --------------------------
-                  if valnum<length(eventtmp)
-                      if eventtmp(valnum+1).epoch == urepoch
-                          urlatency = EEG.urevent(eventtmp(valnum+1).urevent).latency;
-                          latency   = eventtmp(valnum+1).latency;
+                  if valnum<length(EEG.event)
+                      if EEG.event(valnum+1).epoch == urepoch
+                          urlatency = EEG.urevent(EEG.event(valnum+1).urevent).latency;
+                          latency   = EEG.event(valnum+1).latency;
                       end;
                   end;
                   if valnum>1
-                      if eventtmp(valnum-1).epoch == urepoch
-                          urlatency = EEG.urevent(eventtmp(valnum-1).urevent).latency;
-                          latency   = eventtmp(valnum-1).latency;
+                      if EEG.event(valnum-1).epoch == urepoch
+                          urlatency = EEG.urevent(EEG.event(valnum-1).urevent).latency;
+                          latency   = EEG.event(valnum-1).latency;
                       end;
                   end;
                   
@@ -429,32 +424,27 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
                       editval = urlatency - ( latency - editval ); % new latency value
                   end;
               else 
-                  editval = eeg_urlatency(EEG.event, eventtmp(valnum).latency);
+                  editval = eeg_urlatency(EEG.event, EEG.event(valnum).latency);
               end;
           elseif strcmp( field, 'latency') % empty editval
-              eventtmp(valnum).latency = NaN;
+              EEG.event(valnum).latency = NaN;
           end;
           
           % duration case
           % ------------
           if strcmp( field, 'duration') & ~isempty(editval)
-              if isfield(eventtmp, 'epoch')
+              if isfield(EEG.event, 'epoch')
                    editval = editval/1000*EEG.srate; % milliseconds -> point
               else editval = editval*EEG.srate;      % seconds -> point
               end;
           end;
           EEG.urevent = setfield(EEG.urevent, {urvalnum}, field, editval);
       end;
-
-      if gui
-          % update history
-          % --------------
-          oldcom = { oldcom{:} 'changefield' { valnum field editvalori }};
-      end;
       
      case 'sort', % **********************************************************
       
       if gui % retrieve data
+          
           field1 = get(findobj('parent', gcf, 'tag', 'listbox1'), 'value');
           field2 = get(findobj('parent', gcf, 'tag', 'listbox2'), 'value');
           dir1   = get(findobj('parent', gcf, 'tag', 'order1'),   'value');
@@ -462,8 +452,11 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           
           if field1 > 1, field1 = allfields{field1-1}; else return; end;
           if field2 > 1, field1 = allfields{field2-1}; else field2 = []; end;
-          oldevents = EEG.event;
-          EEG.event = eventtmp;
+          
+          % update history
+          % --------------
+          oldcom = { oldcom{:} 'sort' { field1 dir1 field2 dir2 } };
+
       else % command line
           field1 = tmparg{1};
           if length(tmparg) < 2, dir1 = 0;
@@ -501,24 +494,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       EEG.event = events(I);
       
       if gui
-          eventtmp  = EEG.event;
-          EEG.event = oldevents;
-          
-          % update gui
-          % ----------
-          userdata{2} = eventtmp;
-          set(gcf, 'userdata', userdata);
-          pop_editeventvals('goto', 0);
-          
-          % update history
-          % --------------
-          oldcom = { oldcom{:} 'sort' { field1 dir1 field2 dir2 } };
-          
           % warn user
           % ---------
           warndlg2('Sorting done');
       else 
-          eventtmp = EEG.event;
           noeventcheck  = 1; % otherwise infinite recursion with eeg_checkset
       end;
       
@@ -529,11 +508,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
     % -------------
     if gui
         userdata{1} = EEG;
-        userdata{2} = eventtmp;
-        userdata{3} = oldcom;
+        userdata{2} = oldcom;
         set(gcf, 'userdata', userdata);
+        pop_editeventvals('goto', shift);              
     else
-        EEG.event = eventtmp;
         if ~exist('noeventcheck')
             EEG = eeg_checkset(EEG, 'eventconsistency');
         end;
@@ -555,9 +533,6 @@ tmpind = strmatch('urevent', allfields);
 allfields(tmpind) = [];
 
 if nargin<2
-    % transfer events to global workspace
-    evalin('base', [ 'eventtmp = ' inputname(1) '.event;' ]);
-
     % add field values
     % ----------------
     geometry = { [2 0.5] };
@@ -640,7 +615,7 @@ if nargin<2
          { 'Style', 'pushbutton', 'string', 'Re-sort', 'callback', 'pop_editeventvals(''sort'');' }, ...
          { }, { }};
    
-    userdata = { EEG EEG.event {} };
+    userdata = { EEG {} };
     inputgui( geometry, uilist, 'pophelp(''pop_editeventvals'');', ...
                                   'Edit event values -- pop_editeventvals()', userdata, 'plot');
     pop_editeventvals('goto', 0);
@@ -654,13 +629,12 @@ if nargin<2
     
     % transfer events
     % ---------------
-    if ~isempty(userdata{3})
-        com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
+    if ~isempty(userdata{2})
+        com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{2}));
     end;
     if isempty(findstr('''sort''', com))
-        if ~isempty(userdata{3}) % some modification have been done
+        if ~isempty(userdata{2}) % some modification have been done
             EEG       = userdata{1};
-            EEG.event = userdata{2};
             disp('Checking event consistency...');
             EEG = eeg_checkset(EEG, 'eventconsistency');
         end;
