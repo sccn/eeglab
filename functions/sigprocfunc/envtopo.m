@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2004/01/26 01:27:09  scott
+% same
+%
 % Revision 1.37  2004/01/26 01:19:58  scott
 % same
 %
@@ -509,14 +512,12 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 
   [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
   compvars(c)   = val;
-  
-  % compute pvaf
-  if strcmpi(g.pvaf,'on')
-      pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); % find max variance
-  end;
-  i = i+frame1-1;
 
-  if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped
+  % find variance in interval after removing component
+  pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
+
+  i = i+frame1-1;
+  if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped in plot
       ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
       [val,ix] = max(envdata(1,c*frames+ix));
       plotframes(c) = ix; % draw line from max non-clipped env maximum
@@ -530,16 +531,16 @@ fprintf('\n');
 
 % print percent variance accounted for
 % ---------------------------------------
+% compute pvaf
 if strcmpi(g.pvaf, 'on')
-    vardat = mean(mean((data(:,frame1:frame2).^2)));
-    pvaf = 100-100*pvaf / vardat;
-    pvafcomps = g.compnums;
+    vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
+    pvaf = 100-100*pvaf/vardat;
     [sortpvaf spx] = sort(pvaf);
-    sortpvaf = pvaf(spx);
-    pvafcomps = pvafcomps(spx);
     k = 1;
     for index =1:ncomps
-        fprintf('   IC%3d ',pvafcomps(index));
+        fprintf('   IC%d ',spx(index));
+        if pvafcomps(index)<100, fprintf(' '); end
+        if pvafcomps(index)<10, fprintf(' '); end
         fprintf('pvaf: %6.2f%%   ', sortpvaf(index));
         if rem(k,3)==0, fprintf('\n'); end;
         k = k+1;
@@ -553,7 +554,7 @@ x = xmin:sampint:xmax;                % make vector of x-values
 
 [compvars,compx] = sort(compvars');   % sort compnums on max variance
 compx        = compx(ncomps:-1:1);    % reverse order of sort
-compvarorder = g.compnums(compx);       % actual component numbers (output var)
+compvarorder = g.compnums(compx);     % actual component numbers (output var)
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames 
 compframes   = plotframes';           % frame of max variance in each comp (output var)
@@ -606,17 +607,18 @@ for t=1:ntopos
   fprintf('%4.0f  ',plottimes(t));
 end
 fprintf('\n');
-fprintf('                      = frames: ');
+fprintf('                     or frames: ');
 for t=1:ntopos
   fprintf('%4d  ',plotframes(t));
 end
 fprintf('\n');
-fprintf('                          pvaf: ');
-for t=1:ntopos
-  fprintf('%4.2f ',pvaf(maporder(t)));
+if strcmp(g.pvaf,'on')
+  fprintf('                          pvaf: ');
+  for t=1:ntopos
+    fprintf('%4.2f ',pvaf(maporder(t)));
+  end
+  fprintf('\n');
 end
-fprintf('\n');
-
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
