@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/14 17:03:04  arno
+% updating tutdir
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -31,14 +34,14 @@
 
 icadefs % load icadefs.m globals including TUTDIR
 
-TUTDIR = which('eeglab');
-TUTDIR = TUTDIR(1:findstr(TUTDIR, 'eeglab')-1);
+%TUTDIR = which('eeglab');
+%TUTDIR = TUTDIR(1:findstr(TUTDIR, 'eeglab')-1);
 
-if exist([TUTDIR 'index.html'])
-   eval(['web file://' TUTDIR 'index.html' ]);
-else
-   fprintf('The ICA Matlab Toolbox Tutorial not found in the toolbox directory.\n');
-   fprintf('  Opening the toolbox www site ...\n\n');
+%if exist([TUTDIR 'index.html'])
+%   eval(['web file://' TUTDIR 'index.html' ]);
+%else
+%   fprintf('ICA Matlab Toolbox Tutorial not found in the toolbox directory.\n');
+   fprintf('Opening the toolbox www site ...\n\n');
    eval(['web ' TUTORIAL_URL]);
-end
+%end
 
