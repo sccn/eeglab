@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/04/16 15:42:32  arno
+% help command
+%
 % Revision 1.12  2003/01/30 17:23:37  arno
 % allowing to plot several component properties
 %
@@ -242,12 +245,12 @@ try
 		spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
 	else 
 		if option_computeica  
-			spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate );
+			spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
 		else
 			if exist('icaacttmp')~=1, 
 				icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
 			end;
-			spectopo( icaacttmp, EEG.pnts, EEG.srate );
+			spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
 		end;
 	end;
 	set(gca, 'xlim', [0 min(50, EEG.srate/2)]);
