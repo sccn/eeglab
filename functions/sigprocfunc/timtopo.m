@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/03/04 17:21:43  scott
+% debug last -sm
+%
 % Revision 1.8  2003/03/04 17:20:23  scott
 % debug last -sm
 %
@@ -295,9 +298,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% axall = axes('Units','Normalized','Position',[0 0 1 1],...
 axall = axes('Position',pos,...
-             'Visible','Off','Fontsize',16);    % whole-figure invisible axes
+             'Visible','Off','Fontsize',16);    % whole-gca invisible axes
 axes(axall)
 set(axall,'Color',BACKCOLOR);
 axis([0 1 0 1])
@@ -307,12 +309,22 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   axis([0 1 0 1]);
   set(gca,'Visible','off');
 
-  l1 = plot(...
-     [0.12+0.76*(plottimes(t)-xmin)/width  ...
-      topoleft+(t-1)*6*topowidth/5+topowidth/2],...
-      [0.44*(voffsets(t)/height) ...
-            + 0.12+(max(data(plotchans,plotframes(t)))-ymin)/height*0.44 ...
-      0.70],'b');
+maxenv = max(matsel(data,frames,plotframes(t))); % max env val
+  data_y = 0.6*(voffsets(t)+maxenv-ymin)/height;
+  if (data_y > pos(2)+0.6*pos(4))
+      data_y = pos(2)+0.6*pos(4);
+  end
+  l1 = plot([(plottimes(t)-xmin)/width  ...
+               topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+                 [data_y 0.70], ...
+            colors(linestyles(t)+1)); % 0.70 is bottom of topo maps
+
+%  l1 = plot(...
+%     [0.12+0.76*(plottimes(t)-xmin)/width  ...
+%      topoleft+(t-1)*6*topowidth/5+topowidth/2],...
+%      [0.44*(voffsets(t)/height) ...
+%            + 0.12+(max(data(plotchans,plotframes(t)))-ymin)/height*0.44 ...
+%      0.70],'b');
   hold on
   set(gca,'Visible','off');
   axis([0 1 0 1]);
