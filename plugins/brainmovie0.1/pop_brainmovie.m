@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/05/28 01:25:11  arno
+% updating image coordinates with respect to Lee recomendation
+%
 % Revision 1.47  2003/05/20 21:46:39  arno
 % debug question
 %
@@ -289,7 +292,7 @@ clear functions;
 % checking parameters
 % -------------------
 if strcmpi(g.diffmovie, 'on') &	length(ALLEEG) ~= 2
-    error('For difference movies: nedd exactly to process 2 datasets');
+    error('For difference movies: need exactly to process 2 datasets');
 end;
 
 % cfunding components to show
@@ -372,22 +375,30 @@ else
     if strcmpi(g.mode, 'auto')
         fprintf('Auto mode: found existing files\n');
     end;
-	disp('Loading files');
-	eval(['load ' g.tffolder g.tfname '_ALLERSP' ]); 
-	eval(['load ' g.tffolder g.tfname '_ALLITC' ]); 
-	eval(['load ' g.tffolder g.tfname '_ALLCROSSF' ]); 
-	eval(['load ' g.tffolder g.tfname '_ALLCROSSFANGLE' ]); 
-	eval(['load ' g.tffolder g.tfname '_times' ]); 
-	eval(['load ' g.tffolder g.tfname '_freqs' ]); 
+	if exist([g.tffolder g.tfname]) == 2
+        eval(['load -mat ' g.tffolder g.tfname ]); 
+    else
+        disp('Loading files');
+        eval(['load ' g.tffolder g.tfname '_ALLERSP' ]); 
+        eval(['load ' g.tffolder g.tfname '_ALLITC' ]); 
+        eval(['load ' g.tffolder g.tfname '_ALLCROSSF' ]); 
+        eval(['load ' g.tffolder g.tfname '_ALLCROSSFANGLE' ]); 
+        eval(['load ' g.tffolder g.tfname '_times' ]); 
+        eval(['load ' g.tffolder g.tfname '_freqs' ]); 
+    end;
 end;
 
 % threshold activities (so that lines do not flash)
 % -------------------------------------------------
 try, 
-	eval(['load ' g.tffolder g.tfname '_newERSP' ]);
-	eval(['load ' g.tffolder g.tfname '_newITC' ]);
-	eval(['load ' g.tffolder g.tfname '_newCROSSF' ]);
-	eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
+	if exist([g.tffolder g.tfname]) == 2
+        eval(['load -mat ' g.tffolder g.tfname '.thresh' ]);
+	else 
+        eval(['load ' g.tffolder g.tfname '_newERSP' ]);
+        eval(['load ' g.tffolder g.tfname '_newITC' ]);
+        eval(['load ' g.tffolder g.tfname '_newCROSSF' ]);
+        eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
+    end;
 catch,
 	newERSP   = moviethresh( ALLERSP, 0.2, 4, 2);
 	newITC    = moviethresh( ALLITC , 0.2, 4, 2);
@@ -395,11 +406,14 @@ catch,
 	newANGLE  = ALLCROSSFANGLE;
     %newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
 	
-	eval(['save ' g.tffolder g.tfname '_newERSP   newERSP' ]);
-	eval(['save ' g.tffolder g.tfname '_newITC    newITC' ]);
-	eval(['save ' g.tffolder g.tfname '_newCROSSF newCROSSF' ]);
-	eval(['save ' g.tffolder g.tfname '_newANGLE  newANGLE' ]);
-
+	if exist([g.tffolder g.tfname]) == 2
+        save([ g.tffolder g.tfname '.thresh' ], 'newERSP', 'newITC', 'newCROSSF', 'newANGLE');  
+    else
+        eval(['save ' g.tffolder g.tfname '_newERSP   newERSP' ]);
+        eval(['save ' g.tffolder g.tfname '_newITC    newITC' ]);
+        eval(['save ' g.tffolder g.tfname '_newCROSSF newCROSSF' ]);
+        eval(['save ' g.tffolder g.tfname '_newANGLE  newANGLE' ]);
+    end;
 	% this second call is innefective (but it is usefull for you to check that changes have been applied)
 	%newERSP   = moviethresh( newERSP, 0.1, 4, 2);
 	%newITC    = moviethresh( newITC , 0.1, 4, 2);
