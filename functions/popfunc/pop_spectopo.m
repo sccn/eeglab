@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/08/12 22:48:25  arno
+% frequency range
+%
 % Revision 1.22  2002/08/12 22:31:03  arno
 % edit
 %
@@ -210,6 +213,7 @@ if nargin < 3
 		if ~isempty(result{10}), options      =  [ options ',' result{10} ]; end;
 	end;		
 	figure;
+        set(gcf,'Name','spectopo()');
 else
 	options = [',' vararg2str(varargin)];
 	if isempty(timerange)
