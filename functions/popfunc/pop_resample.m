@@ -18,6 +18,10 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
+% Note: uses the resample() function from the signal processing toolbox
+%       if present. Otherwise use griddata interpolation method (it should be
+%       reprogrammed using spline interpolation for speed up).
+%
 % See also: resample(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -39,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/09/29 23:45:07  arno
+% reinitializing urevent if crash
+%
 % Revision 1.6  2003/06/28 02:28:05  arno
 % fixing slight inacuracy in sampling rate
 %
@@ -93,23 +100,33 @@ end;
 % ------------
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 oldpnts   = EEG.pnts;
-fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
 
 % resample for multiple channels
 % -------------------------
-for index1 = 1:size(EEG.data,1)
-   fprintf('%d ', index1);	
-   sigtmp = squeeze (EEG.data(index1,:, :));
-   tmpres = resample( sigtmp, p, q );
-   if index1 == 1
-       if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
-       else                    EEG.pnts  = size(tmpres,1);
-       end;
-       tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
-   end;
-   tmpeeglab(index1,:, :) = tmpres;
+if exist('resample') == 2
+    fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
+    for index1 = 1:size(EEG.data,1)
+        fprintf('%d ', index1);	
+        sigtmp = squeeze (EEG.data(index1,:, :));
+        tmpres = resample( sigtmp, p, q );
+        if index1 == 1
+            if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
+            else                    EEG.pnts  = size(tmpres,1);
+            end;
+            tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+        end;
+        tmpeeglab(index1,:, :) = tmpres;
+    end;
+    fprintf('\n');	
+    EEG.srate   = EEG.srate*p/q;
+else
+    disp('This method of resampling extrimelly slow');
+    disp('To speed it up, use the signal processing toolbox (automatically detected)');
+    disp('or reprogram this function using the spline interpolation (see >> help spline)');
+    EEG.srate   = (round(EEG.pnts*p/q)-1)/(EEG.xmax-EEG.xmin);
+    fprintf('resampling data %3.4f Hz\n', EEG.srate);
+    tmpeeglab = myresample(EEG.data, EEG.pnts, round(EEG.pnts*p/q));
 end;
-fprintf('\n');	
 EEG.data = tmpeeglab;
 
 % recompute all event latencies
@@ -135,7 +152,6 @@ end;
 EEG.icaact = [];
 
 % store dataset
-EEG.srate   = EEG.srate*p/q;
 fprintf('resampling finished\n');
 
 EEG.setname = [EEG.setname ' resampled'];
@@ -143,18 +159,19 @@ EEG.setname = [EEG.setname ' resampled'];
 command = sprintf('EEG = pop_resample( %s, %d);', inputname(1), freq);
 return;
 
-% resample for non multiple
-% -------------------------
-	Y  = [1 2];
-	for index1 = 1:size(EEG.data,1)
-		fprintf('%d\n', index1);	
-		for index3 = 1:size(EEG.data,3)
-			X = [1:EEG.pnts];
-			XX = linspace( 1, EEG.pnts, new_EEG.pnts);
-			tmpsig = [ squeeze(EEG.data(index1, :, index3))' squeeze(EEG.data(index1, :, index3))'];
+% resample if resample is not present
+% -----------------------------------
+function tmpeeglab = myresample(data, pnts, new_pnts);
+    Y  = [1 2];
+	for index1 = 1:size(data,1)
+		fprintf('Channel %d\n', index1);	
+		for index3 = 1:size(data,3)
+			X = [1:pnts];
+			XX = linspace( 1, pnts, new_pnts);
+			tmpsig = [ squeeze(data(index1, :, index3))' squeeze(data(index1, :, index3))'];
    			[Xi,Yi,Zi] = griddata(Y,X', tmpsig , Y, XX', 'invdist');   % interpolate data
 			tmpeeglab(index1,:, index3) = Zi(:,1);
-			fprintf('.');	
+			fprintf('.');
 		end;
 		fprintf('\n');	
 	end;
