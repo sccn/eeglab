@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/05/23 17:19:21  scott
+% *** empty log message ***
+%
 % Revision 1.4  2002/05/23 17:18:21  scott
 % adjust default 'xvals' -sm
 %
@@ -65,7 +68,7 @@ function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin)
 
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
-verbose = 0;
+verbose = 1;
 
 nanexist = 0;  
 if exist('nanmean')==2 % test for stat toolbox nan routines
@@ -223,7 +226,6 @@ end
     elseif length(xwin)==1,
       if fastave
         if nanexist
-lox,hix
          outdata(:,f) = nanmean(data(:,round(lox):round(hix))')'; % Else average ignoring NaNs
         else
          outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
