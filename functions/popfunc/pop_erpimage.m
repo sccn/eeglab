@@ -6,9 +6,9 @@
 %   >> pop_erpimage(EEG, typeplot);          % pop_up window
 %   >> pop_erpimage(EEG, typeplot, lastcom); % pop_up window
 %   >> pop_erpimage(EEG, typeplot, channel); % do not pop-up
-%   >> pop_erpimage(EEG, typeplot, channel, title, smooth, decimate, ...
-%                 sortingtype, sortingwin, sortingeventfield, renorm, ...
-%                 options...);
+%   >> pop_erpimage(EEG, typeplot, channel, projchan, title, smooth, ...
+%                  decimate, sortingtype, sortingwin, sortingeventfield, ...
+%                  renorm, options...);
 %
 % Inputs:
 %   EEG        - dataset structure
@@ -17,7 +17,10 @@
 %                the function output.
 %
 % Commandline options:
-%   channel    - channel or component number to plot
+%   channel    - channel or component(s) number to plot
+%   projchan   - channel to project component to. If plotting channel
+%                this argument is ignored. If [], the ICA activity is
+%                plotted.
 %   title      - plot title
 %   smooth     - smoothing parameter (in terms of trial). Default is 5.
 %   decimate   - decimate parameter (i.e. number of lines to suppress
@@ -78,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2002/08/20 23:55:27  arno
+% updating text and tooltipstring
+%
 % Revision 1.64  2002/08/20 23:29:38  scott
 % changed box labels again - but not the tooltipstring messages!
 %
@@ -235,7 +241,7 @@
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
 
-function varargout = pop_erpimage( EEG, typeplot, channel, titleplot, smooth, decimate, sortingtype, ...
+function varargout = pop_erpimage( EEG, typeplot, channel, projchan, titleplot, smooth, decimate, sortingtype, ...
             sortingwin, sortingeventfield, varargin)
  
 varargout{1} = '';
@@ -307,25 +313,25 @@ if popup
 	
 	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
 				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 2.2] [1 1 1 2.2]};
-    uilist = { { 'Style', 'text', 'string', fastif(typeplot, 'Channel', 'Component'), 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') } { } ...
+    uilist = { { 'Style', 'text', 'string', fastif(typeplot, 'Channel', 'Component(s)'), 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1'), 'tag', 'chan' } { } ...
 			   { 'Style', 'text', 'string', 'Figure title', 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', ''  } ...
+			   { 'Style', 'edit', 'string', '', 'tag', 'title'  } ...
 			   ...
 			   { 'Style', 'text', 'string', 'Smoothing', 'fontweight', 'bold', 'tooltipstring', context('avewidth',vars,txt) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 5, [], int2str(min(max(EEG.trials-5,0), 10))) } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 5, [], int2str(min(max(EEG.trials-5,0), 10))), 'tag', 'smooth' } ...
 			   { 'Style', 'checkbox', 'string', 'Plot scalp map', 'tooltipstring', 'plot a 2-d head map (vector) at upper left', ...
-				 'value', getkeyval(lastcom, 'topo', 'present', 1)  } { } { } ...
+				 'value', getkeyval(lastcom, 'topo', 'present', 1), 'tag', 'plotmap'  } { } { } ...
 			   { 'Style', 'text', 'string', 'Downsampling', 'fontweight', 'bold', 'tooltipstring', context('decimate',vars,txt) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 6, [], '1') } ...
-			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getkeyval(lastcom, '''erp''', 'present', 1) } ...
-			   { 'Style', 'text', 'string', 'ERP limits (uV)', 'tooltipstring', [ 'Plotting limits for ERP trace [min_uV max_uV]' 10 '{Default: ERP data limits}']  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [3:4])  } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 6, [], '1'), 'tag', 'decimate' } ...
+			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getkeyval(lastcom, '''erp''', 'present', 1), 'tag', 'erp' } ...
+			   { 'Style', 'text', 'string', fastif(typeplot, 'ERP limits (uV)','ERP limits'), 'tooltipstring', [ 'Plotting limits for ERP trace [min_uV max_uV]' 10 '{Default: ERP data limits}']  } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [3:4]), 'tag', 'limerp'  } ...
 			   { 'Style', 'text', 'string', 'Time limits (ms)', 'fontweight', 'bold', 'tooltipstring',  'Select time subset in ms' } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [1:2], num2str(1000*[EEG.xmin EEG.xmax])) } ...
-			   { 'Style', 'checkbox', 'string', 'Plot colorbar','tooltipstring', context('caxis',vars,txt), 'value', getkeyval(lastcom, 'cbar', 'present', 1)  } ...
-			   { 'Style', 'text', 'string', 'Color limits','tooltipstring', context('caxis',vars,txt)  } ...
-			   { 'Style', 'edit', 'string',  getkeyval(lastcom, 'caxis') } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [1:2], num2str(1000*[EEG.xmin EEG.xmax])), 'tag', 'limtime' } ...
+			   { 'Style', 'checkbox', 'string', 'Plot colorbar','tooltipstring', context('caxis',vars,txt), 'value', getkeyval(lastcom, 'cbar', 'present', 1), 'tag', 'cbar' } ...
+			   { 'Style', 'text', 'string', 'Color limits','tooltipstring', context('caxis',vars,txt) } ...
+			   { 'Style', 'edit', 'string',  getkeyval(lastcom, 'caxis'), 'tag', 'caxis' } ...
 			   {} ...
 			   { 'Style', 'text', 'string', 'Sort/align trials by epoch event values', 'fontweight', 'bold'} ...
 			   { 'Style', 'pushbutton', 'string', 'Epoch-sorting field', 'callback', commandfield, ...
@@ -337,13 +343,13 @@ if popup
 												  'events of the same type are in the same epoch, or for selecting trials with given response time)']} ...
 			   { 'Style', 'text', 'string', 'Rescale', 'tooltipstring', 'Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):' } ...
 			   { 'Style', 'text', 'string', 'Align', 'tooltipstring',  context('align',vars,txt) } ...
-			   { 'Style', 'checkbox', 'string', 'Don''t sort by value', 'tooltipstring', context('nosort',vars,txt), 'value', getkeyval(lastcom, 'nosort', 'present', 0)  } ...
+			   { 'Style', 'checkbox', 'string', 'Don''t sort by value', 'tooltipstring', context('nosort',vars,txt), 'value', getkeyval(lastcom, 'nosort', 'present', 0), 'tag', 'nosort' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 9), 'tag', 'field' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 7), 'tag', 'type' } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 8) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'renorm',[], 'no') } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'align') } ...
-			   { 'Style', 'checkbox', 'string', 'Don''t plot values', 'tooltipstring', context('noplot',vars,txt), 'value', getkeyval(lastcom, 'noplot', 'present', 0) } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 8), 'tag', 'eventrange' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'renorm',[], 'no'), 'tag', 'renorm' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'align'), 'tag', 'align' } ...
+			   { 'Style', 'checkbox', 'string', 'Don''t plot values', 'tooltipstring', context('noplot',vars,txt), 'value', getkeyval(lastcom, 'noplot', 'present', 0), 'tag', 'noplot' } ...
 			   {} ...
 			   { 'Style', 'text', 'string', 'Sort trials by phase', 'fontweight', 'bold'} ...
 			   { 'Style', 'text', 'string', 'Freq. range (Hz)', 'tooltipstring', ['sort by phase at max power frequency' 10 ...
@@ -353,8 +359,8 @@ if popup
 			   { 'Style', 'text', 'string', 'Window center (ms)', 'tooltipstring', 'Ending time fo the 3 cycle window'  } ...
 			   { 'Style', 'text', 'string', 'Wavelet cycles', 'tooltipstring', '3 cycles wavelet window'  } {}...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [3:4]), 'tag', 'phase', 'callback', commandphase } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [2]) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [1]) } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [2]), 'tag', 'phase2' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [1]), 'tag', 'phase3' } ...
 			   { 'Style', 'text', 'string', '         3'  } {}...
 			   {} ...
 			   { 'Style', 'text', 'string', 'Inter-trial coherence options', 'fontweight', 'bold'} ...
@@ -363,93 +369,123 @@ if popup
 			   { 'Style', 'text', 'string', 'Signif. level (<0.20)', 'tooltipstring', 'add coher. signif. level line at alpha (alpha range: (0,0.1])' } ...
 			   { 'Style', 'text', 'string', 'Amplitude limits (dB)'  } ...
 			   { 'Style', 'text', 'string', 'Coher limits (<=1)'  } ...
-			   { 'Style', 'checkbox', 'string', 'Image amps', 'tooltipstring',  context('plotamp',vars,txt), 'value', getkeyval(lastcom, 'plotamps', 'present', 0) } ...
+			   { 'Style', 'checkbox', 'string', 'Image amps', 'tooltipstring',  context('plotamps',vars,txt), 'value', getkeyval(lastcom, 'plotamps', 'present', 0), 'tag', 'plotamps' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'coher', [1:2]), 'tag', 'coher', 'callback', commandcoher } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'coher', [3])  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',[5:6])  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',[7:8])  } {'style', 'text', 'string', '   (Requires signif.)' } ... 
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'coher', [3]), 'tag', 'coher2'  } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',[5:6]), 'tag', 'limamp' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',[7:8]), 'tag', 'limcoher' } {'style', 'text', 'string', '   (Requires signif.)' } ... 
 			   {} ...
 			   { 'Style', 'text', 'string', 'Other options', 'fontweight', 'bold'} ...
 			   { 'Style', 'text', 'string', 'Spectrum limits (Hz)','tooltipstring',  context('spec',vars,txt)} ...
 			   { 'Style', 'text', 'string', 'Baseline ampl. (dB)', 'tooltipstring', 'Use it to fix baseline amplitude' } ...
 			   { 'Style', 'text', 'string', 'Mark times (ms)','tooltipstring',  context('vert',vars,txt)} ...
 			   { 'Style', 'text', 'string', 'More options (see >> help erpimage, >> help erpimopt)' } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'spec') } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',9) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'vert') } ...
-			   { 'Style', 'edit', 'string', '' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'spec'), 'tag', 'spec' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',9), 'tag', 'limbaseamp' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'vert'), 'tag', 'vert' } ...
+			   { 'Style', 'edit', 'string', '', 'tag', 'others' } ...
 			};
-		
-    result = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
+	if typeplot == 0 % add extra param for components
+		geometry = { [1 1 0.1 0.8 2.1] geometry{:} };
+		uilist   = { { } { } { } { } { } uilist{:}};
+		uilist{1} = uilist{6};
+		uilist{2} = uilist{7};
+		uilist{6} = { 'Style', 'text', 'string', 'Project to channel #', 'fontweight', 'bold','tooltipstring', ['Project component(s) to data channel' 10 ...
+												  'This allow to plot component activity in microvolt'] };
+		uilist{7} = { 'Style', 'edit', 'string', getkeyval(lastcom, 1), 'tag', 'projchan' };
+	end;
+    [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
 							 fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'));
-	if size(result, 1) == 0 return; end;
+	if isempty(oldres), return; end;
 
 	% first rows
 	% ---------
 	limits(1:8)  = NaN;
-	channel   	 = eval( result{1} );
-	titleplot    = result{2};
+	channel   	 = eval( [ '[' res.chan ']' ]);
+	titleplot    = res.title;
+	if isfield(res, 'projchan'), projchan = eval( res.projchan ); else, projchan = []; end;
 	options = '';
     if isempty(titleplot)
         titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
     end;
-	smooth       = eval( result{3} );
-    if result{4}
+	smooth       = eval(res.smooth);
+    if res.plotmap
 		if ~isempty(EEG.chanlocs)
-			if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-			else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
+			if typeplot == 0
+				if isempty( projchan )
+				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
+				else options = [options ',''topo'', { ' int2str(projchan) ' EEG.chanlocs } ']; end;
+			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
 			end;	
 		end;
 	end;
 	
-	decimate     = eval( result{5} );
-	if result{6}
+	decimate     = eval( res.decimate );
+	if res.erp
 		options = [options ',''erp'''];
 	end;
-	if ~isempty(result{7})
-		limits(3:4) = eval( [ '[' result{5} ']' ]); 
+	
+	% finding limits
+	% --------------
+	if ~isempty(res.limerp)
+		limits(3:4) = eval( [ '[' res.limerp ']' ]); 
 	end;
-	if ~isempty(result{8}) % time limits
-		if ~strcmp(result{8}, num2str(1000*[EEG.xmin EEG.xmax]))
-			limits(1:2) = eval( [ '[' result{8} ']' ]);
+	if ~isempty(res.limtime) % time limits
+		if ~strcmp(res.limtime, num2str(1000*[EEG.xmin EEG.xmax]))
+			limits(1:2) = eval( [ '[' res.limtime ']' ]);
 		end;
 	end;
-	if result{9}
+	if ~isempty(res.limamp)
+		limits(5:6) = eval( [ '[' res.limamp ']' ]);
+	end;
+	if ~isempty(res.limcoher)
+		limits(7:8) = eval( [ '[' res.limcoher ']' ]);
+	end;
+	if ~isempty(res.limbaseamp)
+		limits(9) = eval( res.limbaseamp ); %bamp
+	end;
+	if ~all(isnan(limits))
+		options = [ options ',''limits'',[' num2str(limits) ']' ];
+	end;
+	
+	% color limits
+	% --------------
+	if res.cbar
 		options = [options ',''cbar'''];
 	end;
-	if ~isempty(result{10})
-		options = [options ',''caxis'', ' result{8} ];
+	if res.caxis
+		options = [options ',''caxis'', ' res.caxis ];
 	end;
 	
 	% event rows
 	% ----------
-	if result{11}
+	if res.nosort
 		options = [options ',''nosort'''];
 	end;
-	try, sortingeventfield = eval( result{12} ); catch, sortingeventfield = result{12}; end;
-	sortingtype  = parsetxt(result{13});
-	sortingwin   = eval( [ '[' result{14} ']' ] );
-	if ~isempty(result{13}) & ~strcmp(result{15}, 'no')
-		options = [options ',''renorm'', ''' result{15} '''' ];
+	try, sortingeventfield = eval( res.field ); catch, sortingeventfield = res.field; end;
+	sortingtype  = parsetxt(res.type);
+	sortingwin   = eval( [ '[' res.eventrange ']' ] );
+	if ~isempty(res.field) & ~strcmp(res.renorm, 'no')
+		options = [options ',''renorm'', ''' res.renorm '''' ];
 	end;
-	if ~isempty(result{16})
-		options = [options ',''align'', ' result{16} ];
+	if ~isempty(res.align)
+		options = [options ',''align'', ' res.align ];
 	end;
-	if result{17}
+	if res.noplot
 		options = [options ',''noplot'''];
 	end;
 
 	% phase rows
 	% ----------
 	tmpphase = [];
-	if ~isempty(result{18})
-		tmpphase = eval( [ '[ 0 0 ' result{18} ']' ]);
+	if ~isempty(res.phase)
+		tmpphase = eval( [ '[ 0 0 ' res.phase ']' ]);
 	end;
-	if ~isempty(result{19})
-		tmpphase(2) = eval( result{19} );
+	if ~isempty(res.phase2)
+		tmpphase(2) = eval( res.phase2 );
 	end;
-	if ~isempty(result{20})
-		tmpphase(1) = eval( result{20} );
+	if ~isempty(res.phase3)
+		tmpphase(1) = eval( res.phase3 );
 	end;
 	if ~isempty(tmpphase)
 		options = [ options ',''phasesort'',[' num2str(tmpphase) ']' ];
@@ -458,61 +494,52 @@ if popup
 	% coher row
 	% ----------
 	tmpcoher = [];
-	if result{21}
+	if res.plotamps
 		options = [options ',''plotamps'''];
 	end;
-	if ~isempty(result{22})
-		tmpcoher = eval( [ '[' result{22} ']' ]);
+	if ~isempty(res.coher)
+		tmpcoher = eval( [ '[' res.coher ']' ]);
 	end;
-	if ~isempty(result{23})
+	if ~isempty(res.coher2)
 		if length(tmpcoher) == 1
 			tmpcoher(2) = tmpcoher(1);
 		end;
-		tmpcoher(3) = eval( result{23} );
+		tmpcoher(3) = eval( res.coher2 );
 	end;
 	if ~isempty(tmpcoher)
 		options = [ options ',''coher'',[' num2str(tmpcoher) ']' ];
 	end;
-	if ~isempty(result{24})
-		limits(5:6) = eval( [ '[' result{24} ']' ]);
-	end;
-	if ~isempty(result{25})
-		limits(7:8) = eval( [ '[' result{25} ']' ]);
-	end;
 
 	% options row
 	% ------------
-	if ~isempty(result{26})
-		options = [options ',''spec'', [' result{26} ']' ];
+	if ~isempty(res.spec)
+		options = [options ',''spec'', [' res.spec ']' ];
 	end;
-	if ~isempty(result{27})
-		limits(9) = eval( result{27} ); %bamp
+	if ~isempty(res.vert)
+		options = [options ',''vert'', [' res.vert ']' ];
 	end;
-	if ~isempty(result{28})
-		options = [options ',''vert'', [' result{28} ']' ];
-	end;
-	if ~all(isnan(limits))
-		options = [ options ',''limits'',[' num2str(limits) ']' ];
-	end;
-	if ~isempty(result{29})
-		options = [ options ',' result{29} ];
+	if ~isempty(res.others)
+		options = [ options ',' res.others ];
 	end;
 	figure;
 else
 	options = '';
 	if nargin < 4
-		smooth = 5;
+		projchan = [];
 	end;
 	if nargin < 5
-		decimate = 0;
+		smooth = 5;
 	end;
 	if nargin < 6
-		sortingtype = [];
+		decimate = 0;
 	end;
 	if nargin < 7
-		sortingwin = [];
+		sortingtype = [];
 	end;
 	if nargin < 8
+		sortingwin = [];
+	end;
+	if nargin < 9
 		sortingeventfield = [];
 	end;
 	for i=1:length( varargin )
@@ -528,6 +555,12 @@ else
 	end;	
 end;
 try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end;
+
+% testing inputs
+% --------------
+if typeplot == 0 & length(channel) > 1 & isempty(projchan)
+	error('A channel must be selected for plotting several components');
+end;
 
 % find sorting latencies
 % ---------------------
@@ -571,11 +604,14 @@ else
     % ---------------------------------------------------------
     eeg_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
-		tmpsig = ['EEG.icaact(' int2str(channel) ', :)'];
+		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
 	else
-		tmpsig = ['EEG.icaact(' int2str(channel) ', :)'];
-        tmpsig = ['EEG.icaweights(' int2str(channel) ',:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
+		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
+        tmpsig = ['EEG.icaweights([' int2str(channel) '],:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
     end;
+	if ~isempty(projchan)
+		tmpsig = [ 'EEG.icawinv(' int2str(projchan) ',[' int2str(channel) '])*' tmpsig ];
+	end;
 end;
 
 % outputs
@@ -593,7 +629,7 @@ if length( options ) < 2
 end;
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
-popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
+popcom = sprintf('figure; pop_erpimage(%s,[%s],%d,%d,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), projchan, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
 com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
