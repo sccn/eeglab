@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/10/14 17:03:08  arno
+% vararg2str for optional arguments
+%
 % Revision 1.24  2003/09/08 22:54:12  arno
 % typo for refstate
 %
@@ -375,7 +378,7 @@ EEG.nbchan  = size(EEG.data,1);
 
 EEG = eeg_checkset(EEG);
 if ~isempty(EEG.chanlocs)
-    EEG = eeg_checkset(EEG, 'chanlocs_homogenous');
+    EEG = eeg_checkset(EEG, 'chanlocs_homogeneous');
     if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(end).X)
         tmp = convertlocs(EEG.chanlocs(end), 'topo2all');
         fieldtmp = fieldnames(tmp);

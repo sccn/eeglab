@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2003/11/04 15:47:48  scott
+% warning msg edits
+%
 % Revision 1.105  2003/11/04 01:15:06  arno
 % makeur message made clearer
 %
@@ -883,7 +886,7 @@ if ~isempty( varargin)
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without channel location file.'); return;
           end;
-         case 'chanlocs_homogenous', 
+         case 'chanlocs_homogeneous', 
           if isempty(EEG.chanlocs)
               errordlg2( strvcat('Cannot process without a channel location file.', ...
                          'Enter the name of the file via "Edit > Edit dataset info".', ...
@@ -892,7 +895,7 @@ if ~isempty( varargin)
           end;
           if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(1).X)
               EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
-              res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogenous'' ); ' ];
+              res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogeneous'' ); ' ];
           end;
          case 'chanlocsize', 
           if ~isempty(EEG.chanlocs)
