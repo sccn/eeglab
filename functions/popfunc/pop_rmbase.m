@@ -12,7 +12,7 @@
 %                       line option. Overwritten by the time limits option. 
 % Inputs:
 %   EEG        - Input dataset
-%   timerange  - Baseline time range in seconds [min_s max_s]. 
+%   timerange  - Baseline time range in milliseconds [min_ms max_ms]. 
 %   pointrange - Baseline points vector [min:max] (overwritten by timerange).
 % Outputs:
 %   OUTEGG     - Output dataset
@@ -44,6 +44,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/12/16 22:59:32  hilit
+% fixing some typo with 'pointrange' and separating the | condition in the if
+% statement
+%
 % Revision 1.13  2004/08/18 16:45:01  arno
 % ms -> s
 %
