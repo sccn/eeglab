@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/15 02:58:05  arno
+% header for web
+%
 % Revision 1.17  2002/11/15 01:46:21  scott
 % can not -> cannot
 %
@@ -225,7 +228,9 @@ if isstr(filename)
 			  eloc(index).sph_phi = array{index, 3};
 			  eloc(index).sph_radius = 1;
 			  eloc(index).labels  = array{index, 4};
-			end;  
+              [ tmp eloc(index).theta eloc(index).radius] ...
+                  = sph2topo( [ 1  eloc(index).sph_theta eloc(index).sph_phi], 1, 1);
+			end;
         case 'loc', 
 			for index = 1:size( array, 1)
 			  eloc(index).theta = array{index, 2};
