@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/12/17 23:19:52  arno
+% importing channel labels
+%
 % Revision 1.15  2003/11/18 16:26:53  scott
 % same
 %
@@ -116,7 +119,7 @@ function [EEG, command] = pop_loadeeg(filename, filepath, range_chan, range_swee
 EEG = [];
 command = '';
 
-if nargin < 2
+if nargin < 1
 
 	% ask user
 	[filename, filepath] = uigetfile('*.eeg;*.EEG', 'Choose an EEG file -- pop_loadeeg()'); 
@@ -142,6 +145,10 @@ if nargin < 2
 	range_typeeeg   = eval( [ '[' result{3}  ']' ] );
 	range_chan      = eval( [ '[' result{4}  ']' ] );
 	range_response  = eval( [ '[' result{5}  ']' ] );
+else
+    if exist('filepath') ~= 1
+        filepath = '';
+    end;
 end;
 
 if exist('datformat') ~= 1, datformat = 'short'; end;
@@ -153,7 +160,14 @@ if exist('range_response') ~= 1 | isempty(range_response), range_response     = 
 % load datas
 % ----------
 EEG = eeg_emptyset;
-fullFileName = sprintf('%s%s', filepath, filename);
+if ~isempty(filepath)
+    if filepath(end) ~= '/' & filepath(end) ~= '/' & filepath(end) ~= ':'
+        error('The file path last character must be a delimiter');
+    end;
+    fullFileName = sprintf('%s%s', filepath, filename);
+else
+    fullFileName = filename;
+end;    
 [EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = ...
     loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response, datformat);
 EEG.filename        = filename;
