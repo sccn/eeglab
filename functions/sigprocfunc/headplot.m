@@ -45,6 +45,8 @@
 %   'colormap'   -  3-column colormap matrix {default jet(64)}
 %   'verbose'    - 'off' -> no msgs, no rotate3d {default 'on'}
 %
+% Note: if an error is generated, headplot may close the current figure
+%
 % Authors: Colin Humphries & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/14 16:48:54  arno
+% remove ICADIR
+%
 % Revision 1.3  2002/07/25 18:24:08  arno
 % debugging
 %
@@ -413,11 +418,11 @@ else
           end
         case 'lighting'
           if ~isstr(Value)
-            error('headplot(): Lighting value must be on or off.')
+            close; error('headplot(): Lighting value must be on or off.')
           end
           Value = lower(Value);
           if ~strcmp(Value,'on') & ~strcmp(Value,'off')
-            error('headplot(): Lighting value must be on or off.')
+            close; error('headplot(): Lighting value must be on or off.')
           end
           Lighting = lower(Value);
         case 'maplimits'
@@ -427,37 +432,37 @@ else
         case 'lights'
           Lights = Value;
           if size(Lights,2) ~= 3
-            error('headplot(): Light matrix must be (3,N).')
+            close; error('headplot(): Light matrix must be (3,N).')
           end
         case 'view'
           View = Value;
         case 'verbose'
           if ~isstr(Value)
-            error('headplot(): verbose value must be on or off.')
+            close; error('headplot(): verbose value must be on or off.')
           end
           Value = lower(Value);
           if ~strcmp(Value,'on') & ~strcmp(Value,'off')
-            error('headplot(): verbose value must be on or off.')
+            close; error('headplot(): verbose value must be on or off.')
           end
           verbose = Value;
 	    case {'colormap','cmap'}
 	      if size(Value,2) ~= 3
-	        error('Colormap must be an n x 3 matrix.')
+	        close; error('Colormap must be an n x 3 matrix.')
 	      end
 	      Cmap = Value;
         case {'electrodes','elec'}
           if ~isstr(Value)
-            error('headplot(): electrodes value must be on or off.')
+            close; error('headplot(): electrodes value must be on or off.')
           elseif ~strcmp(Value,'on') & ~strcmp(Value,'off')
-            error('headplot(): electrodes value must be on or off.')
+            close; error('headplot(): electrodes value must be on or off.')
           end
           Electrodes = Value;
         case 'labels'
           if isstr(Value)
-            error(['headplot(): labels value must be 0, 1, or 2.'])
+            close; error(['headplot(): labels value must be 0, 1, or 2.'])
           end
           if Value>2 | Value<0 
-               error(['headplot(): labels value must be 0, 1, or 2.'])
+               close; error(['headplot(): labels value must be 0, 1, or 2.'])
           end
           if Value == 1
               Elecnums = 1;
@@ -484,13 +489,15 @@ else
   eval(['load ',spline_file, ' -mat'])
 
   if ~exist(mesh_file)
-    error(['headplot(): head mesh file ',meshfile,...
+	  close;
+	  error(['headplot(): head mesh file ',meshfile,...
 	   ' not found.\n  Change file name in headplot.m.\n'])
   end
   eval(['load ',mesh_file,' -mat'])
   enum = length(values);
   if enum ~= length(Xe)
-    error(['headplot(): Number of values should equal number of electrodes.'])
+	  close;
+	  error(['headplot(): Number of values in spline file should equal number of electrodes.'])
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -606,13 +613,13 @@ else
                   -125 -125 125; ...
                    0 10 -80]; % add light from below!
       otherwise
-        error(['headplot(): Invalid View value %s',View])
+        close; error(['headplot(): Invalid View value %s',View])
     end
   else
     if ~isstr(View)
       [h,a] = size(View);
       if h~= 1 | a~=2
-          error('headplot(): View matrix size must be (1,2).')
+          close; error('headplot(): View matrix size must be (1,2).')
       end
     end
     view(View)   % set camera viewpoint
