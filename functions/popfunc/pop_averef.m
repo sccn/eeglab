@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 16:22:53  arno
+% questdlg2
+%
 % Revision 1.3  2002/04/18 16:10:10  scott
 % changed 'yes' to 'Yes' for uniformity with other flags -sm
 %
@@ -57,8 +60,8 @@ end;
 if nargin < 2 | confirm == 1
     % which set to save
 	% -----------------
-	 ButtonName=questdlg2( ...
-['Convert the data to average reference?' 10 'Note: ICA activations will also be converted if they exist...'], ...
+	 ButtonName=questdlg2( strvcat('Convert the data to average reference?', ...
+								   'Note: ICA activations will also be converted if they exist...'), ...
 	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes', 'pop_averef');
 	 switch lower(ButtonName),
 	      case 'cancel', return;
