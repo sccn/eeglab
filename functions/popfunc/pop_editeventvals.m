@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/06/12 01:50:09  arno
+% still debuging
+%
 % Revision 1.26  2004/06/11 22:52:07  arno
 % remove debug msg
 %
@@ -142,11 +145,11 @@ if nargin < 1
    return;
 end;	
 
-if nargin >=1 % interpreting command from GUI or command line
+if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
     
     if isstr(EEG) % GUI
         gui    = 1;
-        strcom = EEG;
+        varargin = { EEG varargin{:} };
         
         % user data
         % ---------
@@ -181,7 +184,9 @@ if nargin >=1 % interpreting command from GUI or command line
     % scan inputs
     % -----------
     for indfield = 1:2:length(varargin)
-        tmparg = varargin{ indfield+1 };
+        if length(varargin) >= indfield+1
+            tmparg = varargin{ indfield+1 };
+        end;
         
         switch lower(varargin{indfield})
         
@@ -280,13 +285,8 @@ if nargin >=1 % interpreting command from GUI or command line
       
       % update type field
       % -----------------
-      if isfield(eventtmp, 'type')
-          if isstr(eventtmp(1).type) | isstr(eventtmp(1).type)
-              eventtmp(valnum).type = num2str(eventtmp(valnum).type);
-          end;
-      end;
-      if isfield(eventtmp, 'latency')
-          eventtmp(valnum).latency = NaN;
+      for tmpind = 1:length(allfields)
+          eventtmp = checkconsistency(eventtmp, valnum, allfields{tmpind});
       end;
       
       if gui
@@ -304,13 +304,15 @@ if nargin >=1 % interpreting command from GUI or command line
       else
           % update field values if command line
           % -----------------------------------
-          EEG.event = eventtmp;
-          for ind=2:length(tmparg)
-              if ind-1 <= length(allfields) & ~strcmpi(allfields{ind-1}, 'urevent') % do not include urevent 
-                  EEG = pop_editeventvals(EEG, 'changefield', { valnum allfields{ind-1} tmparg{ind} });
+          if any(~cellfun('isempty', tmparg(2:end)))
+              EEG.event = eventtmp;
+              for ind=2:length(tmparg)
+                  if ind-1 <= length(allfields) & ~strcmpi(allfields{ind-1}, 'urevent') % do not include urevent 
+                      EEG = pop_editeventvals(EEG, 'changefield', { valnum allfields{ind-1} tmparg{ind} });
+                  end;
               end;
+              eventtmp = EEG.event;
           end;
-          eventtmp = EEG.event;
       end;
       
      case 'delete', % **********************************************************
@@ -341,10 +343,10 @@ if nargin >=1 % interpreting command from GUI or command line
       
       if gui, % GUI case
           
-          field    = varargin{1};
+          field    = tmparg;
           objfield = findobj('parent', gcf, 'tag', field);
           editval     = get(objfield, 'string');
-          if ~isempty(str2num(editval)), editval =str2num(editval); end;
+          if ~isempty(editval) & ~isempty(str2num(editval)), editval = str2num(editval); end;
       
       else % command line case
           
@@ -372,12 +374,9 @@ if nargin >=1 % interpreting command from GUI or command line
       end;
       
       % adapt to other formats
-      if ~isempty(eventtmp)
-          otherval = mod(valnum+1, length(eventtmp)+1)+1;
-          if ~isstr(editval) &  isstr(getfield(eventtmp(valnum), field)), editval = num2str(editval); end;
-          if  isstr(editval) & ~isstr(getfield(eventtmp(valnum), field)), editval = str2num(editval); end;
-      end;
+      % ----------------------
       eventtmp(valnum) = setfield(eventtmp(valnum), field, editval);
+      eventtmp = checkconsistency(eventtmp, valnum, field);
       
       % update urevents
       % ---------------
@@ -416,7 +415,7 @@ if nargin >=1 % interpreting command from GUI or command line
               else 
                   editval = eeg_urlatency(EEG.event, eventtmp(valnum).latency);
               end;
-          elseif strcmp( field, 'latency')
+          elseif strcmp( field, 'latency') % empty editval
               eventtmp(valnum).latency = NaN;
           end;
           
@@ -451,7 +450,7 @@ if nargin >=1 % interpreting command from GUI or command line
           oldevents = EEG.event;
           EEG.event = eventtmp;
       else % command line
-          field1 = args{ curfield+1 }{1};
+          field1 = tmparg{1};
           if length(tmparg) < 2, dir1 = 0;
           else                   dir1 = tmparg{2}; 
           end;
@@ -470,7 +469,7 @@ if nargin >=1 % interpreting command from GUI or command line
           if strcmp(field2, 'latency') & EEG.trials > 1
               tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
           end;
-          [X I] = sort( tmparray );
+          [X I] = mysort( tmparray );
           if dir2 == 1, I = I(end:-1:1); end;
           events = EEG.event(I);
       else
@@ -482,7 +481,7 @@ if nargin >=1 % interpreting command from GUI or command line
       if strcmp( field1, 'latency') & EEG.trials > 1
           tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
       end;
-      [X I] = sort( tmparray );
+      [X I] = mysort( tmparray );
       if dir1 == 1, I = I(end:-1:1); end;
       EEG.event = events(I);
       
@@ -499,7 +498,7 @@ if nargin >=1 % interpreting command from GUI or command line
           
           % update history
           % --------------
-          oldcom = { oldcom{:} 'sort' newcom };
+          oldcom = { oldcom{:} 'sort' { field1 dir1 field2 dir2 } };
           
           % warn user
           % ---------
@@ -523,6 +522,10 @@ if nargin >=1 % interpreting command from GUI or command line
     end;
     return;
 end;
+
+% ----------------------
+% graphic interface part
+% ----------------------
 
 if isempty(EEG.event)
     disp('Getevent: cannot deal with empty event structure');
@@ -641,6 +644,11 @@ if nargin<2
             EEG       = userdata{1};
             EEG.event = userdata{2};
             disp('Checking event consistency...');
+            TMPEEG = pop_editeventvals(EEG, 'sort', { 'latency' });
+            if ~isequal(TMPEEG.event, EEG.event)
+                EEG = TMPEEG;
+                disp('Event resorted by increasing latencies. Some event indices have changed.');
+            end;
             EEG = eeg_checkset(EEG, 'eventconsistency');
         end;
     else 
@@ -715,4 +723,39 @@ function strval = reformat( val, latencycondition, trialcondition, eventnum)
         if isstr(val), strval = [ '''' val '''' ];
         else           strval = num2str(val);
         end;
+    end;
+
+% sort also empty values
+% ----------------------
+function [X, I] = mysort(tmparray);
+    if iscell(tmparray)
+        if all(cellfun('isreal', tmparray))
+            tmpempty = cellfun('isempty', tmparray);
+            tmparray(tmpempty) = { 0 };
+            tmparray = cell2mat(tmparray);
+        end;
+    end;
+    try, 
+        [X I] = sort(tmparray);
+    catch,
+        sadf
+        disp('Sorting failed. Check that selected fields contain uniform value format.');
+        X = tmparray;
+        I = 1:length(X);
+    end;
+    
+% checkconsistency of new event
+% -----------------------------
+function eventtmp = checkconsistency(eventtmp, valnum, field)
+    
+    otherval = mod(valnum+1, length(eventtmp)+1)+1;
+    
+    if isstr(getfield(eventtmp(valnum), field)) & ~isstr(getfield(eventtmp(otherval), field))
+        eventtmp(valnum) = setfield(eventtmp(valnum), field, str2num(getfield(eventtmp(valnum), field)));
+    end;
+    if ~isstr(getfield(eventtmp(valnum), field)) & isstr(getfield(eventtmp(otherval), field))
+        eventtmp(valnum) = setfield(eventtmp(valnum), field, num2str(getfield(eventtmp(valnum), field)));
+    end;
+    if strcmpi(field, 'latency') & isempty(getfield(eventtmp(valnum), field))
+        eventtmp(valnum).latency = NaN;
     end;
