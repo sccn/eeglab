@@ -39,10 +39,11 @@
 %%                      etc.                     
 %%                                               
 %%    Title1:                                     
-%%      variable1  - text line 1                 
-%%                   text line 2                 
-%%      variable2  - text line 1                 
-%%                   etc.                        
+%%      descriptor1  - text line 1                 
+%%                     text line 2                 
+%%      descriptor2  - text line 1                 
+%%      "descriptor 3" - text line 1 (see notes)                 
+%%                       etc.                        
 %%                                              
 %%    Title2:                                    
 %%      text line 1 [...](see notes)             
@@ -57,7 +58,8 @@
 %           preserving Matlab carriage returns) unless there is a 
 %           Matlab continuation cue ('...'). In this case, lines are 
 %           contcatenated. As below 'Title1', all text lines following
-%           each variable name (i.e., single_word followed by a ' - ' or ' = ') 
+%           each  descriptor (i.e., single_word followed by '-' or '='
+%           or multiple quoted words followed by a '-' or '=') 
 %           are concatenated. 
 %        2) The pattern 'function()' is detected and is printed in bold 
 %           if it is the first function descriptor. Otherwise,
@@ -65,7 +67,8 @@
 %           'function.html' if this exists.
 %        3) If a 'function.jpg' image file (with same 'function' name) exists, 
 %           the image is inserted into the function .html file following 
-%           the function description.
+%           the function description. If the .jpg file is absent, the function
+%           checks for the presence of a .gif file.
 %        4) Lines beginning by '%%' are not interpreted and will be printed as is.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -87,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/02/17 02:19:14  arno
+% including gif images now. Also new format
+%
 % Revision 1.15  2002/09/07 23:08:28  scott
 % help msg -sm & ad
 %
