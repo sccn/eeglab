@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/12/06 02:52:12  arno
+% inserting epoch number
+%
 % Revision 1.10  2002/12/06 02:44:41  arno
 % debugging last
 %
@@ -134,7 +137,6 @@ end;
 fprintf('pop_chanevent: importing events from data channel %d ...\n', chan);
 counte = 1; % event counter
 events(10000).latency = 0;
-chan
 if isnan(g.nbtype)
     if length(unique(EEG.data(chan, :))) == 2, g.nbtype = 1; end;
 end;
@@ -145,6 +147,7 @@ switch g.edge
  case 'trailing', tmpevent = find( diff(EEG.data(chan, :)) < 0);
  case 'leading' , tmpevent = find( diff(EEG.data(chan, :)) > 0);
 end;
+if isempty(tmpevent), disp('No events found'); return; end;
 tmpevent = tmpevent+1;
 for tmpi = tmpevent
     if ~isnan(g.nbtype)
