@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2003/04/09 23:32:49  arno
+% fixing lines
+%
 % Revision 1.53  2003/03/14 16:17:56  arno
 % print pvaf in topoplot
 %
@@ -343,10 +346,10 @@ data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
-if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
-    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
-    error('Cannot plot data component at all channels (option not implemented)');
-end;
+%if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
+%    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
+%    error('Cannot plot data component at all channels (option not implemented)');
+%end;
 if ~isempty(g.freq) & min(g.freq)<0
     if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
    fprintf('spectopo(): freqs must be >=0 Hz\n');
@@ -428,12 +431,23 @@ else
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% compute component spectra
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	fprintf('Computing component spectra: ')
     newweights = g.weights;
 	if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
+        fprintf('Computing component spectra: ')
 		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g);
 	else % in case out of memory error, multiply conmponent sequencially
-		[compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+        if strcmp(g.icamode, 'sub') & ~isempty(g.plotchan) & g.plotchan == 0
+            % scan all electrodes
+            fprintf('Computing component spectra at each channel: ')
+            for index = 1:size(data,1)
+                g.plotchan = index;
+                [compeegspecdB(:,:,index) freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+            end;
+            g.plotchan = 0;
+        else
+            fprintf('Computing component spectra: ')
+            [compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+        end;
 	end;
 	fprintf('\n');
     
@@ -444,7 +458,7 @@ else
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if strcmpi(g.icamode, 'normal')
         for index = 1:size(compeegspecdB,1) 
-            if g.plotchan == 0
+            if g.plotchan == 0 % normalize by component scalp map power
                 compeegspecdB(index,:) = 10*log10( sqrt(mean(g.icawinv(:,index).^4)) * compeegspecdB(index,:) );
             else 
                 compeegspecdB(index,:) = 10*log10( g.icawinv(g.plotchan,index)^2 * compeegspecdB(index,:) );
@@ -587,13 +601,34 @@ if ~isempty(g.weights)
     [tmp indexfreq] = min(abs(g.freq-freqs));
     for index = 1:length(g.icacomps)
         if strcmp(g.icamode, 'normal')
+            % note: maxdatadb = eegspecdBtoplot (RMS power of data)
             resvar(index)  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
             fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar(index));
         else
-            resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
+            if g.plotchan == 0
+                resvartmp = [];
+                for chan = 1:size(eegspecdB,1) % scan channels
+                    resvartmp(chan)  = 100 - 100*exp(-(eegspecdB(chan,freqidx(1))-compeegspecdB(index, indexfreq, chan))/10*log(10));
+                end;
+                resvar(index) = mean(resvartmp); % mean contribution for all channels
+                stdvar(index) = std(resvartmp);
+                fprintf('Component %d percentage variance accounted for:%6.2f ± %3.2f\n', ...
+                        g.icacomps(index), resvar(index), stdvar(index));
+            else
+                resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+                fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
+            end;
         end;
     end;
+    
+    % for icamode=sub and plotchan == 0 -> take the RMS power of all channels
+    % -----------------------------------------------------------------------
+    if ndims(compeegspecdB) == 3
+        compeegspecdB = exp( compeegspecdB/10*log(10) );
+        compeegspecdB = sqrt(mean(compeegspecdB.^2,3)); % RMS before log (dim1=comps, dim2=freqs, dim3=chans)
+        compeegspecdB = 10*log10( compeegspecdB );
+    end;
+    
 end;
 
 if ~isempty(g.freq)
