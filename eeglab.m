@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.187  2002/11/09 18:24:45  scott
+% BESA menu item titles
+%
 % Revision 1.186  2002/11/09 17:53:28  scott
 % edit dipole menu items
 %
@@ -885,7 +888,7 @@ if besamenu
 	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'   , 'CallBack', [ check 'EEG = besaimport(EEG);' e_store]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles on BESA head'   , 'CallBack', [ 'besaplot(EEG.sources);']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'  , 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on MRI', 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
 end;
 
