@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 text interface editing -sm & ad 
 % 03-08-02 removed toolbar option (matlab 5.2 compatibility) -ad
@@ -282,7 +285,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1); eeg_store; h(LASTCOM); eeg_updatemenu;' ]);
    
 third_m = uimenu( W_MAIN, 'Label', 'Plot');
-	loc_m = uimenu( third_m, 'Label', 'Plot channel locations'   );
+	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
        uimenu( loc_m, 'Label', 'By name'   , 'CallBack', [ checkplot      'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''');'']; eval(LASTCOM); h(LASTCOM);']);
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot    'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM); h(LASTCOM);']);
     uimenu( third_m, 'Label', 'EEG data (scroll)'          , 'CallBack', [ check          '[LASTCOM] = pop_eegplot(EEG, 1, 0, 0); h(LASTCOM); eeg_updatemenu;'],'Separator', 'on');
@@ -306,7 +309,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
 	   uimenu( ERPC_m, 'Label', 'On the same axis with maps'      , 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG); h(LASTCOM);']);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); h(LASTCOM); clear tmpeeg;']);
-	spec_m = uimenu( third_m, 'Label', 'Plot/Time-frequency', 'Separator', 'on');
+	spec_m = uimenu( third_m, 'Label', 'Time-frequency', 'Separator', 'on');
 		uimenu( spec_m, 'Label', 'Channel time-frequency'   , 'CallBack', [ checkepoch     'LASTCOM = pop_timef(EEG, 1); h(LASTCOM);']);
 		uimenu( spec_m, 'Label', 'Channel cross-coherence'  , 'CallBack', [ checkepoch     'LASTCOM = pop_crossf(EEG, 1); h(LASTCOM);']);
 		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica     'LASTCOM = pop_timef(EEG, 0); h(LASTCOM);'],'Separator', 'on');
