@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/03/08 16:44:20  arno
+% scott edit
+%
 % Revision 1.26  2003/12/04 22:31:35  arno
 % modificationS
 %
@@ -177,8 +180,8 @@ if reject
 else
 	com2 = [com2 ...
 		    'disp(''warning: manual modifications were not saved in the history'');' ...
-			' warndlg2(strvcat(''Epochs labeled for rejection have been noted.'',' ...
-			'''To actually reject these epochs, use '', ''Tools > Reject data epochs > Reject labeled epochs''), ''Warning'');' ...
+			' warndlg2(strvcat(''Epochs marked for rejection have been noted.'',' ...
+			'''To actually reject these epochs, use '', ''Tools > Reject data epochs > Reject marked epochs''), ''Warning'');' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
 if ~exist('topcommand')
