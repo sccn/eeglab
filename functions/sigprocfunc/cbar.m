@@ -1,19 +1,27 @@
-% cbar() - Display full or partial colorbar, choose numeric range 
+% cbar() - Display full or partial color bar
 %
 % Usage:
-%    >> cbar
-%    >> cbar(type)
-%    >> cbar(type,colors)
-%    >> cbar(axhandle,colors)
-%    >> cbar(axhandle,colors, minmax, grad)
+%    >> cbar % create a vertical cbar on the right side of a figure
+%    >> cbar(type) % specify direction as 'vert' or 'horiz'
+%    >> cbar(type,colors) % specify which colormap colors to plot
+%  else
+%    >> cbar(axhandle) % specify the axes to draw cbar in
+%
+%    >> h = cbar(type|axhandle,colors, minmax, grad)
 %
 % Inputs:
-%  type      - 'vert','horiz', or 0 -> default {'vert')
-%  axhandle  - handle of axes to place colormap in
+%  type      - ['vert'|'horiz'] direction of the cbar {default: 'vert')
+%              ELSE axhandle = handle of axes to draw the cbar
 %  colors    - vector of colormap indices to display, 
-%              or number n -> display colors [1:end-n]
+%              (else int n -> display colors [1:end-n]) {default: all}
 %  minmax    - [min, max] range of values to label on colorbar 
-%  grad      - [integer] number of graduations. Default is 5.
+%  grad      - [integer] number of color graduations. {default: 5}.
+%
+% Example:
+%         >> colormap('default') % default colormap is 64-color 'jet'
+%         >> cbar('vert',33:64); % plot a vertical cbar colored green->red 
+%                                % useful for showing >0 (warm) and 0 (green) 
+%                                % values only in a green=0 plot
 %
 % Author: Colin Humphries, Arnaud Delorme, CNL / Salk Institute, Feb. 1998-
 %
@@ -38,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/07/30 01:53:13  arno
+% adding grad option
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
