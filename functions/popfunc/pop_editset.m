@@ -1,62 +1,61 @@
-% pop_editset() - Edit EEGLAB EEG dataset structure fields.
+% pop_editset() - Edit EEG dataset structure fields.
 %
 % Usage:
-%   >> EEGOUT = pop_editset( EEG ); % pop-up window mode
-%   >> EEGOUT = pop_editset( EEG, 'key', val,...);
+%   >> EEGOUT = pop_editset( EEG ); % pops-up a data entry window
+%   >> EEGOUT = pop_editset( EEG, 'key', val,...); % no pop-up window
 %
-% Graphical interface:
-%   "EEGLAB dataset name" - [Edit box] name for the new dataset. Command line
-%                  equivalent: 'setname'. The last column indicates which
-%                  field of the EEG structure, this paramter is corresponding
-%                  to.
-%   "Time points per epoch" - [Edit box] Number of points per data frame for 
-%                  data epochs. Command line equivalent: 'pnts'
-%   "Data sampling rate" - [Edit box] command line equivalent: 'srate'
-%   "Optional epoch start time" - [Edit box] command line equivalent: 'xmin'
-%   "Channel locations file or array" - [Edit box] see readlocs() help for
-%                  data channel format. Command line equivalent: 'chanlocs'
-%   "ICA weights array or text file" - [edit box] use this option to import
-%                  ICA weight from other decompositions (for instance: same
-%                  data, different conditions). To use the ICA weights from
-%                  an other dataset (i.e. dataset 2) enter "ALLEEG(2).icaweights"
-%                  in this edit box. Command line equivalent: 'icaweight'
-%   "ICA sphere array or text file" - [edit box] import ICA sphere matrix. For
-%                  computational reasons, an ICA decomposition is defined by
-%                  a sphere matrix and an unmixing matrix (see previous option).
-%                  To use the ICA weights from an other dataset (i.e. dataset 2)
-%                  enter "ALLEEG(2).icasphere" in this edit box. Command line 
-%                  equivalent: 'icasphere'.
-%   "Averaged referenced data" - [checkbox] re-reference data to average 
-%                  reference by checking the checkbox. Transform back to common
-%                  reference by unchecking the checkbox. Command line 
-%                  equivalent: 'averef'. See also pop_reref()
-%
+% Graphic interface:
+%   "EEGLAB dataset name" - [Edit box] Name for the new dataset. 
+%                  The last column indicates which field of the EEG structure 
+%                  this paramter is corresponding to. ??? 
+%                  Command line equivalent: 'setname'. 
+%   "Time points per epoch" - [Edit box] Number of data frames (points) per epoch.
+%                  Command line equivalent: 'pnts'
+%   "Data sampling rate" - [Edit box] In Hz. Command line equivalent: 'srate'
+%   "Optional epoch start time" - [Edit box] In ms. ??? Command line equivalent: 'xmin'
+%   "Channel locations file or array" - [Edit box] For channel data formats, see 
+%                  >> readlocs help    Command line equivalent: 'chanlocs'
+%   "ICA weights array or text file" - [edit box] Import ICA weights from other 
+%                  decompositions (e.g., same data, different conditions). 
+%                  To use the ICA weights from another loaded dataset (n) enter 
+%                  "ALLEEG(n).icaweights" Command line equivalent: 'icaweight'
+%                                                              ??? icaweights ???
+%   "ICA sphere array or text file" - [edit box] Import ICA sphere matrix. 
+%                  Infomax ICA decompositions may be defined by a sphere matrix 
+%                  and an unmixing weight matrix (see above).  To use the sphere 
+%                  matrix from another loaded dataset (n), enter "ALLEEG(n).icasphere" 
+%                  Command line equivalent: 'icasphere'.
+%   "Averaged referenced data" - [checkbox] Re-reference data to average reference 
+%                  by checking the checkbox. Transform back to common reference 
+%                  by unchecking the checkbox. Command line equivalent: 'averef' 
+%                  See also pop_reref().
 % Inputs:
-%   EEG             - dataset structure
+%   EEG          - EEG dataset structure
 %
 % Optional inputs:
-%   'setname'    - Name of the dataset
-%   'data'       - ['varname'|'filename'] Import data from a file 
-%                   or Matlab variable into an EEGLAB EEG structure 
+%   'setname'    - Name of the EEG dataset
+%   'data'       - ['varname'|'filename'] Import data from a Matlab variable or file
+%                  into an EEG data structure 
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
 %                  The data file is transposed if the number of rows is larger
-%                  than the number of columns. Note: for types 'float32le' and
+%                  than the number of columns ???. Note: for types 'float32le' and
 %                  'float32be' (little endian or big endian byte ordering), data
-%                  must be organised as (channels x timepoints x epochs).
-%   'chanlocs'   - ['varname'|'filename'] Import a channel locations file.
-%                  (See >> help readlocs for file format).
+%                  must be organised as (channels, timepoints, epochs).
+%   'chanlocs'   - ['varname'|'filename'] Import a channel location file.
+%                  For file formats, see >> help readlocs
 %   'nbchan'     - [int] Number of data channels. 
 %   'xmin'       - [real] Data start time (in seconds).
 %   'averef'     - ['Yes'|'No'] 'Yes' if data are average-reference. 
 %   'pnts'       - [int] Number of data points per epoch (epoched data only)
-%   'srate'      - [real Hz] Data sampling rate. 
+%   'srate'      - [real] Data sampling rate in Hz. 
 %   'icaweight'  - [matrix] ICA weight matrix. 
 %   'icasphere'  - [matrix] ICA sphere matrix. By default, the sphere matrix 
-%                  is initialized to the identity matrix if it is empty.
-%   'comments'   - [string] About the dataset.
-% 
+%                  is initialized to the identity matrix if it is left empty.
+%   'comments'   - [string] Comments on the dataset accessible through the EEGLAB
+%                  main menu (Edit > About This Dataset). Use this to attach 
+%                  background information about the data to the dataset.
 % Outputs:
-%   EEGOUT       - Modified dataset structure
+%   EEGOUT       - Modified EEG dataset structure
 %
 % Note:
 %   To create a new dataset:
@@ -88,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/02/21 22:55:09  arno
+% adding gui info
+%
 % Revision 1.30  2003/01/23 21:34:59  scott
 % header edits -sm
 %
