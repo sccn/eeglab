@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/11/06 03:18:25  arno
+% plotitc -> plotphase
+%
 % Revision 1.27  2004/09/20 18:18:42  hilit
 % added round() on pointrange2 so, the indices will be integers and not double
 %
@@ -200,10 +203,13 @@ if popup
     % add topoplot
     % ------------
 	if ~isempty(EEG.chanlocs)
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 		if typeproc == 1
-			options = [options ', ''topovec'', [' int2str([num1 num2]) '], ''elocs'', EEG.chanlocs' ];
+			options = [options ', ''topovec'', [' int2str([num1 num2]) ...
+                       '], ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
 		else % typeproc == 0
-			options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) '])'', ''elocs'', EEG.chanlocs' ];
+			options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) ...
+                       '])'', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
 		end;
 	end;
     

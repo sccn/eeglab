@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/01/22 21:54:28  scott
+% rm same
+%
 % Revision 1.30  2004/01/22 21:49:32  scott
 % same
 %
@@ -222,11 +225,13 @@ if popup
     % add topoplot
     % ------------
     if ~isempty(EEG.chanlocs)
-      if typeproc == 1
-		  options = [options ', ''topovec'', ' int2str(num) ', ''elocs'', EEG.chanlocs' ];
-      else
-		  options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
-		   '), ''elocs'', EEG.chanlocs' ];
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+        if typeproc == 1
+            options = [options ', ''topovec'', ' int2str(num) ...
+                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
+        else
+            options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
+                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
       end;
     end;
     
