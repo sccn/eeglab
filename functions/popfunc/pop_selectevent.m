@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/19 21:57:55  arno
+% debug for MAC
+%
 % Revision 1.18  2002/08/19 19:06:52  arno
 % debugging
 %
@@ -403,6 +406,9 @@ if strcmp( lower(g.deleteepochs), 'yes') & EEG.trials > 1
 		Iepoch(EEG.event(Ievent(index)).epoch) = 0;
 	end;
 	Iepoch = find(Iepoch == 0);
+	if length(Iepoch) == 0,
+		error('Empty dataset: all epochs have been removed');
+	end;
 	if nargin < 2 
 		ButtonName=questdlg2(strvcat([ 'Warning: keeping ' num2str(length(Ievent)) ' events'], ...
 					['Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ]), ...
