@@ -36,7 +36,7 @@
 %                  'javascript:openhelp(''%s.js'')'} Use '%s.html' for an .html link.     
 %   'font'       - Font name (default: 'Helvetica')
 %   'background' - Background image (Ex: 'img.jpg' -> '<body BACKGROUND="img.jpg">'). 
-%   'outputlink' - Help page calling command for the function index page. {default: 
+%   'outputlink' - Help page calling command for the function index page. {default is
 %                  'javascript:openhelp(''%s.js'')'.  Use '%s.html' to use a
 %                  standard .html page link instead.}    
 %   'fontindex'  - Font for the .html index file (default: 'Helvetica')
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/15 02:43:54  arno
+% header for web
+%
 % Revision 1.10  2002/11/15 01:46:47  scott
 % can not -> cannot
 %
