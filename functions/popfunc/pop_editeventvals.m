@@ -1,6 +1,6 @@
-% pop_editeventvals() - Edit events contained in a EEG dataset structure. 
+% pop_editeventvals() - Edit events contained in an EEG dataset structure. 
 %               If the dataset is the only input, a window pops up 
-%               to ask the user for the relevant parameter values.
+%               allowing the user to insert the relevant parameter values.
 %
 % Usage: >> EEGOUT = pop_editeventvals( EEG, 'key1', value1, ...
 %                                    'key2', value2, ... );
@@ -9,11 +9,11 @@
 %
 % Optional inputs:
 %   'sort'        - { field1 dir1 field2 dir2 } Sort events based on field1
-%                   then otional field2. Arg dir1 indicates the direction 
-%                   (0 = increasing, 1 = decreasing).
-%   'changefield' - {num field value} Change the value of a specified 
-%                   field in event num.
-%   'changeevent' - {num value1 value2 value3 ...} Change the value of
+%                   then on optional field2. Arg dir1 indicates the sort 
+%                   direction (0 = increasing, 1 = decreasing).
+%   'changefield' - {num field value} Insert the given value into the specified 
+%                   field in event num. (Ex: {34 'latency' 320.4})
+%   'changeevent' - {num value1 value2 value3 ...} Change the values of
 %                   all fields in event num.
 %   'add'         - {num value1 value2 value3 ...} Insert event before
 %                   event num having the specified values.
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/18 15:29:23  scott
+% [same] -sm
+%
 % Revision 1.3  2002/04/18 15:26:41  scott
 % added number of events to title -sm
 %
@@ -165,7 +168,7 @@ if nargin<2
     % -------------------
     geometry = { geometry{:} [1] [1] [1 1 1] [1 1 1] [1 1.5 0.5] };
     uilist = {  uilist{:},...
-         {}, { 'Style', 'text', 'string', 'Re-sort event list (optional)', 'fontweight', 'bold'  }, ...
+         {}, { 'Style', 'text', 'string', 'Re-order events (for review only)', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Main sorting field:'  }, ...
          { 'Style', 'listbox', 'string', listboxtext }, ...
          { 'Style', 'checkbox', 'string', 'Click for decreasing order' } ...
