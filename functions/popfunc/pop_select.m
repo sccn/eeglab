@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/08 01:47:00  arno
+% editing text
+%
 % Revision 1.13  2002/07/29 18:01:41  arno
 % changing message
 %
@@ -248,6 +251,15 @@ end;
 if isempty(g.trial)
    error('Empty dataset, no trials');
 end;
+if length(g.trial) ~= EEG.trials
+	fprintf('Removing %d trials...\n', EEG.trials - length(g.trial));
+end;
+if length(g.channel) ~= EEG.nbchan
+	fprintf('Removing %d channels...\n', EEG.nbchan - length(g.channel));
+end;
+if length(g.point) ~= EEG.pnts
+	fprintf('Selecting data points...\n');
+end;
 
 % recompute latency and epoch number for events
 % ---------------------------------------------
@@ -279,15 +291,6 @@ end;
 
 % performing removal
 % ------------------
-if length(g.trial) ~= EEG.trials
-	fprintf('Removing %d trials...\n', EEG.trials - length(g.trial));
-end;
-if length(g.channel) ~= EEG.nbchan
-	fprintf('Removing %d channels...\n', EEG.nbchan - length(g.channel));
-end;
-if length(g.point) ~= EEG.pnts
-	fprintf('Selecting data points...\n');
-end;
 EEG.data      = EEG.data(g.channel, g.point, g.trial);
 EEG.trials    = length(g.trial);
 EEG.pnts      = length(g.point);
