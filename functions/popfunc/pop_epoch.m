@@ -7,14 +7,14 @@
 %        pop_epoch( EEG, typerange, timelim, 'key1', value1 ...);
 %
 % Graphical interface:
-%   1st edit box: Enter time-locking event type(s) ([]=all).      
-%                 Select 'Edit > Event values' to see type values.
+%   "Enter time-locking event type(s)" - [edit box] Select 'Edit > 
+%                 Event values' to see type values.
 %                 Same as the 'typerange' command line input.
-%   2nd edit box: Epoch limits [start, end] in seconds.
+%   "Epoch limits" - [edit box] time range [start, end] in seconds.
 %                 Same as the 'timelim' command line input.
-%   3rd edit box: Name for the new dataset. Same as the 'newname'
+%   "Name for the new dataset" - [edit box] Same as the 'newname'
 %                 optional input from the command line.
-%   4th edit box: Out-of-bounds EEG rejection limits ([min max], []=none).
+%   "Out-of-bounds EEG ..." - [edit box] Rejection limits ([min max], []=none).
 %                 Same as 'valuelim' optional input from the command line.
 %
 % Inputs:
@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/02/16 22:53:02  arno
+% update header for gui info
+%
 % Revision 1.29  2002/11/12 00:15:03  arno
 % updating header
 %

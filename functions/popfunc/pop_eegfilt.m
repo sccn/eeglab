@@ -4,17 +4,17 @@
 %   >> eegout = pop_eegfilt( eegin, locutoff, hicutoff, filtorder);
 %
 % Graphical interface:
-%   1st edit box: Lower edge of the frequency pass band (Hz) (0 -> lowpass)
+%   "Lower edge ..." - [edit box] Lower edge of the frequency pass band (Hz) 
 %                 Same as the 'locutoff' command line input.
-%   2nd edit box: Higher edge of the frequency pass band (Hz) (0 -> highpass)
+%   "Higher edge ..." - [edit box] Higher edge of the frequency pass band (Hz) 
 %                 Same as the 'hicutoff' command line input.
-%   3rd edit box: Notch filter the data. Give the notch range, i.e. [45 55] 
+%   "Notch filter" - [edit box] provide the notch range, i.e. [45 55] 
 %                 for 50 Hz). This option overwrites the low and high edge limits
 %                 given above. Set the 'locutoff' and 'hicutoff' values to the
 %                 values entered as parameters, and set 'revfilt to 1, to swap
 %                 from bandpass to notch filtering.
-%   4th edit box: Filter length in points (default: see >> help pop_eegfilt)
-%                 Same as 'filtorder' optional input.
+%   "Filter length" - [edit box] Filter lenghth in point (default: see 
+%                 >> help pop_eegfilt). Same as 'filtorder' optional input.
 %
 % Inputs:
 %   eegin     - input dataset
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/02/16 23:10:43  arno
+% adding GUI info
+%
 % Revision 1.9  2003/01/24 04:03:37  scott
 % edits msgs -sm
 %
