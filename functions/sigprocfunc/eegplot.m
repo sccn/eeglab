@@ -59,6 +59,7 @@
 %                  continuous data, the time axis shows time in seconds. For epoched
 %                  data, the axis label indicate time within each epoch.
 %    "Cancel" - [button] Closes the window and cancels any data rejection marks.
+%    "Event types" - [button] pop up a legend window for events.
 %    "<<" - [button] Scroll backwards though time or epochs by one window length.
 %    "<"  - [button] Scroll backwards though time or epochs by 0.2 window length.
 %    "Navigation edit box" - [edit box] Enter a starting time or epoch to jump to.
@@ -93,8 +94,8 @@
 %                   limits of the display. (Data should contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
 %    'dispchans'  - [integer] Number of channels to display in the activity window 
-%                   {default: 32}.  If < total number of channels, a vertical slider 
-%                   on the left side of the figure allows vertical data scrolling. 
+%                   {default: from data}.  If < total number of channels, a vertical  
+%                   slider on the left side of the figure allows vertical data scrolling. 
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
@@ -157,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2003/07/22 17:29:54  arno
+% adding event button
+%
 % Revision 1.86  2003/07/20 19:27:37  scott
 % "electrodes" -> "channels"
 %
@@ -518,7 +522,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
-   try, g.dispchans; 		catch, g.dispchans  = min(32, size(data,1)); end;
+   try, g.dispchans; 		catch, g.dispchans  = size(data,1); end;
    try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
    try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
