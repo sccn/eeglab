@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/20 19:37:11  scott
+% typo
+%
 % Revision 1.17  2003/05/30 16:48:31  arno
 % removing debug message
 %
@@ -171,7 +174,7 @@ end;
 overWflag = 0;
 for ind = 1:2:length(args)
     switch lower(args{ind})
-	 case 'setname'   , EEG.setname = args{ind+1};
+	 case 'setname'   , EEG.setname = args{ind+1}; EEG.history = strvcat(EEG.history, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1;
 	 case 'save'      , if isunix | strcmp(computer, 'MAC'), 
