@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.239  2005/02/15 02:38:39  arno
+% same
+%
 % Revision 1.238  2005/02/15 02:35:39  arno
 % return amplitude image if 'plotamps' is used
 %
@@ -1171,6 +1174,9 @@ if nargin > 6
 		  end
 		  topomap = Arg{1};
 		  eloc_file = Arg{2};
+          if length(Arg) > 2, eloc_info = Arg{3};
+          else                eloc_info = [];
+          end;
 		  Topoflag = NO;
 	  elseif Specflag == YES;
 		  if length(Arg) ~= 2
@@ -3207,9 +3213,9 @@ if (~isempty(topomap)) & strcmpi(noshow, 'no')
     fprintf('Plotting a topo map in upper left.\n');
 	if length(topomap) == 1
 		topoplot(topomap,eloc_file,'electrodes','off', ...
-				 'style', 'blank', 'emarkersize1chan', 10);
+				 'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', eloc_info);
 	else
-		topoplot(topomap,eloc_file,'electrodes','off');
+		topoplot(topomap,eloc_file,'electrodes','off', 'chaninfo', eloc_info);
 	end;
     axis('square')
     axhndls = [axhndls h(12)];
