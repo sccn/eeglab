@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2003/09/24 00:45:30  scott
+% debug same
+%
 % Revision 1.154  2003/09/24 00:43:15  scott
 % debug same
 %
@@ -1892,6 +1895,12 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                                       sortvar(1:fronthalf)],...
                                       1:(ntrials+backhalf+fronthalf),avewidth,decfactor); 
                                         % outtrials = 1:ntrials;
+size(auxvar)
+fronthalf
+backhalf
+ntrials
+avewidth
+decfactor
             [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
                                       auxvar,...
                                       auxvar(:,[1:fronthalf])],...
