@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/18 17:18:31  arno
+% offscreen correction
+%
 % Revision 1.4  2002/07/18 17:13:05  arno
 % same
 %
@@ -157,8 +160,10 @@ end;
 
 % setting defaults
 %-----------------
-hh = findobj(allhandlers, 'style', 'text');
+hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
 %set(hh, 'BackgroundColor', get(gcf, 'color'), 'horizontalalignment', 'left');
+set(hh, 'Backgroundcolor', [.846 .892 .956]);
+set(hh, 'foregroundcolor', [0 0 0.4]);
 set(gcf, 'color', get(hh(1), 'BackgroundColor'));
 set(hh, 'horizontalalignment', 'left');
 
@@ -171,4 +176,10 @@ if pos(2)-outheight*1.5 < 0
 else 
 	set(gcf, 'position', [pos(1) (pos(2)-outheight*1.5) outwidth*1.2, outheight*1.5]);
 end;
+
+hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
+set(hh, 'backgroundcolor', [.66 .76 1]);
+hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
+set(hh, 'backgroundcolor', [.66 .76 1]);
+
 return;
