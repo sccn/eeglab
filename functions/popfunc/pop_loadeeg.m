@@ -9,13 +9,13 @@
 % Graphic interface:
 %   "Data precision in bits..." - [edit box] data binary format length
 %                in bits. Command line equivalent: 'format'
-%   "Enter trial range subset" - [edit box] integer array. 
+%   "Trial range subset" - [edit box] integer array. 
 %                Command line equivalent: 'range_trials'
-%   "Enter type range subset" - [edit box] integer array. 
+%   "Type range subset" - [edit box] integer array. 
 %                Command line equivalent: 'range_typeeeg'
-%   "Enter electrode subset" - [edit box] integer array. 
+%   "Electrode subset" - [edit box] integer array. 
 %                Command line equivalent: 'range_chan'
-%   "Enter response range subset" - [edit box] integer array. 
+%   "Response range subset" - [edit box] integer array. 
 %                Command line equivalent: 'range_response'
 %
 % Inputs:
@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/11/18 16:25:55  scott
+% Enter ... -> ...
+%
 % Revision 1.13  2003/05/22 15:43:52  arno
 % header update
 %

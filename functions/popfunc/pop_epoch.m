@@ -7,7 +7,7 @@
 %                               'key1', value1 ...);
 %
 % Graphic interface:
-%   "Enter time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
+%   "Time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
 %                 to see type values. epoch() equivalent: 'typerange' 
 %   "Epoch limits" - [edit box] time range [start, end] in seconds.
 %                 epoch() equivalent: 'timelim' 
@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/11/18 16:29:31  scott
+% Enter ... -> ...
+%
 % Revision 1.34  2003/08/19 22:07:12  arno
 % automatically adding time-locking events if non
 %
