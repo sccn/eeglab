@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.356  2004/11/12 18:40:23  arno
+% same
+%
 % Revision 1.355  2004/11/12 18:37:30  arno
 % same
 %
@@ -1424,6 +1427,7 @@ catchstrs.new_non_empty          = e_newnonempty;
     if exist(path_biosig) == 7
         try,
             addpath(path_biosig);
+            addpath([ p '..' delimiter 'biosig' ]); % for str2double
             version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
             version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
             version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
