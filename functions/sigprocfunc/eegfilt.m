@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/01/23 23:47:26  arno
+% same
+%
 % Revision 1.5  2003/01/23 23:40:59  arno
 % implementing notch filter
 %
@@ -141,9 +144,12 @@ if (1+trans)*hicutoff/nyq > 1
 end;
 
 if locutoff > 0 & hicutoff > 0,    % bandpass filter
-  fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
-  f=[MINFREQ (1-trans)*locutoff/nyq locutoff/nyq hicutoff/nyq (1+trans)*hicutoff/nyq 1]; 
-  m=[0       0                      1            1            0                      0]; 
+    if revfilt
+         fprintf('eegfilt() - performing %d-point notch filtering.\n',filtorder);
+    else fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
+    end; 
+    f=[MINFREQ (1-trans)*locutoff/nyq locutoff/nyq hicutoff/nyq (1+trans)*hicutoff/nyq 1]; 
+        m=[0       0                      1            1            0                      0]; 
 elseif locutoff > 0                % highpass filter
  if locutoff/nyq < MINFREQ
     help eegfilt
