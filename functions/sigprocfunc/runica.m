@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/10/19 17:14:15  scott
+% cosmetics, help msg
+%
 % Revision 1.10  2003/10/03 18:21:25  arno
 % releasing constraint pca<nchans-1
 %
@@ -799,38 +802,38 @@ end
   while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       permute=randperm(datalength); % shuffle data order at each step
 
-    for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-      pause(0);
-      if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-          close; error('USER ABORT');
-      end;
-      if biasflag                                                   
-       u=weights*data(:,permute(t:t+block-1)) + bias*onesrow;      
-      else                                                             
-       u=weights*data(:,permute(t:t+block-1));                      
-      end                                                              
-      if ~extended
-       %%%%%%%%%%%%%%%%%%% Logistic ICA weight update %%%%%%%%%%%%%%%%%%%
-       y=1./(1+exp(-u));                                                %
-       weights = weights + lrate*(BI+(1-2*y)*u')*weights;               %
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      else % Tanh extended-ICA weight update
-       %%%%%%%%%%%%%%%%%%% Extended-ICA weight update %%%%%%%%%%%%%%%%%%%
-       y=tanh(u);                                                       %
-       weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;          %
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      end
-      if biasflag 
-         if ~extended
-       %%%%%%%%%%%%%%%%%%%%%%%% Logistic ICA bias %%%%%%%%%%%%%%%%%%%%%%%
-             bias = bias + lrate*sum((1-2*y)')'; % for logistic nonlin. %
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-         else % extended
-       %%%%%%%%%%%%%%%%%%% Extended-ICA bias %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-             bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.   %
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-         end                                    
-      end
+      for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+          pause(0);
+          if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+              close; error('USER ABORT');
+          end;
+          if biasflag                                                   
+              u=weights*data(:,permute(t:t+block-1)) + bias*onesrow;      
+          else                                                             
+              u=weights*data(:,permute(t:t+block-1));                      
+          end                                                              
+          if ~extended
+              %%%%%%%%%%%%%%%%%%% Logistic ICA weight update %%%%%%%%%%%%%%%%%%%
+              y=1./(1+exp(-u));                                                %
+              weights = weights + lrate*(BI+(1-2*y)*u')*weights;               %
+              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+          else % Tanh extended-ICA weight update
+               %%%%%%%%%%%%%%%%%%% Extended-ICA weight update %%%%%%%%%%%%%%%%%%%
+               y=tanh(u);                                                       %
+               weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;          %
+               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+          end
+          if biasflag 
+              if ~extended
+                  %%%%%%%%%%%%%%%%%%%%%%%% Logistic ICA bias %%%%%%%%%%%%%%%%%%%%%%%
+                  bias = bias + lrate*sum((1-2*y)')'; % for logistic nonlin. %
+                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              else % extended
+                   %%%%%%%%%%%%%%%%%%% Extended-ICA bias %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                   bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.   %
+                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+              end                                    
+          end
 
       if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         weights = weights + momentum*prevwtchange;                
