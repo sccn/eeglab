@@ -47,6 +47,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/04/23 23:13:37  arno
+% removing channel bug
+% ,
+%
 % Revision 1.12  2002/04/23 17:42:56  scott
 % editing legends -sm
 %
@@ -194,11 +198,11 @@ else
 		end;
 	end;	
 end;
-options
+
 % compute epoch limits
 % --------------------
 if isempty(tlimits)
-	tlimits = [EEG.xmin, EEG.xmax];
+	tlimits = [EEG.xmin, EEG.xmax]*1000;
 end;	
 pointrange1 = max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1);
 pointrange2 = min((tlimits(2)/1000-EEG.xmin)*EEG.srate, EEG.pnts);
@@ -232,7 +236,6 @@ end;
 
 % plot the datas and generate output command
 % --------------------------------------------
-options
 if length( options ) < 2
     options = '';
 end;
