@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/07/14 14:50:09  arno
+% ha -> gca
+%
 % Revision 1.38  2003/07/12 01:49:08  arno
 % fixing noplot
 %
@@ -520,7 +523,7 @@ if ~strcmp(STYLE,'blank')
   caxis([amin amax]) % set coloraxis
 
 else % style 'blank'
-  if strcmp(ELECTROD,'labelpoint') |  strcmp(ELECTROD,'numpoint')
+  if strcmpi(ELECTROD,'labelpoint') |  strcmpi(ELECTROD,'numpoint')
     text(-0.6,-0.6, ...
     [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']);
     text(-0.6,-0.65, ...
