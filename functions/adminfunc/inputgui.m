@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/12 18:24:39  arno
+% empty help
+%
 % Revision 1.8  2002/07/18 17:14:48  arno
 % no modif
 %
@@ -113,7 +116,7 @@ if isstr(mode)
 		listui = { listui{:}, {} };
 	end;   
 	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-	[tmp tmp2 allobj] = supergui( geometry, listui{:} );
+	[tmp tmp2 allobj] = supergui( geometry, [], listui{:} );
 else 
 	fig = mode;
 	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);

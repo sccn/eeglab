@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 22:26:28  arno
+% button color and text
+%
 % Revision 1.7  2002/08/07 22:23:00  arno
 % editing spelling
 %
@@ -352,7 +355,7 @@ lisboxoptions = { 'string', [ 'Show only the new trials marked for rejection by 
  	{ 'Style', 'pushbutton', 'string', 'CLEAR ALL MARKS', 'callback', cb_clear  }, ...
 	{ 'Style', 'pushbutton', 'string', 'REJECT MARKED TRIALS', 'callback', cb_reject }};
 
-	allh = supergui( geometry, listui{:});
+	allh = supergui( geometry, [], listui{:});
 
 %	{ 'style', 'checkbox', 'String', ['Include ' fastif(icacomp, 'ica data', 'raw data')], 'tag', 'IOthertype', 'value', 1}, { }, ...
 
