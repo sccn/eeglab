@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/05 18:27:47  luca
+% load fix for reading bug October 2002
+%
 % Revision 1.15  2002/10/15 16:58:47  arno
 % drawnow for windows
 %
@@ -108,12 +111,22 @@ if isfield(TMPVAR, 'EEG') %individual dataset
         else 
             VAROUT.filepath = '';
         end;
+        if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
+            disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+            VAROUT.data = [ inputname(1:end-3) 'fdt' ];
+        end;
     end;
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
     for index=1:length(VAROUT)
-        if isstr(VAROUT(index).data), VAROUT(index).filepath = inputpath; end;
+        if isstr(VAROUT(index).data), 
+            VAROUT(index).filepath = inputpath; 
+            if length(inputname) > 4 & ~strcmp(inputname(1:end-4), VAROUT(index).data(1:end-4)) & strcmpi(inputname(end-3:end), 'sets')
+                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                VAROUT(index).data = [ inputname(1:end-4) 'fdt' int2str(index) ];
+            end;
+        end;
     end;
 else
 	VAROUT = checkoldformat(TMPVAR);
