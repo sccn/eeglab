@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/09 00:41:22  arno
+% updating for boundaries
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -79,15 +82,21 @@ end;
 
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
-		boundaries = strmatch({EEG.event.type}, 'boundary');
+		boundaries = strmatch('boundary', {EEG.event.type});
 		if isempty(boundaries)
 			EEG.data = eegfilt( EEG.data, options{:}); 
 		else
+			options{4} = 0;
 			disp('Pop_eegfilt:finding continuous data boundaries');
-			boundaries = [0 round(boundaries-0.5) EEG.pnts];
+			boundaries = [0 round(boundaries-0.5) EEG.pnts]
 			for n=1:length(boundaries)-1
-				EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
-					eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+				try
+					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+				catch
+					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter can not be applied\n', boundaries(n),boundaries(n+1));
+					disp('Pop_eegfilt: Filter being applied over the whole time range (ignoring discontinuities)');
+				end;
 			end
 		end
 	else
