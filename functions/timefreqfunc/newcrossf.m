@@ -120,7 +120,7 @@
 %                    ('trials'). Option 'times' is not recommended but requires 
 %                    less memory and provide similar results to other options.
 %                    {default: 'timestrials'}
-%       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
+%       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline'; Default
 %                                                  0 -> use whole trial
 %                                                  [min max] -> use time range)
 %                     Default is to use the baseline unless no baseline is
@@ -209,6 +209,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2004/06/02 23:17:47  arno
+% subtracting baseline, baseboot ...
+%
 % Revision 1.68  2004/06/02 18:25:07  arno
 % implementing crossspec option
 %
@@ -705,7 +708,7 @@ try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
 try, g.detrend;    catch, g.detrend = 'off'; end;
 try, g.rmerp;      catch, g.rmerp = 'off'; end;
 try, g.baseline;   catch, g.baseline = NaN; end;
-try, g.baseboot;   catch, g.baseboot = 0; end;
+try, g.baseboot;   catch, g.baseboot = 1; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
 try, g.freqs;      catch, g.freqs = [0 g.maxfreq]; end;
