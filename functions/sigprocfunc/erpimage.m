@@ -162,6 +162,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.216  2004/08/30 17:05:17  scott
+% reshape verttimes if necessary
+%
 % Revision 1.215  2004/08/20 00:39:04  arno
 % debut phasearg if only using 1 frequency
 %
@@ -2299,7 +2302,7 @@ end %%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(verttimes)
- if size(verttimes,1) ~= 1 & size(verttimes,2) == 1
+ if size(verttimes,1) ~= 1 & size(verttimes,2) == 1 & size(verttimes,1) ~= ntrials
         verttimes = verttimes';
  end
  if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
