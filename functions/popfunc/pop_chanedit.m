@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2005/03/05 02:14:33  arno
+% debug chaninfo
+%
 % Revision 1.114  2005/03/04 23:20:41  arno
 % new structure chaninfo etc...
 %
@@ -1139,7 +1142,7 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
 
     % shrink and skirt factors
     % ------------------------
-    shrinkorskirt = 0;
+    shrinkorskirt = [];
 	plotrad  = [];
 	if isfield(chans, 'plotrad'), 
 		plotrad = chans(1).plotrad; 
