@@ -107,6 +107,10 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/04/23 16:39:42  arno
+% flipping coordinate sign
+% ,
+%
 % Revision 1.28  2003/04/23 16:37:18  arno
 % debug last
 %
@@ -611,7 +615,7 @@ function coordinates = founddipoles(ALLEEG, comps)
         if length(indexcomp) > 1
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
         end;            
-        coordinates(index,1) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
-        coordinates(index,2) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
+        coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
+        coordinates(index,2) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
         coordinates(index,3) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,3);
     end;
