@@ -64,7 +64,8 @@
 %   'numcontour'      - number of contour lines {default: 6}
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
-%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
+%   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix (default: 67)
+%   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {101}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Outputs:
@@ -106,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2004/03/23 19:19:34  scott
+% made 'electrodes' default 'off'
+%
 % Revision 1.173  2004/03/23 19:18:32  scott
 % default: plotrad >= 0.5
 %
@@ -471,6 +475,7 @@ INTSQUARE = 'on';       % default, interpolate electrodes located though the who
                         % the plotting disk
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
+CIRCGRID   = 100;       % number of angles to use in drawing circles
 AXHEADFAC = 1.3;        % head to axes scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
@@ -594,8 +599,11 @@ if nargs > 2
 	  MAPLIMITS = Value;
 	 case 'masksurf'
 	  MASKSURF = Value;
-	 case 'gridscale'
-	  GRID_SCALE = Value;
+	 case 'circgrid'
+	  CIRCGRID = Value;
+          if isstr(CIRCGRID) | CIRCGRID<100
+            error('''circgrid'' value must be an int > 100');
+          end
 	 case 'style'
 	  STYLE = lower(Value);
 	 case 'numcontour'
@@ -689,8 +697,8 @@ if nargs > 2
           end
          case 'gridscale'
           GRID_SCALE = Value;
-          if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
-               error('''gridscale'' value must be integer > 4.\n');
+          if isstr(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
+               error('''gridscale'' value must be integer > 32.\n');
           end
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
@@ -1085,7 +1093,7 @@ end;
 %%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if headrad > 0                         % if cartoon head to be plotted
-  circ  = 0:2*pi/100:2*pi;             % 101 circle vertices
+  circ  = 0:2*pi/CIRCGRID:2*pi;     % 101 circle vertices
   basex = 0.18*rmax;                   % nose width
   tip   = rmax*1.15; 
   base  = rmax-.004;
