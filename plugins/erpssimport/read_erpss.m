@@ -132,7 +132,7 @@ function [eeg,ev,header] = read_erpss(filename)
                 cond_code = fread(fp,1,'uint8');
                 ev_code = fread(fp,1,'uint16');
                 ev_cnt = ev_cnt + 1;
-                ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128+1; %+1 for Matlab 
+                ev(ev_cnt).sample_offset = samp_off + (cnt-1)*block_size+1; %+1 for Matlab 
                 ev(ev_cnt).event_code = ev_code;
             end
             fseek(fp,4*(110-nevents),0);
