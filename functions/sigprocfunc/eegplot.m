@@ -52,6 +52,8 @@
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
 %                  Else, draw a rectange in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
+%     "Settings > Events" - [menu] Toggle event on or off (assuming events have been 
+%                  given as input). Press "legend" to pop up a legend window for events.
 % Display window interface:
 %    "Activity plot" - [main window] This axis displays the channel activities.  For 
 %                  continuous data, the time axis shows time in seconds. For epoched
@@ -96,6 +98,7 @@
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
+%
 % Additional keywords:
 %    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
 %                   clicked (see Outputs below). The 'REJECT' button is visible only 
@@ -112,6 +115,7 @@
 %                   be plotted using the cell-array color elements. {default: 'off'}. 
 %    'wincolor'   - [color] Color mark data stretches or epochs  
 %                   {default: [ 0.8345 1 0.956]}
+%    'event'      - [struct] EEGLAB event structure.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
 %    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
@@ -153,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2003/06/28 02:07:18  arno
+% update header
+%
 % Revision 1.80  2003/06/28 02:04:36  arno
 % debuging zoom and scale
 %
@@ -494,13 +501,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.color;		    catch, g.color		= 'off'; end;
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
-   try, g.limits;		    catch, g.limits	    = [0 size(data,2)/g.srate]; end;
+   try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans  = min(32, size(data,1)); end;
    try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
    try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
    try, g.scale; 		    catch, g.scale      = 'on'; end;
+   try, g.event; 		    catch, g.event      = []; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -511,7 +519,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' 'event' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -1004,7 +1012,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   commandzoom = [ 'tmpstr = get(gcbf, ''windowbuttondownfcn'');' ...
                   'set(gcbf, ''windowbuttondownfcn'', [ tmpstr ''; eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
                   'tmpg = get(gcbf, ''userdata'');' ...
-                  'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg; tmpstr;'];
+                  'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg tmpstr;'];
     
   %uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
   %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
@@ -1019,6 +1027,20 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
      'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
      'clear tmpg;' ]);
   uimenu('Parent',figh,'Label', 'help', 'callback', 'pophelp(''eegplot'');');
+
+  % Events %%%%%%%%
+  zm = uimenu('Parent',m(2),'Label','Events');
+  complotevent = [ 'tmpg = get(gcbf, ''userdata'');' ...
+                  'tmpg.plotevent = ''on'';' ...                  
+                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+  comnoevent   = [ 'tmpg = get(gcbf, ''userdata'');' ...
+                  'tmpg.plotevent = ''off'';' ...                  
+                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+  comeventleg  = [ 'eegplot(''drawlegend'', gcbf);'];
+    
+  uimenu('Parent',zm,'Label','Event on'    , 'callback', complotevent, 'enable', fastif(isempty(g.event), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Event off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.event), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Event legend', 'callback', comeventleg , 'enable', fastif(isempty(g.event), 'off', 'on'));
   
   % %%%%%%%%%%%%%%%%%
   % Set up autoselect
@@ -1151,6 +1173,21 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   set(figh, 'interruptible', 'off');
   set(figh, 'busyaction', 'cancel');
   
+  % prepare event array if any
+  % --------------------------
+  if ~isempty(g.event)
+      if ~isfield(g.event, 'type') | ~isfield(g.event, 'latency'), g.event = []; end;
+      
+      [g.eventtypes tmpind indexcolor] = unique({g.event.type});
+      g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
+      g.eventtypecolors = g.eventcolors(mod(tmpind-1,length(g.eventcolors))+1);
+      g.eventcolors     = g.eventcolors(mod(indexcolor-1,length(g.eventcolors))+1);
+      g.eventlatencies  = cell2mat({g.event.latency});
+      g.plotevent       = 'on';
+  end;
+  if isempty(g.event)
+      g.plotevent      = 'off';
+  end;
   g.commandselect = { commandpush commandmove commandrelease };           
   set(figh, 'userdata', g);
   
@@ -1180,6 +1217,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
   end;  
+  eegplot('scaleeye', [], gcf);
   
   h = findobj(gcf, 'style', 'pushbutton');
   set(h, 'backgroundcolor', BUTTON_COLOR);
@@ -1238,6 +1276,7 @@ else
 	 end;		
     
     % Update edit box
+    % ---------------
     g.time = max(0,min(g.time,ceil((g.frames-1)/multiplier)-g.winlength));
     if g.trialstag(1) == -1
         set(EPosition,'string',num2str(g.time)); 
@@ -1250,6 +1289,7 @@ else
     highlim = round(min((g.time+g.winlength)*multiplier+2,g.frames));
     
     % Plot data and update axes
+    % -------------------------
     switch lower(g.submean) % subtract the mean ?
      case 'on', meandata = mean(data(:,lowlim:highlim)');  
      case 'nan',meandata = nan_mean(data(:,lowlim:highlim)');
@@ -1259,6 +1299,7 @@ else
     cla
      
     % plot data
+    % ---------
     axes(ax1)
     hold on
     for i = 1:g.chans
@@ -1267,6 +1308,7 @@ else
     end
      
     % draw selected electrodes
+    % ------------------------
     if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
@@ -1284,6 +1326,7 @@ else
   			end;	
     	end;
     end;		
+    
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
     set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
@@ -1368,17 +1411,36 @@ else
    	%		end;	
     %	end;
     %end;
-	% compute Xticks
-	% --------------
+
+    % draw events if any
+    % ------------------
+    if strcmpi(g.plotevent, 'on')
+        event2plot = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
+        for index = 1:length(event2plot)
+            tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
+            tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) } );
+            %if g.trials == 1
+            %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.4f s');
+            %else
+            %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.2f ms');
+            %end;
+        end;
+    end;
+
     if g.trialstag(1) ~= -1
-    	alltag = [];
-       	for tmptag = lowlim:highlim
-    		if mod(tmptag-1, g.trialstag) == 0
-				plot([tmptag-lowlim-1 tmptag-lowlim-1], [0 1], 'b--');
-				alltag = [ alltag tmptag ];
-   			end;	
-    	end;
-    	tagnum = (alltag-1)/g.trialstag+1;
+        
+        % plot trial limits
+        % -----------------
+        tmptag = [lowlim:highlim];
+       	tmpind = find(mod(tmptag-1, g.trialstag) == 0);
+        for index = tmpind
+            plot([tmptag(index)-lowlim-1 tmptag(index)-lowlim-1], [0 1], 'b--');
+        end;
+        alltag = tmptag(tmpind);
+
+        % compute Xticks
+        % --------------
+        tagnum = (alltag-1)/g.trialstag+1;
      	set(ax0,'XTickLabel', tagnum,'YTickLabel', [],...
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',alltag-lowlim+g.trialstag/2, 'YTick',[], 'tag','backeeg');
@@ -1387,31 +1449,24 @@ else
 		tagpos  = [];
 		tagtext = [];
 		if ~isempty(alltag)
-			alltag = [alltag(1)-g.trialstag alltag alltag(end)+g.trialstag];
+			alltag = [alltag(1)-g.trialstag alltag alltag(end)+g.trialstag]; % add border trial limits
 		else
-			alltag = (lowlim-mod(lowlim, g.trialstag))/g.trialstag+1;
-			%alltag = 
+			alltag = [ floor(lowlim/g.trialstag)*g.trialstag ceil(highlim/g.trialstag)*g.trialstag ]+1;
 		end;
-			%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
-
+        
 		nbdiv = 20/g.winlength; % approximative number of divisions
 		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5 10 20]]; % possible increments
 		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
 
-		incrementtime  = divpossible(indexdiv);
 		incrementpoint = divpossible(indexdiv)/1000*g.srate;
 		tagzerooffset  = -g.limits(1)/1000*g.srate; 
 
 		for i=1:length(alltag)-1
 			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
 				tagpos  = tagpos(1:end-1);
-				tagtext  = tagtext(1:end-1);
 			end;
-			%tagpos  = [ tagpos [alltag(i):incrementpoint:(alltag(i+1)-1)]];
-			%tagtext = [ tagtext [g.limits(1):incrementtime:g.limits(2)] ];
 			if ~isempty(g.freqlimits)
 				tagpos  = [ tagpos linspace(alltag(i),alltag(i+1)-1, nbdiv) ];
-				tagtext = [ tagtext round(linspace(g.freqlimits(1), g.freqlimits(2), nbdiv)) ];	
 			else
 				if tagzerooffset ~= 0
 					tmptagpos = [alltag(i)+tagzerooffset:-incrementpoint:alltag(i)];
@@ -1419,10 +1474,11 @@ else
 					tmptagpos = [];
 				end;
 				tagpos  = [ tagpos [tmptagpos(end:-1:2) alltag(i)+tagzerooffset:incrementpoint:(alltag(i+1)-1)]];
-				tmptagtext = [0:-incrementtime:g.limits(1)];
-				tagtext = [ tagtext [tmptagtext(end:-1:2) 0:incrementtime:g.limits(2)]];
 			end;
 		end;
+        % find corresponding epochs
+        % -------------------------
+        tagtext = eeg_point2lat(tagpos, floor((tagpos)/g.trialstag)+1, g.srate, g.limits, 1E-3);
      	set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
 			
     else
@@ -1705,6 +1761,27 @@ else
       end;
       set(fig,'UserData', g);
 	  eegplot('scaleeye', [], fig);
+   
+   case 'drawlegend'
+      fig = varargin{1};
+      g = get(fig,'UserData');
+      
+      if ~isempty(g.event)
+          nleg = length(g.eventtypes);
+          fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
+          pos = get(fig2, 'position');
+          set(fig2, 'position', [ pos(1) pos(2) 100 10*nleg+20]);
+          
+          for index = 1:nleg
+              plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}); hold on;
+              text(35, (index-0.5)*10, g.eventtypes{index});
+          end;
+          xlim([0 100]);
+          ylim([0 nleg*10]);
+          axis off;
+          set(fig2, 'visible', 'on');
+      end;
+          
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
   end  
