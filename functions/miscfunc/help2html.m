@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/15 18:23:17  arno
+% implementing outputtext
+%
 % Revision 1.4  2002/08/12 17:14:33  arno
 % debug
 %
@@ -127,7 +130,6 @@ try, g.header; 			catch, g.header		= ''; 	end;
 try, g.footer; 			catch, g.footer		= ''; 	end; 
 try, g.refcall; 		catch, g.refcall	= '%s.html'; 	end; 
 try, g.outputlink; 		catch, g.outputlink = [ g.normrow g.normcol1 '<FONT FACE="' g.font '"><A HREF="%s.html">%s.html</A></td>' g.normcol2 '%s</FONT></td></tr>' ]; end; 
-try, g.outputtext; 		catch, g.outputtext	=  filename(1:index(end)-1); 	end; 
 
 g.footer      = [ '<FONT FACE="'  g.font '">' g.footer '</FONT>' ];
 
@@ -146,13 +148,14 @@ end;
 % output file
 % -----------
 if nargin < 2 | isempty(htmlfile);
-	index = findstr( filename, '.');
-	if isempty(index), index = length(filename)+1; end;
-	htmlfile = [ filename(1:index(end)-1) '.html' ];
+	indexdot = findstr( filename, '.');
+	if isempty(indexdot), indexdot = length(filename)+1; end;
+	htmlfile = [ filename(1:indexdot(end)-1) '.html' ];
 else
-	index = findstr( filename, '.');
+	indexdot = findstr( filename, '.');
 end;
 fo = fopen(htmlfile, 'w');
+try, g.outputtext; 		catch, g.outputtext	=  filename(1:indexdot(end)-1); 	end; 
 
 % write header
 % ------------
@@ -325,7 +328,7 @@ fclose( fo  );
 
 % generate the output command
 % ---------------------------
-linktext = sprintf( g.outputlink, g.outputtext,  filename(1:index(end)-1), maintext ); 
+linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
 return;
 
 % -----------------
