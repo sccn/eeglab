@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/31 01:01:57  arno
+% debugging for frequencies
+%
 % Revision 1.6  2002/07/30 23:39:30  arno
 % implement rject superposition
 %
@@ -132,4 +135,7 @@ eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500], 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol };
 if ~isempty(EEG.chanlocs)
 	eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
+end;
+if ~reject
+	eegplotoptions = { eegplotoptions{:}  'butlabel', 'KEEP LABELS' };
 end;
