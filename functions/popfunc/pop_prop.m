@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/07/29 23:13:55  arno
+% debug typecomp
+%
 % Revision 1.18  2004/03/18 00:31:05  arno
 % remove skirt
 %
@@ -264,18 +267,24 @@ end;
 try
 	eeg_options; 
 	if typecomp == 1
-		spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
+		[spectra freqs] = spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
 	else 
 		if option_computeica  
-			spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
+			[spectra freqs] = spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
 		else
 			if exist('icaacttmp')~=1, 
 				icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
 			end;
-			spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
+			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
 		end;
 	end;
-	set(gca, 'xlim', [0 min(50, EEG.srate/2)]);
+    % set up new limits
+    % -----------------
+    freqslim = 50;
+	set(gca, 'xlim', [0 min(freqslim, EEG.srate/2)]);
+    spectra = spectra(find(freqs <= freqslim));
+	set(gca, 'ylim', [min(spectra) max(spectra)]);
+    
 	%tmpy = get(gca, 'ylim');
     %set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
 	set( get(gca, 'ylabel'), 'string', 'Magnitude (dB)', 'fontsize', 14); 
