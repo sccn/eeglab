@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/09/04 23:46:30  arno
+% debug
+%
 % Revision 1.2  2002/09/04 23:18:35  arno
 % addding typecomp for output command
 %
@@ -141,7 +144,7 @@ basename = [fastif(typecomp,'Channel ', 'Component ') int2str(numcompo) ];
 
 fh = figure('name', [basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off');
 pos = get(gcf,'Position');
-set(gcf,'Position', [pos(1) pos(2) 500 500]);
+set(gcf,'Position', [pos(1) pos(2)-500+pos(4) 500 500]);
 pos = get(gca,'position'); % plot relative to current axes
 hh = gca;
 q = [pos(1) pos(2) 0 0];
