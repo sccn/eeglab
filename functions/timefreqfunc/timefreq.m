@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/10/29 01:22:06  arno
+% remve debug msg
+%
 % Revision 1.33  2003/10/29 01:20:21  arno
 % more error checking
 %
@@ -238,7 +241,7 @@ else
 	g.cyclesfact = 1; % default is 1 (no decrease)
 end;
 if g.cyclesfact < 0 | g.cyclesfact > 1
-    error('Wavelet cycle factor must be comprise between 0 and 1');
+    error('Wavelet cycle factor must be comprised between 0 and 1');
 end;
 if (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
    error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
