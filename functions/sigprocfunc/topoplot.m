@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/07/01 23:10:17  julie
+% topoplot2() -> topoplot()
+%
 % Revision 1.30  2003/07/01 23:00:54  scott
 % debug
 %
@@ -627,3 +630,4 @@ hold off
 axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+handle = gca;
