@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/10/21 00:17:23  arno
+% updating default fisrtx and lastx input to allow for 0 latency (before 0=use default)
+%
 % Revision 1.12  2002/05/23 17:33:59  scott
 % adjusting verbose output -sm
 %
@@ -92,9 +95,6 @@ NEARZERO = 1e-22;
 verbose = 0;  % If 1, output process info
 
 nanexist = 0;  
-if exist('nanmean')==2 % test for stat toolbox nan routines
-   nanexist = 1;
-end
 if nargin<1
    help movav
    return
@@ -249,17 +249,9 @@ end
       end
     elseif length(xwin)==1,
       if fastave
-        if nanexist
-         outdata(:,f) = nanmean(data(:,round(lox):round(hix))')'; % Else average ignoring NaNs
-        else
-         outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
-        end
+          outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
       else
-        if nanexist
-          outdata(:,f) = nanmean(data(:,i)')'; % Else average
-        else
           outdata(:,f) = nan_mean(data(:,i)')'; % Else average
-        end
       end
 if verbose
   fprintf('.');
@@ -290,11 +282,7 @@ if verbose,
 end
          end
        else
-        if nanexist
-         outdata(:,f) = nansum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
-        else                % perform normalized windowed smoothing
-         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
-        end               
+           outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
        end 
     end
     lox = lox+xadv;
