@@ -1,27 +1,25 @@
-% pop_subcomp() - substract a selected components from a dataset.
+% pop_subcomp() - subtract specified components from an EEG dataset.
 %
 % Usage:
 %   >> OUTEEG = pop_subcomp( INEEG ); % pop-up window mode
 %   >> OUTEEG = pop_subcomp( INEEG, components, confirm);
 %
-% Graphical interface:
-%   "Component list to subtract ..." - [edit box] Array of components
-%                to subtract. Same as the 'components' parameter from
-%                the command line.
-%   "Component list to keep ..." - [edit box] Array of components to
-%                to keep. Uses the 'component' parameter from the 
-%                command line. comp_to_remove = ...
-%                       setdiff([1:size(EEG.icaweights,1)], comp_to keep)
-%
-% Inputs:
-%   INEEG      - Input dataset.
-%   components - Array of components to subtract. If empty, use the 
-%                 pre-labeled components in the dataset 
-%                (INEEG.reject.gcompreject).
-%   confirm    - Display the difference between original and processed
-%                dataset. 1=ask for confirmation. 0=do not ask. 
-%                Default 0.
-%
+% Pop-up window interface:
+%   "Component(s) to remove ..." - [edit box] Array of components to 
+%                subtract from the data. Sets the 'components' parameter 
+%                in the command line call (see below).
+%   "Component(s) to retain ..." - [edit box] Array of components to
+%                to retain in the data. Sets the 'components' parameter in
+%                the command line call. Then, comp_to_remove = ...
+%                    setdiff([1:size(EEG.icaweights,1)], comp_to_keep)
+%                Overwrites "Component(s) to remove" (above).
+% Command line inputs:
+%   INEEG      - Input EEG dataset.
+%   components - Array of components to subtract from the data. If empty, 
+%                 remove components previously marked for rejection (e.g., 
+%                 EEG.reject.gcompreject).
+%   confirm    - [0|1] Display the difference between original and processed
+%                dataset. 1 = Ask for confirmation. 0 = Do not ask. {Default: 0}
 % Outputs:
 %   OUTEEG     - output dataset.
 %
@@ -48,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/02/19 19:17:25  arno
+% update header for GUI
+%
 % Revision 1.9  2003/01/28 18:34:45  arno
 % adding an option to keep components
 %
@@ -95,15 +96,15 @@ if nargin < 2
 	if ~isempty(EEG.reject.gcompreject)
         components = find(EEG.reject.gcompreject == 1);
         components = components(:)';
-        promptstr    = { ['Component list to subtract from data:'] };
+        promptstr    = { ['Component(s) to remove from the data ([] = marked comps.)'] };
         %promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
     else
         components = [];
-        promptstr    = { ['Component list to subtract from data:'] };
+        promptstr    = { ['Component(s) to remove from data:'] };
     end;
-    promptstr    = { ['Component list to subtract from data:'] 'Component list to keep (overwrite previous option)' };
+    promptstr    = { ['Component(s) to remove from data:'] 'Component(s) to retain (overwrites "Component(s) to remove")' };
 	inistr       = { int2str(components) '' };
-	result       = inputdlg2( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr, 'pop_subcomp');
+	result       = inputdlg2( promptstr, 'Remove components from data -- pop_subcomp()', 1,  inistr, 'pop_subcomp');
 	if length(result) == 0 return; end;
 	components   = eval( [ '[' result{1} ']' ] );
     if ~isempty(result{2}), 
