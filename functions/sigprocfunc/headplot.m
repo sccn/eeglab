@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/03/25 19:43:13  arno
+% allowing to read custom mesh, fixed color bug
+%
 % Revision 1.30  2004/02/24 17:18:33  arno
 % using readlocs to read file
 %
@@ -623,7 +626,7 @@ else
   W(index1) = idx;
   colormap(Cmap)
   p1 = patch('Vertices',POS,'Faces',TRI1,'FaceVertexCdata',W(:),...
-      'FaceColor','interp', 'cdatamapping', 'direct');    %%%%%%%%% Plot scalp map %%%%%%%%%
+      'FaceColor','interp', 'cdatamapping', 'direct', 'tag', 'mesh');    %%%%%%%%% Plot scalp map %%%%%%%%%
   if exist('NORM') == 1 & ~isempty(NORM)
       set(p1, 'vertexnormals', NORM);
   end;
