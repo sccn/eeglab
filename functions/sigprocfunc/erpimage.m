@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.187  2004/01/24 20:45:11  scott
+% same
+%
 % Revision 1.186  2004/01/24 20:42:05  scott
 % same
 %
@@ -2991,7 +2994,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
          return
       end
       if ~isempty(winloc)
-         fillwinx = [winloc(1,:) winloc(2,end:-1:1)];
+         fillwinx = [winloc winloc(end:-1:1)];
          if ~isempty(axlimits) & sum(isnan(axlimits))==0
            fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
          else
@@ -3005,7 +3008,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
   end
-  if ~isempty(stdev) == 1
+  if ~isempty(stdev)
       [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
       [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
   end
