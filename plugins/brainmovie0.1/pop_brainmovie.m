@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/04/24 01:36:48  arno
+% coordinates
+%
 % Revision 1.35  2003/04/23 16:54:46  arno
 % same
 %
@@ -408,6 +411,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
+    coordinates(:,1) = -coordinates(:,1);   
 
     brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
                          'resolution', 'low', ...
