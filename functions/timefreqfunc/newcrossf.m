@@ -85,6 +85,8 @@
 %                     affect the 'mcoh' output and the bootstrap estimation. 
 %                     Use NaN for full epoch. {0}
 %       'powbase'   = Baseline spectrum to log-subtract.  {default: from data}
+%       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
+%                     memory. Default 'off'.
 %
 %    Optional Bootstrap:
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
@@ -177,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/05/01 22:03:17  arno
+% debuging frequencies
+%
 % Revision 1.44  2003/05/01 00:46:33  arno
 % updating outputs
 %
@@ -571,7 +576,7 @@ for index=1:length(varargin)
 	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
 end;
 if ~isempty(varargin)
-    [tmp indices] = unique(varargin(1:2:end));
+    [tmp indices] = unique(varargin(1:2:end)); % keep the first one
     varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 line remove duplicate arguments    
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
@@ -586,7 +591,6 @@ try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(frame)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
 try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end;
 try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end;
-try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
 try, g.topovec;    catch, g.topovec = []; end;
 try, g.elocs;      catch, g.elocs = ''; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
@@ -602,7 +606,8 @@ try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
-try, g.freqs;      catch, g.freqs = [0 50]; end;
+try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
+try, g.freqs;      catch, g.freqs = [0 g.maxfreq]; end;
 try, g.nfreqs;     catch, g.nfreqs = []; end;
 try, g.freqscale;  catch, g.freqscale = 'linear'; end;
 try, g.naccu;      catch, g.naccu = 200; end;
@@ -615,13 +620,14 @@ try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
 try, g.savecoher;  catch, g.savecoher = 0; end;
 try, g.noinput;    catch, g.noinput = 'no'; end;
+try, g.lowmem;     catch, g.lowmem = 'off'; end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
 	switch allfields{index}
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
-		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' ...
+		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' ...
 		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
@@ -713,6 +719,41 @@ if g.tlimits(2)-g.tlimits(1) < 30
     disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
 end;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compute frequency by frequency if low memory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs)
+    
+    % compute for first 2 trials to get freqsout
+    XX = reshape(X, 1, frame, length(X)/g.frame);    
+    YY = reshape(Y, 1, frame, length(Y)/g.frame);    
+    [coh,mcoh,timesout,freqsout] = newcrossf(XX(1,:,1), YY(1,:,1), frame, tlimits, Fs, varwin, 'plotamp', 'off', 'plotphase', 'off',varargin{:});
+    
+    % scan all frequencies
+    for index = 1:length(freqsout)
+        if nargout < 6
+            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+        elseif nargout == 7 % requires RAM
+            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:), ...
+             allcoher(index,:,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+        else
+            [coh(index,:),mcoh(index),timesout,tmpfreqs(index),cohboot(index,:),cohangles(index,:), ...
+             allcoher(index,:,:),alltfX(index,:,:),alltfY(index,:,:)] = ...
+                newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+        end;
+    end;
+    
+    % plot and return
+    coh = coh.*exp(j*cohangles);
+    plotall( coh, cohboot, timesout, freqsout, mcoh, g);
+    return;
+end;    
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
@@ -796,7 +837,7 @@ if iscell(X)
         end;
         g.title = g.title{3};
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-            plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+            plotall(Rdiff, [], times, freqs, mbase, g);
         end;
         Rbootout = [];
 	else 
@@ -827,7 +868,7 @@ if iscell(X)
 		g.title = g.title{3};
 		g.boottype = 'trials';
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-            plotall(Rdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
+            plotall(Rdiff, coherimages, times, freqs, mbase, g);
         end;
         
         % outputs
@@ -898,7 +939,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% -------------------------------------
     spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
                 g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
-                'maxfreq', g.maxfreq 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
+                'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
 
     fprintf('\nProcessing first input\n');
 	X = reshape(X, g.frame, trials);
