@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 01:19:24  arno
+% change colors
+%
 % Revision 1.7  2002/08/11 22:46:44  arno
 % backcolor
 %
@@ -77,7 +80,8 @@ SC  =  ['binica.sc'];           % Master .sc script file for binica.m
                                 % in its path of script directories.
                                 % Copy to pwd to alter ica defaults
 
-BACKCOLOR  =  [.846 .892 .956];     
+GUIBACKCOLOR  =  [.846 .892 .956];     
+BACKCOLOR  =  [.93 .96 1];     
 BACKEEGLABCOLOR  = [.66 .76 1];    
 GUIBUTTONCOLOR   = [.66 .76 1];    
 GUITEXTCOLOR     = [0 0 0.4];
