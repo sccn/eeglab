@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/10/29 22:44:30  scott
+% text
+%
 % Revision 1.39  2002/10/29 22:43:23  scott
 % text
 %
@@ -250,9 +253,9 @@ if nargin<2
 				 if size(tmptext,1) > 15,    stringtext = [ tmptext(1,1:15) '...' ]; 
 				 else                        stringtext = tmptext(1,:); 
 				 end;
-			 else stringtext = 'no-description'; tmptext = 'no-description';
+			 else stringtext = 'no description'; tmptext = 'no description';
 			 end;
-        else stringtext = 'no-description'; tmptext = 'no-description';
+        else stringtext = 'no description'; tmptext = 'no description';
         end;
 
 		descrip = { 'string', stringtext, 'callback', ['questdlg2(' vararg2str(tmptext) ...
