@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/21 01:45:45  arno
+% remove it
+%
 % Revision 1.2  2002/07/29 22:29:25  arno
 % put bug
 %
@@ -48,18 +51,15 @@ function R = convolve( A, B )
 
 % convolve A and B (normalize by the sum of convolved elements)
 % -------------------------------------------------------------
-SIZECONVO = floor(size(B(:),1)/2);
 R = zeros( size(A) );
-for index = 1:size(A(:),1)
+for index = 1:length(A)
 	sumconvo = 0;
-	for indexconvo = -SIZECONVO:SIZECONVO
-		indexA = index + indexconvo;
-		indexB = indexconvo+SIZECONVO+1;
-		if indexA > 0 & indexA < size(A(:),1)
-			if indexB > 0 & indexB < size(B(:),1)
-				R(index) = R(index) + B(indexB)*A(indexA);
-				sumconvo = sumconvo + B(indexconvo+SIZECONVO+1);
-			end;	
+	for indexB = 1:length(B)
+        indexconvo = indexB-1-round(length(B)/2);
+		indexA = index + indexconvo+1;
+		if indexA > 0 & indexA <= length(A)
+            R(index) = R(index) + B(indexB)*A(indexA);
+            sumconvo = sumconvo + B(indexB);
 		end;
 	end;
 	R(index) = R(index) / sumconvo;
