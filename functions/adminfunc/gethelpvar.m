@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/22 23:17:05  arno
+% Initial revision
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -134,12 +137,12 @@ while (str(1) == '%')
                vartext = str;
             else	
                if ~isempty(varname) 
-               	    vartext = [ vartext ' ' str]; % espace if in array
+               	    vartext = [ vartext 10 str]; % espace if in array
                else 
                		if all(vartext(	end-2:end) == '.')
-               			vartext = [ deblank2(vartext(1:end-3)) ' ' str]; % espace if '...'
+               			vartext = [ deblank2(vartext(1:end-3)) 10 str]; % espace if '...'
                		else
-                    	vartext = [ vartext '<BR>' str];    % CR otherwise
+                    	vartext = [ vartext 10 str];    % CR otherwise
                     end;	
                end;		
             end;
