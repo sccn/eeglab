@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/12/04 22:32:15  arno
+% trying to debug tites for multiple conditions
+%
 % Revision 1.28  2002/11/20 15:51:21  arno
 % do not return abs Rdiff
 %
@@ -716,7 +719,7 @@ if iscell(X)
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X).*conj(arg2(:,:,X),3) ./ sqrt(sum(arg1(:,:,X))) ./ sqrt(sum(arg2(:,:,X)))';
 		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
-						'both', g.condboot, { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
+						'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
 		 case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
