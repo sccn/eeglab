@@ -82,7 +82,7 @@
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
 %                    is the whole epoch                         {default: 0}
 %       'condboot' = ['abs'|'angle'|'complex'] for comparing 2 conditions,
-%                    either subtract ITC absolute vales ('abs'), angles 
+%                    either subtract absolute vales ('abs'), angles 
 %                    ('angles') or complex values ('complex').     {'abs'}
 %       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
 %                    The bootstrap type should be identical to that used
@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/11/20 02:04:45  arno
+% debugging ??? One or more output arguments not assigned during call to 'newcrossf'.
+%
 % Revision 1.26  2002/11/20 01:44:06  arno
 % same
 %
@@ -735,7 +738,7 @@ if iscell(X)
         % outputs
         Rbootout = {Rbootout1 Rbootout2 coherimages};
 	end;
-    R        = { abs(R1) abs(R2) abs(Rdiff) };
+    R        = { abs(R1) abs(R2) fastif(isreal(Rdiff), Rdiff, abs(Rdiff)) };
     Rangle   = { angle(R1) angle(R2) angle(Rdiff) };
     coherresout = [];
     if nargout >=9
