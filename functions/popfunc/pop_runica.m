@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2005/03/07 19:53:42  arno
+% fixing fastica call
+%
 % Revision 1.47  2005/02/02 01:29:28  arno
 % new method to compute weights, icawinv...
 %
@@ -259,8 +262,23 @@ else
 	end;	
 end;
 
-% remove old ICA weights etc...
-% -----------------------------
+% Store and then remove current EEG ICA weights and sphere
+% ---------------------------------------------------
+if ~isfield(EEG,'oldwts')
+    EEG.oldwts = {EEG.icaweights};
+    fprintf('Saving current EEG.icaweights as EEG.oldwts.\n');
+else
+    EEG.oldwts = {EEG.oldwts EEG.icaweights};
+    fprintf('Appending current EEG.icaweights to EEG.oldwts.\n');
+end
+if ~isfield(EEG,'oldsph')
+    EEG.oldsph = {EEG.icasphere};
+    fprintf('Saving current EEG.icasphere as EEG.oldsph.\n');
+else
+    EEG.oldsph = {EEG.oldsph EEG.icasphere};
+    fprintf('Appending current EEG.icasphere to EEG.oldsph.\n');
+end
+
 EEG.icaweights = [];
 EEG.icasphere  = [];
 EEG.icaact     = [];
@@ -297,7 +315,7 @@ switch lower(icatype)
         end;
      case 'binica'
         icadefs;
-        fprintf(['Warning: if the binary ICA function does not work, check that you have added the\n' ...
+        fprintf(['Warning: IF the binary ICA function does not work, check that you have added the\n' ...
                  'binary file location (in the EEGLAB directory) to your Unix /bin directory (.cshrc file)\n']);
         if exist(ICABINARY) ~= 2
             error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
@@ -340,7 +358,7 @@ switch lower(icatype)
         end;
         clear tmp;
      case 'egld_ica' 
-        disp('Warning: this algorithm is very slow');
+        disp('Warning: this algorithm is very slow!!!');
         if length(options) < 2
             [tmp EEG.icaweights] = egld_ica( tmpdata );
         else    
