@@ -6,56 +6,45 @@
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
 %              options below). Nose is at top of plot; left is left; right is right.
 % Usage:
-%        >>  topoplot(datavector, EEG.chanlocs); % use a channel locations structure
-%        >>  topoplot(datavector, 'my_chan.locs'); % use a channel locations file
+%        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
+%        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
 %        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...);
 %
 % Required Inputs:
 %   datavector        - single vector of channel values. Else, if a vector of selected 
 %                       channel numbers -> mark their location(s) using 'style' 'blank'.
-%   chan_locs         - name of an EEG electrode position file (>> topoplot example),
-%                       else an EEG.chanlocs structure (>> help pop_editset)
-% Optional Inputs:
-%   'maplimits'       - 'absmax' scale to +/- the absolute-max; 'maxmin', scale to 
-%                       the data range; [clim1,clim2], user-definined lo/hi limits
-%                       {default: 'absmax'}
-%   'style'           - 'straight' - plot colored map only
-%                       'contour'  - plot contour lines only
-%                       'both'     - plot both colored map and contour lines
-%                       'fill'     - plot constant color between contour lines
-%                       'blank'    - plot electrode locations only {default: 'both'}
-%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'
-%                       {default: 'on', marks electrode location points}
-%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{var}
-%                       electrode marking details and their {defaults}. 
-%   'numcontour'      - number of contour lines {default: 6}
-%   'shading'         - 'flat','interp'  {default: 'flat'}
-%   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
-%                       'head'-> interpolate the whole disk {default: 'head'}.
-%   'plotrad'         - [0.15<=float<=1.0] plotting radius. (See >> topoplot example). If 
-%                       plotrad > 0.5, plot channels with arc_length > 0.5 (below ears-eyes)
-%                       in a circular 'skirt' outside the cartoon head outline. 
-%                       {default: the larger of the max channel arc_length and 0.5}. 
-%   'headrad'         - plotting radius (arc_length) of cartoon head. Value in range(0.15,1.0)
-%                       -> specify arc_length. NB: 0.5 is anatomically correct; 0 -> none; 
+%   chan_locs         - name of an EEG electrode position file (>> topoplot example).
+%                       Else, an EEG.chanlocs structure (>> help pop_editset)
+% Optional inputs:
+%   'maplimits'       - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
+%                       'maxmin'   -> scale colors to the data range (makes green mid-range); 
+%                       [lo.hi]    -> use user-definined lo/hi limits {default: 'absmax'}
+%   'style'           - 'straight' -> plot colored map only
+%                       'contour'  -> plot contour lines only
+%                       'both'     -> plot both colored map and contour lines
+%                       'fill'     -> plot constant color between contour lines
+%                       'blank'    -> plot electrode locations only {default: 'both'}
+%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
+%                       options below. {default: 'on' -> mark electrode locations with points}. 
+%   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
+%                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
+%                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside 
+%                       the cartoon head.  {default: max(max(arc_length), 0.5)}. 
+%   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
+%                       NOTE: headdrad = 0.5 is anatomically correct!; 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
-%   'colormap'        -  (n,3) any size colormap {default: existing colormap}
-%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
-%                       If [rad theta] are coordinates of a (possibly missing) channel, 
-%                       returns interpolated value for channel location. For location 
-%                       conventions, see >> topoplot 'example' {default: 'off'}
-%   'ccolor'          - color of the contours {default: blue}
-%   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
-%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
-%
+%                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
+%                       returns interpolated value for channel location.  For more info, 
+%                       see >> topoplot 'example' {default: 'off'}
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
 %                       Coordinates returned by dipplot() may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
-%                       Ex: 'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
+%                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
+% Dipole plotting options:
 %   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'off'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
 %   'diplen'          - [real] scale dipole length {default: 1}.
@@ -63,18 +52,29 @@
 %   'dipsphere'       - [real] size of the dipole sphere. {default: 85 mm}.
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' -> black}.
+% Plot detail options:
+%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{var}
+%                       electrode marking details and their {defaults}. 
+%   'shading'         - 'flat','interp'  {default: 'flat'}
+%   'numcontour'      - number of contour lines {default: 6}
+%   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
+%                       'head'-> interpolate the whole disk {default: 'head'}.
+%   'colormap'        -  (n,3) any size colormap {default: existing colormap}
+%   'ccolor'          - color of the contours {default: blue}
+%   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
+%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
+%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%
 % Outputs:
 %         h           - plot axes handle
 %         val         - interpolated value at given 'noplot' channel location, if any.
 %         grid        - interpolated data image matrix (off-head points = NaN).
 %
-% Eloc_file format:
-%    chan_number degrees arc_length reject_level amp_gain channel_name
-%    (Angle-0 =Cz-to-Fz; C3-angle =-90; arc_length at edge of image = 0.5)
-%    For more information and sample file: >> topoplot 'example'
+% Chan_locs format:
+%    See >> topoplot 'example'
 %
-% Authors: Andy Spydell, Colin Humphries, Scott Makeig & Arnaud Delorme 
-%          CNL / Salk Institute, Aug, 1996 - SCCN/INC/UCSD, Nov. 2001 -
+% Authors: Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
+%          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001 ->
 %
 % See also: timtopo(), envtopo()
 
@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.167  2004/03/21 18:02:08  scott
+% debugged deprecated 'shrink' mode code
+%
 % Revision 1.166  2004/03/21 17:31:44  scott
 % nothing
 %
