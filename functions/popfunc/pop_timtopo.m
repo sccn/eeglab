@@ -1,4 +1,4 @@
-% pop_timtopo() - timtopo function for datasets. Enveloppe of EEG data
+% pop_timtopo() - timtopo function for datasets. Envelope of EEG data
 %                 visualization with head plots at specific latencies.
 %
 % Usage:
@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-16-02 text interface editing -sm & ad 
