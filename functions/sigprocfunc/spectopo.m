@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2005/01/24 01:54:53  arno
+% allowing to display channel/component index
+%
 % Revision 1.90  2004/08/20 18:29:52  hilit
 % *** empty log message ***
 %
@@ -547,8 +550,18 @@ if isempty(g.weights)
         % spec = sqrt( g.mapnorm(1)^4*power(compact).^2 + g.mapnorm(1)^4*power(compact).^2 + ...)
         % spec = sqrt( g.mapnorm(1)^4 + g.mapnorm(1)^4 + ... )*power(compact)
     end;
-	eegspecdB = 10*log10(eegspecdB);
+    
+    tmpc = find(eegspecdB(:,1));
+    g.chanlocs2 = g.chanlocs;
+    if length(tmpc) ~= size(eegspecdB,1)
+        fprintf('\nWarning: channels [%s] have 0 value and are omitted for display', int2str(find(eegspecdB(:,1) == 0)));
+        eegspecdB = eegspecdB(tmpc,:);
+        specstd   = specstd(tmpc,:);
+        g.chanlocs2 = g.chanlocs(tmpc);
+    end;
+    eegspecdB = 10*log10(eegspecdB);
     specstd   = 10*log10(specstd);
+    warning on backtrace
     fprintf('\n');
 else
 	% compute data spectrum
@@ -917,9 +930,9 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
             
 		else	
 			if ~isempty(varargin)
-				topoplot(topodata,g.chanlocs,'maplimits',maplimits, varargin{:}); 
+				topoplot(topodata,g.chanlocs2,'maplimits',maplimits, varargin{:}); 
 			else
-				topoplot(topodata,g.chanlocs,'maplimits',maplimits); 
+				topoplot(topodata,g.chanlocs2,'maplimits',maplimits); 
 			end
 			if f<length(g.freq)
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
