@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.203  2002/11/15 18:18:41  arno
+% adding tutorial to the help menu
+%
 % Revision 1.202  2002/11/15 03:17:20  arno
 % remove old functions from header
 %
@@ -934,8 +937,8 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 
 if besamenu
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Locate dipoles using BESA');
-	uimenu( fourth_sub3, 'Label', 'Export components to BESA'     , 'CallBack', [ checkbesa 'besaexport(EEG);' e_hist ]);
-	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'      , 'CallBack', [ checkbesa 'EEG = besaimport(EEG);' e_store]);
+	uimenu( fourth_sub3, 'Label', 'Export components to BESA'     , 'CallBack', [ checkica 'besaexport(EEG);' e_hist ]);
+	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'      , 'CallBack', [ checkica 'EEG = besaimport(EEG);' e_store]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles on BESA head'     , 'CallBack', [ checkbesa 'besaplot(EEG.sources);' e_hist]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'      , 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''image'', ''mri'');' e_hist]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');' e_hist]);
