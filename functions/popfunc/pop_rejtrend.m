@@ -2,6 +2,7 @@
 %                  epoched trials based on the accuracy of the linear
 %                  fit.
 % Usage:
+%   >> pop_rejtrend( INEEG, typerej); % pop up
 %   >> OUTEEG = pop_rejtrend( INEEG, typerej, electrodes, ...
 %                winsize, minslope, minR, superpose, reject);
 %
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/26 17:04:24  arno
+% adding message
+%
 % Revision 1.2  2002/07/26 16:35:57  arno
 % chaning icacomp
 %
@@ -157,7 +161,9 @@ if calldisp
 	end;	
 end;
 
-com = sprintf('Indexes = pop_rejtrend( %s, %d, [%s], %s, %s, %s, %d, %d);', ...
-   inputname(1), icacomp, num2str(elecrange),  num2str(winsize), num2str(minslope), num2str(minstd), superpose, reject ); 
+%com = sprintf('Indexes = pop_rejtrend( %s, %d, [%s], %s, %s, %s, %d, %d);', ...
+%   inputname(1), icacomp, num2str(elecrange),  num2str(winsize), num2str(minslope), num2str(minstd), superpose, reject ); 
+com = [ com sprintf('%s = pop_rejtrend(%s,%s);', inputname(1), ...
+		inputname(1), vararg2str({icacomp,elecrange,winsize,minslope,minstd,superpose,reject})) ]; 
 
 return;
