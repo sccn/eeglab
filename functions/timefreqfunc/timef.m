@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/04/29 14:32:56  scott
+% removing debugging statements -sm
+%
 % Revision 1.26  2002/04/29 14:32:31  scott
 % adding ; -sm
 %
@@ -743,6 +746,8 @@ end;
 
 switch g.phsamp
  case 'on'
+size(cumulX)
+size(PA)
   for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
     PA(j,:,:) = PA(j,:,:) ./ cumulX;
   end
