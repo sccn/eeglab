@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/07/14 02:39:16  arno
+% same
+%
 % Revision 1.20  2002/07/14 02:23:16  arno
 % same
 %
@@ -1043,11 +1046,14 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                           times(1),times(base(end)));
  end
  amps = 20*log10(amps); % convert to dB
+ allamps = 20*log10(allamps);
 
  if isnan(baseamp) % if not specified in 'limits'
     [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
- else
+ 	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+else
     amps = amps-baseamp; % use specified (log) baseamp
+	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
  end
  if isnan(signifs);
     ampsig = ampsig-baseamp;
@@ -1062,8 +1068,6 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
  fprintf('Subtracting the mean baseline log amplitude \n');
  %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
  % allamps = allamps./baseall;
-
- allamps = allamps./10^(baseamp/20); % divide by (non-log) baseline amplitude
 
  % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
@@ -1091,7 +1095,6 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
   outtrials = 1:ntrials;
   outsort = sortvar;
  end
- allamps = 20*log10(allamps); % convert to dB
 
  %
  %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
