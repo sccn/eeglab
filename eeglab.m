@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.290  2003/12/04 01:14:17  arno
+% adding paths
+%
 % Revision 1.289  2003/12/03 18:36:49  arno
 % same
 %
@@ -1073,11 +1076,25 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 % -------------
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
-myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
-myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
-myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
-myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
-myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/ressources');
+
+% test for local SCCN copy
+% ------------------------
+if (strcmpi(computer, 'GLNX86') & exist( [ eeglabpath 'functions/adminfunc') == 7)
+    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
+    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+    myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
+    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/ressources');
+elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc') == 7)
+    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
+    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
+    myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
+    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions\ressources');
+else
+    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions');    
+end;
+
 eeg_options; 
 eeg_global;
 
