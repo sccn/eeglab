@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/07/11 21:44:00  arno
+% removing warning for urevent
+%
 % Revision 1.8  2003/04/10 17:58:36  arno
 % filter for file read
 %
@@ -92,7 +95,6 @@ EEG.xmin            = 0;
 if ~isempty(Eventdata)
     orinbchans = EEG.nbchan;
     for index = size(Eventdata,1):-1:1
-        if isfield(EEG.event, 'urevent'), EEG.event = rmfield(EEG.event, 'urevent'); end;
         EEG = pop_chanevent( EEG, orinbchans-size(Eventdata,1)+index, 'edge', 'leading', ...
                              'delevent', 'off', 'typename', Head.eventcode(index,:), ...
                              'nbtype', 1, 'delchan', 'on');
