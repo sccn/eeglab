@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/07/22 17:14:44  arno
+% do not pop up help window if 4 argumentes
+%
 % Revision 1.27  2003/07/12 01:24:34  arno
 % plotting events
 %
@@ -253,7 +256,7 @@ else % case of a single trial (continuous data)
     end; 
     eegplotoptions = { 'winlength', 5 };
     if ~isempty(EEG.chanlocs) & icacomp
-        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs, 'event', EEG.event };
+        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs, 'events', EEG.event };
     end;
 end;
 

@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/07/12 01:25:16  arno
+% now plotting events
+%
 % Revision 1.23  2003/01/10 01:10:34  arno
 % remove default position
 %
@@ -223,7 +226,7 @@ if ~isempty(rejeegplot)
 else
 	rejeegplot = [];
 end;
-eegplotoptions = { 'event', EEG.event, 'winlength', 5, 'winrej', ...
+eegplotoptions = { 'events', EEG.event, 'winlength', 5, 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol, ...
 				   'colmodif', { { EEG.reject.rejmanualcol EEG.reject.rejthreshcol EEG.reject.rejconstcol ...
                                    EEG.reject.rejjpcol     EEG.reject.rejkurtcol   EEG.reject.rejfreqcol } } };
