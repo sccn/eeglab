@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/25 02:14:30  arno
+% adding event field description
+%
 % Revision 1.8  2002/04/22 23:47:57  arno
 % debugging 2 variable sorting
 %
@@ -108,9 +111,8 @@ if nargin<2
         if strcmp( allfields{index}, 'latency')
             if EEG.trials > 1
                inputstr =  [ allfields{index} ' (ms)'];
-               latencypoint = mod(getfield(EEG.event,{1}, allfields{index})-1, EEG.pnts);
-               valuestr = num2str(((latencypoint)/EEG.srate+EEG.xmin)*1000);
-               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= (editval/1000-EEG.xmin)*EEG.srate+1 + (eventtmp(valnum).epoch-1)*EEG.pnts;'']);'];
+               valuestr = num2str(eeg_point2lat( getfield(EEG.event,{1}, allfields{index}), EEG.event(1).epoch,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3));
+               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= eeg_lat2point(editval,eventtmp(valnum).epoch,EEG.srate,[EEG.xmin EEG.xmax]*1000, 1E-3);'']);'];
             else
                inputstr =  [ allfields{index} ' (sec)'];
                valuestr = num2str((getfield(EEG.event,{1}, allfields{index})-1)/EEG.srate+EEG.xmin);
@@ -118,7 +120,7 @@ if nargin<2
             end;   
 		else inputstr =  allfields{index};
             valuestr = num2str(getfield(EEG.event,{1}, allfields{index}));
-            strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= editval;'']);']; 
+            strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= editval;'']);'];
 		end;
 		% callback for displaying help
 		% ----------------------------
@@ -156,9 +158,14 @@ if nargin<2
     for index = 1:length(allfields) 
         if strcmp( allfields{index}, 'latency')
             if EEG.trials > 1
-	             callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str((mod(eventtmp(valnum).' allfields{index} '-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000));' ];
-            else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str((eventtmp(valnum).' allfields{index} '-1)/EEG.srate+EEG.xmin));' ]; end;
-        else     callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str(eventtmp(valnum).' allfields{index} '));'  ];
+	             callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
+							   '''), ''string'', num2str(eeg_point2lat(eventtmp(valnum).' allfields{index} ...
+							   ',eventtmp(valnum).epoch, EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3)));' ];
+            else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
+							           '''), ''string'', num2str((eventtmp(valnum).' allfields{index} '-1)/EEG.srate+EEG.xmin));' ]; 
+			end;
+		else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
+						   '''), ''string'', num2str(eventtmp(valnum).' allfields{index} '));'  ];
       end;
     end;
     callpart2 = [ callpart2 'clear valnum;' ];
@@ -322,7 +329,7 @@ return;
 function strval = reformat( val, latencycondition, trialcondition, eventnum)
     if latencycondition
         if trialcondition > 1
-            strval = [ '(' num2str(val) '/1000-EEG.xmin)*EEG.srate+1+ (EEG.event(' int2str(eventnum) ').epoch-1)*EEG.pnts;' ];
+            strval = ['eeg_point2lat(' num2str(val) ', EEG.event(' int2str(eventnum) ').epoch, EEG.srate,[EEG.xmin EEG.xmax]*1000, 1E-3);' ];
         else    
             strval = [ '(' num2str(val) '-EEG.xmin)*EEG.srate+1;' ]; 
         end;
