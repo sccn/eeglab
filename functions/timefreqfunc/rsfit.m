@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/07/10 00:47:58  arno
+% text typo
+%
 % Revision 1.5  2003/07/10 00:36:52  arno
 % adding plot option
 %
@@ -92,11 +95,11 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
     % find fit
     % --------
     try, 
-        [sol tmp exitcode] = fminsearch('rspdfsolv', [0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 1000000), abs(xskew), xkurt);    
+        [sol tmp exitcode] = fminsearch('rspdfsolv', [0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 100000000), abs(xskew), xkurt);    
     catch, exitcode = 0; % did not converge
     end;
     if ~exitcode
-        try, [sol tmp exitcode] = fminsearch('rspdfsolv', -[0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 1000000), abs(xskew), xkurt);
+        try, [sol tmp exitcode] = fminsearch('rspdfsolv', -[0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 100000000), abs(xskew), xkurt);
         catch, exitcode = 0; end;
     end;
     if ~exitcode,           error('No convergence'); end;
