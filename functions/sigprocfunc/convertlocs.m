@@ -15,7 +15,7 @@
 %                 coordinates, then for spherical and finally for polar. Default is 'auto'.
 %
 % Optional input
-%   'verbose' - ['on'|'off'] default is 'on'.
+%   'verbose' - ['on'|'off'] default is 'off'.
 %
 % Outputs:
 %   newchans - new EEGLAB channel locations structure
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/01/01 19:21:55  scott
+% help msg edit
+%
 % Revision 1.14  2003/12/17 00:44:36  arno
 % allowing channels with empty coordinates
 %
@@ -99,10 +102,10 @@ end;
 if nargin < 2
    command = 'auto';
 end;
-if nargin == 4 & strcmpi(varargin{2}, 'off')
-    verbose = 0;
-else
+if nargin == 4 & strcmpi(varargin{2}, 'on')
     verbose = 1;
+else
+    verbose = 0; % off
 end;
 
 % test if value exists for default
