@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/08/03 15:10:42  arno
+% ydir
+%
 % Revision 1.10  2004/07/26 21:11:37  arno
 % fixed problem if flat channel
 %
@@ -386,8 +389,8 @@ end
         %
         if ~ISSPEC
             
-            ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
-            ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
+            ymin = double(min(data(I,1+P*frames:1+P*frames+frames-1)));
+            ymax = double(max(data(I,1+P*frames:1+P*frames+frames-1)));
             if ymin == ymax, ymin = ymin-1; ymax = ymax+1; end;
             plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
             
@@ -399,7 +402,7 @@ end
             
             if P==datasets-1,            % on last traces
                 if I==floor((chans+1)/2),   % draw +/0 on lowest left plot
-                    signx = xmin-0.04*xdiff;
+                    signx = double(xmin-0.04*xdiff);
                     
                     if SIGN > 0  % pos up
                         axis('off');hl=text(signx,ymin,num2str(ymin,3));        % text ymin
@@ -415,7 +418,7 @@ end
                 end
                 
                 if I==chans & limitset,    % draw timescale on lowest right plot
-                    ytick = -ymax-0.25*ydiff;
+                    ytick = double(-ymax-0.25*ydiff);
                     
                     tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
                     set(h,'FontSize',TICKFONTSIZE);         % choose font size
