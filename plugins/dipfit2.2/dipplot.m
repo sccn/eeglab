@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.45  2003/07/22 01:10:06  arno
+%*** empty log message ***
+%
 %Revision 1.44  2003/07/21 22:04:09  arno
 %debug for Matlab 5.3
 %
@@ -377,6 +380,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     if ~isfield(sources, 'posxyz')
         sources = computexyzforbesa(sources);
+    end;        
+    if ~isfield(sources, 'component')
+        disp('No component indices, making incremental ones...');
+        for index = 1:length(sources)
+            sources(index).component = index;
+        end;
     end;        
 
     % normalize position to unit sphere
