@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/12 01:13:40  arno
+% debuging no ploting option
+%
 % Revision 1.8  2002/04/12 01:08:13  arno
 % change plotamps to plotamp in help message
 %
@@ -382,8 +385,10 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    	freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
-	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,.5);
+    dispf = find(freqs <= g.maxfreq);
+    freqs = freqs(dispf);
 
+	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,.5);
 	R = zeros(size(win,2),g.timesout);       % mean coherence
 	RR = repmat(nan,size(win,2),g.timesout); % initialize with nans
 	Rboot = zeros(size(win,2),g.naccu);  % summed bootstrap coher
