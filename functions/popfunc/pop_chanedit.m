@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/07/10 18:30:03  arno
+% debuging rotate axis cancelation
+%
 % Revision 1.50  2003/05/13 23:49:13  arno
 % [Aallowing to write channel location file
 %
