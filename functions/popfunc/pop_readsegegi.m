@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/04/11 00:41:16  arno
+% remove debug messages
+%
 % Revision 1.2  2003/04/11 00:40:11  arno
 % debug
 %
@@ -46,7 +49,7 @@ EEG = [];
 command = '';
 if nargin < 1 
 	% ask user
-	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose first EGI RAW file -- pop_readegi()'); 
+	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose first EGI RAW file -- pop_readsegegi()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
@@ -74,6 +77,8 @@ while cont
     end;
 end;
 
+% add one channel with the event data
+% -----------------------------------
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
