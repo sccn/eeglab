@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/12/17 23:00:24  scott
+% return Wout
+%
 % Revision 1.21  2003/12/17 22:58:11  scott
 % output TRI1
 %
@@ -142,7 +145,7 @@
 % 01-25-02 reformated help & license, added links -ad 
 % 03-21-02 added readlocs and the use of eloc input structure -ad 
 
-function [Wout] = headplot(values,arg1,p1,v1,p2,v2,p3,v3)
+function [] = headplot(values,arg1,p1,v1,p2,v2,p3,v3)
 
 if nargin < 1
     help headplot
@@ -599,7 +602,6 @@ else
   colormap(Cmap)
   p1 = patch('Vertices',POS,'Faces',TRI1,'FaceVertexCdata',W(:),...
       'FaceColor','interp');    %%%%%%%%% Plot scalp map %%%%%%%%%
-  Wout = W;
 
   FCmap = [Cmap; Cmap(end,:); FaceColor; FaceColor; FaceColor];
   colormap(FCmap)
