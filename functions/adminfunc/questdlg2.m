@@ -40,32 +40,44 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/12 18:02:47  arno
+% debug
+%
 % Revision 1.1  2002/08/12 18:01:34  arno
 % Initial revision
 %
 
 function [result] = questdlg2(Prompt,Title,varargin);
 
+result = varargin{end};
 if nargin < 2
    help questdlg2;
    return;
 end;
 	
+fig = figure;
+set(gcf, 'name', Title);
+
 geometry = {};
-listgui = {};
+listui = {};
 for index = 1:size(Prompt,1)
 	geometry = { geometry{:} [1] };
-	listgui = {listgui{:} { 'Style', 'text', 'string', Prompt(index,:) }};
+	listui = {listui{:} { 'Style', 'text', 'string', Prompt(index,:) }};
 end;
 
-for index = 1:length(varargin)
-	if length(varargin) == 1
-		geometry = { geometry{:} [ 1 1 1] };
-		listgui = {listgui{:} { } { 'Style', 'pushbutton', 'string',varargin{index}  } { } };
-	else
-		geometry = { geometry{:} ones(1,length(varargin)) };
-		listgui = {listgui{:} { 'Style', 'pushbutton', 'string',varargin{index}  } };
+geometry = { geometry{:} ones(1,length(varargin)-1) };
+for index = 1:length(varargin)-1 % ignoring default val
+	listui = {listui{:} { 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
+	if strcmp(varargin{index}, varargin{end})
+		listui{end}{end+1} = 'fontweight';
+		listui{end}{end+1} = 'bold';
 	end;
 end;
 
-result = inputgui(geometry, listgui, '', Title);
+[tmp tmp2 allobj] = supergui( geometry, listui{:} );
+
+waitfor( fig, 'userdata');
+try,
+	result = get(fig, 'userdata');
+	close(fig);
+end;
