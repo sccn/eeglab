@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/10/15 15:17:49  scott
+% added YDIR to get postive up/down standard -sm
+%
 % Revision 1.26  2004/07/07 22:22:53  arno
 % add shrink warning
 %
@@ -112,6 +115,7 @@
 % -------------- EEGLAB DEFINITION (V 4.0) -------------
 % ------------------------------------------------------
 
+EEG_VERSION = '4.7a'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
 % for local copies of the web site, uncomment and edit one of the following lines
@@ -140,7 +144,7 @@ else % if full color screen
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
     GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
-    GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
+    GUIBACKCOLOR        = [.66 .76 1];    % EEGLAB GUI background color <---------
     GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
     PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
 end;
