@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/12/03 21:50:16  cooper
+% readegi now compatible with EGI Simple Binary
+% datafile versions 2,3,4,5,6, & 7.
+%
 % Revision 1.9  2002/11/26 20:16:00  cooper
 % Added support for version 5 RAW datafiles.
 % Added a check that the total # of data points
@@ -147,3 +151,8 @@ if (head.eventtypes > 0),
 	EventData = TrialData(head.nchan+1:end,:);
 	TrialData = TrialData(1:head.nchan,:);
 end 
+
+% convert from A/D units to microvolts
+if ( head.bits ~= 0 & head.range ~= 0 )
+       TrialData = (head.range/(2^head.bits))*TrialData;
+end
