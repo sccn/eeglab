@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/11/12 23:56:52  luca
+% now saving outputs -ad
+%
 % Revision 1.9  2002/08/12 21:53:22  arno
 % text
 %
@@ -152,7 +155,9 @@ end;
 
 fprintf('Selecting trials...\n');
 if icacomp == 1
-	[rej rejE] = rejtrend( EEG.data(elecrange, :, :), winsize, minslope, minstd);
+	[rej tmprejE] = rejtrend( EEG.data(elecrange, :, :), winsize, minslope, minstd);
+    rejE = zeros(EEG.nbchan, length(rej));
+    rejE(elecrange,:) = tmprejE;
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
@@ -163,7 +168,9 @@ else
         icaacttmp = EEG.icaweights(elecrange,:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
-    [rej rejE] = rejtrend( icaacttmp, winsize, minslope, minstd);
+    [rej tmprejE] = rejtrend( icaacttmp, winsize, minslope, minstd);
+    rejE = zeros(size(icaacttmp,1), length(rej));
+    rejE(elecrange,:) = tmprejE;
 end;
 fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials marked for rejection\n', length(find(rej > 0)), EEG.trials);
