@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/07/27 00:44:32  arno
+% brand new function for rereferencing
+%
 % Revision 1.14  2003/07/25 23:49:54  arno
 % change interface, warning messages ...
 %
@@ -209,10 +212,20 @@ if nargin < 2
     enable1 = fastif(strcmp(EEG.ref, 'averef'), 'on', 'off');
     enable2 = fastif(strcmp(EEG.ref, 'averef'), 'off', 'on');
 
+    if isstr(EEG.ref)
+        curref = EEG.ref;
+    else
+        if EEG.ref(1) < 0
+            curref = [ int2str(-EEG.ref) ' (absent from data)' ];
+        else
+            curref = [ int2str(-EEG.ref) ' (present in data)' ];
+        end;
+    end;
+    
     geometry = { [1] [1.8 1] [1.8 1] [1.8 1] [1] [1] };
-    uilist = { { 'style' 'text' 'string' ['Data reference state is: ' EEG.ref] } ...
+    uilist = { { 'style' 'text' 'string' ['Current data reference state is: ' curref] } ...
                { 'style' 'checkbox' 'tag' 'ave' 'value' fastif(strcmp(EEG.ref, 'averef'), 0, 1) 'string' 'Compute average reference' ...
-                        'enable' fastif(strcmp(EEG.ref, 'averef'), 'off', 'on')  'callback' ...
+                         'callback' ...
                  [ 'set(findobj(''parent'', gcbf, ''tag'', ''reref''), ''value'', ~get(gcbo, ''value''));' ...
                    'set(findobj(''parent'', gcbf, ''tag'', ''rerefstr''), ''enable'', fastif(get(gcbo, ''value''), ''off'', ''on''));' ] } ...
                { } ...
@@ -264,9 +277,11 @@ end;
 % ----------------------
 if isnan(refstate)
     if isfield(EEG, 'ref')
-        options = { options{:} 'refstate' EEG.ref };
+        options  = { options{:} 'refstate' EEG.ref };
+        refstate = EEG.ref;
     else
-        options = { options{:} 'refstate' 0 };
+        options  = { options{:} 'refstate' 0 };
+        refstate = 0;
     end;
 end;
 
