@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/15 02:47:39  arno
+% header for web
+%
 % Revision 1.7  2002/10/23 15:05:15  arno
 % isppc -> computer
 %
@@ -63,12 +66,42 @@ if nargin <2
 	nonmatlab = 0;
 end;
 
-doc = {};
+doc1 = readfunc(funct);
+if length(funct) > 4 & strcmpi(funct(1:4), 'pop')
+	try,
+		doc2 = readfunc(funct(5:end));
+		doc1 = { doc1{:} ' _________________________________________________________________ ' ...
+					   ' ' ...
+                       ' The ''pop'' function above calls the eponymous Matlab function below, ' ...
+                       ' which may contain more information for some parameters. '...
+					   ' ' ...
+					   ' _________________________________________________________________ ' ...
+				doc2{:} };
+	catch, end;
+else 
 
-if nonmatlab
+textgui(doc1);
+h = findobj('parent', gcf, 'style', 'slider');
+try, icadefs; catch, 
+	GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
+	GUITEXTCOLOR   = 'k'; 
+end;
+set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+h = findobj('parent', gcf, 'style', 'pushbutton');
+set(h, 'backgroundcolor', GUIBUTTONCOLOR);
+h = findobj('parent', gca);
+set(h, 'color', GUITEXTCOLOR);
+set(gcf, 'color', BACKCOLOR);
+
+return;
+
+function [doc] = readfunc(funct, nonmatlab)
+
+doc = {};
+if nonmatlab	
 	fid = fopen( funct, 'r');
 else
-	if findstr( funct, '.m')
+	if f	indstr( funct, '.m')
 		fid = fopen( funct, 'r');
 	else
 		fid = fopen( [funct '.m'], 'r');
@@ -97,25 +130,10 @@ else
 		str = deblank(str(1:end-1));
 		
 		if ~strcmp(computer, 'MAC') & ~isunix % windows
-            doc = { doc{:} str(1:end-1) };    
+            doc = { doc{:} str(2:end-1) };    
         else 
-            doc = { doc{:} str(1:end) };
+            doc = { doc{:} str(2:end) };
         end;
 		str = fgets( fid );
 	end;
 end;
-
-textgui(doc);
-h = findobj('parent', gcf, 'style', 'slider');
-try, icadefs; catch, 
-	GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
-	GUITEXTCOLOR   = 'k'; 
-end;
-set(h, 'backgroundcolor', GUIBUTTONCOLOR);
-h = findobj('parent', gcf, 'style', 'pushbutton');
-set(h, 'backgroundcolor', GUIBUTTONCOLOR);
-h = findobj('parent', gca);
-set(h, 'color', GUITEXTCOLOR);
-set(gcf, 'color', BACKCOLOR);
-
-return;
