@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/03/12 03:20:41  arno
+% help button
+%
 % Revision 1.21  2003/03/06 02:20:39  arno
 % use vararg2str
 %
@@ -231,9 +234,9 @@ for index = 1:size(arg2(:),1)
 	if ~isnan(arg2(index))
 		if typeplot
 			if length( options ) < 2
-				topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits);
+				topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, 'verbose', 'off');
 			else	
-				eval( [ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits' options ');' ] );
+				eval( [ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
 			end;
 			if nbgraph == 1, title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else title([int2str(arg2(index)) ' ms']);
@@ -247,9 +250,9 @@ for index = 1:size(arg2(:),1)
 	            end;    			
 			else	
 			    if arg2(index) < 0
-				    eval( [ 'topoplot(  -EEG.icawinv(:, -arg2(index)), EEG.chanlocs' options ');' ]);
+				    eval( [ 'topoplot(  -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
 	            else
-	    			eval( [ 'topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs' options ');' ]);
+	    			eval( [ 'topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
 	            end;    			
 			end;
 			if nbgraph == 1, title( [ 'IC ' int2str(arg2(index)) ' from ' topotitle] );
