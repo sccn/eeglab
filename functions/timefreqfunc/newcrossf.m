@@ -184,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/08/04 16:22:00  arno
+% marginal plot colors
+%
 % Revision 1.60  2003/07/09 21:30:54  arno
 % timesout - > ntimesout for timefreq call
 %
@@ -562,6 +565,9 @@ DEFAULT_OVERSMP	= 2;			% Number of times to oversample = vertical resolution
 DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= 'Event-Related Coherence';			% Figure title
 DEFAULT_ALPHA   = NaN;			% Default two-sided significance probability threshold
+
+disp('WARNING: this function is not part of the EEGLAB toolbox and should not be distributed');
+disp('         you must contact Arnaud Delorme (arno@salk.edu) for terms of use');
 
 if (nargin < 2)
    help crossf
