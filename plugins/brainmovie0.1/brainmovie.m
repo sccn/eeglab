@@ -118,6 +118,10 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/11/27 22:58:21  cooper
+% Added 'diskscale' option to scale the sizes
+% of the component disks.
+%
 % Revision 1.33  2002/11/26 18:48:28  arno
 % do not draw line if two circle are too close to each other
 %
@@ -313,8 +317,8 @@ try, g.coordinates; catch,
 		count = count + 1;
     end;
 end;
-try, g.circfactor; catch, g.circfactor = zeros( nbcomponents, nbcomponents ); end;
-if isempty(g.circfactor), g.circfactor = zeros( nbcomponents, nbcomponents ); end;
+try, g.circfactor; catch, g.circfactor = ones( nbcomponents, nbcomponents )*0.01; end;
+if isempty(g.circfactor), g.circfactor = ones( nbcomponents, nbcomponents )*0.01; end;
     
 % check size of inputs
 % --------------------
