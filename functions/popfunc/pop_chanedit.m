@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/08/12 21:38:24  arno
+% text
+%
 % Revision 1.23  2002/08/12 21:17:59  arno
 % debug
 %
@@ -257,7 +260,7 @@ if nargin < 2
 					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), ...
 					  'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string''); set(findobj(''tag'', ''shrinkbut''), ''value'', 0);' } ...
 					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), ...
-					  'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; set(findobj(''tag'', ''shrinkfactor''), ''string'', ''''); end;' } ...
+					  'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; else tmpshrink=''off''; end; set(findobj(''tag'', ''shrinkfactor''), ''string'', '''');' } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', [ 'if ~isempty(chantmp(1).X),' ...
 					 'plotchans3d([cell2mat({chantmp.X})'' cell2mat({chantmp.Y})'' cell2mat({chantmp.Z})''],' ...
 					'{chantmp.labels}); else disp(''cannot plot: no XYZ coordinates''); end;'] } ...
@@ -322,12 +325,12 @@ if nargin < 2
 		if evalin('base', 'exist(''tmpshrink'')') == 1
 			tmpshrink = evalin('base', 'tmpshrink');
 			evalin('base', 'clear tmpshrink');
-			if ~strcmp(tmpshrink, 'off') & ~strcmp(num2str(tmpshrink), num2str(shrinkfact))
+			if ~strcmp(num2str(tmpshrink), num2str(shrinkfact))
 				if ~isempty(str2num(tmpshrink))  chans(1).shrink = str2num(tmpshrink);
 				else                             chans(1).shrink = tmpshrink;
 				end;
 				totaluserdat{end+1} = 'shrink';
-				totaluserdat{end+1} = chans(1).shrink;			
+				totaluserdat{end+1} = chans(1).shrink;
 			end; 
 		end;
 		close(gcf);
