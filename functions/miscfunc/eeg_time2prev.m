@@ -3,7 +3,7 @@
 %                   a specified ("previous") type. Requires the EEG.urevent structure, plus 
 %                   EEG.event().urevent pointers to it. 
 % Usage:
-%      >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,target,previous);
+%      >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,{target},{previous});
 % Inputs:
 %  EEG      - structure containing an EEGLAB dataset
 %  target   - cell array of strings naming event type(s) of the specified target events 
@@ -12,18 +12,18 @@
 % Outputs:
 %  delays    - vector giving, for each event of a type listed in "target", the delay (in ms) 
 %              since the last preceding event of a type listed in "previous" (0 if none such).
-%  targets   - indices of the "target" events in the event structure
-%  urtargs   - indices of the "target" events in the urevent structure
-%  urprevs   - indices of the "previous" events in the urevent structure (0 if none).
+%  targets   - vector of indices of the "target" events in the event structure
+%  urtargs   - vector of indices of the "target" events in the urevent structure
+%  urprevs   - vector of indices of the "previous" events in the urevent structure (0 if none).
 %
 % Example:
 % >> target = {'novel'};           % target event type 'novel'
 % >> previous = {'novel', 'rare'}; % either 'novel' or 'rare'
+% >> [delays,targets] = eeg_time2prev(EEG,target,previous);
 %
-% >> delays = eeg_time2prev(EEG,target,previous);
-%
-% Vector delays now contains delays in ms between each 'novel' event and 
-%     the previous 'rare' or 'novel' event (else 0 when none such).
+%% Vector delays now contains delays in ms from each 'novel' event to the previous
+%% 'rare' or 'novel' event (else 0 when none such). Vector targets now contains the
+%% 'novel' event indices.
 %
 % Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, August 28, 2003
 
