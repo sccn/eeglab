@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/07 23:04:42  arno
+% topography" -> "map"
+%
 % Revision 1.4  2002/09/05 16:36:45  arno
 % default plotting location
 %
@@ -167,23 +170,28 @@ title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14);
 
 % plotting erpimage
 % -----------------
-h = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+hhh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 if EEG.trials > 1
 	eeg_options; 
-	title([basename ' activity'], 'fontsize', 14); % put title at top of erpimage
+	 % put title at top of erpimage
 	axis off
-	h = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+	hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 	EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
 	if typecomp == 1
-		erpimage( EEG.data(numcompo,:), ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp');   
+        offset = mean(EEG.data(numcompo,:));
+		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp');   
 	else
 		if option_computeica  
-			erpimage( EEG.icaact(numcompo,:), ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
+            offset = mean(EEG.icaact(numcompo,:));
+			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
 		else
 			icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-			erpimage( icaacttmp, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
+            offset = mean(icaacttmp);
+			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
 		end;
 	end;
+    axes(hhh);
+    title(sprintf('%s activity \\fontsize{10}(global offset %3.3f)', basename, offset), 'fontsize', 14);
 else
 	axis off;
 	text(0.1, 0.3, [ 'No erpimage plotted' 10 'for continuous data']);
