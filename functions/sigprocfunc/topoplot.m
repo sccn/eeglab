@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.201  2004/05/10 15:14:34  scott
+% more flexible labels/numbers/points argument reading; defined ELECTRODE_HEIGHT
+%
 % Revision 1.200  2004/05/07 15:12:51  scott
 % removed textax, instead plot3() electrode labels/pts/numbers above the rest with plot3() -sm
 %
@@ -1420,7 +1423,7 @@ elseif strcmp(ELECTRODES,'labelpoint')
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
-	     'set(gco, ''string'', tmpstr); cllear tmpstr;'] );
+	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
 %
 %%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
