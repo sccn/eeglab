@@ -1,18 +1,33 @@
 % pop_loadcnt() - load a neuroscan CNT file (pop out window if no arguments).
 %
 % Usage:
-%   >> [dat] = pop_loadcnt( filename, varargin);
+%   >> EEG = pop_loadcnt; % pop-up window mode
+%   >> EEG = pop_loadcnt( filename, 'key', 'val', ...);
+%
+% Graphic interface:
+%   "Enter block size in CNT file" - [edit box] Neuroscan files can
+%                   have different data block sizes. It was not
+%                   possible to read this information in the file header
+%                   (though it is probably there). Values known to 
+%                   work are 1 and 40. If 1 does not work (the data does
+%                   not look like EEG), you should try 40. 
+%   "loadcnt() 'key', 'val' params" - [edit box] Enter optional loadcnt()
+%                   parameters.
 %
 % Inputs:
 %   filename       - file name
-%   varargin       - see LDCNT input
+%
+% Optional inputs:
+%   Same as loadcnt() function.
 % 
 % Outputs:
-%   dat            - EEGLAB data structure
+%   EEG            - EEGLAB data structure
 %
 % Note: 
-%   This function extract all non-null event from the CNT data structure.
+% 1) This function extract all non-null event from the CNT data structure.
 % Null events are usually associated with internal signals (recalibrations...).
+% 2) The "Average reference" edit box had been remove since the re-referencing
+% menu of EEGLAB offers more options to re-reference data.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/03/05 19:48:42  arno
+% removing matlab warning
+%
 % Revision 1.6  2002/11/23 21:10:02  arno
 % importing type of event
 %
@@ -71,9 +89,9 @@ if nargin < 1
 
 	% popup window parameters
 	% -----------------------
-	promptstr    = { 'Average reference ?' ...
-					 'Enter block size in CNT file (1 or 40):' };
-	inistr       = { 'YES', '1'  };
+   promptstr    = { 'Enter block size for CNT file (1 or 40):' ...
+                    'loadcnt() ''key'', ''val'' params' };
+	inistr       = { '1'  '' };
 	pop_title    = sprintf('Load a CNT dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
