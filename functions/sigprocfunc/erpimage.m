@@ -155,6 +155,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2003/07/24 18:17:33  scott
+% *** empty log message ***
+%
 % Revision 1.120  2003/07/22 16:03:06  scott
 % phasesort help message
 %
@@ -2586,9 +2589,9 @@ if (~isempty(topomap)) & strcmpi(noshow, 'no')
     fprintf('Plotting a topo map in upper left.\n');
 	if length(topomap) == 1
 		topoplot(topomap,eloc_file,'electrodes','off', ...
-				 'style', 'blank', 'emarkersize1chan', 10)
+				 'style', 'blank', 'emarkersize1chan', 10);
 	else
-		topoplot(topomap,eloc_file,'electrodes','off')
+		topoplot(topomap,eloc_file,'electrodes','off');
 	end;
     axis('square')
     axhndls = [axhndls h(12)];
