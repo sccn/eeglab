@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/04/10 17:34:53  arno
+% header edit
+%
 % Revision 1.13  2003/01/24 02:14:12  arno
 % debuging 'delim' option
 %
