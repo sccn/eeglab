@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/18 15:49:09  scott
+% editted msgs -sm
+%
 % Revision 1.2  2002/04/07 20:47:23  scott
 % worked on no-spline-file msg -sm
 %
@@ -223,6 +226,7 @@ for index = 1:size(arg2(:),1)
 		end;
 		drawnow;
 		axis square; 
+		rotate3d off;
 		if index == size(arg2(:),1)
 	        %pos = get(gca,'position');
 	        %q = [pos(1) pos(2) 0 0];
@@ -238,10 +242,9 @@ end;
 if nbgraph> 1, 
     a = textsc(0.5, 0.05, topotitle); 
     set(a, 'fontweight', 'bold');
-    rotate3d(gcf);
     axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;');
 end;
-if nbgraph== 1, com = 'figure;'; end;
+if nbgraph== 1, com = 'figure;'; rotate3d(gcf); end;
 
 if length( options ) < 2
 	com = [com sprintf('pop_headplot(%s,%d,[%s], ''%s'', [%s]);', inputname(1), typeplot, sprintf('%d ',arg2), topotitle, int2str(rowcols) )];
