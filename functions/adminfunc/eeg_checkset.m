@@ -78,6 +78,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/06/25 00:45:59  arno
+% removing epoch info unofor;isation
+% ,
+%
 % Revision 1.30  2002/05/04 01:47:29  arno
 % same
 %
@@ -454,11 +458,15 @@ if ~isfield(EEG.stats, 'compentr')		EEG.stats.compentr = []; res = com; end;
 if ~isfield(EEG.stats, 'compkurta')		EEG.stats.compkurta = []; res = com; end;
 if ~isfield(EEG.stats, 'compkurtr')		EEG.stats.compkurtr = []; res = com; end;
 if ~isfield(EEG.stats, 'compkurtdist')	EEG.stats.compkurtdist = []; res = com; end;
-if ~isfield(EEG.reject, 'gcompreject')		EEG.reject.gcompreject = []; res = com; end;
 if ~isfield(EEG.reject, 'threshold')		EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end;
 if ~isfield(EEG.reject, 'threshentropy')	EEG.reject.threshentropy = 600; res = com; end;
 if ~isfield(EEG.reject, 'threshkurtact')	EEG.reject.threshkurtact = 600; res = com; end;
 if ~isfield(EEG.reject, 'threshkurtdist')	EEG.reject.threshkurtdist = 600; res = com; end;
+if ~isfield(EEG.reject, 'gcompreject')		EEG.reject.gcompreject = []; res = com; end;
+if length(EEG.reject.gcompreject) ~= size(EEG.icaact,1)
+	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
+end;
+
 
 % component rejection
 % -------------------
