@@ -19,6 +19,7 @@
 %                i.e space and tab}. It is also possible to enter 
 %                strings, Ex: [9 ' ' ','].
 %   'verbose'  - ['on'|'off'] {default:'on'}
+%   'nlines'   - [integer] number of lines to read {default: all file}
 %
 % Outputs:
 %    array - cell array. If the option 'force' is given, the function
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/01/10 17:28:56  arno
+% debug last
+%
 % Revision 1.2  2003/01/10 17:27:13  arno
 % str2num -> str2double
 %
@@ -76,6 +80,7 @@ try, g.convert;	 	  catch, g.convert = 'on'; end;
 try, g.skipline;      catch, g.skipline = 0; end;
 try, g.verbose;       catch, g.verbose = 'on'; end;
 try, g.delim; 	      catch, g.delim = [9 32]; end;
+try, g.nlines; 	      catch, g.nlines = Inf; end;
 g.convert = lower(g.convert);
 g.verbose = lower(g.verbose);
 g.delim = char(g.delim);
@@ -126,8 +131,11 @@ while isempty(inputline) | inputline~=-1
 	     linenb = linenb +1;
      end;
      inputline = fgetl(fid);
+     if linenb > g.nlines
+         inputline = -1;
+     end;
      if ~mod(linenb,10) & strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end;
 end;        
-if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb); end;
+if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end;
 if strcmp(g.convert, 'force'), array = cell2mat(array); end;
 fclose(fid); 
