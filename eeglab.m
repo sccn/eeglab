@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.325  2004/08/31 00:58:30  arno
+% command line warning
+%
 % Revision 1.324  2004/08/25 17:51:21  arno
 % debug last change
 %
@@ -1752,7 +1755,7 @@ else
                 [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
                 h(LASTCOM);
             end;
-        end;                                       '
+        end;
 	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
