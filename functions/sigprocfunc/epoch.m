@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/02/23 09:10:05  scott
+% header edit -sm
+%
 % Revision 1.7  2003/01/14 00:34:25  arno
 % typo in header
 %
@@ -145,12 +148,14 @@ for index = 1:length(events)
    
    if floor((posinit-1)/dataframes) == floor((posend-1)/dataframes) & posinit >= 1 & posend <= datawidth % test if within boundaries
       epochdat(:,:,index) = data(:,posinit:posend);
-      if (max(epochdat(:,:,index)) > g.valuelim(1)) & ...
-            (max(epochdat(:,:,index)) < g.valuelim(2))
-         indexes(index) = 1;
-      else
-         switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end;
-      end;   
+      if ~isinf(g.valuelim(1)) | ~isinf(g.valuelim(2))
+          if (max(epochdat(:,:,index)) > g.valuelim(1)) & ...
+                  (max(epochdat(:,:,index)) < g.valuelim(2))
+              indexes(index) = 1;
+          else
+              switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end;
+          end;   
+      end;
    else
       switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end;
    end;
