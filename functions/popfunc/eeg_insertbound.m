@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/11/16 23:31:48  arno
+% debug event insertion when empty event array
+%
 % Revision 1.28  2004/09/03 15:44:29  arno
 % debug duration
 %
@@ -154,7 +157,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     else 
         return;
     end;
-adsf
+
     % recompute latencies fo boundevents (in new dataset)
     % ---------------------------------------------------
     [regions tmpsort] = sort(regions);
