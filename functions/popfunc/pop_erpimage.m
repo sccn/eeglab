@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/07/27 00:45:17  arno
+% adding messages, changing output command
+%
 % Revision 1.33  2002/07/24 19:29:10  arno
 % removing renorm
 %
@@ -217,7 +220,6 @@ else
 end;
 
 if popup
-	lastcom
 	% get contextual help
 	% -------------------
 	[txt2 vars2] = gethelpvar('erpimage.m');
@@ -262,7 +264,7 @@ if popup
 			   ...
 			   { 'Style', 'text', 'string', 'Smoothing', 'fontweight', 'bold', 'tooltipstring', context('avewidth',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 5, [], int2str(min(max(EEG.trials-5,0), 10))) } ...
-			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getdef(lastcom, 'erp', 'present', 1) } ...
+			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getdef(lastcom, '''erp''', 'present', 1) } ...
 			   { 'Style', 'text', 'string', 'ERP limits (uV)'  } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits', [3:4])  } ...
 			   { 'Style', 'text', 'string', 'Downsampling', 'fontweight', 'bold', 'tooltipstring', context('decimate',vars,txt) } ...
@@ -285,7 +287,7 @@ if popup
 			   { 'Style', 'edit', 'string', getdef(lastcom, 9), 'tag', 'field' } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 7), 'tag', 'type' } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 8) } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom, 10,[], 'no') } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'renorm',[], 'no') } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 'align') } ...
 			   { 'Style', 'checkbox', 'string', 'Don''t plot var.', 'tooltipstring', context('noplot',vars,txt), 'value', getdef(lastcom, 'noplot', 'present', 0) } ...
 			   {} ...
@@ -564,6 +566,7 @@ function txt = context(var, allvars, alltext);
 % get default from command string
 % -------------------------------
 function txt = getdef(lastcom, var, mode, default)
+    % mode can be present for 0 and 1 if the variable is present
 	if nargin < 4
 		default = '';
 	end;
@@ -573,7 +576,7 @@ function txt = getdef(lastcom, var, mode, default)
 	if nargin < 3
 		mode = [];
 	end;
-	if isstr(mode) & strcmp('mode', 'present')
+	if isstr(mode) & strcmp(mode, 'present')
 		if ~isempty(findstr(var, lastcom))
 			txt = 1; return;
 		else
@@ -582,20 +585,33 @@ function txt = getdef(lastcom, var, mode, default)
 	end;
 	if isnumeric(var)
 		comas = findstr(lastcom, ',');
-		if length(comas) >= vars
-			txt = lastcom(comas(var)+1:comas(var+1)-1);
+		if length(comas) >= var
+			txt = lastcom(comas(var-1)+1:comas(var)-1);
 			txt = deblank(txt(end:-1:1));
 			txt = deblank(txt(end:-1:1));
+			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end;
+			if ~isempty(txt)
+				txt = deblank(txt(end:-1:1));
+				txt = deblank(txt(end:-1:1));
+			end;
+			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end;
+			if ~isempty(txt)
+				txt = deblank(txt(end:-1:1));
+				txt = deblank(txt(end:-1:1));
+			end;
+			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end;
 		else
 			txt = default;
 		end;
 		return;
 	else
-		comas  = findstr(lastcom, ',');
+		comas  = findstr(lastcom, ','); % finding all comas
+		comas  = [ comas  findstr(lastcom, ');') ]; % and end of lines
 		varloc = findstr(lastcom, var);
 		if ~isempty(varloc)
-			comas = comas(find(comas >varlocs));
-			txt = lastcom(comas(1)+1:comas(2)-1);
+			% finding comas surrounding 'val' var in 'key', 'val' sequence
+			comas = comas(find(comas >varloc(end)));
+			txt = lastcom(comas(1)+1:comas(2)-1); 
 			txt = deblank(txt(end:-1:1));
 			txt = deblank(txt(end:-1:1));
 			if strcmp(mode, 'full')
@@ -607,16 +623,18 @@ function txt = getdef(lastcom, var, mode, default)
 				txt = [ '''' var ''', ' txt ];	
 			elseif isnumeric(mode)
 				txt = str2num(txt);
-				if length(txt) >= max(mode)
-					txt = int2str(txt(mode));	
-				elseif length(txt) >= mode(1)
-					txt = int2str(txt(mode(1)));	
-				else 
-					txt = default;
+				if ~isempty(mode)
+					if length(txt) >= max(mode)
+						txt = int2str(txt(mode));	
+					elseif length(txt) >= mode(1)
+						txt = int2str(txt(mode(1)));	
+					else 
+						txt = default;
+					end;
 				end;
 			end;
 		else
 			txt = default;
 		end;
 	end;
-			
+	%fprintf('%s:%s\n', var, txt);		
