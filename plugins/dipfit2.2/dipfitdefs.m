@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/10 18:10:27  arno
+% Initial revision
+%
 % Revision 1.16  2003/10/29 16:41:57  arno
 % default grid
 %
@@ -93,6 +96,23 @@ defaultvolume.r = [85-6-7-1 85-6-7 85-6 85];  % in mm
 defaultvolume.c = [0.33 1.00 0.0042 0.33];    % brain/csf/skull/skin
 defaultvolume.o = [0 0 0];
 
+% default file locations 
+% ----------------------
+folder = which('pop_dipfit_settings');
+folder = folder(1:end-21);
+delim  = folder(end);
+template_models = { ...
+    { [ folder 'standard_BESA' delim 'standard_BESA.mat' ] ... % model hdmfile for BESA
+      'spherical' ...                                          % coordinate 'spherical' or 'MNI'
+      [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...      % MRI MNI normalized file
+      [ folder 'standard_BESA' delim 'Standard-10-5-Cap385.sfp' ] } ... % channel location file
+                                                                        % associated with model
+    { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...   % same as above for BEM model
+      'MNI' ...
+      [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
+      [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] } 
+    { '' 'MNI' '' '' } }; % custom model
+
 % constrain electrode to sphere
 % -----------------------------
 meanradius = defaultvolume.r(4);
@@ -102,7 +122,7 @@ defaultelectrodes = sprintf('1:%d', nchan);
 
 % these settings determine the symmetry constraint that can be toggled on
 % for the second dipole
-defaultconstraint = 'y';      % symmetry along x-axis
+defaultconstraint = 'x';      % symmetry along x-axis
 
 % defaults for GUI pop_dipfit_batch dialogs
 rejectstr    = '40';	% in percent
