@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/15 17:15:15  arno
+% windows -> removing last function character
+%
 % Revision 1.5  2002/08/13 15:26:44  arno
 % updating colors
 %
@@ -78,7 +81,7 @@ if nonmatlab
 	while ~feof(fid)
 		str = deblank(str(1:end-1));
 		
-		if ~isppc & ~isunix % windows
+		if ~strcmp(computer, 'MAC') & ~isunix % windows
             doc = { doc{:} str(1:end-1) };    
         else 
             doc = { doc{:} str(1:end) };
@@ -90,7 +93,7 @@ else
 	while (str(1) == '%')
 		str = deblank(str(1:end-1));
 		
-		if ~isppc & ~isunix % windows
+		if ~strcmp(computer, 'MAC') & ~isunix % windows
             doc = { doc{:} str(1:end-1) };    
         else 
             doc = { doc{:} str(1:end) };

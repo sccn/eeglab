@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/10/15 16:25:15  arno
+% magnify edit boxes windows
+%
 % Revision 1.32  2002/10/15 14:42:15  arno
 % button text aspect
 %
@@ -287,7 +290,7 @@ end;
 % -------
 warning off;
 try, 
-	if isppc
+	if strcmp(computer, 'MAC')
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
 			factmulty = factmulty*1.4;

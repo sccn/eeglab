@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/09/26 14:00:44  scott
+% help msg -sm
+%
 % Revision 1.13  2002/08/20 22:36:47  arno
 % debug for windows
 %
@@ -194,7 +197,7 @@ if storelocal
 		delimloc = findstr(filename, '/');
 	else
 		warning off;
-		if isppc % MAC
+		if strcmp(computer,'MAC') % MAC
 			delimloc = findstr(filename, ':');
 		else  % PC (note that ispc is not recognized under windows ?)
 			delimloc = findstr(filename, '\');

@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/15 23:28:07  arno
+% debugging dataset save
+%
 % Revision 1.8  2002/10/15 17:07:19  arno
 % drawnow
 %
@@ -149,7 +152,7 @@ for ind = 1:2:length(args)
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1;
 	 case 'save'      , if isunix, dirindices = find(args{ind+1} == '/');
-                        elseif isppc, dirindices = find(args{ind+1} == ':');
+                        elseif strcmp(computer, 'MAC'), dirindices = find(args{ind+1} == ':');
                         else dirindices = find(args{ind+1} == '\');
                         end;
                         args{ind+1}(dirindices(end)+1:end)
