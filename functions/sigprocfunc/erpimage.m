@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2003/03/07 21:18:13  scott
+% testing axcopy
+%
 % Revision 1.73  2003/03/07 21:15:25  scott
 % adding eegplot option if click on erpimage -sm
 %
@@ -2340,8 +2343,8 @@ limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
 %   
 %%%%%%%%%%%%%%% turn on axcopy() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-axcopy (gcf,'disp ''hello''');
-% axcopy(gcf, 'img=get(gca,''children''); if (strcmp(img(end),''type''),''image''), img=get(img(end),''CData''); times=get(img(end),''Xdata''); clf; args = [''limits'' '','' times(1) '','' times(end)]; if exist(''EEG'')==1, args = [args '','' ''srate'' '','' EEG.srate]; end eegplot(img,args); end')
+eegstr = 'img=get(gca,''''children''''); if (strcmp(img(end),''''type''''),''''image''''), img=get(img(end),''''CData''''); times=get(img(end),''''Xdata''''); clf; args = [''''limits'''' '''','''' times(1) '''','''' times(end)]; if exist(''''EEG'''')==1, args = [args '''','''' ''''srate'''' '''','''' EEG.srate]; end eegplot(img,args); end')
+axcopy(gcf,eegstr);
 
 % turn on popup zoom windows
 
