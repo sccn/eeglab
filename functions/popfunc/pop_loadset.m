@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/23 18:00:17  arno
+% modifying help message
+%
 % Revision 1.7  2002/04/23 17:58:40  arno
 % standalone function
 %
@@ -61,7 +64,6 @@
 % 01-25-02 reformated help & license -ad 
 
 function [VAROUT, command] = pop_loadset( inputname, inputpath);
-eeg_consts;
 
 command = '';
 %eeg_emptyset;
@@ -90,6 +92,49 @@ function EEG = checkoldformat(EEG)
 	if ~isfield( EEG, 'data')
 		fprintf('Incompatible with new format, trying old format...\n');
 		eegset = cellArray;
+		
+		off_setname             = 1;  %= filename
+		off_filename            = 2;  %= filename
+		off_filepath            = 3;  %= fielpath
+		off_type                    = 4;  %= type EEG AVG CNT
+		off_chan_names          = 5;  %= chan_names
+		off_chanlocs            = 21;  %= filename
+		off_pnts                    = 6;  %= pnts
+		off_sweeps                  = 7; %= sweeps
+		off_rate                    = 8;  %= rate
+		off_xmin                    = 9;  %= xmin
+		off_xmax                    = 10;  %= xmax
+		off_accept                  = 11; %= accept
+		off_typeeeg                 = 12; %= typeeeg
+		off_rt                      = 13; %= rt
+		off_response            = 14; %= response
+		off_signal                  = 15; %= signal
+		off_variance            = 16; %= variance
+		off_winv                    = 17; %= variance
+		off_weights             = 18; %= variance
+		off_sphere                  = 19; %= variance
+		off_activations         = 20; %= variance
+		off_entropytrial        = 22; %= variance
+		off_entropycompo        = 23; %= variance
+		off_threshold       = 24; %= variance
+		off_comporeject     = 25; %= variance
+		off_sigreject       = 26;
+		off_kurtA                       = 29;
+		off_kurtR                       = 30;
+		off_kurtDST                 = 31;
+		off_nbchan                  = 32;
+		off_elecreject      = 33;
+		off_comptrial       = 34;
+		off_kurttrial       = 35; %= variance
+		off_kurttrialglob   = 36; %= variance
+		off_icareject       = 37; %= variance
+		off_gcomporeject    = 38; %= variance
+		off_eegentropy          = 27;
+		off_eegkurt             = 28;
+		off_eegkurtg            = 39;
+
+		off_tmp1                        = 40;
+		off_tmp2                        = 40;
 		
 		% must convert here into new format
 		EEG.setname    = eegset{off_setname   };
