@@ -17,7 +17,7 @@
 % See also: eeg_store(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
-
+ 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 23:48:21  arno
+% standalone version
+%
 % Revision 1.1  2002/04/18 19:49:29  arno
 % Initial revision
 %
