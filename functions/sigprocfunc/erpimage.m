@@ -144,6 +144,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2003/04/23 23:58:02  arno
+% debuging phasedet in erpimage
+%
 % Revision 1.91  2003/04/23 23:41:19  arno
 % restoring cycles to a default of 3, adding cycle paramete
 % r
@@ -1259,7 +1262,6 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
 	winloc = winloc(find(winloc>0 & winloc<=frames));
-	winlen
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
