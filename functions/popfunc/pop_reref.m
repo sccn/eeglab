@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/07/25 00:10:51  arno
+% correct typo
+%
 % Revision 1.11  2003/07/02 01:06:00  arno
 % remove debug msg
 %
@@ -153,7 +156,7 @@ if nargin < 2
     % decode inputs
     % -------------
     if isempty(result), return; end;
-    if ~isempty(result{3}), ref = eval([ result{3} ] );
+    if ~isempty(result{3}), ref = eval([ '[' result{3} ']' ] );
     else                    ref = [];
     end;
     if result{1}, ref = []; end;
