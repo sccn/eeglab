@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/05/22 01:21:30  arno
+% detrending param name change
+%
 % Revision 1.31  2003/05/21 02:26:16  arno
 % debug condition
 %
@@ -753,19 +756,19 @@ if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(
     
     % compute for first 2 trials to get freqsout
     XX = reshape(X, 1, frame, length(X)/g.frame);    
-    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:});
+    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
     
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
             alltfX(index,:,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
         end;
     end;
     

@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/05/23 17:15:35  arno
+% lowmem for 2 conditions debug
+%
 % Revision 1.52  2003/05/22 01:21:32  arno
 % detrending param name change
 %
@@ -758,17 +761,17 @@ if strcmpi(g.lowmem, 'on') & ~iscell(X) & length(X) ~= g.frame & (isempty(g.nfre
         if nargout < 6
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
         elseif nargout == 7 % requires RAM
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
              coherresout(index,:,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
         else
             [R(index,:),mbase(index),timesout,tmpfreqs(index),Rbootout(index,:),Rangle(index,:), ...
              coherresout(index,:,:),alltfX(index,:,:),alltfY(index,:,:)] = ...
                 newcrossf(X, Y, frame, tlimits, Fs, varwin, 'freqs', [freqs(index) freqs(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
         end;
     end;
     
