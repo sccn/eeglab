@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/30 20:47:39  scott
+% *** empty log message ***
+%
 % Revision 1.9  2002/04/30 20:45:56  scott
 % showchan==0 -> blockave(abs(tfdata)) -sm
 %
@@ -238,8 +241,14 @@ if showchan>0
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
 else
-  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
-    blockave(abs(matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan)),length(times)));
+  tfave = blockave(...
+            abs(...
+               matsel(tfdata,...
+                        length(times),...
+                           mmidx(1):mmidx(2),...
+                              mmidx(3):mmidx(4),...
+                                 showchan)),length([mmidx(1):mmidx(2)]));
+  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),tfave);
 end
 hold on;
 axis([limits(1:4)]);
