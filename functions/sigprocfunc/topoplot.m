@@ -2,7 +2,7 @@
 %              (looking down at the top of the head) using interpolation on a fine 
 %              cartesian grid. Can also show specified channnel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
-%              Using option 'gridplot', the plot can be a rectangular imagesc() grid
+%              Using option 'plotgrid', the plot can be a rectangular imagesc() grid
 %              or can add such a grid plot to the left or right of the head image.
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
@@ -32,7 +32,7 @@
 %                       unless more than 64 channels, then 'off'}. 
 %   'plotchans'       - vector of channel indices to interpolate in the head plot. Negative
 %                       integers reverse the data polarity. Grid chans, if any, are not included 
-%                       in plotchans (see 'gridplot' below). {default: [] -> plot all chans}
+%                       in plotchans (see 'plotgrid' below). {default: [] -> plot all chans}
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
@@ -104,20 +104,20 @@
 %                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
 %                       so the channel max is 0.5. factor -> Apply a specified shrink
 %                       factor (range (0,1) = shrink fraction). {default: 'off'}
-% Unimplemented future options:
-%   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
-%                       channel numbers - in which 0s plot 0-values and negative integers, 
-%                       polarity-reversed values - and char position (if either 'l' or 'r') 
-%                       indicates which side of the head to plot the grid, or if 'o', plot the 
-%                       grid only {the default grid location is to the left of the head}. The 
-%                       channels matrix should show the topographic ordering of the channels. 
-%                       {default: no grid plot} NOTE: Not yet implemented.
-%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
-%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
-
 % Deprecated but still usable;
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
+
+% Unimplemented future options:
+%   'plotgrid'        - [channels] or {[channels], 'position'} where [channels] is a matrix of grid 
+%                       channel numbers - in which 0's plot 0-values and negative integers, 
+%                       polarity-reversed values - and char 'position' (if either 'l' or 'r') 
+%                       indicates which side of the head to plot the grid, or if 'o', plot the 
+%                       grid only {default grid plotting mode: 'o' = plot the grid only}
+%                       The [channels] matrix should show the topographic ordering of the channels. 
+%                       {default: no grid plot} NOTE: ===> Not yet implemented.
+%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
+%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -136,6 +136,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.226  2004/12/10 21:00:17  scott
+% made 3rd output plotrad (by default). Documented reading of chanlocs.plotrad
+% if it exists.
+%
 % Revision 1.225  2004/11/23 01:52:12  hilit
 % fixing 'style' 'blank' problems
 %
@@ -655,7 +659,7 @@ if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
 end
 plotgrid = 'off';
 plotchans = [];
-gridpos = 'l';          % default grid position left of head
+gridpos = 'o';          % default grid position - plot grid only
 noplot  = 'off';
 handle = [];
 Zi = [];
@@ -688,6 +692,7 @@ shrinkfactor = [];      % shrink mode (dprecated)
 intrad       = [];      % default interpolation square is to outermost electrode (<=1.0)
 plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 headrad      = [];      % default plotting radius for cartoon head is 0.5
+squeezefac = 1.0;
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 VERBOSE = 'off';
 MASKSURF = 'off';
@@ -955,7 +960,10 @@ if strcmp(plotgrid,'on')
         fprintf('topoplot() warning: ''plotgrid'' and ''plotchans'' have channels in common\n');
      end
    end
-   error('''plotgrid'' option not yet implemented.'); % <============
+   if strcmp(gridpos,'o')    % if plot grid only
+     STYLE = 'grid';
+   end
+   % error('''plotgrid'' option not yet implemented.'); % <============
 end
 
 if isempty(ELECTRODES)                     % if electrode labeling not specified
@@ -982,14 +990,16 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
-if isstr(loc_file)
+  if isstr(loc_file)
 	[tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
-else % a locs struct
+  elseif isstruct(loc_file) % a locs struct
 	[tmpeloc labels Th Rd indices] = readlocs(loc_file);
         % Note: Th and Rd correspond to indices channels-with-coordinates only
-end
+  else
+       error('loc_file must be a EEG.locs struct or locs filename');
+  end
 
-if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
+  if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
     tmpeloc(end) = [];
     labels(end) = [];
@@ -1000,32 +1010,32 @@ if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary
     if ~isempty(ni)
         indices(fixit) = [];
     end
-end;
-Th = pi/180*Th;                              % convert degrees to radians
+  end;
+  Th = pi/180*Th;                              % convert degrees to radians
 
-%
-%%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
-%
-if length(Values) < length(tmpeloc) 
-  if isempty(plotchans)
-    if Values ~= round(Values) % if not integer values
-      error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
-    elseif strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
-                                   max(indices),length(Values));
-        fprintf('            Marking the locations of the %d indicated channels.\n', ...
-                                    length(Values));
+  %
+  %%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
+  %
+  if length(Values) < length(tmpeloc) 
+    if isempty(plotchans)
+      if Values ~= round(Values) % if not integer values
+        error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
+      elseif strcmpi(VERBOSE, 'on')
+          fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
+                                     max(indices),length(Values));
+          fprintf('            Marking the locations of the %d indicated channels.\n', ...
+                                      length(Values));
+      end
+      plotchans = Values;
+      STYLE = 'blank'; % plot channels only, marking the indicated channel number
+      if strcmpi(ELECTRODES,'off')
+           ELECTRODES = 'on';
+      end
+    elseif length(plotchans) ~= length(Values)
+      error('number of channel values must = number of ''plotchans''');
     end
-    plotchans = Values;
-    STYLE = 'blank'; % plot channels only, marking the indicated channel number
-    if strcmpi(ELECTRODES,'off')
-         ELECTRODES = 'on';
-    end
-  elseif length(plotchans) ~= length(Values)
-    error('number of channel values must = number of ''plotchans''');
   end
-end
-
+  
 %
 %%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -1165,6 +1175,7 @@ if length(pltchans) < length(Rd) & strcmpi(VERBOSE, 'on')
         fprintf('Interpolating %d and plotting %d of the %d scalp electrodes.\n', ...
                    length(intchans),length(pltchans),length(Rd));    
 end;	
+
 %
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -1322,10 +1333,30 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
                           % specify size of head axes in gca
 
   unsh = (GRID_SCALE+1)/GRID_SCALE; % un-shrink the effects of 'interp' SHADING
+
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
+  if strcmp(STYLE,'grid')                     % plot grid only
+    error('''plotgrid'' option not yet implemented.'); % <============
+    gridvalues = zeros(size(gridchans));
+    for j=1:size(gridchans,1)
+      for k=1:size(gridchans,2)
+         if gridpos(j,k) > 0
+            gridvalues(j,k) = Values(gridpos(j,k));
+         elseif gridpos(j,k) < 0
+            gridvalues(j,k) = -Values(gridpos(j,k));
+         else
+            gridvalues(j,k) = 0;
+         end
+      end
+    end
+    meshgrid(); % <==== incomplete
+    imagesc(gridvalues); % <==== incomplete
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  if strcmp(STYLE,'contour')                     % plot surface contours only
+  elseif strcmp(STYLE,'contour')                     % plot surface contours only
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
     % for h=chs, set(h,'color',CCOLOR); end
   %
