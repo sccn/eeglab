@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2002/05/19 14:28:55  scott
+% improved out-of-bounds testing -sm
+%
 % Revision 1.47  2002/05/19 14:21:52  scott
 % *** empty log message ***
 %
@@ -270,19 +273,19 @@ if exist('signifs') & length(signifs) == 1 % should be ITC
 end
   
 if min(timefreqs(:,2))<min(freqs) 
-   fprintf('tftopo(): selected plotting frequency %3.1g out of range.\n',min(timefreqs(:,2)));
+   fprintf('tftopo(): selected plotting frequency %g out of range.\n',min(timefreqs(:,2)));
    return
 end
 if max(timefreqs(:,2))>max(freqs) 
-   fprintf('tftopo(): selected plotting frequency %3.1g out of range.\n',max(timefreqs(:,2)));
+   fprintf('tftopo(): selected plotting frequency %g out of range.\n',max(timefreqs(:,2)));
    return
 end
 if min(timefreqs(:,1))<min(times) 
-   fprintf('tftopo(): selected plotting time %4.1g out of range.\n',min(timefreqs(:,1)));
+   fprintf('tftopo(): selected plotting time %g out of range.\n',min(timefreqs(:,1)));
    return
 end
 if max(timefreqs(:,1))>max(times) 
-   fprintf('tftopo(): selected plotting time %4.1g out of range.\n',max(timefreqs(:,1)));
+   fprintf('tftopo(): selected plotting time %g out of range.\n',max(timefreqs(:,1)));
    return
 end
 nchans = size(tfdata,2)/length(times);
