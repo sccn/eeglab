@@ -18,6 +18,9 @@
 % Outputs:
 %    smoothdata = smoothed data
 %
+% Known problems:
+%    The signal drop off is much smaller compared to standard filtering methods
+%
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2003
 %
 % See also: eegfilt()
@@ -42,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/12/03 19:18:57  arno
+% same
+%
 % Revision 1.4  2003/12/03 19:18:35  arno
 % same
 %
@@ -86,13 +92,11 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
     else
         idxl = 0;
     end;
-    idxl
     if highcut ~= 0        
         [tmp idxh]=min(abs(fv-highcut));  % Find the entry in fv closest to 5 kHz    
     else 
         idxh = length(fv)/2;
     end;
-    idxh
     
     % filter the data
     % ---------------
