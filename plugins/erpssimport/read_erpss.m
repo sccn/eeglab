@@ -92,20 +92,25 @@ function [eeg,ev,header] = read_erpss(filename)
             % Read nchans and block length
             fseek(fp,2,0);
             nchans = fread(fp,1,'uint16');
-            block_size = power(2,fread(fp,1,'uint16'));
-
+            fread(fp,1,'uint16');
+	    block_size = fread(fp,1,'uint16');
+	    ndupsamp = fread(fp,1,'uint16');
+	    nrun = fread(fp,1,'uint16');
+	    err_detect = fread(fp,1,'uint16');
+	    nlost = fread(fp,1,'uint16');
+	    nevents = fread(fp,1,'uint16');
+	    
             % Read events
-            fseek(fp,62,0);
-            for i=1:110,
-                samp_off = fread(fp,1,'char');
-                cond_code = fread(fp,1,'char');
+            fseek(fp,50,0);
+            for i=1:nevents,
+                samp_off = fread(fp,1,'uint8');
+                cond_code = fread(fp,1,'uint8');
                 ev_code = fread(fp,1,'uint16');
-                if samp_off ~= 0,
-                    ev_cnt = ev_cnt + 1;
-                    ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128;
-                    ev(ev_cnt).event_code = ev_code;
-                end
+                ev_cnt = ev_cnt + 1;
+                ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128;
+                ev(ev_cnt).event_code = ev_code;
             end
+	    fseek(fp,4*(110-nevents),0);
             data = fread(fp,nchans*block_size,'int16');
             eeg(:,totalsize+1:totalsize+block_size) = reshape(data,nchans,block_size); % concatenate data blocks
             totalsize = totalsize + block_size;
