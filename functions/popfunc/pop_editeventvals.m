@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/05/03 01:41:57  arno
+% updating call for modifying latency
+%
 % Revision 1.9  2002/04/25 02:14:30  arno
 % adding event field description
 %
@@ -250,6 +253,9 @@ for curfield = 1:2:length(args)
 	            try, eval(['tmparray = cell2mat( { EEG.event.' tmparg{3} ' } );']);
 	            catch, eval(['tmparray = { EEG.event.' tmparg{3} ' };']);
 	            end;
+				if strcmp( tmparg{3}, 'latency') & EEG.trials > 1
+					tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
+				end;
 	            [X I] = sort( tmparray );
 	            if dir2 == 1, I = I(end:-1:1); end;
 	            events = EEG.event(I);
@@ -259,6 +265,9 @@ for curfield = 1:2:length(args)
             try, eval(['tmparray = cell2mat( { EEG.event.' tmparg{1} ' } );']);
             catch, eval(['tmparray = { EEG.event.' tmparg{1} ' };']);
 	        end;
+			if strcmp( tmparg{1}, 'latency') & EEG.trials > 1
+				tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
+			end;
 	        [X I] = sort( tmparray );
 	        if dir1 == 1, I = I(end:-1:1); end;
 	        EEG.event = events(I);
