@@ -1,6 +1,6 @@
 % envtopo() - Plot the envelope of a data epoch plus envelopes and scalp maps of specified 
-%             or largest contributing components. Click on individual topoplots to examine
-%             them in detail (by axcopy()).
+%             or largest contributing components. If a 3-D input matrix, operating on the
+%             epoch mean. Click on individual topoplots to examine them in detail (by axcopy()).
 % Usage:
 %            >> envtopo(data,weights);
 %            >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2004/11/18 19:11:11  scott
+% adjust chanlocs = g.chanlocs
+%
 % Revision 1.80  2004/11/18 03:11:55  scott
 % chanlocs -> subsample channels for topoplots
 %
@@ -353,15 +356,15 @@ if nargin <= 2 | isstr(varargin{1})
 				  'icaact'        'real'     []                       [] ;
 				  'voffsets'      'real'     []                       [] ;
 				  'vert'          'real'     []                       [] ;
-				  'fillcomp'      'integer'  []                       0 ;  % no fill
-				  'colorfile'     'string'   []                       '' ; % deprecated usage
-				  'colors'        'string'   []                       '' ; % new usage
+				  'fillcomp'      'integer'  []                       0 ; 
+				  'colorfile'     'string'   []                       '' ; 
+				  'colors'        'string'   []                       '' ;
 				  'compnums'      'integer'  []                       -7; 
 				  'subcomps'      'integer'  []                       []; 
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
-				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  ''; % deprecated
-				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; 
+				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  ''; 
+				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv';  
 				  'actscale'      'string'   {'on' 'off'}             'off'; 
 				  'limcontrib'    'real'     []                       0;  
                                   'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
@@ -373,37 +376,53 @@ else % old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
 	end;
+        if isstr(varargin{2}), help envtopo; return; end
 	if nargin > 4,	  g.limits = varargin{2};
 	else              g.limits = 0; % [];
 	end;
+        if isstr(varargin{3}), help envtopo; return; end
 	if nargin > 5,    g.compnums = varargin{3};
 	else              g.compnums = [];
 	end;
+        if ~isstr(varargin{4}), help envtopo; return; end
 	if nargin > 6,    g.title = varargin{4};
 	else              g.title = '';
 	end;
+        if isstr(varargin{5}), help envtopo; return; end
 	if nargin > 7,    g.plotchans = varargin{5};
 	else              g.plotchans = [];
 	end;
+        if isstr(varargin{6}), help envtopo; return; end
 	if nargin > 8,    g.voffsets = varargin{6};
 	else              g.voffsets = [];
 	end;
+        if isstr(varargin{7}), help envtopo; return; end
 	if nargin > 9,    g.colorfile = varargin{7};
 	else              g.colorfile = '';
+	                  g.colors = '';
 	end;
+        if isstr(varargin{8}), help envtopo; return; end
 	if nargin > 10,   g.fillcomp = varargin{8};
 	else              g.fillcom = 0;
 	end;
+        if isstr(varargin{9}), help envtopo; return; end
 	if nargin > 11,   g.vert = varargin{9};
 	else              g.vert = [];
 	end;
+    if nargin > 12, varargin =varargin(10:end); end;
+    g.sumenv = 'on';
+    g.sortvar = 'mv';
+    g.timerange = [];
+    g.pvaf = ''; 
+    g.pvaf = ''; 
+    g.icaact = [];
     g.limcontrib = 0;
     g.icawinv = pinv(weights);
     g.subcomps = [];
     g.envmode = 'avg';
     g.dispmaps = 'on';
-    if nargin > 12, varargin =varargin(10:end); end;
 end;
+
 if ~isempty(g.colors)
     g.colorfile = g.colors; % retain old usage 'colorfile' for 'colors' -sm 4/04
 end
@@ -429,7 +448,9 @@ delete(gca)
 %
 g.timerange = g.timerange/1000;   % the time range of the input data
 g.limits(1) = g.limits(1)/1000;   % the time range to plot
-if length(g.limits)>1, 
+if length(g.limits) == 1   % make g.limits at least of length 2
+    g.limits(1) = 0; g.limits(2) = 0;
+else
     g.limits(2) = g.limits(2)/1000;  % 
 end;
 g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
@@ -441,9 +462,6 @@ if length(g.limits) == 3 | length(g.limits) > 4 % if g.limits wrong length
    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
 end
 
-if length(g.limits) == 1   % make g.limits at least of length 2
-    g.limits(1) = 0; g.limits(2) = 0;
-end
 
 xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
 if ~isempty(g.timerange)   % if 'timerange' given
@@ -470,7 +488,7 @@ end
 pmin = g.limits(1); % plot min and max sec
 pmax = g.limits(2);
 
-dt = (xmax-xmin)/(frames-1); % sampling interval in sec
+dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 
 %
@@ -904,7 +922,8 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
     set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
 
  else % if no 'fill'
-    p=plot(times,matsel(sumenv,frames,0,2,0));% plot the min
+    tmp = matsel(sumenv,frames,0,2,0);
+    p=plot(times,tmp);% plot the min
     hold on
     set(p,'color',FILLCOLOR);
     set(p,'linewidth',2);
