@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/14 00:11:28  arno
+% update header
+%
 % Revision 1.5  2002/08/14 00:06:16  arno
 % empty command as default
 %
@@ -78,6 +81,9 @@ com = '';
 if nargin < 1
 	help pop_saveset;
 	return;
+end;
+if isempty(EEG)
+	error('Can not save multiple datasets');
 end;
 
 if length(EEG) > 1
