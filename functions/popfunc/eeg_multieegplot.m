@@ -2,8 +2,8 @@
 %                  (with optional pre-labelling of specific trials).
 %
 % Usage:
-%   >> eeg_multieegplot( data, typerej, trialrej, elecrej, ...
-%                        'key1', value, 'key2', value ... );
+%   >> eeg_multieegplot( data,trialrej, elecrej, ...
+%                                'key1', value, 'key2', value ... );
 % Inputs:
 %   data        - input data (channnels x points or channels x points x trials).
 %   trialrej    - array of 0s and 1s (depicting rejected trials) (size sweeps)
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 corrected help -ad
