@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/05 23:28:22  arno
+% typo corection
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -289,7 +292,7 @@ if ~isempty(EEG.icaact)
    			end;	
 	   	end;
    	else
-   		printf('Warning: ica data removed because of the change in the numner of channel\n');
+   		fprintf('Warning: ica data removed because of the change in the numner of channel\n');
    		EEG.icaact = [];
    		EEG.specicaact = [];
    	end;		
