@@ -42,7 +42,7 @@
 %   'diffstd'  - ['on'|'off'] Show standard deviation for difference.
 %                Default is 'on'.
 %   'diffall'  - ['on'|'off'] Show all erps for difference. Default: 'off'.
-%   'tplotopt' - [cell array] 'key', val' plotting options for topoplot
+%   'tplotopt' - [cell array] 'key', val' plotting options for plottopo
 %
 % Output:
 %   erp1   - Grand average (or rms) of 'datadd' datasets
@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/07/15 18:40:07  arno
+% debugging difference ...
+%
 % Revision 1.11  2003/07/15 17:19:04  arno
 % reprogrammed the function completelly to allow more options
 %
@@ -161,7 +164,7 @@ if nargin < 3
 	           { 'style' 'text' 'string' 'Use RMS instead of average (check):' } { 'style' 'checkbox' 'string' '' } { } ...
 	           { 'style' 'text' 'string' 'Low pass (Hz) (for display only)' } ...
                { 'style' 'edit' 'string' '' } { } ...
-               { 'style' 'text' 'string' 'Topoplot options (''key'', ''val''):' } ...
+               { 'style' 'text' 'string' 'Plottopo options (''key'', ''val''):' } ...
                { 'style' 'pushbutton' 'string' 'Help' 'callback', 'pophelp(''plottopo'')' } ...
                { 'style' 'edit' 'string' '' }};
     
@@ -420,13 +423,13 @@ end
 if size(d1,dim) == 1
     close; error('Cannot compute paired t-test for a single ERP difference')
 end; 
-disp(['Computing t-values, df:' int2str(df) ]);
 a1 = mean(d1, dim);
 a2 = mean(d2, dim);
 v1 = std(d1, [], dim).^2;
 v2 = std(d2, [], dim).^2;
 n1 = size(d1,dim);
 df = n1 - 1;
+disp(['Computing t-values, df:' int2str(df) ]);
 
 d1 = d1-repmat(a1, [ones(1,dim-1) size(d1,3)]);
 d2 = d2-repmat(a2, [ones(1,dim-1) size(d2,3)]);
