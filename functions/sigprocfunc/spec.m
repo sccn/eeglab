@@ -27,6 +27,8 @@
 %  2) In case only one time window is necessary, the overlapping factor 
 %     will be increased so that at least 2 windows are presents (the 
 %     timef function cannot use a single time window).
+%  3) FOR FILTERED DATA, THE POWER OVER THE FILTERED REGION IS WRONG
+%     (TOO HIGH)
 %
 % Author: Arnaud Delorme, SCCN, Dec 2, 2003
 
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/12/03 03:02:00  arno
+% header
+%
 % Revision 1.7  2003/12/03 02:57:04  arno
 % same
 %
