@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.363  2005/03/05 02:08:02  arno
+% same
+%
 % Revision 1.362  2005/03/05 02:07:13  arno
 % adding chaninfo
 %
@@ -1298,6 +1301,7 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 
 % test for local SCCN copy
 % ------------------------
+addpath(eeglabpath);
 if (strcmpi(computer, 'GLNX86') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
