@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/07/20 19:41:49  scott
+% typos
+%
 % Revision 1.47  2003/04/16 01:47:42  arno
 % removing function call bug
 %
@@ -376,10 +379,6 @@ for index = 1:length(allfields)
 	if isstr(tmpvar) & isempty( findstr(tmpvar, '<='))
 		tmpvar = { tmpvar };
 	end;
-	
-	if isstr(tmpvar) & isempty( findstr(tmpvar, '<='))
-		tmpvar = { tmpvar };
-	end;
 
     % scan each field of EEG.event
     % ----------------------------
@@ -404,8 +403,8 @@ for index = 1:length(allfields)
 											[EEG.xmin EEG.xmax], 1);
 				end;
 			end;
-			Ieventlow  = find( tmpvarvalue > min);
-			Ieventhigh = find( tmpvarvalue < max);
+			Ieventlow  = find( tmpvarvalue >= min);
+			Ieventhigh = find( tmpvarvalue <= max);
 			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) );
         else
 			if strcmp(allfields{index}, 'latency')
