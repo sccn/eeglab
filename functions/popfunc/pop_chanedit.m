@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2005/03/05 02:20:18  arno
+% default shrinkorskirt
+%
 % Revision 1.115  2005/03/05 02:14:33  arno
 % debug chaninfo
 %
@@ -531,10 +534,16 @@ elseif nargin > 1
     params.shrink        = shrinkorskirt;
     params.plotrad       = plotrad;
 else 
-    params.shrink  = 0;
+    params.shrink  = [];
     params.plotrad = [];
 end;
 nosevals       = { '+X' '-X' '+Y' '-Y' };
+if ~isfield(params, 'plotrad')
+    params.plotrad = [];
+end;
+if ~isfield(params, 'shrink')
+    params.shrink = [];
+end;
 if ~isfield(params, 'nosedir')
     params.nosedir = nosevals{1};
 end;
