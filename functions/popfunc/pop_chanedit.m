@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/04/16 02:06:08  arno
+% adding forcelocs option
+%
 % Revision 1.46  2003/04/10 17:29:47  arno
 % header edit
 %
@@ -441,6 +444,7 @@ else
 		 switch lower(args{curfield})
           case 'forcelocs',
            chans = forcelocs(chans,args{curfield+1});
+           disp('Convert XYZ coordinates to spherical and polar');
 		  case 'convert', 
 		   if iscell(args{curfield+1})
 			   method=args{curfield+1}{1};
@@ -467,6 +471,8 @@ else
 				 chans(index).Y  = Y(index);
 				 chans(index).Z  = Z(index);
 			 end;
+             disp('Convert XYZ coordinates to spherical and polar');
+             chans = convertlocs(chans, 'cart2all');
 			case 'cart2topo',
 			 [th rd]=cart2topo([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})']);
 			 if isempty(th), return; end;
