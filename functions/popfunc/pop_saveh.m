@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/06/01 21:29:16  arno
+% save local hisotry
+%
 % Revision 1.4  2002/10/15 17:07:45  arno
 % drawnow
 %
@@ -83,9 +86,9 @@ end;
 fclose(fid);
 
 if iscell(allcoms)
-    com = sprintf('pop_saveset( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
+    com = sprintf('pop_saveh( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
 else
-    com = sprintf('pop_saveset( EEG.history, ''%s'', ''%s'');', curfilename, curfilepath);
+    com = sprintf('pop_saveh( EEG.history, ''%s'', ''%s'');', curfilename, curfilepath);
 end;
 
 return;
