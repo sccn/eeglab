@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/08/18 21:21:17  arno
+% message
+%
 % Revision 1.32  2004/07/30 17:03:23  arno
 % same
 %
@@ -280,7 +283,6 @@ if mode == 0  % single datasets
         end;
         EEG.data = single(EEG.data);
         fprintf('Saving dataset...\n');
-        asdf
         try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
         catch, 
             try, save([ curfilepath curfilename ], '-mat', 'EEG');
