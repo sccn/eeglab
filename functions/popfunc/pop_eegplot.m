@@ -9,16 +9,15 @@
 %                         % or from semi-auotmatic rejection.
 %   >> pop_eegplot( EEG, typerej, superpose, reject );
 %
-% Graphical interface:
-%   "Add to previously marked rejections" - [edit box] can be either YES or NO. This
-%                    edit box corresponds to the command line input option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit box 
-%                    corresponds to the command line input option 'reject'.
-%
+% Graphic interface:
+%   "Add to previously marked rejections" - [edit box] Can be either YES or NO. 
+%                    Command line eqivalent: 'superpose'.
+%   "Reject marked trials" - [edit box] Can be either YES or NO. Command line
+%                    equivalent 'reject'.
 % Inputs:
 %   EEG        - input EEG dataset
 %   typerej    - type of rejection 0 = EEG independent components; 
-%                                  1 = EEG data channels). {default: 1}
+%                                  1 = EEG data channels. {default: 1, data channels}
 %   superpose  - 0 = Show new marks only: Do not color the background of data portions 
 %                    previously marked for rejection by visual inspection. Mark data 
 %                    portions for rejection by first coloring them (by dragging the left 
@@ -43,11 +42,10 @@
 %                    rejection, press button 'Reject' to reject (remove) them from the EEG 
 %                    dataset (i.e., those portions plottted on a colored background. 
 %                    {default: 0, mark for rejection only}
-%
 % Outputs:
 %   Modifications are applied to the current EEG dataset at the end of the
 %   eegplot() call, when the user presses the 'Update Marks' or 'Reject' button.
-%   Note: The modifications made are NOT saved into EEGLAB history.
+%   NOTE: The modifications made are not saved into EEGLAB history.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -72,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/02/18 22:17:52  arno
+% typo in header
+%
 % Revision 1.21  2003/02/18 22:08:54  arno
 % update header for GUI
 %
