@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2004/06/02 23:18:03  arno
+% baseline, baseboot ...
+%
 % Revision 1.60  2004/06/02 22:50:19  arno
 % do not remember
 %
@@ -948,7 +951,17 @@ if iscell(X)
     % --------
     if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
         g.titleall = g.title;
-        if strcmpi(g.newfig, 'on'), figure; end; 
+        if strcmpi(g.newfig, 'on'), figure; end;
+        
+        % using same color scale
+        % ----------------------
+        if ~isfield(g, 'erspmax')
+            g.erspmax = max( max(max(abs(Pboot1))), max(max(abs(Pboot2))) );
+        end;
+        if ~isfield(g, 'itcmax')
+            g.itcmax  = max( max(max(abs(Rboot1))), max(max(abs(Rboot2))) );
+        end;
+            
         subplot(1,3,1); g.title = g.titleall{1}; 
         plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
         subplot(1,3,2); g.title = g.titleall{2}; 
@@ -1035,6 +1048,7 @@ if iscell(X)
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
             g.erspmax = []; % auto scale
+            g.itcmax  = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
                       mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
 		end;
@@ -1275,6 +1289,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %
       
       h(1) = subplot('Position',[.1 ordinate1 .9 height].*s+q);
+      set(h(1), 'tag', 'ersp');
       
       PP = P;
       if ~isnan(g.alpha) % zero out nonsignif. power differences
@@ -1396,6 +1411,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
       %
       h(6) = subplot('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
+      set(h(1), 'tag', 'itc');
 
       RR = R;
       if ~isnan(g.alpha)
