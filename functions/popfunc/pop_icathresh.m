@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 18:24:09  arno
+% typo can not
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -209,7 +212,7 @@ cb_kurtdist  = [ 'EEG.reject.threshkurtdist = str2num(get(gcbo, ''string''));' .
 				drawgraphs ];
 
 if interact
-	cb_calrej = [ 'ButtonName=questdlg( ''This will erase previous projections'', ''Confirmation'', ''CANCEL'', ''OK'', ''OK'');' ]
+	cb_calrej = [ 'ButtonName=questdlg2( ''This will erase previous projections'', ''Confirmation'', ''CANCEL'', ''OK'', ''OK'');' ]
 else
 	cb_calrej = [ 'ButtonName= ''OK''' ];	
 end;

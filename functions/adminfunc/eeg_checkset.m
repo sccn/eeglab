@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2002/08/12 00:16:46  arno
+% same
+%
 % Revision 1.52  2002/08/12 00:13:44  arno
 % same
 %
@@ -611,11 +614,8 @@ if ~isempty( varargin)
 		 case 'data',; % already done at the top 
 		 case 'ica', 
 		  if isempty(EEG.icaweights)
-			  ButtonName=questdlg([ 'No ICA weights. Compute now?' 10 '(then go back to the function you just called)'], ...
-								  'Confirmation', 'Cancel', 'Yes','Yes');
-			  
-			  switch lower(ButtonName),
-			   case 'cancel', error('eeg_checkset: ICA components must be derived before running that function'); 
+			  if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
+				  error('eeg_checkset: ICA components must be derived before running that function'); 
 			  end;
 			  [EEG res] = pop_runica(EEG);
 			  res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
@@ -779,7 +779,7 @@ end;
 return;	
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;

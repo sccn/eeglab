@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 02:27:13  arno
+% inputdlg2
+%
 % Revision 1.2  2002/04/23 21:45:48  arno
 % making the function standalone
 % ,
@@ -164,7 +167,7 @@ end;
 return;
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;

@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2002/08/12 16:13:24  arno
+% same
+%
 % Revision 1.107  2002/08/12 16:09:54  arno
 % debug
 %
@@ -1055,7 +1058,7 @@ end;
 return;
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;

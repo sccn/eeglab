@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/08 02:09:19  arno
+% contraining boundary event to be preserved for continuous data
+%
 % Revision 1.14  2002/08/01 22:21:41  arno
 % debugging
 %
@@ -169,7 +172,7 @@ if nargin<2
         else stringtext = 'no-description'; tmptext = 'no-description';
         end;
 
-		descrip = { 'string', stringtext, 'callback', ['questdlg(' vararg2str(tmptext) ...
+		descrip = { 'string', stringtext, 'callback', ['questdlg2(' vararg2str(tmptext) ...
 					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ] };
 
         % create the gui for this field
@@ -392,8 +395,8 @@ if strcmp( lower(g.deleteepochs), 'yes') & EEG.trials > 1
 	end;
 	Iepoch = find(Iepoch == 0);
 	if nargin < 2 
-		ButtonName=questdlg([ 'Warning: keeping ' num2str(length(Ievent)) ' events' 10 ...
-					'Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ], ...
+		ButtonName=questdlg2(strvcat([ 'Warning: keeping ' num2str(length(Ievent)) ' events'], ...
+					['Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ]), ...
 							'Confirmation', ...
 							'No', 'Cancel', 'Yes','Yes');
 	else ButtonName = 'Yes'; end;

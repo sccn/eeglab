@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/12 14:59:30  arno
+% button color
+%
 % Revision 1.8  2002/08/12 01:42:46  arno
 % colors
 %
@@ -82,7 +85,7 @@ end;
 fprintf('Drawing figure...\n');
 
 if length(compnum) > PLOTPERFIG
- 	ButtonName=questdlg([ 'More than ' int2str(PLOTPERFIG) ' channels so' 10 'this function will pop-up several windows'], ...
+ 	ButtonName=questdlg2(strvcat(['More than ' int2str(PLOTPERFIG) ' channels so'],'this function will pop-up several windows'), ...
 	     'Confirmation', 'Cancel', 'OK','OK');
 	if ~isempty( strmatch(lower(ButtonName), 'cancel')), return; end;
 

@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 02:22:53  arno
+% inpudlg2
+%
 % Revision 1.5  2002/05/03 16:18:50  scott
 % icaweight -> icaweights -sm
 %
@@ -116,7 +119,7 @@ end;
 	
 if nargin < 2 | plotag ~= 0
 
-    ButtonName=questdlg( 'Do you agree with the projection', ...
+    ButtonName=questdlg2( 'Do you agree with the projection', ...
                          'Confirmation', 'NO', 'YES', 'YES');
     switch ButtonName,
         case 'NO', 

@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/06/28 02:32:55  arno
+% disabling ori fields
+%
 % Revision 1.13  2002/06/25 13:58:09  arno
 % typo
 %
@@ -146,7 +149,7 @@ if nargin<2
 			 end;
         else stringtext = 'no-description'; tmptext = 'no-description';
         end;
-		callbackpushbutton = ['questdlg(' vararg2str(tmptext) ...
+		callbackpushbutton = ['questdlg2(' vararg2str(tmptext) ...
 					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ];
 		if strcmp(allfields{index}, 'ori_time') | strcmp(allfields{index}, 'ori_index'), enabling = 'off';
 		else enabling = 'on'; end;

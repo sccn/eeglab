@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/07/31 18:12:35  arno
+% reading floats le and be
+%
 % Revision 1.19  2002/05/21 20:47:02  scott
 % removed ; from evalin() commands -sm
 %
@@ -363,7 +366,7 @@ com = [com ');'];
 return;
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;

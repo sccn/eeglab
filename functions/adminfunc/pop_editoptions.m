@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/25 17:22:31  arno
+% adding a clear functions statement
+%
 % Revision 1.4  2002/04/25 16:56:13  arno
 % copying file if read only
 %
@@ -124,7 +127,7 @@ if nargin == 0
             if length(tmptext) > 25,    stringtext = [ tmptext(1:25) '...' ]; 
             else                        stringtext = tmptext; 
             end;
-            descrip = { 'string', stringtext, 'callback', ['questdlg([''' choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
+            descrip = { 'string', stringtext, 'callback', ['questdlg2([''' choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
         catch, descrip = { 'string', 'no-description' }; end;
 
         descrip = { 'string', description{ index } };
@@ -194,7 +197,7 @@ function  chopedtext = choptext( tmptext )
 return;
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;

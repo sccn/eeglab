@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/05/03 03:05:11  arno
+% editing interface
+%
 % Revision 1.3  2002/05/03 02:59:44  arno
 % debugging cancel
 %
@@ -150,7 +153,7 @@ com = sprintf( '[%s %s %s] = pop_newset(%s, %s, %s, %s)', inputname(1), inputnam
 return;
 
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;
