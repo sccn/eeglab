@@ -27,6 +27,9 @@
 %   allamps = amplitudes at each trial and time point (frames,trials)
 %   allphs  = phase (deg) at each trial and time point (frames,trials)
 %
+% Note: mean amplitudes and amplitude significance levels now calculated on
+%       log amplitudes, though log amplitudes are not returned (7-14-02).
+%
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 5-5-98 
 %
 % See also: erpimage()
@@ -48,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-7-98 added frames, made input data format one-row -sm
 % 5-8-98 added MIN_AMP, times, PLOT_IT -sm
@@ -206,7 +212,7 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
     imagpart = sinwin*epoch(:,t);
     amp = sqrt(realpart.*realpart+imagpart.*imagpart);
     if amp >= MIN_AMP
-      amps(f) = amps(f) + amp; % sum of amps
+      amps(f) = amps(f) + log(amp); % sum of amps
       realcoh(f) = realcoh(f)+ realpart/amp;
       imagcoh(f) = imagcoh(f)+ imagpart/amp;
       nsums(f) = nsums(f)+1;
@@ -222,7 +228,7 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
     end
   end
   if nsums(f)>0
-    amps(f) = amps(f)/nsums(f);
+    amps(f) = exp(amps(f)/nsums(f));
     realcoh(f) = realcoh(f)/nsums(f);
     imagcoh(f) = imagcoh(f)/nsums(f);
   else
@@ -258,7 +264,7 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
     imagpart = sinwin*epoch;
     amp = sqrt(realpart.^2+imagpart.^2);
     if amp >= MIN_AMP
-      tmpamps = tmpamps + amp;
+      tmpamps = tmpamps + log(amp);
       realcoh = realcoh+ realpart/amp;
       imagcoh = imagcoh+ imagpart/amp;
       nsums = nsums+1;
@@ -285,7 +291,8 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
  bootamp = sort(bootamp); % sort low to high
  ampsig = [bootamp(round(COHSIG_REPS*(alpha))) ...
            bootamp(round(COHSIG_REPS*(1.0-alpha)))];
-% keyboard
+ ampsig = exp(ampsig);
+ % keyboard
 
 end %%%%%%%%%%%%%%%%%%%%%%%%%%%% end cohsig %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
