@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/07/11 00:03:09  arno
+% debugging itcmax
+%
 % Revision 1.38  2002/07/10 23:59:57  arno
 % implement itcmax
 %
@@ -979,6 +982,7 @@ switch lower(g.plotitc)
 	if ~isempty(g.itcmax)
 		caxis([-g.itcmax g.itcmax]);
 	end;
+	tmpcaxis = caxis;
 
 	hold on
 	plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
@@ -1001,7 +1005,6 @@ switch lower(g.plotitc)
 	h(9) = get(h(8),'Children');
 	set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
 	set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
-	tmpcaxis = caxis;
 	set(h(8),'YLim',[0 tmpcaxis(2)]); 
 	title('ITC')
 
