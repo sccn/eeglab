@@ -7,7 +7,8 @@
 %            University of California San Diego (http://sccn.ucsd.edu/)
 %
 % Description:
-%   EEGLAB is Matlab software for processing continuous or epoched EEG data. 
+%   EEGLAB is Matlab software for processing continuous or epoched EEG data
+%   using tools from the ICA/EEG toolbox. 
 %   It is built to be useful either to novice or expert Matlab users. 
 %   In normal use, the EEGLAB graphic interface calls graphic functions via 
 %   pop-up windows. For the more advanced user, a single structure, 'EEG,' 
@@ -172,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/04/21 00:03:43  scott
+% [same] -sm
+%
 % Revision 1.21  2002/04/21 00:02:40  scott
 % [same] -sm
 %

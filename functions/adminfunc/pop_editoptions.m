@@ -9,7 +9,7 @@
 %   'option_computeica' - [0|1] If 1, compute the ICA component activity and
 %                   store it into a new variable. If 0, compute ICA activations
 %                   only when needed (only partially, if possible) and do not 
-%                   store the result). 0 is used to process very large datasets.
+%                   store the result). 0 may be used to process large datasets.
 %   'option_keepdataset' - [0|1]. If 1, keep datasets so that the user can undo 
 %                   any EEGLAB operations by returning to previous datasets.
 %                   The user may also work on several datasets at a time.
@@ -18,6 +18,11 @@
 % Outputs:
 %   In the output workspace, variables 'option_computeica', 
 %   'option_keepdataset' and 'option_usedisk' are updated.
+%
+% Note:
+%   Keep a copy of 'editoptions.m' in your working directory to overwrite system
+%   defaults (assuming that '.' is the first non-Matlab directory in your 
+%   MATLABPATH).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 09 March 2002
 %
@@ -42,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 18:09:57  arno
+% updating error message
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %

@@ -10,7 +10,7 @@
 % Convention for function calls: ======================================
 % When the menu calls a function, it uses the EEG dataset as  an
 % argument, sometimes with additional parameters. The function then
-% pops-up an interactive window to ask for additional parameter values.
+% pops-up an interactive window asking for additional parameter values.
 % The advantage of this process is that the same function can be called in 
 % two ways, either in interactive (pop_) mode or directly from the commandline. 
 % This trick allows EEGLAB to build a history of the commands run under an 
@@ -19,17 +19,17 @@
 % EEGLAB history (from h()) into their own Matlab script files.
 %
 % Using the EEGLAB help: =========== ???????? =========================
-% When using the menus, it is possible to call up the help message of any 
-% function that is called from the menu by opening the /Help/EEGLAB menu window.
+% From the EEGLAB menu, it is possible to call up the help message of any 
+% function that is called from the menu by opening the '/Help/EEGLAB' menu window.
 % The help message of each function that is called is then displayed.
 % You must then make the correspondence between the parameters entered through
 % the graphic (pop_) interface and the function arguments. Though this
-% may seem complicated at the beginning, with experience this  should seem 
-% straightforward and will also help the user to learn how to use each function 
-% directly from the command line or in user-composed Matlab scripts.
+% may seem complicated at the beginning, with experience this should seem 
+% straightforward and will also help the user to learn how to use each function,
+% either directly from the command line or in user-composed Matlab scripts.
 % Many EEGLAB functions do not actually process data, in particular the
-% 'pop_' functions. You may then look at the help of the function
-% which process the data. For instance, the menu item "/Plot/Channel ERP image"
+% 'pop_' functions. You may then look at the help of the called function
+% that processes the data. For example, the menu item "/Plot/Channel ERP image"
 % calls the function pop_erpimage(). This in turn serves as an interface to 
 % the function erpimage().
 
@@ -52,5 +52,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 
 help eeg_helphelp

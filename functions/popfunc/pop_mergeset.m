@@ -1,14 +1,15 @@
-% pop_mergeset() - merge two datasets. If only one argument is given
-%               a window pop out to ask for other arguments.
+% pop_mergeset() - Merge two datasets. If only one argument is given,
+%                  a window pops up to ask for other arguments.
 %
 % Usage:
 %   >> OUTEEG = pop_mergeset( INEEG1, INEEG2, keepall);
 %
 % Inputs:
 %  INEEG1  - first input dataset or dataset number
-%  INEEG2  - second  input dataset or dataset number
-%  keepall - [0|1] 0 remove ICA and 1 preserve ICA of the first dataset
-%            and recompute the activity on the merged data.
+%  INEEG2  - second input dataset or dataset number
+%  keepall - [0|1] 0 -> remove or 1 -> preserve ICA activations 
+%            of the first dataset and recompute the activations 
+%            of the merged data.
 %
 % Outputs:
 %  OUTEEG  - merged dataset
@@ -36,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/18 20:03:45  arno
+% retrIeve
+%
 % Revision 1.2  2002/04/10 21:32:26  arno
 % debuging event concatenation
 %
