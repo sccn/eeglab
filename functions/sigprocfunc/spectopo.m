@@ -104,6 +104,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/04/18 01:11:31  arno
+% 3 new options: nfft, winsize, overlap
+%
 % Revision 1.56  2003/04/18 00:49:57  arno
 % adding mapnorm option
 %
@@ -906,13 +909,15 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 				eegspec(c,:) = eegspec(c,:) + tmpspec';
 			else
 				for n=1:length(g.boundaries)-1
-					[tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-										   fftlength,srate,winlength,g.overlap);
-					if c==1 & e==epoch_subset(1)
-						eegspec = zeros(nchans,length(freqs));
-					end
-					eegspec(c,:) = eegspec(c,:) + tmpspec'* ...
-						((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
+                    if g.boundaries(n+1) - g.boundaries(n) > 20 % ignore segments of less than 20 points
+                        [tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
+                                               fftlength,srate,winlength,g.overlap);
+                        if c==1 & e==epoch_subset(1)
+                            eegspec = zeros(nchans,length(freqs));
+                        end
+                        eegspec(c,:) = eegspec(c,:) + tmpspec'* ...
+                            ((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
+                    end;
 				end
 			end;
 		end
