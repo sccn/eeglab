@@ -1,21 +1,23 @@
-% timtopo() - plot a data epoch and map its scalp map(s) at given time(s)
-%
+% timtopo()   - plot all channels of a data epoch on the same axis 
+%               and map its scalp map(s) at selected latencies.
 % Usage:
-%  >> timtopo(data,'chan_locs')
+%  >> timtopo(data,'chan_locs');
 %  >> timtopo(data,'chan_locs',[limits],[plottimes]','title',[plotchans], ...
-%                 [voffsets], 'key', 'val', ...);
-%
+%                    [voffsets], 'key', 'val', ...);
 % Inputs:
-%  data       = EEG/ERP data epoch (chans,frames)
-%  chan_locs  = channel location file, See  >> topoplot example 
+%  data       = (channels,frames) single-epoch data matrix
+%  chan_locs  = channel location file of EEGLAB EEG.chanlocs structure. 
+%               See >> topoplot example for file format.
 %
 % Optional inputs:
-%  [limits]   = [xmin xmax ymin ymax]  (x's in ms) {def|0 or both y's 0 -> data limits}
-%  plottimes  = vector of times to topoplot {default|nan -> frame of max(var())}
+%  [limits]   = [minms maxms minval maxval] data limits for latency (in ms) and data values
+%               {default|0 -> use [0 npts-1 data_min data_max]; else [minms maxms] or [minms maxms 0 0] 
+%               -> use [minms maxms data_min data_max]
+%  plottimes  = vector of latencies (in ms) to plot scalp maps {default|NaN -> latency of maximum variance}
 % 'title'     = plot title {default|0 -> none}
-%  plotchans  = data channel(s) to plot {default|0 -> all}
-%  voffsets   = vertical lines extend above the data this much (plot units){default -> 0}
-% 'key','val' = optional topoplot() arguments. See >> help topoplot 
+%  plotchans  = vector of data channel(s) to plot {default|0 -> all}
+%  voffsets   = vector of (plotting-unit) distances vertical lines extend above the data {default -> all =}
+% 'topokey','val' = optional topoplot() scalp map plotting arguments. See >> help topoplot 
 
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
 %
@@ -38,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2003/11/26 18:20:44  scott
+% Time -> Latency
+%
 % Revision 1.65  2003/08/06 00:27:10  arno
 % remove postp (made matlab 5.3 crash
 %
@@ -286,24 +291,30 @@ if isnumeric(chan_locs) & chan_locs == 0,
     chan_locs = 'chan.locs';  % DEFAULT CHAN_FILE
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-  if limits==0,      % == 0 or [0 0 0 0]
+  %
+  %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % defaults: limits == 0 or [0 0 0 0]
+  if ( length(limits) == 1 & limits==0) | (length(limits)==4 & ~any(limits))  
     xmin=0;
     xmax=frames-1;
     ymin=min(min(data));
     ymax=max(max(data));
-  else
-    if length(limits)~=4,
-      fprintf( ...
-       'timtopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
-      return
-    end;
+  elseif length(limits) == 2  % [minms maxms] only
+    ymin=min(min(data));
+    ymax=max(max(data));
+ elseif length(limits) == 4
     xmin = limits(1);
     xmax = limits(2);
-    ymin = limits(3);
-    ymax = limits(4);
+    if any(limits([3 4]))
+      ymin = limits(3);
+      ymax = limits(4);
+    else % both 0
+      ymin=min(min(data));
+      ymax=max(max(data));
+    end
+  else
+    fprintf('timtopo(): limits format not correct. See >> help timtopo.\n');
+    return
   end;
 
   if xmax == 0 & xmin == 0,
@@ -315,7 +326,7 @@ end
     x=xmin*ones(1,frames)+dx*(0:frames-1); % compute x-values
   end;
   if xmax<=xmin,
-      fprintf('timtopo() - xmax must be > xmin.\n')
+      fprintf('timtopo() - in limits, maxms must be > minms.\n')
       return
   end
 
@@ -324,7 +335,7 @@ end
       ymin=min(min(data));
   end
   if ymax<=ymin,
-      fprintf('timtopo() - ymax must be > ymin.\n')
+      fprintf('timtopo() - in limits, maxval must be > minmval.\n')
       return
   end
 
@@ -354,13 +365,10 @@ if plottimes_set == 1
     return
   end
   if max(plottimes) > xmax | min(plottimes)< xmin
-    fprintf('timtopo(): plottimes out of range - cannot plot.\n');
+    fprintf('timtopo(): plottimes latencies out of range - cannot plot.\n');
     return
   end
-  if sort(plottimes) ~= plottimes
-    fprintf('timtopo(): plottimes out of order - lines would cross.\n');
-    return
-  end
+  plottimes = sort(plottimes); % put map latencies in ascending order, else map lines would cross.
   xshift = [x(2:frames) xmax];
   plotframes = ones(size(plottimes));
   for t = 1:ntopos
@@ -402,6 +410,7 @@ topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth> 0.25*pos(4) % dont make too high
   topowidth = 0.25*pos(4);
 end
+
 halfn = floor(ntopos/2);
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (ntopos/2+halfn*head_sep)*topowidth;
@@ -409,12 +418,8 @@ else % even number of topos
    topoleft = pos(3)/2 - ((halfn)+(halfn-1)*head_sep)*topowidth;
 end
 
-if max(plotframes) > frames
-    fprintf('Plot frame %d is > frames in data (%d)\n',max(plotframes),frames);
-    return
-end
-if min(plotframes) < 1
-    fprintf('Plot frame %d is < 1\n',min(plotframes));
+if max(plotframes) > frames |  min(plotframes) < 1
+    fprintf('Requested map frame %d is outside data range (1-%d)\n',max(plotframes),frames);
     return
 end
 
@@ -422,12 +427,12 @@ end
 %%%%%%%%%%%%%%%%%%%% Print times and frames %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-fprintf('Topo maps will show times: ');
+fprintf('Scalp maps will show latencies: ');
 for t=1:ntopos
   fprintf('%4.0f ',plottimes(t));
 end
 fprintf('\n');
-fprintf('                   frames: ');
+fprintf('                     at frames: ');
 for t=1:ntopos
   fprintf('%4d ',plotframes(t));
 end
@@ -473,12 +478,18 @@ end
 %
 width  = xmax-xmin;
 height = ymax-ymin;
+linc = 0.5;  % increment line thickness
 
 for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
  if length(plotchans)>1 | voffsets(t)
   l1 = plot([plottimes(t) plottimes(t)],...
        [min(data(plotchans,plotframes(t))) ...
-       voffsets(t) + max(data(plotchans,plotframes(t)))],'b');
+       voffsets(t) + max(data(plotchans,plotframes(t)))],'w'); % white underline behind
+  set(l1,'linewidth',2);
+  l1 = plot([plottimes(t) plottimes(t)],...
+       [min(data(plotchans,plotframes(t))) ...
+       voffsets(t) + max(data(plotchans,plotframes(t)))],'b'); % blue line
+  set(l1,'linewidth',1+linc);
  end
 end
 %
@@ -496,8 +507,6 @@ axis([0 1 0 1])
 
 for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(data(:,plotframes(t))); % max data value at plotframe
-
-       % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
   axtp = axes('Units','Normalized','Position',...
        [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
@@ -506,10 +515,11 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   axis([-1 1 -1 1]);
 
   from = changeunits([plottimes(t),maxdata],axdata,axall);
-  to   = changeunits([0,-0.8],axtp,axall);
+  to   = changeunits([0,-0.89],axtp,axall);
   delete(axtp);
   axes(axall);
   l1 = plot([from(1) to(1)],[from(2) to(2)]);
+  set(l1,'linewidth',1+linc);
 
   hold on
   set(axall,'Visible','off');
@@ -518,9 +528,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-
 for t=1:ntopos
-
        % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
   axtp = axes('Units','Normalized','Position',...
        [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
@@ -547,12 +555,12 @@ for t=1:ntopos
   topostring = [ 'topoplot(data(:,plotframes(t)),chan_locs' topoargs ');']; % plot the scalp map 
   eval(topostring);
   %
-  % ELSE make a 3-D headplot
+  % Else make a 3-D headplot
   %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
   
-  timetext = num2str(plottimes(t),'%4.0f');
-  text(0.00,0.70,timetext,'FontSize',axfont-2,'HorizontalAlignment','Center');
+  timetext = [num2str(plottimes(t),'%4.0f') ' ms'];
+  text(0.00,0.60,timetext,'FontSize',axfont-2,'HorizontalAlignment','Center'); % ,'fontweight','bold');
 end
 
 %
@@ -565,7 +573,7 @@ set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.16,0.625,titl,'FontSize',titlefont,'HorizontalAlignment','Center'); % 'FontWeight','Bold');
+text(0.16,0.635,titl,'FontSize',titlefont,'HorizontalAlignment','Center'); % 'FontWeight','Bold');
 
 text(0.966,0.695,'+','FontSize',axfont,'HorizontalAlignment','Center');
 text(0.966,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
