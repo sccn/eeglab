@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/27 01:26:40  scott
+% updated topoplot call -sm
+%
 % Revision 1.6  2002/04/27 01:19:33  scott
 % same -sm
 %
@@ -233,6 +236,7 @@ set(xl,'fontsize',16);
 yl=ylabel(['Frequency (Hz)     Chan ',int2str(showchan)]);
 set(yl,'fontsize',16);
 set(gca,'fontsize',14)
+set(gca,'ydir','normal');
 
 if min(times)<0 & max(times)>0
   plot([0 0],[freqs(1) freqs(end)],[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
@@ -270,7 +274,7 @@ for n=1:tfpoints
    axes(topoaxes(n));
    scalpmap = matsel(tfdata,length(times),tfpidx(n,1),tfpidx(n,2),selchans)';
    topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
-               'electrodes','off','shrink','off');
+               'electrodes','on','shrink','off');
                % 'interlimits','electrodes')
    axis square;
    tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
