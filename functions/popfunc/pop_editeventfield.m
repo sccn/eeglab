@@ -1,54 +1,70 @@
-% pop_editeventfield() - Load/remove event fields in a dataset. If the 
-%              EEG dataset is the only inputs, a window pops up to ask for 
-%              the relevant parameter values.
+% pop_editeventfield() - Add/remove/rename/modify a field in the event structure 
+%              of an EEG dataset. Can also be used to append new events to the end of the 
+%              event structure or to delete all current events. If the dataset is 
+%              the only input, a window pops up to ask for relevant parameter values.
 %
 % Usage: >> [EEG] = pop_editeventfield( EEG, 'key1', 'value1', ...);
 %
 % Input:
 %   EEG      - input dataset
 %
-% Optional input
-%  'latency'  - [ 'filename'|array|number ], 1-column file or
-%               array containing the latency of the events. If the arg
-%               is a single number, it will be used for all events.
-%  'type'     - [ 'filename'|array|number ], Type (numbers) of the events.
-%               Same format as 'latency' {Default event type is 1}.
-%  'USER_VAR' - [ 'filename'|array|number|[] ], here 'USER_VAR'
-%               is the name of a user-defined field. If the argument
-%               is [], the field is removed from all the events.
-%  'skipline' - number of rows to skip for text files 
-%  'rename'   - ['USER_VAR1->USER_VAR2'] rename field 'USER_VAR1' into
-%               'USER_VAR2'. Ex: { 'rename', 'type->condition' }.    
-%  'delold'   - ['yes'|'no'] 'yes' = Erase all previous events. Default
-%               is 'no'.
-%  'indices'  - vector indicating the indices of the events to modify
-%               Default is current events.
-%  'timeunit' - [ latency unit in second ]. Default unit is 1 second. 
-%  'delim'    - delimiting characters in file. Default is tab and space.
-%  'latencyinfo'  - comment string for the latency field
-%  'typeyinfo'    - comment string for the type field
-%  'USER_VARinfo' - comment string for the variable USERVAR
+% Optional inputs:
+%  'FIELDNAME' - [ 'filename'|vector|number|[] ]. Name of a current or new 
+%               user-defined event field. The ascii file, vector variable, 
+%               or explicit numeric vector should contain values for this field 
+%               for all events specified in 'indices' (below) or in new events
+%               appended to the dataset (if 'indices' not specified). If one arg 
+%               value is given, it will be used for all the specified events.
+%               If the arg is [], the named field is *removed* from all the 
+%               specified (or new) events. Use this option to add a new field to 
+%               all events in the dataset, or to modify the field values of specified 
+%               events, to specify field information for new events appended to
+%               the event structure, or to remove an event field.
+%  'FIELDNAMEinfo' - new comment string for field FIELDNAME.
+%  'indices'  - [vector of event indices] The indices of the events to modify. 
+%               If adding a new event field, events not listed here 
+%               will have an empty field value IF they are not in an epoch
+%               containing events whose field value is specified. However,
+%               if adding a new (FIELDNAME) field to an epoched dataset,
+%               and the field value for only one event in some data epoch is 
+%               specified, then the other events in the same epoch will be given 
+%               the specified value. If field values of more than one, but not all 
+%               the events in an epoch are specified, then unspecified events at 
+%               the beginning of the epoch will be given the value of the first 
+%               specified event, unspecified epoch events after this event will 
+%               be given the field value of the second specified epoch event, etc.
+%               {default|[]: modify all events in the dataset}
+%  'rename'   - ['FIELDNAME1->FIELDNAME2'] rename field 'FIELDNAME1' to
+%               field 'FIELDNAME2'. Ex: { 'rename', 'blocktype->condition' }.    
+%  'delold'   - ['yes'|'no'] 'yes' = delete ALL previous events.  {default: 'no'}
+%  'timeunit' - [latency field time unit in fraction of seconds]. Ex: 1e-3 -> 
+%               read specified latencies as msec {default: 1 (-->seconds)}
+%  'skipline' - number of leading text file lines to skip in named text files 
+%  'delim'    - delimiting characters in named text files {default: tabs and spaces}
 %
 % Outputs:
 %   EEG          - dataset with updated event field
 %
 % Example: [EEG, eventnumbers] = pop_editeventfield(EEG, 'type', 1, ...
 %                         'sleepstage', 'sleepstage_values.txt', ...
-%                         'latency', [0.100 0.130 0.123 0.400] );
+%                         'latency', [100 130 123 400],'timeunit',1e-3);
+%          % Append 4 events to the EEG struct, all of type 1, at the latencies
+%          % given (in msec) with user-defined field ('sleepstage') values read 
+%          % from a one-column ascii file ('sleepstage_values.txt').
 %
-%         This appends 4 events to the EEG struct, all of type 1,
-%         with user-defined field ('sleepstage') values read from an
-%         ascii 1-column file ('sleepstage_values.txt').
+% Example: [EEG, eventnumbers] = pop_editeventfield(EEG, 'indices', 1:2:3277, ...
+%                          'sleepstage', 'sleepstage_values.txt');
+%          % Add a new 'sleepstage' field to all events in the EEG struct.
+%          % Read 'sleepstage' field values for odd-numbered events from a one-column 
+%          % ascii file ('sleepstage_values.txt') -- even-numbered % events will have 
+%          % an empty 'sleepstage' value (unless the data are epoched, see 'indices' above).
 %
-% Notes: As indicated above, to remove a user=defined field, simply
-%           enter an empty array [].
-%            Ex: >> EEG = pop_editeventfield(EEG,'sleepstage',[]);
-%        To save the events first convert them in 'array' format and
+% Note: To save events into a readable table, first convert them to 'array' format,
 %        then save the array.
-%            >> tmp = eeg_eventformat(EEG.event, 'array');
-%            >> save -ascii filename.txt tmp 
+%            >> events = eeg_eventformat(EEG.event, 'array');
+%            >> save -ascii myevents.txt events 
 %
-% Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002
+% Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002-
 %
 % See also: pop_importevent(), eeg_eventformat(), pop_selectevent()
 
@@ -71,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2004/08/25 00:30:37  arno
+% remove converting inputnames
+%
 % Revision 1.35  2004/08/25 00:25:20  arno
 % same
 %
@@ -192,7 +211,7 @@ if nargin < 1
 end;	
 
 if isempty(EEG.data)
-    disp('Setevent error: cannot process empty dataset'); return;
+    error('Setevent error: cannot process empty dataset');
 end;    
 
 I = [];
@@ -311,7 +330,7 @@ if nargin<2
 	            else                                args = { args{:}, results{end-sub}, results{end-sub+1} }; end;
 	            if ~isempty( userdat{end} ),        args = { args{:}, [ results{end-sub} 'info' ], userdat{end} }; end;
 	        else
-	            disp(['The new field' results{end-sub} ' was ignored since no input data were given for it.' ]);
+	            disp(['pop_editeventfield(): The new field' results{end-sub} ' was ignored since no input data were given for it.' ]);
 	        end;
 	    end;  
         % handle rename 
@@ -336,7 +355,7 @@ end;
 % ----------------
 if ~isempty(args)
    try, g = struct(args{:});
-   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
+   catch, disp('pop_editeventfield(): wrong syntax in function arguments'); return; end;
 else
     g = [];
 end;
@@ -361,11 +380,11 @@ for curfield = tmpfields'
     switch lower(curfield{1})
        case { 'append' 'delold', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
        case 'rename',
-            if isempty( findstr('->',g.rename) ), disp('Set warning: bad syntax for rename'); end;
+            if isempty( findstr('->',g.rename) ), disp('pop_editeventfield() warning: bad syntax for rename'); end;
             oldname = g.rename(1:findstr('->',g.rename)-1);
             newname = g.rename(findstr('->',g.rename)+2:end);
             indexmatch = strmatch(oldname, allfields);
-            if isempty(indexmatch), disp('Set warning: name not found for rename'); 
+            if isempty(indexmatch), disp('pop_editeventfield() warning: name not found for rename'); 
             else
                 for index  = 1:length(EEG.event)
                      eval([ 'EEG.event(index).' newname '=EEG.event(index).' oldname ';']);  
@@ -373,7 +392,7 @@ for curfield = tmpfields'
                 EEG.event = rmfield(EEG.event, oldname);
             end;
             if isfield(EEG, 'urevent')
-                disp('Warning: field name not renamed in urevent structure');
+                disp('pop_editeventfield() warning: field name not renamed in urevent structure');
             end;
        otherwise, % user defined field command
                   % --------------------------
@@ -384,7 +403,7 @@ for curfield = tmpfields'
                 fieldname = curfield{1}(1:infofield-1);
                 indexmatch = strmatch( fieldname, allfields);
                 if isempty( indexmatch )
-                    disp(['Setevent warning: Field ' fieldname ' not found to add description, ignoring']);
+                    disp(['pop_editeventfield() warning: Field ' fieldname ' not found to add description, ignoring']);
                 else
                     EEG.eventdescription{indexmatch} = getfield(g, curfield{1});
                 end;
@@ -394,12 +413,12 @@ for curfield = tmpfields'
 	            if isempty( getfield(g, curfield{1}) ) % delete
 	                 indexmatch = strmatch( curfield{1}, allfields);
                      if isempty( indexmatch )
-                        disp(['Set warning: Field ''' curfield{1} ''' not found for deletion, ignoring']);
+                        disp(['pop_editeventfield() warning: Field ''' curfield{1} ''' not found for deletion, ignoring']);
                      else
 	                    EEG.event = rmfield(EEG.event, curfield{1}); 
 	                    allfields(indexmatch) = [];
                         if isfield(EEG, 'urevent')
-                            fprintf('Warning: field ''%s'' not deleted from urevent structure\n', curfield{1}  );
+                            fprintf('pop_editeventfield() warning: field ''%s'' not deleted from urevent structure\n', curfield{1}  );
                         end;
 						try,
 							EEG.eventdescription(indexmatch) = [];
@@ -420,7 +439,7 @@ for curfield = tmpfields'
 		                      
 		                      indexmatch = strmatch(curfield{1}, allfields);
 		                      if isempty(indexmatch) % no match
-		                          disp(['Set: creating new field ''' curfield{1} '''' ]);
+		                          disp(['pop_editeventfield(): creating new field ''' curfield{1} '''' ]);
 		                      end;
                               try
                                   EEG.event = setstruct(EEG.event, curfield{1}, g.indices, cell2mat(tmparray));
@@ -436,7 +455,7 @@ for curfield = tmpfields'
                                   end;
 							  end;
                               if isfield(EEG, 'urevent')
-                                  disp('pop-editeventfield: updating urevent structure');
+                                  disp('pop-editeventfield(): updating urevent structure');
                                   try
                                       for indtmp = g.indices(:)'
                                           if ~isempty(EEG.event(indtmp).urevent)
@@ -446,7 +465,7 @@ for curfield = tmpfields'
                                           end;
                                       end;
                                   catch,
-                                      disp('Warning: problem while updating urevent structure');
+                                      disp('pop_editeventfield(): problem while updating urevent structure');
                                   end;
                               end;
 		             end;
