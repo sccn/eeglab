@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/11/29 23:12:43  hilit
+% verifing that everyone have perimissions to eeglab.cfg
+%
 % Revision 1.2  2004/11/23 19:27:14  scott
 % edit help
 %
@@ -54,7 +57,7 @@ function varargout = uigetfile2(varargin);
     if varargout{1} ~= 0
         Path = varargout{2};
         cd(olddir);
-        save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat');
+        save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat','-V6');
         if isunix
             system('chmod 777 eeglab.cfg');
         end
