@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 02:38:13  arno
+% [6~[6~inputdlg2
+%
 % Revision 1.2  2002/05/02 19:39:43  arno
 % updating function for new event structure
 % ,
@@ -95,8 +98,11 @@ EEG.filepath        = filepath;
 EEG.setname 		= 'rawdatas';
 EEG.nbchan          = size(EEG.data,1);
 EEG = eeg_checkset(EEG);
-EEG = pop_importepoch( EEG, [rt(:)*1000 eegtype(:) accept(:) eegresp(:)], { 'RT' 'type' 'accept' 'response'}, {'RT'}, 1E-3, 0, 1);
-
+if any(rt)
+    EEG = pop_importepoch( EEG, [rt(:)*1000 eegtype(:) accept(:) eegresp(:)], { 'RT' 'type' 'accept' 'response'}, {'RT'}, 1E-3, 0, 1);
+else
+    EEG = pop_importepoch( EEG, [eegtype(:) accept(:) eegresp(:)], { 'type' 'accept' 'response'}, { }, 1E-3, 0, 1);
+end;    
 command = sprintf('EEG = pop_loadeeg(''%s'', ''%s'', %s);', filename, filepath, ...
 			vararg2str({range_chan range_sweeps range_typeeeg range_response }));
 
