@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/10/30 23:31:00  arno
+% changing default psd options
+%
 % Revision 1.42  2002/10/23 02:35:02  arno
 % closing figure when error (selective)
 %
@@ -643,7 +646,7 @@ if ~isempty(g.freq)
 		if isnan(g.limits(5)),     maplimits = 'absmax';
 		else                       maplimits = [g.limits(5) g.limits(6)];
 		end;
-		if g.plotchan ~= 0
+		if ~isempty(g.plotchan) & g.plotchan ~= 0
 			if ~isempty(varargin)
 				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
 						 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
