@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/26 20:31:23  arno
+% modifying gui
+%
 % Revision 1.3  2002/04/23 01:31:37  erik
 % edited msgs -sm
 %
@@ -119,8 +122,7 @@ if strcmp(g.gui, 'on')
     results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel locations -- cart2topo()' );
 	if isempty(results), return; end;
 	g.center  = eval( [ '[' results{1} ']' ] );
-	g.squeeze = eval( [ '[' results{2} ']' ] );
-	g.optim   = results{3};
+	g.optim   = results{2};
 end;
 
 if g.squeeze>1
@@ -139,13 +141,6 @@ y = y(:);
 z = z(:);
 
 options = [];
-if isempty(g.center)
-	% Find center
-	% ----------------------------------------------
-	fprintf('Optimizing center position...\n');
-	g.center = fminsearch('spherror',[0 0 0],options,x,y,z);
-	fprintf('Best center is [%g,%g,%g].\n',g.center(1),g.center(2),g.center(3));
-end
 x = x - g.center(1);  % center the data
 y = y - g.center(2);
 z = z - g.center(3);
@@ -154,34 +149,37 @@ wobble = std(radius);              % test if xyz values are on a sphere
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 
 if  wobble/mean(radius) > 0.01 & g.optim==1
-  kk=0;
-  while wobble/mean(radius) > 0.01 & kk<5
-    newcenter = fminsearch('spherror',center,options,x,y,z);
-    nx = x - newcenter(1);  % re-center the data
-    ny = y - newcenter(2);
-    nz = z - newcenter(3);
-    nradius = (sqrt(nx.^2+ny.^2+nz.^2));   % assume xyz values are on a sphere
-    newobble = std(nradius);   
-    if newobble<wobble
-      center=newcenter;
-      fprintf('Wobble too strong (%3.2g%%)! Re-centering data on (%g,%g,%g)\n',...
-                100*wobble/mean(radius),newcenter(1),newcenter(2),newcenter(3))
-      x = nx;  % re-center the data
-      y = ny;
-      z = nz;
-      radius=nradius;
-      wobble=newobble;
-      kk=kk+1;
-    else
-      kk=5;
-    end
-  end
-   fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
-              100*wobble/mean(radius),center(1),center(2), ...
-	   center(3))
-%else
-%  fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
-%              100*wobble/mean(radius),center(1),center(2),center(3))
+	% Find center
+	% ----------------------------------------------
+	fprintf('Optimizing center position...\n');
+	kk=0;
+	while wobble/mean(radius) > 0.01 & kk<5
+		newcenter = fminsearch('spherror',center,options,x,y,z);
+		nx = x - newcenter(1);  % re-center the data
+		ny = y - newcenter(2);
+		nz = z - newcenter(3);
+		nradius = (sqrt(nx.^2+ny.^2+nz.^2));   % assume xyz values are on a sphere
+		newobble = std(nradius);   
+		if newobble<wobble
+			center=newcenter;
+			fprintf('Wobble too strong (%3.2g%%)! Re-centering data on (%g,%g,%g)\n',...
+					100*wobble/mean(radius),newcenter(1),newcenter(2),newcenter(3))
+			x = nx;  % re-center the data
+			y = ny;
+			z = nz;
+			radius=nradius;
+			wobble=newobble;
+			kk=kk+1;
+		else
+			kk=5;
+		end
+	end
+	fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
+			100*wobble/mean(radius),center(1),center(2), ...
+			center(3))
+	%else
+	%  fprintf('Wobble (%3.2g%%) after centering data on (%g,%g,%g)\n',...
+	%              100*wobble/mean(radius),center(1),center(2),center(3))
 end
 
 x = x./radius; % make radius 1
