@@ -1,5 +1,5 @@
 % pop_rejspec() - rejection of artifact in a dataset using 
-%               thresholding of frequencies in the data.
+%                 thresholding of frequencies in the data.
 %
 % Usage:
 %   >>  pop_rejspec(INEEG, typerej); % pops-up
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/12 23:48:59  luca
+% noew saving output
+%
 % Revision 1.13  2002/08/14 15:26:03  arno
 % debug for few channels
 %
