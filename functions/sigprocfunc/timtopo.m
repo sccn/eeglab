@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2004/04/25 20:07:28  scott
+% typo
+%
 % Revision 1.67  2004/04/25 20:05:36  scott
 % help message modernize. adjust text, add white vertical underlines, made limits input more flexible
 %
@@ -541,8 +544,11 @@ for t=1:ntopos
   axes(axtp)                             % topoplot axes
   cla
 
+  topoargs = ' ';
   if ~isempty(varargin)
-    topoargs = varargin{:};
+  for v = varargin{:}
+    topoargs = [ topoargs ' ' cell2mat(v)];
+  end
   else
     topoargs = [];
   end
