@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/16 00:18:34  arno
+% debuging with cooper
+%
 % Revision 1.7  2002/10/15 23:47:29  arno
 % subitc options
 %
@@ -180,8 +183,7 @@ if nargout > 3 | strcmpi(g.subitc, 'on')
 	itcvals = tfitc(tmpall, g.itctype);
 end;
 if strcmpi(g.subitc, 'on')
-    a = gcf;
-    figure; imagesc(abs(itcvals)); cbar; figure(a);
+    %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
 	tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
 end;
 return;
