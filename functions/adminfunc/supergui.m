@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/12 14:50:15  arno
+% color
+%
 % Revision 1.9  2002/08/12 14:47:40  arno
 % color
 %
@@ -130,13 +133,14 @@ outwidth = 0;
 outheight = 0;
 height = 1.05/(length(geometry)+1)*(1-INSETY);
 posy = 1 - height - 1/length(geometry)*INSETY;
+factmultx = 0;
+factmulty = 0;
 for row = 1:length(geometry)
 
 	% init
     posx = -0.05;
 	clear rowhandle;
 	tmprow = geometry{row};
-	tmpwidth = 0;
     
 	for column = 1:length(tmprow)
 
@@ -149,13 +153,17 @@ for row = 1:length(geometry)
 		end;		
 		if ~isempty(currentelem)
 			rowhandle(column) = uicontrol( 'unit', 'normalized', 'position', ...
-						[posx posy width height].*s+q, currentelem{:}); 
-			extnorm = get( rowhandle(column), 'extent');			
+						                      [posx posy width height].*s+q, currentelem{:});
+			
+			% this simply compute a factor so that all uicontrol will be visible
+			% ------------------------------------------------------------------
 			set( rowhandle(column), 'units', 'pixels');			
-			ext = get( rowhandle(column), 'extent');			
-			tmpwidth  = tmpwidth + max(ext(3) + ext(3)/extnorm(3)*INSETX, (width+INSETX)*ext(3)/extnorm(3)); 			
+			curpos = get(rowhandle(column), 'position');
+			curext = get(rowhandle(column), 'extent');
+			factmultx = max(factmultx, curext(3)/curpos(3));
+			factmulty = max(factmulty, curext(4)/curpos(4));
 			set( rowhandle(column), 'units', 'normalized');			
-			outheight = max(outheight, ext(4)*length(geometry)); % because all rows are equal			
+			
         else 
 			rowhandle(column) = 0;
 		end;
@@ -167,11 +175,12 @@ for row = 1:length(geometry)
 		counter = counter+1;
 	end;
 	posy      = posy - height - 1/length(geometry)*INSETY; %compensate for inset 
-	outwidth  = max(outwidth, tmpwidth);
-end;		
+end;
+pos = get(gcf, 'position');
+set(gcf, 'position', [pos(1) 0 pos(3)*factmultx, pos(4)*factmulty]);
 
-% setting defaults
-%-----------------
+% setting defaults colors
+%------------------------
 try, icadefs;
 catch,
 	GUIBACKCOLOR        =  [.8 .8 .8];     
@@ -188,13 +197,6 @@ set(hh, 'horizontalalignment', 'left');
 
 hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
-
-pos = get(gcf, 'position');
-if pos(2)-outheight*1.5 < 0
-	set(gcf, 'position', [pos(1) 0 outwidth*1.2, outheight*1.5]);
-else 
-	set(gcf, 'position', [pos(1) (pos(2)-outheight*1.5) outwidth*1.2, outheight*1.5]);
-end;
 
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
