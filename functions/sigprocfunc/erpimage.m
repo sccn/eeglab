@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2003/07/21 21:09:59  scott
+% debug
+%
 % Revision 1.107  2003/07/21 20:46:19  scott
 % debug
 %
@@ -1496,7 +1499,7 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
             [data,outtrials] = movav([data(:,end),data],[1:(ntrials+1)],avewidth,decfactor); 
             % Note: movav here sorts using square window
             [outsort,outtrials] = movav(sortvar,1:(ntrials+1),avewidth,decfactor); 
-          end
+           end
         end
         if ~isempty(auxvar)
           if ~exist('phargs') % if not phase-sorted trials
@@ -1504,11 +1507,12 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
           else % if phase-sorted trials
            if avewidth>2 
             [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
-                                      auxvar,...
-                                      auxvar(:,[1:fronthalf])],...
-                                      [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
+                                  auxvar,...
+                                  auxvar(:,[1:fronthalf])],...
+                                 [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
            else % avewidth==2
             [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor); 
+           end
           end
         end
         fprintf('Output data will be %d frames by %d smoothed trials.\n',...
