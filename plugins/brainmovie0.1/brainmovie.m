@@ -63,8 +63,11 @@
 % 'envelope'    - (2,points,conditions) envelopes of the average data (ERP) in each condition
 %                 (envelope =  min and max traces of each ERP across all channels and times)
 % 'envylabel'   - ordinate label for envelope. {Default 'Potential \muV'}
-% 'envvert'     - vector of time indices at which to draw vertical lines. A cell array
-%                 of times vectors (1 per condition) can also be given.
+% 'envvert'     - cell array of vector(s) of time indices at which to draw vertical lines. 
+%                 In multiple vector case, use 1 vector per condition. Also can be a cell array
+%                 of structure vector(s). Structure fields: time =  line time in ms
+%                                                           color = line color  (e.g. 'b')
+%                                                           style = line style (e.g. '--'). 
 % 'flashes'     - vector of time indices at which the background flashes.  Specify the color 
 %                 of the flash with a cell array of [1,2] cell arrays. 
 %                 Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
@@ -107,6 +110,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/05 00:20:30  cooper
+% Made top space for fig title and adjusted flash coordinates.
+%
 % Revision 1.16  2002/11/04 20:00:42  cooper
 % Used textsc() to make title. Still needs work...
 %
@@ -203,7 +209,7 @@ try, g.colmapcoh;       catch, g.colmapcoh = hot(64); end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.frames;			catch, g.frames = []; end; 
-try, g.envvert;			catch, g.envvert = []; end; 
+try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
@@ -320,6 +326,9 @@ switch lower(g.caption)
 	case {'on', 'off'} ;  
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
 end;
+if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
+        disp('Error: Invalid type for Envvert.'); return;
+end
 if ~isempty(g.latency) & ~isnumeric(g.latency)
 	disp('Error: Latency must be a vector'); return;
 end;	
@@ -680,13 +689,24 @@ for indeximage = alltimepoints
 			if tmpcond == 1
 				ylabel(g.envylabel, 'fontweight', 'bold', 'fontsize', 12*g.resmult);
 			end;
+
+                        % draw vertical lines if needed
+                        % -----------------------------
 			if ~isempty(g.envvert)
-				if iscell(g.envvert)
-					 tmpvert = g.envvert{ tmpcond };
-				else tmpvert = g.envvert;
-				end;
-				for timevert=tmpvert
-					plot([timevert timevert], [minordinate maxordinate], 'm--', 'linewidth', g.resmult);
+				if length(g.envvert) > 1,
+                                       verts = g.envvert{ tmpcond };
+                                else   verts = g.envvert{1};
+                                end
+				
+				for v=verts,
+                                        if isstruct(v),
+                                             ev = v;
+                                        else
+				             ev.time = v;  ev.color = 'k'; ev.style = '-';
+                                        end
+                                         
+					phandle = plot([ev.time ev.time], [minordinate maxordinate], ev.style, 'linewidth', g.resmult);
+                                        set(phandle,'color',ev.color);
 				end;
 			end;
 		end;
