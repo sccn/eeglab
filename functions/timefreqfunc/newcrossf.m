@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/11/20 15:51:21  arno
+% do not return abs Rdiff
+%
 % Revision 1.27  2002/11/20 02:04:45  arno
 % debugging ??? One or more output arguments not assigned during call to 'newcrossf'.
 %
@@ -665,33 +668,33 @@ if iscell(X)
     
 	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
         figure; 
-        subplot(1,3,1); title(g.title{1});
+        subplot(1,3,1); 
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ', vararginori{:});
+								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, vararginori{:});
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', ' ',  vararginori{:});
+								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', g.title{1},  vararginori{:});
 	end;
 	
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
 	fprintf('\nRunning crossf on condition 2 *********************\n');
 	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-        subplot(1,3,2); title(g.title{2});
+        subplot(1,3,2);
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
-								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
+								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, vararginori{:});
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
-								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
+								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, vararginori{:});
 	end;
 	R2 = R2.*exp(j*Rangle2/180*pi);
 
     if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-        subplot(1,3,3); title(g.title{3});
+        subplot(1,3,3);
 	end;
     if isnan(g.alpha)
         switch(g.condboot)
@@ -699,7 +702,7 @@ if iscell(X)
             case 'angle',  Rdiff = angle(R1)-angle(R2);
             case 'complex',  Rdiff = R1-R2;
         end;
-        g.title = ' ';
+        g.title = g.title{3};
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
             plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
         end;
@@ -729,7 +732,7 @@ if iscell(X)
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
 		%Boot.Coherboot.R = coherimages;
 		%Boot = bootcomppost(Boot, [], [], []);
-		g.title = '';
+		g.title = g.title{3};
 		g.boottype = 'trials';
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
             plotall(Rdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
