@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.146  2004/02/25 15:25:07  scott
+% adjust border of 'skirt'
+%
 % Revision 1.145  2004/02/25 15:19:38  scott
 % not allowing shrink to be negative
 %
@@ -931,10 +934,12 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt') % if 'skirt' mode
-  hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
-  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);         % hide the disk edge jaggies 
   sf = squeezefac;
+  if sf < 0.99
+   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
+   set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);         % hide the disk edge jaggies 
+  end
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
