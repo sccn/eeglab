@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/10/30 22:02:16  arno
+% allowing to read any channel location file
+%
 % Revision 1.2  2003/09/04 23:20:38  arno
 % draw
 %
@@ -46,6 +49,18 @@ function [ laplac, sumLaplac2D ] = del2map( map, filename, draw )
 if nargin < 2
 	help del2map;
 	return;
+end;
+
+% process several maps
+if size(map,2) > 1
+    if size(map,1) > 1
+        for index = 1:size(map,2)
+            laplac(:,index) = del2map( map(:,index), filename);
+        end;
+        return;
+    else
+        map = map';
+    end;
 end;
 
 MAXCHANS = size(map,1);
