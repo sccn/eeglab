@@ -146,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/07/03 23:45:03  arno
+% correcting rboot output
+%
 % Revision 1.28  2002/07/02 21:51:41  scott
 % edited help message -sm
 %
@@ -1229,9 +1232,9 @@ elseif ~isnan(Boot.rboot)
 	Boot.Coherboot.R = Boot.rboot;
 	Boot.Rsignif     = Boot.rboot
 	Rbootout         = Boot.rboot;
-   else 
-	   Boot.Coherboot.R   = [];
-	   Boot.Rsignif = [];
-   end % NOTE: above, mean ?????
-end;
+else 
+	Boot.Coherboot.R = [];
+	Boot.Rsignif     = [];
+	Rbootout         = [];
+end % NOTE: above, mean ?????
 
