@@ -2,24 +2,21 @@
 %
 % Usage:
 %   >> CHANLOCS = readneurolocs( filename );
-%   >> CHANLOCS = readneurolocs( filename, plot, czindex, fzindex, c3index );
+%   >> CHANLOCS = readneurolocs( filename, 'key1', val1, 'key2', val2, ...);
 %
 % Inputs:
 %   filename       - file name or matlab cell array { names x_coord y_coord }
 %
 % Optional inputs:
-%   plot           - [0|1] if 1, plot the electrode locations. Default 0.
-%   czindex        - index of electrode Cz if the label is not defined 
-%                    in the file. Default is [] (find electrode label
-%                    automatically).
-%   fzindex        - index of electrode Fz if the label is not defined 
-%                    in the file. (for 3D accurate conversion of electrode 
-%                    positions). Set it to [] so that the data will not
-%                    be rescaled along the y axis.
-%   c3index        - index of electrode c3 if the label is not defined 
-%                    in the file. (for 3D accurate conversion of electrode 
-%                    positions). Set it to [] so that the data will not
-%                    be rescaled along the x axis.
+%   'hcalib'       - [cell array] name and phi angle of two electrodes with 
+%                    left/right simetry. Ex: { 'c3' 44 'c4' 44 }.
+%   'vcalib'       - [cell array] name and phi angle of two electrodes with 
+%                    bottom/up simetry. Ex: { 'fz' 44 'pz' 44 }.
+%   'autocalib'    - ['on'|'off'] attempt to automatically detect 'c3, 'c4'
+%                    'fz', 'pz' to calibrate the coordinates. Default is 'on'
+%                    for '.asc' files and 'off' for '.dat' files.
+%   'plot'         - ['on'|'off'] if 'on', plot the electrode locations. 
+%                    Default 'off'.
 %
 % Outputs:
 %   CHANLOCS       - EEGLAB channel location data structure. See
@@ -48,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/12/01 02:31:01  arno
+% correct slight innacuracy when reading file
+%
 % Revision 1.6  2003/08/05 18:24:04  arno
 % header
 %
@@ -67,7 +67,7 @@
 % Initial revision
 %
 
-function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
+function chanlocs = readneurolocs( filename, varargin)
     
     if nargin < 1
         help readneurolocs;
@@ -77,78 +77,125 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
         plottag = 0;
     end;
     
+    % check input parameters
+    % ----------------------
+    g = finputcheck( varargin, { 'hcalib'    'cell'  []   {};
+                                 'vcalib'    'cell'  []   {};
+                                 'autocalib' 'string'  { 'on' 'off' 'auto' }   'auto';
+                                 'plot'      'string'  { 'on' 'off' }   'off' });
+    if isstr(g), error(g); end;
+    
     % read location file
     % ------------------
     if isstr( filename )
         locs  = loadtxt( filename );
     
-        % remove trailing control channels
-        % --------------------------------
-        while isnumeric( locs{end,1} ) & locs{end,1} ~= 0
-            locs  = locs(1:end-1,:);
-        end;    
-    
-        % find first numerical index
-        % --------------------------
-        index = 1;
-        while isstr( locs{index,1} )
-            index = index + 1;
-        end;
-        
-        % extract location array
-        % ----------------------   
-        nchans = size( locs, 1 ) - index +1;
-        chans  = cell2mat(locs(end-nchans+1:end, 1:5));
-        names  = locs(end-nchans*2+1: end-nchans, 2);
-        for index = 1:length(names)
-            if ~isstr(names{index})
-                names{index} = int2str(names{index});
+        if locs{1,1}(1) == ';'
+            % remove trailing control channels
+            % --------------------------------
+            while isnumeric( locs{end,1} ) & locs{end,1} ~= 0
+                locs  = locs(1:end-1,:);
+            end;    
+            
+            % find first numerical index
+            % --------------------------
+            index = 1;
+            while isstr( locs{index,1} )
+                index = index + 1;
+            end;
+            
+            % extract location array
+            % ----------------------   
+            nchans = size( locs, 1 ) - index +1;
+            chans  = cell2mat(locs(end-nchans+1:end, 1:5));
+            names  = locs(end-nchans*2+1: end-nchans, 2);
+            for index = 1:length(names)
+                if ~isstr(names{index})
+                    names{index} = int2str(names{index});
+                end;
+            end;
+            x = chans(:,3);
+            y = chans(:,4);
+            if strcmpi(g.autocalib, 'auto')
+                g.autocalib = 'on';
+            end;
+        else
+            [tmp2 tmpind] = sort(cell2mat(locs(:,1))');
+            locs = locs(tmpind,:);
+            y      = cell2mat(locs(:,end));
+            x      = cell2mat(locs(:,end-1));
+            x      = x/513.1617*44;
+            y      = y/513.1617*44;
+            names = locs(:,end-2);
+            if strcmpi(g.autocalib, 'auto')
+                g.autocalib = 'off';
             end;
         end;
-        x = chans(:,3);
-        y = chans(:,4);    
     else
         names = filename{1};
         x     = filename{2};
         y     = filename{3};
+        if strcmpi(g.autocalib, 'auto')
+            g.autocalib = 'on';
+        end;
     end;
     
-    % find Cz and Fz
-    % --------------
-    if exist('indexcz') ~= 1
-        indexcz = strmatch( 'cz', lower(names'), 'exact' );
-        if ~isempty(indexcz), 
-            centerx = x(indexcz);
-            centery = y(indexcz);
-        end;
-    end;
-    if exist('indexc3') ~= 1
+    % auto calibration
+    % ----------------
+    if strcmpi(g.autocalib, 'on')
         indexc3 = strmatch( 'c3', lower(names'), 'exact' );
-        if exist('indexc4') ~= 1
-            indexc4 = strmatch( 'c4', lower(names'), 'exact' );
-            if exist('centerx') ~= 1 & ~isempty(indexc4) & ~isempty(indexc3)
-                centerx = (x(indexc3)+x(indexc4))/2;
-                centery = (y(indexc3)+y(indexc4))/2;
-            end;
+        indexc4 = strmatch( 'c4', lower(names'), 'exact' );
+        if ~isempty(indexc3) & ~isempty(indexc4)
+            g.hcalib = { 'c3' 45 'c4' 45 };
         end;
-    end;
-    if exist('indexfz') ~= 1
         indexfz = strmatch( 'fz', lower(names'), 'exact' );
-        if exist('indexpz') ~= 1
-            indexpz = strmatch( 'pz', lower(names'), 'exact' );
-            if exist('centerx') ~= 1 & ~isempty(indexpz) & ~isempty(indexfz)
-                centerx = (x(indexfz)+x(indexpz))/2;
-                centery = (y(indexfz)+y(indexpz))/2;
-            end;
+        indexpz = strmatch( 'pz', lower(names'), 'exact' );
+        if ~isempty(indexfz) & ~isempty(indexpz)
+            g.vcalib = { 'fz' 45 'pz' 45 };
+        end;
+        if isempty(g.vcalib) & isempty(g.hcalib)
+            disp('No electrodes found for position re-calibration')
+        else
+            disp('Landmark electrodes found for position re-calibration')
         end;
     end;
-    if exist('centerx') ~= 1 
-        error('Unable to find electrode names for rescaling, define the electrode index manually in readneurolocs()');
+    
+    % calibrate
+    % ---------
+    if ~isempty(g.hcalib)
+        index1 = strmatch(lower( g.hcalib{1}), lower(names'), 'exact' );
+        index2 = strmatch( lower(g.hcalib{3}), lower(names'), 'exact' );
+        if isempty(index1) | isempty(index2)
+            error('Electrode not found for horizontal calibration');
+        end;
+        disp([ 'Readneurolocs: electrode location re-calibrated along x axis using ''' ...
+               g.hcalib{1} ''' and '''  g.hcalib{3} '''']);
+        centerx = (x(index1)+x(index2))/2;
+        centery = (y(index1)+y(index2))/2;
+        x = - x + centerx;
+        y = - y + centery;
+        x = x/x(index1)*g.hcalib{2};
+    end;
+    if ~isempty(g.vcalib)
+        index1 = strmatch( lower(g.vcalib{1}), lower(names'), 'exact' );
+        index2 = strmatch( lower(g.vcalib{3}), lower(names'), 'exact' );
+        if isempty(index1) | isempty(index2)
+            error('Electrode not found for horizontal calibration');
+        end;
+        disp([ 'Readneurolocs: electrode location re-calibrated along y axis using ''' ...
+               g.vcalib{1} ''' and '''  g.vcalib{3} '''']);
+        if isempty(g.hcalib)
+            centerx = (x(index1)+x(index2))/2;
+            centery = (y(index1)+y(index2))/2;
+            x = - x + centerx;
+            y = - y + centery;
+        end;
+        y = y/y(index1)*g.vcalib{2};
     end;
     
     % plot all channels
     % -----------------
-    if plottag
+    if strcmpi(g.plot, 'on')
         figure;
         for index = 1:length(x)
             plot( x(index), y(index), '+');
@@ -156,40 +203,10 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
             text( x(index)+0.01, y(index), int2str(index));
         end;
     end;
-    
-    x = - x + centerx;
-    y = - y + centery;
-
-    % shrink coordinates
-    % ------------------
-    if ~isempty(indexfz)
-        yy = y/y(indexfz)*45;
-        y  = y/y(indexfz)*0.25556;
-        disp('Readneurolocs: electrode location scaled along the y axis for standard Fz location');
-        if isempty(indexc3), indexc3 = indexfz; end;
-    end;
-    if ~isempty(indexc3)
-        xx = x/x(indexc3)*45;
-        x  = x/x(indexc3)*0.25556;
-        disp('Readneurolocs: electrode location scaled along the x axis for standard C3 location');
-    end;
-
-    % convert to polar
-    % ----------------
-    [theta r] = cart2pol(x, y);    
-    
-    % create structure
-    % ----------------
-    for index = 1:length(names)
-        chanlocs(index).labels = names{index};
-        chanlocs(index).theta  = theta(index)/pi*180-90;
-        chanlocs(index).radius = r(index);
-    end;
-    % return;
-   
+       
     % second solution using angle
     % ---------------------------
-    [phi,theta] = cart2pol(-xx, yy);
+    [phi,theta] = cart2pol(-x, y);
     phi = phi/pi*180;
     
     % convert to other types of coordinates
