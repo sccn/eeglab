@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.129  2003/08/24 04:17:17  scott
+% same
+%
 % Revision 1.128  2003/08/24 04:16:39  scott
 % debug same
 %
@@ -2797,7 +2800,7 @@ function [out, outalpha]  = nan_mean(in,alpha)
    if nargin>1 
      booterps = zeros(NBOOT,inframes);
      for n=1:NBOOT
-         signs = sign(randn(1,intrials)'-0.5));
+         signs = sign(randn(1,intrials)'-0.5);
          booterps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
      end
      booterps = sort(abs(booterps));
