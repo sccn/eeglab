@@ -1,7 +1,7 @@
 % finputcheck() - check Matlab function {'key','value'} input argument pairs
 %
-% Usage: >> struct = finputcheck( varargin, fieldlist );
-%        >> [struct varargin] = finputcheck( varargin, fieldlist, ... 
+% Usage: >> result = finputcheck( varargin, fieldlist );
+%        >> [result varargin] = finputcheck( varargin, fieldlist, ... 
 %                                                         callingfunc, mode );
 % Input:
 %   varargin  - varargin argument from a function call using 'key', 'value'
@@ -13,21 +13,21 @@
 %               'real', 'string', 'cell' or 'struct'.  For example:
 %                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
 %                       {'key2' 'int' { minint maxint } 'defaultval_key2'} 
-%                An option fifth column may contain the value array size  ???
-%                (and may be a cell array of sizes).
 %  callingfunc - Calling function name for error messages. {default: none}.
 %  mode        - ['ignore'|'error'] ignore keywords that are not specified in
 %                the fieldlist cell array or generate an error. {default: 
 %                'error'}.
 % Outputs:
-%   struct     - checked structure ???
-%   varargin   - residual varagin containing unrecognized input arguments
+%   result     - if no error, structure with 'key' as fields and 'value' as 
+%                content. If error this output contain the string error.
+%   varargin   - residual varagin containing unrecognized input arguments.
+%                Requires mode 'ignore' above.
 %
 % Note: In case of error, a string is returned containing the error message
 %       instead of a structure.
 %
 % Example:
-%	finputcheck(varargin, ...
+%	struct = finputcheck(varargin, ...
 %               { 'title'         'string'   []       ''; ...
 %                 'percent'       'real'     [0 1]    1 ; ...
 %                 'elecamp'       'integer'  [1:10]   [] });
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/11/05 04:10:44  scott
+% help msg. -sm
+%
 % Revision 1.20  2004/06/09 16:30:42  arno
 % adding or if several types
 %
