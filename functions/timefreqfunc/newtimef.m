@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2004/12/07 22:29:58  arno
+% new version with new bootstrap
+%
 % Revision 1.64  2004/10/25 18:37:02  hilit
 % 'ploterps' -> 'plotersp'
 %
@@ -1197,6 +1200,9 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
             baselntmp = [];
             for index = 1:size(g.baseboot,1)
                 tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                if isempty(tmptime),
+                    fprintf('Warning: empty baseline bootstrap interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
+                end;
                 baselntmp = union(baselntmp, tmptime);
             end;
 		end;
