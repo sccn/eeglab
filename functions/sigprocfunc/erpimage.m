@@ -1744,7 +1744,12 @@ if (~isempty(topomap))
         0.20*gcapos(3) 0.14*gcapos(4)]);
     % h(12) = subplot('Position',[.10 .86 .20 .14]); 
     fprintf('Plotting a topo map in upper left.\n');
-    topoplot(topomap,eloc_file,'electrodes','off')
+	if length(topomap) == 1
+		topoplot(topomap,eloc_file,'electrodes','off', ...
+				 'style', 'blank', 'emarkersize1chan', 10)
+	else
+		topoplot(topomap,eloc_file,'electrodes','off')
+	end;
     axis('square')
     axhndls = [axhndls h(12)];
 end 
