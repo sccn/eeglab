@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/11/18 16:30:18  scott
+% same
+%
 % Revision 1.35  2003/11/18 16:29:31  scott
 % Enter ... -> ...
 %
@@ -290,6 +293,7 @@ if ~isempty( events )
 end;
 
 % select event latencies for epoching
+Ievent = sort(Ievent);
 alllatencies = tmpeventlatency(Ievent);
 
 if isempty(alllatencies)
