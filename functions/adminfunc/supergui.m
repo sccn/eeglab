@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/12 21:42:59  arno
+% ignore pushbutton extent
+%
 % Revision 1.13  2002/08/12 16:00:57  arno
 % same
 %
@@ -188,8 +191,16 @@ for row = 1:length(geometry)
 	end;
 	posy      = posy - height - 1/length(geometry)*INSETY; %compensate for inset 
 end;
+
+%scale and replace the figure in the screen
 pos = get(gcf, 'position');
-set(gcf, 'position', [pos(1) 0 pos(3)*factmultx, pos(4)*factmulty]);
+if factmulty > 1
+	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty)
+end;
+pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
+pos(3) = pos(3)*factmultx;
+pos(4) = pos(4)*factmulty;
+set(gcf, 'position', pos);
 
 % setting defaults colors
 %------------------------
