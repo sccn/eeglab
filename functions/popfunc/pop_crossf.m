@@ -1,19 +1,18 @@
-% pop_crossf() - Return estimates and plots of event-related (log) spectral
-%                coherence amplitudes. 
+% pop_crossf() - Return estimates and plots of event-related spectral coherence 
+%
 % Usage:
 %       >> pop_crossf(EEG, typeproc, num1, num2, tlimits,cycles,
-%                        'key1',value1,'key2',value2, ... );   
-%     
+%                                 'key1',value1,'key2',value2, ... );   
 % Inputs:            
 %   INEEG    - Input EEG dataset
 %   typeproc - Type of processing: 
-%                1 = process two raw-data channels,
-%                0 = process ICA components
+%                  1 = process two raw-data channels,
+%                  0 = process two ICA components
 %   num1     - First component or channel number
 %   num2     - Second component or channel number
-%   tlimits  - [mintime maxtime] (in ms) Sub-epoch time limits
-%   cycles   - >0 -> Number of cycles in each analysis wavelet 
-%               0 -> Use FFTs (with constant window length)
+%   tlimits  - [mintime maxtime] Sub-epoch time limits in ms
+%   cycles   -   >0 -> Number of cycles in each analysis wavelet 
+%                 0 -> Use FFTs (with constant window length)
 %
 % Optional inputs: As for crossf().  See >> help crossf
 %    
@@ -43,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/02/13 00:04:33  arno
+% debugging last
+%
 % Revision 1.20  2003/02/13 00:00:55  arno
 % background color
 %
