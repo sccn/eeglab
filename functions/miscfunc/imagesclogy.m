@@ -27,11 +27,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/04/29 18:30:39  arno
+% adding clim
+%
 % Revision 1.1  2003/04/29 18:27:44  arno
 % Initial revision
 %
 
-function imagesclogy(times,freqs,data)
+function imagesclogy(times,freqs,data,clim)
 
   if size(data,1) ~= length(freqs)
       fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
@@ -71,7 +74,7 @@ function imagesclogy(times,freqs,data)
   
   % puting labels
   % -------------
-  divs = linspace(log(freqs(1)), log(freqs(dispf(end))), 10);
+  divs = linspace(log(freqs(1)), log(freqs(end)), 10);
   set(gca, 'xtickmode', 'manual');
   divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
