@@ -1,4 +1,4 @@
-% eegfilt() -  (high|low|band)-pass filter data using two-way least-squares 
+% eegfilt() -  (high|low|band)-iass filter data using two-way least-squares 
 %              FIR filtering. Multiple data channels and epochs supported.
 %              Requires the MATLAB Signal Processing Toolbox.
 % Usage:
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/07/28 17:38:53  arno
+% updating error messages
+%
 % Revision 1.12  2003/07/20 19:17:07  scott
 % added channels-processed info if epochs==1 (continuous data)
 %
@@ -152,11 +155,12 @@ if epochs*epochframes ~= frames,
     error('epochframes does not divide frames.\n');
 end
 
-disp('Note: if a message ''Matrix is close to singular or badly scaled'' appear, Matlab');
-disp('      failed to design a good filter. You should first highpass data, then lowpass.');
+fprintf('eegfilt(): IF a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
+fprintf('           then Matlab has failed to design a good filter. As a workaround, \n');
+fprintf('           for band-pass filtering, first highpass the data, then lowpass it.\n');
 
 if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
-    fprintf('filter order is %d. ',filtorder);
+    fprintf('eegfilt(): filter order is %d. ',filtorder);
     error('epochframes must be 3 times the filtorder.');
 end
 if (1+trans)*hicutoff/nyq > 1
@@ -210,4 +214,5 @@ for e = 1:epochs                % filter each epoch, channel
       end
     end
 end
+fprintf('\n');
 
