@@ -1,13 +1,14 @@
 % chancenter() - recenter cartesian X,Y,Z channel coordinates
 %
-% Usage:  >> [x y z newcenter] = chancenter(x,y,z,center,gui); 
+% Usage:  >> [x y z newcenter] = chancenter(x,y,z,center); 
 %
 % Optional inputs:
 %    x,y,z     = 3D coordintates of the channels
 %    center    = [X Y Z] known center different from [0 0 0]
 %                [] will optimize the center location according
 %                to the best sphere. Default is [0 0 0].
-%    gui       = 0 or 1 for gui. Default is 0.
+%
+% Note: 4th input gui is obsolete. Use pop_chancenter instead.
 %
 % Authors: Arnaud Delorme, Luca Finelli & Scott Makeig SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
@@ -33,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/12/02 19:13:09  arno
+% debug gui
+%
 % Revision 1.5  2003/12/02 18:59:20  arno
 % returning optim
 %
@@ -96,15 +100,7 @@ if nargin<4
 end;
 
 if nargin > 4 & gui
-    geometry = { [1 1  1.5 0.25] };
-    uilist = { { 'Style', 'text', 'string', 'Specify center', 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', '0 0 0'  } ...
-			   { 'Style', 'text', 'string', 'or optimize center location', 'fontweight', 'bold'   } ...
-			   { 'Style', 'checkbox', 'value', 0  } };
-    results = inputgui( geometry, uilist, 'pophelp(''chancenter'');', 'Convert channel locations -- chancenter()' );
-	if isempty(results), x=[]; return; end;
-	center  = eval( [ '[' results{1} ']' ] );
-	optim   = results{2};
+    error('Chancenter: 4th input'' gui'' is obsolete. Use pop_chancenter instead');
 else 
 	if isempty(center)
 		optim = 1;
