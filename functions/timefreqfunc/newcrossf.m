@@ -67,7 +67,8 @@
 %                    spacing is (low_frequency/padratio).
 %       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                    If cycles==0, all FFT frequencies are output.{def: 50}
-%       'baseline' = Coherence baseline end time (ms). NaN=no baseline  {NaN}
+%       'baseline' = Coherence baseline end time (ms). Deprecated, this 
+%                    parameter only affect the 'mcoh' output. NaN=no baseline {NaN}
 %       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
 %
 %    Optional Bootstrap:
@@ -80,6 +81,9 @@
 %       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
 %                    is the whole epoch                         {default: 0}
+%       'condboot' = ['abs'|'angle'|'complex'] for comparing 2 conditions,
+%                    either subtract ITC absolute vales ('abs'), angles 
+%                    ('angles') or complex values ('complex').     {'abs'}
 %       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
@@ -152,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/01 16:06:44  arno
+% Initial revision
+%
 % Revision 1.49  2002/09/12 03:22:44  scott
 % help msg -sm
 %
@@ -417,6 +424,7 @@ else
 	g = [];
 end;
 
+try, g.condboot;   catch, g.condboot = 'abs'; end;
 try, g.shuffle;    catch, g.shuffle = 0; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(frame)-3),4); end;
@@ -456,7 +464,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
-		  'compute' 'maxamp' 'savecoher' 'noinput' };
+		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
@@ -541,6 +549,10 @@ switch g.compute
 case { 'matlab', 'c' },;
 otherwise error('compute must be either ''matlab'' or ''c''');
 end;
+if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
+		& ~strcmpi(g.condboot, 'complex')
+	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
@@ -607,17 +619,19 @@ if iscell(X)
 		  Tfx1 = Tfx1.*conj(Tfx1); Tfx2 = Tfx2.*conj(Tfx2);
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X).*conj(arg2(:,:,X),3) ./ sqrt(sum(arg1(:,:,X))) ./ sqrt(sum(arg2(:,:,X)))';
-		  [coherdiff coherimages coher1 coher2] = ...
-			  condstat(formula, g.naccu, g.alpha, 'upper', { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
+		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
+						'upper', g.condboot, { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
 		 case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', { savecoher1 savecoher2 });
+		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+														   { savecoher1 savecoher2 });
 		 case 'phasecoher2',
 		  formula = 'sum(arg1(:,:,X),3) ./ sum(sqrt(arg1(:,:,X).*conj(arg1(:,:,X)))),3)'; 
 		  % sqrt(a.*conj(a)) is about twice faster than abs()
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', { savecoher1 savecoher2 });
+		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+														   { savecoher1 savecoher2 });
 		end;
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
 		%Boot.Coherboot.R = coherimages;
@@ -772,7 +786,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		
 		Rbootout = bootstat(alltfX, alltfY, formula, 'boottype', g.boottype, ...
 							'formulapost', formulapost, 'formulainit', formulainit, ...
-							'formulaout', formulaout, 'bootside', 'upper');
+							'formulaout', formulaout, 'bootside', 'upper', 'naccu', g.naccu);
 		% note that the bootstrap thresholding is actually performed in the display subfunction plotall()
 	end;
 	

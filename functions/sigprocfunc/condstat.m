@@ -1,17 +1,27 @@
 % condstat() - accumulate surrogate data for comparing two conditions 
 %
 % Usage:
-%     >> [diffres, accres, res1, res2] = condstat(formula, naccu, arg1, arg2 ...);
+%     >> [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, ...
+%                                              bootside, condboot, arg1, arg2 ...);
 %
 % Inputs:
-%    formula - [string] formula to compute a given measure. Takes arguments
-%              'arg1', 'arg2' ... as inputs. i.e.
-%              'sum(arg1(:,:,X),3) ./ sqrt(sum(tfx(:,:,X))) ./ sqrt(sum(tfy(:,:,X)))'
-%    naccu   - [integer] number of accumulation. i.e. 200
-%    arg1    - [cell_array] of 2 nD array of values to compare. The last dimensions
-%              of the array is the dimention that will be shuffled to accumulate
-%              data.
-%    arg2... - same as arg1
+%    formula  - [string] formula to compute a given measure. Takes arguments
+%               'arg1', 'arg2' ... as inputs. i.e.
+%               'sum(arg1(:,:,X),3) ./ sqrt(sum(tfx(:,:,X))) ./ sqrt(sum(tfy(:,:,X)))'
+%    naccu    - [integer] number of accumulation. i.e. 200
+%    alpha    - [float] significance level (0<alpha<0.5)
+%    bootside - ['both'|'upper'] side of the surrogate distribution to
+%               consider for significance. This parameter affect the size
+%               of the last dimension of accumulation array 'accres' (size
+%               is 2 for 'both' and 1 for 'upper').
+%    bootside - ['both'|'upper'] 
+%    condboot - ['abs'|'angle'|'complex'|''] for comparing 2 conditions,
+%               either absolute vales ('abs'), angles ('angles') or complex values 
+%               ('complex'). '' and 'complex' let the formula unchanged.
+%    arg1     - [cell_array] of 2 nD array of values to compare. The last dimensions
+%               of the array is the dimention that will be shuffled to accumulate
+%               data.
+%    arg2...  - same as arg1
 %
 % Outputs: 
 %    diffres  - differential array computed on the non-shuffled data
@@ -22,7 +32,7 @@
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
-% See also: timef()
+% See also: timef(), crossf()
 
 % NOTE: one hidden parameter 'savecoher', 0 or 1
 
@@ -43,11 +53,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/01 16:06:16  arno
+% compute statistics now
+%
 % Revision 1.1  2002/09/24 23:28:02  arno
 % Initial revision
 %
 
-function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootside, varargin);
+function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootside, condboot, varargin);
 
 if nargin < 2
 	help condstat;
@@ -63,7 +76,18 @@ end;
 if isstr(bootside)
 	bootside = { bootside };
 end;
-
+for index = 1:length(bootside)
+	if ~strcmpi(bootside, 'both') & ~strcmpi(bootside, 'upper')
+		error('Bootside must be either ''both'' or ''upper''');
+	end;
+end;	
+if isstr(condboot)
+	condboot = { condboot };
+end;
+for index = 1:length(condboot)
+	if isempty(condboot{index}), condboot{index} = 'complex'; end;
+end;	
+		
 for index = 1:length(varargin)
 	if ~iscell(varargin) | length(varargin{index}) ~=2
 		error('Except for the first arguments, all other arguments given to the function must be cell arrays of two numerical array');
@@ -101,7 +125,17 @@ alltrials = [1:cond1trials+cond2trials];
 % -------------------
 formula1 = [];
 formula2 = [];
-for index = 1:length(formula)
+for index = 1:length(formula)	
+	% updating formula
+	% ----------------
+	switch lower(condboot{ min(length(condboot), index) })
+	 case 'abs', formula{index} = [ 'abs(' formula{index} ')' ];
+	 %case 'angle', formula{index} = [ 'exp(j*angle(' formula{index} '))' ];
+	 case 'angle', formula{index} = [ 'angle(' formula{index} ')/(2*pi)' ];
+	 case 'complex', ;
+	 otherwise, condboot, error('condstat argument must be either ''abs'', ''angle'', ''complex'' or empty');
+	end;
+
 	% computing difference (non-shuffled)
 	% -----------------------------------
 	X = 1:cond1trials;
@@ -109,7 +143,7 @@ for index = 1:length(formula)
 	X = cond1trials+1:cond1trials+cond2trials;
 	eval( [ 'res2{index} = ' formula{index}  ';'] );
 	diffres{index} = res1{index}-res2{index};
-	
+
 	% build formula to execute
 	% ------------------------
 	arrayname = [ 'accres{' int2str(index) '}' ];
@@ -142,7 +176,7 @@ for index= 1:length(formula)
     
     % size = nb_points*naccu
     % size = nb_points*naccu*times
-    if ~isreal(accarray)
+	if ~isreal(accarray)
 		accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
     end;
 	

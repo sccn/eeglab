@@ -19,7 +19,7 @@
 %   'naccu'       - [integer] number of exemplar to accumulate. Default is 200.
 %   'bootside'    - ['both'|'upper'] side of the surrogate distribution to
 %                 consider for significance. This parameter affect the size
-%                 of the last dimension of accumulation array parameter (size
+%                 of the last dimension of accumulation array 'accres' (size
 %                 is 2 for 'both' and 1 for 'upper'). Default is 'both'.
 %   'basevect'    - [integer vector] time vector indices for baseline. Default 
 %                 is all time points.
@@ -33,9 +33,9 @@
 %   'formulaout'  - [string] name of the computed variable. Default is 'res'.
 %
 % Outputs: 
-%    accdres  - result for shuffled data
-%    res1     - result for first condition
-%    res2     - result for second condition
+%    accres  - result for shuffled data
+%    res1    - result for first condition
+%    res2    - result for second condition
 %
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/01 16:07:33  arno
+% Initial revision
+%
 % Revision 1.1  2002/09/24 23:28:02  arno
 % Initial revision
 %
@@ -93,10 +96,12 @@ Boot = finputcheck(varargin, ...
 if isstr(Boot)
 	error(Boot);
 end;
+bootname = Boot.boottype;
+unitname = '';
 switch Boot.boottype
- case 'times',  Boot.boottype = 'first';
- case 'trials', Boot.boottype = 'second';
- case 'timestrials',  Boot.boottype = 'both';
+ case 'times',  Boot.boottype = 'first'; unitname = 'trial '; bootname = 'times';
+ case 'trials', Boot.boottype = 'second'; unitname = 'time '; bootname = 'trials';
+ case 'timestrials',  Boot.boottype = 'both'; unitname = 'trial '; bootname = 'timestrials';
 end;
 if ~iscell(Boot.formulaout)
     Boot.formulaout = { Boot.formulaout };
@@ -132,10 +137,10 @@ end;
 if isnan(Boot.accarray)
 	eval( Boot.formulainit );
 	if strcmpi( Boot.boottype, 'second') % get g.naccu bootstrap estimates for each trial
-		fprintf('\nProcessing dim2 bootstrap (of %d):',times(end));
+		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu, unitname, times(end));
 		
 		arg2 = zeros(nb_points, Boot.naccu);
-		arg1 = zeros(nb_points, Boot.naccu );
+		arg1 = zeros(nb_points, Boot.naccu);
         for index= 1:length(Boot.formulaout) 
             eval( ['accarray' int2str(index) '= zeros(nb_points, Boot.naccu, times);'] );
         end;
@@ -159,12 +164,12 @@ if isnan(Boot.accarray)
 				eval([ Boot.formulapost ';' ]);
 			end;
 			%Boot.Coherboot = cohercomppost(Boot.Coherboot);  % CHECK IF NECSSARY FOR ALL BOOT TYPE
-            for index= 1:length(Boot.formulaout) 
-                eval([ 'accarray' int2str(index) '(:,:,index) = ' Boot.formulaout{index} ';' ]);
+            for index2= 1:length(Boot.formulaout) 
+                eval([ 'accarray' int2str(index2) '(:,:,index) = ' Boot.formulaout{index2} ';' ]);
             end;
 		end;
 	elseif strcmpi(Boot.boottype, 'both') % handle timestrials bootstrap
-		fprintf('\nProcessing dim1 and dim2 bootstrap (of %d):',trials);
+		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu,unitname,trials);
         arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
 		for allt=1:trials
@@ -193,7 +198,7 @@ if isnan(Boot.accarray)
             eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
         end;
 	elseif strcmpi(Boot.boottype, 'first') % boottype is 'times'
-		fprintf('\nProcessing dim1 bootstrap (of %d):',trials);
+		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu,unitname,trials);
 		arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
 		for allt=1:trials
@@ -223,21 +228,23 @@ end;
 for index= 1:length(Boot.formulaout) 
     eval( [ 'accarray = accarray' int2str(index) ';' ]);
     Rbootout{index} = accarray;
-    
+	
     % 'boottype'='times' or 'timestrials', size(R)=nb_points*naccu
     % 'boottype'='trials',                 size(R)=nb_points*naccu*times
-    accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
-    accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
+    if ~isreal(accarray)
+		accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
+    end;
+	accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
     
     % compute bootstrap significance level
     i = round(Boot.naccu*Boot.alpha);
     %rsignif = mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2); % significance levels for Rraw
     if strcmpi(Boot.bootside{min(length(Boot.bootside), index)}, 'upper');
-        accarray        = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2));
-    else 
-        if strcmpi(Boot.boottype,'second') & ndims(oriarg1) ==3
-            accarraytmp        = squeeze(mean(accarray(:,1:i),2));
-            accarraytmp(:,:,2) = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2));
+        accarray        = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu,:),2));
+	else 
+        if strcmpi(Boot.boottype,'second') & ndims(accarray) ==3
+            accarraytmp        = squeeze(mean(accarray(:,1:i,:),2));
+            accarraytmp(:,:,2) = squeeze(mean(accarray(:,Boot.naccu-i+1:Boot.naccu,:),2));
             accarray = accarraytmp;
         else
             accarray = [mean(accarray(:,1:i),2) mean(accarray(:,Boot.naccu-i+1:Boot.naccu),2)];

@@ -39,8 +39,6 @@
 %
 % See also: timef()
 
-% NOTE: one hidden parameter 'savecoher', 0 or 1
-
 % Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -58,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/01 16:09:52  arno
+% Initial revision
+%
 % Revision 1.1  2002/09/24 23:28:02  arno
 % Initial revision
 %

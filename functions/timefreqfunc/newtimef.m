@@ -63,6 +63,17 @@
 %       'naccu'     = Number of bootstrap replications to accumulate     {200}
 %       'baseboot'  = Bootstrap baseline subtract (0 -> use 'baseline';
 %                                                  1 -> use whole trial) {0}
+%       'boottype'  = ['times'|'timestrials'] shuffle time only or time and
+%                     trials for computing bootstrap. Both options should
+%                     return identical results {'times'}.
+%       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
+%                     either subtract ITC absolute vales ('abs'), angles 
+%                     ('angles') or complex values ('complex').     {'abs'}
+%       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from timef()). Note that both
+%                     pboot and rboot must be provided to avoid recomputing
+%                     surogate data.                                {from data}
+%
 %    Optional Scalp Map:
 %       'topovec'   = Scalp topography (map) to plot                     {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
@@ -76,8 +87,6 @@
 %       'title'     = Optional figure title                              {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1) {2}
-%       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from timef())     {from data}
 %       'axesfont'  = Axes text font size                                {10}
 %       'titlefont' = Title text font size                               {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
@@ -131,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/10/01 16:06:55  arno
+% Initial revision
+%
 % Revision 1.49  2002/08/14 21:07:05  arno
 % hanning debug
 %
@@ -408,7 +420,8 @@ if length(varwin)>1
 else 
 	g.cyclesfact = 1;
 end;
-
+try, g.boottype;   catch, g.boottype = 'times'; end;
+try, g.condboot;   catch, g.condboot = 'abs'; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
@@ -497,7 +510,13 @@ if isempty(g.elocs)
 elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
 	error('Channel location file must be a valid text file.');
 end
-
+if ~strcmpi(g.boottype, 'times') & ~strcmpi(g.boottype, 'timestrials')
+	error('Boottype must be either ''times'' or ''timestrials''.');
+end;	
+if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
+		& ~strcmpi(g.condboot, 'complex')
+	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
+end;
 if (~isnumeric(g.alpha) | length(g.alpha)~=1)
 	error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
@@ -523,14 +542,8 @@ else
 	end;
 end;
 
-if ~isnan (g.rboot)
-  if size(g.rboot) == [1,1]
-    if g.cycles == 0
-        g.rboot = g.rboot*ones(g.winsize*g.padratio/2);
-    end
-  end
-end;
-
+% Multitape not used any more
+% ---------------------------
 if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
@@ -653,14 +666,16 @@ if iscell(X)
     % recompute baselines for power
     % -----------------------------
     if ~isnan( g.baseline ) & ~isnan( mbase1 )
+        mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
-        mbase = (mbase1 + mbase2)/2;
-        P1 = P1 - repmat(mbase(1:size(P1,1))',[1 size(P1,2)]); 
-        P2 = P2 - repmat(mbase(1:size(P1,1))',[1 size(P1,2)]);        
+        P1 = P1 - repmat(mbase (1:size(P1,1))',[1 size(P1,2)]); 
+        P2 = P2 - repmat(mbase (1:size(P1,1))',[1 size(P1,2)]);        
         if ~isnan(g.alpha)
-            Pboot1 = Pboot1 + [mbase1(:) mbase1(:)] - [mbase(:) mbase(:)];
-            Pboot2 = Pboot2 + [mbase2(:) mbase2(:)] - [mbase(:) mbase(:)];
+			Pboot1 = Pboot1 + repmat(mbase1(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot2 = Pboot2 + repmat(mbase2(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot1 = Pboot1 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
         end;
         fprintf('\nSubtracting common baseline\n');
     end;
@@ -680,31 +695,25 @@ if iscell(X)
 		
 		% preprocess data and run compstat
 		% --------------------------------
+		alltfX1power = alltfX1.*conj(alltfX1);
+		alltfX2power = alltfX2.*conj(alltfX2);
+		formula = {'log10(mean(arg1(:,:,X),3))'};
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
-		  alltfX1power = alltfX1.*conj(alltfX1);
-		  alltfX2power = alltfX2.*conj(alltfX2);
-		  formula = { ['log10(mean(arg1(:,:,X),3))'] ...
-                      ['mean(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X))'] }; % note ITC: the mean and the sum
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, ...
-                                    { alltfX1power alltfX2power }, {alltfX alltfY});
+		  formula = { formula{1} ['mean(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3))'] };
+		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                                    { alltfX1power alltfX2power }, {alltfX1 alltfX2});
 		 case 'phasecoher2', % normalize first to speed up
-		  alltfX1power = alltfX1.*conj(alltfX1);
-		  alltfX2power = alltfX2.*conj(alltfX2);
-		  alltfX1abs = sqrt(alltfX1power);
-		  alltfX2abs = sqrt(alltfX2power);
-		  formula = { ['log10(mean(arg1(:,:,X),3))'] ...
-                      ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X)'] };
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, ...
-                                    { alltfX1power alltfX2power }, {alltfX alltfY}, { alltfX1abs alltfX2abs });
+		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X),3)'] }; 
+		  alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed 
+		  alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,X)) instead of arg3(:,:,X))
+		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                                    { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
 		 case 'phasecoher',
-		  alltfX1power = alltfX1.*conj(alltfX1);
-		  alltfX2power = alltfX2.*conj(alltfX2);
 		  alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));
 		  alltfX2norm = alltfX2./sqrt(alltfX2.*conj(alltfX2)); % maybe have to suppress preprocessing -> lot of memory
-		  formula = { ['log10(mean(arg1(:,:,X),3))'] ...
-                      ['mean(arg2(:,:,X),3)'] };
-		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, ...
+		  formula = { formula{1} ['mean(arg2(:,:,X),3)'] }; 
+		  [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
                                                    { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
 		end;
         
@@ -808,7 +817,7 @@ if isnan(g.powbase)
   mbase = mean(P(:,baseln),2)';
 else
   fprintf('\nUsing the input baseline spectrum\n');
-  mbase = g.powbase;
+  mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
 if ~isnan( g.baseline ) & ~isnan( mbase )
@@ -821,44 +830,48 @@ end;
 % bootstrap
 % ---------
 if ~isnan(g.alpha) % if bootstrap analysis included . . .
-	formulaout = { 'power' 'itc' };
-	switch g.type
-	 case 'coher',
-      formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-                      'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-                      'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
-	  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + arg2.*conj(arg2);';
-	  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-                      'itc     = itc ./ sqrt(cumul) /' int2str(trials) ];
-	 case 'phasecoher',
-      formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-                      'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
-	  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2;';
-	  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-                      'itc     = itc /' int2str(trials) ];
-	 case 'phasecoher2',
-      formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-                      'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-                      'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
-	  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + sqrt(arg2.*conj(arg2));';
-	  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-                      'itc     = itc ./ cumul;' ];
-	end;
-	resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
-                 'formulapost', formulapost, 'formulainit', formulainit, ...
-                 'formulaout', formulaout, 'bootside', {'both' 'upper'} );
-    Pboot = resboot{1};
-    Rboot = resboot{2};
-    
-    if isnan(g.pboot)
+    if ~isnan(g.pboot) & ~isnan(g.rboot)
+        Rboot = g.rboot;
+        Pboot = g.pboot;
+	else	
+		formulaout = { 'power' 'itc' };
+		switch g.type
+		 case 'coher',
+		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
+						  'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + arg2.*conj(arg2);';
+		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
+						  'itc     = itc ./ sqrt(cumul) /' int2str(trials) ];
+		 case 'phasecoher',
+		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2;';
+		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
+						  'itc     = itc /' int2str(trials) ];
+		 case 'phasecoher2',
+		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
+						  'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + sqrt(arg2.*conj(arg2));';
+		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
+						  'itc     = itc ./ cumul;' ];
+		end;
+		if g.baseboot == 0, baselntmp = [];
+		else                baselntmp = baseln; 
+		end;
+		resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
+						   'formulapost', formulapost, 'formulainit', formulainit, ...
+						   'formulaout', formulaout, 'bootside', {'both' 'upper'}, 'naccu', g.naccu, 'basevect', baselntmp );
+		Pboot = resboot{1};
+		Rboot = resboot{2};
+		
         if ~isnan( g.baseline ) 
-            Pboot = 10 * (log10(Pboot) - [log10(mbase)' log10(mbase)']);
+			Pboot = 10*(log10(Pboot) - repmat(log10(mbase)', [1 size(Pboot,2) size(Pboot,3)])); 
         else
             Pboot = 10 * log10(Pboot);
         end;  
-    else
-        Pboot = g.pboot;
-    end
+	end;
 else 
     Pboot = []; Rboot = [];
 end
@@ -891,9 +904,15 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
     ERP = ERP(ERPindices);
     
     dispf = find(freqs <= g.maxfreq);
-    Rsign = sign(imag(R));
-    R = abs(R); % convert coherence vector to magnitude
-    switch lower(g.plotitc)
+	if ~isreal(R)
+		Rsign = sign(imag(R));
+		R = abs(R); % convert coherence vector to magnitude
+		setylim = 1;
+    else 
+		Rsign = ones(size(R));
+		setylim = 0;
+	end;
+	switch lower(g.plotitc)
      case 'on',  
       switch lower(g.plotersp), 
        case 'on', ordinate1 = 0.67; ordinate2 = 0.1; height = 0.33; g.plot = 1;
@@ -1014,9 +1033,12 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       RR = R;
       if ~isnan(g.alpha)
           if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
-              RR(find(RR < Rboot)) = 0;
-              Rboot = mean(Rboot,2);
-          else
+              tmp = gcf;
+			  if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;			  
+			  else                   RR(find(RR < Rboot)) = 0;				  
+			  end;
+			  Rboot = mean(Rboot(:,:,end),2);
+		  else
               RR(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
           end;
       end
@@ -1058,8 +1080,10 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       h(9) = get(h(8),'Children');
       set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
       set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
-      set(h(8),'YLim',[0 tmpcaxis(2)]); 
-      title('ITC')
+	  if setylim
+		  set(h(8),'YLim',[0 tmpcaxis(2)]); 
+      end;
+	  title('ITC')
 
       %
       %%%%% plot the ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
