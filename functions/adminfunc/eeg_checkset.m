@@ -1,33 +1,46 @@
 % eeg_checkset() - check consistency of EEGLAB dataset fields.
 %
 % Structure of an EEG dataset under EEGLAB:
-%	EEG.data     	- three-dimensional data array (chans, frames, epochs)
+%	EEG.data     	- two-dimentional continuous data array (channel, frames)
+%                     or three-dimensional data array (chans, frames, epochs)
 %	EEG.setname  	- name of the dataset
 %	EEG.filename 	- filename of the dataset
 %	EEG.filepath    - filepath of the dataset
-%	EEG.namechan 	- channel labels (will be deprecated)
-%	EEG.chanlocs  	- name of file containing names and positions 
-%                         of the channels on the scalp
+%	EEG.chanlocs  	- structure array containing names and positions 
+%                     of the channels on the scalp
 %	EEG.pnts     	- number of frames (time points) per epoch (trial)
-%	EEG.nbchan     	- number of channels in each epoch
-%	EEG.trials     	- number of epochs (trials) in the dataset
+%                     if data is continuous, total number of points
+%	EEG.nbchan     	- number of channels
+%	EEG.trials     	- number of epochs (trials) in the dataset. If data
+%                     is continuous, automatically set to 1.
 %	EEG.srate      	- sampling rate (in Hz)
 %	EEG.xmin      	- epoch start time (in seconds)
 %	EEG.xmax      	- epoch end time (in seconds)
+%	EEG.times      	- time vector (one time value per data point)
+%   EEG.averef      - ['yes'|'no'] average reference flag
+%   EEG.comments    - comments about the dataset
 %
 % ICA variables:
-%	EEG.icaact      - ICA activations (components x frames x epochs)  
+%	EEG.icaact      - ICA activations (components x frames x epochs)
+%                     Empty is compute_ica option is set to 0 in the
+%                     EEGLAB option and computed on the fly.
 %	EEG.icasphere   - sphere array returned by ICA
 %	EEG.icaweights  - weight array returned by ICA
 %	EEG.icawinv     - inverse ICA weight matrix giving the projected
 %                         activity of the components at the electrodes.
 %                         NOTE: Any linear unmixing matrix may be used.
+%
 % Event and epoch structures:	
 %       EEG.event       - event structure (any number of events per epoch)
 %       EEG.epoch       - epoch structure (one structure per epoch)
-%   --> See the web page http://sccn.ucsd.edu/eeglab/xxx.html for details
+%       EEG.eventdescription - cell array of string describing event fields.
+%       EEG.epochdescription - cell array of string describing epoch fields.
+%   --> See the web page http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html 
+%       for details
 %
 % Variables used for manual and semi-automatic data rejection:
+%	EEG.specdata            - data spectrum for every single trial
+%	EEG.specica             - data spectrum for every single trial
 %	EEG.stats.kurtc         - component kurtosis values
 %	EEG.stats.kurtg         - global kurtosis of components      
 %	EEG.stats.kurta         - kurtosis of accepted epochs      
@@ -78,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/07/30 22:05:24  arno
+% adding disprej field
+%
 % Revision 1.45  2002/07/30 17:53:22  arno
 % adding color for rejection
 %
