@@ -23,8 +23,9 @@
 %               ELSE [startms ntimes srate] Give start latency (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz), {default|[]: 0:nframes-1}
 %  'title'   - ['string'] Plot titla {default: none}
-%   avewidth - Number of trials to moving-average (NB: may be non-int) {default|0->1}
-%   decimate - Factor to decimate ntrials out by (NB: may be non-int)  {default|0->1}
+%   avewidth - Number of trials to smooth with a moving-average (may be non-integer) 
+%               {default|0->1}
+%   decimate - Factor to decimate ntrials out by (may be non-integer)  {default|0->1}
 %               If this is large ( > sqrt(num. trials)), output this many trials.
 %
 % Unordered options ('keyword',argument pairs):
@@ -54,7 +55,7 @@
 %                [freq,maxfreq] (Note: 'phasesort' arg freq overrides the 
 %                frequency specified in 'coher'). With optional topphase, 
 %                sort by phase, putting topphase (degrees, in range [-180,180]) 
-%                at the top of the image. NB: 'phasesort' now uses circular 
+%                at the top of the image. Note: 'phasesort' now uses circular 
 %                smoothing. Use 'cycles' (below) for wavelet length. 
 %                {Default: [0 25 8 13 180]}
 %  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. 
@@ -63,7 +64,7 @@
 %
 % Plot time-varying spectral amplitude instead of potential:
 % 'plotamps' - Image amplitudes at each trial and latency instead of potential values. 
-%               NB: Currently Requires 'coher' (below) with alpha signif. {default: no}
+%               Note: Currently requires 'coher' (below) with alpha signif. {default: no}
 %
 % Specify plot parameters:
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
@@ -84,7 +85,7 @@
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] = same, but select frequency with max power in 
-%               given range (NB: 'phasesort' freq (above) overwrites these parameters).
+%               given range (Note: 'phasesort' freq (above) overwrites these parameters).
 %               ELSE [minfrq maxfrq alpha] = plot coher. signif. level line at 
 %               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
@@ -161,6 +162,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.213  2004/07/29 23:18:23  arno
+% same
+%
 % Revision 1.212  2004/07/29 23:16:50  arno
 % convert to double for Matlab 7
 %
@@ -1000,7 +1004,7 @@ elseif length(times) == 3
    times = mintime:1000/srate:mintime+(frames-1)*1000/srate;
    fprintf('Using sampling rate %g Hz.\n',srate);
 else
-   % NB: might use default srate read from icadefs here...
+   % Note: might use default srate read from icadefs here...
    srate = 1000*(length(times)-1)/(times(end)-times(1));
 end
 if length(times) ~= frames
@@ -1873,8 +1877,8 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
         fprintf('\n');
         fprintf('  and a decimation factor of %g\n',decfactor);
         if ~exist('phargs') % if not phase-sorted trials
-           [data,outtrials]    = movav(data,1:ntrials,avewidth,decfactor); 
-           % Note: movav here sorts using square window
+           [data,outtrials] = movav(data,1:ntrials,avewidth,decfactor); 
+           % Note: movav() here sorts using square window
            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
         else % if phase-sorted trials, use circular / wrap-around smoothing
            backhalf  = floor(avewidth/2);
