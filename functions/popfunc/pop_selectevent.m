@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/01/02 17:19:43  arno
+% changing exemple fom 'target' to "target" for type
+%
 % Revision 1.45  2002/11/14 22:49:44  arno
 % debugging command line call
 %
@@ -181,7 +184,8 @@ function [EEG, Ievent, com] = pop_selectevent(EEG, varargin);
 if nargin < 1
    help pop_selectevent;
    return;
-end;	
+end;
+Ievent = [];
 com ='';
 event_indices = [];
 
