@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.159  2003/10/29 22:15:52  scott
+% adjust erp alpha NBOOT to (low) alpha
+%
 % Revision 1.158  2003/10/29 22:07:10  arno
 % nothing
 %
@@ -1451,7 +1454,7 @@ if exist('phargs') == 1 % if phase-sort
         fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
                 filtersize, 1000/freq*filtersize, timecenter);
         fprintf(...
-  '    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
+  '    Filter length is %d; Phase has been linearly interpolated to latency at %1.0f ms.\n', ...
                         length(winloc), phargs(1));
     else
         fprintf(...
