@@ -91,6 +91,7 @@
 %       'titlefont' = Title text font size                               {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms.
+%       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'outputformat' = ['old'|'new'] for compatibility with script that used the old
 %                        output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). Default is 'new'.
@@ -140,6 +141,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/01/20 05:30:42  cooper
+% corrected ntrials in linear coher formula.
+%
 % Revision 1.21  2003/01/11 00:38:02  cooper
 % fixed formula for linear coher.
 %
@@ -507,6 +511,7 @@ try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
 try, g.vert;       catch, g.vert = []; end;
+try, g.newfig;     catch, g.newfig = 'on'; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
 try, g.phsamp;     catch, g.phsamp = 'off'; end;
 try, g.plotphase;  catch, g.plotphase = 'on'; end;
@@ -668,6 +673,10 @@ switch lower(g.phsamp)
     case { 'on', 'off' }, ;
     otherwise error('phsamp must be either on or off');
 end;
+switch lower(g.newfig)
+    case { 'on', 'off' }, ;
+    otherwise error('newfig must be either on or off');
+end;
 if ~isnumeric(g.linewidth)
     error('linewidth must be numeric');
 end;
@@ -749,7 +758,8 @@ if iscell(X)
     % --------
     if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
         g.titleall = g.title;
-        figure; subplot(1,3,1); g.title = g.titleall{1}; 
+        if strcmpi(g.newfig, 'on'), figure; end; 
+        subplot(1,3,1); g.title = g.titleall{1}; 
         plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, times, mbase, g);
         subplot(1,3,2); g.title = g.titleall{2}; 
         plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, times, mbase, g);

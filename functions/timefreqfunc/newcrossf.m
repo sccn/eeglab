@@ -112,6 +112,7 @@
 %                     elements {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
+%       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'axesfont'  = Axes font size                               {10}
 %       'titlefont' = Title font size                              {8}
 %
@@ -162,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/01/09 16:00:31  arno
+% correcting typo
+%
 % Revision 1.39  2003/01/06 19:41:52  arno
 % implementing new bootstrap type
 %
@@ -575,6 +579,7 @@ try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.type;       catch, g.type = 'phasecoher'; end; 
+try, g.newfig;     catch, g.newfig = 'on'; end;
 try, g.boottype;   catch, g.boottype = 'timestrials'; end; 
 try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
@@ -648,6 +653,10 @@ if ~isnan(g.alpha)
       fprintf('Bootstrap analysis will use data in all subwindows.\n')
    end
 end
+switch lower(g.newfig)
+    case { 'on', 'off' }, ;
+    otherwise error('newfig must be either on or off');
+end;
 switch g.angleunit
 case { 'ms', 'deg' },;
 otherwise error('Angleunit must be either ''deg'' or ''ms''');
@@ -715,7 +724,7 @@ if iscell(X)
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
     
 	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
-        figure; 
+        if strcmpi(g.newfig, 'on'), figure; end; 
         subplot(1,3,1); 
 	end;
 
