@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/23 20:08:39  arno
+% full reprogramming of the function for standalone
+%
 % Revision 1.4  2002/04/21 01:09:24  scott
 % edited help msg -sm
 %
@@ -81,7 +84,7 @@ if nargin == 1
    
     INEEG2  = eval( [ '[' result{1} ']' ] );
     switch lower(result{2})
-    	case 'keepall', keepall = 1;
+    	case 'yes', keepall = 1;
     	otherwise, keepall = 0;
     end;
 else
