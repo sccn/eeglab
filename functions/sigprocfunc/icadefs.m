@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/12 14:36:02  arno
+% color
+%
 % Revision 1.9  2002/08/12 14:30:17  arno
 % color
 %
@@ -89,6 +92,12 @@ BACKCOLOR  =  [.93 .96 1];
 BACKEEGLABCOLOR  = [.66 .76 1];    
 GUIBUTTONCOLOR   = [.66 .76 1];    
 GUITEXTCOLOR     = [0 0 0.4];
+
+GUIBUTTONCOLOR  =  [.93 .96 1];     
+GUIBACKCOLOR   = [.66 .76 1];    
+GUITEXTCOLOR     = [0 0 0.4];
+
+
 
 MAXENVPLOTCHANS   = 256;  % maximum number of channels to plot in envproj.m
 MAXPLOTDATACHANS  = 256;  % maximum number of channels to plot in dataplot.m
