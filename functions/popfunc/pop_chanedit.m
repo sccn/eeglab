@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/05/13 23:49:13  arno
+% [Aallowing to write channel location file
+%
 % Revision 1.49  2003/05/13 16:55:35  arno
 % debug shrink factor
 %
@@ -273,7 +276,8 @@ if nargin < 2
 					  { 'Style', 'pushbutton', 'string', 'xyz->sph'  , 'callback', ...
 						['comtmp = {''convert'' {''cart2sph'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Rotate axis'  , 'callback', ...
-						['[ comtmp tmpforce ] = forcelocs(chantmp); comtmp = {''forcelocs'' tmpforce{1} }; clear tmpforce;' endgui] }, ...
+						['[ comtmp tmpforce ] = forcelocs(chantmp); if ~isempty(tmpforce), ' ...
+                         'comtmp = {''forcelocs'' tmpforce{1} }; else comtmp = {''forcelocs'' [] }; end; clear tmpforce;' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Transform axes', 'callback', ...
 						['comtmp = {''transform'' ' transform '};' endgui] }, ...
 					  { } { } };
@@ -450,8 +454,10 @@ else
 	 for curfield = 1:2:length(args)
 		 switch lower(args{curfield})
           case 'forcelocs',
-           chans = forcelocs(chans,args{curfield+1});
-           disp('Convert XYZ coordinates to spherical and polar');
+           if ~isempty(args{curfield+1})
+               chans = forcelocs(chans,args{curfield+1});
+               disp('Convert XYZ coordinates to spherical and polar');
+           end;
 		  case 'convert', 
 		   if iscell(args{curfield+1})
 			   method=args{curfield+1}{1};
