@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/12/24 01:25:12  arno
+% Initial revision
+%
 % Revision 1.2  2002/11/14 23:35:36  arno
 % header
 %
@@ -51,12 +54,12 @@ command = '';
 formatskip = [ formatskip 0];
 
 if nargin < 1 
-   %[filename, filepath] = uigetfile('*', 'Importing electrode location file -- pop_readlocs()'); 
-   filename = 'chan32.locs';
-   filepath = 'c:\eeglab\eeglab4.0\';
+   [filename, filepath] = uigetfile('*', 'Importing electrode location file -- pop_readlocs()'); 
+   %filename = 'chan32.locs';
+   %filepath = 'c:\eeglab\eeglab4.0\';
    drawnow;
-	if filename == 0 return; end;
-	filename = [filepath filename];
+   if filename == 0 return; end;
+   filename = [filepath filename];
    tmpfile = loadtxt(filename);
    nbcols = cellfun('isempty', tmpfile(end,:));
    nbcols = ones(1,length(find(~nbcols)));
@@ -151,8 +154,8 @@ if nargin < 1
    eval(formatcom);
    
    % this loop is necessary for decoding Preview
-   continue = 1;
-   while continue 
+   cont = 1;
+   while cont
       waitfor( findobj('parent', fig, 'tag', 'Import'), 'userdata');
       if isempty( findobj('parent', fig, 'tag', 'Import') ), return; end;
       
@@ -181,7 +184,7 @@ if nargin < 1
             errordlg2(strvcat('Error while importing locations:', lasterr), 'Error');
          end;
       else 
-      	continue = 0;   
+      	cont = 0;   
       end;
    end;
    close(fig);
