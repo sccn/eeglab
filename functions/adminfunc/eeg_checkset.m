@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2002/10/09 00:14:13  arno
+% typo last
+%
 % Revision 1.72  2002/10/09 00:11:41  arno
 % debug read float data file
 %
@@ -538,7 +541,14 @@ end;
                 if option_computeica
  	    			fprintf('eeg_checkset: recomputing ica activation matrix ...\n'); 
                     res = com;
-                    EEG.icaact     = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
+                    if any(isnan(EEG.data(:)))
+                        fprintf('eeg_checkset: recomputing using nan indices in first channel ...\n'); 
+                        tmpindices = find(~isnan(EEG.data(index,:)));
+                        EEG.icaact    = EEG.data;
+                        EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
+                    else
+                        EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
+                    end;
                     EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
 				end;
  			end;
