@@ -38,7 +38,7 @@
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 
+% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 3-cycle
 %                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
 %                gives percent of trials to reject for low amplitude. Else if in range
 %               [-100,0], gives percent of trials to reject for high amplitude.
@@ -71,6 +71,8 @@
 %               probability alpha (range: [0,0.1]) {default: none}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg times) {default: as in icadefs.m}
+%   'cycles' - number of cycle for wavelet decomposition. Default is 3 at all
+%              frequency (to preserve time resolution).
 % Add other features to plot:
 %   'cbar'   - Plot color bar to right of ERP-image {default no}
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
@@ -142,6 +144,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2003/04/23 22:09:21  arno
+% adding cycles to the phasedet script
+%
 % Revision 1.89  2003/04/23 01:24:15  arno
 % chaning default to 3 cycles at 5 Hz
 %
@@ -509,6 +514,7 @@ verttimes = [];
 NoTimeflag= NO;     % by default DO print "Time (ms)" below bottom axis
 Signifflag= NO;     % compute significance instead of receiving it
 Auxvarflag= NO;
+Cycleflag = NO;
 signifs   = NaN;
 coherfreq = nan;    % amp/coher-calculating frequency
 freq = 0;           % phase-sorting frequency
@@ -765,6 +771,9 @@ if nargin > 6
 	  elseif Srateflag == YES
           srate = Arg(1);
           Srateflag = NO;
+	  elseif Cycleflag == YES
+          DEFAULT_CYCLES = Arg;
+          Cycleflag = NO;
 	  elseif Auxvarflag == YES;
           if isa(Arg,'cell')==YES & length(Arg)==2
 			  auxvar = Arg{1};
@@ -917,6 +926,8 @@ if nargin > 6
 		  Valflag = YES;
 	  elseif strcmp(Arg,'auxvar')
 		  Auxvarflag = YES;
+	  elseif strcmp(Arg,'cycles')
+		  Cycleflag = YES;
 	  elseif strcmp(Arg,'yerplabel')
 		  yerplabelflag = YES;
 	  elseif strcmp(Arg,'srate')
@@ -979,7 +990,7 @@ if exist('phargs')
 	if phargs(3) > srate/2
 		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
 	end
-    DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
+    %DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
 		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				phargs(3),DEFAULT_CYCLES);
@@ -997,7 +1008,7 @@ if exist('ampargs')
 	if ampargs(3) > srate/2
 		fprintf('erpimage(): amplitude-sorting frequency must be less than Nyquist rate.');
 	end
-    DEFAULT_CYCLES = 9*ampargs(3)/(ampargs(3)+10); % 3 cycles at 5 Hz
+    %DEFAULT_CYCLES = 9*ampargs(3)/(ampargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/ampargs(3)
 		fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				ampargs(3),DEFAULT_CYCLES);
@@ -1017,7 +1028,7 @@ if ~any(isnan(coherfreq))
 		fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
 		return
 	end
-    DEFAULT_CYCLES = 9*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 5 Hz
+    %DEFAULT_CYCLES = 9*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/coherfreq(1)
 		fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
 				coherfreq(1),DEFAULT_CYCLES);
@@ -1166,11 +1177,11 @@ if exist('phargs') == 1 % if phase-sort
 	end
 	
 	[dummy minx] = min(abs(times-phargs(1)));
-	winlen = floor(3*srate/freq);
+	winlen = floor(DEFAULT_CYCLES*srate/freq);
 	%winloc = minx-[winlen:-1:0]; % ending time version
-	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
-	winloc = winloc(find(winloc>0 & winloc<=frames));
-	
+	winloc = minx-linspace(floor(winlen), floor(-winlen), winlen+1);
+    winloc = winloc(find(winloc>0 & winloc<=frames));
+    
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq, DEFAULT_CYCLES);
 	
 	fprintf(...
@@ -2477,15 +2488,19 @@ function [plot_handle] = plot1erp(ax,Time,erp,axlimits,stdev)
 %              Constructs a complex filter at frequency freq
 %
 
-function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq,cycles)
+function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq)
 % Typical values:
 %   frames = 768;
 %   srate = 256;
 %   nwin = [200:300];
 %   freq = 10;
-
+    
 data = reshape(data,[frames prod(size(data))/frames]);
-win = exp(cycles*2i*pi*freq(:)*[1:length(nwin)]/srate);
+% number of cycles depend on window size 
+% number of cycles automatically reduced if smaller window
+% note: as the number of cycle changes, the frequency shifts a little
+%       this has to be fixed
+win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
 win = win .* repmat(hanning(length(nwin))',length(freq),1);
 resp = win * data(nwin,:);
 ang = angle(resp);
