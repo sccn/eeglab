@@ -142,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2003/04/23 01:10:39  arno
+% remove 3-cycle from help
+%
 % Revision 1.85  2003/04/23 01:05:55  arno
 % changing default cycle for coherence
 %
@@ -967,6 +970,7 @@ if exist('phargs')
 	if phargs(3) > srate/2
 		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
 	end
+    DEFAULT_CYCLE = 18*phargs(3)/(phargs(3)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
 		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				phargs(3),DEFAULT_CYCLES);
@@ -984,6 +988,7 @@ if exist('ampargs')
 	if ampargs(3) > srate/2
 		fprintf('erpimage(): amplitude-sorting frequency must be less than Nyquist rate.');
 	end
+    DEFAULT_CYCLE = 18*ampargs(3)/(ampargs(3)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
 	if frames < DEFAULT_CYCLES*srate/ampargs(3)
 		fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				ampargs(3),DEFAULT_CYCLES);
@@ -1003,6 +1008,7 @@ if ~any(isnan(coherfreq))
 		fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
 		return
 	end
+    DEFAULT_CYCLE = 18*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
 	if frames < DEFAULT_CYCLES*srate/coherfreq(1)
 		fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
 				coherfreq(1),DEFAULT_CYCLES);
@@ -1159,7 +1165,7 @@ if exist('phargs') == 1 % if phase-sort
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
 	fprintf(...
-'Sorting data epochs by phase at %2.1f Hz in a %d-cycle (%4.0f ms) window centered at %4.0f ms.\n',...  
+'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%4.0f ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,phargs(1));
 	fprintf('Phase is computed using a filter of length %d frames.\n',...
 			length(winloc));
@@ -1232,7 +1238,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %d-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
+	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %1.1f-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
 	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
 			length(winloc));
@@ -1482,11 +1488,9 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     if freq > 0 
         coherfreq = freq; % use phase-sort frequency
     end
-    
-    DEFAULT_CYCLE = 18*coherfreq/(coherfreq+10); % 3 cycles at 2 Hz, 15 at 50 Hz
-    
+        
     if ~isnan(signifs) % plot received significance levels
-        fprintf('Computing and plotting received amp and ITC signif. levels (%1.1f cycle)...\n', DEFAULT_CYCLE);
+        fprintf('Computing and plotting received amp and ITC signif. levels...\n');
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
         % need to receive cohsig and ampsig to get allamps
@@ -1494,7 +1498,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         cohsig = signifs(3);
         
     elseif alpha>0 % compute significance levels
-        fprintf('Computing and plotting %g amp and ITC signif. level (%1.1f cycle)...\n',alpha, DEFAULT_CYCLE);
+        fprintf('Computing and plotting %g amp and ITC signif. level...\n',alpha);
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
         % need to receive cohsig and ampsig to get allamps
