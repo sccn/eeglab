@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.81  2004/05/05 01:17:27  scott
+%added spheresize
+%
 %Revision 1.80  2004/05/05 00:52:11  scott
 %dipole length 0 + 'spheres' again...
 %
@@ -154,7 +157,7 @@
 %turn off 'spheres' cylinder plotting if g.dipolelenth == 0
 %
 %Revision 1.77  2004/04/30 18:48:53  scott
-%made default image 'mri' - debugged sphers/cylinders
+%made default image 'mri' - debugged spheres/cylinders
 %
 %Revision 1.76  2004/04/29 15:35:32  scott
 %adding cylinders for spheres pointers
@@ -413,11 +416,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
                                  'dipolelength' 'real'  [0 Inf]             1;
-                                 'sphere'       'real'     [0 Inf]             1;
+                                 'sphere'      'real'   [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
-                                 'spheresize'  'real'    [0 Inf]              5;
-                                 'links'    'real'      []                  [];
-                                 'image'     'string'   []                 'mri' }, 'dipplot');
+                                 'spheresize'  'real'   [0 Inf]             5;
+                                 'links'       'real'   []                  [];
+                                 'image'       'string' []                 'mri' }, ...
+                                                                                    'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
     if strcmpi(g.spheres,'on')
@@ -690,7 +694,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         
     % plot sphere mesh and nose
     % -------------------------
-    [x y z] = sphere(20);
+    SPHEREGRAIN = 20; % 20 is Matlab default
+    [x y z] = sphere(SPHEREGRAIN);
     hold on; 
     [xx yy zz] = transcoords(x, y, z, dat.tcparams, dat.coreg);
     if strcmpi(COLORMESH, 'w')
@@ -772,22 +777,21 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
-               h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
+               h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
 
             elseif g.dipolelength>0 % plot dipole direction cylinders with end cap patch
               thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
-              CYLWIDTH = 1.6; CYLLEN = 24;
               for k=1:length(xx)
-                [cx cy cz] = cylinder([1 1 1],20);
+                [cx cy cz] = cylinder([1 1 1],SPHEREGRAIN);
                 % rotate(h1,[yy(k)-yyo1(k) xxo1(k)-xx(k) 0],thetas(k));
-                cx = cx*CYLWIDTH + xx(k);
-                cy = cy*CYLWIDTH + yy(k);
-                cz = cz*CYLLEN + zz(k);
+                cx = cx*g.spheresize/3 + xx(k);
+                cy = cy*g.spheresize/3 + yy(k);
+                cz = cz*g.dipolelength + zz(k);
                 caxis([0 33])
                 cax =caxis;
-                s1 = surf(cx,cy,cz); % makes red
-                set(s1,'cdatamapping','direct','FaceColor','r');
-                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); % c='r'
+                s1 = surf(cx,cy,cz);  % draw the 3-D cylinder
+                set(s1,'cdatamapping','direct','FaceColor','r'); % tries to make cylinder red - doesnt work!?!
+                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); 
               end
             end
 
@@ -811,17 +815,24 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %
             hold on;
             if strcmp(g.spheres,'on') % plot spheres
-                spherecolors = g.color{index};
+                spherecolor = g.color{index};
                 [xs,ys,zs] = sphere;
-                options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
-                'direct','tag','img', 'facelighting', 'none' };
                 for q = 1:length(xx)
-                   scolor = repmat(33,size(xs,1),size(xs,2));
-                   sf=surf(xs/g.spheresize+xx(q),...
-                        ys/g.spheresize+yy(q),...
-                        zs/g.spheresize+zz(q),...
-                        scolor);
-                   % set(sf,{options});
+                   sf=surf(xs*g.spheresize+xx(q),...
+                        ys*g.spheresize+yy(q),...
+                        zs*g.spheresize+zz(q),...
+                   'cdatamapping','direct',...
+                   'facecolor',spherecolor)  % draw the 3-D sphere - last arg pairs NOT SET ????
+
+                  options = {'FaceColor','texturemap', 'EdgeColor','none', ...
+                              'CDataMapping','direct','tag','img', 'facelighting','none' };
+
+                   % set(sf,{options}); <==== this says 'invalid key pair' but which pair ????
+
+                   set(sf,'cdatamapping','direct');
+                   set(sf,'facecolor','g');  % <========= this has no effect !?!?! Why not ????
+                   set(sf) % <========== doesnt show the set() changes made above ????
+
                    shading interp;
                    material shiny;
                 end
