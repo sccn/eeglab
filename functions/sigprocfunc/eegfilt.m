@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/07/20 19:17:07  scott
+% added channels-processed info if epochs==1 (continuous data)
+%
 % Revision 1.11  2003/04/11 15:03:46  arno
 % nothing
 %
@@ -105,16 +108,13 @@ min_filtorder  = 15;   % minimum filter length
 trans          = 0.15; % fractional width of transition zones
 
 if locutoff>0 & hicutoff > 0 & locutoff > hicutoff,
-    help eegfilt
     error('locutoff > hicutoff ???\n');
 end
 if locutoff < 0 | hicutoff < 0,
-   help eegfilt
    error('locutoff | hicutoff < 0 ???\n');
 end
 
 if locutoff>nyq,
-    help eegfilt
     error('locutoff cannot be > srate/2');
 end
 
@@ -152,6 +152,9 @@ if epochs*epochframes ~= frames,
     error('epochframes does not divide frames.\n');
 end
 
+disp('Note: if a message ''Matrix is close to singular or badly scaled'' appear, Matlab');
+disp('      failed to design a good filter. You should first highpass data, then lowpass.');
+
 if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
     fprintf('filter order is %d. ',filtorder);
     error('epochframes must be 3 times the filtorder.');
@@ -170,9 +173,7 @@ if locutoff > 0 & hicutoff > 0,    % bandpass filter
     m=[0       0                      1            1            0                      0]; 
 elseif locutoff > 0                % highpass filter
  if locutoff/nyq < MINFREQ
-    help eegfilt
-    fprintf('eegfilt() - highpass cutoff freq must be > %g Hz\n\n',MINFREQ*nyq);
-    return
+    error(sprintf('eegfilt() - highpass cutoff freq must be > %g Hz\n\n',MINFREQ*nyq));
  end
  fprintf('eegfilt() - performing %d-point highpass filtering.\n',filtorder);
  f=[MINFREQ locutoff*(1-trans)/nyq locutoff/nyq 1]; 
@@ -180,17 +181,14 @@ elseif locutoff > 0                % highpass filter
  m=[   0             0                   1      1];
 elseif hicutoff > 0                %  lowpass filter
  if hicutoff/nyq < MINFREQ
-    help eegfilt
-    fprintf('eegfilt() - lowpass cutoff freq must be > %g Hz\n\n',MINFREQ*nyq);
-    return
+    error(sprintf('eegfilt() - lowpass cutoff freq must be > %g Hz',MINFREQ*nyq));
  end
  fprintf('eegfilt() - performing %d-point lowpass filtering.\n',filtorder);
  f=[MINFREQ hicutoff/nyq hicutoff*(1+trans)/nyq 1]; 
  fprintf('eegfilt() - lowpass transition band width is %1.1g Hz.\n',(f(3)-f(2))*srate/2);
  m=[     1           1              0                 0];
 else
- help eegfilt
- return
+    error('You must provide a non-0 low or high cut-off frequency');
 end
 if revfilt
     m = ~m;
