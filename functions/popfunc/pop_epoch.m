@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/20 00:13:13  arno
+% correcting latency computation bug
+%
 % Revision 1.3  2002/04/11 22:28:54  arno
 % adding new dataset name
 %
@@ -154,11 +157,11 @@ if ~isempty( events )
 				Ieventtmp = [ Ieventtmp strmatch(tmpevent, tmpeventtype, 'exact') ];
 			end;
 		else
-			for index2 = 1:length( tmpeventtype )
+			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if isstr( tmpevent ),tmpevent = str2num( tmpevent ); end;
 				if isempty( tmpevent ), error('Pop_epoch: string type in a numeric field'); end;
-				Ieventtmp = [ Ieventtmp strmatch(tmpevent, tmpeventtype, 'exact') ];
+				Ieventtmp = [ Ieventtmp find(tmpevent == cell2mat(tmpeventtype)) ];
 			end;
 		end;
     else
