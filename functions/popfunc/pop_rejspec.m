@@ -38,7 +38,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegtresh(), eeglab(), eegplot(), pop_rejepoch()
+% See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/13 02:06:52  arno
+% debugging command line call
+%
 % Revision 1.15  2002/11/13 01:21:24  arno
 % typo in header
 %
