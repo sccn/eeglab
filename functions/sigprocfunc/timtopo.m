@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/12 23:48:05  arno
+% debug absmax
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -312,14 +315,13 @@ for t=1:ntopos
                'Visible','Off','Fontsize',16);        % topoplot axes
   set(axt,'Color',BACKCOLOR);
 end
-axcopy(gcf);
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Make the colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
   axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]); % colorbar axes
-  h=colorbar(axt);  
+  h=cbar(axt);  
   set(h,'Ytick',[]);
 
   axes(axall)
@@ -334,3 +336,4 @@ axcopy(gcf);
 	catch, end;
   end
   text(0.86,0.59,'-','FontSize',16,'HorizontalAlignment','Center');
+axcopy(gcf);
