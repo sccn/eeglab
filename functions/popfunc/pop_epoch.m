@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/09/23 23:35:29  arno
+% debug lat
+%
 % Revision 1.24  2002/09/23 23:22:44  arno
 % cle[A
 %
@@ -256,7 +259,7 @@ fprintf('pop_epoch():%d epochs generated\n', length(indices));
 % update other fields
 % -------------------
 if lim(1) ~= tmptime(1) & lim(2)-1/EEG.srate ~= tmptime(2)
-	fprintf('pop_epoch(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits', tmptime(1), tmptime(2)+1/EEG.srate);
+	fprintf('pop_epoch(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
 end;
 EEG.xmin = tmptime(1);
 EEG.xmax = tmptime(2);
