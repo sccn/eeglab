@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2004/02/15 19:41:48  scott
+% skirt with wedges
+%
 % Revision 1.95  2004/02/15 17:35:49  scott
 % added 'style','skirt'
 %
@@ -1004,6 +1007,6 @@ function [newTh] = skirt_Th(Th,Rd,q)
 
 function [newTh] = rot_Th(Th,Rd,q)
      dr = Rd(q)-0.5;
-     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi));
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
      Th(q) = x+(pi/2)*Th(q)/(pi/2-2*x);
 return
