@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/07/10 00:36:52  arno
+% adding plot option
+%
 % Revision 1.4  2003/07/10 00:12:52  arno
 % fix goodness of fit
 %
@@ -178,7 +181,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
             [tmp closestind] = min(abs(rp - abscisia(index)));
             fp = fp./fp(closestind)*maxval;
             plot(rp, fp, 'g');
-            legend('Chi2 fit (some bin have been grouped)', 'Pdf', 'Data histogram'  );
+            legend('Chi2 fit (some bins have been grouped)', 'Pdf', 'Data histogram'  );
             xlabel('Bins');
             ylabel('# of data point per bin');            
             title (sprintf('Fit of distribution using Ramberg-Schmeiser distribution (Chi2 = %2.4g)', res));            
