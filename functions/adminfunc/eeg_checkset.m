@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2003/02/28 15:35:41  scott
+% header edits -sm
+%
 % Revision 1.92  2003/02/28 15:30:00  arno
 % updating warning message
 %
@@ -505,7 +508,7 @@ end;
 
     % parameters coherence -------------------------
     if     round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts          
-       fprintf( 'eeg_checkset() note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames'); 
+       fprintf( 'eeg_checkset() note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames\n'); 
        if EEG.srate == 0
           EEG.srate = 1;
        end;
