@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   data   = input data (chans,frames)
-%   xvals  = index for each data frame (column) {def|0 -> 1:frames}
+%   xvals  = index for each data frame (column) {def|[]|0 -> 1:frames}
 %            Note that default is fastest, assumes equal x-spacing.
 %   xwidth = smoothing-window width in xvals {def|0 -> (lastx-firstx)/4}
 %   xadv   = xvals step size {default|0 -> 1}
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/05/23 17:24:13  scott
+% *** empty log message ***
+%
 % Revision 1.6  2002/05/23 17:20:59  scott
 % *** empty log message ***
 %
@@ -98,6 +101,13 @@ fastave = 0;
 if nargin<2 
   xvals = 0;
 end
+if isempty(xvals)
+  xvals = 0;
+end
+if size(xvals,1)>1 & size(xvals,2)>1
+  help movav
+  return
+end
 xvals = xvals(:)'; % make row vector
 if length(xvals)==1 
   if xvals(1)==0,
@@ -107,20 +117,16 @@ if length(xvals)==1
     return
   end
 end
-if size(xvals,1)>1 & size(xvals,2)>1
-  help movav
-  return
-end
 if fastave == 0 & frames ~= length(xvals)
     fprintf('movav(): columns in (%d) xvals vector and (%d) in data matrix must be equal.\n',length(xvals),size(data,2));
     return
 end
 
-if nargin < 7
+if nargin < 7 | isempty(xwin)
   xwin = 0;
 end
 
-if nargin < 6
+if nargin < 6 | isempty(lastx)
   lastx = 0;
 end
 if lastx == 0,
@@ -131,7 +137,7 @@ if lastx == 0,
   end
 end
 
-if nargin<5,
+if nargin<5 | isempty(firstx)
   firstx = 0;
 end
 if firstx==0,
@@ -142,14 +148,14 @@ if firstx==0,
   end
 end
 
-if nargin<4,
+if nargin<4 | isempty(xadv)
   xadv = 0;
 end
 if isempty(xadv) | xadv == 0,
   xadv = 1.0; % DEFAULT XADV
 end
 
-if nargin<3,
+if nargin<3 | isempty(xwidth)
   xwidth = 0;
 end
 if xwidth==0,
