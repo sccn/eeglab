@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2002/10/13 23:23:05  arno
+% also clear EEGTMP if error
+%
 % Revision 1.173  2002/10/09 21:23:45  arno
 % updating check for pop_envtopo
 %
@@ -920,7 +923,7 @@ help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
 help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
     uimenu( help_subm2, 'Label', 'Dataset structure', 'CallBack', 'pophelp(''eeg_checkset'');');
 	uimenu( help_subm2, 'Label', 'Admin functions', 'callback', 'eeg_helpadmin;');	
-uimenu( help_m, 'Label', 'Contact us', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
