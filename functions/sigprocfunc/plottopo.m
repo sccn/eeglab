@@ -7,7 +7,6 @@
 %    >> plottopo(data,[rows cols])
 %    >> plottopo(data,'chan_locs',frames,limits,title,channels,...
 %                                            axsize,colors,ydir,vert) 
-%
 % Inputs:
 %   data       = data consisting of consecutive epochs of (chans,frames) 
 %  'chan_locs' = file of channel locations as in >> topoplot example   {grid}
@@ -48,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/22 22:57:54  arno
+% swap 2 first colors
+%
 % Revision 1.5  2002/04/24 18:24:39  scott
 % added vert to cal axis -sm
 %
