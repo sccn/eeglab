@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/14 18:17:00  arno
+% new supergui arg
+%
 % Revision 1.6  2002/08/13 22:36:43  arno
 % debug for error
 %
@@ -65,6 +68,8 @@ listui = {{ 'Style', 'text', 'string' Prompt }};
 
 geometry = { geometry{:} ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
+    varargin{index} = lower(varargin{index});
+    varargin{index}(1) = upper(varargin{index}(1));
 	listui = {listui{:} { 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
