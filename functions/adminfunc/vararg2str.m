@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/10 00:33:44  arno
+% Initial revision
+%
 
 function strout = vararg2str(allargs, inputnam, inputnum, int2str );
 
@@ -112,7 +115,7 @@ function str = str2str( array )
 	if isempty( array), str = ''''''; return; end;
 	str = '';
 	for index = 1:size(array,1)
-		str = [ str ', ''' array(index,:) '''' ];
+		str = [ str ', ''' doublequotes(array(index,:)) '''' ];
 	end;
 	if size(array,1) > 1
 		str = [ 'strvcat(' str(2:end) ')'];
@@ -125,7 +128,7 @@ return;
 % -----------------------
 function str = array2str( array )
 	if isempty( array), str = '[]'; return; end;
-	if prod(size(array)) == 1, str = contarray(array); return; end;
+	if prod(size(array)) == 1, str = num2str(array); return; end;
 	if size(array,1) == 1, str = [ '[' contarray(array) '] ' ]; return; end;
 	if size(array,2) == 1, str = [ '[' contarray(array') ']'' ' ]; return; end;
 	str = '';
@@ -151,6 +154,17 @@ function str = struct2str( structure )
 	str = [ 'struct(' str(1:end-1) ')' ];
 return;
 
+% double the quotes in strings
+% ----------------------------
+function str = doublequotes( str )
+	quoteloc = findstr( str, '''');
+	if ~isempty(quoteloc)
+		for index = length(quoteloc):-1:1
+			str = [ str(1:quoteloc(index)) str(quoteloc(index):end) ];
+		end;
+	end;
+return;
+	
 % test continuous arrays
 % ----------------------
 function str = contarray( array )
