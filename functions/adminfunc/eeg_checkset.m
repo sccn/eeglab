@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.146  2005/03/05 02:08:46  arno
+% chaninfo
+%
 % Revision 1.145  2005/03/04 23:45:15  arno
 % implementing chaninfo
 %
@@ -936,6 +939,22 @@ if isstr(EEG.ref) & strcmpi(EEG.ref, 'common')
     end;
 end;
 
+% DIPFIT structure
+% ----------------
+if ~isfield(EEG, 'dipfit')   EEG.dipfit = []; res = com; 
+else
+    if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile');
+        if exist('pop_didfit_settings')
+            disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
+            dipfitdefs;
+            EEG.dipfit.hdmfile     = template_models{1}{1};
+            EEG.dipfit.coordformat = template_models{1}{2};
+            EEG.dipfit.mrifile     = template_models{1}{3};
+            EEG.dipfit.chanfile    = template_models{1}{4};
+        end;
+    end;
+end;
+
 % EEG.times (only for epoched datasets)
 % ---------
 if (EEG.trials > 1)
@@ -945,6 +964,7 @@ else
         EEG = rmfield(EEG, 'times');
     end;
 end;
+
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
 if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
