@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.216  2003/02/03 17:09:59  arno
+% adding outputs to EEGLAB
+%
 % Revision 1.215  2003/01/29 23:07:53  arno
 % typo in readerpss in header
 %
@@ -839,7 +842,7 @@
 % 03-16-02 text interface editing -sm & ad 
 % 3/19/02 Help msg edited by sm 
 
-function [ALLEEG, EEG, CURRENTSET] = eeglab( onearg )
+function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 eeg_options; 
 eeg_global;
 
@@ -880,7 +883,7 @@ if nargin == 1
 		h('eeglab rebuild;');
 	end;
 end;
-
+ALLCOM = ALLCOM;
 colordef white
 
 % checking strings
