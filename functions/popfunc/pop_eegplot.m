@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/31 16:32:09  arno
+% debugging
+%
 % Revision 1.9  2002/07/30 22:21:11  arno
 % debugging
 %
@@ -82,15 +85,18 @@ end;
 if nargin < 2
 	icacomp = 1;
 end;	
-
+if nargin < 3
+	superpose = 0;
+end;
+if nargin < 4
+	reject = 1;
+end;
 if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must run ICA first'); return;
 	end;
 end;
 
-superpose=0; 
-reject = 1;
 if nargin < 3 & EEG.trials > 1
 
 	% which set to save
