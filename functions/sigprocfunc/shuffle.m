@@ -4,7 +4,7 @@
 %        >> [Y = shuffle(X, DIM)
 % 
 % Inputs: X   - input array
-%         DIM - dimension index (default is 1)
+%         DIM - dimension index (default is firt non-singleton dimention)
 %
 % Outputs: Y - shuffled array
 %          I - forward indices (Y = X(I) if 1D)
@@ -35,7 +35,15 @@ if nargin < 1
 	return;
 end;
 if nargin < 2
-	dim = 1;
+	if size(y,1) ~= 1
+		dim = 1;
+	else
+		if size(y,2) ~= 1
+			dim = 2;
+		else
+			dim = 3;
+		end;
+	end;
 end;
 	
 r =size(y, dim);
