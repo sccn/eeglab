@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.221  2003/02/21 22:25:52  arno
+% small problem with 2 import menus
+%
 % Revision 1.220  2003/02/13 00:57:32  arno
 % showing warning if low screen color depth
 %
@@ -930,6 +933,21 @@ e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),'
 e_storeall        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist            = [e_catch 'h(LASTCOM);'];
 
+% build structures for plugins
+% ----------------------------
+trystrs.no_check                 = e_try;
+trystrs.check_ica                = checkica;
+trystrs.check_cont               = checkcont;
+trystrs.check_epoch              = checkepoch;
+trystrs.check_event              = checkevent;
+trystrs.check_epoch_ica          = checkepochica;
+trystrs.check_chanlocs           = checkplot;
+trystrs.check_epoch_chanlocs     = checkepochplot;
+trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
+catchstrs.add_to_hist            = e_hist;
+catchstrs.store_and_hist         = e_store;
+catchstrs.new_and_hist           = e_newset;
+
 % menu definition
 % --------------- 
 eeg_mainfig;
@@ -991,16 +1009,6 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
 	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject data using ICA');
-
-if besamenu
-	fourth_sub3 = uimenu( fourth_m, 'Label', 'Locate dipoles using BESA');
-	uimenu( fourth_sub3, 'Label', 'Export components to BESA'     , 'CallBack', [ checkica 'besaexport(EEG);' e_hist ]);
-	uimenu( fourth_sub3, 'Label', 'Import dipoles from BESA'      , 'CallBack', [ checkica 'EEG = besaimport(EEG);' e_store]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles on BESA head'     , 'CallBack', [ checkbesa 'besaplot(EEG.sources);' e_hist]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles on MRI head'      , 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''image'', ''mri'');' e_hist]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipole summary as in BESA', 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');' e_hist]);
-	uimenu( fourth_sub3, 'Label', 'Plot dipole summary on MRI'    , 'CallBack', [ checkbesa 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');' e_hist]);
-end;
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
 	uimenu( fourth_sub1, 'Label', 'Reject by inspection'     , 'CallBack', [ check      '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
@@ -1069,21 +1077,37 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0, h(''find'',''pop_timef(EEG,0''));' e_hist],'Separator', 'on');
 		uimenu( spec_m, 'Label', 'Component cross-coherence', 'CallBack', [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,h(''find'',''pop_crossf(EEG,0''));' e_hist]);
 		
-set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
-help_m  = uimenu( W_MAIN, 'Label', 'Help');
-uimenu( help_m, 'Label', 'About EEGLAB', 'CallBack', 'pophelp(''eeglab'');');
-uimenu( help_m, 'Label', 'About EEGLAB help', 'CallBack', 'pophelp(''eeg_helphelp'');');
-uimenu( help_m, 'Label', 'EEGLAB license', 'CallBack', 'pophelp(''license.txt'', 1);');
-uimenu( help_m, 'Label', 'EEGLAB menus', 'CallBack', 'eeg_helpmenu;','separator','on');
-help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
+    set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
+    help_m  = uimenu( W_MAIN, 'Label', 'Help');
+    uimenu( help_m, 'Label', 'About EEGLAB', 'CallBack', 'pophelp(''eeglab'');');
+    uimenu( help_m, 'Label', 'About EEGLAB help', 'CallBack', 'pophelp(''eeg_helphelp'');');
+    uimenu( help_m, 'Label', 'EEGLAB license', 'CallBack', 'pophelp(''license.txt'', 1);');
+    uimenu( help_m, 'Label', 'EEGLAB menus', 'CallBack', 'eeg_helpmenu;','separator','on');
+    help_subm1 = uimenu( help_m, 'Label', 'EEGLAB functions');
     uimenu( help_subm1, 'Label', 'Toolbox functions', 'CallBack', 'pophelp(''ica'');');
 	uimenu( help_subm1, 'Label', 'Signal processing functions', 'callback', 'eeg_helpsigproc;');	
 	uimenu( help_subm1, 'Label', 'Interactive pop_ functions', 'callback', 'eeg_helppop;');	
-help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
+    help_subm2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
     uimenu( help_subm2, 'Label', 'Dataset structure', 'CallBack', 'pophelp(''eeg_checkset'');');
 	uimenu( help_subm2, 'Label', 'Admin functions', 'callback', 'eeg_helpadmin;');	
-uimenu( help_m, 'Label', 'Tutorial (web)', 'CallBack', 'tutorial;');
-uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+    uimenu( help_m, 'Label', 'Tutorial (web)', 'CallBack', 'tutorial;');
+    uimenu( help_m, 'Label', 'Contact us (email)', 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+
+    % looking for eeglab plugins
+    % --------------------------
+    p = which('eeglab.m');
+    p = p(1:findstr(p,'eeglab.m')-1);
+    dircontent = what(p);
+    for index = 1:length(dircontent.m)
+        if ~isempty(findstr(dircontent.m{index}, 'eegplugin'))
+            funcname = dircontent.m{index}(1:end-2);
+            disp(['eeglab: executing plugin "' funcname '"' ]);
+            eval( [ funcname '(fourth_m, trystrs, catchstrs)' ]  );
+            %eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
+            %     ['disp(''eeglab: error while executing plugin "' funcname '"'')']  );
+        end;
+    end;
+
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
