@@ -146,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/07/10 19:12:56  arno
+% removing warning messages
+%
 % Revision 1.29  2002/07/03 23:45:03  arno
 % correcting rboot output
 %
@@ -481,7 +484,7 @@ case { 'ms', 'deg' },;
 otherwise error('Angleunit must be either ''deg'' or ''ms''');
 end;    
 switch g.type
-case { 'coher', 'phasecoher' },;
+case { 'coher', 'phasecoher' 'phasecoher2' },;
 otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 switch g.boottype
@@ -587,8 +590,12 @@ dispf     = find(Tfx.freqs <= g.maxfreq);
    
 % display text to user
 % --------------------
-fprintf('\nComputing the Event-Related Cross-Coherence image\n');
-fprintf(' based on %d trials of %d frames sampled at %g Hz.\n', trials,g.frame,g.srate);
+fprintf('\nComputing the Event-Related \n');
+switch g.type
+    case 'phasecoher',  fprintf('Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'coher',       fprintf('Linear Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+end;
 fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
 if ~isnan(g.baseline)
    if length(baseln) == length(times)
@@ -967,8 +974,9 @@ Tf.tmpallbool = zeros(trials,timesout);
 Tf.ITCdone = 0;
 if Tf.subitc
    Tf.ITC  = zeros(Tf.nb_points, timesout);
-   if strcmp(Tf.type, 'coher')
-      Tf.ITCcumul  = zeros(Tf.nb_points, timesout);
+   switch Tf.type,
+	   case { 'coher' 'phasecoher2' }
+		Tf.ITCcumul  = zeros(Tf.nb_points, timesout);
    end;
 end;
 
@@ -980,6 +988,9 @@ switch Tf.type
    case 'coher',
       Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes; % complex coher.
       Tf.ITCcumul(:,times) = Tf.ITCcumul(:,times)+abs(Tf.tmpalltimes).^2;
+   case 'phasecoher2',
+      Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes; % complex coher.
+      Tf.ITCcumul(:,times) = Tf.ITCcumul(:,times)+abs(Tf.tmpalltimes);
    case 'phasecoher',
       Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes ./ abs(Tf.tmpalltimes); % complex coher.
 end % ~any(isnan())
@@ -987,8 +998,9 @@ return;
 
 function [Tf, itcvals] = tfitcpost(Tf, trials);
 switch Tf.type
-   case 'coher',      Tf.ITC = Tf.ITC ./ sqrt(trials * Tf.ITCcumul);
-   case 'phasecoher', Tf.ITC = Tf.ITC / trials; % complex coher.
+   case 'coher',       Tf.ITC = Tf.ITC ./ sqrt(trials * Tf.ITCcumul);
+   case 'phasecoher2', Tf.ITC = Tf.ITC ./ Tf.ITCcumul;
+   case 'phasecoher',  Tf.ITC = Tf.ITC / trials; % complex coher.
 end % ~any(isnan())
 if Tf.saveall
     Tf.ITC = transpose(Tf.ITC); % do not use ' otherwise conjugate
@@ -1059,9 +1071,11 @@ Coher.R  = zeros(nb_points,timesout);       % mean coherence
 Coher.type = type;
 Coher.Rn=zeros(trials,timesout);
 switch type
-case 'coher',
-   Coher.cumulX = zeros(nb_points,timesout);
-   Coher.cumulY = zeros(nb_points,timesout);
+ case 'coher',
+  Coher.cumulX = zeros(nb_points,timesout);
+  Coher.cumulY = zeros(nb_points,timesout);
+ case 'phasecoher2',
+  Coher.cumul  = zeros(nb_points,timesout);
 end;
 
 % function for coherence calculation
@@ -1077,13 +1091,18 @@ end;
 %end % ~any(isnan())
 
 function Coher = cohercomp(Coher, tmpX, tmpY, trial, time);
+tmptrialcoh = tmpX.*conj(tmpY);
 switch Coher.type
    case 'coher',
-      Coher.R(:,time) = Coher.R(:,time) + tmpX.*conj(tmpY); % complex coher.
+      Coher.R(:,time) = Coher.R(:,time) + tmptrialcoh; % complex coher.
       Coher.cumulX(:,time) = Coher.cumulX(:,time) + abs(tmpX).^2;
       Coher.cumulY(:,time) = Coher.cumulY(:,time) + abs(tmpY).^2;
+ case 'phasecoher2',
+      tmp = tmpX.*conj(tmpY);
+      Coher.R(:,time) = Coher.R(:,time) + tmptrialcoh; % complex coher.
+      Coher.cumul(:,time) = Coher.cumul(:,time) + abs(tmptrialcoh);
    case 'phasecoher',
-      Coher.R(:,time) = Coher.R(:,time) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
+      Coher.R(:,time) = Coher.R(:,time) + tmptrialcoh ./ abs(tmptrialcoh); % complex coher.
 	  %figure; imagesc(abs(tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY))));
       Coher.Rn(trial,time) = Coher.Rn(trial,time)+1;
 end % ~any(isnan())
@@ -1092,9 +1111,11 @@ end % ~any(isnan())
 % ---------------------------------------
 function Coher = cohercomppost(Coher, trials);
 switch Coher.type
-case 'coher',
+ case 'coher',
    Coher.R = Coher.R ./ sqrt(Coher.cumulX) ./ sqrt(Coher.cumulY);
-case 'phasecoher',
+ case 'phasecoher2',
+   Coher.R = Coher.R ./ Coher.cumul;
+ case 'phasecoher',
    Coher.Rn = sum(Coher.Rn, 1);
    Coher.R  = Coher.R ./ (ones(size(Coher.R,1),1)*Coher.Rn); % coherence magnitude
 end;
