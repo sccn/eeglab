@@ -87,7 +87,8 @@
 %       mcoh        = Vector of mean baseline coherence at each frequency
 %       timesout    = Vector of output times (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
-%       cohboot     = Matrix (2,nfreqs) of [lower;upper] coh signif. limits
+%       cohboot     = Matrix (nfreqs , 2) of [lower;upper] coh signif. limits
+%                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
 % Note: when cycles==0, nfreqs is total number of FFT frequencies.
@@ -114,6 +115,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/10 01:29:45  arno
+% adding vert optional input
+%
 % Revision 1.4  2002/04/09 19:36:38  arno
 % corrected bootstrap optional input
 %
