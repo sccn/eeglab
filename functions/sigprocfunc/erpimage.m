@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.171  2003/11/14 16:27:27  scott
+% fill coher signif limits
+%
 % Revision 1.170  2003/11/13 02:32:42  scott
 % fill the dB signif limits
 %
@@ -2448,7 +2451,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     if Erpstdflag == YES
         plot1erp(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
-        erpsig = [erpsig;-erpsig];
+        erpsig = [erpsig;-1*erpsig];
         plot1erp(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
     else
         plot1erp(ax2,times,erp,limit); % plot ERP alone
@@ -2637,7 +2640,7 @@ if ~isnan(coherfreq)
         fprintf('     relative to baseamp: %g dB\n',baseamp);
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
-                ampsiglims = [ampsiglims;-ampsiglims];
+                ampsiglims = [ampsiglims;-1*ampsiglims];
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
         else
         	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
@@ -2915,6 +2918,10 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
   if exist('signif') == 1  % (2,times) array giving upper and lower signif limits
     if ~isnan(signif);
       filltimes = [times times(end:-1:1)];
+      if size(signif,1) ~=2 | size(signif,2) ~= length(times)
+         fprintf('plot1erp(): signif array must be size (2,frames)\n')
+         return
+      end
       fillsignif = [signif(1,:) -1*signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
       set(fillh,'edgecolor',FILLCOLOR);
