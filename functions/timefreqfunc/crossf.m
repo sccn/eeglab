@@ -89,6 +89,8 @@
 % Optional Plot and Compute Features:
 %       'compute'   = ['matlab'|'c'] Use C subroutines to speed up the
 %                     computation (currently unimplemented) {def: 'matlab'}
+%       'savecoher' - [0|1] 1 --> Accumulate the individual trial coherence 
+%                     vectors; output them as cohangles {default: 0 = off}
 %       'plotamp'   = ['on'|'off'], Plot coherence magnitude    {def: 'on'}
 %       'maxamp'    = [real] Set the maximum for the amp. scale {def: auto}
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle  {def: 'on'}
@@ -111,6 +113,8 @@
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles (in radians)
+%       cohangles   = (nfreqs,timesout,trials) matrix of single-trial coherence 
+%                      angles (in radians), saved and output only if 'savecoher',1
 %
 % Plot description:
 %   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
@@ -146,8 +150,6 @@
 %
 % See also: timef()
 
-% NOTE: one hidden parameter 'savecoher', 0 or 1
-
 % Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -165,6 +167,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2005/04/01 16:04:21  arno
+% typo
+%
 % Revision 1.65  2005/03/29 16:46:32  scott
 % added to help ms that Rangle output is in radians
 % added option 'rad' to 'angleunit' plotting options
@@ -979,7 +984,9 @@ else
       Tfx = tfcomp( Tfx, t, 1:g.timesout); 
       Tfy = tfcomp( Tfy, t, 1:g.timesout);
 	  if g.savecoher
-		  [Coher trialcoher(:,:,t)] = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
+		  [Coher trialcoher(:,:,t)] = cohercomp( Coher, Tfx.tmpalltimes, ...
+                                                    Tfy.tmpalltimes, ...
+                                                    t, 1:g.timesout);      
       else
 		  Coher = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
 	  end;
@@ -987,7 +994,9 @@ else
       Boot = bootcomp( Boot, Coher.Rn(t,:), Tfx.tmpalltimes, Tfy.tmpalltimes);
    end % t = trial
    [Boot Rbootout] = bootcomppost(Boot, Coher.Rn, Tfx.tmpall, Tfy.tmpall);
-   % not that the bootstrap thresholding is actually performed in the display subfunction plotall()
+      % Note that the bootstrap thresholding is actually performed 
+      %      in the display subfunction plotall()
+
    Coher  = cohercomppost(Coher, trials);
 end;
 
@@ -1036,7 +1045,8 @@ plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
 
 R = abs(Coher.R);
 Rsignif = Boot.Rsignif;
-Tfx = permute(Tfx.tmpall, [3 2 1]); % from [trials timesout nb_points] -> [nb_points timesout trials]
+Tfx = permute(Tfx.tmpall, [3 2 1]); % from [trials timesout nb_points] 
+%                                     to   [nb_points timesout trials]
 Tfy = permute(Tfy.tmpall, [3 2 1]);
 
 return; % end crossf() *************************************************
@@ -1144,7 +1154,8 @@ case 'on'
    %
    % Plot delta-mean min and max coherence at each time point on bottom of image
    %
-   h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
+   h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); 
+                                                            % plot marginal means below
    Emax = max(R(dispf,:)); % mean coherence at each time point
    Emin = min(R(dispf,:)); % mean coherence at each time point
    plot(times,Emin, times, Emax, 'LineWidth',g.linewidth); hold on;
@@ -1170,7 +1181,8 @@ case 'on'
    %
    % Plot mean baseline coherence at each freq on left side of image
    %
-   h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
+   h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); 
+                                                            % plot mean spectrum
    E = abs(mbase(dispf)); % baseline mean coherence at each frequency
    plot(freqs(dispf),E,'LineWidth',g.linewidth); % plot mbase
    if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
@@ -1306,7 +1318,8 @@ switch Tf.type
       Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes; % complex coher.
       Tf.ITCcumul(:,times) = Tf.ITCcumul(:,times)+abs(Tf.tmpalltimes);
    case 'phasecoher',
-      Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes ./ abs(Tf.tmpalltimes); % complex coher.
+      Tf.ITC(:,times)      = Tf.ITC(:,times) + Tf.tmpalltimes ./ abs(Tf.tmpalltimes); 
+                                                            % complex coher.
 end % ~any(isnan())
 return;
 
@@ -1316,22 +1329,27 @@ switch Tf.type
    case 'phasecoher2', Tf.ITC = Tf.ITC ./ Tf.ITCcumul;
    case 'phasecoher',  Tf.ITC = Tf.ITC / trials; % complex coher.
 end % ~any(isnan())
+
 if Tf.saveall
-    Tf.ITC = transpose(Tf.ITC); % do not use ' otherwise conjugate
+  Tf.ITC = transpose(Tf.ITC); % do not use ' otherwise conjugate
+
 	%imagesc(abs(Tf.ITC)); colorbar; figure;
 	%squeeze(Tf.tmpall(1,1,1:Tf.nb_points))
 	%squeeze(Tf.ITC   (1,1,1:Tf.nb_points))
 	%Tf.ITC = shiftdim(Tf.ITC, -1);
+
 	Tf.ITC = repmat(shiftdim(Tf.ITC, -1), [trials 1 1]);
 	Tf.tmpall = (Tf.tmpall - abs(Tf.tmpall) .* Tf.ITC) ./ abs(Tf.tmpall);
-	%for index = 1:trials
-		%imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); drawnow; figure;
-		%Tf.tmpall(index,:,:) = (Tf.tmpall(index,:,:) - Tf.tmpall(index,:,:) .* Tf.ITC)./Tf.tmpall(index,:,:);
-		%imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); drawnow;
-		%subplot(10,10, index); imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); caxis([0 1]); drawnow;
-	%end;
-	%squeeze(Tf.tmpall(1,1,1:Tf.nb_points))
-	%figure; axcopy;
+
+  %	for index = 1:trials
+  %		imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); drawnow; figure;
+  %		Tf.tmpall(index,:,:) = (Tf.tmpall(index,:,:) - Tf.tmpall(index,:,:) .* Tf.ITC)./Tf.tmpall(index,:,:);
+  %		imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); drawnow;
+  %		subplot(10,10, index); imagesc(squeeze(abs(Tf.tmpall(index,:,:)))); caxis([0 1]); drawnow;
+  %	end;
+  %	squeeze(Tf.tmpall(1,1,1:Tf.nb_points))
+  %	figure; axcopy;
+
 end;
 Tf.ITCdone = 1;
 return;
@@ -1381,7 +1399,7 @@ end;
 % -------------------------------------
 function Coher = coherinit(nb_points, trials, timesout, type);
 Coher.R  = zeros(nb_points,timesout);       % mean coherence
-%Coher.RR = repmat(nan,nb_points,timesout); % initialize with nans
+% Coher.RR = repmat(nan,nb_points,timesout); % initialize with nans
 Coher.type = type;
 Coher.Rn=zeros(trials,timesout);
 switch type
@@ -1394,15 +1412,15 @@ end;
 
 % function for coherence calculation
 % -------------------------------------
-%function Coher = cohercomparray(Coher, tmpX, tmpY, trial);
-%switch Coher.type
+% function Coher = cohercomparray(Coher, tmpX, tmpY, trial);
+% switch Coher.type
 %   case 'coher',
 %      Coher.R = Coher.R + tmpX.*conj(tmpY); % complex coher.
 %      Coher.cumulXY = Coher.cumulXY + abs(tmpX).*abs(tmpY);
 %   case 'phasecoher',
 %      Coher.R = Coher.R + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 %      Coher.Rn(trial,:) = 1;
-%end % ~any(isnan())
+% end % ~any(isnan())
 
 function [Coher,tmptrialcoh] = cohercomp(Coher, tmpX, tmpY, trial, time);
 tmptrialcoh = tmpX.*conj(tmpY);
