@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/09 22:21:52  arno
+% implementing 0 zero phase
+%
 % Revision 1.2  2002/08/09 18:59:45  arno
 % updating var anmes
 %
@@ -68,4 +71,14 @@ for i = 1:size(b,2),
 	mu = round(m/2);				                % Number of upper elemnts.
 	ml = m-round(m/2);				                % Number of lower elemnts.
 	b(:,i) = b(:,i) .* [zeros(mu,1) ; hanning(len-m) ; zeros(ml,1)];
+end
+
+% syemtric hanning function
+function w = hanning(n)
+if ~rem(n,2)
+   w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
+   w = [w; w(end:-1:1)];
+else
+   w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
+   w = [w; w(end-1:-1:1)];
 end
