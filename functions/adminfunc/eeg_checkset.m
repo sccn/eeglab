@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/07/25 17:12:55  arno
+% debugging gcompreject
+%
 % Revision 1.38  2002/07/24 18:40:07  arno
 % checking empty values in epochs
 %
@@ -214,7 +217,24 @@ res = 0; % 0 = OK, 1 = error, -1=warning
 if nargin < 1
     help eeg_checkset;
     return;
-end;    
+end;
+
+% checking multiple datasets
+if isempty(EEG), return; end;
+if length(EEG) > 1
+	for index = 1:length(EEG)
+		if ~isempty(EEG(index))
+			if ~isempty( varargin)
+				[TMP, res] = eeg_checkset(EEG(index), varargin{:});
+			else
+				[TMP, res] = eeg_checkset(EEG(index));
+			end;
+			[EEG TMP] = eeg_store(EEG, TMP, index);
+		end;
+	end;
+	return;
+end;
+
 if ~isempty( varargin)
     if isempty(EEG.data)
         helpdlg('Empty dataset -> File / Import data or File / Load existing dataset', 'Error');
@@ -391,7 +411,12 @@ end;
                     res = com;
                     EEG.icaact     = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
                     EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
-                end;
+                else 
+					if ~isempty(EEG.icaact)
+	 	    			fprintf('eeg_checkset: removing ica activation matrix ...\n'); 
+					end;
+					EEG.icaact     = [];
+				end;
  			end;
             if isempty(EEG.icawinv)
 			    EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
