@@ -173,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/04/22 01:00:51  arno
+% fprintf->disp
+%
 % Revision 1.23  2002/04/21 01:00:14  scott
 % edited help msg -sm
 %
@@ -317,7 +320,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Event values'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);' e_store]);
 	uimenu( second_m, 'Label', 'About this dataset'    , 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store]);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
-	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP' e_newset ]);
+	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[LASTCOM] = pop_copyset; h(LASTCOM); eeg_updatemenu;' e_hist], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Append another dataset', 'CallBack', [ check      '[EEG LASTCOM] = pop_mergeset(EEG);' e_newset]);
 	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    'LASTCOM = pop_delset;' e_hist]);
