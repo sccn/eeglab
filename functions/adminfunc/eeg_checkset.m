@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.136  2004/09/22 16:50:23  hilit
+% changed || -> |
+%
 % Revision 1.135  2004/09/21 16:54:51  hilit
 % change && -> &
 %
@@ -1164,7 +1167,8 @@ if ~isempty( varargin)
               clear tmpval; tmpval = getfield(EEG.event,{ 1 },allf{index});
               if isnumeric(tmpval) & ~isa(tmpval, 'double')
                   for indexevent = 1:length(EEG.event)
-                      EEG.event = setfield(EEG.event, { indexevent }, allf{index},  double(tmpval) );
+                      tmpval  =   getfield(EEG.event, { indexevent }, allf{index} );
+                      EEG.event = setfield(EEG.event, { indexevent }, allf{index});
                   end;
               end;
           end;
