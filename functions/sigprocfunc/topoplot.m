@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.136  2004/02/17 16:58:24  scott
+% change color of outer 'shrink' mode ring to almost white, to avoid print bug
+%
 % Revision 1.135  2004/02/17 03:14:44  scott
 % expand skirt border radius
 %
@@ -491,16 +494,19 @@ function [handle,chanval,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC and BACKCOLOR
+if ~exist('BACKCOLOR')
+   BACKCOLOR = [.93 .96 1];  % EEGLAB standard
+end
 noplot  = 'off';
 handle = [];
 Zi = [];
 chanval = NaN;
 rmax = 0.5;             % head radius - don't change this!
-icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC
 INTERPLIMITS = 'head';  % head, electrodes
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
-AXHEADFAC = 1.3;        % axes to head scaling factor
+AXHEADFAC = 1.01; % 1.3 % head to axes scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
@@ -893,7 +899,7 @@ end % exist
 
   if strcmp(STYLE,'contour')                     % plot surface contours only
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
-    for h=chs, set(h,'color',CCOLOR); end
+    % for h=chs, set(h,'color',CCOLOR); end
 
   elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
@@ -915,7 +921,7 @@ end % exist
 
   elseif strcmp(STYLE,'fill')
     [cls chs] = contourf(Xi,Yi,Zi,CONTOURNUM,'k');
-    for h=chs, set(h,'color',CCOLOR); end
+    % for h=chs, set(h,'color',CCOLOR); end <- 'not line objects.' Why does 'both' work above???
 
   else
     error('topoplot(): Invalid style')
@@ -1078,7 +1084,7 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
-  set(hd,'color',[0.99 0.99 0.99],'linewidth',HLINEWIDTH+5);
+  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+5);
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
