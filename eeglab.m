@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.360  2005/02/03 18:46:36  arno
+% fixing link to license
+%
 % Revision 1.359  2005/02/02 20:25:37  arno
 % menu
 %
@@ -1510,8 +1513,8 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                         'disp(''TIP: call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                         'disp(''     to convert between channel location file formats'');' ...
-                        '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize'');' ...
-                        'clear TMPCHAN; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
+                        '[TMPCHAN TMPINFO LASTCOM] = pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; EEG.chaninfo = TMPINFO; eeg_checkset(EEG, ''chanlocsize'');' ...
+                        'clear TMPCHAN TMPINFO; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
