@@ -5,7 +5,7 @@
 %   >> CHANLOCS = readneurolocs( filename, plot, czindex, fzindex, c3index );
 %
 % Inputs:
-%   filename       - file name
+%   filename       - file name or matlab cell array
 %
 % Optional inputs:
 %   plot           - [0|1] if 1, plot the electrode locations. Default 0.
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/06/13 00:53:47  arno
+% debuging
+%
 % Revision 1.2  2003/03/04 20:04:17  arno
 % debuging
 %
@@ -67,36 +70,42 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
     
     % read location file
     % ------------------
-    locs  = loadtxt( filename );
+    if isstr( filename )
+        locs  = loadtxt( filename );
     
-    % remove trailing control channels
-    % --------------------------------
-    while isnumeric( locs{end,1} ) & locs{end,1} ~= 0
-        locs  = locs(1:end-1,:);
-    end;    
+        % remove trailing control channels
+        % --------------------------------
+        while isnumeric( locs{end,1} ) & locs{end,1} ~= 0
+            locs  = locs(1:end-1,:);
+        end;    
     
-    % find first numerical index
-    % --------------------------
-    index = 1;
-    while isstr( locs{index,1} )
-        index = index + 1;
-    end;
-        
-    % extract location array
-    % ----------------------   
-    nchans = size( locs, 1 ) - index +1;
-    chans  = cell2mat(locs(end-nchans+1:end, 1:5));
-    names  = locs(end-nchans*2+1: end-nchans, 2);
-    for index = 1:length(names)
-        if ~isstr(names{index})
-            names{index} = int2str(names{index});
+        % find first numerical index
+        % --------------------------
+        index = 1;
+        while isstr( locs{index,1} )
+            index = index + 1;
         end;
+        
+        % extract location array
+        % ----------------------   
+        nchans = size( locs, 1 ) - index +1;
+        chans  = cell2mat(locs(end-nchans+1:end, 1:5));
+        names  = locs(end-nchans*2+1: end-nchans, 2);
+        for index = 1:length(names)
+            if ~isstr(names{index})
+                names{index} = int2str(names{index});
+            end;
+        end;
+        x = chans(:,3);
+        y = chans(:,4);    
+    else
+        names = filename{1};
+        x     = filename(2};
+        y     = filename(3};
     end;
     
     % find Cz and Fz
     % --------------
-    x = chans(:,3);
-    y = chans(:,4);    
     if exist('indexcz') ~= 1
         indexcz = strmatch( 'cz', lower(names'), 'exact' );
         if ~isempty(indexcz), 
