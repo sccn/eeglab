@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/02/21 16:50:34  arno
+% create uicontrol in current figure
+%
 % Revision 1.35  2002/11/13 00:54:49  arno
 % replace gcf by fig
 %
@@ -268,8 +271,12 @@ for row = 1:length(geomx)
 			% Uniformize button text aspect
             % -----------------------------
             if strcmp(style, 'pushbutton')
-                tmptext = lower(get(rowhandle(column), 'string'));
-                try, tmptext(1) = upper(tmptext(1)); catch, end;
+                if length(tmptext) > 1
+                    if upper(tmptext(1)) ~= tmptext(1) | lower(tmptext(2)) ~= tmptext(2)
+                        tmptext = lower(get(rowhandle(column), 'string'));
+                        try, tmptext(1) = upper(tmptext(1)); catch, end;
+                    end;
+                end;
                 set(rowhandle(column), 'string', tmptext);
             end;
         else 
