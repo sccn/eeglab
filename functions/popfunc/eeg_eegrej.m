@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/06/11 01:00:09  arno
+% recompute latencies before inserting events
+%
 % Revision 1.22  2004/06/08 20:08:34  arno
 % new insertbound
 %
@@ -138,26 +141,6 @@ eeg_options;
 EEG.pnts = size(EEG.data,2);
 EEG.xmax = EEG.xmax+EEG.xmin;
 
-% change event latencies
-% ----------------------
-if ~isempty(tmpalllatencies)
-	for tmpindex = 1:length(tmpalllatencies)
-		EEG.event = setfield(EEG.event, { tmpindex }, 'latency', tmpalllatencies(tmpindex));
-	end;
-
-	tmpnanloc = find(isnan(tmpalllatencies));
-	EEG.event(tmpnanloc) = [];
-    
-    if length(boundevents)
-        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', length(boundevents));
-    end;
-    if length(tmpnanloc) > 0
-        fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', ...
-                length(tmpnanloc));
-    end;
-end;
-EEG.icaact = [];
- 
 % add boundary events
 % -------------------
 if ~isempty(boundevents) % boundevent latencies will be recomputed in the function below
