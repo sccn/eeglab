@@ -1,68 +1,66 @@
-% writelocs() - write electrode positions (expanded from the ICA 
-%              toolbox function)
+% writelocs() - write electrode positions (expanded from the ICA toolbox function)
 %             
 % Usage:
 %   >> writelocs( chanstruct, filename );
 %   >> writelocs( chanstruct, filename, 'key', 'val' );
 %
 % Inputs:
-%   chanstruct - channel structure retuned by readlocs()
-%   filename   - file name for saving electrode locations
+%   chanstruct - EEG channel locations structure returned by readlocs()
+%   filename   - file name for saving electrode location information
 %
 % Optional inputs:
-%   'filetype'  - ['loc'|'sph'|'xyz'|'besa'|'chanedit'] type of 
-%                 the file to be read. By default the file type is
-%                 determined using the file extension.
-%                  'loc' is the eeglab() format (see below)
-%                  'sph' is a matlab spherical coordinate file (spherical
-%                        coordinates in Matlab are different from Besa 
-%                        spherical coordinates).
-%                  'xyz' contain carhtesian coordinates of the electrodes
-%                  'besa' besa '.elp' coordinate file (contact author for
-%                        reading other Besa files). '.elp' Besa files
-%                        have only 3 columns of 'theta' angle, 'phi' angle
-%                        and 'weight' (which is ignored). Also note that 
-%                        'theta' and 'phi' meaning is also the inverse
-%                        as the one they have in Matlab (in Besa 'theta' =
-%                        azimut and 'phi' = horiz).
-%                  'chanedit' files created by pop_chanedit().
-%                  'custom' specify your own format using the 'format' entry
-%                 The Default file type is 'loc'.
+%   'filetype'  - ['loc'|'sph'|'xyz'|'besa'|'chanedit'] type of the file. 
+%                 By default, the file type is determined from the file extension 
+%                 (.loc, .sph, .xyz, .elp, .chanedit):
+%                  'loc' - EEGLAB 2-d topography format (see >> help topoplot() )
+%                  'sph' - Matlab spherical coordinate format. 
+%                        (Note: NOT Besa spherical coordinates!)
+%                  'xyz' - cartesian coordinates: From head center, the x axis 
+%                          points to the nose, y to the right ear, and z to the vertex.
+%                  'besa' -  Besa '.elp' coordinates (contact author for
+%                        other Besa file types). Besa '.elp' files have
+%                        three columns: 'theta', 'phi' and 'weight' (ignored). 
+%                        Also note that the meanings of 'theta' and 'phi' are inverse
+%                        to those in Matlab (in Besa 'theta' = azimuth and 
+%                        'phi' = horizontal angle)
+%                  'chanedit' - files in format of pop_chanedit().
+%                  'custom' - Allows the user to specify another format using 
+%                        the 'format' entry (below).  Default is 'loc'.
 %   'format'    - [cell array] for 'custom' file types only (or if no
-%                 file type is defined). The input cell array contains one
-%                 string entry per column. The string name can be 
-%                     'channum'   for channel number. 
-%                     'labels'    for channel name. 
-%                     'theta'     for channel angle polar coordinate. 
-%                     'radius'    for channel radius polar coordinate. 
-%                     'X'         for channel cathesian coordinate X. 
-%                     'Y'         for channel cathesian coordinate Y. 
-%                     'Z'         for channel cathesian coordinate Z. 
-%                     '-X'        for minus channel cathesian coordinate X. 
-%                     '-X'        for minus channel cathesian coordinate X. 
-%                     '-Z'        for minus channel cathesian coordinate Z.  
-%                     'sph_theta' for Matlab channel spherical theta angle
-%                                 (=horizontal). 
-%                     'sph_phi'   for Matlab channel spherical phi angle
-%                                 (=azimut). 
-%                     'sph_radius' for channel spherical radius. 
-%                     'sph_theta_besa' for BESA channel spherical theta
-%                                 angle (=horizontal).  
-%                     'sph_phi_besa' for BESA channel spherical phi 
-%                                 angle (=azimut). 
-%                     'calib'     for the channel calibration value. 
-%                     'gain'      for the channel gain. 
-%                     'custom1'   custom field 1.
-%                     'custom2', 'custom3', 'custom4' other custom fields.
-%   'header'    - ['on'|'off'] add a header with the name of each column.
-%                 Default is 'off'.
-%   'customheader' - [string] add a custom header at the beginning of the
-%                 file. If used with 'header' set to 'on', the column names
-%                 will be insterted after the custom header.
-%   'elecind'   - [integer array] indices of electrode to export. Default 
-%                 is all ellectrodes.
+%                      file type is defined). The input cell array contains one
+%                      string entry per column. The string names can be:
+%                        'channum'   for channel number. 
+%                        'labels'    for channel name. 
+%                        'theta'     for channel angle in polar coordinates. 
+%                        'radius'    for channel radius in polar coordinates. 
+%                        'X'         for channel cartesian coordinate X. 
+%                        'Y'         for channel cartesian coordinate Y. 
+%                        'Z'         for channel cartesian coordinate Z. 
+%                        '-X'        for negative channel cartesian coordinate X. 
+%                        '-X'        for negative channel cartesian coordinate X. 
+%                        '-Z'        for negative channel cartesian coordinate Z.  
+%                        'sph_radius' for channel radius in spherical coordanites. 
+%                        'sph_theta' for Matlab channel spherical angle theta
+%                                    (= horizontal angle). 
+%                        'sph_phi'   for Matlab channel spherical angle phi
+%                                    (= azimuthal/vertical angle). 
+%                        'sph_theta_besa' for BESA channel spherical theta
+%                                    angle (= horizontal angle).  
+%                        'sph_phi_besa' for BESA channel spherical phi 
+%                                    angle (=azimuthal/vertical angle). 
+%                        'calib'     for the channel calibration value (near 1.0). 
+%                        'gain'      for the channel amplifier gain. 
+%                        'custom1'   custom field 1.
+%                        'custom2', 'custom3', 'custom4' - other custom fields.
+%   'header'   - ['on'|'off'] Add a header line with the name of each column.
+%                             Default is 'off'.
+%   'customheader' - [string] Add a custom header at the beginning of the file. 
+%                             If used with 'header' set to 'on', the column names
+%                             will be insterted after the custom header.
+%   'elecind' - [integer array] Indices of electrodes to export. 
+%                             Default is all ellectrodes.
 %
-% Note: for file formats, see readlocs() help (>> help readlocs)
+% Note: for file formats, see readlocs() help  (>> help readlocs)
 %
 % Author: Arnaud Delorme, Salk Institute, 16 Dec 2002
 %
@@ -87,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/12/24 16:53:58  arno
+% convertelocs -> convertlocs
+%
 % Revision 1.1  2002/12/24 01:25:27  arno
 % Initial revision
 %
