@@ -27,6 +27,8 @@
 %               [0 0 1] gives a sagittal view, [0 -1 0] a view from the rear;
 %               [1 0 0] gives a view from the side of the head.
 %  'mesh'     - ['on'|'off'] Display spherical mesh. {Default is 'on'}
+%  'axistight' - ['on'|'off'] For MRI only, display the closest MRI
+%               slide. {Default is 'off'}
 %  'gui'      - ['on'|'off'] Display controls. {Default is 'on'} If gui 'off', 
 %               a new figure is not created. Useful for incomporating a dipplot 
 %               into a complex figure.
@@ -120,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.35  2003/07/01 19:04:13  arno
+%fixing view problem
+%
 %Revision 1.34  2003/07/01 00:21:18  arno
 %implementing 3-D MNI volume
 %
@@ -233,6 +238,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'    ''         []                 [];
+                                 'axistight' 'string'  { 'on' 'off' }     'off';
                                  'mesh'     'string'   { 'on' 'off' }     'off';
                                  'gui'      'string'   { 'on' 'off' }     'on';
                                  'summary'  'string'   { 'on' 'off' }     'off';
@@ -253,14 +259,13 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % axis image and limits
     % ---------------------
     dat.mode       = g.image;
-    dat.nbsources  = length(sources);
-    dat.axistight  = 0;
+    dat.axistight  = strcmpi(g.axistight, 'on');
+    radius = 84.747;
     if strcmpi(g.image, 'besa')
         scaling = 1.05;
         
         % read besa images
         % ----------------
-        radius = 84.747;
         warning off; imgt = double(imread('besatop.pcx' ))/255; warning on;
         warning off; imgc = double(imread('besarear.pcx'))/255; warning on;
         warning off; imgs = double(imread('besaside.pcx'))/255; warning on;
@@ -286,7 +291,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         BACKCOLOR       = 'w';
     else 
         load('/home/arno/matlab/MNI/VolumeMNI.mat');
-        dat.imgs   = V;
+        dat.imgs   = V; %smooth3(V,'gaussian', [3 3 3]);
         coordinc   = 2; % 2 mm
         allcoords1 = [0.5:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
         allcoords2 = [0.5:coordinc:size(V,2)*coordinc]-size(V,2)/2*coordinc;
@@ -305,8 +310,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         valnasion = [-50.8767  -10.5000  -30.9566 ]*2;
         vallear   = [ 0.1040   -51.0000  -30.9000 ]*2;
         valrear   = [ 0.1040    31.0000  -30.9000 ]*2;
-        valvertex = [ 0.0238   -10.5000   37.8341 ]*2;
-        dat.tcparams = { valinion valnasion vallear valrear valvertex 27.1190*2 };
+        valvertex = [ 0.0238   -10.5000   40.8341 ]*2;
+        zoffset   = 27.1190/(27.1190+radius) * (valvertex(3)-vallear(3));
+        % zoofset = offset of zero center (besa = 27.1 mm for a radius of 84.7)
+        dat.tcparams = { valinion valnasion vallear valrear valvertex zoffset };
        
         %plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [57 85 65]);
         %view(30, 45); axis equal; return;
@@ -632,7 +639,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
              'set(gca, ''userdata'', tmpuserdat);' ...
              'clear tmpuserdat;' ...
              'dipplot(gcbf);' ];
-    viewstyle = fastif(strcmpi(dat.mode, 'besa'), 'text', 'pushbutton');
+    viewstyle  = fastif(strcmpi(dat.mode, 'besa'), 'text', 'pushbutton');
+    viewstring = fastif(dat.axistight, 'Loose view', 'Tight view');
     
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Top view', 'callback', 'view([0 0 1]);');
@@ -643,7 +651,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.15 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
-                  'style',  viewstyle   , 'string', 'Loose view', 'callback', cbview);
+                  'style',  viewstyle   , 'string', viewstring, 'callback', cbview);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.25 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', cbmesh);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.3 .15 .05], 'tag', 'tmp', ...
@@ -704,6 +712,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.95 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '   ' );
     set(gcf, 'userdata', findobj('parent', gca, 'tag', 'dipole1'));
+
+    dat.nbsources  = length(sources);
     set(gca, 'userdata', dat ); % last param=1 for MRI view tight/loose
     set(gcf, 'color', BACKCOLOR);
         
