@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/07/29 23:20:56  arno
+% updating text
+%
 % Revision 1.14  2002/04/29 21:18:24  arno
 % default time limit
 %
@@ -118,34 +121,34 @@ end;
 
 % pop up window
 % -------------
-if nargin < 3
+if popup
 	[txt vars] = gethelpvar('timef.m');
 	
 	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.1 0.78] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
     uilist = { { 'Style', 'text', 'string', fastif(typeproc, 'Channel number', 'Component number'), 'fontweight', 'bold'  } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom,3,[],'1') } {} ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') } {} ...
 			   { 'Style', 'text', 'string', 'Epoch time range [min max] (msec)', 'fontweight', 'bold', ...
 				 'tooltipstring', 'Sub epoch time limits' } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom,4,[],[ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ]) } {} ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,4,[],[ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ]) } {} ...
 			   { 'Style', 'text', 'string', 'Wavelet cycles (0->FFT, see >> help timef)', 'fontweight', 'bold', ...
 				 'tooltipstring', context('cycles',vars,txt) } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom,4,[],'3') } {} ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,5,[],'3') } {} ...
 			   { 'Style', 'text', 'string',  '[set]->Linear coher / [unset]->Phase coher', 'fontweight', 'bold', ...
 				 'tooltipstring', ['Compute linear inter-trial coherence (coher)' 10 ...
 					'OR Amplitude-normalized inter-trial phase coherence (phasecoher)'] } ...
-			   { 'Style', 'checkbox', 'value', ~getdef(lastcom,'phasecoher','present',1) } { } ...
+			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'phasecoher','present',1) } { } ...
 			   { 'Style', 'text', 'string', 'Bootstrap significance level (Ex: 0.01 -> 1%)', 'fontweight', 'bold', ...
 				 'tooltipstring', context('alpha',vars,txt) } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom,'alpha') } {} ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom,'alpha') } {} ...
 			   { 'Style', 'text', 'string', 'Optional timef() arguments (see Help)', 'fontweight', 'bold', ...
 				 'tooltipstring', 'See timef() help via the Help button on the right...' } ...
 			   { 'Style', 'edit', 'string', '''padratio'', 4' } ...
 			   { 'Style', 'pushbutton', 'string', 'Help', 'callback',  'pophelp(''timef'');' } ...
 			   {} ...
-			   { 'Style', 'checkbox', 'value', ~getdef(lastcom,'plotersp','present',0), 'string', ...
+			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotersp','present',0), 'string', ...
 				 'Plot Event Related Spectral Power', 'tooltipstring', ...
 				 'Plot log spectral perturbation image in the upper panel' } ...
-			   { 'Style', 'checkbox', 'value', ~getdef(lastcom,'plotitc','present',0), 'string', ...
+			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotitc','present',0), 'string', ...
 				 'Plot Inter Trial Coherence', 'tooltipstring', ...
 				 'Plot the inter-trial coherence image in the lower panel' } ...
 			 };
@@ -243,7 +246,7 @@ tmpsig = reshape( tmpsig, length(num), size(tmpsig,2)*size(tmpsig,3));
 % outputs
 % -------
 outstr = '';
-if nargin >= 3
+if ~popup
     for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
     if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
 end;
@@ -256,7 +259,7 @@ end;
 varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], %d %s);', inputname(1), typeproc, num, ...
 			int2str(tlimits), cycles, options);
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-eval(com)
+eval(com)	
 
 return;
 
@@ -269,61 +272,4 @@ function txt = context(var, allvars, alltext);
 	else
 		disp([ 'warning: variable ''' var ''' not found']);
 		txt = '';
-	end;
-
-% get default from command string
-% -------------------------------
-function txt = getdef(lastcom, var, mode, default)
-	if nargin < 4
-		default = '';
-	end;
-	if isempty(lastcom)
-		txt = default; return;
-	end;
-	if nargin < 3
-		mode = [];
-	end;
-	if isstr(mode) & strcmp('mode', 'present')
-		if ~isempty(findstr(var, lastcom))
-			txt = 1; return;
-		else
-			txt = 0; return;
-		end;
-	end;
-	if isnumeric(var)
-		comas = findstr(lastcom, ',');
-		if length(comas) >= vars
-			txt = lastcom(comas(var)+1:comas(var+1)-1);
-			txt = deblank(txt(end:-1:1));
-			txt = deblank(txt(end:-1:1));
-		else
-			txt = default;
-		end;
-		return;
-	else
-		comas  = findstr(lastcom, ',');
-		varloc = findstr(lastcom, var);
-		if ~isempty(varloc)
-			comas = comas(find(comas >varlocs));
-			txt = lastcom(comas(1)+1:comas(2)-1);
-			txt = deblank(txt(end:-1:1));
-			txt = deblank(txt(end:-1:1));
-			if strcmp(mode, 'full')
-				parent = findstr(lastcom, '}');
-				if ~isempty(parent)
-					comas = comas(find(comas >parent(1)));
-					txt = lastcom(comas(1)+1:comas(2)-1);
-				end;
-				txt = [ '''' var ''', ' txt ];	
-			elseif isnumeric(mode)
-				txt = str2num(txt);
-				if length(txt) >= max(mode)
-					txt = int2str(txt(mode));	
-				else 
-					txt = default;
-				end;
-			end;
-		else
-			txt = default;
-		end;
 	end;
