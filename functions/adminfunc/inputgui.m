@@ -6,8 +6,9 @@
 %              intend to put text button and descriptions.
 %
 % Usage:
+%   >> [ outparam ] = inputgui( geometry, listui );
 %   >> [ outparam userdat ] = ...
-%             inputgui( geometry, listui, help, title, userdat );
+%             inputgui( geometry, listui, help, title, userdat, mode );
 % 
 % Inputs:
 %   geometry   - see supergui()
@@ -18,6 +19,11 @@
 %   help       - optional help command 
 %   title      - optional figure title
 %   userdat    - optional userdata input for the figure
+%   mode       - ['normal'|'return'|fignumber], either wait for user to press
+%                OK or CANCEL ('normal'), return without processing user
+%                input ('return'), or simply scan parameter of an existing 
+%                window which number is given as input (fignumber). 
+%                Default is 'normal'.
 %
 % Output:
 %   outparam   - list of outputs. The function scan all lines and
@@ -52,48 +58,52 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/09 03:44:35  arno
+% adding input userdata
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat] = inputgui( geometry, listui, helpcom, mytitle, userdat);
+function [result, userdat] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode);
 
 if nargin < 2
    help inputgui;
    return;
 end;	
+if exist('mode') ~= 1
+	mode = 'normal';
+end;
 
-fig = figure;
-if exist('mytitle') == 1, set(gcf, 'name', mytitle); end;
-if exist('userdat') == 1, set(gcf, 'userdata', userdat); end; 
-geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
+if isstr(mode)
+	fig = figure;
+	if exist('mytitle') == 1, set(gcf, 'name', mytitle); end;
+	if exist('userdat') == 1, set(gcf, 'userdata', userdat); end; 
+	geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
+	
+	% add the three buttons
+	% ---------------------
+	listui = { listui{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
+	if exist('helpcom') == 1
+		listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
+	else
+		listui = { listui{:}, {} };
+	end;   
+	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+	[tmp tmp2 allobj] = supergui( geometry, listui{:} );
+	
+	% create figure and wait for return
+	% ---------------------------------
+	if strcmp(mode, 'normal')
+		waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+	end;
+else 
+	fig = mode
+end;
 
-% add the three buttons
-% ---------------------
-listui = { listui{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
-if exist('helpcom') == 1
-	listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
-else
-   listui = { listui{:}, {} };
-end;   
-listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-
-% create figure and wait for return
-% ---------------------------------
-result = {};
-[tmp tmp2 allobj] = supergui( geometry, listui{:} );
-
-waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
-%cont = 1;
-%objok = findobj('parent', fig, 'tag', 'ok');
-%while cont
-%    pause(0.02);
-%    try, cont = isempty(get(objok, 'userdata'));
-%    catch, cont = 0; end;
-%end;    
-
+result = {};	
 userdat = [];
 try, findobj(fig); % figure still exist ?
 catch, return; end;
