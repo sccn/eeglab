@@ -14,7 +14,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeg_retreive(), eeglab()
+% See also: eeg_retrieve(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -37,6 +37,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 14:52:31  scott
+% added "Done." -Scott
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %

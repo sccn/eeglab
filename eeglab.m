@@ -141,7 +141,7 @@
 % eeg_rejsuperpose()   - use by rejmenu to superpose all rejections
 % eeg_rejmacro()       - used by all rejection functions
 % pop_rejmenu()        - rejection menu (with all rejection methods visible)
-% eeg_retreive()       - retrieve dataset from ALLSET
+% eeg_retrieve()       - retrieve dataset from ALLSET
 % eeg_store()          - store dataset into ALLSET
 % eeg_updatemenu()     - update eeglab() gui
 %
@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/04/18 03:10:14  scott
+% changed Edit menu item names -sm
+%
 % Revision 1.15  2002/04/18 02:36:22  scott
 % Load existing dataset(s) -> Load existing dataset -sm
 %

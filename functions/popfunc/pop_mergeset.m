@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 21:32:26  arno
+% debuging event concatenation
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -55,7 +58,7 @@ if isempty(EEG.data)
 end;    
 originput1 = EEG;
 if ~isstruct( EEG )
-    EEG = eeg_retreive( EEG );	
+    EEG = eeg_retrieve( EEG );	
 end;	
 if nargin < 2
    promptstr    = { 'Enter number of dataset to merge with', ...
@@ -78,7 +81,7 @@ end;
 
 originput2 = INEEG2;
 if ~isstruct( INEEG2 )
-	INEEG2 = eeg_retreive( INEEG2 );	
+	INEEG2 = eeg_retrieve( INEEG2 );	
 end;	
 
 % check consistency
