@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/12/19 00:53:17  arno
+% adding dicontinuity dataset
+%
 % Revision 1.15  2003/11/18 16:56:33  scott
 % text
 %
@@ -192,6 +195,38 @@ else
             end;
 		end;
         INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
+	end;
+    
+	% concatenate events
+	% ------------------
+	if ~isempty(INEEG2.urevent)
+        disp('Concatenating urevents...');
+		if isfield( INEEG1.urevent, 'epoch')
+			for index = 1:length(INEEG2.urevent(:))
+				INEEG2.urevent(index).epoch = INEEG2.urevent(index).epoch + INEEG1.trials;
+			end;    
+		end;
+		if isfield( INEEG1.urevent, 'latency')
+			for index = 1:length(INEEG2.urevent(:))
+				INEEG2.urevent(index).latency = INEEG2.urevent(index).latency + INEEG1.trials*INEEG1.pnts;
+			end;    
+		end;
+		
+        % add discontinuity urevent if continuous
+        % -------------------------------------
+        if INEEG1.trials  == 1 & INEEG2.trials == 1
+            disp('Adding a discontinuity urevent between datasets');
+            INEEG1.urevent(end+1).type    = 'boundary';
+            INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;            
+        end;
+        orilen = length(INEEG1.urevent);
+        allfields = union(fieldnames(INEEG1.urevent), fieldnames(INEEG2.urevent) );
+		for i=1:length( allfields )
+            for e=1:length(INEEG2.urevent)
+                tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
+                INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+            end;
+		end;
 	end;
     
 	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
