@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/07/11 20:56:28  arno
+% debugging maxamp
+%
 % Revision 1.34  2002/07/11 18:22:07  arno
 % same
 %
@@ -978,7 +981,7 @@ if (Tf.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
    Tf.nb_points = padratio*winsize/2;   
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
    Tf.freqs = srate*cycles/winsize*[2:2/padratio:winsize]/2;
-   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,.5);
+   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,1);
    Tf.nb_points = size(Tf.win,2);
 end;
 Tf.tmpalltimes = zeros(Tf.nb_points, timesout);

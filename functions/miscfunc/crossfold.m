@@ -252,7 +252,7 @@ if (varwin == 0) % FFT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 else % wavelet DFT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	freqs = Fs*varwin/winsize*[2:2/oversmp:winsize]/2;
-	win = dftfilt(winsize,maxfreq/Fs,varwin,oversmp,0.5);
+	win = dftfilt(winsize,maxfreq/Fs,varwin,oversmp,1);
 
 	R  = zeros(size(win,2),nwin);
 	RR = zeros(size(win,2),nwin);
