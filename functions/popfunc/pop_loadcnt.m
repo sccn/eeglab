@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/08/21 17:38:40  arno
+% nothing
+%
 % Revision 1.18  2003/08/01 21:16:30  arno
 % header info
 %
@@ -210,6 +213,9 @@ end;
 %EEG.chanlocs = readneurolocs( { names x y } );
 
 EEG.srate    = r.header.rate;
+EEG.nbchan   = size(EEG.data,1);
+EEG.trials   = 1;
+EEG.pnts     = size(EEG.data,2);
 EEG          = eeg_checkset(EEG, 'eventconsistency');
 EEG          = eeg_checkset(EEG, 'makeur');
 
