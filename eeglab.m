@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/11 03:35:31  arno
+% editing load and save set menus
+%
 % Revision 1.8  2002/04/11 02:33:33  arno
 % editing menus
 %
@@ -272,7 +275,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;']);
 	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;']);
-	uimenu( fourth_m, 'Label', 'Average reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_averef(EEG,1); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;']);
+	uimenu( fourth_m, 'Label', 'Average reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_averef(EEG,1); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
 	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ check      '[LASTCOM] = pop_eegplot(EEG, 1); h(LASTCOM);']);
 	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); h(LASTCOM); clear tmp; if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;'], 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove baseline'     , 'CallBack', [ checkepoch '[EEG LASTCOM] = pop_rmbase(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
