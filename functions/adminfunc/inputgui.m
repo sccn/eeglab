@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/03/12 02:41:19  arno
+% adding help gui button
+%
 % Revision 1.21  2003/02/21 16:49:22  arno
 % nothing
 %
@@ -157,8 +160,8 @@ if isstr(mode)
         if ~iscell(helpcom)
             listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
         else
-            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom{1} } };
-            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help GUI', 'callback', helpcom{2} } };
+            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help gui', 'callback', helpcom{1} } };
+            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'More help', 'callback', helpcom{2} } };
             geometry{end} = [1 1 1 1];
         end;
 	else
