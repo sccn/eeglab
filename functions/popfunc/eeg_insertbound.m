@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/06/07 18:44:35  arno
+% changing variable name
+%
 % Revision 1.22  2004/06/04 01:30:39  arno
 % initial boundary event. Exact boundary latency
 %
@@ -131,6 +134,12 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, boundevents, region
     if exist('lengths') ~= 1
         lengths = zeros(size(regions));
     end;
+    
+    % sort boundevents by decreasing order (otherwise bug in new event index)
+    % ------------------------------------
+    [boundevents tmpsort] = sort(boundevents); boundevents = boundevents(end:-1:1);
+    lengths               = lengths(tmpsort);  lengths     = lengths    (end:-1:1);
+    regions               = regions(tmpsort);  regions     = regions    (end:-1:1);
     
     eventout = eventin;
     indnew   = 1:length(eventin);
