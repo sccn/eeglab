@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2005/03/04 23:17:22  arno
+% use fieldtrip readeetrack
+%
 % Revision 1.65  2004/10/27 01:01:05  arno
 % msg format
 %
@@ -458,11 +461,10 @@ if isstr(filename)
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(g.filetype, 'elc')
-       eloc = read_asa_elc( filename ); %readeetraklocs( filename );
-       %eloc = struct('labels', eloc.label, 'Y', mat2cell(-eloc.pnt(:,1)'), 'X', ...
+       eloc = readeetraklocs( filename );
+       %eloc = read_asa_elc( filename ); % from fieldtrip
+       %eloc = struct('labels', eloc.label, 'X', mat2cell(eloc.pnt(:,1)'), 'Y', ...
        %                        mat2cell(eloc.pnt(:,2)'), 'Z', mat2cell(eloc.pnt(:,3)'));
-       eloc = struct('labels', eloc.label, 'X', mat2cell(eloc.pnt(:,1)'), 'Y', ...
-                               mat2cell(eloc.pnt(:,2)'), 'Z', mat2cell(eloc.pnt(:,3)'));
        eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
