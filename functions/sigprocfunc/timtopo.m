@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/03/05 03:06:37  scott
+% cleanup
+%
 % Revision 1.58  2003/03/05 03:04:52  scott
 % head_sep
 %
@@ -381,10 +384,26 @@ topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth> 0.25*pos(4) % dont make too high
   topowidth = 0.25*pos(4);
 end
+halfn = floor(ntopos/2);
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep) + 0.5)*topowidth;
+   topoleft = pos(3)/2 - (ntopos/2+halfn*headsep)*topowidth;
 else % even number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep))*topowidth;
+   topoleft = pos(3)/2 - ((halfn)+(halfn-1)*headsep)*topowidth;
+end
+if 0
+if ntopos==1
+   topoleft = pos(3)/2 - topowidth/2;
+elseif ntopos = 2
+   topoleft = pos(3)/2 - (1+0.5*head_sep)*topowidth;
+elseif ntopos==3
+   topoleft = pos(3)/2 - (3/2*topowidth+1*head_sep);
+elseif ntopos==4
+   topoleft = pos(3)/2 - (2+1.5*head_sep)*topowidth;
+elseif ntopos==5
+   topoleft = pos(3)/2 - (5/2*topowidth+2*head_sep);
+end
 end
 if 0
  if ntopos == 3
