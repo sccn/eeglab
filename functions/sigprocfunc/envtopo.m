@@ -1,17 +1,19 @@
-% envtopo() - Plot the envelope of a data epoch plus envelopes and scalp maps of specified 
+% envtopo() - Plot the envelope of a data epoch, plus envelopes and scalp maps of specified 
 %             or largest-contributing components. If a 3-D input matrix, operates on the
 %             mean of the data epochs. Click on individual axes to examine them in detail. 
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
 %             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
-%                    = envtopo(data, weights, 'key1', val1, ...);
+%                                           = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data        = single data epoch (chans,frames) or a 3-D data matrix 
 %                 (chans,frames,epochs). If data are 3-D, process the mean data epoch.
 %  weights     = linear decomposition (unmixing) weight matrix (e.g., icaweights*icasphere)
+%
 % Required keyword:
 %  'chanlocs'  = [string] channel location filename or EEG.chanlocs structure. 
 %                For more information, see >> topoplot example 
+%
 % Optional inputs:
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if int < 0, the number of largest contributing components to plot 
@@ -25,9 +27,9 @@
 %                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> data limits}
 %  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv', 
 %                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative 
-%                  variance, where:                                      {default: 'mv'}
-%                     pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                     rv(component)   = 100*variance(component)/variance(data) 
+%                  variance. Here:                                      
+%                   pvaf(component) = 100-100*variance(data-component))/variance(data)
+%                   rv(component)   = 100*variance(component)/variance(data) {default: 'mv'}
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
 %                  and also for making scalp topo plots {default|[] -> all}
@@ -54,7 +56,8 @@
 %  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity in the
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
 %                  +/-max(abs(map value)) {default: 'off'}
-%  'dispmaps'   = ['on'|'off'] display component number and scalp maps. {default: 'on'}
+%  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
+%
 % Outputs:
 %  compvarorder = component numbers in decreasing order of max variance in data
 %  compvars     = component max variances
@@ -64,8 +67,8 @@
 %  mv|pvaf|rv   = max variance, percent variance accounted for, or relative variance (see 'sortvar')
 %
 % Notes:
-%  To label maps with other than component numbers, put four-char strings into
-%  a local pwd file named 'envtopo.labels' (. = space) in time-order of their projection maxima
+%  To label maps with other than component numbers, put four-char strings into a local (pwd) file 
+%  named 'envtopo.labels' (using . = space) in time-order of their projection maxima
 %
 % Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
@@ -88,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2004/12/17 16:46:22  scott
+% adjusting and correcting help message
+%
 % Revision 1.85  2004/11/30 18:15:06  scott
 % debugging same
 %
@@ -650,51 +656,52 @@ for i=1:ncomps-1
 	       fprintf('Removing repeated component number (%d) in compnums.\n',g.compnums(i));
 	       g.compnums(j)=[];
             end
-	  end
     end
+end
 
-    limitset = 0;
-    if isempty(g.limits)
-      g.limits = 0;
-    end
-    if length(g.limits)>1
-      limitset = 1;
-    end
+limitset = 0;
+if isempty(g.limits)
+  g.limits = 0;
+end
+if length(g.limits)>1
+  limitset = 1;
+end
 
-    %
-    %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
-    %
-    ntopos = length(g.compnums);
-    if ntopos > MAXTOPOS
+%
+%%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
+%
+ntopos = length(g.compnums);
+if ntopos > MAXTOPOS
       ntopos = MAXTOPOS; % limit the number of topoplots to display
-    end
+end
 
-    if max(g.compnums) > wtcomps | min(g.compnums)< 1
+if max(g.compnums) > wtcomps | min(g.compnums)< 1
       fprintf(...
        'envtopo(): one or more compnums out of range (1,%d).\n',wtcomps);
       return
-    end
+end
 
-    plotframes = ones(ncomps);
-    maxproj = zeros(length(g.plotchans),ncomps);
-    %
-    % first, plot the data envelope
-    %
-    envdata = zeros(2,frames*(ncomps+1));
-    envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); 
+plotframes = ones(ncomps);
+maxproj = zeros(length(g.plotchans),ncomps);
+%
+% first, plot the data envelope
+%
+envdata = zeros(2,frames*(ncomps+1));
+envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); 
 
-    fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
-    fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
-    fprintf('Comparing projection sizes for components:  ');
+fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
+fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
+fprintf('Comparing projection sizes for components:  ');
         if ncomps>32
            fprintf('\n');
         end
-    compvars = zeros(1,ncomps);
+compvars = zeros(1,ncomps);
+mapsigns = zeros(1,ncomps);
 
-    %
-    %%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
-    %
-    for c = 1:ncomps 
+%
+%%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
+%
+for c = 1:ncomps 
       if ~rem(c,5) 
           fprintf('%d ... ',g.compnums(c)); % c is index into compnums
       end
@@ -702,16 +709,16 @@ for i=1:ncomps-1
         fprintf('\n');
       end
 
-      if isempty(g.icaact)
+      if isempty(g.icaact) % make the back-projection of component c
           proj = g.icawinv(g.plotchans,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -sm 11/04
       else 
           proj = g.icawinv(g.plotchans,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 11/04
       end;                                                % now proj has only g.plotchans and g.compnums     
 
-      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode);
+      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); % save the comp envelope
 
       [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2))); 
-                                  % find max variance
+                                  % find point of max variance for comp c
       compvars(c)   = maxval;
       %
       %%%%%% find variance in interval after removing component %%%%%%%%%%%
@@ -1183,7 +1190,7 @@ if strcmpi(g.dispmaps, 'on')
     end
     chanlocs = g.chanlocs(g.plotchans); % topoplot based on g.plotchans only! -sm 11/04
 
-    for t=1:ntopos % left to right order 
+    for t=1:ntopos % left to right order  (maporder)
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
                    [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
@@ -1191,17 +1198,21 @@ if strcmpi(g.dispmaps, 'on')
         axes(axt)                             % topoplot axes
         cla
         
-        if ~isempty(chanlocs)
+        if ~isempty(chanlocs)  % plot the component scalp maps
             if ~isempty(varargin) 
-                figure(myfig);topoplot(maxproj(:,t),chanlocs, varargin{:}); 
-            else 
-                figure(myfig);topoplot(maxproj(:,t),chanlocs,'style','both','emarkersize',3);
+                figure(myfig);
+                topoplot(maxproj(:,t),chanlocs, varargin{:}); 
+            else  % if no varargin specified
+                figure(myfig);
+                topoplot(maxproj(:,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ...
+                         ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             else
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ...
+                         ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
@@ -1251,7 +1262,7 @@ if strcmpi(g.dispmaps, 'on')
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
     %
     % axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
-    axt = axes('Position',[pos(1)+pos(3)*1.02 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+    axt = axes('Position',[pos(1)+pos(3)*1.015 pos(2)+0.6055*pos(4) pos(3)*.02 pos(4)*0.09]);
     if strcmpi(g.actscale, 'on')
         h=cbar(axt, [1:64],[-maxvolt maxvolt],3);
     else
@@ -1262,8 +1273,9 @@ if strcmpi(g.dispmaps, 'on')
         set(axall,'Color',axcolor);
         tmp = text(0.50,1.05,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
         set(tmp, 'interpreter', 'none');
-        text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
-        text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
+        text(1,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
+        % text(1,0.637,'0','FontSize',12,'HorizontalAlignment','Center','verticalalignment','middle');
+        text(1,0.61,'-','FontSize',16,'HorizontalAlignment','Center');
     end;
     axes(axall)
     set(axall,'layer','top'); % bring component lines to top
