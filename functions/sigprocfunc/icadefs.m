@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/11/20 02:00:19  arno
+% revision number
+%
 % Revision 1.29  2004/11/12 18:07:04  arno
 % EEG_VERSION -> EEGLAB_VERSION
 %
@@ -132,7 +135,7 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
                             % If none, use []
 SHRINKWARNING = 1;          % warn user about the shrink factor
-YDIR = 1;                   % positive up = 1; negative up = -1
+YDIR = -1;                   % positive up = 1; negative up = -1
 
 % COLORS
 % ------
