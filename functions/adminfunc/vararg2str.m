@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/06/16 15:32:04  arno
+% debug for arrays of indentical numbers
+%
 % Revision 1.9  2003/05/10 19:08:51  arno
 % replacing comma by space
 %
@@ -190,6 +193,7 @@ return;
 % test continuous arrays
 % ----------------------
 function str = contarray( array )
+    array = double(array);
 	tmpind = find( round(array) ~= array );
     if isempty(tmpind) | all(isnan(array(tmpind)))
 		str = num2str(array(1));
