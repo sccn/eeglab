@@ -115,7 +115,7 @@
 %                   be plotted using the cell-array color elements. {default: 'off'}. 
 %    'wincolor'   - [color] Color mark data stretches or epochs  
 %                   {default: [ 0.8345 1 0.956]}
-%    'event'      - [struct] EEGLAB event structure.
+%    'events'     - [struct] EEGLAB event structure.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
 %    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
@@ -157,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2003/07/20 19:27:37  scott
+% "electrodes" -> "channels"
+%
 % Revision 1.85  2003/07/20 19:25:10  scott
 % fixed typo
 %
@@ -520,7 +523,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
    try, g.scale; 		    catch, g.scale      = 'on'; end;
-   try, g.event; 		    catch, g.event      = []; end;
+   try, g.events; 		    catch, g.events      = []; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -531,7 +534,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' 'event' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' 'events' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -682,11 +685,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % %%%%%%%%%%%%%%%%%%%%%%%%%
 
 % positions of buttons
-  posbut(1,:) = [ 0.0364    0.0254    0.0385    0.0339 ]; % <<
-  posbut(2,:) = [ 0.0824    0.0254    0.0288    0.0339 ]; % <
-  posbut(3,:) = [ 0.1824    0.0254    0.0299    0.0339 ]; % >
-  posbut(4,:) = [ 0.2197    0.0254    0.0385    0.0339 ]; % >>
-  posbut(5,:) = [ 0.1187    0.0203    0.0561    0.0390 ]; % Eposition
+  posbut(1,:) = [ 0.0464    0.0254    0.0385    0.0339 ]; % <<
+  posbut(2,:) = [ 0.0924    0.0254    0.0288    0.0339 ]; % <
+  posbut(3,:) = [ 0.1924    0.0254    0.0299    0.0339 ]; % >
+  posbut(4,:) = [ 0.2297    0.0254    0.0385    0.0339 ]; % >>
+  posbut(5,:) = [ 0.1287    0.0203    0.0561    0.0390 ]; % Eposition
   posbut(6,:) = [ 0.4744    0.0236    0.0582    0.0390 ]; % Espacing
   posbut(7,:) = [ 0.2762    0.01    0.0582    0.0390 ]; % elec
   posbut(8,:) = [ 0.3256    0.01    0.0707    0.0390 ]; % g.time
@@ -697,8 +700,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   posbut(10,:) = [ 0.5437    0.0458    0.0275    0.0270 ]; % +
   posbut(11,:) = [ 0.5437    0.0134    0.0275    0.0270 ]; % -
   posbut(12,:) = [ 0.6    0.02    0.14    0.05 ]; % cancel
-  posbut(13,:) = [-0.1    0.02    0.09    0.05 ]; % accept
-  posbut(20,:) = [-0.17    0.15     0.015    0.8 ]; % slider
+  posbut(13,:) = [-0.15   0.02    0.07    0.05 ]; % cancel
+  posbut(17,:) = [-0.06    0.02    0.09    0.05 ]; % events types
+  posbut(20,:) = [-0.17   0.15     0.015    0.8 ]; % slider
   posbut(:,1) = posbut(:,1)+0.2;
 
 % Five move buttons: << < text > >> 
@@ -847,6 +851,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		[	'g = get(gcbf, ''userdata'');' ... 
             'if g.children, delete(g.children); end;' ...
 			'close(gcbf);'] );
+
+  if ~isempty(g.events)
+      u(17) = uicontrol('Parent',figh, ...
+                        'Units', 'normalized', ...
+                        'Position',posbut(17,:), ...
+                        'string', 'Event types', 'callback', 'eegplot(''drawlegend'', gcbf)');
+  end;
 
   set(u,'Units','Normalized')
   
@@ -1050,9 +1061,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
                   'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
   comeventleg  = [ 'eegplot(''drawlegend'', gcbf);'];
     
-  uimenu('Parent',zm,'Label','Event on'    , 'callback', complotevent, 'enable', fastif(isempty(g.event), 'off', 'on'));
-  uimenu('Parent',zm,'Label','Event off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.event), 'off', 'on'));
-  uimenu('Parent',zm,'Label','Event legend', 'callback', comeventleg , 'enable', fastif(isempty(g.event), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Events on'    , 'callback', complotevent, 'enable', fastif(isempty(g.events), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Events off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.events), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Events'' legend', 'callback', comeventleg , 'enable', fastif(isempty(g.events), 'off', 'on'));
   
   % %%%%%%%%%%%%%%%%%
   % Set up autoselect
@@ -1187,14 +1198,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   % prepare event array if any
   % --------------------------
-  if ~isempty(g.event)
-      if ~isfield(g.event, 'type') | ~isfield(g.event, 'latency'), g.event = []; end;
+  if ~isempty(g.events)
+      if ~isfield(g.events, 'type') | ~isfield(g.events, 'latency'), g.events = []; end;
   end;
       
-  if ~isempty(g.event)
-      if isstr(g.event(1).type)
-           [g.eventtypes tmpind indexcolor] = unique({g.event.type});
-      else [g.eventtypes tmpind indexcolor] = unique(cell2mat({g.event.type}));
+  if ~isempty(g.events)
+      if isstr(g.events(1).type)
+           [g.eventtypes tmpind indexcolor] = unique({g.events.type});
+      else [g.eventtypes tmpind indexcolor] = unique(cell2mat({g.events.type}));
       end;
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
       g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};  
@@ -1202,10 +1213,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       g.eventcolors     = g.eventcolors(mod(indexcolor-1               ,length(g.eventcolors))+1);
       g.eventtypestyle  = g.eventstyle (mod([1:length(g.eventtypes)]-1 ,length(g.eventstyle))+1);
       g.eventstyle      = g.eventstyle (mod(indexcolor-1               ,length(g.eventstyle))+1);
-      g.eventlatencies  = cell2mat({g.event.latency});
+      g.eventlatencies  = cell2mat({g.events.latency});
       g.plotevent       = 'on';
   end;
-  if isempty(g.event)
+  if isempty(g.events)
       g.plotevent      = 'off';
   end;
   g.commandselect = { commandpush commandmove commandrelease };           
@@ -1787,7 +1798,7 @@ else
       fig = varargin{1};
       g = get(fig,'UserData');
       
-      if ~isempty(g.event)
+      if ~isempty(g.events)
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
