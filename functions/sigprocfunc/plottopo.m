@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/16 01:47:24  arno
+% allowing setting of each curve color and aspect
+%
 % Revision 1.11  2003/03/16 01:22:16  arno
 % converting to 'key' 'val' parameter sequence
 %
@@ -355,11 +358,9 @@ chans = length(channelnos);
           end
       end
   else % use default color order (no yellow!)
-      if isempty(g.colors)
-          g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
-                       'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
-          g.colors = {g.colors{:} g.colors{:}};  % make > 64 available
-      end;
+      tmpcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
+      g.colors = {g.colors{:} tmpcolors{:} tmpcolors{:}};  % make > 64 available
   end;
 %
 %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
