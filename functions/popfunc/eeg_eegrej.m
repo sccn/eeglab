@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/06/08 17:09:51  arno
+% checking consistency later
+%
 % Revision 1.20  2004/06/07 18:39:18  arno
 % replace indold by indnew
 %
@@ -134,12 +137,11 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 
 % add boundary events
 % -------------------
-if ~isempty(boundevents)
-    [ EEG.event indnew ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
+if ~isempty(boundevents) % boundevent latencies will be recomputed in the function below
+    [ EEG.event indnew ] = eeg_insertbound(EEG.event, EEG.pnts, regions);
 else
     indnew = 1:length(EEG.event);
 end;
-
 
 % change event latencies
 % ----------------------
