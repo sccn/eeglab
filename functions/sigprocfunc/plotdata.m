@@ -43,6 +43,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/01/28 22:47:58  scott
+% fixed scaling bug; increased subplot --> sbplot window
+% sizes to be vertically overlapping. Now correctly handles
+% ymin ymax] limits input, and correctly shows given or from-data
+% y limits.
+%
 % Revision 1.14  2004/11/22 18:20:57  scott
 % adjusting same
 %
@@ -328,11 +334,11 @@ end
   end
 
   if ymax == 0 & ymin == 0,
-      ymax=max(max(data));
-      ymin=min(min(data));
+      ymax=double(max(max(data)));
+      ymin=double(min(min(data)));
       yrange = ymax-ymin;
-      ymin = ymin - 0.00*yrange;
-      ymax = ymax + 0.00*yrange;
+      % ymin = ymin - 0.00*yrange;
+      % ymax = ymax + 0.00*yrange;
   end
   if ymax<=ymin,
       fprintf('plotdata() - ymax must be > ymin.\n')
@@ -418,11 +424,6 @@ end
         %
         if ~ISSPEC % not spectral data
             
-            % double(min(data(I,1+P*frames:1+P*frames+frames-1)));
-            % double(max(data(I,1+P*frames:1+P*frames+frames-1)));
-            % ymin = double(min(data(I,1+P*frames:1+P*frames+frames-1)));
-            % ymax = double(max(data(I,1+P*frames:1+P*frames+frames-1)));
-
             ymin = double(ymin);
             ymax = double(ymax);
 
