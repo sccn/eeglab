@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/06/03 21:22:57  arno
+% recomputing boundevent latency
+%
 % Revision 1.19  2004/06/02 18:21:18  arno
 % debuging finding boundary length
 %
@@ -150,7 +153,7 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
                     tmpind2 = length(eventout)+1;
                     eventout(tmpind2).type     = 'boundary';
                 end;
-                eventout(tmpind2).latency  = regions(tmpindex)-0.5;
+                eventout(tmpind2).latency  = regions(tmpindex)+0.5;
                 eventout(tmpind2).duration = lengths(tmpindex); % just to create field
                 
                 [ tmpnest addlength ] = findnested(eventout, tmpind2);
