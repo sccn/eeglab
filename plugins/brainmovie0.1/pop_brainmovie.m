@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/11/21 02:08:18  arno
+% more debugging of freqs ...
+%
 % Revision 1.9  2002/11/20 19:22:10  arno
 % more besa and allenv debugging
 %
@@ -245,6 +248,7 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
 	eval(['save ' g.tffolder g.tfname '_times times']);
 	eval(['save ' g.tffolder g.tfname '_freqs freqs']);
 	disp('**************** Computation terminated and saved');
+    system(['rm -f ' g.tffolder g.tfname '_newERSP' ]);
 else
     if strcmpi(g.mode, 'auto')
         fprintf('Auto mode: found existing files\n');
