@@ -136,16 +136,6 @@
 %                         C3     -.719        0          .695  
 %                         C4      .719        0          .695  
 %                           ...
-%   '.elc': 
-%               Dipfit cartesian coordinates. Notes: x is toward right ear, y is toward
-%               the back of the head, z is toward the vertex. EEGLAB converts Dipfit 
-%               cartesian coordinates to Matlab/EEGLAB xyz coordinates. 
-%               Fields:   label   x           y          z
-%               Sample:   Fp1    -.308        -.950     -.035    
-%                         Fp2     .308        -.950     -.035  
-%                         C3     -.719        0          .695  
-%                         C4      .719        0          .695  
-%                           ...
 %   '.ced':   
 %               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
 %               Carthesian coordinates are the same as the ones for the 'xyz' format.
@@ -182,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/03/10 16:26:59  arno
+% adding then removing .elc format
+%
 % Revision 1.41  2003/03/08 17:36:13  arno
 % import spherical EGI files correctly
 %
