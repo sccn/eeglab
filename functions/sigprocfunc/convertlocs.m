@@ -17,6 +17,9 @@
 %                 and constrains all the others to this one. It searches first for cartesian 
 %                 coordinates, then for spherical and finally for polar. Default is 'auto'.
 %
+% Optional input
+%   'verbose' - ['on'|'off'] default is 'on'.
+%
 % Outputs:
 %   newchans - new EEGLAB channel locations structure
 %
@@ -46,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/12/27 22:59:47  arno
+% adding warning message
+%
 % Revision 1.5  2002/12/27 22:46:45  scott
 % edit header msg -sm
 %
@@ -62,7 +68,7 @@
 % Initial revision
 %
 
-function chans = convertlocs(chans, command);
+function chans = convertlocs(chans, command, varargin);
 
 if nargin < 1
    help convertlocs;
@@ -72,27 +78,40 @@ end;
 if nargin < 2
    command = 'auto';
 end;
+if nargin == 4 & strmpi(varargin{2}, 'off')
+    verbose = 0;
+else
+    verbose = 1;
+end;
 
 % test if value exists for default
 % --------------------------------
 if strcmp(command, 'auto')
-   if isfield(chans, 'X') & ~isempty(chans(1).X)
-      command = 'cart2all';
-      disp('Uniformize all coordinate frames using Carthesian coords');
-   else
-	   if isfield(chans, 'sph_theta') & ~isempty(chans(1).sph_theta)
-   	   command = 'sph2all';
-	      disp('Uniformize all coordinate frames using spherical coords');
-      else
-		   if isfield(chans, 'sph_theta_besa') & ~isempty(chans(1).sph_theta_besa)
-   		   command = 'sphbesa2all';
-      		disp('Uniformize all coordinate frames using BESA spherical coords');
-         else
-            command = 'topo2all';
-		      disp('Uniformize all coordinate frames using polar coords');
-         end;
-      end;
-   end;
+    if isfield(chans, 'X') & ~isempty(chans(1).X)
+        command = 'cart2all';
+        if verbose
+            disp('Uniformize all coordinate frames using Carthesian coords');
+        end;
+    else
+        if isfield(chans, 'sph_theta') & ~isempty(chans(1).sph_theta)
+            command = 'sph2all';
+            if verbose
+                disp('Uniformize all coordinate frames using spherical coords');
+            end;
+        else
+            if isfield(chans, 'sph_theta_besa') & ~isempty(chans(1).sph_theta_besa)
+                command = 'sphbesa2all';
+                if verbose
+                    disp('Uniformize all coordinate frames using BESA spherical coords');
+                end;
+            else
+                command = 'topo2all';
+                if verbose
+                    disp('Uniformize all coordinate frames using polar coords');
+                end;
+            end;
+        end;
+    end;
 end;
 
 % convert
@@ -110,7 +129,9 @@ case 'topo2sphbesa',
    chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
 case 'topo2cart'
    chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
-   disp('Warning: spherical coordinates automatically updated');
+   if verbose
+       disp('Warning: spherical coordinates automatically updated');
+   end;
    chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
 case 'topo2all',
    chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
@@ -127,8 +148,10 @@ case 'sph2cart',
       chans(index).Z = z(index);
    end;
 case 'sph2topo',
-   disp('Warning: all radii constrained to one for spherical to topo transformation');
-   try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
+ if verbose
+     disp('Warning: all radii constrained to one for spherical to topo transformation');
+ end;
+ try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
    catch, error('Cannot process empty values'); end;
    for index = 1:length(chans)
       chans(index).theta  = angle(index);
@@ -178,8 +201,10 @@ case 'cart2sphbesa',
    chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
 case 'cart2sph',
-    disp('WARNING: XYZ center not optimized, optimize center, then recompute coords');
-	[th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
+    if verbose
+        disp('WARNING: XYZ center not optimized, optimize center, then recompute coords');
+	end;
+    [th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
 	for index = 1:length(chans)
 		 chans(index).sph_theta     = th(index)/pi*180;
 		 chans(index).sph_phi       = phi(index)/pi*180;
