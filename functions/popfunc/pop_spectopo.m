@@ -3,19 +3,23 @@
 %
 % Usage:
 %   >> pop_spectopo( EEG, dataflag); % pops-up
-%   >> pop_spectopo( EEG, dataflag, timerange, 'key', 'val',...);
+%   >> pop_spectopo( EEG, dataflag, timerange, processflag, 'key', 'val',...);
 %
 % Inputs:
-%   EEG        - input dataset
-%   dataflag   - 1 to process EEG data and 0 to process ICA activity.
-%                Default is EEG data.
-%   timerange  - epoch timerange (in msec) to use in computing the spectra
+%   EEG         - input dataset
+%   dataflag    - 1 to process EEG data and 0 to process ICA activity.
+%                 Default is EEG data.
+%   timerange   - epoch timerange (in msec) to use in computing the spectra
+%   processflag - 'EEG'|ERP'|'BOTH' only for epoch raw data, must be 'EEG' if 
+%                 processing continuous data. Default is 'EEG'.
 %
 % Optional inputs:
 %   'key','val' - optional spectopo() and topoplot() arguments 
 %
 % Outputs: Those of spectopo(). When nargin<2, a query window pops-up 
 %          to ask for additional arguments and no output is returned.
+%          Note that output of the ERP spectral analysis are returned
+%          when using processflag 'BOTH'.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 March 2002
 %
@@ -40,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/09 01:33:18  arno
+% debugging boundaries
+%
 % Revision 1.17  2002/08/09 01:13:15  arno
 % debugging boundaries
 %
@@ -96,7 +103,7 @@
 % 03-16-02 add all topoplot options -ad
 % 04-04-02 added outputs -ad & sm
 
-function varargout = pop_spectopo( EEG, dataflag, timerange, varargin);
+function varargout = pop_spectopo( EEG, dataflag, timerange, processflag, varargin);
 
 varargout{1} = '';
 if nargin < 1
@@ -107,51 +114,65 @@ end;
 if nargin < 2
 	dataflag = 1;
 end;
+if nargin < 3
+	processflag = 'EEG';
+end;
 
 if nargin < 3
 	if dataflag
-		geometry = { [2 1] [2 1] [2 1] [2 1] };
-		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include [min max]:' }, ...
+		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] };
+		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include in the analysis [min max]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
-						 { 'style' 'text' 'string' 'Percent windows to sample (0 to 100):'}, ...
+						 { 'style' 'text' 'string' 'Percent of input data to sample (1 to 100):'}, ...
 						 { 'style' 'edit' 'string' '20' }, ...
-						 { 'style' 'text' 'string' 'Scalp map frequencies (Hz):'}, ...
+						 { 'style' 'text' 'string' 'Frequencies to plot as scalp maps (Hz):'}, ...
 						 { 'style' 'edit' 'string' '10 20 30' }, ...
+						 { 'style' 'text' 'string' 'Apply to EEG|ERP|BOTH:'}, ...
+						 { 'style' 'edit' 'string' 'EEG' }, ...
 						 { 'style' 'text' 'string' 'Scalp map plotting options: See >> help topoplot' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
+		if EEG.trials == 1
+			geometry(3) = [];
+			promptstr(7:8) = [];
+		end;
 		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
 		if size(result,1) == 0 return; end;
 		timerange    = eval( [ '[' result{1} ']' ] );
 		options = [];
 		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
 		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
-		if ~isempty(result{4}),    options = [ options ',' result{4} ]; end;
+		if EEG.trials ~= 1
+			processflag = result{4};
+			if ~isempty(result{5}),    options = [ options ',' result{5} ]; end;
+		else 
+			if ~isempty(result{4}),    options = [ options ',' result{4} ]; end;
+		end;
 	else
 		if isempty(EEG.chanlocs)
 			error('Pop_spectopo: cannot plot component contribution without channel locations');
 		end;
 		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 0.18 0.78] [2 1]  };
-		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include [min max]:' }, ...
+		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include in the analysis [min max]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
-						 { 'style' 'text' 'string' 'Percent windows to sample (0 to 100):'}, ...
+						 { 'style' 'text' 'string' 'Percent of input data to sample (1 to 100):'}, ...
 						 { 'style' 'edit' 'string' '20' }, ...
-						 { 'style' 'text' 'string' 'Scalp map frequency (Hz):'}, ...
+						 { 'style' 'text' 'string' 'Frequency to map (Hz):'}, ...
 						 { 'style' 'edit' 'string' '10' }, ...
-						 { 'style' 'text' 'string' 'Channel number for comp. contributions:', 'tooltipstring', ...
+						 { 'style' 'text' 'string' 'Scalp channel number for plotting component contributions:', 'tooltipstring', ...
 						 ['The component contribution will be plotted at that channel' 10 ...
 						 'If no channel is given, the contribution of component at' 10 ...
 						 'the channel of max. power is returned. If 0 is entered, then' ...
 						 'spectopo finds components that globally contribute the most at one frequency'] }, ...
 						 { 'style' 'edit' 'string' '' }, ...
-						 { 'style' 'text' 'string' 'Component indices to compute spectra of:' }, ...
+						 { 'style' 'text' 'string' 'Components to consider:' }, ...
 						 { 'style' 'edit' 'string' ['1:' int2str(size(EEG.icaweights,1))] }, ...
-						 { 'style' 'text' 'string' 'Number of component''s scalp map of  to plot:' }, ...
+						 { 'style' 'text' 'string' 'Number of largest contributing components to plot:' }, ...
 						 { 'style' 'edit' 'string' '' }, ...
-						 { 'style' 'text' 'string' 'Component indices for plotting scalp map:', 'tooltipstring', ...
+						 { 'style' 'text' 'string' 'Components to map (override plotting largest contributors):', 'tooltipstring', ...
 						 ['By default the map of the components of maximum power at the selected' 10 ...
 						 'channel (or power at channel of max. power) are plotted' ] }, ...
 						 { 'style' 'edit' 'string' '' }, ...
-						 { 'style' 'text' 'string' 'Compute component or (data-component) spectra:', 'tooltipstring' ...
+						 { 'style' 'text' 'string' 'Compute component spectra (checked), else data-component spectra:', 'tooltipstring' ...
 						 ['Either compute the spectra of the components'' activity (set)' 10 ...
 						 'or the spectra of the data minus every single slected component (unset)']}, ...
 						 { 'style' 'checkbox' 'value' 1 } { }, ...
@@ -183,6 +204,16 @@ else
 	end;
 end;
 
+switch processflag,
+ case {'EEG' 'ERP' 'BOTH'},;
+ otherwise, if nargin <3, close; end; 
+  error('Pop_spectopo: processflag must be ''EEG'', ''ERP'' or ''BOTH''');
+end;
+if EEG.trials == 1 & ~strcmp(processflag,'EEG')
+	 if nargin <3, close; end;
+	 error('Pop_spectopo: processflag must be ''EEG'' when processing continuous data');
+end;
+
 if ~isempty(EEG.chanlocs)
 	spectopooptions = [ options ', ''chanlocs'', EEG.chanlocs' ];
 	if dataflag == 0 % i.e. components
@@ -206,7 +237,6 @@ end;
 if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
 else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
 end;
-SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
 
 % add boundaries if continuous data
 % ----------------------------------
@@ -236,9 +266,17 @@ end;
 
 % plot the data and generate output and history commands
 % ------------------------------------------------------
-popcom = sprintf('figure; pop_spectopo(%s, %d, [%s] %s);', inputname(1), dataflag, num2str(timerange), options);
-com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate %s);', outstr, spectopooptions);
-eval(com)
+popcom = sprintf('figure; pop_spectopo(%s, %d, [%s], ''%s'' %s);', inputname(1), dataflag, num2str(timerange), processflag, options);
+switch processflag
+	case 'EEG', SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
+	            com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''title'', ''EEG'' %s);', outstr, spectopooptions); eval(com)
+				
+    case 'ERP', com = sprintf('%s spectopo( mean(SIGTMP,3), totsiz, EEG.srate, ''title'', ''ERP'' %s);', outstr, spectopooptions); eval(com)
+	case 'BOTH', sbplot(2,1,1); com = sprintf('%s spectopo( mean(SIGTMP,3), totsiz, EEG.srate, ''title'', ''ERP'' %s);', outstr, spectopooptions); eval(com)
+	             SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
+				 sbplot(2,1,2); com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''title'', ''EEG'' %s);', outstr, spectopooptions); eval(com)
+end;
+
 if nargout < 2 & nargin < 3
 	varargout{1} = popcom;
 end;
