@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/07/15 01:48:20  arno
+% force yscale on amp ploterp
+%
 % Revision 1.22  2002/07/14 03:17:57  arno
 % making allamps moving average of log power
 %
@@ -1629,6 +1632,7 @@ if ~isnan(coherfreq)
      [gcapos(1) gcapos(2)+1/3*image_loy*gcapos(4) ...
       gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
 
+   fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
    if isnan(maxamp) % if not specified
     fac = 1;
     maxamp = 0;
@@ -1660,9 +1664,9 @@ if ~isnan(coherfreq)
      end
      if ampsig(1)< minamp
        if ampsig(1)<0
-        maxamp = 1.01*(ampsig(1));
+        minamp = 1.01*(ampsig(1));
        else
-        maxamp = 0.99*(ampsig(1));
+        minamp = 0.99*(ampsig(1));
        end
      end
    end
