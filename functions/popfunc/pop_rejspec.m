@@ -1,59 +1,57 @@
 % pop_rejspec() - rejection of artifact in a dataset using 
 %                 thresholding of frequencies in the data.
-%
 % Usage:
 %   >>  pop_rejspec(INEEG, typerej); % pop-up interactive windo mode
 %   >> [OUTEEG, Indexes] = pop_rejspec( INEEG, typerej, elec_comp, ...
 %         lowthresh, upthresh, startfreq, endfreq, superpose, reject);
 %
-% Graphical interface:
-%   "Electrode" - [edit box] electrodes or components (number) to take into
-%                 consideration for rejection. Same as the 'elec_comp'
-%                 parameter from the command line.
-%   "Low frequency" - [edit box] lower threshold limit in dB. Same as
-%                 the command line parameter 'lowthresh'.
-%   "High frequency" - [edit box] upper threshold limit in dB. Same as
-%                 the command line parameter 'upthresh'.
-%   "Start time(s)" - [edit box] starting frequency in Hz. Same as
-%                 the command line parameter 'startfreq'.
-%   "End time(s)" - [edit box] ending frequency in Hz. Same as
-%                 the command line parameter 'endfreq'.
-%   "Display with previous rejection" - [edit box] can be either YES or
-%                 NO. This edit box corresponds to the command line input
-%                 option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
-%                 box corresponds to the command line input option 'reject'.
+% Pop-up window options:
+%   "Electrode|Component" - [edit box] electrode or component number(s) to 
+%                 take into consideration for rejection. Sets the 'elec_comp'
+%                 parameter in the command line call (see below).
+%   "Lower limits(s)" - [edit box] lower threshold limits(s) (in dB). 
+%                 Sets the command line parameter 'lowthresh'. If more than
+%                 one, apply to each electrode|component individually. If
+%                 fewer than number of electrodes|components, apply the
+%                 last values to all remaining electrodes|components.
+%   "Upper limits(s)" - [edit box] upper threshold limit(s) in dB. 
+%                 Sets the command line parameter 'upthresh'.
+%   "Low frequency(s)" - [edit box] low-frequency limit(s) in Hz. 
+%                 Sets the command line parameter 'startfreq'.
+%   "High frequency(s)" - [edit box] high-frequency limit(s) in Hz. 
+%                 Sets the command line parameter 'endfreq'.
+%   "Display previous rejection marks?" - [edit box] either YES or NO. 
+%                  Sets the command line input option 'superpose'.
+%   "Reject marked trials?" - [edit box] either YES or NO. Sets the
+%                 command line input option 'reject'.
 %
-% 
-% Inputs:
+% Command line inputs:
 %   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
-%              data). Default is 1. For independent components, before
-%              thresholding, the activity is renormalized for each 
-%              component.
-%   elec_comp  - [e1 e2 ...] electrodes or components (number) to take into 
-%              consideration for rejection
-%   lowthresh  - lower threshold limit in mV (can be an array if 
-%              several electrodes; if less numbe  of values than number 
-%              of electrodes the last value is used for the remaining 
-%              electrodes)
-%   upthresh  - upper threshold limit in mV (same syntax as lowthresh)
-%   startfreq  - starting frequency in Hz (same syntax  as lowthresh)
-%   endfreq    - ending frequency in Hz (same syntax  as lowthresh).
-%              Starfreq and endfreq define the frequncy range for
-%              rejection.
-%   superpose  - 0=do not superpose pre-labelling with previous
-%              pre-labelling (stored in the dataset). 1=consider both
-%              pre-labelling (using different colors). Default is 0.
-%   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 1.
+%   typerej    - [1|0] data to reject on (0 = component activations; 1 = 
+%              electrode data). {Default is 1}. 
+%   elec_comp  - [e1 e2 ...] electrode|component number(s) to take into 
+%              consideration during rejection
+%   lowthresh  - lower threshold limit(s) in dB. Can be an array if 
+%              several electrodes|components. If fewer values than number 
+%              of electrodes|components, the last value is used for the 
+%              remaining electrodes|components.
+%   upthresh  - upper threshold limit(s) in dB (same syntax as lowthresh)
+%   startfreq  - low frequency limit(s) in Hz (same syntax  as lowthresh)
+%   endfreq    - high frequency limit(s) in Hz (same syntax  as lowthresh).
+%              Options 'startfreq' and 'endfreq' define the frequncy range 
+%              used during rejection.
+%   superpose  - [0|1] 0 = Do not superpose rejection marks on previous
+%              marks stored in the dataset. 1 = Show both previous and
+%              current marks using different colors. {Default: 0}.
+%   reject     - [0|1] 0 = Do not reject marked trials (but store the 
+%              marks. 1 = Reject marked trials. {Default: 1}.
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
 %   Indexes    - index of rejected sweeps
-%     when eegplot is called, modifications are applied to the current 
-%     dataset at the end of the call of eegplot (when the user press the 
-%     button 'reject').
+%   Note: When eegplot() is called, modifications are applied to the current 
+%   dataset at the end of the call to eegplot() (e.g., when the user presses 
+%   the 'Reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -78,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/12/17 18:16:35  arno
+% reject
+%
 % Revision 1.21  2003/12/04 23:27:46  arno
 % reject trials
 %
@@ -176,13 +177,14 @@ if nargin < 3
 
 	% which set to save
 	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
+	promptstr   = { fastif(icacomp==0, 'Component number(s) (Ex: 2 4 5):', ...
+                                           'Electrode number(s) (Ex: 2 4 5):'), ...
 					'Lower limit(s) (dB):', ...
 					'Upper limit(s) (dB):', ...
 					'Low frequency(s) (Hz):', ...
 					'High frequency(s) (Hz):', ...
-               		'Display with previous rejection', ...
-         			'Reject marked trial (YES or NO)' };
+               		'Display previous rejection marks? (YES or NO)', ...
+         			'Reject marked trial(s)? (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
 					'-10', ...
 					'10', ...
