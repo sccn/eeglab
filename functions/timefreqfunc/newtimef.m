@@ -113,7 +113,7 @@
 %                     File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plotting Parameters:
-%       'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
+%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
 %       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2004/08/10 01:13:33  arno
+% cheking baseline
+%
 % Revision 1.62  2004/08/03 21:55:57  arno
 % same scaling for both iamges
 %
