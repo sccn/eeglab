@@ -12,13 +12,12 @@
 %   rmmean    = When present and non-zero, remove row means prior to correlation 
 %               {default: 0}
 %   method    = Method used to find assignments.
-%               0= Hungarian Method - maximize sum of abs corrs {default: 0}
+%               0= Hungarian Method - maximize sum of abs corrs {default: 2}
 %               1= Vogel's Assignment Method -find pairs in order of max contrast 
 %               2= Max Abs Corr Method - find pairs in order of max abs corr 
 %               Note that the methods 0 and 1 require matrices to be square.
 %   weighting = An optional weighting matrix size(weighting) = size(corrs) that 
 %               weights the corrs matrix before pair assignment {def: 0/[]->ones()}
-%
 % Outputs:
 %   corr  = a column vector of correlation coefficients between 
 %           best-correlating rows of matrice x and y
@@ -52,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 04-22-99 Re-written using VAM by Sigurd Enghoff, CNL/Salk
 % 04-30-99 Added revision of algorthm loop by SE -sm
@@ -72,7 +74,7 @@ if nargin < 2 | nargin > 5
 end
 
 if nargin < 4
-	method = 0; % default: Hungarian assignment method
+	method = 2; % default: Max Abs Corr - select successive best abs(corr) pairs
 end
 
 [m,n] = size(x);
