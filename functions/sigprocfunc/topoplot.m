@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/10/31 22:51:25  luca
+% now also plotting n < nchans single channels
+%
 % Revision 1.17  2002/10/30 18:50:37  arno
 % debugging dipole
 %
@@ -314,7 +317,11 @@ end
 
 % read the channel location file
 % ------------------------------
-[tmpeloc labels Th Rd] = readlocs(loc_file);
+if isstring(loc_file)
+	[tmpeloc labels Th Rd] = readlocs(loc_file,'filtetype','loc');
+else % a locs struct
+	[tmpeloc labels Th Rd] = readlocs(loc_file);
+end
 if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
