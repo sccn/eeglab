@@ -35,7 +35,7 @@
 % Authors: Scott Makeig, Luca Finelli & Arnaud Delorme SCCN/INC/UCSD,
 %          La Jolla, 11/1999-03/2002 
 %
-% See also: topo2sph(), sph2topo(), cahncenter()
+% See also: topo2sph(), sph2topo(), chancenter()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/05/02 01:42:22  arno
+% debugging center
+%
 % Revision 1.14  2002/05/02 01:38:10  arno
 % same
 %
