@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/07/09 17:00:24  arno
+% only show electrode if less than 64 channels
+%
 % Revision 1.24  2004/03/18 00:31:45  arno
 % remove skirt
 %
@@ -222,10 +225,10 @@ for ri = compnum
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
         if plotelec
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                      'off', 'style' , 'fill');
+                      'off', 'style' , 'fill', 'chaninfo', EEG.chaninfo);
         else
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                      'off', 'style' , 'fill','electrodes','off');
+                      'off', 'style' , 'fill','electrodes','off', 'chaninfo', EEG.chaninfo);
         end;
 		axis square;
 
