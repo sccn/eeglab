@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.283  2003/12/02 17:25:09  arno
+% debuging path add
+%
 % Revision 1.282  2003/12/01 00:44:06  arno
 % undoing revision number
 %
@@ -1704,11 +1707,12 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         tmpp = tmpp(1:end-length(functionname));
         if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
         if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
-        disp([ tmpp '     |        ' tmpnewpath ]);
+        disp([ tmpp '     |        ' tmpnewpath '(' num2str(~strcmpi(tmpnewpath, tmpp)) ')' ]);
         if ~strcmpi(tmpnewpath, tmpp)
             addpath(tmpnewpath);
         end;
     else
+        disp([ 'Adding new path ' tmpnewpath ]);
         addpath(tmpnewpath);
     end;
     
