@@ -1,7 +1,7 @@
 % timefreq() - compute time/frequency decomposition of data trials.
 %
 % Usage:
-%     >> [accarray, rsignif] = timefreq(arg1, arg2, formula, varargin ...);
+%     >> [tf, freqs, times, itcvals] = timefreq(arg1, arg2, formula, varargin ...);
 %
 % Inputs:
 %    arg1    - [array] 2-D or 3-D array of value
@@ -29,10 +29,6 @@
 %   'formulaout'  - [string] name of the computed variable. Default is 'res'.
 %
 % Outputs: 
-%    diffres  - differential array computed on the non-shuffled data
-%    accdres  - result for shuffled data
-%    res1     - result for first condition
-%    res2     - result for second condition
 %
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
@@ -56,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/15 18:29:46  arno
+% changing default wavelet factor
+%
 % Revision 1.4  2002/10/15 00:08:50  arno
 % g.frame -> frame
 %
