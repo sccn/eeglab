@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/09 18:31:50  arno
+% axcopy problem -> only try to execute it
+%
 % Revision 1.3  2002/10/07 22:44:46  arno
 % creating outputs
 %
@@ -652,7 +655,7 @@ if iscell(X)
 	end;
 	if iscell(g.title) 
 		if length(g.title) <= 2,
-			g.title{3} = 'Condition 2 - condition 1';
+			g.title{3} = 'Condition 1 - condition 2';
 		end;
 	else
 		g.title = { 'Condition 1', 'Condition 2', 'Condition 2 - condition 1' };
