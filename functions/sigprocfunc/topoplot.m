@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/11/12 23:06:48  arno
+% still debugging last insert
+%
 % Revision 1.23  2002/11/12 22:19:01  arno
 % typo
 %
@@ -377,7 +380,7 @@ if ~isempty(Vl)
             for kk=1:length(Vl)
                 tmpind = find(enum == Vl(kk));
                 if isempty(tmpind)
-                    disp('Topoplot warning: channel out of head limits');
+                    disp('Topoplot warning: some channel are not visible (use the "Edit > Channel locations" to modify the shrink factor).');
                 else
                     tmpVl(cc) = tmpind;
                     cc=cc+1;
