@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/03/07 23:23:02  arno
+% debuging out of data limits
+%
 % Revision 1.32  2003/03/05 18:50:20  arno
 % adding doc for new button
 %
@@ -487,8 +490,8 @@ if ~isempty(EEG.specdata)
 	if length(g.point) == EEG.pnts
    		EEG.specdata = EEG.specdata(g.channel, :, g.trial);
    	else
-   		printf('Warning: spectral data removed because of the change in the numner of points\n');
    		EEG.specdata = [];
+   		fprintf('Warning: spectral data were removed because of the change in the numner of points\n');
    	end;		
 end;
 
@@ -507,8 +510,8 @@ if ~isempty(EEG.icaact)
 			if length(g.point) == EEG.pnts
    				EEG.specicaact = EEG.specicaact(:, :, g.trial);
    			else
-		   		printf('Warning: spectral ica data removed because of the change in the numner of points\n');
    				EEG.specicaact = [];
+		   		fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
    			end;	
 	   	end;
    	else
