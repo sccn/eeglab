@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/10/11 02:11:42  arno
+% debuging for empty option
+%
 % Revision 1.28  2003/08/07 20:49:15  arno
 % option 'masksurf' to speed up display
 %
@@ -195,7 +198,9 @@ if nargin < 3
 	end;
 	topotitle    = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
-	options      = [ ',' result{4} ];
+    if ~isempty(deblank( result{4} )) options      = [ ',' result{4} ];
+	else                              options      = '';
+    end;
 	if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
 else
 	options = [];
@@ -207,11 +212,7 @@ else
 		end;
 	end;	
 end;
-if length(options) < 2
-    options = 'masksurf'', ''on''';
-else
-    options = [ options ', ''masksurf'', ''on''' ];
-end;
+options = [ options ', ''masksurf'', ''on''' ];
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')  
@@ -301,12 +302,17 @@ for index = 1:size(arg2(:),1)
 		drawnow;
 		axis square; 
 		if index == size(arg2(:),1)
-	        %pos = get(gca,'position');
-	        %q = [pos(1) pos(2) 0 0];
-	        %s = [pos(3) pos(4) pos(3) pos(4)];
-	        %col = colormap;
-	        %ax = subplot('position', [1 0 .05 1].*s+q);
-	        cbar('vert');
+	        if nbgraph == 1
+                clim = get(gca, 'clim');
+                pos = get(gca,'position');
+                q = [pos(1) pos(2) 0 0];
+                s = [pos(3) pos(4) pos(3) pos(4)];
+                col = colormap;
+                ax = axes('position', [0.95 0 .05 1].*s+q);
+                cbar(ax,[1:64],clim);
+	        else 
+                cbar('vert');
+            end;
 	    end;	   
     else
     axis off
