@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2002/07/18 02:25:51  arno
+% debug ALLSET->ALLEEG
+%
 % Revision 1.72  2002/07/13 00:12:26  arno
 % debugging close
 %
@@ -509,6 +512,12 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
 	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject using ICA');
+	fourth_sub3 = uimenu( fourth_m, 'Label', 'Localize dipoles using BESA');
+	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaexport(EEG);']);
+	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaimport(EEG);' e_store]);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles'   , 'CallBack', [ 'besaplot(EEG.sources);']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles2'  , 'CallBack', [ 'besaplot(EEG.sources, ''sideview'', ''on'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 15, ''mesh'', ''off''););']);
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
 	uimenu( fourth_sub1, 'Label', 'Reject by inspection'     , 'CallBack', [ check      '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
