@@ -50,6 +50,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/12/05 20:06:32  arno
+% eeg_hist call
+%
 % Revision 1.6  2003/12/05 00:48:51  arno
 % comment
 %
@@ -136,9 +139,5 @@ else % nargin == 2
         % warning also some code present in eeg_store and pop_newset
         h(command); % add to history
         EEG = eeg_hist(EEG, command);
-        if ~isfield(EEG, 'history')
-            EEG.history = '';
-        end;
-        EEG.history = strvcat(EEG.history, command);
     end;
 end;
