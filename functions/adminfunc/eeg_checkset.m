@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2003/06/13 16:41:51  arno
+% adding chanlocs homogenous check
+%
 % Revision 1.96  2003/06/11 21:18:04  arno
 % new limits for latencies
 %
@@ -848,6 +851,18 @@ if ~isempty( varargin)
                                     'common reference channel. If this is not the case, remove the', ...
                                     'extra channel'), 'Warning', 'Ok', 'Ok');
               end;    
+          end;
+         case 'makeur', 
+          if ~isempty(EEG.event)
+              EEG.urevent = EEG.event;
+              if isfield(EEG.event, 'latency')
+                  for index = 1:length(EEG.event)
+                      EEG.event(index).urlatency = EEG.event(index).latency;
+                  end;
+              end;
+              if isfield(EEG.event, 'epoch')
+                  EEG.event(index).urepoch = EEG.event(index).epoch;
+              end;
           end;
          case 'eventconsistency',          
           if isempty(EEG.event), return; end;
