@@ -77,7 +77,10 @@
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
-%                      baseline is used                              {0}
+%                      baseline is used. A range [min max] may also be entered
+%                     You may also enter one row per region for baseline
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
+%                     300 to 400 ms. { default 0 }
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
 %       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
 %                     memory. Default 'off'.
@@ -88,7 +91,11 @@
 %                      level. Show non-signif. output values as green.   {0}
 %       'naccu'     = Number of bootstrap replications to accumulate     {200}
 %       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
-%                                                  0 -> use whole trial) {1}
+%                                                  0 -> use whole trial
+%                                                  [min max] -> use time range) {1}
+%                     You may also enter one row per region for baseline
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
+%                     300 to 400 ms.
 %       'boottype'  = ['times'|'timestrials'] shuffle time only or time and
 %                     trials for computing bootstrap. Both options should
 %                     return identical results {'times'}.
@@ -168,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2004/03/09 17:35:04  arno
+% msg
+%
 % Revision 1.57  2004/03/01 16:18:20  arno
 % default basebott 1
 %
@@ -741,7 +751,9 @@ if g.alpha>0.5 | g.alpha<=0
     error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
-   if g.baseboot > 0
+    if length(g.baseboot) == 2
+     myprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2))
+    elseif g.baseboot > 0
      myprintf(g.verbose, 'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
    else
      myprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
@@ -832,10 +844,6 @@ end;
 if ~isnumeric(g.baseline)
     error('baseline must be numeric');
 end;
-switch g.baseboot
-    case {0,1}, ;
-    otherwise, error('baseboot must be 0 or 1');
-end;
 switch g.type
     case { 'coher', 'phasecoher', 'phasecoher2' },;
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
@@ -915,7 +923,7 @@ if iscell(X)
     
     % recompute baselines for power
     % -----------------------------
-    if ~isnan( g.baseline ) & ~isnan( mbase1 )
+    if ~isnan( g.baseline(1) ) & ~isnan( mbase1 )
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
@@ -1095,19 +1103,37 @@ end
 % --------
 % baseline
 % --------
-if ~isempty(find(timesout < g.baseline))
-   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+if size(g.baseline,2) == 2
+    baseln = [];
+    for index = 1:size(g.baseline,1)
+        tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
+        baseln = union(baseln, tmptime);
+    end;
+    if length(baseln)==0
+        error('No point found in baseline');
+    end;
 else
-   baseln = 1:length(timesout); % use all times as baseline
-   myprintf(g.verbose, '   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
-   g.baseboot = 0;
-end
+    if ~isempty(find(timesout < g.baseline))
+        baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+    else
+        baseln = 1:length(timesout); % use all times as baseline
+        if length(g.baseboot) == 1 & g.baseboot == 0
+            myprintf(g.verbose, '   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
+            g.baseboot = 0;
+        end;
+    end
+end;
 if ~isnan(g.alpha) & length(baseln)==0
-  myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
-  return
-elseif ~isnan(g.alpha) & g.baseboot
-    myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
-             length(baseln), g.baseline)
+    myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
+    return
+elseif ~isnan(g.alpha) 
+    if length(g.baseboot) == 2
+        myprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', ...
+                 g.baseboot(1),  g.baseboot(2));
+    elseif g.baseboot
+        myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
+                 length(baseln), g.baseline)
+    end;        
 end
 if isnan(g.powbase)
   myprintf(g.verbose, 'Computing the mean baseline spectrum\n');
@@ -1117,7 +1143,7 @@ else
   mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
-if ~isnan( g.baseline ) & ~isnan( mbase )
+if ~isnan( g.baseline(1) ) & ~isnan( mbase )
     P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
@@ -1154,8 +1180,16 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
 						  'itc     = itc ./ cumul;' ];
 		end;
-		if g.baseboot == 0, baselntmp = [];
-		else                baselntmp = baseln; 
+        if size(g.baseboot,2) == 1
+            if g.baseboot == 0, baselntmp = [];
+            else                baselntmp = baseln; 
+            end;
+        else
+            baselntmp = [];
+            for index = 1:size(g.baseboot,1)
+                tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                baselntmp = union(baselntmp, tmptime);
+            end;
 		end;
 		resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
 						   'formulapost', formulapost, 'formulainit', formulainit, ...
