@@ -124,6 +124,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.55  2003/09/11 00:53:04  arno
+%same
+%
 %Revision 1.54  2003/09/11 00:52:38  arno
 %documenting new arg cornermri\
 %
