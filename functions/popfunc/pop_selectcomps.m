@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/05/12 22:29:10  arno
+% verbose off
+% for topoplot
+%
 % Revision 1.17  2003/05/10 17:31:52  arno
 % adding name of dataset to title
 %
@@ -103,27 +107,31 @@ if nargin < 1
 	help pop_selectcomps;
 	return;
 end;	
-if exist('compnum') ~= 1
-    compnum = [1:size(EEG.icaweights,1)];
-end;    
+
+if nargin < 2
+    promptstr = { 'Components to plot:' };
+    initstr   = { [ '1:' int2str(size(EEG.icaweights,1)) ] };
+    
+    result = inputdlg2(promptstr, 'Reject comp. by map -- pop_selectcomps',1, initstr);
+    if isempty(result), return; end;
+    compnum = eval( [ '[' result{1} ']' ]);
+
+    if length(compnum) > PLOTPERFIG
+        ButtonName=questdlg2(strvcat(['More than ' int2str(PLOTPERFIG) ' components so'],'this function will pop-up several windows'), ...
+                             'Confirmation', 'Cancel', 'OK','OK');
+        if ~isempty( strmatch(lower(ButtonName), 'cancel')), return; end;
+    end;
+
+end;
 fprintf('Drawing figure...\n');
 currentfigtag = ['selcomp' num2str(rand)]; % generate a random figure tag
 
 if length(compnum) > PLOTPERFIG
- 	ButtonName=questdlg2(strvcat(['More than ' int2str(PLOTPERFIG) ' channels so'],'this function will pop-up several windows'), ...
-	     'Confirmation', 'Cancel', 'OK','OK');
-	if ~isempty( strmatch(lower(ButtonName), 'cancel')), return; end;
-
     for index = 1:PLOTPERFIG:length(compnum)
         pop_selectcomps(EEG, compnum([index:min(length(compnum),index+PLOTPERFIG-1)]));
     end;
 
-	if length(compnum) == size(EEG.icaweights,1)
-	    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(size(EEG.icaweights,1)) ']);' ];
-	else
-	    com = [ 'pop_selectcomps(' inputname(1) ',[' int2str(compnum) ']);' ];
-	end;
-	return;
+    com = [ 'pop_selectcomps(' inputname(1) ', ' vararg2str(compnum) ');' ];
 end;
 
 if isempty(EEG.reject.gcompreject)
@@ -223,9 +231,5 @@ if ~exist('fig')
 		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
 end;
 
-if length(compnum) == size(EEG.icaweights,1)
-    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(size(EEG.icaweights,1)) ']);' ];
-else
-    com = [ 'pop_selectcomps(' inputname(1) ',[' int2str(compnum) ']);' ];
-end;
+com = [ 'pop_selectcomps(' inputname(1) ', ' vararg2str(compnum) ');' ];
 return;		
