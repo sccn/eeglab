@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/03/18 00:32:19  arno
+% remove skirt
+%
 % Revision 1.40  2004/02/22 23:54:00  scott
 % making electrodes,on the default option
 %
@@ -180,6 +183,7 @@
 function com = pop_topoplot( EEG, typeplot, arg2, topotitle, rowcols, varargin);
 
 com = '';
+curfig = gcf;
 if nargin < 1
    help pop_topoplot;
    return;
@@ -359,22 +363,28 @@ for index = 1:size(arg2(:),1)
     end;
     if ~isnan(arg2(index))
 		if typeplot
+            figure(curfig);
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
+                 figure(curfig);
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
+                 figure(curfig);
                  title([int2str(arg2(index)) ' ms']);
 			end;
 		else
             if arg2(index) < 0
+                 figure(curfig);
                 tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             else
+                 figure(curfig);
                 tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
 			end;
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
+            figure(curfig);
             title(texttitle);
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
@@ -399,6 +409,7 @@ for index = 1:size(arg2(:),1)
     end;
 end;
 if nbgraph> 1, 
+   figure(curfig);
    a = textsc(0.5, 0.05, topotitle); 
    set(a, 'fontweight', 'bold'); 
 end;
