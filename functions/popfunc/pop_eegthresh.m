@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/12/24 17:27:04  scott
+% edited help and pop-window text
+%
 % Revision 1.16  2003/12/17 18:16:03  arno
 % reject
 %
@@ -183,8 +186,12 @@ if isstr(elecrange) % convert arguments if they are in text format
 	elecrange = eval( [ '[' elecrange ']' ]  );
 	negthresh = eval( [ '[' negthresh ']' ]  );
 	posthresh = eval( [ '[' posthresh ']' ]  );
-	starttime = eval( [ '[' starttime ']' ]  );
-	endtime   = eval( [ '[' endtime ']' ]  );
+    if isstr(starttime)
+        starttime = eval( [ '[' starttime ']' ]  );
+    end;
+    if isstr(endtime)
+        endtime   = eval( [ '[' endtime ']' ]  );
+    end;
 else
 	calldisp = 0;
 end;
