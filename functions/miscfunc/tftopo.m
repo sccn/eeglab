@@ -30,6 +30,12 @@
 %                have non-0 (significant) values. If several subject, the second value L
 %                is used to concatenate subject in the same fashion. Default is [1 1].
 %  'selchans'  = Channels to include in topoplot() scalp maps (and image std()) {default: all}
+%  'smooth'    = [pow2] magnification and smoothing factor. Only in power of 2 (Default: 1}.
+%  'mode'      = ['rms'|'ave'] average dB power ('ave') or return root-mean-square ('rms')
+%                {Default: 'rms' }
+%  'logfreq'   = ['on'|'off'] use logarithmic base for frequencies { Default: 'off' }
+%  'vert'      = [times vector] -> plot vertical dashed lines at specified times in ms.
+%                { Default: 0 }
 %
 % Note:
 %  1) Additional topoplot() options can be used.
@@ -41,6 +47,10 @@
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
 % See also: timef(), topoplot(), spectopo(), timtopo(), envtopo(), changeunits()
+
+% hidden parameter: 'shiftimgs' = array with one value per subject for shifting in time
+%                                 time/freq images. Had to be inserted in tftopo because
+%                                 the shift happen after the smoothing
 
 % Copyright (C) Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
 % La Jolla, 3/01
@@ -60,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2002/10/08 23:55:35  arno
+% debug
+%
 % Revision 1.53  2002/10/08 23:54:34  arno
 % 'key', 'val' sequence, new args, new header
 %
@@ -250,15 +263,20 @@ tfdataori = mean(tfdata,4); % for topoplot
 % test inputs
 % -----------
 % 'key' 'val' sequence
-fieldlist = { 'timefreqs'     'real'     []                        [] ;
-              'chanlocs'      { 'string' 'struct' }       []       '' ;
-              'showchan'      'integer'  [0 nchans]                0 ;
+fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
+              'logfreq'       'string'   {'on' 'off' }             'off';
+              'mode'          'string'   { 'ave' 'rms' }           'rms';
+              'selchans'      'integer'  [1 nchans]                [1:nchans];
+              'shiftimgs'     'real'     []                        [] ;
+              'showchan'      'integer'  [0 nchans]                0 ;
               'signifs'       'real'     []                        [];
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
-              'selchans'      'integer'  [1 nchans]                [1:nchans] };
+              'smooth'        'real'     [0 Inf]                   1;
+              'timefreqs'     'real'     []                        [];
+              'vert'          'real'     [times(1) times(end)]     [0] };
 
-[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
+[g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
 if isstr(g), error(g); end;
 
 % setting more defaults
@@ -310,6 +328,10 @@ if ~isempty(g.signifs)
         return
     end
 end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% process time/freq data points
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(g.timefreqs)
     if isempty(g.chanlocs)
         error('tftopo(): ''chanlocs'' must be defined to plot time/freq points');
@@ -359,6 +381,46 @@ else
     tfpoints = 0;
 end;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Zero out non-significant image features
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+range = g.limits(6)-g.limits(5);
+cc = jet(256);
+if ~isempty(g.signifs)
+    fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
+    for subject = 1:size(tfdata,4)
+        for elec = 1:size(tfdata,3)
+            tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
+                      (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+            tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
+        end;
+    end;
+end;
+
+%%%%%%%%%%%%%%%%
+% magnify inputs
+%%%%%%%%%%%%%%%%
+if g.smooth ~= 1
+    fprintf('Smoothing...\n');
+    for index = 1:round(log2(g.smooth))
+        [tfdata times freqs] = magnifytwice(tfdata, times, freqs);
+    end;
+end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Shift time/freq images
+%%%%%%%%%%%%%%%%%%%%%%%%
+if ~isempty(g.shiftimgs)
+    timestep = times(2) - times(1);
+    for S = 1:size(tfdata,4)
+        nbsteps = round(g.shiftimgs(S)/timestep);
+        fprintf('Shifing images of subect %d by %3.3f ms or %d time steps\n', S, g.shiftimgs(S), nbsteps);
+        if nbsteps < 0,  tfdata(:,-nbsteps+1:end,:,S) = tfdata(:,1:end+nbsteps,:,S);
+        else             tfdata(:,1:end-nbsteps,:,S)  = tfdata(:,nbsteps+1:end,:,S);
+        end;
+    end;
+end;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Adjust plotting limits
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -374,21 +436,6 @@ end;
 
 mmidx = [mintimeidx maxtimeidx minfreqidx maxfreqidx];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Zero out non-significant image features ?????????????
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-range = g.limits(6)-g.limits(5);
-cc = jet(256);
-if ~isempty(g.signifs)
-    fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
-    for subject = 1:size(tfdata,4)
-        for elec = 1:size(tfdata,3)
-            tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
-                      (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
-            tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
-        end;
-    end;
-end;
 %colormap('jet');
 %c = colormap;
 %cc = zeros(256,3);
@@ -418,7 +465,6 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot tfdata image for specified channel or selchans std()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
 axis off;
 colormap(cc);
 curax = gca; % current plot axes to plot into
@@ -428,36 +474,41 @@ if tfpoints ~= 0
 else
     imgax = sbplot(1,1,1,'ax',curax);
 end;
+tftimes = mmidx(1):mmidx(2);
+tffreqs = mmidx(3):mmidx(4);
 if g.showchan>0 % -> image showchan data
-    tfave = tfdata(mmidx(3):mmidx(4),mmidx(1):mmidx(2),g.showchan);
-    imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),tfave);
-    axis([g.limits(1:4)]);
-    caxis([g.limits(5:6)]);
-    hold on;
-
+    tfave = tfdata(tffreqs, tftimes,g.showchan);
 else % g.showchan==0 -> image std() of selchans
-    tftimes = mmidx(1):mmidx(2);
-    tffreqs = mmidx(3):mmidx(4);
     tfdat   = tfdata(tffreqs,tftimes,g.selchans,:);
 
     % average across electrodes
     fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
-    tfdat = rmslocal(tfdat, 3, g.sigthresh(1));
+    tfdat = avedata(tfdat, 3, g.sigthresh(1), g.mode);
 
     % if several subject, first (RMS) averaging across subjects
     if size(tfdata,4) > 1
         fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
-        tfdat = rmslocal(tfdat, 4, g.sigthresh(2));
+        tfdat = avedata(tfdat, 4, g.sigthresh(2), g.mode);
     end;
     tfave = tfdat;
     
-    cmax = max(max(abs(tfave)));
-    cmin = -cmax; % make symmetrical
+    g.limits(6) = max(max(abs(tfave)));
+    g.limits(5) = -g.limits(6); % make symmetrical
+end
+
+if strcmpi(g.logfreq, 'on'), 
+    logimagesc(times(tftimes),freqs(tffreqs),tfave);
+    axis([g.limits(1) g.limits(2) log(g.limits(3)), log(g.limits(4))]);
+else                            
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
-    caxis([cmin cmax]);
-    hold on;
-end
+end;
+caxis([g.limits(5:6)]);
+hold on;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title and vertical lines
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 axes(imgax)
 xl=xlabel('Time (ms)');
 set(xl,'fontsize',16);
@@ -476,8 +527,12 @@ set(yl,'fontsize',16);
 set(gca,'fontsize',14)
 set(gca,'ydir','normal');
 
-if min(times)<0 & max(times)>0
-  plot([0 0],[freqs(1) freqs(end)],[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
+for indtime = g.vert
+    if strcmpi(g.logfreq, 'on'), 
+        plot([indtime indtime],log([freqs(1) freqs(end)]),[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
+    else
+        plot([indtime indtime],[freqs(1) freqs(end)],[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
+    end;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -496,7 +551,11 @@ if ~isempty(g.timefreqs)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Plot connecting lines using changeunits()
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        from = changeunits([g.timefreqs(n,:)],imgax,wholeax);
+        if strcmpi(g.logfreq, 'off')
+            from = changeunits([g.timefreqs(n,:)],imgax,wholeax);
+        else  
+            from = changeunits([g.timefreqs(n,1) log(g.timefreqs(n,2))],imgax,wholeax);        
+        end;
         to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
         axes(wholeax);
         plot([from(1) to(1)],[from(2) to(2)],LINECOLOR,'linewidth',LINEWIDTH);
@@ -544,13 +603,34 @@ end;
 if g.showchan>0 & ~isempty(g.chanlocs)
      sbplot(4,4,1,'ax',imgax);
      topoplot(g.showchan,g.chanlocs,'electrodes','off', ...
-                  'style', 'blank', 'emarkersize1chan', 10, 'shrink', 'on')
-     axis('square')
+                  'style', 'blank', 'emarkersize1chan', 10, 'shrink', 'on');
+     axis('square');
 end
 axcopy;
 
 
-function tfdat = rmslocal(tfdat, dim, thresh)
+function tfdat = avedata(tfdat, dim, thresh, mode)
     tfsign  = sign(mean(tfdat,dim));
     tfmask  = sum(tfdat ~= 0,dim) >= thresh;
-    tfdat   = tfmask.*tfsign.*sqrt(mean(tfdat.*tfdat,dim)); % std of all channels
+    if strcmpi(mode, 'rms')
+        tfdat   = tfmask.*tfsign.*sqrt(mean(tfdat.*tfdat,dim)); % std of all channels
+    else
+        tfdat   = tfmask.*mean(tfdat,dim); % std of all channels
+    end;
+    
+function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
+    indicetimes = [floor(1:0.5:size(tfdat,1)) size(tfdat,1)];
+    indicefreqs = [floor(1:0.5:size(tfdat,2)) size(tfdat,2)];
+    tfdatnew = tfdat(indicetimes, indicefreqs, :, :);
+    times = linspace(times(1), times(end), size(tfdat,2)*2);
+    freqs = linspace(freqs(1), freqs(end), size(tfdat,1)*2);
+    
+    % smoothing
+    gauss2 = gauss2d(3,3); 
+    for S = 1:size(tfdat,4)
+        for elec = 1:size(tfdat,3)
+            tfdatnew(:,:,elec,S) = conv2(tfdatnew(:,:,elec,S), gauss2, 'same');
+        end;
+    end;
+
+    %tfdatnew = convn(tfdatnew, gauss2, 'same'); % is equivalent to the loop for slowlier
