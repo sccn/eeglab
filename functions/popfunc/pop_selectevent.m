@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/10/29 22:40:51  scott
+% text
+%
 % Revision 1.37  2002/10/29 22:39:58  scott
 % text
 %
@@ -217,7 +220,7 @@ if isfield(EEG, 'tmpevent') & strmatch('event', allfields)
 end;   
  
 if nargin<2
-    geometry = { [0.8 1 2.3 0.6 ] [0.8 1.1 1.8 1 ] [0.65 0.85 1.3 0.45 0.25 0.1] };
+    geometry = { [0.8 1 2.3 0.6 ] [0.8 1.1 2.0 0.8 ] [0.65 0.85 1.3 0.45 0.25 0.1] };
     uilist = { ...
          { 'Style', 'text', 'string', 'Selection', 'horizontalalignment', 'center', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Field Descriptions', 'fontweight', 'bold'  }, ...
