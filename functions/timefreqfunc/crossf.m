@@ -24,7 +24,11 @@
 %
 % Required inputs:
 %       x       = first single-channel data  (1,frames*nepochs)      {none}
+%                 or cell array of two single-channel data for comparing
+%                 two conditions.
 %       y       = second single-channel data (1,frames*nepochs)      {none}
+%                 or cell array of two single-channel data for comparing
+%                 two conditions.
 %       frames  = frames per epoch                                   {750}
 %       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
 %       srate   = data sampling rate (Hz)                            {250}
@@ -90,7 +94,9 @@
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
 %       'plotbootsub' = ['on'|'off'], Plot coherence for shuffled trials
 %                    if made available using 'bootsub'           {'on'}
-%       'title'     = Optional figure title                       {none}
+%       'title'     = Optional figure title. If two conditions are given
+%                     as input, title can be a cell array with 2 string
+%                     elements {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
@@ -130,7 +136,9 @@
 %
 % See also: timef()
 
-% Copyright (C) 8/1/98 Sigurd Enghoff, Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD
+% NOTE: one hidden parameter 'savecoher', 0 or 1
+
+% Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -147,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/07/16 23:08:25  arno
+% correcting freqs for wavelet output
+%
 % Revision 1.38  2002/07/16 23:00:03  arno
 % testing
 %
@@ -291,7 +302,7 @@
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
 
-function [R,mbase,times,freqs,Rbootout,Rangle] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
+function [R,mbase,times,freqs,Rbootout,Rangle, trialcoher, Tfx, Tfy] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
@@ -316,16 +327,18 @@ if (nargin < 2)
    return
 end
 
-if (min(size(X))~=1 | length(X)<2)
-   fprintf('crossf(): x must be a row or column vector.\n');
-   return
-elseif (min(size(Y))~=1 | length(Y)<2)
-   fprintf('crossf(): y must be a row or column vector.\n');
-   return
-elseif (length(X) ~= length(Y))
-   fprintf('crossf(): x and y must have same length.\n');
-   return
-end
+if ~iscell(X)
+	if (min(size(X))~=1 | length(X)<2)
+		fprintf('crossf(): x must be a row or column vector.\n');
+		return
+	elseif (min(size(Y))~=1 | length(Y)<2)
+		fprintf('crossf(): y must be a row or column vector.\n');
+		return
+	elseif (length(X) ~= length(Y))
+		fprintf('crossf(): x and y must have same length.\n');
+		return
+	end
+end;
 
 if (nargin < 3)
    frame = DEFAULT_EPOCH;
@@ -335,7 +348,7 @@ elseif (~isnumeric(frame) | length(frame)~=1 | frame~=round(frame))
 elseif (frame <= 0)
    fprintf('crossf(): Value of frames must be positive.\n');
    return
-elseif (rem(length(X),frame) ~= 0)
+elseif ~iscell(X) & (rem(length(X),frame) ~= 0)
    fprintf('crossf(): Length of data vectors must be divisible by frames.\n');
    return
 end
@@ -366,9 +379,15 @@ end
 
 % consider structure for these arguments
 % --------------------------------------
+vararginori = varargin;
+for index=1:length(varargin)
+	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
+end;
 if ~isempty(varargin)
    try, g = struct(varargin{:}); 
    catch, error('Argument error in the {''param'', value} sequence'); end; 
+else 
+	g = [];
 end;
 
 try, g.shuffle;    catch, g.shuffle = 0; end;
@@ -402,6 +421,8 @@ try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.memory;     catch, g.memory = 'high'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
+try, g.savecoher;  catch, g.savecoher = 0; end;
+try, g.noinput;    catch, g.noinput = 'no'; end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
@@ -409,7 +430,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
-		  'memory' 'compute' 'maxamp' };
+		  'memory' 'compute' 'maxamp' 'savecoher' 'noinput' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
@@ -533,6 +554,137 @@ case { 'matlab', 'c' },;
 otherwise error('compute must be either ''matlab'' or ''c''');
 end;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compare 2 conditions part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if iscell(X)
+	if length(X) ~= 2 | length(Y) ~= 2
+		error('crossf: to compare conditions, X and Y input must be 2-elements cell arrays');
+	end;
+	if ~strcmp(g.boottype, 'times')
+		disp('crossf warning: significance bootstrap type is irrelevant when comparing conditions');
+	end;
+	for index = 1:2:length(vararginori)
+		if index<=length(vararginori) % needed: if elemenets are deleted
+			if strcmp(vararginori{index}, 'alpha'), vararginori(index:index+1) = [];
+			elseif strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
+			end;
+		end;
+	end;
+	if iscell(g.title) 
+		if length(g.title) <= 2,
+			g.title{3} = 'Condition 2 - condition 1';
+		end;
+	else
+		g.title = { 'Condition 1', 'Condition 2', 'Condition 2 - condition 1' };
+	end;
+	
+	fprintf('Running crosff on condition 1 *********************\n');
+	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
+	fprintf('      number of time points or number of frequencies\n');
+	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
+	figure; 
+	subplot(1,3,1); title(g.title{1});
+	if ~strcmp(g.type, 'coher')
+		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = crossf(X{1}, Y{1}, ...
+								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ', vararginori{:});
+	else
+		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = crossf(X{1}, Y{1}, ...
+								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', ' ',  vararginori{:});
+	end;
+	R1 = R1.*exp(j*Rangle1/180*pi);
+	
+	% asking user for memory limitations
+	%if ~strcmp(g.noinput, 'yes')
+	%	tmp = whos('Tfx1');
+	%	fprintf('This function will require an additionnal %d bytes, do you wish\n', tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
+	%	res = input('to coninue (y/n) (use ''noinput'' option to disable message):', 's');
+	%	if res == 'n', return; end;
+	%end;
+
+	fprintf('\nRunning crosff on condition 2 *********************\n');
+	subplot(1,3,2); title(g.title{2});
+	if ~strcmp(g.type, 'coher')
+		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = crossf(X{2}, Y{2}, ...
+								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
+	else
+		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = crossf(X{2}, Y{2}, ...
+								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
+	end;
+	R2 = R2.*exp(j*Rangle2/180*pi);
+
+	subplot(1,3,3); title(g.title{3});
+	if isnan(g.alpha)
+		plotall(R2-R1, [], [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+	else 
+		% accumulate coherence images (all arrays [nb_points x timesout x trials])
+		% ---------------------------
+		allsavedcoher = zeros(size(savecoher1,1), size(savecoher1,2), size(savecoher1,3)+size(savecoher2,3));
+		allsavedcoher(:,:,1:size(savecoher1,3))     = savecoher1;
+		allsavedcoher(:,:,size(savecoher1,3)+1:end) = savecoher2;
+		clear savecoher1 savecoher2;
+		
+		if strcmp(g.type, 'coher')
+			alltfx = zeros(size(Tfx1,1), size(Tfx2,2), size(Tfx1,3)+size(Tfx2,3));
+			alltfx(:,:,1:size(Tfx1,3))   = Tfx1;
+			alltfx(:,:,size(Tfx1,3):end) = Tfx2;
+			clear Tfx1 Tfx2;
+			
+			alltfy = zeros(size(Tfy1,1), size(Tfy2,2), size(Tfy1,3)+size(Tfy2,3));
+			alltfy(:,:,1:size(Tfy1,3))   = Tfy1;
+			alltfy(:,:,size(Tfy1,3):end) = Tfy2;
+			clear Tfy1 Tfy2;
+		end;
+		
+		coherimages = zeros(size(allsavedcoher,1), size(allsavedcoher,2), g.naccu);
+		cond1trials = length(X{1})/g.frame;
+		cond2trials = length(X{2})/g.frame;
+		alltrials = [1:cond1trials+cond2trials];
+		fprintf('Accumulating bootstrap:');
+		
+		% preprocess data
+		% ---------------
+		switch g.type
+		 case 'coher', % take the square of alltfx and alltfy
+		  alltfx = alltfx.^2;
+		  alltfx = alltfx.^2;
+		 case 'phasecoher', % normalize
+		  allsavedcoher = allsavedcoher ./ abs(allsavedcoher);
+		 case 'phasecoher2', % don't do anything
+		end;
+		
+		if strcmp(g.type, 'coher')
+			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, cond1trials, g.type, alltfx, alltfy);
+		else
+			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, cond1trials, g.type);
+		end;
+		%figure; g.alpha = NaN; & to check that the new images are the same as the original
+		%subplot(1,3,1); plotall(coher1, [], [], times, freqs, mbase, find(freqs <= g.maxfreq), g);
+		%subplot(1,3,2); plotall(coher2, [], [], times, freqs, mbase, find(freqs <= g.maxfreq), g);
+		%return;
+
+		for index=1:g.naccu
+			if rem(index,10) == 0,  fprintf(' %d',index); end
+			if rem(index,120) == 0, fprintf('\n'); end
+			
+			if strcmp(g.type, 'coher')
+				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), cond1trials, g.type, alltfx, alltfy);
+			else
+				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), cond1trials, g.type);
+			end;
+		end;
+		fprintf('\n');
+
+		% create articially a Bootstrap object to compute significance
+		Boot = bootinit( [], size(allsavedcoher,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
+		Boot.Coherboot.R = coherimages;
+		Boot = bootcomppost(Boot, [], [], []);
+		g.title = '';
+		plotall(coherdiff, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, find(freqs <= g.maxfreq), g);
+	end;
+	return; % ********************************** END FOR SEVERAL CONDITIONS
+end;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % shuffle trials if necessary
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -590,7 +742,7 @@ if ~strcmp(lower(g.compute), 'c')
    Coher     = coherinit(Tfx.nb_points, trials, g.timesout, g.type);
    Coherboot = coherinit(Tfx.nb_points, trials, g.naccu   , g.type);
    Boot      = bootinit( Coherboot, Tfx.nb_points, g.timesout, g.naccu, baselength, g.baseboot, g.boottype, g.alpha, g.rboot);
-   freqs = Tfx.freqs
+   freqs = Tfx.freqs;
    dispf = find(freqs <= g.maxfreq);
    freqs = freqs(dispf);
 else
@@ -712,14 +864,23 @@ else
    
    % main loop
    % ---------
+   if g.savecoher,
+	   trialcoher = zeros(Tfx.nb_points, g.timesout, trials);   
+   else  
+	   trialcoher = [];
+   end;
    for t=1:trials
       if rem(t,10) == 0,  fprintf(' %d',t); end
       if rem(t,120) == 0, fprintf('\n'); end
       
       Tfx = tfcomp( Tfx, t, 1:g.timesout); 
-      Tfy = tfcomp( Tfy, t, 1:g.timesout); 
-      Coher = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
-      
+      Tfy = tfcomp( Tfy, t, 1:g.timesout);
+	  if g.savecoher
+		  [Coher trialcoher(:,:,t)] = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
+      else
+		  Coher = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
+	  end;
+	  
       Boot = bootcomp( Boot, Coher.Rn(t,:), Tfx.tmpalltimes, Tfy.tmpalltimes);
    end % t = trial
    [Boot Rbootout] = bootcomppost(Boot, Coher.Rn, Tfx.tmpall, Tfy.tmpall);
@@ -759,6 +920,10 @@ plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
 Rangle = angle(Coher.R);
 R = abs(Coher.R);
 Rsignif = Boot.Rsignif;
+Tfx = permute(Tfx.tmpall, [3 2 1]); % from [trials timesout nb_points] -> [nb_points timesout trials]
+Tfy = permute(Tfy.tmpall, [3 2 1]);
+
+return; % ***********************************************************************
 
 % ------------------
 % plotting functions
@@ -1123,7 +1288,7 @@ end;
 %      Coher.Rn(trial,:) = 1;
 %end % ~any(isnan())
 
-function Coher = cohercomp(Coher, tmpX, tmpY, trial, time);
+function [Coher,tmptrialcoh] = cohercomp(Coher, tmpX, tmpY, trial, time);
 tmptrialcoh = tmpX.*conj(tmpY);
 switch Coher.type
    case 'coher',
@@ -1131,7 +1296,6 @@ switch Coher.type
       Coher.cumulX(:,time) = Coher.cumulX(:,time) + abs(tmpX).^2;
       Coher.cumulY(:,time) = Coher.cumulY(:,time) + abs(tmpY).^2;
  case 'phasecoher2',
-      tmp = tmpX.*conj(tmpY);
       Coher.R(:,time) = Coher.R(:,time) + tmptrialcoh; % complex coher.
       Coher.cumul(:,time) = Coher.cumul(:,time) + abs(tmptrialcoh);
    case 'phasecoher',
@@ -1153,6 +1317,24 @@ switch Coher.type
    Coher.R  = Coher.R ./ (ones(size(Coher.R,1),1)*Coher.Rn); % coherence magnitude
 end;
 
+% function for 2 conditions coherence calculation
+% -----------------------------------------------
+function [coherimage, coherimage1, coherimage2] = coher2conddiff( allsavedcoher, alltrials, cond1trials, type, tfx, tfy);
+	t1s = alltrials(1:cond1trials);
+	t2s = alltrials(cond1trials+1:end);
+	switch type
+	 case 'coher',
+	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) ./ sqrt(sum(tfx(:,:,t1s))) ./ sqrt(sum(tfy(:,:,t1s)));
+	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) ./ sqrt(sum(tfx(:,:,t2s))) ./ sqrt(sum(tfy(:,:,t1s)));
+	 case 'phasecoher2',
+	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) ./ sum(abs(allsavedcoher(:,:,t1s)),3);
+	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) ./ sum(abs(allsavedcoher(:,:,t2s)),3);
+	 case 'phasecoher',
+	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) / cond1trials;
+	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) / (size(allsavedcoher,3)-cond1trials);
+	end;
+	coherimage = coherimage2 - coherimage1;
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BOOTSTRAP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function for bootstrap initialisation
@@ -1259,7 +1441,7 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot)
          Boot.Coherboot = cohercomp(Boot.Coherboot, tmpsX, tmpsY, 1, 1:Boot.naccu);
       end
       Boot.Coherboot = cohercomppost(Boot.Coherboot);
-   else % boottype is 'times'
+   elseif strcmp(Boot.boottype, 'times') % boottype is 'times'
       Boot.Coherboot = cohercomppost(Boot.Coherboot);
    end;
 end;
