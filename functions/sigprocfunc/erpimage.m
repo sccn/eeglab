@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/10/13 23:24:48  scott
+% typo
+%
 % Revision 1.45  2002/10/13 23:23:32  scott
 % added ampsort, valsort args -sm
 %
@@ -306,7 +309,9 @@ Erpflag   = NO;     % don't show erp average by default
 Alignflag = NO;     % don't align data to sortvar by default
 Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
-Phaseflag = NO;     % don't sort by alpha phase
+Phaseflag = NO;     % don't sort by phase
+Ampflag   = NO;     % don't sort by amplitude
+Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
 Renormflag = NO;
