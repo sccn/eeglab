@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/05/20 22:29:05  arno
+% lowmem for 2condition debug
+%
 % Revision 1.29  2003/05/20 21:44:08  arno
 % implemementing lowmem for 2 conditions
 %
@@ -859,6 +862,10 @@ if iscell(X)
                   [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
                                { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) alltfX2(indarr,:,:)});
+                  resdiff{1}(indarr,:)     = resdifftmp{1};   resdiff{2}(indarr,:)     = resdifftmp{2};
+                  resimages{1}(indarr,:,:) = resimagestmp{1}; resimages{2}(indarr,:,:) = resimagestmp{2};
+                  res1{1}(indarr,:)        = res1tmp{1};      res1{2}(indarr,:)        = res1tmp{2};
+                  res2{1}(indarr,:)        = res2tmp{1};      res2{2}(indarr,:)        = res2tmp{2};
               end;     
           else
               [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
@@ -875,6 +882,10 @@ if iscell(X)
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
                                { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) ...
                                       alltfX2(indarr,:,:)}, { alltfX1abs(indarr,:,:) alltfX2abs(indarr,:,:) });
+                  resdiff{1}(indarr,:)     = resdifftmp{1};   resdiff{2}(indarr,:)     = resdifftmp{2};
+                  resimages{1}(indarr,:,:) = resimagestmp{1}; resimages{2}(indarr,:,:) = resimagestmp{2};
+                  res1{1}(indarr,:)        = res1tmp{1};      res1{2}(indarr,:)        = res1tmp{2};
+                  res2{1}(indarr,:)        = res2tmp{1};      res2{2}(indarr,:)        = res2tmp{2};
               end;     
           else
               [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
@@ -887,9 +898,13 @@ if iscell(X)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
                   alltfX1norm = alltfX1(indarr,:,:)./sqrt(alltfX1(indarr,:,:).*conj(alltfX1(indarr,:,:)));
                   alltfX2norm = alltfX2(indarr,:,:)./sqrt(alltfX2(indarr,:,:).*conj(alltfX2(indarr,:,:)));
-                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
-                      condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
+                  [resdifftmp resimagestmp res1tmp res2tmp] = ...
+                      condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
                                { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, { alltfX1norm alltfX2norm });
+                  resdiff{1}(indarr,:)     = resdifftmp{1};   resdiff{2}(indarr,:)     = resdifftmp{2};
+                  resimages{1}(indarr,:,:) = resimagestmp{1}; resimages{2}(indarr,:,:) = resimagestmp{2};
+                  res1{1}(indarr,:)        = res1tmp{1};      res1{2}(indarr,:)        = res1tmp{2};
+                  res2{1}(indarr,:)        = res2tmp{1};      res2{2}(indarr,:)        = res2tmp{2};
               end;     
           else
               alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));
