@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/05/19 14:17:55  scott
+% *** empty log message ***
+%
 % Revision 1.43  2002/05/19 14:16:11  scott
 % *** empty log message ***
 %
@@ -378,7 +381,7 @@ xl=xlabel('Time (ms)');
 set(xl,'fontsize',16);
 set(gca,'yaxislocation','left')
 if showchan>0
-   tl=title(['Channel ',int2str(showchan)]);
+   % tl=title(['Channel ',int2str(showchan)]);
 else
   if exist('std')==2
    tl=title(['Signed channel st. dev.']);
@@ -447,9 +450,8 @@ for n=1:tfpoints
    end
 end
 
-
 if showchan>0
-     sbplot(3,3,1,'ax',imgax);
+     sbplot(4,4,1,'ax',imgax);
      topoplot(showchan,chanlocs,'electrodes','off', ...
                   'style', 'blank', 'emarkersize1chan', 10)
      axis('square')
