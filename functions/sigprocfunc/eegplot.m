@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/08/19 19:47:19  arno
+% debugging last
+%
 % Revision 1.44  2002/08/19 19:33:57  arno
 % bebugging for mac
 %
@@ -723,7 +726,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		        '  set(gcbo,''label'',''X grid off'');',...
 		        'end;' ...
 		        'clear FIGH AXESH;' ];
-  uimenu('Parent',m(3),'Label','X grid off', 'Callback',timestring)
+  uimenu('Parent',m(3),'Label',fastif(strcmp(g.xgrid, 'off'), 'X grid on','X grid off'), 'Callback',timestring)
   
   % Y grid %%%%%%%%%%%%%
   timestring = ['FIGH = gcbf;',...
@@ -736,7 +739,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		        '  set(gcbo,''label'',''Y grid off'');',...
 		        'end;' ...
 		        'clear FIGH AXESH;' ];
-  uimenu('Parent',m(3),'Label','Y grid on', 'Callback',timestring)
+  uimenu('Parent',m(3),'Label',fastif(strcmp(g.ygrid, 'off'), 'X grid on','X grid off'), 'Callback',timestring)
 
   % Grid Style %%%%%%%%%
   m(5) = uimenu('Parent',m(3),'Label','Grid Style');
