@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.85  2004/05/10 14:37:59  arno
+%image type
+%
 %Revision 1.84  2004/05/05 15:25:41  scott
 %typo
 %
@@ -1233,16 +1236,23 @@ function updatedipplot(fig)
    set(newdip, 'visible', 'on');
    set(gcf, 'userdata', newdip);
    
-   % set the new RV
-   % --------------
+   % find all dipolar structures
+   % ---------------------------
    tmprvobj = findobj('parent', fig, 'userdata', 'rv');
-   index = 1;
-   while ~isstruct( get(newdip(index), 'userdata') )
-       index = index+1;
+   index   = 1;
+   count   = 1;
+   for index = 1:length(newdip)
+       if isstruct( get(newdip(index), 'userdata') )
+           allpos3d(count,:) = getfield(get(newdip(index), 'userdata'), 'pos3d');
+           count = count+1;
+           foundind = index;
+       end;
    end;
-   userdat  = get(newdip(index), 'userdata');
-   
-   set( tmprvobj(end), 'string', userdat.rv);
+ 
+   % get residual variance
+   % ---------------------
+   rv = getfield(get(newdip(foundind), 'userdata'), 'rv');
+   set( tmprvobj(end), 'string', rv);
    
    % adapt the MRI to the dipole depth
    % ---------------------------------
@@ -1256,9 +1266,15 @@ function updatedipplot(fig)
        indy = minpos(dat.imgcoords{2}-yy);
        indz = minpos(dat.imgcoords{3}-xx);
    else
-       indx = minpos(dat.imgcoords{1} - userdat.pos3d(3) + 4/tmpdiv);
-       indy = minpos(dat.imgcoords{2} - userdat.pos3d(2) - 4/tmpdiv);
-       indz = minpos(dat.imgcoords{3} - userdat.pos3d(1) + 4/tmpdiv);
+       if ~dat.cornermri
+           indx = minpos(dat.imgcoords{1} - mean(allpos3d(:,3)) + 4/tmpdiv);
+           indy = minpos(dat.imgcoords{2} - mean(allpos3d(:,2)) - 4/tmpdiv);
+           indz = minpos(dat.imgcoords{3} - mean(allpos3d(:,1)) + 4/tmpdiv);
+       else % no need to shift slice if not ploted close to the dipole
+           indx = minpos(dat.imgcoords{1} - mean(allpos3d(:,3)));
+           indy = minpos(dat.imgcoords{2} - mean(allpos3d(:,2)));
+           indz = minpos(dat.imgcoords{3} - mean(allpos3d(:,1)));
+       end;
    end;
    plotimgs( dat, [indx indy indz]);
    %end;
