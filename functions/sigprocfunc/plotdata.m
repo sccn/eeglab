@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/03/05 16:32:02  arno
+% plotting lines after data
+%
 % Revision 1.7  2002/10/20 21:30:33  arno
 % normalization for all plots
 %
@@ -254,10 +257,6 @@ end
          colors(c,1)='k';
     end
   end
-  if size(colors,1)< datasets
-	  close;
-	  error('Too many trials');
-  end;
 
 %
 %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -348,7 +347,7 @@ end
 
   msg = ['\nPlotting %d traces of %d frames with colors: '];
   for c=1:datasets
-    msg = [msg  colors(c,:)];
+    msg = [msg  colors(mod(c-1,length(colors))+1,:)];
   end
   msg = [msg ' -> \n'];    % print starting info on screen . . .
   fprintf(...
@@ -382,7 +381,7 @@ end
             
             ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
             ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
-            plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(P+1));   
+            plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
             
             if SIGN > 0
                 axis([xmin xmax ymin ymax]);           % set axis bounds (pos up)
@@ -431,7 +430,7 @@ end
       %
       else % ISSPEC
         ymin=0;
-        plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(P+1));   
+        plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
         ymaxm = ymax;
         % ymin = 0.01;
         % ymaxm = 10.^ceil(log(ymax)/log(10.));
