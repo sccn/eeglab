@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/13 18:56:01  arno
+% adjustments
+%
 % Revision 1.21  2002/08/13 18:50:54  arno
 % same
 %
@@ -132,7 +135,7 @@ function [handlers, outheight, allhandlers] = supergui( geomx, geomy, varargin);
 % allhandlers linear format
 
 INSETX = 0.05; % x border absolute (5% of width)
-INSETY = 0.01;  % y border relative (50% of heigth)  
+INSETY = 0.05/length(geomx);  % y border relative (50% of heigth)  
 
 if nargin < 2
 	help supergui;
