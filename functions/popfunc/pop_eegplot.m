@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/03/13 03:01:37  arno
+% history
+%
 % Revision 1.34  2004/03/13 02:58:24  arno
 % debuging history
 %
@@ -281,7 +284,7 @@ else % case of a single trial (continuous data)
 end;
 
 if EEG.nbchan > 100
-    disp('pop_eegpot warning: baseline subtraction disabled to speed up display');
+    disp('pop_eegplot() note: Baseline subtraction disabled to speed up display');
     eegplotoptions = { eegplotoptions{:} 'submean' 'off' };
 end;
 
