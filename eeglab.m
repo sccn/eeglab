@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.336  2004/08/31 21:46:40  arno
+% same
+%
 % Revision 1.335  2004/08/31 21:45:24  arno
 % menu color
 %
@@ -1817,7 +1820,7 @@ end;
 % test if dataset has changed
 % ---------------------------
 if option_keepdataset
-    if ~isempty(ALLEEG) && ~isequal(EEG, ALLEEG(CURRENTSET))
+    if ~isempty(ALLEEG) && ~isequal(EEG.data, ALLEEG(CURRENTSET).data)
         tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
                               'Dataset change detected', ...
                               'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
