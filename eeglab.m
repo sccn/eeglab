@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2002/08/19 22:00:13  arno
+% remove 10 as CR
+%
 % Revision 1.152  2002/08/19 19:50:23  arno
 % hiding statistic menu if no ksstat func
 %
@@ -683,6 +686,7 @@ e_try = 'try,';
 e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; end;';
 nocheck           = e_try;
 check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' e_try];
+checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' e_try];
 checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' e_try];
 checkepoch        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' e_try];
 checkevent        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' e_try];
@@ -752,7 +756,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Average reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_averef(EEG,1);' e_store]);
-	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ check      '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
+	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
 	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset], 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove baseline'     , 'CallBack', [ checkepoch '[EEG LASTCOM] = pop_rmbase(EEG);' e_store]);
 	fourth_sub1 = uimenu( fourth_m, 'Label', 'Reject data epochs');
