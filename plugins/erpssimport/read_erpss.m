@@ -93,12 +93,12 @@ function [eeg,ev,header] = read_erpss(filename)
             fseek(fp,2,0);
             nchans = fread(fp,1,'uint16');
             fread(fp,1,'uint16');
-	    block_size = fread(fp,1,'uint16');
-	    ndupsamp = fread(fp,1,'uint16');
-	    nrun = fread(fp,1,'uint16');
-	    err_detect = fread(fp,1,'uint16');
-	    nlost = fread(fp,1,'uint16');
-	    nevents = fread(fp,1,'uint16');
+            block_size = fread(fp,1,'uint16');
+            ndupsamp = fread(fp,1,'uint16');
+            nrun = fread(fp,1,'uint16');
+            err_detect = fread(fp,1,'uint16');
+            nlost = fread(fp,1,'uint16');
+            nevents = fread(fp,1,'uint16');
 	    
             % Read events
             fseek(fp,50,0);
@@ -110,7 +110,7 @@ function [eeg,ev,header] = read_erpss(filename)
                 ev(ev_cnt).sample_offset = samp_off + (cnt-1)*128;
                 ev(ev_cnt).event_code = ev_code;
             end
-	    fseek(fp,4*(110-nevents),0);
+            fseek(fp,4*(110-nevents),0);
             data = fread(fp,nchans*block_size,'int16');
             eeg(:,totalsize+1:totalsize+block_size) = reshape(data,nchans,block_size); % concatenate data blocks
             totalsize = totalsize + block_size;
