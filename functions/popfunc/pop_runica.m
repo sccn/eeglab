@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2004/09/09 00:13:31  arno
+% fixing rank problem
+%
 % Revision 1.43  2004/08/20 18:43:07  arno
 % remove MAC error for Osx
 %
@@ -342,17 +345,17 @@ switch lower(icatype)
         EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'icaml' 
         if length(options) < 2
-            [tmp EEG.icaweights] = icaML( tmpdata );
+            [tmp EEG.icawinv] = icaML( tmpdata );
         else    
-            eval(sprintf('[tmp EEG.icaweights] = icaML( tmpdata %s );', options));
+            eval(sprintf('[tmp EEG.icawinv] = icaML( tmpdata %s );', options));
         end;
         clear tmp;
         EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'icams' 
         if length(options) < 2
-            [tmp EEG.icaweights] = icaMS( tmpdata );
+            [tmp EEG.icawinv] = icaMS( tmpdata );
         else    
-            eval(sprintf('[tmp EEG.icaweights] = icaMS( tmpdata %s );', options));
+            eval(sprintf('[tmp EEG.icawinv] = icaMS( tmpdata %s );', options));
         end;
         clear tmp;
         EEG.icasphere = eye(size(EEG.icaweights,2));
