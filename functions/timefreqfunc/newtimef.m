@@ -107,6 +107,7 @@
 %       'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
+%       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
 %       'itcmax'    = [real] set the ITC maximum for the scale       { auto }
 %       'title'     = Optional figure title                              {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
@@ -165,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2004/01/06 17:01:06  arno
+% header typo
+%
 % Revision 1.52  2003/12/09 23:23:31  arno
 % nothing
 %
@@ -635,6 +639,7 @@ try, g.phsamp;     catch, g.phsamp = 'off'; end;
 try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.outputformat;  catch, g.outputformat = 'new'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
+try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
@@ -1001,6 +1006,7 @@ if iscell(X)
         
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+            g.erspmax = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
                       mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
 		end;
@@ -1227,7 +1233,9 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           end;
       end
 
-      if g.ERSP_CAXIS_LIMIT == 0
+      if ~isempty(g.erspmax)
+          ersp_caxis = [-g.erspmax g.erspmax];
+      elseif g.ERSP_CAXIS_LIMIT == 0
           ersp_caxis = [-1 1]*1.1*max(max(abs(P(:,:))));
       else
           ersp_caxis = g.ERSP_CAXIS_LIMIT*[-1 1];
