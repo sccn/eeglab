@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/04/25 18:13:11  arno
+% updating command output
+%
 % Revision 1.21  2002/04/25 17:55:05  arno
 % improving commandline message
 % ,
@@ -387,7 +390,7 @@ if popup
         end;	
 	end;
 	if ~isempty(result{25})
-		[options ',''spec'', ' result{25} ];
+		options = [options ',''spec'', [' result{25} ']' ];
 	end;
 	if ~isempty(result{26})
 		limits(9) = eval( result{26} ); %bamp
