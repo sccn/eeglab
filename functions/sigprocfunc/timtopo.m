@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/03/04 18:13:58  scott
+% debug last -sm
+%
 % Revision 1.18  2003/03/04 18:11:36  scott
 % debug last -sm
 %
@@ -355,7 +358,6 @@ axes(axall)
 set(axall,'Color',BACKCOLOR);
 axis([0 1 0 1])
 
-for t=1:ntopos % draw oblique lines through to the topoplots 
   axes(axall)
   axis([0 1 0 1]);
   set(gca,'Visible','off');
@@ -369,6 +371,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
 %   >> axis([0 1 0 1]); % set large axes limits
 %   >> axis off % finally, hide large axes
 
+for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(matsel(data,frames,plotframes(t))); % max data value at plotframe
 
   head_sep = 1.2;
