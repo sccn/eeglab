@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/12/06 02:36:08  arno
+% updating header and help
+%
 % Revision 1.8  2002/12/06 02:32:25  arno
 % adding type name
 %
@@ -72,7 +75,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_chanevent(EEG, chans, varargin); 
+function [EEG, command] = pop_chanevent(EEG, chan, varargin); 
 command = '';
 
 if nargin < 1
@@ -100,7 +103,7 @@ if nargin < 2
 	result       = inputgui( geometry, strgui, 'pophelp(''pop_chanevent'');', 'Extract event from channel(s) - pop_chanevent()');
 	
 	if length(result) == 0 return; end;
-	chans   = eval( [ '[' result{1} ']' ] );
+	chan   = eval( [ '[' result{1} ']' ] );
 	switch result{2},
 		case 1, g.edge = 'both';
 		case 2, g.edge = 'leading';
@@ -109,39 +112,42 @@ if nargin < 2
 	if result{3}, g.delchan = 'on'; else g.delchan  = 'off'; end;
 	if result{4}, g.delevent= 'on'; else g.delevent = 'off'; end;
 	if result{5}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
-    g.typename =  [ 'chan' int2str(chans) ];
+    g.typename =  [ 'chan' int2str(chan) ];
 else 
 	listcheck = { 'edge'     'string'     { 'both' 'leading' 'trailing'}     'both';
 				  'delchan'  'string'     { 'on' 'off' }                     'on';
 				  'delevent' 'string'     { 'on' 'off' }                     'on';
-                  'typename' 'string'     []                                 [ 'chan' int2str(chans) ];
+                  'typename' 'string'     []                                 [ 'chan' int2str(chan) ];
 				  'nbtype'   'integer'    [1 NaN]                             NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
 end;
-if length(chans) ~= 1
+if length(chan) ~= 1
 	error('One (single) channel must be selected');
 end;
 
 % process events
 % --------------
-fprintf('pop_chanevent: importing events from data channel %d ...\n', chans);
+fprintf('pop_chanevent: importing events from data channel %d ...\n', chan);
 counte = 1; % event counter
 events(10000).latency = 0;
-if length(unique(EEG.data(index, :))) == 2, g.nbtype = 1; end;
+chan
+if isnan(g.nbtype)
+    if length(unique(EEG.data(chan, :))) == 2, g.nbtype = 1; end;
+end;
 
 counttrial = 1;
 switch g.edge
- case 'both'    , tmpevent = find( diff(EEG.data(index, :)) ~= 0);
- case 'trailing', tmpevent = find( diff(EEG.data(index, :)) < 0);
- case 'leading' , tmpevent = find( diff(EEG.data(index, :)) > 0);
+ case 'both'    , tmpevent = find( diff(EEG.data(chan, :)) ~= 0);
+ case 'trailing', tmpevent = find( diff(EEG.data(chan, :)) < 0);
+ case 'leading' , tmpevent = find( diff(EEG.data(chan, :)) > 0);
 end;
 tmpevent = tmpevent+1;
 for tmpi = tmpevent
     if ~isnan(g.nbtype)
         events(counte).type    = g.typename;
     else
-        events(counte).type    = EEG.data(index, tmpi);
+        events(counte).type    = EEG.data(chan, tmpi);
     end;
     events(counte).latency = tmpi;
     counte = counte+1;
@@ -164,9 +170,9 @@ end;
 % delete channels
 % ---------------
 if strcmp(g.delchan, 'on')
-	EEG = pop_select(EEG, 'nochannel', chans);
+	EEG = pop_select(EEG, 'nochannel', chan);
 end;
 
 command = sprintf('%s = pop_chanevent(%s, %s);', inputname(1), inputname(1), ...
-				  vararg2str({ chans 'edge', g.edge 'nbtype' g.nbtype 'delchan' g.delchan 'delevent' g.delevent})); 
+				  vararg2str({ chan 'edge', g.edge 'nbtype' g.nbtype 'delchan' g.delchan 'delevent' g.delevent})); 
 return;
