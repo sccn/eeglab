@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.198  2004/01/24 21:26:50  scott
+% same
+%
 % Revision 1.197  2004/01/24 21:25:04  scott
 % same
 %
@@ -2735,9 +2738,9 @@ if ~isnan(coherfreq)
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
                 ampsiglims = [ampsiglims;-1*ampsiglims];
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],times(winloc)); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],[]); % plot AMP
         else
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],times(winloc)); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],[]); % plot AMP
         end
         
         if ~isnan(aligntime)
@@ -2832,10 +2835,10 @@ if ~isnan(coherfreq)
         fprintf('Plotting the ITC trace below the ERSP\n');
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],times(winloc)); 
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],[]); 
                                                                            % plot COHER, fill sorting window
         else
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],times(winloc)); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],[]); % plot COHER
         end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
