@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/04/29 14:07:08  scott
+% fixed typo -sm
+%
 % Revision 1.19  2002/04/29 14:02:34  scott
 % made sure cumulX is computed -sm
 %
@@ -308,7 +311,7 @@ try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end;
 try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end;
 try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
 try, g.topovec;    catch, g.topovec = []; end;
-try, g.elocs;   catch, g.elocs = DEFAULT_ELOC; end;
+try, g.elocs;      catch, g.elocs = DEFAULT_ELOC; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
 try, g.marktimes;  catch, g.marktimes = DEFAULT_MARKTIME; end;
 try, g.powbase;    catch, g.powbase = NaN; end;
@@ -316,8 +319,8 @@ try, g.pboot;      catch, g.pboot = NaN; end;
 try, g.rboot;      catch, g.rboot = NaN; end;
 try, g.plotersp;   catch, g.plotersp = 'on'; end;
 try, g.plotitc;    catch, g.plotitc  = 'on'; end;
-try, g.detrep;   catch, g.detrep = 'off'; end;
-try, g.detret;   catch, g.detret = 'off'; end;
+try, g.detrep;     catch, g.detrep = 'off'; end;
+try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
@@ -325,7 +328,7 @@ try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
 try, g.vert;       catch, g.vert = []; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
-try, g.phsamp;   catch, g.phsamp = 'off'; end;
+try, g.phsamp;     catch, g.phsamp = 'off'; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -508,6 +511,11 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 	    case 'coher',
            cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
            cumulXboot = zeros(g.padratio*g.winsize/2,g.naccu);
+        case 'phasecoher'
+           switch g.phsamp
+             case 'on'
+               cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
+           end
     end;        
 
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -532,7 +540,8 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end;        
 end
 
-if g.phsamp
+switch g.phsamp
+  case 'on'
     PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
 end                                             %       phs   amp
 
@@ -648,7 +657,8 @@ for i=1:trials
                   cumulX(:,j) = cumulX(:,j)+abs(tmpX);
 		        case 'phasecoher',
 		          RR(:,j) = tmpX ./ abs(tmpX); % normalized cross-spectral vector
-                  if g.phsamp
+                  switch g.phsamp
+                   case 'on'
                      cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
                   end
               end;
@@ -656,7 +666,8 @@ for i=1:trials
           Wn(j) = 1;
         end
 
-        if g.phsamp
+        switch g.phsamp
+         case 'on'
           PA(:,:,j) = PA(:,:,j) ...
               + repmat((tmpX ./ abs(tmpX)),1,size(PP,1))   ...
                    .* repmat(sqrt(PP(:,j))',size(PP,1),1)    ...
@@ -707,10 +718,11 @@ switch g.type
   R = R ./ (ones(size(R,1),1)*Rn);
 end;        
 
-if g.phsamp
- for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
+switch g.phsamp
+ case 'on'
+  for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
     PA(j,:,:) = PA(j,:,:) ./ cumulX;
- end
+  end
 end
 
 if min(Rn) < 1
