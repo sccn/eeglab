@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/13 19:22:23  arno
+% averef field -> ref field
+%
 % Revision 1.2  2002/11/12 23:23:37  arno
 % mode -> method keyword
 %
@@ -89,8 +92,9 @@ if nargin < 2
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
              };
     if strcmpi(EEG.ref, 'averef') | strcmpi(EEG.ref, 'averefwithref')
-        geometry = { geometry{1:end-2} };
-        uilist   = { uilist{1:end-8} }    
+        geometry  = { geometry{1:end-2} };
+        uilist    = { uilist{1:end-8} };
+        uilist{2} = {}; 
     elseif length(EEG.chanlocs) == EEG.nbchan+1
         geometry = { geometry{1:end-2}  [1] };
         uilist   = { uilist{1:end-8} ...
@@ -102,6 +106,9 @@ if nargin < 2
     % decode inputs
     % -------------
     if isempty(result), return; end;
+    if strcmpi(EEG.ref, 'averef') | strcmpi(EEG.ref, 'averefwithref')
+        result = { 0 result{:} };
+    end;
     if ~isempty(result{3}), ref = eval([ result{3} ] );
     else                    ref = [];
     end;
@@ -115,6 +122,24 @@ else
     options = varargin;
 end;
 optionscall = options;
+
+% warning the user
+% -----------------
+withref = 0;
+for index = 1:length(options)
+    if isstr(options{index}) & strcmpi(options{index}, 'withref');
+        withref = 1;
+    end;
+end;
+if nargin < 2
+    if length(ref) > 1 | (~isempty(ref) & withref == 0 & strcmp(EEG.ref, 'common'))
+        res = questdlg2(strvcat('Using multiple reference, or using a single reference', ...
+                                'without including the old reference reduce the dimensionality', ...
+                                'of the data and prevent from re-referencing later on.', ...
+                                'Do you want to continue ?'), 'warning', 'Cancel', 'Yes', 'yes');
+        if strcmpi(res, 'Cancel'), return; end;
+    end;
+end;
 
 % include channel location file
 % -----------------------------
@@ -141,12 +166,6 @@ if isempty(ref)
     if ~isempty(ref)     
         EEG.ref = 'common';
     else
-        withref = 0;
-        for index = 1:length(options)
-            if isstr(options{index}) & strcmpi(options{index}, 'withref');
-                withref = 1;
-            end;
-        end;
         if withref
             EEG.ref = 'averefwithref';
         else 

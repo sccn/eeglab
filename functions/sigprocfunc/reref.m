@@ -7,7 +7,7 @@
 %
 % Inputs:
 %   data - 2-D data matrix (chans,frames*epochs) 
-%   refchan  - reference channel number -- two possibilities here:
+%   refchan  - reference channel number(s) -- two possibilities here:
 %          1) [] - compute average reference. If the 'withref' method
 %             is set, the function recomputes the common reference potential 
 %             while averaging.
@@ -16,13 +16,17 @@
 %             common reference channel.
 % 
 % Optional inputs:
-%   'elocs'     - Electrode location structure (e.g., EEG.chanlocs).
-%   'icaweight' - ICA weight matrix (Note: this should be weights*sphere)
-%   'method'    - ['standard'|'withref'] Include reference channel in output. 
-%   'refloc'    - Reference channel location -- a cell array with name and 
-%                 polar coordinates of the channel, { 'label' theta radius }. 
-%                 For 3-D location, include the reference as the last channel 
-%                 in the 'chanlocs' structure.
+%   'elocs'      - Electrode location structure (e.g., EEG.chanlocs).
+%   'icaweight'  - ICA weight matrix (Note: this should be weights*sphere)
+%   'method'     - ['standard'|'withref'] Include reference channel in output. 
+%   'refstate  ' - ['common'|'averef'|'averefwithref'| Current average reference state.
+%                  Use this parameter to re-reference data to a given channel if data
+%                  is already average referenced (by setting it to 'averef' or 
+%                  'averefwithref'). Default is 'common'.
+%   'refloc'     - Reference channel location -- a cell array with name and 
+%                  polar coordinates of the channel, { 'label' theta radius }. 
+%                  For 3-D location, include the reference as the last channel 
+%                  in the 'chanlocs' structure.
 %
 % Outputs:
 %   dataout     - Input data converted to average reference
@@ -65,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/13 15:12:21  scott
+% help msg
+%
 % Revision 1.6  2002/11/13 15:08:40  scott
 % help msg
 %
@@ -122,6 +129,7 @@ end;
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'method'     'string'  { 'standard' 'withref' }  '';
+                            'refstate'   'string'  { 'common' 'averef' 'averefwithref' }   'common';
                             'refloc'     'cell'    []          {};
                             'elocs'      'struct'  []          [] });
 if isstr(g), error(g); end;
@@ -131,6 +139,9 @@ if chans < 2
   help reref
   return
 end
+if ref > chans
+    error('reference channel index out of range');
+end;
 
 [dim1 dim2 dim3] = size(data);
 data = reshape(data, dim1, dim2*dim3);
@@ -138,15 +149,19 @@ data = reshape(data, dim1, dim2*dim3);
 % compute potential of reference
 % ------------------------------
 if isempty(ref)
+    if strcmp(g.refstate, 'averef') | strcmp(g.refstate, 'averefwithref')
+        fprintf('Data is already average referenced\n');
+        return;
+    end;
     if strcmp(g.method, 'withref')
-        avematrix = eye(chans)-ones(chans)*1/(chans+1);
+        avematrix = eye(chans)-ones(chans)/(chans+1);
         avematrix(end+1,:) = -1/(chans+1); % common reference channel
         if ~isempty(g.elocs)
             if (length(g.elocs) == chans) & ~isempty(g.refloc)
                 g.elocs(end+1).labels = g.refloc{1};
                 g.elocs(end  ).theta  = g.refloc{2};
                 g.elocs(end  ).radius = g.refloc{3};
-            else 
+            elseif length(g.elocs) ~= chans+1
                 error('No location for old common reference, can not introduce it as a new channel');
             end;
         end;        
@@ -161,31 +176,91 @@ if isempty(ref)
     end;
 else % common re-reference
      % -------------------
+    
+    % compute the inverse average transformation matrix
+    % -------------------------------------------------
+    if strcmp(g.refstate, 'averef')
+        invavematrix = eye(chans-1)-ones(chans-1)*1/chans;
+        invavematrix(end+1,:) = -1/chans; % common reference channel
+        chans = chans -1;
+    elseif strcmp(g.refstate, 'averefwithref')
+        invavematrix = eye(chans)-ones(chans)/chans;        
+        'here'
+    else 
+        invavematrix = [];
+    end;
     if strcmp(g.method, 'withref')
-        avematrix = eye(chans);
-        avematrix(:,ref) = -1;
-        if ~isempty(g.elocs)
-            if length(g.elocs) > chans
-                tmpelocs     = g.elocs(ref);
+        if length(ref) > 1
+            % dealing with multiple references
+            % --------------------------------
+            avematrix = eye(chans);
+            for index = 1:length(ref)
+                avematrix(:,ref) = -1/length(ref);
+            end;
+            fprintf('Warning: reference channels have been removed');
+            avemaxtrix(ref(2:end),:) = []; % supress references
+            if ~isempty(g.elocs)
+                g.elocs(ref(2:end)) = [];
+            end;
+            ref = ref(1);
+            if length(g.elocs) > size(avematrix,1)
                 g.elocs(ref) = g.elocs(end);
-            elseif ~isempty(g.refloc)
-                g.elocs(end+1) = g.elocs(ref);
+                g.elocs(end) = [];
+            elseif ~isempty(g.refloc) & ~isempty(g.refloc{1})
                 g.elocs(ref).labels = g.refloc{1};
                 g.elocs(ref).theta  = g.refloc{2};
                 g.elocs(ref).radius = g.refloc{3};
             else 
                 error('No location for old common reference, can not introduce it as a new channel');
+            end;            
+        else
+            % dealing with a single ref. channel
+            % ----------------------------------
+            avematrix = eye(chans);
+            avematrix(:,ref) = -1;
+            if ~isempty(g.elocs)
+                if length(g.elocs) > chans
+                    tmpelocs     = g.elocs(ref);
+                    g.elocs(ref) = g.elocs(end);
+                    g.elocs(end) = tmpelocs;
+                elseif ~isempty(g.refloc)
+                    g.elocs(end+1) = g.elocs(ref);
+                    g.elocs(ref).labels = g.refloc{1};
+                    g.elocs(ref).theta  = g.refloc{2};
+                    g.elocs(ref).radius = g.refloc{3};
+                else 
+                    error('No location for old common reference, can not introduce it as a new channel');
+                end;
             end;
         end;
     else
-        avematrix = eye(chans);
-        avematrix(:,ref) = -1;
-        avematrix(ref,:) = [];
-        if ~isempty(g.elocs)
-            tmpelocs     = g.elocs(ref);
-            g.elocs(ref:end-1) = g.elocs(ref+1:end);
-            g.elocs(end)       = tmpelocs;
+        if length(ref) > 1
+            % dealing with multiple references (do not include reference)
+            % --------------------------------
+            avematrix = eye(chans);
+            for index = 1:length(ref)
+                avematrix(:,ref) = -1/length(ref);
+            end;
+            fprintf('Warning: reference channels have been removed');
+            avemaxtrix(ref,:) = []; % supress references
+            if ~isempty(g.elocs)
+                g.elocs(ref) = [];        
+            end;    
+        else
+            % dealing with a single ref. channel
+            % ----------------------------------
+            avematrix = eye(chans);
+            avematrix(:,ref) = -1;
+            avematrix(ref,:) = [];
+            if ~isempty(g.elocs)
+                g.elocs(end)       = g.elocs(ref);
+                g.elocs(ref)       = [];
+            end;
         end;
+    end;
+    
+    if ~isempty(invavematrix)
+        avematrix = avematrix * pinv(invavematrix);
     end;
 end;
     
