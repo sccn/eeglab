@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/08/09 01:54:06  arno
+% weighting by boundary interval length
+%
 % Revision 1.25  2002/08/09 01:33:50  arno
 % debugging boundaries
 %
@@ -410,8 +413,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot spectrum of each channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+mainfig = gca; axis off;
 if ~isempty(g.freq)
-	specaxes = sbplot(3,4,[5 12]); 
+	specaxes = sbplot(3,4,[5 12], 'ax', mainfig); 
 end;
 
 if isempty(g.weights)
@@ -499,7 +503,7 @@ if ~isempty(g.freq)
 	tmpmainpos = get(gca, 'position');
 	headax = zeros(1,length(g.freq));
 	for f=1:length(g.freq)+length(g.icamaps)
-		headax(f) = sbplot(3,length(g.freq)+length(g.icamaps),f);
+		headax(f) = sbplot(3,length(g.freq)+length(g.icamaps),f, 'ax', mainfig);
 		axis([-1 1 -1 1]);
 		
 		%axis x coords and use
@@ -507,7 +511,7 @@ if ~isempty(g.freq)
 		allaxcoords(f) = tmppos(1);
 		allaxuse(f)    = 0;
 	end
-	large = sbplot(1,1,1);
+	large = sbplot(1,1,1, 'ax', mainfig);
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% compute relative positions on plot
