@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/03/18 17:52:47  arno
+% turning on 'num' for summary mode
+%
 % Revision 1.28  2005/03/18 17:17:08  arno
 % fixing call to use MRI etc...
 %
@@ -260,7 +263,7 @@ else
         % find localized dipoles
         comps = [];
         for index2 = 1:length(EEG.dipfit.model)
-            if ~isempty(EEG.dipfit.model(index2).posxyz) & EEG.dipfit.model(index2).posxyz(1) ~= 0
+            if ~isempty(EEG.dipfit.model(index2).posxyz) ~= 0
                 comps = [ comps index2 ];
                 EEG.dipfit.model(index2).component = index2;
             end;
