@@ -3,10 +3,14 @@
 %
 % Usage:
 %   >> OUTEEG = pop_mergeset( INEEG1, INEEG2, keepall);
+%   >> OUTEEG = pop_mergeset( ALLEEG ); % pop_up window
+%   >> OUTEEG = pop_mergeset( ALLEEG, indices, keepall);
 %
 % Inputs:
-%  INEEG1  - first input dataset or dataset number
-%  INEEG2  - second input dataset or dataset number
+%  INEEG1  - first input dataset
+%  INEEG2  - second input dataset
+%  ALLEEG  - array of dataset structure
+%  indices - indices of dataset to merge. 
 %  keepall - [0|1] 0 -> remove or 1 -> preserve ICA activations 
 %            of the first dataset and recompute the activations 
 %            of the merged data.
@@ -37,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/21 01:09:24  scott
+% edited help msg -sm
+%
 % Revision 1.3  2002/04/18 20:03:45  arno
 % retrIeve
 %
@@ -50,29 +57,29 @@
 % 01-25-02 reformated help & license -ad 
 % 01-26-02 change format for events and trial conditions -ad
 
-function [EEG, com] = pop_mergeset( EEG, INEEG2, keepall);
+function [INEEG1, com] = pop_mergeset( INEEG1, INEEG2, keepall);
 
 com = '';
 if nargin < 1
 	help pop_mergeset;
 	return;
 end;
-if isempty(EEG.data)
-   disp('Pop_merge error: cannot merge empty dataset'); return;
-end;    
-originput1 = EEG;
-if ~isstruct( EEG )
-    EEG = eeg_retrieve( EEG );	
-end;	
-if nargin < 2
-   promptstr    = { 'Enter number of dataset to merge with', ...
-      				'Preserve ICA of the first dataset ?' };
+if isempty(INEEG1)
+	error('Pop_merge: cannot merge empty dataset');
+end;
+if nargin < 2 & length(INEEG1) == 1
+	error('Pop_merge: need at least 2 datasets');
+end;
+
+if nargin == 1
+	promptstr    = { 'Enter dataset numbers to merge', ...
+					 'Preserve ICA of the first dataset ?' };
 	inistr       = { '1', 'no' };
 	result       = inputdlg( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    
-    INEEG2  = eval( result{1} );
+    INEEG2  = eval( [ '[' result{1} ']' ] );
     switch lower(result{2})
     	case 'keepall', keepall = 1;
     	otherwise, keepall = 0;
@@ -83,113 +90,93 @@ else
 	end;	
 end;
 
-originput2 = INEEG2;
-if ~isstruct( INEEG2 )
-	INEEG2 = eeg_retrieve( INEEG2 );	
-end;	
+fprintf('Merging datasets...\n');		
+if ~isstruct(INEEG2)
+	indices = INEEG2;
+	if length(indices) < 2
+		error('Pop_merge: need at least 2 datasets');
+	end;
+	%NEWEEG = eeg_retrieve(INEEG1, indices(1));
+	NEWEEG = INEEG1(indices(1));
+	for index = indices(2:end)
+		%INEEG2 = eeg_retrieve(INEEG1, indices(2));
+		INEEG2 = INEEG1(index);
+		NEWEEG = pop_mergeset(NEWEEG, INEEG2, keepall);
+	end;
+	INEEG1 = NEWEEG;
+else 
+	% check consistency
+	% -----------------
+	if INEEG1.nbchan ~= INEEG2.nbchan
+		error('The two datasets must have the same number of channels');
+	end;	
+	if INEEG1.srate ~= INEEG2.srate
+		error('The two datasets must have the same sampling rate');
+	end;	
+	if INEEG1.trials > 1 | INEEG2.trials > 1
+		if INEEG1.pnts ~= INEEG2.pnts
+			error('The two epoched datasets must have the same number of points');
+		end;
+		if INEEG1.xmin ~= INEEG2.xmin
+			fprintf('Warning: the two epoched datasets do not have the same time onset, adjusted');
+		end;
+		if INEEG1.xmax ~= INEEG2.xmax
+			fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
+		end;
+	end;	
 
-% check consistency
-% -----------------
-if EEG.nbchan ~= INEEG2.nbchan
-	error('The two datasets must have the same number of channels');
-end;	
-if EEG.srate ~= INEEG2.srate
-	error('The two datasets must have the same sampling rate');
-end;	
-if EEG.trials > 1 | INEEG2.trials > 1
-	if EEG.pnts ~= INEEG2.pnts
-		error('The two epoched datasets must have the same number of points');
-	end;
-	if EEG.xmin ~= INEEG2.xmin
-		fprintf('Warning: the two epoched datasets do not have the same time onset, adjusted');
-	end;
-	if EEG.xmax ~= INEEG2.xmax
-		fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
-	end;
-end;	
+	INEEG1.data    = [ INEEG1.data(:,:) INEEG2.data(:,:) ];
+	INEEG1.setname	= 'Merge datasets';
 
-fprintf('Merging the two datasets...\n');		
-EEG.data    = [ EEG.data(:,:) INEEG2.data(:,:) ];
-EEG.setname	= 'Merge datasets';
+	% concatenate events
+	% ------------------
+	if ~isempty(INEEG2.event)
+		if isfield( INEEG1.event, 'epoch')
+			for index = 1:length(INEEG2.event(:))
+				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1.trials;
+			end;    
+		end;
+		if isfield( INEEG1.event, 'latency')
+			for index = 1:length(INEEG2.event(:))
+				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1.trials*INEEG1.pnts;
+			end;    
+		end;
+		
+		INEEG1.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
+	end;
 
-% concatenate events
-% ------------------
-if ~isempty(INEEG2.event)
-	if isfield( EEG.event, 'epoch')
-		for index = 1:length(INEEG2.event(:))
-			INEEG2.event(index).epoch = INEEG2.event(index).epoch + EEG.trials;
-		end;    
+	INEEG1.epoch = [];
+
+	if INEEG1.trials > 1 | INEEG2.trials > 1
+		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
+	else
+		INEEG1.pnts = INEEG1.pnts + INEEG2.pnts;
 	end;
-	if isfield( EEG.event, 'latency')
-		for index = 1:length(INEEG2.event(:))
-			INEEG2.event(index).latency = INEEG2.event(index).latency + EEG.trials*EEG.pnts;
-		end;    
+	
+	if isfield(INEEG1, 'reject')
+		INEEG1 = rmfield(INEEG1, 'reject' );
 	end;
-			
-	EEG.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
+	INEEG1.specicaact = [];
+	INEEG1.specdata = [];
+	if keepall == 0
+		INEEG1.icaact = [];
+		INEEG1.icawinv = [];
+		INEEG1.icasphere = [];
+		INEEG1.icaweights = [];
+		if isfield(INEEG1, 'stats')
+			INEEG1 = rmfield(INEEG1, 'stats' );
+		end;
+	else
+		INEEG1.icaact = [];
+	end;
 end;
-
-% concatenate epoch
-% ---------------------
-EEG.epoch = [];
-% $$$ if ~isempty(INEEG2.epoch) & ~isempty(EEG.epoch)
-% $$$     fields1 = fieldnames( EEG.epoch );
-% $$$     fields2 = fieldnames( INEEG2.epoch );
-% $$$     fieldsdiff = setdiff( fields2, fields1 );
-% $$$     if ~isempty(fieldsdiff)
-% $$$         for f = 1:length(fieldsdiff)
-% $$$             for index = 1:EEG.trials
-% $$$                 eval( [ 'EEG.epoch(' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
-% $$$              end;
-% $$$         end;
-% $$$     end;
-% $$$     fieldsdiff = setdiff( fields1, fields2 );
-% $$$     fieldscom  = intersect( fields2, fields1 );
-% $$$     for f = 1:length(fieldsdiff)
-% $$$         for index = 1:INEEG2.trials
-% $$$             eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
-% $$$         end;
-% $$$     end;
-% $$$     for f = 1:length(fieldscom)
-% $$$         for index = 1:INEEG2.trials
-% $$$             eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldscom{f} ...
-% $$$                     '= INEEG2.epoch(' int2str(index) ').' fieldscom{f} ';' ] );
-% $$$         end;
-% $$$     end;
-% $$$ end;             
-
-if EEG.trials > 1 | INEEG2.trials > 1
-	EEG.trials  =  EEG.trials + INEEG2.trials;
-else
-	EEG.pnts = EEG.pnts + INEEG2.pnts;
-end;
-
-EEG = rmfield(EEG, 'reject' );
-EEG.specicaact = [];
-EEG.specdata = [];
-if keepall == 0
-    EEG.icaact = [];
-    EEG.icawinv = [];
-    EEG.icasphere = [];
-    EEG.icaweights = [];
-	EEG = rmfield(EEG, 'stats' );
-else
-	EEG.icaact = [];
-end;
-EEG = eeg_checkset(EEG);
 
 % build the command
 % -----------------
-if isstruct( originput1 )	input1 = inputname(1);
-else						input1 = num2str( originput1 );
-end;
-if nargin < 2
-	com = sprintf('EEG = pop_mergeset( %s, %d, %d);', input1, originput2, keepall);		
+if exist('indices') == 1
+	com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
 else
-	if isstruct( originput2 )	input2 = inputname(2);
-	else						input2 = num2str( originput2 );
-	end;
-	com = sprintf('EEG = pop_mergeset( %s, %s, %d);', input1, input2, keepall);		
+	com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);		
 end;
 
 return;
