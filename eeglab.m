@@ -179,6 +179,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.129  2002/08/13 23:17:54  arno
+% error message update
+% .,
+%
 % Revision 1.128  2002/08/13 22:37:38  arno
 % Dataset hide in low mem option
 %
@@ -1016,8 +1020,8 @@ eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
 		if popask( ['Remove all datasets except the present one ?' 10 'Otherwise go back to the memory menu to unset dataset overwrite'])
-			ALLEEG = []; CURRENSET = 0;
-			h('ALLEEG = []; CURRENSET = 0;');
+			ALLEEG = []; CURRENTSET = 0;
+			h('ALLEEG = []; CURRENTSET = 0;');
 		else 
 			return;
 		end;
