@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2004/02/15 20:33:10  scott
+% same
+%
 % Revision 1.122  2004/02/15 20:32:37  scott
 % same
 %
@@ -733,15 +736,15 @@ Rd = Rd(enum);
 labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 
-if isstr('shrinkfactor') % DEBUG
-   fprintf('shrinkfactor: %s\n',shrinkfactor);
-else
-   fprintf('shrinkfactor: %g\n',shrinkfactor);
-end
+%if isstr('shrinkfactor') % DEBUG
+%   fprintf('shrinkfactor: %s\n',shrinkfactor);
+%else
+%   fprintf('shrinkfactor: %g\n',shrinkfactor);
+%end
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-   fprintf('max Th: %g\n',max(Th)); % DEBUG
+%   fprintf('max Th: %g\n',max(Th)); % DEBUG
    Th = skirt_Th(Th,Rd);  % rotate the angles of the electrodes in the 'skirt'
-   fprintf('max Th: %g\n',max(Th)); % DEBUG
+%   fprintf('max Th: %g\n',max(Th)); % DEBUG
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1037,7 +1040,7 @@ hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
-  fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
+%  fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2)); % DEBUG
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
@@ -1071,14 +1074,17 @@ axis square; % keep head round!
 %
 function [newTh] = skirt_Th(Th,Rd)
    q1 = find(Th>=0 & Th<pi/2);
+   q2 = find(Th>=pi/2 & Th<pi);
+   q3 = find(Th<-pi/2 & Th>=-pi);
+   q4 = find(Th<0 & Th>=-pi/2);
+
    if ~isempty(q1)
      dr = Rd(q1)-0.5;
      x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
      Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
    end
-  fprintf('rotated %d q1 angles\n',length(q1)); % DEBUG
+%  fprintf('rotated %d q1 angles\n',length(q1)); % DEBUG
 
-   q2 = find(Th>=pi/2 & Th<pi);
    if ~isempty(q2)
      Th(q2) = Th(q2)-pi/2; % rotate to q1
      dr = Rd(q2)-0.5;
@@ -1086,9 +1092,8 @@ function [newTh] = skirt_Th(Th,Rd)
      Th(q2) = x+(pi/2)*Th(q2)/(pi/2-2*x);
      Th(q2) = Th(q2)+pi/2; % rotate back
    end
-  fprintf('rotated %d q2 angles\n',length(q2)); % DEBUG
+%  fprintf('rotated %d q2 angles\n',length(q2)); % DEBUG
 
-   q3 = find(Th<-pi/2 & Th>=-pi);
    if ~isempty(q3)
      Th(q3) = Th(q3)+pi; % rotate to q1
      dr = Rd(q3)-0.5;
@@ -1096,9 +1101,8 @@ function [newTh] = skirt_Th(Th,Rd)
      Th(q3) = x+(pi/2)*Th(q3)/(pi/2-2*x);
      Th(q3) = Th(q3)-pi; % rotate back
    end
-  fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
+%  fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
 
-   q4 = find(Th<0 & Th>=-pi/2);
    if ~isempty(q4)
      Th(q4) = Th(q4)+pi/2; % rotate to q1
      dr = Rd(q4)-0.5;
