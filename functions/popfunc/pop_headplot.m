@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/05/12 15:59:46  arno
+% debug last
+%
 % Revision 1.20  2003/05/12 15:54:20  arno
 % debuging output command if creating spline file
 %
@@ -135,7 +138,7 @@ if nargin < 3
                     drawnow;
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
-		            options = [ ', ''load'',' EEG.splinefile ',' ]; 
+		            pop_options = [ ', ''load'', ''' EEG.splinefile '''' ]; 
                     com = 'EEG = ';
 		      case 'yes',
 				    [filename, filepath] = uiputfile('*.spl', 'Save spline file with .spl extension');
@@ -143,11 +146,11 @@ if nargin < 3
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
 		            headplot('setup', EEG.chanlocs, EEG.splinefile);
-		            options = [ ', ''setup'',' EEG.splinefile ',' ]; 
+		            pop_options = [ ', ''setup'', ''' EEG.splinefile '''' ]; 
                     com = 'EEG = ';
 		 end;
     else
-    	options      = [ ',' ];
+    	pop_options      = '';
     end;
     
 	if isempty(EEG.splinefile) | exist(EEG.splinefile) ~= 2
@@ -182,7 +185,11 @@ if nargin < 3
 	end;
 	topotitle    = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
-	options      = [ ',' result{4} ];
+    if ~isempty(result{4})
+        options = [ ',' result{4} ];
+    else
+        options = '';
+    end;
 	if size(arg2(:),1) == 1, figure; end;
 else
 	% read or generate file if necessary
@@ -199,6 +206,7 @@ else
     end;
     
 	options = [];
+    pop_options = '';
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
@@ -316,11 +324,7 @@ if nbgraph> 1,
     set(a, 'fontweight', 'bold');
     axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;');
 end;
-if nbgraph== 1, com = [ 'figure;' com ]; rotate3d(gcf); end;
+if nbgraph== 1, com = [ 'figure; ' com ]; rotate3d(gcf); end;
 
-if length( options ) < 2
-	com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s]);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols) )];
-else
-	com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols), options )];
-end;
+com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols), [ options pop_options ])];
 return;
