@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2002/10/19 23:18:57  arno
+% debug lim at very low frequencies
+%
 % Revision 1.57  2002/10/19 23:10:16  arno
 % debug last
 %
@@ -554,7 +557,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Position', posbut(5,:), ...
 	'Style','edit', ...
 	'Tag','EPosition',...
-	'string','1',...
+	'string', fastif(g.trialstag(1) == -1, '0', '1'),...
 	'Callback', 'eegplot(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -1059,15 +1062,20 @@ else
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
     EPosition = findobj('tag','EPosition','parent',figh); % ui handle
-    g.time    = str2num(get(EPosition,'string'))-1;  
+    if g.trialstag(1) == -1
+        g.time    = str2num(get(EPosition,'string'));  
+    else 
+        g.time    = str2num(get(EPosition,'string'));
+        g.time    = g.time - 1;
+    end; 
     g.spacing = str2num(get(ESpacing,'string'));
         
     if p1 == 1
       g.time = g.time-g.winlength;     % << subtract one window length
     elseif p1 == 2               
-      g.time = g.time-1;             % < subtract one second
+      g.time = g.time-fastif(g.winlength>=1, 1, g.winlength/5);             % < subtract one second
     elseif p1 == 3
-      g.time = g.time+1;             % > add one second
+      g.time = g.time+fastif(g.winlength>=1, 1, g.winlength/5);             % > add one second
     elseif p1 == 4
       g.time = g.time+g.winlength;     % >> add one window length
     end
@@ -1080,7 +1088,11 @@ else
     
     % Update edit box
     g.time = max(0,min(g.time,ceil((g.frames-1)/multiplier)-g.winlength));
-    set(EPosition,'string',num2str(g.time+1)); 
+    if g.trialstag(1) == -1
+        set(EPosition,'string',num2str(g.time)); 
+    else 
+        set(EPosition,'string',num2str(g.time+1)); 
+    end; 
     set(figh, 'userdata', g);
 
     lowlim = round(g.time*multiplier+1);
@@ -1157,7 +1169,7 @@ else
 		multiplier = g.srate;
 	end;		
    	lowlim = round(g.time*multiplier+1);
-   	highlim = round(min((g.time+g.winlength)*multiplier));
+   	highlim = round(min((g.time+g.winlength)*multiplier+1));
   	displaymenu = findobj('tag','displaymenu','parent',gcf);
     if ~isempty(g.winrej) & g.winstatus
 		if g.trialstag ~= -1 % epoched data
@@ -1212,7 +1224,7 @@ else
     	alltag = [];
        	for tmptag = lowlim:highlim
     		if mod(tmptag-1, g.trialstag) == 0
-				plot([tmptag-lowlim tmptag-lowlim], [0 1], 'b--');
+				plot([tmptag-lowlim-1 tmptag-lowlim-1], [0 1], 'b--');
 				alltag = [ alltag tmptag ];
    			end;	
     	end;
@@ -1286,7 +1298,11 @@ else
     data = get(ax1, 'userdata');
     ESpacing = findobj('tag','ESpacing','parent',gcf);   % ui handle
     EPosition = findobj('tag','EPosition','parent',gcf); % ui handle
-    g.time    = str2num(get(EPosition,'string'))-1;  
+    if g.trialstag(1) == -1
+        g.time    = str2num(get(EPosition,'string'));  
+    else 
+        g.time    = str2num(get(EPosition,'string'))-1;   
+    end;        
     g.spacing = str2num(get(ESpacing,'string'));  
     
     orgspacing= g.spacing;
@@ -1482,16 +1498,19 @@ else
       
       % deal with abscicia
       % ------------------
-      Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'))-1;
-		if g.trialstag ~= -1
-      	 g.winlength = (tmpxlim(2) - tmpxlim(1))/g.trialstag;
-        	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.trialstag;
-		else
-		 	 g.winlength = (tmpxlim(2) - tmpxlim(1))/g.srate;	
-       	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.srate;
+      if g.trialstag ~= -1
+          Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'));
+          g.winlength = (tmpxlim(2) - tmpxlim(1))/g.trialstag;
+          Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1)-1)/g.trialstag;
+          Eposition = round(Eposition*1000)/1000;
+          set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition));
+      else
+          Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'))-1;
+          g.winlength = (tmpxlim(2) - tmpxlim(1))/g.srate;	
+          Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.srate;
+          Eposition = round(Eposition*1000)/1000;
+          set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
       end;  
-      Eposition = round(Eposition*1000)/1000;
-      set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition+1));
       
       % deal with ordinate
       % ------------------
