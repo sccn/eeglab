@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/11 20:51:32  arno
+% color
+%
 % Revision 1.4  2002/04/25 17:46:33  scott
 % added 'electrodes','off' default -sm
 %
@@ -97,7 +100,7 @@ if nargin < 3
 	if ~isempty( result{3} ), compnums = eval( [ '[' result{3} ']' ] ); end;
 	envtitle     = result{4};
 	options      =  [ ',' result{5} ];
-	figure('color', [1 1 1]);
+	figure;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -108,6 +111,7 @@ else
 		end;
 	end;	
 end;
+set(gcf, 'color', [1 1 1]);
 
 if ~isempty(EEG.chanlocs)
 	sigtmp = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);

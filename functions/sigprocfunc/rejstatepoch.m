@@ -84,6 +84,9 @@
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/07 23:17:24  arno
+% editing text
+%
 % Revision 1.2  2002/08/05 23:43:05  arno
 % update text
 %
@@ -178,7 +181,7 @@ if ~isstr( signal )
 
 	% plot the buttons
 	% ----------------
-	figure;
+	figure('color', [1 1 1]);
 	set(gcf, 'name', 'Rejectrials');
 	pos = get(gca,'position'); % plot relative to current axes
 	set( gca, 'tag', 'mainaxis');
@@ -236,7 +239,7 @@ if ~isstr( signal )
 				'   alldata = get(gcf, ''userdata'');' ...
 				'   plotsig = alldata{1};' ... 
 				'   pnts = alldata{2};' ... 
-				'   fig = figure(''position'', [100 300 500 300]);' ...
+				'   fig = figure(''position'', [100 300 500 300],''color'', [1 1 1]);' ...
 				'   I = alldata{3};' ... 
 				'   sweeps = size(plotsig,2) /pnts;' ... 
 				'   h1 = axes(''parent'', fig, ''Units'',''Normalized'', ''Position'',[0.6 0.11 0.27 0.815]);' ...

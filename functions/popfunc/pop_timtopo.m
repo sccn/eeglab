@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/25 17:58:46  arno
+% spelling
+%
 % Revision 1.2  2002/04/25 17:57:16  arno
 % spelling
 %
@@ -85,6 +88,8 @@ else
 		end;
 	end;	
 end;
+set(gcf, 'color', [1 1 1]);
+
 if exist('plottile') ~= 1
     plottitle = ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ];
 end;

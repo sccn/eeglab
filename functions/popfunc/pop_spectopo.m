@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/11 18:46:23  arno
+% EEG and ERP options
+%
 % Revision 1.18  2002/08/09 01:33:18  arno
 % debugging boundaries
 %
@@ -203,6 +206,7 @@ else
 		topofreqs = [];
 	end;
 end;
+set(gcf, 'color', [1 1 1]);
 
 switch processflag,
  case {'EEG' 'ERP' 'BOTH'},;

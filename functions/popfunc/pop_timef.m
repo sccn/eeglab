@@ -47,6 +47,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/09 22:31:39  arno
+% updating
+% text
+%
 % Revision 1.18  2002/08/09 22:31:04  arno
 % updating history
 %
@@ -209,7 +213,7 @@ if popup
 	if ~result{8}
 		options = [ options ', ''plotitc'', ''off''' ];
 	end;
-	figure;
+	figure('color', [1 1 1]);
 else
 	options = [];
 	for i=1:length( varargin )

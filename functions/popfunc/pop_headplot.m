@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/25 18:41:02  arno
+% same
+%
 % Revision 1.5  2002/07/25 18:40:06  arno
 % debugging
 %
@@ -245,6 +248,7 @@ for index = 1:size(arg2(:),1)
         axis off
     end;
 end;
+set(gcf, 'color', [1 1 1]);
 if nbgraph> 1, 
     a = textsc(0.5, 0.05, topotitle); 
     set(a, 'fontweight', 'bold');
