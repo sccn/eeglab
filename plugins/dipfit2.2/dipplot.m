@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.25  2003/04/30 16:19:28  arno
+%calibrating infants
+%
 %Revision 1.24  2003/04/30 02:05:24  arno
 %changing axis properties for images
 %
@@ -242,8 +245,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     else 
        [IMAGESLOC IMAGESAXIS] = getmriimgs;
        addpath('/data/common/matlab/MRIimages');
-       IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
-       IMAGESMULT   = { 0.8 0.8 1 } ;%[ 1.4 1.15 ] };
+       IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0 0.17] } ;% [ -0.12 0] };
+       IMAGESMULT   = { 1.2 1.2 1.2 } ;%[ 1.4 1.15 ] };
        %IMAGESOFFSET = { [0 0  NaN]   [0 NaN 0]  [NaN 0 0] } ;% [ -0.12 0] };
        %IMAGESMULT   = { [1 1  NaN]   [1 NaN 1]  [NaN 1 1]} ;%[ 1.4 1.15 ] };
        COLORMESH = 'w';
@@ -808,7 +811,7 @@ function updatedipplot(fig, nbsources)
       indz = minpos(imgaxis{3} - userdat.pos3d(1) + 4/84.747);
       tmp = userdat.pos3d*84.747
       [ imgaxis{3}(indx) imgaxis{2}(indy) imgaxis{1}(indz)]*84.747
-      plotimgs( imglocs, imgoffset, imgmult, imgaxis, [indx indy indz], axislim);
+      plotimgs( imglocs, imgoffset, imgmult, imgaxis, axislim, [indx indy indz]);
    end;
    	
 % plot images
