@@ -105,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/12/04 22:50:22  arno
+% implementing plotorder
+%
 % Revision 1.18  2002/11/26 18:58:20  arno
 % scale power duplicate debugging
 %
@@ -353,7 +356,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     else
         coordinates = g.coordinates;
     end;
-    brainmovieoptions = { 'plotorder', g.showcomps(plotorder), 
+    brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
                          'resolution', 'low', ...
                         'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
@@ -382,7 +385,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         coordinates = g.coordinates;
     end;
     
-    brainmovieoptions = {  'plotorder', g.showcomps(plotorder), 
+    brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
                          'resolution', 'low', ...
                         'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
