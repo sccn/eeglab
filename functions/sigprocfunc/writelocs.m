@@ -56,7 +56,8 @@
 %                           'gain'      [real > 1] channel gain. 
 %                           'custom1'   custom field #1.
 %                           'custom2', 'custom3', 'custom4' more custom fields.
-%   'header'   - ['on'|'off'] Add a header comment line with the name of each column.
+%   'unicoord'     - ['on'|'off'] Uniformize all coordinates. Default 'on'.
+%   'header'       - ['on'|'off'] Add a header comment line with the name of each column.
 %                             Comment lines begin with '%'. Default is 'off'.
 %   'customheader' - [string] Add a custom header at the beginning of the file and
 %                             preceded by '%'.  If used with 'header' set to 'on', 
@@ -89,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/05/13 22:10:26  arno
+% debuging writing display
+%
 % Revision 1.6  2003/05/13 21:53:50  arno
 % debug header custom
 %
@@ -116,19 +120,22 @@ if nargin < 2
 	return;
 end;
 
-chans = convertlocs(chans, 'auto');
-
 % get infos from readlocs
 % -----------------------
 [listtype formatinfo listcolformat formatskip] = readlocs('getinfos');
 
 g = finputcheck( varargin, ...
-   { 'filetype'	'string'	 listtype 			'loc';
-     'header'     'string' { 'on' 'off' } 	'off';
-     'customheader' 'string' [] 					'';
-     'elecind'    'integer' [1 Inf]				[];
-     'format'		'cell'	 []					{} }, 'writelocs');
+                 { 'filetype'	  'string'	 listtype 			'loc';
+                   'header'       'string'   { 'on' 'off' } 	'off';
+                   'customheader' 'string'   [] 					'';
+                   'elecind'      'integer'  [1 Inf]				[];
+                   'unicoord'     'string'   { 'on' 'off' } 	'off'; 
+                   'format'		  'cell'	 []					{} }, 'writelocs');
 if isstr(g), error(g); end;  
+
+if strcmpi(g.unicoord, 'on')
+    chans = convertlocs(chans, 'auto');
+end;
 
 % select channels
 % ---------------
