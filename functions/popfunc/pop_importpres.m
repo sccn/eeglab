@@ -8,6 +8,7 @@
 %   EEGIN          - input dataset
 %   filename       - file name
 %   typefield      - [string] type field name. Default is 'code'.
+%   latfield       - [string] latency field name. Default is 'time'.
 %   align          - [integer] alignment with preexisting events
 %                    see pop_importevent().
 % 
@@ -43,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/12/11 19:52:42  arno
+% allowing different alignments
+%
 % Revision 1.10  2003/11/19 19:28:29  arno
 % allow to import different fields for type
 %
@@ -74,7 +78,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_importpres(EEG, filename, typefield, align); 
+function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, align); 
 command = '';
 
 if nargin < 1 
@@ -82,8 +86,8 @@ if nargin < 1
     return
 end;
 
-if nargin < 4
-    align =0;
+if nargin < 5
+    align = 0;
 end;
 
 if nargin < 2 
@@ -101,30 +105,36 @@ fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1, 'verbose', '
 if nargin > 1
     if nargin < 3
         typefield = 'code'; % backward compatibility
+        latfield  = 'time';
     end;
     indtype  = strmatch(lower(typefield), lower(fields));
+    indlat   = strmatch(lower(latfield) , lower(fields));
 else
-    indtype  = strmatch('event type', lower(fields));
-    indtype2 = strmatch('code', lower(fields));
-    if ~isempty(indtype) & ~isempty(indtype2) 
-        typefield = questdlg2(strvcat('What field (column) in the .log file do you', ...
-                                      'want to use for EEGLAB event type?'), ...
-                              'pop_importpres()', ...
-                              'code','event type','code');
-        indtype = strmatch(lower(typefield), lower(fields));
-    else 
-        indtype = [indtype indtype2];
-    end;        
+    indtype1   = strmatch('event type', lower(fields));
+    indtype2   = strmatch('code', lower(fields));
+    indtype    = [ indtype1 indtype2 1];
+    indlatency = strmatch('time', lower(fields), 'exact');
+    indlatency = [ indlatency 1 ];
+    uilist = { { 'style' 'text' 'string' 'Field containing event types' } ...
+               { 'style' 'list' 'string' strvcat(fields) 'value' indtype(1)  'listboxtop' indtype(1)} ...
+               { 'style' 'text' 'string' 'Field containing event latencies' } ...
+               { 'style' 'list' 'string' strvcat(fields) 'value' indlatency(1) 'listboxtop' indlatency(1) } ...
+               { } { 'style' 'text' 'string' 'Note: scroll list then click to select field' } };
+    uigeom = { [2 1] [2 1] 1 1 };
+    result = inputgui(uigeom, uilist, 'pophelp(''pop_importpres'')', 'Import presentation file - pop_importpres()');
+    indtype = result{1};
+    indlat  = result{2};
+    typefield = fields{indtype};
+    latfield  = fields{indlat};
 end;
 if isempty(indtype)
     error(['Could not detect field ''' typefield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
 end;
-disp(['Replacing field ''' typefield ''' by ''type'' for EEGLAB compatibility']);
-indlat  = strmatch('time', lower(fields), 'exact');
 if isempty(indlat)
-    error('Could not detect field ''Time'', try importing the file as ASCII (use delimitor=9 (tab))');
+    error(['Could not detect field ''' latfield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
 end;
-disp('Replacing field ''Time'' by ''latency'' for EEGLAB compatibility');
+disp(['Replacing field ''' typefield ''' by ''type'' for EEGLAB compatibility']);
+disp(['Replacing field ''' latfield  ''' by ''latency'' for EEGLAB compatibility']);
 fields{indtype} = 'type';
 fields{indlat}  = 'latency';
 
@@ -134,7 +144,7 @@ for index = 1:length(fields)
     indspace = find(fields{index} == ' ');
     fields{index}(indspace) = '_';
     indparen = find(fields{index} == ')');
-    if indparen == length(fields{index})
+    if ~isempty(indparen) & indparen == length(fields{index})
         % remove text for parenthesis
         indparen = find(fields{index} == '(');
         if indparen ~= 1
@@ -161,6 +171,7 @@ end;
 % import file
 % -----------
 if isempty(EEG.event), align = NaN; end;
+
 EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields);
 
