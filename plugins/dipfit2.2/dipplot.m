@@ -155,6 +155,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.113  2005/03/17 17:14:18  arno
+%re-implemented normlen, autodetect MRI etc...
+%
 %Revision 1.112  2005/03/17 16:16:03  arno
 %reading anatomical image
 %
@@ -530,6 +533,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % trying to determine coordformat
     % -------------------------------
+    if ~isfield(sources, 'momxyz')
+        g.coordformat = 'spherical';
+    end;
     if strcmpi(g.coordformat, 'auto')
         if ~isempty(g.meshdata)
             g.coordformat = 'MNI';
@@ -1256,7 +1262,7 @@ function src = computexyzforbesa(src);
             phiori   = momtmp(1)+90; %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
             thetaori = momtmp(2);    %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
             % exentricities are in % of the radius of the head sphere
-            [x y z]    = sph2cart(theta/180*pi, phi/180*pi, postmp(3)/100); 
+            [x y z]    = sph2cart(theta/180*pi, phi/180*pi, postmp(3)/1.2); 
             [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, momtmp(3)*5); % exentricity scaled for compatibility with DIPFIT
             src(index).posxyz(index2,:) = [-y x z];
             src(index).momxyz(index2,:) = [-yo xo zo];
