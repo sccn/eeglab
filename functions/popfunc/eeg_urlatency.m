@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/04/20 02:08:48  arno
+% debug
+%
 % Revision 1.1  2004/04/20 01:11:39  arno
 % Initial revision
 %
@@ -48,12 +51,16 @@ function latout = eeg_urlatency( events, latin );
     end;
     
     boundevents = { events.type };
-    indbound = strmatch('boundary', boundevents);
-    
-    latout = latin;
-    for index = indbound'
-        if events(index).latency < latin
-            latout = latout + events(index).length;
+    if ~isempty(boundevents) & isstr(boundevents{1})
+        indbound = strmatch('boundary', boundevents);
+        
+        latout = latin;
+        for index = indbound'
+            if events(index).latency < latin
+                latout = latout + events(index).length;
+            end;
         end;
+    else
+        latout = [];
     end;
     
