@@ -9,13 +9,13 @@
 % Optional inputs:
 %   'setname'    - Name of the dataset
 %   'data'       - ['varname'|'filename'] Import a file or variable
-%                   into the EEG structure of EEGLAB.
+%                   into an EEGLAB EEG structure 
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
-%                  The ata file is transposed if the number of rows is greater
+%                  The data file is transposed if the number of rows is larger
 %                  than the number of columns. Note: for type 'float32le' and
 %                  'float32be' (little endian and big endian byte ordering), data
 %                  must be organised in the format (channels x timepoints x epochs).
-%   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode locations 
+%   'chanlocs'   - ['varname'|'filename'] Import a file containing channel locations 
 %                  (See >> help readlocs for file format).
 %   'nbchan'     - Number of channels in data
 %   'xmin'       - Starting time (in seconds)
@@ -25,10 +25,10 @@
 %   'icaweight'  - ICA weight matrix. By default, the sphering matrix is set to
 %                   the identity matrix if it is empty.
 %   'icasphere'  - ICA sphering matrix
-%   'comments'   - command string for the current dataset
+%   'comments'   - Command string for the current dataset
 % 
 % Outputs:
-%   EEGOUT       - modified dataset structure
+%   EEGOUT       - Modified dataset structure
 %
 % Note:
 %   To create a new dataset, type 
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/11/14 18:29:03  arno
+% new average reference
+%
 % Revision 1.27  2002/11/14 17:38:31  arno
 % gui text
 %
@@ -278,14 +281,14 @@ for curfield = tmpfields'
         case 'srate'   , EEGOUT.srate = getfield(g, {1}, curfield{1});
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2
-                            fprintf('Pop_editset: filename ''%s'' found for channel location\n', varname); 
+                            fprintf('Pop_editset: channel locations file ''%s'' found\n', varname); 
                             EEGOUT.chanlocs = readlocs(varname);
                          else
-                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
+                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2
-                            fprintf('Pop_editset: filename ''%s'' found for ICA weight matrix\n', varname); 
+                            fprintf('Pop_editset: ICA weight matrix file ''%s'' found\n', varname); 
 							try, EEGOUT.icaweights = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch, fprintf('Pop_editset warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
@@ -294,7 +297,7 @@ for curfield = tmpfields'
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
 							 else
-								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
 							 end;
 						 end;
@@ -303,7 +306,7 @@ for curfield = tmpfields'
                          end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2
-                            fprintf('Pop_editset: filename ''%s'' found for ICA sphere matrix\n', varname); 
+                            fprintf('Pop_editset: ICA sphere matrix file ''%s'' found\n', varname); 
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch, fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
@@ -312,13 +315,13 @@ for curfield = tmpfields'
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
 							 else
-								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
 							 end;
                          end;
 	    case 'data'    , varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
-                            fprintf('Pop_editset: filename ''%s'' found for raw data\n', varname); 
+                            fprintf('Pop_editset: raw data file ''%s'' found\n', varname); 
                             switch lower(g.dataformat)
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
