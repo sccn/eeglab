@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/11/18 16:26:53  scott
+% same
+%
 % Revision 1.14  2003/11/18 16:25:55  scott
 % Enter ... -> ...
 %
@@ -157,6 +160,7 @@ EEG.filename        = filename;
 EEG.filepath        = filepath;
 EEG.setname 		= 'Neuroscan EEG data';
 EEG.nbchan          = size(EEG.data,1);
+EEG.chanlocs        = struct('labels', cellstr(char(namechan)));
 EEG = eeg_checkset(EEG);
 if any(rt)
     EEG = pop_importepoch( EEG, [rt(:)*1000 eegtype(:) accept(:) eegresp(:)], { 'RT' 'type' 'accept' 'response'}, {'RT'}, 1E-3, 0, 1);
