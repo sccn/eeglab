@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2002/07/29 18:30:38  arno
+% typo
+%
 % Revision 1.93  2002/07/29 17:55:37  arno
 % add import pop_chanevent
 %
@@ -633,9 +636,9 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( ERPC_m, 'Label', 'On same axis (with maps)', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 	spec_m = uimenu( third_m, 'Label', 'Time-frequency', 'Separator', 'on');
-		uimenu( spec_m, 'Label', 'Channel time-frequency'   , 'CallBack', [ checkepoch    'LASTCOM = pop_timef(EEG, 1);' e_hist]);
+		uimenu( spec_m, 'Label', 'Channel time-frequency'   , 'CallBack', [ checkepoch    'LASTCOM = pop_timef(EEG, 1, h(''find'',''pop_timef''));' e_hist]);
 		uimenu( spec_m, 'Label', 'Channel cross-coherence'  , 'CallBack', [ checkepoch    'LASTCOM = pop_crossf(EEG, 1);' e_hist]);
-		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0);' e_hist],'Separator', 'on');
+		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0, h(''find'',''pop_timef''));' e_hist],'Separator', 'on');
 		uimenu( spec_m, 'Label', 'Component cross-coherence', 'CallBack', [ checkepochica 'LASTCOM = pop_crossf(EEG, 0);' e_hist]);
 		
 set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
