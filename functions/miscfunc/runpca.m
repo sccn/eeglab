@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/05/05 01:37:17  arno
+% lowercase n -> uppercase N
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -83,11 +86,11 @@ else
   if N > size(data,1)
     error('N must be <= the number of rows in data.')
   end
-  if N <= BIG_N | N == rows
-     [U,S,V] = svd(data',0);
-  else
-     [U,S,V] = svds(data',N);
-  end
+  %if N <= BIG_N | N == rows
+  [U,S,V] = svd(data',0);
+  %else
+  %   [U,S,V] = svds(data',N);
+  %end
   if norm == 0
     pc = U';
     M = (S*V')';
@@ -95,9 +98,9 @@ else
     pc = (U*S)';
     M = V;
   end  
-  if N > BIG_N & N < rows
-    pc = pc(1:N,:);
-    M = M(:,1:N);
-  end
+  %if N > BIG_N & N < rows
+  pc = pc(1:N,:);
+  M = M(:,1:N);
+  %end
 end
 %S = diag(S(1:N,1:N));
