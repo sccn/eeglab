@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/04/29 17:13:17  arno
+% ignoring keystroke events
+%
 % Revision 1.23  2004/03/17 22:52:29  arno
 % import keystroke event type
 %
