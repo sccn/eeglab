@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/08/11 15:40:01  arno
+% text
+%
 % Revision 1.38  2003/05/12 23:33:18  arno
 % verbose off, deteecting time limits
 %
@@ -318,7 +321,11 @@ if nargin < 3
 	figure('tag', 'spectopo');
         set(gcf,'Name','spectopo()');
 else
-	options = [',' vararg2str(varargin)];
+    if ~isempty(varargin)
+        options = [',' vararg2str(varargin)];
+    else
+        options = '';
+    end;
 	if isempty(timerange)
 		timerange = [ EEG.xmin*1000 EEG.xmax*1000 ];
 	end;
