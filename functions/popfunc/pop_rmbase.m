@@ -1,25 +1,25 @@
 % pop_rmbase() - remove channel baseline means from an epoched or 
-%                continuous EEG dataset.
-%
+%                continuous EEG dataset. Calls rmbase().
 % Usage:
-%   >> OUTEEG = pop_rmbase( EEG ); % pop up an interactive window
-%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange);
+%   >> OUTEEG = pop_rmbase( EEG ); % first pop up an interactive window
+%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange); % call rmbase()
 %
 % Graphic interface:
-%    "Baseline time range" - [edit box] Same as the 'timerange' command 
-%                       line input.
-%    "Baseline points vector" - [edit box] Same as the 'pointrange' command 
-%                       line option. Overwritten by the time limits option. 
+%    "Baseline latency range" - [edit box] Latency range for the baseline in ms.
+%                               Collects the 'timerange' command line input.
+%    "Baseline points vector" - [edit box] Collects the 'pointrange' command line 
+%                               option. (Overwritten by the timerange option above). 
 % Inputs:
 %   EEG        - Input dataset
-%   timerange  - Baseline time range in milliseconds [min_ms max_ms]. 
-%   pointrange - Baseline points vector [min:max] (overwritten by timerange).
+%   timerange  - [min_ms max_ms] Baseline latency range in milliseconds.
+%   pointrange - [min:max] Baseline points vector (overwritten by timerange).
+%
 % Outputs:
-%   OUTEGG     - Output dataset
+%   OUTEEG     - Output dataset
 %
 % Note: If dataset is continuous, channel means are removed separately 
-%       for each continuous data region, respecting 'boundary'
-%       events marking boundaries of excised data portions.
+%       for each continuous data region, respecting 'boundary' events 
+%       marking boundaries of excised or concatenated data portions.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/12/16 23:21:13  arno
+% header in ms
+%
 % Revision 1.14  2004/12/16 22:59:32  hilit
 % fixing some typo with 'pointrange' and separating the | condition in the if
 % statement
@@ -108,10 +111,10 @@ end;
 if nargin < 2 & EEG.trials > 1
 	% popup window parameters
 	% -----------------------
-    promptstr    = {'Baseline time range (min_s max_s):',...
-         		   strvcat('Baseline points vector (ex:1:56):', ...
-                                  '(Overwrite time limits).') };
-	inistr       = { [num2str(EEG.xmin*1000) ' 0'], '' };
+    promptstr    = {'Baseline latency range (min_ms max_ms) ([] = whole epoch):',...
+         		   strvcat('Else, baseline points vector (ex:1:56) ([] = whole epoch):', ...
+                           '(overwritten by latency range above).') };
+	inistr     = { [num2str(EEG.xmin*1000) ' 0'], '' }; % latency range in ms
 	result       = inputdlg2( promptstr, 'Epoch baseline removal -- pop_rmbase()', ...
                                   1,  inistr, 'pop_rmbase');
 	size_result  = size( result );
@@ -119,9 +122,17 @@ if nargin < 2 & EEG.trials > 1
 
 	% decode parameters
 	% -----------------
-	if isempty( result{1} ) & isempty( result{2} ), return; end;
-    timerange = eval( [ '[' result{1} ']' ] );
-    pointrange = eval( [ '[' result{2} ']' ] );
+	if numel(result) < 2 | ((isempty(result{1}) | strcmp(result{1},'[]') ) ...
+                           & (isempty(result{2}) | strcmp(result{2},'[]')))
+       timerange = [num2str(EEG.xmin*1000) num2str(EEG.xmax*1000)]; % whole epoch latency range
+       fprintf('pop_rmbase(): using whole epoch as baseline.\n');
+
+       % fprintf('pop_rmbase(): baseline limits must be specified.\n');
+       % return; end;
+    else
+      timerange = eval( [ '[' result{1} ']' ] );
+      pointrange = eval( [ '[' result{2} ']' ] );
+    end
 elseif nargin < 2 & EEG.trials == 1
 	% popup window parameters
 	% -----------------------
