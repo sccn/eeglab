@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/07/01 23:00:54  scott
+% debug
+%
 % Revision 1.29  2003/07/01 22:58:35  scott
 % added optional gridimage output, undocumented -sm
 %
@@ -197,7 +200,7 @@
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function [handle, Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle, Zi] = topoplot(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
