@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/06/17 23:19:12  arno
+% j -> jj
+%
 % Revision 1.34  2003/05/29 15:07:03  arno
 % debugging lowmem
 %
@@ -761,7 +764,7 @@ end;
 if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(X)
     
     % compute for first 2 trials to get freqsout
-    XX = reshape(X, 1, frame, length(X)/g.frame);    
+    XX = reshape(X, 1, frame, prod(size(X))/g.frame);    
     [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
     
     % scan all frequencies
