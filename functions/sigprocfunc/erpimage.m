@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2002/08/31 17:00:50  arno
+% add yerplabel option
+%
 % Revision 1.41  2002/08/30 18:18:09  arno
 % same
 %
@@ -1545,7 +1548,8 @@ if Erpflag == YES
     end;
  end;
  xticklabel = strvcat(xticklabel);
- erp=nan_mean(oridata');           % compute erp average, ignoring nan's
+ % erp=nan_mean(oridata');           % compute erp average, ignoring nan's
+ erp=nan_mean(urdata');           % compute erp average, ignoring nan's
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
