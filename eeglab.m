@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.255  2003/10/29 18:28:35  arno
+% debug last
+%
 % Revision 1.254  2003/10/29 18:27:33  arno
 % adding biosign optional menu
 %
@@ -1072,7 +1075,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
         disp('BIOSIG detected; Additinal import menu inserted');
         pathsload   = which('sload');   pathsload   = pathsload(1:end-7);
         pathloadeeg = which('loadeeg'); pathloadeeg = pathloadeeg(1:end-9);
-        if stccmpi(pathsload, pathloadeeg)
+        if strcmpi(pathsload, pathloadeeg)
             disp('Warning: BIOSIG function ''loadeeg'' is in conflict with EEGLAB ''loadeeg'' function');
             disp('         Note: ''loadeeg'' in BIOSIG is redundant with BIOSIG ''sload'' function');
             disp( [ '        We advise that you remove ' which('loadeeg') ]);
