@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2002/04/30 19:03:27  scott
+% trying global COLOR -sm
+%
 % Revision 1.59  2002/04/30 19:01:21  scott
 % *** empty log message ***
 %
@@ -369,7 +372,8 @@ function eeglab( onearg )
 eeg_options; 
 eeg_global;
 eeg_consts;
-global COLOR           = [.56 .66 .90];
+global COLOR;
+COLOR = [.56 .66 .90];
 
 if nargin < 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
