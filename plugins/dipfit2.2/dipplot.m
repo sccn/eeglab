@@ -1,5 +1,5 @@
 % dipplot() - Visualize EEG equivalent-dipole locations and orientations 
-%             in the MNI average MRI brain or in the BESA spherical head model. 
+%             in the MNI average MRI head or in the BESA spherical head model. 
 % Usage:
 %   >> dipplot( sources, 'key', 'val', ...);
 %   >> [sources X Y Z XE YE ZE] = dipplot( sources, 'key', 'val', ...);
@@ -18,71 +18,67 @@
 %                     component: component number
 %                     rv:        residual variance
 % Optional input:
-%  'rvrange'  - [min max] Only plot dipoles with residual variace in the
-%               given range {default: plot all dipoles}
-%  'summary'  - ['on'|'off'] Build a summary plot with three lateral 
-%               brain slice views (top, back, side) {default: 'off'}
-%  'image'    - ['besa'|'mri'] Background image: 'mri' (or 'fullmri') uses 
-%               mean-MRI brain image from the Montreal Neurological Institute. 
-%               This option may also contain a 3-D MRI volume (dim 1: left to right; 
-%               dim 2: anterior-posterior; dim 3: superior-inferior). Use 'coreg' 
-%               (below) to coregister electrodes with the MR image {default: 'mri'} 
-%  'coreg'    - [cx cy cz scale pitch roll yaw] Rotate the electrode coordinates 
-%               in 3-D using pitch (x plane), roll (y plane) and yaw (z plane). 
-%               Then scale (using 'scale') and re-center to 3-D coordinates 
-%               [cx cy cz] {default: none}
+%  'rvrange'  - [min max] Only plot dipoles with residual variace within the
+%               given range. Default: plot all dipoles.
+%  'summary'  - Build a summary plot with three views (top, back, side)
+%  'mri'      - Matlab file containing an MRI volume and a 4-D transformation
+%               matrix to go from voxel space to electrode space:
+%               mri.anatomy   contains a 3-D anatomical data array
+%               mri.transfrom contains a 4-D homogenous transformation matrix.
+%  'sph2spm'  - Uniform transformation matrix to transform Spherical coordinates
+%               of dipoles into SPM coordinates. (Irrelevant for BEM model).
+%  'image'    - ['besa'|'mri'] Background image. 
+%               'mri' (or 'fullmri') uses mean-MRI brain images from the Montreal 
+%               Neurological Institute. This option can also contain a 3-D MRI
+%               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
+%               superior-inferior). Use 'coregist' to coregister electrodes
+%               with the MRI. {default: 'mri'} 
+%
 % Plotting options:
-%  'color'    - [cell array of color strings or (1,3) color arrays]. Dipole colors.
-%               Matlab color name (ex. 'r'), RGB formula (ex. [1 0 0]) or integer.
-%               A single integer will be interpreted as a color index (1:64) in 
-%               the 'jet' colormap.  For example, { 'b' 32 [1 0 0] } gives blue, 
-%               green and then red.  If the number of colors given is less than 
-%               the number of dipoles to plot, dipole colors will rotate through 
-%               the given colors. {default: ['g' 'b' 'r' 'm' 'c' 'y']}
-%  'view'     - 3-D viewing angle in Cartesian coordinates: [0 0 1] gives a axial 
-%               (top) view; [0 -1 0] gives a coronal (rear) view; [1 0 0] gives 
-%               a sagittal (side) view of the head. {default: [0 0 1]=top|axial}
-%  'mesh'     - ['on'|'off'] Display spherical mesh {default: 'off'}
-%  'axistight' - ['on'|'off'] For MRI only, display the closest MRI slice 
-%               {default: 'off'}
-%  'gui'      - ['on'|'off'] Display controls. If gui 'off', a new figure is not 
-%               created. This is sseful for presentation or for incomporating a 
-%               dipplot into a complex figure. {default: 'on'}
-%  'num'      - ['on'|'off'] Display component numbers, taking into account
-%               dipole size. {default: 'off'}
-%  'cornermri' - ['on'|'off'] Force MRI images to the corner of the MRI volume
-%                (useful when background is not black) {default: 'off'}
-%  'drawedges' - ['on'|'off'] Draw edges of the 3-D MRI (black in 'axistight',
-%                white otherwise) {default: 'off'}
-%  'projimg'  -  ['on'|'off'] Plot dipole locations on three cardinal slice images 
-%                in 3-D plots {default 'off'}
-%  'projlines' - ['on'|'off'] Plot thin lines connecting dipoles to their 
-%                locations in the three cardinal slice images {default: 'off'}
-%  'projcol'   - [color] color for the projected line {default: same as dipole}
-%  'dipolesize' - Size of the dipole spheres {default: 30}
-%  'dipolelength' - Length of the dipole pointers {default: 1}
-%  'pointout' - ['on'|'off'] Point the dipoles outward. {default: 'off'}
-%  'sphere'   - [float] radius of sphere corresponding to the skin {default: 1}
-%  'spheres'  - ['on'|'off'] {default: 'off'} Plot dipole markers as 3-D spheres. 
+%  'color'    - [cell array of color strings or (1,3) color arrays]. For
+%               exemple { 'b' 'g' [1 0 0] } gives blue, green and red. 
+%               Dipole colors will rotate through the given colors if
+%               the number given is less than the number of dipoles to plot.
+%               A single number will be used as color index in the jet colormap.
+%  'view'     - 3-D viewing angle in cartesian coords.,
+%               [0 0 1] gives a sagittal view, [0 -1 0] a view from the rear;
+%               [1 0 0] gives a view from the side of the head.
+%  'mesh'     - ['on'|'off'] Display spherical mesh. {Default is 'on'}
+%  'axistight' - ['on'|'off'] For MRI only, display the closest MRI
+%               slide. {Default is 'off'}
+%  'gui'      - ['on'|'off'] Display controls. {Default is 'on'} If gui 'off', 
+%               a new figure is not created. Useful for incomporating a dipplot 
+%               into a complex figure.
+%  'num'      - ['on'|'off'] Display component number. Take into account
+%               dipole size. {Default: 'off'}
+%  'cornermri' - ['on'|'off'] force MRI images to the corner of the MRI volume
+%               (usefull when background is not black). Default: 'off'.
+%  'drawedges' - ['on'|'off'] draw edges of the 3-D MRI (black in axistight,
+%                white otherwise.) Default is 'off'.
+%  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
+%               in making 3-D plots {Default 'off'}
+%  'projlines' - ['on'|'off'] Plot lines connecting dipole with 2-D projection.
+%                Color is dashed black for BESA head and dashed black for the
+%                MNI brain {Default 'off'}
+%  'projcol'   - [color] color for the projected line {Default is same as dipole}
+%  'dipolesize' - Size of the dipole sphere(s) {Default: 30}
+%  'dipolelength' - Length of the dipole bar(s) {Default: 1}
+%  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
+%  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
+%  'spheres'  - ['on'|'off'] {default: 'off'} plot dipole markers as 3-D spheres. 
 %               Does not yet interact with gui buttons, produces non-gui mode.
-%  'spheresize' - [real>0] Size of spheres (if 'spheres','on'). {default: 5}
-%  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {default: 'off'}
-%  'std'      - [cell array] Plot standard deviation of dipoles. i.e.
-%               { [1:6] [7:12] } Plot two elipsoids that best fit all the dipoles
-%               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
-%               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
-%               first elipsoid is 2 standard-dev and the lines are thicker.
-%               {default: none}
-%  'dipnames' - [cell array] Cell array of strings with a name for each dipole 
-%               (or dipole pair) {default: none}
+%  'spheresize' - [real>0] size of spheres (if 'on'). {default: 5}
+%  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
+%  'dipnames' - [cell array] cell array of string with a name for each dipole (or
+%               pair of dipole).
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
 %   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
 %               more than one dipole per components, the last dipole is returned.
-%   XE,YE,ZE  - Locations of dipole tips (Cartesian coordinates). If there is
-%               more than one dipole per components, the last dipole is returned.
+%   XE,YE,ZE  - Locations of dipole ends (Cartesian coordinates). The same
+%               remark as above applies.
 %
-% Author: Arnaud Delorme, SCCN / INC / UCSD, 1st July 2002
+% Author: Arnaud Delorme, CNL / Salk Institute, 1st July 2002
 %
 % Notes: Visualized locations are not exactly the same as in BESA (because of
 % manual tuning of the size of the head textures).  Because of a bug in the 
@@ -120,8 +116,13 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-%                Color is dashed black for BESA head and dashed black for the
-%                MNI brain 
+% old options
+% -----------
+%  'std'      - [cell array] plot standard deviation of dipoles. i.e.
+%               { [1:6] [7:12] } plot two elipsoids that best fit all the dipoles
+%               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
+%               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
+%               first elipsoid is 2 standard-dev and the lines are thicker.
 
 % Copyright (C) 2002 Arnaud Delorme
 %
@@ -150,13 +151,6 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
-%Revision 1.106  2005/02/03 19:17:40  scott
-%help message
-%,
-%
-%Revision 1.105  2005/01/10 19:21:56  scott
-%clarified view plane definitions in help. Specified name of MNI image in error msg
-%
 %Revision 1.104  2004/11/20 02:32:43  scott
 %help msg edits:   carthesian -> Cartesian
 %
@@ -463,7 +457,7 @@
 
 function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
-    DEFAULTVIEW = [0 0 1]; % default to 'top' (axial) view
+    DEFAULTVIEW = [0 0 1];
         
     if nargin < 1
         help dipplot;
@@ -482,7 +476,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
-                                 'coreg'     'real'     []                  [];
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
@@ -492,10 +485,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'normlen'   'string'   { 'on' 'off' }     'off';
                                  'num'       'string'   { 'on' 'off' }     'off';
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
-                                 'std'       'cell'     []                  {};
+                                 'mri'       { 'string' 'struct' } []      '';
                                  'dipnames'   'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
                                  'projcol'   ''         []       [];
+                                 'sph2spm'   ''         []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
@@ -505,6 +499,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'links'       'real'   []                  [];
                                  'image'       { 'string' 'real'} []                 'mri' }, ...
                                                                                     'dipplot');
+    %                             'std'       'cell'     []                  {};
+    %                             'coreg'     'real'     []                  [];
+
     if isstr(g), error(g); end;
     g.zoom = 1500;
 
@@ -514,7 +511,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     dat.maxcoord   = [ 90 100 100 ]; % location of images in 3-D, Z then Y then X
     dat.axistight  = strcmpi(g.axistight, 'on');
     dat.drawedges  = g.drawedges;
-    dat.coreg      = g.coreg;
     dat.cornermri  = strcmpi(g.cornermri, 'on');
     radius = 85;
     if isstr(g.image) & strcmpi(g.image, 'besa')
@@ -548,8 +544,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     elseif isstr(g.image)
         fid = fopen('VolumeMNI.bin', 'rb', 'ieee-le');
         if fid == -1
-            errorstr=sprintf('Cannot find MRI data file "VolumeMNI.bin"');
-            error(errorstr);
+            error('Cannot find MRI data file');
         end;
         V = double(fread(fid, [108 129*129], 'uint8'))/255;
         V = reshape(V, 108, 129, 129);
@@ -610,10 +605,43 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         COLORMESH = 'w';
         BACKCOLOR = 'k';        
     end;
+    if ~isempty(g.mri)
+        if isstr(g.mri);
+            try, 
+                g.mri = load('-mat', g.mri);
+                g.mri = g.mri.mri;
+            catch,
+                disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
+                try,
+                    g.mri = read_fcdc_mri(g.mri);
+                catch,
+                    error('Cannot load file using read_fcdc_mri');
+                end;
+            end;
+        end;
+        dat.sph2spm    = g.sph2spm;
+        dat.imgs       = g.mri.anatomy;
+        dat.tcparams   = []; % only for spherical model
+        dat.imgcoords  = {};
+        dat.transform  = g.mri.transform;
+
+        % MRI coordinates for slices
+        % --------------------------
+        if isfield(g.mri, 'xgrid')
+            g.mri.xgrid = [1:size(dat.imgs,1)]; 
+            g.mri.ygrid = [1:size(dat.imgs,2)];
+            g.mri.zgrid = [1:size(dat.imgs,3)];
+        end;
+        dat.imgcoords = { g.mri.xgrid g.mri.ygrid g.mri.zgrid };            
+        dat.maxcoord  = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
+        COLORMESH = 'w';
+        BACKCOLOR = 'k';
+        
+    end;
 
     % point 0
     % -------
-    [xx yy zz] = transcoords(0,0,0, dat.tcparams, dat.coreg);
+    [xx yy zz] = sph2spm(0, 0, 0, dat.sph2spm); % nothing happens for BEM
     dat.zeroloc = [ xx yy zz ];
     
     % conversion
@@ -640,20 +668,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             sources(index).component = index;
         end;
     end;        
-
-    % normalize position to unit sphere
-    % ---------------------------------
-    maxi = 0;
-    for index = 1:length(sources)
-        maxi = max(maxi,max(abs(sources(index).posxyz(:))));
-    end;
-    if maxi > 1.01 & g.sphere == 1
-        disp('Non-normalized dipole positions, normalizing by standard head radius 85 mm'); 
-        g.sphere = 85;
-        fact = 0.1;
-    else 
-        fact = 1;
-    end;
     
     % find non-empty sources
     % ----------------------
@@ -664,11 +678,13 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % ---------------------
     outsources = sources;
     for index = 1:length(sources)
-        sources(index).posxyz = sources(index).posxyz/g.sphere;
+        sources(index).momxyz = sources(index).momxyz/1000;
+    end;
+    if 0
         tmp = sources(index).posxyz(:,1);
         sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
         sources(index).posxyz(:,2) = -tmp;
-        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05*fact;
+        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05;
         tmp = sources(index).momxyz(:,1);
         sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
         sources(index).momxyz(:,2) = -tmp;
@@ -775,7 +791,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         pos = get(gca, 'position');
         set(gca, 'position', [pos(1)+0.05 pos(2:end)]);
     end;
-    plotimgs( dat, [1 1 1]);
+    indx = ceil(dat.imgcoords{1}(end)/2);
+    indy = ceil(dat.imgcoords{2}(end)/2);
+    indz = ceil(dat.imgcoords{3}(end)/2);
+    plotimgs( dat, [indx indy indz], dat.transform);
     
     set(gca, 'color', BACKCOLOR);
     %warning off; a = imread('besaside.pcx'); warning on;
@@ -798,12 +817,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     SPHEREGRAIN = 20; % 20 is Matlab default
     [x y z] = sphere(SPHEREGRAIN);
     hold on; 
-    [xx yy zz] = transcoords(x, y, z, dat.tcparams, dat.coreg);
+    [xx yy zz] = sph2spm(x*0.085, y*0.085, z*0.085, dat.sph2spm);
+    [xx yy zz] = sph2spm(x*85   , y*85   , z*85   , dat.sph2spm);
+    %xx = x*100;
+    %yy = y*100;
+    %zz = z*100;
     if strcmpi(COLORMESH, 'w')
         hh = mesh(xx, yy, zz, 'cdata', ones(21,21,3), 'tag', 'mesh'); hidden off;
     else
         hh = mesh(xx, yy, zz, 'cdata', zeros(21,21,3), 'tag', 'mesh'); hidden off;
     end;
+    
     %x = x*100*scaling; y = y*100*scaling; z=z*100*scaling;
     %h = line(xx,yy,zz); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
     %h = line(xx,zz,yy); set(h, 'color', COLORMESH, 'linestyle', '--', 'tag', 'mesh');
@@ -851,15 +875,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             yo = sources(index).momxyz(dip,2)*g.dipolelength;
             zo = sources(index).momxyz(dip,3)*g.dipolelength;
             
-            % copy for output
-            % ---------------
-            XX(index) = -y;
-            YY(index) = x;
-            ZZ(index) = z;
-            XO(index) = -yo;
-            YO(index) = xo;
-            ZO(index) = zo;
-            
             if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
                 xo1 = x+xo;
                 yo1 = y+yo;
@@ -873,14 +888,22 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 yo1 = y+yo;
                 zo1 = z+zo;
             end
-            x = -x; xo1 = -xo1; 
-            y = -y; yo1 = -yo1; 
+
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
             tag = [ 'dipole' num2str(index) ];
-            [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg);             
-            [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
+            
+            % from spherical to electrode space
+            % ---------------------------------
+            if ~isempty( dat.tcparams ) % sphere mode
+                [xx   yy   zz]   = sph2spm(x,   y,   z,   dat.sph2spm);             
+                [xxo1 yyo1 zzo1] = sph2spm(xo1, yo1, zo1, dat.sph2spm); 
+            else
+                xx = x; xxo1 = xo1;
+                yy = y; yyo1 = yo1;
+                zz = z; zzo1 = zo1;
+            end;
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
@@ -902,8 +925,21 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
               %end
             end
 
-            dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
-            dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
+            [xxmri   yymri   zzmri  ] = transform(xx,   yy,   zz,   pinv(dat.transform));
+            [xxmrio1 yymrio1 zzmrio1] = transform(xxo1, yyo1, zzo1, pinv(dat.transform));
+            dipstruct.mricoord  = [xxmri yymri zzmri];   % Coordinates in MRI space
+            dipstruct.eleccoord = [ xx yy zz ];          % Coordinates in elec space
+            dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
+            
+            % copy for output
+            % ---------------
+            XX(index) = xx;
+            YY(index) = yy;
+            ZZ(index) = zz;
+            XO(index) = xxo1;
+            YO(index) = yyo1;
+            ZO(index) = zzo1;
+
             if isempty(g.dipnames)
                 dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
                                            sources(index).rv*100);
@@ -923,7 +959,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 if strcmpi(g.projimg, 'on')
                     tmpcolor = g.color{index} / 2;
                     h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index}, 'proj', ...
-                                   [-dat.maxcoord(3) dat.maxcoord(2) -dat.maxcoord(1)]*97/100, 'projcol', tmpcolor);
+                                   [-dat.maxcoordelec(3) dat.maxcoordelec(2) -dat.maxcoordelec(1)]*97/100, 'projcol', tmpcolor);
                     set(h(2:end), 'userdata', 'proj', 'tag', tag);
                 else
                     h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
@@ -934,42 +970,50 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
             end
+            
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto images %%%%%%%%%%%%%%%%%%%%%%%%%
             %
+            [tmp1xx   tmp1yy   tmp1zz  ] = transform( xxmri  , yymri  , dat.imgcoords{3}(1), dat.transform);
+            [tmp1xxo1 tmp1yyo1 tmp1zzo1] = transform( xxmrio1, yymrio1, dat.imgcoords{3}(1), dat.transform);
+            [tmp2xx   tmp2yy   tmp2zz  ] = transform( xxmri  , dat.imgcoords{2}(end), zzmri  , dat.transform);
+            [tmp2xxo1 tmp2yyo1 tmp2zzo1] = transform( xxmrio1, dat.imgcoords{2}(end), zzmrio1, dat.transform);
+            [tmp3xx   tmp3yy   tmp3zz  ] = transform( dat.imgcoords{1}(1), yymri  , zzmri  , dat.transform);
+            [tmp3xxo1 tmp3yyo1 tmp3zzo1] = transform( dat.imgcoords{1}(1), yymrio1, zzmrio1, dat.transform);
+            
             if strcmpi(g.projimg, 'on') & strcmpi(g.spheres, 'off')
                 tmpcolor = g.projcol{index};
                 
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo1]', [yy yyo1]', [-1 -1]'*dat.maxcoord(1));
+                    h = line( [tmp1xx tmp1xxo1]', [tmp1yy tmp1yyo1]', [tmp1zz tmp1zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(xx,  yy,  -dat.maxcoord(1)); 
-                set(h, 'userdata', 'proj', 'tag', tag, ...
-                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
-                
-                % project onto x axis
-                tag = [ 'dipole' num2str(index) ];
-                if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo1]', [1 1]'*dat.maxcoord(2), [zz zzo1]');
-                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-                end;
-                if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(xx,  dat.maxcoord(2),  zz); 
+                h = plot3(tmp1xx,  tmp1yy,  tmp1zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [-1 -1]'*dat.maxcoord(3), [yy yyo1]', [zz zzo1]');
+                    h = line( [tmp2xx tmp2xxo1]', [tmp2yy tmp2yyo1]', [tmp2zz tmp2zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(-dat.maxcoord(3),  yy,  zz); 
+                h = plot3(tmp2xx,  tmp2yy,  tmp2zz); 
+                set(h, 'userdata', 'proj', 'tag', tag, ...
+                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                   
+                % project onto x axis
+                tag = [ 'dipole' num2str(index) ];
+                if ~strcmpi(g.image, 'besa')
+                    h = line( [tmp3xx tmp3xxo1]', [tmp3yy tmp3yyo1]', [tmp3zz tmp3zzo1]');
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                end;
+                if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
+                h = plot3(tmp3xx,  tmp3yy,  tmp3zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
@@ -981,19 +1025,19 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 clear h;
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
-                h(1) = line( [xx xx]', [yy yy]', [zz -dat.maxcoord(1)]');
+                h(1) = line( [xx tmp1xx]', [yy tmp1yy]', [zz tmp1zz]);
                 set(h(1), 'userdata', 'proj', 'linestyle', '--', ...
                              'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
-                h(2) = line( [xx xx]', [yy dat.maxcoord(2)]', [zz zz]');
+                h(2) = line( [xx tmp2xx]', [yy tmp2yy]', [zz tmp2zz]);
                 set(h(2), 'userdata', 'proj', 'linestyle', '--', ...
                              'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
-                h(3) = line( [xx -dat.maxcoord(3)]', [yy yy]', [zz zz]');
+                h(3) = line( [xx tmp3xx]', [yy tmp3yy]', [zz tmp3zz]);
                 set(h(3), 'userdata', 'proj', 'linestyle', '--', ...
                              'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
                 if ~isempty(g.projcol)
@@ -1022,19 +1066,20 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw elipse for group of dipoles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % may not work because of new scheme, have to be redone
     
-    if ~isempty(g.std)
-        for index = 1:length(g.std)
-            if ~iscell(g.std{index})
-                plotellipse(sources, g.std{index}, 1, dat.tcparams, dat.coreg);
-            else
-                sc = plotellipse(sources, g.std{index}{1}, g.std{index}{2}, dat.tcparams, dat.coreg);
-                if length( g.std{index} ) > 2
-                    set(sc, g.std{index}{3:end});
-                end;
-            end;
-        end;
-    end;
+    %if ~isempty(g.std)
+    %    for index = 1:length(g.std)
+    %        if ~iscell(g.std{index})
+    %            plotellipse(sources, g.std{index}, 1, dat.tcparams, dat.coreg);
+    %        else
+    %            sc = plotellipse(sources, g.std{index}{1}, g.std{index}{2}, dat.tcparams, dat.coreg);
+    %            if length( g.std{index} ) > 2
+    %                set(sc, g.std{index}{3:end});
+    %            end;
+    %         end;
+    %     end;
+    % end;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% buttons %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     nbsrc = int2str(length(sources));
@@ -1146,42 +1191,33 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     rotate3d on;
 return;
 
-function [xx,yy,zz] = transcoords(x, y, z, TCPARAMS, coreg);
-    
-    if nargin > 4 & ~isempty(coreg) % custom MRI co-registration
-        %                                              rotation    scale     center
-        newcoords = transformcoords( [x(:) y(:) z(:)], coreg(5:7), coreg(4), coreg(1:3) );
-        xx = newcoords(:,1); xx = reshape(xx, size(x));
-        yy = newcoords(:,2); yy = reshape(yy, size(y));
-        zz = newcoords(:,3); zz = reshape(zz, size(z));
-        return;
+% electrode space to MRI space
+% ============================
+function [xx,yy,zz] = transform(x, y, z, transmat);
+    xx = zeros(size(x));
+    yy = zeros(size(y));
+    zz = zeros(size(z));
+    for i = 1:size(x,1)
+        for j = 1:size(x,2)
+            tmparray = transmat * [ x(i,j) y(i,j) z(i,j) 1 ]';
+            xx(i,j) = tmparray(1);
+            yy(i,j) = tmparray(2);
+            zz(i,j) = tmparray(3);
+        end;
     end;
+
+% from spherical to electrode space
+% ---------------------------------
+function [x,y,z] = sph2spm(x, y, z, transmat);
     
-    if iscell(TCPARAMS) % coregistration for MRI template
-        
-        valinion  = TCPARAMS{1};
-        valnasion = TCPARAMS{2};
-        vallear   = TCPARAMS{3};
-        valrear   = TCPARAMS{4};
-        valvertex = TCPARAMS{5};
-        zoffset   = TCPARAMS{6};
-        
-        % scale axis
-        % ----------
-        y = y/2*( valinion(1)  - valnasion(1) );
-        x = x/2*( valrear(2)   - vallear(2) );
-        z = z*  ( valvertex(3) - vallear(3) - zoffset );
-        
-        % recenter
-        % --------
-        yy = y + (vallear (1) + valrear  (1))/2;
-        xx = x + (valinion(2) + valnasion(2))/2;
-        zz = z + (vallear (3) + valrear  (3))/2 + zoffset;
-        return;
-    elseif isnumeric(TCPARAMS)
-        yy = y*TCPARAMS;
-        xx = x*TCPARAMS;
-        zz = z*TCPARAMS;        
+    if isempty(transmat), return; end;
+    for i = 1:size(x,1)
+        for j = 1:size(x,2)
+            tmparray = transmat * [ x(i,j) y(i,j) z(i,j) 1 ]';
+            x(i,j) = tmparray(1);
+            y(i,j) = tmparray(2);
+            z(i,j) = tmparray(3);
+        end;
     end;
     
 function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg);
@@ -1190,7 +1226,7 @@ function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg);
         tmpval(1,i) = -sources(ind(i)).posxyz(1);    
         tmpval(2,i) = -sources(ind(i)).posxyz(2);    
         tmpval(3,i) = sources(ind(i)).posxyz(3);
-        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = transcoords(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS, coreg);
+        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = sph2spm(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
     end;
     
     % mean and covariance
@@ -1303,7 +1339,7 @@ function updatedipplot(fig)
    count   = 1;
    for index = 1:length(newdip)
        if isstruct( get(newdip(index), 'userdata') )
-           allpos3d(count,:) = getfield(get(newdip(index), 'userdata'), 'pos3d');
+           dip_mricoord(count,:) = getfield(get(newdip(index), 'userdata'), 'mricoord');
            count = count+1;
            foundind = index;
        end;
@@ -1321,78 +1357,95 @@ function updatedipplot(fig)
    %if ~strcmpi(dat.mode, 'besa') % not besa mode
    delete(findobj('parent', gca, 'tag', 'img'));
    
-   tmpdiv = 1;
+   tmpdiv1 = dat.imgcoords{1}(2)-dat.imgcoords{1}(1);
+   tmpdiv2 = dat.imgcoords{2}(2)-dat.imgcoords{2}(1);
+   tmpdiv3 = dat.imgcoords{3}(2)-dat.imgcoords{3}(1);
    if ~dat.axistight
-       [xx yy zz] = transcoords(0,0,0, dat.tcparams, dat.coreg);
+       [xx yy zz] = transform(0,0,0, pinv(dat.transform)); % elec -> MRI space
        indx = minpos(dat.imgcoords{1}-zz);
        indy = minpos(dat.imgcoords{2}-yy);
        indz = minpos(dat.imgcoords{3}-xx);
    else
        if ~dat.cornermri
-           indx = minpos(dat.imgcoords{1} - mean(allpos3d(:,3)) + 4/tmpdiv);
-           indy = minpos(dat.imgcoords{2} - mean(allpos3d(:,2)) - 4/tmpdiv);
-           indz = minpos(dat.imgcoords{3} - mean(allpos3d(:,1)) + 4/tmpdiv);
+           indx = minpos(dat.imgcoords{1} - mean(dip_mricoord(:,1))) - 3*tmpdiv1;
+           indy = minpos(dat.imgcoords{2} - mean(dip_mricoord(:,2))) + 3*tmpdiv2;
+           indz = minpos(dat.imgcoords{3} - mean(dip_mricoord(:,3))) - 3*tmpdiv3;
        else % no need to shift slice if not ploted close to the dipole
-           indx = minpos(dat.imgcoords{1} - mean(allpos3d(:,3)));
-           indy = minpos(dat.imgcoords{2} - mean(allpos3d(:,2)));
-           indz = minpos(dat.imgcoords{3} - mean(allpos3d(:,1)));
+           indx = minpos(dat.imgcoords{1} - mean(dip_mricoord(:,1)));
+           indy = minpos(dat.imgcoords{2} - mean(dip_mricoord(:,2)));
+           indz = minpos(dat.imgcoords{3} - mean(dip_mricoord(:,3)));
        end;
    end;
-   plotimgs( dat, [indx indy indz]);
+   
+   % middle of the brain
+   % -------------------   
+   plotimgs( dat, [indx indy indz], dat.transform);
    %end;
    	
-% plot images
-% -----------
-function plotimgs(dat, index);
+% plot images (transmat is the uniform matrix MRI coords -> elec coords)
+% ----------------------------------------------------------------------
+function plotimgs(dat, mricoord, transmat);
    
     % loading images
     % --------------
     if strcmpi(dat.mode, 'besa')
-        imgt = dat.imgs{1};
-        imgc = dat.imgs{2};
-        imgs = dat.imgs{3};
+        img1 = dat.imgs{1};
+        img2 = dat.imgs{2};
+        img3 = dat.imgs{3};
     else
-        imgt = rot90(squeeze(dat.imgs(:,:,index(1)))); 
-        imgc = rot90(squeeze(dat.imgs(:,index(2),:))); 
-        imgs = rot90(squeeze(dat.imgs(index(3),:,:))); 
+        imgt = squeeze(dat.imgs(:,:,mricoord(1))); 
+        imgc = squeeze(dat.imgs(:,mricoord(2),:)); 
+        imgs = squeeze(dat.imgs(mricoord(3),:,:)); 
+        
+        img1 = rot90(squeeze(dat.imgs(mricoord(1),:,:))); 
+        img2 = rot90(squeeze(dat.imgs(:,mricoord(2),:))); 
+        img3 = rot90(squeeze(dat.imgs(:,:,mricoord(3)))); 
     end;
-    if ndims(imgt) == 2, imgt(:,:,3) = imgt; imgt(:,:,2) = imgt(:,:,1); end;
-    if ndims(imgc) == 2, imgc(:,:,3) = imgc; imgc(:,:,2) = imgc(:,:,1); end;
-    if ndims(imgs) == 2, imgs(:,:,3) = imgs; imgs(:,:,2) = imgs(:,:,1); end;
+    if ndims(img1) == 2, img1(:,:,3) = img1; img1(:,:,2) = img1(:,:,1); end;
+    if ndims(img2) == 2, img2(:,:,3) = img2; img2(:,:,2) = img2(:,:,1); end;
+    if ndims(img3) == 2, img3(:,:,3) = img3; img3(:,:,2) = img3(:,:,1); end;
     
     % computing coordinates for planes
     % --------------------------------    
-    wxt = [min(dat.imgcoords{3}) max(dat.imgcoords{3}); min(dat.imgcoords{3}) max(dat.imgcoords{3})];
-    wyt = [min(dat.imgcoords{2}) min(dat.imgcoords{2}); max(dat.imgcoords{2}) max(dat.imgcoords{2})];
-    wxc = [min(dat.imgcoords{3}) max(dat.imgcoords{3}); min(dat.imgcoords{3}) max(dat.imgcoords{3})];
-    wzc = [max(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) min(dat.imgcoords{1})];
-    wys = [min(dat.imgcoords{2}) max(dat.imgcoords{2}); min(dat.imgcoords{2}) max(dat.imgcoords{2})];
-    wzs = [max(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) min(dat.imgcoords{1})];
+    wy1 = [min(dat.imgcoords{2}) max(dat.imgcoords{2}); min(dat.imgcoords{2}) max(dat.imgcoords{2})];
+    wz1 = [min(dat.imgcoords{3}) min(dat.imgcoords{3}); max(dat.imgcoords{3}) max(dat.imgcoords{3})];
+    wx2 = [min(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) max(dat.imgcoords{1})];
+    wz2 = [min(dat.imgcoords{3}) min(dat.imgcoords{3}); max(dat.imgcoords{3}) max(dat.imgcoords{3})];
+    wx3 = [min(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) max(dat.imgcoords{1})];
+    wy3 = [min(dat.imgcoords{2}) min(dat.imgcoords{2}); max(dat.imgcoords{2}) max(dat.imgcoords{2})];
     if dat.axistight & ~dat.cornermri
-        wzt = [ 1 1; 1 1]*dat.imgcoords{1}(index(1));
-        wyc = [ 1 1; 1 1]*dat.imgcoords{2}(index(2));
-        wxs = [ 1 1; 1 1]*dat.imgcoords{3}(index(3));
+        wx1 = [ 1 1; 1 1]*dat.imgcoords{1}(mricoord(1));
+        wy2 = [ 1 1; 1 1]*dat.imgcoords{2}(mricoord(2));
+        wz3 = [ 1 1; 1 1]*dat.imgcoords{3}(mricoord(3));
     else
-        wzt = -[ 1 1; 1 1]*dat.maxcoord(1);
-        wyc =  [ 1 1; 1 1]*dat.maxcoord(2);
-        wxs = -[ 1 1; 1 1]*dat.maxcoord(3);
+        wx1 =  [ 1 1; 1 1]*dat.imgcoords{1}(1);
+        wy2 =  [ 1 1; 1 1]*dat.imgcoords{2}(end);
+        wz3 =  [ 1 1; 1 1]*dat.imgcoords{3}(1);
     end;
+    
+    % transform MRI coordinates to electrode space
+    % --------------------------------------------
+    [ elecwx1 elecwy1 elecwz1 ] = transform( wx1, wy1, wz1, transmat);
+    [ elecwx2 elecwy2 elecwz2 ] = transform( wx2, wy2, wz2, transmat);
+    [ elecwx3 elecwy3 elecwz3 ] = transform( wx3, wy3, wz3, transmat);
     
     % ploting surfaces
     % ----------------
     options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
                 'direct','tag','img', 'facelighting', 'none' };
     hold on;
-    surface(wxt, wyt, wzt, imgt(end:-1:1,:,:), options{:});
-    surface(wxc, wyc, wzc, imgc              , options{:});
-    surface(wxs, wys, wzs, imgs              , options{:});
+    surface(elecwx1, elecwy1, elecwz1, img1(end:-1:1,:,:), options{:}); 
+    surface(elecwx2, elecwy2, elecwz2, img2(end:-1:1,:,:), options{:});
+    surface(elecwx3, elecwy3, elecwz3, img3(end:-1:1,:,:), options{:}); 
+    %xlabel('x'); ylabel('y'); zlabel('z'); axis equal; dsaffd
+    
     if strcmpi(dat.drawedges, 'on')
         % removing old edges if any
         delete(findobj( gcf, 'tag', 'edges'));
         if dat.axistight & ~dat.cornermri, col = 'k'; else col = [0.5 0.5 0.5]; end;
-        h(1) = line([wxs(1) wxs(2)]', [wys(1) wyc(1)]', [wzt(1) wzt(2)]'); % sagital-transverse
-        h(2) = line([wxs(1) wxc(3)]', [wyc(1) wyc(2)]', [wzt(1) wzt(2)]'); % coronal-tranverse
-        h(3) = line([wxs(1) wxs(2)]', [wyc(1) wyc(2)]', [wzs(1) wzt(1)]'); % sagital-coronal
+        h(1) = line([elecwx3(1) elecwx3(2)]', [elecwy3(1) elecwy2(1)]', [elecwz1(1) elecwz1(2)]'); % sagital-transverse
+        h(2) = line([elecwx3(1) elecwx2(3)]', [elecwy2(1) elecwy2(2)]', [elecwz1(1) elecwz1(2)]'); % coronal-tranverse
+        h(3) = line([elecwx3(1) elecwx3(2)]', [elecwy2(1) elecwy2(2)]', [elecwz3(1) elecwz1(1)]'); % sagital-coronal
         set(h, 'color', col, 'linewidth', 2, 'tag', 'edges');
     end;
         
