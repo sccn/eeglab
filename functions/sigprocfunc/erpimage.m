@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.225  2004/11/05 18:36:54  arno
+% debug && removal
+%
 % Revision 1.224  2004/09/21 16:52:41  hilit
 % change && -> &
 %
@@ -1661,24 +1664,27 @@ end;
 %%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort
-	if length(phargs) >= 4 & phargs(3) ~= phargs(3:min(4,length(phargs))) % find max frequency in specified band
-        if exist('psd') == 2 % requires Singla Processing Toolbox
+	if length(phargs) >= 4 & phargs(3) ~= phargs(4) % find max frequency in specified band
+          if exist('psd') == 2 % requires Signal Processing Toolbox
+            fprintf('Computing data spectrum using psd().\n');
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
-        else
+          else % EEGLAB native work-around
+            fprintf('Computing data spectrum using spec().\n');
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
-        end;
-	%gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
+          end;
+	  %gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
 		
-		pxx = 10*log10(pxx);
-		n = find(freqs >= phargs(3) & freqs <= phargs(4));
-		if ~length(n)
-			freq = phargs(3);
-		end
-		[dummy maxx] = max(pxx(n));
-		freq = freqs(n(maxx));
+	  pxx = 10*log10(pxx);
+	  n = find(freqs >= phargs(3) & freqs <= phargs(4));
+	  if ~length(n)
+	    freq = (phargs(3)+phargs(4))/2;
+	  end
+	  [dummy maxx] = max(pxx(n));
+	  freq = freqs(n(maxx));
 	else
-		freq = phargs(3); % else use specified frequency
+	  freq = phargs(3); % else use specified frequency
 	end
+        fprintf('Sorting trials on phase at %.2g Hz.\n',freq);
         
        phwin = phargs(1);
        [dummy minx] = min(abs(times-phwin)); % closest time to requested
@@ -1756,14 +1762,16 @@ if exist('phargs') == 1 % if phase-sort
 elseif exist('ampargs') == 1 % if amplitude-sort
 	if length(ampargs) == 4 % find max frequency in specified band
           if exist('psd') == 2
+            fprintf('Computing data spectrum using psd().\n');
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
           else
+            fprintf('Computing data spectrum using spec().\n');
             [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
           end;
 	  pxx = 10*log10(pxx);
 	  n = find(freqs >= abs(ampargs(3)) & freqs <= abs(ampargs(4)));
 	  if ~length(n)
-		  freq = abs(ampargs(3));
+		  freq = mean([abs(ampargs(3)),abs(ampargs(4))]);
 	  end
           if ampargs(3)>=0
 	     [dummy maxx] = max(pxx(n));
@@ -1978,6 +1986,7 @@ end
 %%%%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 urdata = data; % save data to compute amp, coher on unsmoothed data
+
 if ~Allampsflag & ~exist('data2') % if imaging potential,
     if avewidth > 1 | decfactor > 1
         if Nosort == YES
@@ -2104,12 +2113,11 @@ end
 %
 if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
 	% find max frequency in specified band
-    if exist('psd') == 2
+    if exist('psd') == 2 % from Signal Processing Toolbox
         [pxx,tmpfreq] = psd(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
-    else
+    else % from EEGLABA
         [pxx,tmpfreq] = spec(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
     end;
-    
 	pxx = 10*log10(pxx);
 	n = find(tmpfreq >= coherfreq(1) & tmpfreq <= coherfreq(2));
 	if ~length(n)
@@ -3115,7 +3123,7 @@ if nargout<1
 end
 
 %   
-%%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
 if (~isempty(topomap)) & strcmpi(noshow, 'no') 
     h(12)=axes('Position',...
@@ -3134,7 +3142,7 @@ if (~isempty(topomap)) & strcmpi(noshow, 'no')
 end 
 
 %   
-%%%%%%%%%%%%%%% plot a spectrum %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Plot a spectrum %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
 SPECFONT = 10;
 if (~isempty(lospecHz)) & strcmpi(noshow, 'no')  
@@ -3159,10 +3167,12 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
     % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
     if exist('psd') == 2
         [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
-                           512,srate,winlength,0,0.05);
+                           max(1024,pow2(ceil(log2(frames)))),srate,frames,0,0.05);
+        % [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0,0.05);
     else
-        [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
-                           512,srate,winlength,0);
+        [pxx,tmpfreq] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+                                   max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
+        % [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0);
     end;
     figure(curfig);plot(F,10*log10(Pxx));
     goodfs = find(F>= lospecHz & F <= hispecHz);
