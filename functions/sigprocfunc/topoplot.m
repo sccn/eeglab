@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/07/16 16:29:46  arno
+% replacing with topoplottest
+%
 % Revision 1.41  2003/07/15 23:55:40  arno
 % retreiving version 1.28
 %
@@ -472,7 +475,7 @@ if ~strcmp(STYLE,'blank')
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
   
-  fprintf('running griddata()...\n');
+  % fprintf('running griddata()...\n');
   [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
   
   % Take data within head
