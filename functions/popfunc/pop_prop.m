@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/01/30 17:23:37  arno
+% allowing to plot several component properties
+%
 % Revision 1.11  2003/01/02 16:40:40  arno
 % erpimage 1/4 -> 2/3 caxis  - sm
 %
@@ -135,7 +138,7 @@ function com = pop_prop(EEG, typecomp, numcompo, winhandle)
 
 com = '';
 if nargin < 1
-	help plotcomp;
+	help pop_prop;
 	return;   
 end;
 if nargin == 1
