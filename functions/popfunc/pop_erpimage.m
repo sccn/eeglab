@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2002/11/19 22:55:02  arno
+% debug for component plotting
+%
 % Revision 1.91  2002/11/18 18:21:21  arno
 % nicer aspect ratio
 %
@@ -490,20 +493,24 @@ if popup
 	if isempty(titleplot)
         if typeplot==1
             if ~isempty(EEG.chanlocs) % if channel plot
-                  titleplot = [ 'ERP Image (' EEG.chanlocs(channel).labels ')'];
-            else, titleplot = [ 'ERP Image (' int2str(channel) ')'];
+                  titleplot = [ EEG.chanlocs(channel).labels ];
+            else, titleplot = [ int2str(channel) ];
             end
         else
-            titleplot = [ 'ERP Image (Comp. ' int2str(channel) ')'];
+            titleplot = [ 'Comp. ' int2str(channel) ];
+            if ~isempty(projchan),
+                if ~isempty(EEG.chanlocs) % if channel plot
+                      titleplot = [ titleplot ' -> ' EEG.chanlocs(projchan).labels ];
+                else, titleplot = [ titleplot ' -> Chan. ' int2str(projchan) ];
+                end
+            end;
         end
     end;
 	smooth       = eval(res.smooth);
     if res.plotmap
 		if ~isempty(EEG.chanlocs)
 			if typeplot == 0
-				if isempty( projchan )
 				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-				else options = [options ',''topo'', { ' int2str(projchan) ' EEG.chanlocs } ']; end;
 			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
 			end;	
 		end;
