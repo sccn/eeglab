@@ -112,6 +112,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.12  2003/03/11 23:33:27  arno
+%typo
+%
 %Revision 1.11  2003/03/11 23:27:09  arno
 %adding normlen parameter
 %
@@ -181,8 +184,11 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         maxi = max(maxi,max(abs(sources(index).posxyz(:))));
     end;
     if maxi > 1.01
-        disp('Non-normalized dipole positions, normalizing by standard head radius 8.4747 cm'); 
-        g.sphere = 8.4747;
+        disp('Non-normalized dipole positions, normalizing by standard head radius 84.747 mm'); 
+        g.sphere = 84.747;
+        fact = 0.1;
+    else 
+        fact = 1;
     end;
     
     for index = 1:length(sources)
@@ -190,7 +196,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         tmp = sources(index).posxyz(:,1);
         sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
         sources(index).posxyz(:,2) = -tmp;
-        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05;
+        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05*fact;
         tmp = sources(index).momxyz(:,1);
         sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
         sources(index).momxyz(:,2) = -tmp;
