@@ -1,18 +1,18 @@
-% pop_timtopo() - timtopo function for datasets. Envelope of EEG data
-%                 visualization with head plots at specific latencies.
-%
+% pop_timtopo() - call the timtopo() function for epoched EEG datasets. 
+%                 Plots the epoch mean for each channel on a single axis,
+%                 plus scalp maps of the data at specified latencies.
 % Usage:
 %   >> pop_timtopo( EEG, timerange, topotimes, title, 'key', 'val', ...);
 %
 % Inputs:
-%   EEG        - input dataset
-%   timerange  - timerange in millisecond to plot the enveloppe
-%   topotimes  - array of times for plotting the head. enter nan to
-%                display topoplot() at frames of max var().
+%   EEG         - input dataset
+%   timerange   - [min max] epoch time range (in ms) to plot 
+%   topotimes   - array of times to plot scalp maps {Default: NaN 
+%                 = display scalp map at frame of max var()}
 %
 % Optional inputs:
-%   title       - plot title
-%   'key','val' - optional topoplot() arguments (see topoplot())
+%   title       - optional plot title
+%   'key','val' - optional topoplot() arguments (see >> help topoplot)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/12 03:18:01  arno
+% update help
+%
 % Revision 1.11  2002/11/15 01:41:26  scott
 % Can not -> cannot
 %
