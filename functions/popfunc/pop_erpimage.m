@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-12-02 added new event format compatibility -ad 
@@ -110,7 +113,7 @@ if nargin < 3
                 'Plot title ([]=default,[space]=none):' };
     inistr       = { '1', int2str(min(max(EEG.trials-5,0), 10)), '1', '', '', '', 'no', '' };
     if typeplot == 0
-        promptstr = { promptstr{:} 'Plot component scal map (yes|no):' };
+        promptstr = { promptstr{:} 'Plot component scalp map (yes|no):' };
         inistr    = { inistr{:} 'yes' };
     end;
    
