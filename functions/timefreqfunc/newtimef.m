@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/15 18:38:16  arno
+% adding alpha to bootstat
+%
 % Revision 1.6  2002/10/15 18:27:08  arno
 % missing argument
 %
@@ -705,7 +708,11 @@ if iscell(X)
     
 	subplot(1,3,3); g.title = g.titleall{3};
     if isnan(g.alpha)
-        Rdiff = R2-R1;
+        switch(g.condboot)
+            case 'abs',  Rdiff = abs(R1)-abs(R2);
+            case 'angle',  Rdiff = angle(R1)-angle(R2);
+            case 'complex',  Rdiff = R1-R2;
+        end;
 		plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
 	else 		
 		% preprocess data and run compstat
