@@ -20,14 +20,7 @@
 %   'notrial'     - array of trial numbers to exclude
 %   'channel'     - array of channels to include
 %   'nochannel'   - array of channels to exclude
-%   'trialcond'   - trial condition to include. First input the field 
-%                   and then the value range in a double nested list
-%                   (ex. { { 'value1', [1 10] } }). It means that the
-%                   program will only consider the trials which field 
-%                   'value1' in EEG.trialcond have values in the range
-%                   [1 10]. 
-%   'notrialcond' - same as 'trialcond' but it excludes trials with the
-%                   given values.
+%   'newname'     - new dataset name
 %
 % Outputs:
 %   OUTEEG        - output dataset
@@ -59,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/11 02:06:24  arno
+% adding event consistency check
+%
 % Revision 1.5  2002/04/09 03:03:26  arno
 % removing debug message
 %
@@ -95,7 +91,7 @@ end;
     
 if nargin < 2
    geometry = { [1 1 1] [1 1 0.25 0.2 0.65] [1 1 0.25 0.2 0.65] [1 1 0.25 0.2 0.65] ...
-           [1 1 0.25 0.2 0.65] [1 0.5 0.5 1.1] [1 0.5 0.5 0.25 0.2 0.65]};
+           [1 1 0.25 0.2 0.65] [1] [1 1 1]};
    uilist = { ...
          { 'Style', 'text', 'string', 'Select data in:', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Input desired range', 'fontweight', 'bold'  }, ...
@@ -116,15 +112,7 @@ if nargin < 2
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'radio', 'string', '    ' },{ }, ...
          ...
-         { }, { 'Style', 'text', 'string', 'Field name', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Value range', 'fontweight', 'bold'  }, ...
-         { }, ...
-         ...
-         { 'Style', 'text', 'string', 'Trial condition' }, ...
-         { 'Style', 'edit', 'string', '' }, ...
-         { 'Style', 'edit', 'string', '' }, ...
-         { }, { 'Style', 'radio', 'string', '    ' },{ }, ...
-      };
+		 { }, { 'Style', 'text', 'string', 'New dataset name:' } { 'Style', 'edit', 'string', '' } { }};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
    if length(results) == 0, return; end;
    
