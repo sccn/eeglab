@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/05/01 18:58:08  luca
+% same
+%
 % Revision 1.22  2002/05/01 18:57:48  luca
 % same
 %
@@ -497,31 +500,42 @@ if ~isempty( varargin)
 			  % remove fields with empty epochs
 			  % -------------------------------
 			  removeevent = [];
-			  for indexevent = 1:length(EEG.event)
-				  if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
-						  | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
-					  removeevent = [removeevent indexevent];
-					  disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
+			  try, allepochs = cell2mat( { EEG.event.epoch } );
+				  removeevent = find( allepochs < 1 | allepochs > EEG.trials);
+				  if ~isempty(removeevent)
+					  disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch number and were removed']);
+				  end;
+			  catch, 
+				  for indexevent = 1:length(EEG.event)
+					  if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
+							  | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
+						  removeevent = [removeevent indexevent];
+						  disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
+					  end;
 				  end;
 			  end;
 			  EEG.event(removeevent) = [];
+			  allepochs = cell2mat( { EEG.event.epoch } );
 			  
 			  % uniformize fields content for the different epochs
 			  % --------------------------------------------------
 			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
-			  arraytmpinfo = cell(EEG.trials, length(difffield));
 			  for index = 1:length(difffield)
+				  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
+				  valempt = cellfun('isempty', allvalues);
+				  arraytmpinfo = cell(1,EEG.trials);
+
 				  % get the field content
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
-					  if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
-						  arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
+					  if ~valempt(indexevent)
+						  arraytmpinfo{allepochs(indexevent)} = allvalues(indexevent);
 					  end;
 				  end;
 				  % uniformize content for all epochs
 				  % ---------------------------------
 				  for indexevent = 1:length(EEG.event)
-					  setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{EEG.event(indexevent).epoch, index});
+					  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{allepochs(indexevent)});
 				  end;
 			  end;
 		  end;
@@ -529,25 +543,29 @@ if ~isempty( varargin)
 		  % uniformize fields (str or int) if necessary
 		  % -------------------------------------------
 		  allfields = fieldnames(EEG.event);
-		  for indexfield=1:length(allfields)
-			  fieldformat{indexfield} = 'int';
-			  for index = 1:length(EEG.event)
-				  if isstr(getfield(EEG.event, { index }, allfields{indexfield}))
-					  fieldformat{indexfield} = 'str';
-					  index = length(EEG.event);
+		  for index = 1:length(allfields)
+			  eval(['allvalues = { EEG.event.' allfields{index} ' };']);
+			  valreal = cellfun('isreal', allvalues);
+			  
+			  format = 'ok';
+			  if ~all(valreal) % all valreal ok
+				  format = 'str';
+				  if all(valreal == 0) % all valreal=0 ok
+					  format = 'ok';
 				  end;
 			  end;
-		  end;
-		  for indexfield=1:length(allfields)
-			  if strcmp( fieldformat{indexfield}, 'str') 
-				  for index = 1:length(EEG.event)
-					  fieldcontent = getfield(EEG.event, { index }, allfields{indexfield});
-					  if ~isstr(fieldcontent)
-						  EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(fieldcontent) );
+			  if strcmp(format, 'str')
+				  fprintf('eeg_checkset: uniformize value type of event field ''%s''\n', difffield{index});
+				  arraytmpinfo = cell(1,EEG.trials);
+				  % get the field content
+				  % ---------------------
+				  for indexevent = 1:length(EEG.event)
+					  if ~isstr(allvalues(indexevent))
+						  EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(allvalues(indexevent)) );
 					  end;
 				  end;
 			  end;
-		  end;		  
+		  end;
 		 otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
