@@ -10,9 +10,9 @@
 %   "Edge type to extract" - [list box] extract events when the event
 %                  channel values go up ('leading'), down ('trailing')
 %                  or both ('both'). Command line equivalent: 'edge'.
-%   "Or set a threshold" - [edit box] extract events when the event
-%                  channel values reaches a threshold. Command line 
-%                  equivalent: 'threshold'.
+%   "Preprocess data channel(s)" - [edit box] prior to extracting edges, perform
+%                  preprocessing on the selected data channel. See also ommand
+%                  line equivalent: 'oper'.
 %   "Delete event channel(s)" - [checkbox] check to delete the event channel
 %                  after events have been extracted from it.
 %                  Command line equivalent: 'delchan'.
@@ -32,10 +32,12 @@
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
 %                    in the event channel go up ('leading'), down ('trailing')
 %                    or both ('both'). {Default is 'both'}.
-%   'threshold'    - [float array] every time the signal on this channel reaches a
-%                    threshold, a new event is generated. This overwrite the
-%                    previous option. Several thresholds can be given for several
-%                    event types.
+%   'oper'         - [string] prior to extracting edges, preprocess data
+%                    channel(s) using the string command provided in this option.
+%                    In the string command channel(s) are depicted using the X
+%                    variable. For instance 'X>3' will constrain the data channel
+%                    to have binary values, equal to 1 if the data channel
+%                    potential is bigger than 3 and 0 otherwise.
 %   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
 %   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
 %   'nbtype'       - [1|NaN] setting this to 1 will force the program to 
@@ -71,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/03/04 03:09:58  arno
+% implementing threshold, debug trials
+%
 % Revision 1.27  2004/01/15 17:55:46  scott
 % same
 %
@@ -171,8 +176,10 @@ if nargin < 2
 				   '(''leading''), down (''trailing'') or either (''both'').' 10 ...
 				   'IN UNIX, AFTER SCROLLING CLICK TO SELECT' ] } ...
 			   { 'style' 'listbox' 'string' 'both|up (leading)|down (trailing)' 'value' 1 } { 'style' 'text' 'string' '(click to select)'} ...
-			   { 'style' 'text' 'string' 'Or set a threshold (overwrite above)' 'tooltipstring' 'extract events when channel value reaches a threshold' } ...
-			   { 'style' 'edit' 'string' '' } {} ...
+			   { 'style' 'text' 'string' 'Preprocess data channel(s) (use X)' 'tooltipstring' [ 'ex: ''X>3'' will constrain the data channel' 10  ...
+                    'to have binary values, equal to 1 if the data channel' 10 ...
+                    'potential is bigger than 3 and 0 otherwise.' ] } ...
+			   { 'style' 'edit' 'string' '' } { 'style' 'text' 'string' 'ex: X>3' } ...
                {} ...
                { 'style' 'text' 'string' 'Delete event channel(s)? ' } ...
 			   { 'style' 'checkbox' 'value' 1 } { 'style' 'text' 'string' '        (set = yes)'} ...
@@ -191,7 +198,7 @@ if nargin < 2
 		case 2, g.edge = 'leading';
 		case 3, g.edge = 'trailing';
 	end;
-	if ~isempty(result{3}), g.threshold = eval( [ '[' result{3} ']' ] ); else g.threshold  = []; end;
+	if ~isempty(result{3}), g.oper = result{3}; else g.oper = ''; end;
 	if result{4}, g.delchan = 'on'; else g.delchan  = 'off'; end;
 	if result{5}, g.delevent= 'on'; else g.delevent = 'off'; end;
 	if result{6}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
@@ -199,15 +206,12 @@ if nargin < 2
 else 
 	listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
 				  'delchan'   'string'     { 'on' 'off' }                     'on';
-				  'threshold' 'real'       []                                 [];
+				  'oper'      'string'     []                                 '';
 				  'delevent'  'string'     { 'on' 'off' }                     'on';
                   'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
 				  'nbtype'    'integer'    [1 NaN]                             NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
-end;
-if length(chan) ~= 1
-	error('One (single) channel must be selected');
 end;
 
 % process events
@@ -219,12 +223,23 @@ if isnan(g.nbtype)
     if length(unique(EEG.data(chan, :))) == 2, g.nbtype = 1; end;
 end;
 
-counttrial = 1;
-if isempty(g.threshold)
+for ci = chan
+    X = EEG.data(ci, :);
+
+    % apply preprocessing
+    % -------------------
+    if ~isempty(g.oper)
+        try, eval( [ 'X = ' g.oper ';' ]);
+        catch, error('pop_chanevent: error evaluating preprocessing string');
+        end;
+    end;    
+    
+    % extract edges
+    % -------------
     switch g.edge
-     case 'both'    , tmpevent = find( diff(EEG.data(chan, :)) ~= 0);
-     case 'trailing', tmpevent = find( diff(EEG.data(chan, :)) < 0);
-     case 'leading' , tmpevent = find( diff(EEG.data(chan, :)) > 0);
+     case 'both'    , tmpevent = find( diff(X) ~= 0);
+     case 'trailing', tmpevent = find( diff(X) < 0);
+     case 'leading' , tmpevent = find( diff(X) > 0);
     end;
     if isempty(tmpevent), disp('No event found'); return; end;
     tmpevent = tmpevent+1;
@@ -232,24 +247,12 @@ if isempty(g.threshold)
         if ~isnan(g.nbtype)
             events(counte).type    = g.typename;
         else
-            events(counte).type    = EEG.data(chan, tmpi);
+            events(counte).type    = X(tmpi);
         end;
         events(counte).latency = tmpi;
         counte = counte+1;
     end;
     events = events(1:counte-1);
-else
-    for index  = 1:length(g.threshold)
-        tmpevent = EEG.data(chan, :) > g.threshold(index);
-        tmpevent = find( diff(tmpevent) > 0);
-        tmpevent = tmpevent+1;
-        for tmpi = tmpevent
-            events(counte).type    = [ 'thres' num2str(g.threshold(index)) ];
-            events(counte).latency = tmpi;
-            counte = counte+1;
-        end;
-        events = events(1:counte-1);
-    end;
 end;
 
 % resort events
