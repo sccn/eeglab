@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 03-19-97 use datamean instead of frames/baseframes, diag(cov()) for var() -sm
 % 04-03-97 changed name to envproj() -sm
@@ -76,6 +79,7 @@ function [envdata] = envproj(data,weights,compnums,titl,limits,chanlist,compname
 FILL = 1; % 1;  % 1 = fill in component envelope unless ncomps>1
 DATA_LINEWIDTH = 1.5; % 2
 COMP_LINEWIDTH = 1.5; % 1
+MAXENVPLOTCHANS = 256;
 
 if nargin < 3,
     help envproj
@@ -91,9 +95,9 @@ NEG_UP = 0;    % 1 = plot negative up
 %%%%%%%%%%%% Substitute for omitted arguments %%%%%%%%%%%%%%%%%%%%%%%%
 %
 if nargin < 8,
-    colors = ENVCOLORS;
+    colors = 'envproj.col';
 elseif colors(1)==0,
-    colors = ENVCOLORS;
+    colors = 'envproj.col';
 end
 
 [chans,frames] = size(data);

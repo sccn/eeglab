@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Without color arg, reads filename for PROJCOLORS from icadefs.m
 
@@ -61,9 +64,9 @@ DEFAULT_TITLE = '';
 % Substitute for missing arguments
 %
 if nargin < 7,
-    colors = PROJCOLORS;
+    colors = 'white1st.col';
 elseif colors==0 | isempty(colors)
-    colors = PROJCOLORS;
+    colors = 'white1st.col';
 end
 
 if nargin < 6,
