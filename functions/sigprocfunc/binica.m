@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/10/25 23:52:05  arno
+% remove asking for permission to remove file
+%
 % Revision 1.7  2003/10/07 18:55:03  arno
 % undo changes
 %
@@ -85,25 +88,25 @@ end
 
 icadefs % import ICABINARY and SC
 if ~exist('SC')
-  fprintf('binica: You need to update your icadefs file to include ICABINARY and SC.\n')
+  fprintf('binica(): You need to update your icadefs file to include ICABINARY and SC.\n')
   return
 end;
 if exist(SC) ~= 2
-  fprintf('binica: No ica source file ''%s'' is in your Matlab path, check...\n', SC);
+  fprintf('binica(): No ica source file ''%s'' is in your Matlab path, check...\n', SC);
   return
 else
 	SC = which(SC);
 	fprintf('binica: using source file ''%s''\n',  SC);
 end
 if exist(ICABINARY) ~= 2
-  fprintf('binica: ica binary ''%s'' is not matlab path, check\n', ICABINARY);
+  fprintf('binica(): ica binary ''%s'' is not in your Matlab path, check\n', ICABINARY);
   return
 else
 	ICABINARYdir = which(ICABINARY);
 	if ~isempty(ICABINARYdir)
-		fprintf('binica: using binary ica file ''%s''\n', ICABINARYdir);
+		fprintf('binica(): using binary ica file ''%s''\n', ICABINARYdir);
 	else
-		fprintf('binica: using binary ica file ''\?/%s''\n', ICABINARY);
+		fprintf('binica(): using binary ica file ''\?/%s''\n', ICABINARY);
 	end;
 end
 
