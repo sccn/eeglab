@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2005/03/13 19:38:10  scott
+% saving EEG.oldwts and EEG.oldsph as cell arrays containing all former wts and sph
+%
 % Revision 1.49  2005/03/13 17:45:04  peter
 % saving wts and sph as EEG.oldwts (cell array) and EEG.oldsph
 % before clearing them
@@ -270,41 +273,20 @@ end;
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
 fprintf('\n');
-if ~isfield(EEG,'oldwts')
-    if isfield(EEG,'icaweights') 
-       ow = cell(1);
-       ow{1} = EEG.icaweights
-       EEG.oldwts = ow;
-        fprintf('Saving current EEG.icaweights as EEG.oldwts.\n');
-    end
-else
-    ow = cell(1,length(EEG.oldwts)+1);
-    for k = 1:length(EEG.oldwts)
-        ow{k} = EEG.oldwts{k};
-    end
-    ow{end} = EEG.icaweights;
-    EEG.oldwts = ow;
-    fprintf('Appending current EEG.icaweights to EEG.oldwts.\n');
-end
-if ~isfield(EEG,'oldsph')
-    if isfield(EEG,'icasphere')
-       ow = cell(1);
-       ow{1} = EEG.icasphere
-       EEG.oldsph = ow;
-       fprintf('Saving current EEG.icasphere as EEG.oldsph.\n');
-    end
-else
-    ow = cell(1,length(EEG.oldsph)+1);
-    for k = 1:length(EEG.oldsph)
-        ow{k} = EEG.oldsph{k};
-    end
-    ow{end} = EEG.icasphere;
-    EEG.oldsph = ow;
-    fprintf('Appending current EEG.icasphere to EEG.oldsph.\n');
+if ~isempty(EEG,'icaweights')
+    fprintf('Saving current ICA weights in "EEG.etc" sub-structure.\n');
+    if ~isfield(EEG,'etc'), EEG.etc = []; end;
+    if ~isfield(EEG.etc,'oldicaweights')
+        EEG.etc.oldicaweights = {};
+        EEG.etc.oldicasphere = {};
+    end;
+    EEG.etc.oldicaweights = { EEG.icaweights EEG.etc.oldicaweights{:} };
+    EEG.etc.oldicasphere  = { EEG.icasphere  EEG.etc.oldicasphere{:}  };
 end
 
 EEG.icaweights = [];
 EEG.icasphere  = [];
+EEG.icawinv    = [];
 EEG.icaact     = [];
 
 %------------------------------
