@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.351  2004/11/12 18:27:17  arno
+% adding biosig menus
+%
 % Revision 1.350  2004/11/12 18:09:59  arno
 % debug last
 %
@@ -1410,9 +1413,9 @@ end;
         try,
             addpath(path_biosig);
             version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
-            version = loadtxt(version, 'convert', 'off');
+            version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
             version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
-            eval( [ 'vers =' funcname 'v' version '(gcf, trystrs, catchstrs);' ]);
+            disp(['eeglab: adding "BIOSIGv' version '" plugin' ]);
             biosigflag = 1;
         catch
             disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
@@ -1468,7 +1471,7 @@ end;
             vers = ''; % version
             try,
                 eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
-                disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
+                disp(['eeglab: adding "' vers '" plugin (see >> help ' funcname ')' ]);    
            catch
                 try,
                     eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
@@ -1498,14 +1501,17 @@ end;
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Brain Vis. Anal. Matlab file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbva;' e_newnonempty ], 'Separator', 'on'); 
+    
     % BIOSIG MENUS
     % ------------
-    combdf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
-    comedf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
-    combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
-    uimenu( menu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
-    uimenu( menu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
-    uimenu( menu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
+    if biosigflag
+        combdf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
+        comedf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
+        combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
+        uimenu( menu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
+        uimenu( menu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
+        uimenu( menu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
+    end;
     
     importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
