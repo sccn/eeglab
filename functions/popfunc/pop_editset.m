@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/18 02:44:08  scott
+% edited error messages -sm
+%
 % Revision 1.9  2002/04/18 02:29:24  arno
 % further checks for matlab file import
 %
@@ -278,9 +281,11 @@ for curfield = tmpfields'
 							try 
 							     res = evalin('base', ['exist(''' varname ''') == 1']);
 							catch
-							     error('Pop_editset: cannot evaluate variable. Is it a filename ?');
+							     error('Pop_editset: cannot fined variable. Is it a filename?');
 							end;
-							if ~res, error('Pop_editset: cannot evaluate variable. Is it a filename ?'); end;
+							if ~res, 
+           error('Pop_editset: cannot evaluate variable. Is it a filename?'); 
+       end;
 						    testval = evalin('base', ['isglobal(' varname ')']);
 							warning off;
 							if ~testval
