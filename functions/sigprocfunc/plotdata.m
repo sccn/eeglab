@@ -4,17 +4,21 @@
 %          >> plotdata(data,frames)
 %          >> plotdata(data,frames,limits,title,channames,colors,rtitle,ydir) 
 %
-% Inputs:
+% Necessary input:
 %   data       = data consisting of consecutive epochs of (chans,frames) 
-%   frames     = time frames/points per epoch {0 -> data length}
+%
+% Optional inputs:
+%   frames     = time frames/points per epoch {default: 0 -> data length}
 %  [limits]    = [xmin xmax ymin ymax]  (x's in ms) 
-%                {0 (or both y's 0) -> use data limits)
-%  'title'     = plot title {0 -> none}
+%                {default|0 (or both y's 0) -> use data limits)
+%  'title'     = plot title {defulat|0 -> none}
 %  'channames' = channel location file or structure (see readlocs())
+%                {default -> channel numbers}
 %  'colors'    = file of color codes, 3 chars per line  
-%                ( '.' = space) {0 -> default color order}
-%  'rtitle'    = right-side plot title {0 -> none}
-%  ydir        = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
+%                ( '.' = space) {default|0 -> default color order}
+%  'rtitle'    = right-side plot title {default|0 -> none}
+%   ydir       = y-axis polarity (1 -> pos-up; -1 -> neg-up) 
+%                {default -> set from default YDIR in 'icadefs.m'}             
 %
 % Authors: Scott Makeig, Arnaud Delorme, Tzyy-Ping Jung, 
 %          SCCN/INC/UCSD, La Jolla, 05-01-96 
@@ -39,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/08/31 01:12:33  arno
+% fixed Matlab 7 bug
+%
 % Revision 1.11  2004/08/03 15:10:42  arno
 % ydir
 %
@@ -113,8 +120,14 @@ end
 %
 FONTSIZE = 12;     % font size to use for labels
 TICKFONTSIZE=12;   % font size to use for axis labels
-DEFAULT_SIGN = 1;  % default to plotting positive-up (1) or negative-up (-1)
-ISSPEC = 0;        % default - 0 = not spectral data, 1 = pos-only spectra
+icadefs;           % read MAXPLOTDATACHANS constant from icadefs.m
+                   % read YDIR
+if ~exist('YDIR')
+    error('YDIR not read from ''icadefs.m''');
+end
+DEFAULT_SIGN = YDIR;  % default to plotting positive-up (1) or negative-up (-1)
+                      % Now, read sign from YDIR in icadefs.m
+ISSPEC = 0;           % default - 0 = not spectral data, 1 = pos-only spectra
 
 axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
 plotfile = 'plotdata.ps';
@@ -123,13 +136,18 @@ ls_plotfile = 'ls -l plotdata.ps';
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% Substitute defaults for missing parameters %%%%%
 %
-SIGN = DEFAULT_SIGN;
+SIGN = DEFAULT_SIGN; % set default ydir from YDIR in icadefs.m
 if nargin < 8
-   ydr = 0;
+   ydr = [];
 end
-if ydr == -1
+if ~isempty(ydir)  % override default from commandline 
+ if ydr == 1
+   SIGN = 1;
+ else
    SIGN = -1;
+ end
 end
+
 if nargin < 7,
     righttitle = 0; 
 end;
@@ -169,8 +187,6 @@ end
                     framestotal-datasets*frames);
     end
   end;
-
-  icadefs; % read MAXPLOTDATACHANS constant from icadefs.m
 
   if chans>MAXPLOTDATACHANS,
     fprintf('plotdata: not set up to plot more than %d channels.\n',...
@@ -387,7 +403,7 @@ end
         %
         %%%%%%%%%%%%%%%%%%%%% Plot two-sided time-series data %%%%%%%%%%%%%%%%%%%
         %
-        if ~ISSPEC
+        if ~ISSPEC % not spectral data
             
             ymin = double(min(data(I,1+P*frames:1+P*frames+frames-1)));
             ymax = double(max(data(I,1+P*frames:1+P*frames+frames-1)));
@@ -437,17 +453,19 @@ end
                 end;
         end;
       %
-      %%%%%%%%%%%%%%%%%%%%% Plot positive-up [0,ymax] %%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%% Plot spectral data positive-up [0,ymax] %%%%%%%%%%%%%%%%%%%%%%%%
       %
       else % ISSPEC
         ymin=0;
         plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
         ymaxm = ymax;
+
         % ymin = 0.01;
         % ymaxm = 10.^ceil(log(ymax)/log(10.));
         % if ymaxm/2. > ymax,
         %    ymaxm = ymaxm/2.;
         % end;
+
         axis([xmin xmax ymin ymaxm]);      % set axis values
 
         if P==datasets-1,                  % on last trace
