@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/27 21:13:57  scott
+% added undocumented arg 'phasecouple',{'on'|'off'} -sm
+%
 % Revision 1.13  2002/04/25 02:56:03  arno
 % redebugging topovec
 %
@@ -482,7 +485,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 	RR = zeros(g.padratio*g.winsize/2,g.timesout); % (coherence)
 	Pboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap power
 	Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
-        PC = zeros(size(PP,1),size(PP,1)g.timesout);   % summed phase coupling
+        PC = zeros(size(PP,1),size(PP,1),g.timesout);  % summed phase coupling
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
