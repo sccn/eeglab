@@ -1,6 +1,6 @@
-% eegfilt() - (high|low|band)-pass filter EEG data using two-way least-squares 
+% eegfilt() -  (high|low|band)-pass filter data using two-way least-squares 
 %              FIR filtering. Multiple data channels and epochs supported.
-%              (Requires the MATLAB Signal Processing Toolbox)
+%              Requires the MATLAB Signal Processing Toolbox.
 % Usage:
 %  >> [smoothdata] = eegfilt(data,srate,locutoff,hicutoff);
 %  >> [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff, ...
@@ -8,9 +8,9 @@
 % Inputs:
 %   data        = (channels,frames*epochs) data to filter
 %   srate       = data sampling rate (Hz)
-%   locutoff    = low edge frequency in pass band (Hz)  {0 -> lowpass}
-%   hicutoff    = high edge frequency in pass band (Hz) {0 -> highpass}
-%   epochframes = frames per epoch (filter each epoch separately {def/0: all}
+%   locutoff    = low-edge frequency in pass band (Hz)  {0 -> lowpass}
+%   hicutoff    = high-edge frequency in pass band (Hz) {0 -> highpass}
+%   epochframes = frames per epoch (filter each epoch separately {def/0: data is 1 epoch}
 %   filtorder   = length of the filter in points {default 3*fix(srate/locutoff)}
 %   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {0}
 %
@@ -18,6 +18,9 @@
 %    smoothdata = smoothed data
 %    filtwts    = filter coefficients [smoothdata <- filtfilt(filtwts,1,data)]
 %
+% See also: firls(), filtfilt()
+%
+
 % Author: Scott Makeig, Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1997 
 
 % Copyright (C) 4-22-97 from bandpass.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
@@ -37,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/01/24 03:59:19  scott
+% header edit -sm
+%
 % Revision 1.8  2003/01/24 00:23:33  arno
 % print information about transition bands
 %
@@ -154,7 +160,7 @@ if locutoff > 0 & hicutoff > 0,    % bandpass filter
     else fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
     end; 
     f=[MINFREQ (1-trans)*locutoff/nyq locutoff/nyq hicutoff/nyq (1+trans)*hicutoff/nyq 1]; 
-    fprintf('eegfilter() - low transition band is %1.1g Hz; high one is %1.1g Hz.\n',(f(3)-f(2))*srate, (f(5)-f(4))*srate);
+    fprintf('eegfilt() - low transition band width is %1.1g Hz; high trans. band width, %1.1g Hz.\n',(f(3)-f(2))*srate, (f(5)-f(4))*srate);
     m=[0       0                      1            1            0                      0]; 
 elseif locutoff > 0                % highpass filter
  if locutoff/nyq < MINFREQ
@@ -162,9 +168,9 @@ elseif locutoff > 0                % highpass filter
     fprintf('eegfilt() - highpass cutoff freq must be > %g Hz\n\n',MINFREQ*nyq);
     return
  end
- fprintf('eegfilter() - performing %d-point highpass filtering.\n',filtorder);
+ fprintf('eegfilt() - performing %d-point highpass filtering.\n',filtorder);
  f=[MINFREQ locutoff*(1-trans)/nyq locutoff/nyq 1]; 
- fprintf('eegfilter() - highpass transition band is %1.1g Hz.\n',(f(3)-f(2))*srate);
+ fprintf('eegfilt() - highpass transition band width is %1.1g Hz.\n',(f(3)-f(2))*srate);
  m=[   0             0                   1      1];
 elseif hicutoff > 0                %  lowpass filter
  if hicutoff/nyq < MINFREQ
@@ -174,7 +180,7 @@ elseif hicutoff > 0                %  lowpass filter
  end
  fprintf('eegfilt() - performing %d-point lowpass filtering.\n',filtorder);
  f=[MINFREQ hicutoff/nyq hicutoff*(1+trans)/nyq 1]; 
- fprintf('eegfilter() - lowpass transition band is %1.1g Hz.\n',(f(3)-f(2))*srate);
+ fprintf('eegfilt() - lowpass transition band width is %1.1g Hz.\n',(f(3)-f(2))*srate);
  m=[     1           1              0                 0];
 else
  help eegfilt
