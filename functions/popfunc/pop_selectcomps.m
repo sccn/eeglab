@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/26 14:35:27  arno
+% debugging: if nb comps~=nb chans
+%
 % Revision 1.3  2002/04/26 21:21:08  arno
 % updating eeg_store call
 %
@@ -93,7 +96,7 @@ if ~exist('fig')
 	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off');
 	set(gcf,'MenuBar', 'none');
 	pos = get(gcf,'Position');
-	set(gcf,'Position', [pos(1) pos(2) 800 800]);
+	set(gcf,'Position', [pos(1) 0 800 800]);
 	pos = get(gca,'position'); % plot relative to current axes
 	hh = gca;
 	q = [pos(1) pos(2) 0 0];
