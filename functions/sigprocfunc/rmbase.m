@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/13 23:04:24  arno
+% using nan_mean instead of mean
+%
 % Revision 1.2  2002/07/22 21:37:32  luca
 % now accept 3-D data matrix -lf
 % now accept 3-D data matrix -lf.
@@ -106,7 +109,7 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 
     dataout = data;
     for e=1:epochs
-        if basevector~=0,
+        if basevector(1)~=0,
 			rmeans = nan_mean(data(:,(e-1)*frames+basevector)');
 		else
 			rmeans = nan_mean(data(:,(e-1)*frames+1:e*frames)');
