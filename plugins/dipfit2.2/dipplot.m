@@ -154,6 +154,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.111  2005/03/14 18:28:56  arno
+%implementing tailarach coordinate display
+%
 %Revision 1.110  2005/03/11 16:31:14  arno
 %new option meshdata
 %
@@ -625,7 +628,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             catch,
                 disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
                 try,
+                    warning off;
                     g.mri = read_fcdc_mri(g.mri);
+                    %g.mri.anatomy(find(g.mri.anatomy > 255)) = 255;
+                    %g.mri.anatomy = uint8(g.mri.anatomy);
+                    g.mri.anatomy = round(gammacorrection( g.mri.anatomy, 0.8));
+                    g.mri.anatomy = uint8(round(g.mri.anatomy/max(reshape(g.mri.anatomy, prod(g.mri.dim),1))*255));
+                    % WARNING: if using double instead of int8, the scaling is different 
+                    % [-128 to 128 and 0 is not good]
+                    % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
+                    % misplaced
+                    warning on;
                 catch,
                     error('Cannot load file using read_fcdc_mri');
                 end;
@@ -639,7 +652,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
         % MRI coordinates for slices
         % --------------------------
-        if isfield(g.mri, 'xgrid')
+        if ~isfield(g.mri, 'xgrid')
             g.mri.xgrid = [1:size(dat.imgs,1)]; 
             g.mri.ygrid = [1:size(dat.imgs,2)];
             g.mri.zgrid = [1:size(dat.imgs,3)];
@@ -1523,3 +1536,9 @@ function color = strcol2real(colorin, colmap)
             end;
         end;
     end;
+
+function x = gammacorrection(x, gammaval);
+    x = 255 * (double(x)/255).^ gammaval;
+    % image is supposed to be scaled from 0 to 255
+    % gammaval = 1 is identity of course
+    
