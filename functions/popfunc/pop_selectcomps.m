@@ -17,7 +17,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: pop_compprop(), eeglab()
+% See also: pop_prop(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/19 22:05:37  arno
+% removing comment
+%
 % Revision 1.10  2002/08/12 18:35:09  arno
 % questdlg2
 %
@@ -157,7 +160,7 @@ for ri = compnum
 		% plot the button
 		% ---------------
 		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',[X+2 Y+15 11 4].*s+q, 'tag', ['comp' num2str(ri)]);
-		command = sprintf('pop_compprop( %s, %d, 0, %3.15f);', inputname(1), ri, button);
+		command = sprintf('pop_prop( %s, 1, %d, %3.15f);', inputname(1), ri, button);
 		set( button, 'callback', command );
 	end;
 	set( button, 'backgroundcolor', eval(fastif(EEG.reject.gcompreject(ri), COLREJ,COLACC)), 'string', int2str(ri)); 	
