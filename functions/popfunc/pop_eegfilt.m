@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/12/03 18:31:32  arno
+% implementing eegfiltfft
+%
 % Revision 1.22  2003/09/01 18:14:17  arno
 % fixing nargin problem -thanks Petr Janata
 %
@@ -204,17 +207,17 @@ if EEG.trials == 1
 				try
                     fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
                     if exist('filtfilt') == 2
-                        EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+                        EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
                             eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
                     else
-                        EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+                        EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
                             eegfiltfft(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
                     end;
 				catch
 					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
                     if locutoff ~= 0 & hicutoff == 0
                         tmprange = [boundaries(n)+1:boundaries(n+1)];
-                        EEGdata(:,tmprange) = ...
+                        EEG.data(:,tmprange) = ...
                             EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
                     end;
 				end;
