@@ -99,6 +99,9 @@
 %                         3      90     44      C3
 %                         4     -90     44      C4
 %                           ...
+%   '.elc':
+%               Cartesian 3-D electrode coordinates scanned using the EETrak software. 
+%               See readeetraklocs().
 %   '.elp':     
 %               Polhemus-.'elp' cartesian coordinates. By default, an .elp extension is read
 %               as PolhemusX-elp in which 'X' on the Polhemus sensor is pointed toward the 
@@ -173,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/11/05 17:20:23  arno
+% first convert spherical instead of carthesian
+%
 % Revision 1.50  2003/09/18 00:07:05  arno
 % further checks for neuroscan
 %
@@ -361,6 +367,7 @@ if isstr(filename)
         case 'elp', g.filetype = 'polhemus';disp( [ 'WARNING: Polhemus carthesian coords "elp" file extension' ... 
                                        ' detected; if importing BESA spherical coords. force to type "besa" instead'] );
         case 'asc', g.filetype = 'asc';
+        case 'elc', g.filetype = 'elc';
         case 'eps', g.filetype = 'besa';
         case 'sfp', g.filetype = 'sfp';
         otherwise, g.filetype =  ''; 
@@ -388,6 +395,8 @@ if isstr(filename)
    % -----------
    if strcmp(lower(g.filetype), 'asc')
        eloc = readneurolocs( filename );
+   elseif strcmp(lower(g.filetype), 'elc')
+       eloc = readeetraklocs( filename );
    elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
            strcmp(lower(g.filetype), 'polhemus')
        try, 
