@@ -114,6 +114,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/11/21 19:19:59  arno
+% adding ppm format
+%
 % Revision 1.29  2002/11/21 18:52:21  arno
 % new envvert
 %
@@ -487,9 +490,17 @@ end;
 % ------------
 switch lower(g.resolution)
 	case 'high', figure( 'position', [100, 100, nbconditions*g.size(1)*3, g.size(2)*3], 'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
-	otherwise    figure( 'position', [100, 100, nbconditions*g.size(1), g.size(2)], 'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
+ otherwise    figure( 'position', ...
+                      [100, 100, ceil(nbconditions*g.size(1)/4)*4, ceil(g.size(2)/4)*4], ...
+                      'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
 end;
+
 axis off
+if strcmpi(g.framesout, 'ppm')
+    r = 0.8465;
+    pos = get(gcf,'position');
+    set(gcf, 'position', [ 0 0 floor(pos(3)/r), floor(pos(4)/r) ]);
+end;
 pos = get(gca,'position');
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)];
