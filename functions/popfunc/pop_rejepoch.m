@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/06/25 01:57:00  arno
+% debuging trial select
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -66,7 +69,7 @@ end;
 fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
 
 if confirm ~= 0
-    ButtonName=questdlg('Are you sure, you want to reject the labeled trials ?', ...
+    ButtonName=questdlg2('Are you sure, you want to reject the labeled trials ?', ...
                          'Reject pre-labelled epochs -- pop_rejepoch()', 'NO', 'YES', 'YES');
     switch ButtonName,
         case 'NO', 
