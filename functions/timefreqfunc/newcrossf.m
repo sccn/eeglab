@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/11/20 01:44:06  arno
+% same
+%
 % Revision 1.25  2002/11/20 01:41:23  arno
 % do not plot for crossfdiff
 %
@@ -431,6 +434,7 @@ if (nargin < 2)
    help crossf
    return
 end
+coherresout = [];
 
 if ~iscell(X)
 	if (min(size(X))~=1 | length(X)<2)
