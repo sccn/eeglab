@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/07/28 15:52:03  arno
+% still debug command line problem
+%
 % Revision 1.39  2004/07/28 15:36:11  arno
 % typo
 %
@@ -361,7 +364,7 @@ for ci = chan
                     'Maybe edges are not perfectly defined, try increasing edge length' ]);
         end;
     end;
-    
+
     if isempty(tmpevent), 
         fprintf('No event found for channel %d\n', ci);
     else
