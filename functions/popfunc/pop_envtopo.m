@@ -1,23 +1,22 @@
-% pop_envtopo() - Call envtopo() function for datasets. Envelope of EEG data
-%                 is plotted plus head plots of specified or largest components 
-%                 reference to their time point maximum amplitude.
-%
+% pop_envtopo() - Plot envelope of an averaged EEG epoch, plus scalp maps 
+%                 of largest or specified components reference to their 
+%                 time point maximum amplitude. Calls envtopo().
 % Usage:
-%   >> pop_envtopo( EEG, timerange, topotimes, title, 'key', 'val', ...);
+%   >> pop_envtopo( EEG, timerange, compnums, title, 'key', 'val', ...);
 %
 % Inputs:
 %   EEG        - input dataset
-%   timerange  - [min max] time range (in msec) to plot the envelope
+%   timerange  - [min max] time range (in msec) to plot 
 %   compnums   - vector of component numbers to plot {default|0 -> all}
-%                ELSE n<0, the number of "largest" comp. maps to plot 
-%                {default|[] -> 7}   
+%                ELSE n<0, plot the number of comp. maps with largest 
+%                projected variance in the plotted epoch. {default|[]-> 7}
 %   title      - plot title
 %
 % Optional inputs:
-%   'key','val' - optional topoplot() arguments (see topoplot())
+%   'key','val' - optional topoplot() arguments (see >> help topoplot())
 %
-% Outputs: same as envtopo(), no outputs are returned when a
-%          window pops-up to ask for additional arguments.
+% Outputs: Same as envtopo(). When nargin < 3, a query window pops-up 
+%          to ask for additional arguments and no outputs are returned.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -42,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 15:53:26  scott
+% editted msgs -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -58,10 +60,10 @@ if nargin < 1
 	return;
 end;	
 if isempty( EEG.icasphere )
-	disp('Error: you must run ICA first. Use Tools/Run ICA.'); return;
+	disp('Error: cannot plot without ICA weights. Use Tools/Run ICA.'); return;
 end;
 if isempty(EEG.chanlocs)
-	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info.\n');
+	fprintf('Cannot plot without channel locations. Use Edit/Dataset info.\n');
 	return;
 end;
 if exist('envtitle') ~= 1
@@ -120,8 +122,10 @@ if ~isempty(EEG.chanlocs)
 	    options = '';
 	end;
 	varargout{1} = sprintf('figure; pop_envtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(compnums), envtitle, options);
+	popcom = sprintf('figure; pop_envtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(compnums), envtitle, options);
 	com =  sprintf('%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, EEG.chanlocs, [timerange(1) timerange(2) 0 0], compnums, envtitle, [], [], [], [], [] %s);', outstr, options);
 	eval(com)
+        varargout{1} = [ 10 popcom 10 '% ' com];
 else
 	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info.\n');
 	return;
