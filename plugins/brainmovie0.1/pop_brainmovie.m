@@ -66,7 +66,9 @@
 %  'circfactor'  - [real array] brainmovie 'circfactor' argument.
 %  'movparams'   - [cell array or string] brainmovie parameters. If a string is given
 %                as argument, 'mriside' will plot a brainmovie using an average
-%                structural side MRI image as background. Default is 'mriside'.
+%                structural side MRI image as background, 'mritop' will plot a 
+%                brainmovie from the top and 'mrirear' will plot plot a brainmovie from 
+%                the rear. Default is 'mriside'.
 %  'addmovparams' - [cell array] brainmovie additional parameters. Allow to use the
 %                standard movie parameters and change some of the parameters.
 %  'eventprob'   - [event] include response probability of events of type given as
@@ -105,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/12/05 15:49:42  arno
+% debuging plotorder
+%
 % Revision 1.19  2002/12/04 22:50:22  arno
 % implementing plotorder
 %
@@ -381,6 +386,35 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,3) );
         coordinates = coordinates(:, [1 2]); % remove Z
+    else
+        coordinates = g.coordinates;
+    end;
+    
+    brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
+                         'resolution', 'low', ...
+                        'coordinates', coordinates, ...
+                        'circfactor', g.circfactor, ...
+                        'xlimaxes', [-1.1 1.1], ...
+                        'ylimaxes', [-1.1 1.1], ...
+                        'envylabel', 'uV', ...
+                        'rthistloc', [9 9 1.3 1], ...
+                        'visible', 'on', ...
+                        'crossfphasespeed', 'off', ...
+                        'head', '/data/common/matlab/toolbox2/mritop.pcx', ...
+                        'crossfphaseunit', 'radian', ...
+                        'size', [350 400], ...
+                        'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
+                        'square', 'off', ...
+                        'condtitle', alltitles };
+elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
+    
+    % ------------------
+    % movie from the rear
+    % ------------------
+    if isempty(g.coordinates)
+        coordinates = founddipoles(ALLEEG, g.comps);
+        [tmp plotorder] = sort( coordinates(:,2) );
+        coordinates = coordinates(:, [1 3]); % remove Z
     else
         coordinates = g.coordinates;
     end;
