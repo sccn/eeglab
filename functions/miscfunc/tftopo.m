@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2002/10/09 18:12:00  arno
+% new inputs logfreq, shiftdims, vert, smooth ...
+%
 % Revision 1.54  2002/10/08 23:55:35  arno
 % debug
 %
@@ -239,7 +242,7 @@ function tfave = tftopo(tfdata,times,freqs,varargin);
     %timefreqs,showchan,chanlocs,limits,signifs,selchans)
 
 LINECOLOR= 'k';
-LINEWIDTH = 2.5;
+LINEWIDTH = 2;
 ZEROLINEWIDTH = 2.8;
 
 if nargin<3
