@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 02:31:36  arno
+% inputdlg2
+%
 % Revision 1.7  2002/08/07 22:39:38  arno
 % same
 %
@@ -155,7 +158,7 @@ else
     [rej rejE] = rejtrend( icaacttmp, winsize, minslope, minstd);
 end;
 fprintf('%d channel selected\n', size(elecrange(:), 1));
-fprintf('%d/%d trials rejected\n', length(find(rej > 0)), EEG.trials);
+fprintf('%d/%d trials marked for rejection\n', length(find(rej > 0)), EEG.trials);
 
 if calldisp
     if icacomp == 1 macrorej  = 'EEG.reject.rejconst';

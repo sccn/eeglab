@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/12 02:33:29  arno
+% inputdlg2
+%
 % Revision 1.8  2002/08/07 23:19:15  arno
 % editing
 %
@@ -181,7 +184,7 @@ else
 	[ EEG.stats.icakurt rej] = rejkurt( tmpdata, globthresh, EEG.stats.icakurt, 1); 
 end;
 rej = rej' | max(rejE, [], 1);
-fprintf('%d/%d trials rejected\n', sum(rej), EEG.trials);
+fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
 if calldisp
 	if vistype == 1 % EEGPLOT -------------------------

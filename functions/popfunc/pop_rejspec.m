@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/12 02:32:24  arno
+% inputdlg2
+%
 % Revision 1.10  2002/08/07 22:38:42  arno
 % editing header
 %
@@ -181,7 +184,7 @@ else
 end;
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
-fprintf('%d/%d trials rejected\n', length(Irej), EEG.trials);
+fprintf('%d/%d trials marked for rejection\n', length(Irej), EEG.trials);
 rej = zeros( 1, EEG.trials);
 rej(Irej) = 1;
 

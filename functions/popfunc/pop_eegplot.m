@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/12 16:26:20  arno
+% inputdlg2
+%
 % Revision 1.13  2002/08/08 01:33:56  arno
 % adding history for continuous rejection
 %
@@ -115,7 +118,7 @@ if nargin < 3 & EEG.trials > 1
 						 };
 	inistr       = { 'yes', 'no' };
 	result       = inputdlg2( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
-								'Manual trials rejection -- pop_eegplot()'), 1,  inistr, 'pop_eegplot');
+								'Reject epochs by visual inspection -- pop_eegplot()'), 1,  inistr, 'pop_eegplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    

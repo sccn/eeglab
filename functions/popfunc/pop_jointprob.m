@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/12 02:42:10  arno
+% inputdlg2
+%
 % Revision 1.11  2002/08/07 23:19:43  arno
 % text
 %
@@ -191,7 +194,7 @@ else
 	clear tmpdata2;
 end;
 rej = rej' | max(rejE, [], 1);
-fprintf('%d/%d trials rejected\n', sum(rej), EEG.trials);
+fprintf('%d/%d trials marked for rejection\n', sum(rej), EEG.trials);
 
 if calldisp
 	if vistype == 1 % EEGPLOT -------------------------
