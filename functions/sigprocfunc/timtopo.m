@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/03/04 18:22:30  scott
+% debug last -sm
+%
 % Revision 1.21  2003/03/04 18:20:01  scott
 % debug last -sm
 %
@@ -390,7 +393,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
 %   >> axis off % finally, hide large axes
 
   from = changeunits([plottimes(t),maxdata],axdata,axall);
-  to   = changeunits([0,-1],axtp,axall);
+  to   = changeunits([0,-0.8],axtp,axall);
   delete(axtp);
   axes(axall);
   l1 = plot([from(1) to(1)],[from(2) to(2)]);
@@ -454,7 +457,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axcb = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+axcb = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.62*pos(4) pos(3)*.02 pos(4)*0.09]);
 h=cbar(axcb);                        % colorbar axes
 set(h,'Ytick',[]);
 
@@ -483,7 +486,6 @@ set(axall,'layer','top'); % bring component lines to top
 		end;
 	catch, end;
   end
-  text(0.86,0.59,'-','FontSize',16,'HorizontalAlignment','Center');
 %
 % Turn on axcopy()
 %
