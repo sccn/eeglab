@@ -90,11 +90,11 @@
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified times
+%   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
 %   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
 %               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
 %               (See also: 'vert' above).
-%
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' - ['string'] ERP ordinate axis label (default is uV)
@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.151  2003/09/21 21:12:27  scott
+% edited comments
+%
 % Revision 1.150  2003/09/11 22:23:25  scott
 % debug same
 %
@@ -661,6 +664,7 @@ try, icadefs; catch, end;
 SORTWIDTH = 2.5;    % Linewidth of plotted sortvar
 ZEROWIDTH = 3.0;    % Linewidth of vertical 0 line
 VERTWIDTH = 2.5;    % Linewidth of optional vertical lines
+HORZWIDTH = 2.1;    % Linewidth of optional vertical lines
 SIGNIFWIDTH = 1.9;  % Linewidth of red significance lines for amp, coher
 DOTSTYLE   = 'k--'; % line style to use for vetical dotted/dashed lines
 LABELFONT = 14;     % font sizes for axis labels, tick labels
@@ -700,6 +704,7 @@ Ampflag   = NO;     % don't sort by amplitude
 Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
+Horzflag  = NO;
 Noshowflag  = NO;
 Renormflag = NO;
 yerplabel = '\muV';
@@ -981,11 +986,14 @@ if nargin > 6
           end
           Auxvarflag = NO;
 	  elseif Vertflag == YES
-          verttimes = Arg;
-          Vertflag = NO;
+            verttimes = Arg;
+            Vertflag = NO;
+	  elseif Horzflag == YES
+            horzepochs = Arg;
+            Horzflag = NO;
 	  elseif yerplabelflag == YES
-          yerplabel = Arg;
-          yerplabelflag = NO;
+            yerplabel = Arg;
+            yerplabelflag = NO;
 	  elseif Signifflag == YES
 		  signifs = Arg; % [low_amp hi_amp coher]
 		  if length(signifs) ~= 3
@@ -1140,6 +1148,8 @@ if nargin > 6
 		  Srateflag = YES;
 	  elseif strcmp(Arg,'vert') |  strcmp(Arg,'verttimes')
 		  Vertflag = YES;
+	  elseif strcmp(Arg,'horz') |  strcmp(Arg,'horiz') | strcmp(Arg,'horizontal')
+		  Horzflag = YES;
 	  elseif strcmp(Arg,'signif')|strcmp(Arg,'signifs')|strcmp(Arg,'sig')|strcmp(Arg,'sigs')
 		  Signifflag = YES;
 	  elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
@@ -2051,6 +2061,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
     
 end %%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(verttimes)
  if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
@@ -2103,6 +2114,28 @@ if ~isempty(verttimes)
  end;
 end
 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% plot horz lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if ~isempty(horzepochs)
+ if size(horzepochs,1) > 1 & size(horzepochs,1) > 1
+    fprintf('\nerpimage(): horz arg must be a vector\n');
+    return
+ end;
+ if strcmpi(noshow, 'no')
+     fprintf('Plotting %d lines at epochs: ',length(horztimes));
+     for he = horzepochs % for each horizontal line
+         fprintf('%g ',he);
+             if TIMEX          % overplot he on image
+                 plot([timelimits(1) timelimits(2)],[he he],DOTSTYLE,'Linewidth',HORZWIDTH);
+             else
+                 plot([he he], [timelimits(1) timelimits(2)],DOTSTYLE,'Linewidth',HORZWIDTH);
+             end
+     end
+     %end
+     fprintf('\n');
+ end;
+end
 if strcmpi(noshow, 'no')
     set(gca,'FontSize',TICKFONT)
     hold on;
