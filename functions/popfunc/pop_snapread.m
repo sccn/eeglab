@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/06/19 21:12:32  arno
+% nothing
+%
 % Revision 1.4  2003/06/19 16:14:17  arno
 % make ur
 %
@@ -97,6 +100,7 @@ EEG.filepath        = '';
 EEG.setname 		= 'SnapMaster file';
 EEG.nbchan          = params(1);
 EEG.pnts            = params(2);
+EEG.trials          = 1;
 EEG.srate           = params(3);
 EEG.xmin            = 0; 
 
