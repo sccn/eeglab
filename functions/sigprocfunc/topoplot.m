@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2004/02/15 17:28:41  scott
+% same
+%
 % Revision 1.92  2004/02/15 17:17:30  scott
 % same
 %
@@ -929,8 +932,8 @@ if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
   set(hd,'color','w','linewidth',HLINEWIDTH+5);
-  hd2=plot(cos(circ).*rmax,sin(circ).*rmax,...
-       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
+  %hd2=plot(cos(circ).*rmax,sin(circ).*rmax,...
+  %     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 else
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
