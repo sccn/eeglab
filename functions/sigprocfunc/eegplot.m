@@ -17,6 +17,7 @@
 %                    vector of integers -> channel numbers
 %    'winlength'  - Number of seconds of EEG displayed {default 5 (seconds
 %                   for continuous data or epochs for data epochs)}
+%    'elecwin'    - Maximum number of electrode to be displayed {default 32}
 %    'title'      - title of the figure
 %    'position'   - position of the figure [cornerx cornery width height].
 %    'trialstag'  - points to tag (i.e. trials delimitation {default []}
@@ -76,9 +77,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.4  2002/05/15 23:45:53  scott
-% added undocumented arg 'nofig' (variant of 'noui') -sm
-%
 % Revision 1.3  2002/05/02 21:27:01  arno
 % reject button debugging
 %
@@ -150,7 +148,7 @@ SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
 DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.788095];
                                   % dimensions of main EEG axes
-ORIGINAL_POSITION = [100 300 800 500];
+ORIGINAL_POSITION = [100 200 800 500];
                                   
 if nargin < 1
    help eegplot
@@ -170,29 +168,40 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    		disp('Error: calling convention {''key'', value, ... } error'); return;
    end;	
 		 
-   try, g.srate; 			catch, g.srate		= 256; 	end;
+   try, g.srate; 			   catch, g.srate		= 256; 	end;
    try, g.spacing; 			catch, g.spacing	= 0; 	end;
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
-   try, g.position; 		catch, g.position	= [100 300 600 500]; 	end;
-   try, g.title; 			catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
+   try, g.position; 		   catch, g.position	= [100 200 800 500]; 	end;
+   try, g.title; 			   catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
    try, g.trialstag; 		catch, g.trialstag	= -1; 	end;
    try, g.winrej; 			catch, g.winrej		= []; 	end;
    try, g.command; 			catch, g.command	= ''; 	end;
    try, g.tag; 				catch, g.tag		= 'EEGPLOT'; end;
-   try, g.xgrid;			catch, g.xgrid		= 'off'; end;
-   try, g.ygrid;			catch, g.ygrid		= 'off'; end;
-   try, g.color;			catch, g.color		= 'off'; end;
+   try, g.xgrid;			   catch, g.xgrid		= 'off'; end;
+   try, g.ygrid;			   catch, g.ygrid		= 'off'; end;
+   try, g.color;			   catch, g.color		= 'off'; end;
    try, g.freq;				catch, g.freq		= []; end;
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
-   try, g.limits;			catch, g.limits	    = [0 1]; end;
+   try, g.limits;			   catch, g.limits	    = [0 1]; end;
+   try, g.elecrange; 		catch, g.elecrange = min(32, size(data,1)); end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
    	end;	
+      
+   gfields = fieldnames(g);
+   for index=1:length(gfields)
+      switch gfields{index}
+      case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
+               'trialstag' 'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
+               'freq' 'submean' 'children' 'limits' 'elecrange' },;
+      otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
+      end;
+   end;
 
-   if length(g.srate) > 1
+	if length(g.srate) > 1
    		disp('Error: srate must be a single number'); return;
    end;	
    if length(g.spacing) > 1
@@ -235,9 +244,12 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	   case 'off', g.color = { 'k' };  
 	   otherwise disp('Error: color must be either ''on'' or ''off'''); return;
    end;	
-
-  [g.chans,g.frames, tmpnb] = size(data);
-  g.frames = g.frames*tmpnb;
+	if length(g.elecrange) > size(data,1)
+		g.elecrange = size(data,1);
+   end;
+   
+   [g.chans,g.frames, tmpnb] = size(data);
+   g.frames = g.frames*tmpnb;
   
   if g.spacing == 0
     maxindex = min(10000, g.frames);  
@@ -257,23 +269,21 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   g.frames = g.frames*tmpnb;
   g.nbdat = 1; % deprecated
   g.time  = 0;
+  g.elecoffset = 0;
   
   % %%%%%%%%%%%%%%%%%%%%%%%%
   % Prepare figure and axes
   % %%%%%%%%%%%%%%%%%%%%%%%%
   
-if ~isstr(data) | (isstr(data) & data(1:5) ~= 'nofig' )
-    figh = figure('UserData', g,... % store the settings here
+  figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
       'MenuBar','none','tag', g.tag ,'Position',ORIGINAL_POSITION, 'numbertitle', 'off');
-end
 
-	pos = get(gcf,'position'); % plot relative to current axes
-	q = [pos(1) pos(2) 0 0];
-	s = [pos(3) pos(4) pos(3) pos(4)]./100;
-	clf;
+  pos = get(gcf,'position'); % plot relative to current axes
+  q = [pos(1) pos(2) 0 0];
+  s = [pos(3) pos(4) pos(3) pos(4)]./100;
+  clf;
       
-
   % Background axis
   % --------------- 
   ax0 = axes('tag','backeeg','parent',figh,...
@@ -325,9 +335,10 @@ end
   posbut(11,:) = [ 0.5437    0.0134    0.0275    0.0270 ]; % -
   posbut(12,:) = [ 0.6    0.02    0.09    0.05 ]; % cancel
   posbut(13,:) = [-0.1    0.02    0.09    0.05 ]; % accept
+  posbut(20,:) = [-0.15    0.15     0.015    0.8 ]; % slider
   posbut(:,1) = posbut(:,1)+0.2;
 
-% Four move buttons: << < > >>
+% Five move buttons: << < text > >> 
 
   u(1) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -341,6 +352,14 @@ end
 	'Tag','Pushbutton2',...
 	'string','<',...
 	'Callback','eegplot(''drawp'',2)');
+  u(5) = uicontrol('Parent',figh, ...
+	'Units', 'normalized', ...
+	'BackgroundColor',[1 1 1], ...
+	'Position', posbut(5,:), ...
+	'Style','edit', ...
+	'Tag','EPosition',...
+	'string','0',...
+	'Callback', 'eegplot(''drawp'',0);' );
   u(3) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'Position',posbut(3,:), ...
@@ -354,17 +373,8 @@ end
 	'string','>>',...
 	'Callback','eegplot(''drawp'',4)');
 
-% Text edit fields: EPosition ESpacing
+% Text edit fields: ESpacing
 
-  u(5) = uicontrol('Parent',figh, ...
-	'Units', 'normalized', ...
-	'BackgroundColor',[1 1 1], ...
-	'Position', posbut(5,:), ...
-	'Style','edit', ...
-	'Tag','EPosition',...
-	'string','0',...
-	'Callback', 'eegplot(''drawp'',0);' );
-	
   u(6) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'BackgroundColor',[1 1 1], ...
@@ -374,6 +384,20 @@ end
 	'string',num2str(g.spacing),...
 	'Callback', 'eegplot(''draws'',0);' );
 
+% Slider for vertical motion
+  u(20) = uicontrol('Parent',figh, ...
+	'Units', 'normalized', ...
+	'Position', posbut(20,:), ...
+   'Style','slider', ...
+   'enable', 'off', ...
+   'sliderstep', [0.9 1], ...
+   'Tag','eegslider', ...
+   'callback', [ 'tmpg = get(gcbf, ''userdata'');' ... 
+   				'tmpg.elecoffset = get(gcbo, ''value'')*(tmpg.chans-tmpg.elecrange);' ...
+               'set(gcbf, ''userdata'', tmpg);' ...
+               'eegplot(''drawp'',0);' ...
+               'clear tmpg;' ], ...
+   'value', 0);
 
 % electrodes, postion, value and tag
 
@@ -383,7 +407,7 @@ end
 	'Position', posbut(7,:), ...
 	'Style','text', ...
 	'Tag','Eelec',...
-	'string','FP1');
+	'string',' ');
   u(10) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'BackgroundColor',DEFAULT_FIG_COLOR, ...
@@ -422,7 +446,6 @@ end
 	'string','Value');
 
 % ESpacing buttons: + -
-
   u(7) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'Position',posbut(10,:), ...
@@ -445,7 +468,7 @@ end
 				    'TMPREJ = g.winrej;' ...
                     'if g.children, delete(g.children); end;' ...
                     'delete(gcbf);' ...
-		  			tmpcom ...
+		  				  tmpcom ...
                     'clear g;']; % quitting expression
   if ~isempty(g.command)
 	  u(12) = uicontrol('Parent',figh, ...
@@ -464,7 +487,6 @@ end
 
   set(u,'Units','Normalized')
   set(gcf, 'position', g.position);
-  
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Set up uimenus
@@ -613,12 +635,12 @@ end
       'Label','Settings'); 
   
   % Window %%%%%%%%%%%%
-  uimenu('Parent',m(2),'Label','Window',...
+  uimenu('Parent',m(2),'Label','Time window',...
       'Callback','eegplot(''window'')')
   
-  % Samplerate %%%%%%%%
-  uimenu('Parent',m(2),'Label','Samplerate',...
-      'Callback','eegplot(''samplerate'')')
+  % Electrode window %%%%%%%%
+  uimenu('Parent',m(2),'Label','Electrode window',...
+      'Callback','eegplot(''winelec'')')
   
   % Electrodes %%%%%%%%
   m(6) = uimenu('Parent',m(2),'Label','Electrodes');
@@ -633,12 +655,32 @@ end
   uimenu('Parent',m(6),'Label','load file',...
       'Callback','eegplot(''loadelect'');')
   
+  % Zooms %%%%%%%%
+  zm = uimenu('Parent',m(2),'Label','Zooms');
+  commandzoom1 = 'set(gcbf, ''windowbuttondownfcn'',''';
+  commandzoom2 = ['eegplot(''''zoom'''', gcbf);'');' ...
+        'set(gcbf, ''windowbuttonupfcn'','''');'...
+        'set(gcf, ''windowbuttonmotionfcn'', '''');' ];
+            
+  uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
+               [commandzoom1  'zoom xdown;' commandzoom2 ]);
+  uimenu('Parent',zm,'Label','Zoom electrodes', 'callback', ...
+               [commandzoom1  'zoom ydown;' commandzoom2 ]);
+  uimenu('Parent',zm,'Label','Zoom both', 'callback', ...
+               [commandzoom1  'zoom down;' commandzoom2 ]);
+  uimenu('Parent',zm,'Label','Disable zoom', 'separator', 'on', 'callback', ...
+     ['tmpg = get(gcbf, ''userdata'');' ...
+     'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
+     'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
+     'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
+     'clear tmpg;' ]);
+   
   % %%%%%%%%%%%%%%%%%
   % Set up autoselect
   % %%%%%%%%%%%%%%%%%
 
   % push button: create/remove window or select electrode
-  command = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+  commandpush = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
   			 'g = get(gcbf,''UserData'');' ... % get data of backgroung image {g.trialstag g.winrej incallback}
 			 'if g.incallback ~= 1' ... % interception of nestest calls
@@ -670,10 +712,8 @@ end
              'end;' ...
              'clear g hhdat hh tmpelec tmppos ax2 ESpacing lowlim Allwin Fs winlength EPosition ax1' ];
 			 		
-  set(gcf, 'windowbuttondownfcn', command);
-
   % motion button: move windows or display current position (channel, g.time and activation)
-  command = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+  commandmove = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
  			 'g = get(gcbf,''UserData'');' ...
     		 'if isstruct(g)' ...      %check if we are dealing with the right window
@@ -707,10 +747,9 @@ end
 			 'end;' ...
 			 'clear g labls eegplotdata tmpelec nbdat ESpacing tmppos ax1 hh lowlim Fs winlength;' ];
 
-  set(gcf, 'windowbuttonmotionfcn', command);
 
   % release button: check window consistency, adpat to trial boundaries
-  command = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+  commandrelease = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
  			 'g = get(gcbf,''UserData'');' ...
  			 'g.incallback = 0;' ...
 			 'set(gcbf,''UserData'', g); ' ... % early save in case of bug in the following
@@ -741,25 +780,22 @@ end
 			 '    end;' ...
 			 '  end;' ...
 			 'end;' ...
-             'set(gcbf,''UserData'', g);' ...
-             'eegplot(''drawb'');' ...
-             'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
+          'set(gcbf,''UserData'', g);' ...
+          'eegplot(''drawb'');' ...
+          'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
 
-  set(gcf, 'windowbuttonupfcn', command);
-
+  set(gcf, 'windowbuttondownfcn', commandpush);
+  set(gcf, 'windowbuttonmotionfcn', commandmove);
+  set(gcf, 'windowbuttonupfcn', commandrelease);
+  
+  g.commandselect = { commandpush commandmove commandrelease };           
+  set(gcf, 'userdata', g);
+  
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Plot EEG Data
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-   	axes(ax1)
-	hold on
-	%for nbplot=1:nbdat	
-   	%	meandata = mean(data(:,1:round(min(g.frames,g.winlength*g.srate)),nbplot )');  
-  	% 	for i = 1:g.chans
-    %		plot(data(g.chans-i+1,1:round(min(g.frames,g.winlength*g.srate)),nbplot) ...
-    %		-meandata(g.chans-i+1)+i*g.spacing, 'color', DEFAULT_PLOT_COLOR{nbplot})
-   	%	end
-   	%end;	
+  axes(ax1)
+  hold on
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Plot Spacing I
@@ -806,7 +842,10 @@ end
   end 
   
   eegplot('drawp', 0);
-
+  if g.elecrange ~= g.chans
+  	   eegplot('zoom', gcf);
+  end;  
+  
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -846,11 +885,11 @@ else
       g.time = g.time+g.winlength;     % >> add one window length
     end
     
-	if g.trialstag ~= -1 % time in second or in trials
+	 if g.trialstag ~= -1 % time in second or in trials
 		multiplier = g.trialstag;	
-	else
+	 else
 		multiplier = g.srate;
-	end;		
+	 end;		
     
     % Update edit box
     g.time = max(0,min(g.time,ceil(g.frames/multiplier)-g.winlength));
@@ -861,21 +900,21 @@ else
     switch lower(g.submean) % subtract the mean ?
     	case 'on', meandata = mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');  
     	otherwise, meandata = zeros(1,g.chans);
-	end;
+	 end;
     axes(ax1)
     cla
     
-	% plot data
-   	axes(ax1)
-	hold on
-	lowlim = round(g.time*multiplier+1);
-	highlim = round(min((g.time+g.winlength)*multiplier,g.frames));
- 	for i = 1:g.chans
+	 % plot data
+    axes(ax1)
+	 hold on
+	 lowlim = round(g.time*multiplier+1);
+	 highlim = round(min((g.time+g.winlength)*multiplier,g.frames));
+ 	 for i = 1:g.chans
       	plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
       		'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
-   	end
+    end
 
-	% draw selected electrodes
+	 % draw selected electrodes
     if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
@@ -898,15 +937,17 @@ else
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',[0:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier])
 
-	eegplot('drawb');
+    % ordinates: even if all elec are plotted, some may be hidden
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
+    eegplot('drawb');
 	
-	if g.children ~= 0
+	 if g.children ~= 0
 		if ~exist('p2')
 			p2 =[];
 		end;	
 		eegplot( 'drawp', p1, p2, g.children);
 		figure(figh);
-	end;	  
+	 end;	  
   
   case 'drawb' % Draw background ******************************************************
     % Redraw EEG and change position
@@ -986,6 +1027,9 @@ else
 		'XTick',[0:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier])
     end;
     		
+    % ordinates: even if all elec are plotted, some may be hidden
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
+    
     axes(ax1)	
 
   case 'draws'
@@ -1012,9 +1056,9 @@ else
 
     set(ESpacing,'string',num2str(g.spacing,4))  % update edit box
     set(gcf, 'userdata', g);
-	eegplot('drawp', 0);
-    set(ax1,'YLim',[0 (g.chans+1)*g.spacing],...
-	'YTick',[0:g.spacing:g.chans*g.spacing])
+	 eegplot('drawp', 0);
+    set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
     
     % update scaling eye if it exists
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
@@ -1022,9 +1066,10 @@ else
       eyetext = findobj('type','text','parent',eyeaxes,'tag','thescale');
       set(eyetext,'string',num2str(g.spacing,4))
     end
-	return;
+    
+    return;
 
-  case 'window'
+  case 'window'  % change window size
     % get new window length with dialog box
     g = get(gcf,'UserData');
 	result       = inputdlg( { fastif(g.trialstag==-1,'Enter new window length(secs):', 'Enter number of epoch(s):') }, 'Change window length', 1,  { num2str(g.winlength) });
@@ -1035,7 +1080,23 @@ else
 	eegplot('drawp',0);	
 	return;
     
-  case 'loadelect'
+  case 'winelec'  % change electrode window size
+   % get new window length with dialog box
+   fig = gcf;
+   g = get(gcf,'UserData');
+	result = inputdlg( { 'Enter new window length (in number of electrodes):' } , 'Change electrode window length', 1,  { num2str(g.elecrange) });
+	if size(result,1) == 0 return; end;
+
+   g.elecrange = eval(result{1});
+   if g.elecrange<0 | g.elecrange>g.chans
+      g.elecrange =g.chans;
+   end;
+	set(gcf, 'UserData', g);
+   eegplot('updateslidder', fig);
+	eegplot('drawp',0);	
+	return;
+   
+  case 'loadelect' % load electrodes
 	[inputname,inputpath] = uigetfile('*','Electrode File');
 	if inputname == 0 return; end;
 	if ~exist([ inputpath inputname ])
@@ -1123,7 +1184,7 @@ else
   case 'noui'
       eegplot( varargin{:} );
 
-      % suppress menu bar
+      % suppres menu bar
       set(gcf, 'menubar', 'figure');
 
       % find button and text
@@ -1133,20 +1194,62 @@ else
       objscale = findobj(obj, 'tag', 'thescale');
       delete(setdiff(obj, objscale));
  
-  case 'nofig'
-      eegplot( varargin{:} );
-
-      % suppress menu bar
-      set(gcf, 'menubar', 'figure');
-
-      % find button and text
-      obj = findobj(gcf, 'style', 'pushbutton'); delete(obj);
-      obj = findobj(gcf, 'style', 'edit'); delete(obj);
-      obj = findobj(gcf, 'style', 'text'); 
-      objscale = findobj(obj, 'tag', 'thescale');
-      delete(setdiff(obj, objscale));
- 
-  otherwise
+	case 'zoom' % if zoom
+      fig = varargin{1};
+      ax1 = findobj('tag','eegaxis','parent',fig); 
+      ax2 = findobj('tag','backeeg','parent',fig); 
+      tmpxlim  = get(ax1, 'xlim');
+      tmpylim  = get(ax1, 'ylim');
+      tmpxlim2 = get(ax2, 'xlim');
+      set(ax2, 'xlim', get(ax1, 'xlim'));
+      g = get(fig,'UserData');
+      
+      % deal with abscicia
+      % ------------------
+      Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'));
+		if g.trialstag ~= -1
+      	 g.winlength = (tmpxlim(2) - tmpxlim(1))/g.trialstag;
+        	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.trialstag;
+		else
+		 	 g.winlength = (tmpxlim(2) - tmpxlim(1))/g.srate;	
+       	 Eposition = Eposition + (tmpxlim(1) - tmpxlim2(1))/g.srate;
+      end;  
+      Eposition = round(Eposition*1000)/1000;
+      set(findobj('tag','EPosition','parent',fig), 'string', num2str(Eposition));
+      
+      % deal with ordinate
+      % ------------------
+      g.elecoffset = tmpylim(1)/g.spacing;
+      g.elecrange  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
+         
+      set(fig,'UserData', g);
+      eegplot('updateslidder', fig);
+      eegplot('drawp', 0);
+      
+	case 'updateslidder' % if zoom
+      fig = varargin{1};
+      g = get(fig,'UserData');
+      slidder = findobj('tag','eegslider','parent',fig);
+      if g.elecoffset < 0
+         g.elecoffset = 0;
+      end;
+      if g.elecrange >= g.chans
+         g.elecrange = g.chans;
+         g.elecoffset = 0;
+         set(slidder, 'enable', 'off');
+      else
+         set(slidder, 'enable', 'on');         
+      end;
+      if g.elecoffset < 0
+         g.elecoffset = 0;
+      end;
+      if g.elecoffset > g.chans-g.elecrange
+         g.elecoffset = g.chans-g.elecrange;
+      end;
+      set(slidder, 'value', g.elecoffset/g.chans, ...
+         'sliderstep', [1/g.chans g.elecrange/g.chans]);
+      set(fig,'UserData', g);
+   otherwise
       error(['Error - invalid eegplot() parameter: ',data])
   end  
 end
