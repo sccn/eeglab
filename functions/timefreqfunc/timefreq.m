@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/10/22 17:06:54  arno
+% winsize length
+%
 % Revision 1.28  2003/07/09 21:29:57  arno
 % implementing ntimesout
 %
@@ -236,20 +239,22 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 
 % finding frequencies
 % -------------------
+if g.freqs(1) == 0 & g.cycles ~= 0
+    g.freqs(1) = srate*g.cycles/g.winsize;
+end;
 if isempty(g.nfreqs)
-    if g.cycles == 0 % FFT
-        g.nfreqs = g.winsize/2*g.padratio;
-    else
-        g.nfreqs = length([2:2/g.padratio:g.winsize]);
+    g.nfreqs = g.winsize/2*g.padratio+1;
+    if g.cycles ~= 0
+        tmpfreqs = linspace(0, srate/2, g.nfreqs); 
+        tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
+        g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
     end;
 end;
-if g.freqs(1) == 0 & g.cycles == 0
-    g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs+1);
-    g.freqs = g.freqs(2:end); % remove DC (match the output of PSD)
+if g.cycles == 0
+    tmpfreqs = linspace(0, srate/2, g.nfreqs); 
+    tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
+    g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
 else
-    if g.freqs(1) == 0
-        g.freqs(1) = srate*g.cycles/g.winsize;
-    end;
     g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
 end;
 if strcmpi(g.freqscale, 'log')
@@ -370,6 +375,7 @@ if length(g.freqs) ~= length(freqs) | any(g.freqs ~= freqs)
 end;    
 
 timesout = g.timesout;
+
 %figure; imagesc(abs(sum(itcvals,3))); cbar;
 return;
 
