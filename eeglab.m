@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2002/07/18 17:58:01  arno
+% add dipole menu
+%
 % Revision 1.73  2002/07/18 02:25:51  arno
 % debug ALLSET->ALLEEG
 %
@@ -514,7 +517,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject using ICA');
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Localize dipoles using BESA');
 	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaexport(EEG);']);
-	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaimport(EEG);' e_store]);
+	uimenu( fourth_sub3, 'Label', 'Import dipoles'   , 'CallBack', [ 'besaimport(EEG);' e_store]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles'   , 'CallBack', [ 'besaplot(EEG.sources);']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles2'  , 'CallBack', [ 'besaplot(EEG.sources, ''sideview'', ''on'');']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 15, ''mesh'', ''off''););']);
