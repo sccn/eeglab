@@ -26,7 +26,8 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
 %                       'head', to edge of head {default 'head'}.
-%   'shrink'           - ['on'|'off'|'force'|'skirt'|factor] 'on': If max radius > 0.5, 
+%   'plotrad'         - [float] plotting radius. Default is data limits.
+%   'shrink'          - ['on'|'off'|'force'|'skirt'|factor] 'on': If max radius > 0.5, 
 %                        normalize electrode polar coordinates to make the maximum
 %                        radius 0.5 (to plot all locations). 'force': Normalize radius 
 %                        so the maximum is 0.5. 'factor': Apply a normalizing
@@ -99,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2004/03/18 00:29:07  arno
+% debug skirt option
+%
 % Revision 1.148  2004/03/18 00:18:09  arno
 % skirt option
 %
