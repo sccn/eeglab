@@ -46,7 +46,7 @@
 %                       Coordinates returned by dipplot() may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
 %                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
-%   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'off'}.
+%   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'on'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
 %   'diplen'          - [real] scale dipole length {default: 1}.
 %   'dipscale'        - [real] scale dipole size {default: 1}.
@@ -112,6 +112,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.197  2004/05/05 13:55:00  hilit
+% Set the defult option of dipnorm to 'on'
+%
+% Revision 1.196  2004/05/05 20:36:04  scott
+% DIPOLE scaling
+%
 % Revision 1.195  2004/05/05 20:21:02  scott
 % *** empty log message ***
 %
@@ -574,7 +580,7 @@ CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
-DIPNORM   = 'off';
+DIPNORM   = 'on';
 DIPSPHERE = 85;
 DIPLEN    = 1;
 DIPSCALE  = 1;
