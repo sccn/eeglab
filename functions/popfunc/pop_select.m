@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/02/28 00:57:21  arno
+% error if time out of range
+%
 % Revision 1.28  2003/02/28 00:51:30  arno
 % milliseconds -> seconds
 %
@@ -433,8 +436,8 @@ if ~isempty(g.time) | ~isempty(g.notime)
     else
         if isempty(g.notime)
             g.time = g.time';
-            if g.time(1) ~= 0, g.notime = [0 g.time(1:end)];
-            else               g.notime = [g.time(2:end)];
+            if g.time(1) ~= 0, g.notime = [0 g.time(1:end)'];
+            else               g.notime = [g.time(2:end)'];
             end;
             if g.time(end) == EEG.xmax, g.notime(end) = [];
             else                        g.notime(end+1) = EEG.xmax;
