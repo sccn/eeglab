@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/07/18 14:22:44  scott
+% commented, increased max channel defaults
+%
 % Revision 1.19  2003/02/12 23:33:41  arno
 % changing default color if less or equal to 256 colors
 %
@@ -110,6 +113,7 @@ if get(0, 'screendepth') <=8 % if mono or 8-bit color
     GUIPOPBUTTONCOLOR   = [1 1 1];    % Buttons colors in GUI windows
     GUIBACKCOLOR        = [1 1 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0];      % GUI foreground color for text    
+    PLUGINMENUCOLOR     = [0.8 0.8 0.8];  % plugin menu color
 else % if full color screen
     BACKCOLOR           = [.93 .96 1];    % Background figure color 
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
@@ -117,6 +121,7 @@ else % if full color screen
     GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
     GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
+    PLUGINMENUCOLOR     = [0.8 0.8 0.8];  % plugin menu color
 end;
 
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
