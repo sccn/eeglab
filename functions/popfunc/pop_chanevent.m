@@ -1,43 +1,42 @@
-% pop_chanevent() - import events from data channel values 
+% pop_chanevent() - import event latencies from 'edge' values of a specified EEG.data channel 
 %
 % Usage:
-%   >> OUTEEG = pop_chanevent( INEEG ); % pop-up window mode
-%   >> OUTEEG = pop_chanevent( INEEG, chanindices, 'key', 'val' ... );
+%   >> OUTEEG = pop_chanevent( INEEG ); % select parameters via a pop-up window
+%   >> OUTEEG = pop_chanevent( INEEG, chanindices, 'key', 'val' ... ); % no pop-up
 %
 % Graphic interface:
 %   "Event channel(s)" - [edit box] indices of event channel(s) to import.
 %                  Command line equivalent: chanindices.
-%   "Edge type to extract" - [list box] extract events if the event
+%   "Edge type to extract" - [list box] extract events when the event
 %                  channel values go up ('leading'), down ('trailing')
 %                  or both ('both'). Command line equivalent: 'edge'.
-%   "Delete event channel(s)" - [checkbox] check this checkbox to delete
-%                  event channel after events have been extracted from
-%                  it. Command line equivalent: 'delchan'.
+%   "Delete event channel(s)" - [checkbox] check to delete the event channel
+%                  after events have been extracted from it.
+%                  Command line equivalent: 'delchan'.
 %   "Delete old events if any" - [checkbox] check this checkbox to 
-%                  remove any prior event in the dataset. Otherwise 
+%                  remove any prior events in the dataset. Otherwise 
 %                  imported events are appended to old events. Command
 %                  line equivalent: 'delevent'.
-%   "Only one event type" - [checkbox] check this checkbox to regroup
-%                  all non-zero values of the data channel under one event 
-%                  type. Otherwise one type is assigned for each non-zero
+%   "Only one event type" - [checkbox] check this checkbox to assign
+%                  all transitions in the event channel to one event 
+%                  type. Else, one type is assigned for each non-zero
 %                  channel value. Command line equivalent: 'nbtype'.
-%
 % Inputs:
 %   INEEG          - input dataset structure
 %   chanindices    - indices of an event channel(s)
 %
-% Optionnal inputs:
+% Optional inputs:
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
-%                    if the event channel go up ('leading'), down ('trailing')
-%                    or both ('both'). Default is 'both'.
+%                    in the event channel go up ('leading'), down ('trailing')
+%                    or both ('both'). {Default is 'both'}.
 %   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
 %   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
-%   'nbtype'       - [1|NaN] setting this to one will force the program to 
-%                    consider all events as having the same type. Default is NaN.
-%   'typename'     - [string] name of the type for the events. Only relevant
-%                    'nbtype' is 1 or if there is only one event type in the
-%                     event channel. Default is 'chanX', X being the index of
-%                     the selected event channel.
+%   'nbtype'       - [1|NaN] setting this to 1 will force the program to 
+%                    consider all events to have the same type. {Default is NaN}.
+%   'typename'     - [string] event type name. Only relevant if 'nbtype' is 1
+%                    or if there is only one event type in the event channel.
+%                     {Default is 'chanX', X being the index of
+%                     the selected event channel}.
 %
 % Outputs:
 %   OUTEEG         - EEGLAB output data structure
@@ -65,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/01/15 17:37:00  scott
+% edited pop-window text
+%
 % Revision 1.20  2003/12/11 20:24:53  arno
 % nothing
 %
