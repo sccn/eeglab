@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/06/04 01:30:59  arno
+% better msg
+%
 % Revision 1.18  2004/06/02 17:38:41  arno
 % index of index problem
 %
@@ -129,24 +132,24 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 % add boundary events
 % -------------------
 if ~isempty(boundevents)
-    [ EEG.event indold ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
+    [ EEG.event indnew ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
     EEG                  = eeg_checkset(EEG, 'eventconsistency');
 else
-    indold = 1:length(EEG.event);
+    indnew = 1:length(EEG.event);
 end;
 
 % change event latencies
 % ----------------------
 if ~isempty(tmpalllatencies)
 	for tmpindex = 1:length(tmpalllatencies)
-		EEG.event = setfield(EEG.event, { indold(tmpindex) }, 'latency', tmpalllatencies(tmpindex));
+		EEG.event = setfield(EEG.event, { indnew(tmpindex) }, 'latency', tmpalllatencies(tmpindex));
 	end;
 
 	tmpnanloc = find(isnan(tmpalllatencies));
-	EEG.event(indold(tmpnanloc)) = [];
+	EEG.event(indnew(tmpnanloc)) = [];
     
-    if length(EEG.event) > length(indold)
-        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', length(EEG.event)-length(indold));
+    if length(EEG.event) > length(indnew)
+        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', length(EEG.event)-length(indnew));
     end;
     if length(tmpnanloc) > 0
         fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', ...
