@@ -15,7 +15,11 @@
 %   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
 %   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
 %   'nbtype'       - [1|NaN] setting this to one will force the program to 
-%                    consider all events as having the same type
+%                    consider all events as having the same type. Default is NaN.
+%   'typename'     - [string] name of the type for the events. Only relevant
+%                    'nbtype' is 1 or if there is only one event type in the
+%                     event channel. Default is 'chanX', X being the index of
+%                     the selected event channel.
 %
 % Outputs:
 %   OUTEEG         - EEGLAB output data structure
@@ -43,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/09 22:28:47  arno
+% update text
+%
 % Revision 1.6  2002/10/09 22:25:31  arno
 % debugging
 %
@@ -94,10 +101,12 @@ if nargin < 2
 	if result{3}, g.delchan = 'on'; else g.delchan  = 'off'; end;
 	if result{4}, g.delevent= 'on'; else g.delevent = 'off'; end;
 	if result{5}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
+    g.typename =  [ 'chan' int2str(chans) ];
 else 
 	listcheck = { 'edge'     'string'     { 'both' 'leading' 'trailing'}     'both';
 				  'delchan'  'string'     { 'on' 'off' }                     'on';
 				  'delevent' 'string'     { 'on' 'off' }                     'on';
+                  'typename' 'string'     []                                 [ 'chan' int2str(chans) ];
 				  'nbtype'   'integer'    [1 NaN]                             NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
@@ -108,26 +117,26 @@ end;
 
 % process events
 % --------------
-fprintf('pop_chanevent: importing events...\n');
+fprintf('pop_chanevent: importing events from data channel %d ...\n', chans);
 counte = 1; % event counter
 events(10000).latency = 0;
-for index = chans
-	counttrial = 1;
-	switch g.edge
-		case 'both'    , tmpevent = find( diff(EEG.data(index, :)) ~= 0);
-		case 'trailing', tmpevent = find( diff(EEG.data(index, :)) < 0);
-		case 'leading' , tmpevent = find( diff(EEG.data(index, :)) > 0);
-	end;
-	tmpevent = tmpevent+1;
-	for tmpi = tmpevent
-		if ~isnan(g.nbtype)
-			events(counte).type    = 1;
-		else
-			events(counte).type    = EEG.data(index, tmpi);
-		end;
-		events(counte).latency = tmpi;
-		counte = counte+1;
-	end;
+if length(unique(EEG.data(index, :))) == 2, g.nbtype = 1; end;
+
+counttrial = 1;
+switch g.edge
+ case 'both'    , tmpevent = find( diff(EEG.data(index, :)) ~= 0);
+ case 'trailing', tmpevent = find( diff(EEG.data(index, :)) < 0);
+ case 'leading' , tmpevent = find( diff(EEG.data(index, :)) > 0);
+end;
+tmpevent = tmpevent+1;
+for tmpi = tmpevent
+    if ~isnan(g.nbtype)
+        events(counte).type    = g.typename;
+    else
+        events(counte).type    = EEG.data(index, tmpi);
+    end;
+    events(counte).latency = tmpi;
+    counte = counte+1;
 end;
 events = events(1:counte-1);
 
