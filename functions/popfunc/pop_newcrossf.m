@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/12 01:48:19  arno
+% [6~[6~same
+%
 % Revision 1.17  2002/08/12 01:45:20  arno
 % color
 %
@@ -180,13 +183,21 @@ if popup
     
     % add title
     % ---------
-	if isempty( strmatch(  '''title''', result{7}))
+	if isempty( findstr(  'title', result{7}))
+        if ~isempty(EEG.chanlocs) & typeproc
+            chanlabel1 = EEG.chanlocs(num1).labels;
+            chanlabel2 = EEG.chanlocs(num2).labels;
+        else
+            chanlabel1 = int2str(num1);
+            chanlabel2 = int2str(num2);
+        end;
 		switch lower(result{5})
-		 case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-					' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
-		 otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-					' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
+		 case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+					' Coherence'''];
+		 otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+					' Phase Coherence''' ];
 		end;
+        options
 	end;
 	if ~isempty( result{6} )
 		options      = [ options ', ''alpha'',' result{6} ];

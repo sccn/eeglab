@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/12 01:48:37  arno
+% same
+%
 % Revision 1.21  2002/08/12 01:45:00  arno
 % color
 %
@@ -199,11 +202,16 @@ if popup
     
     % add title
     % ---------
-	if isempty( strmatch(  '''title''', result{6}))
+	if isempty( findstr(  '''title''', result{6}))
+        if ~isempty(EEG.chanlocs) & typeproc
+            chanlabel = EEG.chanlocs(num).labels;
+        else
+            chanlabel = int2str(num);
+        end;
 	    switch lower(result{4})
-	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num) ...
+	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel ...
 	       ' power and inter-trial coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
-	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num) ...
+	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel ...
 	       ' power and inter-trial phase coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
 	    end;
 	end;
