@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.22  2003/04/23 18:35:11  arno
+%allow to plot elipses
+%
 %Revision 1.21  2003/04/22 21:18:44  arno
 %standard dev
 %
@@ -200,7 +203,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'dipolesize' 'real'   [0 Inf]            30;
                                  'dipolelength' 'real' [0 Inf]            1;
                                  'sphere'   'real'     [0 Inf]              1;
-                                 'image'    'string'   { 'besa' 'mri' 'fullmri'}   'besa' }, 'dipplot');
+                                 'image'    'string'   { 'besa' 'mri' 'mriinfant' 'fullmri'}   'besa' }, 'dipplot');
     if isstr(g), error(g); end;
     
     % axis image and limits
@@ -223,6 +226,14 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         COLORMESH = 'w';
         BACKCOLOR = 'k';
         %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
+        AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
+    elseif strcmpi(g.image, 'mriinfant')
+        IMAGESLOC   = { { 'transv_infant.pcx' } { 'cor_infant.pcx' } { 'sag_infant.pcx' } };
+        IMAGESAXIS  = { -1  1 -1 };
+        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;
+        IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;
+        COLORMESH = 'w';
+        BACKCOLOR = 'k';
         AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
     else 
        [IMAGESLOC IMAGESAXIS] = getmriimgs;
