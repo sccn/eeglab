@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/09 21:02:05  arno
+% adding further check to eventconsistency
+%
 % Revision 1.7  2002/04/09 20:11:33  arno
 % eventdesciption advanced checking
 %
@@ -486,9 +489,13 @@ if ~isempty( varargin)
 						% get the field content
 						% ---------------------
 						for indexevent = 1:length(EEG.event)
-							if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
+							if size(arraytmpinfo,1) >= EEG.event(indexevent).epoch & size(arraytmpinfo,2) >= index
+								if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
+									arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
+								end;
+							else
 								arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
-							end;    
+							end;
 						end;
                         % uniformize content for all epochs
                         % ---------------------------------
