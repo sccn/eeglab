@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2003/06/18 22:27:53  arno
+% implementing makeur
+%
 % Revision 1.97  2003/06/13 16:41:51  arno
 % adding chanlocs homogenous check
 %
@@ -855,13 +858,8 @@ if ~isempty( varargin)
          case 'makeur', 
           if ~isempty(EEG.event)
               EEG.urevent = EEG.event;
-              if isfield(EEG.event, 'latency')
-                  for index = 1:length(EEG.event)
-                      EEG.event(index).urlatency = EEG.event(index).latency;
-                  end;
-              end;
-              if isfield(EEG.event, 'epoch')
-                  EEG.event(index).urepoch = EEG.event(index).epoch;
+              for index = 1:length(EEG.event)
+                  EEG.event(index).urevent = index;
               end;
           end;
          case 'eventconsistency',          
