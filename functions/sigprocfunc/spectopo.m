@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/07 22:44:49  scott
+% *** empty log message ***
+%
 % Revision 1.5  2002/07/07 22:42:17  scott
 % help msg -sm
 %
@@ -84,10 +87,18 @@ function [eegspecdB,freqs]=spectopo(data,frames,srate,headfreqs,chanlocs,limits,
 LOPLOTHZ = 1;  % low  Hz to plot
 FREQFAC  = 4;  % approximate frequencies/Hz (default)
 
-if nargin<5
+if nargin<3
    help spectopo
    return
 end
+if nargin < 4
+	headfreqs = [];
+end;
+if nargin < 5
+	if ~isempty(headfreqs)
+		error('need channel location map');
+	end;
+end;
 
 averef_flag = 0;
 if nargin > 9
@@ -125,7 +136,7 @@ if frames == 0
   frames = size(data,2); % assume one epoch
 end
 
-if min(headfreqs)<0
+if ~isempty(headfreqs) & min(headfreqs)<0
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
 end
@@ -180,21 +191,26 @@ if length(limits)<1 | isnan(limits(1))
    limits(1) = LOPLOTHZ;
 end
 
-if length(limits)<2 | isnan(limits(2))
-   maxheadfreq = max(headfreqs);
-   if rem(maxheadfreq,5) ~= 0
-     limits(2) = 5*ceil(maxheadfreq/5);
-   else
-     limits(2) = maxheadfreq*1.1;
-   end
-end
+if ~isempty(headfreqs)
+	if length(limits)<2 | isnan(limits(2))
+		maxheadfreq = max(headfreqs);
+		if rem(maxheadfreq,5) ~= 0
+			limits(2) = 5*ceil(maxheadfreq/5);
+		else
+			limits(2) = maxheadfreq*1.1;
+		end
+	end
+	
+	headfreqs = sort(headfreqs);          % Determine topoplot frequencies
+	freqidx = zeros(1,length(headfreqs)); % Do not interpolate between freqs
+	for f=1:length(headfreqs)
+		[tmp fi] = min(abs(freqs-headfreqs(f)));
+		freqidx(f)=fi;
+	end
+else 
+	limits(2) = 50;
+end;
 
-headfreqs = sort(headfreqs);          % Determine topoplot frequencies
-freqidx = zeros(1,length(headfreqs)); % Do not interpolate between freqs
-for f=1:length(headfreqs)
-   [tmp fi] = min(abs(freqs-headfreqs(f)));
-   freqidx(f)=fi;
-end
 [tmp maxfreqidx] = min(abs(limits(2)-freqs)); % adjust max frequency
 [tmp minfreqidx] = min(abs(limits(1)-freqs)); % adjust min frequency
 
@@ -223,7 +239,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot spectrum of each channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-specaxes = sbplot(3,4,[5 12]); 
+if ~isempty(headfreqs)
+	specaxes = sbplot(3,4,[5 12]); 
+end;
 % plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)','b','LineWidth',2);
 pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
 set(pl,'LineWidth',2);
@@ -238,76 +256,78 @@ set(yl,'fontsize',16);
 set(gca,'fontsize',16)
 box off;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot lines through channel trace bundle at each headfreq
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for f=1:length(headfreqs)
-   hold on; 
-   plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
-        [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
-               'k','LineWidth',2.5);
-end;
+if ~isempty(headfreqs)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot lines through channel trace bundle at each headfreq
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	for f=1:length(headfreqs)
+		hold on; 
+		plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
+			 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
+			 'k','LineWidth',2.5);
+	end;
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot connecting lines using changeunits()
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	headax = zeros(1,length(headfreqs));
+	for f=1:length(headfreqs) 
+		headax(f) = sbplot(3,length(headfreqs),f);
+		axis([-1 1 -1 1]);
+	end
+	large = sbplot(1,1,1);
+	for f=1:length(headfreqs)
+		from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],...
+						   specaxes,large);
+		to = changeunits([0,0],headax(f),large);
+		hold on;
+		plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
+		axis([0 1 0 1]);
+		axis off;
+	end;
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot heads using topoplot()
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	fprintf('Plotting scalp distributions: ')
+	for f=1:length(headfreqs) 
+		axes(headax(f));
+		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
+		if isnan(limits(5)),     maplimits = 'absmax';
+		else                     maplimits = [limits(5) limits(6)];
+		end;
+		if ~isempty(varargin)
+			topoplot(topodata,chanlocs,'maplimits',maplimits, varargin{:}); 
+		else
+			topoplot(topodata,chanlocs,'maplimits',maplimits); 
+		end
+		if f<length(headfreqs)
+			tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
+		else
+			tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
+		end
+		set(tl,'fontsize',16);
+		axis square;
+		drawnow
+		fprintf('.');
+	end;
+	fprintf('\n');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot connecting lines using changeunits()
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-headax = zeros(1,length(headfreqs));
-for f=1:length(headfreqs) 
-   headax(f) = sbplot(3,length(headfreqs),f);
-   axis([-1 1 -1 1]);
-end
-large = sbplot(1,1,1);
-for f=1:length(headfreqs)
-   from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],...
-                       specaxes,large);
-   to = changeunits([0,0],headax(f),large);
-   hold on;
-   plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
-   axis([0 1 0 1]);
-   axis off;
+	%%%%%%%%%%%%%%%%
+	% Plot color bar
+	%%%%%%%%%%%%%%%%
+	cb=cbar;
+	pos = get(cb,'position');
+	set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
+	set(cb,'fontsize',12);
+	if isnan(limits(5))
+		ticks = get(cb,'ytick');
+		[tmp zi] = find(ticks == 0);
+		ticks = [ticks(1) ticks(zi) ticks(end)];
+		set(cb,'ytick',ticks);
+		set(cb,'yticklabel',{'-','0','+'});
+	end
 end;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot heads using topoplot()
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Plotting scalp distributions: ')
-for f=1:length(headfreqs) 
-   axes(headax(f));
-   topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
-   if isnan(limits(5)),     maplimits = 'absmax';
-   else                     maplimits = [limits(5) limits(6)];
-   end;
-   if ~isempty(varargin)
-     topoplot(topodata,chanlocs,'maplimits',maplimits, varargin{:}); 
-   else
-     topoplot(topodata,chanlocs,'maplimits',maplimits); 
-   end
-   if f<length(headfreqs)
-     tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
-   else
-     tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
-   end
-   set(tl,'fontsize',16);
-   axis square;
-   drawnow
-   fprintf('.');
-end;
-fprintf('\n');
-
-%%%%%%%%%%%%%%%%
-% Plot color bar
-%%%%%%%%%%%%%%%%
-cb=cbar;
-pos = get(cb,'position');
-set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
-set(cb,'fontsize',12);
-if isnan(limits(5))
-   ticks = get(cb,'ytick');
-   [tmp zi] = find(ticks == 0);
-   ticks = [ticks(1) ticks(zi) ticks(end)];
-   set(cb,'ytick',ticks);
-   set(cb,'yticklabel',{'-','0','+'});
-end
 
 %%%%%%%%%%%%%%%%
 % Draw title
