@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/17 00:42:33  arno
+% new modifs
+%
 % Revision 1.4  2002/08/16 16:29:36  arno
 % new revision
 %
@@ -109,7 +112,8 @@ try, g.outputfile;  catch, g.outputfile = 'index.html'; end;
 try, g.fontindex;   catch, g.fontindex = 'Helvetica'; end;
 try, g.backindex;   catch, g.backindex = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
 try, g.header;      catch, g.header = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 'self.window.location = fnc;' 10 '}' 10  '//--></script>' ]; end;
-try, g.background;  catch, g.background = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
+try, g.background;  catch, g.background = '<body bgcolor="#fcffff">'; end;
+%try, g.background;  catch, g.background = '<body BACKGROUND="cream_stucco.jpg" bgproperties="fixed" bgcolor="#ffffe5">'; end;
 try, g.refcall;     catch, g.refcall = 'javascript:openhelp(''%s.html'')'; end;
 try, g.font;        catch, g.font = 'Helvetica'; end;
 try, g.footer;      catch, g.footer = '<A HREF ="indexfunc.html">Back to functions</A>';  end;
