@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/02/23 09:16:09  scott
+% header edits -sm
+%
 % Revision 1.31  2003/02/17 02:40:14  arno
 % reformating text for new functionality in help2html
 %
@@ -202,6 +205,7 @@ if nargin < 3
    size_result  = size( result );
    if size_result(1) == 0 return; end;
    
+   if strcmpi(result{1}, '[]'), result{1} = ''; end;
    events = parsetxt( result{1} );
    lim = eval( [ '[' result{2} ']' ] );
 
