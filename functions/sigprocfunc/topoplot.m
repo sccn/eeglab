@@ -2,8 +2,6 @@
 %              (looking down at the top of the head) using interpolation on a fine 
 %              cartesian grid. Can also show specified channnel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
-%              Using option 'plotgrid', the plot can be a rectangular imagesc() grid
-%              or can add such a grid plot to the left or right of the head image.
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
 %              options below). Nose is at top of plot; left is left; right is right.
@@ -55,11 +53,12 @@
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
 % Plot detail options:
-%   'emarker' {'.'}|'emarkersize' {14}|'emarkersizemark' {40}|'efontsize' {var} -
-%                       electrode marking details and their {defaults}. 
-%   'ecolor'          - color of the electrode markers {default: 'k' = black}
+%   'emarker'         - Matlab marker char | {markerchar color size linewidth} char, else cell array 
+%                       specifying the electrode 'pts' marker. Ex: {'s','r',32,1} -> 32-point solid 
+%                       red square. {default: {'.','k',[],1} where marker size ([]) depends on the number 
+%                       of channels plotted}.
 %   'emarker2'        - {markchans}|{markchans marker color size linewidth} cell array specifying 
-%                       an alternate marker for some of the 'plotchans'. Ex: {[3 17],'s','g'} 
+%                       an alternate marker for specified 'plotchans'. Ex: {[3 17],'s','g'} 
 %                       {default: none, or if {markchans} only are specified, then {markchans,'o','r',10,1}}
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
@@ -83,7 +82,6 @@
 %   'dipsphere'       - [real] size of the dipole sphere. {default: 85 mm}.
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' = black}.
-%
 % Outputs:
 %                   h - plot axes handle
 %         grid_or_val - [matrix] the interpolated data image (with off-head points = NaN).  
@@ -112,11 +110,14 @@
 %                       so the channel max is 0.5. factor -> Apply a specified shrink
 %                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'electcolor' {'k'}  ... electrode marking details and their {defaults}. 
-% Deprecated but still usable;
+%   'emarker' {'.'}|'emarkersize' {14}|'emarkersizemark' {40}|'efontsize' {var} -
+%                       electrode marking details and their {defaults}. 
+%   'ecolor'          - color of the electrode markers {default: 'k' = black}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
 
 % Unimplemented future options:
+%              Using option 'plotgrid', the plot can be a rectangular imagesc() grid.
 %   'plotgrid'        - [channels] or {[channels], 'position'} where [channels] is a matrix of grid 
 %                       channel numbers - in which 0's plot 0-values and negative integers, 
 %                       polarity-reversed values - and char 'position' (if either 'l' or 'r') 
@@ -144,6 +145,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.234  2004/12/24 19:48:23  scott
+% fixed and extended 'emarker2' args; added 'hcolor','none' option; changed 'emarkersize1chan' to
+% 'emarkersizemark' (preserving backwards compatability as well). tested with /home/www/eeglab/test_topoplot.m
+%
 % Revision 1.233  2004/12/24 01:32:29  scott
 % documented xmesh, ymesh optional outputs
 %
@@ -706,11 +711,12 @@ CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HEADCOLOR = [0 0 0];    % default head color (black)
 CCOLOR = [0.2 0.2 0.2]; % default contour color
-ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = [];        % default 'electrodes': on|off|label - set below
 MAXDEFAULTSHOWLOCS = 64;% if more channels than this, don't show electrode locations by default
 EMARKER = '.';          % mark electrode locations with small disks
+ECOLOR = [0 0 0];       % default electrode color = black
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
+EMARKERLINEWIDTH = 1;   % default edge linewidth for emarkers
 EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
 EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EMARKER2CHANS = [];      % mark subset of electrode locations with small disks
@@ -884,10 +890,25 @@ if nargs > 2
 	 case 'dipcolor'
 	  DIPCOLOR = Value;
 	 case 'emarker'
-	  EMARKER = Value;
+          if ischar(Value)
+	      EMARKER = Value;
+          elseif ~iscell(Value) | length(Value) > 4
+              error('''emarker'' argument must be a cell array {marker color size linewidth}')
+          else
+	      EMARKER = Value{1};
+          end
+          if length(Value) > 1
+	      ECOLOR = Value{2};
+          end
+          if length(Value) > 2
+	      EMARKERSIZE2 = Value{3};
+          end
+          if length(Value) > 3
+	      EMARKERLINEWIDTH = Value{4};
+          end
 	 case 'emarker2' 
           if ~iscell(Value) | length(Value) > 5
-              error('''emarker2'' argument must be a cell array {chans marker color}')
+              error('''emarker2'' argument must be a cell array {chans marker color size linewidth}')
           end
 	  EMARKER2CHANS = abs(Value{1}); % ignore channels < 0
           if length(Value) > 1
@@ -1702,10 +1723,10 @@ ELECTRODE_HEIGHT = 2.1;  % z value for plotting electrode information (above the
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
   if isempty(EMARKER2CHANS)
     hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
   else % plot markers for normal chans and EMARKER2CHANS separately
     hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
     hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
         EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
   end
@@ -1725,10 +1746,10 @@ elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
 elseif strcmp(ELECTRODES,'labelpoint') 
   if isempty(EMARKER2CHANS)
     hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
   else
     hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
     hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
         EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
   end
@@ -1747,10 +1768,10 @@ elseif strcmp(ELECTRODES,'labelpoint')
 elseif strcmp(ELECTRODES,'numpoint') 
   if isempty(EMARKER2CHANS)
     hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
   else
     hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
     hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
         EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
   end
