@@ -2,7 +2,8 @@
 %               event-related spectral perturbations, and inter-trial coherence
 %               of localized EEG waveforms. Uses outputs of timef() and cross().
 %Usage:
-%   >> brainmovie(ersps,itcs,crossfs_amp,crossfs_phase,times,freqs,selected);
+%   >> brainmovie(ersps,itcs,crossfs_amp,crossfs_phase,times,freqs,selected,...
+%                         'keyword1',value1,...); % creates files image0001.eps, etc.
 %
 %Inputs:
 % ersps         - Cell array (components,conditions) of ERSP arrays (freqs,times)
@@ -20,10 +21,7 @@
 %                 These indexes determine for which freqs plotting will be performed.
 % selected      - Component indices to plot (default all)
 %
-%Outputs to disk:
-% imageX      - Saves a sequence of images (images0001.eps, ...)
-%
-%Optional parameters:
+%Optional 'keyword' parameters:
 % 'latency'   - plot only a subset of latencies. The time point closest to the 
 %               latency given are plotted. Default = empty, all latencies.
 % 'resolution'- ['low' or 'high'], 'high' -> multiply the size of the image by 3 
@@ -31,59 +29,73 @@
 %               {default: 'low'}
 % 'rt'        - cell array of vector containing reaction times of the subject in 
 %               each conditions (default {} -> ignored)
-% 'rthistloc' - location and size of rt hitograms in individual axis. 
-%               [abscicia ordintate width maxheight].
-% 'square'    - ['on'|'off'] resquare all coordinates (so X and Y width is the same)
+% 'rthistloc' - location and size of rt histograms in individual axes. 
+%               [abscissa ordinate width maxheight].
+% 'square'    - ['on'|'off'] re-square all coordinates (so X and Y width is the same)
 %               default is 'on';
-% 'magnify'   - integer factor of magnification of graphics. Default is 1.
+% 'magnify'   - integer magnification factor for graphics. Default is 1.
 % 'size'      - [widthcond height] output image size {default [400,400]}
-%               widthcond is the width of a single condition
-% 'head'      - [FILENAME], plot the head using the PCX image in FILENAME
-% 'visible'   - ['on'|'off'], pop out the images or keep them hidden {default 'on'}
-% 'power'     - ['on'|'off'] vary the size of the disks wrt spectral power 
+%               widthcond is the width of a single condition plot (in pixels)
+% 'head'      - [FILENAME], plot the head background image using .pcx image in FILENAME
+% 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
+% 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
 %                                                           {default: on}
-% 'itc'       - ['on'|'off'] vary disk colors wrt coherence {default: on}
+% 'itc'       - ['on'|'off'] vary component disk colors according to coherence {default: on}
 % 'crossf'    - ['on'|'off'] plot | do not plot coherence   {default: on}
-% 'crossfcoh' - ['on'|'off'] vary the size of the bar wrt cross-coherence {def: on}
-% 'crossfphasecolor' -['on'|'off'] vary the bar color wrt coherence {default: on}
-% 'crossfphasespeed' - ['on'|'off'] vary the bar speed wrt cross-coherence {def: on}
-% 'crossfphaseunit'  - ['degree'|'radian']. Default is degree.
-% 'colmapcrossf' - colormap array for connections {default: hsv(64) with green as 0} 
-% 'colmapcoh'   - colormap array for inter-trial coherence {default: hot(64)}
-% 'scalepower'  - power scale {default: [-5 5]}  
-% 'scalecoher'  - coherence scale {default: [0 1]}  
-% 'coordinates' - array of coordinates (ncomps,2) of the selected components 
+% 'crossfcoh' - ['on'|'off'] vary the width of the connecting arc 
+%                               according to cross-coherence magnitude {def: on}
+% 'crossfphasecolor' -['on'|'off'] vary the arc color according to coherence {default: on}
+% 'crossfphasespeed' - ['on'|'off'] vary the arc speed according to 
+%                                      cross-coherence phase {def: on}
+% 'crossfphaseunit'  - ['degree'|'radian']. Coherence phase angle unit {Default is degree}.
+% 'colmapcrossf' - colormap array for arcs {default: hsv(64) with green as 0} 
+% 'colmapcoh'   - colormap array for disks (according to inter-trial coherence) 
+%                      {default: hot(64)}
+% 'scalepower'  - [min max] dB range for power (and disk size) variation {default: [-5 5]}  
+% 'scalecoher'  - [min max] coherence range {default: [0 1]}  
+% 'xlimaxes'    - x-axis limits axis for the component locations {default: [-1 1]}
+% 'ylimaxes'    - y-axis limits axis for the component locations {default: [-1 to 1]}
+% 'coordinates' - 2-column array of [x y] coordinates of the selected components 
 %                 {default: spaced evenly around the head circle boundary}  
-% 'xlimaxes'    - x-axis limits axis for the comp locations {default: [-1 1]}
-% 'ylimaxes'    - y-axis limits axis for the comp locations {default: [-1 to 1]}
-% 'circfactor'  - (ncomps,ncomps) array of curvature indices (0=straight; 1=round, 
-%                 positive or negative values for the sense of rotation) {def: 0s}
-% 'envelope'    - (2,points,conditions) envelopes of the data for each condition
-%                 giving the min and max traces of each envelope
-% 'envylabel'   - ordinate label for envelope. Default 'Potential \muV'
-% 'envvert'     - vector of time indices to insert vertical lines. A cell array
-%                 of vector (1 per condition) can also be given.
-% 'flashes'     - vector of time indices at witch the background is set to black. One can 
-%                 specify the color of the flash if a cell array of cell array doublet is
-%                 given as input. Ex. { { 1500 'r' } { 200 'y' }} will generate two 
-%                 flashes, one red at 1500 ms and one yellow at 200 ms.
+% 'circfactor'  - (ncomps,ncomps) array of arc curvatures (0=straight; 1=half-round, 
+%                 positive or negative values give the sense of rotation) {def: 0s}
+% 'envelope'    - (2,points,conditions) envelopes of the average data (ERP) in each condition
+%                 (envelope =  min and max traces of each ERP across all channels and times)
+% 'envylabel'   - ordinate label for envelope. {Default 'Potential \muV'}
+% 'envvert'     - vector of time indices at which to draw vertical lines. A cell array
+%                 of times vectors (1 per condition) can also be given.
+% 'flashes'     - vector of time indices at which the background flashes.  Specify the color 
+%                 of the flash with a cell array of [1,2] cell arrays. 
+%                 Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
+%                 yellow at 200 ms and red at 1500 ms 
 % 'title'       - (string) main movie title
-% 'condtitle'   - (string array) condition titles (nrows = num. of conditions)
+% 'condtitle'   - (string array) condition titles (one condition title per row)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
+%
+%Outputs to disk:
+% imageX      - brainmovie() saves a sequence of image files to disk (image0001.eps, ...)
 %
 %Example:
 %
-% % Given ICA activations in array actICA (2,(176,n)), animate two components 
-% % at 176 points from -100 ms to 600 ms re stimulus onset, 250 Hz sampling rate 
-% >> [ersps{1,1},itcs{1,1},powbase,times,freqs] = ...
-%                timef(actICA(1,:),176,[-100 600],'Component 1',250,1,32,100);
-% >> [ersps{2,1},itcs{2,1},powbase,times,freqs] = ...
-%                timef(actICA(2,:),176,[-100 600],'Component 2',250,1,32,100);
-% >> [crossfs_amp{1,2},mcoh,times,freqs,cohboot,crossfs_phase{1,2}] = ...
-%      crossf_(actICA(1,:),actICA(2,:),176,[-100 600],'Crossf 1 and 2',250,1,32,100);
-% >> brainmovie( ersps, itcs, crossfs_amp, crossfs_phase, times, [1:2] )
-% >> !/usr/local/bin/convert images*.eps movie.mpg 
-% % Now use 'convert' from imagemagic to generate the movie.
+% % Given ICA activations in array icaact (size ncomps,nframes,ntrials), animate (here) 
+% % activity at/between two components at 176 points per epoch (from -100 ms to 600 ms 
+% % re stimulus onset) assuming a 250-Hz sampling rate and 100 output frames
+%
+% >> [ersps{1,1},itcs{1,1},powbase,times,freqs] = ...                          % timef for
+%                timef(icaact(1,:),176,[-100 600],'Component 1',250,1,32,100); %     1st comp
+% >> [ersps{2,1},itcs{2,1},powbase,times,freqs] = ...                          % timef for
+%                timef(icaact(2,:),176,[-100 600],'Component 2',250,1,32,100); %     2nd comp
+% >> [crossfs_amp{1,2},mcoh,times,freqs,cohboot,crossfs_phase{1,2}] = ...      % crossf for
+%      crossf_(icaact(1,:),icaact(2,:),176,[-100 600],'Crossf 1 and 2',250,1,32,100); % both
+%
+% >> brainmovie( ersps, itcs, crossfs_amp, crossfs_phase, times, [1:2] ); % makes files in pwd
+%                                                          image0001.eps, ... image0100.eps
+%
+% >> !/usr/local/bin/convert images*.eps movie.mpg % Now use ImageMagic 'convert' 
+%                                                  % to generate the movie.
+%
+% Note: Better resolution movies can be generated by .eps -> .ppm -> .avi, 
+%       (or, under a planned upgrade to brainmovie, from Matlab6 to .avi directly).
    
 % arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2001
 
@@ -94,6 +106,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/01 23:41:39  arno
+% debugging
+%
 % Revision 1.10  2002/07/16 22:55:19  arno
 % new flash position
 %
