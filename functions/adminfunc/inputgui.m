@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/26 23:32:04  arno
+% updated mode argument value and processing
+%
 % Revision 1.3  2002/04/26 23:24:37  arno
 % adding mode
 %
@@ -100,6 +103,8 @@ if isstr(mode)
 else 
 	fig = mode;
 	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
+	allobj = findobj('parent',fig);
+	allobj = allobj(end:-1:1);
 end;
 
 % create figure and wait for return
