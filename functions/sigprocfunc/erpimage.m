@@ -37,12 +37,12 @@
 %   'noshow' - ['yes'|'no'] do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Optionally sort input epochs: 
-%  {default} - Sort data epochs by sortvar
 %   'nosort' - Do not sort data epochs.
+%  {default} - Sort data epochs by sortvar (see Necessary inputs above).
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 3-cycle
+% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a n-cycle
 %                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
 %                gives percent of trials to reject for low amplitude. Else, if in range
 %               [-100,0], gives percent of trials to reject for high amplitude;
@@ -50,9 +50,8 @@
 %               sort by phase at freq of max power in the data in range [freq,maxfreq]
 %               (Note: 'phasesort' arg freq overrides frequency specified in 'coher').
 %               With optional topphase, sort by phase, putting topphase (degrees, in 
-%               range [-180,180]) at the top of the image. NB: 'phasesort' uses circular 
-%               smoothing. {Default: [0 25 8 13 180]}
-%               
+%               range [-180,180]) at the top of the image. NB: 'phasesort' now uses circular 
+%               smoothing. Use 'cycles' (below) for wavelet length. {Default: [0 25 8 13 180]}
 %  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. See 'phasesort'.
 %
 % Plot time-varying spectral amplitude instead of potential:
@@ -154,6 +153,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2003/08/25 22:38:25  scott
+% auxvars adjust tests -sm
+%
 % Revision 1.140  2003/08/24 04:49:01  scott
 % help msg
 %
