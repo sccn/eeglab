@@ -38,16 +38,22 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/08 01:17:31  arno
+% Initial revision
+%
 % Revision 1.12  2002/08/07 22:41:01  arno
 % editing text
 
 function [EEG, com] = eeg_eegrej( EEG, regions);
 
 com = '';
-if nargin < 1
+if nargin < 2
 	help eeg_eegrej;
 	return;
 end;	
+if isempty(regions)
+	return;
+end;
 
 if ~isempty(regions),
 	if isfield(EEG.event, 'latency'), 
