@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/23 18:34:29  arno
+% modified baseline way of computation
+%
 % Revision 1.10  2002/04/23 18:28:02  arno
 % correcting coher computation
 %
@@ -343,8 +346,11 @@ end
 
 if isempty(g.topovec)
 	g.topovec = [];
-elseif (min(size(g.topovec))~=1)
-	error('tvec must be a row or column vector.');
+elseif min(size(g.topovec))==1
+	g.topovec = g.topovec(:);
+end;
+if size(g.topovec,1)~=2
+	error('topovec must be a row or column vector.');
 end
 if isempty(g.elocs)
 	g.elocs = DEFAULT_ELOC;
