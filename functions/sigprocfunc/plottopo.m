@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/09/08 02:46:47  scott
+% same
+%
 % Revision 1.34  2004/09/08 02:09:39  scott
 % insert figure(curfig) before plotting commands to squelch Matlab 7.0.0 bug -sm
 %
@@ -681,7 +684,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             NAME_OFFSET = -1;
             NAME_OFFSETY = -0.5;
             if ISSPEC
-                figure(curfig);axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
+                figure(curfig);axis('off'),h=text(double(xmin-NAME_OFFSET*xdiff),double(ymax/2),[channames(c,:)]); 
                 set(h,'HorizontalAlignment','right');    % print before traces
                 set(h,'FontSize',CHANFONTSIZE);              % choose font size
             else % ~ISSPEC
@@ -691,7 +694,10 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     yht = mean(data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
                 end
                 if ~ISRECT    % print before traces
-                    figure(curfig);axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
+                    xt = double(xmin-NAME_OFFSET*xdiff);
+                    yt = double(yht-NAME_OFFSETY*ydiff); 
+                    str = [channames(c,:)];
+                    figure(curfig);axis('off'); h=text(xt,yt,str);
                     set(h,'HorizontalAlignment','right');      
                     set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
@@ -819,26 +825,26 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~ISSPEC % not spectral data
                                                     
     signx = xmin-0.15*xdiff;
-    figure(curfig);axis('off');h=text(signx, ymin,num2str(ymin,3)); % text ymin
+    figure(curfig);axis('off');h=text(double(signx),double(ymin),num2str(ymin,3)); % text ymin
     set(h,'FontSize',TICKFONTSIZE);               % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    figure(curfig);axis('off');h=text(signx, ymax,['+' num2str(ymax,3)]);  % text +ymax
+    figure(curfig);axis('off');h=text(double(signx), double(ymax),['+' num2str(ymax,3)]);  % text +ymax
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
     ytick = g.ydir*(-ymax-0.3*ydiff);
-    figure(curfig);tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
+    figure(curfig);tick = [int2str(xmin)]; h=text(double(xmin),double(ytick),tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
 
-    tick = [xlabel]; figure(curfig);h=text(xmin+xdiff/2,ytick-0.5*g.ydir*ydiff,tick);
+    tick = [xlabel]; figure(curfig);h=text(double(xmin+xdiff/2),double(ytick-0.5*g.ydir*ydiff),tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
 
-    tick = [int2str(xmax)]; figure(curfig);h=text(xmax,ytick,tick);
+    tick = [int2str(xmax)]; figure(curfig);h=text(double(xmax),double(ytick),tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
@@ -849,27 +855,27 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
       ymin=0;
       signx = xmin-0.15*xdiff;
 
-      figure(curfig);axis('on');h=text(signx,-1*ymin,num2str(ymin,3));% text ymin
+      figure(curfig);axis('on');h=text(double(signx),double(-1*ymin),num2str(ymin,3));% text ymin
       set(h,'FontSize',TICKFONTSIZE);           % choose font size
       set(h,'HorizontalAlignment','right','Clipping','off');
 
-      figure(curfig);axis('on');h=text(signx,-1*ymax,['+' num2str(ymax,3)]); % text +ymax
+      figure(curfig);axis('on');h=text(double(signx),double(-1*ymax),['+' num2str(ymax,3)]); % text +ymax
       set(h,'FontSize',TICKFONTSIZE);           % choose font size
       set(h,'HorizontalAlignment','right','Clipping','off');
 
       ytick = -ymax-0.25*ydiff;
 
-      tick = [int2str(xmin)]; figure(curfig);h=text(xmin,ytick,tick);
+      tick = [int2str(xmin)]; figure(curfig);h=text(double(xmin),double(ytick),tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
 
-      tick = [xlabel]; figure(curfig);h=text(xmin+xdiff/2,ytick,tick);
+      tick = [xlabel]; figure(curfig);h=text(double(xmin+xdiff/2),double(ytick),tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
 
-      tick = [int2str(xmax)]; figure(curfig);h=text(xmax,ytick,tick);
+      tick = [int2str(xmax)]; figure(curfig);h=text(double(xmax),double(ytick),tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
