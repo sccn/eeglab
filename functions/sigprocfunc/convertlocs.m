@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/12/27 22:18:26  arno
+% debugging besa coords
+%
 % Revision 1.2  2002/12/24 16:53:41  arno
 % convertelocs -> convertlocs
 %
@@ -130,7 +133,7 @@ case 'sph2topo',
 case 'sph2sphbesa',
    % using polar coordinates
    [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2);
-   [sph_theta_besa sph_phi_besa] = topo2sph([angle radius], 1, 1);
+   [sph_phi_besa sph_theta_besa] = topo2sph([angle radius], 1, 1);
    for index = 1:length(chans)
       chans(index).sph_theta_besa  = sph_theta_besa(index);
       chans(index).sph_phi_besa    = sph_phi_besa(index);
