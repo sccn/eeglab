@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/23 21:24:33  scott
+% *** empty log message ***
+%
 % Revision 1.9  2002/04/23 21:20:15  scott
 % edited help msg -sm
 %
@@ -321,7 +324,7 @@ if popup
 		limits(9) = eval( result{26} ); %bamp
 	end;
 	if ~isempty(result{27})
-		[options ',''vert'', [' result{27} ']' ];
+		options = [options ',''vert'', [' result{27} ']' ];
 	end;
 	if ~isempty(result{28})
 		limits(1:2) = eval( [ '[' result{28} ']' ]);
@@ -330,7 +333,7 @@ if popup
 		options = [ options ',''limits'',[' num2str(limits) ']' ];
 	end;
 	if ~isempty(result{29})
-		options      = [ options ',' result{29} ];
+		options = [ options ',' result{29} ];
 	end;
 	figure;
 else
