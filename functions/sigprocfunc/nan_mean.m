@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/17 18:43:16  arno
+% debugging dim
+%
 % Revision 1.1  2002/10/17 02:34:52  arno
 % Initial revision
 %
@@ -44,5 +47,7 @@ function out = nan_mean(in, dim)
     end;
     tmpin = in;
     tmpin(find(isnan(in(:)))) = 0;
-    out = sum(tmpin, dim) ./ sum(~isnan(in),dim);
+    denom = sum(~isnan(in),dim);
+    denom(find(~denom)) = nan;
+    out = sum(tmpin, dim) ./ denom;
     

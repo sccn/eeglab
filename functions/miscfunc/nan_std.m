@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/09/04 00:57:11  arno
+% Initial revision
+%
 
 function out = nan_std(in)
     
@@ -33,7 +36,7 @@ function out = nan_std(in)
     nonnans(nans) = 0;
     nonnans = sum(nonnans);
     nononnans = find(nonnans==0);
-    nonnans(nononnans) = 1;
+    nonnans(nononnans) = NaN;
    
     out = sqrt((sum(in.^2)-sum(in).^2./nonnans)./(nonnans-1));
     out(nononnans) = NaN;
