@@ -1,14 +1,14 @@
 % pop_envtopo() - Plot envelope of an averaged EEG epoch, plus scalp maps 
-%                 of largest or specified components reference to their 
-%                 time point maximum amplitude. Calls envtopo().
+%                 of specified or largest contributing components referenced 
+%                 to their time point of maximum variance. Calls envtopo().
 % Usage:
 %   >> pop_envtopo( EEG ); % pop-up window mode
-%   >> pop_envtopo( EEG, 'key', 'val', ...);
+%   >> pop_envtopo( EEG, timerange, 'key', 'val', ...);
 %
 % Inputs:
-%   EEG        - input dataset. Can also be an array of 2 datasets. Then
-%                the ERP of the second one is subtracted from the ERP of
-%                the first one.
+%   EEG        - input dataset. Can also be an array of two epoched datasets. 
+%                In this case, the epoch mean (ERP) of the second is subtracted 
+%                from the epoch mean (ERP) of the first.
 %   timerange  - [min max] time range (in msec) to plot 
 %
 % Optional inputs:
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/03/03 19:29:49  arno
+% remove pvaf on since it is the default
+%
 % Revision 1.21  2004/03/03 19:11:47  arno
 % fixed pvaf on
 %
@@ -117,10 +120,10 @@ if nargin < 1
 	return;
 end;	
 if length(EEG) == 1 & isempty( EEG.icasphere )
-	disp('Error: cannot plot without ICA weights. Select Tools > Run ICA.'); return;
+	disp('Error: cannot plot without ICA weights. Use "Tools > Run ICA".'); return;
 end;
 if length(EEG) == 1 & isempty(EEG.chanlocs)
-	fprintf('Cannot plot without channel locations. Select Edit > Dataset info.\n');
+	fprintf('Cannot plot without channel locations. Use "Edit > Dataset info".\n');
 	return;
 end;
 if exist('envtitle') ~= 1
@@ -133,8 +136,8 @@ if nargin < 3
 	promptstr    = { 'Enter plotting time range (msec):', ...
 					 'Enter time range for component contribution (msec):', ...
 					 'Plot this many largest components (1-20):', ...
-					 'ELSE plot these components only (<=20) (Ex: 2:4,7 9:11):', ...
-                     'Indices of component to subtract from data before plotting' ...
+					 'Else plot these components only (<=20) (Ex: 2:4,7 9:11):', ...
+                     'Indices of components to remove from data before plotting' ...
 					 'Plot title:' ...
 			         'Additional spectopo() and topoplot() options:' };
 	inistr       = { [num2str( EEG(end).xmin*1000) ' ' num2str(EEG(end).xmax*1000)], ...
@@ -173,13 +176,13 @@ else
 end;
     
 if length(EEG) > 2
-    error('Can not process more than 2 datasets');
+    error('Cannot process more than two datasets');
 end;
 
 sigtmp = reshape(EEG(1).data, EEG(1).nbchan, EEG(1).pnts, EEG(1).trials);
 if length(EEG) == 2
     if ~all(EEG(1).icaweights(:) == EEG(2).icaweights(:))
-        error('The ICA decomposition must be the same for the 2 datasets');
+        error('The ICA decomposition must be the same for the two datasets');
     end;
     sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
 end;
