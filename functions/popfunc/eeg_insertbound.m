@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/05/05 01:50:17  arno
+% same
+%
 % Revision 1.6  2004/05/05 01:49:25  arno
 % debug regions input
 %
@@ -73,8 +76,7 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
         help eeg_insertbound;
         return;
     end;
-    sdf
-    if size(regions,2) ~= 1 & ~exist(length)
+    if size(regions,2) ~= 1 & exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
     end;
@@ -155,10 +157,6 @@ function [ indnested, addlen ] = findnestedur(newur, ind);
         if strcmpi(newur(tmpind).type, 'boundary')
             indnested = [ indnested tmpind ];
             addlen    = addlen + newur(tmpind).length;
-            
-            if newur(tmpind).latency+ newur(tmpind).length > newut(ind).latency+newur(ind).length
-                disp('UREVENT INCONSISTENCY, PLEASE REPORT BUG TO EEGLAB@SCCN.UCSD.EDU');
-            end;
         end;
         tmpind = tmpind+1;
     end;
@@ -167,7 +165,7 @@ function [ indnested, addlen ] = findnestedur(newur, ind);
 % ------------------------------------
 function [event, urevent] = removenested(event, urevent, nestind);
     
-    if length(nestind) > 1
+    if length(nestind) > 0
         fprintf('Debug msg: removing %d nested urevents\n', length(nestind));
         nestind = sort(nestind);
         urind = cell2mat({ event.urevent }); % this must not be done in the loop
