@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/03/03 21:35:59  arno
+% correcting save location problem
+%
 % Revision 1.18  2003/02/26 02:20:07  scott
 % header edits -sm
 %
@@ -288,6 +291,7 @@ else
 	EEG = ALLEEG;	
 	com = sprintf('ALLEEG = pop_saveset( %s, %s, ''%s'', ''%s'');', inputname(1), vararg2str(indices), curfilename, curfilepath);
 end;
+disp('Done.');
 return;
 
 function num = popask( text )
