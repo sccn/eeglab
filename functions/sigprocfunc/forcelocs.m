@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/11/10 17:31:01  arno
+% debug call to channel select
+%
 % Revision 1.6  2004/11/10 16:52:45  arno
 % change call to chansel
 %
@@ -74,7 +77,7 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
     end;
     if nargin < 2
         geom = { [0.4 1 1 0.3] };
-        uilist = { { 'style' 'text' 'string' 'X value' 'tag' 'valstr' } ...
+        uilist = { { 'style' 'text' 'string' 'X/Y value' 'tag' 'valstr' } ...
                    { 'style' 'text' 'string' 'Coordinate' } ...
                    { 'style' 'text' 'string' 'Electrode list' } ...
                    { } };
