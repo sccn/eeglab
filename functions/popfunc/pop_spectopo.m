@@ -22,9 +22,10 @@
 %                      Command line equivalent: 'process'
 %   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
 %                      spectopo() equivalent: 'freqrange'
-%   "Scalp map options" - [edit box] 'key','val','key',... sequence of arguments 
-%                      passed to topoplot() to adjust details of the scalp maps
-%                      For details see  >> help topoplot
+%   "Spectral and scalp map options (see topoplot)" - [edit box] 'key','val','key',... 
+%                      sequence of arguments passed to spectopo() for details of the 
+%                      spectral decomposition or to topoplot() to adjust details of 
+%                      the scalp maps. For details see  >> help topoplot
 %
 % Graphic interface for components (dataflag = 0):
 %   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
@@ -52,8 +53,10 @@
 %                      spectopo() equivalent: 'icamode' 
 %   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
 %                      spectopo() equivalent: 'freqrange'
-%   "Scalp map options" - [edit box] 'key','val','key',... sequence of arguments passed 
-%                      to topoplot() re scalp map details. For details, >> help topoplot
+%   "Spectral and scalp map options (see topoplot)" - [edit box] 'key','val','key',... 
+%                      sequence of arguments passed to spectopo() for details of the 
+%                      spectral decomposition or to topoplot() to adjust details of 
+%                      the scalp maps. For details see  >> help topoplot
 % Inputs:
 %   EEG         - Input EEGLAB dataset
 %   dataflag    - If 1, process the input data channels. 
@@ -97,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/08/11 17:27:59  arno
+% command line problem fixed
+%
 % Revision 1.39  2003/08/11 15:40:01  arno
 % text
 %
@@ -247,7 +253,7 @@ if nargin < 3
 						 { 'style' 'edit' 'string' 'EEG' }, ...
 						 { 'style' 'text' 'string' 'Plotting frequency range [lo_Hz hi_Hz]:'}, ...
 						 { 'style' 'edit' 'string' '2 25' }, ...
-						 { 'style' 'text' 'string' 'Scalp map options (see >> help topoplot):' } ...
+						 { 'style' 'text' 'string' 'Spectral and scalp map options (see topoplot):' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
 		if EEG.trials == 1
 			geometry(3) = [];
@@ -302,7 +308,7 @@ if nargin < 3
 						 { 'style' 'checkbox' 'value' 1 } { }, ...
 						 { 'style' 'text' 'string' 'Plotting frequency range ([min max] Hz):'}, ...
 						 { 'style' 'edit' 'string' '2 25' }, ...
-						 { 'style' 'text' 'string' 'Scalp map options (see >> help topoplot):' } ...
+						 { 'style' 'text' 'string' 'Spectral and scalp map options (see topoplot):' } ...
 						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
 		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
 		if size(result,1) == 0 return; end;
