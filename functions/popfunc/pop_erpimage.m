@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/07/24 19:27:16  arno
+% adding back renorm into text output
+%
 % Revision 1.31  2002/07/24 19:23:56  arno
 % ebugging output message
 %
@@ -182,7 +185,7 @@
 % 04-04-02 added outputs -ad & sm
 
 function varargout = pop_erpimage( EEG, typeplot, channel, titleplot, smooth, decimate, sortingtype, ...
-            sortingwin, sortingeventfield, renorm, varargin)
+            sortingwin, sortingeventfield, varargin)
  
 varargout{1} = '';
 if nargin < 1
@@ -451,9 +454,6 @@ else
 	if nargin < 8
 		sortingeventfield = [];
 	end;
-	if nargin < 9
-		renorm = 'no';
-	end;
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
@@ -531,7 +531,7 @@ if length( options ) < 2
 end;
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
-popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'', ''%s'' %s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
 com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
