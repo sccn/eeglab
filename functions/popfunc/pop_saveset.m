@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/11/15 22:49:29  arno
+% saving in .dat files
+%
 % Revision 1.39  2004/11/05 19:28:15  arno
 % remove uiputfile2
 %
@@ -204,9 +207,9 @@ if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
         drawnow;
 		if length(result) == 0 return; end;
 		indices = eval( [ '[' result{1} ']' ] );
-		[curfilename, curfilepath] = uiputfile('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
+		[curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
 	else
-		[curfilename, curfilepath] = uiputfile('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
+		[curfilename, curfilepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
 	end;
     drawnow;
 	if curfilename == 0 return; end;	
