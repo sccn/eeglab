@@ -5,7 +5,7 @@
 % Computation of the log-likelihood function under the model
 % that the ICs are 1/cosh(s) distributed (according to the tanh
 % nonlinearity in ICA). It does not exactly match for the logistic
-% nonlinearity, but should be a decent approximation -jorn email
+% nonlinearity, but should be a decent approximation
 %
 % negative log likelihood function
 % f = -( log(abs(det(W))) - sum(sum(log( cosh(S) )))/N - M*log(pi) );
@@ -15,13 +15,22 @@
 % S: 2-dim Matrix of source estimates
 % N: number of time points
 % M: number of components
+%
+% Author: Arnaud Delorme and Jorn Anemuller
 
 function f=loglike(W, S);
     
     M = size(W,1);
-    N = size(S,2);
     if ndims(S) == 3
         S = reshape(S, size(S,1), size(S,3)*size(S,2)); 
     end;
-    f=-( log(abs(det(W))) - sum(sum(log( cosh(S) )))/N - M*log(pi) );
+    N = size(S,2);
+    
+    % detect infinite and remove them
+    tmpcoh = log( cosh(S) );
+    tmpinf = find(isinf(tmpcoh));
+    tmpcoh(tmpinf) = [];
+    N = (N*M-length(tmpinf))/M;
+    
+    f=-( log(abs(det(W))) - sum(sum(tmpcoh))/N - M*log(pi) );
 
