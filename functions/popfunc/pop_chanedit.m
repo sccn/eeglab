@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/11/15 01:38:14  scott
+% Can not -> cannot
+%
 % Revision 1.36  2002/11/13 17:44:11  arno
 % header edition -sm, ad
 %
@@ -499,7 +502,7 @@ else
 		   chans(end+1) = chans(end);
 		   chans(num+1:end) = chans(num:end-1);
 		   for index = 1:length( allfields )
-			   eval([ 'chans(' int2str(num) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
+               eval([ 'chans(' int2str(num) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
 		   end;
 		  case 'changechan'
 		   tmpargs = args{ curfield+1 };
@@ -556,6 +559,7 @@ function str = commandwarning(str);
 % format the output field
 % -----------------------
 function strval = reformat( val )
+    if isnumeric(val) & isempty(val), val = '[]'; end;
 	if isstr(val), strval = [ '''' val '''' ];
 	else           strval = num2str(val);
 	end;
