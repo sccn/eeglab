@@ -74,9 +74,9 @@
 %                    obtained from shuffled trials {0=off}. The integer 
 %                    indicates how many shuffled trial averages to
 %                    accumulate. Note that this number also determines 
-%                    the number of bootstrap replication for significance of
+%                    the number of bootstrap replications for significance of
 %                    the returned coherence image, which is equal to
-%                        naccu = ceil(timeout/naccuboot_integer).
+%                        naccu = ceil(timesout/naccuboot_integer).
 %                    Also plot the bootstrap trial coherence on the left.
 %                    Uses bootstrap function arguments for significance of
 %                    the shuffled trial image ('boottype' is forced to 'timestrials')
@@ -111,20 +111,20 @@
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
-% Notes: 1) when cycles==0, nfreqs is total number of FFT frequencies.
+% Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
-%        3) strandard bootstrap method would be 'both' but it uses much
-%           memory, so the 'times' method may be prefered in some cases.
-%        4) if 'boottype' is 'trials', the average of the complex bootstrap
+%        3) The standard bootstrap method should be 'both' but it uses lots 
+%           of memory, so the 'times' method may be prefered in some cases.
+%        4) If 'boottype' is 'trials', the average of the complex bootstrap
 %           is subtracted from the coherence in order to compensate for
 %           phase differences (the average is also subtracted from the 
 %           bootstrap distribution). For other bootstraps, this is not
 %           necessary since the phase is random.
-%        5) if baseline is non-NaN, the baseline is subtracted from
+%        5) If baseline is non-NaN, the baseline is subtracted from
 %           the complex coherence. On the left hand side of the coherence
 %           amplitude image, the baseline is displayed as a magenta line
 %           (if no baseline is selected, this curve represents the average
-%           power at every given frequency).
+%           coherence at every given frequency).
 %
 % Math:
 % if X(t,f) and Y(t,f) are the spectral estimates of X and Y at frequency f
@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/04/25 02:54:07  arno
+% debugging topovec
+%
 % Revision 1.22  2002/04/25 02:38:12  arno
 % change significance (only one sided
 %
@@ -675,7 +678,7 @@ end % t = trial
 % handle trial bootstrap types
 % ----------------------------
 if g.bootsub > 0
-    error('Trial bootstrap is not functional temporarilly');
+    error('Inter-trial bootstrap is not yet functional...');
     fprintf('\nProcessing trial bootstrap (of %d):',trials);
     for allt=1:trials
 		if (rem(allt,10) == 0)
@@ -778,9 +781,12 @@ mbase = mean(abs(R(:,baseln)'));     % mean baseline coherence magnitude
 % ------------------------------------
 if ~isnan(g.alpha) & isnan(g.rboot) % if bootstrap analysis included . . .
 	Rboot = abs(Rboot); % normalize bootstrap magnitude to [0,1]
-	if ~isnan(g.baseline)
-		Rboot = Rboot - repmat(mbase', [1 g.naccu]); % subtract the man also from Rboot
-	end;
+
+%	if ~isnan(g.baseline)
+% 		Rboot = Rboot - repmat(mbase', [1 g.naccu]); 
+%		 	% subtract the mean also from Rboot
+%	end;
+
 	Rboot = sort(Rboot')';
 	Rbootout = Rboot;
 elseif ~isnan(g.rboot)
@@ -805,12 +811,14 @@ if g.bootsub < 0
 	% WARNING RBOOT IS OF RANK N AND MEANRBOOT IS OF RANK N*g.bootsub
 	% MBASE IS NOT GOOD EITHER
 	
-	R = R - meanRboot; % must subtract man R boot from R (complex)
-	Rboot = Rboot - repmat(meanRboot, [1 1 g.naccu]); % subtract the man also from Rboot
-	Rboot = sort(abs(Rboot),3);  
-	if ~isnan(g.baseline)
-		Rboot = Rboot - repmat(mbase', [1 g.timesout g.naccu]); % subtract the man also from Rboot
-	end;
+%	R = R - meanRboot; % subtract mean R boot from R (complex)
+%	Rboot = Rboot - repmat(meanRboot, [1 1 g.naccu]); 
+%                     % subtract the mean also from Rboot
+ 	Rboot = sort(abs(Rboot),3);  
+%	if ~isnan(g.baseline)
+%		Rboot = Rboot - repmat(mbase', [1 g.timesout g.naccu]); 
+%                      % subtract the mean also from Rboot
+%	end;
 	Rbootout = Rboot;
 else	
 	plotall(R, Rboot, Rsignif, times, freqs, mbase, dispf, g);
@@ -842,9 +850,9 @@ if g.cycles ~= 0
    Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
 end
 R = abs(R);
-if ~isnan(g.baseline)
-	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
-end;
+% if ~isnan(g.baseline)
+% 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
+% end;
 Rraw =R; % raw coherence values
 
 if g.plot
@@ -904,7 +912,8 @@ switch lower(g.plotamp)
 	h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
 	Emax = max(R(dispf,:)); % mean coherence at each time point
 	Emin = min(R(dispf,:)); % mean coherence at each time point
-	if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') % plot bootstrap significance limits (base mean +/-)
+	if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') 
+			% plot bootstrap significance limits (base mean +/-)
 	    plot(times,Rboottime([1 2],:),'g','LineWidth',g.linewidth); hold on;
 	    plot(times,Rsigniftime,'k:','LineWidth',g.linewidth);
 		plot(times,Emax,'b');
