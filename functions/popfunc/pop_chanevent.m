@@ -1,12 +1,30 @@
-% pop_chanevent() - import BCI2000 ascii file into eeglab
+% pop_chanevent() - import events from data channel values 
 %
 % Usage:
-%   >> OUTEEG = pop_chanevent( INEEG ); % pop_up
-%   >> OUTEEG = pop_chanevent( INEEG, chanindexes, 'key', 'val' ... );
+%   >> OUTEEG = pop_chanevent( INEEG ); % pop-up window mode
+%   >> OUTEEG = pop_chanevent( INEEG, chanindices, 'key', 'val' ... );
+%
+% Graphic interface:
+%   "Event channel(s)" - [edit box] indices of event channel(s) to import.
+%                  Command line equivalent: chanindices.
+%   "Edge type to extract" - [list box] extract events if the event
+%                  channel values go up ('leading'), down ('trailing')
+%                  or both ('both'). Command line equivalent: 'edge'.
+%   "Delete event channel(s)" - [checkbox] check this checkbox to delete
+%                  event channel after events have been extracted from
+%                  it. Command line equivalent: 'delchan'.
+%   "Delete old events if any" - [checkbox] check this checkbox to 
+%                  remove any prior event in the dataset. Otherwise 
+%                  imported events are appended to old events. Command
+%                  line equivalent: 'delevent'.
+%   "Only one event type" - [checkbox] check this checkbox to regroup
+%                  all non-zero values of the data channel under one event 
+%                  type. Otherwise one type is assigned for each non-zero
+%                  channel value. Command line equivalent: 'nbtype'.
 %
 % Inputs:
 %   INEEG          - input dataset structure
-%   chanindexes    - index of an event channel
+%   chanindices    - indices of an event channel(s)
 %
 % Optionnal inputs:
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
@@ -47,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/12/06 03:49:35  arno
+% resorint events
+%
 % Revision 1.13  2002/12/06 03:20:37  arno
 % correcting typo
 %

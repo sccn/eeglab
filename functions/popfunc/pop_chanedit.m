@@ -3,11 +3,20 @@
 %                  see >> help readlocs  % help message of readlocs() 
 %
 % Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
-%                            'key2', value2, ... ); % edit dataset containing chanlocs
+%                        'key2', value2, ... ); % edit dataset containing chanlocs
 %        >> newchans = pop_chanedit( chanlocs, 'key1', value1, ...
-%                            'key2', value2, ... ); % edit separate chanlocs struct
+%                        'key2', value2, ... ); % edit separate chanlocs struct
+% Graphic interface:
+%   "Channel information ('field name')" - [edit boxes] display channel field 
+%                   content the current channel. Use 'transform' from the command
+%                   line to modify these fields.
+%   "
+
+%
+%
 % Input:
-%   chanlocs - EEG dataset or EEG.chanlocs structure
+%   EEG      - EEG dataset
+%   chanlocs - EEG.chanlocs structure
 %
 % Optional inputs:
 %   'convert'     - {conversion_type [args]} Conversion type may be: 'cart2topo'
@@ -16,23 +25,25 @@
 %                   for 'chancenter'.
 %   'transform'   - String command for manipulating arrays. 'chan' is full channel 
 %                   info. Fields that can be manipulated are 'labels', 'theta'
-%                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3-D) or
-%                   'sph_theta', 'sph_phi', 'sph_radius' for spherical horizontal angle, 
-%                   azimuth and radius. Ex: 'chans(3) = chans(14)', 'X = -X' or a multi- 
-%                   step transform with steps separated by ';': Ex. 'TMP = X; X = Y; Y = TMP'
+%                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 
+%                   3-D) or 'sph_theta', 'sph_phi', 'sph_radius' for spherical 
+%                   horizontal angle, azimuth and radius. 
+%                   Ex: 'chans(3) = chans(14)', 'X = -X' or a multi-step transform
+%                   with steps separated by ';': Ex. 'TMP = X; X = Y; Y = TMP'
 %   'changechan'  - {num value1 value2 value3 ...} Change the values of all fields 
 %                   for the given channel num: mimimally {num label theta radius}.
 %                   Ex: 'changechan' {12 'PXz' -90 0.30}
 %   'changefield' - {num field value} Change field value for channel number num. 
 %                   Ex: {34 'theta' 320.4}.
 %   'add'         - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
-%                   Insert new channel before channel number num with the specified values. 
-%                   If the number of values if less than 10, remaining fields are 0.
+%                   Insert new channel before channel number num with the specified 
+%                   values. If the number of values if less than 10, remaining 
+%                   fields are 0.
 %   'delete'      - [int_vector] Vector of channel numbers to delete.
 %   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
 %   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
-%                   optional arguments (such as file format) to the function readlocs()
-%                   can be specified if the input is a cell array.
+%                   optional arguments (such as file format) to the function 
+%                   readlocs() can be specified if the input is a cell array.
 %   'save'        - 'filename' Save text file with channel info.
 %
 % Outputs:
@@ -66,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/03/06 00:36:34  arno
+% further checking
+%
 % Revision 1.44  2003/03/06 00:35:30  arno
 % same
 %

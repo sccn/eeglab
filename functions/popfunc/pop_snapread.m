@@ -4,22 +4,22 @@
 %   >> [dat] = pop_snapread( filename, gain);
 %
 % Graphic interface:
-%   "Relative gain" - [edit box] to compute the relative gain, vizualise
+%   "Relative gain" - [edit box] to compute the relative gain, fisrt look at
 %                   the text header of the snapmater file with a text editor. 
-%                   Find the recording unit, usually in volts (UNITS field)).  
+%                   Find the recording unit, usually in volts (UNITS field).  
 %                   Then, find the voltage range in the "CHANNEL.RANGE" [cmin cmax]
-%                   field. Finally, look at the gain of the amplifier (directly
+%                   field. Finally, determine the gain of the amplifiers (directly
 %                   on the machine, not in the header file).
 %                   Knowing that the recording precision is 12 bits. The folowing
 %                   formula 
 %                                    1/2^12*[cmax-cmin]*1e6/gain 
-%                   returns the relative gain
-%                   you have to enter in the edit box. For a gain of 50 and
-%                   a channel range of of [-2.5 2.5], the relative gain is 400. 
+%                   returns the relative gain. You have to compute it and enter
+%                   it in the edit box. Enter 1, for preserving the data file units. 
 %                   (note that if the voltage range is not the same for all channels
 %                   or if the CONVERSION.POLY field in the file header
 %                   is not "0 + 1x" for all channels,  you will have to load the data 
-%                   using snapread() and scale manually all channels).
+%                   using snapread() and scale manually all channels, then import
+%                   the Matlab array into EEGLAB).
 %
 % Inputs:
 %   filename       - SnapMaster file name
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/03/02 22:51:56  arno
+% gain
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %

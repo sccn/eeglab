@@ -7,16 +7,32 @@
 % Usage: >> pop_editoptions;
 %        >> pop_editoptions( 'key1', value1, 'key2', value2, ...);
 %
+% Graphic interface:
+%   "Precompute ICA activations" - [checkbox] if checked, ICA activativity
+%                   time courses are precomputed (this requires memory). 
+%                   Command line equivalent: option_computeica.
+%   "Retain parent dataset" - [checkbox] if checked, EEGLAB can retain 
+%                   several datasets in memory. Command line 
+%                   equivalent: option_keepdataset.
+%   "option_savematlab" - [checkbox] if checked, datasets are saved as
+%                   standard Matlab files (this requires disk space). When
+%                   unchecked, datasets' raw data are saved in a separate
+%                   file to save disk space. Command line 
+%                   equivalent: option_savematlab.
+%
 % Optional inputs:
 %   'option_computeica' - [0|1] If 1, compute the ICA component activitations and
 %                   store them in a new variable. If 0, compute ICA activations
 %                   only when needed (& only partially, if possible) and do not 
 %                   store the results). 
-%   'option_keepdataset' - [0|1]. If 1, keep datasets in memory so that the user 
+%   'option_keepdataset' - [0|1] If 1, keep datasets in memory so that the user 
 %                   can undo any EEGLAB operation by returning to the parent
 %                   dataset.  The user may work on several datasets at a time.
 %                   If 0, only one dataset is stored in memory, any changes 
 %                   overwriting the current (EEG) dataset. 
+%   'option_savematlab' - [0|1] If 1, datasets are saved as Matlab files. If 0,
+%                   raw data is saved in a separate file to save disk space.
+%            
 %   NOTE: Turn OFF these options to work with very large datasets or on computers
 %                   with limited memory.
 %
@@ -52,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/12/04 19:13:19  arno
+% debuging for MacOS6 Matlab 6 directories
+%
 % Revision 1.16  2002/11/15 01:38:52  scott
 % same
 %
@@ -178,7 +197,7 @@ if nargin == 0
          { }, { 'Style', 'checkbox', 'string', '    ', 'value', value{index} } { } }; 
     end;
 
-    results = inputgui( geometry, uilist, 'pophelp(''editeegoptions'');' );
+    results = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()' );
     if length(results) == 0, return; end;
    
     % decode inputs

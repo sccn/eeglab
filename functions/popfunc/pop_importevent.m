@@ -2,8 +2,46 @@
 %              is the only input, a window pops up to ask for the relevant 
 %              parameter values.
 %
-% Usage: >> [EEG,eventnumbers] = pop_importevent( EEG, 'key1', 'value1', ...);
+% Usage: >> EEG = pop_importevent( EEG ); % pop-up window mode
+%        >> [EEG,eventindices] = pop_importevent( EEG, 'key1', 'value1', ...);
 %
+% Graphic interface:
+%   "Event indices" - [edit box] enter indices of event to modify. Let
+%               this field blank to import new events. Command line
+%               equivalent: 'indices'.
+%   "Append events?" - [checkbox] check this checkbox to clear prior
+%               event information. See also the "Align event latencies ..."
+%               edit box. Command line equivalent: 'append'.
+%   "Event file or array" - [edit box] enter event file name. Use "Browse" 
+%               button to browse for a file. If a file with the given name
+%               can not be found, the function search for a variable with
+%               this name in the global workspace. Command line 
+%               equivalent: 'filename'.
+%   "Input field (column) name" - [edit box] enter a name for each of the
+%               column in the event text file. If columns names are defined 
+%               in the text file, they cannnot be used and you must copy 
+%               their name in this edit box (and skip the rows). One column 
+%               name for each column must be provided. The keywords "type"
+%               and "latency" should be used to define the columns containing
+%               event types and event latencies. Columns names can be
+%               separated by comas, quoted or not. Command line 
+%               equivalent: fields.
+%  "Latency time unit (sec)" - [edit box] specify the time unit for the 
+%               latency column defined above relative to seconds. Command
+%               line equivalent: 'timeunit'.
+%  "Number of header lines to ignore" - [edit box] for some text files, the 
+%               first rows do not contain epoch information and have to be
+%               skipped. Command line equivalent: 'skiplines'.
+%  "Align event latencies to data events" - [edit box] For most EEG datasets,
+%               basic event information are defined along with the EEG and
+%               a more detailed file is recorded separatelly. This option 
+%               help fuse the two information by realigning the imported
+%               data text file to the existing event. A value of 0 indicates
+%               that the first events of the pre-defined events and imported
+%               events will be aligned. A positive value align the first 
+%               event to the number num pre-existing event. A negative value 
+%               can also be used; then event number -num is aligned with the 
+%               first pre-existing event. Default is 0. (NaN-> no alignment).
 % Input:
 %   EEG      - input dataset
 %
@@ -16,19 +54,20 @@
 %               is the type of the event, the second the latency. 
 %               The others are user-defined. The function can read 
 %               either numeric or text entries in ascii files.
-%  'fields'   - Cell array containing the name of each user-defined column, 
+%  'fields'   - [Cell array] list of the name of each user-defined column, 
 %               optionally followed by a description. Ex: { 'type', 'latency' }
-%  'skipline' - Number of header rows to skip in the text file 
-%  'indices'  - Vector indicating the indices of the events to modify 
+%  'skipline' - [Interger] Number of header rows to skip in the text file 
+%  'indices'  - {integer vector] Vector indicating the indices of the events to
+%               modify. 
 %  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
-%  'delim'    - Delimiting characters in the input file. Default is tab|space.
+%  'delim'    - [string] String of delimiting characters in the input file. 
+%               Default is tab|space.
 %  'align'    - [num] Align the first event latency to the latency of existing 
-%               event number num, and check latency consistency. Negative values 
-%               can also be used; then event number -num is aligned with the 
-%               first pre-existing event. Default is 0. (NaN-> no alignment)
+%               event number num, and check latency consistency. See also GUI
+%               help above.
 % Outputs:
 %   EEG          - EEG dataset with updated event fields
-%   eventnumbers - Indexes of the appended events
+%   eventindices - Indexes of the appended events
 %
 % Example: >> [EEG, eventnumbers] = pop_importevent(EEG, 'event', ...
 %         'event_values.txt', 'fields', {'type', 'latency','condition' }, ...
@@ -63,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/01/24 02:14:12  arno
+% debuging 'delim' option
+%
 % Revision 1.12  2003/01/03 02:20:47  scott
 % header edits -sm
 %

@@ -3,13 +3,53 @@
 %                     the only input, a window pops up to ask for the relevant 
 %                     parameter values.
 % Usage:
+%   >> EEGOUT = pop_importepoch( EEG ); % pop-up window mode
 %   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, 'key', 'val', ...);
+%
+% Graphic interface:
+%  "Epoch file or array" - [edit box] enter epoch text file name. Use "Browse" 
+%                      button to browse for a file. If a file with the given name
+%                      can not be found, the function search for a variable with
+%                      this name in the global workspace. Command line 
+%                      equivalent: filename.
+%  "File input field ..." - [edit box] enter a name for each of the column in the
+%                      text file. If columns names are defined in the text file,
+%                      they cannnot be used and you must copy their names
+%                      in this edit box (and skip the rows). One column name
+%                      for each column must be provided. The keywords "type" and
+%                      "latency" should not be used. Columns names can be
+%                      separated by comas, quoted or not. Command line 
+%                      equivalent: fieldlist.
+%  "Field name containing time locking event type(s)" - [edit box] if one column
+%                      contain the epoch type, its name must be defined in the 
+%                      previous edit box and copied here. It is not necessary to 
+%                      define a type field for the time-locking event (TLE). By 
+%                      default it is defined as type ''TLE'' at time 0 for all 
+%                      epochs. Command line equivalent: 'typefield'.
+%  "Field name(s) containing latencies" - [edit box] enter columns name(s)
+%                      containing latency information. It is not necessary to 
+%                      define a latency field for epoch information. All fields 
+%                      that contain latencies will be imported as different event 
+%                      types. For instance, if field 'RT' contains latencies, 
+%                      events of type 'RT' will be created with latencies given 
+%                      in the RT field. See notes. Command line 
+%                      equivalent: 'latencyfields'.
+%  "Latency time unit rel. to seconds" - [edit box] specify the time unit for 
+%                      latency columns defined above. Command line 
+%                      equivalent: 'timeunit'.
+%  "Number of header lines to ignore" - [edit box] for some text files, the first
+%                      rows do not contain epoch information and have to be
+%                      skipped. Command line equivalent: 'headerlines'.
+%  "Remove current epoch and event info" - [checkbox] check this checkbox
+%                      to remove any prior event or epoch information. Command
+%                      line equivalent: 'clearevents'.
 %
 % Inputs:
 %   EEG              - Input EEG dataset
-%   filename         - Name of an ascii file with epoch and/or epoch event information 
-%                      organised in columns. ELSE, name of a Matlab variable with the 
-%                      same information (either a Matlab array or cell array). 
+%   filename         - Name of an ascii file with epoch and/or epoch event 
+%                      information organised in columns. ELSE, name of a Matlab
+%                      variable with the same information (either a Matlab array 
+%                      or cell array). 
 %   fieldlist        - {cell array} Label of each column (data field) in the file.
 %
 % Optional inputs:
@@ -32,6 +72,15 @@
 %
 % Output:
 %   EEGOUT - EEG dataset with modified event structure
+%
+% FAQ:
+% 1) Why is this function so complex? This function can handle as many events
+%    per epochs as needed, and the information is stored in terms of events
+%    rather than epoch information, which requires some conversion.
+% 2) Can I access epoch information later? The epoch information is stored in
+%    "EEG.event" and the information is stored in terms of events only. For 
+%    user convenience the "EEG.epoch" structure is generated automatically
+%    from the event structure. See EEGLAB manual for more information.
 %
 % Authors: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 11 March 2002
 %
@@ -56,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/02/28 17:04:14  arno
+% smarter warning
+%
 % Revision 1.22  2003/02/28 16:57:58  arno
 % test if xmin < 0before adding TLE events
 %
