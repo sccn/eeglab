@@ -1,119 +1,109 @@
-% readlocs() - read electrode positions (expanded from the ICA 
-%              toolbox function)
+% readlocs() - read electrode location information from a file.
 %             
 % Usage:
 %   >> [eloc, labels, theta, radius] = readlocs( filename );
-%   >> [eloc, labels, theta, radius] = readlocs( filename, ...
-%                                          'key', 'val' );
+%   >> [eloc, labels, theta, radius] = readlocs( filename, 'key', 'val', ... );
 %
 % Inputs:
-%   filename   - name of the file containing the electrode locations
-%                and convert in polar coordinates
+%   filename   - Name of the file containing the electrode locations
+%                Default is 2-D polar coordinates (see >> help topoplot )
 %
 % Optional inputs:
 %   'filetype'  - ['loc'|'sph'|'xyz'|'polhemus'|'besa'|'chanedit'|'custom'] 
-%                 type of the file to be read. By default the file type is
-%                 determined using the file extension.
-%                  'loc' is the eeglab() format (see below)
-%                  'sph' is a matlab spherical coordinate file (spherical
-%                        coordinates in Matlab are different from Besa 
-%                        spherical coordinates).
-%                  'xyz' contain carhtesian coordinates of the electrodes
-%                  'polhemus' or 'polhemusx' polhemus file with electrodes 
-%                        recorded using X as the main axis (see readelp() )
-%                  'polhemusy' polhemus file with electrodes recorded
-%                        using Y as the main axis (see readelp() )
-%                  'besa' besa '.elp' coordinate file (contact author for
-%                        reading other Besa files). '.elp' Besa files
-%                        have only 3 columns of 'theta' angle, 'phi' angle
-%                        and 'weight' (which is ignored). Also note that 
-%                        'theta' and 'phi' meaning is also the inverse
-%                        as the one they have in Matlab (in Besa 'theta' =
-%                        azimut and 'phi' = horiz).
-%                  'chanedit' files created by pop_chanedit().
-%                  'custom' specify your own format using the 'format' entry
-%   'format'    - [cell array] for 'custom' file types (or if no
-%                 file type is defined). The input cell array contains one
-%                 string entry per column. The string name can be 
-%                     'channum'   for channel number. 
-%                     'labels'    for channel name. 
-%                     'theta'     for channel angle polar coordinate. 
-%                     'radius'    for channel radius polar coordinate. 
-%                     'X'         for channel cathesian coordinate X. 
-%                     'Y'         for channel cathesian coordinate Y. 
-%                     'Z'         for channel cathesian coordinate Z. 
-%                     '-X'        for minus channel cathesian coordinate X. 
-%                     '-X'        for minus channel cathesian coordinate X. 
-%                     '-Z'        for minus channel cathesian coordinate Z.  
-%                     'sph_theta' for Matlab channel spherical theta angle
-%                                 (=horizontal). 
-%                     'sph_phi'   for Matlab channel spherical phi angle
-%                                 (=azimut). 
-%                     'sph_radius' for channel spherical radius. 
-%                     'sph_theta_besa' for BESA channel spherical theta
-%                                 angle (=horizontal).  
-%                     'sph_phi_besa' for BESA channel spherical phi 
-%                                 angle (=azimut). 
-%                     'calib'     for the channel calibration value. 
-%                     'gain'      for the channel gain. 
-%                     'custom1'   custom field 1.
-%                     'custom2', 'custom3', 'custom4' other custom fields.
-%   'skipline'  - [integer] number of header lines to skip for custom file
-%                 types only.
-%   'elecind'   - [integer array] indices of electrode to read 
-%   'center'    - [integer array or 'auto'] for X, Y, Z coordinates, specify
-%                the center of the sphere. 'auto' uses the best matching
-%                that passes through all the electrodes. Default is [0 0 0].
+%                 Type of file to read. By default the file type is determined 
+%                 using the file extension (.loc, .sph, etc.):
+%                  'loc' - an EEGLAB 2-D topography file (see >> help topoplot)
+%                  'sph' - a Matlab spherical coordinate file (Note: spherical
+%                        coordinates used by native Matlab functions are different 
+%                        from spherical coordinates used by BESA).
+%                  'xyz' - cartesian coordinates. From head center, x is toward the nose,
+%                        y is toward the right ear, and z is toward the vertex.
+%                  'polhemus' or 'polhemusx' - Polhemus electrode location file 
+%                        recorded using x as the main axis (see readelp() )
+%                  'polhemusy' - Polhemus electrode location file 
+%                        recorded using Y as the main axis (see readelp() )
+%                  'besa' - BESA '.elp' coordinate file (contact author for
+%                        other Besa file types). '.elp' Besa files
+%                        have three columns: 'theta', 'phi' and 'weight' (ignored). 
+%                        Note: The meanings of 'theta' and 'phi' are the inverse
+%                        of those in Matlab (in Besa 'theta' = azimuthal/vertical angle 
+%                        and 'phi' = horizontal angle). Angles are in radians.
+%                  'chanedit' - EEGLAB files created by pop_chanedit().
+%                  'custom' - Allows the user to specify a format using 'format' 
+%   'format'    - [cell array] Definition of a 'custom' channel location file type 
+%                        (or if no file type is defined). The input cell array contains:
+%                           'channum'   channel number. 
+%                           'labels'    channel name. 
+%                           'theta'     channel angle polar coordinate. 
+%                           'radius'    channel radius polar coordinate. 
+%                           'X'         channel cathesian coordinate X. 
+%                           'Y'         channel cathesian coordinate Y. 
+%                           'Z'         channel cathesian coordinate Z. 
+%                           '-X'        negative channel cathesian coordinate X. 
+%                           '-X'        negative channel cathesian coordinate X. 
+%                           '-Z'        negative channel cathesian coordinate Z.  
+%                           'sph_theta' Matlab theta angle ( = horizontal angle). 
+%                           'sph_phi'   Matlab channel phi angle ( = azimuthal/vertical). 
+%                           'sph_radius' channel radius. 
+%                           'sph_theta_besa' BESA theta angle ( = horizontal angle).  
+%                           'sph_phi_besa' BESA phi angle ( = azimuthal/vetical angle). 
+%                           'calib'     channel calibration value (near 1.0).
+%                           'gain'      channel gain. 
+%                           'custom1'   custom field 1.
+%                           'custom2', 'custom3', 'custom4' other custom fields.
+%   'skipline'  - [integer] number of header lines to skip ('custom' file types only).
+%   'elecind'   - [integer array] indices of electrodes to read. Default is all.
+%   'center'    - [(1,3) array or 'auto'] for xyz coordinates, specify
+%                the center of the sphere. 'auto' uses the center of the sphere
+%                that best fits all the electrodes. Default is [0 0 0].
 %
 % File formats:
-%   The extension of the file determines its type
-%   if the 'filetype' parameter is not specified
+%   The extension of the file determines its type if 'filetype' is unspecified
 %   '.loc' or '.locs':
-%               polar format. Example
+%               polar coordinates. Example:
 %               1    -18    .352       Fp1
 %               2     18    .352       Fp2
 %               3    -90    .181       C3
 %               4     90    .181       C4
-%                 more lines ...
+%                 ...
 %               Note that in previous releases, the channel labels
-%               had to contain 4 characters (spaces replaced by '.').
-%               This format still works but the dots are no longer
-%               required.
+%               had to contain exactly 4 characters (spaces replaced by '.').
+%               This format still works but dots are no longer required.
 %   '.sph':
-%               spherical coordinate file. Example
+%               spherical coordinates. Example:
 %               1    -63.36    -72      Fp1
 %               2     63.36    72       Fp2
 %               3     32.58    0        C3
 %               4     32.58    0        C4
-%                 more lines ...
+%                 ...
 %   '.xyz': 
-%               cartesian coordinate file. Example
+%               cartesian coordinates. Example:
 %               1   -0.8355   -0.2192   -0.5039      Fp1
 %               2   -0.8355    0.2192    0.5039      Fp2
 %               3    0.3956         0   -0.9184      C3
 %               4    0.3956         0    0.9184      C4
-%                 more lines ...
+%                 ...
 %   '.txt':   
-%               read ascii files saved using pop_chanedit()
+%               ASCII file saved using pop_chanedit()
 %   '.elp':     
-%               Polhemus coordinate file (uses readelp())
+%               Polhemus coordinates (uses readelp())
 %
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
-%               It has three fields 'labels', 'theta' and 'radius'.
+%               It has three fields: 'labels', 'theta' and 'radius'.
 %   labels    - cell array of strings giving the  names of the electrodes
-%   theta     - vector of polar angles of the electrodes in degrees
-%   radius    - vector of polar norms of the electrodes
+%   theta     - vector of polar angles for the electrodes (in degrees).
+%   radius    - vector of polar coordinate radius values for the electrodes
 %
-% Note: If the channel label are not given, they are given the name
-%       'E1', 'E2', etc.
+% Note: If channel labels are not given, they are given the names
+%               'E1', 'E2', etc.
 %       ************************** TO CHANGE HERE
-%       the function cart2topo() is used to convert cartesian to polar
+%       The function cart2topo() is used to convert cartesian to polar
 %       coordinates. By default the current function uses cart2topo()
 %       options to recompute the best center coordinates.
 %
 % Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
-%
+%         (expanded from the ICA toolbox function)
 % See also: readelp(), writelocs(), topo2sph(), sph2topo(), cart2topo(), sph2cart()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -135,6 +125,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/12/27 22:57:23  arno
+% debugging polhemus
+%
 % Revision 1.23  2002/12/27 17:47:32  arno
 % compatible with more BESA formats
 %
