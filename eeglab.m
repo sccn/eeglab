@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.292  2003/12/04 01:26:47  arno
+% debug path
+%
 % Revision 1.291  2003/12/04 01:24:12  arno
 % adding paths
 %
@@ -1097,6 +1100,7 @@ elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ]
 else
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions');    
 end;
+myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
 eeg_options; 
 eeg_global;
@@ -1350,15 +1354,17 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     % --------------------------
     p = which('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
-    dircontent = what(p);
-    for index = 1:length(dircontent.m)
-        if ~isempty(findstr(dircontent.m{index}, 'eegplugin'))
-            if exist(dircontent.m{index}) == 7
-                addpath(dircontent.m{index})
-                funcname = dircontent.m{index};
+    dircontent1 = what(p);
+    dircontent2 = what( [ p 'plugins' ]);
+    dircontent  = { dircontent1.m{:} dircontent2.m{:} };
+    for index = 1:length(dircontent)
+        if ~isempty(findstr(dircontent{index}, 'eegplugin'))
+            if exist(dircontent{index}) == 7
+                addpath(dircontent{index})
+                funcname = dircontent{index};
                 disp(['eeglab: adding plugin "' funcname '" (path added; see help ' funcname ')' ]);    
             else 
-                funcname = dircontent.m{index}(1:end-2);
+                funcname = dircontent{index}(1:end-2);
                 disp(['eeglab: adding plugin "' funcname '" (see help ' funcname ')' ]);    
             end;
             eval( [ funcname '(gcf, trystrs, catchstrs)' ], ...
