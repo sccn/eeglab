@@ -18,6 +18,8 @@
 % Outputs:
 %   OUTEEG  - output dataset
 %
+% Author: Luca Finelli, CNL / Salk Institute - SCCN, 2 August 2002
+%
 % See also:
 %   SIGNALSTAT,  EEGLAB 
 
