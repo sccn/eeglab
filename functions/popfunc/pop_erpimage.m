@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2003/07/26 17:29:44  scott
+% test
+%
 % Revision 1.114  2003/05/10 19:06:21  arno
 % debug last
 %
@@ -895,7 +898,7 @@ disp(' '); disp(com); disp(' ');
 eval(com)
 
 if popup
-	varargout{1} = [popcom 10 '% Call: ' com];
+	varargout{1} = [popcom 10 '% Calls: ' com];
 end;
 
 return;
