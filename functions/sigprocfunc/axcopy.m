@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/05/21 15:37:53  scott
+% header edit
+%
 % Revision 1.9  2003/03/07 22:03:37  scott
 % type
 % typo
@@ -95,7 +98,13 @@ for a=1:length(hndl)                    % make all axes visible
         command_dbl = double(command);
         % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
         comstr = double(['copyaxis(''' char(command_dbl) ''')']);
-        set(findobj('parent',hndl(a)),'ButtonDownFcn',char(comstr));
+        allobjs = findobj('parent',hndl(a));
+        for index = 1:length(allobjs)
+            if isempty(get(allobjs(index), 'ButtonDownFcn'))
+                set(allobjs(index), 'ButtonDownFcn', char(comstr));
+            end;
+        end;
+        %set(findobj('parent',hndl(a)),'ButtonDownFcn',char(comstr));
     end;        
 end
 figure(fig);
