@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/03/05 18:34:50  arno
+% same
+%
 % Revision 1.3  2003/03/05 18:33:27  arno
 % handling cancel
 %
@@ -88,7 +91,7 @@ function chanlist = pop_chansel(chans);
    chanliststr = userdat{2};
    chanlist = [];
    for index = 1:length(chanliststr)
-       i = strmatch (chanliststr{index}, channelnames);
+       i = strmatch (chanliststr{index}, channelnames, 'exact');
        chanlist  = [chanlist i];
    end;
    chanlist = sort(chanlist);
