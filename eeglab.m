@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.273  2003/11/27 01:03:42  arno
+% automatically adding paths
+%
 % Revision 1.272  2003/11/26 01:23:15  arno
 % color for plugin in plot menu
 %
@@ -1022,11 +1025,22 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 % -------------
 p = which('eeglab.m');
 p = p(1:findstr(p,'eeglab.m')-1);
-addpath([p 'dipfit']);
-addpath([p 'sigprocfunc']);
-addpath([p 'popfunc']);
-addpath([p 'adminfunc']);
-    
+if strcmpi(computer, 'pcwin') 
+    allpahs = [';' path ';' ];
+    tmpf = [ ';' p 'dipfit;' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ';' p 'sigprocfunc;' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ';' p 'popfunc;' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ';' p 'adminfunc;' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ';' p 'miscfunc;' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+else
+    allpahs = [':' path ':' ];
+    tmpf = [ ':' p 'dipfit:' ];      if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ':' p 'sigprocfunc:' ]; if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ':' p 'popfunc:' ];     if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ':' p 'adminfunc:' ];   if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+    tmpf = [ ':' p 'miscfunc:' ];    if isempty(findstr(tmpf, allpaths)), addpath(tmpf(2:end-1)); end;
+end;
+
 eeg_options; 
 eeg_global;
 
