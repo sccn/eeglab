@@ -88,7 +88,10 @@
 %
 %   cycles      = >0 -> Number of cycles in each analysis wavelet 
 %                 =0 -> Use FFTs (with constant window length) {0}
-%                       OR multitaper decomposition (with 'mtaper').
+%                 If [wavecycles factor] -> wavelet cycles increase with frequency
+%                 beginning at wavecyles (0<factor<1; factor=1 -> no increase,
+%                 standard wavelets; factor=0 -> fixed epoch length, as in FFT.
+%                 OR multitaper decomposition (with 'mtaper').
 %  Here, the user chooses either to use the FFT method (fixed window size
 %  for all frequencies) or the wavelet DFT method (the data window length
 %  depends inversely on the frequency, e.g. '3' means that the data
@@ -103,7 +106,9 @@
 %
 % Optional Detrending:
 %   'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
-%   'detrep'    = ['on'|'off'], Detrend data across trialsk {'off'}
+%   'detrep'    = ['on'|'off'], Detrend data across trials (at each time point
+%                 compute the linear trend across the set of ordered trials and 
+%                 remove it; not that this also subtract the ERP) {'off'}
 %
 % Optional FFT/DFT Parameters:
 %   'winsize'   = If cycles==0: data subwindow length (fastest is 2^n < frames);
@@ -129,8 +134,10 @@
 %
 %   'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
 %                  If cycles==0, all FFT frequencies are output. {50}
-%   'baseline'  = Spectral baseline end-time (in ms).            {0}
-%   'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%   'baseline'  = Spectral baseline end-time (in ms). Use NaN for no baseline
+%                 removal{0}
+%   'powbase'   = Baseline spectrum to log-subtract. 'baseline' parameter is
+%                 ignored if this parameter is used {def|NaN->from data}
 %  This is useful only when you want to use a known baseline spectrum (e.g. from
 %  another condition) instead of using the actual mean baseline spectrum of the data.
 %  Otherwise, leave this out or specify as 'NaN' (not a number).
@@ -172,7 +179,7 @@
 %  Use this to add extra vertical dashed lines at significant epoch times.
 %  Time 0 is marked by default.
 %                     
-%   'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
+%   'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %   'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %   'title'     = Optional figure title                              {none}
 %
@@ -199,6 +206,22 @@
 %     erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
 %      itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (abs., not diffs)
 %  Note that the itcboot lower bound is practically meaningless.
+%
+%  Plot description:
+%    Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
+%    presents the data ERSP (Event-Related Spectral Perturbation) in dB, with mean baseline
+%    spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent timef() from
+%    removing the baseline. The lower panel presents the data ITC (Inter-Trial Coherence).
+%    Click on any plot axes to pop up a new window (using 'axcopy()')
+%    -- Upper left marginal panel presents the mean spectrum during the baseline period
+%       (blue), and when significance is set, the significance threshold at each frequency
+%       (dotted green-black trace).
+%    -- The marginal panel under the ERSP image shows the maximum (green) and minimum
+%       (blue) ERSP values relative to baseline power at each frequency.
+%    -- The lower left marginal panel shows mean ITC across the imaged time range (blue),
+%       and when significance is set, the significance threshold (dotted green-black).
+%    -- The marginal panel under the ITC image shows the ERP (which is produced by ITC
+%       across the data spectral pass band).
 %
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
@@ -232,6 +255,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/15 03:23:57  arno
+% formating for web
+%
 % Revision 1.4  2002/11/15 03:06:41  arno
 % header for web
 %
