@@ -5,16 +5,13 @@
 %   >> EEG = pop_loadcnt( filename, 'key', 'val', ...);
 %
 % Graphic interface:
-%   "Enter block size in CNT file" - [edit box] Neuroscan files can
-%                   have different data block sizes. It was not
-%                   possible to read this information in the file header
-%                   (though it is probably there). Values known to 
-%                   work are 1 and 40. If 1 does not work (the data does
-%                   not look like EEG), you should try 40. 
+%   "Data fomat" - [checkbox] 16-bits or 32-bits. We couldn't find in the
+%                   data file where this information was stored. Command
+%                   line equivalent in loadcnt() 'dataformat'.
 %   "Time interval in seconds" - [edit box] specify time interval [min max]
 %                   to import portion of data. Command line equivalent
 %                   in loadcnt: 't1' and 'lddur'
-%   "Import keystrokes" - [edit box] set this option to 'yes' to import
+%   "Import keystrokes" - [checkbox] set this option to import
 %                   keystrokes events in dataset. Command line equivalent
 %                   'keystroke'.
 %   "loadcnt() 'key', 'val' params" - [edit box] Enter optional loadcnt()
@@ -36,6 +33,8 @@
 % Null events are usually associated with internal signals (recalibrations...).
 % 2) The "Average reference" edit box had been remove since the re-referencing
 % menu of EEGLAB offers more options to re-reference data.
+% 3) The 'blockread' has been disabled since we found where this information
+% was stored in the file.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -60,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/07/29 21:26:34  arno
+% new loadcnt version
+%
 % Revision 1.16  2003/07/28 22:07:44  arno
 % no more block factor
 %
