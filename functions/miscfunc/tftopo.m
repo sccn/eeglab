@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2004/10/12 14:35:16  scott
+% help msg -sm
+%
 % Revision 1.66  2004/10/08 19:14:35  hilit
 % changed the font size of figure title and axes to 12
 %
@@ -306,6 +309,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
               'logfreq'       'string'   {'on' 'off' }             'off';
               'mode'          'string'   { 'ave' 'rms' }           'rms';
+              'title'         'string'   []                        '';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
               'showchan'      'integer'  [0 nchans]                0 ;
@@ -575,12 +579,13 @@ if g.showchan>0
    % tl=title(['Channel ',int2str(g.showchan)]);
    % set(tl,'fontsize',14);
 else
-    if strcmpi(g.mode, 'rms')
-        tl=title(['Signed channel rms']);
+    if isempty(g.title)
+        if strcmpi(g.mode, 'rms')
+            tl=title(['Signed channel rms']);
+        else
+            tl=title(['Signed channel average']);
+        end;
     else
-        tl=title(['Signed channel average']);
-    end;
-    if isfield(g, 'title') %user title
         tl = title(g.title);
     end
   set(tl,'fontsize',12);
