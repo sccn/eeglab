@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/05/24 19:09:16  arno
+% debug lowmem
+%
 % Revision 1.32  2003/05/22 01:21:30  arno
 % detrending param name change
 %
@@ -422,7 +425,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,times,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
 
 % Note: PA is output of 'phsamp','on' 
 
@@ -589,15 +592,15 @@ elseif (g.winsize > g.frame)
 	error('Value of winsize must be less than frame length.');
 end
 
-if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesout))
-	error('Value of timesout must be an integer number.');
-elseif (g.timesout <= 0)
-	error('Value of timesout must be positive.');
+if ~all(isnumeric(g.timesout))
+	error('Value of timesout must be a number.');
 end
-if (g.timesout > g.frame-g.winsize)
-	g.timesout = g.frame-g.winsize;
-	disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
-end
+if length(g.timesout) == 1
+    if g.timesout > g.frame-g.winsize
+        g.timesout = g.frame-g.winsize;
+        disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
+    end
+end;
 
 if (~isnumeric(g.padratio) | length(g.padratio)~=1 | g.padratio~=round(g.padratio))
 	error('Value of padratio must be an integer.');
@@ -763,12 +766,12 @@ if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
             alltfX(index,:,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off');
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         end;
     end;
     
@@ -811,11 +814,11 @@ if iscell(X)
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
-    [P1,R1,mbase1,times,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
+    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
 	fprintf('\nRunning newtimef on condition 2 *********************\n');
-    [P2,R2,mbase2,times,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
+    [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     
     % recompute baselines for power
@@ -841,9 +844,9 @@ if iscell(X)
         g.titleall = g.title;
         if strcmpi(g.newfig, 'on'), figure; end; 
         subplot(1,3,1); g.title = g.titleall{1}; 
-        plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, times, mbase, g);
+        plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
         subplot(1,3,2); g.title = g.titleall{2}; 
-        plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, times, mbase, g);
+        plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, timesout, mbase, g);
         subplot(1,3,3); g.title = g.titleall{3};
     end;
     
@@ -854,7 +857,7 @@ if iscell(X)
             case 'complex',  Rdiff = R1-R2;
         end;
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
-            plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+            plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
         end;
 	else 		
 		% preprocess data and run compstat
@@ -926,7 +929,7 @@ if iscell(X)
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
-                      mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+                      mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
 		end;
         R1 = res1{2};
 		R2 = res2{2};
@@ -969,7 +972,7 @@ end;
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
 g.subitc = 'off';
-[alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
+[alltfX freqs timesout R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
                                 'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                 g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                       'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 
@@ -997,10 +1000,10 @@ end
 % --------
 % baseline
 % --------
-if ~isempty(find(times < g.baseline))
-   baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
+if ~isempty(find(timesout < g.baseline))
+   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
 else
-   baseln = 1:length(times); % use all times as baseline
+   baseln = 1:length(timesout); % use all times as baseline
 end
 if ~isnan(g.alpha) & length(baseln)==0
   fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
@@ -1018,7 +1021,7 @@ else
 end
 baselength = length(baseln);
 if ~isnan( g.baseline ) & ~isnan( mbase )
-    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(times)])); % convert to (10log10) dB
+    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
 end;
@@ -1078,7 +1081,7 @@ end
 % plotting
 % --------
 ERP = mean(X,2);
-plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
+plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
 else 
