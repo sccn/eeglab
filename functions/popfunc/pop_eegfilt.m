@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/07/20 19:19:10  scott
+% clarify processing message
+%
 % Revision 1.16  2003/04/24 22:13:51  arno
 % typo
 %
@@ -177,7 +180,12 @@ if EEG.trials == 1
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
 						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
-					fprintf('\nFilter error: continuous data portion too narrow (remains unfiltered)\n');
+					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
+                    if locutoff ~= 0 & hicutoff == 0
+                        tmprange = [boundaries(n)+1:boundaries(n+1)];
+                        EEGdata(:,tmprange) = ...
+                            EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
+                    end;
 				end;
 			end
             try, warning on MATLAB:divideByZero
