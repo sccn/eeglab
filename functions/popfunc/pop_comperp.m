@@ -1,48 +1,45 @@
-% pop_comperp() - Compute the ERP grand averages of multiple datasets,
-%               with optional subtraction.
-%
+% pop_comperp() - Compute the grand average ERP waveforms of multiple datasets,
+%                 with optional ERP subtraction.
 % Usage:
-%       >> pop_comperp( ALLEEG, flag ); % pop-up window mode
+%       >> pop_comperp( ALLEEG, flag );      % pop-up window mode
 %       >> [erp1 erp2 erpsub time sig] = pop_comperp( ALLEEG, flag, ...
-%                                    datadd, datsub, chansubset, title);
-%
+%                                   datadd, datsub, chansubset, title);
 % Inputs:
-%   ALLEEG  - array of datasets
-%   flag    - [0|1] use raw data (1) or ICA components (0). Default 1.
-%   datadd  - [integer array] list of datasets to add for ERP grand 
-%             average.
-%   datsub  - [integer array] list of datasets to subtract for ERP
+%   ALLEEG  - Array of EEG datasets
+%   flag    - [0|1] (1) Use raw data or (0) ICA components. {default: 1}
+%   datadd  - [integer array] List of datasets to sum to make an ERP 
+%             grand average.
+%   datsub  - [integer array] List of datasets to subtract to make an ERP
 %             grand average. This option is to be used to compare
-%             sub-conditions so each the array must have the same 
-%             number of elements as 'datadd'. First dataset in
-%             'datsub' is subtracted from first dataset in 'datadd',
-%             so the 2 dataset must contain data from the same subject
-%             but under different experiemtal conditions.
+%             sub-conditions; each array must have the same number of 
+%             elements as the respective 'datadd' datasets. 
+%             e.g., The first 'datsub' dataset is subtracted from first 
+%             'datadd' dataset. The two datasets may normally contain data 
+%             from the same subject under different experiemtal conditions.
 %
 % Optional inputs:
-%   'chans'    - [integer array] vector of channel or component subset. 
-%                Default: all.
-%   'title'    - [string] plot title.
-%   'alpha'    - [float] apply t-test for p=alpha. If [float N], only
-%                asses significance if N consecutive point are significant.
-%                Default is [].
-%   'geom'     - ['scalp'|'array'] plot erps in scalp array (plottopo())
-%                or rectangular array (plotdata()). Note that components
-%                can not be plotted in a scalp array.
-%   'std'      - ['on'|'off'] show standard deviation. Default: 'off'.
-%   'diffonly' - ['on'|'off'] when subtracting datasets, do not plot ('on')
-%                or plot ('off') ERP grand averages.
-%   'allerps'  - ['on'|'off'] sow all erps. Default 'off'.
-%   'mode'     - ['ave'|'rms'] plot grand average or RMS (root mean square)
-%   'multcmp'  - [integer] correct for multiple comparisons. Enter the number
-%                of data points (divide alpha by the number of data points).
-%
+%   'chans'    - [integer array] Vector of channel or component indices. 
+%                {default: all}.
+%   'title'    - [string] Plot title. {default: none}
+%   'alpha'    - [float] Apply t-test for p=alpha. If [float N], only mark 
+%                for significance when N consecutive points are significant.
+%                {default: []}
+%   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
+%                or as a rectangular array (plotdata()). Note: Components
+%                cannot be plotted in a 'scalp' array.
+%   'std'      - ['on'|'off'] Show standard deviation. Default: 'off'.
+%   'diffonly' - ['on'|'off'] When subtracting datasets, ('on') do not plot 
+%                or ('off') do plot the ERP grand averages.
+%   'allerps'  - ['on'|'off'] Show all erps. {default: 'off'}
+%   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
+%   'multcmp'  - [integer] Correct for multiple comparisons. Enter the number
+%                of degrees of freedom (divides alpha by this number).
 % Output:
-%   erp1   - grand average (or rms) of dataset from 'datadd'
-%   erp2   - grand average (or rms) of dataset from 'datsub'
-%   erpsub - grand average (or rms) of subtraction
-%   times  - array of time indices
-%   sig    - significant values (array of 0 and 1 of the same size of
+%   erp1   - Grand average (or rms) of 'datadd' datasets
+%   erp2   - Grand average (or rms) of 'datsub' datasets
+%   erpsub - Grand average (or rms) 'datadd' minus 'datsub' difference
+%   times  - Array of epoch time indices
+%   sig    - Significance indicator (array of 0s and 1s of the same size as
 %            erp1 or erpsub).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2003
@@ -68,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/03/16 03:00:52  arno
+% Initial revision
+%
 
 function [erp1, erp2, erpsub, time, sig] = pop_comperp( ALLEEG, flag, chanadd, chansub, varargin);
 
