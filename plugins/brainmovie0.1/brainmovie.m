@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/04/22 22:31:20  arno
+% axis images for MRI plots
+%
 % Revision 1.41  2003/01/01 02:24:20  arno
 % searching why one component was invisible -> plotting error
 %
@@ -886,7 +889,7 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 		
                 tmpsize = g.diskscale*tmpsize;
 		if tmpsize > 0
-			circle( tmpcoord(1), tmpcoord(2), tmpsize, tmpcolor, 'k', 0, 360, dashed);
+			circle( tmpcoord(1), tmpcoord(2), tmpsize, tmpcolor, 'k', 0, 360, dashed, fastif(dashed, 2, 1));
 		end;
 return;
 
