@@ -1,25 +1,28 @@
-%  plottopo() - plot concatenated multichannel data epochs in a topographic format
-%               Uses a channel location file with the same format as topoplot() 
-%               or else plots data on a rectangular grid of axes.
+%  plottopo() - plot concatenated multichannel data epochs in a topographic or
+%               rectangular array. Uses a channel location file with the same 
+%               format as topoplot(), or else plots data on a rectangular grid. 
+%               If data are all positive, they are assumed to be spectra.
 % Usage:
 %    >> plottopo(data,'chan_locs')
 %    >> plottopo(data,[rows cols])
-%    >> plottopo(data,'chan_locs',frames,limits,title,channels,axsize,colors,ydir) 
+%    >> plottopo(data,'chan_locs',frames,limits,title,channels,...
+%                                            axsize,colors,ydir,vert) 
 %
 % Inputs:
 %   data       = data consisting of consecutive epochs of (chans,frames) 
 %  'chan_locs' = file of channel locations as in >> topoplot example   {grid}
-%                Else: [rows cols] grid size for location matrix. Example: [6 4]
-%   frames     = time frames/points per epoch {0 -> data length}
-%  [limits]    = [xmin xmax ymin ymax]  (x's in ms) 
-%                {0 (or both y's 0) -> use data limits)
-%  'title'     = plot title {0 -> none}
-%   channels   = vector of channel numbers to plot & label {0 -> all}
+%                ELSE: [rows cols] grid size for rectangular matrix. Example: [6 4]
+%   frames     = time frames (points) per epoch {def|0 -> data length}
+%  [limits]    = [xmin xmax ymin ymax]  (x's in ms or Hz) {def|0 
+%                 (or both y's 0) -> use data limits)
+%  'title'     = plot title {def|0 -> none}
+%   channels   = vector of channel numbers to plot & label {def|0 -> all}
 %                   else, filename of ascii channel-name file
 %   axsize     = [x y] axis size {default [.07 .07]}
 %  'colors'    = file of color codes, 3 chars per line  
 %                ( '.' = space) {0 -> default color order}
 %   ydir       = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
+%   vert       = [vector] of times (in ms or Hz) to plot vertical lines {def none}
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 3-2-98 
 %
@@ -45,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-11-98 added channels arg -sm
 % 7-15-98 added ydir arg, made pos-up the default -sm
@@ -57,9 +63,9 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-15-02 debuging chanlocs structure -ad & sm 
 
-function plottopo(data,chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr)
+function plottopo(data,chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
 
-if nargin < 1,
+if nargin < 1 | nargin > 10
     help plottopo
     return
 end
@@ -107,6 +113,13 @@ ls_plotfile = 'ls -l plottopo.ps';
 %
 %%%%%%%%%%%%%%% Substitute defaults for missing parameters %%%%%%%%%%%%%%%%
 %
+
+if nargin < 10
+   vert = [];
+end
+if vert==0
+   vert = [];
+end
 SIGN = DEFAULT_SIGN;
 if nargin < 9
    ydr = 0;
@@ -572,7 +585,25 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         end;
         axis([xmin xmax ymin ymaxm]);      % set axis values
       end
-     fprintf(' %d',c);
+      %
+      %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
+      %
+      if ~isnan(vert)
+       if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+        ymean = (ymin+ymax)/2; 
+        vmin = ymean-2/3*(ymean-ymin);
+        vmin = ymean+2/3*(ymax-ymean);
+        for v = vert
+          plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+        end
+       else
+        for v = vert
+          plot([v v],[0 ymax],'color',vertcolor); 
+        end
+       end
+      end
+
+     fprintf(' %d',c); % finished with channel plot
     end; % c, chans / subplot
   end; % P / epoch
   fprintf('\n');
