@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2003/08/12 16:52:55  arno
+% pwelch
+%
 % Revision 1.66  2003/08/11 15:37:16  arno
 % psd -> pwelch
 %
@@ -969,9 +972,9 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	end
     
     n = length(epoch_subset);
-	eegspecdB = eegspec/n; % convert power to dB
+	eegspecdB = eegspec/n; % normalize by the number of sections
     if n>1
-         specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % convert power to dB
+         specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % normalize standard deviation by the number of sections
     else specstd   = [];
     end;
 	return;
