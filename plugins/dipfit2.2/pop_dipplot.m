@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/10/31 19:00:41  arno
+% adding more options
+%
 % Revision 1.16  2003/10/29 16:37:44  arno
 % space in command
 %
@@ -163,11 +166,11 @@ if nargin < 3
     options = { options{:} 'image' fastif(result{ind} == 1, 'mri', 'besa') };
     if ~isempty(result{ind+1}), options = { options{:} 'rvrange' eval(  [ '[' result{ind+1} ']' ] ) }; end;
     if result{ind+2} == 1, options = { options{:} 'summary'   'on' }; end;
-    if result{ind+3} == 1, options = { options{:} 'normlen'   'on' }; end;
-    if result{ind+4} == 1, options = { options{:} 'drawedges' 'on' }; end;
-    if result{ind+5} == 1, options = { options{:} 'projimg'   'on' }; end;
-    if result{ind+6} == 1, options = { options{:} 'projlines' 'on' }; end;
-    if result{ind+7} == 1, options = { options{:} 'pointout'  'on' }; end;
+    if result{ind+3} == 1, options = { options{:} 'drawedges' 'on' }; end;
+    if result{ind+4} == 1, options = { options{:} 'projimg'   'on' }; end;
+    if result{ind+5} == 1, options = { options{:} 'projlines' 'on' }; end;
+    if result{ind+6} == 1, options = { options{:} 'pointout'  'on' }; end; 
+    if result{ind+7} == 1, options = { options{:} 'normlen'   'on' }; end;
     if ~isempty( result{ind+8} ), tmpopt = eval( [ '{' result{ind+8} '}' ] ); options = { options{:} tmpopt{:} }; end;
 else 
     options = varargin;
