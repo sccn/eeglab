@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2002/10/23 15:41:25  arno
+% typo
+%
 % Revision 1.177  2002/10/23 15:33:56  arno
 % put warning for chan edit
 %
@@ -724,6 +727,12 @@ function eeglab( onearg )
 eeg_options; 
 eeg_global;
 
+% for the history function
+% ------------------------
+comtmp = 'warning off MATLAB:mir_warning_variable_used_as_function';
+evalin('base'  , comtmp, '');
+evalin('caller', comtmp, '');
+    
 evalin('base', 'eeg_global;');
 if nargin < 1 | exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
