@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/08/28 00:42:57  arno
+% debugging if no arguments
+%
 % Revision 1.46  2002/08/27 23:34:00  arno
 % debugging xgrid
 %
@@ -1253,7 +1256,7 @@ else
     % update scaling eye if it exists
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
     if ~isempty(eyeaxes)
-      eyetext = findobj('type','text','parent',eyeaxes,'tag','thescale');
+      eyetext = findobj('type','text','parent',eyeaxes,'tag','thescalenum');
       set(eyetext,'string',num2str(g.spacing,4))
     end
     
@@ -1336,13 +1339,16 @@ else
     
     if ~isempty(obj)
 		toggle = get(obj,'checked');
+		eyeaxes = findobj('tag','eyeaxes','parent',figh);
+		children = get(eyeaxes,'children');
 		if strcmp(toggle,'on')
-			eyeaxes = findobj('tag','eyeaxes','parent',figh);
-			children = get(eyeaxes,'children');
-			delete(children)
+			set(children, 'visible', 'off');
+			set(eyeaxes, 'visible', 'off');
 			set(obj,'checked','off');
 			return;
 		else
+			set(children, 'visible', 'on');
+			set(eyeaxes, 'visible', 'on');
 			set(obj,'checked','on');
 		end;
 	end;
@@ -1352,7 +1358,7 @@ else
 	ESpacing = findobj('tag','ESpacing','parent',figh);
 	g.spacing= str2num(get(ESpacing,'string'));
 	
-	axes(eyeaxes); cla;
+	axes(eyeaxes); cla; axis off;
 	YLim = get(eyeaxes,'Ylim');
 	Xl = [.35 .65 .5 .5 .35 .65];
 	Yl = [ [g.spacing g.spacing g.spacing]*g.chans/g.dispchans 0 0 0] + 0.2;
@@ -1360,7 +1366,7 @@ else
 		 'tag','eyeline')
 	text(.5,YLim(2)/23+Yl(1),num2str(g.spacing,4),...
 		 'HorizontalAlignment','center','FontSize',10,...
-		 'tag','thescale')
+		 'tag','thescalenum')
 	if strcmp(YAXIS_NEG,'off')
         text(Xl(2)+.1,Yl(1),'+','HorizontalAlignment','left',...
 			 'verticalalignment','middle', 'tag', 'thescale')
@@ -1389,8 +1395,8 @@ else
       obj = findobj(gcf, 'style', 'pushbutton'); delete(obj);
       obj = findobj(gcf, 'style', 'edit'); delete(obj);
       obj = findobj(gcf, 'style', 'text'); 
-      objscale = findobj(obj, 'tag', 'thescale');
-      delete(setdiff(obj, objscale));
+      %objscale = findobj(obj, 'tag', 'thescale');
+      %delete(setdiff(obj, objscale));
  
 	case 'zoom' % if zoom
       fig = varargin{1};
