@@ -52,7 +52,18 @@
 %                      dividing their spacing. When cycles==0, frequency
 %                      spacing is (low_freq/padratio).
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
-%                      If cycles==0, all FFT frequencies are output. {50}
+%                     If cycles==0, all FFT frequencies are output. {50}
+%                     DEPRECATED, use 'freqs' instead,
+%       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
+%                     minfreq being determined by the number of data points, 
+%                     cycles and sampling frequency.
+%       'nfreqs'    = number of output frequencies. For FFT, closest computed
+%                     frequency will be returned. Overwrite 'padratio' effects
+%                     for wavelets. Default: use 'padratio'.
+%       'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                     Note that for obtaining 'log' spaced freqs using FFT, 
+%                     closest correspondant frequencies in the 'linear' space 
+%                     are returned.
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
 %                      baseline is used                              {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
@@ -141,6 +152,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/04/17 18:06:06  arno
+% adding newfig option
+%
 % Revision 1.22  2003/01/20 05:30:42  cooper
 % corrected ntrials in linear coher formula.
 %
@@ -510,6 +524,9 @@ try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
+try, g.freqs;      catch, g.freqs = [0 50]; end;
+try, g.nfreqs;     catch, g.nfreqs = []; end;
+try, g.freqscale;  catch, g.freqscale = 'linear'; end;
 try, g.vert;       catch, g.vert = []; end;
 try, g.newfig;     catch, g.newfig = 'on'; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
@@ -821,16 +838,6 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%
 % display text to user (computation perfomed only for display)
 %%%%%%%%%%%%%%%%%%%%%%
-wintime = 1000/g.srate*(g.winsize/2); % (1000/g.srate)*(g.winsize/2);
-times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
-if (g.cycles == 0) % FFT
-    freqs = g.srate/g.winsize*[1:2/g.padratio:g.winsize]/2;
-else % wavelet
-    freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
-end;
-dispf = find(freqs <= g.maxfreq);
-freqs = freqs(dispf);
-stp = (g.frame-g.winsize)/(g.timesout-1);
 fprintf('Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
     case 'phasecoher',  fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
@@ -840,16 +847,11 @@ end;
 fprintf('  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
 fprintf('Each trial contains samples from %d ms before to\n',g.tlimits(1));
 fprintf('  %d ms after the timelocking event.\n',g.tlimits(2));
-fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize,2*wintime);
-fprintf('The window is applied %d times at an average step\n',g.timesout);
-fprintf('  size of %g samples (%gms).\n',stp,1000*stp/g.srate);
-fprintf('Results are oversampled %d times; the %d frequencies\n',g.padratio,length(dispf));
-fprintf('  displayed are from %2.1f Hz to %3.1f Hz.\n',freqs(dispf(1)),freqs(dispf(end)));
+fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 2*1000/g.srate*g.winsize);
 if ~isnan(g.alpha)
   fprintf('Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
   fprintf('  non-significant values will be plotted in green\n');
 end
-fprintf('\nOf %d trials total, processing trial:',trials);
 
 % -----------------------------------------
 % detrend over epochs (trials) if requested
@@ -862,10 +864,10 @@ end;
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
 g.subitc = 'off';
-fprintf('\nProcessing trial (of %d):',trials);
 [alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
                                 'tlimits', g.tlimits, 'maxfreq', g.maxfreq, 'detrend', g.detret, 'itctype', ...
-                                g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], 'padratio', g.padratio); 
+                                g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
+                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 
 dispf     = find(freqs <= g.maxfreq);
 freqs = freqs(dispf);
 if size(alltfX,1) ~=length(dispf), alltfX = alltfX(dispf,:,:); R = R(dispf,:); end;
@@ -906,10 +908,10 @@ elseif ~isnan(g.alpha) & g.baseboot
           g.baseline,length(baseln))
 end
 if isnan(g.powbase)
-  fprintf('\nComputing the mean baseline spectrum\n');
+  fprintf('Computing the mean baseline spectrum\n');
   mbase = mean(P(:,baseln),2)';
 else
-  fprintf('\nUsing the input baseline spectrum\n');
+  fprintf('Using the input baseline spectrum\n');
   mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
@@ -1053,12 +1055,20 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           ersp_caxis = g.ERSP_CAXIS_LIMIT*[-1 1];
       end
 
-      if ~isnan( g.baseline ) 
-          imagesc(times,freqs(dispf),PP(dispf,:),ersp_caxis); 
-      else
-          imagesc(times,freqs(dispf),PP(dispf,:));
+      if ~strcmpi(g.freqscale, 'log')
+          if ~isnan( g.baseline ) 
+              imagesc(times,freqs(dispf),PP(dispf,:),ersp_caxis); 
+          else
+              imagesc(times,freqs(dispf),PP(dispf,:));
+          end;
+      else 
+          if ~isnan( g.baseline ) 
+              imagesclogy(times,newfreqs,PP(dispf,:),ersp_caxis); 
+          else
+              imagesclogy(times,newfreqs,PP(dispf,:));
+          end;
       end;
-      
+          
       hold on
       plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % plot time 0
       if ~isnan(g.marktimes) % plot marked time
@@ -1098,21 +1108,46 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       ylabel('dB')
 
       E = 10 * log10(mbase(dispf));
+
       h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                                % to left of ERSP image
-      if ~isnan(g.alpha)
-          plot(freqs(dispf),Pboot(dispf,:)'+[E;E],'LineWidth',g.linewidth)
+      if ~strcmpi(g.freqscale, 'log')
+          if ~isnan(g.alpha)
+              plot(freqs(dispf),Pboot(dispf,:)'+[E;E],'LineWidth',g.linewidth)
+          else
+              plot(freqs(dispf),E,'LineWidth',g.linewidth)
+          end
+          axis([freqs(1) freqs(max(dispf)) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          set(h(5),'TickLength',[0.020 0.025]);
+      
+          set(h(5),'View',[90 90])
+          tick = get(h(5),'YTick');
+          if (length(tick)>1)
+              set(h(5),'YTick',[tick(1) ; tick(end-1)])
+          end
+          set(h(5),'View',[90 90])
+          xlabel('Frequency (Hz)')
+          ylabel('dB')
       else
-          plot(freqs(dispf),E,'LineWidth',g.linewidth)
-      end
-
-      axis([freqs(1) freqs(max(dispf)) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          if ~isnan(g.alpha)
+              semilogx(freqs,Pboot(dispf,:)'+[E;E],'LineWidth',g.linewidth)
+          else
+              semilogx(freqs,E,'LineWidth',g.linewidth)
+          end
+          axis([freqs(1) freqs(max(dispf)) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+          set(h(5),'View',[90 90])
+          divs = linspace(log(freqs(1)), log(freqs(dispf(end))), 10);
+          set(gca, 'xtickmode', 'manual');
+          divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+                                                       % out-of border label with within border ticks
+          set(gca, 'xtick', divs);
+      end;
+      set(h(5),'TickLength',[0.020 0.025]);          
+      set(h(5),'View',[90 90])
       tick = get(h(5),'YTick');
       if (length(tick)>1)
           set(h(5),'YTick',[tick(1) ; tick(end-1)])
       end
-      set(h(5),'TickLength',[0.020 0.025]);
-      set(h(5),'View',[90 90])
       xlabel('Frequency (Hz)')
       ylabel('dB')
     end;
@@ -1143,11 +1178,20 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           coh_caxis = g.ITC_CAXIS_LIMIT*[-1 1];
       end
 
-      if exist('Rsign') & strcmp(g.plotphase, 'on')
-          imagesc(times,freqs(dispf),Rsign(dispf,:).*RR(dispf,:),coh_caxis); % <---
-      else
-          imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % <---
-      end
+      if ~strcmpi(g.freqscale, 'log')
+          if exist('Rsign') & strcmp(g.plotphase, 'on')
+              imagesc(times,freqs(dispf),Rsign(dispf,:).*RR(dispf,:),coh_caxis); % <---
+          else
+              imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % <---
+          end
+      else 
+          if exist('Rsign') & strcmp(g.plotphase, 'on')
+              imagesclogy(times,newfreqs,Rsign(dispf,:).*RR(dispf,:),coh_caxis); % <---
+          else
+              imagesclogy(times,newfreqs,RR(dispf,:),coh_caxis); % <---
+          end
+      end;
+
       if ~isempty(g.itcmax)
           caxis([-g.itcmax g.itcmax]);
       end;
@@ -1225,13 +1269,28 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       
       h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                                 % ITC left of the ITC image
-      if ~isnan(g.alpha)
-          plot(freqs(dispf),E,freqs(dispf),Rboot(dispf),'LineWidth',g.linewidth)
-          axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(dispf)'])+max(E)/3])
+      if ~strcmpi(g.freqscale, 'log')
+          if ~isnan(g.alpha)
+              plot(freqs(dispf),E,freqs(dispf),Rboot(dispf),'LineWidth',g.linewidth)
+              axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(dispf)'])+max(E)/3])
+          else
+              plot(freqs(dispf),E,'LineWidth',g.linewidth)
+              axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3])
+          end
       else
-          plot(freqs(dispf),E,'LineWidth',g.linewidth)
-          axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3])
-      end
+          if ~isnan(g.alpha)
+              semilogx(freqs(dispf),E,freqs(dispf),Rboot(dispf),'LineWidth',g.linewidth)
+              axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(dispf)'])+max(E)/3])
+          else
+              semilogx(freqs(dispf),E,'LineWidth',g.linewidth)
+              axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3])
+          end
+          divs = linspace(log(freqs(1)), log(freqs(dispf(end))), 10);
+          set(gca, 'xtickmode', 'manual');
+          divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+                                                       % out-of border label with within border ticks
+          set(gca, 'xtick', divs);
+      end;
 
       tick = get(h(11),'YTick');
       set(h(11),'YTick',[tick(1) ; tick(length(tick))])
