@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/03 16:26:27  arno
+% debugging extension
+%
 % Revision 1.9  2002/09/23 16:43:48  arno
 % [Aimplementing saving as float
 %
@@ -172,7 +175,7 @@ if mode == 0  % single datasets
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
 			eval(command);
-			floatwrite( tmpdata, EEG.data, 'ieee-le');
+			floatwrite( tmpdata, [EEG.filepath EEG.data], 'ieee-le');
 		catch, 
 			error('Pop_saveset: saving error, check permission on file or directory');
 		end;
@@ -232,7 +235,7 @@ else
 			tmpdata = ALLEEG(index).data;
 			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
 			try, 
-				floatwrite( tmpdata, ALLEEG(index).data, 'ieee-le');
+				floatwrite( tmpdata, [ curfilepath ALLEEG(index).data], 'ieee-le');
 			catch, 
 				error('Pop_saveset: saving error, check permission on file or directory');
 			end;
