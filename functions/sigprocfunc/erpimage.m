@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2003/07/15 18:01:05  scott
+% trial number -> trials throughout
+%
 % Revision 1.103  2003/05/06 17:31:29  arno
 % debug Rmerp
 %
@@ -1034,7 +1037,7 @@ if exist('phargs')
 	if phargs(3) > srate/2
 		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
 	end
-    %DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
+    % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
 		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				phargs(3),DEFAULT_CYCLES);
@@ -1453,7 +1456,7 @@ end
 %%%%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-urdata = data; % compute amp, coher on unsmoothed data
+urdata = data; % save data to compute amp, coher on unsmoothed data
 if ~Allampsflag & ~exist('data2') % if imaging potential,
     if avewidth > 1 | decfactor > 1
         if Nosort == YES
@@ -1464,11 +1467,28 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
         end
         fprintf('\n');
         fprintf('  and a decimation factor of %g\n',decfactor);
-        [data,outtrials]    = movav(data,1:ntrials,avewidth,decfactor); 
-        % Note: movav here sorts using square window
-        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+        if ~exist('phargs') % if not phase-sorted trials
+           [data,outtrials]    = movav(data,1:ntrials,avewidth,decfactor); 
+           % Note: movav here sorts using square window
+           [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+        else % if phase-sorted trials
+           halfwidth = ceil(avewidth/2);
+           [data,outtrials]    = movav([data(:,(end-halfwidth):end) ...
+                                        data,...
+                                        data(:,1:(halfwidth-1)), ...
+                        1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
+           % Note: movav here sorts using square window
+           [outsort,outtrials] = movav(sortvar,1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
+        end
         if ~isempty(auxvar)
+          if ~exist('phargs') % if not phase-sorted trials
             [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
+          else % if phase-sorted trials
+            [auxvar,tmp] = movav([auxvar(:,(end-halfwidth):end) ...
+                                        auxvar,...
+                                        auxvar(:,1:(halfwidth-1)), ...
+                           1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
+          end
         end
         fprintf('Output data will be %d frames by %d smoothed trials.\n',...
                 frames,length(outtrials));
@@ -1558,7 +1578,7 @@ else
 	coherfreq = coherfreq(1);
 end
 
-if ~Allampsflag & ~exist('data2') %%%%%%%%%%%%%%% Plot ERP image %%%%%%%%%%%%%%
+if ~Allampsflag & ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
 
     if strcmpi(noshow, 'no')
         if TIMEX
