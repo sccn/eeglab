@@ -1,144 +1,135 @@
-% eegplot() - Horizontally (and/or vertically) scroll through multichannel data.
+% eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
 %             This version (3) allows vertical scrolling through channels and
 %             manual marking/unmarking of portions of the data for rejection.
 % Usage: 
-%           >> eegplot(data, 'key1', value1 ...);
+%           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
 %      else
-%           >> eegplot('noui', data, 'key1', value1 ...);
+%           >> eegplot('noui', data, 'key1', value1 ...); % no user interface
 %
-% Graphical interface:
-%   "Figure > print" - [menu] Use to print figure in portrait or landscape.
-%   "Figure > Edit figure" - [menu] remove menus and buttons and call back the 
-%                  standard Matlab figure menu. Use Tools > Edit to format the figure
-%                  for publication. Use the 'noui' option to obtain the same effect 
-%                  from the command line.
-%   "Figure > Accept and Close" - [menu] Same as bottom right button "Reject". 
-%   "Figure > Cancel and Close" - [menu] Same as "Cancel" bottom. Cancel all editing.
-%   "Display > Marking color > [Hide marks|Show marks]" - [menu] show or hide marks 
-%                  on the EEG background. Mark portions of continuous EEG data 
-%                  by draging the mouse horizontally over the main activity 
-%                  plot. For EEG data epochs, simply click on the selected epochs.
-%                  Clicked on the marked region to remove the marks. If the function
-%                  is called from the command line, the marks are returned in the TMPREJ
-%                  variable in the global workspace when the "Reject" button
-%                  is pressed (see outputs). If the function is called from
-%                  pop_eegplot() or eeglab(), the current dataset is automatically 
-%                  updated.
-%    "Display > Marking color > Choose color" - [menu] change the color for marking
-%                  trials. Color of previously marked trials is preserved. If
-%                  the function is called from command line, the functions
-%                  eegplot2event() or eegplot2trials() allow to process the trials 
-%                  marked with different colors in the TMPREJ output variable. Use the 
-%                  'wincolor' parameter from the command line to select the marking
-%                  color at startup.
-%    "Display > Grid > ..." - [menu] toggle on or off the grid for the time axis or
-%                  the channel axis in the activity plot. Submenus alow allow to
-%                  modify the grid's aspect. Use the 'xgrid' and 'ygrid' parameter from
-%                  the command line to toggle on or off the grids at startup.
-%    "Display > Show scale" - [menu] show or hide the scale on the bottom right corner
-%                  of the activity window. Use the 'scale' parameter from the command
-%                  line to toggle on or off the scale at startup.
-%    "Display > Title" - [menu] change the title of the figure.
-%    "Settings > Time range to display" - [menu] for continuous EEG data, this menu 
-%                  pops up a query window for entering the number of second to show
-%                  in the main activity window. For EEG data epochs, the query window
-%                  ask for the number of epochs to display (can be fractional). Use
-%                  the 'winlength' command line parameter to specify length at startup.
-%    "Settings > Number of channels to display" - [menu] Number of channels to display
-%                  in the main activity window. Use the 'dispchans' command line 
-%                  parameter to specify number of channels to display at startup. If not
-%                  all channels are visible, you can scroll through them using the slidder 
-%                  on the left of the main activity plot. 
-%    "Settings > Channel labels > ..." - [menu] use numbers for channel labels or load
-%                  a channel location file on disk. See also the 'eloc_file' input
-%                  parameter from the command line.
-%    "Settings > Zoom on/off" - [menu] toggle on or off zoom for the time axis, the 
-%                  electrode axis or both. Simply left click to zoom x2 and right click
-%                  to unzoom. You might also draw a rectange in the main activity window
-%                  to zoom over that region. When the zoom is on, EEG data can not be
-%                  marked for rejection.
-%    "Main activity plot" - [plotting window] this window contain the channel activity.
-%                  The time axis depict time in second for continuous data. For data
-%                  epochs, the axis label contain time tags within each epoch.
-%    "Cancel" - [button] close the window and cancel all editing.
-%    "<<" - [button] scroll backward though time or epoch by one window length.
-%    "<" - [button] scroll backward though time or epoch by 1/5 of window length.
-%    "Navigation edit box" - [edit box] enter a number here to jump to that time or
-%                  epoch.
-%    ">" - [button] scroll forward though time or epoch by 1/5 of window length.
-%    ">>" - [button] scroll forward though time or epoch by one window length.
-%    "Elec Time Value" - [text] when the mouse is within the main activity plot window,
-%                  indicate which electrode, time and activity the mouse is pointing to.
-%    "Amplitude edit box" - [edit box] indicate the current the amplitude in unit of
-%                  activity. Use command line parameter 'spacing' to specify amplitude
-%                  at startup.
-%    "+ and -" - [buttons] use these button to increase/decrease the scale by 10%. 
-%    "Reject" - [button] When pressed, accept modifications and close the figure; the 
-%                  optional input parameter 'command' is evaluated at that time. Note that
-%                  this button label might also be redefined at stratup using the 'butlabel'
-%                  command line parameter.
-%
-% Required Input:
-%    data         - Input data matrix, either continuous 2-D (channels,timepoints) or 
-%                    epoched 3-D (channels,timepoints, epochs) data. If the data matrix 
-%                    is preceded by keyword 'noui', GUI control elements are omitted
-%                    (Use the 'noui' mode to plot data for presentation).
-%
-% Optional inputs:
+% Menu items:
+%    Figure > print - [menu] Print figure in portrait or landscape.
+%    Figure > Edit figure - [menu] Remove menus and buttons and call up the standard
+%                  Matlab figure menu. Select "Tools > Edit" to format the figure
+%                  for publication. Command line equivalent: 'noui' 
+%    Figure > Accept and Close - [menu] Same as the bottom-right "Reject" button. 
+%    Figure > Cancel and Close - [menu] Cancel all editing, same as the "Cancel" button. 
+%    Display > Marking color > [Hide|Show] marks - [menu] Show or hide patches of 
+%                  background color behind the data. Mark stretches of *continuous* 
+%                  data (e.g., for rejection) by dragging the mouse horizontally 
+%                  over the activity. With *epoched* data, click on the selected epochs.
+%                  Clicked on a marked region to unmark it. Called from the
+%                  command line, marked data stretches or epochs are returned in 
+%                  the TMPREJ variable in the global workspace *if/when* the "Reject" 
+%                  button is pressed (see Outputs); called from pop_eegplot() or 
+%                  eeglab(), the marked data portions are removed from the current
+%                  dataset, and the dataset is automatically updated.
+%    Display > Marking color > Choose color - [menu] Change the background marking 
+%                  color. The marking color(s) of previously marked trials are preserved. 
+%                  Called from command line, subsequent functions eegplot2event() or 
+%                  eegplot2trials() allow processing trials marked with different colors 
+%                  in the TMPREJ output variable. Command line equivalent: 'wincolor'.
+%     Display > Grid > ... - [menu] Toggle (on or off) time and/or channel axis grids 
+%                  in the activity plot. Submenus allow modifications to grid aspects.
+%                  Command line equivalents: 'xgrid' / 'ygrid' 
+%     Display > Show scale - [menu] Show (or hide ???) the scale on the bottom right corner
+%                  of the activity window. Command line equivalent: 'scale' 
+%     Display > Title  - [menu] Change the title of the figure. Command line equivalent:
+%                  'title'
+%     Settings > Time range to display  - [menu] For continuous EEG data, this item 
+%                  pops up a query window for entering the number of seconds to display
+%                  in the activity window. For epoched data, the query window asks
+%                  for the number of epochs to display (this can be fractional). 
+%                  Command line equivalent: 'winlength'
+%     Settings > Number of channels to display - [menu] Number of channels to display
+%                  in the activity window.  If not all channels are displayed, the 
+%                  user may scroll through channels using the slider on the left 
+%                  of the activity plot. Command line equivalent: 'dispchans'
+%     Settings > Channel labels > ...  - [menu] Use numbers as channel labels or load
+%                  a channel location file from disk. Command line equivalent: 'eloc_file' 
+%[??? from disk? what if the dtaset has channel labels specified???]
+%    "Settings > Zoom on/off" - [menu] Toggle Matlab figure zoom on or off (for time and/or
+%                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
+%                  Else, draw a rectange in the activity window to zoom the display into 
+%                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
+% Display window:
+%    "Activity plot" - [main window] This axis displays the channel activities.  For 
+%                  continuous data, the time axis shows time in seconds. For epoched
+%                  data, the axis label shows time tags within each epoch.
+%[??? does this include events?]
+%    "Cancel" - [button] Closes the window and cancels any data rejection marks.
+%    "<<" - [button] Scroll backwards though time or epochs by one window length.
+%    "<"  - [button] Scroll backwards though time or epochs by 0.2 window length.
+%    "Navigation edit box" - [edit box] Enter a starting time or epoch to jump to.
+%    ">"  - [button] Scroll forward though time or epochs by 0.2 window length.
+%    ">>" - [button] Scroll forward though time or epochs by one window length.
+%    "Chan/Time/Value" - [text] If the mouse is within the activity window, indicates
+%[??? Elec -> Chan ???]
+%                  which channel, time, and activity value the cursor is closest to.
+%    "Scale edit box" - [edit box] Scales the displayed amplitude in activity units.
+%[??? Amplitude -> Scale ???]
+%                  Command line equivalent: 'spacing' 
+%    "+ / -" - [buttons] Use these buttons to +/- the amplitude scale by 10%. 
+%    "Reject" - [button] When pressed, save rejection marks and close the figure. 
+%                  Optional input parameter 'command' is evaluated at that time. 
+%                  NOTE: This button's label can be redefined from the command line
+%                  using the keyword 'butlabel'
+% Required input:
+%    data        - Input data matrix, either continuous 2-D (channels,timepoints) or 
+%                  epoched 3-D (channels,timepoints,epochs). If the data is preceded 
+%                  by keyword 'noui', GUI control elements are omitted (useful for 
+%                  plotting data for presentation). A set of power spectra at
+%                  each channel may also be plotted (see 'freqlimits' below).
+% Optional keywords:
 %    'srate'      - Sampling rate in Hz {default|0: 256 Hz}
 %    'spacing'    - Display range per channel (default|0: max(data)-min(data))
 %    'eloc_file'  - Electrode filename (as in  >> topoplot example) to read
 %                    ascii channel labels. Else,
-%                    [vector of integers] -> Show specified channel numbers
-%                    [] -> Do not show channel labels 
-%                    {default|0 -> Show channel numbers [1:nchans]}
-%    'limits'     - [start end] Time limits for each epoch.
-%    'freqlimits' - [start end] Frequency limits for each epoch if plotting spectrum of
-%                   epoch instead of data (data has to contain spectral values).
+%                    [vector of integers] -> Show specified channel numbers, else
+%                    [] -> Do not show channel labels {default|0 -> Show [1:nchans]}
+%    'limits'     - [start end] Time limits for each epoch (??? in ms ???).
+%    'freqlimits' - [start end] If plotting epoch spectra instead of data, frequency 
+%                   limits of the display. (Data should contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
-%    'dispchans'  - [integer] Number of channels to display in the main activity
-%                   window {default: 32}
-%                    If < number of channels a vertical slider will allow scrolling. 
+%    'dispchans'  - [integer] Number of channels to display in the activity window 
+%                   {default: 32}.  If < number of channels, a vertical slider 
+%                   on the left side of the figure will allow vertical scrolling. 
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
-%
-% Other available inputs:
-%    'command'    - Matlab command to evaluate when the 'REJECT' button is clicked 
-%                    (see Outputs below). The 'REJECT' button is displayed only when 
-%                    'command' is non-empty.
-%    'butlabel'   - reject button label. Default is REJECT.
+% Additional keywords:
+%    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
+%                   clicked (see Outputs below). The 'REJECT' button is active only 
+%               ??? when 'command' is specified with a non-empty argument string. ???
+%    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
 %                    for rejection, each row indicating a different period. 
-%                    [start end] Period limits; [R G B] Marking color; 
-%                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
-%                    to reject (1); its length must be the number of data channels. 
-%    'color'      - ['on'|'off'|cell array] Plot channels with different colors {default:
-%                   'off'}. 
-%                   Entering a nested cell array, channels will be plotted using cell 
-%                   array colors elements. {default: 'off'}. 
-%    'wincolor'   - [color] color used when selecting EEG.
-%    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
-%    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
+%                    [start end] period limits (in ???frames from 0???); [R G B] gives the marking color; 
+%                    [e1 e2 e3 ...] a (1,nchans) logical [0|1] vector telling which 
+%                    channels to reject (1). 
+%    'color'      - ['on'|'off'|cell array] Plot channels with different colors 
+%                   Entering a ???nested cell array???, channels will be plotted using cell 
+%                   array color elements. {default: 'off'}. 
+%    'wincolor'   - [color] Color mark data stretches or epochs  {default: ???}
+%    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
+%    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
 %    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
 %                    keeping track of several simultaneous eegplot() windows). 
-%    'children'   - [integer] Figure handle of a dependant eegplot() window. Scrolling
-%                    horizontally in the master window will produce the same effect in the
-%                    dependent window. Allows comparison of two concurrent data types.
-%    'scale'      - ['on'|'off'] display scale { default: 'on'}.
-%
+%    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
+%                    horizontally in the master window will produce the same scroll in 
+%                    the dependent window. Allows comparison of two concurrent datasets.
+%    'scale'      - ['on'|'off'] Display the amplitude scale { default: 'on'}.
 % Outputs:
-%    TMPREJ       - Matrix with same format as 'winrej' set as a variable in
-%                    the global workspace when the REJECT button is clicked. 
-%                    The command specified in the 'command'-flag argument can use this 
-%                    variable. (See eegplot2trial() and eegplot2event()). 
+%    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
+%                    the global workspace (only) when the REJECT button is clicked. 
+%                    The command specified in the 'command' keyword argument can use 
+%                    this variable. (See eegplot2trial() and eegplot2event()). 
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/UCSD , 1998-2001
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
 
 % deprecated 
-%    'colmodif'   - nested cell array of window colors that can be marked/unmarked. Default
+%    'colmodif'   - nested cell array of window colors that may be marked/unmarked. Default
 %                   is current color only.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -160,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2003/02/20 18:35:02  arno
+% adding interface description and new menu option to edit figure
+%
 % Revision 1.70  2003/02/17 03:04:57  arno
 % typo in header
 %
