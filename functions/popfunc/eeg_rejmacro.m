@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 include past rejections in eegplot -ad
@@ -53,9 +56,11 @@ com2 = [ 'if ~isempty(TMPREJ), [tmprej tmprejE] = eegplot2trial(TMPREJ,' ...
          macrorej '= tmprej;' macrorejE '= tmprejE2;' ];
 if reject
 	if ~exist('icacomp'), icacomp = typerej; end;
-    com2 = [com2 sprintf('%s = pop_rejepoch(%s, tmprej, 1); eeg_store; eeg_updatemenu; end;', inputname(1), inputname(1)); ] ;
+    com2 = [com2 sprintf(['%s = pop_rejepoch(%s, tmprej, 1);' ...
+		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);' ...
+	       'eeglab(''redraw''); end;'], inputname(1), inputname(1)); ] ;
 else
-	com2 = [com2 ' eeg_store(CURRENTSET); eeg_updatemenu; end;' ];
+	com2 = [com2 '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
 
 if ~exist('topcommand')
