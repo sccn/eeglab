@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/06 01:20:04  arno
+% more editing, title mainly
+%
 % Revision 1.3  2002/04/06 01:09:19  arno
 % increasing font size
 %
@@ -141,14 +144,14 @@ for index = 1:length( textmenu )
         commands = { commands{:} [] };
     end;
     if ~isempty(commands{index})
-        a = [ a ' -- ' commands{index}];
+        a = [ a ' -- ' commands{index} '()'];
         textmenu(index, 1:length(a)) = a;
         commands{index} = [ 'pophelp(''' commands{index} ''');' ];
     end;
 end;
 
 textmenu = strvcat('Functions called through the EEGLAB menu', ...
-		   '(Click on blue text for help)', ' ', ...
+		   '(For help message, click on blue text below)', ' ', ...
 		   textmenu(1:end-1,:));
 fontsize   = { 16 15 15 fontsize{:} };
 fontweight = { 'bold' 'normal' 'normal' fontweight{:} };
