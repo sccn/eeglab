@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/07/18 01:27:17  scott
+% debug
+%
 % Revision 1.48  2003/07/18 01:26:05  scott
 % debug
 %
@@ -535,8 +538,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   cla  % clear current axis
   hold on
   set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
-  pos = get(gca,'position');
-  fprintf('Current axes size %g,%g\n',pos(3),pos(4));
+  % pos = get(gca,'position');
+  % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(STYLE,'contour')
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
@@ -566,8 +569,8 @@ else % if style 'blank'
    cla
    hold on
    set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
-   pos = get(gca,'position');
-   fprintf('Current axes size %g,%g\n',pos(3),pos(4));
+   % pos = get(gca,'position');
+   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(ELECTRODES,'labelpoint') |  strcmp(ELECTRODES,'numpoint')
     text(-0.6,-0.6, ...
