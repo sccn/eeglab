@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/08 21:52:51  arno
+% checking event description consistency
+%
 % Revision 1.3  2002/04/08 20:49:26  arno
 % add check for the comments field
 %
@@ -427,12 +430,27 @@ if ~isempty( varargin)
 	                    end;
                     end;
                 end;
-                                             
+				
+				% remove the events which latency are out of boundary
+				% ---------------------------------------------------
+				if isfield(EEG.event, 'latency')
+					try, alllatencies = cell2mat( { EEG.event.latency } );
+					catch, error('Checkset: error empty latency entry for new events added by user');
+					end;
+					I1 = find(alllatencies < 0);
+					I2 = find(alllatencies > EEG.pnts*EEG.trials);
+					if (length(I1) + length(I2)) > 0 
+						fprintf('Checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
+								length(I1) + length(I2), length(EEG.event));
+						EEG.event(union(I1, I2)) = [];
+					end;
+				end;
+				
 				% save information for non latency fields updates
 				% -----------------------------------------------
 				difffield = [];
 				if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
-                    % remove fields with empty epochs
+					% remove fields with empty epochs
                     % -------------------------------
                     removeevent = [];
 				    for indexevent = 1:length(EEG.event)
