@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/03/18 00:27:53  arno
+% adding help button
+%
 % Revision 1.3  2003/03/17 23:42:31  arno
 % adding lots of options
 %
@@ -194,7 +197,7 @@ end;
 % optional: subtract
 % ------------------
 colors = {}; % color aspect for curves
-if length(datsub) > 1
+if length(datsub) > 0
     for index = 1:length(datsub)
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)));
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
