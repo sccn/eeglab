@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/10/15 23:42:31  arno
+% error if no delimiter for last character of directory
+%
 % Revision 1.13  2002/10/15 16:59:57  arno
 % drawnow for windows
 %
@@ -113,7 +116,7 @@ else
 	mode = 0; % single datasets
 end;
 
-if nargin < 2
+if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
 	% ask user
 	if mode == 1 % multiple datasets
 		indices = [];
@@ -135,8 +138,15 @@ if nargin < 2
 else 
 	if mode == 1
 		indices = inarg;
+        if nargin < 4
+            curfilepath = '';
+        end;
 	else
-		curfilepath = curfilename;
+        if nargin < 3
+            curfilepath ='';
+        else 
+            curfilepath = curfilename;
+        end;
 		curfilename = inarg;
 	end;
 end;
@@ -156,7 +166,7 @@ end;
 if mode == 1 & ( length(curfilename)<=4 | ~strcmp(lower(curfilename(end-4:end)), '.sets'))
 	if length(curfilename)>3 & strcmp(lower(curfilename(end-3:end)), '.set')
 		disp('Changing file extension to ''.sets''');
-		curfilename = [ curfilename '.s' ];
+		curfilename = [ curfilename 's' ];
 	else
 		disp('Adding ''.sets'' extension to the file');
 		curfilename = [ curfilename '.sets' ];
