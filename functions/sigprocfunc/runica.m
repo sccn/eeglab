@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/12/11 17:51:11  arno
+% stoping rule debug if more than 32 channels
+%
 % Revision 1.12  2003/10/23 15:48:45  arno
 % indents
 %
@@ -578,6 +581,7 @@ if isnan(nochange)
         nochange = 1E-7;
         nochangeupdated = 1; % for fprinting purposes
     else
+        nochangeupdated = 1; % for fprinting purposes
         nochange = DEFAULT_STOP;
     end;
 else 
