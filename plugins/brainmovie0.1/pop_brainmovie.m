@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/20 01:42:12  arno
+% debugging
+%
 % Revision 1.5  2002/11/20 01:10:48  arno
 % header update
 %
@@ -282,6 +285,10 @@ if strcmpi(g.mode, 'mriside')
     for index = 1:nbconditions
         alltittles{index} = sprintf('Condition %d', index);
     end;
+    if strcmpi(g.diffmovie, 'on')
+        alltitles{3} = 'Cond1 - Cond2';
+    end
+    alltitles = strvcat(alltitles{:});
     alltittles = strvcat(alltitles{:});
     if isempty(g.coordinates)
         if ~isfield(ALLEEG, 'sources')
@@ -309,7 +316,7 @@ if strcmpi(g.mode, 'mriside')
                         'crossfphaseunit', 'radian', ...
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
-                        'condtitle', alltittles(1:nbconditions,:) };
+                        'condtitle', alltittles };
 elseif strcmpi(g.mode, 'mritop')
     
     % ------------------
@@ -319,6 +326,9 @@ elseif strcmpi(g.mode, 'mritop')
         alltittles{index} = sprintf('Condition %d', index);
     end;
     alltittles = strvcat(alltitles{:});
+    if strcmpi(g.diffmovie, 'on')
+        alltitles{3} = 'Cond1 - Cond2';
+    end
     
     if isempty(g.coordinates)
         if ~isfield(ALLEEG, 'sources')
@@ -347,11 +357,11 @@ elseif strcmpi(g.mode, 'mritop')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
-                        'condtitle', alltittles(1:nbconditions,:) };
+                        'condtitle', alltittles };
 else 
-    % ------------
-    % custom movie
-    % ------------
+    % ----------------------------------------------------------------
+    % custom movie -> g.movparams contains cell array of movie options
+    % ----------------------------------------------------------------
     brainmovieoptions = { 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
@@ -380,7 +390,7 @@ if ~isempty(g.eventprob)
     brainmovieoptions = { brainmovieoptions{:} 'rt' eventcellarray };
 end;
 %if strcmp(g.oneframe, 'on')
-%   brainmovieoptions = { 'frames' [1 2] };
+%   brainmovieoptions = { brainmovieoptions{:} 'frames' [1 2] };
 %end;
 
 % BRAINMOVIE 
@@ -423,7 +433,7 @@ if ~strcmpi(g.mode, 'compute')
             cd(origdir);
         end;
         if length(g.freqindices) > 1, outname = g.moviename;
-        else                          outname = sprintf('%s3.2f', g.moviename, freqs(g.freqindices(freqindex)));
+        else                          outname = sprintf('%s%3.2f', g.moviename, freqs(g.freqindices(freqindex)));
         end;
         g.makemovie = removedup({ 'mode' 'fast' g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
         makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
