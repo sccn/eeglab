@@ -3,7 +3,7 @@
 %             manual marking/unmarking of portions of the data for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...);
-%    else
+%      else
 %           >> eegplot('noui', data, 'key1', value1 ...);
 %
 % Required Input:
@@ -14,14 +14,14 @@
 % Optional inputs:
 %    'srate'      - Sampling rate in Hz {default|0: 256 Hz}
 %    'spacing'    - Display range per channel (default|0: max(data)-min(data))
-%    'eloc_file'  - Electrode filename as in  >> topoplot example
-%                    Ascii channel labels (read from the eloc_file) are shown.
+%    'eloc_file'  - Electrode filename (as in  >> topoplot example) to read
+%                    ascii channel labels. Else,
 %                    [vector of integers] -> Show specified channel numbers
 %                    [] -> Do not show channel labels 
 %                    {default|0 -> Show channel numbers [1:nchans]}
 %    'limits'     - [start end] Time limits for each epoch.
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
-%    'elecwin'    - [integer] Number of channels to display in window {default: 32}    ???
+%    'dispchans'  - [integer] Number of channels to display in window {default: 32}    ???
 %                    If < number of channels a vertical slider will allow scrolling. 
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off']
@@ -31,30 +31,31 @@
 %    'command'    - Matlab command to evaluate when the 'REJECT' button is clicked 
 %                    (see Outputs below). The 'REJECT' button is displayed only when 
 %                    'command' is non-empty.
-%    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark, 
-%                    each row indicating a different period. [start end] Window limits;
-%                    [R G B] Marking color; [e1 e2 e3 ...] Logical vector [0|1] 
-%                    indicating rejected channels (1=rejected) -- its length must be 
-%                    the number of data channels. 
+%    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
+%                    for rejection, each row indicating a different period. 
+%                    [start end] Period limits; [R G B] Marking color; 
+%                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
+%                    to reject (1); its length must be the number of data channels. 
 %    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
 %    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
-%    'tag'        - Matlab object tag to identify the EEGPLOT window (allow to have several
-%                   EEGPLOT windows active simulatenously)
-%    'freq'       - Maximum frequency when plotting frequencies (instead of activities).
-%                   This number is only used for the scale of the ordinate axis.
-%    'children'   - Window handler of a dependant eegplot() window {0}. The dependant 
-%                   window follows horizontal time scrolls of the master window.
+%    'tag'        - [string] Matlab object tag to identify this eegplot() window (allows 
+%                    keeping track of several simultaneous eegplot() windows). 
+%    'children'   - [integer] Figure handle of a dependant eegplot() window. Scrolling
+%                    horizontally in the master window will produce the same effect in the
+%                    dependent window. Allows comparison of two concurrent data types.
 % Outputs:
-%    TMPREJ       - [integer vector] Indices of rejected epochs (given as a variable in
-%                    the global workspace when the EEGPLOT window is closed). When the user 
-%                    clicks the 'REJECT' button, the 'command'-argument command can use this 
-%                    variable to perform  various operations. (Use eegplot2trial() and 
-%                    eegplot2event() to convert between rejected data types).
+%    TMPREJ       - Matrix with same format as 'winrej' set as a variable in
+%                    the global workspace when the REJECT button is clicked. 
+%                    The command specified in the 'command'-flag argument can use this 
+%                    variable. (See eegplot2trial() and eegplot2event()). 
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/UCSD , 1998-2001
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
+
+%    'freq'       - Maximum frequency when plotting frequencies (instead of activities).
+%                   This number is only used for the scale of the ordinate axis.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -75,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/06/26 22:12:30  arno
+% debugging slider and editing
+%
 % Revision 1.9  2002/06/26 21:29:14  arno
 % editing header
 %
@@ -195,7 +199,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;			   catch, g.limits	    = [0 1]; end;
-   try, g.elecrange; 		catch, g.elecrange = min(32, size(data,1)); end;
+   try, g.dispchans; 		catch, g.dispchans = min(32, size(data,1)); end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -206,7 +210,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag' 'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
-               'freq' 'submean' 'children' 'limits' 'elecrange' },;
+               'freq' 'submean' 'children' 'limits' 'dispchans' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -254,8 +258,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	   case 'off', g.color = { 'k' };  
 	   otherwise disp('Error: color must be either ''on'' or ''off'''); return;
    end;	
-	if length(g.elecrange) > size(data,1)
-		g.elecrange = size(data,1);
+	if length(g.dispchans) > size(data,1)
+		g.dispchans = size(data,1);
    end;
    
    [g.chans,g.frames, tmpnb] = size(data);
@@ -403,7 +407,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    'sliderstep', [0.9 1], ...
    'Tag','eegslider', ...
    'callback', [ 'tmpg = get(gcbf, ''userdata'');' ... 
-   				'tmpg.elecoffset = get(gcbo, ''value'')*(tmpg.chans-tmpg.elecrange);' ...
+   				'tmpg.elecoffset = get(gcbo, ''value'')*(tmpg.chans-tmpg.dispchans);' ...
                'set(gcbf, ''userdata'', tmpg);' ...
                'eegplot(''drawp'',0);' ...
                'clear tmpg;' ], ...
@@ -852,7 +856,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   end 
   
   eegplot('drawp', 0);
-  if g.elecrange ~= g.chans
+  if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
   end;  
   
@@ -948,7 +952,7 @@ else
 		'XTick',[0:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier])
 
     % ordinates: even if all elec are plotted, some may be hidden
-    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     eegplot('drawb');
 	
 	 if g.children ~= 0
@@ -1038,7 +1042,7 @@ else
     end;
     		
     % ordinates: even if all elec are plotted, some may be hidden
-    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
     axes(ax1)	
 
@@ -1068,7 +1072,7 @@ else
     set(gcf, 'userdata', g);
 	 eegplot('drawp', 0);
     set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
-    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.elecrange+1)*g.spacing] );
+    set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
     % update scaling eye if it exists
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
@@ -1094,12 +1098,12 @@ else
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-	result = inputdlg( { 'Enter number of electrodes to show:' } , 'Change number of electrode to show', 1,  { num2str(g.elecrange) });
+	result = inputdlg( { 'Enter number of electrodes to show:' } , 'Change number of electrode to show', 1,  { num2str(g.dispchans) });
 	if size(result,1) == 0 return; end;
 
-   g.elecrange = eval(result{1});
-   if g.elecrange<0 | g.elecrange>g.chans
-      g.elecrange =g.chans;
+   g.dispchans = eval(result{1});
+   if g.dispchans<0 | g.dispchans>g.chans
+      g.dispchans =g.chans;
    end;
 	set(gcf, 'UserData', g);
    eegplot('updateslidder', fig);
@@ -1230,7 +1234,7 @@ else
       % deal with ordinate
       % ------------------
       g.elecoffset = tmpylim(1)/g.spacing;
-      g.elecrange  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
+      g.dispchans  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
          
       set(fig,'UserData', g);
       eegplot('updateslidder', fig);
@@ -1243,8 +1247,8 @@ else
       if g.elecoffset < 0
          g.elecoffset = 0;
       end;
-      if g.elecrange >= g.chans
-         g.elecrange = g.chans;
+      if g.dispchans >= g.chans
+         g.dispchans = g.chans;
          g.elecoffset = 0;
          set(slidder, 'visible', 'off');
       else
@@ -1253,12 +1257,12 @@ else
       if g.elecoffset < 0
          g.elecoffset = 0;
       end;
-      if g.elecoffset > g.chans-g.elecrange
-         g.elecoffset = g.chans-g.elecrange;
+      if g.elecoffset > g.chans-g.dispchans
+         g.elecoffset = g.chans-g.dispchans;
       end;
       set(slidder, 'value', g.elecoffset/g.chans, ...
-         'sliderstep', [1/(g.chans-g.elecrange) g.elecrange/(g.chans-g.elecrange)]);
-         %'sliderstep', [1/(g.chans-1) g.elecrange/(g.chans-1)]);
+         'sliderstep', [1/(g.chans-g.dispchans) g.dispchans/(g.chans-g.dispchans)]);
+         %'sliderstep', [1/(g.chans-1) g.dispchans/(g.chans-1)]);
       set(fig,'UserData', g);
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
