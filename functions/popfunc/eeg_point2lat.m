@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/05/03 01:04:42  arno
+% Initial revision
+%
 
 function newlat = eeg_point2lat( lat_array, epoch_array, srate, timewin, timeunit);
 
@@ -67,3 +70,4 @@ timewin = timewin*timeunit;
 
 pnts = (timewin(2)-timewin(1))*srate+1;
 newlat  = ((lat_array - (epoch_array-1)*pnts-1)/srate+timewin(1))/timeunit;
+newlat = round(newlat*1E9)*1E-9;
