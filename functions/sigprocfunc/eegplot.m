@@ -26,7 +26,7 @@
 %    'dispchans'  - [integer] Number of channels to display in window {default: 32}    ???
 %                    If < number of channels a vertical slider will allow scrolling. 
 %    'title'      - Figure title {default: none}
-%    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off']
+%    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
 %
 % Other available inputs:
@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2003/01/10 01:17:20  arno
+% default position once more
+%
 % Revision 1.68  2003/01/10 01:11:15  arno
 % new default position
 %
