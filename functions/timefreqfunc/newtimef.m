@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/12/08 18:32:01  arno
+% undoing baseline
+%
 % Revision 1.49  2003/12/08 18:10:44  arno
 % problem in baseline subtraction
 %
@@ -901,7 +904,7 @@ if iscell(X)
         end;
         myprintf(g.verbose, '\nSubtracting common baseline\n');
     end;
-	
+
     % plotting
     % --------
     if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
@@ -1145,11 +1148,11 @@ end
 % plotting
 % --------
 ERP = mean(X,2);
+mbase = log10(mbase)*10;
 plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
-else 
-    mbase = log10(mbase)*10;
+    mbase = 10^(mbase/10);
 end;
 return;
 
@@ -1275,7 +1278,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       xlabel('Time (ms)')
       ylabel('dB')
 
-      E = 10 * log10(mbase);
+      E = mbase;
 
       h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                                % to left of ERSP image
