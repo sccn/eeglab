@@ -145,6 +145,11 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2003/07/21 20:45:01  scott
+% fg
+%
+% debug last
+%
 % Revision 1.105  2003/07/21 20:43:15  scott
 % using wraparound smoothing for phase-sorted epochs
 %
@@ -1476,9 +1481,9 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
         else % if phase-sorted trials
            halfwidth = ceil(avewidth/2);
-           [data,outtrials]    = movav([data(:,(end-halfwidth):end),...
+           [data,outtrials] = movav([data(:,[(end-halfwidth):end]),...
                                         data,...
-                                        data(:,1:(halfwidth-1)), ...
+                                        data(:,[1:(halfwidth-1)]),...
                         [1:(ntrials+2*halfwidth-1)],avewidth,decfactor); 
            % Note: movav here sorts using square window
            [outsort,outtrials] = movav(sortvar,1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
