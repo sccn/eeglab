@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/11/05 19:28:15  arno
+% remove uiputfile2
+%
 % Revision 1.38  2004/11/05 19:27:34  arno
 % uiputfile -> uiputfile2
 %
@@ -268,8 +271,8 @@ if mode == 0  % single datasets
 	% Saving data as float or as Matlab
 	eeg_options;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
-		tmpdata = EEG.data;
-		EEG.data = [ noextcurfilename '.fdt' ];
+        tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+        EEG.data = [ noextcurfilename '.dat' ];
 		try, 
             fprintf('Saving dataset...\n');
             try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
@@ -278,14 +281,14 @@ if mode == 0  % single datasets
                 catch, error('Pop_saveset: save error, out of space or file permission problem');
                 end;
             end;
-			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
+			floatwrite( tmpdata', [curfilepath EEG.data], 'ieee-le');
 		catch, 
 			error('Pop_saveset: save error, out of space or file permission problem');
 		end;
-		EEG.data = tmpdata; 
+		EEG.data   = reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials);
 		EEG.icaact = tmpica;
 	else % saving data as a single Matlab file
-        tmpfilename = [ noextcurfilename '.fdt' ];
+        tmpfilename = [ noextcurfilename '.dat' ];
         del = 0;
         if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
             if exist(tmpfilename) == 2
@@ -363,25 +366,25 @@ else
     del = 0;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		for index = 1:length(ALLEEG)
-			tmpdata = ALLEEG(index).data;
+			tmpdata = reshape(ALLEEG(index).data, ALLEEG(index).nbchan,  ALLEEG(index).pnts*ALLEEG(index).trials);
 			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
             ALLEEG(index).filepath = '';
 			try, 
-				floatwrite( tmpdata, [ curfilepath ALLEEG(index).data], 'ieee-le');
+				floatwrite( tmpdata', [ curfilepath ALLEEG(index).data], 'ieee-le');
 			catch, 
 				error('Pop_saveset: saving error, out of space or file permission problem');
 			end;
 		end;
 	else % standard file saving
         if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
-            tmpfilename = [ noextcurfilename '.fdt1' ];
+            tmpfilename = [ noextcurfilename '.dat1' ];
             if exist(tmpfilename) == 2
                 but = questdlg2(strvcat('Warning: EEGLAB .mat file format has changed (v4.11). EEGLAB now saves', ...
                                         'data matrices in .set files as single precision. Therefore, storing data in separate', ...
                                         '''.fdt'' files no longer saves disk space. (To reinstate saving data in separate .fdt files,', ...
                                         [ 'use menu File > Maximize menu). Delete the existing file ''' tmpfilename(1:end-1) 'X'' (recommended)?']), ...
                                         'File format has changed !', 'No', 'Yes', 'Yes');
-                 if strcmpi(but, 'yes'), del =1; end;
+                if strcmpi(but, 'yes'), del =1; end;
             end;
         end;
 		for index = 1:length(ALLEEG)
@@ -401,7 +404,7 @@ else
     if del,
         try,
             for index = 1:length(ALLEEG)
-                tmpfilename = [ noextcurfilename '.fdt' int2str(index) ];
+                tmpfilename = [ noextcurfilename '.dat' int2str(index) ];
                 tmpfilename = which(tmpfilename);
                 disp([ 'Deleting ''' tmpfilename '''...' ]);
                 delete(tmpfilename);
