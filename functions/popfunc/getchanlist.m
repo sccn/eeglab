@@ -8,6 +8,10 @@
 %     type     - [string] select channel of specified type
 %                can enter a cell array to select several channel types
 %
+% Output:
+%     chanlist - list of channel indices for the selected type(s)
+%                sorted in increasing order
+%
 % Note: this function is not case sensitive
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2004
@@ -31,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/09/14 18:06:53  arno
+% debug if no type
+%
 % Revision 1.1  2004/09/14 17:34:22  arno
 % Initial revision
 %
