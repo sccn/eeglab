@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2002/10/15 16:42:27  scott
+% debug
+%
 % Revision 1.78  2002/10/15 16:39:36  scott
 % default title with channel name
 %
@@ -453,7 +456,7 @@ if popup
 		options = [options ',''yerplabel'',''''' ];
 	end;
 	if isempty(titleplot)
-        titleplot = [ fastif( typeplot, '', 'Comp. ') fastif( typeplot, chanlabels(channel),int2str(channel)) ' ERP image'];
+        titleplot = [ fastif( typeplot, '', 'Comp. ') fastif( typeplot, chanlabels{channel},int2str(channel)) ' ERP image'];
     end;
 	smooth       = eval(res.smooth);
     if res.plotmap
