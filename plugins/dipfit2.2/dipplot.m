@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.49  2003/08/04 19:08:09  arno
+%[Afixing normlen in summarize mode
+%
 %Revision 1.48  2003/07/31 23:37:07  arno
 %adding property to structure attatched to dipole
 %
@@ -300,7 +303,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     dat.mode       = g.image;
     dat.maxcoord   = 100;
     dat.axistight  = strcmpi(g.axistight, 'on');
-    radius = 84.747;
+    radius = 85;
     if strcmpi(g.image, 'besa')
         scaling = 1.05;
         
@@ -362,7 +365,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         valrear   = [ 0.1040    31.0000  -30.9000 ]*2;
         valvertex = [ 0.0238   -10.5000   40.8341 ]*2;
         zoffset   = 27.1190/(27.1190+radius) * (valvertex(3)-vallear(3));
-        % zoofset = offset of zero center (besa = 27.1 mm for a radius of 84.7)
         dat.tcparams = { valinion valnasion vallear valrear valvertex zoffset };
        
         %plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [57 85 65]);
@@ -404,8 +406,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         maxi = max(maxi,max(abs(sources(index).posxyz(:))));
     end;
     if maxi > 1.01 & g.sphere == 1
-        disp('Non-normalized dipole positions, normalizing by standard head radius 84.747 mm'); 
-        g.sphere = 84.747;
+        disp('Non-normalized dipole positions, normalizing by standard head radius 85 mm'); 
+        g.sphere = 85;
         fact = 0.1;
     else 
         fact = 1;
@@ -657,6 +659,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 if strcmp(g.num, 'on')
                     h = text(xx,  yy,  zz, [ '  ' int2str(sources(index).component)]);
                     set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize/2 );
+                    if ~strcmpi(g.image, 'besa'), set(h, 'color', 'w'); end;
                 end;
             end;
         end;
