@@ -1,4 +1,4 @@
-% readlocs() - read polar electrode positions from ICA toolbox
+% readlocs() - read polar electrode positions (expanded from the ICA toolbox function)
 %             
 % Usage:
 %   >> [eloc, labels, theta, radius] = readlocs( filename, elpmaindir );
@@ -6,41 +6,41 @@
 % Inputs:
 %   filename   - name of the file containing the electrode locations
 %                and convert in polar coordinates
-%   elpmaindir - direction pointing toward the subject in the Polhemus 
-%                elp file. Can be 'X' or 'Y'. Default is 'X'. This 
-%                information is used to convert carthesian to polar
-%                coordinates.
+% Optional:
+%   elpmaindir - ['X'|'Y'] Direction pointing toward the subject in 
+%                the Polhemus .elp file. Default is 'X'.  Used to 
+%                convert locations from cartesian to polar coordinates.
 %
 % Note on suported formats:
-% The extension of the file determine its type
-%   '.loc' or '.locs'   - polar format, for example
+%   The extension of the file determines its type
+%   '.loc' or '.locs'   - polar format. Example:
 %               1    -18    .352       Fp1
 %               2     18    .352       Fp2
 %               3    -90    .181       C3
 %               4     90    .181       C4
-%               more lines ...
-%   '.sph' - spherical coordinate file, for example
+%                 more lines ...
+%   '.sph' - spherical coordinate file. Example:
 %               1    -63.36    -72      Fp1
 %               2     63.36    72       Fp2
 %               3     32.58    0        C3
 %               4     32.58    0        C4
-%               more lines ...
-%   '.xyz' - carthesian coordinate file, for example
+%                 more lines ...
+%   '.xyz' - cartesian coordinate file. Example:
 %               1   -0.8355   -0.2192   -0.5039      Fp1
 %               2   -0.8355    0.2192    0.5039      Fp2
 %               3    0.3956         0   -0.9184      C3
 %               4    0.3956         0    0.9184      C4
-%               more lines ...
-%   '.elp' - Polhemus coordinate file (use the readelp() function)
+%                 more lines ...
+%   '.elp' - Polhemus coordinate file (uses readelp())
 %
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
 %               It has three fields 'labels', 'theta' and 'radius'.
 %   labels    - names of the electrodes
-%   theta     - vector of polar angles of the electrodes in degree
+%   theta     - vector of polar angles of the electrodes in degrees
 %   radius    - vector of polar norms of the electrodes
 %
-% Note: the function cart2topo() is used to convert carthesian to polar
+% Note: the function cart2topo() is used to convert cartesian to polar
 %       coordinates. By default the current function uses cart2topo()
 %       options to recompute the best center and optimize the squeezing
 %       parameter.
@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function [eloc, labels, theta, radius] = readlocs( filename, elpmaindir ); 
 
@@ -128,7 +131,7 @@ if isstr(filename)
 			  eloc(index).radius = radius(index);
 			  eloc(index).labels = labels{index};
             end;
-        otherwise, error('Readlocs: unrecognised file extension');
+        otherwise, error('Readlocs(): unrecognized file extension');
     end;
     for index = 1:length( eloc )
         if ~isstr(eloc(index).labels)
