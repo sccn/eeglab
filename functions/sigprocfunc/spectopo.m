@@ -4,8 +4,8 @@
 %              Uses Matlab psd() from signal processing toolbox.
 % Usage:
 %        >> spectopo(data, frames, srate);
-%        >> [spectra,freqs,speccomp] = spectopo(data, frames, srate, 'key1', 'val1' ...
-%                                                           'key2', 'val2' ...);
+%        >> [spectra,freqs,speccomp,contrib,specstd] = ...
+%                     spectopo(data, frames, srate, 'key1', 'val1', 'key2', 'val2' ...);
 %
 % Inputs:
 %       data   = 2D (nchans,frames*epochs); % can be single-epoch
@@ -76,6 +76,7 @@
 %                   with 0.
 %        contrib  = contribution of each component (if 'icamode' is 'normal', relative
 %                   variance, if 'icamode' is 'sub', percentage variance accounted for)
+%        specstd  = spectrum standard deviation in dB
 %
 % Notes: The old function call is still function for backward compatibility
 %        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
@@ -104,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/05/11 19:51:53  arno
+% debuging changeunitis
+%
 % Revision 1.58  2003/04/23 21:24:24  arno
 % ignore small data segments
 %
@@ -290,7 +294,7 @@
 
 % Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
 
-function [eegspecdB,freqs,compeegspecdB,resvar]=spectopo(data,frames,srate,varargin) 
+function [eegspecdB,freqs,compeegspecdB,resvar,specstd]=spectopo(data,frames,srate,varargin) 
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
@@ -417,23 +421,24 @@ if isempty(g.weights)
 	% compute data spectrum
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing spectra')
-	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
+	[eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);
     if ~isempty(g.mapnorm) % normalize by component map RMS power (if data contain 1 component
         disp('Scaling spectrum by component RMS of scalp map power');
         eegspecdB       = sqrt(mean(g.mapnorm.^4)) * eegspecdB;
     end;
 	eegspecdB = 10*log10(eegspecdB);
+    specstd   = 10*log10(specstd);
     fprintf('\n');
 else
 	% compute data spectrum
 	if isempty(g.plotchan) | g.plotchan == 0
 		fprintf('Computing spectra')
-		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);	
+		[eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);	
         fprintf('\n'); % log below
 	else
 		fprintf('Computing spectra at specified channel')
 		g.reref = 'no';
-		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
+		[eegspecdB freqs specstd] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
         fprintf('\n'); % log below
 	end;
 	g.reref = 'no';
@@ -452,6 +457,7 @@ else
 	else 
 		eegspecdBtoplot = eegspecdB;
 	end;
+    specstd   = 10*log10(specstd);
     eegspecdB = 10*log10(eegspecdB);
 	eegspecdBtoplot = 10*log10(eegspecdBtoplot);
     
@@ -867,7 +873,7 @@ function [index, usedplots] = closestplot(xpos, xcentercoords, usedplots);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function computing spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
 	if exist('newweights') == 1
 		nchans = size(newweights,1);
 	else 
@@ -908,8 +914,10 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 									  fftlength,srate,winlength,g.overlap);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
+					specstd = zeros(nchans,length(freqs));
 				end
 				eegspec(c,:) = eegspec(c,:) + tmpspec';
+				specstd(c,:) = eegspec(c,:) + tmpspec'.^2;
 			else
 				for n=1:length(g.boundaries)-1
                     if g.boundaries(n+1) - g.boundaries(n) > 20 % ignore segments of less than 20 points
@@ -917,8 +925,11 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
                                                fftlength,srate,winlength,g.overlap);
                         if c==1 & e==epoch_subset(1)
                             eegspec = zeros(nchans,length(freqs));
+                            specstd = zeros(nchans,length(freqs));
                         end
                         eegspec(c,:) = eegspec(c,:) + tmpspec'* ...
+                            ((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
+                        specstd(c,:) = eegspec(c,:) + tmpspec'.^2 * ...
                             ((g.boundaries(n+1)-g.boundaries(n)+1)/g.boundaries(end));
                     end;
 				end
@@ -926,5 +937,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		end
 		fprintf('.')
 	end
-	eegspecdB = eegspec/length(epoch_subset); % convert power to dB
+    
+    n = length(epoch_subset);
+	eegspecdB = eegspec/n; % convert power to dB
+	specstd   = sqrt( (specstd +  eegspecdB.^2/n)/(n-1) ); % convert power to dB
 	return;
