@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.345  2004/09/14 16:33:28  arno
+% debug delete dataset
+%
 % Revision 1.344  2004/09/13 01:31:46  arno
 % same
 %
@@ -1581,7 +1584,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     % spetial case of eeglab subfolder (for BIOSIG)
                     % --------------------------------
                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
-                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
+                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
                         tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
                         for tmpind2 = 1:length(tmpdir2)
                             if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
