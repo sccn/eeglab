@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/11/10 02:33:11  arno
+% nothing
+%
 % Revision 1.41  2004/11/09 01:54:02  arno
 % no change
 %
@@ -329,7 +332,7 @@ for ci = chan
     
     % extract edges
     % -------------
-    tmpdiff =  diff(X);
+    tmpdiff =  diff(abs(X));
     switch g.edge
      case 'both'    , tmpevent1 = find( tmpdiff > 0)-1; tmpevent2 = find( tmpdiff < 0);
      case 'trailing', tmpevent2 = find( tmpdiff < 0);
