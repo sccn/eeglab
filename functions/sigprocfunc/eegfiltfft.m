@@ -1,14 +1,18 @@
 % eegfiltfft() -  (high|low|band)-pass filter data using inverse fft 
 %                 (without using the Matlab signal processing toolbox)
 % Usage:
-%  >> [smoothdata] = eegfiltfft(data,srate,locutoff,hicutoff,epochframes);
+%  >> [smoothdata] = eegfiltfft(data,srate,locutoff,hicutoff);
+%  >> [smoothdata] = eegfiltfft(data,srate,locutoff,hicutoff,epochframes,filtorder,revfilt);
 %
 % Inputs:
 %   data        = (channels,frames*epochs) data to filter
 %   srate       = data sampling rate (Hz)
 %   locutoff    = low-edge frequency in pass band (Hz)  {0 -> lowpass}
 %   hicutoff    = high-edge frequency in pass band (Hz) {0 -> highpass}
+%
+% Optional inputs:
 %   epochframes = frames per epoch (filter each epoch separately {def/0: data is 1 epoch}
+%   filtorder   = argument not used (but required for symetry with eegfilt() function).
 %   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {0}
 %
 % Outputs:
@@ -38,8 +42,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/12/03 18:26:17  arno
+% Initial revision
+%
 
-function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, revfilt);
+function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtorder, revfilt);
     
     if nargin < 4
         help eegfiltfft;
@@ -48,7 +55,7 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, revfilt
     if nargin < 5 | epochframes == 0
         epochframes = frames;
     end
-    if nargin < 6
+    if nargin < 7
         revfilt = 0;
     end;
     
