@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/06/19 16:14:59  arno
+% makeur
+%
 % Revision 1.13  2003/05/20 01:49:01  arno
 % allowing to import keystrokes
 %
@@ -115,8 +118,7 @@ if nargin < 1
 
 	% popup window parameters
 	% -----------------------
-    promptstr    = { 'Enter block size for CNT file (1 or 40):' ...
-                     'Time interval in seconds (i.e. [0 100]; default all):' ...
+    promptstr    = { 'Time interval in seconds (i.e. [0 100]; default all):' ...
                      'Import keystrokes (off|on -> import as type 0):' ...
                      'loadcnt() ''key'', ''val'' params' };
 	inistr       = { '1'  '' 'off' '' };
@@ -126,14 +128,12 @@ if nargin < 1
 
 	% decode parameters
 	% -----------------
-    blockread = eval( result{1} );
-    options = [ ', ''blockread'', ' int2str(blockread) ];
-    if ~isempty(result{2}), 
-        timer =  eval( [ '[' result{2} ']' ]);
+    if ~isempty(result{1}), 
+        timer =  eval( [ '[' result{1} ']' ]);
         options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
     end;   
-    if ~strcmpi(result{3}, 'off'), options = [ options ', ''keystroke'', ''' result{3} '''' ]; end;
-    if ~isempty(result{4}), options = [ options ',' result{4} ]; end;
+    if ~strcmpi(result{2}, 'off'), options = [ options ', ''keystroke'', ''' result{2} '''' ]; end;
+    if ~isempty(result{3}), options = [ options ',' result{3} ]; end;
 else
 	options = vararg2str(varargin);
 end;
