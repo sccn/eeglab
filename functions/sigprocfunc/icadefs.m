@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/11/22 17:55:10  scott
+% nothing
+%
 % Revision 1.31  2004/11/22 17:54:24  scott
 % nothing
 %
@@ -142,7 +145,6 @@ YDIR = 1;                   % positive up = 1; negative up = -1
 
 % COLORS
 % ------
-
 if get(0, 'screendepth') <=8 % if mono or 8-bit color
     BACKCOLOR           = [1 1 1];    % Background figure color 
     BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
