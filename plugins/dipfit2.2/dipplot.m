@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.97  2004/06/09 21:12:34  arno
+%fixing projcolor
+%
 %Revision 1.96  2004/06/09 16:27:11  arno
 %color debug
 %
@@ -674,7 +677,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     if ~isempty(g.projcol)
         g.projcol = strcol2real( g.projcol, jet(64) );
-        g.projcol = g.color(mod(0:length(sources)-1, length(g.projcol)) +1);        
+        g.projcol = g.projcol(mod(0:length(sources)-1, length(g.projcol)) +1);        
     else
         g.projcol = g.color;
         for index = 1:length(g.color)
