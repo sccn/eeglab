@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/12/02 02:34:10  arno
+% now using adjustlocs
+%
 % Revision 1.8  2003/12/01 17:10:17  arno
 % automatic calibration
 %
@@ -137,4 +140,4 @@ function chanlocs = readneurolocs( filename, varargin)
     
     % re-calibration
     % --------------
-    chanlocs = adjustlocs(chanlocs, 'autoscale', 'on');
+    chanlocs = adjustlocs(chanlocs, 'autoscale', 'on', varargin{:});
