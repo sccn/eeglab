@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/02/12 23:08:02  scott
+% text output edit
+%
 % Revision 1.14  2004/02/12 22:51:30  scott
 % text output edits
 %
@@ -172,7 +175,7 @@ if locutoff > 0 & hicutoff > 0,    % bandpass filter
     else 
          fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
     end; 
-    fprintf('eegfilt() - IF a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
+    fprintf('            If a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
     fprintf('            then Matlab has failed to design a good filter. As a workaround, \n');
     fprintf('            for band-pass filtering, first highpass the data, then lowpass it.\n');
 
