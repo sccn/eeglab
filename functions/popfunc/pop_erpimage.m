@@ -1,118 +1,105 @@
-% pop_erpimage() - plot an erpimage of a given EEG channel or independent
-%                  component. Uses a pop-up window if only two (or three 
-%                  in a specific condition) input arguments are given.
-%
+% pop_erpimage() - draw an ERP-image plot of a given EEG channel or independent
+%                  component. Uses a pop-up window if less than three (or four 
+%                  in one condition) input arguments are supplied.  Calls erpimage(). 
+%                  For futher details see >> help erpimage
 % Usage:
-%   >> pop_erpimage(EEG, typeplot);          % pop_up window
-%   >> pop_erpimage(EEG, typeplot, lastcom); % pop_up window
-%   >> pop_erpimage(EEG, typeplot, channel); % do not pop-up
+%   >> pop_erpimage(EEG, typeplot);          % pop-up a data entry window
+%   >> pop_erpimage(EEG, typeplot, lastcom); % pop-up a data entry window
+%   >> pop_erpimage(EEG, typeplot, channel); % no pop-up window
 %   >> pop_erpimage(EEG, typeplot, channel, projchan, title, ...
 %                  smooth, decimate, sortingtype, sortingwin, ...
-%                  sortingeventfield, renorm, options...);
+%                            sortingeventfield, renorm, options...);
 %
-% Graphical interface:
+% Graphic interface:
 %   "Channel or Component" - [edit box] Enter channel number or component
-%                 number to plot. Sets the 'channel' parameter in erpimage()).
-%   "Project to channel #" - [edit box] (only present when plotting independent
-%                 components). Allow reprojecting the component activity 
-%                 to a given channel or group of channels. Sets the
-%                 the 'projchan' parameter in erpimage().
+%                 number to plot. erpimage() equivalent: 'channel' 
+%   "Project to channel #" - [edit box] (for plotting independent components). 
+%                 Allow reprojecting the component activity 
+%                 to a given channel or group of channels. 
+%                 erpimage() equivalent: 'projchan' 
 %   "Smoothing" - [text box] Smoothing parameter in number of trials.
-%                 Sets the 'smooth' parameter in erpimage(). 
-%   "Downsampling" - [edit box] Decimate parameter. Sets the 
-%                 'decimate' parameter in erpimage()).
+%                 erpimage() equivalent: 'smooth' 
+%   "Downsampling" - [edit box] Decimate parameter. 
+%                 erpimage() equivalent: 'decimate' 
 %   "Time limits" - [edit box] Enter the time limits in milliseconds. 
-%                 Sets the two first parameters of the optional 'limit' 
-%                 array in erpimage()).
-%   "Figure title" - [edit box] Enter the figure title here.  If empty, a 
-%                 title is automatically generated. Sets the 'title' option 
-%                 in erpimage().
+%                 erpimage() equivalent: the 1st and 2nd parameters of the 'limit' array
+%   "Figure title" - [edit box] Enter the figure title here.  If empty, a title
+%                 is automatically generated. erpimage() equivalent: 'title' 
 %   "Plot scalp map" - [checkbox] Setting this option plot a scalp map of the 
 %                 channel location (or component topography) next to the 
-%                 erpimage. Sets the optional 'topo' input in erpimage().
+%                 erpimage. erpimage() equivalent: 'topo' 
 %   "plot ERP" - [checkbox] Setting this option plot the channel or component 
-%                 ERP below the ERP image. Sets the 'erp' option in erpimage().
-%   "Plot colorbar" - [checkbox] Plot the colorbar on the right of the 
-%                 erpimage. Sets the 'cbar' option in erpimage().
-%   "ERP limits" - [edit box] Set the minimum and maximum value for the ERP 
-%                 plot. Sets the 3rd and 4th parameters of the optional 
-%                 'limit' array in erpimage().
-%   "Color limits" - [edit box] Set the color limits for the ERP image. Sets
-%                 the 'caxis' option in erpimage().
+%                 ERP below the ERP image. erpimage() equivalent: 'erp' 
+%   "Plot colorbar" - [checkbox] Plot the colorbar on the right of the erpimage. 
+%                  erpimage() equivalent: 'cbar' 
+%   "ERP limits" - [edit box] Set the minimum and maximum value for the ERP plot
+%                  erpimage() equivalent: 3rd and 4th parameters of the 'limit' array 
+%   "Color limits" - [edit box] Set the color limits for the ERP image. 
+%                  erpimage() equivalent: 'caxis' 
 %   "Epoch sorting field" - [button and edit box] Specify the event field whose 
-%                 values will be used to sort the trials. Sets the
-%                 'sortingeventfield' parameter in erpimage(). ???
+%                  values will be used to sort the trials. 
+%                  erpimage() equivalent: 'sortingeventfield' ???
 %   "Event type(s)" - [button and edit box] Specify which event to consider. 
-%                 When several events are present in individual trials, 
+%                  When several events are present in individual trials, 
 %                 selects which event should be processed. After selecting 
 %                 events with specified event types, if several events are 
 %                 still present within some trials, the event field value for 
 %                 the first event in the trial is used for sorting, and a 
-%                 warning is issued. Sets the 'sortingtype' parameter in
-%                 erpimage(). ???
+%                 warning is issued. erpiamge() equivalent: 'sortingtype' ???
 %   "Event time range" - [edit box] Allow the user to specify a time range in ms 
 %                 for selecting events. This further restrains the selection of 
-%                 events (see the option above). Sets the 'sortingwin' option 
-%                 in erpimage(). ???
-%   "rescale" - [edit box] Can be 'yes', 'no', or a Matlab formula. Sets the
-%                 'renorm' option in erpimage().
+%                 events (see the option above). erpimage() equivalent: 'sortingwin' ???  
+%   "rescale" - [edit box] 'yes', 'no', or a Matlab formula. 
+%                 erpimage() equivalent: 'renorm' 
 %   "align" - [edit box] Set this to 'Inf' to re-align the individual trials 
-%                 on the selected event values. Sets the optional 'align' 
-%                 parameter in erpimage().
+%                 on the median time of the selected events.  Else, enter an epoch time 
+%                 (in ms) to align the events to. Ex: 0. erpimage() equivalent: 'align' 
 %   "Don't sort by value" - [checkbox] Check this box if you do not want to 
 %                 sort the trials but do want to plot the selected event 
-%                 values. Sets the 'nosort' option in erpimage().
+%                 values. erpimage() equivalent: 'nosort' 
 %   "Don't plot value" - [checkbox] Check this box if you do not want to 
 %                 plot the selected event values, but still want to sort 
-%                 the data trials according to these values. Sets the
-%                 'noplot' option in erpimage().
+%                 the data trials according to these values. 
+%                 erpimage() eqivalent: 'noplot' 
 %   "Sort by phase > Frequency" - [edit box] Specify the frequency or frequency 
-%                 range for sorting trials by phase. Sets the 3rd and 
-%                  4th inputs to 'phasesort' in erpimage().
-%   "Window center (ms)" - [edit box] Sets the 1st optional 'phasesort'  
-%                 input in erpimage().
-%   "Percent low-amp. trials to ignore" - [edit box] Sets the 2nd 
-%                 optional 'phasesort' input in erpimage().
+%                 range for sorting trials by phase. erpimage() equivalent: 
+%                 3rd and 4th inputs to 'phasesort' 
+%   "Window center (ms)" - [edit box] erpimage() equivalent: 1st 'phasesort' input
+%   "Percent low-amp. trials to ignore" - [edit box] erpimage() equivalent: 
+%                 2nd 'phasesort' input 
 %   "Wavelet cycle" - [text] Number of wavelet cycles used for spectral 
 %                 decomposition at the specified latency. Cannot be edited.
-%   "Inter-trial coherence options > Frequency" - [edit box] Frequency for 
-%                 plotting coherence. Constrained to be the same as the 
-%                 "Sort by phase > Frequency" edit box. Sets the 'coher' 
-%                 option in erpimage().
-%   "Signif. level" - [edit box] Significance level for coherence. Sets the
-%                 the optional 'signif' parameter in erpimage().
+%   "Inter-trial coherence options > Frequency" - [edit box] Frequency at which  
+%                 to compute coherence. Constrained to be the same as the 
+%                 "Sort by phase > Frequency" edit box. erpimage() equivalent: 'coher' 
+%   "Signif. level" - [edit box] Coherence significance cutoff, as a proability. Ex: .05. 
+%                 erpimage() equivalent: 'signif' 
 %   "Amplitude limit" - [edit box] Amplitude limits [min max] for the data power 
-%                 plot at the selected frequency (plotted automatically). Sets
-%                 the 5th and 6th parameter of the optional 'limit' 
-%                 parameter in erpimage(). 
+%                 plot at the selected frequency. erpimage() equivalent:
+%                 5th and 6th inputs to 'limit' 
 %   "Coher limits" - [edit box] Upper limit (<=1) for the coherence 
-%                 plot. Sets the 7th and 8th parameter of the optional 'limit' 
-%                 parameter in erpimage().
-%   "Image amps" - [checkbox] Check this box for plotting spectral amplitude 
-%                 at the selected frequency instead of raw EEG potential. Sets
-%                 the 'plotamp' parameter of erpimage(). ???
+%                 plot. erpimage() equivalent: 7th and 8th inputs of 'limit' 
+%   "Image amps" - [checkbox] Check this box for plotting spectral amplitudes
+%                 at the selected frequency in single (or smoothed) trials, instead 
+%                 of plotting EEG potential. erpimage() equivalent: 'plotamp' ???
 %   "Plot spectrum" - [edit box] Plot the channel or component data spectrum in 
-%                 the right top corner of the ERP image plot. Sets the 'spec' 
-%                 option in erpimage().
+%                 the top right corner of the ERP image. erpimage() equivalent: 'spec' 
 %   "Baseline ampl." - [edit box] Baseline amplitude for data power plot at the 
-%                 selected frequency. Sets the 7th parameter of the optional 
-%                 'limit' parameter of the erpimage() function.
-%   "Mark times" - [edit box] Enter value(s) to plot vertical lines at specified 
-%                 latencies. Sets the optional 'vert' parameter in erpimage().
+%                 selected frequency. erpimage() equivalent: 7th inputs of 'limit'
+%   "Mark times" - [edit box] Time(s) in ms to plot vertical lines.
+%                 erpimage() equivalent: 'vert' 
 %   "More options" - [edit box] Enter 'key', 'value' sequences. Other erpimage()
-%                 option not handled by this interface: 'erpstd' for 
-%                 plotting the ERP standard deviation; 'auxvar' for 
-%                 plotting auxilary variables; 'ampsort' for sorting trials 
-%                 based on their amplitude at the selected frequency. See 
-%                 help erpimage() for more information.
-%
+%                 options not handled by this interface, including: 'erpstd' to 
+%                 plot the ERP standard deviation; 'auxvar' to plot auxilary 
+%                 variables; 'ampsort' to sort trials based on amplitude at 
+%                 the selected frequency, etc.
+%                 For further information see  >>help erpimage() 
 % Inputs:
 %   EEG        - dataset structure
 %   typeplot   - 1=channel, 0=component {default: ?}
-%   lastcom    - string containing previous pop_erpimage command 
-%                (from LASTCOM) or from the previous function call output.
-%                The values in this function call are used as default in the
-%                graphical interface.
+%   lastcom    - string containing previous pop_erpimage command (from LASTCOM) 
+%                or from the previous function call output.  The values from this 
+%                function call are used as default in the graphic interface.
 %
 % Commandline options:
 %   channel    - Index of channel or component(s) to plot {default: 1}
@@ -120,17 +107,16 @@
 %                If plotting channel activity, this argument is ignored. 
 %                If [], the ICA component activation is plotted {default []}.
 %   title      - ['string'] Plot title {default: []}
-%   smooth     - Smoothing parameter (number of trials). Default is 5. 
-%                Sets the 'avewidth' parameter in erpimage().
+%   smooth     - Smoothing parameter (number of trials). {Default: 5} 
+%                erpimage() equivalent: 'avewidth' 
 %   decimate   - Decimate parameter (i.e. ratio of trials_in/trials_out).
-%                Sets the 'decimate' parameter in erpimage(). {Default: 0}
-%   sortingtype - Sorting event type(s) ([int vector]; []=all). See notes.
+%                erpaimge() equivalent: 'decimate' {Default: 0}
+%   sortingtype - Sorting event type(s) ([int vector]; []=all). See Notes below.
 %                Either a string or an integer.
 %   sortingwin - Sorting event window [start, end] in seconds ([]=whole epoch)
-%   sortingeventfield - Sorting field name. {default: none}
-%   options    - erpimage() options. Default is none. Separate the options
-%                by commas. Example 'erp', 'cbar'. See erpimage() help 
-%                for further details. 
+%   sortingeventfield - Sorting field name. {default: none}. See Notes below.
+%   options    - erpimage() options, separated by commas. Ex: 'erp', 'cbar'. 
+%                For further details see >>  erpimage help   {Default: none}
 %
 % Outputs from pop-up: 
 %   String containing the command used to evaluate this plotting function
@@ -142,8 +128,8 @@
 %   to ask for additional arguments
 %   
 % Notes:
-%   1) A new figure is created only when the pop_up window is called, 
-%      so you may call this command to draw in e.g. sbplot() axes.
+%   1) A new figure is created only when the pop-up window is called, 
+%      so you may call this command to draw in (e.g.) sbplot() axes.
 %   2) To sort epochs, first define the event field to be used with
 %      the argument 'sortingeventfield' (for instance 'latency'). Then,
 %      because there may be several events with different latencies in a
@@ -154,7 +140,7 @@
 %      epoch to select events. For instance the epoch time range may be -1 
 %      to 2 seconds but one may want to select events only in the range 0 
 %      to 1 second. These three parameters are forwarded to the function
-%      eeg_getepochevent() whose help message contains more details.
+%      eeg_getepochevent(), whose help message contains more details.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -179,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2003/02/18 19:21:40  scott
+% header edits -sm
+%
 % Revision 1.96  2003/02/17 02:25:28  arno
 % reformating text for new functionality in help2html
 %
