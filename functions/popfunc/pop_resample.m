@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/06/28 02:26:45  arno
+% fixing slight inacuracy in new sampling rate
+%
 % Revision 1.4  2003/06/13 15:07:00  arno
 % adding urevent compatiblity
 %
@@ -73,7 +76,7 @@ if nargin < 2
 	% popup window parameters
 	% -----------------------
 	promptstr    = {['New sampling rate']};
-	inistr       = { int2str(EEG.srate) };
+	inistr       = { num2str(EEG.srate) };
 	result       = inputdlg2( promptstr, 'Resample current dataset -- pop_resample()', 1,  inistr, 'pop_resample');
 	if length(result) == 0 return; end;
 	freq         = eval( result{1} );
@@ -87,7 +90,7 @@ end;
 % ------------
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 oldpnts   = EEG.pnts;
-fprintf('resampling data %3.0f Hz\n', freq);
+fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
 
 % resample for multiple channels
 % -------------------------
