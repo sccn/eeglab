@@ -9,8 +9,7 @@
 %	        	1 	No AutoCalib
 %	Mode+2	Concatanated (channels with lower sampling rate if more than 1 record is loaded)
 %
-% Author: Alois Schloegl, 03.02.1998, updated T.S. Lorig Sept 6, 2002 for BDF read, 
-%         Arnaud Delorme Nov 11, 2002 for EDF/BDF read
+% Author: Alois Schloegl, 03.02.1998, updated T.S. Lorig Sept 6, 2002 for BDF read
 %
 % See also: openbdf()
 
@@ -58,7 +57,7 @@ for nrec=1:length(Records),
 	if NREC<0 fprintf(2,'Warning READEDF: invalid Record Number %i \n',NREC);end;
 
 	fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
-	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,EDF.databits);
+	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
 
 	S(EDF.AS.IDX2)=s;
 
