@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2005/01/06 17:47:37  scott
+% nothing
+%
 % Revision 1.78  2004/11/06 02:43:53  scott
 % nothing
 %
@@ -996,9 +999,11 @@ end;
 
 Rsign = sign(imag(R));
 if nargout > 7
-   Rphase = rem(phase(R),2*pi);
-   Rphase(find(Rphase>pi))  = 2*pi-Rphase;
-   Rphase(find(Rphase<-pi)) = -2*pi-Rphase;
+   for lp = 1:size(R,1)
+       Rphase(lp,:) = rem(phase(R(lp,:)),2*pi);
+   end
+   Rphase(find(Rphase>pi))  = 2*pi-Rphase(find(Rphase>pi));
+   Rphase(find(Rphase<-pi)) = -2*pi-Rphase(find(Rphase<-pi));
 end
 
 R = abs(R); % convert coherence vector to magnitude
