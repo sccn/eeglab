@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % original function by a.c.james 2000-2001
 % 'blockread' by arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2001
 
@@ -81,7 +84,7 @@ if ~any(file=='.'), file=[file '.cnt']; end
 
 disp(['Loading file ' file ' ...'])
 
-f=fopen(file, 'rb');
+f=fopen(file, 'rb', 'ieee-le');
 if f==-1, error([file ' not found']), end
 
 r.filename=file;
