@@ -6,7 +6,9 @@
 %   University of California San Diego (http://sccn.ucsd.edu/). 
 %   User feedback welcome: email eeglab@sccn.ucsd.edu
 %
-% Authors: Arnaud Delorme, Scott Makeig, et al.
+% Authors: Arnaud Delorme, Scott Makeig, with substantial contributions
+%   from Colin Humphries, Sigurd Enghoff, Tzyy-Ping Jung, plus contributions 
+%   from Tony Bell, Te-Won Lee, Luca Finelli and other contributors. 
 %
 % Description:
 %   EEGLAB is Matlab software for processing continuous or event-related 
@@ -16,6 +18,8 @@
 %   can save the resulting Matlab calls to disk for later incorporation into 
 %   Matlab scripts.  A single data structure ('EEG') containing all dataset 
 %   parameters may be accessed and modified directly from the Matlab commandline. 
+%   EEGLAB now recognizes "plugins," sets of EEGLAB functions linked to the EEGLAB
+%   main menu through an "eegplugin_[name].m" function (Ex. >> help eeplugin_besa.m). 
 %
 % Usage: 1) To (re)start EEGLAB, type
 %            >> eeglab           % Ignores any loaded datasets
@@ -32,7 +36,7 @@
 % eeglab()        - main graphic interface
 % license.txt     - GNU license
 % 
-% Functions added recently to EEGLAB: 
+% Functions added to EEGLAB: 
 % --------------------------------------------------------------------
 % cell2mat()      - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
@@ -181,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.224  2003/02/24 19:56:40  arno
+% debuginh last
+%
 % Revision 1.223  2003/02/24 19:54:53  arno
 % do not crash eeglab if bad plugin
 %
