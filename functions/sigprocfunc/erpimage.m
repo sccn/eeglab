@@ -125,6 +125,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2002/10/14 16:09:53  scott
+% valsort fprintf
+%
 % Revision 1.63  2002/10/14 16:07:29  scott
 % removed moreargs - consolidated help message -sm
 %
@@ -1065,7 +1068,8 @@ if exist('phargs') == 1 % if phase-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by phase at %f4 Hz in a %d-cycle (%f4 ms) window centered at %f4. ms.\n',...  
+	fprintf(...
+'Sorting data epochs by phase at %2.1f Hz in a %d-cycle (%4.0f ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,phargs(1));
 	fprintf('Phase is computed using a filter of length %d frames.\n',...
 			length(winloc));
@@ -1138,7 +1142,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by amplitude at %f4 Hz in %d-cycle (%f4-ms) window centered at %f4 ms.\n',...  
+	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %d-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
 	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
 			length(winloc));
@@ -1199,9 +1203,9 @@ elseif exist('valargs')
      endtime = times(endframe);
   end
   if length(valargs)==1 | sttime == endtime
-     fprintf('Sorting data on value at time %f4 ms.\n',sttime);
+     fprintf('Sorting data on value at time %4.0f ms.\n',sttime);
   elseif length(valargs)>1
-     fprintf('Sorting data on mean value between %f4 and %f4 ms.\n',...
+     fprintf('Sorting data on mean value between %4.0f and %4.0f ms.\n',...
             sttime,endtime);
   end
   if endframe>stframe
