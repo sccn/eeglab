@@ -162,6 +162,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.214  2004/08/13 20:27:12  scott
+% help msg
+%
 % Revision 1.213  2004/07/29 23:18:23  arno
 % same
 %
@@ -1596,7 +1599,7 @@ end;
 %%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort
-	if length(phargs) >= 4 % find max frequency in specified band
+	if length(phargs) >= 4 && phargs(3) ~= phargs(4) % find max frequency in specified band
         if exist('psd') == 2
             [pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
         else
