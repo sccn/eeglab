@@ -9,6 +9,12 @@
 %                         % or from semi-auotmatic rejection.
 %   >> pop_eegplot( EEG, typerej, superpose, reject );
 %
+% Graphical interface:
+%   "Add to previously marked rejections" - [edit box] can be either YES or NO. This
+%                    edit box corresponds to the command line input option 'superpose'.
+%"  "Reject marked trials" - [edit box] can be either YES or NO. This edit box 
+%                    corresponds to the command line input option 'reject'.
+%
 % Inputs:
 %   EEG        - input EEG dataset
 %   typerej    - type of rejection 0 = EEG independent components; 
@@ -66,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/02/03 18:36:53  scott
+% header msg clarified -sm
+%
 % Revision 1.19  2003/01/10 01:11:49  arno
 % removing default position
 %
