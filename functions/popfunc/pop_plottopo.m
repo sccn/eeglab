@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/11 22:18:23  arno
+% color
+%
 % Revision 1.3  2002/04/24 18:56:29  arno
 % adding vert and others
 %
@@ -89,6 +92,7 @@ if nargin < 2
 else 
 	options ={ EEG.chanlocs, EEG.pnts, [EEG.xmin EEG.xmax 0 0]*1000, plottitle, channels varargin{:}};
 end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 	
 if exist('plottitle') ~= 1
     plottitle = '';

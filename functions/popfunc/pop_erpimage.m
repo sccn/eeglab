@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/08/11 22:12:40  arno
+% color
+%
 % Revision 1.39  2002/08/09 16:45:47  arno
 % updating plotamp and phasesort
 %
@@ -494,7 +497,7 @@ else
 		end;
 	end;	
 end;
-set(gcf, 'color', [1 1 1]);
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 % find sorting latencies
 % ---------------------

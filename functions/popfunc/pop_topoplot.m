@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/11 22:22:19  arno
+% color
+%
 % Revision 1.2  2002/04/18 18:26:14  arno
 % typo can not
 %
@@ -115,7 +118,7 @@ else
 		end;
 	end;	
 end;
-set(gcf, 'color', [1 1 1]);
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')  

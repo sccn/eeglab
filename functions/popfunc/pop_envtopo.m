@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/11 22:09:36  arno
+% color
+%
 % Revision 1.5  2002/08/11 20:51:32  arno
 % color
 %
@@ -111,7 +114,7 @@ else
 		end;
 	end;	
 end;
-set(gcf, 'color', [1 1 1]);
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 if ~isempty(EEG.chanlocs)
 	sigtmp = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);

@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/11 22:17:52  arno
+% color
+%
 % Revision 1.2  2002/08/06 21:56:25  arno
 % spelling
 %
@@ -122,7 +125,8 @@ else
 	   sigtmp = EEG.icaact(indices,:,trials);
 	end;
 end;
-figure('color', [1 1 1]);
+figure;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 % plot
 % ----

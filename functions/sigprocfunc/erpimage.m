@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/08/11 22:34:04  arno
+% color
+%
 % Revision 1.30  2002/08/09 16:28:07  arno
 % debugging allamps
 %
@@ -220,10 +223,10 @@ DEFAULT_BASELINE_END = 0; % ms
 TIMEX = 1;          % 1 -> plot time on x-axis; 
                     % 0 -> plot trials on x-axis
 
-icadefs;            % read BACKCOLOR for plot from defs file (edit this)
+BACKCOLOR = [0.8 0.8 0.8]; % grey background
+try, icadefs; catch, end;
+                    % read BACKCOLOR for plot from defs file (edit this)
                     % read DEFAULT_SRATE for coher,phase,allamps, etc.
-% BACKCOLOR = [0.8 0.8 0.8]; % grey background
-BACKCOLOR = [1 1 1];
 
 % Fix plotting text and line style parameters
 SORTWIDTH = 2.5;    % Linewidth of plotted sortvar

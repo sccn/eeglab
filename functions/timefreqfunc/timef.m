@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/08/11 22:30:20  arno
+% color
+%
 % Revision 1.45  2002/08/09 22:29:44  arno
 % implementing wavelet factor
 %
@@ -1120,7 +1123,7 @@ switch lower(g.plotitc)
 end; %switch
 
 if g.plot
-    set(gcf, 'color', [1 1 1]);
+	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
     if (length(g.title) > 0)
 	    axes('Position',pos,'Visible','Off');               
 	    h(13) = text(-.05,1.01,g.title);
