@@ -1,5 +1,6 @@
-% WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
-%           you must contact Arnaud Delorme (arno@salk.edu) for terms of use
+% WARNING: this function is not part of the EEGLAB toolbox and should not be 
+%          distributed you must contact Arnaud Delorme (arno@salk.edu) for 
+%          terms of use
 %
 % vectdata() - vector data interpolation with optional moving 
 %              average.
@@ -22,8 +23,10 @@
 %        'nearest'   -> Nearest neighbor interpolation.
 %        'v4'        -> MATLAB 4 griddata method.
 %   'average'  - [real] moving average in the dimension of timesin
-%                note that extreme values might be inacurate. Default
-%                none or [].
+%                note that extreme values might be inacurate (see 'borders'). 
+%                Default none or [].
+%   'avgtype'  - ['const'|'gauss'] use a const value when averaging (array of 
+%                ones) or a gaussian window. Default is 'const'.
 %   'border'   - ['on'|'off'] correct border effect when smoothing.
 %                default is 'off'.
 %
@@ -54,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/02/06 22:36:23  arno
+% new option 'border'
+%
 % Revision 1.10  2004/02/06 00:55:28  arno
 % conv2 -> convolve
 %
@@ -96,6 +102,7 @@ g = finputcheck( varargin, { 'timesout'   'real'  []           [];
                              'average'    'real'  []           [];
                              'gauss'      'real'  []           [];
                              'border'     'string' { 'on' 'off' } 'off';
+                             'avgtype'    'string' { 'const' 'gauss' } 'const';
                              'method'     'string' { 'linear' 'cubic' 'nearest' 'v4' } 'linear'});
 if isstr(g), error(g); end;
 
@@ -119,9 +126,19 @@ if ~isempty(g.average)
                 oldavg, g.average*(timevect(2)-timevect(1)), g.average);
     end;
     if strcmpi(g.border, 'on')
-        array = convolve(array, ones(1, g.average));
+        if strcmpi(g.avgtype, 'const')
+            array = convolve(array, ones(1, g.average));
+        else
+            convolution = gauss2d(1,g.average,1,round(0.15*g.average));
+            array = convolve(array, convolution);
+        end;
     else
-        array = conv2(array, ones(1, g.average)/g.average, 'same');
+        if strcmpi(g.avgtype, 'const')
+            array = conv2(array, ones(1, g.average)/g.average, 'same');
+        else
+            convolution = gauss2d(1,g.average,1,round(0.15*g.average));
+            array = conv2(array, convolution/sum(convolution), 'same');
+        end;
     end;
 end;
 
