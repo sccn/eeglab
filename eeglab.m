@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2002/08/11 19:17:38  arno
+% removing eeg_const eeg_updatemenu
+%
 % Revision 1.103  2002/08/11 17:37:47  arno
 % same
 %
@@ -500,7 +503,6 @@
 function eeglab( onearg )
 eeg_options; 
 eeg_global;
-COLOR = [.56 .66 .90];
 
 if nargin < 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
@@ -697,7 +699,8 @@ eeglab('redraw');
 % --------------------
 function eeg_mainfig;
 
-COLOR = [.56 .66 .90];
+icadefs;
+COLOR = BACKCOLOR;
 WINMINX         = 17;
 WINMAXX         = 260;
 WINYDEC			= 13;
