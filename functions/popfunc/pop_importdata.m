@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/04/29 15:00:47  arno
+% results -> result
+%
 % Revision 1.20  2003/04/21 00:43:56  arno
 % warning for epoch start time > 10
 %
@@ -229,28 +232,30 @@ if nargin < 1                 % if several arguments, assign values
 	if ~isempty( results{i  } ) , args = { args{:}, 'chanlocs' , results{i} }; end;
 	if ~isempty( results{i+1} ),  args = { args{:}, 'icaweights', results{i+1} }; end;
 	if ~isempty( results{i+2} ) , args = { args{:}, 'icasphere', results{i+2} }; end;
-else % no interactive inputs
-    args = varargin;
-    for index=1:2:length(args)
-        if ~isempty(inputname(index+1)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
-			args{index+1} = inputname(index+1); 
-		end;
-    end;                
-end;
 
-% generate the output command
-% ---------------------------
-com = '';
-for i=1:2:length(args)
-    if ~isempty( args{i+1} )
-        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
-        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+    % generate the output command
+    % ---------------------------
+    com = '';
+    for i=1:2:length(args)
+        if ~isempty( args{i+1} )
+            if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
+            else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+            end;
+        else
+            com = sprintf('%s, ''%s'', []', com, args{i} );
         end;
-    else
-        com = sprintf('%s, ''%s'', []', com, args{i} );
     end;
+    eval( [ 'EEGOUT = pop_editset(EEGOUT' com ');'] );
+    com = [ 'EEG = pop_importdata(' com(2:end) ');'];
+
+else % no interactive inputs
+    EEGOUT = pop_editset(EEGOUT, varargin{:});
+    %args = varargin;
+    %for index=1:2:length(args)
+    %    if ~isempty(inputname(index+1)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
+	%		args{index+1} = inputname(index+1); 
+	%	end;
+    %end;                
 end;
 
-eval( [ 'EEGOUT = pop_editset(EEGOUT' com ');'] );
-com = [ 'EEG = pop_importdata(' com(2:end) ');'];
 return;
