@@ -135,6 +135,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/12/26 16:41:23  arno
+% new release
+%
 % Revision 1.21  2002/12/24 02:51:22  arno
 % new version of readlocs
 % ,
@@ -174,7 +177,7 @@ listimportformat = { ...
    	{ } ... % polhemus (specific non-columnar implementation)	
       { } ... % polhemus (specific non-columnar implementation)
       { } ... % polhemus (specific non-columnar implementation)
-      { 'sph_theta_besa' 'sph_phi_besa' } ... % BESA/EGI format
+      { 'labels' 'sph_theta_besa' 'sph_phi_besa' } ... % BESA/EGI format
       { 'channum' 'X' 'Y' 'Z' } ... % xyz format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
@@ -188,7 +191,7 @@ listskipline = [ ...
    0 ... % polhemus, not applicable
    0 ... % polhemus, not applicable
    0 ... % polhemus, not applicable
-   1 ...  % besa
+   -1 ...  % besa
    0 ...
    0 ...
    0 ...
@@ -271,11 +274,20 @@ if isstr(filename)
    else      
        % importing file
        % --------------
-       array = load_file_or_array( filename, g.skipline);
+       array = load_file_or_array( filename, max(g.skipline,0));
        if size(array,2) < length(g.format)
            fprintf('Readlocs warning: # of columns in file inferior to # format entries');
        elseif size(array,2) > length(g.format)
            fprintf('Readlocs warning: # of columns in file superior to # format entries');
+       end;
+       
+       % removing lines BESA
+       % -------------------
+       if g.skipline == -1
+           if isempty(array{1,2})
+               disp('BESA header detected, skipping 3 lines');
+               array = load_file_or_array( filename, -2);
+           end;
        end;
        
        % removing comments and empty lines
@@ -292,21 +304,34 @@ if isstr(filename)
        for indexcol = 1:min(size(array,2), length(g.format))
            [str mult] = checkformat(g.format{indexcol});
            for indexrow = 1:size( array, 1)
-               eval ( [ 'eloc(indexrow).'  str '= mult*array{indexrow, indexcol};' ]);   
+               if mult ~= 1
+                   eval ( [ 'eloc(indexrow).'  str '= -array{indexrow, indexcol};' ]);
+               else
+                   eval ( [ 'eloc(indexrow).'  str '= array{indexrow, indexcol};' ]);
+               end;
            end;
        end;
    end;
    
    % handling BESA coordinates
    % -------------------------
-   if isfield(eloc, 'sph_phi_besa') & isfield(eloc, 'sph_theta_besa')
-       eloc = convertlocs(eloc, 'sphbesa2all');
+   if isfield(eloc, 'sph_theta_besa')
+       %eloc = convertlocs(eloc, 'sphbesa2all');
+       if isnumeric(eloc(1).labels)
+           disp('Alternate BESA format detected ( Theta | Phi )');
+           for index = 1:length(eloc)
+               eloc(index).sph_phi_besa   = eloc(index).sph_theta_besa;
+               eloc(index).sph_theta_besa = eloc(index).labels;
+           end;
+           eloc = rmfield(eloc, 'labels');
+       end;
        fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
        fprintf('          to avoid confusion (these field can be exported though)\n');   
-       eloc = rmfield(eloc, 'sph_phi_besa');
-       eloc = rmfield(eloc, 'sph_theta_besa');  
-   % converting XYZ coordinates to polar
-   % -----------------------------------
+       %eloc = rmfield(eloc, 'sph_phi_besa');
+       %eloc = rmfield(eloc, 'sph_theta_besa');  
+
+       % converting XYZ coordinates to polar
+       % -----------------------------------
    elseif isfield(eloc, 'X')
        eloc = convertlocs(eloc, 'cart2all');  
    elseif isfield(eloc, 'X')
@@ -348,8 +373,8 @@ end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
-theta = cell2mat({ eloc.theta });
-radius  = cell2mat({ eloc.radius });
+%theta = cell2mat({ eloc.theta });
+%radius  = cell2mat({ eloc.radius });
 if isnumeric(eloc(1).labels)
     for index = 1:length(eloc)
         eloc(index).labels = int2str(eloc(index).labels);
