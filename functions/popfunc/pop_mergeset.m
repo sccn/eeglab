@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/11/18 23:20:25  arno
+% fixed urevent boundary latency
+%
 % Revision 1.30  2004/11/15 22:36:52  arno
 % latency of urevent boundary
 %
@@ -240,7 +243,20 @@ else
 
 	% concatenate events
 	% ------------------
-	if ~isempty(INEEG2.event)
+	if isempty(INEEG2.event)
+        INEEG1.event(end+1).type    = 'boundary';
+        INEEG1.event(end  ).latency = INEEG1pnts+0.5;
+        
+        % urevents
+        % --------
+        if ~isfield(INEEG1, 'urevent'), INEEG1.urevent = []; end;
+        INEEG1.urevent(end+1).type    = 'boundary';
+        if length(INEEG1.urevent) > 1
+            INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
+        else
+            INEEG1.urevent(end  ).latency = INEEG1pnts+0.5;
+        end;
+    else        
         disp('Concatenating events...');
 		if isfield( INEEG1.event, 'epoch')
 			for index = 1:length(INEEG2.event(:))
