@@ -120,6 +120,17 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.29  2003/05/30 17:09:00  arno
+%for index = 1:size(x, 2);
+%    dipstruct(index).posxyz = [x(index) y(index) z(index)];
+%    %dipstruct(index).posxyz = tmp(index).posxyz;
+%    dipstruct(index).momxyz = [1 1 1];
+%    dipstruct(index).component = index;
+%    dipstruct(index).rv = 0.1;
+%end;
+%dipplot(dipstruct);
+%making xyz output compatible
+%
 %Revision 1.28  2003/05/30 16:06:27  arno
 %nothing
 %
