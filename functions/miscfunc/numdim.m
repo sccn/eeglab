@@ -1,7 +1,7 @@
-% numsources() - estimate a lower bound on the (minimum) number of discrete sources 
+% numdim() - estimate a lower bound on the (minimum) number of discrete sources 
 %                in the data via their second-order statistics.
 % Usage:
-%   >> num = numsources( data );
+%   >> num = numdim( data );
 %
 % Inputs:
 %   data   - 2-D data (nchannel x npoints)
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/02/26 23:01:10  arno
+% Initial revision
+%
 % Revision 1.5  2003/02/14 16:11:35  scott
 % header
 % ,
@@ -56,7 +59,7 @@
 % Initial revision
 %
 
-function lambda = numsources( a )
+function lambda = numdim( a )
     
 % Akaike, Identification toolbox (linear identification)
 
@@ -75,4 +78,4 @@ function lambda = numsources( a )
     % testing by duplicating columns
     a = rand(100,5)*2-1;
     a = [a a];
-    numsources( a )
+    numdim( a )
