@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/04/15 00:15:32  arno
+% axis off
+%
 % Revision 1.5  2003/04/15 00:12:30  arno
 % debuging for 1 dataset only
 %
@@ -140,7 +143,7 @@ if nargin < 3
     datsub = eval( [ '[' result{2} ']' ]);
     options = {};
     if result{3}, options = { options{:} 'chans' eval( [ '[' result{3} ']' ]) }; end;
-    if ~isempty(result{4}), options = { options{:} 'alpha' result{4} }; end;
+    if ~isempty(result{4}), options = { options{:} 'alpha' str2num(result{4}) }; end;
     if result{5}, options = { options{:} 'std' 'on' }; end;
     if result{6}, options = { options{:} 'allerps' 'on' }; end;
     if result{7}, options = { options{:} 'diffonly' 'on' }; end;
