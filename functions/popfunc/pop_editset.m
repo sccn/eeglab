@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/12 18:31:31  arno
+% questdlg2
+%
 % Revision 1.20  2002/07/31 18:12:35  arno
 % reading floats le and be
 %
@@ -233,7 +236,25 @@ for curfield = tmpfields'
         case 'setname' , EEGOUT.setname = getfield(g, {1}, curfield{1});
         case 'pnts'    , EEGOUT.pnts = getfield(g, {1}, curfield{1});
         case 'comments', EEGOUT.comments = getfield(g, {1}, curfield{1});
-        case 'averef'  , EEGOUT.averef = getfield(g, {1}, curfield{1});
+	    case 'averef'  , EEGOUT.averef = getfield(g, {1}, curfield{1});
+	                     if strcmp(EEGOUT.averef, 'yes')
+							 disp('Computing average reference...');
+							 EEGOUT = pop_averef(EEGOUT, 0);
+						 else
+							 if nargin < 2
+								 if popask(strvcat('Warning: do you really want to remove average','reference flag while keeping data unchanged')),
+									 disp('Warning: average reference flag changed but data unchanged');
+								 else	 
+									 EEGOUT.averef = 'yes';
+									 for index = 1:2:length(args)
+										 if strcmp(args{index}, 'averef')
+											 args(index:index+1) = [];
+											 break;
+										 end;
+									 end;
+								 end;
+							 end;
+						 end;
         case 'nbchan'  , EEGOUT.nbchan = getfield(g, {1}, curfield{1});
         case 'xmin'    , oldxmin = EEG.xmin;
                          EEGOUT.xmin = getfield(g, {1}, curfield{1});
