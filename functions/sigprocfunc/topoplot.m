@@ -146,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.236  2005/01/02 18:42:25  scott
+% implementing 'plotgrid'
+%
 % Revision 1.235  2004/12/26 05:48:57  scott
 % enlarged definition of 'emarker', deprecated 'ecolor','emarkersize'...
 %
@@ -707,6 +710,7 @@ rmax = 0.5;             % head radius - don't change this!
 INTERPLIMITS = 'head';  % head, electrodes
 INTSQUARE = 'on';       % default, interpolate electrodes located though the whole square containing
                         % the plotting disk
+default_intrad = 1;     % indicator for (no) specified intrad
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
 CIRCGRID   = 201;       % number of angles to use in drawing circles
@@ -1059,6 +1063,7 @@ if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
    error('intrad must be >= plotrad');
 end
 
+if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -1164,7 +1169,7 @@ if isempty(plotrad)
 end                                           % don't plot channels with Rd > 1 (below head)
 
 if isempty(intrad) 
-  default_intrad = 1;                         % indicator for (no) specified intrad
+  default_intrad = 1;     % indicator for (no) specified intrad
   intrad = min(1.0,max(Rd)*1.02);             % default: just outside the outermost electrode location
 else
   default_intrad = 0;                         % indicator for (no) specified intrad
@@ -1334,10 +1339,15 @@ allx    = allx*squeezefac;
 ally    = ally*squeezefac;   
 % Note: Now outermost channel will be plotted just inside rmax
 
+else % if strcmpi(STYLE,'grid')
+   intx = rmax; inty=rmax;
+end % if ~strcmpi(STYLE,'grid')
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
+ if ~strcmpi(STYLE,'grid')
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1415,6 +1425,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   end
   delta = xi(2)-xi(1); % length of grid entry
 
+ end % if ~strcmpi(STYLE,'grid')
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Scale the axes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1436,22 +1447,39 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  if strcmp(STYLE,'grid')                     % plot grid only
-    % error('''plotgrid'' option not yet implemented.'); % <============
+  if strcmpi(STYLE,'grid')                     % plot grid only
+    g1 = size(gridchans,1); Xi = linspace(-rmax,rmax,g1+1);
+    Xi = Xi+rmax/g1; Xi = Xi(1:end-1);
+
+    g2 = size(gridchans,2); Yi = linspace(-rmax,rmax,g2+1);
+    Yi = Yi+rmax/g2; Yi = Yi(1:end-1); Yi = Yi(end:-1:1); % by trial and error!
+
     gridvalues = zeros(size(gridchans));
-gridchans
-size(Values)
     for j=1:size(gridchans,1)
       for k=1:size(gridchans,2)
          if gridchans(j,k) > 0
-fprintf('%d, %d\n',j,k);
             gridvalues(j,k) = Values(gridchans(j,k));
          elseif gridchans(j,k) < 0
             gridvalues(j,k) = -Values(gridchans(j,k));
          end
       end
     end
-    h=imagesc(gridvalues); % ,'EdgeColor','none','FaceColor',SHADING);                    
+    handle=imagesc(Xi,Yi,gridvalues); % plot grid
+    axis square
+
+    if isstr(MAPLIMITS)
+      amin = min(min(gridvalues(find(gridchans~=0))));
+      amax = max(max(gridvalues(find(gridchans~=0))));
+      if strcmp(MAPLIMITS,'absmax')
+        amin = -max(max(abs([amin amax])));
+        amax = max(max(abs([amin amax])));
+      else
+        error('unknown ''maplimits'' value.');
+      end
+    else
+      amin = MAPLIMITS(1);
+      amax = MAPLIMITS(2);
+    end
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1532,11 +1560,13 @@ else % if STYLE 'blank'
     tl = title('Channel locations');
     set(tl, 'fontweight', 'bold');
   end;
-end
+end % STYLE 'blank'
 
 if exist('handle') ~= 1
     handle = gca;
 end;
+
+if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 
 %
 %%%%%%%%%%%%%%%%%%% Plot filled ring to mask jagged grid boundary %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1882,6 +1912,7 @@ if ~isempty(DIPOLE)
     end;
 end;
 
+end % if ~ 'gridplot'
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
