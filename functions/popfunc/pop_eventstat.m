@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/06/03 18:29:47  arno
+% debug label
+%
 % Revision 1.9  2004/06/03 18:28:28  arno
 % debug for empty field
 %
@@ -126,8 +129,13 @@ end;
 
 % call function signalstat() either on raw data or ICA data
 % ---------------------------------------------------------
-typevals = eeg_getepochevent(EEG, type, latrange, eventfield);
-typevals=typevals(~isnan(typevals));
+[ typevals alltypevals ] = eeg_getepochevent(EEG, type, latrange, eventfield);
+% concatenate alltypevals
+% -----------------------
+typevals = [];
+for index = 1:length(alltypevals)
+    typevals = [ typevals alltypevals{index} ];
+end;   
 if isempty(typevals)
     error('No such events found. See Edit > Event values to confirm event type.');
 end;
