@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/08/20 18:11:11  arno
+% no eval for binica
+%
 % Revision 1.41  2004/05/20 15:48:19  arno
 % debug fastica call
 %
@@ -272,9 +275,6 @@ switch lower(icatype)
             end;
         end;
      case 'binica'
-        if ~isunix | strcmp(computer, 'MAC')
-            error('Pop_runica: binica can now only be used under specific UNIX OS');
-        end;
         icadefs;
         fprintf(['Warning: if the binary ICA function does not work, check that you have added the\n' ...
                  'binary file location (in the EEGLAB directory) to your Unix /bin directory (.cshrc file)\n']);
