@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/09/03 21:15:23  scott
+% go back to averaging urdata instead of oridata -sm
+%
 % Revision 1.42  2002/08/31 17:00:50  arno
 % add yerplabel option
 %
@@ -239,7 +242,7 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been dropped from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(oridata,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
 %
 %%%%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -341,7 +344,6 @@ if nargin < 1
   return
 end
 
-data = oridata;
 if isstr(data) 
    ans=strcmp(data,'moreargs');
    if ans==1
@@ -798,7 +800,6 @@ if size(data,2) ~= ntrials
 		data=reshape(data,1,frames*ntrials);
    end
    data=reshape(data,frames,ntrials);
-   oridata = data;
 end
 fprintf('Plotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
                              ntrials,frames,srate);
@@ -820,7 +821,6 @@ if any(isnan(sortvar))
 	nanlocs = find(isnan(sortvar));
 	fprintf('Removing %d trials having NaN values for sorting variable', length(nanlocs));
 	data(:,nanlocs) = [];
-	oridata(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
 	if exist('data2') == 1
 		data2(:,nanlocs) = [];
@@ -1548,7 +1548,6 @@ if Erpflag == YES
     end;
  end;
  xticklabel = strvcat(xticklabel);
- % erp=nan_mean(oridata');           % compute erp average, ignoring nan's
  erp=nan_mean(urdata');           % compute erp average, ignoring nan's
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
