@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/01/26 02:10:24  scott
+% same
+%
 % Revision 1.40  2004/01/26 02:06:55  scott
 % same
 %
@@ -613,13 +616,13 @@ for t=1:ntopos
   fprintf('%4.0f  ',plottimes(t));
 end
 fprintf('\n');
-fprintf('                     or frames: ');
+fprintf('               or epoch frames: ');
 for t=1:ntopos
-  fprintf('%4d  ',plotframes(t));
+  fprintf('%4d  ',frame1-1+plotframes(t));
 end
 fprintf('\n');
 if strcmp(g.pvaf,'on')
-  fprintf('                          pvaf:  ');
+  fprintf('  component pvaf in interval:  ');
   for t=1:ntopos
     fprintf('%4.2f ',pvaf(maporder(t)));
   end
