@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.289  2003/12/03 18:36:49  arno
+% same
+%
 % Revision 1.288  2003/12/03 18:35:48  arno
 % removing de-activated menus
 %
@@ -1070,11 +1073,11 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 % -------------
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
-myaddpath( eeglabpath, 'readeetraklocs.m', 'sigprocfunc');
-myaddpath( eeglabpath, 'eeg_checkset.m',   'adminfunc');
-myaddpath( eeglabpath, 'pop_loadbci.m',    'popfunc');
-myaddpath( eeglabpath, 'icademo.m',        'miscfunc');
-myaddpath( eeglabpath, 'VolumeMNI.bin',    'datafiles');
+myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
+myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
+myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
+myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/ressources');
 eeg_options; 
 eeg_global;
 
