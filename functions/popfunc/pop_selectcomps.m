@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/02/23 15:30:18  scott
+% added 'shrink','skirt' to topoplot call
+%
 % Revision 1.22  2004/02/23 15:28:08  scott
 % turned 'electrodes','off' in topoplots
 %
@@ -209,7 +212,7 @@ for ri = compnum
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
 		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                            'off', 'style' , 'fill','electrodes','off','shrink','skirt');
+                            'off', 'style' , 'fill','electrodes','off');
 		axis square;
 
 		% plot the button

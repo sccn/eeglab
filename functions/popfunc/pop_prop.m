@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/02/23 15:45:00  scott
+% changed erpimage smoothing width to 1 when EEG.trials < 6
+%
 % Revision 1.16  2004/02/23 15:37:35  scott
 % same
 %
@@ -206,10 +209,10 @@ h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 %topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs); axis square; 
 if typecomp == 1 % plot single channel locations
 	topoplot( numcompo, EEG.chanlocs, ...
-             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10,'shrink','skirt'); axis square;
+             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10); axis square;
 else             % plot component map
 	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, ...
-             'shading', 'interp', 'numcontour', 3,'shrink','skirt'); axis square;
+             'shading', 'interp', 'numcontour', 3); axis square;
 end;
 title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 

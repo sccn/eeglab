@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/02/22 23:54:00  scott
+% making electrodes,on the default option
+%
 % Revision 1.39  2004/02/22 23:48:49  scott
 % made srhink,skirt the default option
 %
@@ -217,7 +220,7 @@ if nargin < 3
                { } ...
                { 'style'   'text'     'string'    [ '-> Additional scalp map' fastif(typeplot,'',' (and dipole)') ...
                                                   ' plotting options (see help)' ] } ...
-               { 'style'   'edit'     'string'    '''electrodes'', ''on'', ''shrink'', ''skirt''' } };
+               { 'style'   'edit'     'string'    '''electrodes'', ''on''' } };
     uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
     if typeplot
         uilist(9:11) = [];
