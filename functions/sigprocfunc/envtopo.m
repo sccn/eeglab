@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2004/07/30 01:03:52  arno
+% changed text to double
+%
 % Revision 1.61  2004/05/06 23:41:25  scott
 % typo
 %
@@ -252,7 +255,8 @@
 % 03-16-02 added all topoplot options -ad
 
 function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin);
-
+myfig =gcf;
+    
 if nargin < 2
    help envtopo
    return
@@ -1005,9 +1009,9 @@ if strcmpi(g.dispmaps, 'on')
         
         if ~isempty(g.chanlocs)
             if ~isempty(varargin) 
-                topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+                figure(myfig);topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
             else 
-                topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+                figure(myfig);topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
