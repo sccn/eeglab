@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.136  2002/08/15 00:51:26  arno
+% editing text
+%
 % Revision 1.135  2002/08/14 23:54:36  arno
 % new format for dataset parameter ui
 %
@@ -1036,8 +1039,8 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	set( g.win1, 'String', sprintf('Dataset name: %s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
 	fullfilename = [ EEG.filepath EEG.filename];
 	if ~isempty(fullfilename)
-		if length(fullfilename) > 35
-			set( g.win2, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-35):end) ));
+		if length(fullfilename) > 30
+			set( g.win2, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
 		else
 			set( g.win2, 'String', sprintf('Filename: %s\n', fullfilename));
 		end;        	
