@@ -41,8 +41,7 @@
 %                Useful for comparing component strengths.
 %   'boundaries' = data point indices of discontinuities in the signal
 %   'plot'     = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
-%   'rmdc'     =  ['on'|'off'] 'on' -> remove DC. {default: 'off'}  
-%
+%   'rmdc'     = ['on'|'off'] 'on' -> remove DC. {default: 'off'}  
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
@@ -107,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2004/08/20 18:29:52  hilit
+% *** empty log message ***
+%
 % Revision 1.89  2004/08/20 01:45:55  hilit
 % added 'rmdc' - remove DC input option
 %
@@ -154,18 +156,6 @@
 %
 % Revision 1.74  2003/09/25 00:50:14  arno
 % mapnorm
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
 % adding comments for mapnorm
 %
 % Revision 1.73  2003/09/09 23:26:17  arno
@@ -401,6 +391,13 @@ function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,s
 
 LOPLOTHZ = 1;  % low  Hz to plot
 FREQFAC  = 2;  % approximate frequencies/Hz (default)
+allcolors = { [0 0.7500 0.7500] 
+              [1 0 0] 
+              [0 0.5000 0] 
+              [0 0 1] 
+              [0.2500 0.2500 0.2500] 
+              [0.7500 0.7500 0] 
+              [0.7500 0 0.7500] }; % colors from real plots                };
 
 if nargin<3
    help spectopo
@@ -711,9 +708,20 @@ if strcmpi(g.plot, 'on')
     end;
     
     if isempty(g.weights)
-        pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)');
+        %pl=plot(freqs(1:maxfreqidx),eegspecdB(:,1:maxfreqidx)'); % old command
+        for index = 1:size(eegspecdB,1)
+            tmpcol  = allcolors{mod(index, length(allcolors))+1};
+            command = [ 'disp(''Channel ' int2str(index) ''')' ];
+            pl(index)=plot(freqs(1:maxfreqidx),eegspecdB(index,1:maxfreqidx)', ...
+                           'color', tmpcol, 'ButtonDownFcn', command); hold on;
+        end;
     else 
-        pl=plot(freqs(1:maxfreqidx),eegspecdBtoplot(:,1:maxfreqidx)');
+        for index = 1:size(eegspecdBtoplot,1)
+            tmpcol  = allcolors{mod(index, length(allcolors))+1};
+            command = [ 'disp(''Channel ' int2str(g.plotchan(index)) ''')' ];
+            pl(index)=plot(freqs(1:maxfreqidx),eegspecdBtoplot(index,1:maxfreqidx)', ...
+                           'color', tmpcol, 'ButtonDownFcn', command); hold on;
+        end;
     end;
     set(pl,'LineWidth',2);
     set(gca,'TickLength',[0.02 0.02]);
@@ -744,11 +752,18 @@ if ~isempty(g.weights)
         hold on;
         for f=1:length(g.icamaps)
             colr = colrs{mod((f-1),5)+1};
-            pl2=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)',colr);
+            command = [ 'disp(''Component ' int2str(g.icamaps(f)) ''')' ];
+            pl2(index)=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)', ...
+                            'color', colr, 'ButtonDownFcn', command); hold on;
         end
         othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
         if ~isempty(othercomps)
-            pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
+            for index = 1:length(othercomps)
+                tmpcol  = allcolors{mod(index, length(allcolors))+1};
+                command = [ 'disp(''Component ' int2str(othercomps(index)) ''')' ];
+                pl(index)=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps(index),1:maxfreqidx)', ...
+                               'color', tmpcol, 'ButtonDownFcn', command); hold on;
+            end;
         end;
         if length(g.limits)<3|isnan(g.limits(3))
             newaxis = axis;
@@ -967,10 +982,12 @@ if ~isempty(g.weights) & nargout >= 3
 end;
     
 %%%%%%%%%%%%%%%%
-% Turn on axcopy
+% Turn on axcopy (disabled to allow to click on curves)
 %%%%%%%%%%%%%%%%
 if strcmpi(g.plot, 'on')
+    disp('Click on each trace for channel/component index');
     axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
+    % will not erase the commands for the curves
 end;
 
 %%%%%%%%%%%%%%%%
