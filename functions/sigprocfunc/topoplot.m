@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.179  2004/03/30 17:38:15  scott
+% plot ring patch instead of blanking circle
+%
 % Revision 1.178  2004/03/25 22:30:13  arno
 % same thing
 %
@@ -1118,7 +1121,9 @@ if headrad > 0                         % if cartoon head to be plotted
 ringpts = 201;
 ringwidth = 1.03;  % 3% width
 ringmin = rmax; % rmax/(ringwidth/2); % make head outline be at ring middle
+fillring = 0;
 
+if fillring
 rx = sin(linspace(0,2*pi,ringpts)); rX = rx(end:-1:1);
 ry = cos(linspace(0,2*pi,ringpts)); rY = ry(end:-1:1);
 for i=2:2:ringpts
@@ -1128,10 +1133,11 @@ end
 f1= fill(ringmin*[rx rX],ringmin*[ry rY],BACKCOLOR,'edgealpha',0); hold on
 f2= fill(ringmin*[rx rX*ringwidth],ringmin*[ry rY*ringwidth],BACKCOLOR,'edgealpha',0);
 
-%  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
-%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
-%  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
-  
+else
+  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
+      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
+  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
+end 
 %
 %%%%%%%%%%%%%%%%%%% Plot head outline %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
