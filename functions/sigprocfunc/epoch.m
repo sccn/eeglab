@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/26 00:40:05  arno
+% testing for inf
+%
 % Revision 1.8  2003/02/23 09:10:05  scott
 % header edit -sm
 %
@@ -155,6 +158,8 @@ for index = 1:length(events)
           else
               switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end;
           end;   
+      else 
+          indexes(index) = 1;
       end;
    else
       switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end;
