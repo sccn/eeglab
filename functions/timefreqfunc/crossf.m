@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/24 21:59:11  arno
+% debugging
+%
 % Revision 1.18  2002/04/24 21:45:18  scott
 % topovec bug -sm
 %
@@ -402,7 +405,7 @@ end
 
 if isempty(g.elocs)
 	g.elocs = '';
-elseif (~ischar(g.elocs))
+elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
 	error('Channel location file must be a valid text file.');
 end
 
