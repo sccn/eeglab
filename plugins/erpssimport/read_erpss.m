@@ -19,7 +19,7 @@
 % Notes: ERPSS was developed by Jonathan Hansen at the Hillyard ERP lab 
 %        of UCSD (http://sdepl.ucsd.edu/erpss/).
 %
-% Authors: Jeng-Ren Duann, CNL/Salk & INC/UCSD, 2002-12-12
+% Authors: Jeng-Ren Duann, Arnaud Delorme, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov
 
 function [eeg,ev,header] = read_erpss(filename)
@@ -41,6 +41,10 @@ function [eeg,ev,header] = read_erpss(filename)
     
     cnt = 0;
     ev_cnt = 0;
+    
+    % first pass, scan data
+    totalsize = 0;
+    disp('finding total number of blocks ...');
     while(~feof(fp)),
         tag = fread(fp,1,'uint32');
         if length(tag) == 0,
@@ -48,8 +52,42 @@ function [eeg,ev,header] = read_erpss(filename)
         end
         if tag == hex2dec('f0aa55'),
             cnt = cnt + 1;
-            disp(['  block ' num2str(cnt) ' found']);
 
+            % Read nchans and block length
+            fseek(fp,2,0);
+            nchans = fread(fp,1,'uint16');
+            block_size = power(2,fread(fp,1,'uint16'));
+
+            % Read events
+            fseek(fp,62+110*4+nchans*block_size*2,0);
+            totalsize = totalsize + block_size;
+        end
+    end
+    eeg = zeros(header.nchans, totalsize);
+    
+    % second pass, read data
+    disp(['Reading blocks (out of ' num2str(cnt) '):']);
+    cnt = 0;
+    totalsize = 0;
+    fclose(fp);
+    fp = fopen(filename,'rb','ieee-le');
+    fseek(fp,6,-1);
+    header.nchans = fread(fp,1,'uint16');
+
+    while(~feof(fp)),
+        tag = fread(fp,1,'uint32');
+        if length(tag) == 0,
+            break;
+        end
+        if tag == hex2dec('f0aa55'),
+            cnt = cnt + 1;
+            if ~mod(cnt,10)
+                fprintf('%d ', cnt);
+            end;
+            if ~mod(cnt,100)
+                fprintf('\n');
+            end;
+            
             % Read nchans and block length
             fseek(fp,2,0);
             nchans = fread(fp,1,'uint16');
@@ -68,10 +106,11 @@ function [eeg,ev,header] = read_erpss(filename)
                 end
             end
             data = fread(fp,nchans*block_size,'int16');
-            data = reshape(data,nchans,block_size);
-            eeg = [eeg data]; % concatenate data blocks
+            eeg(:,totalsize+1:totalsize+block_size) = reshape(data,nchans,block_size); % concatenate data blocks
+            totalsize = totalsize + block_size;
         end
     end
+    fprintf('\n');
     
     fclose(fp);
     header.nframes = size(eeg,2);
