@@ -1,8 +1,8 @@
-% caliblocs() - read neuroscan polar location file (.asc)
+% adjustlocs() - read neuroscan polar location file (.asc)
 %
 % Usage:
-%   >> chanlocs = caliblocs( chanlocs );
-%   >> chanlocs = caliblocs( chanlocs, 'key1', val1, 'key2', val2, ...);
+%   >> chanlocs = adjustlocs( chanlocs );
+%   >> chanlocs = adjustlocs( chanlocs, 'key1', val1, 'key2', val2, ...);
 %
 % Inputs:
 %   chanlocs       - EEGLAB channel location data structure. See
@@ -69,14 +69,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/12/02 19:16:54  arno
+% remove verbose option
+%
 % Revision 1.1  2003/12/02 02:34:33  arno
 % Initial revision
 %
 
-function chanlocs = caliblocs( chanlocs, varargin)
+function chanlocs = adjustlocs( chanlocs, varargin)
     
     if nargin < 1
-        help caliblocs;
+        help adjustlocs;
         return;
     end;
     
