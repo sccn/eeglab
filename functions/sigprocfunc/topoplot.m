@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.197  2004/05/05 20:56:20  hilit
+% change the defult setting of dipnorm to 'on'.
+%
 % Revision 1.197  2004/05/05 13:55:00  hilit
 % Set the defult option of dipnorm to 'on'
 %
