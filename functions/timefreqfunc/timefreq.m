@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/10/22 18:07:37  arno
+% if only 1 input for g.freqs
+%
 % Revision 1.30  2003/10/22 17:48:17  arno
 % debuging default spacing between frequencies
 % ,
@@ -243,7 +246,7 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 
 % finding frequencies
 % -------------------
-if length(g.freqs) ==1
+if length(g.freqs) == 1
     g.freqs(2) = g.freqs(1);
 end;
 if g.freqs(1) == 0 & g.cycles ~= 0
@@ -255,12 +258,15 @@ if isempty(g.nfreqs)
         tmpfreqs = linspace(0, srate/2, g.nfreqs); 
         tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
         g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
+        if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end;
     end;
 end;
 if g.cycles == 0
     tmpfreqs = linspace(0, srate/2, g.nfreqs); 
     tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
-    g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
+    if g.freqs(1)==g.freqs(2), g.freqs = g.freqs(1); 
+    else g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
+    end;
 else
     g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
 end;
@@ -300,6 +306,7 @@ tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 % -------------------------------
 % compute time freq decomposition
 % -------------------------------
+g
 fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 1000/srate*g.winsize);
 fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
         fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
