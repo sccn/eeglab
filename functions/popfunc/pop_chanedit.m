@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/01 03:22:22  arno
+% testelp->plotchans3d
+%
 % Revision 1.1  2002/05/01 03:14:50  arno
 % Initial revision
 %
@@ -76,33 +79,7 @@ if nargin < 1
 end;	
 
 nbchan = length(chans);
-try, allfields = fieldnames(chans); catch, allfields = []; end;
-newstruct{1}  = 'labels';
-newstruct{3}  = 'theta';
-newstruct{5}  = 'radius';
-newstruct{7}  = 'X';
-newstruct{9}  = 'Y';
-newstruct{11} = 'Z';
-newstruct{13} = 'sph_theta';
-newstruct{15} = 'sph_phi';
-newstruct{17} = 'sph_radius';
-newstruct{18} = [];
-for index = 1:length(allfields)
-	switch allfields{index}
-	 case 'labels', pos=1;
-	 case 'theta',  pos=3;
-	 case 'radius', pos=5;
-	 case 'X',      pos=7;
-	 case 'Y',      pos=9;
-	 case 'Z',      pos=11;
-	 case 'sph_theta',    pos=13;
-	 case 'sph_phi',      pos=15;
-	 case 'sph_radius',   pos=17;
-	 otherwise, error(['Unrecognized field''' allfields{index} ''' in input structure']);
-	end;
-	newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
-end;
-chans = struct(newstruct{:});
+chans = checkchans(chans);
 
 allfields = fieldnames(chans);
 if nargin < 2
@@ -237,6 +214,7 @@ if nargin < 2
 			chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
 			totaluserdat = { totaluserdat{:} tmpcom };
 			evalin('base', 'clear comtmp;');
+			chans = checkchans(chans);
 		end;
 		
 		% handle arguments
@@ -424,4 +402,31 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
-	
+function chans = checkchans(chans);
+	try, allfields = fieldnames(chans); catch, allfields = []; end;
+	newstruct{1}  = 'labels';
+	newstruct{3}  = 'theta';
+	newstruct{5}  = 'radius';
+	newstruct{7}  = 'X';
+	newstruct{9}  = 'Y';
+	newstruct{11} = 'Z';
+	newstruct{13} = 'sph_theta';
+	newstruct{15} = 'sph_phi';
+	newstruct{17} = 'sph_radius';
+	newstruct{18} = [];
+	for index = 1:length(allfields)
+		switch allfields{index}
+		 case 'labels', pos=1;
+		 case 'theta',  pos=3;
+		 case 'radius', pos=5;
+		 case 'X',      pos=7;
+		 case 'Y',      pos=9;
+		 case 'Z',      pos=11;
+		 case 'sph_theta',    pos=13;
+		 case 'sph_phi',      pos=15;
+		 case 'sph_radius',   pos=17;
+		 otherwise, error(['Unrecognized field''' allfields{index} ''' in input structure']);
+		end;
+		newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
+	end;
+	chans = struct(newstruct{:});
