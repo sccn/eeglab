@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/07/12 01:42:00  arno
+% header
+%
 % Revision 1.36  2003/07/12 01:40:49  arno
 % fixing noplot
 %
@@ -451,13 +454,8 @@ Th = Th(enum);
 Rd = Rd(enum);
 
 labels = labels(enum,:);
-
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
-
-ha = gca;
-cla
-hold on
 
 if ~strcmp(STYLE,'blank')
   % find limits for interpolation
@@ -483,6 +481,7 @@ if ~strcmp(STYLE,'blank')
       fprintf('topoplot(): no plot requested.\n')
       return;
   end
+  hold on
   
   % calculate colormap limits
   m = size(colormap,1);
