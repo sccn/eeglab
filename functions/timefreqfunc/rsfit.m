@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/07/08 15:59:53  arno
+% Initial revision
+%
 
 function [p, c, l, res] = rsfit(x, val)
 
@@ -69,11 +72,17 @@ function [p, c, l, res] = rsfit(x, val)
     
     % find fit
     % --------
-    try, sol = fminsearch('rspdfsolv', [0.1 0.1], optimset('TolX',1e-12), abs(xskew), xkurt);
-    catch,
-        try, sol = fminsearch('rspdfsolv', -[0.1 0.1], optimset('TolX',1e-12), abs(xskew), xkurt);
-        catch, p = NaN; return; end;
+    try, 
+        [sol tmp exitcode] = fminsearch('rspdfsolv', [0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 1000000), abs(xskew), xkurt);    
+    catch, exitcode = 0; % did not converge
     end;
+    if ~exitcode
+        try, [sol tmp exitcode] = fminsearch('rspdfsolv', -[0.1 0.1], optimset('TolX',1e-12, 'MaxFunEvals', 1000000), abs(xskew), xkurt);
+        catch, exitcode = 0; end;
+    end;
+    if ~exitcode,           error('No convergence'); end;
+    if sol(2)*sol(1) == -1, error('Wrong sign for convergence'); end;
+    %fprintf('          l-val:%f\n', sol);
     
     res = rspdfsolv(sol, abs(xskew), xkurt);
     l3 = sol(1);
