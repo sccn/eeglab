@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2002/10/13 23:55:47  scott
+% debugging valsort
+%
 % Revision 1.58  2002/10/13 23:51:22  scott
 % edit valsort fprint
 %
@@ -731,7 +734,7 @@ if nargin > 6
 			  		error('erpimage(): end time for value sorting out of bounds.');
            end
           end
-          if n >= 1 & valargs(1) > valargs(2)
+          if n > 1 & valargs(1) > valargs(2)
 			  		error('erpimage(): Value sorting time range must be increasing.');
           end
           if n==3 & (~isnum(valargs(3)) | valargs(3)==0)
