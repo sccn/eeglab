@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.279  2003/11/27 20:10:11  arno
+% remove trailing delimitor for path
+%
 % Revision 1.278  2003/11/27 20:05:42  arno
 % debug path
 %
@@ -1044,6 +1047,7 @@ myaddpath( eeglabpath, 'readeetraklocs.m', 'sigprocfunc');
 myaddpath( eeglabpath, 'eeg_checkset.m',   'adminfunc');
 myaddpath( eeglabpath, 'pop_readbci.m',    'popfunc');
 myaddpath( eeglabpath, 'tftopo.m',         'miscfunc');
+myaddpath( eeglabpath, 'VolumeMNI.bin',    'datafiles');
 eeg_options; 
 eeg_global;
 
