@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/08/04 16:37:14  arno
+% updating color for significance curves
+%
 % Revision 1.42  2003/08/04 14:43:09  arno
 % updating ERP plot as for timef
 %
@@ -497,6 +500,9 @@ DEFAULT_MARKTIME= NaN;
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
 TITLE_FONT      = 8;
+
+disp('WARNING: this function is not part of the EEGLAB toolbox and should not be distributed');
+disp('         you must contact Arnaud Delorme (arno@salk.edu) for terms of use');
 
 if (nargin < 1)
 	help timef
