@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license, added links -ad 
 
@@ -47,8 +50,8 @@ if nargin < 2
 	return;
 end;
 
-MAXCHANS = size(map,1);
-GRID_SCALE = 2*MAXCHANS+5;
+NCHANS = size(map,1);
+GRID_SCALE = 2*NCHANS+5;
 MAX_RADIUS = 0.5;
 
 % --------------------------------
@@ -56,7 +59,7 @@ MAX_RADIUS = 0.5;
 % --------------------------------
 if isstr( filename )
 	fid = fopen(filename); 
-	locations = fscanf(fid,'%d %f %f %s',[7 MAXCHANS]);
+	locations = fscanf(fid,'%d %f %f %s',[7 NCHANS]);
 	fclose(fid);
 	locations = locations';
 	Th = pi/180*locations(:,2);  % convert degrees to rads
@@ -65,7 +68,13 @@ if isstr( filename )
 	Th = Th(ii);
 	Rd = Rd(ii);
 	[x,y] = pol2cart(Th,Rd);
-else
+        if length(x) ~= NCHANS
+         fprintf(...
+          'gradplot(): channels in locs file (%d) ~= channels in maps (%d)\n', ...
+                                            length(x),              NCHANS);
+         return
+       end
+else                         % what is this complex format ??? -sm
 	x = real(filename);
 	y = imag(filename);
 end;	
@@ -77,7 +86,7 @@ xi = linspace(-0.5,0.5,GRID_SCALE);   % x-axis description (row vector)
 yi = linspace(-0.5,0.5,GRID_SCALE);   % y-axis description (row vector)
 delta = xi(2)-xi(1); % length of grid entry
 
-for c=1:MAXCHANS
+for c=1:NCHANS
    [useless_var horizidx(c)] = min(abs(y(c) - xi)); % find pointers to electrode
    [useless_var vertidx(c)] = min(abs(x(c) - yi));  % positions in Zi
 end;
