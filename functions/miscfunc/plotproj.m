@@ -16,8 +16,7 @@
 %   limits      = [xmin xmax ymin ymax]  (x's in msec) 
 %                          {0, or both y's 0 -> data limits}
 %   chanlist    = list of data channels to plot {0 -> all}
-%   channames   = file of channel names, 4 chars per line ('.' = space)
-%                 else, vector of channel numbers {0 -> [1:chans]}
+%   channames   = channel location file or structure (see readlocs())
 %   colors      = file of color codes, 3 chars per line  ('.' = space)
 %                          {0 -> default color order (black/white first)}
 %
@@ -47,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/09/05 15:43:05  arno
+% debug for new icadef
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
