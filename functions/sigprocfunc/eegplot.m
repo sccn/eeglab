@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2004/05/24 21:02:27  arno
+% ploting duration of events
+%
 % Revision 1.95  2004/04/06 01:30:49  arno
 % scaling when selecting a number of channel
 %
@@ -1257,9 +1260,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       
       % latency and duration of events
       % ------------------------------
-      g.eventlatencies  = cell2mat({g.events.latency});
+      g.eventlatencies  = cell2mat({g.events.latency})+1;
       if isfield(g.events, 'duration')
-           g.eventlatencyend   = g.eventlatencies + cell2mat({g.events.duration});
+           g.eventlatencyend   = g.eventlatencies + cell2mat({g.events.duration})+1;
       else g.eventlatencyend   = [];
       end;
       g.plotevent       = 'on';
