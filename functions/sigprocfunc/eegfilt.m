@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/11/19 23:27:27  arno
+% better error messsage
+%
 % Revision 1.17  2004/08/31 02:12:56  arno
 % typo
 %
@@ -172,7 +175,7 @@ if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
     error('epochframes must be at least 3 times the filtorder.');
 end
 if (1+trans)*hicutoff/nyq > 1
-	error('high cutoff frequency to close to Nyquist frequency');
+	error('high cutoff frequency too close to Nyquist frequency');
 end;
 
 if locutoff > 0 & hicutoff > 0,    % bandpass filter
