@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2004/02/15 16:52:21  scott
+% same
+%
 % Revision 1.83  2004/02/15 16:48:44  scott
 % same
 %
@@ -710,7 +713,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(STYLE,'contour')
-    contour(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
+    contour(Xi,Yi,Zi,CONTOURNUM,'LINESPEC',CCOLOR);
   elseif strcmp(STYLE,'both')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -718,7 +721,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-    contour(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
+    contour(Xi,Yi,Zi,CONTOURNUM,'LINESPEC',CCOLOR);
   elseif strcmp(STYLE,'straight')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -727,7 +730,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         handle = tmph;
     end;
   elseif strcmp(STYLE,'fill')
-    contourf(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
+    contourf(Xi,Yi,Zi,CONTOURNUM,'LINESPEC',CCOLOR);
   else
     error('topoplot(): Invalid style')
   end
