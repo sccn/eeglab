@@ -1,72 +1,74 @@
-% eeg_checkset() - check consistency of EEGLAB dataset fields.
+% eeg_checkset() - check the consistency of fields of an EEGLAB dataset 
 %
 % Structure of an EEG dataset under EEGLAB:
-%	EEG.data     	- two-dimentional continuous data array (channel, frames)
-%                     or three-dimensional data array (chans, frames, epochs)
-%	EEG.setname  	- name of the dataset
-%	EEG.filename 	- filename of the dataset
-%	EEG.filepath    - filepath of the dataset
-%	EEG.chanlocs  	- structure array containing names and positions 
-%                     of the channels on the scalp
-%	EEG.pnts     	- number of frames (time points) per epoch (trial)
-%                     if data is continuous, total number of points
-%	EEG.nbchan     	- number of channels
-%	EEG.trials     	- number of epochs (trials) in the dataset. If data
-%                     is continuous, automatically set to 1.
-%	EEG.srate      	- sampling rate (in Hz)
-%	EEG.xmin      	- epoch start time (in seconds)
-%	EEG.xmax      	- epoch end time (in seconds)
-%	EEG.times      	- time vector (one time value per data point)
-%   EEG.ref         - ['common'|'averef'|'averefwithref'] average reference flag
-%   EEG.comments    - comments about the dataset
+%    EEG.data         - two-dimensional continuous data array (chans, frames)
+%                       OR three-dimensional data array (chans, frames, epochs)
+%    EEG.setname      - name of the dataset
+%    EEG.filename     - filename of the dataset
+%    EEG.filepath     - filepath of the dataset
+%    EEG.chanlocs     - structure array containing names and positions 
+%                       of the channels on the scalp
+%    EEG.pnts         - number of frames (time points) per epoch (trial).
+%                       If data is continuous, total number of points
+%    EEG.nbchan       - number of channels
+%    EEG.trials       - number of epochs (trials) in the dataset. If data
+%                       is continuous, automatically set to 1.
+%    EEG.srate        - channel sampling rate (in Hz)
+%    EEG.xmin         - epoch start time (in seconds)
+%    EEG.xmax         - epoch end time (in seconds)
+%    EEG.times        - time vector (one time value per data point)
+%    EEG.ref          - ['common'|'averef'|'averefwithref'] average reference flag
+%    EEG.comments     - comments about the dataset
 %
 % ICA variables:
-%	EEG.icaact      - ICA activations (components x frames x epochs)
-%                     Empty is compute_ica option is set to 0 in the
-%                     EEGLAB option and computed on the fly.
-%	EEG.icasphere   - sphere array returned by ICA
-%	EEG.icaweights  - weight array returned by ICA
-%	EEG.icawinv     - inverse ICA weight matrix giving the projected
-%                         activity of the components at the electrodes.
-%                         NOTE: Any linear unmixing matrix may be used.
+%    EEG.icaact       - ICA activations (components, frames, epochs)
+%                       Empty means compute_ica option is set to 0 in the
+%                       EEGLAB options -> activations are computed on the fly.
+%    EEG.icasphere    - sphere array returned by ICA decomposition
+%    EEG.icaweights   - weight array returned by ICA decomposition
+%    EEG.icawinv      - inverse ICA weight matrix giving the projected
+%                       activity of the components to the electrodes.
+%                       NOTE: Any linear unmixing matrix may be used, not
+%                       those obtained by ICA.
 %
-% Event and epoch structures:	
-%       EEG.event       - event structure (any number of events per epoch)
-%       EEG.epoch       - epoch structure (one structure per epoch)
-%       EEG.eventdescription - cell array of string describing event fields.
-%       EEG.epochdescription - cell array of string describing epoch fields.
-%   --> See the web page http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html 
-%       for details
+% Event and epoch structures:    
+%       EEG.event     - event structure (any number of events per epoch)
+%       EEG.epoch     - epoch structure (one structure per epoch)
+%       EEG.eventdescription - cell array of strings describing event fields.
+%       EEG.epochdescription - cell array of strings describing epoch fields.
+%       --> See the http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html 
+%           for details
 %
 % Variables used for manual and semi-automatic data rejection:
-%	EEG.specdata            - data spectrum for every single trial
-%	EEG.specica             - data spectrum for every single trial
-%	EEG.stats.kurtc         - component kurtosis values
-%	EEG.stats.kurtg         - global kurtosis of components      
-%	EEG.stats.kurta         - kurtosis of accepted epochs      
-%	EEG.stats.kurtr         - kurtosis of rejected epochs      
-%	EEG.stats.kurtd         - kurtosis of spatial distribution      
-%	EEG.reject.entropy  	- entropy of epochs  
-%	EEG.reject.entropyc   	- entropy of components
-%	EEG.reject.threshold    - rejection thresholds 
-%	EEG.reject.icareject    - epochs rejected by ICA criteria
-%	EEG.reject.gcompreject  - rejected ICA components
-%	EEG.reject.sigreject    - epochs rejected by single-channel criteria
-%	EEG.reject.elecreject   - epochs rejected by raw data criteria
-%	EEG.reject.compreject   - deprecated
-%	EEG.reject.comptrial    - deprecated
-%	EEG.reject.eegentropy   - deprecated
-%	EEG.reject.eegkurt      - deprecated
-%	EEG.reject.eegkurtg     - deprecated
+%      EEG.specdata          - data spectrum for every single trial
+%      EEG.specica           - data spectrum for every single trial
+%      EEG.stats.kurtc       - component kurtosis values
+%      EEG.stats.kurtg       - global kurtosis of components      
+%      EEG.stats.kurta       - kurtosis of accepted epochs      
+%      EEG.stats.kurtr       - kurtosis of rejected epochs      
+%      EEG.stats.kurtd       - kurtosis of spatial distribution      
+%      EEG.reject.entropy    - entropy of epochs  
+%      EEG.reject.entropyc   - entropy of components
+%      EEG.reject.threshold  - rejection thresholds 
+%      EEG.reject.icareject  - epochs rejected by ICA criteria
+%      EEG.reject.gcompreject - rejected ICA components
+%      EEG.reject.sigreject  - epochs rejected by single-channel criteria
+%      EEG.reject.elecreject - epochs rejected by raw data criteria
+%
+%      EEG.reject.compreject - deprecated
+%      EEG.reject.comptrial  - deprecated
+%      EEG.reject.eegentropy - deprecated
+%      EEG.reject.eegkurt    - deprecated
+%      EEG.reject.eegkurtg   - deprecated
 %
 % Usage:
-%       >> [EEGOUT, res] = eeg_checkset( EEG );
+%       >> [EEGOUT, res] = eeg_checkset( EEG ); % check consistency of EEG
 %
 % Inputs:
-%       EEG        - dataset structure
+%       EEG        - EEGLAB dataset structure
 %
 % Outputs:
-%       EEGOUT     - output dataset
+%       EEGOUT     - output EEGLAB dataset
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -91,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2003/01/02 16:37:33  arno
+% editing message - ad & sm
+%
 % Revision 1.86  2002/12/24 01:34:44  arno
 % debug multiple checks
 %
@@ -377,17 +382,17 @@ end;
 if isempty(EEG), return; end;
 if ~isfield(EEG, 'data'), return; end;
 if length(EEG) > 1
-	for index = 1:length(EEG)
-		if ~isempty(EEG(index))
-			if ~isempty( varargin)
-				[TMP, res] = eeg_checkset(EEG(index), varargin{:});
-			else
-				[TMP, res] = eeg_checkset(EEG(index));
-			end;
-			[EEG TMP] = eeg_store(EEG, TMP, index);
-		end;
-	end;
-	return;
+    for index = 1:length(EEG)
+        if ~isempty(EEG(index))
+            if ~isempty( varargin)
+                [TMP, res] = eeg_checkset(EEG(index), varargin{:});
+            else
+                [TMP, res] = eeg_checkset(EEG(index));
+            end;
+            [EEG TMP] = eeg_store(EEG, TMP, index);
+        end;
+    end;
+    return;
 end;
 if isempty(EEG.data), return; end;
 
@@ -404,44 +409,44 @@ res = [];
 % check name consistency
 % ----------------------
 if ~isempty(EEG.setname)
-	if ~isstr(EEG.setname)
-		EEG.setname = '';
-	else
-		if size(EEG.setname,1) > 1
-			disp('eeg_checkset warning: invalid dataset name, removed');
-			EEG.setname = '';
-		end;
-	end;
+    if ~isstr(EEG.setname)
+        EEG.setname = '';
+    else
+        if size(EEG.setname,1) > 1
+            disp('eeg_checkset warning: invalid dataset name, removed');
+            EEG.setname = '';
+        end;
+    end;
 else
-	EEG.setname = '';
-end;	
+    EEG.setname = '';
+end;    
 
 % read data if necessary
 % ----------------------
 if isstr(EEG.data)
-	fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
-	if fid == -1
-		errordlg2(['Cannot open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
-	end;
-	fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
-	EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+    fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
+    if fid == -1
+        errordlg2(['Cannot open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
+    end;
+    fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
+    EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
 end;
 
 % verify the type of the variables
 % --------------------------------
-	% data dimensions -------------------------
-	if size(EEG.data,1) ~= EEG.nbchan
- 	  disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,1)) ...
- 	  ') does not match the number of channels (' int2str(EEG.nbchan) '): corrected' ]); 
- 	  res = com;
- 	  EEG.nbchan = size(EEG.data,1);
-	end;	
+    % data dimensions -------------------------
+    if size(EEG.data,1) ~= EEG.nbchan
+       disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,1)) ...
+       ') does not match the number of channels (' int2str(EEG.nbchan) '): corrected' ]); 
+       res = com;
+       EEG.nbchan = size(EEG.data,1);
+    end;    
 
-	if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
+    if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
       if mod(size(EEG.data,2), EEG.pnts) ~= 0
-           if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
-                          'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-               error('eeg_checkset error: user abord');
+           if popask( [ 'eeg_checkset() error: the number of frames does not divide the number of columns in the data.'  10 ...
+                          'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+               error('eeg_checkset() error: user abort');
                 %res = com;
                 %EEG.pnts = size(EEG.data,2);
                 %EEG = eeg_checkset(EEG);
@@ -449,50 +454,50 @@ end;
            else
                res = com;
                return;
-               %error( 'eeg_checkset error: number of points does not divide the number of columns in data');
-            end;  	  
+               %error( 'eeg_checkset() error: number of points does not divide the number of columns in data');
+            end;        
       else
         if EEG.trials > 1
-       		disp( 'eeg_checkset note: data array made 3-D'); 
-       	    res = com;
-       	end;    
-       	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);		 
+               disp( 'eeg_checkset note: data array made 3-D'); 
+               res = com;
+           end;    
+           EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);         
       end;    
-	end;
+    end;
 
-	% size of data -----------
-	if size(EEG.data,3) ~= EEG.trials 
- 	  disp( ['eeg_checkset warning: 3rd dimension size of data (' int2str(size(EEG.data,3)) ...
- 	  			') does not match the number of epochs (' int2str(EEG.trials) '), corrected' ]); 
- 	  res = com;
- 	  EEG.trials = size(EEG.data,3);
-	end;	
-	if size(EEG.data,2) ~= EEG.pnts 
- 	  disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
- 	  	') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
- 	  res = com;
- 	  EEG.pnts = size(EEG.data,2);
-	end;	
+    % size of data -----------
+    if size(EEG.data,3) ~= EEG.trials 
+       disp( ['eeg_checkset warning: 3rd dimension size of data (' int2str(size(EEG.data,3)) ...
+                   ') does not match the number of epochs (' int2str(EEG.trials) '), corrected' ]); 
+       res = com;
+       EEG.trials = size(EEG.data,3);
+    end;    
+    if size(EEG.data,2) ~= EEG.pnts 
+       disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
+           ') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
+       res = com;
+       EEG.pnts = size(EEG.data,2);
+    end;    
 
-	% parameters coherence -------------------------
-    if 	round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts	  	
-       fprintf( 'eeg_checkset warning: inconsistency (xmax-xmin)*rate+1 (=%f) must be equal to the number of frames (=%d); xmax corrected\n', ...
+    % parameters coherence -------------------------
+    if     round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts          
+       fprintf( 'eeg_checkset() warning: inconsistency (xmax-xmin)*rate+1 (=%f) must be equal to the number of frames (=%d); xmax corrected\n', ...
           EEG.srate*(EEG.xmax-EEG.xmin)+1, EEG.pnts); 
        if EEG.srate == 0
           EEG.srate = 1;
        end;
        EEG.xmax = (EEG.pnts-1)/EEG.srate+EEG.xmin;
-   	   res = com;
-	end;
-	
-	% deal with event arrays
+          res = com;
+    end;
+    
+    % deal with event arrays
     % ----------------------
     if ~isfield(EEG, 'event'), EEG.event = []; res = com; end;
     if ~isempty(EEG.event)
         if EEG.trials > 1 & ~isfield(EEG.event, 'epoch')
-             if popask( [ 'eeg_checkset error: the event info structure does not contain an ''epoch'' field.'  ...
-                          'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-                 error('eeg_checkset error: user abord');
+             if popask( [ 'eeg_checkset() error: the event info structure does not contain an ''epoch'' field.'  ...
+                          'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                 error('eeg_checkset error(): user abort');
                 %res = com;
                 %EEG.event = [];
                 %EEG = eeg_checkset(EEG);
@@ -500,29 +505,29 @@ end;
             else 
                 res = com;
                 return;
-               %error('eeg_checkset error: no epoch field in event structure');
+               %error('eeg_checkset() error: no epoch field in event structure');
             end;
         end;
     else
         EEG.event = [];
     end;
-	if isempty(EEG.event)
-		EEG.eventdescription = {};
-	end;
+    if isempty(EEG.event)
+        EEG.eventdescription = {};
+    end;
     if ~isfield(EEG, 'eventdescription') | ~iscell(EEG.eventdescription)
-		EEG.eventdescription = cell(1, length(fieldnames(EEG.event)));
-		res = com; 
+        EEG.eventdescription = cell(1, length(fieldnames(EEG.event)));
+        res = com; 
     else 
-		if ~isempty(EEG.event)
-			if length(EEG.eventdescription) > length( fieldnames(EEG.event))
-				EEG.eventdescription = EEG.eventdescription(1:length( fieldnames(EEG.event)));
-			elseif length(EEG.eventdescription) < length( fieldnames(EEG.event))
-				EEG.eventdescription(end+1:length( fieldnames(EEG.event))) = {''};
-			end;
-		end;
+        if ~isempty(EEG.event)
+            if length(EEG.eventdescription) > length( fieldnames(EEG.event))
+                EEG.eventdescription = EEG.eventdescription(1:length( fieldnames(EEG.event)));
+            elseif length(EEG.eventdescription) < length( fieldnames(EEG.event))
+                EEG.eventdescription(end+1:length( fieldnames(EEG.event))) = {''};
+            end;
+        end;
     end;
     
- 	% deal with epoch arrays
+     % deal with epoch arrays
     % ----------------------
     if ~isfield(EEG, 'epoch'), EEG.epoch = []; res = com; end;
     if ~isfield(EEG, 'epochdescription'), EEG.epochdescription = {}; res = com; end;
@@ -531,10 +536,10 @@ end;
         else                     l = size( EEG.epoch, 2); 
         end;   
         if l ~= EEG.trials
-             if popask( [ 'eeg_checkset error: the number of epoch indices in the epoch array/struct (' ...
+             if popask( [ 'eeg_checkset() error: the number of epoch indices in the epoch array/struct (' ...
                    int2str(l) ') is different from the number of epochs in the data (' int2str(EEG.trials) ').' 10 ...
-                   'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-                 error('eeg_checkset error: user abord');
+                   'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                 error('eeg_checkset() error: user abort');
                 %res = com;
                 %EEG.epoch = [];
                 %EEG = eeg_checkset(EEG);
@@ -542,23 +547,23 @@ end;
              else
                  res = com;
                  return;
-                %error('eeg_checkset error: epoch structure size invalid');
+                %error('eeg_checkset() error: epoch structure size invalid');
             end;
         end;
     else
         EEG.epoch = [];
     end;
 
-	% check ica
-	% ---------
-	eeg_options; % changed from eeglaboptions 3/30/02 -sm
-	if ~isempty(EEG.icasphere)
-		if ~isempty(EEG.icaweights)
-			if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
-	  			if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ...
- 	  			') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
- 	  			'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-                    error('eeg_checkset error: user abord');
+    % check ica
+    % ---------
+    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    if ~isempty(EEG.icasphere)
+        if ~isempty(EEG.icaweights)
+            if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
+                  if popask( [ 'eeg_checkset() error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ...
+                   ') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
+                   'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                    error('eeg_checkset error: user abort');
                     %res = com;
                     %EEG.icasphere = [];
                     %EEG.icaweights = [];
@@ -567,36 +572,36 @@ end;
                 else
                     res = com;
                     return;
-                    %error('eeg_checkset error: invalid weight and sphere array sizes');
+                    %error('eeg_checkset() error: invalid weight and sphere array sizes');
                 end;    
-			end;
-			if size(EEG.icasphere,2) ~= size(EEG.data,1)
- 	  			disp( [ 'eeg_checkset warning: number of columns in ica matrix (' int2str(size(EEG.icasphere,2)) ...
- 	  			') does not match the number of rows in data (' int2str(size(EEG.data,1)) ')' ]); 
+            end;
+            if size(EEG.icasphere,2) ~= size(EEG.data,1)
+                   disp( [ 'eeg_checkset warning: number of columns in ica matrix (' int2str(size(EEG.icasphere,2)) ...
+                   ') does not match the number of rows in data (' int2str(size(EEG.data,1)) ')' ]); 
                 res = com;
-			end;
-			if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
+            end;
+            if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
-	 	  			if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
-	 	  			') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
-	 	  			'Do you want to want to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-	                    error('eeg_checkset error: user abord');
-	                    %res = com;
-	                    %EEG.icasphere = [];
-	                    %EEG.icaweights = [];
-	                    %EEG = eeg_checkset(EEG);
-	                    %return;
-	                else
+                       if popask( [ 'eeg_checkset() error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
+                       ') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
+                       'Do you want to want to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                        error('eeg_checkset error: user abort');
+                        %res = com;
+                        %EEG.icasphere = [];
+                        %EEG.icaweights = [];
+                        %EEG = eeg_checkset(EEG);
+                        %return;
+                    else
                         res = com;
                         return;
-	                    %error('eeg_checkset error: invalid weight and sphere array size');
-	                end;    
+                        %error('eeg_checkset() error: invalid weight and sphere array size');
+                    end;    
                 end;
                 if option_computeica
- 	    			fprintf('eeg_checkset: recomputing ica activation matrix ...\n'); 
+                     fprintf('eeg_checkset(): recomputing the ICA activation matrix ...\n'); 
                     res = com;
                     if any(isnan(EEG.data(:)))
-                        fprintf('eeg_checkset: recomputing using nan indices in first channel ...\n'); 
+                        fprintf('eeg_checkset(): recomputing using NaN indices in first channel ...\n'); 
                         tmpindices = find(~isnan(EEG.data(1,:)));
                         EEG.icaact    = EEG.data;
                         EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
@@ -604,59 +609,59 @@ end;
                         EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
                     end;
                     EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
-				end;
- 			end;
+                end;
+             end;
             if isempty(EEG.icawinv)
-			    EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
+                EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
                 res = com;
-			end;     
-		else
- 	  		disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
+            end;     
+        else
+               disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
             res = com;
- 	  		EEG.icasphere = [];
-		end;
-		if option_computeica
-			if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
-				disp( [ 'eeg_checkset note: number of dimensions in independent component array increased to 3' ]); 
-				res = com;
-				EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);		
-			end;
-		else 
-			if ~isempty(EEG.icaact)
-				fprintf('eeg_checkset: removing ica activation matrix (see edit options) ...\n'); 
-			end;
-			EEG.icaact     = [];
-		end;
-	else
+               EEG.icasphere = [];
+        end;
+        if option_computeica
+            if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
+                disp( [ 'eeg_checkset note: independent component made 3-D' ]); 
+                res = com;
+                EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);        
+            end;
+        else 
+            if ~isempty(EEG.icaact)
+                fprintf('eeg_checkset(): removing ICA activation matrix (as per edit options) ...\n'); 
+            end;
+            EEG.icaact     = [];
+        end;
+    else
         if ~isempty( EEG.icaweights ), EEG.icaweights = []; res = com; end;
         if ~isempty( EEG.icawinv ),    EEG.icawinv = []; res = com; end;
         if ~isempty( EEG.icaact ),     EEG.icaact = []; res = com; end;
-	end;
-	if isempty(EEG.icaact)
-		EEG.icaact = [];
-	end;
-	
+    end;
+    if isempty(EEG.icaact)
+        EEG.icaact = [];
+    end;
+    
 % check chanlocs
 % -------------
 if ~isempty( EEG.chanlocs )
     if ~isstruct( EEG.chanlocs)
-		if exist( EEG.chanlocs ) ~= 2
-			disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
-	        EEG.chanlocs = [];
-	        res = com;
+        if exist( EEG.chanlocs ) ~= 2
+            disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
+            EEG.chanlocs = [];
+            res = com;
         else
             res = com;
             try, EEG.chanlocs = readlocs( EEG.chanlocs );
- 			     disp( [ 'eeg_checkset: channel file read' ]); 
+                  disp( [ 'eeg_checkset(): channel file read' ]); 
             catch, EEG.chanlocs = []; end;
-		end; 	
+        end;     
     end;
     if isstruct( EEG.chanlocs)
         if length( EEG.chanlocs) ~= EEG.nbchan & length( EEG.chanlocs) ~= EEG.nbchan+1
-			disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct: channel file/struct removed' ]); 
-	        EEG.chanlocs = [];
-	        res = com;
-	    end;
+            disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct: channel file/struct removed' ]); 
+            EEG.chanlocs = [];
+            res = com;
+        end;
     end;
     if isstruct( EEG.chanlocs)
         if ~isstr(EEG.chanlocs(1).labels)
@@ -677,11 +682,11 @@ end;
 % EEG.times (only for epoched datasets)
 % ---------
 if (EEG.trials > 1)
-	EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
+    EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
 else
-	if isfield(EEG, 'times')
-		EEG = rmfield(EEG, 'times');
-	end;
+    if isfield(EEG, 'times')
+        EEG = rmfield(EEG, 'times');
+    end;
 end;
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
@@ -690,57 +695,57 @@ if ~isfield(EEG, 'ref') | isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
 
 % create fields if absent
 % -----------------------
-if ~isfield(EEG, 'reject')					EEG.reject.rejjp = []; res = com; end;
+if ~isfield(EEG, 'reject')                    EEG.reject.rejjp = []; res = com; end;
 
 listf = { 'rejjp' 'rejkurt' 'rejmanual' 'rejthresh' 'rejconst', 'rejfreq' ...
-			   'icarejjp' 'icarejkurt' 'icarejmanual' 'icarejthresh' 'icarejconst', 'icarejfreq'};
-for index = 1:length(listf)	
-	if ~isfield(EEG.reject, listf{index}),	EEG.reject = setfield(EEG.reject, listf{index}, []); res = com; end;
-	elecfield = [listf{index} 'E'];
-	if ~isfield(EEG.reject, elecfield),     EEG.reject = setfield(EEG.reject, elecfield, []); res = com; end;
-	% check if electrode array is empty with rejection array is not
+               'icarejjp' 'icarejkurt' 'icarejmanual' 'icarejthresh' 'icarejconst', 'icarejfreq'};
+for index = 1:length(listf)    
+    if ~isfield(EEG.reject, listf{index}),    EEG.reject = setfield(EEG.reject, listf{index}, []); res = com; end;
+    elecfield = [listf{index} 'E'];
+    if ~isfield(EEG.reject, elecfield),     EEG.reject = setfield(EEG.reject, elecfield, []); res = com; end;
+    % check if electrode array is empty with rejection array is not
     if ~isempty(getfield(EEG.reject, listf{index})) & isempty(getfield(EEG.reject, elecfield))
-		nbchan = fastif( strcmp(listf{index}, 'ica'), size(EEG.icaweights,1), EEG.nbchan);
-		EEG.reject = setfield(EEG.reject, elecfield, zeros(nbchan, length(getfield(EEG.reject, listf{index})))); res = com;
-	end;
+        nbchan = fastif( strcmp(listf{index}, 'ica'), size(EEG.icaweights,1), EEG.nbchan);
+        EEG.reject = setfield(EEG.reject, elecfield, zeros(nbchan, length(getfield(EEG.reject, listf{index})))); res = com;
+    end;
 end;
-if ~isfield(EEG.reject, 'rejglobal')		EEG.reject.rejglobal = []; res = com; end;
-if ~isfield(EEG.reject, 'rejglobalE')		EEG.reject.rejglobalE = []; res = com; end;
+if ~isfield(EEG.reject, 'rejglobal')        EEG.reject.rejglobal = []; res = com; end;
+if ~isfield(EEG.reject, 'rejglobalE')        EEG.reject.rejglobalE = []; res = com; end;
 
 % default colors for rejection
 % ----------------------------
-if ~isfield(EEG.reject, 'rejmanualcol')		EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end;
-if ~isfield(EEG.reject, 'rejthreshcol')		EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end;
-if ~isfield(EEG.reject, 'rejconstcol')		EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end;
-if ~isfield(EEG.reject, 'rejjpcol')		    EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
-if ~isfield(EEG.reject, 'rejkurtcol')		EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end;
-if ~isfield(EEG.reject, 'rejfreqcol')		EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end;
-if ~isfield(EEG.reject, 'disprej')		    EEG.reject.disprej      = { }; end;
-	
-if ~isfield(EEG, 'stats')			EEG.stats.jp = []; res = com; end;
-if ~isfield(EEG.stats, 'jp')		EEG.stats.jp = []; res = com; end;
-if ~isfield(EEG.stats, 'jpE')		EEG.stats.jpE = []; res = com; end;
-if ~isfield(EEG.stats, 'icajp')		EEG.stats.icajp = []; res = com; end;
-if ~isfield(EEG.stats, 'icajpE')	EEG.stats.icajpE = []; res = com; end;
-if ~isfield(EEG.stats, 'kurt')		EEG.stats.kurt = []; res = com; end;
-if ~isfield(EEG.stats, 'kurtE')		EEG.stats.kurtE = []; res = com; end;
-if ~isfield(EEG.stats, 'icakurt')	EEG.stats.icakurt = []; res = com; end;
-if ~isfield(EEG.stats, 'icakurtE')	EEG.stats.icakurtE = []; res = com; end;
+if ~isfield(EEG.reject, 'rejmanualcol')        EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end;
+if ~isfield(EEG.reject, 'rejthreshcol')        EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end;
+if ~isfield(EEG.reject, 'rejconstcol')        EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end;
+if ~isfield(EEG.reject, 'rejjpcol')            EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
+if ~isfield(EEG.reject, 'rejkurtcol')        EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end;
+if ~isfield(EEG.reject, 'rejfreqcol')        EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end;
+if ~isfield(EEG.reject, 'disprej')            EEG.reject.disprej      = { }; end;
+    
+if ~isfield(EEG, 'stats')            EEG.stats.jp = []; res = com; end;
+if ~isfield(EEG.stats, 'jp')        EEG.stats.jp = []; res = com; end;
+if ~isfield(EEG.stats, 'jpE')        EEG.stats.jpE = []; res = com; end;
+if ~isfield(EEG.stats, 'icajp')        EEG.stats.icajp = []; res = com; end;
+if ~isfield(EEG.stats, 'icajpE')    EEG.stats.icajpE = []; res = com; end;
+if ~isfield(EEG.stats, 'kurt')        EEG.stats.kurt = []; res = com; end;
+if ~isfield(EEG.stats, 'kurtE')        EEG.stats.kurtE = []; res = com; end;
+if ~isfield(EEG.stats, 'icakurt')    EEG.stats.icakurt = []; res = com; end;
+if ~isfield(EEG.stats, 'icakurtE')    EEG.stats.icakurtE = []; res = com; end;
 
 % component rejection
 % -------------------
-if ~isfield(EEG.stats, 'compenta')		EEG.stats.compenta = []; res = com; end;
-if ~isfield(EEG.stats, 'compentr')		EEG.stats.compentr = []; res = com; end;
-if ~isfield(EEG.stats, 'compkurta')		EEG.stats.compkurta = []; res = com; end;
-if ~isfield(EEG.stats, 'compkurtr')		EEG.stats.compkurtr = []; res = com; end;
-if ~isfield(EEG.stats, 'compkurtdist')	EEG.stats.compkurtdist = []; res = com; end;
-if ~isfield(EEG.reject, 'threshold')		EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end;
-if ~isfield(EEG.reject, 'threshentropy')	EEG.reject.threshentropy = 600; res = com; end;
-if ~isfield(EEG.reject, 'threshkurtact')	EEG.reject.threshkurtact = 600; res = com; end;
-if ~isfield(EEG.reject, 'threshkurtdist')	EEG.reject.threshkurtdist = 600; res = com; end;
-if ~isfield(EEG.reject, 'gcompreject')		EEG.reject.gcompreject = []; res = com; end;
+if ~isfield(EEG.stats, 'compenta')        EEG.stats.compenta = []; res = com; end;
+if ~isfield(EEG.stats, 'compentr')        EEG.stats.compentr = []; res = com; end;
+if ~isfield(EEG.stats, 'compkurta')        EEG.stats.compkurta = []; res = com; end;
+if ~isfield(EEG.stats, 'compkurtr')        EEG.stats.compkurtr = []; res = com; end;
+if ~isfield(EEG.stats, 'compkurtdist')    EEG.stats.compkurtdist = []; res = com; end;
+if ~isfield(EEG.reject, 'threshold')        EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end;
+if ~isfield(EEG.reject, 'threshentropy')    EEG.reject.threshentropy = 600; res = com; end;
+if ~isfield(EEG.reject, 'threshkurtact')    EEG.reject.threshkurtact = 600; res = com; end;
+if ~isfield(EEG.reject, 'threshkurtdist')    EEG.reject.threshkurtdist = 600; res = com; end;
+if ~isfield(EEG.reject, 'gcompreject')        EEG.reject.gcompreject = []; res = com; end;
 if length(EEG.reject.gcompreject) ~= size(EEG.icaweights,1)
-	EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
+    EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
 end;
 
 % component rejection
@@ -750,47 +755,47 @@ end;
 if ~isempty( varargin)
     for index = 1:length( varargin )
         switch varargin{ index }
-		 case 'data',; % already done at the top 
-		 case 'contdata',; % already done at the top 
-		  if EEG.trials > 1
-			  errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
-			  error('eeg_checkset error: data is not continuous'); return;
-		  end;
-		 case 'ica', 
-		  if isempty(EEG.icaweights)
-			  if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
-				  errordlg2('eeg_checkset: ICA components must be derived before running that function'); 
-				  error('no ica components'); return; 
-			  end;
-			  [EEG res] = pop_runica(EEG);
-			  res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
-		  end;
-		 case 'epoch', 
-		  if EEG.trials == 1
-			  errordlg2(strvcat('Epochs must be extracted before running that function', 'Use /Tools/Extract epochs'), 'Error');
-			  error('eeg_checkset error: epochs must be extracted before running that function'); return
-		  end;
-		 case 'besa', 
-		  if ~isfield(EEG, 'sources')
-			  errordlg2(strvcat('No dipole information', '1) Component maps must be exported: Tools > Localize ... BESA > Export ...' ...
+         case 'data',; % already done at the top 
+         case 'contdata',; % already done at the top 
+          if EEG.trials > 1
+              errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
+              error('eeg_checkset() error: data is not continuous'); return;
+          end;
+         case 'ica', 
+          if isempty(EEG.icaweights)
+              if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
+                  errordlg2('eeg_checkset(): ICA components must be derived before running that function'); 
+                  error('no ICA components'); return; 
+              end;
+              [EEG res] = pop_runica(EEG);
+              res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
+          end;
+         case 'epoch', 
+          if EEG.trials == 1
+              errordlg2(strvcat('Epochs must be extracted before running that function', 'Use Tools > Extract epochs'), 'Error');
+              error('eeg_checkset() error: epochs must be extracted before running that function'); return
+          end;
+         case 'besa', 
+          if ~isfield(EEG, 'sources')
+              errordlg2(strvcat('No dipole information', '1) Component maps must be exported: Tools > Localize ... BESA > Export ...' ...
                                 , '2) BESA must be run to localize the equivalent dipoles', ...
                                 '3) BESA dipoles must be imported: Tools > Localize ... BESA > Import ...'), 'Error');
-			  error('eeg_checkset error: no BESA dipole information'); return
-		  end;
-		 case 'event', 
-		  if isempty(EEG.event)
-			  errordlg2(strvcat('Cannot process if no events. First add events.', 'Use /File/Import event info or /Import epoch info'), 'Error');
-			  error('eeg_checkset: no events'); return;
-		  end;
-		 case 'chanloc', 
-		  if isempty(EEG.chanlocs)
-			  errordlg2( strvcat('Cannot process without channel location file.', ...
-						 'Enter the name of the file via "/Edit/Edit dataset info".', ...
-						 'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
-			  error('eeg_checkset: cannot process without channel location file.'); return;
-		  end;
-		 case 'chanlocsize', 
-		  if ~isempty(EEG.chanlocs)
+              error('eeg_checkset() error: no BESA dipole information'); return
+          end;
+         case 'event', 
+          if isempty(EEG.event)
+              errordlg2(strvcat('Cannot process if no events. First add events.', 'Use File > Import event info or > Import epoch info'), 'Error');
+              error('eeg_checkset(): no events'); return;
+          end;
+         case 'chanloc', 
+          if isempty(EEG.chanlocs)
+              errordlg2( strvcat('Cannot process without channel location file.', ...
+                         'Enter the name of the file via "Edit > Edit dataset info".', ...
+                         'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
+              error('eeg_checkset(): cannot process dataset without channel location file.'); return;
+          end;
+         case 'chanlocsize', 
+          if ~isempty(EEG.chanlocs)
               if length(EEG.chanlocs) > EEG.nbchan
                   questdlg2(strvcat('Warning: there is one more electrode location than', ...
                                     'data channels. EEGLAB will consider the last electrode to be the', ...
@@ -798,176 +803,176 @@ if ~isempty( varargin)
                                     'extra channel'), 'Warning', 'Ok', 'Ok');
               end;    
           end;
-		 case 'eventconsistency',		  
-		  if isempty(EEG.event), return; end;
-		  
-		  % remove the events which latency are out of boundary
-		  % ---------------------------------------------------
-		  if isfield(EEG.event, 'latency')
-			  try, alllatencies = cell2mat( { EEG.event.latency } );
-			  catch, error('Checkset: error empty latency entry for new events added by user');
-			  end;
-			  I1 = find(alllatencies < 0);
-			  I2 = find(alllatencies > EEG.pnts*EEG.trials);
-			  if (length(I1) + length(I2)) > 0 
-				  fprintf('Checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
-						  length(I1) + length(I2), length(EEG.event));
-				  EEG.event(union(I1, I2)) = [];
-			  end;
-		  end;
-		  
-		  % save information for non latency fields updates
-		  % -----------------------------------------------
-		  difffield = [];
-		  if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
-			  % remove fields with empty epochs
-			  % -------------------------------
-			  removeevent = [];
-			  try, allepochs = cell2mat( { EEG.event.epoch } );
-				  removeevent = find( allepochs < 1 | allepochs > EEG.trials);
-				  if ~isempty(removeevent)
-					  disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch number and were removed']);
-				  end;
-			  catch, 
-				  for indexevent = 1:length(EEG.event)
-					  if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
-							  | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
-						  removeevent = [removeevent indexevent];
-						  disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
-					  end;
-				  end;
-			  end;
-			  EEG.event(removeevent) = [];
-			  allepochs = cell2mat( { EEG.event.epoch } );
-			  
-			  % uniformize fields content for the different epochs
-			  % --------------------------------------------------
-			  % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
-			  % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
- 			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
- 			  for index = 1:length(difffield)
- 			  	  eval(['allvalues = { EEG.event.' difffield{index} ' };']);
- 				  try,   eval(['valempt = cellfun(''isempty'', allvalues);']);
-				  catch, valempt = mycellfun('isempty', allvalues);
-				  end;
- 			 	  arraytmpinfo = cell(1,EEG.trials);
+         case 'eventconsistency',          
+          if isempty(EEG.event), return; end;
+          
+          % remove the events which latency are out of boundary
+          % ---------------------------------------------------
+          if isfield(EEG.event, 'latency')
+              try, alllatencies = cell2mat( { EEG.event.latency } );
+              catch, error('Checkset: error empty latency entry for new events added by user');
+              end;
+              I1 = find(alllatencies < 0);
+              I2 = find(alllatencies > EEG.pnts*EEG.trials);
+              if (length(I1) + length(I2)) > 0 
+                  fprintf('eeg_checkset() warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
+                          length(I1) + length(I2), length(EEG.event));
+                  EEG.event(union(I1, I2)) = [];
+              end;
+          end;
+          
+          % save information for non latency fields updates
+          % -----------------------------------------------
+          difffield = [];
+          if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
+              % remove fields with empty epochs
+              % -------------------------------
+              removeevent = [];
+              try, allepochs = cell2mat( { EEG.event.epoch } );
+                  removeevent = find( allepochs < 1 | allepochs > EEG.trials);
+                  if ~isempty(removeevent)
+                      disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch number and were removed']);
+                  end;
+              catch, 
+                  for indexevent = 1:length(EEG.event)
+                      if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
+                              | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
+                          removeevent = [removeevent indexevent];
+                          disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
+                      end;
+                  end;
+              end;
+              EEG.event(removeevent) = [];
+              allepochs = cell2mat( { EEG.event.epoch } );
+              
+              % uniformize fields content for the different epochs
+              % --------------------------------------------------
+              % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
+              % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
+               difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
+               for index = 1:length(difffield)
+                     eval(['allvalues = { EEG.event.' difffield{index} ' };']);
+                   try,   eval(['valempt = cellfun(''isempty'', allvalues);']);
+                  catch, valempt = mycellfun('isempty', allvalues);
+                  end;
+                    arraytmpinfo = cell(1,EEG.trials);
  
- 				  % get the field content
- 				  % ---------------------
- 				  for indexevent = 1:length(EEG.event)
- 					  if ~valempt(indexevent)
- 						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
- 					  end;
- 				  end;
- 				  % uniformize content for all epochs
- 				  % ---------------------------------
- 				  for indexevent = 1:length(EEG.event)
-					  if valempt(indexevent)
-						  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, ...
-														   arraytmpinfo{allepochs(indexevent)});
-					  end;
- 				  end;
-				  if any(valempt)
-					  fprintf(['Eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
-					  fprintf(['Eeg_checkset: filling with value of other events in the same epochs\n']);
-				  end;
- 			  end;
-		  end;
-		  
-		  % uniformize fields (str or int) if necessary
-		  % -------------------------------------------
-		  allfields = fieldnames(EEG.event);
-		  for index = 1:length(allfields)
-			  eval(['allvalues = { EEG.event.' allfields{index} ' };']);
-			  try,   eval(['valreal = cellfun(''isclass'', allvalues, ''double'');']);
-			  catch, valreal = mycellfun('isclass', allvalues, 'double');
-			  end;
-			  
-			  format = 'ok';
-			  if ~all(valreal) % all valreal ok
-				  format = 'str';
-				  if all(valreal == 0) % all valreal=0 ok
-					  format = 'ok';
-				  end;
-			  end;
-			  if strcmp(format, 'str')
-				  fprintf('eeg_checkset: uniformize value format of event field ''%s''\n', allfields{index});
-				  % get the field content
-				  % ---------------------
-				  for indexevent = 1:length(EEG.event)
-					  if valreal(indexevent)
-						  EEG.event = setfield(EEG.event, { indexevent }, allfields{index}, num2str(allvalues{indexevent}) );
-					  end;
-				  end;
-			  end;
-		  end;
-		  
-		  % build epoch structure
-		  try,
-		  if EEG.trials > 1 & ~isempty(EEG.event)
-			  maxlen = 0;
-			  EEG.epoch = [];
-			  EEG.epoch(1).event = [];	
-			  EEG.epoch(EEG.trials).event = [];	
-			  for index = 1:length(EEG.event)
-				  currentepoch = EEG.event(index).epoch;
-				  if currentepoch <= length(EEG.epoch)
-					  EEG.epoch(currentepoch).event = [ EEG.epoch(currentepoch).event index ];
-				  else
-					  EEG.epoch(currentepoch).event = [ index ];
-				  end;
-				  maxlen = max(length(EEG.epoch(currentepoch).event), maxlen);
-			  end;
-			  
-			  % copy event information into the epoch array
-			  % -------------------------------------------
-			  eventfields = fieldnames(EEG.event);
-			  eventfields = setdiff(eventfields, 'epoch');
-			  for fieldnum = 1:length(eventfields)
-				  eval( ['allfieldvals = { EEG.event.' eventfields{fieldnum} '};'] );
-				  for trial = 1:EEG.trials
-					  valfield = allfieldvals( EEG.epoch(trial).event );
-					  if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
-						  valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
-						  valfield = mat2cell(valfield);
-					  end;
-					  if ~isempty(valfield)
-						  if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
-						  else            EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield);
-						  end;
-					  end;
-				  end;
-			  end;    
-		  end;
-		  catch, errordlg2(['warning: minor problem encountered when generating' 10 ...
-						'epoch information (only usefull for users using command line scripts)']); return;
-		  end;
-		 otherwise, error('eeg_checkset: unknown option');
-		end;        
+                   % get the field content
+                   % ---------------------
+                   for indexevent = 1:length(EEG.event)
+                       if ~valempt(indexevent)
+                           arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
+                       end;
+                   end;
+                   % uniformize content for all epochs
+                   % ---------------------------------
+                   for indexevent = 1:length(EEG.event)
+                      if valempt(indexevent)
+                          EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, ...
+                                                           arraytmpinfo{allepochs(indexevent)});
+                      end;
+                   end;
+                  if any(valempt)
+                      fprintf(['eeg_checkset(): found empty values for field ''' difffield{index} '''\n']);
+                      fprintf(['eeg_checkset(): filling with values of other events in the same epochs\n']);
+                  end;
+               end;
+          end;
+          
+          % uniformize fields (str or int) if necessary
+          % -------------------------------------------
+          allfields = fieldnames(EEG.event);
+          for index = 1:length(allfields)
+              eval(['allvalues = { EEG.event.' allfields{index} ' };']);
+              try,   eval(['valreal = cellfun(''isclass'', allvalues, ''double'');']);
+              catch, valreal = mycellfun('isclass', allvalues, 'double');
+              end;
+              
+              format = 'ok';
+              if ~all(valreal) % all valreal ok
+                  format = 'str';
+                  if all(valreal == 0) % all valreal=0 ok
+                      format = 'ok';
+                  end;
+              end;
+              if strcmp(format, 'str')
+                  fprintf('eeg_checkset(): value format of event field ''%s'' made uniform\n', allfields{index});
+                  % get the field content
+                  % ---------------------
+                  for indexevent = 1:length(EEG.event)
+                      if valreal(indexevent)
+                          EEG.event = setfield(EEG.event, { indexevent }, allfields{index}, num2str(allvalues{indexevent}) );
+                      end;
+                  end;
+              end;
+          end;
+          
+          % build epoch structure
+          try,
+          if EEG.trials > 1 & ~isempty(EEG.event)
+              maxlen = 0;
+              EEG.epoch = [];
+              EEG.epoch(1).event = [];    
+              EEG.epoch(EEG.trials).event = [];    
+              for index = 1:length(EEG.event)
+                  currentepoch = EEG.event(index).epoch;
+                  if currentepoch <= length(EEG.epoch)
+                      EEG.epoch(currentepoch).event = [ EEG.epoch(currentepoch).event index ];
+                  else
+                      EEG.epoch(currentepoch).event = [ index ];
+                  end;
+                  maxlen = max(length(EEG.epoch(currentepoch).event), maxlen);
+              end;
+              
+              % copy event information into the epoch array
+              % -------------------------------------------
+              eventfields = fieldnames(EEG.event);
+              eventfields = setdiff(eventfields, 'epoch');
+              for fieldnum = 1:length(eventfields)
+                  eval( ['allfieldvals = { EEG.event.' eventfields{fieldnum} '};'] );
+                  for trial = 1:EEG.trials
+                      valfield = allfieldvals( EEG.epoch(trial).event );
+                      if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
+                          valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+                          valfield = mat2cell(valfield);
+                      end;
+                      if ~isempty(valfield)
+                          if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
+                          else            EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield);
+                          end;
+                      end;
+                  end;
+              end;    
+          end;
+          catch, errordlg2(['warning: minor problem encountered when generating' 10 ...
+                        'epoch information (only useful for users using command line scripts)']); return;
+          end;
+         otherwise, error('eeg_checkset(): unknown option');
+        end;        
     end;
 end;            
 
-return;	
+return;    
 
 function num = popask( text )
-	 ButtonName=questdlg2( text, ...
-	        'Confirmation', 'Cancel', 'Yes','Yes');
-	 switch lower(ButtonName),
-	      case 'cancel', num = 0;
-	      case 'yes',    num = 1;
-	 end;
+     ButtonName=questdlg2( text, ...
+            'Confirmation', 'Cancel', 'Yes','Yes');
+     switch lower(ButtonName),
+          case 'cancel', num = 0;
+          case 'yes',    num = 1;
+     end;
 
 function res = mycellfun(com, vals, classtype);
-	res = zeros(1, length(vals));
-	switch com
-	 case 'isempty', 
-	  for index = 1:length(vals), res(index) = isempty(vals{index}); end;
-	 case 'isclass'
-	  if strcmp(classtype, 'double')
-		  for index = 1:length(vals), res(index) = isnumeric(vals{index}); end;
-	  else 
-		  error('unknown cellfun command');
-	  end;
-	 otherwise error('unknown cellfun command');
-	end;
-	
+    res = zeros(1, length(vals));
+    switch com
+     case 'isempty', 
+      for index = 1:length(vals), res(index) = isempty(vals{index}); end;
+     case 'isclass'
+      if strcmp(classtype, 'double')
+          for index = 1:length(vals), res(index) = isnumeric(vals{index}); end;
+      else 
+          error('unknown cellfun command');
+      end;
+     otherwise error('unknown cellfun command');
+    end;
+    
