@@ -34,6 +34,8 @@
 %  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> 1}
 %  'vert'      = [vector] of times (in ms or Hz) to plot vertical lines 
 %                {def none}
+%  'regions'   = [float array] float array of size (n,2) each line defining 
+%                a time region [low high] to be highlighted.
 %  'axsize'    = [x y] axis size {default [.07 .07]}
 %
 % Author: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3-2-98 
@@ -60,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/03/16 02:59:30  arno
+% debug legend
+%
 % Revision 1.14  2003/03/16 02:43:50  arno
 % allowing to show legend
 %
@@ -186,6 +191,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'limits'    'float'                 []          0;
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
+                    'regions'   'float'                 []          [];
                     'colors'    'cell'                  []          {};
                     'legend'    'cell'                  []          {};
                     'showleg'   'string'                {'on' 'off'} 'on';
@@ -566,6 +572,16 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             axislcolor = get(gca,'Xcolor');   %%CJH
             
             axis('off');
+
+            %
+            %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            for index=1:size(g.regions,1)
+                tmpreg = g.regions(index,:);
+                tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                             [-100 -100 100 100], [1 1 0.9]); hold on;
+                set(tmph, 'edgecolor', [1 1 0.9]);
+            end;
             
             % secondx = 200;                             % draw second vert axis 
             % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
@@ -595,6 +611,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
             end % ~ISSPEC
+            
+            
         end; % P=0 
         %
         %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -602,8 +620,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         if ~iscell( g.colors{P+1} ), tmpcolor = { g.colors{P+1} 'linewidth' LINEWIDTH };
         else                         tmpcolor = g.colors{P+1};
         end;
-        if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-            
+        if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
             plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), tmpcolor{:});   
             ymn = min(g.ydir*[ymax ymin]);
             ymx = max(g.ydir*[ymax ymin]);
