@@ -1,13 +1,15 @@
 % pop_topoplot() - Plot scalp map(s) in a figure window. If number of input
-%                  arguments is < 3, pop-up an interactive query window.
-%
+%                  arguments is less than 3, pop up an interactive query window.
+%                  Makes (possibly repeated) calls to topoplot().
 % Usage:
-%   >> pop_topoplot( EEG, typeplot, items, title, options...);
-%   >> pop_topoplot( EEG, typeplot, items, title, plotdip, options...);
+%   >> pop_topoplot( EEG); % pops up a parameter query window
+%   >> pop_topoplot( EEG, typeplot, items, title, plotdip, options...); % no pop-up
 %
 % Inputs:
 %   EEG      - Input EEG dataset structure (see >> help eeglab)
-%   typeplot - 1-> Plot ERP maps, 0-> plot components {default:1}.
+%   typeplot - 1-> Plot channel ERP maps; 0-> Plot component maps {default:1}.
+%
+% Commandline inputs also set in pop-up window:
 %   items    - [array] If typeplot==1 (ERP maps), within-epoch latencies 
 %              (ms) at which to plot the maps. If typeplot==0 (component
 %              maps), component indices to plot. In this case,
@@ -19,7 +21,7 @@
 %              are produced {default|0 -> one near-square page}.
 %   plotdip  - [0|1] plot associated dipole(s) for scalp map if present
 %              in dataset.
-%   options  - topoplot() argument options. Separate using commas. 
+%   options  - optional topoplot() arguments. Separate using commas. 
 %              Example 'style', 'straight'. See >> help topoplot
 %              for further details. {default: none}
 %
@@ -51,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2004/11/09 19:22:47  arno
+% testing if curpos empty
+%
 % Revision 1.56  2004/09/15 19:05:14  hilit
 % undo previous change
 %
@@ -253,16 +258,16 @@ if nargin < 3
                { 'style'   'text'     'string'    'Plot associated dipole(s) (if present)' } ...
                { 'style'   'checkbox' 'string'    '' } { } ...
                { } ...
-               { 'style'   'text'     'string'    [ '-> Additional scalp map' fastif(typeplot,'',' (and dipole)') ...
-                                                  ' plotting options (see help)' ] } ...
+               { 'style'   'text'     'string'    [ '-> Additional topoplot()' fastif(typeplot,'',' (and dipole)') ...
+                                                  ' options (see Help)' ] } ...
                { 'style'   'edit'     'string'    '''electrodes'', ''on''' } };
     uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
     if typeplot
         uilist(9:11) = [];
         uigeom(6) = [];
     end;
-    guititle = fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', ...
-                       'Component scalp map(s) -- pop_topoplot()');
+    guititle = fastif( typeplot, 'Plot ERP scalp maps in 2-D -- pop_topoplot()', ...
+                       'Plot component scalp maps in 2-D -- pop_topoplot()');
     
     result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal');
 	if length(result) == 0 return; end;
