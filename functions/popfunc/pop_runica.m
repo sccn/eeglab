@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/11/15 18:01:06  arno
+% adding more warning messages
+%
 % Revision 1.12  2002/11/13 23:05:53  arno
 % problem from command line call
 %
@@ -105,6 +108,7 @@ if nargin < 1
     return;
 end;
 
+fig = [];
 if nargin < 2 
     % popup window parameters
     % -----------------------
@@ -116,7 +120,6 @@ if nargin < 2
 	icatype      = result{1};
 	options      = [ ',' result{2} ];
 else
-    fig = [];
 	options = [];
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
