@@ -1,6 +1,7 @@
 % eeg_point2lat() - convert latency in data points to latency in ms relative
 %                   to the time locking. Used in eeglab().
 % Usage:
+%       >> [newlat ] = eeg_point2lat( lat_array, [], srate);
 %       >> [newlat ] = eeg_point2lat( lat_array, epoch_array,...
 %                                 srate, timelimits, timeunit);
 % Inputs:
@@ -13,6 +14,17 @@
 %
 % Outputs:
 %   newlat      - converted latency values (in 'timeunit' units) for each epoch
+%
+% Example:
+%   eeg_point2lat(cell2mat({EEG.event.latency}), [], EEG.srate);
+%   % returns the latency of all events in second for a continuous
+%   % dataset EEG
+%
+%   eeg_point2lat(cell2mat({EEG.event.latency}), cell2mat({EEG.event.epoch}), 
+%                 EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+%   % returns the latency of all events in millisecond for a dataset
+%   % containing data epochs.
+%
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
@@ -37,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/02 15:58:28  arno
+% edit header
+%
 % Revision 1.4  2003/01/01 18:23:57  scott
 % header edit & unused output noted
 %
@@ -52,10 +67,16 @@
 
 function newlat = eeg_point2lat( lat_array, epoch_array, srate, timewin, timeunit);
 
-if nargin <4
+if nargin <3
     help eeg_point2lat;
     return;
-end;    
+end;
+if isempty( epoch_array )
+    epoch_array = ones( size(lat_array) );
+end;
+if nagin <4
+    timewin = 0;
+end;
 if nargin <5
 	timeunit = 1;
 end;
@@ -79,6 +100,10 @@ end
 
 timewin = timewin*timeunit;
 
-pnts = (timewin(2)-timewin(1))*srate+1;
+if length(timewin) == 2
+    pnts = (timewin(2)-timewin(1))*srate+1;
+else
+    pnts = 0;
+end;
 newlat  = ((lat_array - (epoch_array-1)*pnts-1)/srate+timewin(1))/timeunit;
 newlat = round(newlat*1E9)*1E-9;
