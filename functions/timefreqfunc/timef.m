@@ -80,8 +80,10 @@
 %    Optional plotting parameters:
 %       'ploterps'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
-%       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
-%       'itcmax'    = [real] set the ITC maximum for the scale             {auto }
+%       'plotphase' = ['on'|'off'] Plot sign of the phase in the ITC panel, i.e.
+%                     green->red, pos.-phase ITC, green->blue, neg.-phase ITC {'on'}
+%       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
+%       'itcmax'    = [real<=1] set the ITC maximum for the scale          {auto}
 %       'title'     = Optional figure title                                {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)  {2}
@@ -145,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2004/01/23 02:23:35  scott
+% add erspmax
+%
 % Revision 1.66  2004/01/06 17:00:37  arno
 % header typo
 %
