@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/12 01:45:00  arno
+% color
+%
 % Revision 1.20  2002/08/11 22:21:05  arno
 % color
 %
@@ -276,7 +279,6 @@ varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputna
 			int2str(tlimits), num2str(cycles), options);
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 return;
 
