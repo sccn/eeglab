@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/11/01 03:47:40  erik
+% added test for locs_file string to readlocs call
+%
 % Revision 1.18  2002/10/31 22:51:25  luca
 % now also plotting n < nchans single channels
 %
@@ -317,8 +320,8 @@ end
 
 % read the channel location file
 % ------------------------------
-if isstring(loc_file)
-	[tmpeloc labels Th Rd] = readlocs(loc_file,'filtetype','loc');
+if isstr(loc_file)
+	[tmpeloc labels Th Rd] = readlocs(loc_file,'filetype','loc');
 else % a locs struct
 	[tmpeloc labels Th Rd] = readlocs(loc_file);
 end
