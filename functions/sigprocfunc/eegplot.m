@@ -1,6 +1,6 @@
 % eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
-%             This version (3) allows vertical scrolling through channels and
-%             manual marking/unmarking of portions of the data for rejection.
+%             The current version (3) allows vertical scrolling through channels 
+%             and manual marking/unmarking of data stretches or epochs for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
 %      else
@@ -52,7 +52,7 @@
 %                  electrode axes. left-click to zoom (x2); right-click to reverse-zoom. 
 %                  Else, draw a rectange in the activity window to zoom the display into 
 %                  that region. NOTE: When zoom is on, data cannot be marked for rejection.
-% Display window:
+% Display window interface:
 %    "Activity plot" - [main window] This axis displays the channel activities.  For 
 %                  continuous data, the time axis shows time in seconds. For epoched
 %                  data, the axis label indicate time within each epoch.
@@ -70,8 +70,8 @@
 %    "Reject" - [button] When pressed, save rejection marks and close the figure. 
 %                  Optional input parameter 'command' is evaluated at that time. 
 %                  NOTE: This button's label can be redefined from the command line
-%                  using the keyword 'butlabel'. If no processing command is specified
-%                  for the 'command' parameter, this button does not appear.
+%                  (see 'butlabel' below). If no processing command is specified
+%                  for the 'command' parameter (below), this button does not appear.
 % Required input:
 %    data        - Input data matrix, either continuous 2-D (channels,timepoints) or 
 %                  epoched 3-D (channels,timepoints,epochs). If the data is preceded 
@@ -83,16 +83,16 @@
 %    'spacing'    - Display range per channel (default|0: max(data)-min(data))
 %    'eloc_file'  - Electrode filename (as in  >> topoplot example) to read
 %                    ascii channel labels. Else,
-%                    [vector of integers] -> Show specified channel numbers, else
-%                    [] -> Do not show channel labels {default|0 -> Show [1:nchans]}
+%                   [vector of integers] -> Show specified channel numbers. Else,
+%                   [] -> Do not show channel labels {default|0 -> Show [1:nchans]}
 %    'limits'     - [start end] Time limits for data epochs in ms (for labelling 
 %                   purpose only).
 %    'freqlimits' - [start end] If plotting epoch spectra instead of data, frequency 
 %                   limits of the display. (Data should contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
 %    'dispchans'  - [integer] Number of channels to display in the activity window 
-%                   {default: 32}.  If < number of channels, a vertical slider 
-%                   on the left side of the figure will allow vertical scrolling. 
+%                   {default: 32}.  If < total number of channels, a vertical slider 
+%                   on the left side of the figure allows vertical data scrolling. 
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
@@ -102,14 +102,14 @@
 %                   if this parameter is not empty.
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
-%                    for rejection, each row indicating a different period. 
-%                    [start end] period limits (in frames from beginning of data); 
-%                    [R G B] gives the marking color; 
-%                    [e1 e2 e3 ...] a (1,nchans) logical [0|1] vector telling which 
-%                    channels to reject (1). 
+%                    for rejection, each row indicating a different period: 
+%                      [start end] = period limits (in frames from beginning of data); 
+%                      [R G B] = specifies the marking color; 
+%                      [e1 e2 e3 ...] = a (1,nchans) logical [0|1] vector giving 
+%                         channels (1) to mark and (0) to not mark for rejection.
 %    'color'      - ['on'|'off'|cell array] Plot channels with different colors 
-%                   Entering a nested cell array (i.e. { {'r' 'b' 'g'} }), channels will 
-%                   be plotted using cell array color elements. {default: 'off'}. 
+%                   Entering a nested RGB cell array ({{'r' 'b' 'g'}}), channels will 
+%                   be plotted using the cell-array color elements. {default: 'off'}. 
 %    'wincolor'   - [color] Color mark data stretches or epochs  
 %                   {default: [ 0.8345 1 0.956]}
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
@@ -119,7 +119,7 @@
 %    'children'   - [integer] Figure handle of a *dependent* eegplot() window. Scrolling
 %                    horizontally in the master window will produce the same scroll in 
 %                    the dependent window. Allows comparison of two concurrent datasets.
-%    'scale'      - ['on'|'off'] Display the amplitude scale { default: 'on'}.
+%    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
@@ -153,6 +153,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2003/02/20 20:11:33  arno
+% replaing ???
+% /
+%
 % Revision 1.72  2003/02/20 19:42:01  scott
 % edit header msg -sm
 %
