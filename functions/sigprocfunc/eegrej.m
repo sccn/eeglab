@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/02/27 20:25:30  arno
+% taking the round of regions
+%
 % Revision 1.5  2002/11/15 01:35:22  scott
 % nbpoints -> datlen
 % .,
@@ -99,8 +102,10 @@ end;
 newevents = [];
 if exist('eventtimes') == 1 
     if ~isempty(eventtimes)
-	    rmevent = find( reject(round(eventtimes)) == 1);
-	    eventtimes(rmevent) = NaN;
+        try
+            rmevent = find( reject(round(eventtimes)) == 1);
+	    catch, error('Latency event out of bound'); end;
+        eventtimes(rmevent) = NaN;
 	    newevents = eventtimes;
 	    for i=1:size(regions,1)
 	        for index=1:length( eventtimes )
