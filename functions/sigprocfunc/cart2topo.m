@@ -55,6 +55,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/26 20:33:37  arno
+% updating message
+% ,
+%
 % Revision 1.5  2002/04/26 20:32:49  arno
 % debugging center empty
 %
@@ -145,6 +149,7 @@ options = [];
 x = x - g.center(1);  % center the data
 y = y - g.center(2);
 z = z - g.center(3);
+center = g.center;
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
 wobble = std(radius);              % test if xyz values are on a sphere
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
