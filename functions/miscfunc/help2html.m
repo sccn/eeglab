@@ -15,10 +15,13 @@
 %   'refcall'  - syntax format to call references. Default '%s.html'. For
 %                   javascript function uses 'javascript:funcname(''%s.js'')'
 %   'font'     - font name
-%   'background'- background tag (i.e. '<body BACKGROUND="img.jpg">'). 
+%   'background' - background tag (i.e. '<body BACKGROUND="img.jpg">'). 
 %                   {Default none}.
-%   'outputlink'- command to call the generated HTML page. Default is
-%                   standard HTML href.    
+%   'outputlink' - command to call the generated HTML page. Default is
+%                  standard HTML href. Must contain two '%s' symbol to
+%                  write title and link.
+%   'outputtext' - Text used in the outputlink. Default is the function
+%                  name.
 %
 % Output:
 %   linktext   - html text link to the output file
@@ -79,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 17:14:33  arno
+% debug
+%
 % Revision 1.3  2002/07/29 00:51:20  arno
 % adding ref search for variable names
 %
@@ -121,6 +127,7 @@ try, g.header; 			catch, g.header		= ''; 	end;
 try, g.footer; 			catch, g.footer		= ''; 	end; 
 try, g.refcall; 		catch, g.refcall	= '%s.html'; 	end; 
 try, g.outputlink; 		catch, g.outputlink = [ g.normrow g.normcol1 '<FONT FACE="' g.font '"><A HREF="%s.html">%s.html</A></td>' g.normcol2 '%s</FONT></td></tr>' ]; end; 
+try, g.outputtext; 		catch, g.outputtext	=  filename(1:index(end)-1); 	end; 
 
 g.footer      = [ '<FONT FACE="'  g.font '">' g.footer '</FONT>' ];
 
@@ -318,7 +325,7 @@ fclose( fo  );
 
 % generate the output command
 % ---------------------------
-linktext = sprintf( g.outputlink,  filename(1:index(end)-1),  filename(1:index(end)-1), maintext ); 
+linktext = sprintf( g.outputlink, g.outputtext,  filename(1:index(end)-1), maintext ); 
 return;
 
 % -----------------
