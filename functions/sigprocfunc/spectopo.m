@@ -104,6 +104,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/04/23 21:24:24  arno
+% ignore small data segments
+%
 % Revision 1.57  2003/04/18 01:11:31  arno
 % 3 new options: nfft, winsize, overlap
 %
@@ -718,7 +721,7 @@ if ~isempty(g.freq)
 				from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
 				%g.icafreqsval contains the sorted frequency values at the specified frequency
 			else 
-				from = changeunits([freqs(freqidx(f)),max(eegspecdBtoplot(:,:))],specaxes,large);
+				from = changeunits([freqs(freqidx(f)),maxcompdB],specaxes,large);
 			end;
 		else
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
@@ -731,7 +734,7 @@ if ~isempty(g.freq)
 		else
 			colr = colrs{mod((f-2),5)+1};
 		end
-		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',2);
+		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',1.5);
 		axis([0 1 0 1]);
 		axis off;
 	end;
@@ -785,7 +788,7 @@ if ~isempty(g.freq)
 	if ~isempty(g.weights)
 		if realpos(1) == max(realpos), plotcolbar(g); end;
 		% use headaxe from 2 to end (reserved earlier)
-		set(li(realpos(1)), 'linewidth', 3); % make the line with the scalp topoplot thicker than others
+		set(li(realpos(1)), 'linewidth', 2.5); % make the line with the scalp topoplot thicker than others
 		for index = 1:length(g.icamaps)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
