@@ -12,8 +12,8 @@
 %   2) Option 'noticks' does not make x and y tickloabelmodes 'auto' in the pop-up.
 %   2) The command option is an optional string that is evaluated in the new window
 %      when it pops up. This allows the user to customize the pop-up display.
-%   3) Deleting the pop-up window containing the copied axis leaves the clicked axis
-%      as the gca).
+%   3) Deleting the pop-up window containing the copied axis leaves the selected axis
+%      as the current graphic axis (gca).
 
 % Authors: Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 
@@ -36,6 +36,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/03/07 22:03:37  scott
+% type
+% typo
+%
 % Revision 1.8  2003/03/07 22:02:57  scott
 % more '''???
 %
