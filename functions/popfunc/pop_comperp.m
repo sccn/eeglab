@@ -1,67 +1,68 @@
 % pop_comperp() - Compute the grand average ERP waveforms of multiple datasets
 %                 currently loaded into EEGLAB, with optional ERP difference-wave 
-%                 plotting and t-tests.
+%                 plotting and t-tests. Creates a plotting figure.
 % Usage:
 %       >> pop_comperp( ALLEEG, flag );  % pop-up window, interactive mode
 %       >> [erp1 erp2 erpsub time sig] = pop_comperp( ALLEEG, flag, ...
 %                                         datadd, datsub, 'key', 'val', ...);
 % Inputs:
-%   ALLEEG  - Array of EEG datasets
+%   ALLEEG  - Array of loaded EEGLAB EEG structure datasets
 %   flag    - [0|1] 0 -> Use ICA components; 1 -> use data channels {default: 1}
 %   datadd  - [integer array] List of ALLEEG dataset indices to average to make 
-%             an ERP grand average.
-%   datsub  - [integer array] List of ALLEEG dataset indices to average and then 
-%             subtract from the 'datadd' result to make an ERP grand mean difference. 
-%             This option is to be used to compare sub-conditions; each array 
-%             must have the same number of elements as the respective 'datadd' 
-%             datasets. e.g., The first 'datsub' dataset is subtracted from first 
-%             'datadd' dataset. The two datasets may normally contain data 
-%             from the same subject under different experiemtal conditions.
+%             an ERP grand average and optionally to compare with 'datsub' datasets.
 %
 % Optional inputs:
+%   datsub  - [integer array] List of ALLEEG dataset indices to average and then 
+%             subtract from the 'datadd' result to make an ERP grand mean difference. 
+%             Together, 'datadd' and 'datsub' may be used to plot and compare grand mean 
+%             responses across subjects or conditions. Both arrays must contain the same 
+%             number of dataset indices and entries must be matched pairwise (Ex:
+%             'datadd' indexes condition A datasets from subjects 1:n, and 'datsub',
+%             condition B datasets from the same subjects 1:n). {default: []}
+%   'alpha'    - [0 < float < 1] Apply two-tailed t-tests for p < alpha. If 'datsub' is
+%                not empty, perform t-tests at each latency. If 'datasub' is empty, 
+%                perform two-tailed t-tests against a 0 mean dataset with same variance. 
+%                Significant time regions are highlighted in the plotted data. 
 %   'chans'    - [integer array] Vector of chans. or comps. to use {default: all}
 %   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
 %                or as a rectangular array (plotdata()). Note: Only channels
 %                (see 'chans' above) can be plotted in a 'scalp' array.
 %   'tlim'     - [min max] Time window (ms) to plot data {default: whole time range}
 %   'title'    - [string] Plot title {default: none}
-%   'ylim'     - [min max] y-axis limits. {default: auto}
-%   'alpha'    - [float] Apply t-test for p=alpha (0<alpha<1). Use paired if
-%                t-test datasub is not empty (two-tailed). If data is empty,
-%                use t-test against a 0 mean dataset with same variance (two-
-%                tailed). Significan time regions are highlighted in the
-%                data plots.
-%   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
-%   'std'      - ['on'|'off'|'none'] Show standard devitations. 'none' means that
-%                this option does not affect other options {default:'none'}
-%   'addstd'   - ['on'|'off'] Show standard deviation for datadd only {default is
-%                'on' if 'datsub' empty, otherwise 'off'}
-%   'substd'   - ['on'|'off'] Plot standard deviation of datsub only {default:'off'}
-%   'diffstd'  - ['on'|'off'] Show standard dev. of datadd-datsub {default:'on'}
-%   'addavg'   - ['on'|'off'] Show average or RMS for datadd {default: 'on' 
-%                if 'datsub' empty, otherwise 'off'}
-%   'subavg'   - ['on'|'off'] Plot average/RMS of datsub {default:'off'}
-%   'allerps'  - ['on'|'off'|'none'] Show ERPs for all conditions. 'none' means that
-%                this option does not affect other options {default:'none'}
-%   'addall'   - ['on'|'off'] Plot all ERPs in dataadd only {default:'off'}
-%   'suball'   - ['on'|'off'] Plot all ERPs in datasub only {default:'off'}
-%   'diffall'  - ['on'|'off'] Show all erps for difference {default:'off'}
-%   'diffonly' - ['on'|'off'|'none'] Show difference only. 'none' means that this
-%                option does not affect other options {default:'none'}
-%   'tplotopt' - [cell array] Pass 'key', val' plotting options for plottopo()
+%   'ylim'     - [min max] y-axis limits {default: auto from data limits}
+%   'std'      - ['on'|'off'|'none'] 'on' -> plot std. devs.; 'none' -> do not 
+%                interact with other options {default:'none'}
+%   'addstd'   - ['on'|'off'] Plot std. dev. for 'datadd' datasets only 
+%                {default: 'on' if 'datsub' empty, otherwise 'off'}
+%   'substd'   - ['on'|'off'] Plot std. dev. of 'datsub' datasets only {default:'off'}
+%   'diffstd'  - ['on'|'off'] Plot std. dev. of 'datadd'-'datsub' differences {default:'on'}
+%   'mode'     - ['ave'|'rms'] Plotting mode. Plot  either grand average or RMS 
+%                (root mean square) time course(s) {default: 'ave' -> grand average}.
+%   'addavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datadd' datasets
+%                {default: 'on' if 'datsub' empty, otherwise 'off'}
+%   'subavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datsub' datasets 
+%                {default:'off'}
+%   'allerps'  - ['on'|'off'|'none'] 'on' -> show ERPs for all conditions; 
+%                'none' -> do not affect other options {default:'none'}
+%   'addall'   - ['on'|'off'] Plot the ERPs for all 'dataadd' datasets only {default:'off'}
+%   'suball'   - ['on'|'off'] Plot the ERPs for all 'datasub datasets only {default:'off'}
+%   'diffall'  - ['on'|'off'] Plot all the 'datadd'-'datsub' ERP differences {default:'off'}
+%   'diffonly' - ['on'|'off'|'none'] 'on' -> plot difference only; 'none' -> do not affect 
+%                other options {default:'none'}
+%   'tplotopt' - [cell array] Pass 'key', val' plotting options to plottopo()
 %
 % Output:
 %   erp1   - Grand average (or rms) of the 'datadd' datasets
 %   erp2   - Grand average (or rms) of the 'datsub' datasets
 %   erpsub - Grand average (or rms) 'datadd' minus 'datsub' difference
 %   times  - Vector of epoch time indices
-%   sig    - t-test significance values (chans,times). 
+%   sig    - T-test significance values (chans,times). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2003
 %
-% Note: t-test functions were adapted for matrix preprocessing from C
-%       functions Press et al. See the description in the code of this
-%       function for more information.
+% Note: t-test functions were adapted for matrix preprocessing from C functions 
+%       by Press et al. See the description in the pttest() code below 
+%       for more information.
 %
 % See also: eeglab(), plottopo()
 
@@ -84,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/03/21 16:13:25  arno
+% header etc
+%
 % Revision 1.28  2005/03/20 18:24:03  scott
 % help msg - still needs clarification
 %
@@ -249,6 +253,10 @@ else
     options = varargin;
 end;
 
+if nargin == 3
+  datsub = []; % default 
+end
+
 % decode inputs
 % -------------
 if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end;
@@ -278,6 +286,7 @@ g = finputcheck( options, ...
 if isstr(g), error(g); end;
 
 figure;
+
 try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
 
 % backward compatibility of param
@@ -317,6 +326,10 @@ for index = union(datadd, datsub)
     if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' does not have the same number of channels as others']); end;
 end;
     
+if ~isempty(alpha) & length(datadd) == 1
+    error('T-tests require more than one '''datadd''' dataset');
+end
+
 % compute ERPs for add
 % --------------------
 for index = 1:length(datadd)
