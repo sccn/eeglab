@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.221  2004/11/22 05:41:43  arno
+% more debugging
+%
 % Revision 1.220  2004/11/22 05:39:05  arno
 % function was crashing on regular topoplot, debuging
 %
@@ -989,8 +992,8 @@ Th = pi/180*Th;                              % convert degrees to radians
 %
 if length(Values) < length(tmpeloc) 
   if isempty(plotchans)
-    if Values ~= round(Values)
-      error('plotting fewer channels than in chanlocs: needs channel numbers in ''plotchans''');
+    if Values ~= round(Values) % if not integer values
+      error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
     elseif strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
                                    max(indices),length(Values));
@@ -1022,7 +1025,7 @@ if length(Values) > 1
    if max(indices)>length(Values)
       STYLE = 'blank';
    else
-      Values     = Values(indices);
+      Values = Values(indices);
    end
 end;
 labels = labels(indices); % remove labels for electrodes without locations
