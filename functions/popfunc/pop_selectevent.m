@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 %02/01/2002 added inputgui and finalize function - ad
 %02/06/2002 work on the header and event format - sm & ad
@@ -127,7 +130,7 @@ if nargin<2
              end;
         else stringtext = 'no-description'; tmptext = 'no-description';
         end;
-        descrip = { 'string', stringtext, 'callback', ['questdlg([''' choptext( tmptext ) '''],''Description of field ' allfields{index} ''', ''OK'', ''OK'');' ] } 
+        descrip = { 'string', stringtext, 'callback', ['questdlg([''' choptext( tmptext ) '''],''Description of field ' allfields{index} ''', ''OK'', ''OK'');' ] };
 
         % create the gui for this field
         % -----------------------------
@@ -181,7 +184,7 @@ end;
 
 % test the presence of variables
 % ------------------------------
-try, if isempty(g.event) g.event = [1:size(EEG.event,1)]; end; catch, g.event = [1:size(EEG.event,1)]; end;
+try, if isempty(g.event) g.event = [1:length(EEG.event)]; end; catch, g.event = [1:length(EEG.event)]; end;
 try, g.omitevent; 	 	 catch, g.omitevent = []; end;
 try, g.deleteothers; 	 catch, g.deleteothers = 'no'; end;
 for index = 1:length(allfields) 
@@ -221,7 +224,7 @@ for index = 1:length(allfields)
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp find(tmpvarvalue == tmpvar(index2)) ] );
             end;
-            Ievent = intersect( Ievent, Ieventtmp );
+			Ievent = intersect( Ievent, Ieventtmp );
         end;
      end;
         
@@ -255,50 +258,35 @@ for index = 1:length(allfields)
 end;
 
 Ievent = setdiff( Ievent, Ieventrem);
-if ~isfield( EEG, 'tmpevent') % not a function call from getepoch
-	% Events: delete epochs
-	% ---------------------
-	switch lower(g.deleteothers)
-		case 'yes', % ask for confirmation
-	               % --------------------
-        Iepoch = [];
-        for index = 1:length(EEG.epoch)
-            if any(ismember(EEG.epoch(index).event, Ievent)) Iepoch = [Iepoch index]; end;
-        end;
-	    if nargin < 2 
-	        ButtonName=questdlg([ 'Warning:\bf ' num2str(length(Ievent)) ' events selected' 10 ...
-	                          'Delete '  num2str(length(Iepoch)) ' un-referenced epochs ?' ], ...
-	                       'Confirmation', ...
-	                       'No', 'Cancel', 'Yes','Yes');
-	    else ButtonName = 'Yes'; end;
-	                           
-	    switch lower(ButtonName),
-	     case 'cancel', return; 
-	     case 'yes',
-	        EEG.event = EEG.event(Ievent);
-	        if isempty( strmatch( 'event', fieldnames(EEG.epoch) ) )
-	            error('Getevent error: can not delete epochs since the ''event'' field absent in epochs');
-	        end;
-	        EEG = pop_select(EEG, 'trial', Iepoch);
-	     case 'no',
-	        EEG.event = EEG.event(Ievent);
-	    end % switch
 
-	   otherwise, EEG.event = EEG.event(Ievent);
-	end;
-else
-	% Epoch: delete epochs ?
-	% ---------------------
-    switch lower(g.deleteothers)
-	   case 'no', % ask for confirmation
-                non_indices = setdiff(1:EEG.trials, Ievent );
-                for indexfield = allfields{:}'
-                    for index = non_indices
-                        EEG.event = setfield( EEG.event, { index }, indexfield, 0);
-                    end;
-                end;        
-	   otherwise, EEG.event = EEG.event(Ievent,:);
-	end;
+% Events: delete epochs
+% ---------------------
+switch lower(g.deleteothers)
+ case 'yes', % ask for confirmation
+			 % --------------------
+			 Iepoch = ones(1, EEG.trials);
+			 for index = 1:length(Ievent)
+				 Iepoch(EEG.event(Ievent(index)).epoch) = 0;
+			 end;
+			 Iepoch = find(Iepoch == 0);
+			 if nargin < 2 
+				 ButtonName=questdlg([ 'Warning: ' num2str(length(Ievent)) ' events selected' 10 ...
+					'Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ], ...
+									 'Confirmation', ...
+									 'No', 'Cancel', 'Yes','Yes');
+			 else ButtonName = 'Yes'; end;
+			 
+			 switch lower(ButtonName),
+			  case 'cancel', return; 
+			  case 'yes',
+			   length(Ievent)
+			   EEG.event = EEG.event(Ievent);
+			   EEG = pop_select(EEG, 'trial', Iepoch);
+			  case 'no',
+			   EEG.event = EEG.event(Ievent);
+			 end % switch
+			 
+ otherwise, EEG.event = EEG.event(Ievent);
 end;
 
 event_indices = Ievent;
