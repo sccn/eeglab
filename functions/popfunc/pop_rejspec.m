@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/30 15:17:52  arno
+% debug display
+%
 % Revision 1.5  2002/07/30 15:17:16  arno
 % debugging
 %
@@ -184,15 +187,18 @@ if calldisp
     else			macrorej  = 'EEG.reject.icarejfreq';
         			macrorejE = 'EEG.reject.icarejfreqE';
     end;
+	colrej = EEG.reject.rejfreqcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
      
 	if icacomp == 1
-		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], 'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
+		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], ...
+				'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
 	else
-		eegplot(icaacttmp, 'winlength', 5, 'position', [100 800 800 500], 'limits', [EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
+		eegplot(icaacttmp, 'winlength', 5, 'position', [100 800 800 500], 'limits', ...
+				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
-	eeg_multieegplot( allspec, tmprejectelec, tmpelecIout(elecrange,:), oldrej, oldrejE, 'srate', ...
-		      EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', command, 'children', gcf); 
+	eegplot( allspec, 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
+			 command, 'children', gcf, eegplotoptions{:}); 
 end;
 
 % store variables if necessary
