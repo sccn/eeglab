@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/09/03 15:44:29  arno
+% debug duration
+%
 % Revision 1.27  2004/06/11 14:36:20  arno
 % adding Hilit as functions' author
 %
@@ -151,7 +154,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     else 
         return;
     end;
-
+adsf
     % recompute latencies fo boundevents (in new dataset)
     % ---------------------------------------------------
     [regions tmpsort] = sort(regions);
@@ -172,7 +175,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             % find event succeding boundary to insert event 
             % at the correct location in the event structure
             % ----------------------------------------------
-            if ~isempty(eventin) & isfield(eventin, 'latency')
+            if ~isempty(eventout) & isfield(eventout, 'latency')
                 alllats   = cell2mat( { eventout.latency } ) - boundevents(tmpindex);
                 tmpind    = find( alllats >= 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
