@@ -1,9 +1,10 @@
-% bootstat() - accumulate surrogate data to assess significance by bootstrap of 
-%              some measure of two input variables. Fits the psd with a 4th-order 
-%              polynomial using the distribution kurtosis. Reference: Ramberg, J.S., 
-%              Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. "A probability 
-%              distribution and its uses in fitting data." Technimetrics, 1979, 
-%              21:201-214.
+% bootstat() - accumulate surrogate data to assess significance by bootstrap of some 
+%              measure of two input variables. 
+%
+%              If 'distfit','on', fits the psd with a 4th-order polynomial using the 
+%              data kurtosis, as in Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., 
+%              Mykkytka, E.F. "A probability distribution and its uses in fitting data." 
+%              Technometrics, 21:201-214, 1979.
 % Usage:
 %            >> [rsignif,accarray] = bootstat(arg1, arg2, formula, varargin ...);
 % Inputs:
@@ -42,7 +43,7 @@
 %                   Ex: 'res = res /10;' {default: none}.
 %   'formulaout'  - [string] name of the computed variable {default: 'res'}.
 %   'distfit'     - ['on'|'off'] fit distribution with known function to compute more accurate 
-%                   limits or exact p-value (see 'vals' option). the MATLAB statistical toolbox 
+%                   limits or exact p-value (see 'vals' option). The MATLAB statistical toolbox 
 %                   is required. This option is currently implemented only for 1-D data.
 %   'vals'        - [float array] significance values. 'alpha' is ignored and 
 %                   rsignif returns the p-values. Requires 'distfit' (see above).
@@ -59,10 +60,9 @@
 %
 % See also: timef()
 
-% NOTE: There is one hidden parameter 'savecoher', 0 or 1
-% HELP TEXT REMOVED:          (Ex: Using option 'both', 
-%                             coherence during baseline would be ignored since times
-%                             are shuffled during each accumulation.
+% NOTE: There is an undocumented parameter, 'savecoher', [0|1]
+% HELP TEXT REMOVED:  (Ex: Using option 'both', coherence during baseline would be 
+%                      ignored since times are shuffled during each accumulation.
 
 % Copyright (C) 9/2002  Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD
 %
@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/04/15 01:46:18  arno
+% removing debug message
+%
 % Revision 1.22  2004/04/15 01:44:47  arno
 % refining distfit for 1-D data
 %
