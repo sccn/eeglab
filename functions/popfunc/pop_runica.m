@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 02:28:24  arno
+% inputdlg2
+%
 % Revision 1.3  2002/05/02 21:39:42  arno
 % editing message
 %
@@ -133,7 +136,7 @@ switch lower(icatype)
             error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
         end;     
         if length(options) < 2
-            [ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, 'displayMode', 'off' );
+            eval('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' );' ]);
         else    
             eval(sprintf('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata %s );', options));
         end;
