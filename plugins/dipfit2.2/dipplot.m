@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.28  2003/05/30 16:06:27  arno
+%nothing
+%
 %Revision 1.27  2003/05/14 21:36:36  arno
 %nothing
 %
@@ -424,11 +427,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
             % copy for output
             % ---------------
-            XX(index) = x;
-            YY(index) = y;
+            XX(index) = -y;
+            YY(index) = x;
             ZZ(index) = z;
-            XO(index) = xo;
-            YO(index) = yo;
+            XO(index) = -yo;
+            YO(index) = xo;
             ZO(index) = zo;
             
             if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
@@ -621,30 +624,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         set(findobj('parent', gca, 'tag', 'mesh'), 'visible', 'off');
     end;
         
-    % HORIZONTAL LIMITS PLOTING
-    % -------------------------
-    %hold on;
-    %for i=0:20:360
-    %    [x y z]    = sph2cart(i/180*pi, 0, 100*scaling);
-    %    h = plot3(x,  y,  z, 'g'); set(h, 'marker', '.', 'markersize', 30);
-    %end;
-    
-    % VERTICAL LIMITS PLOTING
-    % -----------------------
-    %hold on;
-    %for i=0:20:360
-    %    [x y z]    = sph2cart(0, i/180*pi, 100*scaling);
-    %    h = plot3(x,  y,  z, 'g'); set(h, 'marker', '.', 'markersize', 30);
-    %end;
-
-    try,
-        x = cell2mat( {sources.X} );
-        y = cell2mat( {sources.Y} );
-        z = cell2mat( {sources.Z} );
-        xe = cell2mat( {sources.XE} );
-        ye = cell2mat( {sources.YE} );
-        ze = cell2mat( {sources.ZE} );
-    catch, end;
     rotate3d;
 return;
 
