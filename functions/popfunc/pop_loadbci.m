@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/08/30 22:37:24  arno
+% cdnew revision
+%
 % Revision 1.15  2003/12/16 20:02:02  arno
 % remove folder separator
 %
@@ -195,7 +198,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
         
     % find block size
     % ---------------
-    tmpevent = find( diff(getfield(bci, 'SourceTime')) ~= 0);
+    tmpevent = find( diff(getfield(bci, 'SourceTime')) > 0);
     diffevent = tmpevent(2:end)-tmpevent(1:end-1);
     blocksize = unique(diffevent);
     if length(blocksize) > 1, error('Error in determining block size'); 
