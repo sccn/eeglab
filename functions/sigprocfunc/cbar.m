@@ -5,7 +5,7 @@
 %    >> cbar(type)
 %    >> cbar(type,colors)
 %    >> cbar(axhandle,colors)
-%    >> cbar(axhandle,colors, minmax)
+%    >> cbar(axhandle,colors, minmax, grad)
 %
 % Inputs:
 %  type      - 'vert','horiz', or 0 -> default {'vert')
@@ -13,8 +13,9 @@
 %  colors    - vector of colormap indices to display, 
 %              or number n -> display colors [1:end-n]
 %  minmax    - [min, max] range of values to label on colorbar 
+%  grad      - [integer] number of graduations. Default is 5.
 %
-% Author: Colin Humphries, CNL / Salk Institute, Feb. 1998 
+% Author: Colin Humphries, Arnaud Delorme, CNL / Salk Institute, Feb. 1998-
 %
 % See also: colorbar()
 
@@ -37,11 +38,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 12-13-98 added minmax arg -Scott Makeig
 % 01-25-02 reformated help & license, added links -ad 
 
-function [handle]=cbar(arg,colors,minmax)
+function [handle]=cbar(arg,colors,minmax, grad)
 
 if nargin < 2
   colors = 0;
@@ -73,7 +77,9 @@ if nargin>2
     return
   end
 end
-
+if nargin < 4
+    grad = 5;
+end;
 
 %obj = findobj('tag','cbar','parent',gcf);
 %if ~isempty(obj) & ~isempty(arg)
@@ -166,10 +172,11 @@ end
 
 if nargin > 2 
   Cax = get(ax,'Ylim');
-  CBTicks = [Cax(1):(Cax(2)-Cax(1))/4:Cax(2)]; % caxis tick positions
-  CBLabels = [minmax(1):(minmax(2)-minmax(1))/4:minmax(2)]; % tick labels
+  CBTicks = [Cax(1):(Cax(2)-Cax(1))/(grad-1):Cax(2)]; % caxis tick positions
+  CBLabels = [minmax(1):(minmax(2)-minmax(1))/(grad-1):minmax(2)]; % tick labels
   dec = floor(log10(max(abs(minmax)))); % decade of largest abs value
-  CBLabels = ([minmax]*[1.0 .75 .50 .25 0.0; 0.0 .25 .50 .75 1.0]);
+  CBLabels = ([minmax]* [ linspace(1,0, grad);linspace(0, 1, grad)]);
+  %[1.0 .75 .50 .25 0.0; 0.0 .25 .50 .75 1.0]);
   if dec<1
     CBLabels = round(CBLabels*10^(1-dec))*10^(dec-1);
   elseif dec == 1
