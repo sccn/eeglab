@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2002/10/18 16:50:40  arno
+% win' -> transpose(win)
+%
 % Revision 1.50  2002/09/26 00:40:48  arno
 % updating header
 %
@@ -1149,7 +1152,7 @@ if g.plot
    %
    if (~isempty(g.topovec))
       h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
-      if size(g.topovec,2) == 1
+      if size(g.topovec,2) <= 2
          topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
             'style', 'blank', 'emarkersize1chan', 10);
       else
@@ -1158,8 +1161,8 @@ if g.plot
       axis('square')
       
       h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
-      if size(g.topovec,2) == 1
-         topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
+      if size(g.topovec,2) <= 2
+         topoplot(g.topovec(2),g.elocs,'electrodes','off', ...
             'style', 'blank', 'emarkersize1chan', 10);
       else
          topoplot(g.topovec(2,:),g.elocs,'electrodes','off');
