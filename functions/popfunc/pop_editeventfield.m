@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/08/26 22:06:19  arno
+% update message
+%
 % Revision 1.20  2002/08/21 23:11:15  arno
 % optimize size
 %
@@ -175,11 +178,11 @@ if nargin<2
          {   }, ...
          { 'Style', 'text', 'string', 'Delete field', 'fontweight', 'bold'  } ...
          };
-        geometry = { geometry{:} [1] [0.9 0.95 1.2 0.8 1] };
+        geometry = { geometry{:} [1] [1.05 1.05 1.1 0.8 0.8] };
 
 	    listboxtext = 'No field selected';  
 	    for index = 1:length(allfields) 
-	        geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] };
+	        geometry = { geometry{:} [1 1 1 0.7 0.2 0.32 0.2] };
 	        description = '';
 	        try, 
 				description = fastif(isempty(EEG.eventdescription{index}), '', EEG.eventdescription{index});
@@ -199,7 +202,7 @@ if nargin<2
 	         { }, fastif(strcmp(allfields{index}, 'epoch'), {}, { 'Style', 'checkbox', 'string', '    ' }),{ } };
 	         listboxtext = [ listboxtext '|' allfields{index} ]; 
 	    end;
-	    geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] [1] [1 1.2 0.6 1.3 1.7] };
+	    geometry = { geometry{:} geometry{end} [1] [1 1.2 0.6 1.3 1.7] };
 	    uilist   = { uilist{:}, ...
 	         { 'Style', 'edit', 'string', ''}, ...
 	         { 'Style', 'edit', 'string', '' }, ...
