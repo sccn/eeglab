@@ -10,12 +10,12 @@
 %                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', 'chancenter'. 
 %                   Help can be found in the function having the same name. Args are
 %                   only relevant for 'chancenter'.
-%   'formula'     - string command for manipulating arrays. 'chan' is a full 
+%   'transform'     - string command for manipulating arrays. 'chan' is a full 
 %                   electrode info. Fields can be manipulated using 'labels', 'theta'
 %                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3D) or
 %                   'sph_theta', 'sph_phi', 'sph_radius' for spherical horizontal angle, 
-%                   azimut and radius. Ex: 'chans(3) = chans(14)'. 'X = -X' or complex 
-%                   formula separated by ';': 'TMP = X; X = Y; Y = TMP'
+%                   azimut and radius. Ex: 'chans(3) = chans(14)'. 'X = -X' or a more complex 
+%                   transform separated by ';': 'TMP = X; X = Y; Y = TMP'
 %   'changechan'  - {num value1 value2 value3 ...} Change the values of
 %                   all fields the channel.
 %   'changefield' - {num field value} change field value for channel number num. 
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/05/02 23:29:56  scott
+% Num -> number -sm
+%
 % Revision 1.10  2002/05/02 23:18:27  scott
 % editting -sm
 %
@@ -122,11 +125,11 @@ if nargin < 2
 		% add field values
 		% ----------------
 		geometry = { 1 };
-		tmpstr = sprintf('Edit channel information:');
+		tmpstr = sprintf('Channel information (variable_name):');
 		uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
-		formula = ['inputdlg({strvcat(''Enter formula (see help on previous page)''' ...
-					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Formula'', 1, { '''' });'];
+		transform = ['inputdlg({strvcat(''Enter transform (Help on chanedit window)''' ...
+					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Transform'', 1, { '''' });'];
 		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
 						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
@@ -139,8 +142,8 @@ if nargin < 2
 						['comtmp = {''convert'' {''sph2cart'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->sph'  , 'callback', ...
 						['comtmp = {''convert'' {''cart2sph'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'Axes formula', 'callback', ...
-						['comtmp = {''formula'' ' formula '};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'Transform axes', 'callback', ...
+						['comtmp = {''transform'' ' transform '};' endgui] }, ...
 					  {} { } { } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
@@ -348,7 +351,7 @@ else
 				 chans(index).sph_radius    = radius(index);
 			 end;
 		   end;
-		  case 'formula'
+		  case 'transform'
 		   tmpoper = args{curfield+1};
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
 		   if isempty(findstr(tmpoper, 'chans'))
