@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2004/05/06 23:41:25  scott
+% typo
+%
 % Revision 1.60  2004/05/04 05:35:25  scott
 % finished debugging limits
 %
@@ -793,8 +796,8 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
  end
 end
 if strcmpi(g.pvaf,'on')
-    t = text(xmin+0.1*(xmax-xmin), ...
-             ymin+0.1*(ymax-ymin), ...
+    t = text(double(xmin+0.1*(xmax-xmin)), ...
+             double(ymin+0.1*(ymax-ymin)), ...
              ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
    set(t,'fontsize',12,'fontweight','bold')
 end
