@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.199  2004/05/07 04:35:10  scott
+% superimpose textax again - making both axes square
+%
 % Revision 1.198  2004/05/05 21:57:23  hilit
 % removed text from the previous log message
 %
@@ -1344,7 +1347,7 @@ end
  pos = get(gca,'position');
  xlm = get(gca,'xlim');
  ylm = get(gca,'ylim');
- textax = axes('position',pos,'xlim',xlm,'ylim',ylm);  % make new axes so clicking numbers <-> labels 
+ % textax = axes('position',pos,'xlim',xlm,'ylim',ylm);  % make new axes so clicking numbers <-> labels 
                                                        % will work inside head cartoon patch
  % axes(textax);                   
  axis square                                           % make textax square
@@ -1387,13 +1390,13 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations only %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
-  hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+  hp2 = plot3(y,x,ones(size(x))*2.1,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
     for i = 1:size(labels,1)
-    text(y(i),x(i),labels(i,:),'HorizontalAlignment','center',...
+    text(y(i),x(i),2.1,labels(i,:),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
@@ -1401,22 +1404,22 @@ elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
 %%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus labels %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labelpoint') 
-  hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+  hp2 = plot3(y,x,ones(size(x))*2.1,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(y(i)+0.01,x(i),labels(i,:),'HorizontalAlignment','left',...
+    hh(i) = text(y(i)+0.01,x(i),2.1,labels(i,:),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(pltchans(i)), ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
-	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
+	     'set(gco, ''string'', tmpstr); cllear tmpstr;'] );
   end
 %
 %%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'numpoint') 
-  hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+  hp2 = plot3(y,x,ones(size(x))*2.1,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(y(i)+0.01,x(i),num2str(pltchans(i)),'HorizontalAlignment','left',...
+    hh(i) = text(y(i)+0.01,x(i),2.1,num2str(pltchans(i)),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -1428,7 +1431,7 @@ elseif strcmp(ELECTRODES,'numpoint')
 %
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
-    text(y(i),x(i),int2str(pltchans(i)),'HorizontalAlignment','center',...
+    text(y(i),x(i),2.1,int2str(pltchans(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
@@ -1439,7 +1442,7 @@ end
 if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
   if length(Values) < length(pltchans)   % mark selected electrodes
       for kk = 1:length(Values)
-        hp2 = plot(y(Values(kk)),x(Values(kk)),'.','Color', EMARKERCOLOR1CHAN, ...
+        hp2 = plot3(y(Values(kk)),x(Values(kk)),2.1,'.','Color', EMARKERCOLOR1CHAN, ...
                                               'markersize', EMARKERSIZE1CHAN);
         hold on
       end
