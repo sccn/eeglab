@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/11/04 00:10:49  arno
+% g.delim integer OK
+%
 % Revision 1.19  2003/11/03 23:23:37  arno
 % adapting to new history ...
 %
@@ -383,8 +386,8 @@ com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vara
 % interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if isstr(varname) & exist(varname(1)) == 2  % mean that it is a filename
-                                                % --------------------------
+    if isstr(varname) & exist(varname) == 2  % mean that it is a filename
+                                             % --------------------------
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
         
     else % variable in the global workspace
