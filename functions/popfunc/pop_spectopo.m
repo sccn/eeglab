@@ -1,68 +1,65 @@
-% pop_spectopo() - Plot spectra of specified data channels (or ICA components).
+% pop_spectopo() - Plot spectra of specified data channels or components.
 %                  Show scalp maps of power at specified frequencies. 
 %                  Calls spectopo(). 
-%
 % Usage:
 %   >> pop_spectopo( EEG, dataflag); % pops-up interactive window
 %  OR
 %   >> [spectopo_outputs] = pop_spectopo( EEG, dataflag, timerange, ...
 %                        process, 'key', 'val',...); % returns spectopo() outputs
 %
-% Graphic interface for EEG data (dataflag 1):
-%   "Epoch time range" - [edit box]  Epoch time range in ms [min max] to use 
-%                      in computing the spectra (by default the whole time range).
-%                      Command line equivalent: 'timerange'
-%   "Percent data to sample" - [edit box] percentage of data to keep while
-%                      computing the spectra (low percentages speed up computation).
-%                      Command line equivalent in spectopo(): 'percent'
-%   "Frequencies to plot as scalp maps" - [edit box] vector of frequencies for 
-%                      topoplot() scalp maps of power at all channels.
-%                      Command line equivalent in spectopo(): 'freqs'
-%   "Apply to EEG|ERP|BOTH" - [edit box] plot spectra for the EEG, the ERP or BOTH.
-%                      Note this edit box does not appear for continuous EEG data.
-%                      Command line equivalent: 'process'
-%   "Plotting frequency range" - [edit box] frequency range [min max] to plot.
-%                      Command line equivalent in spectopo(): 'freqrange'
-%   "Scalp map options" - [edit box] 'key', 'val' sequence of argument passed on
-%                      to the topoplot() function for scalp map aspect.
+% Graphic interface for EEG data (dataflag = 1):
+%   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
+%                      in computing the spectra (by default the whole epoch or data).
+%                      spectopo() equivalent: 'timerange'
+%   "Percent data to sample" - [edit box] Percentage of data to use in
+%                      computing the spectra (low % speeds up the computation).
+%                      spectopo() equivalent: 'percent'
+%   "Frequencies to plot as scalp maps" - [edit box] Vector of 1-7 frequencies to 
+%                      plot topoplot() scalp maps of power at all channels.
+%                      spectopo() equivalent: 'freqs'
+%   "Apply to EEG|ERP|BOTH" - [edit box] Plot spectra of the 'EEG', 'ERP' or of 'BOTH'.
+%                      NOTE: This edit box does not appear for continuous data.
+%                      spectopo() equivalent: 'process'
+%   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
+%                      spectopo() equivalent: 'freqrange'
+%   "Scalp map options" - [edit box] 'key','val','key',... sequence of arguments 
+%                      passed to topoplot() to adjust details of the scalp maps
+%                      For details see  >> help topoplot
 %
-% Graphic interface for ICA comp. (dataflag 0):
-%   "Epoch time range" - [edit box]  Epoch time range in ms [min max] to use 
-%                      in computing the spectra (by default the whole time range).
-%                      Command line equivalent: 'timerange'
-%   "Frequency (Hz) to analyze" - [edit box] single frequency to plot component
-%                      contributions. Command line equivalent in spectopo(): 'freqs'
-%   "Electrode number to analyze" - [edit box] If value is 1 to nchans, plot 
-%                      component contributions at this channel; If value is [], 
-%                      plot contributions at channel with max. power; If value is 0, 
-%                      plot component contributions to global (RMS) power.
-%                      Command line equivalent in spectopo(): 'plotchan'
-%   "Percent data to sample" - [edit box] percentage of data to keep while
-%                      computing the spectra (low percentage speeds up computation).
-%                      Command line equivalent in spectopo(): 'percent'
-%   "Components to include ..." - [Edit box] only compute spectrum for subset of 
-%                      components. Command line equivalent in spectopo(): 'icacomps'
-%   "Number of largest-contributing ..." - [edit box] number of ICA component maps 
-%                      to plot. Command line equivalent in spectopo(): 'nicamaps'
-%   "Else, map only these component ..." - [edit box] Use this entry to override 
-%                      plotting maps of the components that project most strongly to 
-%                      the selected channel (or whole scalp) at the selected frequency.
-%                      Command line equivalent in spectopo(): 'icamaps'
+% Graphic interface for ICA components (dataflag = 0):
+%   "Epoch time range" - [edit box]  [min max] Epoch time range (in ms) to use 
+%                      in computing the spectra (by default the whole epoch or data).
+%                      spectopo() equivalent: 'timerange'
+%   "Frequency (Hz) to analyze" - [edit box] Single frequency (Hz) at which to plot 
+%                      component contributions. spectopo() equivalent: 'freqs'
+%   "Electrode number to analyze" - [edit box] 1-nchans --> Plot component contributions 
+%                      at this channel; [] --> Plot contributions at channel with max 
+%                      power; 0 --> Plot component contributions to global (RMS) power.
+%                      spectopo() equivalent: 'plotchan'
+%   "Percent data to sample" - [edit box] Percent of data to use in computing the spectra 
+%                      (low % speeds up the computation). spectopo() equivalent: 'percent'
+%   "Components to include ..." - [Edit box] Only compute spectrum of a subset of the
+%                      components. spectopo() equivalent: 'icacomps'
+%   "Number of largest-contributing ..." - [edit box] Number of component maps 
+%                      to plot. spectopo() equivalent: 'nicamaps'
+%   "Else, map only these components ..." - [edit box] Use this entry to override 
+%                      plotting maps of the components that project most strongly (at
+%                      the selected frequency) to the the selected channel (or whole scalp 
+%                      if 'plotchan' (above) == 0). spectopo() equivalent: 'icamaps'
 %   "[Checked] Compute comp spectra ..." - [checkbox] If checked, compute the spectra 
-%                      of the selected component activations else [if unchecked], 
+%                      of the selected component activations; else, if unchecked 
 %                      compute the spectra of (the data MINUS each selected component).
-%                      Command line equivalent in spectopo(): 'icamode' 
-%   "Plotting frequency range" - [edit box] frequency range [min max] to plot.
-%                      Command line equivalent in spectopo(): 'freqrange'
-%   "Scalp map options" - [edit box] 'key', 'val' sequence of argument passed on
-%                      to the topoplot() function for scalp map aspect.
-%
+%                      spectopo() equivalent: 'icamode' 
+%   "Plotting frequency range" - [edit box] [min max] Frequency range (in Hz) to plot.
+%                      spectopo() equivalent: 'freqrange'
+%   "Scalp map options" - [edit box] 'key','val','key',... sequence of arguments passed 
+%                      to topoplot() re scalp map details. For details, >> help topoplot
 % Inputs:
 %   EEG         - Input EEGLAB dataset
 %   dataflag    - If 1, process the input data channels. 
-%                   If 0, process its ICA component activations.
+%                 If 0, process its ICA component activations.
 %                   {Default: 1, process the data channels}.
-%   timerange   - Epoch time range [min_ms max_ms] to use in computing the spectra
+%   timerange   - [min_ms max_ms] Epoch time range to use in computing the spectra
 %                   {Default: whole input epochs}
 %   process     - 'EEG'|ERP'|'BOTH' If processing data epochs, work on either the
 %                   mean single-trial 'EEG' spectra, the spectrum of the trial-average 
@@ -100,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/02/26 03:14:28  arno
+% graphic interface help
+%
 % Revision 1.32  2003/01/28 18:02:42  arno
 % adding warning messages if no channel location file
 %
