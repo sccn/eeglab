@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/17 00:35:56  arno
+% debugging
+%
 % Revision 1.11  2002/08/16 16:53:14  arno
 % debug
 %
@@ -387,7 +390,7 @@ return;
  
 function tokout = functionformat( tokin, refcall );
 	tokout = tokin;	% default
-	[test, realtokin, tail] = testfunc1( tokin );
+	[test, realtokin, tail, beg] = testfunc1( tokin );
 	if ~test,  [test, realtokin, tail] = testfunc2( tokin ); end;
 	if test
 		i1 = findstr( refcall, '%s');
@@ -396,20 +399,20 @@ function tokout = functionformat( tokin, refcall );
 		filename  = [ realtokin refcall(i1+2:i1+i2-2)]; % concatenate filename and extension
 		%disp(filename)
 		if exist( filename ) % do not make link if the file does not exist 
-			tokout =  sprintf( [ '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
+			tokout =  sprintf( [ beg '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
 		end;
 	end;		
 return;
 
-function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'function()[,]'  
-	test = 0; realtokin = ''; tail = '';
+function [test, realtokin, tail, beg] = testfunc1( tokin ) % test if is string is 'function()[,]'  
+	test = 0; realtokin = ''; tail = ''; beg = '';
 	if ~isempty( findstr( tokin, '()' ) )
 		if length(tokin)<3, return; end;
 		realtokin = tokin( 1:findstr( tokin, '()' )-1);
 		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end;
 		test = 1;
-		if realtokin(1) == '(', realtokin = realtokin(2:end); end;
-		if realtokin(1) == ',', realtokin = realtokin(2:end); end;
+		if realtokin(1) == '(', realtokin = realtokin(2:end); beg = '('; end;
+		if realtokin(1) == ',', realtokin = realtokin(2:end); beg = ','; end;
 	end;
 return;
 
