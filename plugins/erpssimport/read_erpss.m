@@ -82,10 +82,10 @@ function [eeg,ev,header] = read_erpss(filename)
         end
         if tag == hex2dec('f0aa55'),
             cnt = cnt + 1;
-            if ~mod(cnt,10)
+            if ~mod(cnt,100)
                 fprintf('%d ', cnt);
             end;
-            if ~mod(cnt,100)
+            if ~mod(cnt,1000)
                 fprintf('\n');
             end;
             
