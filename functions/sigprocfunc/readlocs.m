@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2004/01/01 01:47:34  scott
+% franglais -> anglais
+%
 % Revision 1.58  2003/12/17 00:55:07  arno
 % debug last
 %
@@ -391,12 +394,14 @@ if isstr(filename)
    if isempty(g.filetype)
        switch lower(fileextension),
         case {'loc' 'locs' }, g.filetype = 'loc';
-        case 'xyz', g.filetype = 'xyz'; disp( [ 'WARNING: Matlab carthesian coords "xyz" file extension' ... 
-                                       ' detected; if importing EGI cartesian coords, force to type "sfp" instead'] );
+        case 'xyz', g.filetype = 'xyz'; 
+          disp( [ 'WARNING: Matlab Cartesian coord. file extension (".xyz") detected.\n' ... 
+                  'If importing EGI Cartesian coords, force type "sfp" instead.'] );
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
-        case 'elp', g.filetype = 'polhemus';disp( [ 'WARNING: Polhemus carthesian coords "elp" file extension' ... 
-                                       ' detected; if importing BESA spherical coords. force to type "besa" instead'] );
+        case 'elp', g.filetype = 'polhemus';
+            disp( [ 'WARNING: Polhemus Cartesian coord. file extension (".elp") detected.\n' ... 
+                    '         If importing BESA spherical coords, force type "besa" instead'] );
         case 'asc', g.filetype = 'asc';
         case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
@@ -404,7 +409,7 @@ if isstr(filename)
         case 'sfp', g.filetype = 'sfp';
         otherwise, g.filetype =  ''; 
        end;
-       fprintf('Readlocs: ''%s'' format detected from file extension\n', g.filetype); 
+       fprintf('readlocs(): ''%s'' format assumed from file extension\n', g.filetype); 
    else 
        if strcmpi(g.filetype, 'locs'),  g.filetype = 'loc'; end;
    end;
@@ -419,8 +424,8 @@ if isstr(filename)
          g.skiplines = listskipline(indexformat);
       end;
       if isempty(g.filetype) 
-         error( ['Readlocs error: filetype can not be detected from' ...
-               'file extension and custom format not specified']);
+         error( ['readlocs() error: The filetype cannot be detected from the \n' ...
+                 '                  file extension, and custom format not specified']);
       end;
    end;
    
@@ -438,7 +443,7 @@ if isstr(filename)
            strcmp(g.filetype, 'polhemus')
        try, 
            [eloc labels X Y Z]= readelp( filename );
-       catch, error('Error while reading Polhemus (for BESA .elp file force file type to BESA)'); end;
+       catch, error('readlocs(): Error reading Polhemus coords. If BESA .elp file, force file type to BESA.'); end;
        if strcmp(g.filetype, 'polhemusy')
            tmp = X; X = Y; Y = tmp;
        end;
@@ -452,16 +457,18 @@ if isstr(filename)
        % --------------
        array = load_file_or_array( filename, max(g.skiplines,0));
        if size(array,2) < length(g.format)
-           fprintf('Readlocs warning: fewer columns in the file than expected\n');
+           fprintf(['readlocs() warning: Fewer columns in the input than expected.\n' ...
+                    '                    See >> help readlocs\n']);
        elseif size(array,2) > length(g.format)
-           fprintf('Readlocs warning: more columns in the file than expected\n');
+           fprintf(['readlocs() warning: More columns in the input than expected.\n' ...
+                    '                    See >> help readlocs\n']);
        end;
        
        % removing lines BESA
        % -------------------
        if g.skiplines == -1
            if isempty(array{1,2})
-               disp('BESA header detected, skipping 3 lines');
+               disp('BESA header detected, skipping three lines...');
                array = load_file_or_array( filename, -2);
            end;
        end;
@@ -513,7 +520,7 @@ if isstr(filename)
            eloc = convertlocs(eloc, 'topo2all'); % problem with some EGI files (not BESA files)
        catch, disp('Warning: coordinate conversion failed'); end;
        fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
-       fprintf('          to avoid confusion (these field can be exported though)\n');   
+       fprintf('          to avoid confusion (these fields can be exported, though)\n');   
        eloc = rmfield(eloc, 'sph_phi_besa');
        eloc = rmfield(eloc, 'sph_theta_besa');
 
@@ -536,7 +543,7 @@ if isstr(filename)
    % inserting labels if no labels
    % -----------------------------
    if ~isfield(eloc, 'labels')
-       fprintf('Readlocs: Automatically inserting electrode labels\n');
+       fprintf('readlocs(): Inserting electrode labels automatically.\n');
        for index = 1:length(eloc)
            eloc(index).labels = [ 'E' int2str(index) ];
        end;
@@ -558,7 +565,7 @@ if isstr(filename)
        end;
        allchannum = cell2mat( { eloc.channum } );
        if any( sort(allchannum) ~= allchannum )
-           fprintf('Readlocs: Resorting channel number based on ''channum'' column indices\n');
+           fprintf('readlocs(): Re-sorting channel numbers based on ''channum'' column indices\n');
            [tmp newindices] = sort(allchannum);
            eloc = eloc(newindices);
        end;
@@ -568,7 +575,7 @@ else
     if isstruct(filename)
         eloc = filename;
     else
-        disp('Readlocs: input variable must be a string or a structure');
+        disp('readlocs(): input variable must be a string or a structure');
     end;        
 end;
 if ~isempty(g.elecind)
@@ -609,7 +616,7 @@ function array = load_file_or_array( varname, skiplines );
     else % variable in the global workspace
          % --------------------------
          try, array = evalin('base', varname);
-	     catch, error('readlocs: cannot find file or variable, check syntax');
+	     catch, error('readlocs(): cannot find the named file or variable, check syntax');
 		 end;
     end;     
 return;
@@ -641,5 +648,5 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, 'custum2'), return; end;
 	if strcmpi(str, 'custum3'), return; end;
 	if strcmpi(str, 'custum4'), return; end;
-    error(['Readlocs: undefined field ''' str '''']);
+    error(['readlocs(): undefined field ''' str '''']);
    
