@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/07/24 18:40:07  arno
+% checking empty values in epochs
+%
 % Revision 1.37  2002/07/23 23:51:25  arno
 % removing error
 %
@@ -511,7 +514,7 @@ if length(EEG.reject.gcompreject) ~= size(EEG.icaact,1)
 	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
 end;
 if isempty(EEG.reject.gcompreject)
-	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
+	EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
 end;
 
 % component rejection
