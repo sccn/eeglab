@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/03/04 17:16:01  scott
+% debug last -sm
+%
 % Revision 1.6  2003/03/04 17:11:51  scott
 % edit to work in subplot axes -sm
 %
@@ -238,8 +241,8 @@ fprintf('\n');
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 pos = get(gca,'Position');
+axis('off')
 cla % clear the current axes
-set(gca,'Color',BACKCOLOR); % set the background color
 
 % site the plot at bottom of the figure
 axe = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
@@ -345,14 +348,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Make the colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-  axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]); % colorbar axes
-  h=cbar(axt);  
-  set(h,'Ytick',[]);
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+h=cbar(axt);                        % colorbar axes
+set(h,'Ytick',[]);
 
-  axes(axall)
-  set(axall,'Color',BACKCOLOR);
-  text(0.50,0.96,titl,'FontSize',16,'HorizontalAlignment','Center');
-  text(0.86,0.67,'+','FontSize',16,'HorizontalAlignment','Center');
+axes(axall)
+set(axall,'Color',axcolor);
+text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
+text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
+
+axes(axall)
+set(axall,'layer','top'); % bring component lines to top
+
+%  axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]); % colorbar axes
+%  h=cbar(axt);  
+%  set(h,'Ytick',[]);
+%
+%  axes(axall)
+%  set(axall,'Color',BACKCOLOR);
+%  text(0.50,0.96,titl,'FontSize',16,'HorizontalAlignment','Center');
+%  text(0.86,0.67,'+','FontSize',16,'HorizontalAlignment','Center');
+
   if ~isempty(varargin)
     try,
 		if ~isempty( strmatch( 'absmax', varargin))
@@ -361,4 +381,7 @@ end
 	catch, end;
   end
   text(0.86,0.59,'-','FontSize',16,'HorizontalAlignment','Center');
+%
+% Turn on axcopy()
+%
 axcopy(gcf);
