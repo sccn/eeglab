@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/02/27 03:35:41  arno
+% graphic interface help
+%
 % Revision 1.22  2003/02/27 03:16:02  arno
 % debugging for continuous dataset (time selection)
 %
@@ -400,13 +403,20 @@ if ~isempty(g.time) | ~isempty(g.notime)
             if g.time(end) == EEG.xmax, g.notime(end) = [];
             else                        g.notime(end+1) = EEG.xmax;
             end;
+            
+            for index = 1:length(g.notime)
+                if g.notime(index) ~= 0  & g.notime(index) ~= EEG.xmax
+                    if mod(index,2), g.notime(index) = g.notime(index) + 1/EEG.srate;
+                    else             g.notime(index) = g.notime(index) - 1/EEG.srate;
+                    end;
+                end;
+            end;        
             g.notime = reshape(g.notime, 2, length(g.notime)/2)';
         end;   
         
         nbtimes = length(g.notime(:));
         points = eeg_lat2point(g.notime(:)', ones(1,nbtimes), EEG.srate, [EEG.xmin EEG.xmax]);
         points = reshape(points, size(g.notime));
-        points
         EEG = eeg_eegrej(EEG, points);
     end
 end;
