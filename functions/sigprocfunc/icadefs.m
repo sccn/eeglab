@@ -22,6 +22,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/31 23:30:10  arno
+% updating
+% ,
+%
 % Revision 1.4  2002/06/25 02:36:27  scott
 % removed outdated defs, clarified comments and layout -sm
 %
@@ -54,7 +58,7 @@ else % assume Windows
  TUTDIR = ['f:\scott\matlab\tutorial']; % <=INSERT ica tutorial dirname here
 end
                                        
-TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/icatutorial/'; % online version
+TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglab.html'; % online version
 
 ICABINARY = 'ica_linux'; % <=INSERT name of ica executable for binica.m
 
@@ -78,6 +82,7 @@ MAXTOPOPLOTCHANS  = 256;  % maximum number of channels to plot in topoplot.m
 DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL RATE
 DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
+
 
 if strcmp(ICADIR,'XXX/') | ~exist(ICADIR)
     fprintf('===============================================\n');
