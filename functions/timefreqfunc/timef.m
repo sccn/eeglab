@@ -20,6 +20,8 @@
 %                        'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed information about timef
+%        some default values are not relevant if this function is called from
+%           pop_timef()
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -147,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2004/03/25 15:12:08  scott
+% help message re EEG.chanlocs struct possibility
+%
 % Revision 1.72  2004/03/09 17:35:33  arno
 % msg
 %
