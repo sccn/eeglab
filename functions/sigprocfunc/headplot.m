@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/23 17:19:10  arno
+% cleaning up, removing ls for windows
+%
 % Revision 1.7  2002/10/23 17:06:26  arno
 % saving syntax change for windows
 %
@@ -321,6 +324,8 @@ if isstr(values)
     fprintf('            but doesnt have to be done again for this montage...\n');
     hwb = waitbar(0,'Computing spline file (percent done)...');
 
+    %figure; plot3(x (:),  y(:),  z(:), '.' );
+    %figure; plot3(Xe(:), Ye(:), Ze(:), '.' );
     hwbend = length(x);
     for j = 1:length(x)
       % fprintf('%d ',j)
