@@ -5,7 +5,8 @@
 %                                         endangle,dashed,thickness,segments);
 % Inputs:
 %   X, Y       - circle center coordinates 
-%   radius     - circle radius 
+%   radius     - circle radius. Can be a vector of 2 values, one
+%                for the x dimension and one the y dimension.
 %   colorfill  - circle fill color (default:0=none)
 %   coloredge  - circle edge color (default:black; 0:no edge)  
 %   oriangle   - starting angle (default:0 degrees)
@@ -18,7 +19,7 @@
 %   linehandles - handle to the lines of the circle object
 %   fillhandle  - handle to the interior of the circle object
 
-% arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001
 
 % This program is free software; you can redistribute it and/or modify it.  
 % This program is distributed in the hope that it will be useful,
@@ -26,6 +27,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/04/24 21:19:12  arno
+% abord if radius negative
+%
 % Revision 1.2  2002/04/10 22:22:52  arno
 % test
 %
@@ -57,7 +61,7 @@ end;
 if nargin < 10
 	segments = 50;
 end;
-if radius <= 0
+if any(radius <= 0)
     return;
 end;
 
@@ -67,7 +71,7 @@ A = linspace(oriangle/180*pi, endangle/180*pi, segments);
 % ------------
 if any(colorfill)
 	A = linspace(oriangle/180*pi, endangle/180*pi, segments);
-	h2 = patch( X + cos(A)*radius, Y + sin(A)*radius, zeros(1,segments), colorfill);
+	h2 = patch( X + cos(A)*radius(1), Y + sin(A)*radius(end), zeros(1,segments), colorfill);
 	set(h2, 'FaceColor', colorfill); 
 	set(h2, 'EdgeColor', 'none'); 
 end;		
@@ -78,10 +82,10 @@ if dashed
 	compt=0;	
 	for i=1:3:segments-2
 		compt = compt+1;
-		h(compt) = line( X + cos(A(i:i+1))*radius, Y + sin(A(i:i+1))*radius);
+		h(compt) = line( X + cos(A(i:i+1))*radius(1), Y + sin(A(i:i+1))*radius(end));
 	end;
 else
-	h = line( X + cos(A)*radius, Y + sin(A)*radius);
+	h = line( X + cos(A)*radius(1), Y + sin(A)*radius(end));
 end;
 set(h, 'Color', coloredge); 
 
