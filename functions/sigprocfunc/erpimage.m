@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2003/07/26 17:05:26  scott
+% debug auxvars warning, hide vert matrix option
+%
 % Revision 1.122  2003/07/24 23:41:05  arno
 % correcting output
 %
@@ -1085,7 +1088,7 @@ if ~isempty(auxvar)
 	if size(auxvar,1)>size(auxvar,2)  % make (N,frames)
 		auxvar = auxvar';               % (assuming N < frames)
 	end
-	if size(auxvar,2) ~= frames
+	if size(auxvar,2) ~= ntrials
 		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',ntrials);
 		return
 	end
