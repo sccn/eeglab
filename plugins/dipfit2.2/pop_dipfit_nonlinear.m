@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/09 19:42:37  arno
+% Initial revision
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT, com] = pop_dipfit_nonlinear( EEG, subfunction, parent, dipnum )
@@ -377,7 +380,7 @@ elseif nargin>=3
       EEG.dipfit.model(current).posxyz(select,:) = model_after_fitting.posxyz;
       EEG.dipfit.model(current).momxyz(select,:) = model_after_fitting.momxyz;
       EEG.dipfit.model(current).rv               = model_after_fitting.rv;
-      EEG.dipfit.model(current).diffmap          = model_after_fitting.diffmap;
+      %EEG.dipfit.model(current).diffmap          = model_after_fitting.diffmap;
 
       % reassign the global EEG object back to the dialogs userdata
       set(parent, 'userdata', EEG);
