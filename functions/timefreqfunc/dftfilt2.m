@@ -1,4 +1,4 @@
-% dftfilt2() - discrete Morlet wavelet filters
+% dftfilt2() - discrete complex wavelet filters
 %
 % Usage:
 %   >> wavelet = dftfilt2( freqs, cycles, srate, cyclefact)
@@ -12,6 +12,11 @@
 %   srate   - sampling rate
 %   cycleinc - ['linear'|'log'] increase mode if [min max] cycles is
 %              provided in 'cycle' parameter. Default is 'linear'.
+%   type     - ['sinus'|'morlet'] wavelet type is sinusoidal
+%             cosine (real part) and sine (imaginary part) tapered by
+%             a hanning function. 'morlet' is the typical morlet wavelet
+%             (p=2pi and sigma=0.7 so that the wavelet best matches 
+%             sinusoidal wavelets). Default is 'morlet'.
 %
 % Output:
 %   wavelet - cell array of wavelet filters
@@ -38,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/05/09 20:55:10  arno
+% adding hanning function
+%
 % Revision 1.4  2003/04/29 16:02:54  arno
 % header typos
 %
@@ -51,10 +59,13 @@
 % Initial revision
 %
 
-function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
+function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
 
     if nargin < 3
         error('3 arguments required');
+    end;
+    if nargin < 5
+        type = 'morlet';
     end;
     
     % compute number of cycles at each frequency
@@ -72,21 +83,29 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
     
     % compute wavelet
     for index = 1:length(freqs)
-       
+        
         % number of cycles depend on window size 
         % number of cycles automatically reduced if smaller window
         % note: as the number of cycle changes, the frequency shifts a little
         %       this has to be fixed
-	
+        
         winlen = cycles(index)*srate/freqs(index);
         winlenint = floor(winlen);
         if mod(winlenint,2) == 1, winlenint = winlenint+1; end; 
         winval = linspace(winlenint/2, -winlenint/2, winlenint+1);        
         
-        win = exp(2i*pi*freqs(index)*winval/srate);
-        wavelet{index} = win .* hanning(length(winval))';
-        
+        if strcmpi(type, 'sinus')
+            win = exp(2i*pi*freqs(index)*winval/srate);
+            wavelet{index} = win .* hanning(length(winval))';
+        else % morlet
+            t = freqs(index)*winval/srate;
+            p = 2*pi;
+            s = cycles(index)/5;
+            wavelet{index} = exp(j*t*p)/sqrt(2*pi) .* ...
+                (exp(-t.^2/(2*s^2))-sqrt(2)*exp(-t.^2/(s^2)-p^2*s^2/4));
+        end;    
     end;
+    
     
     return;
     
@@ -111,12 +130,14 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
     % more testing
     % ------------
     freqs = exp(linspace(0,log(10),10));
-    win = dftfilt2(freqs, [3 10], 256, 'linear'); size(win)
+    win = dftfilt2(freqs, [3 3], 256, 'linear'); size(win)
+    win = dftfilt2(freqs, [3 3], 256, 'linear', 'morlet');
     
     freqs = [12.0008   13.2675   14.5341   15.8007   17.0674   18.3340   19.6007   20.8673   22.1339   23.4006   24.6672   25.9339   27.2005 28.4671   29.7338   31.0004   32.2670   33.5337   34.8003   36.0670   37.3336   38.6002   39.8669   41.1335   42.4002   43.6668 44.9334   46.2001   47.4667 ...
              48.7334   50.0000];
     
     win = dftfilt2(freqs, [3 12], 256, 'linear'); size(win)
+    
     winsize = 0;
     for index = 1:length(win)
         winsize = max(winsize,length(win{index}));
