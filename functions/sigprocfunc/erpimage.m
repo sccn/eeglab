@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.184  2003/12/17 21:42:13  scott
+% adjust same
+%
 % Revision 1.183  2003/12/17 21:40:12  scott
 % change y-labels on traces
 %
@@ -747,7 +750,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % Initialize optional output variables:
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
-auxvar = []; erpsig = [];
+auxvar = []; erpsig = []; winloc = [];
 
 YES = 1;  % logical variables
 NO  = 0;
@@ -1109,43 +1112,40 @@ if nargin > 6
 		  end
 		  Signifflag = NO;
 	  elseif Allcohersflag == YES
-          data2=Arg;
-          if size(data2) ~= size(data)
+            data2=Arg;
+            if size(data2) ~= size(data)
 			  fprintf('erpimage(): allcohers data matrix must be the same size as data.\n');
               return
-          end
-          Allcohersflag = NO;
+            end
+            Allcohersflag = NO;
 	  elseif Phaseflag == YES
-          n = length(Arg);
-          if n > 5
+            n = length(Arg);
+            if n > 5
 			  error('erpimage(): Too many arguments for keyword ''phasesort''');
-          end
-          phargs = Arg;
+            end
+            phargs = Arg;
 		  
-          if phargs(3) < 0
+            if phargs(3) < 0
               error('erpimage(): Invalid negative argument for keyword ''phasesort''');
-          end
-          if n>=4
+            end
+            if n>=4
 			  if phargs(4) < 0
 				  error('erpimage(): Invalid negative argument for keyword ''phasesort''');
 			  end
-          end
-          
-          if min(phargs(1)) < times(1) | max(phargs(1)) > times(end)
+            end
+            if min(phargs(1)) < times(1) | max(phargs(1)) > times(end)
 			  error('erpimage(): time for phase sorting filter out of bound.');
-          end
-
-          if phargs(2) >= 100 | phargs(2) < -100
+            end
+            if phargs(2) >= 100 | phargs(2) < -100
 			  error('%-argument for keyword ''phasesort'' must be (-100;100)');
-          end
-          
-          if length(phargs) >= 4 & phargs(3) > phargs(4)
+            end
+            if length(phargs) >= 4 & phargs(3) > phargs(4)
 			  error('erpimage(): Phase sorting frequency range must be increasing.');
-          end
-          if length(phargs) == 5
+            end
+            if length(phargs) == 5
 			  topphase = phargs(5);
-          end
-          Phaseflag = NO;
+            end
+            Phaseflag = NO;
 	  elseif Ampflag == YES % 'ampsort',[center_time,prcnt_reject,minfreq,maxfreq]
           n = length(Arg);
           if n > 4
@@ -1323,7 +1323,7 @@ if exist('phargs')
             'erpimage(): Phase-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
                 phargs(3),srate/2);
 	end
-    % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
+                                    % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
 		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				phargs(3),DEFAULT_CYCLES);
@@ -1520,10 +1520,9 @@ if exist('phargs') == 1 % if phase-sort
 	
 	[dummy minx] = min(abs(times-phargs(1)));
 	winlen = floor(DEFAULT_CYCLES*srate/freq);
-	%winloc = minx-[winlen:-1:0]; % ending time version
-	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
-    tmprange = find(winloc>0 & winloc<=frames);
-    winloc = winloc(tmprange);
+	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
+        tmprange = find(winloc>0 & winloc<=frames);
+        winloc = winloc(tmprange); % sorting window times
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -1615,7 +1614,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
     tmprange = find(winloc>0 & winloc<=frames);
-    winloc = winloc(tmprange);
+    winloc = winloc(tmprange); % sorting window times
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -2502,12 +2501,12 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                   gcapos(3) image_loy*gcapos(4)]);
     end
     if Erpstdflag == YES
-        plot1trace(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
+        plot1trace(ax2,times,erp,limit, NaN, stdev,[],winloc); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
-        plot1trace(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
+        plot1trace(ax2,times,erp,limit,erpsig,[],winloc); % plot ERP and 0+/-alpha threshold
     else
-        plot1trace(ax2,times,erp,limit); % plot ERP alone
+        plot1trace(ax2,times,erp,limit,[],[],winloc); % plot ERP alone
     end;
         
     if ~isnan(aligntime)
@@ -2694,9 +2693,9 @@ if ~isnan(coherfreq)
         if Cohsigflag
                 ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
                 ampsiglims = [ampsiglims;-1*ampsiglims];
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],winloc); % plot AMP
         else
-        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
+        	plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],winloc); % plot AMP
         end
         
         if ~isnan(aligntime)
@@ -2790,9 +2789,10 @@ if ~isnan(coherfreq)
         end
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],winloc); 
+                                                                           % plot COHER, fill sorting window
         else
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],winloc); % plot COHER
         end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
@@ -2968,19 +2968,31 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev)
-%                           if signif is NaN, plot erp +/- stdev
-%                           else if signif, plot erp and signif(1,:)&signif(2,:) fill
-%                           else, plot erp alone
+function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
+%                           If signif is NaN, plot erp +/- stdev
+%                           Else if signif, plot erp and signif(1,:)&signif(2,:) fill
+%                           Else, plot erp alone
+%                           If winloc vector, plot grey back image in sort window
+%                                       winloc(1)-> winloc(end) (ms)
   FILLCOLOR    = [.66 .76 1];
+  WINFILLCOLOR    = [.66 .76 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   if exist('signif') == 1  % (2,times) array giving upper and lower signif limits
-    if ~isnan(signif);
+    if ~isempty(signif);
       filltimes = [times times(end:-1:1)];
       if size(signif,1) ~=2 | size(signif,2) ~= length(times)
          fprintf('plot1trace(): signif array must be size (2,frames)\n')
          return
+      end
+      if ~isempty(winloc)
+         fillwinx = [winloc(1,:) winloc(2,end:-1:1)];
+         if ~isempty(axlimits) & sum(isnan(axlimits))==0
+           fillwiny = [repmat(axlimits(3),1,length(winloc) repmat(axlimits(4),1,length(winloc))];
+         else
+           fillwiny = [repmat(min(erp)*1.1,1,length(winloc) repmat(max(erp)*1.1,1,length(winloc))];
+         end
+         fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
       end
       fillsignif = [signif(1,:) signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
@@ -2994,7 +3006,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev)
     end
   end;
   [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
-  if sum(isnan(axlimits))==0
+  if ~isempty(axlimits) & sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
       axis([axlimits(1:2) 1.1*axlimits(3:4)])
     end
