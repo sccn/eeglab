@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/05/15 00:59:05  arno
+% allow empty event array
+%
 % Revision 1.14  2004/05/14 22:14:05  arno
 % empty fields for boundary events
 %
@@ -142,6 +145,7 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
                     disp('         and will not contain the duration of the removed region');
                 else
                     eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
+                    if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
                 end;
                 rmnested = [ rmnested tmpnest ];
             end; 
