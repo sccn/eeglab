@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/10/23 02:28:54  arno
+% RMS for channel and better implementation for global channel power
+%
 % Revision 1.40  2002/10/23 00:59:48  arno
 % implementing new component scaling
 %
@@ -256,6 +259,7 @@ if nargin <= 3 | isstr(varargin{1})
 	if ~isempty(g.freqrange), g.limits(1:2) = g.freqrange; end;
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2
+            if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
 			error('spectopo: for computing component contribution, one must specify a (single) frequency');
 		end;
 	end;
@@ -296,9 +300,11 @@ if frames == 0
   frames = size(data,2); % assume one epoch
 end
 if g.plotchan == 0 & strcmpi(g.icamode, 'sub')
+    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
     error('Can not plot data-component for all channels (option not implemented)');
 end;
 if ~isempty(g.freq) & min(g.freq)<0
+    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
 end
