@@ -93,6 +93,7 @@
 % pop_loaddat()   - load Neuroscan .DAT info file (loaddat())
 % pop_loadcnt()   - load Neuroscan .CNT data (lndcnt())
 % pop_loadeeg()   - load Neuroscan .EEG data (loadeeg())
+% pop_loadbva()   - load Brain Vision Analyser matlab files
 % pop_plotdata()  - plot data epochs in rectangular array (plotdata())
 % pop_read_erpss() - read ERPSS data (read_erpss())
 % pop_readegi()   - load binary EGI data file (readegi())
@@ -186,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.301  2003/12/12 01:17:55  arno
+% debug history for channel locations
+%
 % Revision 1.300  2003/12/11 17:29:19  arno
 % fixing lastcom for pop_chaneditset and pop_copyset
 %
@@ -1252,6 +1256,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Brain Vis. Anal. Matlab file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbva;' e_newnonempty ], 'Separator', 'on'); 
         
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
