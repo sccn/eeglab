@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/01/23 23:53:25  arno
+% change text
+%
 % Revision 1.6  2003/01/23 23:47:26  arno
 % same
 %
@@ -112,7 +115,7 @@ if nargin<7
    revfilt = 0;
 end
 
-if filtorder==0,
+if isempty(filtorder) | filtorder==0,
    if locutoff>0,
      filtorder = minfac*fix(srate/locutoff);
    elseif hicutoff>0,
@@ -149,7 +152,8 @@ if locutoff > 0 & hicutoff > 0,    % bandpass filter
     else fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
     end; 
     f=[MINFREQ (1-trans)*locutoff/nyq locutoff/nyq hicutoff/nyq (1+trans)*hicutoff/nyq 1]; 
-        m=[0       0                      1            1            0                      0]; 
+    fprintf('eegfilter() - low transition band is %1.1g Hz; high one is %1.1g Hz.\n',(f(3)-f(2))*srate, (f(5)-f(4))*srate);
+    m=[0       0                      1            1            0                      0]; 
 elseif locutoff > 0                % highpass filter
  if locutoff/nyq < MINFREQ
     help eegfilt
@@ -158,6 +162,7 @@ elseif locutoff > 0                % highpass filter
  end
  fprintf('eegfilter() - performing %d-point highpass filtering.\n',filtorder);
  f=[MINFREQ locutoff*(1-trans)/nyq locutoff/nyq 1]; 
+ fprintf('eegfilter() - highpass transition band is %1.1g Hz.\n',(f(3)-f(2))*srate);
  m=[   0             0                   1      1];
 elseif hicutoff > 0                %  lowpass filter
  if hicutoff/nyq < MINFREQ
@@ -167,12 +172,13 @@ elseif hicutoff > 0                %  lowpass filter
  end
  fprintf('eegfilt() - performing %d-point lowpass filtering.\n',filtorder);
  f=[MINFREQ hicutoff/nyq hicutoff*(1+trans)/nyq 1]; 
+ fprintf('eegfilter() - lowpass transition band is %1.1g Hz.\n',(f(3)-f(2))*srate);
  m=[     1           1              0                 0];
 else
  help eegfilt
  return
 end
-if ~isempty(revfilt) & revfilt
+if revfilt
     m = ~m;
 end;
 
