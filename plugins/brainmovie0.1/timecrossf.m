@@ -74,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/06/18 17:21:04  arno
+% allowing to read file on disk
+%
 % Revision 1.10  2003/04/24 15:46:00  arno
 % debuging standard movie
 %
@@ -209,7 +212,7 @@ function array = applyboot(array, arrayboot)
     if size(arrayboot,3) == 2
         array(find((array > arrayboot(:,:,1)) & (array < arrayboot(:,:,2)))) = 0;
     elseif size(arrayboot,2) > 2
-        array(find(array > arrayboot(:,:))) = 0;
+        array(find(array < arrayboot(:,:))) = 0;
     elseif size(arrayboot,2) == 2        
         array(find((array > repmat(arrayboot(:,1),[1 size(array,2)])) & ...
                    (array < repmat(arrayboot(:,2),[1 size(array,2)])))) = 0;
