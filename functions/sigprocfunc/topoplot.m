@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2004/02/15 20:57:04  scott
+% same
+%
 % Revision 1.129  2004/02/15 20:48:15  scott
 % same
 %
@@ -1085,7 +1088,7 @@ axis square; % keep head round!
 %%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%
 %
 function [newTh] = skirt_Th(Th,Rd,maxr)
-
+   pi2 = pi/2;
    q1 = find(Th>=0 & Th<pi/2 & Rd>maxr); % electrodes to move
    q2 = find(Th>=pi/2 & Th<pi & Rd>maxr);
    q3 = find(Th<-pi/2 & Th>=-pi & Rd>maxr);
@@ -1096,17 +1099,17 @@ function [newTh] = skirt_Th(Th,Rd,maxr)
      x = abs(asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi))));
 180*x/pi % DEBUG
 oldTh = Th; % DEBUG
-     Th(q1) = x+(pi/2)/(pi/2-2*x)*Th(q1);
-[q1' oldTh(q1)' Th(q1)'] % DEBUG
+     Th(q1) = x+Th(q1)*(pi2-2*x)/(pi2);
+[q1' 180/pi*oldTh(q1)' 180/pi*Th(q1)'] % DEBUG
    end
 %  fprintf('rotated %d q1 angles\n',length(q1)); % DEBUG
 
    if ~isempty(q2)
-     Th(q2) = Th(q2)-pi/2; % rotate to q1
+     Th(q2) = Th(q2)-pi2; % rotate to q1
      dr = Rd(q2)-0.5;
      x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q2) = x+(pi/2)*Th(q2)/(pi/2-2*x);
-     Th(q2) = Th(q2)+pi/2; % rotate back
+     Th(q2) = x+Th(q2)*(pi2-2*x)/pi2;
+     Th(q2) = Th(q2)+pi2; % rotate back
    end
 %  fprintf('rotated %d q2 angles\n',length(q2)); % DEBUG
 
@@ -1114,16 +1117,16 @@ oldTh = Th; % DEBUG
      Th(q3) = Th(q3)+pi; % rotate to q1
      dr = Rd(q3)-0.5;
      x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q3) = x+(pi/2)*Th(q3)/(pi/2-2*x);
+     Th(q3) = x+*Th(q3)*(pi2-2*x)/pi2;
      Th(q3) = Th(q3)-pi; % rotate back
    end
 %  fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
 
    if ~isempty(q4)
-     Th(q4) = Th(q4)+pi/2; % rotate to q1
+     Th(q4) = Th(q4)+pi2; % rotate to q1
      dr = Rd(q4)-0.5;
      x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q4) = x+(pi/2)*Th(q4)/(pi/2-2*x);
+     Th(q4) = x+Th(q4)*(pi2-2*x)/pi2;
      Th(q4) = Th(q4)-pi/2; % rotate back
    end
 %  fprintf('rotated %d q4 angles\n',length(q4)); % DEBUG
