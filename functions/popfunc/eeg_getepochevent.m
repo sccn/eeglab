@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/06/02 18:21:45  arno
+% adding extra output
+%
 % Revision 1.12  2004/06/02 16:49:00  arno
 % allowing to process continuous data
 %
@@ -209,7 +212,6 @@ end;
 % -------------
 epochval       = zeros(1,EEG.trials); epochval(:) = nan;
 allepochval    = cell(1, EEG.trials);
-allepochval(:) = { NaN };
 if strcmp(fieldname, 'latency')
     count = 1;
 	for index = 1:length(Ieventtmp)
@@ -235,7 +237,7 @@ else
             else                             epoch = EEG.event(Ieventtmp(index)).epoch;
             end;
             epochval(epoch) = val;
-            allepochval{epoch}(enf) = val;
+            allepochval{epoch}(end+1) = val;
             count = count+1;
 		end;
 	end;
