@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/05/29 14:59:07  arno
+% nothing
+%
 % Revision 1.22  2003/05/22 01:18:56  arno
 % header typo
 %
@@ -403,7 +406,6 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize)
     srate    = 1000*(frames-1)/(tlimits(2)-tlimits(1));
     
     if length(timevar) == 1 
-
         if timevar(1) > 0
             % generate linearly space vector
             % ------------------------------
@@ -423,7 +425,8 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize)
             timevals    = timevect( timeindices );
             fprintf('Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
         end;
-    
+    else
+        timevals = timevar;
     end;
     
     % find closet points in data
