@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/10/15 17:23:21  arno
+% debug drawnow
+%
 % Revision 1.15  2002/10/15 16:53:37  arno
 % add drawnow for windows
 %
@@ -125,7 +128,7 @@ if exist('mode') ~= 1
 end;
 
 if isstr(mode)
-	fig = figure('visible', 'off');
+	fig = figure('visible', 'off', 'tag', 'supergui');
 	if exist('mytitle') == 1, set(gcf, 'name', mytitle); end;
 	if exist('userdat') == 1, set(gcf, 'userdata', userdat); end; 
 	geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
