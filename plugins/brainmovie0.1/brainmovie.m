@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/05/06 15:47:59  arno
+% adding debug msg
+%
 % Revision 1.47  2003/04/24 15:20:12  arno
 % debuging plotorder
 %
@@ -752,7 +755,8 @@ for indeximage = alltimepoints
 	for i=1:nbconditions
 		axes(hh(i)); 	cla; set (gcf, 'visible', g.visible); 
         if strcmpi(g.mesh, 'on')
-            circle(0,0,1,'w'); hold on;
+            hold on; h = circle(0,0,1); hold on;
+            set(h, 'color', 'w');
 		end;
         if ~isempty(g.title) & i == 1
 			%x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
