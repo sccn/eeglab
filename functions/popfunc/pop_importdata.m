@@ -1,10 +1,42 @@
 % pop_importdata() - Import data from a Matlab variable or from a file. 
 %
 % Usage:
+%   >> EEGOUT = pop_importdata( EEG ); % pop-up window mode
 %   >> EEGOUT = pop_importdata( 'key', val,...);
 %
+% Graphical interface:
+%   "EEGLAB dataset name" - [Edit box] name for the new dataset. Command line
+%                  equivalent: 'setname'
+%   "Data file/array" - [Edit box] Data file or Matlab variable name to import
+%                  to EEGLAB. Command line equivalent: 'data'
+%   "Data file/array" - [list box] select data format from listbox. If you
+%                  browse for a data file, the graphical interface might be
+%                  able to detect the file format from the file extension and
+%                  his list box accordingly. Note that you have to click on
+%                  the option to make it active. Command line equivalent:
+%                  'dataformat'
+%   "Number of channels" - [Edit box] number of data channel. Command line
+%                  equivalent: 'nbchan'
+%   "Time points per epoch" - [Edit box] Number of points per data frame for 
+%                  data epochs. Command line equivalent: 'pnts'
+%   "Data sampling rate" - [Edit box] command line equivalent: 'srate'
+%   "Optional epoch start time" - [Edit box] command line equivalent: 'xmin'
+%   "Channel locations file or array" - [Edit box] see readlocs() help for
+%                  data channel format. Command line equivalent: 'chanlocs'
+%   "ICA weights array or text file" - [edit box] use this option to import
+%                  ICA weight from other decompositions (for instance: same
+%                  data, different conditions). To use the ICA weights from
+%                  an other dataset (i.e. dataset 2) enter "ALLEEG(2).icaweights"
+%                  in this edit box. Command line equivalent: 'icaweight'
+%   "ICA sphere array or text file" - [edit box] import ICA sphere matrix. For
+%                  computational reasons, an ICA decomposition is defined by
+%                  a sphere matrix and an unmixing matrix (see previous option).
+%                  To use the ICA weights from an other dataset (i.e. dataset 2)
+%                  enter "ALLEEG(2).icasphere" in this edit box. Command line 
+%                  equivalent: 'icasphere'.
+%
 % Optional inputs:
-%   'setname'    - name of the existing .set EEGLAB dataset
+%   'setname'    - name of the new EEGLAB dataset
 %   'data'       - ['varname'|'filename'] Data file or variable to import
 %                  into EEGLAB.
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
@@ -49,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/12/18 22:25:46  arno
+% Automatic file format detection debug
+%
 % Revision 1.13  2002/12/05 02:26:41  arno
 % adding an additionnal warning for clicking on the selected option
 %
@@ -101,7 +136,8 @@ EEGOUT = eeg_emptyset;
 if nargin < 1                 % if several arguments, assign values 
    % popup window parameters	
    % -----------------------
-    geometry    = { [2 0.1 0.8 0.5] [1.3 0.8 .8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] [1.5 0.6 0.8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] };
+    geometry    = { [2 0.1 0.8 0.5] [1.3 0.8 .8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] ...
+                    [2 0.1 0.8 0.5] [1.5 0.6 0.8 0.5] [2 0.1 0.8 0.5] [2 0.1 0.8 0.5] };
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
                     'if filename ~=0,' ...
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
@@ -148,7 +184,7 @@ if nargin < 1                 % if several arguments, assign values
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'sphfile' } ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } };
 
-    results = inputgui( geometry, uilist, 'pophelp(''pop_importdata'');', 'Import dataset info -- pop_editset()');
+    results = inputgui( geometry, uilist, 'pophelp(''pop_importdata'');', 'Import dataset info -- pop_importdata()');
     if length(results) == 0, return; end;
 
 	args = {};

@@ -1,7 +1,35 @@
 % pop_editset() - Edit EEGLAB EEG dataset structure fields.
 %
 % Usage:
+%   >> EEGOUT = pop_editset( EEG ); % pop-up window mode
 %   >> EEGOUT = pop_editset( EEG, 'key', val,...);
+%
+% Graphical interface:
+%   "EEGLAB dataset name" - [Edit box] name for the new dataset. Command line
+%                  equivalent: 'setname'. The last column indicates which
+%                  field of the EEG structure, this paramter is corresponding
+%                  to.
+%   "Time points per epoch" - [Edit box] Number of points per data frame for 
+%                  data epochs. Command line equivalent: 'pnts'
+%   "Data sampling rate" - [Edit box] command line equivalent: 'srate'
+%   "Optional epoch start time" - [Edit box] command line equivalent: 'xmin'
+%   "Channel locations file or array" - [Edit box] see readlocs() help for
+%                  data channel format. Command line equivalent: 'chanlocs'
+%   "ICA weights array or text file" - [edit box] use this option to import
+%                  ICA weight from other decompositions (for instance: same
+%                  data, different conditions). To use the ICA weights from
+%                  an other dataset (i.e. dataset 2) enter "ALLEEG(2).icaweights"
+%                  in this edit box. Command line equivalent: 'icaweight'
+%   "ICA sphere array or text file" - [edit box] import ICA sphere matrix. For
+%                  computational reasons, an ICA decomposition is defined by
+%                  a sphere matrix and an unmixing matrix (see previous option).
+%                  To use the ICA weights from an other dataset (i.e. dataset 2)
+%                  enter "ALLEEG(2).icasphere" in this edit box. Command line 
+%                  equivalent: 'icasphere'.
+%   "Averaged referenced data" - [checkbox] re-reference data to average 
+%                  reference by checking the checkbox. Transform back to common
+%                  reference by unchecking the checkbox. Command line 
+%                  equivalent: 'averef'. See also pop_reref()
 %
 % Inputs:
 %   EEG             - dataset structure
@@ -60,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/01/23 21:34:59  scott
+% header edits -sm
+%
 % Revision 1.29  2003/01/22 22:43:53  scott
 % edit header -sm
 %
