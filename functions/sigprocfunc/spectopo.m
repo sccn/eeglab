@@ -25,6 +25,7 @@
 %                  keep while computing spectra. Downsampling can help to speed up
 %                  the computation. From 0 to 1 {default: 1}
 %        'key','val' = optional topoplot() arguments (see topoplot())
+% and/or 'reref','averef'= convert input data to average reference 
 %
 % Outputs:
 %        spectra = (nchans,nfreqs) power spectra (average over epochs) in dB
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/21 00:38:25  scott
+% 'Selecting randomly' -> 'Randomly selecting' -sm
+%
 % Revision 1.2  2002/04/18 18:19:28  arno
 % adding 3D option
 %
@@ -67,7 +71,7 @@
 % 03-27-02 downsampling factor exact calculation -ad
 % 04-03-02 added axcopy -sm
 
-% Uses: psd(), changeunits(), topoplot(), textsc()
+% Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
 
 function [eegspecdB,freqs]=spectopo(data,frames,srate,headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
@@ -77,6 +81,18 @@ FREQFAC  = 4;  % approximate frequencies/Hz (default)
 if nargin<5
    help spectopo
    return
+end
+
+averef_flag = 0;
+if nargin > 9
+   if strcmp(varargin(1),'reref') 
+     if strcmp(varargin(2),'averef')
+        averef_flag = 1;
+        varargin(1) = [];
+     else
+        error('only reref choice is averef');
+     end
+   end
 end
 
 if nargin<8
@@ -133,8 +149,13 @@ fftlength = 2^round(log(srate)/log(2))*FREQFAC;
 fprintf('Computing spectra: ')
 for c=1:nchans
   for e=epoch_subset
-    [tmpspec,freqs] = psd(matsel(data,frames,0,c,e),fftlength,...
+    if averef_flag
+      [tmpspec,freqs] = psd(averef(matsel(data,frames,0,c,e)),fftlength,...
                                     srate,fftlength/2,fftlength/8);
+    else
+      [tmpspec,freqs] = psd(matsel(data,frames,0,c,e),fftlength,...
+                                    srate,fftlength/2,fftlength/8);
+    end
      if c==1 & e==epoch_subset(1)
        eegspec = zeros(nchans,length(freqs));
      end
