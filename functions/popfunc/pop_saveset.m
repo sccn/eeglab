@@ -1,9 +1,9 @@
-% pop_saveset() - save one or more EEG dataset structure(s)
+% pop_saveset() - save one or more EEG dataset structures
 %
 % Usage:
 %   >> pop_saveset( EEG ); % use an interactive pop-up window 
-%   >> pop_saveset( ALLEEG ); % use pop-up window
-%   >> EEG = pop_saveset( EEG, filename, filepath); % non pop-up
+%   >> pop_saveset( ALLEEG );               % use pop-up window
+%   >> EEG = pop_saveset( EEG, filename, filepath); % no pop-up
 %   >> ALLEEG = pop_saveset( ALLEEG, indices, filename, filepath);
 %
 % Inputs:
@@ -17,8 +17,8 @@
 %   EEG        - saved dataset (after extensive syntax checks)
 %   ALLEEG     - saved datasets (after extensive syntax checks)
 %
-% Note: An individual dataset should be saved with a '.set' file extension
-%       and multiple datasets with a '.sets' file extension
+% Note: An individual dataset should be saved with a '.set' file extension,
+%       multiple datasets (at once) with a '.sets' file extension
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/10/31 00:52:30  scott
+% commandline messages
+%
 % Revision 1.24  2003/07/24 17:54:03  arno
 % changing message
 %
@@ -215,7 +218,7 @@ else
 end;
 
 if mode == 0  % single datasets
-	disp('Pop_saveset: Performing extended dataset syntax check...');
+	fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
 	EEG = eeg_checkset(EEG, 'eventconsistency');
 	EEG.filename    = curfilename;
 	EEG.filepath    = '';
@@ -223,17 +226,17 @@ if mode == 0  % single datasets
 	EEG.icaact      = [];
 	command = sprintf('save(''%s'',''-MAT'',''EEG'');', [ curfilepath curfilename ]);
 	
-	% saving data as float or as Matlab
+	% Saving data as float or as Matlab
 	eeg_options;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		tmpdata = EEG.data;
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
-            disp('             Saving dataset...');
+            fprintf('             Saving dataset...\n');
 			eval(command);
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
-			error('Pop_saveset: saving error, check permission on file or directory');
+			error('Pop_saveset: save error, check permissions on file or directory');
 		end;
 		EEG.data = tmpdata; 
 		EEG.icaact = tmpica;
@@ -243,20 +246,20 @@ if mode == 0  % single datasets
         if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
             if exist(tmpfilename) == 2
                 but = questdlg2(strvcat('Warning: EEGLAB .mat file format has changed (v4.11). EEGLAB now saves', ...
-                                        'data matrices in .set files as single precision. Therefore, storing data in separate', ...
+                                        'data matrices in .set files in single-precision. Therefore, storing data in separate', ...
                                         '''.fdt'' files no longer saves disk space. (To reinstate saving data in separate .fdt files,', ...
-                                        [ 'use menu File > Maximize menu). Delete the existing file ''' tmpfilename ''' (recommended)?']), ...
+                                        [ 'select menu item File > Maximize menu). Delete the existing file ''' tmpfilename ''' (recommended)?']), ...
                                         'File format has changed !', 'No', 'Yes', 'Yes');
                 if strcmpi(but, 'yes'), del =1; end;
             end;
         end;
         try, 
             EEG.data = single(EEG.data);
-            disp('Saving dataset...');
+            fprintf('             Saving dataset...\n');
 			eval(command);
             EEG.data = double(EEG.data);
 		catch, 
-			error('Pop_saveset: saving error, check permission on file or directory');
+			error('Pop_saveset: Save error, check permissions on file or directory');
 		end;
         if del,
             try,
@@ -274,7 +277,7 @@ else
 	ALLEEG = EEG; clear EEG;
 	
 	if max(indices) > length(ALLEEG)
-		error('Pop_saveset: index out-of-bound');
+		error('Pop_saveset: index out-of-bounds');
 	end;
 
 	% checking datasets
@@ -285,12 +288,12 @@ else
 			try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
 			catch
 				if nargin < 2
-					if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has non-consistent events' 10 ...
+					if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
 								  'Do you want to continue ?' ])
-						error( ['dataset ' int2str(indices(index)) ' has non-consistent events. You must fix the problem.']);
+						error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
 					end;	
 				else
-					disp( ['Warning: dataset ' int2str(indices(index)) ' has non-consistent events. You must fix the problem.']);
+					disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
 				end;
 			end;
 		else
@@ -306,7 +309,7 @@ else
 	% ------
 	ALLEEG = ALLEEG(indices);
 	
-	% saving data as float or as Matlab
+	% Saving data as float or as Matlab
 	eeg_options;
     del = 0;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
@@ -338,7 +341,7 @@ else
     end;
 	disp('Pop_saveset: saving datasets...');
 	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
-	catch, error('Pop_saveset: saving error, check permission on file or directory');
+	catch, error('Pop_saveset: save error, check permissions on file or directory');
 	end;
     
     % delete .fdt files
