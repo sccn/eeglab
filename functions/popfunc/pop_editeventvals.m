@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/09 20:54:55  arno
+% debuging latency display for latency in continuous data
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -80,7 +83,8 @@ if nargin<2
     % add field values
     % ----------------
     geometry = { 1 };
-    uilist = { { 'Style', 'text', 'string', 'Edit event field values:', 'fontweight', 'bold'  } };
+    tmpstr = sprintf('Edit events field values (%d events):',length(EEG.event));
+    uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
     for index = 1:length(allfields) 
         geometry = { geometry{:} [1 1 1 1] };
         if strcmp( allfields{index}, 'latency')
