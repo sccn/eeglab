@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/11/22 18:20:57  scott
+% adjusting same
+%
 % Revision 1.13  2004/11/22 18:14:26  scott
 % set ydir from YDIR in 'icadefs.m'; update help message
 %
@@ -126,7 +129,8 @@ TICKFONTSIZE=12;   % font size to use for axis labels
 icadefs;           % read MAXPLOTDATACHANS constant from icadefs.m
                    % read YDIR
 if ~exist('YDIR')
-    error('YDIR not read from ''icadefs.m''');
+    fprintf('YDIR not read from ''icadefs.m'' - plotting positive-up.\n');
+    YDIR = 1;
 end
 DEFAULT_SIGN = YDIR;  % default to plotting positive-up (1) or negative-up (-1)
                       % Now, read sign from YDIR in icadefs.m
@@ -357,22 +361,23 @@ end
 %
   clf;   % clear the current figure
 
-  % print plottitle over (left) subplot 1
+  % print plottitle over (left) sbplot 1
   if plottitle==0,
     plottitle = '';
   end
   if righttitle==0,
     righttitle = '';
   end
-  subplot(ceil(chans/2),2,1), h=gca;%title([plottitle],'FontSize',FONTSIZE); % title plot and
-  set(h,'YLim',[ymin ymax]);            % set default plotting parameters
-  set(h,'XLim',[xmin xmax]);
-  set(h,'FontSize',FONTSIZE);            % choose font size
+  % sbplot(ceil(chans/2),2,1), h=gca;%title([plottitle],'FontSize',FONTSIZE); % title plot and
+  % set(h,'YLim',[ymin ymax]);            % set default plotting parameters
+  % set(h,'XLim',[xmin xmax]);
+  % set(h,'FontSize',FONTSIZE);            % choose font size
+  % set(h,'visible','off');
 
-  subplot(ceil(chans/2),2,2), h=gca;%title([righttitle], 'FontSize',FONTSIZE); % title plot and
-  set(h,'FontSize',FONTSIZE);            % choose font size
-  set(h,'YLim',[ymin ymax]);            % set default plotting parameters
-  set(h,'XLim',[xmin xmax]);
+  % sbplot(ceil(chans/2),2,2), h=gca;%title([righttitle], 'FontSize',FONTSIZE); % title plot and
+  % set(h,'FontSize',FONTSIZE);            % choose font size
+  % set(h,'YLim',[ymin ymax]);            % set default plotting parameters
+  % set(h,'XLim',[xmin xmax]);
 
   msg = ['\nPlotting %d traces of %d frames with colors: '];
   for c=1:datasets
@@ -396,8 +401,13 @@ end
     for I=1:chans,        % for each data channel
 
         index=(2*((rem(I-1,ceil(chans/2))+1)))-1+floor(2*(I-1)/chans); 
-        subplot(ceil(chans/2),2,index); h=gca;    % = 1 3 5 .. 2 4 6 ..
-        hold on;                      % plot down left side of page first
+                                      % = 1 3 5 .. 2 4 6 ..
+                                      % plot down left side of page first
+        h=sbplot(ceil(chans/2),2,index); h=gca;    
+        pos = get(h,'position');
+        set(h,'position',[pos(1)-pos(4)*0.5 pos(2), pos(3),pos(4)*2]); % increase sbplot-height
+
+        hold on;                      
         set(h,'YLim',[ymin ymax]);    % set default plotting parameters
         set(h,'XLim',[xmin xmax]);
         
@@ -408,8 +418,14 @@ end
         %
         if ~ISSPEC % not spectral data
             
-            ymin = double(min(data(I,1+P*frames:1+P*frames+frames-1)));
-            ymax = double(max(data(I,1+P*frames:1+P*frames+frames-1)));
+            % double(min(data(I,1+P*frames:1+P*frames+frames-1)));
+            % double(max(data(I,1+P*frames:1+P*frames+frames-1)));
+            % ymin = double(min(data(I,1+P*frames:1+P*frames+frames-1)));
+            % ymax = double(max(data(I,1+P*frames:1+P*frames+frames-1)));
+
+            ymin = double(ymin);
+            ymax = double(ymax);
+
             if ymin == ymax, ymin = ymin-1; ymax = ymax+1; end;
             plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(mod(P,length(colors))+1));   
             
@@ -439,17 +455,17 @@ end
                 if I==chans & limitset,    % draw timescale on lowest right plot
                     ytick = double(-ymax-0.25*ydiff);
                     
-                    tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
+                    tick = [int2str(xmin)]; h=text(xmin,ytick,tick); % min time
                     set(h,'FontSize',TICKFONTSIZE);         % choose font size
                     set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
                     
-                    tick = [xlabel]; h=text(xmin+xdiff/2,ytick,tick);
+                    tick = [xlabel]; h=text(xmin+xdiff/2,ytick,tick); % xlabel
                     set(h,'FontSize',TICKFONTSIZE);         % choose font size
                     set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
                     
-                    tick = [int2str(xmax)]; h=text(xmax,ytick,tick);
+                    tick = [int2str(xmax)]; h=text(xmax,ytick,tick); % max time
                     set(h,'FontSize',TICKFONTSIZE);         % choose font size
                     set(h,'HorizontalAlignment','center',...
                       'Clipping','off');  % center text
@@ -514,14 +530,13 @@ end
               axis('off');plot([xmin xmin],[0 ymax],'color',axislcolor); 
           end  
           
-          % secondx = 200;                               % draw second vert axis 
+          % secondx = 200;                                % draw second vert axis 
           % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
           
           axis('off');
-          plot([xmin xmax],[0 0],'color',axislcolor);   % draw horizontal axis 
+          plot([xmin xmax],[0 0],'color',axislcolor);     % draw horizontal axis 
           
-          
-          if ~isempty(channels),                               % print channames
+          if ~isempty(channels),                          % print channames
               if ~ISSPEC
                   if ymin <= 0 & ymax >= 0,
                   yht = 0;
