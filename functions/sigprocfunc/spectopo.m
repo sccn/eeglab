@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/07/20 01:35:14  arno
+% percent from 0 to 100
+%
 % Revision 1.8  2002/07/20 01:17:10  arno
 % new version with component plotting options
 %
@@ -157,7 +160,7 @@ else
 	if nargin > 7,    g.freqfac = varargin{5};
 	else              g.freqfac = FREQFAC;
 	end;
-	if nargin > 8,    g.percent = varargin{6}*100;
+	if nargin > 8,    g.percent = varargin{6};
 	else              g.percent = 100;
 	end;
 	if nargin > 10,    g.reref = 'averef';
@@ -166,7 +169,9 @@ else
 	g.weights = [];
 	g.icamaps = [];
 end;
-g.percent = g.percent/100; % make it from 0 to 1
+if g.percent > 1
+	g.percent = g.percent/100; % make it from 0 to 1
+end;
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
