@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2004/02/05 01:37:51  arno
+% same
+%
 % Revision 1.37  2004/02/05 01:29:59  arno
 % debug sobi call
 %
@@ -468,9 +471,9 @@ switch lower(icatype)
      case 'acsobiro' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icawinv = acsobiro( tmpdata, size(tmpdata,1) );
+             EEG.icawinv = acsobiro( EEG.data, size(tmpdata,1) );
         else    
-            eval(sprintf('EEG.icawinv = acsobiro( tmpdata %s );', options));
+            eval(sprintf('EEG.icawinv = acsobiro( EEG.data %s );', options));
         end;
         EEG.icaweights = pinv(EEG.icawinv);
         EEG.icasphere  = eye(size(EEG.icaweights,2));
