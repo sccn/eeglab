@@ -6,7 +6,7 @@
 %                    [voffsets], 'key', 'val', ...);
 % Inputs:
 %  data       = (channels,frames) single-epoch data matrix
-%  chan_locs  = channel location file of EEGLAB EEG.chanlocs structure. 
+%  chan_locs  = EEGLAB channel location file or EEG.chanlocs structure. 
 %               See >> topoplot example for file format.
 %
 % Optional inputs:
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2004/04/25 20:05:36  scott
+% help message modernize. adjust text, add white vertical underlines, made limits input more flexible
+%
 % Revision 1.66  2003/11/26 18:20:44  scott
 % Time -> Latency
 %
