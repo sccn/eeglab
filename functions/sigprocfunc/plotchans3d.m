@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/02 23:22:14  scott
+% added 'axis off' -sm
+%
 % Revision 1.2  2002/04/27 02:40:13  arno
 % editing header
 %
@@ -109,5 +112,4 @@ for i = 1:length(zs)
 end
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
-axis off
 rotate3d on
