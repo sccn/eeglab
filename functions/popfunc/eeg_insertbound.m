@@ -23,7 +23,7 @@
 %   of all events.
 %   2) all latencies are given in data point unit. 
 % 
-% Author: Arnaud Delorme, SCCN, INC, UCSD, April, 19, 2004
+% Author: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, April, 19, 2004
 %
 % See also: eeg_eegrej(), pop_mergeset()
 
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2004/06/11 01:26:43  arno
+% recomputing event boundaries ...
+%
 % Revision 1.25  2004/06/08 17:29:39  arno
 % removing boundevent input
 %
