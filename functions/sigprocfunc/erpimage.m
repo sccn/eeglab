@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.128  2003/08/24 04:16:39  scott
+% debug same
+%
 % Revision 1.127  2003/08/24 04:12:33  scott
 % added (erpalpha) bootstrap ERP estimation -sm
 %
@@ -2776,7 +2779,7 @@ prctl = interp1(pt,sortdata,pc);
 %
 % nan_mean() - take the column means of a matrix, ignoring NaN values
 % 
-function [out outalpha]  = nan_mean(in,alpha)
+function [out, outalpha]  = nan_mean(in,alpha)
    intrials = size(in,1);
    inframes = size(in,2);
    nans = find(isnan(in));
