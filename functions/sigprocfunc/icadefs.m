@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/14 16:58:59  arno
+% update for new release
+%
 % Revision 1.12  2002/08/12 14:50:47  arno
 % [6~color
 %
@@ -71,7 +74,7 @@
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglab.html'; % online version
 
-ICABINARY = 'ica_linux'; % <=INSERT name of ica executable for binica.m
+ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
 
 % COLORS
 % ------
