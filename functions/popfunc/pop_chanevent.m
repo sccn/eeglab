@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/12/06 03:12:10  arno
+% removing debuging message
+%
 % Revision 1.11  2002/12/06 02:52:12  arno
 % inserting epoch number
 %
@@ -147,7 +150,7 @@ switch g.edge
  case 'trailing', tmpevent = find( diff(EEG.data(chan, :)) < 0);
  case 'leading' , tmpevent = find( diff(EEG.data(chan, :)) > 0);
 end;
-if isempty(tmpevent), disp('No events found'); return; end;
+if isempty(tmpevent), disp('No event found'); return; end;
 tmpevent = tmpevent+1;
 for tmpi = tmpevent
     if ~isnan(g.nbtype)
