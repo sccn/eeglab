@@ -2,16 +2,15 @@
 %                     structure array of an EEG dataset. If the dataset is 
 %                     the only input, a window pops up to ask for the relevant 
 %                     parameter values.
-%
 % Usage:
 %   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, 'key', 'val', ...);
 %
 % Inputs:
 %   EEG              - Input EEG dataset
-%   filename         - Name of a file or an array with epoch and/or epoch event
-%                      information organised in columns. It may be either 
-%                      an array or a cell array. 
-%   fieldlist        - {cell array} Name of each column in the file.
+%   filename         - Name of an ascii file with epoch and/or epoch event information 
+%                      organised in columns. ELSE, name of a Matlab variable with the 
+%                      same information (either a Matlab array or cell array). 
+%   fieldlist        - {cell array} Label of each column (data field) in the file.
 %
 % Optional inputs:
 %   'typefield'      - ['string'] Name of the field containing the type(s)
@@ -23,7 +22,7 @@
 %                      events whose type will be the same as the name of
 %                      the latency field. (Ex: field RT -> type 'RT' events).
 %   'timeunit'       - [float] Optional unit for latencies relative to seconds. 
-%                      Ex: sec -> 1, msec -> 1e-3. Default: assume latencies 
+%                      Ex: sec -> 1, msec -> 1e-3. Default: Assume latencies 
 %                      are in time points (relative to the time-zero time point 
 %                      in the epoch). 
 %   'headerlines'    - [int] Number of header lines in the input file to ignore. 
@@ -57,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/11/15 00:51:21  arno
+% debugging TLE latencies, add more feedback to the user
+%
 % Revision 1.19  2002/10/29 22:57:03  scott
 % text
 %
