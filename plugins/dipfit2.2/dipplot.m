@@ -36,7 +36,7 @@
 %               Matlab color name (ex. 'r'), RGB formula (ex. [1 0 0]) or integer.
 %               A single integer will be interpreted as a color index (1:64) in 
 %               the 'jet' colormap.  For example, { 'b' 32 [1 0 0] } gives blue, 
-$               green and then red.  If the number of colors given is less than 
+%               green and then red.  If the number of colors given is less than 
 %               the number of dipoles to plot, dipole colors will rotate through 
 %               the given colors. {default: ['g' 'b' 'r' 'm' 'c' 'y']}
 %  'view'     - 3-D viewing angle in Cartesian coordinates: [0 0 1] gives a axial 
@@ -150,6 +150,10 @@ $               green and then red.  If the number of colors given is less than
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.106  2005/02/03 19:17:40  scott
+%help message
+%,
+%
 %Revision 1.105  2005/01/10 19:21:56  scott
 %clarified view plane definitions in help. Specified name of MNI image in error msg
 %
