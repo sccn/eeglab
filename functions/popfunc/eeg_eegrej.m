@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/06/11 01:27:29  arno
+% now recompute event latencies in eeg_insertbound
+%
 % Revision 1.23  2004/06/11 01:00:09  arno
 % recompute latencies before inserting events
 %
@@ -123,7 +126,7 @@ if isempty(regions)
 end;
 
 if isfield(EEG.event, 'latency'), 
-	tmpalllatencies = cell2mat( { EEG.event.latency } );
+   	 tmpalllatencies = cell2mat( { EEG.event.latency } );
 else tmpalllatencies = []; 
 end;
 
@@ -138,13 +141,14 @@ eeg_options;
 % ----------------------------------------------------------------
 %[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
 %												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
-EEG.pnts = size(EEG.data,2);
-EEG.xmax = EEG.xmax+EEG.xmin;
+oldEEGpnts = EEG.pnts;
+EEG.pnts   = size(EEG.data,2);
+EEG.xmax   = EEG.xmax+EEG.xmin;
 
 % add boundary events
 % -------------------
 if ~isempty(boundevents) % boundevent latencies will be recomputed in the function below
-    [ EEG.event ] = eeg_insertbound(EEG.event, EEG.pnts, regions);
+    [ EEG.event ] = eeg_insertbound(EEG.event, oldEEGpnts, regions);
     EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
 
