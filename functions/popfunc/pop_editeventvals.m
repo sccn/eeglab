@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/05/26 23:23:34  arno
+% adding event consistency check
+%
 % Revision 1.22  2004/05/22 00:49:30  arno
 % enable duration
 %
@@ -506,7 +509,7 @@ if nargin<2
         if ~isempty(userdata{3}) % some modification have been done
             EEG       = userdata{1};
             EEG.event = userdata{2};
-            disp('Checking event consistenc...');
+            disp('Checking event consistency...');
             EEG = eeg_checkset(EEG, 'eventconsistency');
         end;
     else 
