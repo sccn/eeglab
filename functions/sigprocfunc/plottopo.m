@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/03/17 23:05:05  arno
+% debuging regions
+%
 % Revision 1.16  2003/03/17 22:04:41  arno
 % allow to highlight regions of interest
 %
@@ -580,11 +583,13 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             %
             %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            for index=1:size(g.regions{c},2)
-                tmpreg = g.regions{c}(:,index);
-                tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
-                             [-100 -100 100 100], [1 1 0.9]); hold on;
-                set(tmph, 'edgecolor', [1 1 0.9]);
+            if ~isempty(g.regions)
+                for index=1:size(g.regions{c},2)
+                    tmpreg = g.regions{c}(:,index);
+                    tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                                 [-100 -100 100 100], [1 1 0.9]); hold on;
+                    set(tmph, 'edgecolor', [1 1 0.9]);
+                end;
             end;
             
             % secondx = 200;                             % draw second vert axis 
