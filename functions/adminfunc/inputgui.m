@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/15 16:53:37  arno
+% add drawnow for windows
+%
 % Revision 1.14  2002/08/23 17:41:13  arno
 % implementing new option
 %
@@ -151,7 +154,6 @@ end;
 % create figure and wait for return
 % ---------------------------------
 waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
-drawnow; % for windows
 
 result = {};
 userdat = [];
@@ -185,6 +187,7 @@ end;
 if isstr(mode) & strcmp(mode, 'normal')
 	close(fig);
 end;
+drawnow; % for windows
 
 % function for gui res
 % --------------------
