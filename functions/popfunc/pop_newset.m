@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/03 02:59:44  arno
+% debugging cancel
+%
 % Revision 1.2  2002/04/26 02:51:26  arno
 % adding com parameter
 %
@@ -96,7 +99,12 @@ if nargin < 4                 % if several arguments, assign values
 	};
 
 	eeg_options;
-	if ~option_keepdataset, uilist{9} = { uilist{9}{:} 'enable', 'off'}; end;
+	if ~option_keepdataset, 
+		uilist{9} = { uilist{9}{:} 'enable', 'off'}; 
+		geometry  = { geometry{:} [1] [1] };
+		uilist = { uilist{:} {} { 'Style', 'text', 'string', ['Note: cancel is inefficient in the automatic '...
+					'dataset overwrite mode (toggle using /File/Maximize memory)']}};
+	end;
     [result userdat] = inputgui( geometry, uilist, 'pophelp(''pop_newset'');', ...
 								  fastif(isempty(EEG.data), 'Import dataset info -- pop_newset()', 'Edit dataset info -- pop_newset()'), userdat);
     if length(result) == 0,
