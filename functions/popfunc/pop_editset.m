@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/08/29 23:17:01  arno
+% debugging icaweights and sphere
+%
 % Revision 1.22  2002/08/26 22:03:01  arno
 % average reference more message
 %
@@ -213,7 +216,9 @@ if nargin < 2                 % if several arguments, assign values
 else % no interactive inputs
     args = varargin;
     for index=1:2:length(args)
-        if ~isempty(inputname(index+2)), args{index+1} = { inputname(index+2) }; end;
+        if ~isempty(inputname(index+2)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
+			args{index+1} = inputname(index+2); 
+		end;
     end;                
 end;
 
