@@ -1,21 +1,20 @@
-% dftfilt2() - discrete Fourier filter
+% dftfilt2() - discrete Morlet wavelet filters
 %
 % Usage:
 %   >> wavelet = dftfilt2( freqs, cycles, srate, cyclefact)
 %
 % Inputs:
 %   freqs   - frequency array
-%   cycles  - cycles array. If one vale is given, all wavelet use
+%   cycles  - cycles array. If one vale is given, all wavelets have
 %             the same number of cycles. If 2 numbers are given, these
-%             2 number are used for the number of cycles at the lowest
+%             2 numbers are used for the number of cycles at the lowest
 %             frequency and at the higher frequency. 
 %   srate   - sampling rate
-%   cycleinc - ['linear'|'log'] increase mode if [min max] cycles
-%              provided in 'cycle' parameter. Default is 'log' but
-%              use 'linear' if frequencies are 'log' spaced.
+%   cycleinc - ['linear'|'log'] increase mode if [min max] cycles is
+%              provided in 'cycle' parameter. Default is 'linear'.
 %
 % Output:
-%   wavelet - cell array of wavelet filter to apply onto the data
+%   wavelet - cell array of wavelet filters
 %
 % Note: The size of the window is automatically computed from the 
 %       number of cycles ans is always odd.
@@ -39,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/04/29 01:09:16  arno
+% debug imaginary part
+%
 % Revision 1.2  2003/04/28 23:01:13  arno
 % *** empty log message ***
 %
