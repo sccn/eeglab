@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2004/07/30 16:59:02  arno
+% new version detection
+%
 % Revision 1.129  2004/07/26 15:53:35  arno
 % debug conversion
 %
@@ -1103,7 +1106,7 @@ if ~isempty( varargin)
           allfields = fieldnames(EEG.event);
           for index = 1:length(allfields)
               eval(['allvalues = { EEG.event.' allfields{index} ' };']);
-              try,   eval(['valreal = cellfun(''isclass'', allvalues, ''double'');']);
+              try,   eval(['valreal = ~cellfun(''isclass'', allvalues, ''char'');']);
               catch, valreal = mycellfun('isclass', allvalues, 'double');
               end;
               
