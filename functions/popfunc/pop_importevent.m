@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/11/18 18:18:01  arno
+% removing debugging message
+%
 % Revision 1.9  2002/10/10 21:18:09  arno
 % remove text message
 %
@@ -146,7 +149,7 @@ if nargin<2
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'globfile' }, ...
          { }, { 'Style', 'text', 'string', 'NB: No = overwrite', 'value', 0 }, { }, ...
          { 'Style', 'text', 'string', 'Input field (column) names       ', 'fontweight', 'bold', 'tooltipstring', helpfields } ...
-         { 'Style', 'edit', 'string', '' } { 'Style', 'text', 'string', 'Ex: type latency position', 'tooltipstring', helpfields } };
+         { 'Style', 'edit', 'string', '' } { 'Style', 'text', 'string', 'Ex: latency type position', 'tooltipstring', helpfields } };
          geometry = { geometry{:} [2 1 1] [2 1 1] [2 1 1] };
          uilist   = { uilist{:}, ...
                 { 'Style', 'text', 'string', 'Number of file header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, ...
