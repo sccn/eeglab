@@ -142,6 +142,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.71  2004/03/26 01:22:20  arno
+%mricorner with tightview
+%
 %Revision 1.70  2004/03/26 00:57:17  arno
 %read custom mri
 %
@@ -686,6 +689,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 tmp = sources(index).momxyz(2,:);
                 sources(index).momxyz(2,:) = sources(index).momxyz(1,:);
                 sources(index).momxyz(1,:) = tmp;
+            end;
+            if isfield(sources, 'active'),
+                nbdip = length(sources(index).active);
             end;
         end;
         
