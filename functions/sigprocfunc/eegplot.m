@@ -99,6 +99,7 @@
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
+%    'ploteventdur' - ['on'|'off'] Toggle display of event duration { default: 'on' }
 %
 % Additional keywords:
 %    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
@@ -158,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2004/07/28 15:49:22  arno
+% remove warning for Matlab 7
+%
 % Revision 1.97  2004/06/04 01:12:35  arno
 % alignment of event and data (1 point offset error)
 %
@@ -558,7 +562,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
    try, g.scale; 		    catch, g.scale      = 'on'; end;
    try, g.events; 		    catch, g.events      = []; end;
+   try, g.ploteventdur;     catch, g.ploteventdur = 'on'; end;
 
+   if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
    	end;	
@@ -609,6 +615,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    switch lower(g.scale)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
+   end;	
+   switch lower(g.ploteventdur)
+	   case { 'on' 'off' };
+	   otherwise disp('Error: ploteventdur must be either ''on'' or ''off'''); return;
    end;	
    
    if ~iscell(g.color)
@@ -944,7 +954,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   % window grid %%%%%%%%%%%%%
   % userdata = 4 cells : display yes/no, color, electrode yes/no, trial boundary adapt yes/no (1/0)  
-  m(11) = uimenu('Parent',m(1),'Label','Marking color', 'tag', 'displaywin', ...
+  m(11) = uimenu('Parent',m(1),'Label','Data select/mark', 'tag', 'displaywin', ...
 				 'userdata', { 1, [0.8 1 0.8], 0, fastif( g.trialstag(1) == -1, 0, 1)} );
   uimenu('Parent',m(11),'Label','Hide marks','Callback', ...
   	['g = get(gcbf, ''userdata'');' ...
@@ -965,12 +975,12 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'clear g;'] )
 
 	% set channels
-	uimenu('Parent',m(11),'Label','Mark channels', 'enable', 'off', 'checked', 'off', 'Callback', ...
-  	['g = get(gcbf, ''userdata'');' ...
-  	 'g.setelectrode = ~g.setelectrode;' ...
-  	 'set(gcbf, ''userdata'', g); ' ...
-     'if ~g.setelectrode setgcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;'...
-     ' clear g;'] )
+	%uimenu('Parent',m(11),'Label','Mark channels', 'enable', 'off', 'checked', 'off', 'Callback', ...
+  	%['g = get(gcbf, ''userdata'');' ...
+  	% 'g.setelectrode = ~g.setelectrode;' ...
+  	% 'set(gcbf, ''userdata'', g); ' ...
+    % 'if ~g.setelectrode setgcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;'...
+    % ' clear g;'] )
 
 	% trials boundaries
 	%uimenu('Parent',m(11),'Label','Trial boundaries', 'checked', fastif( g.trialstag(1) == -1, 'off', 'on'), 'Callback', ...
@@ -979,6 +989,22 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   	% 'set(hh, ''userdata'', { hhdat{1},  hhdat{2}, hhdat{3}, ~hhdat{4}} ); ' ...
     %'if ~hhdat{4} set(gcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;' ... 
     %' clear hh hhdat;'] )
+
+  % plot durations
+  % --------------
+  if g.ploteventdur & isfield(g.events, 'duration')
+      disp('Use menu "Display > Hide event duration" to hide colored regions representing event duration');
+  end;
+  uimenu('Parent',m(1),'Label','Hide event duration','Callback', ...
+  	['g = get(gcbf, ''userdata'');' ...
+  	 'if ~g.ploteventdur' ... 
+  	 '  set(gcbo, ''label'', ''Hide event duration'');' ...
+  	 'else' ...
+  	 '  set(gcbo, ''label'', ''Show event duration'');' ...
+  	 'end;' ...
+  	 'g.ploteventdur = ~g.ploteventdur;' ...
+  	 'set(gcbf, ''userdata'', g);' ...
+  	 'eegplot(''drawb''); clear g;'] )
 
   % X grid %%%%%%%%%%%%
   m(3) = uimenu('Parent',m(1),'Label','Grid');
@@ -1524,8 +1550,8 @@ else
             
             % draw duration is not 0
             % ----------------------
-            if ~isempty(g.eventlatencyend) ...
-                    & g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
+            if g.ploteventdur && ~isempty(g.eventlatencyend) ...
+                    && g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
                 tmplatend = g.eventlatencyend(event2plot(index))-lowlim-1;
                 if tmplatend ~= 0, 
                     tmplim = ylim;
