@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/08/30 18:00:22  arno
+% debug erp axis and average
+%
 % Revision 1.34  2002/08/21 18:36:13  arno
 % adding error message
 %
@@ -1505,7 +1508,7 @@ if Erpflag == YES
  axes(ax1); % reset current axes to the erpimage
  xtick = get(ax1,'Xtick');     % remember x-axis tick locations
  xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
- set(ax1, 'xticklabel' []);
+ set(ax1, 'xticklabel', []);
  widthxticklabel = size(xticklabel,2);
  xticklabel = cellstr(xticklabel);
  for tmpindex = 1:length(xticklabel)
