@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/15 17:10:14  arno
+% adding low pass filtering capabilities
+%
 % Revision 1.7  2003/04/15 00:26:15  arno
 % debug alpha
 %
@@ -111,7 +114,7 @@ allcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b
 erp1 = '';
 if nargin < 3
     checkboxgeom = [1.6 0.15 0.5];
-    uigeom = { [ 2 1] [2 1] [2 1] [2 1] checkboxgeom checkboxgeom checkboxgeom checkboxgeom [2 1] [0.9 0.4 1] };
+    uigeom = { [ 2 1] [2 1] [2 1] [2 1] checkboxgeom checkboxgeom checkboxgeom checkboxgeom [2 1] [1.1 0.4 1] };
     commulcomp= ['if get(gcbo, ''value''),' ...
                  '    set(findobj(gcbf, ''tag'', ''multcomp''), ''enable'', ''on'');' ...
                  'else,' ...
@@ -365,6 +368,9 @@ function [p, t, df] = pttest(d1, d2, dim)
 if size(d1,dim) ~= size(d2, dim)
    error('PTTEST: paired samples must have the same number of elements !')
 end
+if size(d1,dim) == 1
+    close; error('Cannot compute paired t-test for a single ERP difference')
+end; 
 disp(['Computing t-values, df:' int2str(df) ]);
 a1 = mean(d1, dim);
 a2 = mean(d2, dim);
@@ -402,6 +408,9 @@ function [p, t] = ttest(d1, d2, dim)
 %       the SAME VARIANCE. Otherwise, use UTTEST.
 %
 %See also: UTTEST, PTTEST.
+if size(d1,dim) == 1
+    close; error('Cannot compute t-test for a single ERP')
+end; 
 a1 = mean(d1, dim);
 v1 = std(d1, [], dim).^2;
 n1 = size(d1,dim);
