@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/13 22:36:43  arno
+% debug for error
+%
 % Revision 1.5  2002/08/13 17:29:35  arno
 % new superguicall
 %
@@ -54,7 +57,7 @@ if Prompt(end) == 10, Prompt(end) = []; end;
 if Prompt(end) == 10, Prompt(end) = []; end;
 if Prompt(end) == 10, Prompt(end) = []; end;
 
-fig = figure;
+fig = figure('visible', 'off');
 set(gcf, 'name', Title);
 
 geometry = {[1]};
@@ -74,7 +77,7 @@ if cr == 1
 	cr = size(Prompt,1);
 end;
 
-[tmp tmp2 allobj] = supergui( geometry, [cr 1], listui{:} );
+[tmp tmp2 allobj] = supergui( fig, geometry, [cr 1], listui{:} );
 
 waitfor( fig, 'userdata');
 try,

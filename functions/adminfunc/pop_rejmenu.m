@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/14 16:06:58  arno
+% updating size of buttons
+%
 % Revision 1.11  2002/08/14 00:58:51  arno
 % debug some calls
 %
@@ -82,7 +85,7 @@ if ~isempty( findobj('tag', tagmenu))
 	error('cannot open two identical windows; close the first one first');
 end;
 
-figure('numbertitle', 'off', 'name', rejtitle, 'tag', tagmenu);
+figure('visible', 'off', 'numbertitle', 'off', 'name', rejtitle, 'tag', tagmenu);
 
 % definition of callbacks
 % -----------------------
@@ -391,10 +394,9 @@ lisboxoptions = { 'string', [ 'Show only the new trials marked for rejection by 
  	{ 'Style', 'pushbutton', 'string', 'CLEAR ALL MARKS', 'callback', cb_clear  }, ...
 	{ 'Style', 'pushbutton', 'string', 'REJECT MARKED TRIALS', 'callback', cb_reject }};
 
-	allh = supergui( geometry, [], listui{:});
+	allh = supergui( gcf, geometry, [], listui{:});
 
 %	{ 'style', 'checkbox', 'String', ['Include ' fastif(icacomp, 'ica data', 'raw data')], 'tag', 'IOthertype', 'value', 1}, { }, ...
-
 set(gcf, 'userdata', { allh });	
 set(findobj('parent', gcf', 'tag', 'butmanual'), 'backgroundcolor', EEG.reject.rejmanualcol);
 set(findobj('parent', gcf', 'tag', 'butthresh'), 'backgroundcolor', EEG.reject.rejthreshcol);

@@ -10,6 +10,7 @@
 %             supergui( geomx, geomy, { arguments1 }, { arguments2 }... );
 % 
 % Inputs:
+%   figh    - figure handler, if 0 create a new figure
 %   geomx   - cell array describing the geometry of the elements
 %             in the figure. For instance, [2 3 2] means that the
 %             figures will have 3 rows, with 2 elements in the first
@@ -62,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/08/14 18:07:20  arno
+% changing default checkbox backcolor
+%
 % Revision 1.25  2002/08/14 16:32:37  arno
 % yfact takes into account button now
 %
@@ -138,7 +142,7 @@
 % Initial revision
 %
 
-function [handlers, outheight, allhandlers] = supergui( geomx, geomy, varargin);
+function [handlers, outheight, allhandlers] = supergui( fig, geomx, geomy, varargin);
 
 % handlers cell format
 % allhandlers linear format
@@ -149,6 +153,9 @@ INSETY = 0.05/length(geomx);  % y border relative (50% of heigth)
 if nargin < 2
 	help supergui;
 	return;
+end;
+if fig == 0
+	figure('visible','off');
 end;
 
 % converting the geometry formats
@@ -263,7 +270,6 @@ pos(3) = pos(3)*factmultx;
 pos(4) = pos(4)*factmulty;
 set(gcf, 'position', pos);
 
-
 % vertical alignment to bottom for text
 % ---------------------------------------
 for index = 1:length(allhandlers)
@@ -312,5 +318,7 @@ set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
+
+set(gcf, 'visible', 'on');
 
 return;

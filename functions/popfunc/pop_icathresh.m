@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/13 17:32:11  arno
+% new supergui call
+%
 % Revision 1.3  2002/08/12 18:32:15  arno
 % questdlg2
 %
@@ -127,7 +130,7 @@ end;
 
 % the current rejection will be stored in userdata of the figure
 % --------------------------------------------------------------
-gcf = figure('numbertitle', 'off', 'name', 'Choose thresholds', 'tag', tagmenu, 'userdata', rej);
+gcf = figure('visible', 'off', 'numbertitle', 'off', 'name', 'Choose thresholds', 'tag', tagmenu, 'userdata', rej);
 pos = get(gca, 'position');
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]./100;
@@ -239,7 +242,7 @@ switch rejmethod
 end;
     				
 % -----------------------------------------------------
-allh = supergui( { 	[1] ...
+allh = supergui(gcf, { 	[1] ...
 					[2 1] [2 1] [2 1] ...
 					[1] ... 
 					[1] ... 
