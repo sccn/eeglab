@@ -5,6 +5,7 @@
 % Inputs:
 %        BIGlocs    - larger (or equal-sized) EEG.chanlocs structure array
 %        smalllocs  - smaller (or equal-sized) EEG.chanlocs structure array
+% Optional inputs:
 %        'noplot'   - [optional string 'noplot'] -> do not produce plots {default: 
 %                     produce illustrative plots of the BIG and small locations}
 % Outputs:
@@ -41,6 +42,10 @@
 
 function [selchans,dists,selocs] = eeg_matchchans(bglocs,ltlocs,noplot)
 
+if nargin < 2
+  help eeg_matchchans
+  return
+end
 no_plot = 0; % yes|no flag
 if nargin > 2 & strcmp(lower(noplot),'noplot')
   no_plot = 1;
