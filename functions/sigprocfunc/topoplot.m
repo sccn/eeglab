@@ -3,13 +3,13 @@
 %              using cointerpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
-%        >>  [h zi] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
+%        >>  [h grid val] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
 %                        if a single channel number, show location of that 
 %                        channel (use with 'style', 'blank' only)
 %   		chan_locs  - name of an EEG electrode position file (See
-%                             >> topoplot example for format). Can also be a
+%                             >> topoplot 'example' for format). Can also be a
 %                        structure (see >> help pop_editset)
 % Optional Parameters:
 %   'shrink'           - ['on'|'off'|'force'|factor] normalize electrode polar
@@ -45,7 +45,10 @@
 %   'headcolor'       - Color of head cartoon {default black}
 %   'verbose'         - ['on'|'off'] default is 'on'.
 %   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
-%   'noplot'          - ['on'|'off'] Do not plot (but return interpolated data).
+%   'noplot'          - ['on'|'off'|[rad theta]] Do not plot (but return interpolated data).
+%                        If [rad theta] coordinates of a (possibly missing) channel, returns
+%                        interpolated val for channel location. For channel location conventions
+%                        see >> topoplot 'example'
 %   'gridscale'       - [int value >> 1] - interpoled data matrix size (rows) (default: 67)
 %   'efontsize'       - detail
 %   'electcolor'      - detail
@@ -56,11 +59,12 @@
 % Outputs:
 %         h           - axes handle
 %         grid        - interpolated data image (gridscale,gridscale) (off-head points = NaN).
+%         val         - interpolated value at 'noplot' channel location (default = NaN);
 %
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
 %    (Angle-0 =Cz-to-Fz; C3-angle =-90; Radius at edge of image = 0.5)
-%    For a sample eloc file: >> topoplot example
+%    For a sample eloc file: >> topoplot 'example'
 %
 % Note: 1) topoplot only works when map limits are >= the max and min 
 %          interpolated data values.
@@ -89,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/07/18 01:34:07  scott
+% text placement
+%
 % Revision 1.51  2003/07/18 01:33:19  scott
 % text placement
 %
@@ -227,13 +234,14 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function [handle,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi,chanval] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 noplot  = 'off';
 handle = [];
 Zi = [];
 
+chanval = NaN;
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
 INTERPLIMITS = 'head';  % head, electrodes
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
@@ -377,6 +385,14 @@ if nargs > 2
 	  end
      case 'noplot'
       noplot = Value;
+      if ~isstr(noplot)
+        if length(noplot) ~= 2
+            error('noplot location should be [radius, angle]')
+        else
+            chanrad = noplot(1);
+            chantheta = noplot(2);
+            noplot = 'on';
+         end
      case 'gridscale'
       GRID_SCALE = Value;
       if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
@@ -510,6 +526,18 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
   ii = find(mask == 0);
   Zi(ii) = NaN;
+  %
+  %%%%%%%%%%%%%%%%%%%%%%% return designated channel value %%%%%%%%%%%%%%%%
+  %
+  if exist('chanrad')
+      chantheta = (chantheta/360)*2*pi;
+      chancoords = round(34+33.5*2*chanrad*[-cos(-chantheta),-sin(-chantheta)]);
+      if chancoords(1)<1 | chancoords(1) > 67 | chancoords(2)<1 | chancoords(2)>67
+          error('designated ''noplot'' channel out of bounds')
+      else
+        chanval = Zi(chancoords);
+      end
+  end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Return interpolated image only  %%%%%%%%%%%%%%%%%
   %
