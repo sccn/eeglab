@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/05/22 01:48:49  arno
+% debug icaweight/icasphere
+%
 % Revision 1.35  2003/03/04 20:11:57  arno
 % header typo
 %
@@ -379,7 +382,9 @@ for curfield = tmpfields'
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end;
 	    case 'data'    , varname = getfield(g, {1}, curfield{1});
-                         if exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
+                         if isnumeric(varname)
+                             EEGOUT.data = varname;
+                         elseif exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
                             fprintf('Pop_editset: raw data file ''%s'' found\n', varname); 
                             switch lower(g.dataformat)
 							 case 'ascii' , 
