@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2003/07/22 00:48:36  scott
+% debug
+%
 % Revision 1.116  2003/07/22 00:44:21  scott
 % debug
 %
@@ -1941,12 +1944,14 @@ end;
 if strcmpi(noshow, 'no')
     if ~isnan(aligntime) % if trials time-aligned 
         if times(1) <= aligntime & times(frames) >= aligntime
-            plot([aligntime aligntime],[min(outtrials) max(outtrials)],'k','Linewidth',ZEROWIDTH); 
+            plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
+                               'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
             % plot vertical line at aligntime
         end
     else % trials not time-aligned 
         if times(1) <= 0 & times(frames) >= 0
-            plot([0 0],[min(outtrials) max(outtrials)],'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
+            plot([0 0],[min(outtrials) max(outtrials)],...
+                               'k','Linewidth',ZEROWIDTH); % plot smoothed sortwvar
         end
     end
 end;
@@ -2033,17 +2038,16 @@ if strcmpi(noshow, 'no')
         end
         hold on; 
         if TIMEX      % overplot re-aligned 0 time on image
-            plot([aligntime aligntime],[min(outtrials) max(outtrials)],'k','LineWidth',SORTWIDTH);
+            plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
+                                            'k','LineWidth',SORTWIDTH);
         else
-            plot([[min(outtrials) max(outtrials)],aligntime aligntime],'k','LineWidth',SORTWIDTH);
+            plot([[min(outtrials) max(outtrials)],aligntime aligntime],...
+                                            'k','LineWidth',SORTWIDTH);
         end
         fprintf('Overplotting realigned times-zero on data.\n');
         hold on; 
         
         if TIMEX      % overplot realigned sortvar on image
-aligntime
-size(outsort)
-size(outtrials)
             plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
         else
             plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
