@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/12 01:24:10  arno
+% update mean power
+%
 % Revision 1.6  2002/10/08 14:46:49  arno
 % adding global offset
 %
@@ -223,8 +226,8 @@ try
 		end;
 	end;
 	set(gca, 'xlim', [0 min(50, EEG.srate/2)]);
-	tmpy = get(gca, 'ylim');
-    set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
+	%tmpy = get(gca, 'ylim');
+    %set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
 	set( get(gca, 'ylabel'), 'string', 'Magnitude (dB)', 'fontsize', 14); 
 	set( get(gca, 'xlabel'), 'string', 'Frequency (Hz)', 'fontsize', 14); 
 	title('Activity power spectrum', 'fontsize', 14); 
