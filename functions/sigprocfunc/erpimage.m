@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.147  2003/09/07 00:41:51  arno
+% fixing stdev, do not know why it crashed
+%
 % Revision 1.146  2003/09/06 22:45:04  scott
 % same
 %
@@ -1166,12 +1169,12 @@ if ~exist('srate') | srate <= 0
 end
 if ~isempty(auxvar)
 	% whos auxvar
-    if size(auxvar,1) ~= ntrials && size(auxvar,2) ~= ntrials
+    if size(auxvar,1) ~= ntrials & size(auxvar,2) ~= ntrials
 		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
                            ntrials);
         return
     end
-	if size(auxvar,1) == ntrials && size(auxvar,2) ~= ntrials  % make (N,frames)
+	if size(auxvar,1) == ntrials & size(auxvar,2) ~= ntrials  % make (N,frames)
 		auxvar = auxvar';               
 	end
 	if size(auxvar,2) ~= ntrials
