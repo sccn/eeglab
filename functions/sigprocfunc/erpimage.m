@@ -172,6 +172,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.242  2005/03/10 02:33:38  arno
+% implementing percentile
+%
 % Revision 1.241  2005/03/07 22:55:21  arno
 % fixing error
 %
@@ -1420,7 +1423,7 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
-	  elseif strcmp(Arg,'percentile')
+	  elseif strcmp(Arg,'sortvarpercent')
 		  percentileflag = YES;
 	  elseif strcmp(Arg,'showwin')
 		  Showwin = YES;
