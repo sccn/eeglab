@@ -26,14 +26,12 @@
 %                       'blank'    -> plot electrode locations only {default: 'both'}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
 %                       options below. {default: 'on' -> mark electrode locations with points}. 
-%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
-%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
-%                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside 
-%                       the cartoon head.  {default: max(max(arc_length), 0.5)}. 
+%                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
+%                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5)}. 
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
-%                       NOTE: headdrad = 0.5 is anatomically correct!; 0 -> don't draw head; 
+%                       NOTE: only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
@@ -54,6 +52,8 @@
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' -> black}.
 % Plot detail options:
+%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
+%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
 %                       values from electrodes shown in the plotting disk only. {default: 'on'}
@@ -69,8 +69,8 @@
 %
 % Outputs:
 %         h           - plot axes handle
-%         val         - interpolated value at given 'noplot' channel location, if any.
-%         grid        - interpolated data image matrix (off-head points = NaN).
+%         grid/val    - interpolated data image matrix (off-head points = NaN).  
+%                       ELSE, interpolated value at single input 'noplot' channel location, if any.
 %
 % Chan_locs format:
 %    See >> topoplot 'example'
@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.171  2004/03/23 00:40:06  scott
+% clarifying handling of un-located channels
+%
 % Revision 1.170  2004/03/22 17:57:21  scott
 % added arg 'intrad' - separated interpolation and plotting areas
 % Now, by default, interpolates over all the (radius<=1) electrodes.
@@ -443,7 +446,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,chanval,Zi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -718,6 +721,11 @@ if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary
     labels(end) = [];
     Th(end) = [];
     Rd(end) = [];
+    ni = length(indices);
+    fixit = find(indices==ni);
+    if ~isempty(ni)
+        indices(fixit) = [];
+    end
 end;
 Th = pi/180*Th;                              % convert degrees to radians
 
@@ -943,6 +951,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
+        Zi = chanval;  % return interpolated value instead of Zi
       end
   end
   %
@@ -1245,5 +1254,4 @@ axis square; % keep head round!
 
 hold off
 axis off
-
 return
