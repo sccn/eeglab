@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/27 00:20:54  arno
+% debugging colorbar->cbar (for menus)
+%
 % Revision 1.2  2002/08/12 23:48:05  arno
 % debug absmax
 %
@@ -78,7 +81,7 @@ if nargin < 5,
 end
 
 plottimes_set=1;   % flag variable
-if nargin< 4 | isempty(plottimes) | isnan(plottimes)
+if nargin< 4 | isempty(plottimes) | any(isnan(plottimes))
    plottimes_set = 0;
 end
 
@@ -145,7 +148,19 @@ x = xmin:sampint:xmax;   % make vector of x-values
 %%%%%%%%%%%%%%% Compute plotframes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
+if plottimes_set == 0
+  [mx plotframes] = max(sum(data.*data)); 
+                  % default plotting frame has max variance
+  if nargin< 4 | isempty(plottimes)
+	  plottimes = x(plotframes);
+  else
+	  plottimes(find(isnan(plottimes))) = x(plotframes);
+  end;
+  plottimes_set = 1;
+end;
+
 if plottimes_set == 1
+	plottimes = sort(plottimes);
   ntopos = length(plottimes);
   if ntopos > 32
     fprintf('timtopo(): too many plottimes!\n');
@@ -165,11 +180,6 @@ if plottimes_set == 1
     time = plottimes(t);
     plotframes(t) = find(time>=x & time < xshift);
   end
-else
-  [mx plotframes] = max(sum(data.*data)); 
-                  % default plotting frame has max variance
-  plottimes = x(plotframes);
-  ntopos=1;
 end
 
 vlen = length(voffsets); % extend voffsets if necessary
