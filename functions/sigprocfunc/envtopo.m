@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/03/11 01:45:03  arno
+% first capital letter in labels
+%
 % Revision 1.15  2003/03/10 18:24:47  arno
 % ploting only one contribution
 %
@@ -175,6 +178,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'subcomps'      'integer'  []                       []; ...
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
+				  'pvaf'          'string'   {'on' 'off'}             'on'; ...
 				  'limcontrib'    'real'     []                       0 };
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
@@ -417,7 +421,7 @@ envdata = zeros(2,frames*(ncomps+1));
 envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); % first, plot the data envelope
 fprintf('Comparing projection sizes for components: ');
 compvars = zeros(1,ncomps);
-
+    
 for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 
   fprintf('%d ',g.compnums(c)); % c is index into compnums
@@ -434,6 +438,11 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 
   [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
   compvars(c)   = val;
+  
+  % compute pvaf
+  if strcmpi(g.pvaf,'on')
+      pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); % find max variance
+  end;
   i = i+frame1-1;
 
   if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped
@@ -447,6 +456,16 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
   end
 end 
 fprintf('\n');
+
+% print percentage variance accounted for
+% ---------------------------------------
+if strcmpi(g.pvaf, 'on')
+    vardat = mean(mean((data(:,frame1:frame2).^2)));
+    pvaf = pvaf / vardat;
+    for index =1:ncomps
+        fprintf('Component %d percentage variance accounted for: %6.2f\n', index, 100-100*pvaf(index));
+    end;
+end;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
