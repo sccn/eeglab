@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/07/15 18:37:29  arno
+% debug color
+%
 % Revision 1.21  2003/07/15 17:11:22  arno
 % allowing empty g.chans & header typo
 %
@@ -622,7 +625,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 if ymin <= 0 & ymax >= 0,
                     yht = 0;
                 else
-                    yht = mean(g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
+                    yht = mean(data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
                 end
                 if ~ISRECT    % print before traces
                     axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
@@ -645,15 +648,21 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         else                         tmpcolor = g.colors{P+1};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
-            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
-            ymn = min(g.ydir*[ymax ymin]);
-            ymx = max(g.ydir*[ymax ymin]);
+            plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
+            ymn = min([ymax ymin]);
+            ymx = max([ymax ymin]);
+            if g.ydir == -1
+                set(gca, 'ydir', 'reverse');
+            end;
             axis([xmin xmax ymn ymx]);          % set axis bounds
         else % ISSPEC
-            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color',  tmpcolor{:});   
+            plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color',  tmpcolor{:});   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
                 ymaxm = ymaxm/2.;
+            end;
+            if g.ydir == -1
+                set(gca, 'ydir', 'reverse');
             end;
             axis([xmin xmax ymin ymaxm]);      % set axis values
         end
@@ -741,11 +750,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~ISSPEC % not spectral data
                                                     
     signx = xmin-0.15*xdiff;
-    axis('off');h=text(signx,g.ydir*ymin,num2str(ymin,3)); % text ymin
+    axis('off');h=text(signx,ymin,num2str(ymin,3)); % text ymin
     set(h,'FontSize',TICKFONTSIZE);               % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    axis('off');h=text(signx,g.ydir*ymax,['+' num2str(ymax,3)]);  % text +ymax
+    axis('off');h=text(signx,ymax,['+' num2str(ymax,3)]);  % text +ymax
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
