@@ -21,7 +21,7 @@
 %                 (or both y's 0) -> use data limits)
 %  'ylim'      = [ymin ymax] y axis limits. Overwrite option above.
 %  'title'     = [string] plot title {def|'' -> none}
-%  'chan'      = vector of channel numbers to plot {def|0 -> all}
+%  'chans'     = vector of channel numbers to plot {def|0 -> all}
 %  'axsize'    = [x y] axis size {default [.07 .07]}
 %  'legend'    = [cell array] cell array of string for the legend. Note
 %                the last element can be an integer to set legend 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/05/09 23:26:06  arno
+% debuging regions
+%
 % Revision 1.19  2003/03/17 23:38:08  arno
 % programing ylim option
 %
@@ -225,12 +228,10 @@ if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); e
 axwidth  = g.axsize(1);
 axheight = g.axsize(2);
 
-if ~isempty(g.chans) & g.chans == 0
+if isempty(g.chans) | g.chans == 0
    channelnos = 1:size(data,1);
 elseif ~isstr(g.chans)
    channelnos = g.chans;
-else
-   channelnos = 1:size(data,1);
 end
 
 nolegend = 0;
