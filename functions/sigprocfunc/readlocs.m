@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2004/01/01 19:12:08  scott
+% help message edits
+%
 % Revision 1.60  2004/01/01 18:57:26  scott
 % edit text outputs
 %
@@ -401,8 +404,8 @@ if isstr(filename)
        switch lower(fileextension),
         case {'loc' 'locs' }, g.filetype = 'loc';
         case 'xyz', g.filetype = 'xyz'; 
-          disp( [ 'WARNING: Matlab Cartesian coord. file extension (".xyz") detected.\n' ... 
-                  'If importing EGI Cartesian coords, force type "sfp" instead.'] );
+          fprintf( [ 'WARNING: Matlab Cartesian coord. file extension (".xyz") detected.\n' ... 
+                  'If importing EGI Cartesian coords, force type "sfp" instead.\n'] );
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';
