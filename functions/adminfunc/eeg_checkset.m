@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.102  2003/07/28 15:19:09  arno
+% detect reference electrode
+%
 % Revision 1.101  2003/07/21 14:32:17  arno
 % convert single to double precision
 %
@@ -743,6 +746,9 @@ end;
 
 % check reference
 % ---------------
+if ~isfield(EEG, 'ref')
+    EEG.ref = 'common';
+end;
 if isstr(EEG.ref) & strcmpi(EEG.ref, 'common')
     if length(EEG.chanlocs) > EEG.nbchan
         disp('Extra common reference electrode location detected');
