@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/12/03 02:56:37  arno
+% timesout min
+%
 % Revision 1.5  2003/12/03 02:46:55  arno
 % unmatched end
 %
@@ -89,7 +92,7 @@ end;
 % ------------------------------------------
 padratio = pow2(nextpow2(nfft/win));
 timesout = floor(length(X)/(win-overlap));
-if timesout == 1, timesout = 2; end;
+if timesout <= 1, timesout = 2; end;
 
 [ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs, fs, ...
                                         0, 'padratio', padratio, 'timesout', timesout, 'winsize', win, 'maxfreq', fs/2, ...
