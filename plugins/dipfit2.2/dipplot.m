@@ -142,6 +142,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.70  2004/03/26 00:57:17  arno
+%read custom mri
+%
 %Revision 1.69  2004/02/27 19:13:25  arno
 %nothing
 %
@@ -390,6 +393,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     dat.axistight  = strcmpi(g.axistight, 'on');
     dat.drawedges  = g.drawedges;
     dat.coreg      = g.coreg;
+    dat.cornermri  = strcmpi(g.cornermri, 'on');
     radius = 85;
     if isstr(g.image) & strcmpi(g.image, 'besa')
         scaling = 1.05;
@@ -1167,7 +1171,7 @@ function plotimgs(dat, index);
     wzc = [max(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) min(dat.imgcoords{1})];
     wys = [min(dat.imgcoords{2}) max(dat.imgcoords{2}); min(dat.imgcoords{2}) max(dat.imgcoords{2})];
     wzs = [max(dat.imgcoords{1}) max(dat.imgcoords{1}); min(dat.imgcoords{1}) min(dat.imgcoords{1})];
-    if dat.axistight
+    if dat.axistight & ~dat.cornermri
         wzt = [ 1 1; 1 1]*dat.imgcoords{1}(index(1));
         wyc = [ 1 1; 1 1]*dat.imgcoords{2}(index(2));
         wxs = [ 1 1; 1 1]*dat.imgcoords{3}(index(3));
@@ -1188,7 +1192,7 @@ function plotimgs(dat, index);
     if strcmpi(dat.drawedges, 'on')
         % removing old edges if any
         delete(findobj( gcf, 'tag', 'edges'));
-        if dat.axistight, col = 'k'; else col = [0.5 0.5 0.5]; end;
+        if dat.axistight & ~dat.cornermri, col = 'k'; else col = [0.5 0.5 0.5]; end;
         h(1) = line([wxs(1) wxs(2)]', [wys(1) wyc(1)]', [wzt(1) wzt(2)]'); % sagital-transverse
         h(2) = line([wxs(1) wxc(3)]', [wyc(1) wyc(2)]', [wzt(1) wzt(2)]'); % coronal-tranverse
         h(3) = line([wxs(1) wxs(2)]', [wyc(1) wyc(2)]', [wzs(1) wzt(1)]'); % sagital-coronal
