@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/07/29 17:53:03  arno
+% Initial revision
+%
 
 function [EEG, command] = pop_chanevent(EEG, chans, varargin); 
 command = '';
@@ -99,11 +102,13 @@ for index = chans
 	end;
 	tmpevent = tmpevent+1;
 	for tmpi = tmpevent
-		if EEG.data(index, tmpi)
+		if ~isnan(g.nbtype)
+			events(counte).type    = 1;
+		else
 			events(counte).type    = EEG.data(index, tmpi);
-			events(counte).latency = tmpi;
-			counte = counte+1;
 		end;
+		events(counte).latency = tmpi;
+		counte = counte+1;
 	end;
 end;
 events = events(1:counte-1);
