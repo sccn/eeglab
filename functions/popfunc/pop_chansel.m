@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/03/05 18:46:49  arno
+% debug for numerical channels
+%
 % Revision 1.4  2003/03/05 18:34:50  arno
 % same
 %
@@ -46,6 +49,7 @@ function chanlist = pop_chansel(chans);
         help pop_chansel;
         return;
     end;
+    if isempty(chans), dips('No channel structure loaded'); return; end;
     
     % get infos from readlocs
     % -----------------------
