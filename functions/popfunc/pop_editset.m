@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/07/28 17:49:12  arno
+% ref text
+%
 % Revision 1.38  2003/07/28 15:28:24  arno
 % obsolete averef
 %
@@ -236,7 +239,11 @@ if nargin < 2                 % if several arguments, assign values
     if isstr(EEG.ref)
         curref = EEG.ref;
     else
-        curref = [ 'channel(s) ' int2str(abs(EEG.ref)) ];
+        if length(EEG.ref) > 1
+            curref = [ 'channel(s) ' int2str(abs(EEG.ref)) ];
+        else
+            curref = [ 'channel ' int2str(abs(EEG.ref)) ];
+        end;
     end;
     uilist = { ...
          { 'Style', 'text', 'string', 'Dataset name (optional):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
