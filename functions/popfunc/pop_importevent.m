@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/06/09 16:53:28  arno
+% nothing
+%
 % Revision 1.14  2003/04/10 17:34:53  arno
 % header edit
 %
@@ -357,25 +360,30 @@ if isfield(EEG.event, 'latency')
 	end;
 end;
 
+% generate ur variables
+% ---------------------
+EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
+
 % generate the output command
 % ---------------------------
-EEG = eeg_checkset(EEG, 'eventconsistency');
-com = sprintf('%s = pop_importevent( %s', inputname(1), inputname(1));
-for i=1:2:length(args)
-    if ~isempty( args{i+1} )
-        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, args{i+1} );
-        else    if ~iscell( args{i+1} ) com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-                else 
-                    com = sprintf('%s, ''%s'', { ', com, args{i});
-                    for index = 1:length( args{i+1}{1} ), com = sprintf('%s ''%s'' ', com, args{i+1}{1}{index}); end;
-                    com = sprintf('%s }', com);
-                end;                    
-        end;
-    else
-        com = sprintf('%s, ''%s'', []', com, args{i} );
-    end;
-end;
-com = [com ');'];
+com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vararg2str(args));
+
+%for i=1:2:length(args)
+%    if ~isempty( args{i+1} )
+%        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, args{i+1} );
+%        else    if ~iscell( args{i+1} ) com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+%                else 
+%                    com = sprintf('%s, ''%s'', { ', com, args{i});
+%                    for index = 1:length( args{i+1}{1} ), com = sprintf('%s ''%s'' ', com, args{i+1}{1}{index}); end;
+%                    com = sprintf('%s }', com);
+%                end;                    
+%        end;
+%    else
+%        com = sprintf('%s, ''%s'', []', com, args{i} );
+%    end;
+%end;
+%com = [com ');'];
 
 % interpret the variable name
 % ---------------------------
