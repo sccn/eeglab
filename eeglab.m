@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.362  2005/03/05 02:07:13  arno
+% adding chaninfo
+%
 % Revision 1.361  2005/03/04 23:42:06  arno
 % make function compatible with channel info
 %
@@ -1516,7 +1519,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                         'disp(''TIP: call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                         'disp(''     to convert between channel location file formats'');' ...
-                        '[TMPCHAN TMPINFO LASTCOM] = pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; EEG.chaninfo = TMPINFO; eeg_checkset(EEG, ''chanlocsize'');' ...
+                        '[TMPCHAN TMPINFO LASTCOM] = pop_chanedit(EEG.chanlocs, EEG.chaninfo); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; EEG.chaninfo = TMPINFO; eeg_checkset(EEG, ''chanlocsize'');' ...
                         'clear TMPCHAN TMPINFO; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
@@ -1568,7 +1571,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
 third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
        uimenu( loc_m, 'Label', 'By name'   , 'CallBack'  , [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''', ''''chaninfo'''', EEG.chaninfo);'']; eval(LASTCOM);' e_hist]);
-	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
+	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''', ''''chaninfo'''', EEG.chaninfo);'']; eval(LASTCOM);' e_hist]);
     uimenu( third_m, 'Label', 'Channel data (scroll)'        , 'CallBack', [ check          'LASTCOM = pop_eegplot(EEG, 1, 1, 1);' e_hist], 'Separator', 'on');
 	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ check      'LASTCOM = pop_spectopo(EEG, 1);' e_hist]);
 	uimenu( third_m, 'Label', 'Channel properties'       , 'CallBack', [ checkplot   'LASTCOM = pop_prop(EEG,1);' e_hist]);
