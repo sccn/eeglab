@@ -380,7 +380,8 @@ for curfield = tmpfields'
 						  EEG.event(index).init_index = index;
 						  EEG.event(index).init_time  = EEG.event(index).latency*g.timeunit;
 					  end;
-					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align, g.oldevents, g.optimalign);
+					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, ...
+                                                    g.timeunit, g.align, g.oldevents, g.optimalign);
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
@@ -406,7 +407,8 @@ for curfield = tmpfields'
 						  EEG.event(index+offset).init_index = index;
 						  EEG.event(index+offset).init_time  = EEG.event(index+offset).latency*g.timeunit;
 					  end;
-                      EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align, g.oldevents, g.optimalign);
+                      EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, ...
+                                                    g.align, g.oldevents, g.optimalign);
             end;
       end;
 end;
@@ -541,8 +543,10 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
         end;
     else
+        % must add one (because first sample point has latency 0
+        % ------------------------------------------------------
         for index = indices
-            event(index).latency = round(event(index).latency*newfactor);
+            event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
         end;
     end;        
 
