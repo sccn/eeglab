@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2002/10/20 21:32:08  arno
+% nan activation computation debug
+%
 % Revision 1.74  2002/10/16 22:44:04  arno
 % ica recompute for NaNs
 %
@@ -404,13 +407,16 @@ end;
 	if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
       if mod(size(EEG.data,2), EEG.pnts) ~= 0
            if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
-                          'Should EEGLAB attempt to adjust?' 10 '(press Cancel to fix the problem from the command line)']) 
-                res = com;
-                EEG.pnts = size(EEG.data,2);
-                EEG = eeg_checkset(EEG);
-                return;
-            else
-              	 error( 'eeg_checkset error: number of points does not divide the number of columns in data');
+                          'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+               error('eeg_checkset error: user abord');
+                %res = com;
+                %EEG.pnts = size(EEG.data,2);
+                %EEG = eeg_checkset(EEG);
+                %return;
+           else
+               res = com;
+               return;
+               %error( 'eeg_checkset error: number of points does not divide the number of columns in data');
             end;  	  
       else
         if EEG.trials > 1
@@ -452,13 +458,16 @@ end;
     if ~isempty(EEG.event)
         if EEG.trials > 1 & ~isfield(EEG.event, 'epoch')
              if popask( [ 'eeg_checkset error: the event info structure does not contain an ''epoch'' field.'  ...
-                          'Should EEGLAB remove all events ?' 10 '(press Cancel to fix the problem from the command line)']) 
+                          'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+                 error('eeg_checkset error: user abord');
+                %res = com;
+                %EEG.event = [];
+                %EEG = eeg_checkset(EEG);
+                %return;
+            else 
                 res = com;
-                EEG.event = [];
-                EEG = eeg_checkset(EEG);
                 return;
-            else
-                error('eeg_checkset error: no epoch field in event structure');
+               %error('eeg_checkset error: no epoch field in event structure');
             end;
         end;
     else
@@ -491,13 +500,16 @@ end;
         if l ~= EEG.trials
              if popask( [ 'eeg_checkset error: the number of epoch indices in the epoch array/struct (' ...
                    int2str(l) ') is different from the number of epochs in the data (' int2str(EEG.trials) ').' 10 ...
-                   'Do you want to remove them ?' 10 '(press Cancel to fix the problem from the command line)']) 
-                res = com;
-                EEG.epoch = [];
-                EEG = eeg_checkset(EEG);
-                return;
-            else
-                error('eeg_checkset error: epoch structure size invalid');
+                   'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+                 error('eeg_checkset error: user abord');
+                %res = com;
+                %EEG.epoch = [];
+                %EEG = eeg_checkset(EEG);
+                %return;
+             else
+                 res = com;
+                 return;
+                %error('eeg_checkset error: epoch structure size invalid');
             end;
         end;
     else
@@ -512,14 +524,17 @@ end;
 			if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
 	  			if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ...
  	  			') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
- 	  			'Should EEGLAB clear these matrices?' 10 '(press Cancel to fix the problem from the command line)']) 
-                    res = com;
-                    EEG.icasphere = [];
-                    EEG.icaweights = [];
-                    EEG = eeg_checkset(EEG);
-                    return;
+ 	  			'Should EEGLAB attempt to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+                    error('eeg_checkset error: user abord');
+                    %res = com;
+                    %EEG.icasphere = [];
+                    %EEG.icaweights = [];
+                    %EEG = eeg_checkset(EEG);
+                    %return;
                 else
-                    error('eeg_checkset error: invalid weight and sphere array sizes');
+                    res = com;
+                    return;
+                    %error('eeg_checkset error: invalid weight and sphere array sizes');
                 end;    
 			end;
 			if size(EEG.icasphere,2) ~= size(EEG.data,1)
@@ -531,14 +546,17 @@ end;
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
 	 	  			if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
 	 	  			') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
-	 	  			'Do you want to remove them ?' 10 '(press Cancel to fix the problem from the command line)']) 
-	                    res = com;
-	                    EEG.icasphere = [];
-	                    EEG.icaweights = [];
-	                    EEG = eeg_checkset(EEG);
-	                    return;
+	 	  			'Do you want to want to abord operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
+	                    error('eeg_checkset error: user abord');
+	                    %res = com;
+	                    %EEG.icasphere = [];
+	                    %EEG.icaweights = [];
+	                    %EEG = eeg_checkset(EEG);
+	                    %return;
 	                else
-	                    error('eeg_checkset error: invalid weight and sphere array size');
+                        res = com;
+                        return;
+	                    %error('eeg_checkset error: invalid weight and sphere array size');
 	                end;    
                 end;
                 if option_computeica
