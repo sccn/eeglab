@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/03/11 23:34:07  arno
+% adding doc and options
+%
 % Revision 1.1  2003/02/26 17:07:14  arno
 % Initial revision
 %
@@ -64,7 +67,7 @@ if nargin < 1
     return;
 end;
 
-if nargin < 2
+if nargin < 3
 	% popup window parameters
 	% -----------------------
     if isfield(EEG, 'dipfit'), defaulttype = 2;

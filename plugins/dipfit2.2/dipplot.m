@@ -112,6 +112,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.11  2003/03/11 23:27:09  arno
+%adding normlen parameter
+%
 %Revision 1.10  2003/03/11 01:20:32  arno
 %updating default besaextori, debuging summary
 %
@@ -160,7 +163,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % conversion
     % ----------
-    if strcompi(g.normlen, 'on')
+    if strcmpi(g.normlen, 'on')
         try, EEG.sources = rmfield(EEG.sources, 'besaextori'); catch, end;
     end;
     
