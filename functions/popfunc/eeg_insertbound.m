@@ -1,7 +1,7 @@
 % eeg_insertbound() - insert boundary event in event structure.
 %
 % Usage:
-%   >> EEGOUT = eeg_insertbound( EEG, latency, regions );
+%   >> EEGOUT = eeg_insertbound( EEG, latency, abslatency, lengths, checkevent);
 %
 % Inputs:
 %   EEG        - EEG dataset
@@ -11,6 +11,7 @@
 %                also be an array of [beg end] latency with one row
 %                per region removed. Then 'lengths' is ignored.
 %   lengths    - length of removed regions
+%   checkevent - [0|1] check event consistency (1). Default is 1.
 %
 % Outputs:
 %   EEG        - output EEG dataset with 'event' and 'urevent' fields
@@ -45,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/05/05 01:54:40  arno
+% removing debug message
+%
 % Revision 1.7  2004/05/05 01:50:17  arno
 % same
 %
@@ -70,11 +74,14 @@
 % Initial revision
 %
 
-function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
+function EEG = eeg_insertbound( EEG, boundevents, regions, lengths, checkevent );
     
     if nargin < 2
         help eeg_insertbound;
         return;
+    end;
+    if nargin < 5
+        checkevent = 1;
     end;
     if size(regions,2) ~= 1 & exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
@@ -141,7 +148,9 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
     end;
     
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	EEG = eeg_checkset(EEG, 'eventconsistency');
+    if checkevent
+        EEG = eeg_checkset(EEG, 'eventconsistency');
+    end;
 
 % look for nested ur events
 % retrun indices of nested events and
