@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/08/13 18:59:49  arno
+% update automatic INSETY
+%
 % Revision 1.22  2002/08/13 18:56:01  arno
 % adjustments
 %
@@ -169,24 +172,6 @@ end;
 sumcol = sum(geomy);
 geomy  = (1.03+0.003*sumcol)*geomy/sumcol;
 geomy  = geomy - INSETY*(length(geomy)-1)/length(geomy);
-
-% $$$ % counting rows
-% $$$ % -------------
-% $$$ nbrows = 0;
-% $$$ counter = 1; % count the elements
-% $$$ for row = 1:length(geomx)
-% $$$ 	nbrowtmp = 1;
-% $$$ 	for column = 1:length(tmprow)
-% $$$ 		currentelem = varargin{ counter };
-% $$$ 		if ~isempty(currentelem)
-% $$$ 			try, 
-% $$$ 				if size(currentelem,1) > 1
-% $$$ 			nbrowtmp = 2;
-% $$$ 		end;
-% $$$ 		counter = counter+1;
-% $$$ 	end;
-% $$$ 	nbrows = nbrow+nbrowtmp;
-% $$$ end;
 
 % get axis coordinates
 % --------------------
