@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/04/20 02:08:45  arno
+% calling eeg_insertbound
+%
 % Revision 1.10  2004/03/20 01:48:16  arno
 % same
 %
@@ -118,7 +121,7 @@ end;
 % add boundary events
 % -------------------
 if ~isempty(boundevents)
-    EEG = eeg_insertbound(EEG, boundevents, regions);
+    EEG.event = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
 end;
 EEG.icaact = [];
 
