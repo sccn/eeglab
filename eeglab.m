@@ -125,6 +125,8 @@
 % pop_editeventfield() - edit event fields
 % pop_editeventvals()  - edit event values
 % pop_editset()        - edit dataset information
+% pop_export()         - export data or ica activity to ASCII file
+% pop_expica()         - export ica weights or inverse matrix to ASCII file
 % pop_icathresh()      - choose rejection thresholds (in development)
 % pop_importepoch()    - import epoch info ASCII file
 % pop_importevent()    - import event info ASCII file
@@ -185,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.240  2003/05/12 16:23:01  scott
+% edited text fprintfs
+%
 % Revision 1.239  2003/05/12 16:16:11  scott
 % plugin "executing" -> plugin "adding"
 %
@@ -1009,12 +1014,12 @@ set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
 	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'From EGI .RAW file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Segmented EGI .RAW files'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readsegegi;' e_newnonempty ]); 
-	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From .BDF and Biosemi .EDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From EGI .RAW file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Segmented EGI .RAW files', 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readsegegi;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'      , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'    , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From .BDF and Biosemi .EDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'    ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
 
@@ -1025,6 +1030,10 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
 	uimenu( importevent, 'Label', 'From data channel'          , 'CallBack', [ check   '[EEG LASTCOM]= pop_chanevent(EEG);' e_store]); 
 	uimenu( importevent, 'Label', 'From Presentation .LOG file'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
+	exportm = uimenu( first_m, 'Label', 'Export'); 
+	uimenu( exportm, 'Label', 'Data and ICA activity to text file', 'CallBack', [ check   'LASTCOM = pop_export(EEG);' e_hist ]);
+	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_hist ]); 
+	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_hist ]); 
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
