@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/07/30 16:57:26  arno
+% allow to save under Matlab 7
+%
 % Revision 1.29  2003/12/05 18:50:27  arno
 % remove trailing blanks
 %
@@ -236,11 +239,6 @@ if mode == 0  % single datasets
 	EEG.filepath    = '';
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
-    try, save([ curfilepath curfilename ], '-mat', 'EEG');
-	catch, 
-        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
-        catch, error('Pop_saveset: save error, check permissions on file or directory');
-	end;
     
 	% Saving data as float or as Matlab
 	eeg_options;
@@ -249,7 +247,12 @@ if mode == 0  % single datasets
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
             fprintf('Saving dataset...\n');
-			eval(command);
+            try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+            catch, 
+                try, save([ curfilepath curfilename ], '-mat', 'EEG');
+                catch, error('Pop_saveset: save error, check permissions on file or directory');
+                end;
+            end;
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
 			error('Pop_saveset: save error, check permissions on file or directory');
@@ -272,7 +275,12 @@ if mode == 0  % single datasets
         try, 
             EEG.data = single(EEG.data);
             fprintf('Saving dataset...\n');
-			eval(command);
+            try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+            catch, 
+                try, save([ curfilepath curfilename ], '-mat', 'EEG');
+                catch, error('Pop_saveset: save error, check permissions on file or directory');
+                end;
+            end;
             EEG.data = double(EEG.data);
 		catch, 
 			error('Pop_saveset: Save error, check permissions on file or directory');
@@ -356,9 +364,9 @@ else
 		end;        
     end;
 	disp('Pop_saveset: saving datasets...');
-	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
+	try, save([ curfilepath curfilename ], '-V6', '-mat', 'ALLEEG');
 	catch, 
-        try, save([ curfilepath curfilename ], '-V6', '-mat', 'ALLEEG');
+        try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
         catch, error('Pop_saveset: save error, check permissions on file or directory');
 	end;
     
