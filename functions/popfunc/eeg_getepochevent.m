@@ -11,7 +11,7 @@
 %   types     - Cell array of a subset of event types. 
 %               {} is all type events. Note: this requires that 
 %               a field named 'type' is defined in 'EEG.event'.
-%   timewin   - Event time window [start, end] in seconds
+%   timewin   - Event time window [start, end] in milliseconds
 %               (default []=whole epoch).
 %   fieldname - Name of the field to return the values for. Default 
 %               field is the event 'latency' in seconds
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/05/03 01:53:54  arno
+% using eeg_point2lat
+%
 % Revision 1.6  2002/04/22 22:05:53  arno
 % debuggig last change
 %
