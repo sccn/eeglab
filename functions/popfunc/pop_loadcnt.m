@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/03/17 22:52:29  arno
+% import keystroke event type
+%
 % Revision 1.22  2003/12/17 23:20:49  arno
 % debug last
 %
@@ -220,6 +223,19 @@ if ~isempty(findstr('keystroke', lower(options)))
                 EEG.event(index).type = [ 'keyboard' num2str(r.event(index).keyboard) ];
             end;
         end;
+    end;
+else
+    % removeing keystroke events
+    % --------------------------
+    rmind = [];
+    for index = 1:length(EEG.event)
+        if EEG.event(index).type == 0
+            rmind = [rmind index];
+        end;
+    end;
+    if ~isempty(rmind)
+        fprintf('Ignoring %d keystroke events\n', length(rmind));
+        EEG.event(rmind) = [];
     end;
 end;
 
