@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2002/10/13 23:37:01  scott
+% debug valsort
+%
 % Revision 1.49  2002/10/13 23:35:51  scott
 % debug
 %
@@ -1044,8 +1047,10 @@ if exist('phargs') == 1 % if phase-sort
 	if ~isempty(auxvar)
 		auxvar = auxvar(:,sortidx);
 	end
-
-if exist('ampargs') == 1 % if amplitude-sort
+%
+% %%%%%%%%%%%%%%% Sort data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+elseif exist('ampargs') == 1 % if amplitude-sort
 	if length(ampargs) == 4 % find max frequency in specified band
 		[pxx,freqs] = psd(data(:),1024,srate,frames,0);
 		
@@ -1109,7 +1114,9 @@ if exist('ampargs') == 1 % if amplitude-sort
 	if ~isempty(auxvar)
 		auxvar = auxvar(:,sortidx);
 	end
-
+%
+%%%%%%%%%%%%%%%%%%%%%% Don't Sort trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 elseif Nosort == YES
   fprintf('Not sorting data on input sortvar.\n');
   sortidx = 1:ntrials;	
