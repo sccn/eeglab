@@ -1,9 +1,11 @@
-% pop_chanedit() - Edit channel locations structure of an EEGLAB EEG dataset
+% pop_chanedit() - Edit channel locations (chanlocs) structure of an EEGLAB dataset
 %
-% Usage: >> newchans = pop_chanedit( chans, 'key1', value1, ...
-%                                           'key2', value2, ... );
+% Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
+%                            'key2', value2, ... ); % dataset containing chanlocs
+%        >> newchans = pop_chanedit( chanlocs, 'key1', value1, ...
+%                            'key2', value2, ... ); % separate chanlocs struct
 % Input:
-%   chans - channel EEGLAB structure
+%   chanlocs - EEGLAB dataset or EEG.chanlocs structure
 %
 % Optional inputs:
 %   'convert'     - { conversion_type args } Conversion type may be: 'cart2topo'
@@ -16,8 +18,8 @@
 %                   'sph_theta', 'sph_phi', 'sph_radius' for spherical horizontal angle, 
 %                   azimuth and radius. Ex: 'chans(3) = chans(14)', 'X = -X' or a multi- 
 %                   step transform with steps separated by ';': 'TMP = X; X = Y; Y = TMP'
-%   'changechan'  - {num value1 value2 value3 ...} Change the values of
-%                   all fields for the given channel num.
+%   'changechan'  - {num value1 value2 value3 ...} Change the values of all fields 
+%                   for the given channel num.
 %   'changefield' - {num field value} Change field value for channel number num. 
 %                   Ex: {34 'theta' 320.4}.
 %   'add'         - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
@@ -61,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/11/13 14:57:54  scott
+% help msg edit
+%
 % Revision 1.32  2002/11/12 23:02:21  arno
 % debugging message when number of channel does not match
 %
