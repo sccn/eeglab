@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/05/29 15:00:32  arno
+% debug lowmem option
+%
 % Revision 1.56  2003/05/29 00:23:00  arno
 % debug last
 %
@@ -944,6 +947,7 @@ if iscell(X)
         % outputs
         Rbootout = {Rbootout1 Rbootout2 coherimages};
 	end;
+    if size(Rdiff,3) > 1, Rdiff = reshape(Rdiff, 1, size(Rdiff,3)); end;
     R        = { abs(R1) abs(R2) fastif(isreal(Rdiff), Rdiff, abs(Rdiff)) };
     Rangle   = { angle(R1) angle(R2) angle(Rdiff) };
     coherresout = [];
