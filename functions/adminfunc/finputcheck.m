@@ -32,8 +32,8 @@
 % Example:
 %	finputcheck(varargin,
 %               { 'title'         'string'   []                       '';
-%				  'percent'       'real'     [0 1]                     1 ;
-%				  'elecamp'       'integer'  [1:10]                   [] });
+%                 'percent'       'real'     [0 1]                     1 ;
+%                 'elecamp'       'integer'  [1:10]                   [] });
 %   'title' is a string with no default value
 %   'percent' is a real number in between 0 and 1 and default value 1
 %   'elecamp' is an integer that can tak value between 1 and 10
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/20 19:10:41  arno
+% debugging output
+%
 % Revision 1.6  2002/07/19 17:58:11  arno
 % returning non-matched 'key' 'val' arguments
 %
