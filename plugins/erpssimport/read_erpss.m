@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2005/03/10 23:47:15  arno
+% edit message
+%
 % Revision 1.20  2003/12/10 17:00:03  arno
 % comment
 %
@@ -119,7 +122,11 @@ function [eeg,ev,header] = read_erpss(filename)
                 if header.divider & header.clock_freq
                     header.srate     = header.clock_freq/header.divider/header.nsteps;
                     header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
-                    fprintf('Sampling rate is %4.4f\n', header.srate);
+                    if round(header.srate)
+                        fprintf('Sampling rate is %4.4fHz\n', header.srate);
+                    else
+                        fprintf('Unknown sampling rate. Use menu "Edit > Dataset info" to enter it.\n');
+                    end;
                 end;
                 firstpass = 0;
             end; 
