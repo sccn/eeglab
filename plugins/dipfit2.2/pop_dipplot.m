@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/03/04 23:19:57  arno
+% use new dipplot with MNI coordinates
+%
 % Revision 1.20  2004/03/24 01:26:20  arno
 % same
 %
@@ -218,10 +221,10 @@ else
     
     % plotting
     % --------
-    if ~isempty(findstr(EEG.dipfit.hdmfile, 'BESA'))
+    if ~isempty(findstr(EEG.dipfit.coordformat, 'spherical'))
         dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'sph2spm', sph2spm, options{:});
     else
-        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, options{:});
+        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'meshdata', EEG.dipfit.hdmfile, options{:});
     end;
 end;
     
