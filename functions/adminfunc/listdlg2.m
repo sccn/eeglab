@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/11/10 16:48:20  arno
+% nothing
+%
 % Revision 1.7  2004/11/10 16:33:18  arno
 % maximum height
 %
@@ -98,7 +101,6 @@ if ~isempty(g.promptstring)
 	geomvert = [1 geomvert];
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
 end;
-geomvert
 [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
 
 if ~isempty(g.listsize)
