@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2004/11/11 06:58:53  scott
+% debugging limits -sm
+%
 % Revision 1.65  2004/11/05 03:39:53  scott
 % nothing
 %
@@ -264,7 +267,9 @@
 % 03-16-02 added all topoplot options -ad
 
 function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin);
+
 myfig =gcf;
+xframes = 0; % are xmin & xmax in frames?? (default no)
     
 if nargin < 2
    help envtopo
@@ -447,10 +452,12 @@ end;
 	%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
 	if length(g.limits) < 2 % 'limits',0
-             if g.limits == 0,         
+            if g.limits == 0,         
 	      xmin = 0;
 	      xmax = frames-1;  % use dummy times
-             else
+              fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
+              xframes = 1;
+            else
 	      fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
               if isempty(g.limits) 
                   disp empty
@@ -458,9 +465,9 @@ end;
                   g.limits
               end
               return
-             end
-	     ymin = min(min(data));
-	     ymax = max(max(data));
+            end
+	    ymin = min(min(data));
+	    ymax = max(max(data));
 
         elseif length(g.limits) == 2  % 'limits',[a b]
 	     xmin = g.limits(1);
@@ -496,6 +503,8 @@ end;
 	  times = (0:1:frames-1);
 	  xmin = 0;
 	  xmax = frames-1;
+          fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
+          xframes = 1;
 	else
 	  dt = (xmax-xmin)/(frames-1);
 	  times=xmin*ones(1,frames)+dt*(0:frames-1); % compute times-values
@@ -556,8 +565,6 @@ end;
 		end;
 	  end;
 	colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
-	% [rr cc] = size(colors);
-	% colors
 
 	%
 	%%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
@@ -586,6 +593,7 @@ end;
            fprintf('\n');
         end
 	compvars = zeros(1,ncomps);
+
         %
 	%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
         %
@@ -597,7 +605,7 @@ end;
 	  if ~rem(c,100)
 	    fprintf('\n');
 	  end
-	  %proj = icaproj(data,weights,g.compnums(c)); % updated arg list 12/00 -sm
+
 	  if isempty(g.icaact)
 	      proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
 	  else 
@@ -605,28 +613,44 @@ end;
 	  end;
 	  envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode);
 
-  [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
-  compvars(c)   = val;
+          [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
+          compvars(c)   = val;
 
-  % find variance in interval after removing component
-  if strcmpi(g.pvaf, 'on')
-      pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
-  else
-      pvaf(c) = mean(mean(proj(:,frame1:frame2).^2));      
-  end;
+          % find variance in interval after removing component
+          if strcmpi(g.pvaf, 'on')
+              pvaf(c) = mean(mean((data(:,frame1:frame2)-proj(:,frame1:frame2)).^2)); 
+          else
+              pvaf(c) = mean(mean(proj(:,frame1:frame2).^2));      
+          end;
 
-  i = i+frame1-1;
-  if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped in plot
-      ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
-      [val,ix] = max(envdata(1,c*frames+ix));
-      plotframes(c) = ix; % draw line from max non-clipped env maximum
-      maxproj(:,c)  = proj(:,ix);
-  else  % draw line from max envelope value at max projection time point
-      plotframes(c) = i;
-      maxproj(:,c)  = proj(:,i);
-  end
-end %c
-fprintf('\n');
+          i = i+frame1-1;
+          if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped in plot
+              ymax = envdata(1,c*frames+i);
+              if ymax>0
+                 ymax = ymax*1.05;
+              else
+                 ymax = ymax/1.05;
+              end
+          end
+          if envdata(2,c*frames+i) < ymin % if envelop max at max variance clipped in plot
+              ymin = envdata(2,c*frames+i);
+              if ymin>0
+                 ymin = ymin/1.05;
+              else
+                 ymin = ymin*1.05;
+              end
+          end
+          plotframes(c) = i;
+          maxproj(:,c)  = proj(:,i);
+      
+          %    ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
+          %    [val,ix] = max(envdata(1,c*frames+ix));
+          %    plotframes(c) = ix; % draw line from max non-clipped env maximum
+          %    maxproj(:,c)  = proj(:,ix);
+          %else  % draw line from max envelope value at max projection time point
+          %end
+        end %c
+        fprintf('\n');
 
 % print percent variance accounted for
 % ---------------------------------------
@@ -773,7 +797,7 @@ set(axe,'Ygrid','on')
 axes(axe)
 set(axe,'Color',axcolor);
 
-fprintf('Using limits [%g,%g,%g,%g]\n',xmin,xmax,ymin,ymax);
+fprintf('    Using limits [%g,%g,%g,%g]\n\n',xmin,xmax,ymin,ymax);
 
 %
 %%%%%%%%%%%%%%%%% plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
@@ -897,16 +921,19 @@ end
         end
         axis([xmin xmax ymin ymax]);
     end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 set(axe,'Color',axcolor);
-l= xlabel('Time (s)');
-% l= xlabel('Time (s)');
+if ~xframes
+   l= xlabel('Time (s)');
+else
+   l= xlabel('Data (time points)');
+end
 set(l,'FontSize',14,'FontWeight','Bold');
 if strcmpi(g.envmode, 'avg')
     l=ylabel('Potential (uV)');
 else 
     l=ylabel('RMS of uV');
 end;    
-% l=ylabel('Potential (uV)');
 set(l,'FontSize',14,'FontWeight','Bold');
 %
 %%%%%%%%%%%%%%%%%%%%%% Draw oblique/vertical lines %%%%%%%%%%%%%%%%%%%%
