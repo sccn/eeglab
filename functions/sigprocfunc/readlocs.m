@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/05/02 00:06:19  arno
+% correcting polhemus reading
+%
 % Revision 1.5  2002/05/01 03:27:40  arno
 % removing sperical
 %
@@ -128,20 +131,25 @@ if isstr(filename)
 			  eloc(index).labels( find(eloc(index).labels == '.' )) = ' ';
 			end;
         case 'elp', 
-            [eloc labels X Y Z]= readelp( filename );
+            [eloctmp labels X Y Z]= readelp( filename );
             if exist('elpmaindir') ~= 1, elpmaindir = 'X'; end;
  			if strcmp(lower(elpmaindir), 'x')
-                [theta radius] = cart2topo( -X', -Y', Z');  
+                [theta radius] = cart2topo( -X', -Y', Z','optim',1);  
             else
                 [theta radius] = cart2topo( -Y', -X', Z','optim',1);  
             end;
-			for index = 1:length( eloc )
-			  tmp = eloc(index).X;
-			  eloc(index).X = -eloc(index).Y;
-			  eloc(index).Y = -tmp;			  
+			for index = 1:length( eloctmp )
+			  eloc(index).labels = labels{index};
 			  eloc(index).theta  = theta(index);
 			  eloc(index).radius = radius(index);
-			  eloc(index).labels = labels{index};
+			  if strcmp(lower(elpmaindir), 'x')
+				  eloc(index).X = -eloctmp(index).X;
+				  eloc(index).Y = -eloctmp(index).Y;	
+			  else
+				  eloc(index).X = -eloctmp(index).Y;
+				  eloc(index).Y = -eloctmp(index).X;	
+			  end;
+			  eloc(index).Z = eloctmp(index).Z;		  
             end;
 	     case 'txt', 
 		    if isempty(array(end,1)), totlines = size( array, 1)-1; else totlines = size( array, 1); end;
