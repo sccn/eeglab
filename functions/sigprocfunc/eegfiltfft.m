@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/12/03 18:51:45  arno
+% unused filtorder
+%
 % Revision 1.1  2003/12/03 18:26:17  arno
 % Initial revision
 %
@@ -77,12 +80,14 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
     else
         idxl = 0;
     end;
+    idxl
     if highcut ~= 0        
         [tmp idxh]=min(abs(fv-highcut));  % Find the entry in fv closest to 5 kHz    
     else 
-        idxh = length(fv)+1;
+        idxh = length(fv)/2;
     end;
-
+    idxh
+    
     % filter the data
     % ---------------
     smoothdata = zeros(chans,frames);
@@ -93,7 +98,8 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
                 X(idxl+1:idxh-1)=0;
             else
                 X(1:idxl)=0;
-                X(idxh:epochframes)=0;
+                X(end-idxl:end)=0;
+                X(idxh:end)=0;
             end;                
             smoothdata(c,(e-1)*epochframes+1:e*epochframes) = 2*real(ifft(X));
             if epochs == 1 
