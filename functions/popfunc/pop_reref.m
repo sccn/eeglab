@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/28 16:42:03  arno
+% text with scott
+%
 % Revision 1.17  2003/07/27 01:19:21  arno
 % debuging GUI call
 %
@@ -205,7 +208,7 @@ if nargin < 2
                 end;
             end;
             if result{4},
-                options = { options{:} 'method' 'withref' };
+                % options = { options{:} 'method' 'withref' }; do not include here, otherwise redundant with next gui
                 includeref = 1;
                 if ~isempty(result{5}),
                     options = { options{:} 'refloc' { result{5} eval(result{6}) eval(result{7}) } };
@@ -273,7 +276,7 @@ if nargin < 2
 else
     options = varargin;
 end;
-optionscall = options
+optionscall = options;
 
 % decode inputs
 % -------------
