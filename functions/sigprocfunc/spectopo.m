@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/08/30 17:37:07  arno
+% debugging for channel 0
+%
 % Revision 1.32  2002/08/29 01:10:02  arno
 % imaging component square
 %
@@ -539,6 +542,11 @@ if ~isempty(g.freq)
 		for index = 1:length(g.icamaps)+1
 			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
 		end;
+	
+		% put the channel plot a liitle bit higher
+		tmppos = get(headax(realpos(1)), 'position');
+		tmppos(2) = tmppos(2)+0.04;
+		set(headax(realpos(1)), 'position', tmppos);
 	else 
 		realpos = 1:length(g.freq); % indices giving order of plotting positions
 	end;
