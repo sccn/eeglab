@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/02/24 18:46:33  arno
+% debug FFT log ...
+%
 % Revision 1.41  2004/02/17 19:56:05  arno
 % debug frequency assigment for FFT
 %
@@ -281,12 +284,6 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 % -------------------
 if length(g.freqs) == 2
     
-    % min and max
-    % -----------
-    if g.freqs(1) == 0 & g.cycles ~= 0
-        g.freqs(1) = srate*g.cycles/g.winsize;
-    end;
-
     % default number of freqs using padratio
     % --------------------------------------
     if isempty(g.nfreqs)
@@ -304,7 +301,7 @@ if length(g.freqs) == 2
             end;
             if ~any(tmpfreqs == g.freqs(2))
                 [tmp minind] = min(abs(tmpfreqs-g.freqs(2)));
-                g.freqs(1)   = tmpfreqs(minind);
+                g.freqs(2)   = tmpfreqs(minind);
                 fprintf('Adjust max freq. to %3.2f Hz to match FFT output frequencies\n', g.freqs(2));
             end;
         end;
@@ -326,6 +323,7 @@ if length(g.freqs) == 2
     end;
 end;
 g.nfreqs = length(g.freqs);
+
 
 % function for time freq initialisation
 % -------------------------------------
