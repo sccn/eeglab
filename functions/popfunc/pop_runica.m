@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/25 23:52:01  arno
+% debugging for Mac
+%
 % Revision 1.8  2002/10/23 18:09:58  arno
 % new interupt button
 %
@@ -102,10 +105,6 @@ if nargin < 2
 	if length(result) == 0 return; end;
 	icatype      = result{1};
 	options      = [ ',' result{2} ];
-    fig = figure;
-    supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
-                        {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
-    drawnow;
 else
     fig = [];
 	options = [];
@@ -124,6 +123,12 @@ end;
 tmpdata = reshape( EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 switch lower(icatype)
     case 'runica' 
+        if nargin < 2
+            fig = figure('visible', 'off');
+            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
+                      {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
+            drawnow;
+        end;
         if length(options) < 2
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001 );
         else    
