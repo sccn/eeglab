@@ -4,7 +4,7 @@
 %
 % Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
 %                        'key2', value2, ... ); % edit dataset containing chanlocs
-%        >> newchans = pop_chanedit( chanlocs, 'key1', value1, ...
+%        >> [ newchans options ] = pop_chanedit( chanlocs, 'key1', value1, ...
 %                        'key2', value2, ... ); % edit separate chanlocs struct
 % Graphic interface:
 %   "Channel information ('field name')" - [edit boxes] display channel field 
@@ -29,6 +29,12 @@
 %                 3-D cartesian coordinates. Command line equivalent is 'convert', 
 %                 'topo2all'. Note that if spherical radii are absent, they are forced
 %                 to 1.
+%   "Set head radius" - [button] change head size radius. This is usefull
+%                 to make channel location compatible with a specified
+%                 spherical model. Command line option: 'headrad'.
+%   'Set channel types' - [button] set type names for a range of data channels.
+%   'Shift data channels' - [button] shift data channel indices. Command
+%                 line equivalent: 'shiftdatachans'.
 %   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
 %   "Insert chan" - [button] insert channel before current channel. Command line 
 %                 equivalent: 'insert'.
@@ -44,8 +50,9 @@
 %                 is only used for visualization. This parameter is attached to the 
 %                 chanlocs structure and is then used in all 2-D scalp topoplots. 
 %                 Default -> to data limits. Command line equivalent: 'plotrad'.
-%   "Shrink to center" - [button] (deprecated, 'plotrad' above now recommended) shrink 
-%                 channel locations towards the vertex to show all on 2-D topoplots.
+%   "Nose along +X" - [list] Indicate along which direction the nose should be. 
+%                 This information is used in functions like topoplot(), headplot() or 
+%                 dipplot(). Command line option: 'nosedir'.
 %   "Plot 3D" - [button] plot channel positions in 3-D using the plotchans3d() function.
 %   "Read locations" - [button] read location file using the readlocs() function. 
 %                 Command line equivalent: 'load'.
@@ -98,12 +105,17 @@
 %                   readlocs() can be specified if the input is a cell array.
 %   'save'        - 'filename' Save text file with channel info.
 %   'eval'        - [string] evaluate string ('chantmp' is the name of the channel
-%                   location structure.
-%   'lookup'      - [integer array] lookup channel indices standard location. []
-%                   looks up all channels.
+%                   location structure).
+%   'headrad'     - [float] change head radius.
+%   'lookup'      - [string] lookup channel indices standard location from
+%                   channel location file given as input.
+%   'shiftdatachans' - [pos shift] shift data channel indices at position 'pos'
+%                   by 'shift'. This option is useful if some data channel
+%                   do not have location.
 %
 % Outputs:
 %   newchans      - new EEGLAB channel locations structure
+%   options       - structure containing plotting options
 %
 % Ex:  EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
 %          'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
@@ -133,9 +145,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.112  2005/01/18 17:55:05  arno
-% removing besa fields
-%
 % Revision 1.111  2004/11/19 02:07:38  arno
 % display warning when deleting channels
 %
@@ -476,10 +485,12 @@
 % hidden parameter
 %   'gui' - [figure value], allow to process the same dialog box several times
 
-function [chans, com] = pop_chanedit(chans, varargin);
+function [chans, params, com] = pop_chanedit(chans, params, varargin);
 
+urchans = chans;
 com ='';
 if nargin < 1
+   params = [];
    help pop_editeventvals;
    return;
 end;
@@ -491,19 +502,37 @@ if isstruct(chans) & isfield(chans, 'chanlocs')
 end;
 
 nbchan = length(chans);
-allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' };
+allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'datachan' };
 
 if isfield(chans, 'shrink')
     icadefs;
     if SHRINKWARNING
         warndlg2( [ 'You are currently shrinking channel locations for display.' 10 ...
                     'A new option (more anatomically correct) is to plot channels' 10 ...
-                    'outside head limits: to do so try disabling the shrink option' 10 ...
-                    'by unclicking the ''shrink'' button. (Edit the icadefs file to' 10 ...
-                    'disable this message)' ], 'Shrink factor warning');
+                    'outside head limits so the shrink option has been disabled.' 10 ...
+                    '(Edit the icadefs file to disable this message)' ], 'Shrink factor warning');
     end;
+    chans = rmfield(chans, 'shink');
 end;
-[chans shrinkorskirt plotrad]= checkchans(chans, allfields);
+[chans shrinkorskirt plotrad] = checkchans(chans, allfields);
+
+% dealing with additional parameters
+% ----------------------------------
+if nargin > 2 & ~isstr(params), % nothing
+ elseif nargin > 1
+    varargin = { params varargin{:} };
+    clear params;
+    params.shrink        = shrinkorskirt;
+    params.plotrad       = plotrad;
+else 
+    params.shrink  = 0;
+    params.plotrad = [];
+end;
+nosevals       = { '+X' '-X' '+Y' '-Y' };
+if ~isfield(params, 'nosedir')
+    params.nosedir = nosevals{1};
+end;
+oldparams = params;
 
 if nargin < 2
     
@@ -511,22 +540,9 @@ if nargin < 2
     % lookup channel locations if necessary
     % -------------------------------------
     if ~all(cellfun('isempty', {chans.labels})) & all(cellfun('isempty', {chans.theta}))
-        standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
-                          'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
-                          'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
-                          'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
-                          'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
-                          'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
-        [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
-        if ~isempty(tmp1)
-            res = questdlg2(strvcat('Only channel labels are currenlty present but some', ...
-                                   'of these labels have standart locations. Do you want to look up', ...
-                                   'standard coordinates for these channels?'), 'Look up channel locations?', ...
-                           'No', 'Yes', 'Yes');
-            if strcmpi(res, 'yes')
-                chans = pop_chanedit(chans, 'lookup', []);	
-                totaluserdat = { 'lookup' [] };
-            end;
+        [chans tmp2 com] = pop_chanedit(chans, 'lookupgui', []);
+        if ~isempty(com)
+            totaluserdat = com;
         end;
     end;
     
@@ -536,7 +552,7 @@ if nargin < 2
 		commentfields = { 'Channel label ("label")', 'Polar angle ("theta")', 'Polar radius ("radius")', ...
                           'Cartesian X ("X")', 'Cartesian Y ("Y")', 'Cartesian Z ("Z")', ...
 						  'Spherical horiz. angle ("sph_theta")', 'Spherical azimuth angle ("sph_phi")', ...
-                          'Spherical radius ("sph_radius")' 'Channel type' };
+                          'Spherical radius ("sph_radius")' 'Channel type' 'Associated data channel' };
 		% transfer channel to global workspace
 		global chantmp;
 		chantmp = chans;
@@ -550,6 +566,8 @@ if nargin < 2
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
 		transform = [ 'inputdlg2({''Enter transform: (Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc.'' }, ' ...
                       '''Transform'', 1, { '''' }, ''pop_chanedit'');'];
+		headrad   = [ 'tmpres = inputdlg2({''Enter new head radius (same unit as DIPFIT head model):'' }, ' ...
+                      '''Head radius'', 1, { '''' }, ''pop_chanedit''); if isempty(tmpres), return; end;'];
 		settype   = [ 'inputdlg2({''Channel indices'' ''Type (e.g. EEG)'' }, ' ...
                       '''Set channel type'', 1, { '''' '''' }, ''pop_chanedit'');'];
         guicenter = [ '[chantmp newcenter tmpcom] = pop_chancenter(chantmp);' ...
@@ -563,7 +581,10 @@ if nargin < 2
         %              'if tmpoptim, newcenter = []; end;' ...
         %              'set( gcbf, ''userdata'', { olduserdat{:} ''convert'', { ''chancenter'' newcenter 0 } });' ...
         %              'clear tmpcell olduserdat tmpoptim tpmpX tmpY tmpZ newcenter;' ];
-
+		shiftdatachan  = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ...
+                           'tmpshift = inputdlg2( { strvcat(''Enter shift of index from current channel to the last one'', ' ...
+                           '''(you may use positive or negative shifts)'') }, ''Channel data indices'' , 1, { ''+1'' }, ''pop_chanedit'');' ];
+        
 		uiconvert = { { 'Style', 'pushbutton', 'string', 'Opt. head center', 'callback', ...
 						guicenter }, ...
 					  { 'Style', 'pushbutton', 'string', 'Rotate axis'  , 'callback', ...
@@ -579,9 +600,13 @@ if nargin < 2
 						['comtmp = {''convert'' {''sph2all'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'polar -> sph. & xyz', 'callback', ...
 						['comtmp = {''convert'' {''topo2all'' ''gui''}};' endgui] }, ...
-					  {  }, { } ...
+					  {  }, ...
+                      { 'Style', 'pushbutton', 'string', 'Set head radius', 'callback', ...
+						[ headrad 'comtmp = {''headrad'' str2num(tmpres{1}) }; clear tmpres;' endgui] } ...
                       { 'Style', 'pushbutton', 'string', 'Set channel types', 'callback', ...
-						['comtmp = {''settype'' ' settype '};' endgui] } };
+						['comtmp = {''settype'' ' settype '};' endgui] } ...
+                      { 'style', 'pushbutton' , 'string', 'Shift data channels', 'callback', ...
+						[ shiftdatachan 'comtmp = {''shiftdatachans'' [ valnum str2num(tmpshift{1}) ] }; clear tmpshift valnum;' endgui] } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
 			geometry = { geometry{:} [1.5 1 0.2 1] };
@@ -608,7 +633,7 @@ if nargin < 2
 		callpart2 = [ 'set(findobj(''tag'', ''chaneditnumval''), ''string'', num2str(valnum));' ];
 		for index = 1:length(allfields)
 			callpart2 = [ callpart2  'set(findobj(''tag'', ''chanedit' allfields{index} ...
-						  '''), ''string'', num2str(chantmp(valnum).' allfields{index} '));' ];
+						   '''), ''string'', num2str(chantmp(valnum).' allfields{index} '));' ];
 		end;
 		callpart2 = [ callpart2 'set(findobj(''tag'', ''chaneditscantitle''), ' ...
 					  '''string'', [''Channel number (of '' int2str(length(chantmp)) '')'']);' ...
@@ -689,12 +714,20 @@ if nargin < 2
                        '   plotchans3d([cell2mat({chantmp(tmpind).X})'' cell2mat({chantmp(tmpind).Y})'' cell2mat({chantmp(tmpind).Z})''],' ...
 					                   '{chantmp(tmpind).labels}); else disp(''cannot plot: no XYZ coordinates'');' ...
                        'end;' ];
+               
+        switch upper(params.nosedir)
+            case nosevals{1}, noseparam = 1;
+            case nosevals{2}, noseparam = 2;
+            case nosevals{3}, noseparam = 3;
+            case nosevals{4}, noseparam = 4;
+            otherwise, error('Wrong value for nose direction');
+        end;
 		uilist = {  uilist{:},...
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2-D', 'callback', plot2dcom },... 
 					{ 'Style', 'text', 'string', 'Plot radius (0.2-1, []=auto)'} ...
-					{ 'Style', 'edit', 'string', plotrad, 'tag', 'shrinkfactor' } ...
-					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', ' Shrink to vertex', 'value', shrinkorskirt } ...
+					{ 'Style', 'edit', 'string', params.plotrad, 'tag', 'shrinkfactor' } ... %					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', ' Shrink to vertex', 'value', params.shrink } ...
+					{ 'Style', 'listbox',  'string', 'Nose along +X|Nose along -X|Nose along +Y|Nose along -Y', 'tag' 'nose' 'value', noseparam } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3-D (XYZ)', 'callback', plot3d } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Read locations', 'callback', guireadlocs }, ...
 					{ 'Style', 'pushbutton', 'string', 'Read locs help', 'callback', 'pophelp(''readlocs.m'');' }, ...	
@@ -727,7 +760,7 @@ if nargin < 2
 			tmpcom = evalin('base', 'comtmp');
             if ~isempty(tmpcom)
                 try, 
-                    chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
+                    [chans params ] = pop_chanedit(chans, params, tmpcom{:}); % apply modification to channel structure
                     if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
                         tmpcom = { tmpcom{1} tmpcom{2}{1} };
                     end;
@@ -762,22 +795,33 @@ if nargin < 2
     
 	% not in the loop, returning
 	% --------------------------
-	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
+	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor')) % figure still here
         tmpshrinkskirt = get(findobj('parent', gcf, 'tag','shrinkbut'), 'value');
-        tmpval         = num2str(get(findobj('parent', gcf, 'tag','shrinkfactor'), 'string'));
+        tmpval1        = num2str(get(findobj('parent', gcf, 'tag','shrinkfactor'), 'string'));
+        tmpval2        = get(findobj('parent', gcf, 'tag','nose'), 'value');
         
         if tmpshrinkskirt,
-            chans(1).shrink = 'auto';
+            params.shrink = 'auto';
             totaluserdat{end+1} = 'shrink';
             totaluserdat{end+1} = 'auto';
         end;
-        if ~isempty(tmpval)
-            chans(1).plotrad  = str2num(tmpval);
+        if ~isempty(tmpval1)
+            params.plotrad  = str2num(tmpval1);
             totaluserdat{end+1} = 'plotrad';
-            totaluserdat{end+1} = chans(1).plotrad;
+            totaluserdat{end+1} = params.plotrad;
         end;
-		close(gcf);
-		if ~isempty( totaluserdat )
+        
+        % nose orientation
+        % ----------------
+        params.nosedir = nosevals{tmpval2};
+        if ~strcmpi(params.nosedir, oldparams.nosedir)
+            totaluserdat = { totaluserdat 'nosedir' tmpval2 };
+        end;
+        close(gcf);
+
+        % history
+        % -------
+        if ~isempty( totaluserdat )
 			if isempty(inputname(1)), varname = 'EEG.chanlocs';
 			else varname = inputname(1);
 			end;
@@ -874,6 +918,18 @@ else
 			   eval(tmpoper);
 		   end;
            
+		  case 'headrad'
+              allrad = [ chans.sph_radius ];
+              if length(unique(allrad)) == 1 % already spherical
+                  chans = pop_chanedit(chans, 'transform', [ 'sph_radius = ' num2str( args{ curfield+1 } ) ';' ]);
+              else % non-spherical, finding best match
+                  factor = args{ curfield+1 } / mean(allrad);
+                  chans = pop_chanedit(chans, 'transform', [ 'sph_radius = sph_radius*' num2str( factor ) ';' ]);
+                  disp('Warning: electrodes do not lie on a sphere. Sphere model fitting for');
+                  disp('         dipole localization will work but generate many warnings');
+              end;  
+              chans = convertlocs(chans, 'sph2all');
+           
 		  case 'shrink'
 		   chans(1).shrink = args{ curfield+1 };		   
            
@@ -883,7 +939,19 @@ else
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
            
-		  case 'changefield'
+		  case 'shiftdatachans'
+		   tmpargs = args{ curfield+1 };
+           for indtmp = tmpargs(1):tmpargs(1)+tmpargs(2)-1
+               chans(indtmp).datachan = [];
+           end;
+           for indtmp = max(1,tmpargs(1)+tmpargs(2)):length(chans)
+               chans(indtmp).datachan = chans(indtmp).datachan-tmpargs(2);
+           end;
+           for indtmp = length(chans)+tmpargs(2)+1:length(chans)
+               chans(indtmp).datachan = [];
+           end;
+           
+          case 'changefield'
 		   tmpargs = args{ curfield+1 };
 		   if length( tmpargs ) < 3
 			   error('pop_chanedit: not enough arguments to change field value');
@@ -937,32 +1005,6 @@ else
 			   end;
 		   end;
            
-		  case 'lookup'
-           tmplocs = readlocs('Standard-10-5-Cap385.sfp', 'filetype', 'sfp');
-           [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
-           if ~isempty(tmp)
-               [ind2 ind3] = sort(ind2);
-               ind1 = ind1(ind3);
-               for index = 1:length(ind2)
-                   chans(ind2(index)).theta      = tmplocs(ind1(index)).theta;
-                   chans(ind2(index)).radius     = tmplocs(ind1(index)).radius;
-                   chans(ind2(index)).X          = tmplocs(ind1(index)).X;
-                   chans(ind2(index)).Y          = tmplocs(ind1(index)).Y;
-                   chans(ind2(index)).Z          = tmplocs(ind1(index)).Z;
-                   chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
-                   chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
-                   chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
-               end;
-               tmpdiff = setdiff([1:length(chans)], ind2);
-               if ~isempty(tmpdiff)
-                   fprintf('Channel lookup: no location for ');
-                   for index = 1:(length(tmpdiff)-1)
-                       fprintf('%s,', chans(tmpdiff(index)).labels);
-                   end;
-                   fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
-                           chans(tmpdiff(end)).labels);
-               end;
-           end;
           case 'eval'
 		   tmpargs = args{ curfield+1 };
            eval(tmpargs);
@@ -991,8 +1033,76 @@ else
 			   fprintf(fid, '\n');
 		   end;
 		   if isempty(tmpargs), chantmp = readlocs(tmpargs); end;
-		 end;
+        
+          case 'nosedir'
+            params.nosedir = args{ curfield+1 };
+            if isempty(strmatch(params.nosedir, nosevals))
+                error('Wrong value for nose direction');
+            end;
+           
+		  case 'lookup'
+           tmplocs = readlocs( args{ curfield+1 } );
+           [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
+           if ~isempty(tmp)
+               for index = 1:length(chans)
+                   chans(index).datachan = index;
+               end;
+               [ind2 ind3] = sort(ind2);
+               ind1 = ind1(ind3);
+               for index = 1:length(ind2)
+                   chans(ind2(index)).theta      = tmplocs(ind1(index)).theta;
+                   chans(ind2(index)).radius     = tmplocs(ind1(index)).radius;
+                   chans(ind2(index)).X          = tmplocs(ind1(index)).X;
+                   chans(ind2(index)).Y          = tmplocs(ind1(index)).Y;
+                   chans(ind2(index)).Z          = tmplocs(ind1(index)).Z;
+                   chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
+                   chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
+                   chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
+               end;
+               tmpdiff = setdiff([1:length(chans)], ind2);
+               if ~isempty(tmpdiff)
+                   fprintf('Channel lookup: no location for ');
+                   for index = 1:(length(tmpdiff)-1)
+                       fprintf('%s,', chans(tmpdiff(index)).labels);
+                   end;
+                   fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
+                           chans(tmpdiff(end)).labels);
+               end;
+           end;
+           
+        case 'lookupgui'
+         standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
+                          'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
+                          'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
+                          'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
+                          'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
+                          'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
+        [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
+        if ~isempty(tmp1)
+            comhelp = [ 'warndlg2(strvcat(''The template file may depends on the model'',' ...
+                        '''you intend to use for dipole fitting. The default file is fine for'',' ...
+                        '''spherical model. For Boundary element model, use ''standard1005.elc'',' ...
+                        '''in the "plugins/dipfit/BEM/elec" subfolder of EEGLAB'');' ];
+            commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
+                            'if filename ~=0,' ...
+                            '   set(findobj(''parent'', gcbf, ''tag'', ''elec''), ''string'', [ filepath filename ]);' ...
+                            'end;' ...
+                            'clear filename filepath tagtest;' ];    
+            uilist = { { 'style' 'text' 'string' strvcat('Only channel labels are currenlty present but some', ...
+                                   'of these labels have know labels. Do you want to look up', ...
+                                   'coordinates for these channels using the electrode file below?') } ...
+                       { 'style' 'edit'       'string' 'Standard-10-5-Cap385.sfp' 'tag' 'elec' } ...
+                       { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
+            
+            res = inputgui( { 1 [1 0.2] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', ...
+                           [], 'normal', [3 1 1] );
+            if ~isempty(res)
+                chans = pop_chanedit(chans, 'lookup', res{1});	
+                com = { 'lookup' res{1} };
+            end;
+        end;
 	 end;
+   end;
 end;
 
 if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
@@ -1021,6 +1131,7 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
+     
 function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);	
 
     % shrink and skirt factors
@@ -1042,12 +1153,18 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
     
     for index = 1:length(fields)
         if ~isfield(chans, fields{index})
-            chans = setfield(chans, {1}, fields{index}, []);
+            if ~strcmpi(fields{index}, 'datachan')
+                chans = setfield(chans, {1}, fields{index}, []);
+            else
+                for indchan = 1:length(chans)
+                    chans = setfield(chans, {indchan}, fields{index}, indchan);
+                end;
+            end;
         end;
     end;
-    if isfield(chans, 'sph_theta_besa'), chans = rmfield( chans, 'sph_theta_besa'); end;
-    if isfield(chans, 'sph_phi_besa'  ), chans = rmfield( chans, 'sph_phi_besa');   end;
     if exist('orderfields') == 2
-        chans = orderfields(chans, fields);
+        try,
+            chans = orderfields(chans, fields);
+        catch, end;
     end;
     
