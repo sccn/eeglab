@@ -15,7 +15,7 @@
 %   filepath   - path of the file to save to (optional)
 %
 % Optional arguments
-%   'savemode' - [0|1] 0 saves all the structure in a Matlab file and 1 
+%   'savemode' - [0|1] 1 saves all the structure in a Matlab file and 0 
 %                saves the structure without the data in a Matlab file and
 %                the data in a binary float file.
 %
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/12/16 22:33:02  arno
+% removing EEGDATA
+%
 % Revision 1.42  2004/12/16 19:29:58  arno
 % new option savemode
 %
