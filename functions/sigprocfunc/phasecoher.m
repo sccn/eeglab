@@ -27,9 +27,6 @@
 %   allamps = amplitudes at each trial and time point (frames,trials)
 %   allphs  = phase (deg) at each trial and time point (frames,trials)
 %
-% Note: mean amplitudes and amplitude significance levels now calculated on
-%       log amplitudes, though log amplitudes are not returned (7-14-02).
-%
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 5-5-98 
 %
 % See also: erpimage()
@@ -212,7 +209,7 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
     imagpart = sinwin*epoch(:,t);
     amp = sqrt(realpart.*realpart+imagpart.*imagpart);
     if amp >= MIN_AMP
-      amps(f) = amps(f) + log(amp); % sum of amps
+      amps(f) = amps(f) + amp; % sum of amps
       realcoh(f) = realcoh(f)+ realpart/amp;
       imagcoh(f) = imagcoh(f)+ imagpart/amp;
       nsums(f) = nsums(f)+1;
@@ -228,7 +225,7 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
     end
   end
   if nsums(f)>0
-    amps(f) = exp(amps(f)/nsums(f));
+    amps(f) = amps(f)/nsums(f);
     realcoh(f) = realcoh(f)/nsums(f);
     imagcoh(f) = imagcoh(f)/nsums(f);
   else
@@ -264,7 +261,7 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
     imagpart = sinwin*epoch;
     amp = sqrt(realpart.^2+imagpart.^2);
     if amp >= MIN_AMP
-      tmpamps = tmpamps + log(amp);
+      tmpamps = tmpamps + amp;
       realcoh = realcoh+ realpart/amp;
       imagcoh = imagcoh+ imagpart/amp;
       nsums = nsums+1;
@@ -291,8 +288,7 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
  bootamp = sort(bootamp); % sort low to high
  ampsig = [bootamp(round(COHSIG_REPS*(alpha))) ...
            bootamp(round(COHSIG_REPS*(1.0-alpha)))];
- ampsig = exp(ampsig);
- % keyboard
+% keyboard
 
 end %%%%%%%%%%%%%%%%%%%%%%%%%%%% end cohsig %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
