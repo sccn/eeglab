@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/03/12 03:16:24  arno
+% help update
+%
 % Revision 1.36  2003/02/26 17:48:01  arno
 % correcting corrections
 %
@@ -336,7 +339,7 @@ if EEG.trials == 1 & ~strcmp(processflag,'EEG')
 end;
 
 if ~isempty(EEG.chanlocs)
-	spectopooptions = [ options ', ''chanlocs'', EEG.chanlocs' ];
+	spectopooptions = [ options ', ''verbose'', ''off'', ''chanlocs'', EEG.chanlocs' ];
 	if dataflag == 0 % i.e. components
 		spectopooptions = [ spectopooptions ', ''weights'', EEG.icaweights*EEG.icasphere' ];
 	end;
@@ -352,7 +355,7 @@ end;
 % ----------------------------------------------------------------
 if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
 	posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
-	posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
+	posf = min(round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1, EEG.pnts );
 	pointrange = posi:posf;
 	if posi == posf, error('pop_spectopo(): empty time range'); end;
 	fprintf('pop_spectopo(): selecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
