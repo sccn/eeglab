@@ -42,8 +42,10 @@
 %
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
-%   X,Y,Z     - Locations of dipole heads (Cartesian coordinates)
-%   XE,YE,ZE  - Locations of dipole ends (Cartesian coordinates)
+%   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
+%               more than one dipole per components, the last dipole is returned.
+%   XE,YE,ZE  - Locations of dipole ends (Cartesian coordinates). The same
+%               remark as above applies.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 1st July 2002
 %
@@ -108,7 +110,7 @@
 % - The gcf object stores the handle of the dipole that is currently
 %     being modified
 
-function [sources, x, y, z, xo, yo, zo] = dipplot( sources, varargin )
+function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
     
     DEFAULTVIEW = [0 0 1];
         
@@ -348,6 +350,12 @@ function [sources, x, y, z, xo, yo, zo] = dipplot( sources, varargin )
             end
             x = -x; xo=-xo;
             y = -y; yo=-yo;
+            XX(index) = x;
+            YY(index) = y;
+            ZZ(index) = z;
+            XO(index) = xo;
+            YO(index) = yo;
+            ZO(index) = zo;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tag = [ 'dipole' num2str(index) ];
