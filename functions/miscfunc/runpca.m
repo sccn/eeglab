@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/05/05 16:30:57  arno
+% svd -> svds
+%
 % Revision 1.3  2004/05/05 15:22:20  arno
 % remove svds
 %
@@ -102,8 +105,8 @@ else
     M = V;
   end  
   %if N > BIG_N & N < rows
-  pc = pc(1:N,:);
-  M = M(:,1:N);
+  %pc = pc(1:N,:);
+  %M = M(:,1:N);
   %end
 end
 %S = diag(S(1:N,1:N));
