@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.179  2002/10/23 15:44:26  arno
+% disable function warning
+%
 % Revision 1.178  2002/10/23 15:41:25  arno
 % typo
 %
@@ -903,7 +906,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	uimenu( third_m, 'Label', 'Channel properties'       , 'CallBack', [ checkplot   'LASTCOM = pop_prop(EEG,1);' e_hist]);
 	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch  'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
 	ERP_m = uimenu( third_m, 'Label', 'Channel ERPs');
-		uimenu( ERP_m, 'Label', 'With scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
+		uimenu( ERP_m, 'Label', 'With scalp maps'     , 'CallBack', [ checkplot     'LASTCOM = pop_timtopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'In scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'In rect. array'     , 'CallBack', [ checkepoch     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 1); clear tmpeeg;' e_hist]);
 	topo_m = uimenu( third_m, 'Label', 'ERP map series');
