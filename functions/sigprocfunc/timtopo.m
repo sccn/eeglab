@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2004/10/20 15:19:03  scott
+% nothing
+%
 % Revision 1.68  2004/04/25 20:07:28  scott
 % typo
 %
@@ -544,11 +547,8 @@ for t=1:ntopos
   axes(axtp)                             % topoplot axes
   cla
 
-  topoargs = ' ';
   if ~isempty(varargin)
-  for v = varargin{:}
-    topoargs = [ topoargs ' ' cell2mat(v)];
-  end
+    topoargs = varargin{:};
   else
     topoargs = [];
   end
