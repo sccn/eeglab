@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/04/29 20:22:22  arno
+% typo
+%
 % Revision 1.24  2002/04/26 21:41:27  arno
 % phase/coher consistency chack
 %
@@ -224,8 +227,6 @@ if popup
 				   '   end;' ...
 				   'end;' ...
 				   'clear tmps tmpv tmpfieldnames;' ];
-	    
-	
 	
 	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
 				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 1 1.1] [1 1 1 1 1.1] [1] [1 3.1 0.8 0.1 0.1]};
@@ -390,9 +391,11 @@ if popup
 	% options row
 	% ------------
     if result{24}
-		if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-		else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
-        end;	
+		if ~isempty(EEG.chanlocs)
+			if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
+			else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
+			end;	
+		end;
 	end;
 	if ~isempty(result{25})
 		options = [options ',''spec'', [' result{25} ']' ];
