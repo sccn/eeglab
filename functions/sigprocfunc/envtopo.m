@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2005/04/01 22:06:55  scott
+% made default ymax,ymin from plotted data, not whole data
+%
 % Revision 1.88  2005/03/31 16:06:45  arno
 % header
 %
@@ -521,8 +524,8 @@ times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 %%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
 %
 ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(data(plotchans,:))); % begin by setting limits from data
-ymax = max(max(data(plotchans,:)));
+ymin = min(min(data(g.plotchans,:))); % begin by setting limits from data
+ymax = max(max(data(g.plotchans,:)));
 if length(g.limits) == 4 
      if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
 	 ymin = g.limits(3);
