@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/07/23 00:28:22  scott
+% help msg
+%
 % Revision 1.56  2003/05/12 23:41:54  arno
 % text typo
 %
@@ -1009,7 +1012,7 @@ switch lower(g.plotersp)
 	xlabel('Time (ms)')
 	ylabel('dB')
 
-	E = 10 * log10(mbase(dispf));
+	E = 10 * log10(mbase(dispf))
 	h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                     % to left of ERSP image
 	if ~isnan(g.alpha)
@@ -1075,7 +1078,7 @@ switch lower(g.plotitc)
 
 	h(7) = gca;
 	h(8) = cbar('vert');
-	h(9) = get(h(8),'Children');
+	%h(9) = get(h(8),'Children');
 	set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
 	set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
 	set(h(8),'YLim',[0 tmpcaxis(2)]); 
