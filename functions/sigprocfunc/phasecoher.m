@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/16 18:12:11  scott
+% message edit
+%
 % Revision 1.5  2003/03/15 17:23:57  scott
 % print msg
 %
@@ -209,7 +212,7 @@ nsums = zeros(1,frames);
 for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
   epoch = data(ix+f,:);
   epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
-  if rem(f,100)== 0
+  if rem(f,50)== 0
     fprintf(' %d',f)
   end
   for t = 1:trials  %%%%%%%%%%%%%%% trials %%%%%%%%%%%%%%%%%%%
