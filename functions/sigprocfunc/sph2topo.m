@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/29 01:25:56  arno
+% updating header for besa compatibility
+%
 % Revision 1.2  2002/05/02 00:52:36  arno
 % removing absolute value for compatibility
 %
@@ -89,13 +92,13 @@ channo = input(:,1);
 az = input(:,2);
 horiz = input(:,3);
 
-if exist('method')== 1 & method == 2
-  angle  = -horiz;
-  radius = 0.5 - az/180;
-else
+if exist('method')== 1 & method == 1
   radius = abs(az/180)/factor;
   i = find(az>=0);
   angle(i) = 90-horiz(i);
   i = find(az<0);
   angle(i) = -90-horiz(i);
+else
+  angle  = -horiz;
+  radius = 0.5 - az/180;
 end;
