@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/05/16 01:13:19  scott
+% typo
+%
 % Revision 1.18  2004/05/16 01:09:30  scott
 % typo
 %
@@ -828,6 +831,8 @@ end
   laststep=0; 
   blockno = 1;  % running block counter for kurtosis interrupts
 
+  rand('state',sum(100*clock));  % set the random number generator state to
+                                 % a position dependent on the system clock
   while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       permute=randperm(datalength); % shuffle data order at each step
 
