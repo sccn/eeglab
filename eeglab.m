@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2002/10/03 23:49:46  arno
+% besaplot options
+%
 % Revision 1.169  2002/10/03 14:55:36  arno
 % change besaplot summary
 %
@@ -824,7 +827,8 @@ if besamenu
 	uimenu( fourth_sub3, 'Label', 'Import dipoles'   , 'CallBack', [ check 'EEG = besaimport(EEG);' e_store]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles BESA'   , 'CallBack', [ 'besaplot(EEG.sources);']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles MRI'  , 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'');']);
-	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off''); set(gcf, ''color'', ''w'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary BESA', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
+	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary BESA', 'CallBack', [ 'besaplot(EEG.sources, ''image'', ''mri'', ''summary'', ''on'', ''dipolesize'', 30, ''mesh'', ''off'');']);
 end;
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
