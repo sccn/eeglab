@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2003/08/06 00:27:10  arno
+% remove postp (made matlab 5.3 crash
+%
 % Revision 1.64  2003/03/05 03:22:40  scott
 % cleanup
 %
@@ -449,7 +452,7 @@ if length(plotchans)==1
   set(pl,'color','k');
   set(pl,'linewidth',2);
 end
-l= xlabel('Time (ms)');
+l= xlabel('Latency (ms)');
 set(l,'FontSize',axfont);
 l=ylabel('Potential (uV)');
 set(l,'FontSize',axfont);
