@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/03/12 00:42:20  arno
+% removing namechan field
+%
 % Revision 1.6  2003/02/23 08:33:04  scott
 % header edits -sm
 %
@@ -86,7 +89,7 @@ command = '';
 if nargin < 2
 
 	% ask user
-	[filename, filepath] = uigetfile('*.eeg', 'Choose an EEG file -- pop_loadeeg()'); 
+	[filename, filepath] = uigetfile('*.eeg;*.EEG', 'Choose an EEG file -- pop_loadeeg()'); 
 	if filename == 0 return; end;
 
 	% popup window parameters
