@@ -88,7 +88,7 @@
 %                      level. Show non-signif. output values as green.   {0}
 %       'naccu'     = Number of bootstrap replications to accumulate     {200}
 %       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
-%                                                  0 -> use whole trial) {0}
+%                                                  0 -> use whole trial) {1}
 %       'boottype'  = ['times'|'timestrials'] shuffle time only or time and
 %                     trials for computing bootstrap. Both options should
 %                     return identical results {'times'}.
@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2004/03/01 02:24:31  arno
+% help message
+%
 % Revision 1.55  2004/02/27 18:59:22  arno
 % reshape data
 %
@@ -632,7 +635,7 @@ try, g.plotitc;    catch, g.plotitc  = 'on'; end;
 try, g.detrend;    catch, g.detrend = 'off'; end;
 try, g.rmerp;      catch, g.rmerp = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
-try, g.baseboot;   catch, g.baseboot = 0; end;
+try, g.baseboot;   catch, g.baseboot = 1; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
