@@ -82,12 +82,14 @@
 %  sources(1).besaphloc= 19.702;
 %  sources(1).besathori= -80.02;
 %  sources(1).besaphori= 87.575;
+%  sources(1).rv = 0.1;
 %  % position and orientation of the second dipole
 %  sources(2).besaexent= 69.036;
 %  sources(2).besathloc= 46;
 %  sources(2).besaphloc= 39;
 %  sources(2).besathori= 150;
 %  sources(2).besaphori= -3;
+%  sources(2).rv = 0.05;
 %  % plot of the two dipoles (first in green, second in blue)
 %  dipplot( sources, 'color', { 'g' 'b' }); 
 %
@@ -130,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.60  2003/10/31 18:59:41  arno
+%divide rvrange by 100
+%
 %Revision 1.59  2003/10/30 03:25:17  arno
 %adding projection lines
 %
@@ -598,6 +603,16 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     for index = 1:length(sources)
         nbdip = 1;
         if size(sources(index).posxyz, 1) > 1 & any(sources(index).posxyz(2,:)) nbdip = 2; end;
+        
+        % reorder dipoles for plotting
+        if nbdip == 2
+            if sources(index).posxyz(1,1) > sources(index).posxyz(2,1)
+                tmp = sources(index).posxyz(2,:);
+                sources(index).posxyz(2,:) = sources(index).posxyz(1,:);
+                sources(index).posxyz(1,:) = tmp;
+            end;
+        end;
+        
         for dip = 1:nbdip
         
             x = sources(index).posxyz(dip,1);
@@ -1037,25 +1052,26 @@ function updatedipplot(fig)
        index = index+1;
    end;
    userdat  = get(newdip(index), 'userdata');
+   
    set( tmprvobj(end), 'string', userdat.rv);
    
    % adapt the MRI to the dipole depth
    % ---------------------------------
    %if ~strcmpi(dat.mode, 'besa') % not besa mode
-       delete(findobj('parent', gca, 'tag', 'img'));
-      
-       tmpdiv = 1;
-       if ~dat.axistight
-           [xx yy zz] = transformcoords(0,0,0, dat.tcparams);
-           indx = minpos(dat.imgcoords{1}-zz);
-           indy = minpos(dat.imgcoords{2}-yy);
-           indz = minpos(dat.imgcoords{3}-xx);
-       else
-           indx = minpos(dat.imgcoords{1} - userdat.pos3d(3) + 4/tmpdiv);
-           indy = minpos(dat.imgcoords{2} - userdat.pos3d(2) - 4/tmpdiv);
-           indz = minpos(dat.imgcoords{3} - userdat.pos3d(1) + 4/tmpdiv);
-       end;
-       plotimgs( dat, [indx indy indz]);
+   delete(findobj('parent', gca, 'tag', 'img'));
+   
+   tmpdiv = 1;
+   if ~dat.axistight
+       [xx yy zz] = transformcoords(0,0,0, dat.tcparams);
+       indx = minpos(dat.imgcoords{1}-zz);
+       indy = minpos(dat.imgcoords{2}-yy);
+       indz = minpos(dat.imgcoords{3}-xx);
+   else
+       indx = minpos(dat.imgcoords{1} - userdat.pos3d(3) + 4/tmpdiv);
+       indy = minpos(dat.imgcoords{2} - userdat.pos3d(2) - 4/tmpdiv);
+       indz = minpos(dat.imgcoords{3} - userdat.pos3d(1) + 4/tmpdiv);
+   end;
+   plotimgs( dat, [indx indy indz]);
    %end;
    	
 % plot images
@@ -1104,11 +1120,13 @@ function plotimgs(dat, index);
     surface(wxc, wyc, wzc, imgc              , options{:});
     surface(wxs, wys, wzs, imgs              , options{:});
     if strcmpi(dat.drawedges, 'on')
+        % removing old edges if any
+        delete(findobj( gcf, 'tag', 'edges'));
         if dat.axistight, col = 'k'; else col = [0.5 0.5 0.5]; end;
         h(1) = line([wxs(1) wxs(2)]', [wys(1) wyc(1)]', [wzt(1) wzt(2)]'); % sagital-transverse
         h(2) = line([wxs(1) wxc(3)]', [wyc(1) wyc(2)]', [wzt(1) wzt(2)]'); % coronal-tranverse
         h(3) = line([wxs(1) wxs(2)]', [wyc(1) wyc(2)]', [wzs(1) wzt(1)]'); % sagital-coronal
-        set(h, 'color', col, 'linewidth', 2);
+        set(h, 'color', col, 'linewidth', 2, 'tag', 'edges');
     end;
         
     %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
