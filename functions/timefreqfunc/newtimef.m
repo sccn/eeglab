@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/15 20:54:16  arno
+% title diff
+%
 % Revision 1.9  2002/10/15 19:17:25  arno
 % cyclefact
 %
@@ -647,6 +650,9 @@ switch g.type
     case { 'coher', 'phasecoher', 'phasecoher2' },;
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
+if g.tlimits(2)-g.tlimits(1) < 30
+    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
