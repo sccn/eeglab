@@ -3,10 +3,11 @@
 %               format as topoplot(), or else plots data on a rectangular grid. 
 %               If data are all positive, they are assumed to be spectra.
 % Usage:
-%    >> plottopo(data,'chan_locs')
-%    >> plottopo(data,[rows cols])
+%    >> plottopo(data, 'key1', 'val1', 'key2', 'val2')
+%    >> plottopo(data,'chan_locs')   % old function call
+%    >> plottopo(data,[rows cols])   % old function call
 %    >> plottopo(data,'chan_locs',frames,limits,title,channels,...
-%                                            axsize,colors,ydir,vert) 
+%                      axsize,colors,ydir,vert) % old function call
 % Inputs:
 %   data       = data consisting of consecutive epochs of (chans,frames)
 %                or (chans,frames,n)
@@ -64,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/07/25 17:24:43  arno
+% allow to plot more than 50 trials
+%
 % Revision 1.27  2003/07/16 00:58:35  arno
 % debug legnd
 %
@@ -204,7 +208,8 @@ if nargin < 1
 end
 
 if length(varargin) > 0
-    if length(varargin) == 1 | ~isstr(varargin{1}) | isempty(varargin{1})
+    if length(varargin) == 1 | ~isstr(varargin{1}) | isempty(varargin{1}) | ...
+        (length(varargin)>2 &  ~isstr(varargin{3}))
         options = { 'chanlocs' varargin{1} };
         if nargin > 2, options = { options{:} 'frames' varargin{2} }; end;
         if nargin > 3, options = { options{:} 'limits' varargin{3} }; end;
@@ -231,7 +236,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
                     'regions'   'cell'                  []          {};
-                    'colors'    'cell'                  []          {};
+                    'colors'    { 'cell' 'string' }     []          {};
                     'legend'    'cell'                  []          {};
                     'showleg'   'string'                {'on' 'off'} 'on';
                     'ydir'      'integer'               [-1 1]      DEFAULT_SIGN;
@@ -247,8 +252,11 @@ if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); e
 %
   
 axwidth  = g.axsize(1);
-axheight = g.axsize(2);
-
+if length(g.axsize) < 2
+    axheight = NaN;
+else 
+    axheight = g.axsize(2);
+end;
 if isempty(g.chans) | g.chans == 0
    channelnos = 1:size(data,1);
 elseif ~isstr(g.chans)
