@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/10/09 00:21:44  arno
+% remove previous modif
+%
 % Revision 1.37  2002/10/09 00:21:14  arno
 % nothing
 %
@@ -666,7 +669,7 @@ end;
 %%%%%%%%%%%%%%%%
 if ~isempty(g.title)
 	axes(mainfig); axis off;
-	tl = text(-0.1,1,g.title);
+	tl = text(-0.1,1.06,g.title);
 	set(tl,'fontsize',15)
 end
 
