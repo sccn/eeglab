@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.167  2003/11/13 02:26:25  scott
+% debug
+%
 % Revision 1.166  2003/11/13 02:25:29  scott
 % debug
 %
@@ -730,7 +733,6 @@ alpha     = 0;      % default alpha level for coherence significance
 
 MIN_ERPALPHA = 0.001; % significance bounds for ERP 
 MAX_ERPALPHA = 0.1; 
-FILLCOLOR    = [1 .7 .7];
 
 Noshow    = NO;     % show sortvar by default
 Nosort    = NO;     % sort on sortvar by default
@@ -2892,6 +2894,7 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
 %                           if signif is NaN, plot erp +/- stdev
 %                           else if signif, plot erp and +/-signif
 %                           else, plot erp alone
+  FILLCOLOR    = [1 .7 .7];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   if exist('signif') == 1 
