@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 %02/19/2002 debuging function -ad
 
 function com = pop_editoptions(varargin);
@@ -50,9 +53,13 @@ com = '';
 % parse the eeg_options file
 % ----------------------------
 filename = which('eeg_options.m');
-fid = fopen( filename, 'r');
-if fid == -1
-	error('File not found');
+fid = fopen( filename, 'r+');
+if	fid == -1
+	if exist(filename) == 2 
+		error(['Can not modify read-only file ''' filename '''' 10 'move a copy to your working directory']);
+	else
+		error('File not found');
+	end;
 end;
 
 % store header
