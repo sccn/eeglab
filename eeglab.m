@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.233  2003/03/18 00:30:26  arno
+% adding menu for ICA erps
+%
 % Revision 1.232  2003/03/17 23:43:30  arno
 % including new erp function
 %
@@ -1098,7 +1101,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( ERPC_m, 'Label', 'With component maps', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'With comp. maps (compare)', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(ALLEEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
-	uimenu( third_m, 'Label', 'Compare comp. ERPs'      , 'CallBack', [ checkicaepoch     'LASTCOM = pop_comperp(ALLEEG, 0);' e_hist]);
+	uimenu( third_m, 'Label', 'Compare comp. ERPs'      , 'CallBack', [ checkepochica     'LASTCOM = pop_comperp(ALLEEG, 0);' e_hist]);
 
 	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('kstest'), 'on', 'off'));
 	uimenu( stat_m, 'Label', 'Channel statistics'       , 'CallBack', [ check          'LASTCOM = pop_signalstat(EEG, 1);' e_hist]);
