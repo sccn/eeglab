@@ -151,7 +151,8 @@
 %       'plotamp'   = ['on'|'off']. Plot coherence magnitude       {'on'}
 %       'maxamp'    = [real] Set the maximum for the amplitude scale {auto}
 %       'plotphase' = ['on'|'off']. Plot coherence phase angle     {'on'}
-%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
+%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees or 'rad' 
+%                     for radians {'deg'}
 %       'title'     = Optional figure title. If two conditions are given
 %                     as input, title can be a cell array with two text
 %                     string elements {none}
@@ -169,7 +170,7 @@
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
-%       cohangle    = (nfreqs,timesout) matrix of coherence angles 
+%       cohangle    = (nfreqs,timesout) matrix of coherence angles in radian
 %       allcoher    = single trial coherence
 %       alltfX      = single trial spectral decomposition of X
 %       alltfY      = single trial spectral decomposition of Y
@@ -213,6 +214,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2005/03/09 00:09:24  arno
+% add chaninfo
+%
 % Revision 1.74  2005/03/07 21:24:54  arno
 % chaninfo
 %
@@ -844,8 +848,8 @@ switch lower(g.newfig)
     otherwise error('newfig must be either on or off');
 end;
 switch g.angleunit
-case { 'ms', 'deg' },;
-otherwise error('Angleunit must be either ''deg'' or ''ms''');
+case { 'ms', 'deg', 'rad' },;
+otherwise error('Angleunit must be either ''deg'', ''rad'', or ''ms''');
 end;    
 switch g.type
 case { 'coher', 'phasecoher' 'phasecoher2' 'amp' 'crossspec' },;
@@ -1538,9 +1542,11 @@ case 'on'
            if strcmp(g.angleunit,'ms')  % convert to ms
                Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(:)',1,length(times)); 
                maxangle = max(max(abs(Rangle)));
-           else
+           elseif strcmpi(g.angleunit,'deg')  % convert to degrees
                Rangle = Rangle*180/pi; % convert to degrees
                maxangle = 180; % use full-cycle plotting 
+           else
+               maxangle = pi;
            end           
        end;
        Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
