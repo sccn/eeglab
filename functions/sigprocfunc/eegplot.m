@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2002/10/16 23:06:34  arno
+% default spacing 1
+%
 % Revision 1.52  2002/10/04 17:57:12  arno
 % Y grid text
 %
@@ -321,7 +324,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    end;	
 		 
    try, g.srate; 		    catch, g.srate		= 256; 	end;
-   try, g.spacing; 			catch, g.spacing	= 1; 	end;
+   try, g.spacing; 			catch, g.spacing	= 0; 	end;
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= [100 200 800 500]; 	end;
@@ -361,7 +364,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    		disp('Error: srate must be a single number'); return;
    end;	
    if length(g.spacing) > 1
-   		disp('Error: g.spacingmust be a single number'); return;
+   		disp('Error: ''spacing'' must be a single number'); return;
    end;	
    if length(g.winlength) > 1
    		disp('Error: winlength must be a single number'); return;
@@ -433,6 +436,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     if g.spacing > 10
       g.spacing = round(g.spacing);
     end
+    if g.spacing  == 0
+        g.spacing = 1;
+    end;
   end
 
   % set defaults
