@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/01/02 19:59:33  arno
+% remove phase inversion for wavelets
+%
 % Revision 1.32  2003/01/02 09:08:41  cooper
 % fixed bug in formula for linear
 % coherence passed to condstat.
@@ -728,7 +731,7 @@ if iscell(X)
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
 		  Tfx1 = Tfx1.*conj(Tfx1); Tfx2 = Tfx2.*conj(Tfx2);
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
-		  formula = 'sum(arg1(:,:,X).*conj(arg2(:,:,X)),3) ./ sqrt(sum(arg1(:,:,X),3)) ./ sqrt(sum(arg2(:,:,X),3))';
+		  formula = 'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X),3)) ./ sqrt(sum(arg3(:,:,X),3))';
 		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
 						'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
 		 case 'phasecoher', % normalize first to speed up
