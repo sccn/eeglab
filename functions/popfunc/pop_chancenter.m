@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/03/04 19:30:14  arno
+% email
+%
 % Revision 1.1  2004/02/12 20:23:43  arno
 % Initial revision
 %
@@ -58,7 +61,9 @@ if nargin < 3
     omitchans = [];
 end;
 if nargin < 2
-    cb_browse = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel(get(gcbf, ''userdata''))));';
+    cb_browse = [ 'tmpchans = get(gcbf, ''userdata'');' ...
+                  'set(findobj(gcbf, ''tag'', ''chans''), ''string'', ' ...
+                  'int2str(pop_chansel( { tmpchans.labels } )));' ];
     cb_opt    = [ 'if get(gcbo, ''value''), ' ...
                   '    set(findobj(gcbf, ''tag'', ''center''), ''enable'', ''off'');' ...
                   'else,' ...
