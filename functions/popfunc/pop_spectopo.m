@@ -1,8 +1,8 @@
-% pop_spectopo() - spectrum of specified channels plus scalp maps of power
+% pop_spectopo() - spectrum of all data channels plus scalp maps of power
 %                  at specified frequencies. Calls spectopo(). 
 %
 % Usage:
-%   >> pop_spectopo( EEG, timerange, percent, topofreqs, 'key', 'val', ...);
+%   >> pop_spectopo( EEG, timerange, percent, topofreqs, 'key', 'val',...);
 %
 % Inputs:
 %   EEG        - input dataset
@@ -15,7 +15,7 @@
 %   'key','val' - optional topoplot() arguments (see topoplot())
 %
 % Outputs: Those of spectopo(). When nargin<4, a query window pops-up 
-%          to ask for additional arguments and no arguments are returned.
+%          to ask for additional arguments and no output is returned.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 March 2002
 %
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/25 17:00:47  scott
+% editted help nd msgs, added % spectopo call to history -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -62,7 +65,7 @@ if nargin < 4
 			         'Scalp map frequencies (Hz):', ...
 			         'Scalp map plotting options: See >> help topoplot' };
 	inistr       = { [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
-			         '50' '10' '''electrodes'',''off''' };
+			         '20' '10' '''electrodes'',''off''' };
     help topoplot;
 	result       = inputdlg( promptstr, 'Channel spectra and maps -- pop_spectopo()', 1, inistr);
 	if size(result,1) == 0 return; end;
