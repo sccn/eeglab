@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/04/24 22:04:49  arno
+% debugging error check
+%
 % Revision 1.19  2002/04/24 21:59:11  arno
 % debugging
 %
@@ -401,6 +404,9 @@ if isempty(g.topovec)
 	g.topovec = [];
 elseif size(g.topovec,2)~=2
 	error('tvec must be two column vectors.');
+	if isempty(g.elocs)
+		error('Channel location file must be specified.');
+	end;
 end
 
 if isempty(g.elocs)
@@ -1001,6 +1007,7 @@ if g.plot
          h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
          topoplot(g.topovec(:,1),g.elocs,'electrodes','off', ...
                     'style', 'blank', 'emarkersize1chan', 10);
+		 axis('square')
 
          h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
          topoplot(g.topovec(:,2),g.elocs,'electrodes','off', ...
