@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.278  2003/11/27 20:05:42  arno
+% debug path
+%
 % Revision 1.277  2003/11/27 20:00:57  arno
 % still working on path
 %
@@ -1683,12 +1686,15 @@ function g = myguihandles(fig)
 function myaddpath(eeglabpath, functionname, pathtoadd);
 
     tmpp = which(functionname);
+    tmpnewpath = [ eeglabpath pathtoadd ];
     if ~isempty(tmpp)
         tmpp = tmpp(1:end-length(functionname));
-        if ~strcmpi([ eeglabpath pathtoadd ], tmpp)
-            addpath([ eeglabpath pathtoadd ]);
+        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
+        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
+        if ~strcmpi(tmpnewpath, tmpp)
+            addpath(tmpnewpath);
         end;
     else
-        addpath([ eeglabpath pathtoadd ]);
+        addpath(tmpnewpath);
     end;
     
