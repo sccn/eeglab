@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/25 02:38:49  scott
+% calrified error msgs -sm
+%
 % Revision 1.2  2002/05/01 18:22:36  arno
 % making binica available from everywhere
 %
@@ -84,8 +87,12 @@ if exist(ICABINARY) ~= 2
   fprintf('binica: ica binary ''%s'' is not matlab path, check\n', ICABINARY);
   return
 else
-	ICABINARY = which(ICABINARY);
-	fprintf('binica: using binary ica file ''%s''\n', ICABINARY);
+	ICABINARYdir = which(ICABINARY);
+	if ~isempty(ICABINARYdir)
+		fprintf('binica: using binary ica file ''%s''\n', ICABINARYdir);
+	else
+		fprintf('binica: using binary ica file ''\?/%s''\n', ICABINARY);
+	end;
 end
 
 %
