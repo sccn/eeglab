@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/12/03 02:19:41  arno
+% optional plotting
+%
 % Revision 1.1  2003/12/03 02:11:04  arno
 % Initial revision
 %
@@ -57,6 +60,8 @@ end;
 % ------------------
 if nargin < 2
     nfft = 256;
+else 
+    nfft = pow2(nextpow2(nfft));
 end;
 nfft = min(length(X), nfft);
 if nargin < 3
@@ -64,6 +69,9 @@ if nargin < 3
 end;
 if nargin < 4
     win = nfft;
+else 
+    win = pow2(nextpow2(win));
+end;
 end;
 if nargin < 5
     overlap = 0;
