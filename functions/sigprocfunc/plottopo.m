@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/07/16 00:31:18  arno
+% debug ydir
+%
 % Revision 1.24  2003/07/16 00:26:49  arno
 % debug legend
 %
@@ -767,13 +770,13 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    ytick = -g.ydir*ymax-0.3*ydiff;
+    ytick = g.ydir*(-ymax-0.3*ydiff);
     tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
 
-    tick = [xlabel]; h=text(xmin+xdiff/2,ytick-0.5*ydiff,tick);
+    tick = [xlabel]; h=text(xmin+xdiff/2,ytick-0.5*g.ydir*ydiff,tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
