@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/10/23 02:32:36  arno
+% put tag to figure for spectopo to close
+%
 % Revision 1.30  2002/10/23 01:40:50  arno
 % message - sm & ad
 %
@@ -184,8 +187,13 @@ if nargin < 3
 		if size(result,1) == 0 return; end;
 		timerange    = eval( [ '[' result{1} ']' ] );
 		options = [];
+        if isempty(EEG.chanlocs)
+            disp('Topographic plot options ignored. First import a channel location file');  
+            disp('To plot a single channel, use channel property menu or the following call');
+            disp('  >> figure; chan = 1; spectopo(EEG.data(chan,:,:), EEG.pnts, EEG.srate);');
+        end;
 		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
-		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
+		if ~isempty(result{3}) & ~isempty(EEG.chanlocs), options = [ options ', ''freq'', ['  result{3} ']' ]; end;
 		if EEG.trials ~= 1
 			processflag = result{4};
 			if ~isempty(result{5}),    options = [ options ', ''freqrange'',[' result{5} ']' ]; end;
