@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2003/12/11 17:59:41  arno
+% msg
+%
 % Revision 1.114  2003/12/04 22:33:54  arno
 % urevent remove
 %
@@ -772,7 +775,7 @@ if ~isempty( EEG.chanlocs )
         if ~isstr(EEG.chanlocs(1).labels)
             for index = 1:length(EEG.chanlocs)
                 if ~isstr(EEG.chanlocs(index).labels)
-                    EEG.chanlocs(index).labels = int2str(EEG.chanlocs(index).labels);
+                    EEG.chanlocs(index).labels = [ 'E' int2str(EEG.chanlocs(index).labels) ];
                 end;
             end;
         end;
