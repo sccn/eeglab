@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2004/02/15 16:30:30  scott
+% same
+%
 % Revision 1.79  2004/02/15 16:29:37  scott
 % same
 %
@@ -549,19 +552,20 @@ Th = pi/180*Th;                              % convert degrees to radians
 if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) | strcmp(lower(shrinkfactor), ...
                        'force')
-		squeezefac = 1 - rmax/max(Rd); %(2*max(r)-1)/(2*rmax);
+		squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
 		if strcmpi(VERBOSE, 'on')
                    fprintf(...
-                   'topoplot(): electrode radii shrunk towards vertex by %2.3g to show all\n', ...
-                                                                      squeezefac);
+                   'topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
+                                                                      1-squeezefac);
                end;
-		Rd = Rd-squeezefac*Rd; % squeeze electrodes by squeezefac*100% 
-	end;	                       % to plot all inside the head cartoon
-else 
+		Rd = Rd*squeezefac; % squeeze electrodes by squeezefac*100% 
+	end;	                        % to plot all inside the head cartoon
+else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g\n', shrinkfactor);
 	end;
-    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes by squeezefac*100% to plot all inside head
+    Rd = Rd*(1-shrinkfactor); % squeeze electrodes by shrinkfactor*100% to plot all inside head
+    squeezefac = 1-shrinkfactor;
 end;
 	  
 enum = find(Rd <= rmax);                     % interpolate on-head channels only
@@ -873,15 +877,15 @@ hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
-  sf = 0.8;
+  sf = squeezefac;
   HCOLOR = 'w'; 
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head 
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
-  set(hd,'color',HCOLOR,'linewidth',HLINEWIDTH+2);
+  set(hd,'color',HCOLOR,'linewidth',HLINEWIDTH+5);
 else
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
