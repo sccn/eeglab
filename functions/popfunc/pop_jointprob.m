@@ -42,7 +42,7 @@
 %              previous marks using different colors. {Default: 0}.
 %   reject     - 0 = do not reject marked trials (but store the marks: 
 %              1 = reject marked trials {Default: 1}.
-%   vistype    - visualization mode: 0 = rejepoch(); 1 = eegplot()
+%   vistype    - visualization mode: 0 = rejstatepoch(); 1 = eegplot()
 %              {Default: 0}.  
 %
 % Outputs:
@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/12/24 18:12:50  scott
+% help msg and text edits
+%
 % Revision 1.20  2003/12/24 16:52:15  scott
 % pop window text edits
 %
@@ -181,7 +184,7 @@ if nargin < 3
 					fastif(icacomp, '3', '5'), ...
                		'YES', ...
             		'NO', ...
-            		'REJECTRIALS' };
+            		'REJECTTRIALS' };
 
 	result       = inputdlg2( promptstr, fastif( ~icacomp, 'Reject. improbable comp. -- pop_jointprob()', 'Reject improbable data -- pop_jointprob()'), 1,  inistr, 'pop_jointprob');
 	size_result  = size( result );
@@ -191,7 +194,7 @@ if nargin < 3
 	globthresh   = result{3};
 	switch lower(result{4}), case 'yes', superpose=1; otherwise, superpose=0; end;
 	switch lower(result{5}), case 'yes', reject=1; otherwise, reject=0; end;
-	switch lower(result{6}), case 'rejepoch', vistype=0; otherwise, vistype=1; end;
+	switch lower(result{6}), case 'rejecttrials', vistype=0; otherwise, vistype=1; end;
 end;
 
 if ~exist('vistype') vistype = 0; end;
