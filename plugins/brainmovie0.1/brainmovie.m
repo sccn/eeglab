@@ -115,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/11/19 00:41:22  arno
+% default for framesout
+%
 % Revision 1.21  2002/11/19 00:35:58  arno
 % new default for frames
 % output format (fig). actually default is still '.eps'
@@ -349,7 +352,7 @@ switch lower(g.caption)
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
 end;
 switch lower(g.framesout)
-	case {'esp', 'fig'} ;  
+	case {'eps', 'fig'} ;  
 	otherwise disp('Error: Framesout must be either ''eps'' or ''fig'''); return;
 end;	
 if ~isempty(g.envvert),
