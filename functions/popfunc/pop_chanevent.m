@@ -14,6 +14,11 @@
 %   "Edge type to extract" - [list box] extract events when the event
 %                  channel values go up ('leading'), down ('trailing')
 %                  or both ('both'). Command line equivalent: 'edge'.
+%   "Assign duration to events?" - [checkbox] . Assign duration to each 
+%                  extracted event.  This option can only be used when 
+%                  extracting events on leading edges. Event will last
+%                  until next trailing edge (down) event. Command line 
+%                  equivalent: 'duration'.
 %   "Delete event channel(s)" - [checkbox] check to delete the event channel
 %                  after events have been extracted from it.
 %                  Command line equivalent: 'delchan'.
@@ -40,6 +45,9 @@
 %                    at each time point (returning 1 if the data channel value 
 %                    is larger than 3, and 0 otherwise). You may also use 
 %                    any function (Ex: 'myfunction(X)').
+%   'duration'     - ['on'|'off'] extract event duration. This option can only be
+%                    used when extracting events on leading edges. Event will last
+%                    until next trailing-edge (down) event { 'off' }.
 %   'delchan'      - ['on'|'off'] delete channel from data { 'on' }.
 %   'delevent'     - ['on'|'off'] delete old events if any { 'on' }.
 %   'nbtype'       - [1|NaN] setting this to 1 will force the program to 
@@ -79,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2004/05/13 22:27:10  arno
+% debug operation
+%
 % Revision 1.33  2004/04/16 15:40:39  arno
 % nothing
 %
@@ -188,7 +199,17 @@ if nargin < 1
 end;
 
 if nargin < 2
-	geometry = { [1.5 1 1] [1] [1.5 1 1] [1.5 1 1] [1] [1.5 0.21 1] [1.5 0.21 1] [1.5 0.21 1] };
+	geometry = { [1.5 1 1] [1] [1.5 1 1] [1.5 1 1] [1.5 0.2 0.36 0.84] ...
+                 [1] [1.5 0.21 1] [1.5 0.21 1] [1.5 0.21 1] };
+    
+    % callback from listbox to disable duration checkbox (if leading event is not selected)
+    % --------------------------------------------------
+    cb_list = [ 'if get(gcbo, ''value'') == 1,' ...
+                '  set(findobj(gcbf, ''tag'', ''dur''), ''enable'', ''on'');' ...
+                'else,' ...
+                '  set(findobj(gcbf, ''tag'', ''dur''), ''enable'', ''off'', ''value'', 0);' ...
+                'end;' ];
+  
 	strgui = { { 'style' 'text' 'string' 'Event channel(s)' 'tooltipstring' 'indexes of event channels' } ...
 			   { 'style' 'edit' 'string' '' } { } ...
                {} ...
@@ -201,7 +222,13 @@ if nargin < 2
 				 [ 'Extract events whenever values in the (transformed) event channel(s) shift up' 10 ...
 				   '(''leading''), down (''trailing'') or either (''both'').' 10 ...
 				   'AFTER SCROLLING CLICK TO SELECT' ] } ...
-			   { 'style' 'listbox' 'string' 'both|up (leading)|down (trailing)' 'value' 1 } { 'style' 'text' 'string' '(click to select)'} ...
+			   { 'style' 'listbox' 'string' 'up (leading)|both|down (trailing)' 'value' 1 'callback' cb_list } ...
+               { 'style' 'text' 'string' '(click to select)'} ...
+			   { 'style' 'text' 'string' 'Assign duration to each events?' 'tag' 'dur' 'tooltipstring' ...
+				 [ 'You may assign an event duration to each event if you select to detect' 10 ...
+				   'event on the leading edge above. Event will last as long as the signal is non-0.' ] } ...
+			   { 'style' 'checkbox' 'string' '' 'value' 0 'tag' 'dur'} { } ...
+               { 'style' 'text' 'string' '(set=yes)' } ...
                {} ...
                { 'style' 'text' 'string' 'Delete event channel(s)? ' } ...
 			   { 'style' 'checkbox' 'value' 1 } { 'style' 'text' 'string' '        (set = yes)'} ...
@@ -219,23 +246,31 @@ if nargin < 2
 	chan   = eval( [ '[' result{1} ']' ] );
 	if ~isempty(result{2}), g.oper = result{2}; else g.oper = ''; end;
 	switch result{3},
-		case 1, g.edge = 'both';
-		case 2, g.edge = 'leading';
+		case 1, g.edge = 'leading';
+		case 2, g.edge = 'both';
 		case 3, g.edge = 'trailing';
 	end;
-	if result{4}, g.delchan = 'on'; else g.delchan  = 'off'; end;
-	if result{5}, g.delevent= 'on'; else g.delevent = 'off'; end;
-	if result{6}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
+    if result{4}, g.duration = 'on'; else g.duration = 'off'; end;
+	if result{5}, g.delchan  = 'on'; else g.delchan  = 'off'; end;
+	if result{6}, g.delevent = 'on'; else g.delevent = 'off'; end;
+	if result{7}, g.nbtype   = 1;    else g.nbtype   = NaN; end;
     g.typename =  [ 'chan' int2str(chan) ];
 else 
 	listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
 				  'delchan'   'string'     { 'on' 'off' }                     'on';
 				  'oper'      'string'     []                                 '';
 				  'delevent'  'string'     { 'on' 'off' }                     'on';
+				  'duration'  'string'     { 'on' 'off' }                     'off';
                   'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
 				  'nbtype'    'integer'    [1 NaN]                             NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
+end;
+
+% check inut consistency
+% ----------------------
+if strcmpi(g.duration, 'on') & ~strcmpi(g.edge, 'leading')
+    error('Must detect leading edge to extract event duration');
 end;
 
 % process events
@@ -263,18 +298,35 @@ for ci = chan
     switch g.edge
      case 'both'    , tmpevent = find( diff(X) ~= 0);
      case 'trailing', tmpevent = find( diff(X) < 0);
-     case 'leading' , tmpevent = find( diff(X) > 0);
+     case 'leading' , tmpevent = find( diff(X) > 0); tmpdur = find( diff(X) < 0);
     end;
-    if isempty(tmpevent), disp('No event found'); return; end;
-    tmpevent = tmpevent+1;
-    for tmpi = tmpevent
-        if ~isnan(g.nbtype)
-            events(counte).type    = g.typename;
-        else
-            events(counte).type    = X(tmpi);
+    
+    % adjust edges for duration  if necessary
+    % ---------------------------------------
+    if strcmpi(g.duration, 'on')
+        if tmpdur(1) < tmpevent(1), tmpdur(1) = []; end;
+        if length(tmpevent) > length(tmpdur), tmpdur(end+1) = EEG.pnts; end;
+        if length(tmpevent) ~= length(tmpdur)
+            error('Error while attempting to extract event duration');
         end;
-        events(counte).latency = tmpi;
-        counte = counte+1;
+    end;
+    
+    if isempty(tmpevent), 
+        fprintf('No event found for channel %d\n', ci);
+    else
+        tmpevent = tmpevent+1;
+        for tmpi = 1:length(tmpevent)
+            if ~isnan(g.nbtype)
+                events(counte).type    = g.typename;
+            else
+                events(counte).type    = X(tmpevent(tmpi));
+            end;
+            events(counte).latency = tmpevent(tmpi);
+            if strcmpi(g.duration, 'on')
+                events(counte).duration = tmpdur(tmpi) - tmpevent(tmpi);
+            end;
+            counte = counte+1;
+        end;
     end;
     events = events(1:counte-1);
 end;
