@@ -9,7 +9,7 @@
 %  comps    - component to fit
 %
 % Optional inputs:
-%  'model'     - ['BESA'|'BEM'] dipfit template model settings.
+%  'model'     - ['4Shell'|'BEM'] dipfit template model settings.
 %  'settings'  - [cell array] optional arguments for pop_dipfit_settings
 %                such as electrodes to omit.
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/03/15 23:27:06  arno
+% non-empty loc coordinates
+%
 % Revision 1.3  2005/03/10 19:43:28  arno
 % typo
 %
@@ -131,12 +134,12 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     if ncomps == 0, error('you must run ICA first'); end;
 
     if nargin<2
-        cb_chans = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel(EEG.chanlocs)));';
+        cb_chans = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({EEG.chanlocs.labels})));';
         
         uilist = { { 'style' 'text' 'string' 'Component indices' } ...
                    { 'style' 'edit' 'string' [ '1:' int2str(ncomps) ] } ... 
                    { 'style' 'text' 'string' 'Template dipole model' } ...
-                   { 'style' 'listbox' 'string' '4 shell (BESA)|Boundary Element Model' } ... 
+                   { 'style' 'listbox' 'string' '4 shell (same as BESA)|Boundary Element Model' } ... 
                    { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''pop_dipfit_settings'')' } ... 
                    { 'style' 'text' 'string' 'Omit the following channels' } ...
                    { 'style' 'edit' 'string' '' 'tag' 'chans' } ... 
@@ -150,7 +153,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                    { 'style' 'text' 'string' 'Plot resulting dipoles (check)' } ...
                    { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                    { 'style' 'text' 'string' 'dipplot() plotting options' } ...
-                   { 'style' 'edit' 'string' '''normlen'' ''on'' ''image'' ''fullmri''' } ...
+                   { 'style' 'edit' 'string' '''normlen'' ''on''' } ...
                    { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''dipplot'')' } }; 
 
         results = inputgui( { [1.91 2.8] [2.12 2.2 0.8]  [2.12 2.2 0.8] [1.91 2.8] [3.1 0.4 2] [3.1 0.4 2] [3.1 0.4 2] [2.12 2.2 0.8]}, ...
@@ -179,12 +182,12 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     % checking parameters
     % -------------------
     g = finputcheck(options, { 'settings'  'cell'     []        {}; 
-                               'model'     'string'   { 'BESA' 'BEM' } 'BESA';
+                               'model'     'string'   { '4Shell' 'BEM' } '4Shell';
                                'dipoles'   'integer'  [1 2]      1;
                                'threshold' 'float'    [0 100]   40;
                                'dipplot'   'string'   { 'on' 'off' } 'off';
                                'rmout'     'string'   { 'on' 'off' } 'on';
-                               'plotopt'   'cell'     {}        {'normlen' 'on' 'image' 'fullmri'}});
+                               'plotopt'   'cell'     {}        {'normlen' 'on' }});
     
     if isstr(g), error(g); end;    
     EEG     = eeg_checkset(EEG, 'chanlocs_homogeneous');
@@ -209,7 +212,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     %    EEG     = pop_dipfit_settings( EEG, g.settings{:}, 'electrodes', elecsel);
     %end;
     
-    if strcmpi(g.model, 'BESA'), ind = 1; else ind = 2; end;
+    if strcmpi(g.model, '4Shell'), ind = 1; else ind = 2; end;
     dipfitdefs;
 	[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
     if isempty(g.settings), g.settings = { 'electrodes', indices }; end;
