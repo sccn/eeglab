@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/08 14:55:55  arno
+% rounding very low latencies
+%
 % Revision 1.1  2002/05/03 01:04:42  arno
 % Initial revision
 %
@@ -54,7 +57,11 @@ if nargin <5
 end;
 
 if length(lat_array) ~= length(epoch_array)
-    disp('eeg_point2lat: latency and epochs must have the same length'); return;
+	if length(epoch_array)~= 1
+		disp('eeg_point2lat: latency and epochs must have the same length'); return;
+	else
+		epoch_array = ones(1,length(lat_array))*epoch_array;
+	end;
 end;
 if length(timewin) ~= 2
     disp('eeg_point2lat: timelimits must have length 2'); return;
