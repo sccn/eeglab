@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/05/12 15:35:22  arno
+% updated output command
+%
 % Revision 1.15  2003/02/27 00:38:58  arno
 % typo
 %
@@ -173,8 +176,6 @@ for ind = 1:2:length(args)
                              dirindices = sort(union(findstr(args{ind+1}, ':'), findstr(args{ind+1}, '/')));
                         else dirindices = find(args{ind+1} == '\');
                         end;
-                        args{ind+1}(dirindices(end)+1:end)
-                        args{ind+1}(1:dirindices(end))
                         if ~isempty(dirindices)
                             EEG = pop_saveset(EEG, args{ind+1}(dirindices(end)+1:end), args{ind+1}(1:dirindices(end)));
                         else
