@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/07/20 01:51:14  arno
+% back to old way of computing average of power
+%
 % Revision 1.11  2002/07/20 01:44:12  arno
 % checking parameter
 %
@@ -148,7 +151,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'icacomps'      'integer'  []                       [] ;
 				  'icamaps'       'integer'  []                       [] };
 	
-	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignoreextras');
+	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
 else
 	if nargin > 3,    g.freq = varargin{1};
