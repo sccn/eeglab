@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/06/12 23:51:09  arno
+% put normlen by default
+%
 % Revision 1.8  2003/06/12 23:42:12  arno
 % dipfit dipole localization
 %
@@ -156,12 +159,12 @@ else
         % find localized dipoles
         comps = [];
         for index2 = 1:length(EEG.dipfit.model)
-            if EEG.dipfit.model(index2).posxyz(1) ~= 0
+            if ~isempty(EEG.dipfit.model(index2).posxyz) & EEG.dipfit.model(index2).posxyz(1) ~= 0
                 comps = [ comps index2 ];
                 EEG.dipfit.model(index2).component = index2;
             end;
         end;        
-        dipplot(EEG.dipfit.model, options{:});
+        dipplot(EEG.dipfit.model(comps), options{:});
     end;
 end;
     
