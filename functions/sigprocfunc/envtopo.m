@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2004/01/29 16:50:45  scott
+% printout edit
+%
 % Revision 1.44  2004/01/29 16:44:56  scott
 % rm pvaf printout for now
 %
@@ -551,6 +554,7 @@ fprintf('\n');
 % ---------------------------------------
 % compute pvaf
 if strcmpi(g.pvaf, 'on')
+    fprintf('In the interval %4.0g to %4.0g ms:\n',x(frame1),x(frame2))l
     vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
     pvaf = 100-100*pvaf/vardat;
     [sortpvaf spx] = sort(pvaf);
@@ -901,7 +905,7 @@ if strcmpi(g.dispmaps, 'on')
             end
             axis square
             if strcmpi(g.pvaf, 'on')
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
