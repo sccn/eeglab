@@ -93,7 +93,7 @@
 %   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
 %               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
-%               (See also: 'vert' aobve).
+%               (See also: 'vert' above).
 %
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.150  2003/09/11 22:23:25  scott
+% debug same
+%
 % Revision 1.149  2003/09/11 22:19:49  scott
 % made 'plotamps' and 'auxvar' work together
 %
@@ -1297,7 +1300,7 @@ end
 %
 if any(isnan(sortvar))
 	nanlocs = find(isnan(sortvar));
-	fprintf('Removing %d trials having NaN values for sorting variable', length(nanlocs));
+	fprintf('Removing %d trials with NaN sortvar values.\n', length(nanlocs));
 	data(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
 	if exist('data2') == 1
