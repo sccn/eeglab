@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/22 01:48:39  luca
+% changed label
+%
 % Revision 1.1  2002/08/22 01:01:13  luca
 % Initial revision
 %
@@ -120,8 +123,8 @@ else
 	% For normally distributed data, the slope of the plot line is equal to the ratio
 	% of the standard deviation of the distributions
 	sigma=(yqrt3-yqrt1)/(xqrt3-xqrt1); 
-	cx=(xqrt1 + xqrt3)/2
-	cy=(yqrt1 + yqrt3)/2
+	cx=(xqrt1 + xqrt3)/2;
+	cy=(yqrt1 + yqrt3)/2;
 	maxy=cy+sigma*(max(x)-cx);
 	miny=cy-sigma*(cx-min(x));
 	
