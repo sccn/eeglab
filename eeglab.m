@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.228  2003/03/03 17:09:38  arno
+% debug last
+%
 % Revision 1.227  2003/03/03 17:08:20  arno
 % adding path detection for plugins
 %
@@ -900,7 +903,6 @@ if nargin < 1 | exist('EEG') ~= 1
     end;
 end;
 
-besamenu = 0;
 if nargin == 1
 	if strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
@@ -912,14 +914,8 @@ if nargin == 1
 			h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 		end;
 	elseif strcmp(onearg, 'besa');
-		besamenu = 1;
-		if exist('ALLEEG') == 0
-			clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
-			EEG = eeg_emptyset;
-		end;
-		eeg_global;
-        h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''besa'');');
-		disp('Besa menu activated');
+		disp('Besa option deprecated. Download the BESA plugin to activate the BESA menu.');
+        h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
 	else
         h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 	end;
