@@ -1,12 +1,12 @@
-% pop_importdata() - Import data from a Matlab variable or from a file. 
-%
+% pop_importdata() - import data from a Matlab variable or disk file by calling
+%                    importdata().
 % Usage:
-%   >> EEGOUT = pop_importdata( EEG ); % pop-up window mode
-%   >> EEGOUT = pop_importdata( 'key', val,...);
+%   >> EEGOUT = pop_importdata( EEG ); % pop-up a data entry window 
+%   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
-% Graphical interface:
-%   "EEGLAB dataset name" - [Edit box] name for the new dataset. Command line
-%                  equivalent: 'setname'
+% Graphic interface:
+%   "EEGLAB dataset name" - [Edit box] name for the new dataset. 
+%                  Command line equivalent: 'setname'
 %   "Data file/array" - [Edit box] Data file or Matlab variable name to import
 %                  to EEGLAB. Command line equivalent: 'data'
 %   "Data file/array" - [list box] select data format from listbox. If you
@@ -15,48 +15,48 @@
 %                  his list box accordingly. Note that you have to click on
 %                  the option to make it active. Command line equivalent:
 %                  'dataformat'
-%   "Number of channels" - [Edit box] number of data channel. Command line
-%                  equivalent: 'nbchan'
-%   "Time points per epoch" - [Edit box] Number of points per data frame for 
-%                  data epochs. Command line equivalent: 'pnts'
-%   "Data sampling rate" - [Edit box] command line equivalent: 'srate'
-%   "Optional epoch start time" - [Edit box] command line equivalent: 'xmin'
+%   "Number of channels" - [Edit box] Number of data channels. 
+%                  Command line equivalent: 'nbchan'
+%   "Time points per epoch" - [Edit box] Number of points per data epoch.
+%                  Irrelevant for continuous data. Command line equivalent: 'pnts' 
+%   "Data sampling rate" - [Edit box] Command line equivalent: 'srate'
+%   "Optional epoch start time" - [Edit box] Command line equivalent: 'xmin'
 %   "Channel locations file or array" - [Edit box] see readlocs() help for
 %                  data channel format. Command line equivalent: 'chanlocs'
-%   "ICA weights array or text file" - [edit box] use this option to import
-%                  ICA weight from other decompositions (for instance: same
+%   "ICA weights array or text file" - [edit box] Use this option to import
+%                  ICA weights from other decompositions (for instance: same
 %                  data, different conditions). To use the ICA weights from
-%                  an other dataset (i.e. dataset 2) enter "ALLEEG(2).icaweights"
+%                  another loaded dataset (n) enter "ALLEEG(n).icaweights"
 %                  in this edit box. Command line equivalent: 'icaweight'
-%   "ICA sphere array or text file" - [edit box] import ICA sphere matrix. For
-%                  computational reasons, an ICA decomposition is defined by
-%                  a sphere matrix and an unmixing matrix (see previous option).
-%                  To use the ICA weights from an other dataset (i.e. dataset 2)
-%                  enter "ALLEEG(2).icasphere" in this edit box. Command line 
-%                  equivalent: 'icasphere'.
-%
+%                                               ??? Should be 'icaweights' ???
+%   "ICA sphere array or text file" - [edit box] Import an ICA sphering matrix. 
+%                  For computational reasons, an ICA decomposition may be defined 
+%                  by a sphere matrix and an unmixing (weight) matrix (above).
+%                  To use the ICA weights from another loaded dataset (n)
+%                  enter "ALLEEG(n).icasphere". If no sphering matrix, enter 
+%                  "eye(EEG.nbchan)". Command line equivalent: 'icasphere'.
+%                    ??? above ???
 % Optional inputs:
-%   'setname'    - name of the new EEGLAB dataset
-%   'data'       - ['varname'|'filename'] Data file or variable to import
-%                  into EEGLAB.
-%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
-%                  The ata file is transposed if the number of rows is greater
-%                  than the number of columns. Note: for type 'float32le' and
+%   'setname'    - ['string'] Name of the new EEGLAB dataset
+%   'data'       - ['varname'|'filename'] Data variable or file name to import.
+%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data file format.
+%                  The data file is transposed if the number of rows is greater
+%                  than the number of columns. NOTE: for types 'float32le' and
 %                  'float32be' (little endian and big endian byte ordering), data
-%                  must be organised in the format (channels x timepoints x epochs).
-%   'chanlocs'   - ['varname'|'filename'] Import a file containing
-%                  electrode locations (see >> help readlocs for file format).
-%   'nbchan'     - Number of data channels 
-%   'xmin'       - Starting time in seconds
-%   'pnts'       - Number of points per data frame (epoched data only)
-%   'srate'      - Data sampling rate
+%                  must be organised in the format (channels, times,  epochs).
+%   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode 
+%                  locations (see >> help readlocs for file format).
+%   'nbchan'     - Number of data channels. 
+%   'xmin'       - Starting time in seconds.
+%   'pnts'       - Number of data frames (time points) per data epoch (epoched data only).
+%   'srate'      - Data sampling rate in Hz.
 %   'icaweight'  - ICA weight matrix. 
 %   'icasphere'  - ICA sphering matrix (if [], eye(nchans)).
 % 
 % Outputs:
-%   EEGOUT      - modified dataset structure
+%   EEGOUT      - modified EEG dataset structure
 %
-% Note: this function call pop_editset() to modify parameter values.
+% Note: This function calls pop_editset() to modify parameter values.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/02/21 22:55:11  arno
+% adding gui info
+%
 % Revision 1.14  2002/12/18 22:25:46  arno
 % Automatic file format detection debug
 %
