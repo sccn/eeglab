@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2005/01/18 17:55:05  arno
+% removing besa fields
+%
 % Revision 1.111  2004/11/19 02:07:38  arno
 % display warning when deleting channels
 %
