@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/04/21 00:43:56  arno
+% warning for epoch start time > 10
+%
 % Revision 1.19  2003/03/04 20:24:13  arno
 % header typo
 %
@@ -218,7 +221,7 @@ if nargin < 1                 % if several arguments, assign values
 	if ~isempty( results{5} ) , args = { args{:}, 'pnts', str2num(results{5}) }; end;
 	if ~isempty( results{6} ) , args = { args{:}, 'srate', str2num(results{6}) }; end;
     if ~isempty( results{7} ) , args = { args{:}, 'xmin', str2num(results{7}) }; 
-        if abs(str2num(result{7})) > 10,
+        if abs(str2num(results{7})) > 10,
             fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n');
         end;
     end;
