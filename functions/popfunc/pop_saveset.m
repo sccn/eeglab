@@ -4,7 +4,8 @@
 %   >> pop_saveset( EEG ); % use an interactive pop-up window 
 %   >> pop_saveset( ALLEEG );               % use pop-up window
 %   >> EEG = pop_saveset( EEG, filename, filepath); % no pop-up
-%   >> ALLEEG = pop_saveset( ALLEEG, indices, filename, filepath);
+%   >> ALLEEG = pop_saveset( ALLEEG, indices, filename, filepath, ...
+%                                                          'key', val);
 %
 % Inputs:
 %   EEG        - EEG dataset structure
@@ -12,6 +13,11 @@
 %   indices    - indices of datasets in the ALLEEG structure to save 
 %   filename   - name of the file to save to (optional)
 %   filepath   - path of the file to save to (optional)
+%
+% Optional arguments
+%   'savemode' - [0|1] 0 saves all the structure in a Matlab file and 1 
+%                saves the structure without the data in a Matlab file and
+%                the data in a binary float file.
 %
 % Outputs:
 %   EEG        - saved dataset (after extensive syntax checks)
@@ -43,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/12/03 23:55:38  hilit
+% uiputfile -> uiputfile2
+%
 % Revision 1.40  2004/11/15 22:49:29  arno
 % saving in .dat files
 %
@@ -176,7 +185,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_saveset( EEG, inarg, curfilename, curfilepath);
+function [EEG, com] = pop_saveset( EEG, inarg, curfilename, curfilepath, tmp, option_savematlab);
 
 com = '';
 if nargin < 1
@@ -272,7 +281,9 @@ if mode == 0  % single datasets
 	EEG.icaact      = [];
     
 	% Saving data as float or as Matlab
-	eeg_options;
+    if ~exist('option_savematlab')
+        eeg_options;
+    end;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
         tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
         EEG.data = [ noextcurfilename '.dat' ];
@@ -365,7 +376,9 @@ else
 	ALLEEG = ALLEEG(indices);
 	
 	% Saving data as float or as Matlab
-	eeg_options;
+    if ~exist('option_savematlab')
+        eeg_options;
+    end;
     del = 0;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		for index = 1:length(ALLEEG)
