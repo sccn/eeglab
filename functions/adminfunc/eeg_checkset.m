@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2003/07/16 20:53:43  arno
+% auto creation of urevent table
+%
 % Revision 1.99  2003/06/27 16:59:11  arno
 % updating ur
 %
@@ -461,6 +464,9 @@ end;
 
 % read data if necessary
 % ----------------------
+if isa(EEG.data, 'single')
+    EEG.data = double(EEG.data);
+end;
 if isstr(EEG.data)
     fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
     if fid == -1
