@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/04/15 00:12:30  arno
+% debuging for 1 dataset only
+%
 % Revision 1.4  2003/03/18 00:27:53  arno
 % adding help button
 %
@@ -164,7 +167,7 @@ g = finputcheck( options, ...
 if isstr(g), error(g); end;
 
 figure;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
 
 % check consistency
 % -----------------
