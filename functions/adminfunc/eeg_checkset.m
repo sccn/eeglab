@@ -17,7 +17,7 @@
 %	EEG.xmin      	- epoch start time (in seconds)
 %	EEG.xmax      	- epoch end time (in seconds)
 %	EEG.times      	- time vector (one time value per data point)
-%   EEG.averef      - ['yes'|'no'] average reference flag
+%   EEG.ref         - ['common'|'averef'|'averefwithref'] average reference flag
 %   EEG.comments    - comments about the dataset
 %
 % ICA variables:
@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2002/11/13 17:41:11  arno
+% editing chanlocs warning -sm
+%
 % Revision 1.79  2002/11/13 17:10:09  arno
 % forcing channel labels to string
 %
@@ -276,7 +279,7 @@
 % editing error message
 %
 % Revision 1.18  2002/04/18 16:14:25  scott
-% EEG.averef = 'No' by default -sm
+% EEG.ref = 'No' by default -sm
 %
 % Revision 1.17  2002/04/18 02:37:54  scott
 % [same] -sm
@@ -291,7 +294,7 @@
 % adding event check in event consistency
 %
 % Revision 1.13  2002/04/11 18:21:43  arno
-% add furhter check for EEG.averef
+% add furhter check for EEG.ref
 %
 % Revision 1.12  2002/04/11 18:08:47  arno
 % adding average reference variable check
@@ -658,7 +661,7 @@ end;
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
 if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
-if ~isfield(EEG, 'averef') | isempty(EEG.averef) EEG.averef = 'No'; res = com; end;
+if ~isfield(EEG, 'ref') | isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
 
 % create fields if absent
 % -----------------------
