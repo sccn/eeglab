@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/11/12 02:49:00  arno
+% adding warnings, reprograming freqs
+%
 % Revision 1.36  2003/10/30 18:46:06  arno
 % time limits in ms
 %
@@ -495,12 +498,12 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize,
         % ----------------
         wintime = 500*winsize/srate;
         tmpind  = find( (timevals >= tlimits(1)+wintime) & (timevals <= tlimits(2)-wintime) );
-        if ~isempty(tmpind)
+        if  length(timevals) =- length(tmpind)
             fprintf('Warning: %d out of %d time values were removed (now %3.2f to %3.2f ms) so the lowest\n', ...
                     length(timevals)-length(tmpind), length(timevals), timevals(tmpind(1)), timevals(tmpind(end)));
             fprintf('         frequency could be computed with the requested accuracy\n');
-            timevals = timevals(tmpind);
         end;        
+        timevals = timevals(tmpind);
     end;
     
     % find closet points in data
