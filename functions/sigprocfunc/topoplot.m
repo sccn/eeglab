@@ -25,7 +25,7 @@
 %                       'fill'     -> plot constant color between contour lines
 %                       'blank'    -> plot electrode locations only {default: 'both'}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
-%                       options below. {default: 'on' -> mark electrode locations with points}. 
+%                       options below. {default: 'off' -> mark electrode locations with points}. 
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.173  2004/03/23 19:18:32  scott
+% default: plotrad >= 0.5
+%
 % Revision 1.172  2004/03/23 15:20:39  scott
 % made only 2 outputs
 %
@@ -474,7 +477,7 @@ STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
 CCOLOR = [0 0 1];       % default contour color
 ECOLOR = [0 0 0];       % default electrode color
-ELECTRODES = 'on';      % default 'electrodes': on|off|label
+ELECTRODES = 'off';     % default 'electrodes': on|off|label
 EMARKER = '.';          % mark electrode locations with small disks
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
