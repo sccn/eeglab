@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2004/06/16 18:58:58  arno
+% same
+%
 % Revision 1.125  2004/06/16 18:57:45  arno
 % resort by epoch first
 %
@@ -989,6 +992,20 @@ if ~isempty( varargin)
               EEG.urevent = EEG.event;
               for index = 1:length(EEG.event)
                   EEG.event(index).urevent = index;
+              end;
+          end;
+         case 'checkur', 
+          if ~isempty(EEG.event)
+              if isfield(EEG.event, 'urevent') & ~isempty(EEG.urevent)
+                  urlatencies = cell2mat( { EEG.urevent.latency });
+                  [newlat tmpind] = sort(urlatencies);
+                  if ~isequal(newlat, urlatencies)
+                      EEG.urevent   = EEG.urevent(tmpind);
+                      [tmp tmpind2] = sort(tmpind);
+                      for index = 1:length(EEG.event)
+                          EEG.event(index).urevent = tmpind2(EEG.event(index).urevent);
+                      end;
+                  end;
               end;
           end;
          case 'eventconsistency',          
