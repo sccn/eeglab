@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/18 17:14:48  arno
+% no modif
+%
 % Revision 1.7  2002/04/27 01:20:08  arno
 % debugging mode
 %
@@ -104,7 +107,7 @@ if isstr(mode)
 	% add the three buttons
 	% ---------------------
 	listui = { listui{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
-	if exist('helpcom') == 1
+	if exist('helpcom') == 1 & ~isempty(helpcom)
 		listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
 	else
 		listui = { listui{:}, {} };
