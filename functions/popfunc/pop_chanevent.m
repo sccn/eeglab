@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/12/06 02:44:41  arno
+% debugging last
+%
 % Revision 1.9  2002/12/06 02:36:08  arno
 % updating header and help
 %
@@ -162,6 +165,9 @@ else
 	for index = 1:length(events)
 		EEG.event(end+1).type  = events(index).type;
 		EEG.event(end).latency = events(index).latency;
+        if EEG.trials > 1
+            EEG.event(end).epoch = 1+floor(EEG.event(end).latency / EEG.pnts);
+        end;
 	end;
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 	EEG = eeg_checkset(EEG, 'eventconsistency');
