@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2004/02/18 01:16:53  scott
+% help message adjust
+%
 % Revision 1.140  2004/02/18 01:02:58  scott
 % 'dipole' help message. Adaptive AXHEADFAC.
 %
@@ -920,7 +923,10 @@ if ~isempty(DIPOLE)
         DIPOLE(:,3) = -tmp.momxyz(:,2);
         DIPOLE(:,4) =  tmp.momxyz(:,1);
         DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500;
+        if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+           DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
+        end                                            % plot dipole(s) inside head
+        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500; % ???
     else
         DIPOLE(:,1) = -tmp(:,2);
         DIPOLE(:,2) =  tmp(:,1);
