@@ -4,8 +4,8 @@
 %        >> [result varargin] = finputcheck( varargin, fieldlist, ... 
 %                                                         callingfunc, mode );
 % Input:
-%   varargin  - varargin argument from a function call using 'key', 'value'
-%               arguement pairs.
+%   varargin  - 'varargin' argument from a function call using 'key', 'value'
+%               argument pairs.
 %   fieldlist - A 3- to 5-column cell array, one row per 'key'. The first
 %               column contains the key string, the second its type, 
 %               the third the accepted value range, and the fourth the 
@@ -14,11 +14,11 @@
 %                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
 %                       {'key2' 'int' { minint maxint } 'defaultval_key2'} 
 %  callingfunc - Calling function name for error messages. {default: none}.
-%  mode        - ['ignore'|'error'] ignore keywords that are not specified in
-%                the fieldlist cell array or generate an error. {default: 
-%                'error'}.
+%  mode        - ['ignore'|'error'] ignore keywords that are either not specified 
+%                in the fieldlist cell array or generate an error. 
+%                {default: 'error'}.
 % Outputs:
-%   result     - if no error, structure with 'key' as fields and 'value' as 
+%   result     - If no error, structure with 'key' as fields and 'value' as 
 %                content. If error this output contain the string error.
 %   varargin   - residual varagin containing unrecognized input arguments.
 %                Requires mode 'ignore' above.
@@ -27,13 +27,16 @@
 %       instead of a structure.
 %
 % Example:
-%	struct = finputcheck(varargin, ...
+%	g = finputcheck(varargin, ...
 %               { 'title'         'string'   []       ''; ...
 %                 'percent'       'real'     [0 1]    1 ; ...
 %                 'elecamp'       'integer'  [1:10]   [] });
-%   The 'title' argument should be a string {no default value}
-%   The 'percent' argument should be a real number between 0 and 1 {default: 1}
-%   The 'elecamp' argument should be an integer between 1 and 10 (inclusive)
+% Note: 
+%   The 'title' argument should be a string. {no default value}
+%   The 'percent' argument should be a real number between 0 and 1. {default: 1}
+%   The 'elecamp' argument should be an integer between 1 and 10 (inclusive).
+%
+%   Now 'g.title' will contain the title arg (if any, else the default ''), etc.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 July 2002
 
@@ -56,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/11/05 15:23:37  arno
+% ,sg
+%
 % Revision 1.21  2004/11/05 04:10:44  scott
 % help msg. -sm
 %
