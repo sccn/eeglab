@@ -8,18 +8,33 @@
 %   INEEG	input dataset
 %
 % Optional inputs:
-%   'model'    - [string] file containing model compatible with
+%   'hdmfile'  - [string] file containing model compatible with
 %                Fieldtrip dipolefitting() function ("vol" entry)
-%   'chanfile' - [string] template channel location file
-
+%   'mrifile'  - [string] file containing anatomical MRI. MRI must
+%                normalized to the MNI brain. See Matlab files
+%                used by the spherical and boundary element model
+%                (select BESA model for instance and look at
+%                EEG.dipfit). If SPM2 is installed, dipfit will be
+%                able to read most MRI file formats for ploting (.mnc files
+%                etc...). To plot dipole in a subject MRI, normalized
+%                firt the MRI to the MNI brain in SPM2.
+%   'coordformat' - ['MNI'|'Spherical'] coordinate returned by the selected
+%                model. Can be MNI coordinates or spherical coordinates
+%                (head radius is assumed to be 85 mm for spherical
+%                coordinates).
+%   'chanfile' - [string] template channel location file. The function will
+%                check if your channel location file is compatible with the
+%                model.
+%
 %   'electrodes'   - [integer array] indices of electrode to include
 %                    in model. Default: all.
 %
 % Outputs:
 %   OUTEEG	output dataset
 %
-% Author: Robert Oostenveld, SMI/FCDC, Nijmegen 2003
-%         Arnaud Delorme, SCCN, La Jolla 2003
+% Author: Arnaud Delorme, SCCN, La Jolla 2003-
+%         Robert Oostenveld, SMI/FCDC, Nijmegen 2003
+%         
 
 %   'gradfile' - [string] file containing gradiometer locations
 %                ("gradfile" parameter in Fieldtrip dipolefitting() function)
@@ -27,7 +42,7 @@
 % SMI, University Aalborg, Denmark http://www.smi.auc.dk/
 % FC Donders Centre, University Nijmegen, the Netherlands http://www.fcdonders.kun.nl
 
-% Copyright (C) 2003 Robert Oostenveld, SMI/FCDC roberto@smi.auc.dk
+% Copyright (C) 2003 arno@salk.edu, Arnaud Delorme, SCCN, La Jolla 2003-2005
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -44,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/10 18:07:22  arno
+% lowercase
+%
 % Revision 1.2  2005/03/10 18:05:27  arno
 % renaming BESA file
 %
@@ -162,15 +180,16 @@ if nargin < 2
     
     userdata    = [];
     
-    geomvert = [1 1 1 1 1 1 1 1 1];
+    geomvert = [1 1 1 1 1 1 1 1 1 1];
     
     geomhorz = {
         [1 2] 
         [1]
         [1 1.3 0.5 0.5 ]
+        [1 1.3 0.9 0.1 ]
         [1 1.3 0.5 0.5 ]
         [1 1.3 0.5 0.5 ]
-        [1.28 1 0.6]
+        [1 1.3 0.5 0.5 ]
         [1]
         [1]
         [1] };
@@ -200,36 +219,42 @@ if nargin < 2
     delim  = folder(end);
     
     userdata = { { [ folder 'standard_BESA' delim 'standard_BESA.mat' ] ...
+                   1 ...
                    [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...
                    [ folder 'standard_BESA' delim 'Standard-10-5-Cap385.sfp' ] } ...
                  { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...
+                   2 ...
                    [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
-                   [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] } { [] [] [] } { [] [] [] } };
+                   [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] } { [] 2 [] [] } { [] 2 [] [] } };
     setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
                  'tmpval = get(gcbo, ''value'');' ...
                  'set(findobj(gcbf, ''tag'', ''model''), ''string'', tmpdat{tmpval}{1});' ...
-                 'set(findobj(gcbf, ''tag'', ''mri''  ), ''string'', tmpdat{tmpval}{2});' ...
-                 'set(findobj(gcbf, ''tag'', ''meg''), ''string'', tmpdat{tmpval}{3});' ];
+                 'set(findobj(gcbf, ''tag'', ''coord''), ''value'' , tmpdat{tmpval}{2});' ...
+                 'set(findobj(gcbf, ''tag'', ''mri''  ), ''string'', tmpdat{tmpval}{3});' ...
+                 'set(findobj(gcbf, ''tag'', ''meg''), ''string'', tmpdat{tmpval}{4});' ];
         
     elements  = { ...
         { 'style' 'text'        'string'  'Model' } ...
-        { 'style' 'listbox'     'string'  'Spherical 4 shell (BESA)|Boundary Element Model|Spherical MEG|Custom' ... 
+        { 'style' 'listbox'     'string'  'Spherical 4 shell (BESA)|Boundary Element Model|Custom' ... 
                                 'callback' setmodel } { } ...
         { 'style' 'text'        'string' 'Model file' } ...
-        { 'style' 'edit'        'string' ''          'tag'      'model' } ...
+        { 'style' 'edit'        'string' userdata{1}{1}  'tag'      'model' } ...
         { 'style' 'pushbutton'  'string' 'Browse'    'callback' commandload1 } ...
         { 'style' 'pushbutton'  'string' 'Help'      'callback' comhelp1 } ...
+        { 'style' 'text'        'string' 'Ouput coordinates' } ...
+        { 'style' 'listbox'     'string' 'spherical (head radius 85 mm)|MNI' 'tag' 'coord' 'value' userdata{1}{2} } ...
+        { 'style' 'text'        'string' 'Click to select' } { } ...
         { 'style' 'text'        'string' 'MRI' } ...
-        { 'style' 'edit'        'string' ''          'tag'      'mri' } ...
-        { 'style' 'pushbutton'  'string' 'Browse'    'callback' commandload3 } ...
-        { 'style' 'pushbutton'  'string' 'Help'      'callback' comhelp1 } ...
+        { 'style' 'edit'        'string' userdata{1}{3} 'tag'      'mri' } ...
+        { 'style' 'pushbutton'  'string' 'Browse'       'callback' commandload3 } ...
+        { 'style' 'pushbutton'  'string' 'Help'         'callback' comhelp1 } ...
         { 'style' 'text'        'string' 'Template channel loc. file' } ...
-        { 'style' 'edit'        'string' ''          'tag'      'meg' } ...
-        { 'style' 'pushbutton'  'string' 'Browse'    'callback' commandload2 } ...
-        { 'style' 'pushbutton'  'string' 'Help'      'callback' comhelp2 } ...
+        { 'style' 'edit'        'string' userdata{1}{4} 'tag'      'meg' } ...
+        { 'style' 'pushbutton'  'string' 'Browse'       'callback' commandload2 } ...
+        { 'style' 'pushbutton'  'string' 'Help'         'callback' comhelp2 } ...
         { 'style' 'text'        'string' 'Omit channels for dipole fit' } ...
-        { 'style' 'edit'        'string' ''          'tag' 'elec' } ...
-        { 'style' 'pushbutton'  'string' 'List' 'callback' cb_selectelectrodes } ... 
+        { 'style' 'edit'        'string' ''             'tag' 'elec' } ...
+        { 'style' 'pushbutton'  'string' 'List' 'callback' cb_selectelectrodes } { } ... 
         { } ...
         { 'style' 'text'        'string' 'Note: check that the channels lie on the surface of the head model' } ...
         { 'style' 'text'        'string' '(e.g., in the channel editor ''Set head radius'' to usually 85).' } ...
@@ -241,21 +266,30 @@ if nargin < 2
     if isempty(result), return; end
     options = {};
     options = { options{:} 'hdmfile'      result{2} };
-    options = { options{:} 'mrifile'      result{3} };
-    options = { options{:} 'chanfile'     result{4} };
-    options = { options{:} 'chansel'      setdiff(1:EEG.nbchan, str2num(result{5})) };
+    options = { options{:} 'coordformat'  fastif(result{3} == 2, 'MNI', 'Spherical') };
+    options = { options{:} 'mrifile'      result{4} };
+    options = { options{:} 'chanfile'     result{5} };
+    options = { options{:} 'chansel'      setdiff(1:EEG.nbchan, str2num(result{6})) };
 
 else
     options = varargin;
 end
 
+options = finputcheck(options, { 'hdmfile'  'string'    []         '';
+                                 'mrifile'  'string'    []         '';
+                                 'chanfile' 'string'    []         '';
+                                 'chansel'  'integer'   []         [];
+                                 'coordformat' 'string'    { 'MNI' 'spherical' } 'MNI' });
+if isstr(options), error(options); end;
+
 % convert to structure
-options = cell2struct(options(2:2:end), options(1:2:end),2);
+% options = cell2struct(options(2:2:end), options(1:2:end),2);
 % assign/update the EEG structure
 OUTEEG.dipfit.hdmfile  = options.hdmfile;
 OUTEEG.dipfit.mrifile  = options.mrifile;
 OUTEEG.dipfit.chanfile = options.chanfile;
 OUTEEG.dipfit.chansel  = options.chansel;
+OUTEEG.dipfit.coordformat = options.coordformat;
 
 % checking electrode configuration
 % --------------------------------
