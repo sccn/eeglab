@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/07/15 01:55:45  arno
+% debugging minamp maxamp
+%
 % Revision 1.23  2002/07/15 01:48:20  arno
 % force yscale on amp ploterp
 %
@@ -1632,7 +1635,6 @@ if ~isnan(coherfreq)
      [gcapos(1) gcapos(2)+1/3*image_loy*gcapos(4) ...
       gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
 
-   fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
    if isnan(maxamp) % if not specified
     fac = 1;
     maxamp = 0;
@@ -1641,6 +1643,15 @@ if ~isnan(coherfreq)
      fac = 10*fac;
     end
     maxamp = maxamp + 10/fac;
+    if Cohsigflag
+     if ampsig(2)>maxamp
+       if ampsig(2)>0
+        maxamp = 1.01*(ampsig(2));
+       else
+        maxamp = 0.99*(ampsig(2));
+       end
+     end
+	end
    end
 
    if isnan(minamp) % if not specified
@@ -1652,24 +1663,17 @@ if ~isnan(coherfreq)
     end
     minamp = minamp + 10/fac;
     minamp = -minamp;
+	if Cohsigflag
+		if ampsig(1)< minamp
+			if ampsig(1)<0
+				minamp = 1.01*(ampsig(1));
+			else
+				minamp = 0.99*(ampsig(1));
+			end
+		end
+	end
    end
 
-   if Cohsigflag
-     if ampsig(2)>maxamp
-       if ampsig(2)>0
-        maxamp = 1.01*(ampsig(2));
-       else
-        maxamp = 0.99*(ampsig(2));
-       end
-     end
-     if ampsig(1)< minamp
-       if ampsig(1)<0
-        minamp = 1.01*(ampsig(1));
-       else
-        minamp = 0.99*(ampsig(1));
-       end
-     end
-   end
    fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
    fprintf('     relative to baseamp: %g dB\n',baseamp);
    plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
