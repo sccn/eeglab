@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/01/10 01:10:34  arno
+% remove default position
+%
 % Revision 1.22  2002/11/15 19:07:25  arno
 % updating default position
 %
@@ -220,7 +223,7 @@ if ~isempty(rejeegplot)
 else
 	rejeegplot = [];
 end;
-eegplotoptions = { 'winlength', 5, 'winrej', ...
+eegplotoptions = { 'event', EEG.event, 'winlength', 5, 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol, ...
 				   'colmodif', { { EEG.reject.rejmanualcol EEG.reject.rejthreshcol EEG.reject.rejconstcol ...
                                    EEG.reject.rejjpcol     EEG.reject.rejkurtcol   EEG.reject.rejfreqcol } } };
