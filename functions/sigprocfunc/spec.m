@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/02/12 02:08:28  arno
+% do not return power as log
+%
 % Revision 1.11  2003/12/04 23:01:07  arno
 % warnings
 %
@@ -108,6 +111,12 @@ if nargin < 4
     win = nfft;
 else 
     win = pow2(nextpow2(win));
+end;
+if win > length(X)
+    win = length(X);
+end;
+if log2(win) ~= round(log2(win))
+    win = pow2(floor(log2(win)));
 end;
 if nargin < 5
     overlap = 0;
