@@ -116,10 +116,29 @@ function [sources, x, y, z, xe, ye, ze] = dipplot( sources, varargin )
         return;
     end;
     
+    if isfield(sources, 'besathloc')
+        sources = convertbesaoldformat(sources);
+    end;
+    if isfield(sources, 'dip')
+        for index = 1:length(sources)
+            sources(index).posxyz = sources(index).dip.pos/4;
+            tmp = sources(index).posxyz(:,1);
+            sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
+            sources(index).posxyz(:,2) = -tmp;
+            sources(index).momxyz = sources(index).dip.mom'/10000;
+            tmp = sources(index).momxyz(:,1);
+            sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
+            sources(index).momxyz(:,2) = -tmp;
+        end;
+    end;
+    if ~isfield(sources, 'posxyz')
+        sources = computexyzforbesa(sources);
+    end;        
+    
     % reading and testing arguments
     % -----------------------------
     if ~isstruct(sources)
-        error('dipplot: ''sources'' must be a cell array');
+        error('dipplot: ''sources'' must be a strcuture');
     end;
     
     %                             key        type       range             default
@@ -282,142 +301,126 @@ function [sources, x, y, z, xe, ye, ze] = dipplot( sources, varargin )
     
     % determine max length if besatextori exist
     % -----------------------------------------
-    if isfield(sources, 'besaextori')
-        maxlength = max(cell2mat({sources.besaextori}));
-        g.dipolelength = g.dipolelength/maxlength;
-    end;
-    
-    colorcount = 1;
+    sizedip = [];
     for index = 1:length(sources)
+        sizedip = [ sizedip sources(index).momxyz(3) ]; 
+    end;
+    maxlength = max(sizedip);
+    
+    for index = 1:length(sources)
+        nbdip = 1;
+        if size(sources(index).posxyz, 1) > 1 & any(sources(index).posxyz(2,:)) nbdip = 2; end;
+        for dip = 1:nbdip
         
-        % compute coordinates
-        phi   = sources(index).besathloc+90; %% %%%%%%%%%%%%%%% USE BESA COORDINATES %%%%%
-        theta = sources(index).besaphloc;    %% %%%%%%%%%%%%%%% USE BESA COORDINATES %%%%%
-        phiori   = sources(index).besathori+90; %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
-        thetaori = sources(index).besaphori;    %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
-        [x y z]    = sph2cart(theta/180*pi, phi/180*pi, sources(index).besaexent*scaling);
-        [xm ym zm] = sph2cart(theta/180*pi, phi/180*pi, sources(index).besaexent*scaling);
-        if ~isfield(sources, 'besaextori')
-            [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, scaling*g.dipolelength);
-        else
-            [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, sources(index).besaextori*scaling*g.dipolelength);
-        end;        
-        if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
-           xo = x+xo;
-           yo = y+yo;
-           zo = z+zo;
-        elseif strcmpi(g.pointout,'on')
-           xo = x-xo; % make dipole point outward from head center
-           yo = y-yo;
-           zo = z-zo;
-        else
-           xo = x+xo;
-           yo = y+yo;
-           zo = z+zo;
-        end
-        x = -x; xo=-xo; xm = -xm;
-        y = -y; yo=-yo; ym = -ym;
-        sources(index).X = x;
-        sources(index).Y = y;
-        sources(index).Z = z;        
-        sources(index).XE = xo;
-        sources(index).YE = yo;
-        sources(index).ZE = zo;        
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        tag = [ 'dipole' num2str(colorcount) ];
-        h = line( [x xo]', [y yo]', [z zo]');
-        set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-        if strcmp(BACKCOLOR, 'k'), set(h, 'color', g.color{colorcount});
-        end;
-        
-        % draw point
-        hold on;
-        h = plot3(x,  y,  z); 
-        set(h, 'userdata', 'dipole', 'tag', tag, ...
-               'marker', '.', 'markersize', g.dipolesize, 'color', g.color{colorcount});
-
-        % project onto images
-        if strcmpi(g.projimg, 'on')
-            if isstr(g.color{colorcount})
-                switch g.color{colorcount}
-                 case 'y', g.color{colorcount} = [1 1 0]; % yellow
-                 case 'm', g.color{colorcount} = [1 0 1];
-                 case 'c', g.color{colorcount} = [0 1 1];
-                 case 'r', g.color{colorcount} = [1 0 0];
-                 case 'g', g.color{colorcount} = [0 1 0];
-                 case 'b', g.color{colorcount} = [0 0 1];
-                 case 'w', g.color{colorcount} = [1 1 1];
-                 case 'k', g.color{colorcount} = [0 0 0];
-                end;
-            end;
-            tmpcolor = g.color{colorcount} / 2;
+            x = sources(index).posxyz(dip,1);
+            y = sources(index).posxyz(dip,2);
+            z = sources(index).posxyz(dip,3);
+            xo = sources(index).momxyz(dip,1)*g.dipolelength;
+            yo = sources(index).momxyz(dip,2)*g.dipolelength;
+            zo = sources(index).momxyz(dip,3)*g.dipolelength;
             
-            % project onto z axis
-            tag = [ 'dipole' num2str(colorcount) ];
-            h = line( [x xo]', [y yo]', [-1 -1]');
+            if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
+                xo = x+xo;
+                yo = y+yo;
+                zo = z+zo;
+            elseif strcmpi(g.pointout,'on')
+                xo = x-xo; % make dipole point outward from head center
+                yo = y-yo;
+                zo = z-zo;
+            else
+                xo = x+xo;
+                yo = y+yo;
+                zo = z+zo;
+            end
+            x = -x; xo=-xo;
+            y = -y; yo=-yo;
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            tag = [ 'dipole' num2str(index) ];
+            h = line( [x xo]', [y yo]', [z zo]');
             set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-            if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor);
-            end;
-            h = plot3(x,  y,  -1); 
+            if strcmp(BACKCOLOR, 'k'), set(h, 'color', g.color{index}); end;
+            
+            % draw point
+            hold on;
+            h = plot3(x,  y,  z); 
             set(h, 'userdata', 'dipole', 'tag', tag, ...
-                   'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
-
-            % project onto x axis
-            tag = [ 'dipole' num2str(colorcount) ];
-            h = line( [x xo]', [-1 -1]', [z zo]');
-            set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-            if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor);
-            end;
-            h = plot3(x,  -1,  z); 
-            set(h, 'userdata', 'dipole', 'tag', tag, ...
-                   'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
-        end;
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw circle  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-        if isfield(sources, 'stdX') & sources(index).stdX ~= 0
-            stdX = num2str(sources(index).stdX); strX = num2str(x);
-            stdY = num2str(sources(index).stdY); strY = num2str(y);
-            stdZ = num2str(sources(index).stdZ); strZ = num2str(z);
-            if isempty(g.view) | g.view(3) ~= 0
-                h = myezplot3([strX '+cos(t)*' stdX], [strY '+sin(t)*' stdY], strZ, [0,2*pi]);
-                set(h, 'color', g.color{colorcount}, 'tag', tag, 'userdata', 'dipole' );
-            end;
-            if isempty(g.view) | g.view(2) ~= 0
-                h = myezplot3([strX '+cos(t)*' stdX], strY, [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                set(h, 'color', g.color{colorcount}, 'tag', tag, 'userdata', 'dipole' );
-            end;
-            if isempty(g.view) | g.view(1) ~= 0
-                h = myezplot3(strX, [strY '+cos(t)*' stdY], [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                set(h, 'color', g.color{colorcount}, 'tag', tag, 'userdata', 'dipole' );
-            end;
-        end;
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw text  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if strcmp(g.num, 'on')
-            h = text(x,  y,  z, [ '  ' int2str(sources(index).component)]);
-            set(h, 'userdata', 'dipole', 'tag', tag, 'fontsize', g.dipolesize/2 );
-        end;
-        
-        % make text for GUI with component number and residual variance
-        % -------------------------------------------------------------
-        if isfield(sources, 'component')
-            if index~=length(sources) 
-                if sources(index).component ~= sources(index+1).component
-                    textgui(colorcount) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
-                    colorcount = colorcount+1;
+                   'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
+            
+            % project onto images
+            if strcmpi(g.projimg, 'on')
+                if isstr(g.color{index})
+                    switch g.color{index}
+                     case 'y', g.color{index} = [1 1 0]; % yellow
+                     case 'm', g.color{index} = [1 0 1];
+                     case 'c', g.color{index} = [0 1 1];
+                     case 'r', g.color{index} = [1 0 0];
+                     case 'g', g.color{index} = [0 1 0];
+                     case 'b', g.color{index} = [0 0 1];
+                     case 'w', g.color{index} = [1 1 1];
+                     case 'k', g.color{index} = [0 0 0];
+                    end;
                 end;
-            else 
-                textgui(colorcount) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
-                colorcount = colorcount+1;
+                tmpcolor = g.color{index} / 2;
+                
+                % project onto z axis
+                tag = [ 'dipole' num2str(index) ];
+                h = line( [x xo]', [y yo]', [-1 -1]');
+                set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
+                h = plot3(x,  y,  -1); 
+                set(h, 'userdata', 'dipole', 'tag', tag, ...
+                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                
+                % project onto x axis
+                tag = [ 'dipole' num2str(index) ];
+                h = line( [x xo]', [-1 -1]', [z zo]');
+                set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
+                h = plot3(x,  -1,  z); 
+                set(h, 'userdata', 'dipole', 'tag', tag, ...
+                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
-        else
-            colorcount = colorcount+1;
-            textgui(colorcount) = { '' };
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw circle  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            if isfield(sources, 'stdX') & sources(index).stdX ~= 0
+                stdX = num2str(sources(index).stdX); strX = num2str(x);
+                stdY = num2str(sources(index).stdY); strY = num2str(y);
+                stdZ = num2str(sources(index).stdZ); strZ = num2str(z);
+                if isempty(g.view) | g.view(3) ~= 0
+                    h = myezplot3([strX '+cos(t)*' stdX], [strY '+sin(t)*' stdY], strZ, [0,2*pi]);
+                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                end;
+                if isempty(g.view) | g.view(2) ~= 0
+                    h = myezplot3([strX '+cos(t)*' stdX], strY, [strZ '+sin(t)*' stdZ], [0,2*pi]);
+                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                end;
+                if isempty(g.view) | g.view(1) ~= 0
+                    h = myezplot3(strX, [strY '+cos(t)*' stdY], [strZ '+sin(t)*' stdZ], [0,2*pi]);
+                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                end;
+            end;
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw text  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            if isfield(sources, 'component')
+                if strcmp(g.num, 'on')
+                    h = text(x,  y,  z, [ '  ' int2str(sources(index).component)]);
+                    set(h, 'userdata', 'dipole', 'tag', tag, 'fontsize', g.dipolesize/2 );
+                end;
+                if index~=length(sources) 
+                    if sources(index).component ~= sources(index+1).component
+                        textgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
+                    end;
+                else 
+                    textgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
+                end;
+            else
+                textgui(index) = { '' };
+            end;
         end;
     end;
-    colorcount = colorcount-1;
         
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% buttons %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
@@ -478,7 +481,7 @@ function [sources, x, y, z, xe, ye, ze] = dipplot( sources, varargin )
                 [ 'editobj = findobj(''parent'', gcf, ''userdata'', ''editor'');' ...
                   'tmpnum = str2num(get(editobj, ''string''));' ...
                   'if tmpnum < 1, tmpnum = 1; end;' ...
-                  'if tmpnum >' num2str(colorcount) ', tmpnum = ' num2str(colorcount) '; end;' ...
+                  'if tmpnum >' num2str(length(sources)) ', tmpnum = ' num2str(length(sources)) '; end;' ...
                   'set(editobj, ''string'', num2str(tmpnum));' ...
                   'set(get(gcf, ''userdata''), ''visible'', ''off'');' ...
                   'newdip = findobj(''parent'', gca, ''tag'',' ...
@@ -576,3 +579,59 @@ function h = myezplot3(strX, strY, strZ, range);
     zdata = get(h, 'zdata');
     close;
     h = plot3(xdata, ydata, zdata);
+
+function newsrc = convertbesaoldformat(src);
+    newsrc = [];
+    count = 1;
+    if ~isfield(src, 'besaextori'), src.besaextori = []; end;
+    for index = 1:length(src)
+        countdip = 1;
+        
+        % convert format
+        % --------------
+        if isempty(src(index).besaextori), src(index).besaextori = 20; end; % 20 mm
+        newsrc(index).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
+        newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori];
+        
+        % copy other fields
+        % -----------------
+        if isfield(src, 'rv')
+            newsrc(index).rv = src(index).rv;
+        end;
+        if isfield(src, 'elecrv')
+            newsrc(index).rvelec = src(index).elecrv;
+        end;
+        if isfield(src, 'component')
+            newsrc(index).component = src(index).component;
+            if index ~= 1 & src(index).component == src(index-1).component
+                countdip = countdip + 1;
+            else
+                count = count + 1;
+            end;
+        else
+            count = count + 1;
+        end;
+    end; 
+
+function src = computexyzforbesa(src);
+    scaling = 0.0105; % image scaling factor
+    
+    for index = 1:length( src )
+        for index2 = size( src(index).possph, 1 )
+
+            % compute coordinates
+            % -------------------
+            postmp = src(index).possph(index2,:);
+            momtmp = src(index).momsph(index2,:);
+            
+            phi      = postmp(1)+90; %% %%%%%%%%%%%%%%% USE BESA COORDINATES %%%%%
+            theta    = postmp(2);    %% %%%%%%%%%%%%%%% USE BESA COORDINATES %%%%%
+            phiori   = momtmp(1)+90; %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
+            thetaori = momtmp(2);    %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
+            [x y z]    = sph2cart(theta/180*pi, phi/180*pi, postmp(3)*scaling);
+            [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, momtmp(3)*scaling);
+            src(index).posxyz(index2,:) = [x y z];
+            src(index).momxyz(index2,:) = [xo yo zo];
+                    
+        end;
+    end;
