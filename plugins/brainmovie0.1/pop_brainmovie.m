@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/04/23 16:32:14  arno
+% using coords for non-template plot
+%
 % Revision 1.25  2003/04/23 16:26:46  arno
 % debug
 %
@@ -593,7 +596,7 @@ function coordinates = founddipoles(ALLEEG, comps)
     indexeeg = indexeeg(1);
     fprintf('Found besa sources in dataset number %d\n', indexeeg);
     
-    if ~isfield(ALLEEG(indexeeg).sources, 'X')
+    if ~isfield(ALLEEG(indexeeg).sources, 'posxyz')
         fprintf('No 3-D coordinates found, running besaplot ...\n');
         ALLEEG(indexeeg).sources = besaplot(ALLEEG(indexeeg).sources);
         close;
@@ -609,7 +612,7 @@ function coordinates = founddipoles(ALLEEG, comps)
         if length(indexcomp) > 1
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
         end;            
-        coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).X;
-        coordinates(index,2) = ALLEEG(indexeeg).sources(indexcomp(1)).Y;
-        coordinates(index,3) = ALLEEG(indexeeg).sources(indexcomp(1)).Z;
+        coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
+        coordinates(index,2) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
+        coordinates(index,3) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,3);
     end;
