@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-1-96 from showerps.m  -sm from showerp.m -tpj
 % 5-3-96 added default channel numbering, frames & title -sm
@@ -235,6 +238,11 @@ end
          colors(c,1)='k';
     end
   end
+  if size(colors,1)< datasets
+	  close;
+	  error('Too many trials');
+  end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
