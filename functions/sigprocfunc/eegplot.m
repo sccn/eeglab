@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2002/10/17 18:45:09  arno
+% implementing nan
+%
 % Revision 1.54  2002/10/17 00:42:13  arno
 % debug last
 %
@@ -1070,7 +1073,7 @@ else
 	 end;		
     
     % Update edit box
-    g.time = max(0,min(g.time,ceil(g.frames/multiplier)-g.winlength));
+    g.time = max(0,min(g.time,ceil((g.frames-1)/multiplier)-g.winlength));
     set(EPosition,'string',num2str(g.time+1)); 
     set(figh, 'userdata', g);
 
@@ -1079,22 +1082,22 @@ else
      case 'on', meandata = mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');  
      case 'nan',meandata = nan_mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');
      otherwise, meandata = zeros(1,g.chans);
-	 end;
+    end;
     axes(ax1)
     cla
-    
+     
 	 % plot data
-    axes(ax1)
+     axes(ax1)
 	 hold on
 	 lowlim = round(g.time*multiplier+1);
-	 highlim = round(min((g.time+g.winlength)*multiplier,g.frames));
+	 highlim = round(min((g.time+g.winlength)*multiplier+2,g.frames));
  	 for i = 1:g.chans
-      	plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
-      		'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
-    end
+         plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+              'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
+     end
 
-    % draw selected electrodes
-    if ~isempty(g.winrej)
+     % draw selected electrodes
+     if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
 				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)
@@ -1112,9 +1115,10 @@ else
     	end;
     end;		
 
-    set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
-		'Xlim',[0 g.winlength*multiplier],...
-		'XTick',[0:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier])
+    set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
+		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
+    set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
+    return
 
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
@@ -1260,7 +1264,7 @@ else
 
 		axes(ax1);
     	set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
-		'XTick',[0:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier])
+		'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1])
     end;
     		
     % ordinates: even if all elec are plotted, some may be hidden
