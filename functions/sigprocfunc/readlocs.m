@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/12/17 00:50:10  arno
+% adding index for non-empty electrodes
+%
 % Revision 1.56  2003/12/05 18:37:56  arno
 % debug polhemus x and y fixed
 %
@@ -571,7 +574,7 @@ end;
 if nargout > 2
     tmptheta = { eloc.theta };
     indices = find(~cellfun('isempty', tmptheta));
-    theta = cell2mat(tmp_theta(indices));
+    theta = cell2mat(tmptheta(indices));
 end;
 if nargout > 3
     tmprad = { eloc.radius };
