@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2002/07/31 16:13:50  arno
+% updating check for spectopo
+%
 % Revision 1.98  2002/07/30 18:06:56  arno
 % new spectopo menu
 %
@@ -628,7 +631,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
     uimenu( third_m, 'Label', 'EEG data (scroll)'        , 'CallBack', [ check          'LASTCOM = pop_eegplot(EEG, 1, 0, 0);' e_hist], 'Separator', 'on');
 	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ checkplot      'LASTCOM = pop_spectopo(EEG, 1);' e_hist]);
-	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch     'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG, 1''));' e_hist]);
+	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch     'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
 	ERP_m = uimenu( third_m, 'Label', 'ERP plots');
 		uimenu( ERP_m, 'Label', 'ERP and scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'ERP in scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
@@ -644,15 +647,15 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 		uimenu( topoica_m, 'Label', 'As 2-D scalp maps'  , 'CallBack', [ checkicaplot   'LASTCOM = pop_topoplot(EEG, 0);' e_hist]);
 		uimenu( topoica_m, 'Label', 'As 3-D head plots'  , 'CallBack', [ checkicaplot   '[EEG LASTCOM] = pop_headplot(EEG, 0);' e_store]);
 	uimenu( third_m, 'Label', 'Component properties'     , 'CallBack', [ checkicaplot   'LASTCOM = pop_compprop(EEG);' e_hist]);
-	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG, 0''));' e_hist]);
+	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
 	   uimenu( ERPC_m, 'Label', 'On same axis (with maps)', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 	spec_m = uimenu( third_m, 'Label', 'Time-frequency', 'Separator', 'on');
-		uimenu( spec_m, 'Label', 'Channel time-frequency'   , 'CallBack', [ checkepoch    'LASTCOM = pop_timef(EEG, 1, h(''find'',''pop_timef(EEG, 1''));' e_hist]);
-		uimenu( spec_m, 'Label', 'Channel cross-coherence'  , 'CallBack', [ checkepoch    'LASTCOM = pop_crossf(EEG, 1,h(''find'',''pop_crossf(EEG, 1''));' e_hist]);
-		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0, h(''find'',''pop_timef(EEG, 0''));' e_hist],'Separator', 'on');
-		uimenu( spec_m, 'Label', 'Component cross-coherence', 'CallBack', [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,h(''find'',''pop_crossf(EEG, 0''));' e_hist]);
+		uimenu( spec_m, 'Label', 'Channel time-frequency'   , 'CallBack', [ checkepoch    'LASTCOM = pop_timef(EEG, 1, h(''find'',''pop_timef(EEG,1''));' e_hist]);
+		uimenu( spec_m, 'Label', 'Channel cross-coherence'  , 'CallBack', [ checkepoch    'LASTCOM = pop_crossf(EEG, 1,h(''find'',''pop_crossf(EEG,1''));' e_hist]);
+		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0, h(''find'',''pop_timef(EEG,0''));' e_hist],'Separator', 'on');
+		uimenu( spec_m, 'Label', 'Component cross-coherence', 'CallBack', [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,h(''find'',''pop_crossf(EEG,0''));' e_hist]);
 		
 set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
 help_m  = uimenu( W_MAIN, 'Label', 'Help');
