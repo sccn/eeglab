@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/11/27 00:31:30  arno
+% debuging elc format
+%
 % Revision 1.52  2003/11/27 00:25:51  arno
 % automatically detecting elc files
 %
@@ -401,6 +404,8 @@ if isstr(filename)
        eloc = readneurolocs( filename );
    elseif strcmp(lower(g.filetype), 'elc')
        eloc = readeetraklocs( filename );
+       eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
+       eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
    elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
            strcmp(lower(g.filetype), 'polhemus')
        try, 
