@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/11 18:28:58  arno
+% adding average reference input
+%
 % Revision 1.7  2002/04/11 18:01:24  arno
 % removing warning when removing ICA components
 %
@@ -133,7 +136,7 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'edit', 'string', fastif(isempty(EEG.icaweights), '', 'EEG.icaweights'), 'horizontalalignment', 'left', 'tag',  'weightfile' }, ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''weightfile'';' commandload ] }, ...
          ...
-         { 'Style', 'text', 'string', 'CA sphere array or text file (if any):', 'horizontalalignment', 'right' }, { }, ...
+         { 'Style', 'text', 'string', 'ICA sphere array or text file (if any):', 'horizontalalignment', 'right' }, { }, ...
          { 'Style', 'edit', 'string', fastif(isempty(EEG.icasphere), '', 'EEG.icasphere'), 'horizontalalignment', 'left', 'tag',  'sphfile' } ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } ...
 	     ...
@@ -245,21 +248,26 @@ for curfield = tmpfields'
                          if exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
                             fprintf('Pop_editset: filename ''%s'' found for raw data\n', varname); 
                             switch lower(g.dataformat)
-                                case 'ascii' , try, EEGOUT.data = load(varname, '-ascii');
-                                              catch, error(['Pop_editset error: can not read ascii file ''' varname ''' for raw data']); 
-                                              end;
-                                              if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
-                                case 'matlab', try, EEGOUT.data = load(varname, '-mat');
-                                              catch, error(['Pop_editset error: can not read matlab file ''' varname ''' for raw data']); 
-                                              end;
-                                              if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
-                                case 'float32', if EEGOUT.nbchan == 0,
-                                                    error(['Pop_editset error: can not read file float_32 without the number of channel']);
-                                                end;     
-                                                try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf]);
-                                                catch, error(['Pop_editset error: can not read float_32 file ''' varname ''' for raw data']); 
-                                                end;
-                                otherwise, error('Pop_editset error: unrecognized file format');
+							 case 'ascii' , 
+							  try, EEGOUT.data = load(varname, '-ascii');
+							  catch, error(['Pop_editset error: can not read ascii file ''' varname ''' for raw data']); 
+							  end;
+							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							 case 'matlab', 
+							  try,
+								  x = whos('-file', varname);
+								  if length(x) > 1, error('Pop_editset error: Matlab file must contain a single variable'); end;
+								  EEGOUT.data = load(varname, '-mat');
+							  catch, error(['Pop_editset error: can not read matlab file ''' varname ''' for raw data']); 
+							  end;
+							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							 case 'float32', if EEGOUT.nbchan == 0,
+								  error(['Pop_editset error: can not read file float_32 without the number of channel']);
+							 end;     
+							 try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf]);
+							 catch, error(['Pop_editset error: can not read float_32 file ''' varname ''' for raw data']); 
+							 end;
+							 otherwise, error('Pop_editset error: unrecognized file format');
                             end;
                          else
 							% restoration command
