@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2002/08/13 00:14:46  scott
+% menu text
+%
 % Revision 1.115  2002/08/13 00:13:37  scott
 % menu text
 % ,
@@ -977,7 +980,7 @@ MAX_SET = max(length( ALLEEG ), length(EEGMENU));
 eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
-		if popask( ['Remove all datasets except the present one ?' 10 'Otherwise go back to the memory meu to unset dataset overwrite'])
+		if popask( ['Remove all datasets except the present one ?' 10 'Otherwise go back to the memory menu to unset dataset overwrite'])
 			ALLEEG = []; CURRENSET = 0;
 			h('ALLEEG = []; CURRENSET = 0;');
 		else 

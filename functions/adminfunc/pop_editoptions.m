@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 18:40:17  arno
+% questdlg2
+%
 % Revision 1.5  2002/07/25 17:22:31  arno
 % adding a clear functions statement
 %
@@ -153,7 +156,7 @@ else % no interactive inputs
     args = varargin;
     for index = 1:2:length(varargin)
         if isempty(strmatch(varargin{index}, varname, 'exact'))
-            error(['Varialbe name ''' varargin{index} ''' is invalid']);
+            error(['Variable name ''' varargin{index} ''' is invalid']);
         end;
     end;        
 end;
