@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/05/26 23:24:29  arno
+% same
+%
 % Revision 1.23  2004/05/26 23:23:34  arno
 % adding event consistency check
 %
@@ -340,7 +343,7 @@ if nargin >=1 & isstr(EEG) % interpreting command from GUI
               end;
           end;
           
-          EEG.urevent(urvalnum) = setfield(EEG.urevent(urvalnum), field, editval);
+          EEG.urevent = setfield(EEG.urevent, {urvalnum}, field, editval);
       end;
 
       % update history
