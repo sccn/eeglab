@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/01/03 22:38:39  arno
+% adding warning message
+%
 % Revision 1.32  2002/12/29 23:04:00  scott
 % header
 %
@@ -290,6 +293,7 @@ if isstr(filename)
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';
         case 'eps', g.filetype = 'besa';
+        case 'sfp', g.filetype = 'sfp';
         otherwise, g.filetype =  ''; 
        end;
        fprintf('Readlocs: ''%s'' format detected from file extension\n', g.filetype); 
