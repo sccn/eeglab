@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/21 15:25:31  arno
+% allowing to select component to reject
+%
 % Revision 1.18  2003/05/12 22:29:10  arno
 % verbose off
 % for topoplot
@@ -52,7 +55,7 @@
 % allowing to plot less than 35 components
 %
 % Revision 1.14  2002/09/04 23:31:22  arno
-% spetial abording plot feature
+% spetial aborting plot feature
 %
 % Revision 1.13  2002/09/04 23:25:40  arno
 % debugging last
@@ -190,7 +193,7 @@ for ri = compnum
 		% plot the head
 		% -------------
 		if ~strcmp(get(gcf, 'tag'), currentfigtag);
-			disp('Abording plot');
+			disp('Aborting plot');
 			return;
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
