@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/05/13 21:53:50  arno
+% debug header custom
+%
 % Revision 1.5  2003/05/13 21:42:17  arno
 % debugging header writing
 %
@@ -157,11 +160,11 @@ if ~isempty(g.customheader)
 end;
 if  strcmpi(g.header, 'on') | g.skipline == 2
    for index=1:length(g.format)
-      fprintf(fid, '%s ', g.format{index});
+      fprintf(fid, '%8s\t', g.format{index});
    end;
    fprintf(fid, '\n');
    for index=1:length(g.format)
-      fprintf(fid, '%s', char(ones(1,length(g.format{index})+1)*45));
+      fprintf(fid, '%8s\t', char(ones(1,8)*45));
    end;
    fprintf(fid, '\n');
 end;
@@ -181,8 +184,13 @@ for indexchan = 1:length(chans)
             error([ 'Non-existant field: ''' str '''' ]);
          end;
          eval( [ 'chanval = chans(indexchan).' str ';' ] );
-         if   isstr(chanval), fprintf(fid, '%s', chanval);
-         else   					fprintf(fid, '%s', num2str(mult*chanval));
+         if   isstr(chanval), fprintf(fid, '%8s', chanval);
+         else   	
+             if abs(mult*chanval) > 1E-10
+                 fprintf(fid, '%8s', num2str(mult*chanval,5));
+             else
+                 fprintf(fid, '%8s', '0');
+             end;
          end;
       end;
       if index ~= length(g.format)
