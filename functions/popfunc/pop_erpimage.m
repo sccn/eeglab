@@ -31,24 +31,32 @@
 %   "plot ERP" - [checkbox] Setting this option plot the channel or component 
 %                 ERP below the ERP image. erpimage() equivalent: 'erp' 
 %   "Plot colorbar" - [checkbox] Plot the colorbar on the right of the erpimage. 
-%                  erpimage() equivalent: 'cbar' 
+%                 erpimage() equivalent: 'cbar' 
 %   "ERP limits" - [edit box] Set the minimum and maximum value for the ERP plot
-%                  erpimage() equivalent: 3rd and 4th parameters of the 'limit' array 
+%                 erpimage() equivalent: 3rd and 4th parameters of the 'limit' array 
 %   "Color limits" - [edit box] Set the color limits for the ERP image. 
-%                  erpimage() equivalent: 'caxis' 
-%   "Epoch sorting field" - [button and edit box] Specify the event field whose 
-%                  values will be used to sort the trials. 
-%                  erpimage() equivalent: 'sortingeventfield' ???
-%   "Event type(s)" - [button and edit box] Specify which event to consider. 
-%                  When several events are present in individual trials, 
-%                 selects which event should be processed. After selecting 
-%                 events with specified event types, if several events are 
-%                 still present within some trials, the event field value for 
-%                 the first event in the trial is used for sorting, and a 
-%                 warning is issued. erpiamge() equivalent: 'sortingtype' ???
-%   "Event time range" - [edit box] Allow the user to specify a time range in ms 
-%                 for selecting events. This further restrains the selection of 
-%                 events (see the option above). erpimage() equivalent: 'sortingwin' ???  
+%                 erpimage() equivalent: 'caxis' 
+%   "Epoch sorting field" - [button and edit box] Specify the event field which
+%                 values will be used to sort the trials. For instance, if you
+%                 select the 'latency' fields, trials will be sorted by the 
+%                 latency of the selected events.
+%                 erpimage() equivalent: 'sortingeventfield'
+%   "Event type(s)" - [button and edit box] Specify which event subset to select,
+%                 based on the event 'type' field values (to scan for event types, use 
+%                 menu Edit > Events values and look at the values of the 'type'
+%                 field). For instance, entering type 'rt' (if defined) and field 
+%                 'latency' in option aboce will sort trials on reaction time latencies. 
+%                 When several selected events are present in individual trials, 
+%                 the first event values are used for sorting and a warning is issued. 
+%                 erpimage() equivalent: 'sortingtype'
+%   "Event time range" - [edit box] Specify which event subset to select,
+%                 based on the event latency values. As the option above, this further 
+%                 restrains the selection of events. For instance, entering [200 300]
+%                 in this box, 'rt' for the event type above and 'latency' for the 
+%                 epoch sorting field will select trials with reaction time latencies
+%                 in between 200 and 300 ms. Trials with no such event will not be
+%                 included in the ERPimage.
+%                 erpimage() equivalent: 'sortingwin'  
 %   "rescale" - [edit box] 'yes', 'no', or a Matlab formula. 
 %                 erpimage() equivalent: 'renorm' 
 %   "align" - [edit box] Set this to 'Inf' to re-align the individual trials 
@@ -79,9 +87,9 @@
 %                 5th and 6th inputs to 'limit' 
 %   "Coher limits" - [edit box] Upper limit (<=1) for the coherence 
 %                 plot. erpimage() equivalent: 7th and 8th inputs of 'limit' 
-%   "Image amps" - [checkbox] Check this box for plotting spectral amplitudes
-%                 at the selected frequency in single (or smoothed) trials, instead 
-%                 of plotting EEG potential. erpimage() equivalent: 'plotamp' ???
+%   "Image amps" - [checkbox] Check this box for plotting the spectral amplitude
+%                 image at the selected frequency (instead of plotting EEG potential). 
+%                 erpimage() equivalent: 'plotamp'
 %   "Plot spectrum" - [edit box] Plot the channel or component data spectrum in 
 %                 the top right corner of the ERP image. erpimage() equivalent: 'spec' 
 %   "Baseline ampl." - [edit box] Baseline amplitude for data power plot at the 
@@ -165,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2003/02/23 09:06:15  scott
+% header edits -sm
+%
 % Revision 1.97  2003/02/18 19:21:40  scott
 % header edits -sm
 %
