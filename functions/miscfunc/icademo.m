@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % This version tested on package version
 % Added envproj(), used maxmap in compplot() 6-18-97 -sm
@@ -134,7 +137,7 @@ fprintf('        of %d chans by %d frames using plotdata()...\n\n', ...
                                size(data,1),size(data,2));
 figure('Position',pos+off/2); % #2a
 
-  plotdata(data,frames,[0 995 -10 10],'ERP Data','chan.nam',0,'(2 conditions)');
+  plotdata(data,frames,[0 995 -10 10],'ERP Data','chan.locs',0,'(2 conditions)');
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
@@ -175,7 +178,7 @@ fprintf('Try using the on-screen and menu control elements...\n')
 
 %  >> eegplot(data,srate,spacing,eloc_file,windowlength,title)
 
-     eegplot(data,srate,0,chan_locs,1,'Two data epochs using eegplot()')
+     eegplotold(data,srate,0,chan_locs,1,'Two data epochs using eegplot()')
      set(gcf,'Position',pos+2*off); % #3 - eegplot() makes its own figure
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
@@ -190,10 +193,10 @@ fprintf('Thus, eegplot() can be used to embed plots in larger figures.\n')
 %
 figure('Position',pos+2.5*off); 
 subplot(1,2,1)
-  eegplot('noui',data(:,1:312),srate,0,chan_locs,0,'r');
+  eegplotold('noui',data(:,1:312),srate,0,chan_locs,0,'r');
   title('Lapses')
 subplot(1,2,2)
-  eegplot('noui',data(:,313:624),srate,0,chan_locs,0,'b');
+  eegplotold('noui',data(:,313:624),srate,0,chan_locs,0,'b');
   title('Hits')
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
