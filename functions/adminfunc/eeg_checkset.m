@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2003/12/04 02:40:56  arno
+% msg
+%
 % Revision 1.111  2003/12/02 22:29:40  arno
 % adding urchan
 %
@@ -931,7 +934,7 @@ if ~isempty( varargin)
           end;
          case 'makeur', 
           if ~isempty(EEG.event)
-              if isfield(EEG. event, 'urevent'), 
+              if isfield(EEG.event, 'urevent'), 
                   EEG.event = rmfield(EEG.event, 'urevent');
                   disp('eeg_checkset note: re-creating the original event table (EEG.urevent)');
               else
