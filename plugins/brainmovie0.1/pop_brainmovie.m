@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/09/15 21:41:20  arno
+% adapting for dipfit dipoles
+%
 % Revision 1.58  2003/09/04 23:42:01  arno
 % DO NOT KNOW LAST MODIF, REVERT PREVIOUS VERSION IF PROBLEM
 %
@@ -694,10 +697,10 @@ if ~strcmpi(g.mode, 'compute')
         % Run brainmovie
         % --------------
         if strcmpi(g.type, '3d')
-            brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
+            allframes = brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
                         brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         else
-            brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
+            allframes = brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
                         brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         end;            
         if strcmp(g.oneframe, 'on')
@@ -716,7 +719,7 @@ if ~strcmpi(g.mode, 'compute')
             unix(sprintf('mkavi -file %s.avi image*.ppm', outname));
         else
             g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
-            makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
+            makemovie( { 'image' min(allframes) max(allframes) 4 }, g.makemovie{:});
         end;
     end;    
 	cd(origdir);
@@ -756,17 +759,18 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
         if isempty(indexeeg)
             error('Field ''sources''containing dipole location is empty');
         end;
-        tmpstruct  = ALLEEG(indexeeg).sources;
+        tmpstruct  = ALLEEG(indexeeg(1)).sources;
         spheresize = 1;
+        fprintf('Using besa sources from dataset number %d\n', indexeeg(1));
     else
         indexeeg = find(~cellfun('isempty', { ALLEEG.dipfit }));
         if isempty(indexeeg)
             error('Field ''dipfit'' containing dipole location is empty');
         end;
-        tmpstruct  = ALLEEG(indexeeg).dipfit.model;
-        spheresize = max(ALLEEG(indexeeg).dipfit.vol.r);
+        tmpstruct  = ALLEEG(indexeeg(1)).dipfit.model;
+        spheresize = max(ALLEEG(indexeeg(1)).dipfit.vol.r);
+        fprintf('Using Dipfit sources from dataset number %d\n', indexeeg(1));
     end;
-    fprintf('Found besa sources in dataset number %d\n', indexeeg);
     
     if ~isfield(tmpstruct, 'posxyz') | ~isfield(tmpstruct, 'component')
         fprintf('No 3-D coordinates found, running besaplot ...\n');
@@ -785,8 +789,8 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ...
                    ': only considering the first one']);
         end;            
-        coordinates(index,1) =  tmpstruct(indexcomp(1)).posxyz(1,2);
-        coordinates(index,2) = -tmpstruct(indexcomp(1)).posxyz(1,1);
-        coordinates(index,3) = -tmpstruct(indexcomp(1)).posxyz(1,3);
+        coordinates(index,1) =  tmpstruct(indexcomp(1)).posxyz(1,2)/spheresize;
+        coordinates(index,2) = -tmpstruct(indexcomp(1)).posxyz(1,1)/spheresize;
+        coordinates(index,3) = -tmpstruct(indexcomp(1)).posxyz(1,3)/spheresize;
         compdipoles(index)   =  tmpstruct(indexcomp(1));
     end;
