@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2004/11/20 22:48:15  scott
+% fixed error detection using old-style argument list (no longer documented)
+%
 % Revision 1.81  2004/11/18 19:11:11  scott
 % adjust chanlocs = g.chanlocs
 %
@@ -372,7 +375,7 @@ if nargin <= 2 | isstr(varargin{1})
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
 	if isstr(g), error(g); end;
 
-else % old style input args
+else % dprecated - old style input args
 	if nargin > 3,    g.chanlocs = varargin{1};
 	else              g.chanlocs = [];
 	end;
@@ -732,7 +735,7 @@ fprintf('\n');
 if ~xunitframes
   fprintf('  from the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
-vardat = mean(mean((data(:,limframe1:limframe2).^2))); % find data variance in interval
+vardat = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
 
 if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on')
     pvaf = 100-100*pvaf/vardat;
