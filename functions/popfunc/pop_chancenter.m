@@ -22,7 +22,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) 2004, Arnaud Delorme, SCCN/INC/UCSD, arno@sccn.ucsd.edu
+% Copyright (C) 2004, Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/02/12 20:23:43  arno
+% Initial revision
+%
  
 function [ chanlocs, newcenter, com] = pop_chancenter( chanlocs, center, omitchans)
 

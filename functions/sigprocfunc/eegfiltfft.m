@@ -28,7 +28,7 @@
 % inspired from a ggogle group message
 % http://groups.google.com/groups?q=without+%22the+signal+processing+toolbox%22&hl=en&lr=&ie=UTF-8&oe=UTF-8&selm=f56893ae.0311141025.3069d4f8%40posting.google.com&rnum=8
 
-% Copyright (C) Arnaud Delorme, SCCN/INC/UCSD, arno@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/12/03 19:32:25  arno
+% removing debug messages
+%
 % Revision 1.5  2003/12/03 19:18:57  arno
 % same
 %
