@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2004/05/21 17:54:46  arno
+% allowing to use EEG as input
+%
 % Revision 1.96  2004/03/19 19:45:49  arno
 % plotrad as number
 %
