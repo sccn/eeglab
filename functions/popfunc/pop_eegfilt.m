@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/04/24 22:00:16  arno
+% debuging boundaries
+%
 % Revision 1.11  2003/02/17 02:43:43  arno
 % reformating text for new functionality in help2html
 %
@@ -156,12 +159,13 @@ if EEG.trials == 1
             boundaries = [0 round(boundaries-0.5) EEG.pnts];
 			for n=1:length(boundaries)-1
 				try
+                    fprintf('Processing data portion %d to %d\n',boundaries(n),boundaries(n+1)); 
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
 						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
 					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter cannot be applied\n', ...
                             boundaries(n),boundaries(n+1));
-					disp('Pop_eegfilt: Filter being applied over the whole time range (ignoring discontinuities)');
+					disp('Pop_eegfilt: data portion not filtered');
 				end;
 			end
 		end
