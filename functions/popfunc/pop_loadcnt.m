@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/05/14 17:16:27  arno
+% putting time range in gui
+%
 % Revision 1.10  2003/04/23 21:29:49  arno
 % removing filepath
 %
@@ -150,9 +153,11 @@ EEG.setname 		= 'CNT file';
 EEG.nbchan          = r.nchannels; 
 I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
 
-EEG.event(1:length(I),1) = r.event.stimtype(I);
-EEG.event(1:length(I),2) = r.event.frame(I);
-EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
+if ~isempty(I)
+    EEG.event(1:length(I),1) = r.event.stimtype(I);
+    EEG.event(1:length(I),2) = r.event.frame(I);
+    EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
+end;
 
 EEG.srate           = r.rate;
 EEG = eeg_checkset(EEG);
