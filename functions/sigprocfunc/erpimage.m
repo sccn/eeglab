@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2002/10/13 23:49:43  scott
+% *** empty log message ***
+%
 % Revision 1.56  2002/10/13 23:48:30  scott
 % *** empty log message ***
 %
@@ -1143,15 +1146,18 @@ elseif Nosort == YES
 %
 elseif exist('valargs')
   [sttime stframe] = min(abs(times-valargs(1)));
+   sttime = times(stframe);
   if length(valargs)>1
      [endtime endframe] = min(abs(times-valargs(2)));
+     endtime = times(endframe);
   else
      endframe = stframe;
+     endtime = times(endframe);
   end
   if length(valargs)==1
      fprintf('Sorting data on value at time %f ms.\n',sttime);
   elseif length(valargs)>1
-     fprintf('Sorting data on mean value between %f and %f ms.\n',...
+     fprintf('Sorting data on mean value between %g and %g ms.\n',...
             sttime,endtime);
      fprintf('Frames: %d to %d\n',stframe,endframe);
   end
