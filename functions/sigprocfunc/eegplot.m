@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.102  2005/01/24 00:37:52  arno
+% debug channel labels
+%
 % Revision 1.101  2004/09/21 16:51:59  hilit
 % change && -> &
 %
@@ -1098,8 +1101,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   % Zooms %%%%%%%%
   zm = uimenu('Parent',m(2),'Label','Zoom off/on');
-  commandzoom = [ 'tmpstr = get(gcbf, ''windowbuttondownfcn'');' ...
-                  'set(gcbf, ''windowbuttondownfcn'', [ tmpstr ''; eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
+  commandzoom = [ 'set(gcbf, ''windowbuttondownfcn'', [ ''zoom(gcbf,''''down''''); eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
                   'tmpg = get(gcbf, ''userdata'');' ...
                   'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg tmpstr;'];
     
@@ -1876,8 +1878,7 @@ else
       % ------------------------------
       if exist('p2') == 1
           zoom on;
-          tmpstr = get(gcbf, 'windowbuttondownfcn');
-          set(gcbf, 'windowbuttondownfcn', [ tmpstr '; eegplot(''zoom'', gcbf, 1);' ]);
+          set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
           set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
       end;
 
