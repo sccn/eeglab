@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/10/16 01:15:07  arno
+% nan_mean
+%
 % Revision 1.11  2002/10/16 01:05:17  arno
 % using nan_mean
 %
@@ -98,9 +101,9 @@ end;
 
 if nargin <3
 	if typeplot
-		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Plot ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname),'',[ EEG.setname ' ERP'])] 'no'}, 'plotdata' );
+		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Plot ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname),'',[ EEG.setname ' ERP'])] 'no'}, 'pop_plotdata' );
 	else
-		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Component ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] 'no'}, 'plotdata' );
+		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Component ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] 'no'}, 'pop_plotdata' );
 	end;		
 	if length(result) == 0 return; end;
 	indices   	 = eval( [ '[' result{1} ']' ] );
