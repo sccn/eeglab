@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2004/01/01 19:18:50  scott
+% same
+%
 % Revision 1.83  2004/01/01 19:16:09  scott
 % 3d center -> Opt. 3D center
 %
@@ -413,7 +416,7 @@ if nargin < 2
         [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
         if ~isempty(tmp1)
             res = questdlg2(strvcat('Only channel labels are currenlty present but some', ...
-                                   'of these labels are standart location. Do you want to look up', ...
+                                   'of these labels have standart locations. Do you want to look up', ...
                                    'standard coordinates for these channels?'), 'Look up channel locations?', ...
                            'No', 'Yes', 'Yes');
             if strcmpi(res, 'yes')
