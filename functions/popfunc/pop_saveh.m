@@ -1,12 +1,12 @@
-% pop_saveh() - save history
+% pop_saveh() - save the EEGLAB session command history stored in ALLCOM
 %
 % Usage:
 %   >> pop_saveh( ALLCOM, filename, filepath);
 %
 % Inputs:
-%   ALLCOM     - cell array of string for the history 
-%   filename   - name of the file to save (optional)
-%   filepath   - path of the file to save (optional)
+%   ALLCOM     - cell array of strings containing the EEGLAB command history 
+%   filename   - name of the file to save to (optional, default "eeglabhist.m"
+%   filepath   - path of the file to save to (optional, default pwd)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 23:33:14  arno
+% changing last call
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -47,15 +50,15 @@ if nargin < 1
 end;
 	
 if nargin < 3
-	[curfilename, curfilepath] = uiputfile('eeglabhist.m', 'Save history with .m extension -- pop_saveh()');
+	[curfilename, curfilepath] = uiputfile('eeglabhist.m', 'Save the EEGLAB session command history with .m extension -- pop_saveh()');
 	if curfilename == 0 return; end;
 end;
 
-disp('Saving history...');
+disp('Saving the EEGLAB session command history...');
 
 fid = fopen( [ curfilepath curfilename ], 'w');
 if fid == -1
-    error('Pop_saveh: cannot open file');
+    error('pop_saveh(): Cannot open named file');
 end;    
 fprintf(fid, '%% EEGLAB history file generated on the %s\n', date);
 fprintf(fid, '%% ------------------------------------------------\n');
