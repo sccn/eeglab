@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/08/26 16:49:05  arno
+% remove square brackets in time window
+%
 % Revision 1.42  2004/06/19 01:08:42  arno
 % first look at event latency problem
 %
@@ -218,7 +221,7 @@ if isempty(EEG.event)
         disp('No event found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
         EEG.event(EEG.trials).epoch = EEG.trials; 
         for trial = 1:EEG.trials
-            EEG.event(trial).epoc    = trial; 
+            EEG.event(trial).epoch   = trial; 
             EEG.event(trial).type    = 'TLE';
             EEG.event(trial).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
         end;
