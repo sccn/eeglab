@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2004/11/13 19:27:12  scott
+% added test for 'subcomps' argument
+%
 % Revision 1.75  2004/11/13 06:47:25  scott
 % debugged yaxis limits selection
 %
@@ -560,7 +563,11 @@ end
 %%%%%%%%%%%%%%% Subtract components from data if requested %%%%%%%%%%%%%
 %
 if ~isempty(g.subcomps)
-	    fprintf('Subtracting requested components from data\n');
+	    fprintf('Subtracting requested components from data: ');
+            for c=g.subcomps
+              fprintf('%d ',c);
+            end
+            fprintf('\n');
 	    proj = icaproj(data,weights,g.subcomps); % updated arg list 12/00 -sm
 	    data = data - proj;
 end;
