@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/03/13 02:53:32  scott
+% debugging axcopy
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -101,6 +104,5 @@ end
 % Execute additional command if present
 %
 if exist('command') == 1
-   command
    eval(command);
 end;   
