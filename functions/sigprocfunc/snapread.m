@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Scott Makeig & Tzyy-Ping Jung, CNL / Salk Institute / January 31, 2000
 % 7-13-00 fixed fprintf count print bug -sm
@@ -60,7 +63,7 @@ head   = [];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% Open file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-fid = fopen(file,'r');
+fid = fopen(file,'r', 'ieee-le');
 if fid<1
   fprintf('\nsnapread(): Could not open file %s.\n\n',file)
   return
