@@ -42,6 +42,7 @@
 % 'polarity'  - ['pos'|'posneg'] polarity for ITC and crossf. 'pos' = only positive values
 %               'posneg' = positive and negative values.
 % 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
+% 'mesh'      - ['on'|'off'] show mesh of radius one.
 %
 % Movie ITC, Power and Crossf options:
 % 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
@@ -120,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/04/23 02:11:07  arno
+% dotted thicker
+%
 % Revision 1.42  2003/04/22 22:31:20  arno
 % axis images for MRI plots
 %
@@ -301,6 +305,7 @@ try, g.caption;			catch, g.caption = 'on'; end;
 try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
+try, g.mesh;			catch, g.mesh = 'off'; end; 
 try, g.polarity;		catch, g.polarity = 'pos'; end; 
 try, g.framesout;	    catch, g.framesout = 'eps'; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
@@ -405,6 +410,10 @@ end;
 switch lower(g.itc)
 	case {'on', 'off'} ;  
 	otherwise disp('Error: Itc must be either ''on'' or ''off'''); return;
+end;	
+switch lower(g.mesh)
+	case {'on', 'off'} ;  
+	otherwise disp('Error: Mesh must be either ''on'' or ''off'''); return;
 end;	
 switch lower(g.crossf)
 	case {'on', 'off'} ;  
@@ -515,18 +524,19 @@ nwin = size(tmp,2);
 % -----------------------------------
 g.magnify = g.magnify/4;
 if strcmp(lower(g.square), 'on') 
-	for index = selected
-    	if length(selected) > 1
-			g.coordinates( index,1) = (g.coordinates( index,1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-			g.coordinates( index,2) = (g.coordinates( index,2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-		end;
-	end;
-	g.rthistloc(1) = (g.rthistloc(1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-	g.rthistloc(2) = (g.rthistloc(2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-	g.rthistloc(3) = g.rthistloc(3)/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
-	g.rthistloc(4) = g.rthistloc(4)/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
-	g.xlimaxes = [0 1]/g.magnify;
-	g.ylimaxes = [0 1]/g.magnify;
+    disp('Square option disabled');
+%	for index = selected
+%    	if length(selected) > 1
+%			g.coordinates( index,1) = (g.coordinates( index,1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
+%			g.coordinates( index,2) = (g.coordinates( index,2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
+%		end;
+%	end;
+%	g.rthistloc(1) = (g.rthistloc(1) - g.xlimaxes(1))/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
+%	g.rthistloc(2) = (g.rthistloc(2) - g.ylimaxes(1))/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
+%	g.rthistloc(3) = g.rthistloc(3)/(g.xlimaxes(2)-g.xlimaxes(1))/g.magnify;
+%	g.rthistloc(4) = g.rthistloc(4)/(g.ylimaxes(2)-g.ylimaxes(1))/g.magnify;
+%	g.xlimaxes = [0 1]/g.magnify;
+%	g.ylimaxes = [0 1]/g.magnify;
 end;
 
 % compute RT distribution
@@ -707,6 +717,7 @@ end;
 
 % scan time windows
 % -----------------
+g.coordinates
 for indeximage = alltimepoints
     
 	fprintf('Processing image %d\n', indeximage);
@@ -729,7 +740,10 @@ for indeximage = alltimepoints
 	% ------------
 	for i=1:nbconditions
 		axes(hh(i)); 	cla; set (gcf, 'visible', g.visible); 
-		if ~isempty(g.title) & i == 1
+        if strcmpi(g.mesh, 'on')
+            circle(0,0,1,'w'); hold on;
+		end;
+        if ~isempty(g.title) & i == 1
 			%x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
 			%y = (g.ylimaxes(2)-g.ylimaxes(1))*(-0.06) + g.ylimaxes(1);
 			%text(x, y, g.title, 'fontsize', 14, 'fontweight', 'bold' );
