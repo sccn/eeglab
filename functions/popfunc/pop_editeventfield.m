@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/21 23:03:48  arno
+% shorten message
+%
 % Revision 1.18  2002/08/20 23:38:12  arno
 % can not remove epoch field
 %
@@ -193,7 +196,7 @@ if nargin<2
 	         { }, fastif(strcmp(allfields{index}, 'epoch'), {}, { 'Style', 'checkbox', 'string', '    ' }),{ } };
 	         listboxtext = [ listboxtext '|' allfields{index} ]; 
 	    end;
-	    geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] [1] [1 2 0.6 1.3 1.5] };
+	    geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] [1] [1 1.2 0.6 1.3 1.7] };
 	    uilist   = { uilist{:}, ...
 	         { 'Style', 'edit', 'string', ''}, ...
 	         { 'Style', 'edit', 'string', '' }, ...
