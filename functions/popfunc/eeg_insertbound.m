@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/06/03 21:24:31  arno
+% same
+%
 % Revision 1.20  2004/06/03 21:22:57  arno
 % recomputing boundevent latency
 %
@@ -128,48 +131,48 @@ function [eventout,indold] = eeg_insertbound( eventin, pnts, boundevents, region
     eventout = eventin;
     indold   = 1:length(eventin);
 	for tmpindex = 1:length(boundevents)
-        if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= pnts
-            
-            % insert event at the correct location in the urevent structure
-            % -------------------------------------------------------------
+        if boundevents(tmpindex) >= 0.5 & boundevents(tmpindex) <= pnts
+                            
+            % find event succeding boundary to insert event 
+            % at the correct location in the urevent structure
+            % ------------------------------
             if ~isempty(eventin) & isfield(eventin, 'latency')
-                
-                % find event succeding boundary
-                % ------------------------------
                 alllats   = cell2mat( { eventout.latency } ) - regions(tmpindex)+0.5;
-                tmpind    = find( alllats > 0 );
+                tmpind    = find( alllats >= 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
                 tmpind2        = tmpind(tmpind2);
-                
-                % insert event at tmpind2
-                % -----------------------
-                if ~isempty(tmpind2)
-                    eventout(end+1).type      = 'boundary';
-                    tmp = eventout(end);
-                    eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
-                    eventout(tmpind2) = tmp;
-                    indold(tmpind2:end) = indold(tmpind2:end)+1;
-                else
-                    tmpind2 = length(eventout)+1;
-                    eventout(tmpind2).type     = 'boundary';
-                end;
-                eventout(tmpind2).latency  = regions(tmpindex)+0.5;
-                eventout(tmpind2).duration = lengths(tmpindex); % just to create field
-                
-                [ tmpnest addlength ] = findnested(eventout, tmpind2);
-                % We use to remove nested event (tmpnest) but this
-                % interfere with parent function eeg_eegre()
-                
-                if addlength == -1
-                    eventout(tmpind2) = rmfield(eventout, 'duration');
-                    disp('Warning: old boundary event type present in dataset');
-                    disp('         The new boundary events have to be compatible with the old ones');
-                    disp('         and will not contain the duration of the removed region');
-                else
-                    eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
-                    if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
-                end;
-            end; 
+            else
+                tmpind2 = [];
+            end;
+            
+            % insert event at tmpind2
+            % -----------------------
+            if ~isempty(tmpind2)
+                eventout(end+1).type      = 'boundary';
+                tmp = eventout(end);
+                eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
+                eventout(tmpind2) = tmp;
+                indold(tmpind2:end) = indold(tmpind2:end)+1;
+            else
+                tmpind2 = length(eventout)+1;
+                eventout(tmpind2).type     = 'boundary';
+            end;
+            eventout(tmpind2).latency  = regions(tmpindex)-0.5;
+            eventout(tmpind2).duration = lengths(tmpindex); % just to create field
+            
+            [ tmpnest addlength ] = findnested(eventout, tmpind2);
+            % We use to remove nested event (tmpnest) but this
+            % interfere with parent function eeg_eegre()
+            
+            if addlength == -1
+                eventout(tmpind2) = rmfield(eventout, 'duration');
+                disp('Warning: old boundary event type present in dataset');
+                disp('         The new boundary events have to be compatible with the old ones');
+                disp('         and will not contain the duration of the removed region');
+            else
+                eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
+                if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
+            end;
         
         end; 
 	end;
