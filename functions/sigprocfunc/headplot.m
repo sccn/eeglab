@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/23 17:06:26  arno
+% saving syntax change for windows
+%
 % Revision 1.6  2002/10/23 16:52:23  arno
 % testing
 %
@@ -335,21 +338,12 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Save spline file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    spline_file
-    fprintf(['Saving (587k) file ',spline_file])
+    fprintf('Saving (587k) file %s\n',spline_file);
     if nargin == 3
         save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames');
     else
         save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');
     end;
-    
-    %  eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames'])
-    %else
-    %  eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames comment'])
-    %end
-    fprintf('\n')
-    eval(['! ls -l ',spline_file]);
-    fprintf('\n')
     return
 
   elseif strcmp(values,'example') | strcmp(values,'demo')
