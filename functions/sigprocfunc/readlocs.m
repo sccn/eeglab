@@ -70,12 +70,13 @@
 %                 This uses the center of the sphere that best fits all the electrode 
 %                 locations read. Default is [0 0 0].
 % Outputs:
-%   eloc        - structure containing the channel names and locations.
-%                 It has three fields: 'labels', 'theta' and 'radius' 
-%                 Identical to the EEGLAB struct EEG.chanlocs.
-%   labels      - cell array of strings giving the  names of the electrodes
-%   theta       - vector of polar angles for the electrodes (in degrees).
-%   radius      - vector of polar coordinate radius values for the electrodes
+%   eloc        - structure containing the channel names and locations (if present).
+%                 It has three fields: 'eloc.labels', 'eloc.theta' and 'eloc.radius' 
+%                 identical in meaning to the EEGLAB struct 'EEG.chanlocs'.
+%   labels      - cell array of strings giving the names of the electrodes. NOTE: Unlike the
+%                 three outputs below, includes labels of channels *without* location info.
+%   theta       - vector (in degrees) of polar angles of the electrode locations.
+%   radius      - vector of polar-coordinate radii (arc_lengths) of the electrode locations 
 %   indices     - indices, k, of channels with non-empty 'locs(k).theta' coordinate
 %
 % File formats:
@@ -180,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2004/03/23 00:22:51  scott
+% clarified meaning of output 'indices'
+%
 % Revision 1.62  2004/02/24 17:17:32  arno
 % dbug message
 %
