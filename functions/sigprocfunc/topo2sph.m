@@ -1,24 +1,23 @@
-% topo2sph() - convert a topoplot() style 2-D polar-coordinates 
+% topo2sph() - convert a topoplot() style 2-D polar-coordinate
 %              channel locations file to a 3-D spherical-angle
 %              file for use with headplot()
-%
 % Usage: 
 %   >> [c h] = topo2sph('eloc_file','eloc_outfile', method, unshrink);
 %   >> [c h] = topo2sph( topoarray, method, unshrink );
 %
 % Inputs:
-%   'eloc_file'    = filename of polar 2-d electrode locations file used by 
+%   'eloc_file'    = filename of polar 2-D electrode locations file used by 
 %                    topoplot(). See >> topoplot example or cart2topo()
-%   'eloc_outfile' = output file of electrode locations in spherical angle coords.
-%                    for use in headplot().
-%   topoarray      = polar array of 2-d electrode locations, with polar angle
+%   'eloc_outfile' = output file of 3-D electrode locations in spherical angle 
+%                    coords. for use in headplot().
+%   topoarray      = polar array of 2-D electrode locations, with polar angle
 %                    in the first column and radius in the second one.
-%   method         = [1|2], optional. 1 is for Besa compatibility, 2 is for
-%                    compatibility with Matla function cart2sph(). Default is 2.
-%   unshrink       = [0<real<1] unshrink factor. Enter the shrink factor used
+%   method         = [1|2] 1 is for Besa compatibility, 2 is for
+%                    compatibility with Matlab function cart2sph(). {default: 2}
+%   unshrink       = [0<real<1] unshrink factor. Enter a shrink factor used
 %                    to convert spherical to topo (see sph2topo()). Only 
-%                    implemented for method 1.
-%
+%                    implemented for 'method' 1 (above). Electrode 'shrink' 
+%                    is now deprecated. See >> help topoplot
 % Outputs:
 %   c = coronal rotation
 %   h = horizontal rotation
@@ -46,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/12 17:27:28  arno
+% programming unshrink factor
+%
 % Revision 1.3  2002/06/29 22:55:21  arno
 % type
 % typo
