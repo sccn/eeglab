@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2004/11/17 02:06:14  arno
+% debug dat format
+%
 % Revision 1.139  2004/11/15 22:54:31  arno
 % read data from .dat file
 %
@@ -616,7 +619,7 @@ if isstr(EEG.data)
         end;
     end;
     if datformat
-        EEG.data = fread(fid, [Inf EEG.nbchan], 'float32')';
+        EEG.data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
     else
         EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
     end;
