@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/13 00:31:31  scott
+% text
+%
 % Revision 1.6  2002/08/12 18:40:17  arno
 % questdlg2
 %
@@ -127,7 +130,7 @@ if nargin == 0
         try, % format the description to fit a help box THIS DOES NOT WORK (CONFLICT BETWEEN WAITFOR & QUESTLDG IN INPUTDLG)
              % ----------------------------------------
             tmptext = description{ index };
-            if length(tmptext) > 25,    stringtext = [ tmptext(1:25) '...' ]; 
+            if length(tmptext) > 40,    stringtext = [ tmptext(1:40) '...' ]; 
             else                        stringtext = tmptext; 
             end;
             descrip = { 'string', stringtext, 'callback', ['questdlg2([''' choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
@@ -137,7 +140,7 @@ if nargin == 0
            
         % create the gui for this variable
         % --------------------------------
-        geometry = { geometry{:} [4 0.7 0.35 0.5] };
+        geometry = { geometry{:} [4 0.7 0.45 0.5] };
         uilist   = { uilist{:}, ...
          { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ', 'value', value{index} } { } }; 
