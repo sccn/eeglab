@@ -30,6 +30,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/22 21:37:32  luca
+% now accept 3-D data matrix -lf
+% now accept 3-D data matrix -lf.
+%
+%
+%
+% help
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -99,9 +107,9 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
     dataout = data;
     for e=1:epochs
         if basevector~=0,
-			rmeans = mean(data(:,(e-1)*frames+basevector)');
+			rmeans = nan_mean(data(:,(e-1)*frames+basevector)');
 		else
-			rmeans = mean(data(:,(e-1)*frames+1:e*frames)');
+			rmeans = nan_mean(data(:,(e-1)*frames+1:e*frames)');
 			fprintf('rmbase(): whole-data channel means removed. \n\n');
         end;
         datamean(:,e) = rmeans';
@@ -113,4 +121,18 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 	if reshape_flag
       	dataout = reshape(dataout, size(data,1), size(data,2), size(data,3));
 	end
-	
+    
+    
+function out = nan_mean(in)
+    
+    nans = find(isnan(in));
+    in(nans) = 0;
+    sums = sum(in);
+    nonnans = ones(size(in));
+    nonnans(nans) = 0;
+    nonnans = sum(nonnans);
+    nononnans = find(nonnans==0);
+    nonnans(nononnans) = 1;
+    out = sum(in)./nonnans;
+    out(nononnans) = NaN;
+
