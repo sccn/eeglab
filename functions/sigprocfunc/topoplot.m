@@ -5,6 +5,7 @@
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
 %              options below). Nose is at top of plot; left is left; right is right.
+%              Using option 'plotgrid', the plot may be one or more rectangular grids.
 % Usage:
 %        >>  topoplot(datavector, EEG.chanlocs);   % plot using an EEG chanlocs structure
 %        >>  topoplot(datavector, 'my_chan.locs'); % plot by reading a channel locations file
@@ -28,8 +29,16 @@
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'. To set the 'pts' marker,
 %                       see 'Plot detail options' below. {default: 'on' -> mark electrode locations 
 %                       with points ('.') unless more than 64 channels, then 'off'}. 
-%   'plotchans'       - vector of channel indices to use in making the head plot. Grid chans, if any, 
-%                       are not included in plotchans (see 'plotgrid' below). {default: [] -> plot all chans}
+%   'plotchans'       - vector of channel indices to use in making the head plot. 
+%                       {default: [] -> plot all chans}
+%   'plotgrid'        - [channels] Plot channel data in one or more rectangular grids, as 
+%                       specified by [channels],  a position matrix of channel numbers defining 
+%                       the topographic locations of the channels in the grid. Zero values are 
+%                       given the figure background color; negative integers, the color of the 
+%                       polarity-reversed channel values.  Ex: >> figure; ...
+%                             topoplot(values,'chanlocs','plotgrid',[11 12 0; 13 14 15]);
+%                       % Plot a (2,3) grid of data values from channels 11-15 with one empty 
+%                       grid cell (top right) {default: no grid plot} 
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
@@ -41,8 +50,8 @@
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'intrad'          - [0.15<=float<=1.0] radius of the scalp map interpolation area (square or disk, 
 %                       see 'intsquare' below). Interpolate electrodes in this area and use this
-%                       limit to define boundaries of the scalp map interpolation grid 
-%                       {default: channel max}
+%                       limit to define boundaries of the scalp map interpolated data matrix
+%                       {default: max channel location radius}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius intrad) interpolation disk; 'off' -> Interpolate
 %                       values from electrodes shown in the interpolation disk only {default: 'on'}.
@@ -64,7 +73,7 @@
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}
 %   'ccolor'          - color of the contours {default: dark grey}
-%   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix {default: 67}
+%   'gridscale'       - [int > 32] size (nrows) of interpolated scalp map data matrix {default: 67}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
@@ -117,17 +126,13 @@
 %                       'head'-> interpolate the whole disk {default: 'head'}.
 
 % Unimplemented future options:
-%              Using option 'plotgrid', the plot can be a rectangular imagesc() grid.
+%                      Grid chans, if any, are not included in plotchans (see 'plotgrid' below). 
 %
 %   'plotgrid'        - [channels] or {[channels], 'position'} where [channels] is a matrix of grid 
-%                       channel numbers - in which 0's plot 0-values and negative integers, 
-%                       polarity-reversed values - and char 'position' (if either 'l' or 'r') 
+%                       - and char 'position' (if either 'l' or 'r') 
 %                       indicates which side of the head to plot the grid, or if 'o', plot the 
 %                       grid only {default grid plotting mode: 'o' = plot the grid only}
-%                       The [channels] matrix should show the topographic ordering of the channels. 
-%                       {default: no grid plot} NOTE: ===> Not yet implemented.
-%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
-%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
+%
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -146,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.238  2005/01/03 02:27:32  scott
+% made 'grid' rectangular (each element square)
+%
 % Revision 1.237  2005/01/03 02:10:33  scott
 % added 'gridplot' option
 %
@@ -702,6 +710,9 @@ icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC and BA
 if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
    BACKCOLOR = [.93 .96 1];  % EEGLAB standard
 end
+cmap = colormap;
+cmaplen = size(cmap,1);
+
 plotgrid = 'off';
 plotchans = [];
 gridpos = 'o';          % default grid position - plot grid only
@@ -883,7 +894,8 @@ if nargs > 2
          elseif ~strcmp(ELECTRODES,'off') ...
               & ~strcmpi(ELECTRODES,'on') ...
               & ~strcmp(ELECTRODES,'labels') ...
-              & ~strcmpi(ELECTRODES,'numbers') 
+              & ~strcmpi(ELECTRODES,'numbers') ...
+              & ~strcmpi(ELECTRODES,'numpoint') 
                 error('Unknown value for keyword ''electrodes''');
          end
 	 case 'dipole'
@@ -1028,9 +1040,9 @@ if strcmp(plotgrid,'on')
         error('''plotgrid'' channel index > the number of input channel values');
    end
    gchans = sort(find(abs(gridchans(:))>0));
-   if setdiff(gchans,unique(gchans))
-        fprintf('topoplot() warning: ''plotgrid'' channel matrix has duplicate channels\n');
-   end
+   % if setdiff(gchans,unique(gchans))
+   %      fprintf('topoplot() warning: ''plotgrid'' channel matrix has duplicate channels\n');
+   % end
    if ~isempty(plotchans)
      if intersect(gchans,abs(plotchans))
         fprintf('topoplot() warning: ''plotgrid'' and ''plotchans'' have channels in common\n');
@@ -1411,7 +1423,6 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%% Calculate colormap limits %%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  m = size(colormap,1);
   if isstr(MAPLIMITS)
     if strcmp(MAPLIMITS,'absmax')
       amin = -max(max(abs(Zi)));
@@ -1451,43 +1462,71 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   if strcmpi(STYLE,'grid')                     % plot grid only
+
+    %
+    % The goal below is to make the grid cells square - not yet achieved in all cases? -sm
+    %
     g1 = size(gridchans,1); 
     g2 = size(gridchans,2); 
     gmax = max([g1 g2]);
-
     Xi = linspace(-rmax*g2/gmax,rmax*g2/gmax,g1+1);
     Xi = Xi+rmax/g1; Xi = Xi(1:end-1);
-
     Yi = linspace(-rmax*g1/gmax,rmax*g1/gmax,g2+1);
     Yi = Yi+rmax/g2; Yi = Yi(1:end-1); Yi = Yi(end:-1:1); % by trial and error!
-
+    %
+    %%%%%%%%%%% collect the gridchans values %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
     gridvalues = zeros(size(gridchans));
     for j=1:size(gridchans,1)
       for k=1:size(gridchans,2)
-         if gridchans(j,k) > 0
-            gridvalues(j,k) = Values(gridchans(j,k));
-         elseif gridchans(j,k) < 0
-            gridvalues(j,k) = -Values(gridchans(j,k));
+         gc = gridchans(j,k);
+         if gc > 0
+              gridvalues(j,k) = Values(gc);
+         elseif gc < 0
+              gridvalues(j,k) = -Values(gc);
+         else 
+              gridvalues(j,k) = nan; % not-a-number = no value
          end
       end
     end
-
-    handle=imagesc(Xi,Yi,gridvalues); % plot grid
-    axis square
-
-    if isstr(MAPLIMITS)
+    %
+    %%%%%%%%%%% reset color limits for grid plot %%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if isstr(MAPLIMITS) 
       amin = min(min(gridvalues(find(gridchans~=0))));
       amax = max(max(gridvalues(find(gridchans~=0))));
       if strcmp(MAPLIMITS,'absmax')
         amin = -max(max(abs([amin amax])));
         amax = max(max(abs([amin amax])));
-      else
-        error('unknown ''maplimits'' value.');
       end
     else
       amin = MAPLIMITS(1);
       amax = MAPLIMITS(2);
     end
+
+    %
+    %%%%%%%%%% explicitly compute grid colors, allowing BACKCOLOR  %%%%%%
+    %
+    gridvalues = 1+floor(cmaplen*(gridvalues-amin)/(amax-amin));
+    gridvalues(find(gridvalues == cmaplen+1)) = cmaplen;
+    gridcolors = zeros([size(gridvalues),3]);
+    for j=1:size(gridchans,1)
+      for k=1:size(gridchans,2)
+         if ~isnan(gridvalues(j,k))
+             gridcolors(j,k,:) = cmap(gridvalues(j,k),:);
+         else
+             gridcolors(j,k,:) = BACKCOLOR; % gridchans == 0 -> background color
+             % This allows showing 'space' between separate sub-grids or strips
+         end
+      end
+    end
+
+    %
+    %%%%%%%%%% draw the gridplot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    handle=imagesc(Xi,Yi,gridcolors); % plot grid with explicit colors
+    axis square
+
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
