@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/17 20:56:14  arno
+% changing XYZ coordinate transformation for eloc structure
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -209,7 +212,7 @@ if isstr(values)
 	    %%%%%%%%%%%%%%%%%%%%%
 	    % Electrode structure
 	    %%%%%%%%%%%%%%%%%%%%%
-	    if ~isfield(eloc_file, 'X') % no X Y Z coordinates
+	    if ~isfield(eloc_file, 'X') | isempty(eloc_file(1).X) % no X Y Z coordinates
 			[tmp labels Th Rd] = readlocs(eloc_file);
 			ElectrodeNames = strvcat(labels); 
 			labels = strvcat(labels);
