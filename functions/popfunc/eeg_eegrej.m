@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/02/27 03:06:47  arno
+% debug, handle regions from eegplot
+%
 % Revision 1.6  2002/11/15 02:14:07  arno
 % diabling rejection on
 % disk
@@ -81,6 +84,7 @@ end;
 if size(regions,2) > 2, regions = regions(:, 3:4); end;
 
 eeg_options; 
+dsaf
 [EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( EEG.data, ...
 												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
 % the string option has been disable since it was causing problems
@@ -108,8 +112,10 @@ end;
 if ~isempty(boundevents)
 	fprintf('eeg_eegrej(): boundary events added.\n');
 	for tmpindex = 1:length(boundevents)
-		EEG.event(end+1).type  = 'boundary';
-		EEG.event(end).latency = boundevents(tmpindex);
+        if boundevents(tmpindex) => 1 & boundevents(tmpindex) <= EEG.pnts
+            EEG.event(end+1).type  = 'boundary';
+            EEG.event(end).latency = boundevents(tmpindex);
+        end;
 	end;
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 	EEG = eeg_checkset(EEG, 'eventconsistency');
