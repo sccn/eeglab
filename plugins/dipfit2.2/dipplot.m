@@ -39,6 +39,8 @@
 %               mean-MRI brain images from the Montreal Neurological Institute.
 %  'cornermri' - ['on'|'off'] force MRI images to the corner of the MRI volume
 %               (usefull when background is not black). Default: 'off'.
+%  'drawedges' - ['on'|'off'] draw edges of the 3-D MRI (black in axistight,
+%                white otherwise.) Default is 'off'.
 %  'rvrange'  - [min max] Only plot dipoles with residual variace within the
 %               given range. Default: plot all dipoles.
 %  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
@@ -124,6 +126,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.56  2003/10/09 01:02:12  arno
+%nothing
+%
 %Revision 1.55  2003/09/11 00:53:04  arno
 %same
 %
@@ -301,6 +306,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'     ''         []                 [];
                                  'axistight' 'string'  { 'on' 'off' }     'off';
+                                 'drawedges' 'string'  { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on' 'off' }     'off';
@@ -322,8 +328,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % axis image and limits
     % ---------------------
     dat.mode       = g.image;
-    dat.maxcoord   = [ 100 100 100 ]; % location of images in 3-D
+    dat.maxcoord   = [ 90 100 100 ]; % location of images in 3-D, Z then Y then X
     dat.axistight  = strcmpi(g.axistight, 'on');
+    dat.drawedges  = g.drawedges;
     radius = 85;
     if strcmpi(g.image, 'besa')
         scaling = 1.05;
@@ -1044,6 +1051,14 @@ function plotimgs(dat, index);
     surface(wxt, wyt, wzt, imgt(end:-1:1,:,:), options{:});
     surface(wxc, wyc, wzc, imgc              , options{:});
     surface(wxs, wys, wzs, imgs              , options{:});
+    if strcmpi(dat.drawedges, 'on')
+        if dat.axistight, col = 'k'; else col = [0.5 0.5 0.5]; end;
+        h(1) = line([wxs(1) wxs(2)]', [wys(1) wyc(1)]', [wzt(1) wzt(2)]'); % sagital-transverse
+        h(2) = line([wxs(1) wxc(3)]', [wyc(1) wyc(2)]', [wzt(1) wzt(2)]'); % coronal-tranverse
+        h(3) = line([wxs(1) wxs(2)]', [wyc(1) wyc(2)]', [wzs(1) wzt(1)]'); % sagital-coronal
+        set(h, 'color', col, 'linewidth', 2);
+    end;
+        
     %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
     %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
     rotate3d on 
