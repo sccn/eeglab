@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/03/08 00:11:06  arno
+% allowing input of ICA component activity
+%
 % Revision 1.12  2003/03/05 03:23:44  scott
 % minor
 %
@@ -416,7 +419,7 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
   if isempty(g.icaact)
       proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
   else 
-      proj = g.icaact(g.compnums(c),:);  
+      proj = g.icaact;  
   end;
   envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode);
 
