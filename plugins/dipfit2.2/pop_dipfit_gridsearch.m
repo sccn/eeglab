@@ -16,7 +16,7 @@
 %               -1 and 1.
 %   zgrid     - [float array] z-grid. Default is 10 elements between
 %               -1 and 1.
-%   threshold - [float] threshold in percent. Default 40.
+%   thresh    - [float] threshold in percent. Default 40.
 %
 % Outputs:
 %   EEGOUT      output dataset
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/10 18:17:02  arno
+% no warning backtrace
+%
 % Revision 1.2  2005/03/10 18:02:19  arno
 % add "Done"
 %
@@ -135,3 +138,5 @@ if nargin < 2
 
   % FIXME reject is not being used at the moment
   disp('Done');
+  com = sprintf('%s = pop_dipfit_gridsearch(%s, %s);', ...
+                inputname(1), inputname(1), vararg2str( { select xgrid, ygrid, zgrid reject }));
