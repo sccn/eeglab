@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2004/02/15 16:13:10  scott
+% same
+%
 % Revision 1.74  2004/02/15 16:07:46  scott
 % same
 %
@@ -855,18 +858,21 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
+plot([basex;0;-basex],[base;tip;base],...
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
+plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
+plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
-fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
-  plot(cos(circ).*0.6,sin(circ).*0.6,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot skirt 
+  fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
+  sf = 0.8;
+  plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head 
+  plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
+  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
+  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
 end
-
-plot([basex;0;-basex],[base;tip;base],...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH); % plot nose
-   
-plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)  % plot left ear
-plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot right ear
 
 %
 %%%%%%%%%%%%%%%%%%%% Set standard background color %%%%%%%%%%%%%%%%%%%%%%%%
