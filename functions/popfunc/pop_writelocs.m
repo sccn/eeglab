@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/03/09 18:45:57  arno
+% make compatible to new format returned by readlocs
+%
 % Revision 1.8  2003/05/13 23:24:20  arno
 % nothing
 %
@@ -75,6 +78,9 @@ if isfield(chans, 'shrink')
     chans = rmfield(chans, 'shrink');
     disp('Warning: shrink factor ignored');
 end;
+
+disp('WARNING: ELECTRODE COORDINATES MUST BE WITH NOSE ALONG THE +X DIMENSION TO BE EXPORTED')
+disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INNACURATE')
 
 % get infos from readlocs
 % -----------------------
