@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/18 02:21:01  arno
+% adding pop-up errors
+%
 % Revision 1.13  2002/04/18 00:22:42  scott
 % Load dataset(s) -> Load existing dataset(s) -sm
 %
@@ -271,7 +274,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'Import Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
 	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check   'eeg_global; [EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ nocheck 'eeg_global; [TMPVAR LASTCOM]= pop_loadset; clear TMPVAR;' e_hist]); 
+	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck 'eeg_global; [TMPVAR LASTCOM]= pop_loadset; clear TMPVAR;' e_hist]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   'LASTCOM = pop_saveset(EEG);' e_hist]);
 	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   'LASTCOM = pop_saveset;' e_hist ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck 'LASTCOM = pop_delset;' e_hist ]);
