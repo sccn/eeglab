@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/10/15 18:48:54  arno
+% *** empty log message ***
+%
 % Revision 1.6  2003/07/04 00:04:39  arno
 % same
 %
@@ -88,11 +91,12 @@ if size(array,2) == 1
     array = transpose(array);
 end;
 
+dsaf
 if ~isempty(g.average)
     timediff = timevect(2:end) -timevect(1:end-1);
     if any( (timediff - mean(timediff)) > 1e-8 ) % not uniform values
         fprintf('Data has to be interpolated uniformly for moving average\n');
-        minspace = median(timediff);
+        minspace = mean(timediff);
         newtimevect = linspace(timevect(1), timevect(end), ceil((timevect(end)-timevect(1))/minspace)); 
         array = interpolate( array, timevect, newtimevect, g.method);
         timevect = newtimevect;
