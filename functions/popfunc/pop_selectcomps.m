@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/02/11 02:02:16  arno
+% making it compatible for one row
+%
 % Revision 1.15  2003/02/10 23:25:52  arno
 % allowing to plot less than 35 components
 %
@@ -134,7 +137,7 @@ end;
 column =ceil(sqrt( length(compnum) ))+1;
 rows = ceil(length(compnum)/column);
 if ~exist('fig')
-	figure('name', 'Reject components by map - pop_selectcomps()', 'tag', currentfigtag, ...
+	figure('name', [ 'Reject components by map - pop_selectcomps() (dataset: ' EEG.setname ')'], 'tag', currentfigtag, ...
 		   'numbertitle', 'off', 'color', BACKCOLOR);
 	set(gcf,'MenuBar', 'none');
 	pos = get(gcf,'Position');
