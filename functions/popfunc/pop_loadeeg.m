@@ -1,31 +1,31 @@
-% pop_loadeeg() - load a neuroscan EEG file (pop out window if no arguments).
+% pop_loadeeg() - load a Neuroscan .EEG file (via a pop-up window if no arguments).
+%                 Calls loadeeg().
 %
 % Usage:
-%   >> EEG = pop_loadeeg; % pop-up window mode
+%   >> EEG = pop_loadeeg; % pop-up data entry window
 %   >> EEG = pop_loadeeg( filename, filepath, range_chan, range_trials, ...
-%                  range_typeeeg, range_response);
+%                  range_typeeeg, range_response); % no pop-up window
 %
-% Graphical interface:
-%   "Enter trial range subset" - [edit box] integer array. Command line
-%                equivalent: 'range_trials'
-%   "Enter type range subset" - [edit box] integer array. Command line
-%                equivalent: 'range_typeeeg'
-%   "Enter electrode subset" - [edit box] integer array. Command line
-%                equivalent: 'range_chan'
-%   "Enter response range subset" - [edit box] integer array. Command line
-%                equivalent: 'range_response'
+% Graphic interface:
+%   "Enter trial range subset" - [edit box] integer array. 
+%                Command line equivalent: 'range_trials'
+%   "Enter type range subset" - [edit box] integer array. 
+%                Command line equivalent: 'range_typeeeg'
+%   "Enter electrode subset" - [edit box] integer array. 
+%                Command line equivalent: 'range_chan'
+%   "Enter response range subset" - [edit box] integer array. 
+%                Command line equivalent: 'range_response'
 %
 % Inputs:
-%   filename       - file name
-%   filepath       - file path
-%   range_chan     - [integer array] only import selected electrodes
-%                    (ex: 3,4:10; default all)
-%   range_trials   - [integer array] only import selected trials (default all)
-%   range_typeeeg  - [integer array] only import trials with selected type
-%                    (default all)
-%   range_response - [integer array] only import trials with selected responses
-%                    values (default all)
-% 
+%   filename       - ['string'] file name
+%   filepath       - ['string'] file path
+%   range_chan     - [integer array] Import only selected electrodes
+%                    Ex: 3,4:10; {Default: import all}
+%   range_trials   - [integer array] Import only selected trials {Default: import all}
+%   range_typeeeg  - [integer array] Import only trials of selected type
+%                    {Default: import all}
+%   range_response - [integer array] Import only trials with selected response values 
+%                    {Default: import all}
 % Outputs:
 %   EEG            - eeglab() data structure
 %
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/02/21 17:31:45  arno
+% update header for GUI
+%
 % Revision 1.4  2003/01/14 00:30:23  arno
 % handling the case where all rts are 0
 %
