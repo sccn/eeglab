@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/09 01:31:41  arno
+% debuging event latency recalculation
+%
 % Revision 1.3  2002/04/05 23:50:44  arno
 % typo
 %
@@ -241,7 +244,6 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
 			for indexevent = 1:length(EEG.event)
 				newindex = find( EEG.event(indexevent).epoch == g.trial );
 				if ~isempty(newindex)
-					newindex
 					keepevent = [keepevent indexevent];
 					EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
 					EEG.event(indexevent).epoch   = newindex;
