@@ -40,7 +40,8 @@ function [eeg,ev,header] = read_erpss(filename)
     fseek(fp,4,-1);
     compressed = fread(fp,1,'uint16');
     if compressed, 
-        disp('Reading compressed data'); 
+        disp('Reading compressed data: if an error occurs while calling the MEX'); 
+        disp('function, try recompiling it for your platform "mex decompresserpss.cc"'); 
         complendian = 0;
         switch computer
          case {'MAC2','SUN4','SOL2','SGI','SGI64'}, complendian = 1;
