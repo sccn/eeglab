@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.220  2004/09/02 00:04:00  scott
+% added 'sortwin' and ampsort by mean freq in a range. -sm
+%
 % Revision 1.219  2004/09/01 21:56:28  scott
 % adding 'sortwin' for 'ampsort' -sm
 %
@@ -864,7 +867,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % Initialize optional output variables:
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
-auxvar = []; erpsig = []; winloc = [];
+auxvar = []; erpsig = []; winloc = [];winlocs = [];
 curfig = gcf;   % note current figure - to avoid v7.0.0 bug that draws
                 % some elements on the EEGLAB window -sm 8-30-04
 
@@ -1671,6 +1674,7 @@ if exist('phargs') == 1 % if phase-sort
        tmprange = find(winloc>0 & winloc<=frames);
        winloc = winloc(tmprange); % sorting window times
        [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+       winlocs = winloc;
 	
     if length(tmprange) ~=  winlen+1
         filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
@@ -1686,7 +1690,7 @@ if exist('phargs') == 1 % if phase-sort
         fprintf(...
   'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
-        fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
+        fprintf('Phase is computed using a wavelet of %d frames.\n',length(winloc));
     end;
 	%
 	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1758,9 +1762,10 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	  freq = abs(ampargs(3)); % else use specified frequency
 	end
         if length(freq) == 1
-           fprintf('Sorting data epochs by amplitude at frequency %2.1f Hz: \n', freq);
+           fprintf('Sorting data epochs by amplitude at frequency %2.1f Hz \n', freq);
         else
-           fprintf('Sorting data epochs by amplitude at %d frequencies %2.1f Hz to %.1f Hz: \n', length(freq),freq(1),freq(end));
+           fprintf('Sorting data epochs by amplitude at %d frequencies (%2.1f Hz to %.1f Hz) \n',...
+                                  length(freq),freq(1),freq(end));
         end
         SPECWININCR = 10;	% make spectral sorting time windows increment by 10 ms
         if isinf(ampargs(1))
@@ -1768,33 +1773,50 @@ elseif exist('ampargs') == 1 % if amplitude-sort
         else
             ampwins = ampargs(1);
         end
+        if ~isinf(ampargs(1)) % single time given
+            if length(freq) == 1
+        	fprintf(...
+'   in a %1.1f-cycle (%1.0f ms) time window centered at %1.0f ms.\n',...  
+			DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(minx));
+           else
+        	fprintf(...
+'   in %1.1f-cycle (%1.0f-%1.0f ms) time windows centered at %1.0f ms.\n',...  
+	  DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,times(minx));
+           end
+        else % range of times
+            [dummy sortwin_st ] = min(abs(times-ampwins(1)));
+            [dummy sortwin_end] = min(abs(times-ampwins(end)));
+            if length(freq) == 1
+        	fprintf(...
+'   in %d %1.1f-cycle (%1.0f ms) time windows centered from %1.0f to  %1.0f ms.\n',...  
+			length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
+           else
+        	fprintf(...
+'   in %d %1.1f-cycle (%1.0f-%1.0f ms) time windows centered from %1.0f to %1.0f ms.\n',...  
+			length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
+           end
+        end
 	
-        phsamps = 0;
+        phsamps = 0; %%%%%%%%%%%%%%%%%%%%%%%%%% sort by (mean) amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%
         minxs = [];
-        for frq = 1:length(freq)  % use one or range of frequencies
-         frq = freq(frq);
+        for f = 1:length(freq)  % use one or range of frequencies
+         frq = freq(f);
          for ampwin = ampwins
-	   [dummy minx] = min(abs(times-ampwin)); % find nearest time point to requested
+	       [dummy minx] = min(abs(times-ampwin)); % find nearest time point to requested
            minxs = [minxs minx];
-	   winlen = floor(DEFAULT_CYCLES*srate/frq);
-	   %winloc = minx-[winlen:-1:0]; % ending time version
-	   winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
+	       winlen = floor(DEFAULT_CYCLES*srate/frq);
+	       % winloc = minx-[winlen:-1:0]; % ending time version
+	       winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
            tmprange = find(winloc>0 & winloc<=frames);
            winloc = winloc(tmprange); % sorting window frames
-	   [phaseangles phsamp] = phasedet(data,frames,srate,winloc,frq);
+           if f==1
+              winlocs = [winlocs;winloc];  % store tme windows
+           end
+	       [phaseangles phsamp] = phasedet(data,frames,srate,winloc,frq);
            phsamps = phsamps+phsamp;  % accumulate amplitudes across 'sortwin'
-	 end
-        end
-        if ~isinf(ampargs(1))
-        	fprintf(...
-'Sorting data epochs by amplitude in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
-			DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(minx));
-        else % range of times
-        	fprintf(...
-'Sorting data epochs by mean amplitude in %d %1.1f-cycle (%1.0f ms) windows centered from %1.0f to  %1.0f ms.\n',...  
-			length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(minxs(1)),times(minxs(end)));
-        end
-     	if length(tmprange) ~=  winlen+1 % ????????? -sm 9/1/04
+	     end
+        end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     	if length(tmprange) ~=  winlen+1 % ????????? 
        	 	filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
         	timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
         	phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq(end);
@@ -1802,10 +1824,12 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 '    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
                 	filtersize, 1000/freq(1)*filtersize, timecenter);
         	fprintf(...
-'    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
-           		length(winloc), ampargs(1));
+'    Wavelet length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
+           		length(winloc(1,:)), ampargs(1));
         end 
-        fprintf('Amplitudes are computed using a filter of length %d frames.\n',length(winloc));
+        if length(freq) == 1
+           fprintf('Amplitudes are computed using a wavelet of %d frames.\n',length(winloc(1,:)));
+        end
 
 	%
 	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1893,6 +1917,7 @@ elseif exist('valargs')
 	phaseangles  =  phaseangles(sortidx);      % sort angles by amp
     end
     winloc = [stframe,endframe];
+    winlocs = winloc;
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -2689,20 +2714,20 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     fprintf('Plotting the ERP trace below the ERP image\n');
     if Erpstdflag == YES
         if Showwin
-          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
+          tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],times(winlocs)); % plot ERP +/-stdev
         else
           tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],[]); % plot ERP +/-stdev
         end
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
         if Showwin
-          tmph = plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
+          tmph = plot1trace(ax2,times,erp,limit,erpsig,[],times(winlocs)); % plot ERP and 0+/-alpha threshold
         else
           tmph = plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
         end
     else
         if Showwin
-          tmph = plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
+          tmph = plot1trace(ax2,times,erp,limit,[],[],times(winlocs)); % plot ERP alone
         else
           tmph = plot1trace(ax2,times,erp,limit,[],[],[]); % plot ERP alone
         end
@@ -3175,18 +3200,22 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
+function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winlocs)
 %                           If signif is [], plot erp +/- stdev
 %                           Else if signif, plot erp and signif(1,:)&signif(2,:) fill
 %                           Else, plot erp alone
-%                           If winloc not [], plot grey back image in sort window
-%                                       winloc(1)-> winloc(end) (ms)
+%                           If winlocs not [], plot grey back image(s) in sort window
+%                                       winlocs(1,1)-> winlocs(1,end) (ms)
+%                                        ...
+%                                       winlocs(end,1)-> winlocs(end,end) (ms)
   FILLCOLOR    = [.66 .76 1];
   WINFILLCOLOR    = [.88 .92 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   axes(ax);
-  if ~isempty(winloc)
+  if ~isempty(winlocs)
+   for k=1:size(winlocs,1)
+    winloc = winlocs(k,:);
     fillwinx = [winloc winloc(end:-1:1)];
     hannwin = makehanning(length(winloc));
     hannwin = hannwin./max(hannwin); % make max = 1
@@ -3200,6 +3229,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
     set(fillwh,'edgecolor',WINFILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
+   end
   end
   if ~isempty(signif);% (2,times) array giving upper and lower signif limits
       filltimes = [times times(end:-1:1)];
