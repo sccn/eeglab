@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/09/04 23:25:40  arno
+% debugging last
+%
 % Revision 1.12  2002/09/04 23:24:34  arno
 % updating pop_compprop -> pop_prop
 %
@@ -92,6 +95,7 @@ if exist('compnum') ~= 1
     compnum = [1:size(EEG.icaweights,1)];
 end;    
 fprintf('Drawing figure...\n');
+currentfigtag = ['selcomp' num2str(rand)]; % generate a random figure tag
 
 if length(compnum) > PLOTPERFIG
  	ButtonName=questdlg2(strvcat(['More than ' int2str(PLOTPERFIG) ' channels so'],'this function will pop-up several windows'), ...
@@ -122,7 +126,8 @@ end;
 % set up the figure
 % -----------------
 if ~exist('fig')
-	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off', 'color', BACKCOLOR);
+	figure('name', 'Reject components by map - pop_selectcomps()', 'tag', currentfigtag, ...
+		   'numbertitle', 'off', 'color', BACKCOLOR);
 	set(gcf,'MenuBar', 'none');
 	pos = get(gcf,'Position');
 	set(gcf,'Position', [pos(1) 20 800 800]);
@@ -156,6 +161,10 @@ for ri = compnum
 
 		% plot the head
 		% -------------
+		if ~strcmp(get(gcf, 'tag'), currentfigtag);
+			disp('Abording plot');
+			return;
+		end;
 		ha = axes('Units','Normalized', 'Position',[X Y 15 15].*s+q);
 		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'style' , 'fill');
 		axis square;
