@@ -2,10 +2,13 @@
 %                 of largest or specified components reference to their 
 %                 time point maximum amplitude. Calls envtopo().
 % Usage:
+%   >> pop_envtopo( EEG ); % pop-up window mode
 %   >> pop_envtopo( EEG, 'key', 'val', ...);
 %
 % Inputs:
-%   EEG        - input dataset
+%   EEG        - input dataset. Can also be an array of 2 datasets. Then
+%                the ERP of the second one is subtracted from the ERP of
+%                the first one.
 %   timerange  - [min max] time range (in msec) to plot 
 %
 % Optional inputs:
@@ -38,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/03/14 03:17:55  arno
+% allowing to subtract 2 datasets
+%
 % Revision 1.14  2002/11/12 16:25:13  scott
 % warning command edit
 %
