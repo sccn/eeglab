@@ -3,32 +3,30 @@
 % Usage:
 %   >> OUTEEG = pop_epoch( EEG, events, timelim);
 %   >> [OUTEEG, indices] = ...
-%        pop_epoch( EEG, typerange, timelim, 'key1', val1, 'key2', val1 ...);
+%        pop_epoch( EEG, typerange, timelim, 'key1', value1 ...);
 %
 % Inputs:
-%   EEG        - input dataset. Dataset can already be epoched. The
-%                epoch function can extract subepochs time locked on
-%                an other event.
-%   typerange  - cell array of events type to consider for epoching. 
-%                {} is all type events. Note that this requires that 
-%                field 'type' is defined in 'EEG.event'.
-%   timelim    - [init end] in second for trial extraction centered
-%                on the events (i.e. [-1 2])
+%   EEG        - Input dataset. Data can already be epoched. In this case,
+%                extract (shorter) subepochs time locked to any epoch events.
+%   typerange  - Cell array of events type to consider for epoching. 
+%                {} --> all types of  events. Note: An event field 
+%                called 'type' must be defined in the 'EEG.event' structure.
+%   timelim    - Epoch limits [start end] in seconds relative to the
+%                time-locking event (default: [-1 2])
 %
 % Optional inputs:
-%   'timeunit'   - ['seconds'|'points'] if 'seconds', consider events in
-%                time events in seconds. If 'points' consider events as
-%                data array indexes. Default is 'points'   
-%   'valuelim'   - upper and lower limit of values that a trial should not
-%                overpass. If one positive value is given, consider the 
-%                opposite for lower bound. Given values are also consider
-%                outlier (if equal the trial is rejected). Default: none.
-%   'verbose'    - ['yes'|'no']. Default is 'yes'.
-%   'newname'    - 'string'. Default is (if parent dataset name not empty)
-%                "Epoched from "[old dataset name]" dataset" 
-%   'eventindices' - [indices], use event indices to epoch data
-%   'epochinfo'  - ['yes'|'no']. Propagate all events information into the
-%                the epoch structure. Default is 'yes'.
+%   'timeunit' - Time unit ['seconds'|'points'] If 'seconds,' consider events 
+%                times to be in seconds. If 'points,' consider events as
+%                indices into the data array. {Default: 'points'}
+%   'valuelim' - Upper and lower limit values that data in a trial should not
+%                exceed. If one positive value is given, use the negative
+%                of this as lower bound. The given values are also considered
+%                outliers. {Default: none}
+%   'verbose'  - ['yes'|'no']. Default is 'yes'.
+%   'newname'  - 'string' New dataset name {Default: "old_dataset epochs"}
+%   'eventindices'- [indices] Use event indices to epoch data.
+%   'epochinfo'- ['yes'|'no']. Propagate event information into the new
+%                epoch structure. {Default: 'yes'}
 %   
 % Outputs:
 %   OUTEEG     - output dataset
@@ -57,6 +55,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/08/17 19:53:02  scott
+% Epoch [min,max] -> Epoch limits [min,max]
+% ,
+%
 % Revision 1.18  2002/08/14 18:50:53  arno
 % same
 %
@@ -166,7 +168,7 @@ end;
 % ----------------
 if ~isempty(args)
    try, g = struct(args{:});
-   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
+   catch, disp('pop_epoch(): wrong syntax in function arguments'); return; end;
 else
     g = [];
 end;
@@ -176,7 +178,7 @@ end;
 try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end;
 try, g.verbose; 	      catch, g.verbose = 'on'; end;
-try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '"' ]); end;
+try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', [EEG.setname ' epochs' ]); end;
 try, g.eventindices;      catch, g.eventindices = []; end;
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end;
 try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [-Inf Inf]; end;
@@ -204,12 +206,12 @@ if ~isempty( events )
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if isstr( tmpevent ),tmpevent = str2num( tmpevent ); end;
-				if isempty( tmpevent ), error('Pop_epoch: string type in a numeric field'); end;
+				if isempty( tmpevent ), error('pop_epoch(): string entered in a numeric field'); end;
 				Ieventtmp = [ Ieventtmp find(tmpevent == cell2mat(tmpeventtype)) ];
 			end;
 		end;
     else
-        error('Pop_epoch: types must be in cell array'); return;
+        error('pop_epoch(): multiple event types must be entered as {a  cell array}'); return;
     end;
     Ievent = Ieventtmp;
 end;
@@ -218,19 +220,19 @@ end;
 alllatencies = tmpeventlatency(Ievent);
 
 if isempty(alllatencies)
-   error('Pop_epoch error: empty event range'); return;
+   error('pop_epoch(): empty event range'); return;
 end;
-fprintf('Pop_epoch:%d epochs selected\n', length(alllatencies));
+fprintf('pop_epoch():%d epochs selected\n', length(alllatencies));
 
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
 	case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [ceil(lim(1)*EEG.srate) ceil(lim(2)*EEG.srate)], 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
 	case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, 'srate', EEG.srate, 'allevents', tmpeventlatency);
-	otherwise, disp('Pop_epoch error: invalid event time format'); beep; return;
+	otherwise, disp('pop_epoch(): invalid event time format'); beep; return;
 end;
 alllatencies = alllatencies(indices);
-fprintf('Pop_epoch:%d epochs generated\n', length(indices));
+fprintf('pop_epoch():%d epochs generated\n', length(indices));
 
 % update other fields
 % -------------------
@@ -274,7 +276,7 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % check for boundary events
 % -------------------------
-disp('Pop_epoch: checking for EEG discontinuity in epochs');
+disp('pop_epoch(): checking epochs for data discontinuity');
 if ~isempty(EEG.event) & isstr(EEG.event(1).type)
 	boundaryindex = strmatch('boundary', { EEG.event.type });
 	if ~isempty(boundaryindex)
