@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/05/14 22:10:04  arno
+% header
+%
 % Revision 1.12  2004/05/14 21:29:06  arno
 % only event not urevents
 %
@@ -118,11 +121,14 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
                 % insert event at tmpind2
                 % -----------------------
                 if ~isempty(tmpind2)
-                    eventout(tmpind2+1:end+1) = eventout(tmpind2:end);
+                    eventout(end+1).type      = 'boundary';
+                    tmp = eventout(end);
+                    eventout(tmpind2+1:end) = eventout(tmpind2:end-1);
+                    eventout(tmpind2) = tmp;
                 else
                     tmpind2 = length(eventout)+1;
+                    eventout(tmpind2).type     = 'boundary';
                 end;
-                eventout(tmpind2).type     = 'boundary';
                 eventout(tmpind2).latency  = regions(tmpindex)-0.5;
                 eventout(tmpind2).duration = 0; % just to create field
                 [ tmpnest addlength ] = findnested(eventout, tmpind2);
