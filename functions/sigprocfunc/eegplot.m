@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/09/06 19:29:40  arno
+% addscale scale argument to toggle on/off the scale at startup
+%
 % Revision 1.48  2002/09/05 15:03:43  arno
 % debug scale
 %
@@ -1413,7 +1416,8 @@ else
       eegplot( varargin{:} );
 
       % suppres menu bar
-      set(gcf, 'menubar', 'figure');
+      %set(gcf, 'menubar', 'none');
+      %set(gcf, 'menubar', 'figure');
 
       % find button and text
       obj = findobj(gcf, 'style', 'pushbutton'); delete(obj);
@@ -1427,6 +1431,7 @@ else
 	  obj = findobj(gcf, 'tag', 'Eelecname');delete(obj);
 	  obj = findobj(gcf, 'tag', 'Etimename');delete(obj);
 	  obj = findobj(gcf, 'tag', 'Evaluename');delete(obj);
+	  obj = findobj(gcf, 'type', 'uimenu');delete(obj);
  
 	case 'zoom' % if zoom
       fig = varargin{1};
