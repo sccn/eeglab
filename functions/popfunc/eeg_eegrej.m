@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/03/20 01:48:16  arno
+% same
+%
 % Revision 1.9  2004/03/20 01:46:50  arno
 % debug last
 %
@@ -115,15 +118,7 @@ end;
 % add boundary events
 % -------------------
 if ~isempty(boundevents)
-	fprintf('eeg_eegrej(): boundary events added.\n');
-	for tmpindex = 1:length(boundevents)
-        if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= EEG.pnts
-            EEG.event(end+1).type  = 'boundary';
-            EEG.event(end).latency = boundevents(tmpindex);
-        end;
-	end;
-	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	EEG = eeg_checkset(EEG, 'eventconsistency');
+    EEG = eeg_insertbound(EEG, boundevents, regions);
 end;
 EEG.icaact = [];
 
