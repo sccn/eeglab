@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/01/13 23:03:46  arno
+% same
+%
 % Revision 1.4  2005/01/13 23:01:59  arno
 % omit channels
 %
@@ -112,5 +115,8 @@ for index = 1:length(c)
 end;
 disp('Note: automatically convert XYZ coordinates to spherical and polar');
 chanlocs = convertlocs(chanlocs, 'cart2all');
+if ~isempty(omitchans)
+    disp('Important warning: the location of channels omitted has not been modified');
+end;
 
 com = sprintf('%s = pop_chancenter( %s, %s);', inputname(1), inputname(1), vararg2str({ center omitchans }));
