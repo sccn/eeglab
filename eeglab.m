@@ -65,7 +65,7 @@
 % pophelp()       - format the help header  !!!
 % readedf()       - read binary EEG EDF file
 % readegi()       - read binary EEG EGI file 
-% readerpss()     - read ERPSS data 
+% read_erpss()    - read ERPSS data 
 % readegihdr()    - read binary EEG EGI file header
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.214  2003/01/28 18:03:27  arno
+% removing channel location file constraint for spectopo
+%
 % Revision 1.213  2003/01/24 01:28:27  arno
 % adding the function to read ERPSS data
 %
