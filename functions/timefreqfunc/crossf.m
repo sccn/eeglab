@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/05/05 16:25:24  arno
+% debuging FFT freq scale
+%
 % Revision 1.58  2003/01/31 23:57:08  arno
 % debuging plotting title
 %
@@ -1212,7 +1215,7 @@ Tf.saveall   = saveall;
 if (Tf.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
    % Tf.freqs = srate/winsize*[1:2/padratio:winsize]/2; % incorect for padratio > 2
    Tf.freqs = linspace(0, srate/2, length([1:2/padratio:winsize])+1);
-   Tf.freqs = freqs(2:end);
+   Tf.freqs = Tf.freqs(2:end);
    Tf.win   = hanning(winsize);
    Tf.nb_points = padratio*winsize/2;   
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
