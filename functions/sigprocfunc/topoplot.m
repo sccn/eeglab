@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.180  2004/03/30 18:29:08  scott
+% testing fill ring
+%
 % Revision 1.179  2004/03/30 17:38:15  scott
 % plot ring patch instead of blanking circle
 %
@@ -490,7 +493,7 @@ INTSQUARE = 'on';       % default, interpolate electrodes located though the who
                         % the plotting disk
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
-CIRCGRID   = 100;       % number of angles to use in drawing circles
+CIRCGRID   = 201;       % number of angles to use in drawing circles
 AXHEADFAC = 1.3;        % head to axes scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
@@ -1109,7 +1112,7 @@ end;
 %%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if headrad > 0                         % if cartoon head to be plotted
-  circ  = 0:2*pi/CIRCGRID:2*pi;     % 101 circle vertices
+  circ  = 0:2*pi/CIRCGRID:2*pi;        % 101 circle vertices
   basex = 0.18*rmax;                   % nose width
   tip   = rmax*1.15; 
   base  = rmax-.004;
@@ -1120,8 +1123,8 @@ if headrad > 0                         % if cartoon head to be plotted
 %
 ringpts = 201;
 ringwidth = 1.03;  % 3% width
-ringmin = rmax; % rmax/(ringwidth/2); % make head outline be at ring middle
-fillring = 0;
+ringmin =  rmax*0.985; % make head outline be at ring middle
+fillring = 1;
 
 if fillring
 rx = sin(linspace(0,2*pi,ringpts)); rX = rx(end:-1:1);
@@ -1130,11 +1133,11 @@ for i=2:2:ringpts
   rx(i) = rx(i)*ringwidth;
   ry(i) = ry(i)*ringwidth;
 end
-f1= fill(ringmin*[rx rX],ringmin*[ry rY],BACKCOLOR,'edgealpha',0); hold on
-f2= fill(ringmin*[rx rX*ringwidth],ringmin*[ry rY*ringwidth],BACKCOLOR,'edgealpha',0);
+f1= fill(ringmin*[rx rX],ringmin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+f2= fill(ringmin*[rx rX*ringwidth],ringmin*[ry rY*ringwidth],BACKCOLOR,'edgecolor',BACKCOLOR);
 
 else
-  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
+  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
   set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
 end 
