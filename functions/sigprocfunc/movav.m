@@ -1,6 +1,6 @@
 % movav() - Perform a moving average of data indexed by xvals.
 %           Supports use of a moving non-rectangular window.
-%           Can be used to resample a data matrix.
+%           Can be used to resample a data matrix (see NOTE below).
 % Usage:
 %     >> [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin);
 %
@@ -10,11 +10,11 @@
 %            Note that default is fastest, assumes equal x-spacing.
 %   xwidth = smoothing-window width in xvals {def|0 -> (lastx-firstx)/4}
 %   xadv   = xvals step size {default|0 -> 1}
-%            Note that to reduce yyy frames to xxx, use yyy/(xxx+2)
+%            NOTE: to reduce yyy frames to xxx, use yyy/(xxx+2)
 %   firstx = low xval of first averaging window {def|0 -> low xvals}
 %   lastx  = high xval of last averaging window {def|0 -> high xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
-%            May be long; linear interp. is NOT used between values.
+%            May be long, since linear interp. is NOT used between values.
 %            An example is >> gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
 %
 % Outputs:
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/23 17:06:00  scott
+% *** empty log message ***
+%
 % Revision 1.2  2002/05/23 17:03:41  scott
 % added alternate functions nan_mean() and nan_sum() -sm
 %
@@ -86,10 +89,9 @@ fastave = 0;
 if nargin<2 
   xvals = 0;
 end
+xvals = xvals(:)'; % make row vector
 if length(xvals)==1 
-  if size(xvals,1)>1
-    xvals=xvals';    % make row vector
-  elseif xvals(1)==0,
+  if xvals(1)==0,
     fastave =1;
   else
     help movav
