@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/08/05 18:04:55  arno
+% performing moving average on allamps amplitude (and not log)
+%
 % Revision 1.28  2002/07/27 01:25:45  arno
 % debugging vert
 %
@@ -572,16 +575,16 @@ if nargin > 6
 	  elseif Phaseflag == YES
           n = length(Arg);
           if n > 5
-			  error('erpimage(): Too many arguments for keyword ''phase''');
+			  error('erpimage(): Too many arguments for keyword ''phasesort''');
           end
           phargs = Arg;
 		  
           if phargs(3) < 0
-              error('erpimage(): Invalid negative argument for keyword ''phase''');
+              error('erpimage(): Invalid negative argument for keyword ''phasesort''');
           end
           if n>=4
 			  if phargs(4) < 0
-				  error('erpimage(): Invalid negative argument for keyword ''phase''');
+				  error('erpimage(): Invalid negative argument for keyword ''phasesort''');
 			  end
           end
           
@@ -590,7 +593,7 @@ if nargin > 6
           end
 
           if phargs(2) >= 100 | phargs(2) < -100
-			  error('%-argument for keyword ''phase'' must be (-100;100)');
+			  error('%-argument for keyword ''phasesort'' must be (-100;100)');
           end
           
           if length(phargs) >= 4 & phargs(3) > phargs(4)
@@ -610,7 +613,7 @@ if nargin > 6
 		  Caxflag = YES;
 	  elseif strcmp(Arg,'coher')
 		  Coherflag = YES;
-	  elseif strcmp(Arg,'allamps')
+	  elseif (strcmp(Arg,'allamps') | strcmp(Arg,'plotamps'))
 		  Allampsflag = YES;
 	  elseif strcmp(Arg,'allcohers')
 		  Allcohersflag = YES;
@@ -626,7 +629,7 @@ if nargin > 6
 		  Colorbar = YES;
 	  elseif strcmp(Arg,'limits')
 		  Limitflag = YES;
-	  elseif strcmp(Arg,'phase')
+	  elseif (strcmp(Arg,'phase') | strcmp(Arg,'phasesort'))
 		  Phaseflag = YES;
 	  elseif strcmp(Arg,'auxvar')
 		  Auxvarflag = YES;
@@ -1090,16 +1093,6 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
  end
  amps = 20*log10(amps); % convert to dB
 
- if isnan(baseamp) % if not specified in 'limits'
-    [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
- 	allamps = allamps - 10.^(baseamp/20); % divide by (non-log) baseline amplitude
-else
-    amps = amps-baseamp; % use specified (log) baseamp
-	allamps = allamps - 10.^(baseamp/20); % divide by (non-log) baseline amplitude
- end
- if isnan(signifs);
-    ampsig = ampsig-baseamp;
- end
  if alpha>0
    fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
  end
@@ -1139,6 +1132,16 @@ else
  end
  allamps = 20*log10(allamps);
 
+ if isnan(baseamp) % if not specified in 'limits'
+    [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
+ 	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+ else
+    amps = amps-baseamp; % use specified (log) baseamp
+	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+	if isnan(signifs);
+		ampsig = ampsig-baseamp;
+	end
+ end
  %
  %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
