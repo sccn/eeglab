@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/09/15 06:03:24  arno
+% now systematically crashes under Matlab 7?
+%
 % Revision 1.13  2004/08/10 22:54:52  arno
 % fixed resampling for data epochs
 %
@@ -145,7 +148,7 @@ if exist('resample') == 2
             tmpres = [];
             indices = [1];
             for ind = 1:length(bounds)-1
-                tmpres  = [ tmpres resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q ) ];
+                tmpres  = [ tmpres; resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q ) ];
                 indices = [ indices size(tmpres,1)+1 ];
             end;
             if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
