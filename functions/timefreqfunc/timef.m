@@ -99,6 +99,20 @@
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %
+% Plot description:
+%   Assuming both 'plotersp' and 'plotitc' options are set (default), the upper plot
+%   represents data's ERSP (Event-Related Spectral Perturbation) with baseline activity 
+%   subtracted (use "'baseline', NaN" to prevent the function from removing the baseline) 
+%   and the lower plot represents data's ITC (Inter-Trial Coherence). 
+%   Click on any plot to pop up a new window
+%   -- Upper left marginal plot represents the average power during the baseline period
+%      (blue) and when significance is set, the threshold for significance (green).
+%   -- Upper horizontal marginal plot (under ERSP image) indicates the maximum (green) and
+%      minimum (blue) relative to baseline power across all frequencies.
+%   -- Lower left marginal plot indicates average ITC during the whole time range (blue)
+%      and when significance is set, the significance threshold (green).
+%   -- Lower horizontal marginal plot (under ITC image) indicates the ERP.  
+%
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
@@ -127,6 +141,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/08/02 23:07:10  arno
+% debug h(9)
+%
 % Revision 1.57  2003/07/23 00:28:22  scott
 % help msg
 %
@@ -1012,7 +1029,7 @@ switch lower(g.plotersp)
 	xlabel('Time (ms)')
 	ylabel('dB')
 
-	E = 10 * log10(mbase(dispf))
+	E = 10 * log10(mbase(dispf));
 	h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                     % to left of ERSP image
 	if ~isnan(g.alpha)
@@ -1095,29 +1112,10 @@ switch lower(g.plotitc)
     ERPmin = ERPmin - 0.1*(ERPmax-ERPmin);
 	h(10) = subplot('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
 
-	if ~isnan(g.alpha)
-
-    % plot(times,E,[times(1) times(length(times))],...
-    %       mean(Rboot(dispf))*[1 1],[0 0],...
-    %    [min(E)-max(E)/3 max(E)+max(E)/3],'--m','LineWidth',g.linewidth)
-    % axis([min(times) max(times) min(E)-max(E)/3 ...
-    %       max([E mean(Rboot(dispf))])+max(E)/3]);
-
-		plot(ERPtimes,ERP(ERPindices),...
-            [times(1) times(length(times))],[0 0],...
-            [0 0],[ERPmin ERPmin],'--m','LineWidth',g.linewidth);
-		axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
-	else
-
-		% plot(times,E,[0 0],[min(E)-max(E)/3 max(E)+max(E)/3],'--m',...
-        %      'LineWidth',g.linewidth)
-		% axis([min(times) max(times) min(E)-max(E)/3 max(E)+max(E)/3]);
-
-		plot(ERPtimes,ERP(ERPindices),...
-            [times(1) times(length(times))],[0 0],...
-            [0 0],[ERPmin ERPmax],'--m','LineWidth',g.linewidth);
-		axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
-	end
+    plot(ERPtimes,ERP(ERPindices),...
+         [0 0],[ERPmin ERPmax],'--m','LineWidth',g.linewidth);
+    hold on; plot([times(1) times(length(times))],[0 0], 'k');
+    axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
 
 	tick = get(h(10),'YTick');
 	set(h(10),'YTick',[tick(1) ; tick(end)])
