@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/04/11 18:21:43  arno
+% add furhter check for EEG.averef
+%
 % Revision 1.12  2002/04/11 18:08:47  arno
 % adding average reference variable check
 % ,
@@ -412,115 +415,116 @@ if ~isfield(EEG.reject, 'threshkurtdist')	EEG.reject.threshkurtdist = 600; res =
 if ~isempty( varargin)
     for index = 1:length( varargin )
         switch varargin{ index }
-            case 'data',; % already done at the top 
-            case 'ica', 
-                if isempty(EEG.icaweights)
-	               ButtonName=questdlg([ 'No ICA weights. Compute now?' 10 '(then go back to the function you just called)'], ...
-	                       'Confirmation', 'Cancel', 'Yes','Yes');
-	                           
-	               switch lower(ButtonName),
-	                   case 'cancel', error('eeg_checkset: ICA components must be derived before running that function'); 
-                   end;
-                   [EEG res] = pop_runica(EEG);
-                   res = [ inputnames(1) ' = eeg_checkset('  inputnames(1) '); ' res ];
-                else, return; end;
-            case 'epoch', 
-                if EEG.trials == 1
-                    errordlg([ 'Epochs must be extracted before running that function' 10 'Use /Tools/Extract epochs'], 'Error');
-                    error('eeg_checkset: epochs must be extracted before running that function');
-                end;
-            case 'event', 
-                if isempty(EEG.event)
-                    errordlg([ 'Cannot process if no events. First add events.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
-                    error('eeg_checkset: data epochs must be extracted before running that function');
-                end;
-            case 'chanloc', 
-                if isempty(EEG.chanlocs)
-                    errordlg( ['Cannot process without channel location file.' 10 ...
-                               'Enter the name of the file via "/Edit/Edit dataset info".' 10 ...
-                               'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
-                    error('eeg_checkset: cannot process without channel location file.');
-                end;
-            case 'eventconsistency',				
-				% remove the events which latency are out of boundary
-				% ---------------------------------------------------
-				if isfield(EEG.event, 'latency')
-					try, alllatencies = cell2mat( { EEG.event.latency } );
-					catch, error('Checkset: error empty latency entry for new events added by user');
-					end;
-					I1 = find(alllatencies < 0);
-					I2 = find(alllatencies > EEG.pnts*EEG.trials);
-					if (length(I1) + length(I2)) > 0 
-						fprintf('Checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
-								length(I1) + length(I2), length(EEG.event));
-						EEG.event(union(I1, I2)) = [];
-					end;
-				end;
-				
-				% save information for non latency fields updates
-				% -----------------------------------------------
-				difffield = [];
-				if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
-					% remove fields with empty epochs
-                    % -------------------------------
-                    removeevent = [];
-				    for indexevent = 1:length(EEG.event)
-                        if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
-                            | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
-                            removeevent = [removeevent indexevent];
-                            disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
-				        end;
-				    end;
-				    EEG.event(removeevent) = [];
-					
-					% uniformize fields content for the different epochs
-					% --------------------------------------------------
-					difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
-					arraytmpinfo = cell(EEG.trials, length(difffield));
-					for index = 1:length(difffield)
-						% get the field content
-						% ---------------------
-						for indexevent = 1:length(EEG.event)
-							if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
-								arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
-							end;
-						end;
-                        % uniformize content for all epochs
-                        % ---------------------------------
-				        for indexevent = 1:length(EEG.event)
-			                setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{EEG.event(indexevent).epoch, index});
-				        end;
-				    end;
-				end;
-				
-                % uniformize fields (str or int) if necessary
-                % -------------------------------------------
-                allfields = fieldnames(EEG.event);
-                for indexfield=1:length(allfields)
-                    fieldformat{indexfield} = 'int';
-                    for index = 1:length(EEG.event)
-                        if isstr(getfield(EEG.event, { index }, allfields{indexfield}))
-                            fieldformat{indexfield} = 'str';
-                            index = length(EEG.event);
-                        end;
-                    end;
-                end;
-                for indexfield=1:length(allfields)
-                    if strcmp( fieldformat{indexfield}, 'str') 
-	                    for index = 1:length(EEG.event)
-	                        fieldcontent = getfield(EEG.event, { index }, allfields{indexfield});
-	                        if ~isstr(fieldcontent)
-	                            EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(fieldcontent) );
-	                        end;
-	                    end;
-                    end;
-                end;
-
-            otherwise, error('eeg_checkset: unknown option');
+		 case 'data',; % already done at the top 
+		 case 'ica', 
+		  if isempty(EEG.icaweights)
+			  ButtonName=questdlg([ 'No ICA weights. Compute now?' 10 '(then go back to the function you just called)'], ...
+								  'Confirmation', 'Cancel', 'Yes','Yes');
+			  
+			  switch lower(ButtonName),
+			   case 'cancel', error('eeg_checkset: ICA components must be derived before running that function'); 
+			  end;
+			  [EEG res] = pop_runica(EEG);
+			  res = [ inputnames(1) ' = eeg_checkset('  inputnames(1) '); ' res ];
+		  else, return; end;
+		 case 'epoch', 
+		  if EEG.trials == 1
+			  errordlg([ 'Epochs must be extracted before running that function' 10 'Use /Tools/Extract epochs'], 'Error');
+			  error('eeg_checkset: epochs must be extracted before running that function');
+		  end;
+		 case 'event', 
+		  if isempty(EEG.event)
+			  errordlg([ 'Cannot process if no events. First add events.' 10 'Use /File/Import event info or /Import epoch info'], 'Error');
+			  error('eeg_checkset: data epochs must be extracted before running that function');
+		  end;
+		 case 'chanloc', 
+		  if isempty(EEG.chanlocs)
+			  errordlg( ['Cannot process without channel location file.' 10 ...
+						 'Enter the name of the file via "/Edit/Edit dataset info".' 10 ...
+						 'For the file format, enter ''>> help totoplot'' from the command line.' ], 'Error');
+			  error('eeg_checkset: cannot process without channel location file.');
+		  end;
+		 case 'eventconsistency',	
+		  if isempty(EEG.event), return; end;
+		  
+		  % remove the events which latency are out of boundary
+		  % ---------------------------------------------------
+		  if isfield(EEG.event, 'latency')
+			  try, alllatencies = cell2mat( { EEG.event.latency } );
+			  catch, error('Checkset: error empty latency entry for new events added by user');
+			  end;
+			  I1 = find(alllatencies < 0);
+			  I2 = find(alllatencies > EEG.pnts*EEG.trials);
+			  if (length(I1) + length(I2)) > 0 
+				  fprintf('Checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
+						  length(I1) + length(I2), length(EEG.event));
+				  EEG.event(union(I1, I2)) = [];
+			  end;
+		  end;
+		  
+		  % save information for non latency fields updates
+		  % -----------------------------------------------
+		  difffield = [];
+		  if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
+			  % remove fields with empty epochs
+			  % -------------------------------
+			  removeevent = [];
+			  for indexevent = 1:length(EEG.event)
+				  if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
+						  | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
+					  removeevent = [removeevent indexevent];
+					  disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has invalid epoch number: removed']);
+				  end;
+			  end;
+			  EEG.event(removeevent) = [];
+			  
+			  % uniformize fields content for the different epochs
+			  % --------------------------------------------------
+			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
+			  arraytmpinfo = cell(EEG.trials, length(difffield));
+			  for index = 1:length(difffield)
+				  % get the field content
+				  % ---------------------
+				  for indexevent = 1:length(EEG.event)
+					  if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
+						  arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
+					  end;
+				  end;
+				  % uniformize content for all epochs
+				  % ---------------------------------
+				  for indexevent = 1:length(EEG.event)
+					  setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{EEG.event(indexevent).epoch, index});
+				  end;
+			  end;
+		  end;
+		  
+		  % uniformize fields (str or int) if necessary
+		  % -------------------------------------------
+		  allfields = fieldnames(EEG.event);
+		  for indexfield=1:length(allfields)
+			  fieldformat{indexfield} = 'int';
+			  for index = 1:length(EEG.event)
+				  if isstr(getfield(EEG.event, { index }, allfields{indexfield}))
+					  fieldformat{indexfield} = 'str';
+					  index = length(EEG.event);
+				  end;
+			  end;
+		  end;
+		  for indexfield=1:length(allfields)
+			  if strcmp( fieldformat{indexfield}, 'str') 
+				  for index = 1:length(EEG.event)
+					  fieldcontent = getfield(EEG.event, { index }, allfields{indexfield});
+					  if ~isstr(fieldcontent)
+						  EEG.event = setfield(EEG.event, { index }, allfields{indexfield}, num2str(fieldcontent) );
+					  end;
+				  end;
+			  end;
+		  end;		  
+		 otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
 end;            
-       
+
 return;	
 
 function num = popask( text )
