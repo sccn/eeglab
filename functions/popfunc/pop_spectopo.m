@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/08/29 17:52:57  arno
+% typo
+%
 % Revision 1.26  2002/08/20 04:25:31  scott
 % text
 %
@@ -193,7 +196,7 @@ if nargin < 3
 						 { 'style' 'edit' 'string' '20' }, ...
 						 { 'style' 'text' 'string' 'Frequency (Hz) to map:'}, ...
 						 { 'style' 'edit' 'string' '10' }, ...
-						 { 'style' 'text' 'string' 'Plotting channel (number):', 'tooltipstring', ...
+						 { 'style' 'text' 'string' 'Plotting channel (number; 0=global power):', 'tooltipstring', ...
 						 ['If 1-nchans, plot component contributions at this channel' 10 ...
 						  'If [], plot contributions at channel with max. power' 10 ...
 						  'If 0, plot component contributions to global (RMS) power'] }, ...
@@ -217,6 +220,7 @@ if nargin < 3
 		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
 		if size(result,1) == 0 return; end;
 		timerange    = eval( [ '[' result{1} ']' ] );
+		option = '';
 		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
 		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
 		if ~isempty(result{4})   , options = [ options ', ''plotchan'', ' result{4} ]; end;
