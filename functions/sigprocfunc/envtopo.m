@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/01/29 16:39:45  scott
+% test for chanlocs file location and size
+%
 % Revision 1.42  2004/01/26 02:22:13  scott
 % same
 %
@@ -619,18 +622,19 @@ for t=1:ntopos
   fprintf('%4.0f  ',plottimes(t));
 end
 fprintf('\n');
-fprintf('               or epoch frames: ');
-for t=1:ntopos
-  fprintf('%4d  ',frame1-1+plotframes(t));
-end
-fprintf('\n');
-if strcmp(g.pvaf,'on')
-  fprintf('  component pvaf in interval:  ');
-  for t=1:ntopos
-    fprintf('%4.2f ',pvaf(maporder(t)));
-  end
-  fprintf('\n');
-end
+
+%fprintf('               or epoch frames: ');
+%for t=1:ntopos
+  %fprintf('%4d  ',frame1-1+plotframes(t));
+%end
+%fprintf('\n');
+%if strcmp(g.pvaf,'on')
+  %fprintf('  component pvaf in interval:  ');
+  %for t=1:ntopos
+    %fprintf('%4.2f ',pvaf(maporder(t)));
+  %end
+  %fprintf('\n');
+%end
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
