@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/03/17 02:18:45  arno
+% reject
+%
 % Revision 1.4  2005/03/17 02:17:41  arno
 % fixing history
 %
@@ -144,3 +147,4 @@ if nargin < 2
   disp('Done');
   com = sprintf('%s = pop_dipfit_gridsearch(%s, %s);', ...
                 inputname(1), inputname(1), vararg2str( { select xgrid, ygrid, zgrid reject }));
+  

@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/03/17 17:41:34  arno
+% change BESA to 4Shell
+%
 % Revision 1.4  2005/03/15 23:27:06  arno
 % non-empty loc coordinates
 %
@@ -245,8 +248,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         disp('Scanning terminated. Refining dipole locations...');
     end;
     EEG.dipfit.model  = dipfit_reject(EEG.dipfit.model, g.threshold/100);
-
-    
+   
     % Searching dipole localization
     % -----------------------------
     disp('Searching dipoles locations...');
