@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/25 16:03:12  scott
+% trying to output com into history as well as popcom -sm
+%
 % Revision 1.17  2002/04/24 20:36:22  arno
 % implementing buttons
 %
@@ -491,7 +494,7 @@ popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''
 com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], titleplot, smooth, decimate %s);', outstr, options);
 eval(com)
 
-varargout{1} = [popcom 10 '% ' com];
+varargout{1} = [10 popcom 10 '% ' com];
 
 return;
 
