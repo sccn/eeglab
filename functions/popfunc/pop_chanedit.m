@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2004/02/13 00:10:31  arno
+% implementing new history for channel recentering
+%
 % Revision 1.86  2004/02/12 23:57:47  arno
 % *** empty log message ***
 %
@@ -457,7 +460,7 @@ if nargin < 2
         guicenter = [ '[chantmp newcenter tmpcom] = pop_chancenter(chantmp);' ...
                       'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
                       'set( gcbf, ''userdata'', { olduserdat{:} ''eval'', tmpcom });' ...
-                      'clear olduserdat tmpcom newcenter;' ];
+                      'clear olduserdat tmpcom newcenter; comtmp = {};' endgui ];
         %guicenter = [ '[tmpX tmpY tmpZ newcenter tmpoptim]=chancenter(cell2mat({chanstmp.X})'', ' ...
         %              '               cell2mat({chanstmp.Y})'', cell2mat({chanstmp.Z})'',[]);' ...
         %              'chanstmp = pop_chanedit(chanstmp, ''convert'', { ''chancenter'' newcenter 0 });' ...
@@ -620,21 +623,23 @@ if nargin < 2
 		totaluserdat = { totaluserdat{:} userdat{:}};
 		if evalin('base', 'exist(''comtmp'')') == 1
 			tmpcom = evalin('base', 'comtmp');
-			try, 
-				chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
-                if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
-                    tmpcom = { tmpcom{1} tmpcom{2}{1} };
-                end;
-                if iscell(tmpcom{2}) & (length(tmpcom{2}) > 0) & isstr(tmpcom{2}{1}) & strcmpi(tmpcom{2}{1}, 'chancenter')
-                    tmpcom = { tmpcom{1} { tmpcom{2}{1} tmpcom{2}{2} 0 } };
-                end;
-                totaluserdat = { totaluserdat{:} tmpcom{:} };
-			catch
-				errordlg2(lasterr, 'Channel location error');
-				returnmode = 'no';
-			end;	
-			evalin('base', 'clear comtmp');
-			chans = checkchans(chans, allfields);
+            if ~isempty(tmpcom)
+                try, 
+                    chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
+                    if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
+                        tmpcom = { tmpcom{1} tmpcom{2}{1} };
+                    end;
+                    if iscell(tmpcom{2}) & (length(tmpcom{2}) > 0) & isstr(tmpcom{2}{1}) & strcmpi(tmpcom{2}{1}, 'chancenter')
+                        tmpcom = { tmpcom{1} { tmpcom{2}{1} tmpcom{2}{2} 0 } };
+                    end;
+                    totaluserdat = { totaluserdat{:} tmpcom{:} };
+                catch
+                    errordlg2(lasterr, 'Channel location error');
+                    returnmode = 'no';
+                end;	
+                evalin('base', 'clear comtmp');
+            end;
+            chans = checkchans(chans, allfields);
 		end;
 		
 		% handle arguments
