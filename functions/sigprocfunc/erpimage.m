@@ -1,14 +1,14 @@
 % erpimage() - Image a collection of single-trial data epochs, optionally sorted on 
 %              and/or aligned to an input sorting variable and smoothed across trials 
-%              with a moving-average. Optionally sort trials on value, amplitude or
-%              phase within a specified window (NB: to return event-aligned data 
-%              without plotting, use eventlock()). Click on figure axes to examine 
-%              separately and zoom (using axcopy()).
-%
+%              with a moving-average.  (To return event-aligned data without plotting, 
+%              use eventlock()).  Optionally sort trials on value, amplitude or phase 
+%              within a specified time window. Optionally plot the ERP mean and std. dev.,
+%              and moving-window spectral amplitude and inter-trial coherence at a
+%              selected or peak frequency. Click on individual figures parts to examine 
+%              them separately and zoom (using axcopy()).
 % Usage:
 %   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
 %         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx] ...
-%              ...  
 %                  = erpimage(data,sortvar,times,'title',avewidth,decimate,...
 %                             flag1,arg1,flag2,arg2,...);
 % Necessary inputs:
@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2003/05/06 15:54:15  scott
+% edit header
+%
 % Revision 1.100  2003/05/06 00:49:52  arno
 % debug last
 %
