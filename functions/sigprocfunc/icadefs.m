@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/15 15:44:37  arno
+% warning for tutorial path
+%
 % Revision 1.15  2002/11/13 17:57:03  arno
 % tutorial link update
 %
@@ -79,8 +82,11 @@
 % ------------------------------------------------------
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
-% warning for local web tutorial: end the directory path with a folder delimiter 
-% '\' for windows, '/' for Unix and ':' for Mac
+
+% for local copies of the web site, uncomment and edit one of the following lines
+% TUTORIAL_URL = 'file://C:\folder\eeglabtutorial\index.html'; % Windows
+% TUTORIAL_URL = 'file:///home/user/eeglabtutorial/index.html'; % Unix
+% TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:index.html'; % Mac
 
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
 
