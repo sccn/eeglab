@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/15 19:16:23  arno
+% debugging wavelets ...
+%
 % Revision 1.6  2002/10/15 00:11:14  arno
 % title bug
 %
@@ -588,7 +591,7 @@ if iscell(X)
 			g.title{3} = 'Condition 1 - condition 2';
 		end;
 	else
-		g.title = { 'Condition 1', 'Condition 2', 'Condition 2 - condition 1' };
+		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
 	end;
 	
 	fprintf('Running crossf on condition 1 *********************\n');

@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/15 19:17:25  arno
+% cyclefact
+%
 % Revision 1.8  2002/10/15 19:07:11  arno
 % for no signif diff
 %
@@ -670,7 +673,7 @@ if iscell(X)
 			g.title{3} = 'Condition 1 - condition 2';
 		end;
 	else
-		g.title = { 'Condition 1', 'Condition 2', 'Condition 2 - condition 1' };
+		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
 	end;
 	
 	fprintf('Running timef on condition 1 *********************\n');
