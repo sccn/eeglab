@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/08/07 15:51:05  scott
+% added 'noplot' option to return interpolated channel value
+%
 % Revision 1.52  2003/07/18 01:34:07  scott
 % text placement
 %
@@ -381,24 +384,25 @@ if nargs > 2
 	 case 'shading'
 	  SHADING = lower(Value);
 	  if ~any(strcmp(SHADING,{'flat','interp'}))
-		  error('Invalid shading parameter')
+	     error('Invalid shading parameter')
 	  end
-     case 'noplot'
-      noplot = Value;
-      if ~isstr(noplot)
-        if length(noplot) ~= 2
-            error('noplot location should be [radius, angle]')
-        else
-            chanrad = noplot(1);
-            chantheta = noplot(2);
-            noplot = 'on';
-         end
-     case 'gridscale'
-      GRID_SCALE = Value;
-      if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
-           fprintf('topoplot(): ''gridscale'' value must be integer > 4.\n');
-           return
-      end
+         case 'noplot'
+          noplot = Value;
+          if ~isstr(noplot)
+            if length(noplot) ~= 2
+              error('''noplot'' location should be [radius, angle]')
+            else
+              chanrad = noplot(1);
+              chantheta = noplot(2);
+              noplot = 'on';
+            end
+          end
+         case 'gridscale'
+          GRID_SCALE = Value;
+          if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
+               fprintf('topoplot(): ''gridscale'' value must be integer > 4.\n');
+               return
+          end
 	 otherwise
 	  error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
     end
