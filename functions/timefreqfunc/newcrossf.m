@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/04/17 21:21:35  arno
+% fixing newfig
+%
 % Revision 1.41  2003/04/17 18:06:05  arno
 % adding newfig option
 %
@@ -847,26 +850,12 @@ end;
 % display text to user
 %%%%%%%%%%%%%%%%%%%%%%
 trials    = length(X)/g.frame;
-freqs     = g.srate*g.cycles(1)/g.winsize*[2:2/g.padratio:g.winsize]/2; % recomputed by timefreq
-dispf     = find(freqs <= g.maxfreq);
 fprintf('\nComputing the Event-Related \n');
 switch g.type
     case 'phasecoher',  fprintf('Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
     case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
     case 'coher',       fprintf('Linear Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
 end;
-fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
-fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
-if g.cycles(1)==0
-   fprintf('The data window size is %d sample points (%g ms).\n',g.winsize,1000*g.winsize/g.srate);
-   fprintf('The FFT length is %d samples\n',g.winsize*g.padratio);
-else
-   fprintf('The window size is %d cycles.\n',g.cycles(1));
-   fprintf('The maximum window size is %d sample points (%g ms).\n',g.winsize,1000*g.winsize/g.srate);
-end
-fprintf('The window is applied %d times\n',g.timesout);
-%fprintf(' with an average step size of %g samples (%g ms).\n', Tfx.stp,1000*Tfx.stp/g.srate);
-fprintf('Results are oversampled %d times.\n',g.padratio);
 if ~isnan(g.alpha)
    fprintf('Bootstrap confidence limits will be computed based on alpha = %g\n', g.alpha);
 else
@@ -894,10 +883,6 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
     fprintf('\nProcessing trial for second input (of %d):',trials);
 	Y = reshape(Y, g.frame, trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
-	dispf     = find(freqs <= g.maxfreq);
-	freqs = freqs(dispf);
-    if size(alltfX,1) ~=length(dispf), alltfX = alltfX(dispf,:,:); end;
-    if size(alltfY,1) ~=length(dispf), alltfY = alltfY(dispf,:,:); end;
     
 	% ------------------
 	% compute coherences
@@ -915,22 +900,6 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	  coherres = sum( coherresout ./ abs(coherresout), 3) / trials;
 	end;
 	
-	%ITERATIVE PART
-	%for t=1:trials
-	%	if rem(t,10) == 0,  fprintf(' %d',t); end
-	%	if rem(t,120) == 0, fprintf('\n'); end
-		
-		%Tfx = tfcomp( Tfx, t, 1:g.timesout); 
-	%	tmpalltimesX = transpose(squeeze(alltfX(t, :,:)));
-	%	tmpalltimesY = transpose(squeeze(alltfY(t, :,:)));
-	%	if g.savecoher
-	%		[Coher trialcoher(:,:,t)] = cohercomp( Coher, tmpalltimesX, tmpalltimesY, t, 1:g.timesout);      
-	%	else
-	%	  Coher = cohercomp( Coher, tmpalltimesX, tmpalltimesY, t, 1:g.timesout);      
-	%	end;
-	%end % t = trial
-	%Coher  = cohercomppost(Coher, trials);
-	
 	% -----------------
 	% compute bootstrap
 	% -----------------
@@ -940,21 +909,21 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		formulaout = 'coher';
 		switch g.type
 		 case 'coher',
-		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
-						  'cumulX = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
-						  'cumulY = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+						  'cumulY = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
 		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ...
 						  'cumulX = cumulX + arg1.*conj(arg1);' ...
 						  'cumulY = cumulY + arg2.*conj(arg2);' ];
 		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
 		 case 'phasecoher2',
-		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
-						  'cumul  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
+						  'cumul  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
 		  formula =     [ 'tmpprod = arg1.*conj(arg2); coher  = coher  + tmpprod;' ...
 						  'cumul   = cumul + abs(tmpprod);' ];
 		  formulapost =   'coher = coher ./ cumul;'; 
 		 case 'phasecoher',
-		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'tmpprod = arg1.*conj(arg2); coher = coher + tmpprod ./ abs(tmpprod)';
 		  formulapost = [ 'coher = coher /' int2str(trials) ];
 		end;
@@ -1000,7 +969,7 @@ mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
 
 % plot everything
 % ---------------
-plotall( coherres, Rbootout, times, freqs, mbase, dispf, g);
+plotall( coherres, Rbootout, times, freqs, mbase, g);
 
 % proces outputs
 % --------------
@@ -1013,7 +982,7 @@ return;
 % ------------------
 % plotting functions
 % ------------------
-function plotall(R, Rboot, times, freqs, mbase, dispf, g) 
+function plotall(R, Rboot, times, freqs, mbase, g) 
 
 switch lower(g.plotphase)
 case 'on',  
@@ -1079,8 +1048,8 @@ case 'on'
    map(151,:) = map(151,:)*0.9; % tone down the (0=) green!
    colormap(map);
    
-   try, imagesc(times,freqs(dispf),RR(dispf,:),max(max(RR(dispf,:)))*[-1 1]); % plot the coherence image
-   catch, imagesc(times,freqs(dispf),RR(dispf,:),[-1 1]); end;
+   try, imagesc(times,freqs,RR,max(max(RR))*[-1 1]); % plot the coherence image
+   catch, imagesc(times,freqs,RR,[-1 1]); end;
    
    if ~isempty(g.maxamp)
 	   caxis([-g.maxamp g.maxamp]);
@@ -1088,9 +1057,9 @@ case 'on'
    tmpscale = caxis;
    
    hold on
-   plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth)
+   plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth)
    for i=1:length(g.marktimes)
-      plot([g.marktimes(i) g.marktimes(i)],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
+      plot([g.marktimes(i) g.marktimes(i)],[0 freqs(end)],'--m','LineWidth',g.linewidth);
    end;
    hold off
    set(h(6),'YTickLabel',[],'YTick',[])
@@ -1107,8 +1076,8 @@ case 'on'
    %
    
    h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
-   Emax = max(R(dispf,:)); % mean coherence at each time point
-   Emin = min(R(dispf,:)); % mean coherence at each time point
+   Emax = max(R); % mean coherence at each time point
+   Emin = min(R); % mean coherence at each time point
    hold on;
    plot(times,Emax,'b');
    plot(times,Emin,'b');
@@ -1120,9 +1089,9 @@ case 'on'
    if ~isnan(g.alpha) & dims(Rboot) > 1
       % plot bootstrap significance limits (base mean +/-)
       switch dims(Rboot)
-       case 2, plot(times,mean(Rboot(dispf,:),1),'g','LineWidth',g.linewidth);
-       case 3, plot(times,mean(Rboot(dispf,:,1),1),'g','LineWidth',g.linewidth);
-               plot(times,mean(Rboot(dispf,:,2),1),'g','LineWidth',g.linewidth);
+       case 2, plot(times,mean(Rboot(:,:),1),'g','LineWidth',g.linewidth);
+       case 3, plot(times,mean(Rboot(:,:,1),1),'g','LineWidth',g.linewidth);
+               plot(times,mean(Rboot(:,:,2),1),'g','LineWidth',g.linewidth);
       end;
       axis([min(times) max(times) 0 max([Emax(:)' Rboot(:)'])*1.2])
    else
@@ -1140,23 +1109,23 @@ case 'on'
    %   
    
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
-   E = abs(mbase(dispf)); % baseline mean coherence at each frequency
-   plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
+   E = abs(mbase); % baseline mean coherence at each frequency
+   plot(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
    
    if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
        hold on
        switch dims(Rboot)
-        case 1, plot(freqs(dispf),Rboot(dispf),'g','LineWidth',g.linewidth);
-        case 2, plot(freqs(dispf),mean(Rboot(dispf,:),2),'g','LineWidth',g.linewidth);
-        case 3, plot(freqs(dispf),mean(Rboot(dispf,:,1),2),'g','LineWidth',g.linewidth);
-                plot(freqs(dispf),mean(Rboot(dispf,:,2),2),'g','LineWidth',g.linewidth);
+        case 1, plot(freqs,Rboot(:),'g','LineWidth',g.linewidth);
+        case 2, plot(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
+        case 3, plot(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
+                plot(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
        end;  
        if ~isnan(max(E))
-           axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(:)'])*1.2]);
+           axis([freqs(1) freqs(end) 0 max([E Rboot(:)'])*1.2]);
        end;
    else             % plot marginal mean coherence only
       if ~isnan(max(E))
-          axis([freqs(1) freqs(max(dispf)) 0 max(E)*1.2]);
+          axis([freqs(1) freqs(end) 0 max(E)*1.2]);
       end;
    end
    
@@ -1175,7 +1144,7 @@ case 'on'
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
    if setylim
        if strcmp(g.angleunit,'ms')  % convert to ms
-           Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
+           Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(:)',1,length(times)); 
            maxangle = max(max(abs(Rangle)));
        else
            Rangle = Rangle*180/pi; % convert to degrees
@@ -1183,11 +1152,11 @@ case 'on'
        end
        Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
        
-       imagesc(times,freqs(dispf),Rangle(dispf,:),[-maxangle maxangle]); % plot the 
+       imagesc(times,freqs,Rangle,[-maxangle maxangle]); % plot the 
        hold on                                             % coherence phase angles
-       plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth); % zero-time line
+       plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth); % zero-time line
        for i=1:length(g.marktimes)
-           plot([g.marktimes(i) g.marktimes(i)],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
+           plot([g.marktimes(i) g.marktimes(i)],[0 freqs(end)],'--m','LineWidth',g.linewidth);
        end;
        
        ylabel('Freq. (Hz)')
