@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/05/06 17:47:22  arno
+% debug add boundary event
+%
 % Revision 1.23  2004/05/06 17:42:14  arno
 % add urevent boundary
 %
@@ -235,7 +238,7 @@ else
         % concatenate events
         % ------------------
         orilen = length(INEEG1.event);
-        allfields = union(fieldnames(INEEG1.event), fieldnames(INEEG2.event) );
+        allfields = fieldnames(INEEG2.event);
 		for i=1:length( allfields )
             for e=1:length(INEEG2.event)
                 tmpval = getfield(INEEG2.event, { e }, allfields{i});
@@ -249,7 +252,7 @@ else
         if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
             disp('Concatenating urevents...');
             orilen = length(INEEG1.urevent);
-            allfields = union(fieldnames(INEEG1.urevent), fieldnames(INEEG2.urevent) );
+            allfields = fieldnames(INEEG2.urevent);
             for i=1:length( allfields )
                 for e=1:length(INEEG2.urevent)
                     tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
