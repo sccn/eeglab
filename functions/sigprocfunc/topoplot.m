@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.181  2004/03/30 18:48:21  scott
+% same
+%
 % Revision 1.180  2004/03/30 18:29:08  scott
 % testing fill ring
 %
@@ -500,13 +503,16 @@ STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
 CCOLOR = [0 0 1];       % default contour color
 ECOLOR = [0 0 0];       % default electrode color
-ELECTRODES = 'off';     % default 'electrodes': on|off|label
+ELECTRODES = [];        % default 'electrodes': on|off|label - set below
+MAXDEFAULTSHOWLOCS = 64;% if more channels than this, don't show electrode locations by default
 EMARKER = '.';          % mark electrode locations with small disks
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
 EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
+BLANKINGRINGWIDTH = .03;% width of the blanking ring 
+HEADRINGWIDTH     = .01;% width of the cartoon head ring
 SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = [];      % shrink mode (dprecated)
 intrad       = [];      % default interpolation square is to outermost electrode (<=1.0)
@@ -721,6 +727,14 @@ if nargs > 2
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
     end
+  end
+end
+
+if isempty(ELECTRODES)                     % if electrode labeling not specified
+  if length(Values) > MAXDEFAULTSHOWLOCS   % if more channels than default max
+    ELECTRODES = 'off';                    % don't show electrodes
+  else                                     % else if fewer chans
+    ELECTRODES = 'on';                     % do
   end
 end
 
@@ -1112,7 +1126,6 @@ end;
 %%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if headrad > 0                         % if cartoon head to be plotted
-  circ  = 0:2*pi/CIRCGRID:2*pi;        % 101 circle vertices
   basex = 0.18*rmax;                   % nose width
   tip   = rmax*1.15; 
   base  = rmax-.004;
@@ -1121,37 +1134,52 @@ if headrad > 0                         % if cartoon head to be plotted
 %
 %%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-ringpts = 201;
-ringwidth = 1.03;  % 3% width
-ringmin =  rmax*0.985; % make head outline be at ring middle
-fillring = 1;
+circ = linspace(0,2*pi,CIRCGRID);
 
-if fillring
-rx = sin(linspace(0,2*pi,ringpts)); rX = rx(end:-1:1);
-ry = cos(linspace(0,2*pi,ringpts)); rY = ry(end:-1:1);
-for i=2:2:ringpts
-  rx(i) = rx(i)*ringwidth;
-  ry(i) = ry(i)*ringwidth;
+hwidth = HEADRINGWIDTH;                   % width of head ring 
+hin  = squeezefac*headrad*(1- hwidth/2);  % inner head ring radius
+
+rwidth = BLANKINGRINGWIDTH;               % width of blanking outer ring
+rin =  rmax*(1-rwidth/2);                 % inner ring radius
+if hin>rin
+  rin = hin;                              % dont blank inside the head ring
 end
-f1= fill(ringmin*[rx rX],ringmin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
-f2= fill(ringmin*[rx rX*ringwidth],ringmin*[ry rY*ringwidth],BACKCOLOR,'edgecolor',BACKCOLOR);
 
-else
-  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
-      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
-  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
-end 
+rx = sin(circ); rX = rx(end:-1:1);
+ry = cos(circ); rY = ry(end:-1:1);
+for k=2:2:CIRCGRID
+  rx(k) = rx(k)*(1+rwidth);
+  ry(k) = ry(k)*(1+rwidth);
+end
+f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
+
+% Former line-style border smoothing - width did not scale with plot
+%  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
+%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
+%  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
+
 %
 %%%%%%%%%%%%%%%%%%% Plot head outline %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
-      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
+rx = sin(circ); rX = rx(end:-1:1);
+ry = cos(circ); rY = ry(end:-1:1);
+for k=2:2:CIRCGRID
+  rx(k) = rx(k)*(1+hwidth);
+  ry(k) = ry(k)*(1+hwidth);
+end
+f3= fill(hin*[rx rX],hin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
 
-  sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
-                                                                 % by this factor
+% Former line-style head
+%  plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
+%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
+
 %
 %%%%%%%%%%%%%%%%%%% Plot ears and nose %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+  sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
+                                                                 % by this factor
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
          'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
