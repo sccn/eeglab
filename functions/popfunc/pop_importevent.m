@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/06/18 22:24:40  arno
+% ur events
+%
 % Revision 1.15  2003/06/09 16:53:28  arno
 % nothing
 %
@@ -245,31 +248,41 @@ else % no interactive inputs
     % (this is usefull to build the string command for the function)
     % --------------------------------------------------------------
     for index=1:2:length(args)
-        if iscell(args{index+1}), args{index+1} = { args{index+1} }; end; % double nested 
-        if isstr(args{index+1})                 args{index+1} = [ '''' args{index+1} '''' ]; % string 
-        else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
-        end;
+        if iscell(args{index+1}), if iscell(args{index+1}{1}) args{index+1} = args{index+1}{1}; end; end; % double nested 
+        %if isstr(args{index+1})                 args{index+1} = [ '''' args{index+1} '''' ]; % string 
+        %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
+        %end;
     end;                
 end;
-     
+
+g = finputcheck( args, { 'fields'    'cell'     []         {};
+                         'skipline'  'integer'  [0 Inf]    0;
+                         'indices'   'integer'  [1 Inf]    [];
+                         'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         '''yes''';
+                         'timeunit'  'real'     [0 Inf]    1;
+                         'align'     'integer'  []         NaN;
+                         'delim'     'string'   []         char([9 32])}, 'pop_importevent');
+if isstr(g), error(g); end;
+if ~isempty(g.indices), g.append = 'yes'; end;
+    
 % create structure
 % ----------------
-if ~isempty(args)
-   try, g = struct(args{:});
-   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
-else
-    g = [];
-end;
+%if ~isempty(args)
+%   try, g = struct(args{:});
+%   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
+%else
+%    g = [];
+%end;
 
 % test the presence of variables
 % ------------------------------
-try, g.fields; 	 	  catch, g.fields = {}; end;
-try, g.skipline;      catch, g.skipline = 0; end;
-try, g.indices;  g.append = '''yes'''; catch, g.indices = []; end;
-try, g.append; 	      catch, g.append = '''yes'''; end;
-try, g.timeunit; 	  catch, g.timeunit = 1; end;
-try, g.align; 	      catch, g.align = NaN; end;
-try, g.delim; 	      catch, g.delim = char([9 32]); end;
+%try, g.fields; 	 	  catch, g.fields = {}; end;
+%try, g.skipline;      catch, g.skipline = 0; end;
+%try, g.indices;  g.append = '''yes'''; catch, g.indices = []; end;
+%try, g.append; 	      catch, g.append = '''yes'''; end;
+%try, g.timeunit; 	  catch, g.timeunit = 1; end;
+%try, g.align; 	      catch, g.align = NaN; end;
+%try, g.delim; 	      catch, g.delim = char([9 32]); end;
 
 % determine latency for old event alignment
 % -----------------------------------------
@@ -282,7 +295,7 @@ if ~isnan(g.align.val)
         error('Setevent: pre-existing events do not have a latency field for re-alignment');
     end;    
     switch g.append
-        case 'yes', disp('Setevent warning: using align, events should not be appended but erased');
+        case {'yes' '''yes'''}, disp('Setevent warning: using align, events should not be appended but erased');
     end;
     if g.align.val < 0
         g.align.event = EEG.event(1).latency;
@@ -303,7 +316,7 @@ for curfield = tmpfields'
         case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
         case 'event', % load an ascii file
             switch g.append 
-                case '''no'''
+                case { '''no''' 'no' } % for backward compatibility
                       EEG.event = load_file_or_array( g.event, g.skipline, g.delim );
                       allfields = g.fields(1:min(length(g.fields), size(EEG.event,2)));
                       EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
@@ -314,7 +327,7 @@ for curfield = tmpfields'
 						  EEG.event(index).init_time  = EEG.event(index).latency*g.timeunit;
 					  end;
 					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
-                case '''yes'''
+                case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
@@ -368,22 +381,6 @@ EEG = eeg_checkset(EEG, 'makeur');
 % generate the output command
 % ---------------------------
 com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vararg2str(args));
-
-%for i=1:2:length(args)
-%    if ~isempty( args{i+1} )
-%        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, args{i+1} );
-%        else    if ~iscell( args{i+1} ) com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-%                else 
-%                    com = sprintf('%s, ''%s'', { ', com, args{i});
-%                    for index = 1:length( args{i+1}{1} ), com = sprintf('%s ''%s'' ', com, args{i+1}{1}{index}); end;
-%                    com = sprintf('%s }', com);
-%                end;                    
-%        end;
-%    else
-%        com = sprintf('%s, ''%s'', []', com, args{i} );
-%    end;
-%end;
-%com = [com ');'];
 
 % interpret the variable name
 % ---------------------------
