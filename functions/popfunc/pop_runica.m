@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2005/03/14 22:13:59  hilit
+% fixing a typo
+%
 % Revision 1.51  2005/03/14 19:43:28  arno
 % saving old weights
 %
@@ -276,7 +279,7 @@ end;
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
 fprintf('\n');
-if ~isempty('EEG.icaweights')
+if ~isempty(EEG.icaweights)
     fprintf('Saving current ICA weights in "EEG.etc" sub-structure.\n');
     if ~isfield(EEG,'etc'), EEG.etc = []; end;
     if ~isfield(EEG.etc,'oldicaweights')
