@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/10/29 16:36:49  arno
+% typo last
+%
 % Revision 1.14  2003/10/29 16:35:29  arno
 % moving sphere options
 %
@@ -183,5 +186,5 @@ else
     end;
 end;
     
-com = sprintf('pop_dipplot( %s, %s);', inputname(1), vararg2str({ typedip comps options{:}}));
+com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ typedip comps options{:}}));
 return;
