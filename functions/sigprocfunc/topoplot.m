@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2004/03/18 01:47:24  scott
+% debug
+%
 % Revision 1.151  2004/03/18 01:44:28  scott
 % 'plotrad' arg and help message re skirt
 %
@@ -608,8 +611,8 @@ labels = labels(ind);
 if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), 
    shrinkfactor = tmpeloc(1).shrink;
 end;
-if abs(shrinkfactor) > 3
-    shrinkfactor = (shrinkfactor-90)/90; 
+if ~isstr(shrinkfactor)
+    shrinkfactor = 0.5+0.5*shrinkfactor; 
 end;
 if strcmpi(skirtfactor, 'off') & isfield(tmpeloc, 'skirt'), 
    skirtfactor = tmpeloc(1).skirt; 
@@ -625,32 +628,30 @@ Th = pi/180*Th;                              % convert degrees to radians
 
 % shrink mode
 % -----------
-squeezefac=1;
 if isstr(shrinkfactor) % if shrink arg is a string option
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) ...
                    | strcmp(lower(shrinkfactor),'force') 
-		squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
-        if squeezefac > 1
-            squeezefac = 1;
+		shrinkfactor = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
+        if shrinkfactor > 1
+            shrinkfactor = 1;
         elseif strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
-                1-squeezefac);
+            fprintf('topoplot(): electrode radii shrunk towards vertex by (radius %2.3g) to plot all\n', ...
+                shrinkfactor);
         end;
-		Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
+		Rd = Rd*shrinkfactor; % squeeze electrodes by (squeezefac*100)%
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
+        fprintf('topoplot(): electrode radii shrunk towards vertex (radius %2.3g) to plot all\n', ...
                                                                       shrinkfactor);
 	end;
-    squeezefac = 1-shrinkfactor;
-keyboard
-    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)% 
+    Rd = Rd/shrinkfactor*rmax; % squeeze electrodes by (squeezefac*100)% 
                         % to fit inside plotting circle
 end;
 
 % skirt mode
 % ----------
+squeezefac=1;
 if ~isstr(skirtfactor) & strcmpi(skirtfactor, 'off') 
     squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
     if squeezefac > 1
