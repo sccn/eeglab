@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/08/10 22:54:52  arno
+% fixed resampling for data epochs
+%
 % Revision 1.12  2004/08/03 01:33:03  arno
 % convert to double for Matlab 7
 %
@@ -130,7 +133,7 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
     end;
     bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];
 else 
-    bounds = [1 size(EEG.data,2)];
+    bounds = [1 size(EEG.data,2)+1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
 end;
 if exist('resample') == 2
     fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
@@ -143,7 +146,7 @@ if exist('resample') == 2
             indices = [1];
             for ind = 1:length(bounds)-1
                 tmpres  = [ tmpres resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q ) ];
-                indices = [ indices length(tmpres)+1 ];
+                indices = [ indices size(tmpres,1)+1 ];
             end;
             if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
             else                    EEG.pnts  = size(tmpres,1);
@@ -153,7 +156,7 @@ if exist('resample') == 2
             for ind = 1:length(bounds)-1
                 tmpres(indices(ind):indices(ind+1)-1,:) = resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q );
             end;
-        end;        
+        end; 
         tmpeeglab(index1,:, :) = tmpres;
     end;
     fprintf('\n');	
