@@ -39,12 +39,12 @@
 %   "Append chan" - [button] append channel after the current channel. Command line 
 %                 equivalent: 'append'.
 %   "Plot 2D" - [button] plot channel positions in 2-D using topoplot() function.  
-%   "2-D shrink factor" - [edit box] enter a value to shrink channel location in the
-%                 2-D polar view. This DOES NOT AFFECT channel locations and is only
-%                 used for visualization. This parameter is attached to the dataset
+%   "Head limit (0-180)" - [edit box] enter a value in degree of head limit for plotting
+%                 channels in 2-D polar view. This DOES NOT AFFECT channel locations and
+%                 is only used for visualization. This parameter is attached to the dataset
 %                 and is then used in all 2-D scalp plots. Command line equivalent
 %                 is 'shrink'.
-%   "Auto shrink" - [button] automatically computes the shrinking factor so all
+%   "Shrink(set)/Skirt" - [button] automatically computes the shrinking factor so all
 %                 channels are visible on the 2-D topographical plot.
 %   "Plot 3D" - [button] plot channel positions in 3-D using plotchans3d() function.                 
 %   "Read locations" - [button] read location file using readlocs() function. 
@@ -92,6 +92,7 @@
 %                   to be at a particular location on the sphere (and rotate other
 %                   channels accordingly).
 %   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
+%   'skirt'       - Topographical polar skirt factor (see >> help topoplot) 
 %   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
 %                   optional arguments (such as file format) to the function 
 %                   readlocs() can be specified if the input is a cell array.
@@ -132,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2004/03/08 19:24:49  arno
+% shink -> shrink
+%
 % Revision 1.89  2004/02/13 19:13:56  arno
 % nothing
 %
@@ -416,7 +420,7 @@ end;
 
 nbchan = length(chans);
 allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' };
-[chans shrinkfact]= checkchans(chans, allfields);
+[chans shrinkorskirt shrinkskirtfact]= checkchans(chans, allfields);
 
 if nargin < 2
     
@@ -559,21 +563,17 @@ if nargin < 2
 		
 		% add sorting options
 		% -------------------
-		if isstr(shrinkfact)
-			evalin('base', ['tmpshrink = ''' shrinkfact ''';' ]);
-		else
-			evalin('base', ['tmpshrink = ' num2str(shrinkfact) ';' ]);
-		end;
-		plot2dcom = [ 'tmpshrink = ''off'';' ...
-					  'if get(findobj(''parent'', gcbf,  ''string'', ''Auto shrink''), ''value'')' ...
-					  '   tmpshrink = ''force'';' ...
-					  'else ' ...
-					  '   if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''))' ...
-					  '       tmpshrink = str2num(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''));' ...
-					  '   end;' ...
+		plot2dcom = [ 'if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''))' ...
+					  '   tmpshrink = str2num(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''));' ...
+                      'else ' ...
+                      '   tmpshrink = ''auto'';' ...
 					  'end;' ...
-					  'figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''shrink'', tmpshrink);' ];
-		geometry = { geometry{:} [1] [1 1.4 0.6 1 1] [1] [1 1 1 1]};
+                      'if get(findobj(''parent'', gcbf,  ''tag'', ''shrinkbut''), ''value'')' ...
+					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''shrink'', tmpshrink);' ...
+					  'else ' ...
+					  '   figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''skirt'', tmpshrink);' ...
+                      'end; clear tmpshrink;' ];
+		geometry = { geometry{:} [1] [1 1.2 0.6 1.2 1] [1] [1 1 1 1]};
         guireadlocs = [ '[tmpf tmpp] = uigetfile(''*'', ''Load a channel location file''); drawnow;' ...
                         'if ~isequal(tmpf, 0),' ...
                         '   tmpformats = { ''autodetect'', ''loc eeglab'', ''sph eeglab'', ''sfp egi/besa'', ''xyz eeglab'', ''asc neuroscan'', ' ...
@@ -594,11 +594,9 @@ if nargin < 2
 		uilist = {  uilist{:},...
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
-					{ 'Style', 'text', 'string', '2D shrink factor (-1 to 1)'} ...
-					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), ...
-					  'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string''); set(findobj(''tag'', ''shrinkbut''), ''value'', 0);' } ...
-					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), ...
-					  'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; else tmpshrink=''off''; end; set(findobj(''tag'', ''shrinkfactor''), ''string'', '''');' } ...
+					{ 'Style', 'text', 'string', 'Head limit (0-180)'} ...
+					{ 'Style', 'edit', 'string', shrinkskirtfact, 'tag', 'shrinkfactor' } ...
+					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Shrink(set)/Skirt', 'value', shrinkorskirt } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', plot3d } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Read locations', 'callback', guireadlocs }, ...
 					{ 'Style', 'pushbutton', 'string', 'Read help', 'callback', 'pophelp(''readlocs.m'');' }, ...	
@@ -667,17 +665,18 @@ if nargin < 2
 	% not in the loop, returning
 	% --------------------------
 	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
-		if evalin('base', 'exist(''tmpshrink'')') == 1
-			tmpshrink = evalin('base', 'tmpshrink');
-			evalin('base', 'clear tmpshrink');
-            if ~isequal(tmpshrink, shrinkfact)
-				if  isstr(tmpshrink)  chans(1).shrink = num2str(tmpshrink);
-				else                  chans(1).shrink = tmpshrink;
-				end;
-				totaluserdat{end+1} = 'shrink';
-				totaluserdat{end+1} = chans(1).shrink;
-			end; 
-		end;
+        tmpshrinkskirt = get(findobj('parent', gcf, 'tag','shrinkbut'), 'value');
+        tmpval         = num2str(get(findobj('parent', gcf, 'tag','shrinkfactor'), 'string'));
+        
+        if tmpshrinkskirt,
+            chans(1).shrink = num2str(tmpval);
+            totaluserdat{end+1} = 'shrink';
+            totaluserdat{end+1} = chans(1).shrink;
+        else
+            chans(1).skirt  = num2str(tmpval);
+            totaluserdat{end+1} = 'skirt';
+            totaluserdat{end+1} = chans(1).skirt;
+        end;
 		close(gcf);
 		if ~isempty( totaluserdat )
 			if isempty(inputname(1)), varname = 'EEG.chanlocs';
@@ -766,6 +765,9 @@ else
            
 		  case 'shrink'
 		   chans(1).shrink = args{ curfield+1 };		   
+           
+		  case 'skirt'
+		   chans(1).skirt  = args{ curfield+1 };		   
            
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
@@ -908,13 +910,34 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
-function [chans, shrinkfact]= checkchans(chans, fields);
-	shrinkfact = 'off';
+function [chans, shrinkorskirt, factval]= checkchans(chans, fields);
+	shrinkfact = '';
+	skirtfact  = '';
 	if isfield(chans, 'shrink'), 
 		shrinkfact = chans(1).shrink; 
 		chans = rmfield(chans, 'shrink');
         if isstr(shrinkfact) & ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
 	end;
+	if isfield(chans, 'skirt'), 
+		shrinkfact = chans(1).skirt; 
+		chans = rmfield(chans, 'skirt');
+        if isstr(skirtfact) & ~isempty(str2num(skirtfact)), skirtfact = str2num(skirtfact); end;
+	end;
+    
+    % shrink and skirt factors
+    % ------------------------
+    shrinkorskirt = 0;
+    factval = 90;
+    if ~isempty(shrinkfact)
+        shrinkorskirt = 1;
+        factval       = shrinkfact;
+        if abs(factval) < 3,
+            factval = factval*90; % auto-conversion
+        end;
+    elseif ~isempty(skirtfact)
+        factval       = skirtfact;
+    end;        
+    
     for index = 1:length(fields)
         if ~isfield(chans, fields{index})
             chans = setfield(chans, {1}, fields{index}, []);
