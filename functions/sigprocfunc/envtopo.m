@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/03/23 20:05:59  scott
+% overplot data envelope on filled component projection
+%
 % Revision 1.20  2003/03/14 16:18:37  arno
 % plot pvaf in topoplot
 %
@@ -671,7 +674,9 @@ envx = [1;compx+1];
             % Overplot the data envlope again so it is not covered by the fill()'d component
             %
             p=plot(x,matsel(envdata,frames,0,1,envx(1)),colors(mapcolors(1),1));% plot the max
+            set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
             p=plot(x,matsel(envdata,frames,0,2,envx(1)),colors(mapcolors(1),1));% plot the min
+            set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
         end
         axis([xmin xmax ymin ymax]);
     end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
