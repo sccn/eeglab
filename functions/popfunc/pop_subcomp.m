@@ -1,7 +1,17 @@
 % pop_subcomp() - substract a selected components from a dataset.
 %
 % Usage:
+%   >> OUTEEG = pop_subcomp( INEEG ); % pop-up window mode
 %   >> OUTEEG = pop_subcomp( INEEG, components, confirm);
+%
+% Graphical interface:
+%   "Component list to subtract ..." - [edit box] Array of components
+%                to subtract. Same as the 'components' parameter from
+%                the command line.
+%   "Component list to keep ..." - [edit box] Array of components to
+%                to keep. Uses the 'component' parameter from the 
+%                command line. comp_to_remove = ...
+%                       setdiff([1:size(EEG.icaweights,1)], comp_to keep)
 %
 % Inputs:
 %   INEEG      - Input dataset.
@@ -38,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/01/28 18:34:45  arno
+% adding an option to keep components
+%
 % Revision 1.8  2003/01/16 18:10:56  arno
 % debugging for PCA
 %
