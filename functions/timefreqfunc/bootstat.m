@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/23 00:31:20  arno
+%  fitting with normal distribution for 1-D data
+%
 % Revision 1.8  2003/04/18 18:55:28  arno
 % comment to fit with normal distribution
 %
@@ -178,7 +181,7 @@ end;
 
 % vector of only one dimension
 % -----------------------------
-if size(oriarg1,1) == 1 | size(oriarg1,2) == 1
+if (size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1
     if isnan(g.accarray)
         fprintf('Bootstrap type is 1-D\n');
         fprintf('Processing %d bootstrap accumulation\n', g.naccu);
