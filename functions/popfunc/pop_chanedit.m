@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2003/12/18 01:10:37  arno
+% debug text
+%
 % Revision 1.78  2003/12/18 01:08:20  arno
 % channel location lookup
 %
@@ -801,13 +804,12 @@ else
                    for index = 1:(length(tmpdiff)-1)
                        fprintf('%s,', chans(tmpdiff(index)).labels);
                    end;
-                   fprintf('%s\n', chans(tmpdiff(end)).labels);
+                   fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu', chans(tmpdiff(end)).labels);
                end;
            end;
           case 'eval'
 		   tmpargs = args{ curfield+1 };
            eval(tmpargs);
-                tmplocs = readlocs('Standard-10-20-Cap81.ced', 'filetype', 'chanedit');
 		  
           case 'save'
 		   tmpargs = args{ curfield+1 };
