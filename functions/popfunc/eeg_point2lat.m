@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/05/26 23:15:43  arno
+% add example
+%
 % Revision 1.5  2003/01/02 15:58:28  arno
 % edit header
 %
@@ -74,7 +77,7 @@ end;
 if isempty( epoch_array )
     epoch_array = ones( size(lat_array) );
 end;
-if nagin <4
+if nargin <4
     timewin = 0;
 end;
 if nargin <5
