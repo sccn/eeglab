@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 function [EEG, com] = pop_headplot( EEG, typeplot, arg2, topotitle, rowcols, varargin);
 
@@ -90,7 +93,8 @@ if nargin < 3
     end;
     
 	if isempty(EEG.splinefile) | exist(EEG.splinefile) ~= 2
-	    error('Pop_headplot: can not find spline file, check path, abording');
+	    errmsg = sprintf('Pop_headplot: can not find spline file %s. Check path. Aborting',EEG.splinefile);
+	    error(errmsg);
 	end;
 
  	% which set to save
