@@ -1,6 +1,6 @@
-% binica - Run stand-alone binary version of runica() from the
-%          Matlab command line. Saves time and memory. 
-%          If stored in a file, data are not read into Matlab.
+% binica() - Run stand-alone binary version of runica() from the
+%            Matlab command line. Saves time and memory. 
+%            If stored in a file, data are not read into Matlab.
 % Usage:
 %  >> [wts,sph] = binica( datavar, 'key1', value1, 'key2', value2 ...);
 %  >> [wts,sph] = binica( 'datafile', chans, frames, 'key1', value1, ...);
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/05 18:17:06  arno
+% debugging directory finding
+%
 % Revision 1.3  2002/06/25 02:38:49  scott
 % calrified error msgs -sm
 %

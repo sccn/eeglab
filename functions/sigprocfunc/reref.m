@@ -40,7 +40,7 @@
 %        2) 'icaweight' conversion of the weight matrix W to average reference:
 %        If ica_act = W*data, then data = inv(W)*ica_act; 
 %        If R*data is the average-referenced data, 
-%        R*data = (R*inv(W))*ica_act and Wout = inv(R*inv(W));
+%        R*data=(R*inv(W))*ica_act and Wout = inv(R*inv(W));
 %        The average-reference ICA maps are the columns of inv(Wout).
 %
 % Authors: Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1999-2002 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/14 18:14:02  arno
+% updating elocs parameter filter
+%
 % Revision 1.10  2002/11/13 23:04:41  arno
 % removing extra electrode in average ref
 %

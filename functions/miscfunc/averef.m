@@ -17,10 +17,12 @@
 % Note: If 2 args, also converts the weight matrix W to average reference:
 %         If ica_act = W*data, then data = inv(W)*ica_act; 
 %         If R*data is the average-referenced data, 
-%         R*data = (R*inv(W))*ica_act and W_out = inv(R*inv(W));
-%       The average-reference ICA maps are the columns of inv(W_out).
+%         R*data=(R*inv(W))*ica_act and W_out = inv(R*inv(W));
+%         The average-reference ICA maps are the columns of inv(W_out).
 %
 % Authors: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1999 
+%
+% See also: reref()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -41,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/12 18:01:21  arno
+% header typo
+%
 % Revision 1.7  2002/09/05 00:30:23  scott
 % added meandata output -sm
 %
