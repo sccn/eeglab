@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/06/29 16:44:09  scott
+% randomize data shuffling by clock state
+%
 % Revision 1.19  2004/05/16 01:13:19  scott
 % typo
 %
@@ -217,7 +220,7 @@ DEFAULT_LRATE        = 0.00065/log(chans);
                                   % heuristic default - may need adjustment
                                   %   for large or tiny data sets!
 % DEFAULT_BLOCK        = floor(sqrt(frames/4));  % heuristic default 
-DEFAULT_BLOCK        = min(floor(5*log(frames)),0.3*frames); % heuristic 
+DEFAULT_BLOCK          = ceil(min(5*log(frames)),0.3*frames)); % heuristic 
                                   % - may need adjustment!
 % Extended-ICA option:
 DEFAULT_EXTENDED     = 0;         % default off
@@ -356,7 +359,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf('runica(): block size value must be a number')
             return
          end
-         block = Value;
+         block = floor(Value);
          if ~block,
            block = DEFAULT_BLOCK; 
          end
@@ -797,8 +800,8 @@ end
   oldweights = startweights;
   prevwtchange = zeros(chans,ncomps);
   oldwtchange = zeros(chans,ncomps);
-  lrates = zeros(1,maxsteps);
-  onesrow = ones(1,block);
+  lrates = zeros(1,maxsteps); block
+  onesrow = ones(1,block); 
   bias = zeros(ncomps,1);
   signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
   for k=1:nsub
