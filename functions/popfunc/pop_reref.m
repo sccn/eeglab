@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/12 23:23:37  arno
+% mode -> method keyword
+%
 % Revision 1.1  2002/11/12 19:08:34  arno
 % Initial revision
 %
@@ -64,12 +67,13 @@ end;
 if nargin < 2
     % build gui
 	% ---------
-    geometry = { [1 1] [1 1] [1] [3 1 1 1 1] [3 1 1 1 1] };
-    uilist = { { 'style' 'checkbox' 'tag' 'ave' 'value' 1 'string' 'Compute average reference' 'callback' ...
+    geometry = { [1] [1.8 1] [1.8 1] [1] [3 1 1 1] [3 1 1 1] };
+    uilist = { { 'style' 'text' 'string' ['Data reference state is: ' EEG.ref] } ...
+               { 'style' 'checkbox' 'tag' 'ave' 'value' 1 'string' 'Compute average reference' 'callback' ...
                  [ 'set(findobj(''parent'', gcbf, ''tag'', ''reref''), ''value'', ~get(gcbo, ''value''));' ...
                    'set(findobj(''parent'', gcbf, ''tag'', ''rerefstr''), ''enable'', fastif(get(gcbo, ''value''), ''off'', ''on''));' ] } ...
                { } ...
-               { 'style' 'checkbox' 'tag' 'reref' 'string' 'Re-reference data to channel:' 'callback' ...
+               { 'style' 'checkbox' 'tag' 'reref' 'string' 'Re-reference data to channel number(s):' 'callback' ...
                  [ 'set(findobj(''parent'', gcbf, ''tag'', ''ave''), ''value'', ~get(gcbo, ''value''));'  ...
                  'set(findobj(''parent'', gcbf, ''tag'', ''rerefstr''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));' ] } ...
                { 'style' 'edit' 'tag' 'rerefstr' 'string' '' 'enable' 'off' } ...
@@ -78,14 +82,21 @@ if nargin < 2
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Label' } ...
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Theta' } ...
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Radius' } ...
-               { } ...
                { 'style' 'checkbox' 'string' 'Include old reference channel' 'callback' ...
                  'set(findobj(''parent'', gcbf, ''tag'', ''oldref''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
-               { 'style' 'text' 'string' 'Help' 'tooltipstring' 'If present, will use the extra channel in the electrode location structure' } ...
              };
+    if strcmpi(EEG.ref, 'averef') | strcmpi(EEG.ref, 'averefwithref')
+        geometry = { geometry{1:end-2} };
+        uilist   = { uilist{1:end-8} }    
+    elseif length(EEG.chanlocs) == EEG.nbchan+1
+        geometry = { geometry{1:end-2}  [1] };
+        uilist   = { uilist{1:end-8} ...
+                     { 'style' 'checkbox' 'string' 'Include old reference channel (use location from the electrode location structure)' } };
+    end;
+    
     result = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
 
     % decode inputs
@@ -96,8 +107,10 @@ if nargin < 2
     end;
     if result{1}, ref = []; end;
     options = { };
-    if result{4}, options = { options{:} 'method' 'withref' }; end;
-    if ~isempty(result{5}), options = { options{:} 'refloc' { result{5} eval(result{6}) eval(result{7}) } }; end;
+    if length(result) > 3 & result{4}, options = { options{:} 'method' 'withref' }; end;
+    if length(result) > 4 & ~isempty(result{5}), 
+        options = { options{:} 'refloc' { result{5} eval(result{6}) eval(result{7}) } };
+    end;
 else 
     options = varargin;
 end;
@@ -108,6 +121,9 @@ optionscall = options;
 if ~isempty(EEG.chanlocs)
     optionscall = { optionscall{:} 'elocs' EEG.chanlocs }; 
 end;    
+if isfield(EEG, 'reref')
+    optionscall = { optionscall{:} 'refstate' EEG.ref }; 
+end;
 
 % include ICA or not
 % ------------------
@@ -122,8 +138,21 @@ end;
 % add a tag in the dataset and clear some fields
 % ----------------------------------------------
 if isempty(ref)
-         EEG.reref = 'Average';
-else     EEG.reref = 'Yes';
+    if ~isempty(ref)     
+        EEG.ref = 'common';
+    else
+        withref = 0;
+        for index = 1:length(options)
+            if isstr(options{index}) & strcmpi(options{index}, 'withref');
+                withref = 1;
+            end;
+        end;
+        if withref
+            EEG.ref = 'averefwithref';
+        else 
+            EEG.ref = 'averef';
+        end;
+    end;
 end;
 EEG.icaact  = [];
 EEG.icawinv = [];
