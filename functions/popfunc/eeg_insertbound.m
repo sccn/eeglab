@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/11/16 23:33:00  arno
+% same
+%
 % Revision 1.29  2004/11/16 23:31:48  arno
 % debug event insertion when empty event array
 %
@@ -214,17 +217,8 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             
             % add lengths of previous events (must be done after above
             % --------------------------------------------------------
-            if addlength == -1
-                if isfield(eventout, 'duration')
-                    eventout = rmfield(eventout, 'duration');
-                    disp('Warning: old boundary event type present in dataset');
-                    disp('         The new boundary events have to be compatible with the old ones');
-                    disp('         and will not contain the duration of the removed region');
-                end;
-            else
-                eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
-                if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
-            end;
+            eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
+            if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
         
         end; 
 	end;
@@ -243,13 +237,12 @@ function [ indnested, addlen ] = findnested(event, ind);
     addlen = 0;
     tmpind = ind+1;
 
-    while tmpind < length(event) & ...
+    while tmpind <= length(event) & ...
         event(tmpind).latency < event(ind).latency+event(ind).duration
         if strcmpi(event(tmpind).type, 'boundary')
             if ~isempty( event(tmpind).duration )
                 addlen    = addlen + event(tmpind).duration;
-            else
-                addlen = -1; % error
+                % otherwise old event duration or merge data discontinuity
             end;
         end;
         indnested = [ indnested tmpind ];
