@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/07/18 01:26:05  scott
+% debug
+%
 % Revision 1.47  2003/07/18 01:18:12  scott
 % debug last
 %
@@ -474,11 +477,7 @@ labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
 
-  pos = get(gca,'position');
-  fprintf('0 - Current axes size %g,%g\n',pos(3),pos(4));
 if ~strcmpi(STYLE,'blank') % if draw scalp map
-  pos = get(gca,'position');
-  fprintf('1 - Current axes size %g,%g\n',pos(3),pos(4));
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
