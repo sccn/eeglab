@@ -184,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/07/09 21:30:54  arno
+% timesout - > ntimesout for timefreq call
+%
 % Revision 1.59  2003/06/27 01:01:32  arno
 % updating timesout help
 %
@@ -1234,9 +1237,7 @@ case 'on'
    h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
    Emax = max(R); % mean coherence at each time point
    Emin = min(R); % mean coherence at each time point
-   hold on;
-   plot(times,Emax,'b');
-   plot(times,Emin,'b');
+   plot(times,Emin, times, Emax, 'LineWidth',g.linewidth); hold on;
    plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
    plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
    for i=1:length(g.marktimes)
@@ -1245,9 +1246,12 @@ case 'on'
    if ~isnan(g.alpha) & dims(Rboot) > 1
       % plot bootstrap significance limits (base mean +/-)
       switch dims(Rboot)
-       case 2, plot(times,mean(Rboot(:,:),1),'g','LineWidth',g.linewidth);
-       case 3, plot(times,mean(Rboot(:,:,1),1),'g','LineWidth',g.linewidth);
-               plot(times,mean(Rboot(:,:,2),1),'g','LineWidth',g.linewidth);
+       case 2, plot(times,mean(Rboot(:,:),1),'g' ,'LineWidth',g.linewidth);
+               plot(times,mean(Rboot(:,:),1),'k:','LineWidth',g.linewidth);
+       case 3, plot(times,mean(Rboot(:,:,1),1),'g' ,'LineWidth',g.linewidth);
+               plot(times,mean(Rboot(:,:,1),1),'k:','LineWidth',g.linewidth);
+               plot(times,mean(Rboot(:,:,2),1),'g' ,'LineWidth',g.linewidth);
+               plot(times,mean(Rboot(:,:,2),1),'k:','LineWidth',g.linewidth);
       end;
       axis([min(times) max(times) 0 max([Emax(:)' Rboot(:)'])*1.2])
    else
@@ -1267,9 +1271,9 @@ case 'on'
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
    E = abs(mbase); % baseline mean coherence at each frequency
    if ~strcmpi(g.freqscale, 'log')
-       plot(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
+       plot(freqs,E,'b','LineWidth',g.linewidth); % plot mbase
    else
-       semilogy(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
+       semilogy(freqs,E,'b','LineWidth',g.linewidth); % plot mbase
        set(h(5),'View',[90 90])
        divs = linspace(log(freqs(1)), log(freqs(end)), 10);
        set(gca, 'xtickmode', 'manual');
@@ -1281,17 +1285,25 @@ case 'on'
        hold on
        if ~strcmpi(g.freqscale, 'log')
            switch dims(Rboot)
-            case 1, plot(freqs,Rboot(:),'g','LineWidth',g.linewidth);
-            case 2, plot(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
-            case 3, plot(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
-             plot(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
+            case 1, plot(freqs,Rboot(:),'g' ,'LineWidth',g.linewidth);
+                    plot(freqs,Rboot(:),'k:','LineWidth',g.linewidth);
+            case 2, plot(freqs,mean(Rboot(:,:),2),'g' ,'LineWidth',g.linewidth);
+                    plot(freqs,mean(Rboot(:,:),2),'k:','LineWidth',g.linewidth);
+            case 3, plot(freqs,mean(Rboot(:,:,1),2),'g' ,'LineWidth',g.linewidth);
+                    plot(freqs,mean(Rboot(:,:,1),2),'k:','LineWidth',g.linewidth);
+                    plot(freqs,mean(Rboot(:,:,2),2),'g' ,'LineWidth',g.linewidth);
+                    plot(freqs,mean(Rboot(:,:,2),2),'k:','LineWidth',g.linewidth);
            end;  
        else
            switch dims(Rboot)
-            case 1, semilogy(freqs,Rboot(:),'g','LineWidth',g.linewidth);
-            case 2, semilogy(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
-            case 3, semilogy(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
-                    semilogy(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
+            case 1, semilogy(freqs,Rboot(:),'g' ,'LineWidth',g.linewidth);
+                    semilogy(freqs,Rboot(:),'k:','LineWidth',g.linewidth);
+            case 2, semilogy(freqs,mean(Rboot(:,:),2),'g' ,'LineWidth',g.linewidth);
+                    semilogy(freqs,mean(Rboot(:,:),2),'k:','LineWidth',g.linewidth);
+            case 3, semilogy(freqs,mean(Rboot(:,:,1),2),'g' ,'LineWidth',g.linewidth);
+                    semilogy(freqs,mean(Rboot(:,:,1),2),'k:','LineWidth',g.linewidth);
+                    semilogy(freqs,mean(Rboot(:,:,2),2),'g' ,'LineWidth',g.linewidth);
+                    semilogy(freqs,mean(Rboot(:,:,2),2),'k:','LineWidth',g.linewidth);
            end;  
        end;           
        if ~isnan(max(E))
