@@ -33,7 +33,9 @@
 %  'vert'      = vector of times to plot vertical lines {default|[] -> none}
 %  'icawinv'   = [float array] inverse weigth matrix. By default computed by inverting
 %                the weight matrix (but if some components have been removed, then
-%                weight's pseudo-inverse matrix does not represent component's maps. 
+%                weight's pseudo-inverse matrix does not represent component's maps).
+%  'icaact'    = [float array] ICA component activity. By default computed using the
+%                weight matrix.
 %  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
 %                envelope { Default -> 'avg' }
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
@@ -71,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/05 03:23:44  scott
+% minor
+%
 % Revision 1.11  2003/03/03 22:28:03  arno
 % update text header
 %
@@ -151,6 +156,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'limits'        'real'     []                       0;
 				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
 				  'icawinv'       'real'     []                       pinv(weights) ;
+				  'icaact'        'real'     []                       [] ;
 				  'voffsets'      'real'     []                       [] ;
 				  'vert'          'real'     []                       [] ;
 				  'fillcomp'      'integer'  []                       0 ; %no fill
@@ -407,7 +413,11 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
     fprintf('\n');
   end
   %proj = icaproj(data,weights,g.compnums(c)); % updated arg list 12/00 -sm
-  proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
+  if isempty(g.icaact)
+      proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
+  else 
+      proj = g.icaact(g.compnums(c),:);  
+  end;
   envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode);
 
   [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
