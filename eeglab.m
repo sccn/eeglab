@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.302  2003/12/16 23:31:36  arno
+% adding brain vision analyser import function
+%
 % Revision 1.301  2003/12/12 01:17:55  arno
 % debug history for channel locations
 %
@@ -1426,7 +1429,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
-    if length(importsub_m) > 10, set(importsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(importsub_m) > 11, set(importsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
