@@ -3,7 +3,8 @@
 %              with a moving-average. Optionally sort trials on value, amplitude or
 %              phase within a specified window (NB: to return event-aligned data 
 %              without plotting, use eventlock()). Click on figure axes to examine 
-%              separately and zoom.
+%              separately and zoom (using axcopy()).
+%
 % Usage:
 %   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
 %         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx] ...
@@ -15,64 +16,73 @@
 %               Formats (1,frames*trials) or (frames,trials)
 %   sortvar  - [vector] Variable to sort epochs on (length(sortvar) = nepochs)
 %              Example: sortvar may by subject response time in each epoch (in ms)
-% Additional ordered inputs (with defaults):
-%   times    - Vector of times (ms) (length(times) = frames) {def|0: [0:frames-1]}
+% Additional ordered inputs {with defaults}:
+%   times    - Vector of times (ms) (length(times) = frames) {Def|0: [0:frames-1]}
 %               ELSE [startms ntimes srate] Give start time (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz),
-%  'title'   - ['string'] Plot titla {default: none}
-%   avewidth - Number of trials to moving-average (NB: may be non-int) {def|0->1}
-%   decimate - Factor to decimate ntrials out by (NB: may be non-int) {def|0->1}
+%  'title'   - ['string'] Plot titla {Default: none}
+%   avewidth - Number of trials to moving-average (NB: may be non-int) {Def|0->1}
+%   decimate - Factor to decimate ntrials out by (NB: may be non-int) {Def|0->1}
 %               If this is large ( > sqrt(num. trials)), output this many trials.
-% Unordered 'keyword',arg options:
+% Unordered options ('keyword',argument):
+% Optionally realign data epochs: 
 %   'align'  - [time] Time-lock data to sortvar. Plot sortvar as at time (ms)
-%              If time == Inf, plot at sortvar median {default: no align}
-%   'noplot' - Do not plot sortvar {default: do plot sortvar if in times range}
+%               If time == Inf, plot at sortvar median {Default: no align}
 %   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to times range.
-%              and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
-%   'nosort' - Do not sort data on sortvar {default: do sort on sortvar}
+%               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {Default: 'no'}
+%   'noplot' - Do not plot sortvar {Default: Do plot sortvar if in times range}
+% Optionally sort input epochs: 
+%  [Default] - Sort data epochs by sortvar
+%   'nosort' - Do not sort data epochs.
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
-%              If -1, plot max-value epoch at bottom {default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq] Sort epochs by phase in a 3-cycle window 
-%                centered at time ms_center (ms). Percentile (prct) in range [0,100] 
-%                gives percent of trials to reject for low amplitude. Else, in range
-%               [-100,0] gives percent of trials to reject for high amplitude.
-%               minfreq (Hz) is the phase-sorting frequency. With optional maxfreq,
-%               sort by phase at freq of max power in the data in range [minfrq,maxfrq]
-%               (Note: phasesort freq overrides frequency specified in 'coher').
-%               With optional arg. topphase, sort by phase, putting topphase (deg. in 
-%               range [-180,180]) at the top of the image {default: [0 25 8 13 180]}
-%  'ampsort' - [center_ms prcnt minfreq maxfreq] Sort epochs by amplitude. See
-%               'phasesort' help above.
+%              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
+% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 3-cycle 
+%                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
+%                gives percent of trials to reject for low amplitude. Else if in range
+%               [-100,0], gives percent of trials to reject for high amplitude.
+%               freq (Hz) is the phase-sorting frequency. With optional maxfreq,
+%               sort by phase at freq of max power in the data in range [freq,maxfreq]
+%               (Note: 'phasesort' arg freq overrides frequency specified in 'coher').
+%               With optional topphase, sort by phase, putting topphase (degrees, in 
+%               range [-180,180]) at the top of the image {Default: [0 25 8 13 180]}
+%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. See 'phasesort' 
+%               explanation above.
+% Plot time-varying spectral amplitude instead of potential:
+% 'plotamps' - Image amplitudes at each time and trial instead of potential values. 
+%               Note: Currently Requires 'coher' (below) with alpha signif. {default: no}
+% Specify plot parameters:
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
 %               PLot axes limits. Can use NaN for missing items and omit late items. 
 %               Use last input bamp to fix the baseline amplitude.
+%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
+%               levels to save computation time. {default: none}
 %   'caxis'  - [lo hi] Set color axis limits ELSE [fraction] Set caxis limits at 
-%               (+/-)fraction*max(abs(data)) {default: data bounds}
-%   'cbar'   - Plot color bar to right of ERP-image {default no}
-%   'erp'    - Plot ERP time average of the trials below the image {default no}
-%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
-%               traces. To plot N traces, the auxvar matrix should be size (N,frames) 
-%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
-%               e.g. colorstrings = {'r','bo-','k:'} 
-%  'coher'   - [freq] Plot erp plus amp & coher at freq (Hz)
-%               [minfrq maxfrq] Same, but select frequency with max power
-%               in given range (NB: phasesort freq above overwrites these parameters).
-%               [minfrq maxfrq alpha] Add coher. signif. level line at alpha probability
-%               (alpha range: (0,0.1]) {default none}
-% 'plotamps' - Image amplitudes at each time & trial instead of potential values. 
-%               NB: Requires arg 'coher' with alpha signif. {default: image raw data}
+%               (+/-)fraction*max(abs(data)) {Default: data bounds}
+% Add epoch-mean ERP to plot:
+%   'erp'    - Plot ERP time average of the trials below the image {Default no}
+% Add time/frequency information:
+%  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
+%               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
+%               given range (NB: phasesort freq (above) overwrites these parameters).
+%               ELSE [minfrq maxfrq alpha] Add coher. signif. level line at 
+%               probability alpha (range: (0,0.1]) {Default: none}
+%   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
+%               implicit in third arg times) {default: as in icadefs.m}
+% Add other features to plot:
+%   'cbar'   - Plot color bar to right of ERP-image {Default no}
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
-%   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
-%               implicit in third arg times) {default: as in icadefs.m}
-%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
-%               levels to save computation time. {default: none}
+%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
+%               traces. To plot N traces, the auxvar matrix should be size (N,frames) 
+%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
+%               e.g. colorstrings = {'r','bo-','k:'} (See also: 'vert')
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified times
 %               ELSE  [times_matrix] Plot vertical dashed time series at times 
 %               specified by the columns of the 'vert' arg matrix. Matrix must  
-%               have ntrials rows (See also: auxvar).
+%               have ntrials rows (See also: 'auxvar').
+% Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' - ['string'] ERP ordinate axis label (default is uV)
 %
@@ -125,6 +135,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2002/10/15 17:52:00  scott
+% help msg - only two args required
+%
 % Revision 1.65  2002/10/14 16:12:38  scott
 % fprintf ms
 %
