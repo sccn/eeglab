@@ -151,6 +151,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.245  2005/01/25 18:47:01  scott
+% fixed recent bug that made all topoplot colors positive!!
+% worked on bug when removing gridchans from specified plotchans (using setxor)
+%
 % Revision 1.244  2005/01/25 01:32:53  scott
 % help msg
 %
@@ -1235,7 +1239,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
             if isstr(shrinkfactor)
                 fprintf('Automatically shrinking coordinates\n');
             else                
-                fprintf('Automatically shrinking coordinates by 3.2f\n', shrinkfactor);
+                fprintf('Automatically shrinking coordinates by %3.2f\n', shrinkfactor);
             end;
         end
     end;
