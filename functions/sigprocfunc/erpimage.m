@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.183  2003/12/17 21:40:12  scott
+% change y-labels on traces
+%
 % Revision 1.182  2003/12/04 17:53:52  arno
 % debug spec()
 %
@@ -2752,7 +2755,7 @@ if ~isnan(coherfreq)
         t=text(ynumoffset,minamp, num2str(minamp,3));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
-        t=text(ytextoffset,(maxamp+minamp)/2,'ERSP (dB)','Rotation',90);
+        t=text(ytextoffset,(maxamp+minamp)/2,'ERSP','Rotation',90);
         set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
         
         axtmp = axis;
@@ -2832,7 +2835,7 @@ if ~isnan(coherfreq)
         t=text(ynumoffset,maxcoh, num2str(maxcoh));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
-        t=text(ytextoffset,maxcoh/2,'ITC (r)','Rotation',90);
+        t=text(ytextoffset,maxcoh/2,'ITC','Rotation',90);
         set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
         drawnow
         
