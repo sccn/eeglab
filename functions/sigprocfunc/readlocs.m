@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/05/01 02:11:56  arno
+% new .txt format
+%
 % Revision 1.3  2002/05/01 01:15:31  arno
 % removing topo optimization
 %
@@ -109,12 +112,10 @@ if isstr(filename)
 			end;  
         case 'sph', 
 			for index = 1:size( array, 1)
-			  eloc(index).sperical_az    = array{index, 2};
-			  eloc(index).sperical_horiz = array{index, 3};
+			  eloc(index).sph_theta    = array{index, 2};
+			  eloc(index).sph_phi = array{index, 3};
+			  eloc(index).sph_radius = 1;
 			  eloc(index).labels  = array{index, 4};
-			  [ tmp eloc(index).theta eloc(index).radius] ...
-			         = sph2topo( index, eloc(index).sperical_az, eloc(index).sperical_horiz);
-			  [eloc.X eloc.Y eloc.Z] = sph2cart(eloc(index).sperical_horiz'/180*pi, eloc(index).sperical_az'/180*pi, 1);
 			end;  
         case { 'loc' 'locs' }, 
 			for index = 1:size( array, 1)
@@ -122,8 +123,6 @@ if isstr(filename)
 			  eloc(index).radius  = array{index, 3};
 			  eloc(index).labels  = array{index, 4};
 			  eloc(index).labels( find(eloc(index).labels == '.' )) = ' ';
-              [eloc(index).sperical_az eloc(index).sperical_horiz] = topo2sph( [eloc(index).theta eloc(index).radius]);
-			  [eloc(index).X eloc(index).Y eloc(index).Z] = sph2cart(eloc(index).sperical_horiz'/180*pi, eloc(index).sperical_az'/180*pi, 1);
 			end;
         case 'elp', 
             [eloc labels X Y Z]= readelp( filename );
