@@ -5,9 +5,9 @@
 %
 % Inputs:
 %   ALLEEG   - array of EEG datasets
-%   indices  - Indexes of datasets to delete. If no index is given,
-%              a pop_up window asks the user to choose. If a negative
-%              index is given, it is used a default in the pop-up window.
+%   indices  - indices of datasets to delete. None -> a pop_up window asks 
+%              the user to choose. Index < 0 -> it's positive is given as 
+%              the default in the pop-up window (ex: -3 -> default 3).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/15 01:43:07  scott
+% Can not -> cannot
+%
 % Revision 1.7  2002/08/14 00:02:32  arno
 % update error message
 %
@@ -72,7 +75,7 @@ end;
 if nargin < 2 | set_in < 0
 	% which set to delete
 	% -----------------
-	promptstr    = { 'Enter the dataset(s) to delete:' };
+	promptstr    = { 'Dataset(s) to delete:' };
 	if nargin == 2
 		inistr       = { int2str(-set_in) };
 	else
