@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/05/23 16:59:09  scott
+% replaced nanmean with nan_mean() -sm
+%
 % Revision 1.16  2002/05/22 06:06:28  marissa
 % changed line 1047 to remove nonexistent variable 'baseall'
 %
@@ -1647,7 +1650,7 @@ if ~isnan(coherfreq)
    end
    fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
    fprintf('     relative to baseamp: %g dB\n',baseamp);
-   plot1erp(ax3,times,amps,[timelimits(1) timelimits(2) minamp maxamp]); % plot AMP
+   plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
 
    if ~isnan(aligntime)
      line([aligntime aligntime],[minamp maxamp]*1.1,'Color','k'); 
