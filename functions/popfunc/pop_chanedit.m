@@ -24,6 +24,7 @@
 %                   Insert channel before channel number num with the specified values. 
 %                   If the number of values if less than ten, fields are filled with 0.
 %   'delete'      - vector of indices of channel to delete
+%   'shrink'      - topographical polar shrink factor (see >> help topoplot) 
 %   'load'        - { textfile 'format' } format can be 'loc' for polar coordinate
 %                   file, 'elp' for Polhemus text files, 'sph1' for spherical files
 %                   with no radius.
@@ -60,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/05/01 03:30:55  arno
+% editing interface
+%
 % Revision 1.4  2002/05/01 03:29:28  arno
 % correct typo
 %
@@ -85,7 +89,7 @@ if nargin < 1
 end;	
 
 nbchan = length(chans);
-chans = checkchans(chans);
+[chans shrinkfact]= checkchans(chans);
 
 allfields = fieldnames(chans);
 if nargin < 2
@@ -175,6 +179,11 @@ if nargin < 2
 		
 		% add sorting options
 		% -------------------
+		if isstr(shrinkfact)
+			evalin('base', ['tmpshrink = ''' shrinkfact ''';' ]);
+		else
+			evalin('base', ['tmpshrink = ' num2str(shrinkfact) ';' ]);
+		end;
 		plot2dcom = [ 'tmpshrink = ''off'';' ...
 					  'if get(findobj(''parent'', gcbf,  ''string'', ''Auto shrink''), ''value'')' ...
 					  '   tmpshrink = ''force'';' ...
@@ -183,14 +192,14 @@ if nargin < 2
 					  '       tmpshrink = str2num(get(findobj(''parent'', gcbf, ''tag'', ''shrinkfactor''), ''string''));' ...
 					  '   end;' ...
 					  'end;' ...
-					  'figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''shrink'', tmpshrink); tmpshrink, clear tmpshrink;'];
+					  'figure; topoplot([],chantmp, ''style'', ''blank'', ''electrodes'', ''labelpoint'', ''shrink'', tmpshrink);' ];
 		geometry = { geometry{:} [1] [1 1.4 0.6 1 1] [1] [1 1 1 1]};
 		uilist = {  uilist{:},...
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
 					{ 'Style', 'text', 'string', '2D shink factor (-1 to 1)'} ...
-					{'Style', 'edit', 'string', '', 'tag', 'shrinkfactor'} ...
-					{'Style', 'checkbox', 'string', 'Auto shrink'} ...
+					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), 'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string'');' } ...
+					{ 'Style', 'checkbox', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), 'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; end;' } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', 'plotchans3d([cell2mat({chantmp.X})'' cell2mat({chantmp.Y})'' cell2mat({chantmp.Z})''], {chantmp.labels});' } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Load', 'callback', ...
 						  ['[tmpf tmpp] = uigetfile(''*'', ''Load a channel location file'');' ...
@@ -239,10 +248,19 @@ if nargin < 2
 		end;
 	end;
 	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
+		if evalin('base', 'exist(''tmpshrink'')') == 1
+			tmpshrink = evalin('base', 'tmpshrink;');
+			evalin('base', 'clear tmpshrink;');
+			if ~strcmp(tmpshrink, 'off'), 
+				if ~isempty(str2num(tmpshrink))  chans(1).shrink = str2num(tmpshrink);
+				else                             chans(1).shrink = tmpshrink;
+				end;
+			end;
+		end;
 		close(gcf);
-	end;
-	if ~isempty( totaluserdat )
-		com = sprintf('%s=pop_chanedit(%s, %s);', vararg2str(totaluserdat));
+		if ~isempty( totaluserdat )
+			com = sprintf('%s=pop_chanedit(%s, %s);', vararg2str(totaluserdat));
+		end;
 	end;
 else 
 	 args = varargin;
@@ -325,6 +343,8 @@ else
 		   else 
 			   eval(tmpoper);
 		   end;
+		  case 'shrink'
+		   chans(1).shrink = args{ curfield+1 };		   
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
 		  case 'changefield'
@@ -408,8 +428,13 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
-function chans = checkchans(chans);
-	try, allfields = fieldnames(chans); catch, allfields = []; end;
+function [chans, shrinkfact]= checkchans(chans);
+	shrinkfact = 'off';
+	if isfield(chans, 'shrink'), 
+		shrinkfact = chans(1).shrink; 
+		chans = rmfield(chans, 'shrink');
+	end;
+    try, allfields = fieldnames(chans); catch, allfields = []; end;
 	newstruct{1}  = 'labels';
 	newstruct{3}  = 'theta';
 	newstruct{5}  = 'radius';
