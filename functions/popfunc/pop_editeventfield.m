@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/14 16:32:34  arno
+% constrain description to 1 line
+%
 % Revision 1.16  2002/08/13 00:03:10  scott
 % text
 %
@@ -184,7 +187,7 @@ if nargin<2
 			   'set(gcf, ''userdata'', tmpuserdata); clear tmpuserdata;' ] }, ...
 	         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  allfields{index} }, ...
 	         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''' allfields{index} ''';' commandload ] }, ...
-	         { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
+	         { }, fastif(strcmp(allfields{index}, 'epoch'), {}, { 'Style', 'checkbox', 'string', '    ' }),{ } };
 	         listboxtext = [ listboxtext '|' allfields{index} ]; 
 	    end;
 	    geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] [1] [1 2 0.6 1.3 1.5] };
