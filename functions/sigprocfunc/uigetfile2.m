@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/11/23 19:27:14  scott
+% edit help
+%
 % Revision 1.1  2004/09/09 22:56:44  arno
 % Initial revision
 %
@@ -50,7 +53,12 @@ function varargout = uigetfile2(varargin);
     [varargout{1} varargout{2}] = uigetfile(varargin{:});
     if varargout{1} ~= 0
         Path = varargout{2};
+        cd(olddir);
         save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat');
+        if isunix
+            system('chmod 777 eeglab.cfg');
+        end
+    else
+       cd(olddir) 
     end;
-    cd(olddir)
-    
+     
