@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/10/09 22:00:53  arno
+% upodating for new envtopo
+%
 % Revision 1.11  2002/10/08 15:55:04  arno
 % nothing
 %
@@ -146,9 +149,15 @@ end;
 if length( options ) < 2, options = ''; end;
 varargout{1} = sprintf('figure; pop_envtopo(%s, [%s] %s);', inputname(1), num2str(timerange), ...
                        options);
-com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
-                '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
-                '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+if any(isnan(sigtmp(:)))
+    com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
+                    '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
+                    '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+else    
+    com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
+                    '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
+                    '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+end;
 eval(com);
 
 return;
