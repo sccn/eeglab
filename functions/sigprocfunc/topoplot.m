@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2004/02/15 16:58:48  scott
+% same
+%
 % Revision 1.85  2004/02/15 16:55:39  scott
 % same
 %
@@ -717,6 +720,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 
   if strcmp(STYLE,'contour')
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'LINESPEC');
+    set(chs(1))
       for h=chs
           set(h,'color',CCOLOR);
       end
