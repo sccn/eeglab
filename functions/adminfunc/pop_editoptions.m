@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/15 01:38:52  scott
+% same
+%
 % Revision 1.15  2002/10/23 15:01:50  arno
 % isppc -> computer
 %
@@ -196,17 +199,13 @@ end;
 % write to eeg_options file
 % -------------------------
 if storelocal
-	if isunix
-		delimloc = findstr(filename, '/');
+    warning off;
+	if isunix | strcmp(computer,'MAC')
+        delimloc = sort(union(findstr(filename, ':'), findstr(filename, '/')));
 	else
-		warning off;
-		if strcmp(computer,'MAC') % MAC
-			delimloc = findstr(filename, ':');
-		else  % PC (note that ispc is not recognized under windows ?)
-			delimloc = findstr(filename, '\');
-		end;
-		warning on;
+        delimloc = findstr(filename, '\');
 	end;
+    warning on;
 	filename = filename(delimloc(end)+1:end);
 end;
 fid = fopen( filename, 'w');
