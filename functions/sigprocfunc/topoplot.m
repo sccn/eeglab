@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.222  2004/11/22 20:11:38  scott
+% trying to fix style 'blank' problems
+%
 % Revision 1.221  2004/11/22 05:41:43  arno
 % more debugging
 %
@@ -990,7 +993,7 @@ Th = pi/180*Th;                              % convert degrees to radians
 %
 %%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
 %
-if length(Values) < length(tmpeloc) 
+if length(Values) <= length(tmpeloc) 
   if isempty(plotchans)
     if Values ~= round(Values) % if not integer values
       error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
@@ -999,6 +1002,9 @@ if length(Values) < length(tmpeloc)
                                    max(indices),length(Values));
         fprintf('            Marking the locations of the %d indicated channels.\n', ...
                                     length(Values));
+    end
+    if isempty(Values)
+      Values = 1:length(tmpeloc);
     end
     plotchans = Values;
     STYLE = 'blank'; % plot channels only, marking the indicated channel number
