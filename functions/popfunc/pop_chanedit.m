@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/07/19 01:24:47  arno
+% remving double &
+%
 % Revision 1.54  2003/07/16 18:45:50  arno
 % debug string
 % []
@@ -565,19 +568,28 @@ else
 		   tmpoper = args{curfield+1};
 		   if isempty(tmpoper), return; end;
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
+           tmpoper = [ tmpoper ';' ];
 		   if isempty(findstr(tmpoper, 'chans'))
-			   try, X = cell2mat({chans.X}); catch, X(1:length(chans)) = NaN; end;
-			   try, Y = cell2mat({chans.Y}); catch, Y(1:length(chans)) = NaN; end;
-			   try, Z = cell2mat({chans.Z}); catch, Z(1:length(chans)) = NaN; end;
-			   try, theta  = cell2mat({chans.theta}); catch, theta(1:length(chans)) = NaN; end;
-			   try, radius = cell2mat({chans.radius}); catch, radius(1:length(chans)) = NaN; end;
-			   try, sph_theta  = cell2mat({chans.sph_theta}); catch, sph_theta(1:length(chans)) = NaN; end;
-			   try, sph_phi    = cell2mat({chans.sph_phi}); catch, sph_phi(1:length(chans)) = NaN; end;
+			   try, X          = cell2mat({chans.X});          catch, X(1:length(chans)) = NaN; end;
+			   try, Y          = cell2mat({chans.Y});          catch, Y(1:length(chans)) = NaN; end;
+			   try, Z          = cell2mat({chans.Z});          catch, Z(1:length(chans)) = NaN; end;
+			   try, theta      = cell2mat({chans.theta});      catch, theta(1:length(chans)) = NaN; end;
+			   try, radius     = cell2mat({chans.radius});     catch, radius(1:length(chans)) = NaN; end;
+			   try, sph_theta  = cell2mat({chans.sph_theta});  catch, sph_theta(1:length(chans)) = NaN; end;
+			   try, sph_phi    = cell2mat({chans.sph_phi});    catch, sph_phi(1:length(chans)) = NaN; end;
 			   try, sph_radius = cell2mat({chans.sph_radius}); catch, sph_radius(1:length(chans)) = NaN; end;
-			   eval(tmpoper);
+			   eval(tmpoper)
 			   chans = struct('labels', { chans.labels }, 'X', mat2cell(X), 'Y', mat2cell(Y), 'Z', mat2cell(Z), ...
 							  'theta', mat2cell(theta), 'radius', mat2cell(radius), 'sph_theta', mat2cell(sph_theta), ...
 							  'sph_phi', mat2cell(sph_phi), 'sph_radius', mat2cell(sph_radius));
+               if     ~isempty(findstr(tmpoper, 'X')),          chans = convertlocs(chans, 'cart2all'); end;
+               if     ~isempty(findstr(tmpoper, 'Y')),          chans = convertlocs(chans, 'cart2all'); end;
+               if     ~isempty(findstr(tmpoper, 'Z')),          chans = convertlocs(chans, 'cart2all'); end;
+               if     ~isempty(findstr(tmpoper, 'sph_theta')),  chans = convertlocs(chans, 'sph2all');
+               elseif ~isempty(findstr(tmpoper, 'theta')),      chans = convertlocs(chans, 'topo2all'); end;
+               if     ~isempty(findstr(tmpoper, 'sph_phi')),    chans = convertlocs(chans, 'sph2all');  end;
+               if     ~isempty(findstr(tmpoper, 'sph_radius')), chans = convertlocs(chans, 'sph2all');
+               elseif ~isempty(findstr(tmpoper, 'radius')),     chans = convertlocs(chans, 'topo2all'); end;
 		   else 
 			   eval(tmpoper);
 		   end;
