@@ -1,11 +1,13 @@
 % openbdf() - Opens an EDF File (European Data Format for Biosignals) in MATLAB (R)
 % 
 % Usage:
-%   >> EDF=openedf(FILENAME)
+%   >> EDF=openedf(FILENAME, mode)
 %
 % Note: About EDF -> www.biosemi.com/faq/file_format.htm
+%       mode is either 'EDF' or 'DBF'. Default is 'BDF'.
 %
-% Author: Alois Schloegl, 5.Nov.1998
+% Author: Alois Schloegl, 5.Nov.1998, updated Arnaud Delorme 14 Oct 2002
+%         for BDF/EDF read
 %
 % See also: readedf()
 
@@ -36,12 +38,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-
 % Name changed for bdf files Sept 6,2002  T.S. Lorig
 % Header updated for EEGLAB format (update web link too) - Arnaud Delorme 14 Oct 2002
 
-function [DAT,H1]=openbdf(FILENAME)
+function [DAT,H1]=openbdf(FILENAME, mode)
+    
+if nargin < 2
+    mode = 'BDF';
+else
+    if ~strcmp(mode, 'EDF') & ~strcmp(mode, 'BDF')
+        error('Unrecognized mode');
+    end;
+end;
+
 SLASH='/';		% defines Seperator for Subdirectories
 BSLASH=setstr(92);
 
@@ -194,7 +203,12 @@ EDF.AS.IDX2=idx2;
 %EDF.AS.IDX3=idx3;
 
 
-DAT.Head=EDF;  
+if strcmp(mode, 'EDF')
+    DAT.Head.databits = 'int16';
+else
+    DAT.Head.databits = 'bit24';
+end;    
+DAT.Head=EDF;
 DAT.MX.ReRef=1;
 
 %DAT.MX=feval('loadxcm',EDF);
