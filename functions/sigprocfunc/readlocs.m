@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/05/13 21:14:11  arno
+% only write a subset of file format
+%
 % Revision 1.43  2003/03/10 16:28:12  arno
 % removing help for elc
 %
@@ -277,7 +280,7 @@ listimportformat = { ...
       { } ... % polhemus (specific non-columnar implementation)
       { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' } ... % BESA/EGI format
       { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
-      { 'labels' '-Y' 'X' 'Z' 'labels' } ... % sfp format
+      { 'labels' '-Y' 'X' 'Z' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
       { } ... % ascii Neuroscan format
