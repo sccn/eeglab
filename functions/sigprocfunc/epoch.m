@@ -26,7 +26,7 @@
 %                return an array 'rerefevent' which contain the latency
 %                of these events in each trials (assuming the events are
 %                included in the trial time window). These events can
-%                be in point or second but they must be in the same
+%                be in point or second but they must be in the same format
 %                as the events used for epoching.
 %   'alleventrange' - for event re-referencing, defined a time range
 %                [init end] in second or points centered on the events
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/01/14 00:28:45  arno
+% adding more checks if 'allevents' is empty
+%
 % Revision 1.5  2002/09/23 23:06:25  arno
 % debugging limits
 %
