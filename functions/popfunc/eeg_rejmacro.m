@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/08 22:02:42  arno
+% adding a warning for data epoch labelling
+%
 % Revision 1.3  2002/06/25 01:48:19  arno
 % changing inputaname to EEG
 %
@@ -61,7 +64,6 @@ com2 = [ 'if ~isempty(TMPREJ), [tmprej tmprejE] = eegplot2trial(TMPREJ,' ...
          sprintf('tmprejE2([%s],:) = tmprejE;', int2str(elecrange)) ... 
          macrorej '= tmprej;' macrorejE '= tmprejE2;' ];
 if reject
-	if ~exist('icacomp'), icacomp = typerej; end;
     com2 = [com2 sprintf(['%s = pop_rejepoch(%s, tmprej, 1);' ...
 		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);' ...
 	       'eeglab(''redraw''); end;'], 'EEG', 'EEG'); ] ;
