@@ -1,3 +1,6 @@
+% WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
+%           you must contact Arnaud Delorme (arno@salk.edu) for terms of use
+%
 % vectdata() - vector data interpolation with optional moving 
 %              average.
 %
@@ -49,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/07/04 00:04:39  arno
+% same
+%
 % Revision 1.5  2003/07/04 00:01:09  arno
 % newanglevalless constraint for uniform data (on precision)
 %

@@ -1,7 +1,7 @@
 % WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
 %          you must contact Arnaud Delorme (arno@salk.edu) for terms of use
 %
-% timef() - Returns estimates and plots of event-related (log) spectral
+% newtimef() - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
@@ -164,6 +164,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/10/15 18:45:11  arno
+% *** empty log message ***
+%
 % Revision 1.44  2003/08/08 22:19:10  arno
 % *** empty log message ***
 %
@@ -508,7 +511,7 @@ AXES_FONT       = 10;           % axes text FontSize
 TITLE_FONT      = 8;
 
 if (nargin < 1)
-	help timef
+	help newtimef
 	return
 end
 
