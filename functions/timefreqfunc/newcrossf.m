@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/15 21:10:32  arno
+% title
+%
 % Revision 1.9  2002/10/15 21:07:36  arno
 % bilateral bootstrap for difference
 %
@@ -923,16 +926,8 @@ case 'on'
    RR = R;
    if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
        if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
-           PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
-           Pboot = squeeze(mean(Pboot,2));
-       else
-           PP(find((PP > repmat(Pboot(:,1),[1 g.timesout])) ...
-                   & (PP < repmat(Pboot(:,2),[1 g.timesout])))) = 0;
-       end;
-       end
-       if all(size(RR) == size(Rboot))
-           RR  (find((RR < Rboot(1,:,:)) & (RR < Rboot(2,:,:)))) = 0;
-           Rraw(find((RR < Rboot(1,:,:)) & (RR < Rboot(2,:,:)))) = 0;
+           RR  (find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
+           Rraw(find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
        else
            RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
            Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
@@ -984,8 +979,8 @@ case 'on'
    Emin = min(R(dispf,:)); % mean coherence at each time point
    if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') 
       % plot bootstrap significance limits (base mean +/-)
-      plot(times,mean(Rboot(dispf,:)),'g','LineWidth',g.linewidth); hold on;
-      plot(times,mean(Rboot(dispf,:)),'k:','LineWidth',g.linewidth);
+      plot(times,mean(Rboot(dispf,:,1)),'k:','LineWidth',g.linewidth); hold on;
+      plot(times,mean(Rboot(dispf,:,2)),'k:','LineWidth',g.linewidth);
       plot(times,Emax,'b');
       plot(times,Emin,'b');
       plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
