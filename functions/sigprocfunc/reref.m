@@ -27,6 +27,10 @@
 %                  polar coordinates of the channel, { 'label' theta radius }. 
 %                  For 3-D location, include the reference as the last channel 
 %                  in the 'chanlocs' structure.
+%   'exclude'    - [integer array] channel indices to exclude from rereferencing
+%                  i.e. EMG
+%   'keepref'    - ['on'|'off'] keep reference channel in output (only for several
+%                  references).
 %
 % Outputs:
 %   dataout     - Input data converted to average reference
@@ -65,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/07/02 01:07:41  arno
+% debug input check
+%
 % Revision 1.16  2003/06/11 00:10:27  arno
 % debug multiple references
 %
@@ -152,9 +159,11 @@ end;
 % ------------
 g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'method'     'string'  { 'standard' 'withref' }  'standard';
-                            'refstate'   'string'  { 'common' 'averef' }   'common';
-                            'refloc'     'cell'    []          {};
-                            'elocs'      {'integer' 'struct'}  []          [] });
+                            'refstate'   'string'  { 'common' 'averef' }     'common';
+                            'exclude'    'integer' [1 size(data,1)]          [];
+                            'refloc'     'cell'    []                        {};
+                            'keepref'    'string'  {'on' 'off' }             'off';
+                            'elocs'      {'integer' 'struct'}  []            [] });
 if isstr(g), error(g); end;
 
 chans = size(data,1);
@@ -169,111 +178,97 @@ end;
 [dim1 dim2 dim3] = size(data);
 data = reshape(data, dim1, dim2*dim3);
 
-% compute potential of reference
-% ------------------------------
-if isempty(ref)
-    avematrix = eye(chans)-ones(chans)*1/chans;
-    if strcmp(g.refstate, 'averef')
-        fprintf('Undoing average reference\n');
-        avematrix = pinv(avematrix);
-    else 
-        fprintf('Computing average reference\n');
-    end;
-    % electrode structure remain unchanged except if reference electrode is present
-    if ~isempty(g.elocs) & length(g.elocs) > chans
-        g.elocs(end) = [];
-    end;
-    meandata = sum(data)/chans;
-else % common re-reference
-     % -------------------
-    meandata = [];
+if ~isempty(g.exclude)
+    rerefchans = setdiff([1:dim1], g.exclude);
+    nbchans    = chans    - length(g.exclude);
+else
+    rerefchans = [1:dim1];
+    nbchans    = chans;  
+end;
+rerefchansout = rerefchans;   
+
+% return mean data
+% ----------------
+if nargout > 4
+    meandata = sum(data(rerefchans,2))/nbchans;
+end;
+
+% compute average reference matrix
+% --------------------------------
+if ~strcmp(g.refstate, 'averef')
     
-    % compute the inverse average transformation matrix
-    % -------------------------------------------------
-    if strcmp(g.refstate, 'averef')
-        fprintf('Undoing average reference\n');
-        invavematrix = eye(chans)-ones(chans)/chans;        
-    else 
-        invavematrix = [];
+    if strcmpi(g.method, 'withref')
+        disp('Note: old reference electrode included in average reference computation');
+        avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans-1); % reference is a relrevant channel i.e. Cz
+        avematrix(end+1,:) = -1/(nbchans-1);                           % potential for the new electrode (previously ref)
+        if ~( length(g.elocs) > chans )
+            if ~isempty(g.refloc) & ~isempty(g.refloc{1})
+                g.elocs(end+1).labels = g.refloc{1};
+                g.elocs(end  ).theta  = g.refloc{2};
+                g.elocs(end  ).radius = g.refloc{3};
+            else
+                error('Need a old reference location to include it as a data channel');
+            end;
+        end;
+        rerefchansout(end+1) = chans+1;
+    else
+        disp('Note: old reference electrode not included in average reference computation');
+        avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
+        if length(g.elocs) > chans
+            g.elocs(end) = []; % discard info
+        end;
     end;
+else
+    avematrix = eye(nbchans);
+end;
+
+% new reference electrode
+% -----------------------
+chans = size(avematrix,1);
+refmatrix = eye(chans);
+if ~isempty(ref)
+    
     fprintf('Re-referencing data\n');
-    if strcmp(g.method, 'withref')
-        if length(ref) > 1
-            % dealing with multiple references
-            % --------------------------------
-            avematrix = eye(chans);
-            for index = 1:length(ref)
-                avematrix(:,ref) = -1/length(ref);
-            end;
-            fprintf('Warning: reference channels have been removed\n');
-            avematrix(ref(2:end),:) = []; % supress references
+    for index = 1:length(ref)
+        refmatrix(:,ref) = -1/length(ref);
+    end;
+    fprintf('Warning: reference channels have been removed\n');
+    if length(ref) > 1 
+        if strcmpi(g.keepref, 'off')
+            refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
+            refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
+
             if ~isempty(g.elocs)
-                g.elocs(ref(2:end)) = [];
+                g.elocs(ref) = [];
             end;
-            ref = ref(1);
-            if length(g.elocs) > size(avematrix,1)
-                g.elocs(ref) = g.elocs(end);
-                g.elocs(end) = [];
-            elseif ~isempty(g.refloc) & ~isempty(g.refloc{1})
-                g.elocs(ref).labels = g.refloc{1};
-                g.elocs(ref).theta  = g.refloc{2};
-                g.elocs(ref).radius = g.refloc{3};
-            else 
-                error('No location for old common reference, cannot introduce it as a new channel');
-            end;            
         else
-            % dealing with a single ref. channel
-            % ----------------------------------
-            avematrix = eye(chans);
-            avematrix(:,ref) = -1;
-            if ~isempty(g.elocs)
-                if length(g.elocs) > chans
-                    tmpelocs     = g.elocs(ref);
-                    g.elocs(ref) = g.elocs(end);
-                    g.elocs(end) = tmpelocs;
-                elseif ~isempty(g.refloc)
-                    g.elocs(end+1) = g.elocs(ref);
-                    g.elocs(ref).labels = g.refloc{1};
-                    g.elocs(ref).theta  = g.refloc{2};
-                    g.elocs(ref).radius = g.refloc{3};
-                else 
-                    error('No location for old common reference, cannot introduce it as a new channel');
-                end;
-            end;
+            refmatrix(g.exclude,:) = []; % supress non EEG channels
+            refmatrix(:,g.exclude) = []; % supress non EEG channels
         end;
     else
-        if length(ref) > 1
-            % dealing with multiple references (do not include reference)
-            % --------------------------------
-            avematrix = eye(chans);
-            for index = 1:length(ref)
-                avematrix(:,ref) = -1/length(ref);
-            end;
-            fprintf('Warning: reference channels have been removed\n');
-            avematrix(ref,:) = []; % supress references
-            if ~isempty(g.elocs)
-                g.elocs(ref) = [];        
-            end;    
-        else
-            % dealing with a single ref. channel
-            % ----------------------------------
-            avematrix = eye(chans);
-            avematrix(:,ref) = -1;
-            avematrix(ref,:) = [];
-            if ~isempty(g.elocs)
-                g.elocs(end)       = g.elocs(ref);
-                g.elocs(ref)       = [];
-            end;
+        refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
+        refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
+        rerefchansout = setdiff(rerefchansout, ref);
+
+        % copy channel location for single ref
+        % ------------------------------------
+        if ~isempty(g.elocs) & length(g.elocs) > chans & length(ref) == 1
+            tmpelocs       = g.elocs(ref);
+            g.elocs(ref)   = [];
+            g.elocs(end+1) = tmpelocs;
         end;
-    end;
-    
-    if ~isempty(invavematrix)
-        avematrix = avematrix * pinv(invavematrix);
     end;
 end;
 
-data = avematrix*data; % implement as a matrix multiply
 % there are faster methods but this one is the simpliest
+
+rerefchansout
+rerefchans
+data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % implement as a matrix multiply
+if strcmpi(g.keepref, 'off')
+    data = data(setdiff(1:size(data,1), ref),:);
+end;
+
 Elocs = g.elocs;
 data = reshape(data, size(data,1), dim2, dim3);
 
@@ -282,9 +277,11 @@ data = reshape(data, size(data,1), dim2, dim3);
 if ~isempty(g.icaweight) 
 	winv = pinv(g.icaweight);
     try, 
-        W = pinv(avematrix*winv);
+        W = pinv(refmatrix*avematrix*winv);
 	catch,
-        error('Weight matrix size is different from the data size, re-referencing impossible');
+        error([ 'Weight matrix size is different from the data size, re-referencing impossible' 10 ...
+                      '(you have to use the same number of channel in rereferenging (minus excluded ones)' 10 ...
+                      'as in the ICA decomposition; best solution is to suppress ICA weights, rereference, then rerun ICA)']);
     end;
     S = eye(size(W,2));
 else
