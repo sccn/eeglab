@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/07/01 22:17:37  arno
+% rename mhead files
+%
 % Revision 1.40  2004/07/01 22:12:35  arno
 % change default mesh
 %
@@ -490,7 +493,7 @@ else
    spline_file = arg1;
    
    g = finputcheck( varargin, { ...
-       'cbar'       'real'   [0 Inf]     0; % Colorbar value must be 0 or axis handle.'
+       'cbar'       'real'   [0 Inf]         []; % Colorbar value must be 0 or axis handle.'
        'lighting'   'string' { 'on' 'off' }  'on';
        'verbose'    'string' { 'on' 'off' }  'on';
        'maplimits'  { 'string' 'real' }  []  'absmax'; 
