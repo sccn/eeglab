@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.119  2004/05/06 21:54:55  arno
+% message text
+%
 % Revision 1.118  2004/02/17 20:05:04  arno
 % remove ICA weights if invalid
 %
@@ -516,6 +519,16 @@ if ~isempty(EEG.setname)
 else
     EEG.setname = '';
 end;    
+
+% checking history and convert if necessary
+% -----------------------------------------
+if isfield(EEG, 'history') & size(EEG.history,1) > 1
+    allcoms = cellstr(EEG.history);
+    EEG.history = deblank(allcoms{1});
+    for index = 2:length(allcoms)
+        EEG.history = [ EEG.history 10 deblank(allcoms{index}) ];
+    end;
+end;
 
 % read data if necessary
 % ----------------------
