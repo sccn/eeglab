@@ -1,4 +1,4 @@
-% condstat() - accumulate surrogate data for comparing two conditions 
+% condstat() - accumulate surrogate data for comparing two data conditions 
 %
 % Usage:
 %     >> [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, ...
@@ -6,26 +6,25 @@
 %
 % Inputs:
 %    formula  - [string] formula to compute a given measure. Takes arguments
-%               'arg1', 'arg2' ... as inputs. i.e.
-%               'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X))) ./ sqrt(sum(arg3(:,:,X)))'
-%    naccu    - [integer] number of accumulation for surrogate data. i.e. 200
+%               'arg1', 'arg2' ... as inputs. e.g.,
+%        'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X))) ./ sqrt(sum(arg3(:,:,X)))'
+%    naccu    - [integer] number of accumulations of surrogate data. e.g., 200
 %    alpha    - [float] significance level (0<alpha<0.5)
 %    bootside - ['both'|'upper'] side of the surrogate distribution to
 %               consider for significance. This parameter affect the size
 %               of the last dimension of accumulation array 'accres' (size
 %               is 2 for 'both' and 1 for 'upper').
-%    condboot - ['abs'|'angle'|'complex'|''] for comparing 2 conditions,
+%    condboot - ['abs'|'angle'|'complex'|''] When comparing two conditions, compare
 %               either absolute vales ('abs'), angles ('angles') or complex values 
-%               ('complex'). '' and 'complex' let the formula unchanged, 'abs' takes
-%               its norm before subtraction and 'angle' normalize it (norm 1) before
-%               subtraction.
-%    arg1     - [cell_array] of 2 nD array of values to compare. The last dimensions
-%               of the array is the dimention that will be shuffled to accumulate
-%               data.
+%               ('complex'). Either '' or 'complex' leave the formula unchanged; 
+%               'abs' takes its norm before subtraction, and 'angle' normalizes 
+%               each value (to norm 1) before taking the difference.
+%    arg1     - [cell_array] of 2 nD array of values to compare. 
+%               The last dimension of the array is shuffled to accumulate data.
 %    arg2...  - same as arg1
 %
 % Outputs: 
-%    diffres  - differential array computed on the non-shuffled data
+%    diffres  - difference array for the actual (non-shuffled) data
 %    accdres  - result for shuffled data
 %    res1     - result for first condition
 %    res2     - result for second condition
@@ -52,6 +51,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/02 04:23:12  cooper
+% fixed type
+% typo, not type
+%
 % Revision 1.4  2002/10/18 14:27:16  arno
 % editing thanks to Cooper
 %
