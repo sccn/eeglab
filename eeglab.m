@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/04/24 15:12:03  scott
+% [same] -sm
+%
 % Revision 1.34  2002/04/24 15:09:41  scott
 % [same] -sm
 %
@@ -691,6 +694,7 @@ W_MAIN = findobj('tag', 'EEGLAB');
 EEGUSERDAT = get(W_MAIN, 'userdata');
 H_MAIN  = EEGUSERDAT{1};
 EEGMENU = EEGUSERDAT{2};
+if exist('CURRENTSET') ~= 1, CURRENTSET = 0; end;
 
 % test if the menu is present  
 try
