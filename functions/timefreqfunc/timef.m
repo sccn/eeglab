@@ -1,95 +1,100 @@
 % timef() - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
-%           timelocked to a set of input events in one data channel. 
+%           across event-related trials (epochs) of a single input time series. 
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%           0-padded DFTs (both Hanning-tapered), OR multitaper ('mtaper').
-%         * For the wavelet and FFT methods, uutput frequency spacing 
-%           is the lowest frequency (srate/winsize) divided by the padratio.
+%           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
+%         * For the wavelet and FFT methods, output frequency spacing 
+%           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
 %           NaN input values (such as returned by eventlock()) are ignored.
 %         * If 'alpha' is given, then bootstrap statistics are computed 
-%           (from a distribution of 'naccu' surrogate data epochs) and 
+%           (from a distribution of 'naccu' surrogate data trials) and 
 %           non-significant features of the output plots are zeroed out 
 %           (i.e., plotted in green). 
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
 %           the figure also shows a topoplot() of the specified scalp map.
-%         * Note: Left-click on subplots to view them in separate windows.
+%         * Note: Left-click on subplots to view and zoom in separate windows.
 % Usage: 
-%      >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
+%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
 %                timef(data,frames,tlimits,srate,cycles,...
 %                        'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
-%      >> timef details  % scrolls more detailed info!
+%        >> timef details  % scrolls more detailed information about timef
 %
-% Inputs:             Value                                   {default}
-%       data        = single-channel (1,frames*nepochs) data (required)
-%       frames      = frames per epoch                        {768}
-%       tlimits     = [mintime maxtime] (ms) epoch time limits {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                 {256}
+% Required inputs:     Value                                 {default}
+%       data        = Single-channel data vector (1,frames*ntrials) (required)
+%       frames      = Frames per trial                        {750}
+%       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
+%       srate       = data sampling rate (Hz)                 {250}
 %       cycles      = >0 -> Number of cycles in each analysis wavelet 
 %                     =0 -> Use FFTs (with constant window length) {0}
 %                           OR multitaper decomposition (with 'mtaper').
 %
-%    Optional timef inter-trial coherence:
-%       'type'      = ['coher'|'phasecoher'], compute either the coherence
-%                     ('coher') or the phase coherence ('phasecoher') also known
-%                     as the phase coupling factor of the two data inputs. Default
-%                     is 'phasecoher' { 'phasecoher' }.
-%    Optional Detrend:
-%       'detret'    = ['on'|'off'], Detrend data in time.     {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across epochs (trials) {'off'}
-%    Optional FFT/DFT:
+%    Optional Inter-Irial Coherence Type:
+%       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
+%                      ('coher') or phase coherence ('phasecoher') also known
+%                      as the phase coupling factor           {'phasecoher'}.
+%
+%    Optional Detrending:
+%       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
+%       'detrep'    = ['on'|'off'], Detrend data across trialsk {'off'}
+%
+%    Optional FFT/DFT Parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                     if cycles >0: *longest* window length to use. This
-%                     determines the lowest output frequency  {~frames/8}
+%                     If cycles >0: *longest* window length to use. This
+%                      determines the lowest output frequency  {~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes) {200}
-%       'padratio'  = FFT-length/winframes (2^k)              {2}
-%                     Multiplies the number of output frequencies by
-%                     dividing their spacing. When cycles==0, frequency
-%                     spacing is (low freq/padratio).
-%       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
-%                     If cycles==0, all FFT frequencies are output.
-%       'baseline'  = ERSP baseline end time (ms).            {0}
+%       'padratio'  = FFT-length/winframes (2^k)                    {2}
+%                      Multiplies the number of output frequencies by
+%                      dividing their spacing. When cycles==0, frequency
+%                      spacing is (low_freq/padratio).
+%       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
+%                      If cycles==0, all FFT frequencies are output. {50}
+%       'baseline'  = Spectral baseline end-time (in ms).            {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
-%    Optional Multitaper:
-%       'mtaper'    = [N W] Multitaper decomposition (N is the time resolution
-%                     and W the frequency resolution; maximum taper number is
-%                     2NW-1). Overwrites winsize and padratio. 
-%       'mtaper'    = [N W K] Forces the use of K sleeping tapers (if possible).
-%                     Phase is calculated using standard methods.
-%                     The use of mutitaper with wavelets (cycles>0) is not 
-%                     recommended (as multiwavelets are not implemented). 
-%                     See also Matlab DPSS, PMTM.        {no multitaper}
-%    Optional Bootstrap:
-%       'alpha'     = If non-0, compute Two-tailed bootstrap significance prob. 
-%                     level. Show non-signif output values as green. {0}
-%       'naccu'     = Number of bootstrap replications to compute {200}
-%       'baseboot'  = Bootstrap baseline subtract (0=same as 'baseline';
-%                     1=whole epoch) {0}
-%       'topovec'   = Scalp topography (map) to plot          {[]}
+%
+%    Optional Multitaper Parameters:
+%       'mtaper'    = If [N W], performs multitaper decomposition. 
+%                      (N is the time resolution and W the frequency resolution; 
+%                      maximum taper number is 2NW-1). Overwrites 'winsize' and 'padratio'. 
+%                     If [N W K], forces the use of K Slepian tapers (if possible).
+%                      Phase is calculated using standard methods.
+%                      The use of mutitaper with wavelets (cycles>0) is not 
+%                      recommended (as multiwavelets are not implemented). 
+%                      Uses Matlab functions DPSS, PMTM.      {no multitaper}
+%
+%    Optional Bootstrap Parameters:
+%       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
+%                      level. Show non-signif. output values as green.   {0}
+%       'naccu'     = Number of bootstrap replications to accumulate     {200}
+%       'baseboot'  = Bootstrap baseline subtract (0 -> use 'baseline';
+%                                                  1 -> use whole trial) {0}
+%    Optional Scalp Map:
+%       'topovec'   = Scalp topography (map) to plot                     {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
-%    Optional Plot:
-%       'ploterps'  = ['on'|'off'], Plot power spectrum       {'on'}
-%       'plotitc'   = ['on'|'off'], Plot inter trial coherence{'on'}
-%       'title'     = Optional figure title                   {none}
-%       'marktimes' = Times to mark with a dotted vertical line{def|NaN->none}
-%       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'pboot'     = Bootstrap power limits (from timef()){def|NaN->from data}
-%       'rboot'     = Bootstrap ITC limits (from timef())  {def|NaN->from data}
-%       'axesfont'  = Font size for the axes                  {10}
-%       'titlefont' = Font size for the title                 {8}
+%
+%    Optional Plotting Parameters:
+%       'ploterps'  = ['on'|'off'] Plot power spectrum                   {'on'}
+%       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
+%       'title'     = Optional figure title                              {none}
+%       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
+%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1) {2}
+%       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from timef())     {from data}
+%       'axesfont'  = Axes text font size                                {10}
+%       'titlefont' = Title text font size                               {8}
 %
 % Outputs: 
-%            ersp   = log spectral differences (dB) from baseline (nfreqs,timesout)
-%            itc    = inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%          powbase  = baseline power spectrum (in whole epoch or given baseline)
-%            times  = vector of output times (subwindow centers) in ms.
-%            freqs  = vector of frequency bin centers in Hz.
-%         erspboot  = [2,nfreqs] matrix of [lower;upper] ERSP significance diffs.
-%          itcboot  = [2,nfreqs] matrix of [lower;upper] ITC thresholds (not diffs).
+%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
+%            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
+%          powbase  = Baseline power spectrum (removed for each window to compute the ersp)
+%            times  = Vector of output times (subwindow centers) (in ms).
+%            freqs  = Vector of frequency bin centers (in Hz).
+%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
+%          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %
-% Author: Sigurd Enghoff, Scott Makeig & Arnaud Delorme 
-%          CNL / Salk Institute 1998-2002
+% Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
+%          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
 % See also: crossf()
  
@@ -113,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/06 03:48:07  arno
+% changing input for 1 channel for topoplot
+%
 % Revision 1.2  2002/04/06 03:40:58  arno
 % modifying location file check
 %
@@ -160,9 +168,9 @@ ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
 MIN_ABS          = 1e-8;        % avoid division by ~zero
 
 % Commandline arg defaults:
-DEFAULT_EPOCH	= 768;			% Frames per epoch
+DEFAULT_EPOCH	= 750;			% Frames per trial
 DEFAULT_TIMLIM = [-1000 2000];	% Time range of g.frames (ms)
-DEFAULT_FS		= 256;			% Sampling frequency (Hz)
+DEFAULT_FS	= 250;			% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;			% Fixed window length or fixed number of cycles.
 								% =0: fix window length to that determined by nwin
@@ -173,8 +181,8 @@ DEFAULT_OVERSMP	= 2;			% Number of times to oversample frequencies
 DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= '';			% Figure title
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
-DEFAULT_ALPHA   = nan;			% Percentile of bins to keep
-DEFAULT_MARKTIME= nan;
+DEFAULT_ALPHA   = NaN;			% Percentile of bins to keep
+DEFAULT_MARKTIME= NaN;
 
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
@@ -251,9 +259,9 @@ try, g.topovec;    catch, g.topovec = []; end;
 try, g.elocs;   catch, g.elocs = DEFAULT_ELOC; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
 try, g.marktimes;  catch, g.marktimes = DEFAULT_MARKTIME; end;
-try, g.powbase;    catch, g.powbase = nan; end;
-try, g.pboot;      catch, g.pboot = nan; end;
-try, g.rboot;      catch, g.rboot = nan; end;
+try, g.powbase;    catch, g.powbase = NaN; end;
+try, g.pboot;      catch, g.pboot = NaN; end;
+try, g.rboot;      catch, g.rboot = NaN; end;
 try, g.plotersp;   catch, g.plotersp = 'on'; end;
 try, g.plotitc;    catch, g.plotitc  = 'on'; end;
 try, g.detrep;   catch, g.detrep = 'off'; end;
@@ -443,8 +451,8 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,.5);
 	P = zeros(size(win,2),g.timesout);       % summed power
 	R = zeros(size(win,2),g.timesout);       % mean coherence
-	PP = repmat(nan,size(win,2),g.timesout); % initialize with nans
-	RR = repmat(nan,size(win,2),g.timesout); % initialize with nans
+	PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
+	RR = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
 	Pboot = zeros(size(win,2),g.naccu);  % summed bootstrap power
 	Rboot = zeros(size(win,2),g.naccu);  % summed bootstrap coher
     Rn = zeros(1,g.timesout);
@@ -483,8 +491,8 @@ stp = (g.frame-g.winsize)/(g.timesout-1);
 
 fprintf('Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher', fprintf('  Inter-Trial phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',      fprintf('  Inter-Trial amplitude Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher', fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'coher',      fprintf('  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
 end;
 fprintf('  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
 fprintf('Each trial contains samples from %d ms before to\n',g.tlimits(1));
@@ -595,7 +603,7 @@ for i=1:trials
 	
     Wn = find(Wn>0);
     if length(Wn)>0
-	  P(:,Wn) = P(:,Wn) + PP(:,Wn); % add non-nan windows
+	  P(:,Wn) = P(:,Wn) + PP(:,Wn); % add non-NaN windows
 	  R(:,Wn) = R(:,Wn) + RR(:,Wn);
 	  Rn(Wn) = Rn(Wn) + ones(1,length(Wn)); % count number of addends
     end
