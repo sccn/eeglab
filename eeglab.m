@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/04/30 18:29:20  scott
+% editting colors -sm
+%
 % Revision 1.46  2002/04/30 18:07:49  arno
 % multiple colors
 %
@@ -505,7 +508,7 @@ mat0 = colormap;
 close;
 WINMINX         = 17;
 WINMAXX         = 260;
-COLOR           = [0.87    0.,87    0.9108];
+COLOR           = [0.87    0.87    0.9108];
 WINYDEC			= 13;
 NBLINES         = 16;
 WINY		    = WINYDEC*NBLINES;
