@@ -116,7 +116,7 @@
 %   smooth     - Smoothing parameter (number of trials). {Default: 5} 
 %                erpimage() equivalent: 'avewidth' 
 %   decimate   - Decimate parameter (i.e. ratio of trials_in/trials_out).
-%                erpaimge() equivalent: 'decimate' {Default: 0}
+%                erpimage() equivalent: 'decimate' {Default: 0}
 %   sortingtype - Sorting event type(s) ([int vector]; []=all). See Notes below.
 %                Either a string or an integer.
 %   sortingwin - Sorting event window [start, end] in seconds ([]=whole epoch)
@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2003/07/26 17:31:57  scott
+% added erpimage call to history
+%
 % Revision 1.115  2003/07/26 17:29:44  scott
 % test
 %
@@ -827,7 +830,8 @@ end;
 typetxt = '';
 if ~isempty(sortingeventfield)
     %events = eeg_getepochevent( EEG, sortingtype, sortingwin, sortingeventfield);
-	events = sprintf('eeg_getepochevent( EEG, %s)', vararg2str({sortingtype, sortingwin, sortingeventfield}));
+
+    events = sprintf('eeg_getepochevent( EEG, %s)', vararg2str({sortingtype, sortingwin, sortingeventfield}));
 	
     % generate text for the command
     % -----------------------------
@@ -888,11 +892,16 @@ if length( options ) < 2
     options = '';
 end;
 
-% varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+% varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', ...
+                      inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, ...
+                      int2str(sortingwin), sortingeventfield, renorm, options);
 
-popcom = sprintf('figure; pop_erpimage(%s,%d, [%s],[%s],''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), int2str(projchan), titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d, [%s],[%s],''%s'',%d,%d,{%s},[%s],''%s'' %s);', ...
+                     inputname(1), typeplot, int2str(channel), int2str(projchan), titleplot, smooth, decimate, ...
+                     typetxt, int2str(sortingwin), sortingeventfield, options);
 
-com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
+com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);',...
+               outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
 disp(' '); disp(com); disp(' ');
 eval(com)
