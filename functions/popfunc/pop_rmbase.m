@@ -4,13 +4,13 @@
 %   >> outeeg = pop_rmbase( eeg, timerange, pointrange);
 %
 % Inputs:
-%   eeg        - input dataset
-%   timerange  - timerange for baseline [min max] in milliseconds
-%   pointrange - pointrange for baseline [min max]. Timerange must be
-%                empty. Timerange is prioritary over pointrange.
+%   eeg        - Input dataset
+%   timerange  - Baseline time range [min_ms max_ms]. 
+%   pointrange - Baseline points range [min max]. 
+%                (Overwritten by time range).
 %
 % Outputs:
-%   outeeg     - output dataset
+%   outeeg     - Output dataset
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/13 18:19:13  arno
+% strvcat instead of 10
+%
 % Revision 1.2  2002/08/12 02:29:51  arno
 % inputdlg2
 %
@@ -48,7 +51,7 @@ function [EEG, com] = pop_rmbase( EEG, timerange, pointrange);
 
 com ='';
 if isempty(EEG.data)
-    disp('Pop_rmbase error: cannot remove baseline of empty dataset'); return;
+    disp('pop_rmbase(): cannot remove baseline of an empty dataset'); return;
 end;    
 if nargin < 1
 	help pop_rmbase;
@@ -57,10 +60,10 @@ end;
 if nargin < 2
 	% popup window parameters
 	% -----------------------
-   promptstr    = {'Enter time limits (in ms) for baseline:',...
-         		   strvcat('Enter point range for baseline (ex:1:frames):', '(overwrite previous option)') };
+   promptstr    = {'Baseline time range (min_ms max_ms):',...
+         		   strvcat('Baseline points range (ex:1:56):', '(Overwritten by time limits).') };
 	inistr       = { [num2str(EEG.xmin*1000) ' 0'], '' };
-	result       = inputdlg2( promptstr, 'Baseline removal -- pop_rmbase()', 1,  inistr, 'pop_rmbase');
+	result       = inputdlg2( promptstr, 'Epoch baseline removal -- pop_rmbase()', 1,  inistr, 'pop_rmbase');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 
@@ -76,13 +79,13 @@ if ~isempty(timerange)
 end;	
 
 if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
-   error('Wrong time range');
+   error('pop_rembase(): Bad time range');
 end;
 if (min(pointrange) < 1) | (max( pointrange ) > EEG.pnts)  
    error('Wrong point range');
 end;
 
-fprintf('Removing baseline...\n');
+fprintf('pop_rmbase(): Removing baseline...\n');
 EEG.data = rmbase( EEG.data(:,:), EEG.pnts, pointrange );
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 
