@@ -84,6 +84,9 @@
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/20 22:25:34  arno
+% debug
+%
 % Revision 1.6  2002/08/12 22:19:34  arno
 % same
 %
@@ -303,7 +306,7 @@ if ~isstr( signal )
 
 	rejstatepoch('draw');
 	switch g.plot,
-		case 'on', waitfor( haccept, 'userdata');
+		case 'on', waitfor( haccept, 'userdata'); drawnow;
 	end;
 
 	threshold  = g.threshold;
