@@ -58,6 +58,7 @@
 %                {Default: [0 25 8 13 180]}
 %  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. 
 %                See 'phasesort'.
+%  'showwin' - Show sorting window behind ERP trace. {default: don't show sorting window}
 %
 % Plot time-varying spectral amplitude instead of potential:
 % 'plotamps' - Image amplitudes at each trial and latency instead of potential values. 
@@ -159,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.200  2004/01/24 21:43:59  scott
+% *** empty log message ***
+%
 % Revision 1.199  2004/01/24 21:36:01  scott
 % *** empty log message ***
 %
@@ -860,6 +864,7 @@ Vertflag  = NO;
 Horzflag  = NO;
 Noshowflag  = NO;
 Renormflag = NO;
+Showwin = NO;
 % yerplabel = '\muV';
 yerplabel = 'ERP';
 yerplabelflag = NO;
@@ -1253,6 +1258,8 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
+	  elseif strcmp(Arg,'showwin')
+		  Showwin = YES;
 	  elseif strcmp(Arg,'renorm')
 		  Renormflag = YES;
 	  elseif strcmp(Arg,'noshow')
@@ -2548,12 +2555,24 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     end
     fprintf('Plotting the ERP trace below the ERP image\n');
     if Erpstdflag == YES
-        plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
+        if Showwin
+          plot1trace(ax2,times,erp,limit, [], stdev,[],times(winloc)); % plot ERP +/-stdev
+        else
+          plot1trace(ax2,times,erp,limit, [], stdev,[],[]); % plot ERP +/-stdev
+        end
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
-        plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
+        if Showwin
+          plot1trace(ax2,times,erp,limit,erpsig,[],times(winloc)); % plot ERP and 0+/-alpha threshold
+        else
+          plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
+        end
     else
-        plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
+        if Showwin
+          plot1trace(ax2,times,erp,limit,[],[],times(winloc)); % plot ERP alone
+        else
+          plot1trace(ax2,times,erp,limit,[],[],[]); % plot ERP alone
+        end
     end;
         
     if ~isnan(aligntime)
