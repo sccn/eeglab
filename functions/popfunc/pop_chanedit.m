@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/01/02 17:31:49  arno
+% text in pop-up window for reading channel location
+%
 % Revision 1.39  2002/12/27 22:58:07  arno
 % removing debugging message
 %
@@ -609,7 +612,7 @@ function [chans, shrinkfact]= checkchans(chans);
 		 case 'sph_theta',    pos=13;
 		 case 'sph_phi',      pos=15;
 		 case 'sph_radius',   pos=17;
-		 otherwise, disp(['Unrecognized field''' allfields{index} ''' in channel structure, removing it']); pos = -1;
+		 otherwise, pos = -1;
 		end;
 		if pos ~= -1
 			newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
