@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/02 00:35:53  arno
+% update condstat, debug
+%
 % Revision 1.1  2002/10/01 16:06:55  arno
 % Initial revision
 %
@@ -689,10 +692,10 @@ if iscell(X)
 	plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, times, mbase, g);
     
 	subplot(1,3,3); g.title = g.titleall{3};
-	if isnan(g.alpha)
-		plottimef(P1-P2, R2-R1, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
-	else 
-		
+    if isnan(g.alpha)
+        Rdiff = R2-R1;
+		plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+	else 		
 		% preprocess data and run compstat
 		% --------------------------------
 		alltfX1power = alltfX1.*conj(alltfX1);
@@ -720,8 +723,16 @@ if iscell(X)
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
         plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
                   mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
-			
+		R1 = res1{2};
+		R2 = res2{2};
+        Rdiff = resdiff{2};
+        Pboot = { Pboot1 Pboot2 10*resimages{1} };
+        Rboot = { Rboot1 Rboot2 resimages{2} };
 	end;
+    P = { P1 P2 P1-P2 };
+    R = { R1 R2 Rdiff };
+    if nargout >= 8, alltfX = { alltfX1 alltfX2 }; end;
+    
 	return; % ********************************** END FOR SEVERAL CONDITIONS
 end;
  
