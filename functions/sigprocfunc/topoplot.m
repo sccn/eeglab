@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2004/02/15 20:32:37  scott
+% same
+%
 % Revision 1.121  2004/02/15 20:30:46  scott
 % same
 %
@@ -830,7 +833,7 @@ if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrin
   size(Thi(:))
   size(Phi(:))
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
-  skirt_mask = (sqrt(Xi.^2+Yi.^2)> rmax*squeezefac & ...
+  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2)> rmax*squeezefac & ...
          abs(Thi)<pi/2);
   ii = find(mask == 0);
   Zi(ii) = NaN;
