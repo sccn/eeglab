@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/05/04 23:19:52  arno
+% typo
+%
 % Revision 1.3  2004/05/04 23:05:02  arno
 % debug length
 %
@@ -150,6 +153,7 @@ function [ indnested, addlen ] = removenestedur(newur, ind);
                 disp('UREVENT INCONSISTENCY, PLEASE REPORT BUG TO EEGLAB@SCCN.UCSD.EDU');
             end;
         end;
+        tmpind = tmpind+1;
     end;
     
 % remove urevent and recompute indices
@@ -162,7 +166,6 @@ function [event, urevent] = removenested(event, urevent, nestind);
                                          % since the indices are dyanmically updated
     
     for ind = 1:length(nestind)
-        
         % find event urindices higher than the urevent to suppress
         % --------------------------------------------------------
         tmpind = find( urind > nestind(ind) );
