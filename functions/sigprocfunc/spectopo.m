@@ -1,7 +1,7 @@
 % spectopo() - Plot the mean log spectrum of a set of data epochs at
 %              all channels as a bundle of traces. At specified frequencies,
 %              plot the relative topographic distribution of power.
-%              Uses Matlab psd() from signal processing toolbox.
+%              Uses Matlab pwelch() from signal processing toolbox.
 % Usage:
 %        >> spectopo(data, frames, srate);
 %        >> [spectra,freqs,speccomp,contrib,specstd] = ...
@@ -79,9 +79,10 @@
 %                   variance, if 'icamode' is 'sub', percentage variance accounted for)
 %        specstd  = spectrum standard deviation in dB
 %
-% Notes: The old function call is still function for backward compatibility
+% Notes: The old function call is still functional for backward compatibility
 %        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
 %                               chanlocs, limits, titl, freqfac, percent);
+%        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
@@ -106,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2003/07/31 17:18:15  arno
+% 20 to winlength
+%
 % Revision 1.64  2003/07/30 19:05:12  arno
 % debuging for boundaries thank to Johannes Sarnthein
 %
@@ -170,7 +174,7 @@
 % debugging channel spectra
 %
 % Revision 1.43  2002/10/30 23:31:00  arno
-% changing default psd options
+% changing default pwelch options
 %
 % Revision 1.42  2002/10/23 02:35:02  arno
 % closing figure when error (selective)
@@ -308,7 +312,7 @@
 % 03-27-02 downsampling factor exact calculation -ad
 % 04-03-02 added axcopy -sm
 
-% Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
+% Uses: MATLAB pwelch(), changeunits(), topoplot(), textsc()
 
 function [eegspecdB,freqs,compeegspecdB,resvar,specstd]=spectopo(data,frames,srate,varargin) 
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
@@ -419,7 +423,7 @@ compeegspecdB = [];
 resvar = NaN;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute channel spectra using psd()
+% Compute channel spectra using pwelch()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 epoch_subset = 1:epochs;
 if g.percent ~= 1 & epochs > 1
@@ -933,8 +937,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 		end;
 		for e=epoch_subset
 			if isempty(g.boundaries)
-				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),...
-									  fftlength,srate,winlength,g.overlap);
+				[tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
+									  winlength,g.overlap,fftlength,srate);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 					specstd = zeros(nchans,length(freqs));
@@ -944,8 +948,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 			else
 				for n=1:length(g.boundaries)-1
                     if g.boundaries(n+1) - g.boundaries(n) >= winlength % ignore segments of less than winlength
-                        [tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-                                               fftlength,srate,winlength,g.overlap);
+                        [tmpspec,freqs] =  pwelch(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
+                                               winlength,g.overlap,fftlength,srate);
                         if c==1 & n==1 & e==epoch_subset(1)
                             eegspec = zeros(nchans,length(freqs));
                             specstd = zeros(nchans,length(freqs));
