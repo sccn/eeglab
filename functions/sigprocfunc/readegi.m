@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/02/02 20:05:15  arno
+% returning segment category indices
+%
 % Revision 1.13  2003/06/11 07:39:35  cooper
 % Added 'dataChunks' input argument.
 %
@@ -92,8 +95,8 @@ if nargin <1 | nargin >2,
     return;
 end
 
-if nargout < 2 | nargout > 3,
-	error('2 or 3 output args required');
+if nargout < 2 | nargout > 4,
+	error('2 to 4 output args required');
 end
 
 if ~exist('dataChunks','var')
