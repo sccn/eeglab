@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.110  2002/08/12 18:53:51  arno
+% errordlg2
+%
 % Revision 1.109  2002/08/12 18:37:13  arno
 % questdlg2
 %
@@ -636,7 +639,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_sub1, 'Label', 'Reject by probability'    , 'CallBack', [ checkepoch '[EEG LASTCOM] = pop_jointprob(EEG, 1);' e_store]);
 	uimenu( fourth_sub1, 'Label', 'Reject by kurtosis'       , 'CallBack', [ checkepoch '[EEG LASTCOM] = pop_rejkurt(EEG, 1);' e_store]);
 	uimenu( fourth_sub1, 'Label', 'Reject by spectra'        , 'CallBack', [ checkepoch '[EEG Itmp LASTCOM] = pop_rejspec(EEG, 1); clear Itmp;' e_store]);
-	uimenu( fourth_sub1, 'Label', 'Reject labeled epochs', 'separator', 'on', 'CallBack', [ checkepoch ...
+	uimenu( fourth_sub1, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepoch ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); h(LASTCOM);' ...
 	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1);' e_newset]);
 	   
@@ -648,7 +651,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_sub2, 'Label', 'Reject by probability',    'CallBack', [ checkepochica '[EEG LASTCOM] = pop_jointprob(EEG, 0);' e_store]);
 	uimenu( fourth_sub2, 'Label', 'Reject by kurtosis',       'CallBack', [ checkepochica '[EEG LASTCOM] = pop_rejkurt(EEG, 0);' e_store]);
 	uimenu( fourth_sub2, 'Label', 'Reject by spectra',        'CallBack', [ checkepochica '[EEG LASTCOM] = pop_rejspec(EEG, 0);' e_store]);
-	uimenu( fourth_sub2, 'Label', 'Reject labeled epochs', 'separator', 'on', 'CallBack', [ checkepochica ...
+	uimenu( fourth_sub2, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepochica ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); h(LASTCOM);' ...
 	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1);' e_newset ]);
    
@@ -661,9 +664,9 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch     'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
 	uimenu( third_m, 'Label', 'Channel statistics'       , 'CallBack', [ check          'LASTCOM = pop_signalstat(EEG, 1);' e_hist]);
 	ERP_m = uimenu( third_m, 'Label', 'ERP plots');
-		uimenu( ERP_m, 'Label', 'ERP and scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
-		uimenu( ERP_m, 'Label', 'ERP in scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
-		uimenu( ERP_m, 'Label', 'ERP in rect. array'     , 'CallBack', [ checkepoch     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 1); clear tmpeeg;' e_hist]);
+		uimenu( ERP_m, 'Label', 'And scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
+		uimenu( ERP_m, 'Label', 'In scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
+		uimenu( ERP_m, 'Label', 'In rect. array'     , 'CallBack', [ checkepoch     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 1); clear tmpeeg;' e_hist]);
 	topo_m = uimenu( third_m, 'Label', 'ERP maps');
 		uimenu( topo_m, 'Label', 'As 2-D scalp maps'     , 'CallBack', [ checkplot      'LASTCOM = pop_topoplot(EEG, 1);' e_hist]);
 		uimenu( topo_m, 'Label', 'As 3-D head plots'     , 'CallBack', [ checkplot      '[EEG LASTCOM] = pop_headplot(EEG, 1);' e_store]);
