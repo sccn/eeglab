@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2002/12/24 01:34:44  arno
+% debug multiple checks
+%
 % Revision 1.85  2002/11/15 18:40:54  arno
 % adding another test if chanlocs empty
 %
@@ -450,7 +453,7 @@ end;
             end;  	  
       else
         if EEG.trials > 1
-       		disp( 'eeg_checkset note: number of dimensions in data increased to 3'); 
+       		disp( 'eeg_checkset note: data array made 3-D'); 
        	    res = com;
        	end;    
        	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);		 
