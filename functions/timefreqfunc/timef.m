@@ -144,6 +144,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/08/27 21:49:11  arno
+% header typo
+%
 % Revision 1.62  2003/08/25 21:58:50  arno
 % header typo
 %
@@ -658,7 +661,7 @@ end;
 
 if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     %freqs = g.srate/g.winsize*[1:2/g.padratio:g.winsize]/2 % incorect for padratio > 2
-    freqs = linspace(0, g.srate/2, length([1:2/g.padratio:g.winsize])+1);
+    freqs = linspace(0, g.srate/2, g.padratio*g.winsize/2+1);
     freqs = freqs(2:end);
     win = hanning(g.winsize);
 
