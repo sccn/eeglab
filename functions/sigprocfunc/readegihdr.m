@@ -9,7 +9,7 @@
 % Output:
 %   head - structure containing header information.
 %          Structure fields are:
-%           version     = 2 or 3
+%           version     = 2, 3, or 5
 %           samp_rate   = sampling rate in samples/s
 %           nchan       = number of EEG channels
 %           gain        = gain of amplifier
@@ -58,7 +58,7 @@ head.range = fread(fid,1,'integer*2');
 
 head.segments = 1;
 
-if (head.version == 3),
+if (head.version > 2),
         head.categories = fread(fid,1,'integer*2');
         if (head.categories),
                 for i=1:head.categories,
