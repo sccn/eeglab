@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/05/03 00:49:24  arno
+% debugging channel center
+%
 % Revision 1.13  2002/05/02 23:37:27  scott
 % editting -sm
 %
@@ -126,7 +129,7 @@ if nargin < 2
 		% transfer channel to global workspace
 		global chantmp;
 		chantmp = chans;
-		evalin('base', [ 'global chantmp ;' ]);
+		evalin('base', [ 'global chantmp ' ]);
 		
 		% add field values
 		% ----------------
@@ -205,9 +208,9 @@ if nargin < 2
 		% add sorting options
 		% -------------------
 		if isstr(shrinkfact)
-			evalin('base', ['tmpshrink = ''' shrinkfact ''';' ]);
+			evalin('base', ['tmpshrink = ''' shrinkfact '''' ]);
 		else
-			evalin('base', ['tmpshrink = ' num2str(shrinkfact) ';' ]);
+			evalin('base', ['tmpshrink = ' num2str(shrinkfact) '' ]);
 		end;
 		plot2dcom = [ 'tmpshrink = ''off'';' ...
 					  'if get(findobj(''parent'', gcbf,  ''string'', ''Auto shrink''), ''value'')' ...
@@ -247,11 +250,11 @@ if nargin < 2
 		if length(results) == 0, return; end;
 		
 		% transfer events back from global workspace
-		chans = evalin('base', 'chantmp;');
-		%evalin('base', 'clear chantmp;');
+		chans = evalin('base', 'chantmp');
+		%evalin('base', 'clear chantmp');
 		totaluserdat = { totaluserdat{:} userdat{:}};
 		if evalin('base', 'exist(''comtmp'')') == 1
-			tmpcom = evalin('base', 'comtmp;');
+			tmpcom = evalin('base', 'comtmp');
 			try, 
 				chans = pop_chanedit(chans, tmpcom{:}); % apply modification to channel structure
 				totaluserdat = { totaluserdat{:} tmpcom };
@@ -259,7 +262,7 @@ if nargin < 2
 				errordlg(lasterr, 'Channel locations error');
 				returnmode = 'no';
 			end;	
-			evalin('base', 'clear comtmp;');
+			evalin('base', 'clear comtmp');
 			chans = checkchans(chans);
 		end;
 		
@@ -280,8 +283,8 @@ if nargin < 2
 	end;
 	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
 		if evalin('base', 'exist(''tmpshrink'')') == 1
-			tmpshrink = evalin('base', 'tmpshrink;');
-			evalin('base', 'clear tmpshrink;');
+			tmpshrink = evalin('base', 'tmpshrink');
+			evalin('base', 'clear tmpshrink');
 			if ~strcmp(tmpshrink, 'off'), 
 				if ~isempty(str2num(tmpshrink))  chans(1).shrink = str2num(tmpshrink);
 				else                             chans(1).shrink = tmpshrink;

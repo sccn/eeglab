@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/05/03 02:35:15  arno
+% allowing sorting on latency
+%
 % Revision 1.10  2002/05/03 01:41:57  arno
 % updating call for modifying latency
 %
@@ -102,7 +105,7 @@ end;
 allfields = fieldnames(EEG.event);
 if nargin<2
     % transfer events to global workspace
-    evalin('base', [ 'eventtmp = ' inputname(1) '.event;' ]);
+    evalin('base', [ 'eventtmp = ' inputname(1) '.event' ]);
 
     % add field values
     % ----------------
@@ -218,8 +221,8 @@ if nargin<2
     if length(results) == 0, return; end;
 
     % transfer events back from global workspace
-    eventtmp = evalin('base', 'eventtmp;');
-    evalin('base', 'clear eventtmp;');
+    eventtmp = evalin('base', 'eventtmp');
+    evalin('base', 'clear eventtmp');
     EEG.event = eventtmp;
 
     % handle sorting
