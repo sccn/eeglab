@@ -3,7 +3,8 @@
 %              plot the relative topographic distribution of power.
 %              Uses Matlab psd() from signal processing toolbox.
 % Usage:
-%        >> [spectra,freqs] = spectopo(data, frames, srate, 'key1', 'val1' ...
+%        >> spectopo(data, frames, srate);
+%        >> [spectra,freqs,speccomp] = spectopo(data, frames, srate, 'key1', 'val1' ...
 %                                                           'key2', 'val2' ...);
 %
 % Inputs:
@@ -59,8 +60,12 @@
 %    (see help topoplot())
 %
 % Outputs:
-%        spectra = (nchans,nfreqs) power spectra (average over epochs) in dB
-%        freqs   = frequencies of spectra (Hz)
+%        spectra  = (nchans,nfreqs) power spectra (average over epochs) in dB
+%        freqs    = frequencies of spectra (Hz)
+%        speccomp = component spectra (ncomps,nfreqs). Warning, only the function  
+%                   only computes the spectrum of the components given as input using 
+%                   the 'icacomps' parameter. Other component spectrum are filled  
+%                   with 0.
 %
 % Notes: The old function call is still function for backward compatibility
 %        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
@@ -89,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/11/15 01:39:31  scott
+% Can not -> cannot
+%
 % Revision 1.44  2002/11/14 17:12:10  arno
 % debugging channel spectra
 %
@@ -233,7 +241,7 @@
 
 % Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
 
-function [eegspecdB,freqs]=spectopo(data,frames,srate,varargin) 
+function [eegspecdB,freqs,compeegspecdB]=spectopo(data,frames,srate,varargin) 
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
@@ -322,6 +330,7 @@ if frames*epochs ~= size(data,2)
    error('Spectopo: non-integer number of epochs');
 end
 if ~isempty(g.weights)
+    ncompsori = size(g.weights,1);
     if isempty(g.icawinv)
         g.icawinv = pinv(g.weights); % maps
     end;
@@ -713,10 +722,19 @@ if ~isempty(g.title)
 	set(tl,'fontsize',15)
 end
 
+% return component spectrum
+% -------------------------
+if ~isempty(g.weights) & nargout >= 3
+    tmp = compeegspecdB;
+    compeegspecdB = zeros(ncompsori, size(tmp,2));
+    compeegspecdB(g.icacomps,:) = tmp;
+end;
+    
 %%%%%%%%%%%%%%%%
 % Turn on axcopy
 %%%%%%%%%%%%%%%%
 axcopy
+
 
 %%%%%%%%%%%%%%%%
 % Plot color bar
