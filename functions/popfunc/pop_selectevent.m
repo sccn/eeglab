@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2004/05/26 23:29:47  arno
+% implementing duration
+%
 % Revision 1.50  2004/05/07 17:11:48  arno
 % checking event consistency
 %
@@ -415,8 +418,8 @@ for index = 1:length(allfields)
 				end;
 			end;
 			if strcmp(allfields{index}, 'duration')
-				if EEG.trials > 1, tmpvarvalue = tmpvarvalue*EEG.srate;
-                else               tmpvarvalue = tmpvarvalue*EEG.srate/1000;
+				if EEG.trials > 1, tmpvarvalue = tmpvarvalue/EEG.srate*1000;
+                else               tmpvarvalue = tmpvarvalue/EEG.srate;
                 end;
             end;
 			Ieventlow  = find( tmpvarvalue >= min);
@@ -470,8 +473,8 @@ for index = 1:length(allfields)
 				end;
 			end;
 			if strcmp(allfields{index}, 'duration')
-				if EEG.trials > 1, tmpvarvalue = tmpvarvalue*EEG.srate;
-                else               tmpvarvalue = tmpvarvalue*EEG.srate/1000;
+				if EEG.trials > 1, tmpvarvalue = tmpvarvalue/EEG.srate*1000;
+                else               tmpvarvalue = tmpvarvalue/EEG.srate;
                 end;
             end;
             Ieventlow  = find( tmpvarvalue > min);
