@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2002/10/15 16:56:44  scott
+% debug
+%
 % Revision 1.81  2002/10/15 16:56:07  scott
 % debug
 %
@@ -588,18 +591,21 @@ else
 		projchan = [];
 	end;
 	if nargin < 5
-		smooth = 5;
+		titleplot = ' ';
 	end;
 	if nargin < 6
-		decimate = 0;
+		smooth = 5;
 	end;
 	if nargin < 7
-		sortingtype = [];
+		decimate = 0;
 	end;
 	if nargin < 8
-		sortingwin = [];
+		sortingtype = [];
 	end;
 	if nargin < 9
+		sortingwin = [];
+	end;
+	if nargin < 10
 		sortingeventfield = [];
 	end;
 	for i=1:length( varargin )
