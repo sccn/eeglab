@@ -63,6 +63,7 @@
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {default no}
 %   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {default no}
+%   'rmerp'  - remove the erp from the data {default no}
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
@@ -144,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2003/04/26 01:06:38  arno
+% debuging ampsort for phase sorting
+%
 % Revision 1.97  2003/04/25 22:32:26  arno
 % doing the same for ampsort
 %
@@ -548,6 +552,7 @@ lospecHz  = [];     % spec lo frequency
 topphase = 180;     % default top phase for 'phase' option
 renorm    = 'no';
 noshow    = 'no';
+rmerp     = 'no';
 
 minerp = NaN; % default limits
 maxerp = NaN;
@@ -934,6 +939,8 @@ if nargin > 6
 		  Erpflag = YES;
 	  elseif strcmpi(Arg,'erpstd')
 		  Erpstdflag = YES;
+	  elseif strcmpi(Arg,'rmerp')
+		  Rmerp = 'yes';
 	  elseif strcmp(Arg,'align')
 		  Alignflag = YES;
 	  elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
@@ -1174,6 +1181,14 @@ if ~isnan(aligntime)
     fprintf('Shifted epochs by %d to %d frames.\n',min(shifts),max(shifts));
     data = aligndata;                       % now data is aligned to sortvar
 end 
+
+%
+%%%%%%%%%%%%%%% Remove the ERP %%%%%%%%%%%%%%%
+%
+if strcmpi(Rmerp, 'yes')
+    data = data - repmat(nan_mean(data,2), [1 size(data,2)]);
+end;
+
 %
 %%%%%%%%%%%%%%% Sort the data trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
