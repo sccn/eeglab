@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.166  2002/09/11 19:43:26  arno
+% debug besa menu
+%
 % Revision 1.165  2002/09/08 00:45:03  scott
 % pop_envtopo() menu label -scott
 %
@@ -1170,8 +1173,10 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	set( g.val5, 'String', int2str(EEG.trials));
 	set( g.val6, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
 	set( g.val7, 'String', int2str( round(EEG.srate)) );
-	set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmin));
-	set( g.val9, 'String', sprintf('%6.3f\n', EEG.xmax));
+	%set( g.val8, 'String', sprintf('%6.3f to %6.3f\n', EEG.xmin, EEG.xmin+1/EEG.srate));
+	%set( g.val9, 'String', sprintf('%6.3f to %6.3f\n', EEG.xmax, EEG.xmax+1/EEG.srate));
+	set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
+	set( g.val9, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
 	set( g.val10, 'String', EEG.averef);
 	set( g.val11, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
 	set( g.val12, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
