@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/07/15 02:00:48  arno
+% same
+%
 % Revision 1.24  2002/07/15 01:55:45  arno
 % debugging minamp maxamp
 %
@@ -741,7 +744,7 @@ fprintf('Plotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',.
 %
 %%%%%%%%%%%%%% Reshape data2 to (frames,ntrials) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if exist('data2')
+if exist('data2') == 1
   if size(data2,2) ~= ntrials
    if size(data2,1)>1
      data2=reshape(data2,1,frames*ntrials);
@@ -750,13 +753,35 @@ if exist('data2')
   end
 end
 %
+%%%%%%%%%%%%%%% if sortvar=NaN, remove lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -ad
+%
+if any(isnan(sortvar))
+	nanlocs = find(isnan(sortvar));
+	fprintf('Removing %d trials with NaN values for sorting variable', length(nanlocs));
+	data(:,nanlocs) = [];
+	sortvar(nanlocs) = [];
+	if exist('data2') == 1
+		data2(:,nanlocs) = [];
+	end;
+	if ~isempty(auxvar)
+		auxvar(nanlocs,:) = [];
+	end
+	if ~isempty(verttimes)
+		if size(verttimes,1) == ntrials
+			verttimes(nanlocs,:) = [];
+		end;
+	end;
+	ntrials = size(data,2)
+end;
+
+%
 %%%%%%%%%%%%%%%%%%% Renormalize sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 switch lower(renorm)
  case 'yes',
-  disp('erpimage warning: *** sorting variable renormalized ***');
+  disp('erpimage warning: *** sorting variable renormalized ***');  
   sortvar = (sortvar-min(sortvar)) / (max(sortvar) - min(sortvar)) * ...
-		   0.5 * (max(times) - min(times)) + min(times)*1000 + 0.4*(max(times) - min(times));
+		   0.5 * (max(times) - min(times)) + min(times) + 0.4*(max(times) - min(times));
  case 'no',;
  otherwise,
   locx = findstr('x', lower(renorm))
@@ -1243,9 +1268,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
 end %%%%%%%%%%%%%%%%%%%%%%%%%%% End image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~isempty(verttimes)
- if min(size(verttimes))==1  % if verttimes is a vector
-    verttimes = verttimes(:)';  % make verttimes a row vector
- elseif size(verttimes,1) ~= ntrials
+ if size(verttimes,1) ~= ntrials
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
     return
  end;
@@ -1525,12 +1548,12 @@ if Erpflag == YES
   end
  end
 
- if ~isempty(verttimes)
-  if min(size(verttimes))==1  % if verttimes is a vector
-   vts = verttimes(:)';  % make vts a row vector
-  elseif size(verttimes,1) == ntrials
+ if ~isempty(verttimes) 
+  if size(verttimes,1) == ntrials
    vts=sort(verttimes); 
    vts = vts(ceil(ntrials/2),:); % plot median verttimes values if a matrix
+  else 
+   vts = verttimes(:)';  % make verttimes a row vector
   end
   for vt = vts
      if isnan(aligntime)
@@ -1690,12 +1713,12 @@ if ~isnan(coherfreq)
    set(ax3,'Box','off','color',BACKCOLOR);
 
    if ~isempty(verttimes)
-    if min(size(verttimes))==1  % if verttimes is a vector
-       vts = verttimes(:)';  % make verttimes a row vector
-    elseif size(verttimes,1) == ntrials
+	if size(verttimes,1) == ntrials
      vts=sort(verttimes); 
      vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
-    end
+    else 
+		vts=verttimes(:)';	
+	end
      for vt = vts
       if isnan(aligntime)
        if TIMEX      % overplot vt on amp
@@ -1779,12 +1802,12 @@ if ~isnan(coherfreq)
    set(ax4,'YColor',BACKCOLOR);
 
    if ~isempty(verttimes)
-    if min(size(verttimes))==1  % if verttimes is a vector
-       vts = verttimes(:)';  % make verttimes a row vector
-    elseif size(verttimes,1) == ntrials
+	if size(verttimes,1) == ntrials
      vts=sort(verttimes); 
      vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
-    end
+    else 
+       vts = verttimes(:)';  % make verttimes a row vector
+	end
      for vt = vts
       if isnan(aligntime)
        if TIMEX      % overplot vt on coher
