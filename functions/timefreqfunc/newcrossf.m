@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/15 21:07:36  arno
+% bilateral bootstrap for difference
+%
 % Revision 1.8  2002/10/15 20:53:32  arno
 % title diff
 %
@@ -631,6 +634,7 @@ if iscell(X)
             case 'angle',  Rdiff = angle(R1)-angle(R2);
             case 'complex',  Rdiff = R1-R2;
         end;
+        g.title = ' ';
 		plotall(Rdiff, [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
         Rbootout = [];
 	else 
