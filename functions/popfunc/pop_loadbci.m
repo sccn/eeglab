@@ -1,4 +1,4 @@
-% pop_loadbci() - import BCI2000 ascii file into eeglab
+% pop_loadbci() - import a BCI2000 ascii file into EEGLAB
 %
 % Usage:
 %   >> OUTEEG = pop_loadbci( filename, srate );
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/15 17:00:49  arno
+% drawnow
+%
 % Revision 1.6  2002/08/12 16:33:37  arno
 % inputdlg2
 %
