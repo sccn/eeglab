@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/22 23:57:21  arno
+% change default blockread
+%
 % Revision 1.4  2002/10/15 17:01:13  arno
 % drawnow
 %
@@ -110,9 +113,9 @@ EEG.filename        = filename;
 EEG.filepath        = filepath;
 EEG.setname 		= 'CNT file';
 EEG.nbchan          = r.nchannels; 
-I = find( r.event.stimtype > 0);
+I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
 
-EEG.event(1:length(I),1) = 0;
+EEG.event(1:length(I),1) = r.event.stimtype(I);
 EEG.event(1:length(I),2) = r.event.frame(I);
 EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 
