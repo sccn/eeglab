@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/12/17 03:13:25  arno
+% attempting to rename event types
+%
 % Revision 1.12  2004/11/10 02:43:06  arno
 % add new pop up gui for epoch file
 %
@@ -91,7 +94,7 @@ if nargin < 1
     fclose(fid);
     
     if head.segments ~= 0
-        promptstr    = { sprintf('Segment/frame number (default:1:%d)', head.segments) };
+        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
         inistr       = { '' };
         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
         if length(result) == 0 return; end;
@@ -106,9 +109,9 @@ end;
 % ----------
 EEG = eeg_emptyset;
 if exist('datachunks')
-    [Head EEG.data Eventdata] = readegi( filename, datachunks);
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks);
 else
-    [Head EEG.data Eventdata] = readegi( filename);
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename);
 end;
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
@@ -161,6 +164,22 @@ if ~isempty(Eventdata)
      catch, disp('Warning: event renaming failed'); end;
 end;
 
+% adding segment category indices
+% -------------------------------
+if ~isempty(SegCatIndex) & EEG.trials > 1
+    if ~isempty(EEG.event)
+        for index = 1:length(EEG.event)
+            EEG.event(index).category = Head.catname{SegCatIndex(EEG.event(index).epoch)};
+        end;
+    else % create time-locking events
+        for trial = 1:EEG.trials
+            EEG.event(trial).epoch    = trial; 
+            EEG.event(trial).type     = 'TLE';
+            EEG.event(trial).latency  = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
+            EEG.event(trial).category = Head.catname{SegCatIndex(trial)};
+        end;
+    end;
+end;
 
 EEG = eeg_checkset(EEG, 'makeur');
 EEG = eeg_checkset(EEG, 'eventconsistency');
