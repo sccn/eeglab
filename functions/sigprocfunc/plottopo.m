@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/03/05 16:27:53  arno
+% plotting lines after data
+%
 % Revision 1.8  2003/03/05 02:25:23  arno
 % removing warnings and extra CR
 %
@@ -102,7 +105,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%% Graphics Settings - can be customized %%%%%%%%%%%%%%%%%%
 %
-LINEWIDTH     = 2.0;     % data line widths (can be non-integer)
+LINEWIDTH     = 1.0;     % data line widths (can be non-integer)
 FONTSIZE      = 14;      % font size to use for labels
 CHANFONTSIZE  = 12;      % font size to use for channel names
 TICKFONTSIZE  = 10;      % font size to use for axis labels
