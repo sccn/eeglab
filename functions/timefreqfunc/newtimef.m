@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2004/08/03 21:55:57  arno
+% same scaling for both iamges
+%
 % Revision 1.61  2004/06/02 23:18:03  arno
 % baseline, baseboot ...
 %
@@ -1139,6 +1142,7 @@ else
         baseln = 1:length(timesout); % use all times as baseline
     end
 end;
+
 if ~isnan(g.alpha) & length(baseln)==0
     myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
