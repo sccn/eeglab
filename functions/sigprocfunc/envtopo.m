@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2004/11/12 07:14:53  scott
+% debugging 'limcontrib'; changed 'times' keyword to 'timerange'
+%
 % Revision 1.70  2004/11/11 15:12:33  scott
 % clean up
 %
@@ -371,8 +374,8 @@ g.limcontrib = g.limcontrib/1000; % convert ms -> s
 if ~isempty(g.timerange) 
     g.timerange = g.timerange/1000; % convert ms -> s
     if (g.limits(1) == 0 & (length(g.limits)>1 & g.limits(2) == 0)) | length(g.limits)==1
-         g.limits(1) = min(timerange);
-         g.limits(2) = max(timerange);
+         g.limits(1) = min(g.timerange);
+         g.limits(2) = max(g.timerange);
     end
 end
 
