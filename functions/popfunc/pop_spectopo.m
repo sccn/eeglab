@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/07/29 22:25:58  arno
+% updating message
+%
 % Revision 1.11  2002/07/29 22:15:50  arno
 % reprogramming for spectopo component
 %
@@ -201,7 +204,7 @@ end;
 % plot the data and generate output and history commands
 % ------------------------------------------------------
 popcom = sprintf('figure; pop_spectopo(%s, %d, [%s] %s);', inputname(1), dataflag, num2str(timerange), options);
-com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate %s);', outstr, spectopooptions);
+com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate %s);', outstr, spectopooptions)
 eval(com)
 if nargout < 2 & nargin < 3
 	varargout{1} = popcom;

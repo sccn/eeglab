@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/07/29 22:22:27  arno
+% update messages
+%
 % Revision 1.21  2002/07/26 02:11:02  arno
 % debugging max limits
 %
@@ -452,7 +455,7 @@ if ~isempty(g.weights)
 		end;
 	else
 		fprintf(['Warning: can not compute component percentage contribution\n' ...
-				 'when considering global power (i.e. when using ''plotchan'', 0)\n');
+				 'when considering global power (i.e. when using ''plotchan'', 0)\n']);
 	end;
 end;
 
