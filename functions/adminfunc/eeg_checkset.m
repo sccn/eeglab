@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2003/09/22 23:45:24  arno
+% debug urevent
+%
 % Revision 1.103  2003/07/28 15:30:31  arno
 % default for EEG.ref
 %
@@ -899,9 +902,11 @@ if ~isempty( varargin)
           end;
          case 'makeur', 
           if ~isempty(EEG.event)
-              disp('eeg_checkset note: creating backup event table (urevent)');
               if isfield(EEG. event, 'urevent'), 
                   EEG.event = rmfield(EEG.event, 'urevent');
+                  disp('eeg_checkset note: re-creating backup event table (urevent)');
+              else
+                  disp('eeg_checkset note: creating backup event table (urevent)');
               end;
               EEG.urevent = EEG.event;
               for index = 1:length(EEG.event)
