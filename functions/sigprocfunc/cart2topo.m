@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/05/02 00:03:29  arno
+% updating header
+%
 % Revision 1.7  2002/04/27 01:45:18  arno
 % debuged center
 %
@@ -144,8 +147,8 @@ if ~isempty(g.center) & size(g.center,2) ~= 3
 end
 
 % convert to columns
-x = x(:);
-y = y(:);
+x = -x(:); % minus os for consistency between measures
+y = -y(:);
 z = z(:);
 
 options = [];
