@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.202  2004/05/14 23:29:32  arno
+% fixing toggle name/number
+%
 % Revision 1.201  2004/05/10 15:14:34  scott
 % more flexible labels/numbers/points argument reading; defined ELECTRODE_HEIGHT
 %
@@ -944,18 +947,14 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
             headrad = plotrad; % plot head around outer electrodes, no matter if 0.5 or not
         end
     else % apply shrinkfactor
-        if shrinkfactor < 0 | shrinkfactor > 1-1e-3
-            error('shrink factor out of bounds [0,.999)')
-        else
-            plotrad = rmax/(1-shrinkfactor);
-            headrad = plotrad;  % make deprecated 'shrink' mode plot 
-            if strcmpi(VERBOSE,'on')
-                fprintf('    %g%% shrink  applied.');
-                if abs(headrad-rmax) > 1e-2
-                    fprintf(' Cartoon head is not anatomically correct.\n');
-                else
-                    fprintf('\n');
-                end
+        plotrad = rmax/(1-shrinkfactor);
+        headrad = plotrad;  % make deprecated 'shrink' mode plot 
+        if strcmpi(VERBOSE,'on')
+            fprintf('    %g%% shrink  applied.');
+            if abs(headrad-rmax) > 1e-2
+                fprintf(' Cartoon head is not anatomically correct.\n');
+            else
+                fprintf('\n');
             end
         end
     end
