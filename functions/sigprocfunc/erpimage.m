@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2003/09/24 00:42:10  scott
+% debug same
+%
 % Revision 1.152  2003/09/24 00:39:05  scott
 % adding 'horz' -> horizontal line plotting
 %
@@ -2127,7 +2130,7 @@ if ~isempty(horzepochs)
     return
  end;
  if strcmpi(noshow, 'no')
-     fprintf('Plotting %d lines at epochs: ',length(horztimes));
+     fprintf('Plotting %d lines at epochs: ',length(horzepochs));
      for he = horzepochs % for each horizontal line
          fprintf('%g ',he);
              if TIMEX          % overplot he on image
