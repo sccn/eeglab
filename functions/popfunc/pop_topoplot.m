@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/07/03 16:55:07  arno
+% header
+%
 % Revision 1.25  2003/07/03 16:52:44  arno
 % same
 %
@@ -150,9 +153,12 @@ if nargin < 3
 	% which set to save
 	% -----------------
 	if typeplot
-		txt = strvcat('Plotting ERP scalp maps at these latencies:', sprintf('(range: %d to %d ms, NaN -> empty):', round(EEG.xmin*1000), round(EEG.xmax*1000)));
+		txt = strvcat('Plotting ERP scalp maps at these latencies:', ...
+                             sprintf('(range: %d to %d ms, NaN -> empty):', ...
+                                  round(EEG.xmin*1000), round(EEG.xmax*1000)));
 	else
-		txt = strvcat('Component numbers (negate index to invert component polarity):', '(NaN -> empty subplot)(Ex: -1 NaN 3)');
+		txt = strvcat('Component numbers (negate index to invert component polarity):', ...
+                             '(NaN -> empty subplot)(Ex: -1 NaN 3)');
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...
@@ -168,12 +174,17 @@ if nargin < 3
 	                 [fastif(~isempty(EEG.setname), [EEG.setname ' components'], '') ] ...
 	                 '' ['''electrodes'', ''off''' ] };
         end
-	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'pop_topoplot');
+	result       = inputdlg2( txt, ...
+                        fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', ...
+                            'Component scalp map(s) -- pop_topoplot()'), ...
+                                 1,  inistr, 'pop_topoplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
 	if length(arg2) > EEG.nbchan
-		tmpbut = questdlg2(['This involve drawing ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
+		tmpbut = questdlg2(...
+                  ['This involves drawing ' int2str(length(arg2)) ' plots. Continue ?'], ...
+                         '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
 	topotitle    = result{2};
@@ -243,12 +254,15 @@ for index = 1:size(arg2(:),1)
 	if ~isnan(arg2(index))
 		if typeplot
 			if length( options ) < 2
-				topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, 'verbose', 'off');
+				topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, ...
+                          'verbose', 'off');
 			else	
-				eval( [ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
+				eval([ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
 			end;
-			if nbgraph == 1, title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
-			else title([int2str(arg2(index)) ' ms']);
+			if nbgraph == 1, 
+                 title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
+			else 
+                 title([int2str(arg2(index)) ' ms']);
 			end;
 		else
 			if length( options ) < 2
@@ -282,14 +296,21 @@ for index = 1:size(arg2(:),1)
     axis off
     end;
 end;
-if nbgraph> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
-if nbgraph== 1, com = 'figure;'; end;
+if nbgraph> 1, 
+   a = textsc(0.5, 0.05, topotitle); 
+   set(a, 'fontweight', 'bold'); 
+end;
+if nbgraph== 1, 
+   com = 'figure;'; 
+end;
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
 if length( options ) < 2
-	com = [com sprintf('pop_topoplot(%s,%d, %s);', inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}))];
+	com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
+              inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}))];
 else
-	com = [com sprintf('pop_topoplot(%s,%d, %s %s);', inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}), options)];
+	com = [com sprintf('pop_topoplot(%s,%d, %s %s);', ...
+              inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}), options)];
 end;
 return;
 
