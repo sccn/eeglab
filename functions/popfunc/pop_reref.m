@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/09/08 22:54:12  arno
+% typo for refstate
+%
 % Revision 1.23  2003/07/31 17:10:05  arno
 % conversion to 3-D for the last channel
 %
@@ -385,9 +388,5 @@ end;
 
 % generate the output command
 % ---------------------------
-if isempty( options )
-    com = sprintf('%s = pop_reref( %s, [%s]);', inputname(1), inputname(1), num2str(ref));
-else 
-    com = sprintf('%s = pop_reref( %s, [%s], %s);', inputname(1), inputname(1), num2str(ref), vararg2str(options));
-end;    
+com = sprintf('%s = pop_reref( %s, %s);', inputname(1), inputname(1), vararg2str({ref, options{:}}));
 return;
