@@ -17,7 +17,7 @@
 %    EEG.xmin         - epoch start time (in seconds)
 %    EEG.xmax         - epoch end time (in seconds)
 %    EEG.times        - time vector (one value per time point)
-%    EEG.ref          - ['common'|'averef'|'averefwithref'] average reference flag
+%    EEG.ref          - ['common'|'averef'|integer] reference index or type
 %    EEG.comments     - comments about the dataset
 %
 % ICA variables:
@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2003/07/21 14:32:17  arno
+% convert single to double precision
+%
 % Revision 1.100  2003/07/16 20:53:43  arno
 % auto creation of urevent table
 %
@@ -735,6 +738,15 @@ if ~isempty( EEG.chanlocs )
                 EEG.chanlocs(index).shrink = EEG.chanlocs(1).shrink;
             end;
         end;
+    end;
+end;
+
+% check reference
+% ---------------
+if isstr(EEG.ref) & strcmpi(EEG.ref, 'common')
+    if length(EEG.chanlocs) > EEG.nbchan
+        disp('Extra common reference electrode location detected');
+        EEG.ref = EEG.nbchan+1;
     end;
 end;
 
