@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/07/30 22:21:11  arno
+% debugging
+%
 % Revision 1.8  2002/07/30 22:19:24  arno
 % removing multieegplot.m
 %
@@ -114,8 +117,8 @@ if EEG.trials > 1
     end;
     elecrange = [1:EEG.nbchan];
 	colrej = EEG.reject.rejmanualcol;
-	rej  = [];
-	rejE = [];
+	rej  = eval(macrorej);
+	rejE = eval(macrorejE);
 	
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
