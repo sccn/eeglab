@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/05/14 18:12:58  arno
+% implementing checkbox
+%
 % Revision 1.25  2003/05/12 15:33:41  arno
 % same
 %
@@ -245,7 +248,7 @@ else % case of a single trial (continuous data)
     end; 
     eegplotoptions = { 'winlength', 5 };
     if ~isempty(EEG.chanlocs) & icacomp
-        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
+        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs, 'event', EEG.event };
     end;
 end;
 
