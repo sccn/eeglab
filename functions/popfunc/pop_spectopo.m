@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/24 18:16:49  arno
+% changing default freqs
+%
 % Revision 1.6  2002/07/20 19:21:39  arno
 % new spectopo compatibility
 %
@@ -112,6 +115,7 @@ if ~isempty(EEG.chanlocs)
 	   posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
 	   posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
 	   pointrange = posi:posf;
+	   if posi == posf, error('pop_spectopo: empty time range'); end;
 	end;
     if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
     else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
@@ -132,7 +136,7 @@ if ~isempty(EEG.chanlocs)
 	    options = '';
 	end;
 	popcom = sprintf('figure; pop_spectopo(%s, [%s], %s, [%s] %s);', inputname(1), num2str(timerange), num2str(percent), num2str(topofreqs), options);
-	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''freq'', topofreqs, ''chanlocs'', EEG.chanlocs, ''limits'', [nan nan nan nan nan nan], ''percent'', percent %s);', outstr, options);
+	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''freq'', topofreqs, ''chanlocs'', EEG.chanlocs, ''percent'', percent %s);', outstr, options);
 	eval(com)
 	varargout{1} = [10 popcom 10 '% ' com];
 
