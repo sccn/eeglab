@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/10/23 15:06:40  arno
+% isppc -> computer
+%
 % Revision 1.33  2002/10/15 16:25:15  arno
 % magnify edit boxes windows
 %
@@ -176,7 +179,7 @@ if nargin < 2
 	return;
 end;
 if fig == 0
-	figure('visible','off');
+	fig = figure('visible','off');
 end;
 
 % converting the geometry formats
@@ -209,7 +212,7 @@ geomy  = geomy - INSETY*(length(geomy)-1)/length(geomy);
 
 % get axis coordinates
 % --------------------
-set(gcf, 'menubar', 'none', 'numbertitle', 'off');		
+set(fig, 'menubar', 'none', 'numbertitle', 'off');		
 pos = get(gca,'position'); % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]; % allow to use normalized position [0 100] for x and y
@@ -306,14 +309,14 @@ warning on;
 
 % scale and replace the figure in the screen
 % -----------------------------------------
-pos = get(gcf, 'position');
+pos = get(fig, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = pos(3)*factmultx;
 pos(4) = pos(4)*factmulty;
-set(gcf, 'position', pos);
+set(fig, 'position', pos);
 
 % vertical alignment to bottom for text
 % ---------------------------------------
@@ -336,20 +339,20 @@ catch,
 	GUITEXTCOLOR        = [0 0 0];
 end;
 
-hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
-%set(hh, 'BackgroundColor', get(gcf, 'color'), 'horizontalalignment', 'left');
+hh = findobj(allhandlers, 'parent', fig, 'style', 'text');
+%set(hh, 'BackgroundColor', get(fig, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-set(gcf, 'color',GUIBACKCOLOR );
+set(fig, 'color',GUIBACKCOLOR );
 set(hh, 'horizontalalignment', 'left');
 
 hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
-hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
+hh =findobj(allhandlers, 'parent', fig, 'style', 'pushbutton');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
+hh =findobj(allhandlers, 'parent', fig, 'style', 'checkbox');
 if isunix
 	set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 	set(hh, 'foregroundcolor', GUITEXTCOLOR);	
@@ -357,13 +360,13 @@ else
 	set(hh, 'backgroundcolor', GUIBACKCOLOR);
 	set(hh, 'foregroundcolor', GUITEXTCOLOR);
 end;
-hh =findobj(allhandlers, 'parent', gcf, 'style', 'listbox');
+hh =findobj(allhandlers, 'parent', fig, 'style', 'listbox');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlers, 'parent', gcf, 'style', 'radio');
+hh =findobj(allhandlers, 'parent', fig, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 
-set(gcf, 'visible', 'on');
+set(fig, 'visible', 'on');
 
 return;

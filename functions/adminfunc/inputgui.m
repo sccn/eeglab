@@ -66,6 +66,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/13 00:49:31  arno
+% tag the figure
+% /
+%
 % Revision 1.16  2002/10/15 17:23:21  arno
 % debug drawnow
 %
@@ -128,9 +132,9 @@ if exist('mode') ~= 1
 end;
 
 if isstr(mode)
-	fig = figure('visible', 'off', 'tag', 'supergui');
-	if exist('mytitle') == 1, set(gcf, 'name', mytitle); end;
-	if exist('userdat') == 1, set(gcf, 'userdata', userdat); end; 
+	fig = figure('visible', 'off');
+	if exist('mytitle') == 1, set(fig, 'name', mytitle); end;
+	if exist('userdat') == 1, set(fig, 'userdata', userdat); end; 
 	geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
 	
 	% add the three buttons
@@ -196,7 +200,7 @@ drawnow; % for windows
 % --------------------
 function g = myguihandles(fig)
 	g = [];
-	h = findobj('parent', gcf);
+	h = findobj('parent', fig);
 	for index = 1:length(h)
 		if ~isempty(get(h(index), 'tag'))
 			try, 
