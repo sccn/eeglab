@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/05/29 00:17:24  arno
+% allow 3D inputs
+%
 % Revision 1.54  2003/05/24 19:10:57  arno
 % debug lowmem
 %
@@ -567,7 +570,7 @@ elseif (~isnumeric(frame) | length(frame)~=1 | frame~=round(frame))
 elseif (frame <= 0)
    fprintf('crossf(): Value of frames must be positive.\n');
    return
-elseif ~iscell(X) & (rem(length(X),frame) ~= 0)
+elseif ~iscell(X) & (rem(size(X,2),frame) ~= 0) & (rem(size(X,1),frame) ~= 0)
    fprintf('crossf(): Length of data vectors must be divisible by frames.\n');
    return
 end
