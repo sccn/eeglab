@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.120  2004/05/14 17:47:15  arno
+% convert history
+%
 % Revision 1.119  2004/05/06 21:54:55  arno
 % message text
 %
@@ -1077,7 +1080,21 @@ if ~isempty( varargin)
               end;
           end;
           
+          % check duration field, replace empty by 0
+          % ----------------------------------------
+          if isfield(EEG.event, 'duration')
+              try,   valempt = cellfun('isempty'  , { EEG.event.duration });
+              catch, valempt = mycellfun('isempty', { EEG.event.duration });
+              end;
+              if any(valempt),
+                  for index = find(valempt)
+                      EEG.event(index).duration = 0;
+                  end;
+              end;
+          end;
+          
           % build epoch structure
+          % ---------------------
           try,
           if EEG.trials > 1 & ~isempty(EEG.event)
               maxlen = 0;
