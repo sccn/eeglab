@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/06 21:55:36  arno
+% spelling
+%
 % Revision 1.11  2002/05/02 19:31:29  arno
 % debugging strmatch (exact)
 %
@@ -161,6 +164,9 @@ end;
 % check parameters
 % ----------------
 if size(values,1) < size(values,2), values = values'; end;
+if length(fieldlist) ~= size(values,2)
+	error('There must be as many field names as there are columsn in the file/array');
+end;
 if ~iscell(fieldlist)
     otherfieldlist = { fieldlist };
     fieldlist = { fieldlist };
