@@ -1,23 +1,47 @@
-% pop_eegplot() - reject by visual inspection of artifact in a dataset
-%
+% pop_eegplot() - Visually inspect EEG data in a scrolling display.
+%                 Perform rejection or marking for rejection of manually 
+%                 (and/or previously manually) selected data portions 
+%                 (= stretches of continuous data or whole data epochs).
 % Usage:
-%   >> pop_eegplot( INEEG, typerej, superpose, reject );
+%   >> pop_eegplot( EEG ) % Scroll EEG channel data. Allow marking for rejection via
+%                         % button 'Update Marks' but perform no actual data rejection.
+%                         % Do not show or use marks from previous visual inspections
+%                         % or from semi-auotmatic rejection.
+%   >> pop_eegplot( EEG, typerej, superpose, reject );
 %
 % Inputs:
-%   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 
-%                                   1 = eeg data channels). {default: 1}
-%   superpose  - 0 = do not superpose marking on previous marking 
-%                    (stored in the dataset). 
-%                1 = consider both markings (using different colors). 
-%                     {default: 0}
-%   reject     - 0 = do not reject marked trials 
-%                     (but still store the them). 
-%                1 = reject marked trials) {default: 0}
+%   EEG        - input EEG dataset
+%   typerej    - type of rejection 0 = EEG independent components; 
+%                                  1 = EEG data channels). {default: 1}
+%   superpose  - 0 = Show new marks only: Do not color the background of data portions 
+%                    previously marked for rejection by visual inspection. Mark data 
+%                    portions for rejection by first coloring them (by dragging the left 
+%                    mouse button) and then pressing the 'Update Marks' or 'Reject' 
+%                    button (see 'reject' below). Previous markings from visual inspection 
+%                    will be lost.
+%                1 = Show data portions previously marked by visual inspection plus 
+%                    data portions selected in this window for rejection (by dragging 
+%                    the left mouse button in this window). These are differentiated 
+%                    using a lighter and darker hue, respectively). Pressing the 
+%                    'Update Marks' or 'Reject' button (see 'reject' below)
+%                    will then mark or reject all the colored data portions.
+%                     {default: 0, show and act on new marks only}
+%   reject     - 0 = Mark for rejection. Mark data portions by dragging the left mouse 
+%                    button on the data windows (producing a background coloring indicating 
+%                    the extent of the marked data portion).  Then press the screen button 
+%                    'Update Marks' to store the data portions marked for rejection 
+%                    (stretches of continuous data or whole data epochs). No 'Reject' button 
+%                    is present, so data marked for rejection cannot be actually rejected 
+%                    from this eegplot() window. 
+%                1 = Reject marked trials. After inspecting/selecting data portions for
+%                    rejection, press button 'Reject' to reject (remove) them from the EEG 
+%                    dataset (i.e., those portions plottted on a colored background. 
+%                    {default: 0, mark for rejection only}
 %
 % Outputs:
-%   Modifications are applied to the current dataset at the end of the
-%   eegplot() call (e.g., when the user presses the 'reject' button).
+%   Modifications are applied to the current EEG dataset at the end of the
+%   eegplot() call, when the user presses the 'Update Marks' or 'Reject' button.
+%   Note: The modifications made are NOT saved into EEGLAB history.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -42,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/01/10 01:11:49  arno
+% removing default position
+%
 % Revision 1.18  2002/11/15 19:52:53  arno
 % do not plot channel names for ICA continuous data
 %
