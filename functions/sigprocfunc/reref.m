@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/11/13 22:28:57  arno
+% removing the average reference with original common reference
+%
 % Revision 1.8  2002/11/13 20:29:41  arno
 % debugging
 %
@@ -147,7 +150,7 @@ data = reshape(data, dim1, dim2*dim3);
 % compute potential of reference
 % ------------------------------
 if isempty(ref)
-    avematrix = eye(chans)-ones(chans)*1/chans;    
+    avematrix = eye(chans)-ones(chans)*1/chans;
     if strcmp(g.refstate, 'averef')
         fprintf('Undoing average reference\n');
         avematrix = pinv(avematrix);

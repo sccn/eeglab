@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/13 20:29:44  arno
+% debugging
+%
 % Revision 1.3  2002/11/13 19:22:23  arno
 % averef field -> ref field
 %
@@ -72,7 +75,8 @@ if nargin < 2
 	% ---------
     geometry = { [1] [1.8 1] [1.8 1] [1] [3 1 1 1] [3 1 1 1] };
     uilist = { { 'style' 'text' 'string' ['Data reference state is: ' EEG.ref] } ...
-               { 'style' 'checkbox' 'tag' 'ave' 'value' 1 'string' 'Compute average reference' 'callback' ...
+               { 'style' 'checkbox' 'tag' 'ave' 'value' 1 'string' fastif(strcmp(EEG.ref, 'averef'), 'Undo average reference', ...
+                        'Compute average reference') 'callback' ...
                  [ 'set(findobj(''parent'', gcbf, ''tag'', ''reref''), ''value'', ~get(gcbo, ''value''));' ...
                    'set(findobj(''parent'', gcbf, ''tag'', ''rerefstr''), ''enable'', fastif(get(gcbo, ''value''), ''off'', ''on''));' ] } ...
                { } ...
@@ -85,17 +89,13 @@ if nargin < 2
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Label' } ...
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Theta' } ...
                { 'style' 'text' 'tag' 'oldref' 'enable' 'off' 'string' 'Radius' } ...
-               { 'style' 'checkbox' 'string' 'Include old reference channel' 'callback' ...
+               { 'style' 'checkbox' 'tag' 'rerefstr' 'enable', 'off' 'string' 'Include old reference channel' 'callback' ...
                  'set(findobj(''parent'', gcbf, ''tag'', ''oldref''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
                { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
              };
-    if strcmpi(EEG.ref, 'averef') | strcmpi(EEG.ref, 'averefwithref')
-        geometry  = { geometry{1:end-2} };
-        uilist    = { uilist{1:end-8} };
-        uilist{2} = {}; 
-    elseif length(EEG.chanlocs) == EEG.nbchan+1
+    if length(EEG.chanlocs) == EEG.nbchan+1
         geometry = { geometry{1:end-2}  [1] };
         uilist   = { uilist{1:end-8} ...
                      { 'style' 'checkbox' 'string' 'Include old reference channel (use location from the electrode location structure)' } };
@@ -106,9 +106,6 @@ if nargin < 2
     % decode inputs
     % -------------
     if isempty(result), return; end;
-    if strcmpi(EEG.ref, 'averef') | strcmpi(EEG.ref, 'averefwithref')
-        result = { 0 result{:} };
-    end;
     if ~isempty(result{3}), ref = eval([ result{3} ] );
     else                    ref = [];
     end;
@@ -146,14 +143,13 @@ end;
 if ~isempty(EEG.chanlocs)
     optionscall = { optionscall{:} 'elocs' EEG.chanlocs }; 
 end;    
-if isfield(EEG, 'reref')
+if isfield(EEG, 'ref')
     optionscall = { optionscall{:} 'refstate' EEG.ref }; 
 end;
 
 % include ICA or not
 % ------------------
 if ~isempty(EEG.icaweights)
-	disp('pop_reref(): converting ICA weight matrix to average reference (see >> help reref)');
     optionscall = { optionscall{:} 'icaweight' EEG.icaweights*EEG.icasphere }; 
     [EEG.data EEG.chanlocs EEG.icaweights EEG.icasphere] = reref(EEG.data, ref, optionscall{:});
 else 
@@ -163,15 +159,13 @@ end;
 % add a tag in the dataset and clear some fields
 % ----------------------------------------------
 if isempty(ref)
-    if ~isempty(ref)     
+    if strcmp(EEG.ref, 'averef')
         EEG.ref = 'common';
     else
-        if withref
-            EEG.ref = 'averefwithref';
-        else 
-            EEG.ref = 'averef';
-        end;
+        EEG.ref = 'averef';
     end;
+else 
+    EEG.ref = 'common';
 end;
 EEG.icaact  = [];
 EEG.icawinv = [];
