@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/04/11 15:03:46  arno
+% nothing
+%
 % Revision 1.10  2003/03/16 01:00:48  scott
 % header and error msgs -sm
 %
@@ -200,6 +203,13 @@ for e = 1:epochs                % filter each epoch, channel
     for c=1:chans
       smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
         = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+      if epochs == 1 
+       if rem(c,20) ~= 0
+         fprintf('.');
+       else 
+         fprintf('%d',c);
+       end
+      end
     end
 end
 
