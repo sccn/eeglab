@@ -94,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/16 22:55:19  arno
+% new flash position
+%
 % Revision 1.9  2002/07/16 19:30:16  arno
 % making a smaller flash
 %
@@ -606,7 +609,7 @@ for indeximage = alltimepoints
 	% -------------------------------
 	for tmpcond = 1:nbconditions
 		if ~isempty(g.rt)
-			if ~isempty(g.rt{index}) 
+			if ~isempty(g.rt{tmpcond}) 
 				axes(hh(tmpcond)); set (gcf, 'visible', g.visible);      
 				ll = line([g.rthistloc(1)-g.rthistloc(3)/2 g.rthistloc(1)+g.rthistloc(3)/2], [g.rthistloc(2) g.rthistloc(2)]);
 				set(ll, 'linewidth', 2*g.resmult, 'color', 'k'); 
