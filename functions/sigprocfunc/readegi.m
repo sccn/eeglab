@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/14 18:00:23  arno
+% readEGIhr -> readegihdr
+%
 % Revision 1.5  2002/11/14 17:54:09  arno
 % header typo
 %
@@ -69,6 +72,7 @@ if (fid == 0),
 end
 
 % get our header structure
+fprintf('Importing binary EGI data file ...\n');
 head = readegihdr(fid);
 
 % each type of event has a dedicated "channel"
