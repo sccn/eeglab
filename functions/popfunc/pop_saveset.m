@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/19 22:09:28  arno
+% debugging save for MAC
+%
 % Revision 1.7  2002/08/14 00:12:52  arno
 % new error message
 %
@@ -121,6 +124,34 @@ else
 	end;
 end;
 
+% currentfilename without the .set
+% --------------------------------
+if mode == 0 & ( length(curfilename)<=3 | ~strcmp(lower(curfilename(end-3:end)), '.set'))
+	disp('Adding ''.set'' extension to the file');
+	curfilename = [ curfilename '.set' ];
+end;
+if mode == 1 & ( length(curfilename)<=4 | ~strcmp(lower(curfilename(end-3:end)), '.sets'))
+	if length(curfilename)>3 & strcmp(lower(curfilename(end-3:end)), '.set')
+		disp('Changing file extension to ''.sets''');
+		curfilename = [ curfilename '.s' ];
+	else
+		disp('Adding ''.sets'' extension to the file');
+		curfilename = [ curfilename '.sets' ];
+	end;
+end;
+
+if length(curfilename)>4
+	if strcmp(lower(curfilename(end-3:end)), '.set') 
+		noextcurfilename = curfilename(1:end-4);
+	elseif strcmp(lower(curfilename(end-4:end)), '.sets')
+		noextcurfilename = curfilename(1:end-5);
+	else
+		noextcurfilename = curfilename;
+	end;
+else 
+	noextcurfilename = curfilename;
+end;
+
 if mode == 0  % single datasets
 	disp('Pop_saveset: extended datasets syntax check...');
 	EEG = eeg_checkset(EEG, 'eventconsistency');
@@ -130,8 +161,26 @@ if mode == 0  % single datasets
 	EEG.icaact      = [];
 	disp('Saving dataset...');
 	command = sprintf('save(''%s'',''-MAT'',''EEG'');', [ curfilepath curfilename ]);
-	try, eval(command);
-	catch, error('Pop_saveset: saving error, check permission on file or directory');
+	
+	% saving data as float or as Matlab
+	eeg_options;
+	if exist('option_savematlab') == 1 & option_savematlab == 0
+		tmpdata = EEG.data;
+		EEG.data = [ curfilepath noextcurfilename '.fdt' ];
+		try, 
+			eval(command);
+			floatwrite( tmpdata, EEG.data, 'ieee-le');
+		catch, 
+			error('Pop_saveset: saving error, check permission on file or directory');
+		end;
+		EEG.data = tmpdata; 
+		EEG.icaact = tmpica;
+	else % saving data as a single Matlab file 
+		try, 
+			eval(command);
+		catch, 
+			error('Pop_saveset: saving error, check permission on file or directory');
+		end;
 	end;
 	EEG.icaact = tmpica;
 	
@@ -172,12 +221,26 @@ else
 	% ------
 	disp('Pop_saveset: saving datasets...');
 	ALLEEG = ALLEEG(indices);
+	
+	% saving data as float or as Matlab
+	eeg_options;
+	if exist('option_savematlab') == 1 & option_savematlab == 0
+		for index = 1:length(ALLEEG)
+			tmpdata = ALLEEG(index).data;
+			ALLEEG(index).data = [ curfilepath noextcurfilename '.fdt' int2str(index) ];
+			try, 
+				floatwrite( tmpdata, ALLEEG(index).data, 'ieee-le');
+			catch, 
+				error('Pop_saveset: saving error, check permission on file or directory');
+			end;
+		end;
+	end;
 	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
 	catch, error('Pop_saveset: saving error, check permission on file or directory');
 	end;
+
 	ALLEEG = TMPALLEEG;
-	EEG = ALLEEG;
-	
+	EEG = ALLEEG;	
 	com = sprintf('ALLEEG = pop_saveset( %s, %s, ''%s'', ''%s'');', inputname(1), vararg2str(indices), curfilename, curfilepath);
 end;
 return;
