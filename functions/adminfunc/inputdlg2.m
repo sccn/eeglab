@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/12 02:13:42  arno
+% Initial revision
+%
 
 function [result] = inputdlg2(Prompt,Title,LineNo,DefAns,funcname);
 
@@ -63,4 +66,4 @@ for index = 1:length(Prompt)
 				   { 'Style', 'edit', 'string', DefAns{index} } };
 end;
 
-result = inputgui(geometry, listgui, funcname, Title);
+result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title);
