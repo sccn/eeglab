@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/05/20 17:58:53  scott
+% adding fprintf info about ampsig plotting -sm
+%
 % Revision 1.14  2002/04/25 17:52:51  arno
 % removing debug message
 %
@@ -1041,7 +1044,8 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
  % baseall = mean(mean(allamps(base,:)));
  % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
- fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
+ fprintf('Subtracting the mean baseline log amplitude \n');
+ %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
  % allamps = allamps./baseall;
 
  allamps = allamps./10^(baseamp/20); % divide by (non-log) baseline amplitude
