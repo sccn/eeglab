@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.154  2004/03/18 16:36:53  arno
+% debug shrink and plotrad
+%
 % Revision 1.153  2004/03/18 16:22:12  arno
 % debug shrink
 %
@@ -697,8 +700,7 @@ labels = labels(enum,:);
 
 % squeeze all to 0.5
 % ------------------
-squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
-squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
+squeezefac = rmax/plotrad;   % was (2*max(r)-1)/(2*rmax);
 if squeezefac > 1
     squeezefac = 1;
 else 
