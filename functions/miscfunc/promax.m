@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % formatted and modified to return V by Scott Makeig, 6/23/98
 % reset maxit default to 5, added ncomps -sm 7/8/98
@@ -100,13 +103,13 @@ if ncomps < chans
 end
 B = B';            % transpose
 R = R';
-continue = 1;
+cont = 1;
 fprintf(...
   'Finding oblique Promax rotation using exponent %g and tolerance %g\n',...
                                                   powr,tol)
 it = 1;
 Pz = zeros(size(B));
-while continue & it <= MAX_ITERATIONS
+while cont & it <= MAX_ITERATIONS
   P = Pz;
   ii = find(abs(B) > NEAR_ZERO); % avoid division by 0
   P(ii) = (abs(B(ii).^(powr+1)))./B(ii);
@@ -118,11 +121,11 @@ while continue & it <= MAX_ITERATIONS
   if it > 1
     delta = abs(distnew-distold);
     if delta < tol
-      continue = 0;
+      cont = 0;
     end
     fprintf('#%d delta %f\n',it,delta)
     if isnan(delta)
-      continue = 0;
+      cont = 0;
     end
   end
   R = Rn;
