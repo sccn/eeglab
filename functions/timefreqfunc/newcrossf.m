@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/10/18 21:58:58  arno
+% new bootstrap plot with cooper
+%
 % Revision 1.18  2002/10/18 20:53:46  arno
 % checking rcs
 %
@@ -776,7 +779,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% -------------------------------------
     spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
                         g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
-                        'padratio', g.padratio };
+                        'padratio', g.padratio, 'maxfreq', g.maxfreq };
 
     fprintf('\nProcessing trial for first input (of %d):',trials);
 	X = reshape(X, g.frame, trials);
@@ -787,7 +790,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	nb_points = size(alltfX,1);
 	dispf     = find(freqs <= g.maxfreq);
 	freqs = freqs(dispf);
-
+    if size(alltfX,1) ~=length(dispf), alltfX = alltfX(dispf,:,:); end;
+    if size(alltfY,1) ~=length(dispf), alltfY = alltfY(dispf,:,:); end;
+    
 	% ------------------
 	% compute coherences
 	% ------------------
@@ -829,21 +834,21 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		formulaout = 'coher';
 		switch g.type
 		 case 'coher',
-		  formulainit = [ 'coher  = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'cumulX = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'cumulY = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'cumulX = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'cumulY = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ...
 						  'cumulX = cumulX + arg1.*conj(arg1);' ...
 						  'cumulY = cumulY + arg2.*conj(arg2);' ];
 		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
 		 case 'phasecoher2',
-		  formulainit = [ 'coher  = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'cumul  = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'cumul  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula =     [ 'tmpprod = arg1.*conj(arg2); coher  = coher  + tmpprod;' ...
 						  'cumul   = cumul + abs(tmpprod);' ];
 		  formulapost =   'coher = coher ./ cumul;'; 
 		 case 'phasecoher',
-		  formulainit = [ 'coher  = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'coher  = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'tmpprod = arg1.*conj(arg2); coher = coher + tmpprod ./ abs(tmpprod)';
 		  formulapost = [ 'coher = coher /' int2str(trials) ];
 		end;
