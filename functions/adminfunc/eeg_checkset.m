@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.147  2005/03/17 18:00:23  arno
+% convert old dipfit structure to new one
+%
 % Revision 1.146  2005/03/05 02:08:46  arno
 % chaninfo
 %
@@ -941,16 +944,18 @@ end;
 
 % DIPFIT structure
 % ----------------
-if ~isfield(EEG, 'dipfit')   EEG.dipfit = []; res = com; 
+if ~isfield(EEG, 'dipfit')   
+    EEG.dipfit = []; res = com; 
 else
-    if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile');
-        if exist('pop_didfit_settings')
+    if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
+        if exist('pop_dipfit_settings')
             disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
             dipfitdefs;
             EEG.dipfit.hdmfile     = template_models{1}{1};
             EEG.dipfit.coordformat = template_models{1}{2};
             EEG.dipfit.mrifile     = template_models{1}{3};
             EEG.dipfit.chanfile    = template_models{1}{4};
+            res = com;
         end;
     end;
 end;
