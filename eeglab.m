@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.299  2003/12/05 18:06:39  arno
+% debug adding path
+%
 % Revision 1.298  2003/12/05 00:49:20  arno
 % no local history when changing comments
 %
@@ -1277,10 +1280,11 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''WARNING: The number of channel locations must match the number of'');' ... 
                         'disp(''         data channels (otherwise channel locations are ignored)'');' ...
                         'disp(''TIP: To edit channel info only, ">> chanlocs = pop_chanedit([]);" on the command line'');' ...
-    '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize''); clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
+                        '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize'');' ...
+                        'clear TMPCHAN; h(LASTCOM); H(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
-	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); h(LASTCOM); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
+	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Append datasets', 'CallBack', [ check      '[EEGTMP LASTCOM] = pop_mergeset(ALLEEG);' e_newnonempty_nh]);
 	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 		
