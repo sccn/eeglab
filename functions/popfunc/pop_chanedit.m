@@ -10,7 +10,7 @@
 %   "Channel information ('field name')" - [edit boxes] display channel field 
 %                   content of the current channel. Use 'transform' from the command
 %                   line to modify these fields.
-%   "3d center" - [button] recenter 3-D channel coordinates. Uses the chancenter()
+%   "Opt. 3D center" - [button] recenter 3-D channel coordinates. Uses the chancenter()
 %                 function. Command line equivalent is 'convert', { 'chancenter' [xc
 %                 yc zc] }, [xc yc zc] being the center of the sphere (use empty to
 %                 find the center so that electrodes best match a sphere).
@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2003/12/20 01:47:09  arno
+% debug call with empty array
+%
 % Revision 1.81  2003/12/18 01:21:24  arno
 % same
 %
