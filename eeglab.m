@@ -176,6 +176,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.151  2002/08/17 22:23:23  scott
+% As 2-D scalp series -> In 2-D
+% As 3-D head plots -> In 3-D
+%
 % Revision 1.150  2002/08/17 21:59:13  scott
 % As 2-D scalp maps -> In 2-D
 % As 3-D head plots -> In 3-D
@@ -812,7 +816,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( ERPC_m, 'Label', 'On same axis (with maps)', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 
-	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('weibstat'), 'on', 'off'));
+	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('kstest'), 'on', 'off'));
 	uimenu( stat_m, 'Label', 'Channel statistics'       , 'CallBack', [ check          'LASTCOM = pop_signalstat(EEG, 1);' e_hist]);
 	uimenu( stat_m, 'Label', 'Component statistics'     , 'CallBack', [ checkica       'LASTCOM = pop_signalstat(EEG, 0);' e_hist]);
 	uimenu( stat_m, 'Label', 'Event statistics'         , 'CallBack', [ checkevent     'LASTCOM = pop_eventstat(EEG);' e_hist]);
