@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/07/30 19:22:57  arno
+% creating new argument for selecting colors
+%
 % Revision 1.21  2002/07/30 17:15:06  arno
 % adding multiple window plotting
 %
@@ -244,7 +247,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
