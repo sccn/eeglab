@@ -48,11 +48,7 @@
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
-%   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
-%                       shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
+%
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
@@ -82,6 +78,13 @@
 %
 % See also: timtopo(), envtopo()
 
+% Deprecated but still usable;
+%   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
+%                       shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
+
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
 % This program is free software; you can redistribute it and/or modify
@@ -99,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.166  2004/03/21 17:31:44  scott
+% nothing
+%
 % Revision 1.165  2004/03/21 17:25:39  scott
 % corrected dipole plotting
 %
@@ -447,7 +453,7 @@ EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 SHADING = 'flat';       % default 'shading': flat|interp
-shrinkfactor = 'off';   % shrinking mode
+shrinkfactor = [];      % shrink mode (dprecated)
 plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 headrad      = [];      % default plotting radius for cartoon head is 0.5
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
@@ -589,7 +595,6 @@ if nargs > 2
 	 case 'emarker'
 	  EMARKER = Value;
 	 case 'shrink'
-	  SHRINKSET = 1;        % flag 'shrink' set
 	  shrinkfactor = Value;
 	 case 'plotrad'
 	  plotrad = Value;
@@ -738,53 +743,59 @@ elseif strcmpi(headrad,'rim') % force plotting at rim of map
 end
 
 % headrad now set
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
+  if strcmpi(VERBOSE,'on')
+    fprintf('Using deprecated mode ''shrink''. Recommend moving to using headrad, plotrad.\n');
+  end
+
+%  'shrink' - ['on'|'off'|'force'|factor] 
+%  'on' -> If max channel arc_length > 0.5, shrink electrode coordinates towards vertex 
+%           to plot all channels by making max arc_length 0.5. 
+%  'force' -> Normalize arc_length so the channel max is 0.5. 
+%  [factor] -> Apply a specified shrink factor (range (0,1) = shrink fraction). {default: 'on'}
+
+if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
+   shrinkfactor = tmpeloc(1).shrink;         % read default shrinkfactor from chanlocs
+end;
+
+if isstr(shrinkfactor)
+  if strcmpi(shrinkfactor, 'off') 
+     plotrad = 0.5; headrad = 0.5;
+     if strcmpi(VERBOSE,'on')
+       fprintf('    Shrink flag "off" -> making plotrad 0.5, headrad 0.5\n');
+     end
+  elseif strcmpi(shrinkfactor, 'on') 
+     headrad = plotrad;
+     if strcmpi(VERBOSE,'on')
+       fprintf('    Shrink flag "on" -> making headrad = plotrad\n');
+     end
+  elseif strcmpi(shrinkfactor, 'force')  % 'on' and 'force' were different ???
+     headrad = plotrad;
+     if strcmpi(VERBOSE,'on')
+       fprintf('    Shrink flag "on" -> making headrad = plotrad\n');
+     end
+  end
+else   
+    if shrinkfactor<0.15 | shrinkfactor>1
+      error('shrink factor out of bounds (0.15, 1.0)')
+    else
+      headrad = plotrad;  % make deprecated 'shrink' mode plot 
+    end
+end
+end; % if shrink
+      
+%
+%%%%%%%%%%%%%%%%% Issue warning if headrad ~= rmax  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
 
 if headrad ~= 0.5 & strcmpi(VERBOSE, 'on')
    fprintf('NB: Plotting map using: plotrad %-4.3g,',plotrad);
    fprintf(    ' headrad %-4.3g\n',headrad);
-   fprintf('    The cartoon head is NOT anatomically correct (headrad 0.5).\n')
+   fprintf('    The cartoon head is NOT anatomically correct (should be 0.5).\n')
 end
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%
-if exist('SHRINKSET') % plotrad and headrad set above from those args and/or chanlocs
-                      % and/or defaults - do not change them without careful thought!
-
-% NOTE: This section should ONLY adjust plotrad and headrad based on 'shrink' values
-
-%if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), 
-%   shrinkfactor = tmpeloc(1).shrink;         % read default shrinkfactor from chanlocs
-%end;
-%if ~isstr(shrinkfactor)
-%    shrinkfactor = 0.5+0.5*shrinkfactor;     % convert input shrinkfactor value ????
-%end;                                         
-%
-%if isstr(shrinkfactor) & ~strcmpi(shrinkfactor, 'off') & ~isempty(plotrad)
-%    shrinkfactor = plotrad;                  % not specified 'shrink' mode
-%end;
-%
-%if isstr(shrinkfactor)                       % if shrink arg is 'on' or 'force'
-%  if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) ...
-%                   | strcmp(lower(shrinkfactor),'force') 
-%    shrinkfactor = rmax/max(Rd);   % was ??? (2*max(r)-1)/(2*rmax);
-%    if shrinkfactor > 1            % shrink, do not expand
-%            shrinkfactor = 1;
-%    elseif strcmpi(VERBOSE, 'on')
-%            fprintf(...
-%         'topoplot(): electrode arc_lengths shrunk by (1 -> %2.3g) to plot all\n', ...
-%                shrinkfactor);
-%    end;
-%  end;
-%
-%else                                         % if numeric shrinkfactor read or set above
-%    if strcmpi(VERBOSE, 'on')
-%        fprintf('topoplot(): electrode arc_lengths shrunk by (1 -> %2.3g)\n',...
-%                                                                  shrinkfactor);
-%    end;
-%end;
-end % SHRINKSET
-
 %
 %%%%%%%%%%%%%%%%%%%%% Find plotting channels  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
