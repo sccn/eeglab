@@ -1,33 +1,34 @@
-% bootstat() - accumulate surrogate data for comparing two conditions 
+% bootstat() - accumulate surrogate data to compare two conditions 
 %
 % Usage:
 %     >> [accarray, rsignif] = bootstat(arg1, arg2, formula, varargin ...);
 %
 % Inputs:
-%    arg1    - [array] 2-D or 3-D array of value
-%    arg2    - [array] 2-D or 3-D array of value
-%    formula - [string] formula to compute a given measure. Takes arguments
-%              'arg1', 'arg2' as inputs and 'res' (by default) as output. i.e.
-%              'res = res + arg1 .* conj(arg2)'
+%    arg1    - [array] 2-D or 3-D array of values
+%    arg2    - [array] 2-D or 3-D array of values
+%    formula - [string] formula to compute the given measure. Takes arguments
+%              'arg1', 'arg2' as inputs and 'res' (result, by default) as 
+%              output. i.e.    'res = res + arg1 .* conj(arg2)'
 %
 % Optional inputs:
-%   'boottype '   - ['first'|'second'|'both'] 'fist' accumulate in the first 
-%                 dimension only (shuffling the first dimension). 'second'
-%                 shuffle the second dimension but keep the fist constant. 
-%                 'both' shuffle the two dimension. Default is 'both'.
-%   'alpha'       - [real] significance (between 0 and 1). Default is 0.05.
-%   'naccu'       - [integer] number of exemplar to accumulate. Default is 200.
+%   'boottype '   - ['first'|'second'|'both'] 
+%                 'first' = accumulate in the first dimension only (shuffling 
+%                           the first dimension (e.g., trials)). 
+%                 'second' = shuffle the second dimension (e.g., times), 
+%                            keeping the first (e.g., trials) constant. 
+%                 'both' = shuffle both dimensions. Default is 'both'.
+%   'alpha'       - [real] significance level (between 0 and 1). Default is 0.05.
+%   'naccu'       - [integer] number of exemplars to accumulate. Default is 200.
 %   'bootside'    - ['both'|'upper'] side of the surrogate distribution to
-%                 consider for significance. This parameter affect the size
-%                 of the last dimension of accumulation array 'accres' (size
+%                 consider for significance. This parameter affects the size
+%                 of the last dimension of the accumulation array 'accres' (size
 %                 is 2 for 'both' and 1 for 'upper'). Default is 'both'.
 %   'basevect'    - [integer vector] time vector indices for baseline. Default 
 %                 is all time points.
-%   'accarray'    - accumulation array (from previous calls). Allow to compute
+%   'accarray'    - accumulation array (from previous calls). Allows computing
 %                 only the 'rsignif' output.
 %   'formulainit' - [string] for initializing variable. i.e. 'res = zeros(10,40);'
-%                 Default is initialization of the res variable to
-%                 (size(arg1,3) x naccu)
+%                 Default is initializing  'res = (size(arg1,3) x naccu)'
 %   'formulapost' - [string] after the accumulation. i.e. 'res = res /10;'
 %                 default is none.
 %   'formulaout'  - [string] name of the computed variable. Default is 'res'.
@@ -42,7 +43,7 @@
 %
 % See also: timef()
 
-% NOTE: one hidden parameter 'savecoher', 0 or 1
+% NOTE: There is one hidden parameter 'savecoher', 0 or 1
 
 % Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
@@ -61,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/12/07 02:54:27  arno
+% adding message for how to implement new statistics
+%
 % Revision 1.2  2002/10/02 00:36:04  arno
 % update condstat, debug
 %
