@@ -4,63 +4,64 @@
 % Usage:
 %            >> envtopo(data,weights);
 %            >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
-%                                       = envtopo(data, weights, 'key1', val1, ...);
+%                    = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
-%  data       = single data epoch (chans,frames)
-%  weights    = ICA weight matrix (= weights*sphere)
+%  data         = single data epoch (chans,frames) or a 3-D data matrix 
+%                 (chans,frames,epochs). If data are 3-D, process the mean data epoch.
+%  weights      = ICA weight matrix (e.g., icaweights*icasphere)
 %
 % Optional inputs:
 %  'chanlocs'  = [string] channel location file or EEG.chanlocs structure. 
 %                  See >> topoplot example 
-%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  {default|[]|[0 0] -> data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
-%                  Else if n < 0, the number largest-comp. maps  to plot (component with max
-%                  variance) {default|[] -> 7}
+%                  Else if int < 0, the number of largest contributing components to plot 
+%                  {default|[] -> 7}
 %  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plotting
 %                  limits (in ms) and min/max data limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
-%  'title'     = [string] plot title {default|[] -> none}
-%  'plotchans' = [integer array] data channels to use in computing contributions and envelopes 
+%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
+%                  {default|[]|[0 0] -> data limits}
+%  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv', 
+%                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative 
+%                  variance, where:                                      {default: 'mv'}
+%                     pvaf(component) = 100-100*variance(data-component))/variance(data)
+%                     rv(component)   = 100*variance(component)/variance(data) 
+%  'title'      = [string] plot title {default|[] -> none}
+%  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes 
 %                  {default|[] -> all}
-%  'voffsets'  = [float array] vertical line extentions above the data max to disentangle
+%  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
 %                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
-%  'colors'    = [string] filename of file containing colors for envelopes, 3 chars
+%  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
 %                  per line, (. = blank). First color should be "w.." (white)
 %                  Else, 'bold' -> plot default colors in thick lines.
 %                  {default|[] -> standard Matlab color order}
-%  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
+%  'fillcomp'   = int_vector>0 -> fill the numbered component envelope(s) with 
 %                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
-%  'vert'      = vector of times to plot vertical lines {default|[] -> none}
-%  'icawinv'   = [float array] inverse weight matrix. By default computed by inverting
+%  'vert'       = vector of times to plot vertical lines {default|[] -> none}
+%  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
 %                  the weight matrix (but if some components have been removed, then
 %                  weight's pseudo-inverse matrix does not represent component's maps).
-%  'icaact'    = [float array] ICA component activations. By default these are computed 
+%  'icaact'     = [float array] ICA component activations. By default these are computed 
 %                  from the input weight matrix.
-%  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
+%  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
-%  'subcomps'  = [integer vector] indices of components to remove from data before 
+%  'subcomps'   = [integer vector] indices of components to remove from data before 
 %                  plotting. {default: none}
-%  'sumenv'    = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections 
+%  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections 
 %                  of the selected components; 'on' -> show the envelope only {default: 'fill'}
-%  'actscale'  = ['on'|'off'] scale component scalp maps by maximum component activity in the
+%  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity in the
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
 %                  +/-max(abs(map value)) {default: 'off'}
-%  'dispmaps'  = ['on'|'off'] display component number and scalp maps. {default: 'on'}
-%  'pvaf'      = ['mv'|'pv'|'rv'] if 'mv', use max back-projected variance , if 'pv', sort by 
-%                  percent variance accounted for (pvaf). If 'rv', sort by relative variance to
-%                  select components contributing the most during the selected ('limcontrib') interval, 
-%                  where pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                        rv(component)   = 100*variance(component)/variance(data) {default: 'mv'}
+%  'dispmaps'   = ['on'|'off'] display component number and scalp maps. {default: 'on'}
 % Outputs:
-%  compvarorder  = component numbers in decreasing order of max variance in data
-%  compvars      = component max variances
-%  compframes    = frames of max variance
-%  comptimes     = times of max variance
-%  compsplotted  = components plotted
-%  pvaf/rv       = max variance, percent variance accounted for, or relative variance (see 'pvaf')
+%  compvarorder = component numbers in decreasing order of max variance in data
+%  compvars     = component max variances
+%  compframes   = frames of max variance
+%  comptimes    = times of max variance
+%  compsplotted = components plotted
+%  mv|pvaf|rv   = max variance, percent variance accounted for, or relative variance (see 'sortvar')
 %
 % Notes:
 %  To label maps with other than component numbers, put four-char strings into
@@ -87,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2004/11/13 19:29:10  scott
+% print which components subtracted
+%
 % Revision 1.76  2004/11/13 19:27:12  scott
 % added test for 'subcomps' argument
 %
@@ -341,7 +345,8 @@ if nargin <= 2 | isstr(varargin{1})
 				  'subcomps'      'integer'  []                       []; ...
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
-				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; ...
+				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'}  []; ...
+				  'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; ...
 				  'actscale'      'string'   {'on' 'off'}             'off'; ...
 				  'limcontrib'    'real'     []                       0;  ...
                                   'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
@@ -389,7 +394,7 @@ if ~isempty(g.colors)
 end
 
 if ndims(data) == 3
-    data = mean(data,3);
+    data = mean(data,3); % average the data if 3-D
 end;
 [chans,frames] = size(data);
 
@@ -406,10 +411,10 @@ delete(gca)
 %
 g.timerange = g.timerange/1000;   % the time range of the input data
 g.limits(1) = g.limits(1)/1000;   % the time range to plot
-g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
 if length(g.limits)>1, 
     g.limits(2) = g.limits(2)/1000;  % 
 end;
+g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
 
 %
 %%%%%%%%%%%% Collect time range information %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -436,16 +441,23 @@ else % if no 'timerange' given
          xunitframes     = 1; % mark frames as time unit instead of sec
     end
 end
-    
-xmin = g.limits(1); % (xmin, xmax) are data limits in sec
-xmax = g.limits(2);
+ 
+if isempty(g.timerange)
+  xmin = g.limits(1); % (xmin, xmax) are data limits in sec
+  xmax = g.limits(2);
+else 
+  xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
+  xmax = g.timerange(2);
+end
+pmin = g.limits(1); % plot min and max sec
+pmax = g.limits(2);
+
 dt = (xmax-xmin)/(frames-1); % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 
 %
 %%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
 %
-
 ylimset = 0; % flag whether hard limits have been set by the user
 ymin = min(min(data)); % begin by setting limits from data
 ymax = max(max(data));
@@ -481,7 +493,7 @@ else
 end;
 
 %
-%%%%%%%%%%%%%%%%%%%%%%% Read line color information %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Read line color information %%%%%%%%%%%%%%%%%%%%%
 %
 ENVCOLORS = strvcat('w..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..');
 
@@ -563,7 +575,7 @@ end
 %%%%%%%%%%%%%%% Subtract components from data if requested %%%%%%%%%%%%%
 %
 if ~isempty(g.subcomps)
-	    fprintf('Subtracting requested components from data: ');
+	    fprintf('Subtracting requested components from plotting data: ');
             for c=g.subcomps
               fprintf('%d ',c);
             end
@@ -603,7 +615,6 @@ for i=1:ncomps-1
     %
     %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
     %
-
     ntopos = length(g.compnums);
     if ntopos > MAXTOPOS
       ntopos = MAXTOPOS; % limit the number of topoplots to display
@@ -622,7 +633,10 @@ for i=1:ncomps-1
     %
     envdata = zeros(2,frames*(ncomps+1));
     envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); 
-    fprintf('\nComparing projection sizes for components:  ');
+
+    fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
+    fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
+    fprintf('Comparing projection sizes for components:  ');
         if ncomps>32
            fprintf('\n');
         end
@@ -652,6 +666,9 @@ for i=1:ncomps-1
       %
       %%%%%% find variance in interval after removing component %%%%%%%%%%%
       %
+      if isempty(g.pvaf)
+                 g.pvaf = g.sortvar;
+      end
       if strcmpi(g.pvaf, 'pvaf') | strcmpi('pvaf','on') | strcmpi(g.pvaf,'mv')
               pvaf(c) = mean(mean((data(:,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2)); 
       else % if 'pvaf' is 'rv' (or old 'off')
@@ -677,7 +694,7 @@ fprintf('\n');
 
 % compute pvaf
 if ~xunitframes
-  fprintf('  in the interval %3.0f to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
+  fprintf('  from the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
 vardat = mean(mean((data(:,limframe1:limframe2).^2))); % find data variance in interval
 
@@ -706,8 +723,13 @@ npercol = ceil(ncomps/3);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-sampint = (xmax-xmin)/(frames-1);     % sampling interval in sec
-times = xmin:sampint:xmax;            % make vector of times-values
+sampint  = (xmax-xmin)/(frames-1);     % sampling interval in sec
+times    = xmin:sampint:xmax;          % make vector of data time values
+
+[v minf] = min(abs(times-pmin));
+[v maxf] = max(abs(times-pmax));
+pframes  = minf:maxf;         % frames to plot
+ptimes   = times(pframes);    % times to plot
 
 if strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
     [compvars,compx] = sort(compvars');  % sort compnums on max variance
@@ -753,7 +775,7 @@ end
 %%%%%%%%%%%%%%%%%%%% Print times and frames of comp maxes %%%%%%%%%%%%%%
 %
 
-fprintf('\n');
+% fprintf('\n');
 fprintf('Plotting envelopes of %d component projections.\n',ntopos);
 if length(g.plotchans) ~= chans
   fprintf('Envelopes computed from %d specified data channels.\n',...
@@ -880,7 +902,7 @@ if strcmpi(g.pvaf,'pvaf')
              ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
    set(t,'fontsize',12,'fontweight','bold')
 elseif strcmpi(g.pvaf,'rv') | strcmpi(g.pvaf,'off')
-    t = text(double(xmin+0.1*(xmax-xmin)), ...
+    t = text(double(xmin+0.1*(xmaxxpmin)), ...
              double(ymin+0.1*(ymax-ymin)), ...
              ['rv ' num2str(sumpvaf,'%4.2f') '%']);
    set(t,'fontsize',12,'fontweight','bold')
@@ -980,7 +1002,7 @@ if ~ylimset
   ymin = ymin-0.05*datarange;
   ymax = ymax+0.05*datarange;
 end
-axis([xmin xmax ymin ymax]);
+axis([pmin pmax ymin ymax]);
 
 %
 %%%%%%%%%%%%%%%%%%%%%% Label axes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -999,7 +1021,7 @@ else
 end;    
 set(l,'FontSize',14,'FontWeight','Bold');
 %
-%%%%%%%%%%%%%%%%%%%%%% Draw oblique/vertical lines %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% Draw maps and oblique/vertical lines %%%%%%%%%%%%%%%%%%%%%
 %
 % axall = axes('Units','Normalized','Position',pos,...
 axall = axes('Position',pos,...
@@ -1009,17 +1031,14 @@ set(axall,'Color',axcolor);
 axis([0 1 0 1])
 
 width  = xmax-xmin;
+pwidth  = pmax-pmin;
 height = ymax-ymin;
-
-%
-%%%%%%%%%%%%%%%%%%%%%% draw component maps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 
 if strcmpi(g.dispmaps, 'on')
     for t=1:ntopos % draw oblique lines from max env vals (or plot top)
                  % to map bases, in left to right order
         %
-        %%%%%%%%%%%%%%%%% draw vertical lines and labels %%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%% draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
         if BOLD_COLORS==1
             linestyles = 1:ntopos;
@@ -1035,11 +1054,8 @@ if strcmpi(g.dispmaps, 'on')
         if (data_y > pos(2)+0.6*pos(4)) 
             data_y = pos(2)+0.6*pos(4);
         end
-        %
-        %%%%%%%%%%%%%%%%%%%% plot oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        l1 = plot([(plottimes(t)-xmin)/width  ...
-                   topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+        l1 = plot([(plottimes(t)-pmin)/pwidth  ...
+                   topoleft + 1/pos(3)*(t-1)*1.2*topowidth + (topowidth*0.6)],...
                   [data_y 0.68], ...
                   colors(linestyles(t)+1)); % 0.68 is bottom of topo maps
         if all_bold > 0
