@@ -16,7 +16,7 @@
 % Optional inputs:
 %   'freq'     = [float vector (Hz)] vector of frequencies for topoplot() scalp maps
 %                of power at all channels, or single frequency to plot component 
-%                contributions at a single channel ('plotchan').
+%                contributions at a single channel (see also 'plotchan').
 %   'chanlocs' = electrode locations file (format: >> topoplot example)
 %   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax]
 %                To use data limits, omit final values or use nan's
@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/01/28 18:02:20  arno
+% debuging ERP plot if no channel location file
+%
 % Revision 1.50  2003/01/28 17:37:25  arno
 % debugging freqency range if no topoplot
 %
