@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/08/30 18:14:08  arno
+% same
+%
 % Revision 1.39  2002/08/30 18:12:12  arno
 % same
 %
@@ -777,11 +780,12 @@ end
 %%%%%%%%%%%%%% Reshape data to (frames,ntrials) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if size(data,2) ~= ntrials
-   if size(data,1)>1
-% fprintf('frames %d, ntrials %d length(data) %d\n',frames,ntrials,length(data));
-     data=reshape(data,1,frames*ntrials);
+	if size(data,1)>1
+		% fprintf('frames %d, ntrials %d length(data) %d\n',frames,ntrials,length(data));
+		data=reshape(data,1,frames*ntrials);
    end
    data=reshape(data,frames,ntrials);
+   oridata = data;
 end
 fprintf('Plotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
                              ntrials,frames,srate);
@@ -803,6 +807,7 @@ if any(isnan(sortvar))
 	nanlocs = find(isnan(sortvar));
 	fprintf('Removing %d trials having NaN values for sorting variable', length(nanlocs));
 	data(:,nanlocs) = [];
+	oridata(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
 	if exist('data2') == 1
 		data2(:,nanlocs) = [];
@@ -1530,7 +1535,7 @@ if Erpflag == YES
     end;
  end;
  xticklabel = strvcat(xticklabel);
- erp=nan_mean(reshape(oridata, length(oridata)/ntrials, ntrials)');           % compute erp average, ignoring nan's
+ erp=nan_mean(oridata');           % compute erp average, ignoring nan's
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
