@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/08/25 00:18:09  arno
+% allow values
+%
 % Revision 1.32  2004/08/23 18:44:02  arno
 % problem with urevent and boundaries
 %
@@ -489,20 +492,20 @@ return;
 % interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-	if exist(varname) == 2 % mean that it is a filename
-                           % --------------------------
-        array = loadtxt( varname );
-        
-    else % variable in the global workspace
-         % --------------------------
-        try
+    if isstr(varname)
+        if exist(varname) == 2 % mean that it is a filename
+                               % --------------------------
+            array = loadtxt( varname );
+            
+        else % variable in the global workspace
+             % --------------------------
             array = evalin('base', varname);
             if ~iscell(array)
                 array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
             end;   
-        catch
-            array = varname;
         end;
+    else
+        array = varname;
     end;     
 return;
 
