@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/04/30 15:16:31  scott
+% edited help msg -sm
+%
 % Revision 1.44  2002/04/26 21:18:20  arno
 % updating pop_copyset call
 %
@@ -499,7 +502,7 @@ mat0 = colormap;
 close;
 WINMINX         = 17;
 WINMAXX         = 260;
-
+COLOR           = [0.87    1.0000    0.9108];
 WINYDEC			= 13;
 NBLINES         = 16;
 WINY		    = WINYDEC*NBLINES;
@@ -523,6 +526,7 @@ W_MAIN = figure('Units','points', ...
 	'numbertitle', 'off', ...
 	'resize', 'off', ...
 	'Position',[545.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ], ...
+	'color', COLOR, ...
 	'Tag','EEGLAB', ...
 	'Userdata', {[] []});
 BackgroundColor = get(gcf, 'color'); %[0.701960784313725 0.701960784313725 0.701960784313725];
