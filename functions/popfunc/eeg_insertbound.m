@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/05/14 22:14:05  arno
+% empty fields for boundary events
+%
 % Revision 1.13  2004/05/14 22:10:04  arno
 % header
 %
@@ -109,7 +112,7 @@ function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, length
             
             % insert event at the correct location in the urevent structure
             % -------------------------------------------------------------
-            if isfield(eventin, 'latency')
+            if ~isempty(eventin) & isfield(eventin, 'latency')
                 
                 % find event succeding boundary
                 % ------------------------------
