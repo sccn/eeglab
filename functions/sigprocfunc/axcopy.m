@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/03/07 21:52:28  scott
+% adding spaces
+%
 % Revision 1.4  2003/03/07 21:50:45  scott
 % trying char(double(string)) to avoid nested '''' -sm
 %
@@ -76,7 +79,7 @@ for a=1:length(hndl)                    % make all axes visible
     if exist('command') ~= 1
         set(findobj('parent',hndl(a)),'ButtonDownFcn','copyaxis');
     else
-        commanddbl = double(command);
+        command_dbl = double(command);
         % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
         set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(' char(command_dbl) ')']);
     end;        
