@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/22 21:08:21  arno
+% debug strvcat
+%
 % Revision 1.5  2002/08/12 02:39:48  arno
 % inputdlg2
 %
@@ -67,9 +70,9 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.DAT', 'Choose a DAT file -- pop_loaddat'); 
 	if filename == 0 return; end;
-	result       = inputdlg2( {strvcat('Code signifying no event in a trial ([]=none)', ...
-									 'Load Neuroscan DATA file -- pop_loaddat()')}, 1,  {'1000'}, 'pop_loaddat');
-%									 '(none=all latencies are imported)')}, ...
+	result       = inputdlg2( { strvcat('Code signifying no event in a trial ([]=none)', ...
+									 '(none=all latencies are imported)')}, ...
+									 'Load Neuroscan DATA file -- pop_loaddat()', 1,  {'1000'}, 'pop_loaddat');
 	if length(result) == 0 return; end;
 	no_rt = eval( result{1} );
 end;
