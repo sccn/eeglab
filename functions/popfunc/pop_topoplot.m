@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2005/03/18 18:02:24  arno
+% fix plot component dipole for spherical model
+%
 % Revision 1.62  2005/03/10 18:46:30  arno
 % nothing
 %
@@ -395,6 +398,10 @@ for index = 1:size(arg2(:),1)
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
+                try, 
+                      select = EEG.dipfit.model(arg2(index)).select;
+                catch select = 0;
+                end;
                 if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
                     transform = pinv( sph2spm );                    
                     tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
@@ -404,7 +411,7 @@ for index = 1:size(arg2(:),1)
                 end;
                 curpos = curpos / 85;
                 if ~isempty(curpos)
-                    if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
+                    if size(curpos,1) > 1 & length(select) == 2
                         options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
                         dipoleplotted = 1;
                     else
