@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.134  2004/02/15 21:30:01  scott
+% same
+%
 % Revision 1.133  2004/02/15 21:17:07  scott
 % omit QUAD_SKIRT option - not ready !
 %
@@ -1063,11 +1066,12 @@ tip = rmax*1.15; base = rmax-.004;
 EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
 %  fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2)); % DEBUG
+  hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
+  set(hd,'color','w','linewidth',HLINEWIDTH+5);
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
@@ -1075,8 +1079,9 @@ if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
-  set(hd,'color','w','linewidth',HLINEWIDTH+5);
 else % no 'skirt'
+  plot(cos(circ).*rmax,sin(circ).*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
   plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
