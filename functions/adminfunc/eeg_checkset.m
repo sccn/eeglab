@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.113  2003/12/04 17:45:12  arno
+% debug urevent (made Matlab 5.3 crash systematically)
+%
 % Revision 1.112  2003/12/04 02:40:56  arno
 % msg
 %
@@ -615,13 +618,13 @@ end;
     end;
     % create urevent if continuous data
     % ---------------------------------
-    if ~isempty(EEG.event) & ~isfield(EEG, 'urevent')
-        EEG.urevent = EEG.event;
-        disp('eeg_checkset note: creating the original event table (EEG.urevent)');
-        for index = 1:length(EEG.event)
-            EEG.event(index).urevent = index;
-        end;
-    end;
+    %if ~isempty(EEG.event) & ~isfield(EEG, 'urevent')
+    %    EEG.urevent = EEG.event;
+    %   disp('eeg_checkset note: creating the original event table (EEG.urevent)');
+    %    for index = 1:length(EEG.event)
+    %        EEG.event(index).urevent = index;
+    %    end;
+    %end;
     if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'urevent')
         EEG.urevent = rmfield(EEG.urevent, 'urevent');
     end;
@@ -777,13 +780,13 @@ if ~isempty( EEG.chanlocs )
         end;
     end;
 end;
-if ~isfield(EEG, 'urchanlocs')
-    EEG.urchanlocs = EEG.chanlocs;
-    for index = 1:length(EEG.chanlocs)
-        EEG.chanlocs(index).urchan = index;
-    end;
-    disp('eeg_checkset note: creating backup chanlocs structure (urchanlocs)');
-end;
+%if ~isfield(EEG, 'urchanlocs')
+%    EEG.urchanlocs = EEG.chanlocs;
+%    for index = 1:length(EEG.chanlocs)
+%        EEG.chanlocs(index).urchan = index;
+%    end;
+%    disp('eeg_checkset note: creating backup chanlocs structure (urchanlocs)');
+%end;
 
 % check reference
 % ---------------
