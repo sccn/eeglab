@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/06/29 02:02:30  arno
+% last revision backup
+%
 % Revision 1.18  2003/02/23 08:38:32  scott
 % header edit -sm
 %
@@ -130,12 +133,26 @@ if nargin < 1
     return;
 end;
 
+% find available algorithms
+% -------------------------
+allalgs   = { 'runica' 'binica' 'jader' 'MatlabshibbsR' 'fastica' ...
+              'pearson_ica' 'egld_ica' 'eeA' 'tfbss' };
+selectalg = {};
+stralg    = '';
+for index = 1:length(allalgs)
+    if exist(allalgs{index}) == 2
+        selectalg = { selectalg{:} allalgs{index} };
+        stralg    = [ stralg ' | '  allalgs{index} ];
+    end;
+end;
+stralg = stralg(3:end);
+    
 fig = [];
 if nargin < 2 
     % popup window parameters
     % -----------------------
-    promptstr    = { [ 'ICA algorithm to use [ runica | binica | jader | fastICA ]' ] ...
-                      ['Commandline options (See algorithm help messages)']};
+    promptstr    = { [ 'ICA algorithm to use [' stralg ' ]' ] ...
+                     [ 'Commandline options (See algorithm help messages)' ] };
 	inistr       = { 'runica' '' };
 	result       = inputdlg2( promptstr, 'Run ICA decomposition -- pop_runica()', 1,  inistr, 'pop_runica');
 	if length(result) == 0 return; end;
@@ -191,6 +208,45 @@ switch lower(icatype)
             eval(sprintf('[EEG.icaweights] = jader( tmpdata %s );', options));
         end;
         EEG.icasphere = eye(size(EEG.icaweights,2));
+     case 'MatlabshibbsR' 
+        if length(options) < 2
+            [EEG.icaweights] = MatlabshibbsR( tmpdata );
+        else    
+            eval(sprintf('[EEG.icaweights] = MatlabshibbsR( tmpdata %s );', options));
+        end;
+        EEG.icasphere = eye(size(EEG.icaweights,2));
+     case 'pearson_ica' 
+        if length(options) < 2
+            [tmp EEG.icaweights] = pearson_ica( tmpdata );
+        else    
+            eval(sprintf('[tmp EEG.icaweights] = pearson_ica( tmpdata %s );', options));
+        end;
+        clear tmp;
+        EEG.icasphere = eye(size(EEG.icaweights,2));
+     case 'egld_ica' 
+        if length(options) < 2
+            [tmp EEG.icaweights] = egld_ica( tmpdata );
+        else    
+            eval(sprintf('[tmp EEG.icaweights] = egld_ica( tmpdata %s );', options));
+        end;
+        clear tmp;
+        EEG.icasphere = eye(size(EEG.icaweights,2));
+     case 'eea' 
+        if length(options) < 2
+            [EEG.icaweights] = eeA( tmpdata );
+        else    
+            eval(sprintf('[EEG.icaweights] = eeA( tmpdata %s );', options));
+        end;
+        EEG.icasphere = eye(size(EEG.icaweights,2));
+     case 'tfbss' 
+        if length(options) < 2
+             size(tmpdata,1)
+             [tmp EEG.icaweights] = tfbss( tmpdata, size(tmpdata,1), 10, round(size(tmpdata,2)/2) );
+        else    
+            eval(sprintf('[tmp EEG.icaweights] = tfbss( tmpdata %s );', options));
+        end;
+        EEG.icasphere = eye(size(EEG.icaweights,2));
+        clear tmp;
      case 'fastica'
         if exist('fastica') ~= 2
             error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
