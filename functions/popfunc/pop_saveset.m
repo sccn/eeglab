@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/07/22 15:43:10  arno
+% *** empty log message ***
+%
 % Revision 1.21  2003/05/29 18:54:59  arno
 % debug command line call
 %
@@ -212,7 +215,6 @@ if mode == 0  % single datasets
 	EEG.filepath    = '';
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
-	disp('Saving dataset...');
 	command = sprintf('save(''%s'',''-MAT'',''EEG'');', [ curfilepath curfilename ]);
 	
 	% saving data as float or as Matlab
@@ -221,6 +223,7 @@ if mode == 0  % single datasets
 		tmpdata = EEG.data;
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
+            disp('Saving dataset...');
 			eval(command);
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
@@ -228,14 +231,34 @@ if mode == 0  % single datasets
 		end;
 		EEG.data = tmpdata; 
 		EEG.icaact = tmpica;
-	else % saving data as a single Matlab file 
-		try, 
+	else % saving data as a single Matlab file
+        tmpfilename = [ noextcurfilename '.fdt' ];
+        del = 0;
+        if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
+            if exist(tmpfilename) == 2
+                but = questdlg2(strvcat('Warning: EEGLAB default file format has changed and ''.fdt'' files are not needed', ...
+                                        ['any more to save disk space. Do you want to delete ''' tmpfilename ''' (recommended)?'], ...
+                                        '(to restore previous default use "File > Maximize memory" menu)'), ...
+                                        'File format has changed !', 'No', 'Yes', 'Yes');
+                if strcmpi(but, 'yes'), del =1; end;
+            end;
+        end;
+        try, 
             EEG.data = single(EEG.data);
+            disp('Saving dataset...');
 			eval(command);
             EEG.data = double(EEG.data);
 		catch, 
 			error('Pop_saveset: saving error, check permission on file or directory');
 		end;
+        if del,
+            try,
+                tmpfilename = which(tmpfilename);
+                disp([ 'Deleting ''' tmpfilename '''...' ]);
+                delete(tmpfilename);
+            catch, disp('Error while attempting to remove file'); 
+            end;
+        end;
 	end;
 	EEG.icaact = tmpica;
 	
@@ -274,11 +297,11 @@ else
 	
 	% saving
 	% ------
-	disp('Pop_saveset: saving datasets...');
 	ALLEEG = ALLEEG(indices);
 	
 	% saving data as float or as Matlab
 	eeg_options;
+    del = 0;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		for index = 1:length(ALLEEG)
 			tmpdata = ALLEEG(index).data;
@@ -291,19 +314,44 @@ else
 			end;
 		end;
 	else % standard file saving
+        if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
+            tmpfilename = [ noextcurfilename '.fdt1' ];
+            if exist(tmpfilename) == 2
+                but = questdlg2(strvcat('Warning: EEGLAB default file format has changed and ''.fdt'' files are not needed', ...
+                                        ['any more to save disk space. Do you want to delete ''' tmpfilename(1:end-1) 'X'' (recommended)?'], ...
+                                        '(to restore previous default use "File > Maximize memory" menu)'), ...
+                                        'File format has changed !', 'No', 'Yes', 'Yes');
+                if strcmpi(but, 'yes'), del =1; end;
+            end;
+        end;
 		for index = 1:length(ALLEEG)
 			ALLEEG(index).data = single(ALLEEG(index).data);
 		end;        
     end;
+	disp('Pop_saveset: saving datasets...');
 	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
 	catch, error('Pop_saveset: saving error, check permission on file or directory');
 	end;
+    
+    % delete .fdt files
+    % -----------------
+    if del,
+        try,
+            for index = 1:length(ALLEEG)
+                tmpfilename = [ noextcurfilename '.fdt' int2str(index) ];
+                tmpfilename = which(tmpfilename);
+                disp([ 'Deleting ''' tmpfilename '''...' ]);
+                delete(tmpfilename);
+            end;
+        catch, disp('Error while attempting to remove files'); 
+        end;
+    end;
+    disp ('Done');
 
 	ALLEEG = TMPALLEEG;
 	EEG = ALLEEG;	
 	com = sprintf('ALLEEG = pop_saveset( %s, %s, ''%s'', ''%s'');', inputname(1), vararg2str(indices), curfilename, curfilepath);
 end;
-disp('Done.');
 return;
 
 function num = popask( text )
