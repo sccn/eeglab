@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.196  2004/01/24 21:22:59  scott
+% same
+%
 % Revision 1.195  2004/01/24 21:17:00  scott
 % same
 %
@@ -3012,7 +3015,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
 %                           If winloc not [], plot grey back image in sort window
 %                                       winloc(1)-> winloc(end) (ms)
   FILLCOLOR    = [.66 .76 1];
-  WINFILLCOLOR    = [.66 .76 1];
+  WINFILLCOLOR    = [.83 .88 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   if ~isempty(winloc)
