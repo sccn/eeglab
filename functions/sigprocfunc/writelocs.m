@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/05/13 21:42:17  arno
+% debugging header writing
+%
 % Revision 1.4  2002/12/29 00:17:33  scott
 % header
 %
@@ -147,7 +150,10 @@ fid = fopen(filename, 'w');
 % exporting header
 % ----------------
 if ~isempty(g.customheader)
-   fprintf(fid, '%s\n', g.customheader);
+    allstrs = cellstr(g.customheader);
+    for index=1:length(allstrs)
+        fprintf(fid, '%s\n', allstrs{index});
+    end;
 end;
 if  strcmpi(g.header, 'on') | g.skipline == 2
    for index=1:length(g.format)
