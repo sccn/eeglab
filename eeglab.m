@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 02:03:58  arno
+% editing menus
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %
@@ -242,7 +245,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Edit dataset info'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_editset(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
 	uimenu( second_m, 'Label', 'Edit event fields'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
 	uimenu( second_m, 'Label', 'Edit event values'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
-	uimenu( second_m, 'Label', 'About this dataset'    , 'CallBack', [ check      '[EEG LASTCOM] = pop_comments(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
+	uimenu( second_m, 'Label', 'About this dataset'    , 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset''); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;'], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; clear TMP; eeg_updatemenu;']);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[LASTCOM] = pop_copyset; h(LASTCOM); eeg_updatemenu;'], 'Separator', 'on');
