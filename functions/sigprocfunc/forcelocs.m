@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/11/10 17:39:31  arno
+% change message.m
+%
 % Revision 1.7  2004/11/10 17:31:01  arno
 % debug call to channel select
 %
@@ -92,12 +95,12 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
                                       'end;' ] } ...
                        { 'style' 'edit' 'string'  fastif(index==1, 'Cz','') 'tag' tag } ...
                        { 'style' 'pushbutton' 'string' 'Pick' ...
-                         'callback', [ '[tmp1 tmp2] = pop_chansel({EEG.chanlocs.labels}, ''selectionmode'', ''single'');' ...
+                         'callback', [ '[tmp1 tmp2] = pop_chansel(get(gcbf, ''userdata''), ''selectionmode'', ''single'');' ...
                                        'if ~isempty(tmp1) set(findobj(gcbf, ''tag'', ''' tag '''), ''string'', tmp2); end;' ...
                                        'clear tmp1 tmp2;' ] } };
         end;
         
-        results = inputgui( geom, uilist, 'pophelp(''forcelocs'');', 'Force electrode location -- forcelocs()' );
+        results = inputgui( geom, uilist, 'pophelp(''forcelocs'');', 'Force electrode location -- forcelocs()', chanlocs );
         if length(results) == 0, return; end;
         
         options = {};
