@@ -30,8 +30,7 @@ function [eeg,ev,header] = read_erpss(filename)
     
     fp = fopen(filename,'rb','ieee-le');
     if fp == -1,
-        disp('read_erpss(): Cannot open data file...!');
-        return;
+        error('read_erpss(): Cannot open data file...!');
     else
         disp('File opened:');
     end

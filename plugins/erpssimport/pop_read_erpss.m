@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/01/24 17:49:39  arno
+% now reading sampling rate
+%
 % Revision 1.3  2003/01/24 04:13:00  scott
 % header edit -sm
 %
@@ -56,7 +59,7 @@ end;
 % read ERPSS format
 EEG = eeg_emptyset;
 fprintf('pop_read_erpss: importing ERPSS file...\n');
-[EEG.data,events,header] = read_erpss('KBSTERN1.RDF');
+[EEG.data,events,header] = read_erpss(filename);
 EEG.nbchan = size(EEG.data,1);
 EEG.srate = header.srate;
 EEG.setname = 'ERPSS data';
