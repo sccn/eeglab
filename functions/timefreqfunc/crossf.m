@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/04/25 02:18:19  arno
+% debugging topovec
+%
 % Revision 1.20  2002/04/24 22:04:49  arno
 % debugging error check
 %
@@ -669,6 +672,7 @@ end % t = trial
 % handle trial bootstrap types
 % ----------------------------
 if g.bootsub > 0
+    error('Trial bootstrap is not functional temporarilly');
     fprintf('\nProcessing trial bootstrap (of %d):',trials);
     for allt=1:trials
 		if (rem(allt,10) == 0)
@@ -785,7 +789,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 	i = round(g.naccu*g.alpha);
 	Rboot = Rboot';
 	Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
-	Rboot = [mean(Rboot(1:i,:)); mean(Rboot(g.naccu-i+1:g.naccu,:))];
+	Rboot = mean(Rboot(g.naccu-i+1:g.naccu,:));
 	%Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
 end % NOTE: above, mean ?????
 
@@ -838,7 +842,6 @@ if ~isnan(g.baseline)
 end;
 Rraw =R; % raw coherence values
 
-	
 if g.plot
     fprintf('\nNow plotting...\n');
 	set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
@@ -857,19 +860,8 @@ switch lower(g.plotamp)
     %
 	RR = R;
 	if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
-        switch g.boottype
-	       case 'trials',
-		      RR(find((RR > Rbootplus) & (RR < Rbootminus))) = 0;
-		      Rraw(find(Rsignif >= Rraw))=0;
-		      Rboottime = [mean(Rbootplus(dispf,:),1); mean(Rbootminus(dispf,:),1)];
-		      Rsigniftime = mean(Rsignif(dispf,:),1);
-		      Rboot = [mean(Rbootplus,2) mean(Rbootminus,2)]';
-		      Rsignif = mean(Rsignif,2)';
-		   otherwise
-		      RR(find((RR > repmat(Rboot(1,:)',[1 g.timesout])) ...
-	              & (RR < repmat(Rboot(2,:)',[1 g.timesout])))) = 0;
-		      Rraw(find(repmat(Rsignif',[1,size(Rraw,2)])>=Rraw))=0;
-		   end;   
+		RR(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+		Rraw(find(repmat(Rsignif',[1,size(Rraw,2)])>=Rraw))=0;
 	end
 
 	if g.cmax == 0
@@ -945,7 +937,7 @@ switch lower(g.plotamp)
 		plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
 	    hold on
 		% plot(freqs(dispf),Rboot(:,dispf)+[E;E],'g','LineWidth',g.linewidth);
-		plot(freqs(dispf),Rboot([1 2],dispf),'g','LineWidth',g.linewidth);
+		plot(freqs(dispf),Rboot(:,dispf),'g','LineWidth',g.linewidth);
 		plot(freqs(dispf),Rsignif(dispf),'k:','LineWidth',g.linewidth);
 		axis([freqs(1) freqs(max(dispf)) 0 max([E Rsignif])*1.2]);
 	else             % plot marginal mean coherence only
