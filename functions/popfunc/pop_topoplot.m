@@ -2,7 +2,7 @@
 %                  arguments is 2, pop-up an interactive query window.
 %
 % Usage:
-%   >> pop_topoplot( EEG, typeplot, latencies, title, options...);
+%   >> pop_topoplot( EEG, typeplot, items, title, options...);
 %
 % Inputs:
 %   EEG        - Input dataset (see eeglab())
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/27 00:38:21  arno
+% cl more optimal auto location
+%
 % Revision 1.17  2002/08/22 17:38:39  arno
 % correct title
 %
