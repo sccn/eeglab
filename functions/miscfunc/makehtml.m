@@ -41,6 +41,8 @@
 %                  standard .html page link instead.}    
 %   'fontindex'  - Font for the .html index file (default: 'Helvetica')
 %   'backindex'  - Background tag for the index file (c.f. 'background')
+%   'mainheader' - Text file to insert at the beggining of the index page. Default is
+%                  none.
 %   'mainonly'   - ['on'|'off'] 'on' -> Generate the index page only.
 %                   {default: 'off' -> generate both the index and help pages}
 %   
@@ -50,7 +52,7 @@
 %  makehtml({ { 'adminfunc' 'Admin functions' 'adminfunc/eeg_helpadmin.m' } ...
 %             { 'popfunc', 'Interactive pop_functions' 'adminfunc/eeg_helppop.m' } ...
 %             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
-%            '/home/www/eeglab/allfunctions');          
+%            '/home/www/eeglab/allfunctions', 'mainheader', '/data/common/matlab/indexfunchdr.txt');          
 %
 % See also: help2html()
 
@@ -71,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/11/21 23:06:37  arno
+% indexfunc -> index
+%
 % Revision 1.12  2002/11/15 02:44:32  arno
 % same
 %
@@ -124,6 +129,7 @@ else
 end;
     
 try, g.mainonly;    catch, g.mainonly = 'off'; end;
+try, g.mainheader;  catch, g.mainheader = ''; end;
 try, g.outputfile;  catch, g.outputfile = 'index.html'; end;
 try, g.fontindex;   catch, g.fontindex = 'Helvetica'; end;
 try, g.backindex;   catch, g.backindex =  '<body bgcolor="#fcffff">'; end;
@@ -135,13 +141,28 @@ try, g.font;        catch, g.font = 'Helvetica'; end;
 try, g.footer;      catch, g.footer = '<A HREF ="index.html">Back to functions</A>';  end;
 try, g.outputlink;  catch, g.outputlink = [ '<tr><td VALIGN=TOP ALIGN=RIGHT NOSAVE><A HREF="javascript:openhelp(''%s.html'')">%s</A></td><td>%s</td></tr>' ];  end;
 
+% read header text file
+% ---------------------
+if ~isempty(g.mainheader)
+    doc = [];
+    fid = fopen(g.mainheader , 'r');
+    if (fid == -1), error(['Can not open file ''' g.mainheader '''' ]); end;
+    str = fgets( fid );
+    while ~feof(fid)
+        str = deblank(str(1:end-1));
+        doc = [ doc str(1:end) ];
+        str = fgets( fid );
+    end;
+    g.backindex = [ g.backindex doc ];
+end;
+
 options = { 'footer', g.footer, 'background', g.background, ...
 		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink, 'outputonly', g.mainonly };
 
 % ------------------------------------------- 
 % scrips which generate a web page for eeglab
 % ------------------------------------------- 
-STYLEHEADER = '<BR><H2>%s</H2>\n'; 
+STYLEHEADER = '<BR><a name="%s"></a><H2>%s</H2>\n'; 
 OPENWIN = [ '<script language="JavaScript"><!--' 10 'function openhelp(fnc){' 10 ... 
             'self.window.location = fnc;' 10 '}' 10 '//--></script>'];
 ORIGIN      = pwd;
@@ -265,7 +286,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 		end;
 		fprintf(fo, '</UL>' );
 	else 
-		fprintf(fo, STYLEHEADER, title );
+		fprintf(fo, STYLEHEADER, title, title );
 		fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
 		for index = 1:length(files)
 	        % Processing file only
