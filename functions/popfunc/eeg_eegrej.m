@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/06/02 17:18:00  arno
+% insert bound before removing events
+%
 % Revision 1.14  2004/05/24 20:56:35  arno
 % checking event consistency
 %
@@ -117,8 +120,8 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 % add boundary events
 % -------------------
 if ~isempty(boundevents)
-    EEG.event rmevent = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
-    EEG               = eeg_checkset(EEG, 'eventconsistency');
+    EEG.event = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
+    EEG       = eeg_checkset(EEG, 'eventconsistency');
 end;
 
 % change event latencies
