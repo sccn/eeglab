@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/07/08 21:42:41  arno
+% correcting icawinv channel selection bug
+%
 % Revision 1.11  2002/06/25 01:55:02  arno
 % adding parameter check
 %
@@ -273,7 +276,7 @@ end;
 
 % performing removal
 % ------------------
-fprintf('Selecting trials..\n');
+fprintf('Selecting data subset..\n');
 EEG.data      = EEG.data(g.channel, g.point, g.trial);
 EEG.trials    = length(g.trial);
 EEG.pnts      = length(g.point);
