@@ -8,8 +8,8 @@
 %                  it is not possible to remove a slice of time (i.e. 
 %                  either low=0 or high=max time). For continuous data
 %                  several intervals can be separated by commas. For 
-%                  instance "0 10; 12 100" will remove the portion of data
-%                  from 10 to 12 and from 100 to the maximal time.
+%                  instance "5 10; 12 EEG.xmax" will remove the portion of 
+%                  data from 0 to 5 seconds and from 10 to 12 seconds.
 %                  Command line equivalent: 'time' and 'notime'
 %   "Time range" - [checkbox] by checking the checkbox, the regions
 %                  selected will be removed. Command line equivalent: 'time' 
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/02/28 00:51:30  arno
+% milliseconds -> seconds
+%
 % Revision 1.27  2003/02/28 00:18:49  arno
 % backward compatibility
 %
@@ -318,10 +321,16 @@ if ~isempty( g.notime )
             error('Wrong notime range. Remember that it is not possible to remove a slice of time for data epochs.');
         end;
     end;
+    if max(g.notime(:)) > EEG.xmax | min(g.notime(:)) < 0
+        error('Time/point range out of data limits');
+    end;
 end;
 if ~isempty(g.time)
     if size(g.time,2) ~= 2
         error('Time/point range must contain 2 columns exactly');
+    end;
+    if max(g.time(:)) > EEG.xmax | min(g.time(:)) < 0
+        error('Time/point range out of data limits');
     end;
 end;
 
