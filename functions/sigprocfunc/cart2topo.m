@@ -5,8 +5,8 @@
 %
 % Usage:  >> [th r] = cart2topo(xyz);   % 3-column data
 %         >> [th r] = cart2topo(x,y,z); % separate x,y,z vectors
-%         >> [th r] = cart2topo(xyz,'key', 'val', ...); 
-%         >> [th r] = cart2topo(x,y,z,'key', 'val', ...); 
+%         >> [th r x y z] = cart2topo(xyz,'key', 'val', ...); 
+%         >> [th r x y z] = cart2topo(x,y,z,'key', 'val', ...); 
 %
 % Optional inputs:
 %    'center'  = [X Y Z] known center different from [0 0 0]
@@ -24,6 +24,7 @@
 % Notes: topoplot() does not plot channels with radius>0.5
 %        Shrink radii to within this range to interpolate 
 %        all channels.
+%        [x y z] are returned after the optimization of the center
 %        Radii are further squeezed in of factor squeeze
 %
 % Important: 
@@ -55,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/05/02 01:24:41  arno
+% debugging radius
+%
 % Revision 1.10  2002/05/02 01:23:29  arno
 % using chancenter
 %
@@ -96,7 +100,7 @@
 % 03-31-02 center fitting is optional
 % 04-01-02 automatic squeeze calculation -ad & sm
  
-function [th,r] = cart2topo(x,varargin)
+function [th,r,x,y,z] = cart2topo(x,varargin)
 
 if nargin<1
     help cart2topo
