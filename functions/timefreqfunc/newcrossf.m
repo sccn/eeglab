@@ -2,7 +2,7 @@
 %           you must contact Arnaud Delorme (arno@salk.edu) for terms of use
 %
 % newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
-%        between two input time series. A lower panel (optionally) shows 
+%        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
@@ -18,7 +18,7 @@
 %        computed (from a distribution of 'naccu' (200) surrogate baseline
 %        data epochs) for the baseline epoch, and non-significant features 
 %        of the output plots are zeroed (and shown in green). The baseline
-%        epoch is all windows with center times < the given 'baseline' value 
+%        epoch is all windows with center latencies < the given 'baseline' value 
 %        or, if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles,...
@@ -26,15 +26,15 @@
 %                                        cycles, 'key1', 'val1', 'key2', val2' ...);
 %
 % Required inputs:
-%       x       = first single-channel data set (1,frames*nepochs)      
+%       x       = First single-channel data set (1,frames*nepochs)      
 %                 Else, cell array {x1,x2} of two such data vectors to also
 %                 estimate (significant) coherence differences between two 
 %                 conditions.
-%       y       = second single-channel data set (1,frames*nepochs)     
+%       y       = Second single-channel data set (1,frames*nepochs)     
 %                 Else, cell array {y1,y2} of two such data vectors.
-%       frames  = frames per epoch                                   {750}
-%       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
-%       srate   = data sampling rate (Hz)                            {250}
+%       frames  = Frames per epoch                                   {750}
+%       tlimits = [mintime maxtime] (ms) Epoch latency limits  {[-1000 2000]}
+%       srate   = Data sampling rate (Hz)                            {250}
 %       cycles  = 0  -> Use FFTs (with constant window length) 
 %               = >0 -> Number of cycles in each analysis wavelet 
 %               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
@@ -46,12 +46,12 @@
 %       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
 %                 ('coher') or phase coherence ('phasecoher') also known
 %                 as phase coupling factor' {default: 'phasecoher'}.
-%       'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
+%       'subitc' = ['on'|'off'] Subtract stimulus locked Inter-Trial Coherence 
 %                 from x and y. This computes the  'intrinsic' coherence
 %                 x and y not arising from common synchronization to 
 %                 experimental events. For cell array input, one may provide
 %                 a cell array ({'on','off'} for example). {default: 'off'}
-%       'shuffle' = integer indicating the number of estimates to compute
+%       'shuffle' = Integer indicating the number of estimates to compute
 %                 bootstrap coherence based on shuffled trials. This estimates
 %                 the coherence arising only from time locking of x and y
 %                 to experimental events (opposite of 'subitc'). For cell array 
@@ -66,72 +66,75 @@
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     if cycles >0: *longest* window length to use. This
 %                     determines the lowest output frequency  {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winframes). Enter a 
-%                     negative value [-S] to subsample original time by S.
-%                     Enter an array to obtain spectral decomposition at 
-%                     specific time values (note: algorithm find closest time 
-%                     point in data and this might result in an unevenly spaced
-%                     time array. {def: 200}
+%       'timesout'  = Number of output latencies (int<frames-winframes). {200) 
+%                     A negative value (-S) subsamples the original latencies 
+%                     by S. An array of latencies computes spectral 
+%                     decompositions at specific latency values (Note: the 
+%                     algorithm finds the closest latencies in the data, 
+%                     possibly resulting in slightly unevenly spaced 
+%                     output latencies. 
 %       'padratio'  = FFT-length/winframes (2^k)                    {2}
 %                     Multiplies the number of output frequencies by dividing
 %                     their spacing (standard FFT padding). When cycles~=0, 
 %                     frequency spacing is divided by padratio.
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                     If cycles==0, all FFT frequencies are output.{def: 50}
-%                     DEPRECATED, use 'freqs' instead,
-%       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
+%                     Note: NOW DEPRECATED, use 'freqs' instead,
+%       'freqs'     = [min max] Frequency limits. {Default: [minfreq 50],
 %                     minfreq being determined by the number of data points, 
-%                     cycles and sampling frequency.
-%       'nfreqs'    = number of output frequencies. For FFT, closest computed
+%                     cycles and sampling frequency}.
+%       'nfreqs'    = Number of output frequencies. For FFT, closest computed
 %                     frequency will be returned. Overwrite 'padratio' effects
-%                     for wavelets. Default: use 'padratio'.
-%       'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                     for wavelets. {Default: use 'padratio'}.
+%       'freqscale' = ['log'|'linear'] Frequency scaling. {Default: 'linear'}.
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
-%       'baseline'  = Coherence baseline end time (ms). This parameter
-%                     affect the 'mcoh' output and the bootstrap estimation. 
-%                     Use NaN for full epoch. {0}
-%       'powbase'   = Baseline spectrum to log-subtract.  {default: from data}
-%       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
-%                     memory. Default 'off'.
+%       'baseline'  = Coherence baseline end latency (ms). {0} This parameter
+%                     affects the 'mcoh' output and the bootstrap estimation. 
+%                     Use NaN to include the full epoch in the baseline. 
+%       'powbase'   = Baseline spectrum to log-subtract. {Default: mean 
+%                     spectrum of the baseline data}
+%       'lowmem'    = ['on'|'off'] {'off'} Compute frequency by frequency to 
+%                     save memory. 
 %
 %    Optional Bootstrap:
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
-%                    level. Show non-signif output values as green. {0}
+%                    level. Show non-signif output values in neutral green. {0}
 %       'naccu'    = Number of bootstrap replications to compute {200}
 %       'boottype' = ['times'|'timestrials'|'trials'] Bootstrap type: Either 
 %                    shuffle windows ('times') or windows and trials ('timestrials')
 %                    or trials only using a separate bootstrap for each time window
-%                    ('trials'). Option 'times' is not recommended but requires less
-%                    memory and provide similar results to other options.
-%                    {default 'timestrials'}
+%                    ('trials'). Option 'times' is not recommended but requires 
+%                    less memory and provide similar results to other options.
+%                    {default: 'timestrials'}
 %       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
-%                    is the whole epoch                         {default: 0}
-%       'condboot' = ['abs'|'angle'|'complex'] for comparing 2 conditions,
-%                    either subtract absolute vales ('abs'), angles 
-%                    ('angles') or complex values ('complex').     {'abs'}
+%                    is the whole epoch  {default: 0}
+%       'condboot' = ['abs'|'angle'|'complex'] In comparing two conditions,
+%                    either subtract complex spectral values' absolute vales 
+%                    ('abs'), angles ('angles') or the complex values themselves
+%                    ('complex').     {default: 'abs'}
 %       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
-% Optional Scalp Map:
-%       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {[]}
-%                    ELSE (c1,c2), plot two cartoons showing channel locations.
+% Optional scalp map:
+%       'topovec'  = (2,nchans) matrix. Scalp maps to plot {[]}
+%                    ELSE [c1,c2], plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
 %                    File should be ascii in format of >> topoplot example   
 %
-% Optional Plot and Compute Features:
+% Optional plot and compute features:
 %       'compute'   = ['matlab'|'C'] Use C sub-routine to speed up the
 %                     computation                      {default 'matlab'}
-%       'plotamp'   = ['on'|'off'], Plot coherence magnitude       {'on'}
-%       'maxamp'    = [real] Set the maximum for the amp. scale    {auto}
-%       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
+%       'plotamp'   = ['on'|'off']. Plot coherence magnitude       {'on'}
+%       'maxamp'    = [real] Set the maximum for the amplitude scale {auto}
+%       'plotphase' = ['on'|'off']. Plot coherence phase angle     {'on'}
 %       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
 %       'title'     = Optional figure title. If two conditions are given
-%                     as input, title can be a cell array with 2 string
-%                     elements {none}
-%       'vert'      = Times to mark with a dotted vertical line   {none}
+%                     as input, title can be a cell array with two text
+%                     string elements {none}
+%       'vert'      = Latencies to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'axesfont'  = Axes font size                               {10}
@@ -140,7 +143,7 @@
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
 %       mcoh        = Vector of mean baseline coherence at each frequency
-%       timesout    = Vector of output times (window centers) (ms).
+%       timesout    = Vector of output latencies (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
@@ -151,16 +154,17 @@
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
-%        3) The 'boottype' should be ideally 'timestrials', but this creates high 
-%           memory demands, so the 'times' method must be used in many cases.
+%        3) The 'boottype' should be ideally 'timestrials', but this creates 
+%           large memory demands, so 'times' must be used in many cases.
 %        4) If 'boottype' is 'trials', the average of the complex bootstrap
-%           is subtracted from the coherence to compensate for phase differences 
+%           is subtracted from the coherence to compensate for phase differences
 %           (the average is also subtracted from the bootstrap distribution). 
-%           For other bootstraps, this is not necessary since the phase is random.
+%           For other bootstraps, this is not necessary since there the phase 
+%           distribution should be random.
 %        5) If baseline is non-NaN, the baseline is subtracted from
 %           the complex coherence. On the left hand side of the coherence
-%           amplitude image, the baseline is displayed as a magenta line
-%           (if no baseline is selected, this curve represents the average
+%           amplitude image, the baseline is displayed as a magenta line.
+%           (If no baseline is selected, this curve represents the average
 %           coherence at every given frequency).
 %
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
@@ -187,6 +191,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/10/15 18:46:01  arno
+% *** empty log message ***
+%
 % Revision 1.62  2003/08/08 22:25:28  arno
 % *** empty log message ***
 %
