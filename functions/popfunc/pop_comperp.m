@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2004/02/10 17:26:14  arno
+% adding tlim and ylim option
+%
 % Revision 1.25  2004/01/30 16:05:16  arno
 % text in legend
 %
@@ -157,7 +160,7 @@
 % Initial revision
 %
 
-function [erp1, erp2, erpsub, time, pvalues] = pop_comperp( ALLEEG, flag, datadd, datsub, varargin);
+function [erp1, erp2, erpsub, times, pvalues] = pop_comperp( ALLEEG, flag, datadd, datsub, varargin);
 
 erp1 = '';
 if nargin < 1
@@ -416,7 +419,18 @@ end;
 plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
           'limits', [xmin xmax 0 0]*1000, 'title', g.title, 'colors', colors, ...
           'chans', g.chans, 'legend', legend, 'regions', regions, 'ylim', g.ylim, g.tplotopt{:});
-times = linspace(xmin, xmax, pnts);
+
+% outputs
+% -------
+times  = linspace(xmin, xmax, pnts);
+erp1   = mean(erp1ind,3);
+if length(datsub) > 0 % dataset to subtract
+    erp2   = mean(erp2ind,3);
+    erpsub = erp1-erp2;
+else
+    erp2 = [];
+    erpsub = [];
+end;
 
 if nargin < 3 & nargout == 1
     erp1 = sprintf('pop_comperp( %s, %d, %s);', inputname(1), ...
