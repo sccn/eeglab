@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/12 18:36:10  arno
+% questdlg2
+%
 % Revision 1.15  2002/08/08 02:09:19  arno
 % contraining boundary event to be preserved for continuous data
 %
@@ -194,9 +197,9 @@ if nargin<2
 
 	if isfield(EEG.event, 'latency')
 		if EEG.trials > 1
-			uilist{end} = { 'Style', 'text', 'string', 'Note: latency unit is millisecond' };
+			uilist{end} = { 'Style', 'text', 'string', 'NOTE: Latency unit is milliseconds' };
 		else
-			uilist{end} = { 'Style', 'text', 'string', 'Note: latency unit is second' };	   
+			uilist{end} = { 'Style', 'text', 'string', 'NOTE: Latency unit is seconds' };	   
 		end;
 	end;
  
