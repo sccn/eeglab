@@ -2,16 +2,24 @@
 %                eeg dataset.
 %
 % Usage:
-%   >> outeeg = pop_rmbase( eeg, timerange, pointrange);
+%   >> OUTEEG = pop_rmbase( EEG ); % pop up interactive window
+%   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange);
+%
+% Graphical interface:
+%    1st edit box: Baseline time range ([min_ms max_ms]). Same as
+%                  the 'timerange' command line input.
+%    1st edit box: Baseline points vector (ex:1:56). Overwritten by 
+%                  the time limits option above. Same as the 
+%                  'pointrange' command line input.
 %
 % Inputs:
-%   eeg        - Input dataset
+%   EEG        - Input dataset
 %   timerange  - Baseline time range [min_ms max_ms]. 
 %   pointrange - Baseline points vector [min:max]. 
 %                (Overwritten by time range).
 %
 % Outputs:
-%   outeeg     - Output dataset
+%   OUTEGG     - Output dataset
 %
 % Note: in the case of a continuous dataset, the baseline is removed
 %       seperatelly for the non-continuous regions (for instance if
@@ -40,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/18 02:47:23  arno
+% adding continuous data baseline subtraction
+%
 % Revision 1.5  2002/10/11 14:48:20  arno
 % recomputing ICA activations
 %
