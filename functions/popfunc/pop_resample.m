@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/06/28 02:28:05  arno
+% fixing slight inacuracy in sampling rate
+%
 % Revision 1.5  2003/06/28 02:26:45  arno
 % fixing slight inacuracy in new sampling rate
 %
@@ -117,8 +120,13 @@ if isfield(EEG.event, 'latency')
         EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
     end;
     if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
-        for index1 = 1:length(EEG.event)
-            EEG.urevent(index1).latency = EEG.urevent(index1).latency * EEG.pnts /oldpnts;
+        try,
+            for index1 = 1:length(EEG.event)
+                EEG.urevent(index1).latency = EEG.urevent(index1).latency * EEG.pnts /oldpnts;
+            end;
+        catch, 
+            disp('pop_resample warning: ''urevent'' problem, reinitializing urevents');
+            EEG = rmfield(EEG, 'urevent');
         end;
     end;
 end;
