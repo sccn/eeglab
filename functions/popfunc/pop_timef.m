@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/23 17:42:56  scott
+% editing legends -sm
+%
 % Revision 1.11  2002/04/23 17:38:08  scott
 % [same] -sm
 %
@@ -100,9 +103,9 @@ lastcom = [];
 if nargin < 3
 	popup = 1;
 else
-	popup = isstr(channel) | isempty(channel);
-	if isstr(channel)
-		lastcom = channel;
+	popup = isstr(num) | isempty(num);
+	if isstr(num)
+		lastcom = num;
 	end;
 end;
 
