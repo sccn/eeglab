@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2004/07/07 22:31:22  arno
+% shrink message
+%
 % Revision 1.100  2004/07/07 22:21:13  arno
 % debug shrinkorskirt
 %
@@ -972,7 +975,7 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
 	if isfield(chans, 'shrink') 
 		shrinkorskirt = 1;
         if ~isstr(chans(1).shrink)
-            plotrad = 0.5 + 0.5*chans(1).shrink; % convert old values
+            plotrad = 0.5/(1-chans(1).shrink); % convert old values
         end;
 		chans = rmfield(chans, 'shrink');
 	end;
