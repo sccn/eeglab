@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/26 18:04:48  arno
+% debugging
+%
 % Revision 1.2  2002/07/26 16:44:35  arno
 % switching icacomp
 %
@@ -229,7 +232,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
     
     Irej    = [];
     Erej    = zeros(size(data,1), size(data,2));
-	fprintf('Computing spectrum (using slepian tapers; done only once):\n', elecrange(index));    
+	fprintf('Computing spectrum (using slepian tapers; done only once):\n');    
     for index = 1:length(elecrange)
 	   if testgoinloop( specdata, index )
 	      fprintf('%d\t', elecrange(index));    
@@ -243,7 +246,6 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	   else
 	       tmpspec = specdata(index,:,:);
 	   end;
-	   fprintf('\n');    
 
        % perform the rejection
        % ---------------------	
@@ -252,3 +254,4 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
  	   Irej = union(Irej, Itmprej);
  	   Erej(elecrange(index),Itmprej) = Etmprej;
 	end;
+	fprintf('\n');    
