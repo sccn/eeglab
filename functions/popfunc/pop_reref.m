@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/05/14 23:58:23  arno
+% operator precedence
+%
 % Revision 1.27  2004/01/30 23:01:52  arno
 % update channel position only if refloc is set
 %
@@ -389,7 +392,7 @@ if ~isempty(EEG.chanlocs)
         EEG = eeg_checkset(EEG, 'chanlocs_homogeneous');
         if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(end).X)
             tmp = convertlocs(EEG.chanlocs(end), 'topo2all');
-            fieldtmp = fieldnames(tmp);
+            fieldtmp = setdiff( fieldnames(tmp), { 'sph_theta_besa' 'sph_phi_besa' });
             for index = 1:length(fieldtmp)
                 tmpval = getfield(tmp, fieldtmp{index});
                 EEG.chanlocs(end) = setfield(EEG.chanlocs(end), fieldtmp{index}, tmpval);
