@@ -15,9 +15,9 @@
 %                   field in event num. (Ex: {34 'latency' 320.4})
 %   'changeevent' - {num value1 value2 value3 ...} Change the values of
 %                   all fields in event num.
-%   'add','append' - {num value1 value2 value3 ...} Insert event before
+%   'add','append' - {num value1 value2 value3 ...} Insert event after
 %                   event num, and assign value to structure fields.
-%   'insert'       - {num value1 value2 value3 ...} Insert event after
+%   'insert'       - {num value1 value2 value3 ...} Insert event before
 %                   event num, and assign value to structure fields.
 %   'delete'      - vector of indices of events to delete
 %
@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/06/18 23:23:02  arno
+% changing authors
+%
 % Revision 1.34  2004/06/17 19:36:47  arno
 % adding check ur to the GUI
 %
@@ -270,12 +273,12 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           tmpcell    = cell(1,1+length(fieldnames(EEG.event))); 
           tmpcell{1} = valnum;
           if shift
-              oldcom     = { oldcom{:} 'insert', tmpcell };
-          else
               oldcom     = { oldcom{:} 'append', tmpcell };
+          else
+              oldcom     = { oldcom{:} 'insert', tmpcell };
           end;
       else
-          if strcmpi(lower(varargin{indfield}), 'insert')
+          if strcmpi(lower(varargin{indfield}), 'append') % not 'add' for backward compatibility
                shift = 1;
           else shift = 0;
           end;
@@ -598,13 +601,13 @@ if nargin<2
     uilist   = { uilist{:}, ...
           { }, ...
           { },{ },{ }, {'Style', 'text', 'string', 'Event Num', 'fontweight', 'bold' }, { },{ },{ }, ...
-          { 'Style', 'pushbutton', 'string', 'Append event',  'callback', 'pop_editeventvals(''append'', 0);', 'tooltipstring', tpappend }, ...
+          { 'Style', 'pushbutton', 'string', 'Append event',  'callback', 'pop_editeventvals(''append'', 1);', 'tooltipstring', tpappend }, ...
           { 'Style', 'pushbutton', 'string', '<<',            'callback', 'pop_editeventvals(''goto'', -10);' }, ...
           { 'Style', 'pushbutton', 'string', '<',             'callback', 'pop_editeventvals(''goto'', -1);' }, ...
           { 'Style', 'edit',       'string', '1',             'callback', 'pop_editeventvals(''goto'', 0);', 'tag', 'numval' }, ...
           { 'Style', 'pushbutton', 'string', '>',             'callback', 'pop_editeventvals(''goto'', 1);' }, ...
           { 'Style', 'pushbutton', 'string', '>>',            'callback', 'pop_editeventvals(''goto'', 10);' }, ...
-          { 'Style', 'pushbutton', 'string', 'Insert event',  'callback', 'pop_editeventvals(''append'', 1);', 'tooltipstring', tpinsert }, ...
+          { 'Style', 'pushbutton', 'string', 'Insert event',  'callback', 'pop_editeventvals(''append'', 0);', 'tooltipstring', tpinsert }, ...
           { }, { 'Style', 'text',  'string', ' ', 'tag', 'original' 'horizontalalignment' 'center' 'tooltipstring' tporigin } { } };
 
     % add sorting options
