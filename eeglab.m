@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.293  2003/12/04 01:34:02  arno
+% plugins
+%
 % Revision 1.292  2003/12/04 01:26:47  arno
 % debug path
 %
@@ -1096,9 +1099,12 @@ elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ]
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
-    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions\ressources');
+    myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\ressources');
 else
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions');    
+    funcpath = which('readeetraklocs.m');
+    funcpath = eeglabpath(1:end-length('readeetraklocs.m'));
+    myaddpath( funcpath , 'eeglab1020.ced', 'ressources');    
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
