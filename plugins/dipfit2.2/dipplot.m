@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.39  2003/07/02 23:38:58  arno
+%debuging projections and summary
+%
 %Revision 1.38  2003/07/01 23:52:50  arno
 %test for sphere 1 before renormalizing
 %
@@ -227,7 +230,8 @@
 %adding log message
 %
 
-function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
+%function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
+function [outsources, xx, yy, zz, xxo1, yyo1, zzo1] = dipplot( sourcesori, varargin )
     
     DEFAULTVIEW = [0 0 1];
         
