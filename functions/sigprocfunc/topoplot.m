@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2004/02/15 16:07:01  scott
+% same
+%
 % Revision 1.72  2004/02/15 15:58:33  scott
 % formatting, try 'shrink','skirt' ...
 %
@@ -850,7 +853,7 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 plot(cos(l).*rmax,sin(l).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
-fprintf('%s\n',shrinkfactor);
+fprintf('%s, %3.2g\n',shrinkfactor,max(Rd));
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   plot(cos(l).*max(Rd),sin(l).*max(Rd),...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot skirt 
