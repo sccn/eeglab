@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/05/22 00:49:30  arno
+% enable duration
+%
 % Revision 1.21  2004/05/21 21:21:49  arno
 % debug history if no modification
 %
@@ -500,8 +503,12 @@ if nargin<2
         com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
     end;
     if isempty(findstr('''sort''', com))
-        EEG       = userdata{1};
-        EEG.event = userdata{2};
+        if ~isempty(userdata{3}) % some modification have been done
+            EEG       = userdata{1};
+            EEG.event = userdata{2};
+            disp('Checking event consistenc...');
+            EEG = eeg_checkset(EEG, 'eventconsistency');
+        end;
     else 
         com = '';
         disp('WARNING: all edits discarded because of event resorting. The EEGLAB event structure');
