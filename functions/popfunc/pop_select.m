@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/03/19 20:37:24  scott
+% printf->fprintf
+%
 % Revision 1.33  2003/03/07 23:23:02  arno
 % debuging out of data limits
 %
@@ -232,7 +235,7 @@ if nargin < 2
          { 'style', 'pushbutton', 'string', '...', ...
            'callback', 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel(EEG.chanlocs)));' }, ...
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'callback', ...
-                          'eegplot(EEG.data, ''winlength'', 5, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
+                          'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
    if length(results) == 0, return; end;
 
