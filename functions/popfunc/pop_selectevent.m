@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2004/03/19 17:45:19  arno
+% including limits when selecting event boundaries
+%
 % Revision 1.48  2003/07/20 19:41:49  scott
 % typos
 %
@@ -538,6 +541,7 @@ else
     end;
 end;
 
+EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate the output command
 % ---------------------------
