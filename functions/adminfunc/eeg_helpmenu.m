@@ -25,6 +25,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/15 00:40:08  arno
+% adding readegi menu
+%
 % Revision 1.13  2002/11/12 01:33:18  arno
 % add BDF read file command
 %
@@ -108,7 +111,7 @@ allmenus = { ...
 'Tools' ''      ...
 '   Change sampling rate' 'pop_resample'       ... %    Change sampling rate      
 '   Filter the data' 'pop_eegfilt'        ... %    Filter the data      
-'   Average reference' 'pop_averef'         ... %    Average reference      
+'   Re-referencing' 'pop_reref'         ... %    Average reference      
 '   Reject continuous data' 'pop_eegplot'        ... %    Reject continuous data      
 '   Extract epochs' 'pop_epoch'          ... %    Extract epochs      
 '   Remove baseline' 'pop_rmbase'         ... %    Remove baseline      
