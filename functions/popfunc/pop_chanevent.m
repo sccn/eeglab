@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/03/04 18:21:26  arno
+% more header
+%
 % Revision 1.30  2004/03/04 18:19:51  arno
 % editing text
 %
@@ -208,12 +211,12 @@ if nargin < 2
 	
 	if length(result) == 0 return; end;
 	chan   = eval( [ '[' result{1} ']' ] );
-	switch result{2},
+	if ~isempty(result{2}), g.oper = result{3}; else g.oper = ''; end;
+	switch result{3},
 		case 1, g.edge = 'both';
 		case 2, g.edge = 'leading';
 		case 3, g.edge = 'trailing';
 	end;
-	if ~isempty(result{3}), g.oper = result{3}; else g.oper = ''; end;
 	if result{4}, g.delchan = 'on'; else g.delchan  = 'off'; end;
 	if result{5}, g.delevent= 'on'; else g.delevent = 'off'; end;
 	if result{6}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
@@ -245,7 +248,7 @@ for ci = chan
     % -------------------
     if ~isempty(g.oper)
         try, eval( [ 'X = ' g.oper ';' ]);
-        catch, error('pop_chanevent: error evaluating preprocessing string');
+        catch, error('pop_chanevent: error executing preprocessing string');
         end;
     end;    
     
