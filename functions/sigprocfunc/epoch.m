@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/28 01:50:11  arno
+% minor editing
+%
 % Revision 1.2  2002/04/20 00:12:53  arno
 % debuging fro 3 dimensions epoching
 %
@@ -146,6 +149,8 @@ newtime(2) = (lim(2)-1)/g.srate;
 
 indexes = find(indexes == 1);
 epochdat = epochdat(:,:,indexes);
+alleventout = alleventout(indexes);
+alllatencyout= alllatencyout(indexes);
 return;
 
 %% GENERATION OF NAN IN ARRAYS (old implementation)
