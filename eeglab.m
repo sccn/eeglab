@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.310  2004/03/13 03:04:21  arno
+% history
+%
 % Revision 1.309  2004/03/04 18:48:28  arno
 % debug last
 %
@@ -1180,7 +1183,9 @@ if nargin < 1 | exist('EEG') ~= 1
 end;
 
 if nargin == 1
-	if strcmp(onearg, 'redraw')
+	if strcmp(onearg, 'verions')
+        disp('EEGLAB v4.0');
+	elseif strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
 			updatemenu;
