@@ -111,7 +111,6 @@
 % pop_readedf()   - read .EDF EEG data format (readedf())
 % pop_headplot()  - plot a 3-D data scalp map (headplot())
 % pop_reref()     - re-reference data (reref())
-% pop_averef()    - convert data to average reference (averef())
 % pop_signalstat() - plot signal or component statistic (signalstat())
 %
 % Other GUI functions:
@@ -187,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.245  2003/07/22 17:14:09  arno
+% automatic reject button for channel scroll
+%
 % Revision 1.244  2003/06/05 15:28:09  arno
 % update import menu
 %
