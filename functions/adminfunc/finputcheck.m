@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/30 23:53:58  arno
+% debug multiple return values
+%
 % Revision 1.17  2003/07/26 00:21:17  arno
 % allowing cell array for values
 %
@@ -267,6 +270,6 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 function cella = removedup(cella)
     [tmp indices] = unique(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
-        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)');
+        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
