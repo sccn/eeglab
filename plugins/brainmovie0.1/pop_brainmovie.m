@@ -97,6 +97,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/20 00:46:44  arno
+% default subitc
+%
 % Revision 1.2  2002/11/19 23:15:41  arno
 % debugging
 %
@@ -149,7 +152,7 @@ if length(unique(cell2mat({ALLEEG(:).pnts}))) > 1
 end;
 if isempty(g.freqs) & strcmp(g.confirm, 'on')
     disp('********** USER ATTENTION REQUIRED ************');
-    r = input('Are you sure you want to make a movie a each of the output frequencies (y/n)');
+    r = input('Are you sure you want to make a movie a each of the output frequencies (y/n)', 's');
     if r(1) == 'n', disp('Cancelling movie call'); return; end;
 end;
 g.tffolder    = addfinalsep(g.tffolder);
@@ -184,7 +187,7 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
     end;
     if strcmp(g.confirm, 'on')
         disp('********** USER ATTENTION REQUIRED ************');
-        r = input('Are you sure you want to compute time-frequency decompositions (y/n)');
+        r = input('Are you sure you want to compute time-frequency decompositions (y/n)', 's');
         if r(1) == 'n', disp('Cancelling movie call'); return; end;
     end;
     
