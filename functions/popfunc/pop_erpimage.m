@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2002/10/29 23:32:44  arno
+% debugging channel name when no channel location file
+%
 % Revision 1.83  2002/10/16 16:24:37  arno
 % debug command line call
 %
@@ -467,7 +470,7 @@ if popup
 	if isempty(titleplot)
         if typeplot==1
             if ~isempty(EEG.chanlocs) % if channel plot
-                  titleplot = [ 'ERP Image (' EEG.chanlocs(index).labels ')'];
+                  titleplot = [ 'ERP Image (' EEG.chanlocs(channel).labels ')'];
             else, titleplot = [ 'ERP Image (' int2str(channel) ')'];
             end
         else
