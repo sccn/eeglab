@@ -29,9 +29,7 @@
 %                   This option is relevant only for epoched datasets derived
 %                   from continuous datasets.
 %   'deleteevents' - ['on'|'off'] 'on' = Delete ALL events except
-%                   the selected events. {NOTE Default = 'off'}. This option
-%                   is irrelevant for continuous dataset and is automatically
-%                   set to 'on' unless 'renameevents' is defined.
+%                   the selected events. {NOTE Default = 'off'}.
 %   'renametype'   - [string] rename the type of selected events with the
 %                  string given as parameter. Default is [], do not rename
 %                  field.
@@ -75,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/10/29 16:07:23  arno
+% new version with renaming etc ...
+%
 % Revision 1.22  2002/10/27 17:11:06  julie
 % help msg
 %
@@ -232,17 +233,18 @@ if nargin<2
 		end;
 	end;
 
-    geometry = { geometry{:} [1] [1 0.5 1 0.5] };
+    geometry = { geometry{:} [1] [1 0.5 1 0.5] [2 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string', 'Rename selected event types as:' } ...
                 { 'Style', 'edit', 'string', '' } ...
                 { 'Style', 'text', 'string', 'Retain old type in (new) field named:' } ...
-                { 'Style', 'edit', 'string', '' } };
+                { 'Style', 'edit', 'string', '' } ...
+                { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events', ...
+                'value', fastif(EEG.trials>1, 0, 1) } { } };
 
     if EEG.trials > 1
-        geometry = { geometry{:} [2 1] [2 1] };
+        geometry = { geometry{:} [2 1] };
         uilist   = { uilist{:} ...
-                     { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events',} { } ...
                      { 'Style', 'checkbox', 'string','Remove epochs not referenced by any selected event', ...
                        'fontweight', 'bold', 'value', 1  } { } };
     end;
@@ -273,9 +275,10 @@ if nargin<2
         args = { args{:}, 'deleteevents', fastif(results{end-1}, 'on', 'off') };
         args = { args{:}, 'deleteepochs', fastif(results{end}, 'on', 'off') };
     else
-        if results{end-2},  args = { args{:}, 'select', 'inverse' }; end;
-        if ~isempty(results{end-1}),  args = { args{:}, 'renametype', results{end-1} }; end;
-        if ~isempty(results{end}),    args = { args{:}, 'oldtypefield', results{end} }; end;
+        if results{end-3},  args = { args{:}, 'select', 'inverse' }; end;
+        if ~isempty(results{end-2}),  args = { args{:}, 'renametype', results{end-2} }; end;
+        if ~isempty(results{end-1}),  args = { args{:}, 'oldtypefield', results{end-1} }; end;
+        args = { args{:}, 'deleteevents', fastif(results{end}, 'on', 'off') };
     end;
 else % no interactive inputs
     args = varargin;
@@ -302,7 +305,6 @@ end;
 g = finputcheck( args, fieldlist, 'pop_selectevent');
 if isstr(g), error(g); end;
 if isempty(g.event), g.event = [1:length(EEG.event)]; end;
-if EEG.trials == 1, g.deleteevents = 'on'; end;
 if strcmpi(g.select, 'remove'), g.select = 'inverse'; end;
 if strcmpi(g.select, 'keep'  ), g.select = 'normal'; end;
 if strcmpi(g.deleteepochs, 'yes'  ), g.deleteepochs = 'on'; end;
