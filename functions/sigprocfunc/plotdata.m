@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/12 21:14:25  arno
+% updating error message
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -82,8 +85,8 @@ end
 %
 % Set defaults
 %
-FONTSIZE = 16;     % font size to use for labels
-TICKFONTSIZE=16;   % font size to use for axis labels
+FONTSIZE = 12;     % font size to use for labels
+TICKFONTSIZE=12;   % font size to use for axis labels
 DEFAULT_SIGN = 1;  % default to plotting positive-up (1) or negative-up (-1)
 ISSPEC = 0;        % default - 0 = not spectral data, 1 = pos-only spectra
 
@@ -320,14 +323,12 @@ end
   if righttitle==0,
     righttitle = '';
   end
-  subplot(ceil(chans/2),2,1), h=gca;title([plottitle],...
-              'FontSize',FONTSIZE); % title plot and
+  subplot(ceil(chans/2),2,1), h=gca;%title([plottitle],'FontSize',FONTSIZE); % title plot and
   set(h,'YLim',[ymin ymax]);            % set default plotting parameters
   set(h,'XLim',[xmin xmax]);
   set(h,'FontSize',FONTSIZE);            % choose font size
 
-  subplot(ceil(chans/2),2,2), h=gca;title([righttitle],...
-              'FontSize',FONTSIZE); % title plot and
+  subplot(ceil(chans/2),2,2), h=gca;%title([righttitle], 'FontSize',FONTSIZE); % title plot and
   set(h,'FontSize',FONTSIZE);            % choose font size
   set(h,'YLim',[ymin ymax]);            % set default plotting parameters
   set(h,'XLim',[xmin xmax]);
@@ -516,6 +517,10 @@ end
   % set(h,'DefaultAxesFontSize',axfont);
 
 %%%%%%%%%%%%%%%%%% Add axcopy %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if plottitle
+	h = textsc(plottitle, 'title');
+	set(h, 'fontsize', FONTSIZE);
+end;
 axcopy(gcf, 'axis on');
 
 if 0,    % START DETOUR XXXXXXXXXXXXX
