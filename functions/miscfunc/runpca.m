@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/05/05 15:22:20  arno
+% remove svds
+%
 % Revision 1.2  2004/05/05 01:37:17  arno
 % lowercase n -> uppercase N
 %
@@ -87,9 +90,9 @@ else
     error('N must be <= the number of rows in data.')
   end
   %if N <= BIG_N | N == rows
-  [U,S,V] = svd(data',0);
+  %[U,S,V] = svd(data',0);
   %else
-  %   [U,S,V] = svds(data',N);
+  [U,S,V] = svds(data',N);
   %end
   if norm == 0
     pc = U';
