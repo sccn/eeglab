@@ -10,6 +10,7 @@
 %   data    - FIELDTRIP structure
 %
 % Author: Robert Oostenveld, F.C. Donders Centre, May, 2004.
+%         Arnaud Delorme, SCCN, INC, UCSD
 %
 % See also: 
 
@@ -49,10 +50,18 @@ data.fsample = EEG.srate;
 % channels can be more or less than the number of channel locations, i.e. not 
 % every channel has a position, or the potential was not measured on every
 % position. This is not supported by EEGLAB, but it is supported by FIELDTRIP.
-data.elec.label = { EEG.chanlocs.labels };
-data.elec.pnt   = [ cell2mat({ EEG.chanlocs.X })' ...
-    cell2mat({ EEG.chanlocs.Y })' ...
-    cell2mat({ EEG.chanlocs.Z })' ] ;
+
+data.elec.pnt   = zeros(length( EEG.chanlocs ), 3);
+for ind = 1:length( EEG.chanlocs )
+    data.elec.label{ind} = EEG.chanlocs(ind).labels;
+    if ~isempty(EEG.chanlocs(ind).X)
+        data.elec.pnt(ind,1) = EEG.chanlocs(ind).X;
+        data.elec.pnt(ind,2) = EEG.chanlocs(ind).Y;
+        data.elec.pnt(ind,3) = EEG.chanlocs(ind).Z;
+    else
+        data.elec.pnt(ind,:) = [0 0 0];
+    end;
+end;
 
 switch fieldbox
   case 'preprocessing'
@@ -100,6 +109,6 @@ catch
 end
 
 % add the version details of this function call to the configuration
-data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.1 2005-03-16 02:22:35 arno Exp $';
+data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.2 2005-03-16 02:32:41 arno Exp $';
 
 return

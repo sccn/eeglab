@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/03/11 16:07:07  arno
+% header
+%
 % Revision 1.5  2005/03/10 19:34:58  arno
 % backward compatibility with old option electrodes
 %
@@ -288,7 +291,16 @@ OUTEEG.dipfit.hdmfile  = options.hdmfile;
 OUTEEG.dipfit.mrifile  = options.mrifile;
 OUTEEG.dipfit.chanfile = options.chanfile;
 OUTEEG.dipfit.chansel  = options.chansel;
-if ~isempty(options.electrodes), OUTEEG.dipfit.chansel  = options.electrodes; end;
+if ~isempty(options.electrodes), OUTEEG.dipfit.chansel = options.electrodes; end;
+
+% removing channels with no coordinates
+% -------------------------------------
+[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
+if length(indices) < length(EEG.chanlocs)
+    disp('Warning: some channels contain no coordinate. They were removed from dipole fitting.');
+    OUTEEG.dipfit.chansel = intersect( OUTEEG.dipfit.chansel, indices);
+end;
+
 OUTEEG.dipfit.coordformat = options.coordformat;
 
 % checking electrode configuration
