@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/24 21:37:25  scott
+% editing topovec call -sm
+%
 % Revision 1.7  2002/04/24 21:15:40  scott
 % editing topovec call -sm
 %
@@ -82,17 +85,18 @@ end;
 % -------------
 if nargin < 3
 	promptstr    = { fastif(typeproc, 'First channel number:', 'First component number:') ...
-					 fastif(typeproc, 'Second channel number:', 'Second component number:') ...
-					 'Epoch time range [min max] (msec)' ...
+					         fastif(typeproc, 'Second channel number:', 'Second component number:') ...
+					         'Epoch time range [min max] (msec)' ...
 	                 'Wavelet cycles (0->FFT, see >> help crossf)' ...
 	                 'Compute coherence (coher) or phase locking factor (phasecoher)' ...
 	                 'Compute bootstrap significance level (Ex: 0.01 -> 1%)' ...
 	                 'Optional crossf parameters (see >> help crossf)' };
 	inistr       = {  '1' '2' ...
-					  [ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ] ...
-					  '0' ...
-					  'phasecoher' '' '''padratio'', 4' };
-    titlegui = fastif(typeproc, 'Plot channel cross-coherence -- pop_crossf()', 'Plot component cross-coherence -- pop_crossf()');
+					          [ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ] ...
+					          '0' ...
+					          'phasecoher' '' '''padratio'', 4' };
+    titlegui = fastif(typeproc, 'Plot channel cross-coherence -- pop_crossf()', ...
+                  'Plot component cross-coherence -- pop_crossf()');
 	result       = inputdlg( promptstr, titlegui, 1,  inistr );
 	if length( result ) == 0 return; end;
 
@@ -106,15 +110,15 @@ if nargin < 3
         otherwise, error('Invalid type of coherence');
     end;	
 
-    % add title
-    % ---------
-	if isempty( strmatch(  '''title''', result{7}))
-	    switch lower(result{5})
-	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-	           ' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
-	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-	           ' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
-        end;
+   % add title
+   % ---------
+  if isempty( strmatch(  '''title''', result{7}))
+	  switch lower(result{5})
+	     case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+	         ' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
+	     otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+	         ' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
+    end;
 	end;
 	if ~isempty( result{6} )
 		options      = [ options ', ''alpha'',' result{6} ];
@@ -163,7 +167,7 @@ else
  	    else
             tmpsig1 = (EEG.icaweights(num1,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
             tmpsig2 = (EEG.icaweights(num2,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
-        end;
+      end;
 	else
 		error('You must run ICA first');
 	end;	
@@ -196,9 +200,12 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], %d %s);', inputname(1), typeproc, num1, num2, ...
+varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], %d %s);', ...
+          inputname(1), typeproc, num1, num2, ...
 			int2str(tlimits), cycles, options);
-com = sprintf('%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
+com = sprintf(...
+    '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);',... 
+          outstr, options);
 com
 eval(com)
 
