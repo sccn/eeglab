@@ -18,7 +18,8 @@
 % Optional input:
 %  'rvrange'  - [min max] or [max] Only plot dipoles with residual variace
 %               within the given range. Default: plot all dipoles.
-%  'summary'  - Build a summary plot with three views (top, back, side)
+%  'summary'  - ['on'|'off'] Build a summary plot with three views (top, back, side)
+%               {default: 'off'}
 %  'mri'      - Matlab file containing an MRI volume and a 4-D transformation
 %               matrix to go from voxel space to electrode space:
 %               mri.anatomy   contains a 3-D anatomical data array
@@ -147,6 +148,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.121  2005/03/31 18:44:24  arno
+%debug summary
+%
 %Revision 1.120  2005/03/31 18:39:21  arno
 %same
 %
