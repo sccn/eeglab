@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/05/22 15:43:52  arno
+% header update
+%
 % Revision 1.12  2003/05/14 16:55:49  arno
 % adding format to history
 %
@@ -116,10 +119,10 @@ if nargin < 2
 	% popup window parameters
 	% -----------------------
 	promptstr    = { 'Data precision in bits (16 or 32 for Neuroscan v4.3):', ...
-                     'Enter trialrange subset:', ...
-					 'Enter the type range subset:', ...
-					 'Enter electrodes subset:', ...
-					 'Enter response range subset:'};
+                     'Trial range subset:', ...
+					 'Type range subset:', ...
+					 'Electrodes subset:', ...
+					 'Response range subset:'};
 	inistr       = { '16' '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadeeg');

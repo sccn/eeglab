@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/08/19 22:07:12  arno
+% automatically adding time-locking events if non
+%
 % Revision 1.33  2003/03/05 01:07:26  arno
 % no error if types is "[]"
 %
@@ -207,7 +210,7 @@ OLDEEG = EEG;
 if nargin < 3
 	% popup window parameters
 	% -----------------------
-   promptstr    = { strvcat('Enter time-locking event type(s) ([]=all):', ...
+   promptstr    = { strvcat('Time-locking event type(s) ([]=all):', ...
                     'Select ''Edit > Event values'' to see type values.'), ...
                     'Epoch limits [start, end] in seconds:', ... 
                     'Name for the new dataset:', ... 

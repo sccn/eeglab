@@ -2,7 +2,6 @@
 %
 % Usage:
 %       >> pop_compareerps( ALLEEG, datasetlist, chansubset, title);
-%
 % Inputs:
 %   ALLEEG      - array of datasets
 %   datasetlist - list of datasets
@@ -32,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 16:23:42  arno
+% inputdlg2
+%
 % Revision 1.3  2002/08/12 02:15:37  arno
 % colors
 %
@@ -62,9 +64,9 @@ end;
 if nargin < 2
    % which set to save
 	% -----------------
-	promptstr    = { 'Enter a list of datasets to compare (ex: 1 3 4):' ...
-	                 'Enter a subset of channels ([]=all):' ...
-	                 'Plot title ([]=automatically generated):' };
+	promptstr    = { 'List of datasets to compare (ex: 1 3 4):' ...
+	                 'Channels subset to consider ([]=all):' ...
+	                 'Plot title ([]=automatic):' };
 	inistr       = { '1' '' '' };
 	result       = inputdlg2( promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1,  inistr, 'pop_compareerps');
 	if length(result) == 0 return; end;
