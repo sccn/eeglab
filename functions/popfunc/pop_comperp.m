@@ -3,7 +3,7 @@
 % Usage:
 %       >> pop_comperp( ALLEEG, flag );      % pop-up window mode
 %       >> [erp1 erp2 erpsub time sig] = pop_comperp( ALLEEG, flag, ...
-%                                   datadd, datsub, chansubset, title);
+%                                   datadd, datsub, 'key', 'val', ...);
 % Inputs:
 %   ALLEEG  - Array of EEG datasets
 %   flag    - [0|1] (1) Use raw data or (0) ICA components. {default: 1}
@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/07/15 17:19:04  arno
+% reprogrammed the function completelly to allow more options
+%
 % Revision 1.10  2003/05/10 17:59:21  arno
 % debug command output
 %
@@ -197,10 +200,10 @@ g = finputcheck( options, ...
                    'title'    'string'   []               '';
                    'alpha'    'float'    []               [];
                    'geom'     'string'  {'scalp' 'array'} fastif(flag, 'scalp', 'array');
-                   'addstd'   'string'  {'on' 'off'}     'on';
+                   'addstd'   'string'  {'on' 'off'}      fastif(isempty(datsub), 'on', 'off');
                    'substd'   'string'  {'on' 'off'}     'off';
                    'diffstd'  'string'  {'on' 'off'}     'on';
-                   'addavg'   'string'  {'on' 'off'}     'on';
+                   'addavg'   'string'  {'on' 'off'}     fastif(isempty(datsub), 'on', 'off');
                    'subavg'   'string'  {'on' 'off'}     'off';
                    'diffavg'  'string'  {'on' 'off'}     'on';
                    'addall'   'string'  {'on' 'off'}     'off';
@@ -211,7 +214,6 @@ g = finputcheck( options, ...
                    'mode'     'string'  {'ave' 'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
 if isstr(g), error(g); end;
-if ~isempty(datsub), g.addstd = 'off'; g.addstd = 'off'; end;
 
 figure;
 try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
@@ -251,6 +253,7 @@ end;
 colors = {}; % color aspect for curves
 allcolors = { 'b' 'r' 'g' 'c' 'm' 'y' [0 0.5 0] [0.5 0 0] [0 0 0.5] [0.5 0.5 0] [0 0.5 0.5] [0.5 0 0.5] [0.5 0.5 0.5] };
 allcolors = { allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} };
+allcolors = { allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} };
 if length(datsub) > 0 % dataset to subtract
 
     % compute ERPs for sub
@@ -269,12 +272,16 @@ if length(datsub) > 0 % dataset to subtract
     allcolors1 = allcolors(3:l1+2);
     allcolors2 = allcolors(l1+3:l1+l2+3);
     allcolors3 = allcolors(l1+l2+3:end);
-    [erps1, colors1, legend1] = preparedata( erp1ind        , g.addavg , g.addstd , g.addall , g.mode, 'Add' , addnames, 'b', allcolors1 );
-    [erps2, colors2, legend2] = preparedata( erp2ind        , g.subavg , g.substd , g.suball , g.mode, 'Sub' , subnames, 'r', allcolors2 );
-    [erps3, colors3, legend3] = preparedata( erp1ind-erp2ind, g.diffavg, g.diffstd, g.diffall, g.mode, 'Diff', { addnames subnames }, 'k', allcolors3 );
-    erptoplot  = [ erps1      erps2      erps3      ];
-    colors     = { colors1{:} colors2{:} colors3{:} };
-    legends    = { legend1{:} legend2{:} legend3{:} };
+    [erps1, erpstd1, colors1, colstd1, legend1] = preparedata( erp1ind        , g.addavg , g.addstd , g.addall , g.mode, 'Add ' , addnames, 'b', allcolors1 );
+    [erps2, erpstd2, colors2, colstd2, legend2] = preparedata( erp2ind        , g.subavg , g.substd , g.suball , g.mode, 'Sub ' , subnames, 'r', allcolors2 );
+    [erps3, erpstd3, colors3, colstd3, legend3] = preparedata( erp1ind-erp2ind, g.diffavg, g.diffstd, g.diffall, g.mode, 'Diff ', ...
+                                                      { addnames subnames }, 'k', allcolors3 );
+    
+    % handle special case of std
+    % --------------------------
+    erptoplot  = [ erps1 erps2 erps3 erpstd1 erpstd2 erpstd3 ];
+    colors     = { colors1{:} colors2{:} colors3{:} colstd1{:} colstd2{:} colstd3{:}};
+    legend     = { legend1{:} legend2{:} legend3{:} };
     
     % highlight significant regions
     % -----------------------------
@@ -284,7 +291,9 @@ if length(datsub) > 0 % dataset to subtract
     end;
     
 else
-    [erptoplot, colors, legend] = preparedata( erp1ind, g.addavg, g.addstd, g.addall, g.mode, 'Add', addnames, 'k', allcolors);
+    [erptoplot, erpstd, colors, colstd, legend] = preparedata( erp1ind, g.addavg, g.addstd, g.addall, g.mode, '', addnames, 'k', allcolors);
+    erptoplot = [ erptoplot erpstd ];
+    colors    = { colors{:} colstd{:} };
     
     % highlight significant regions
     % -----------------------------
@@ -330,11 +339,13 @@ function regions = p2regions( pvalues, alpha, limits);
     
 % process data
 % ------------
-function [erptoplot, colors, legend] = preparedata( erpind, plotavg, plotstd, plotall, mode, tag, dataset, coloravg, allcolors);
+function [erptoplot, erpstd, colors, colstd, legend] = preparedata( erpind, plotavg, plotstd, plotall, mode, tag, dataset, coloravg, allcolors);
 
     colors    = {};
     legend    = {};
     erptoplot = [];
+    erpstd    = [];
+    colstd    = {};
 
     % plot individual differences
     % ---------------------------
@@ -342,7 +353,7 @@ function [erptoplot, colors, legend] = preparedata( erpind, plotavg, plotstd, pl
         erptoplot = [ erptoplot erpind(:,:) ];
         for index=1:size(erpind,3)
             if iscell(dataset)
-                if strcmpi(tag, 'Diff')
+                if strcmpi(tag, 'Diff ')
                     legend = { legend{:} [ dataset{1}{index} ' - ' dataset{2}{index} ] };
                 else
                     legend = { legend{:} dataset{index} };
@@ -359,13 +370,12 @@ function [erptoplot, colors, legend] = preparedata( erpind, plotavg, plotstd, pl
     if strcmpi( plotavg, 'on')
         if strcmpi(mode, 'ave')
              granderp    = mean(erpind,3);
-             legend      = { legend{:} [ tag ' Avg.' ] };
+             legend      = { legend{:} [ tag 'Average' ] };
         else granderp    = sqrt(mean(erpind.^2,3));
-             legend      = { legend{:} [ tag ' RMS' ] };
+             legend      = { legend{:} [ tag 'RMS' ] };
         end;
         colors    = { colors{:}  {coloravg 'linewidth' 2 }};
         erptoplot = [ erptoplot granderp];
-    else
     end;
 
     % plot standard deviation
@@ -373,11 +383,14 @@ function [erptoplot, colors, legend] = preparedata( erpind, plotavg, plotstd, pl
     if strcmpi(plotstd, 'on')
         if strcmpi(plotavg, 'on')
             std1      = std(erpind, [], 3);
-            erptoplot = [ erptoplot granderp+std1 granderp-std1 ];
-            legend    = { legend{:} [ tag ' Std.' ] };
-            colors    = { colors{:} [ coloravg ':' ] [ coloravg ':' ] };
+            erptoplot = [ erptoplot granderp+std1 ];
+            erpstd    = granderp-std1;
+            legend    = { legend{:} [ tag 'Standard dev.' ] };
+            colors    = { colors{:} { coloravg 'linestyle' ':' } };
+            colstd    = { { coloravg 'linestyle' ':' } };
+        else 
+            disp('Warning: cannot show standard deviation without showing average');
         end;
-        disp('Warning: cannot show standard deviation without showing average');
     end;
 
 % ------------------------------------------------------------------
