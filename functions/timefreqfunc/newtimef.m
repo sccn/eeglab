@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/20 01:13:49  arno
+% remove duplicate arguments
+%
 % Revision 1.15  2002/11/20 01:00:59  arno
 % undo last
 %
@@ -729,20 +732,24 @@ if iscell(X)
 	
     % plotting
     % --------
-    g.titleall = g.title;
-    figure; subplot(1,3,1); g.title = g.titleall{1}; 
-    plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, times, mbase, g);
-    subplot(1,3,2); g.title = g.titleall{2}; 
-	plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, times, mbase, g);
+    if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+        g.titleall = g.title;
+        figure; subplot(1,3,1); g.title = g.titleall{1}; 
+        plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, times, mbase, g);
+        subplot(1,3,2); g.title = g.titleall{2}; 
+        plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, times, mbase, g);
+        subplot(1,3,3); g.title = g.titleall{3};
+    end;
     
-	subplot(1,3,3); g.title = g.titleall{3};
     if isnan(g.alpha)
         switch(g.condboot)
             case 'abs',  Rdiff = abs(R1)-abs(R2);
             case 'angle',  Rdiff = angle(R1)-angle(R2);
             case 'complex',  Rdiff = R1-R2;
         end;
-		plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+        if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+            plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+        end;
 	else 		
 		% preprocess data and run compstat
 		% --------------------------------
@@ -769,9 +776,11 @@ if iscell(X)
 		end;
         
 		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
-        plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
-                  mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
-		R1 = res1{2};
+        if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+            plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
+                      mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+		end;
+        R1 = res1{2};
 		R2 = res2{2};
         Rdiff = resdiff{2};
         Pboot = { Pboot1 Pboot2 10*resimages{1} };
