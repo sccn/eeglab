@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/20 15:33:24  arno
+% more correction, some thanks to cooper
+%
 % Revision 1.6  2002/11/20 01:42:12  arno
 % debugging
 %
@@ -277,7 +280,7 @@ end;
         
 % pern10 movie parameters
 % -----------------------
-if strcmpi(g.mode, 'mriside')
+if isstr(g.movparams) & strcmpi(g.movparams, 'mriside')
     
     % -------------------
     % movie from the side
@@ -291,13 +294,8 @@ if strcmpi(g.mode, 'mriside')
     alltitles = strvcat(alltitles{:});
     alltittles = strvcat(alltitles{:});
     if isempty(g.coordinates)
-        if ~isfield(ALLEEG, 'sources')
-            error('Field ''sources'' containing dipole location does not exist');
-        end;
-        for index = g.comps
-            coordinates(index,1) = EEG.sources(index).Y;
-            coordinates(index,2) = EEG.sources(index).Z;
-        end;
+        coordinates = founddipoles(ALLEEG, comps)
+        coordinates = coordinates(:, [2 3]); % remove X
     else
         coordinates = g.coordinates;
     end;
@@ -317,7 +315,7 @@ if strcmpi(g.mode, 'mriside')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'condtitle', alltittles };
-elseif strcmpi(g.mode, 'mritop')
+elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     
     % ------------------
     % movie from the top
@@ -331,13 +329,8 @@ elseif strcmpi(g.mode, 'mritop')
     end
     
     if isempty(g.coordinates)
-        if ~isfield(ALLEEG, 'sources')
-            error('Field ''sources'' containing dipole location does not exist');
-        end;
-        for index = g.comps
-            coordinates(index,1) = EEG.sources(index).X;
-            coordinates(index,2) = EEG.sources(index).Y;
-        end;
+        coordinates = founddipoles(ALLEEG, comps)
+        coordinates = coordinates(:, [1 2]); % remove Z
     else
         coordinates = g.coordinates;
     end;
@@ -460,3 +453,22 @@ function str = addfinalsep(str)
 function cella = removedup(cella)
     [tmp indices] = unique(cella(1:2:end));
     cella = cella(sort(union(indices*2-1, indices*2)));
+    
+% get dipoles location
+% --------------------
+function coordinates = founddipoles(ALLEEG, comps)
+    if ~isfield(ALLEEG, 'sources')
+        error('Field ''sources'' containing dipole location does not exist');
+    end;
+    for index = 1:length(comps)
+        indexcomp = find(cell2mat({ALLEEG(1).sources.component}) == comps(index))
+        if isempty(indexomp)
+            error(['Component ' int2str( comps(index) ) ' not found in the besa equivalent dipole strcuture']);
+        end;
+        if length(indexomp) > 1
+            error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
+        end;            
+        coordinates(index,1) = EEG.sources(indexcomp(1)).X;
+        coordinates(index,2) = EEG.sources(indexcomp(1)).Y;
+        coordinates(index,3) = EEG.sources(indexcomp(1)).Z;
+    end;
