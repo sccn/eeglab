@@ -1,42 +1,39 @@
-% finputcheck() - check matlab function { 'key', 'val' } inputs
+% finputcheck() - check Matlab function {'key','value'} input argument pairs
 %
 % Usage: >> struct = finputcheck( varargin, fieldlist );
 %        >> [struct varargin] = finputcheck( varargin, fieldlist, ... 
-%                                                      callingfunc, mode );
-%
+%                                                         callingfunc, mode );
 % Input:
-%   varargin  - varargin arguement from a function call with 'key', 'val'
-%               arguements.
-%   fieldlist - 3 or 4 columns cell array with one row per variable. The first
-%               column contain the variable name, the second one the type, 
-%                the third the accepted value range and the fourth one the 
-%               defaultvalue. For instance
-%                  { 'varanme1' { 'value1' 'value2' } 'defaultvaluevar1' }
-%                  { 'varanme2' { int1 int2 } 'defaultvaluevar2' }
-%                  etc...
-%               allowed types are 'boolean', 'integer', 'real', 'string', 
-%               'cell' or 'struct'
-%               the fifth column may contain the size (can be a cell array 
-%               of size), but is optional.
-%  callingfunc - calling function name for error messages. Default is none.
+%   varargin  - varargin argument from a function call using 'key', 'value'
+%               arguement pairs.
+%   fieldlist - A 3- to 5-column cell array, one row per 'key'. The first
+%               column contains the key string, the second its type, 
+%               the third the accepted value range, and the fourth the 
+%               default value.  Allowed types are 'boolean', 'integer', 
+%               'real', 'string', 'cell' or 'struct'.  For example:
+%                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
+%                       {'key2' 'int' { minint maxint } 'defaultval_key2'} 
+%                An option fifth column may contain the value array size  ???
+%                (and may be a cell array of sizes).
+%  callingfunc - Calling function name for error messages. {default: none}.
 %  mode        - ['ignore'|'error'] ignore keywords that are not specified in
-%                the fieldlist cell array or generate an error. Default is
-%                'error'.
+%                the fieldlist cell array or generate an error. {default: 
+%                'error'}.
 % Outputs:
-%   struct     - checked structure
-%   varargin   - residual varagin with non-recognized arguments
+%   struct     - checked structure ???
+%   varargin   - residual varagin containing unrecognized input arguments
 %
-% Note: in case of error, a string is returned with the error message
+% Note: In case of error, a string is returned containing the error message
 %       instead of a structure.
 %
 % Example:
 %	finputcheck(varargin, ...
-%               { 'title'         'string'   []                       ''; ...
-%                 'percent'       'real'     [0 1]                     1 ; ...
-%                 'elecamp'       'integer'  [1:10]                   [] });
-%   'title' is a string with no default value
-%   'percent' is a real number in between 0 and 1 and default value 1
-%   'elecamp' is an integer that can tak value between 1 and 10
+%               { 'title'         'string'   []       ''; ...
+%                 'percent'       'real'     [0 1]    1 ; ...
+%                 'elecamp'       'integer'  [1:10]   [] });
+%   The 'title' argument should be a string {no default value}
+%   The 'percent' argument should be a real number between 0 and 1 {default: 1}
+%   The 'elecamp' argument should be an integer between 1 and 10 (inclusive)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 July 2002
 
@@ -59,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/06/09 16:30:42  arno
+% adding or if several types
+%
 % Revision 1.19  2003/10/29 16:35:57  arno
 % msg typo
 %
