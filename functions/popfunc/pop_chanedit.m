@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/11/13 17:44:11  arno
+% header edition -sm, ad
+%
 % Revision 1.35  2002/11/13 17:12:50  scott
 % help msg - changechan
 %
@@ -429,7 +432,7 @@ else
 			case 'sph2topo',
 			 disp('Warning: all radii considered to be one for this transformation');
 			 try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
-		     catch, error('Can not process empty values'); end;
+		     catch, error('Cannot process empty values'); end;
 			 for index = 1:length(chans)
 				 chans(index).theta  = angle(index);
 				 chans(index).radius = radius(index);
@@ -523,7 +526,7 @@ else
 		   tmpargs = args{ curfield+1 };
 		   if isempty(tmpargs), return; end;
 		   fid = fopen(tmpargs, 'w');
-		   if fid ==-1, error('Can not open file'); end;
+		   if fid ==-1, error('Cannot open file'); end;
 		   allfields = fieldnames(chans);
 		   fprintf(fid, 'Number\t');
 		   for field = 1:length(allfields)

@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/14 23:03:04  arno
+% debugging save from the command line
+%
 % Revision 1.14  2002/10/15 23:42:31  arno
 % error if no delimiter for last character of directory
 %
@@ -107,7 +110,7 @@ if nargin < 1
 	return;
 end;
 if isempty(EEG)
-	error('Can not save multiple datasets');
+	error('Cannot save multiple datasets');
 end;
 
 if length(EEG) > 1

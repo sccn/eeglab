@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/11/14 17:12:10  arno
+% debugging channel spectra
+%
 % Revision 1.43  2002/10/30 23:31:00  arno
 % changing default psd options
 %
@@ -307,7 +310,7 @@ if frames == 0
 end
 if g.plotchan == 0 & strcmpi(g.icamode, 'sub')
     if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
-    error('Can not plot data-component for all channels (option not implemented)');
+    error('Cannot plot data component at all channels (option not implemented)');
 end;
 if ~isempty(g.freq) & min(g.freq)<0
     if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;

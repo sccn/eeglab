@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/17 19:23:19  scott
+% menu item text
+%
 % Revision 1.9  2002/08/14 01:37:55  scott
 % added timtopo() to figure title
 %
@@ -124,7 +127,7 @@ if ~isempty(EEG.chanlocs)
 	    com = sprintf('figure; pop_timtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(topotime), plottitle, options);
 	end;		
 else
-	fprintf('Can not plot without channel location\n');
+	fprintf('Cannot make plot without channel locations\n');
 	return;
 end;
 return;

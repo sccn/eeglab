@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/21 23:11:17  scott
+% edited help msg -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -52,7 +55,7 @@ end;
 % ---------
 fid = fopen(filename, 'r');
 if fid == -1
-  disp('Can not open file'); return;
+  disp('Cannot open file'); return;
 end;
 for index=1:12	fgetl(fid); end;
 
