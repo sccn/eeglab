@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/14 15:26:03  arno
+% debug for few channels
+%
 % Revision 1.12  2002/08/12 21:53:00  arno
 % text
 %
@@ -208,6 +211,15 @@ if calldisp
 	end;	
 	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
 			 command, 'children', gcf, eegplotoptions{:}); 
+end;
+if ~isempty(rej)
+	if icacomp	== 1
+		EEG.reject.rejfreq = rej;
+		EEG.reject.rejfreqE = rejE;
+	else
+		EEG.reject.icarejfreq = rej;
+		EEG.reject.icarejfreqE = rejE;
+	end;
 end;
 
 % store variables if necessary
