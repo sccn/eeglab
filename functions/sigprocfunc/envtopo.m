@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/01/26 00:45:14  scott
+% improved listing of pvaf in Matlab command window
+%
 % Revision 1.27  2003/12/03 18:31:35  scott
 % percentage -> percent
 %
@@ -510,7 +513,7 @@ if strcmpi(g.pvaf, 'on')
     for index =1:ncomps-ntopos
         fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
     end;
-    fprintf('Imaged componentsL\n")
+    fprintf('Imaged componentsL\n')
     for index =ncomps-ntopos+1:ncomps
         fprintf('Component %d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
     end;
