@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.318  2004/07/09 23:58:59  arno
+% debug plugin
+%
 % Revision 1.317  2004/07/09 23:42:46  arno
 % same
 %
@@ -1496,6 +1499,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
                     disp(['eeglab: adding plugin function "' funcname '"' ]);    
                 catch
+                    sadf
                     disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
                     disp([ '   ' lasterr] );
                 end;
