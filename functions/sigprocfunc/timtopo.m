@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/04 17:40:51  scott
+% debug head size for sbplots -sm
+%
 % Revision 1.11  2003/03/04 17:37:47  scott
 % debug last -sm
 %
@@ -214,6 +217,10 @@ while vlen< ntopos
         vlen=vlen+1;
 end
 
+pos = get(gca,'Position');
+axis('off')
+cla % clear the current axes
+
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth*head_sep + pos(3) > 0.90    % adjust for maximum height
@@ -276,10 +283,6 @@ fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-pos = get(gca,'Position');
-axis('off')
-cla % clear the current axes
-
 % site the plot at bottom of the figure
 axe = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
 set(axe,'Color',BACKCOLOR);
