@@ -98,6 +98,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/10/22 17:48:17  arno
+% debuging default spacing between frequencies
+% ,
+%
 % Revision 1.29  2003/10/22 17:06:54  arno
 % winsize length
 %
@@ -239,6 +243,9 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 
 % finding frequencies
 % -------------------
+if length(g.freqs) ==1
+    g.freqs(2) = g.freqs(1);
+end;
 if g.freqs(1) == 0 & g.cycles ~= 0
     g.freqs(1) = srate*g.cycles/g.winsize;
 end;
