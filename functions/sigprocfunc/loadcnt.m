@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/04/10 17:50:11  arno
+% adding error message
+%
 % Revision 1.2  2002/10/22 23:53:23  arno
 % fopen ieee-le for Mac
 %
@@ -135,7 +138,6 @@ r.event.type=fread(f, 1, 'char');
 event.size=fread(f, 1, 'long');
 %event.offset=fread(f, 1, 'long')
 
-tmp = r.event.type
 if r.event.type==1
     event.bytes=8;
 elseif r.event.type==2
