@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/06/25 00:38:03  arno
+% sort event in ascending time before epoching
+%
 % Revision 1.5  2002/04/26 20:16:09  arno
 % debugging epoch extraction from integer types
 %
@@ -224,7 +227,7 @@ for index=1:EEG.trials
 end;
 EEG.event = newevent;
 EEG.event = EEG.event(allevents); % remove events that were not in the selection
-%EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % include the event latencies into EEG.epoch
 % ------------------------------------------
