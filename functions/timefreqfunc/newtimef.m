@@ -67,6 +67,8 @@
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
 %                      baseline is used                              {0}
 %       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
+%                     memory. Default 'off'.
 %
 %    Optional Bootstrap Parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -152,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/05/02 17:58:56  arno
+% do not pass on maxfreq to timefreq
+%
 % Revision 1.25  2003/04/30 00:07:28  arno
 % removing all ref to dispf
 % /
@@ -541,6 +546,7 @@ try, g.phsamp;     catch, g.phsamp = 'off'; end;
 try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.outputformat;  catch, g.outputformat = 'new'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
+try, g.lowmem;     catch, g.lowmem = 'off'; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -721,6 +727,36 @@ end;
 if g.tlimits(2)-g.tlimits(1) < 30
     disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
 end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compute frequency by frequency if low memory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs)
+    
+    % compute for first 2 trials to get freqsout
+    XX = reshape(X, 1, frame, length(X)/g.frame);    
+    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:});
+    
+    % scan all frequencies
+    for index = 1:length(freqsout)
+        if nargout < 8
+            [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
+                newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+        else
+            [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
+            alltfX(index,:,:)] = ...
+                newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                          'plotamp', 'off', 'plotphase', 'off',varargin{:});
+        end;
+    end;
+    
+    % plot and return
+    ERP = mean(X,2);
+    plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, g);
+    return;
+end;    
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
