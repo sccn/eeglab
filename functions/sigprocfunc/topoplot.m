@@ -28,7 +28,8 @@
 %                       'fill'     -> plot constant color between contour lines
 %                       'blank'    -> plot electrode locations only {default: 'both'}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
-%                       options below. {default: 'off' -> mark electrode locations with points}. 
+%                       options below. {default: 'on' -> mark electrode locations with points
+%                       unless more than 64 channels, then 'off'}. 
 %   'plotchans'       - vector of channel indices to interpolate in the head plot. Negative
 %                       integers reverse the data polarity. Grid chans, if any, are not included 
 %                       in plotchans (see 'gridplot' below). {default: [] -> plot all chans}
@@ -74,11 +75,6 @@
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix {default: 67}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
-%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
-%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Outputs:
@@ -99,7 +95,7 @@
 %
 % See also: timtopo(), envtopo()
 
-% future:
+% Unimplemented future options:
 %   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
 %                       channel numbers - in which 0s plot 0-values and negative integers, 
 %                       polarity-reversed values - and char position (if either 'l' or 'r') 
@@ -113,6 +109,11 @@
 % Deprecated but still usable;
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
+%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
+%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -131,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.217  2004/11/18 20:29:14  hilit
+% enabled the 'example' option
+%
 % Revision 1.216  2004/11/18 19:22:22  scott
 % made 3rd output, 'grid'. [] unless interpolated value asked for
 %
@@ -656,7 +660,7 @@ intrad       = [];      % default interpolation square is to outermost electrode
 plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 headrad      = [];      % default plotting radius for cartoon head is 0.5
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
-VERBOSE = 'on';
+VERBOSE = 'off';
 MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 
@@ -906,6 +910,9 @@ if nargs > 2
   end
 end
 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
+%
 if strcmp(plotgrid,'on')
    if abs(max(max(gridchans))) > length(Values)
         error('''plotgrid'' channel index larger than the number of input channel values');
@@ -922,12 +929,6 @@ if strcmp(plotgrid,'on')
    error('''plotgrid'' option not yet implemented.'); % <============
 end
 
-if isempty(plotchans) & ~isempty(Values)
-  plotchans = 1:length(Values);
-  if strcmp(plotgrid,'on')
-     plotchans(gchans) = [];   % remove grid chans from head plotchans
-  end
-end
 if isempty(ELECTRODES)                     % if electrode labeling not specified
   if length(Values) > MAXDEFAULTSHOWLOCS   % if more channels than default max
     ELECTRODES = 'off';                    % don't show electrodes
@@ -942,9 +943,8 @@ end
 [r,c] = size(Values);
 if r>1 & c>1,
   error('input data must be a single vector');
-elseif r==1 & c==1
-  STYLE = 'blank'; % plot channels only, marking the indicated channel number
 end
+Values = Values(:); % make Values a column vector
 
 if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
    error('intrad must be >= plotrad');
@@ -974,9 +974,32 @@ if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary
 end;
 Th = pi/180*Th;                              % convert degrees to radians
 
-% ------------------------------
-% remove infinite and NaN values
-% ------------------------------
+%
+%%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
+%
+if length(Values) < length(tmpeloc) 
+  if isempty(plotchans)
+    if Values ~= round(Values)
+      error('plotting fewer channels than in chanlocs: needs channel numbers in ''plotchans''');
+    elseif strcmpi(VERBOSE, 'on')
+        fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
+                                   max(indices),length(Values));
+        fprintf('            Marking the locations of the %d indicated channels.\n', ...
+                                    length(Values));
+    end
+    plotchans = Values;
+    STYLE = 'blank'; % plot channels only, marking the indicated channel number
+    if strcmpi(ELECTRODES,'off')
+         ELECTRODES = 'on';
+    end
+  elseif length(plotchans) ~= length(Values)
+    error('number of channel values must = number of ''plotchans''');
+  end
+end
+
+%
+%%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
 if length(Values) > 1
     inds = union(find(isnan(Values)), find(isinf(Values)));
     indices = setdiff(indices, inds);
@@ -987,12 +1010,6 @@ end;
 
 if length(Values) > 1
    if max(indices)>length(Values)
-      if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
-                                   max(indices),length(Values));
-        fprintf('            Marking the locations of the %d indicated channels.\n', ...
-                                    length(Values));
-      end
       STYLE = 'blank';
    else
       Values     = Values(indices);
@@ -1118,6 +1135,11 @@ end;
 %
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
+
+if strcmp(plotgrid,'on')
+     plotchans(gchans) = [];   % remove grid chans from head plotchans
+end
+
 allx = x;
 ally = y;
 
@@ -1590,16 +1612,16 @@ elseif strcmp(ELECTRODES,'numbers')
   end
 end
 %
-%%%%%%%%%%%%%%%%%%%%%% Mark specified electrode locations %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Mark specified electrode locations with red filled disks  %%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
-  if length(Values) < length(pltchans)   % mark selected electrodes
-      for kk = 1:length(Values)
-        hp2 = plot3(y(Values(kk)),x(Values(kk)),ELECTRODE_HEIGHT,'.','Color', EMARKERCOLOR1CHAN, ...
+  if strcmpi(ELECTRODES,'on') | strcmpi(ELECTRODES,'off')
+   for kk = 1:length(plotchans)
+        hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
                                               'markersize', EMARKERSIZE1CHAN);
         hold on
-      end
-  end;
+   end
+  end
 end
 
 %
@@ -1669,7 +1691,6 @@ try,
   set(gcf, 'color', BACKCOLOR); 
   catch, 
 end; 
-
 
 hold off
 axis off
