@@ -29,6 +29,8 @@
 %               for subsequent antialiasing and high quality movie generation 
 %               {default: 'low'}
 % 'framesout' - ['eps'|'ppm'|'fig'] Default format for saving frames on disk. Default is '.eps'.
+% 'framesfolder' - [string] frames output folder. Default uses current directory.
+%               the directory is created if it does not exist.
 % 'rt'        - cell array of vector containing reaction times of the subject in 
 %               each conditions (default {} -> ignored)
 % 'rthistloc' - location and size of rt histograms in individual axes. 
@@ -38,7 +40,6 @@
 % 'magnify'   - integer magnification factor for graphics. Default is 1.
 % 'size'      - [widthcond height] output image size {default [400,400]}
 %               widthcond is the width of a single condition plot (in pixels)
-% 'head'      - [FILENAME], plot the head background image using .pcx image in FILENAME
 % 'polarity'  - ['pos'|'posneg'] polarity for ITC and crossf. 'pos' = only positive values
 %               'posneg' = positive and negative values.
 % 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
@@ -133,6 +134,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/10/08 23:21:15  arno
+% 3d problem
+%
 % Revision 1.7  2003/10/08 22:54:16  arno
 % updating for 3 conditions
 %
@@ -203,6 +207,7 @@ try, g.scalepower;      catch, g.scalepower = [-5 5]; end;
 try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
 try, g.scaleitc;        catch, g.scaleitc = 1; end;
 try, g.diskscale;       catch, g.diskscale = 1; end;
+try, g.framesfolder;    catch, g.framesfolder = ''; end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.frames;			catch, g.frames = []; end; 
@@ -251,7 +256,7 @@ try, g.coordinates; catch,
    	for index = selected
     	if length(selected) > 1
    			g.coordinates( index,:) = [ cos(count/length(selected)*2*pi) sin(count/length(selected)*2*pi) ] * 0.7;
-    	else	g.coordinates( index,:) = [ 0.01 0.01];
+    	else	g.coordinates(index,:) = [ 0.01 0.01];
 		end;
 		count = count + 1;
     end;
@@ -410,6 +415,10 @@ end;
 if max(g.plotorder) > max(selected)
     error([ 'Error: ''plotorder'' must be below the number of selected components:' int2str(max(selected)) ]);
 end;
+if ~isempty(g.framesfolder)
+    [tmp1 tmp2] = mkdir('/', g.framefolder(2:end) );
+    if g.framesfolder(end) == '/', g.framesfolder(end) = []; end;
+end;  
 
 % other variables
 % ---------------
@@ -791,13 +800,13 @@ for indeximage = alltimepoints
 	% save the file for a movie
 	% -------------------------
     if strcmpi(g.framesout, 'eps')
-        command2 = sprintf('print -depsc -loose image%4.4d.eps', indeximage);
+        command2 = sprintf('print -depsc -loose %s/image%4.4d.eps', g.framesfolder, indeximage);
         eval(command2);
     elseif 	strcmpi(g.framesout, 'ppm')
-        command2 = sprintf('print -dppm -loose image%4.4d.ppm', indeximage);
+        command2 = sprintf('print -dppm -loose %s/image%4.4d.ppm', g.framesfolder, indeximage);
         eval(command2);
     else % fig format
-        hgsave(sprintf('image%4.4d.fig', indeximage));
+        hgsave(sprintf('%s/image%4.4d.fig', g.framesfolder, indeximage));
         if strcmp(g.visible, 'on')
             drawnow;
         end;
