@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 04-04-2002 added style option
 
 function tmp = textgui( textmenu, helparray, varargin);
@@ -99,28 +102,6 @@ pos = get(gca,'position'); % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]./100;
 
-topordi = TOPORDINATE;
-if ~isempty(g.title)
-    addlines = 2+TOPLINES;
-    if nblines+addlines < g.linesperpage 
-        divider = g.linesperpage;
-    else
-        divider = nblines+addlines;
-    end;    
-	ordinate      = topordi-topordi*TOPLINES/divider;
-	currentheight = topordi/divider;
-
-	h = uicontrol( gcf, 'unit', 'normalized', 'style', 'text', 'backgroundcolor', get(gcf, 'color'), 'horizontalalignment', 'left', ...
-			'position', [-0.1 ordinate 1.1 currentheight].*s*100+q, 'string', g.title, 'fontsize', g.fontsize{1}+2, 'fontweight', 'bold');
- else
-    addlines = TOPLINES;
-    if nblines+addlines < g.linesperpage
-        divider = g.linesperpage;
-    else
-        divider = nblines+addlines;
-    end;    
-end;
-
 % generating cell arrays
 % ----------------------
 if isstr(g.fontname),     tmp1(1:nblines) = {g.fontname}; g.fontname = tmp1; end;
@@ -130,6 +111,35 @@ switch g.fontname{1}
     case 'courrier', CHAR_WIDTH = 11; % pixels
     case 'times', CHAR_WIDTH = 7; % pixels
     otherwise, CHAR_WIDTH = 11;
+end;
+
+topordi = TOPORDINATE;
+if ~isempty(g.title)
+    addlines = size(g.title,1)+1+TOPLINES;
+    if nblines+addlines < g.linesperpage 
+        divider = g.linesperpage;
+    else
+        divider = nblines+addlines;
+    end;    
+    ordinate      = topordi-topordi*TOPLINES/divider;
+    currentheight = topordi/divider;
+    
+    for index=1:size(g.title,1)
+      ordinate      = topordi-topordi*(TOPLINES+index-1)/divider;
+      h = text( -0.1, ordinate, g.title(index,:), 'unit', 'normalized', 'horizontalalignment', 'left', ...
+		 'fontname', g.fontname{1}, 'fontsize', g.fontsize{1},'fontweight', fastif(index ==1, 'bold', ...
+		  'normal'), 'interpreter', 'none' );
+    end;
+    %h = uicontrol( gcf, 'unit', 'normalized', 'style', 'text', 'backgroundcolor', get(gcf, 'color'), 'horizontalalignment', 'left', ...
+    %		'position', [-0.1 ordinate 1.1 currentheight].*s*100+q, 'string', g.title, ...
+    %	       'fontsize', g.fontsize{1}+1, 'fontweight', 'bold', 'fontname', g.fontname{1});
+ else
+    addlines = TOPLINES;
+    if nblines+addlines < g.linesperpage
+        divider = g.linesperpage;
+    else
+        divider = nblines+addlines;
+    end;    
 end;
 
 maxlen = length(g.title);
