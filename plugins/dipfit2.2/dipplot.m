@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.24  2003/04/30 02:05:24  arno
+%changing axis properties for images
+%
 %Revision 1.23  2003/04/30 01:31:53  arno
 %infant option
 %
@@ -231,11 +234,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     elseif strcmpi(g.image, 'mriinfant')
         IMAGESLOC   = { { 'transv_infant.pcx' } { 'cor_infant.pcx' } { 'sag_infant.pcx' } };
         IMAGESAXIS  = { -1  1 -1 };
-        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;
-        IMAGESMULT   = { 0.8 0.8 1 } ;
+        IMAGESOFFSET = { [-0.01 0.08  NaN]   [-0.02 NaN 0.05]  [NaN 0.05 0.1] } ;
+        IMAGESMULT   = { 0.9 0.91 1.05 } ;
         COLORMESH = 'w';
         BACKCOLOR = 'k';
-        AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
+        AXISLIM   = [-1.25 1.25 -1.1 1.1 -1.2 1.2];
     else 
        [IMAGESLOC IMAGESAXIS] = getmriimgs;
        addpath('/data/common/matlab/MRIimages');
@@ -812,7 +815,7 @@ function updatedipplot(fig, nbsources)
 % -----------
 function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, index);
    
-    try,
+    %try,
         fprintf('Reading img: %s\n', IMAGESLOC{1}{index(1)} );
         warning off;  a = double(imread(IMAGESLOC{1}{index(1)}))/255; warning on;
         if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
@@ -826,7 +829,7 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         surface(wx, wy, wz, a(end:-1:1,:,:), 'FaceColor','texturemap', ...
            'EdgeColor','none', 'CDataMapping','direct','tag','img');
         hold on; %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
-    catch, error(lasterr); end;
+    %catch, error(lasterr); end;
     try,
         fprintf('Reading img: %s\n', IMAGESLOC{2}{index(2)} );
         warning off; a = double(imread(IMAGESLOC{2}{index(2)}))/255;  warning on;
