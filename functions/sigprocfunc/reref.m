@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/12/11 17:55:22  arno
+% remove debug msg
+%
 % Revision 1.26  2003/10/14 17:13:36  arno
 % *** empty log message ***
 %
@@ -310,11 +313,15 @@ end;
 % there are faster methods but this one is the simpliest
 
 data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % implement as a matrix multiply
+Elocs = g.elocs;
 if strcmpi(g.keepref, 'off')
-    data = data(setdiff(1:size(data,1), ref),:);
+    rmchans = setdiff(1:size(data,1), ref);
+    data  = data(rmchans,:);
+    if ~isempty(Elocs)
+        Elocs = Elocs(rmchans);
+    end;
 end;
 
-Elocs = g.elocs;
 data = reshape(data, size(data,1), dim2, dim3);
 
 % treat optional ica parameters
