@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/12/16 19:29:58  arno
+% new option savemode
+%
 % Revision 1.41  2004/12/03 23:55:38  hilit
 % uiputfile -> uiputfile2
 %
@@ -315,18 +318,14 @@ if mode == 0  % single datasets
             end;
         end;
         EEG.data = single(EEG.data);
-        EEGDATA  = EEG.data;
-        EEG.data = 'EEGDATA';
         fprintf('Saving dataset...\n');
-        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG', 'EEGDATA'); % Matlab 7
+        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG'); % Matlab 7
         catch, 
-            try, save([ curfilepath curfilename ], '-mat', 'EEG', 'EEGDATA');
+            try, save([ curfilepath curfilename ], '-mat', 'EEG');
             catch, error('Pop_saveset: save error, out of space or file permission problem');
             end;
-            EEGDATA= double(EEGDATA); 
+            EEG.data = double(EEG.data); 
         end;
-        EEG.data = EEGDATA;
-        clear EEGDATA;
         if del,
             try,
                 tmpfilename = which(tmpfilename);
