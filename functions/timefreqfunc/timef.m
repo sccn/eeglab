@@ -76,6 +76,7 @@
 %    Optional Plotting Parameters:
 %       'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
+%       'phase'     = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
 %       'title'     = Optional figure title                              {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1) {2}
@@ -120,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/05/03 03:17:45  arno
+% diffdlt 0.5 -> 1
+%
 % Revision 1.35  2002/05/01 22:25:21  arno
 % no modif
 %
@@ -374,6 +378,7 @@ try, g.mtaper;     catch, g.mtaper = []; end;
 try, g.vert;       catch, g.vert = []; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
 try, g.phsamp;     catch, g.phsamp = 'off'; end;
+try, g.phase;      catch, g.phase = 'on'; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -502,6 +507,10 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   
 end;           
 
+switch lower(g.phase)
+    case { 'on', 'off' }, ;
+    otherwise error('phase must be either on or off');
+end;
 switch lower(g.plotersp)
     case { 'on', 'off' }, ;
     otherwise error('plotersp must be either on or off');
@@ -954,7 +963,7 @@ switch lower(g.plotitc)
        coh_caxis = ITC_CAXIS_LIMIT*[-1 1];
     end
 
-	if exist('Rsign')
+	if exist('Rsign') & strcmp(g.phase, 'on')
 		imagesc(times,freqs(dispf),Rsign(dispf,:).*RR(dispf,:),coh_caxis); % <---
 	else
 		imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % <---
