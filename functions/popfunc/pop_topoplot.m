@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2005/03/05 00:05:52  arno
+% same
+%
 % Revision 1.59  2005/03/05 00:04:42  arno
 % adding chaninfo
 %
@@ -374,7 +377,7 @@ for index = 1:size(arg2(:),1)
        end;    
 		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
         set(curax, 'visible', 'off')
-   end;
+    end;
 
 	% add dipole location if present
     % ------------------------------
@@ -383,8 +386,16 @@ for index = 1:size(arg2(:),1)
     if plotdip & typeplot == 0
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
             if length(EEG.dipfit.model) >= index
-                curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
+                %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
+                curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
+                if strcmpi(EEG.dipfit.coordtype, 'MNI') % from MNI to sperical coordinates
+                    transform = pinv( sph2spm );                    
+                    tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3)/85;
+                    tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
+                    try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3)/85; catch, end;
+                    try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
+                end;
                 if ~isempty(curpos)
                     if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
                         options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
@@ -399,7 +410,7 @@ for index = 1:size(arg2(:),1)
                 if nbgraph ~= 1
                     options = {  options{:} 'dipscale' 0.6 };
                 end;
-                options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
+                %options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
             end;
         end;
     end;
