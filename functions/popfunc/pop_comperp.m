@@ -29,12 +29,19 @@
 %   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
 %                or as a rectangular array (plotdata()). Note: Components
 %                cannot be plotted in a 'scalp' array.
-%   'std'      - ['on'|'off'] Show standard deviation. Default: 'off'.
-%   'diffonly' - ['on'|'off'] When subtracting datasets, ('on') do not plot 
-%                or ('off') do plot the ERP grand averages.
-%   'allerps'  - ['on'|'off'] Show all erps. {default: 'off'}
 %   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
-%   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
+%   'addavg'   - ['on'|'off'] Show average/RMS for datadd. Default: 'on' if
+%                datsub empty, otherwise 'off'.
+%   'addstd'   - ['on'|'off'] Show standard deviation for datadd. Default: 'on'
+%                if datsub empty, otherwise 'off'.
+%   'addall'   - ['on'|'off'] Show all erps for dataadd. Default: 'off'.
+%   'subavg'   - ['on'|'off'] Show average/RMS for datsub. Default: 'off'.
+%   'substd'   - ['on'|'off'] Show standard deviation for datsub. Default: 'off'.
+%   'suball'   - ['on'|'off'] Show all erps for datasub. Default: 'off'.
+%   'diffadd'  - ['on'|'off'] Show average/RMS for difference. Default: 'on'.
+%   'diffstd'  - ['on'|'off'] Show standard deviation for difference.
+%                Default is 'on'.
+%   'diffall'  - ['on'|'off'] Show all erps for difference. Default: 'off'.
 %   'tplotopt' - [cell array] 'key', val' plotting options for topoplot
 %
 % Output:
@@ -71,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/05/10 17:59:21  arno
+% debug command output
+%
 % Revision 1.9  2003/04/15 23:38:35  arno
 % debuging last
 %
@@ -116,32 +126,38 @@ allcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b
               'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
 erp1 = '';
 if nargin < 3
-    checkboxgeom = [1.6 0.15 0.5];
-    uigeom = { [ 2 1] [2 1] [2 1] [2 1] checkboxgeom checkboxgeom checkboxgeom checkboxgeom [2 1] [1.1 0.4 1] };
+    gtmp = [1.1 0.8 .18 .18 .18 0.1]; gtmp2 = [1.48 1.07 0.93];
+    uigeom = { [2.6 0.95] gtmp gtmp gtmp [1] gtmp2 gtmp2 [1.48 0.21 1.79] gtmp2 [0.6 0.5 0.9] };
     commulcomp= ['if get(gcbo, ''value''),' ...
                  '    set(findobj(gcbf, ''tag'', ''multcomp''), ''enable'', ''on'');' ...
                  'else,' ...
                  '    set(findobj(gcbf, ''tag'', ''multcomp''), ''enable'', ''off'');' ...
                  'end;'];
-	uilist = { { 'style' 'text' 'string' 'Enter a list of datasets to add (ex: 1 3 4):' } ...
+	uilist = { { } ...
+               { 'style' 'text' 'string' 'avg.        std.      all ERPs' } ...
+               { 'style' 'text' 'string' 'List of datasets to add (ex: 1 3 4):' } ...
                { 'style' 'edit' 'string' '' } ...
-	           { 'style' 'text' 'string' 'Enter a list of datasets to subtract (ex: 5 6 7):' } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } { } ...
+	           { 'style' 'text' 'string' 'List of datasets to subtract (ex: 5 6 7):' } ...
                { 'style' 'edit' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } { } ...
+	           { 'style' 'text' 'string' 'Plot Difference' } { } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } ...
+               { 'style' 'checkbox' 'string' '' } { } ...
+               { } ...
 	           { 'style' 'text' 'string' fastif(flag, 'Enter a subset of channels ([]=all):', ...
                                                   'Enter a subset of components ([]=all):') } ...
-               { 'style' 'edit' 'string' '' } ...
-	           { 'style' 'text' 'string' 'p value to highligh significant regions (i.e. 0.01)' } ...
-               { 'style' 'edit' 'string' '' } ...
-	           { 'style' 'text' 'string' 'Show standard deviations:' } ...
-               { 'style' 'checkbox' 'string' '' } { } ...
-	           { 'style' 'text' 'string' 'Show all ERPs:' } ...
-               { 'style' 'checkbox' 'string' '' } { } ...
-	           { 'style' 'text' 'string' 'Show difference plot(s) only:' } ...
-               { 'style' 'checkbox' 'string' '' } { } ...
-	           { 'style' 'text' 'string' 'Check checkbox to use RMS instead of average:' } ...
-               { 'style' 'checkbox' 'string' '' } { } ...
+               { 'style' 'edit' 'string' '' } { } ...
+	           { 'style' 'text' 'string' 'Highligh significant regions (.01 -> p=.01)' } ...
+               { 'style' 'edit' 'string' '' } { } ...
+	           { 'style' 'text' 'string' 'Use RMS instead of average (check):' } { 'style' 'checkbox' 'string' '' } { } ...
 	           { 'style' 'text' 'string' 'Low pass (Hz) (for display only)' } ...
-               { 'style' 'edit' 'string' '' } ...
+               { 'style' 'edit' 'string' '' } { } ...
                { 'style' 'text' 'string' 'Topoplot options (''key'', ''val''):' } ...
                { 'style' 'pushbutton' 'string' 'Help' 'callback', 'pophelp(''plottopo'')' } ...
                { 'style' 'edit' 'string' '' }};
@@ -150,18 +166,25 @@ if nargin < 3
     result = inputgui( uigeom, uilist, 'pophelp(''pop_comperp'')', 'ERP grand average/RMS - pop_comperp()');
     if length(result) == 0, return; end;
 
-    %decode parameters
-    datadd = eval( [ '[' result{1} ']' ]);
-    datsub = eval( [ '[' result{2} ']' ]);
+    %decode parameters list
     options = {};
-    if result{3}, options = { options{:} 'chans' eval( [ '[' result{3} ']' ]) }; end;
-    if ~isempty(result{4}), options = { options{:} 'alpha' str2num(result{4}) }; end;
-    if result{5}, options = { options{:} 'std' 'on' }; end;
-    if result{6}, options = { options{:} 'allerps' 'on' }; end;
-    if result{7}, options = { options{:} 'diffonly' 'on' }; end;
-    if result{8}, options = { options{:} 'mode' 'rms' }; end;
-    if ~isempty(result{9}) , options = { options{:} 'lowpass' str2num(result{9}) }; end;
-    if ~isempty(result{10}), options = { options{:} 'tplotopt' eval([ '{ ' result{10} ' }' ]) }; end; 
+    datadd = eval( [ '[' result{1} ']' ]);
+    if result{2},  options = { options{:} 'addavg'  'on' }; else, options = { options{:} 'addavg'  'off' }; end;
+    if result{3},  options = { options{:} 'addstd'  'on' }; else, options = { options{:} 'addstd'  'off' }; end;
+    if result{4},  options = { options{:} 'addall'  'on' }; end;
+    datsub = eval( [ '[' result{5} ']' ]);
+    if result{6},  options = { options{:} 'subavg'  'on' }; end;
+    if result{7},  options = { options{:} 'substd'  'on' }; end;
+    if result{8},  options = { options{:} 'suball'  'on' }; end;
+    if result{9},  options = { options{:} 'diffavg' 'on' }; else, options = { options{:} 'diffavg' 'off' }; end;
+    if result{10}, options = { options{:} 'diffstd' 'on' }; else, options = { options{:} 'diffstd' 'off' }; end;
+    if result{11}, options = { options{:} 'diffall' 'on' }; end;
+    
+    if result{12},           options = { options{:} 'chans' eval( [ '[' result{12} ']' ]) }; end;
+    if ~isempty(result{13}), options = { options{:} 'alpha' str2num(result{13}) }; end;
+    if result{14},           options = { options{:} 'mode' 'rms' }; end;
+    if ~isempty(result{15}), options = { options{:} 'lowpass' str2num(result{15}) }; end;
+    if ~isempty(result{16}), options = { options{:} 'tplotopt' eval([ '{ ' result{16} ' }' ]) }; end; 
 else 
     options = varargin;
 end;
@@ -170,18 +193,25 @@ end;
 % -------------
 if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end;
 g = finputcheck( options, ... 
-                 { 'chans'    'integer'  [1:ALLEEG(datadd(1)).nbchan] [];
+                 { 'chans'    'integer'  [0:ALLEEG(datadd(1)).nbchan] 0;
                    'title'    'string'   []               '';
                    'alpha'    'float'    []               [];
                    'geom'     'string'  {'scalp' 'array'} fastif(flag, 'scalp', 'array');
-                   'std'      'string'  {'on' 'off'}     'off';
-                   'diffonly' 'string'  {'on' 'off'}     'off';
-                   'allerps'  'string'  {'on' 'off'}     'off';
+                   'addstd'   'string'  {'on' 'off'}     'on';
+                   'substd'   'string'  {'on' 'off'}     'off';
+                   'diffstd'  'string'  {'on' 'off'}     'on';
+                   'addavg'   'string'  {'on' 'off'}     'on';
+                   'subavg'   'string'  {'on' 'off'}     'off';
+                   'diffavg'  'string'  {'on' 'off'}     'on';
+                   'addall'   'string'  {'on' 'off'}     'off';
+                   'suball'   'string'  {'on' 'off'}     'off';
+                   'diffall'  'string'  {'on' 'off'}     'off';
                    'lowpass'  'float'    [0 Inf]         [];
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave' 'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
 if isstr(g), error(g); end;
+if ~isempty(datsub), g.addstd = 'off'; g.addstd = 'off'; end;
 
 figure;
 try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
@@ -205,126 +235,77 @@ for index = union(datadd, datsub)
     if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' has not the same number of channels as others']); end;
 end;
     
-% compute grand average
-% ---------------------
+% compute ERPs for add
+% --------------------
 for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)));
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     else          erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
     end;
+    addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname '(' int2str(TMPEEG.trials) ')' ];
     clear TMPEEG;
 end;
 
 % optional: subtract
 % ------------------
 colors = {}; % color aspect for curves
-if length(datsub) > 0
+allcolors = { 'b' 'r' 'g' 'c' 'm' 'y' [0 0.5 0] [0.5 0 0] [0 0 0.5] [0.5 0.5 0] [0 0.5 0.5] [0.5 0 0.5] [0.5 0.5 0.5] };
+allcolors = { allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} allcolors{:} };
+if length(datsub) > 0 % dataset to subtract
+
+    % compute ERPs for sub
+    % --------------------
     for index = 1:length(datsub)
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)));
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         else          erp2ind(:,:,index)  = mean(TMPEEG.icaact,3);
         end;
+        subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(' int2str(TMPEEG.trials) ')' ];
         clear TMPEEG
     end;
-    colors    = {{'k' 'linewidth' 2 }};
-    if strcmpi(g.mode, 'ave')
-         erpsub = mean(erp1ind-erp2ind,3);
-         erp1   = mean(erp1ind,3);
-         erp2   = mean(erp2ind,3);
-         legend = { 'Avg. difference' };
-    else erpsub = sqrt(mean((erp1ind-erp2ind).^2,3));
-         erp1   = sqrt(mean(erp1ind.^2,3));
-         erp2   = sqrt(mean(erp2ind.^2,3));
-         legend = { 'RMS difference' };
-    end;
+    
+    l1 = size(erp1ind,3);
+    l2 = size(erp2ind,3);
+    allcolors1 = allcolors(3:l1+2);
+    allcolors2 = allcolors(l1+3:l1+l2+3);
+    allcolors3 = allcolors(l1+l2+3:end);
+    [erps1, colors1, legend1] = preparedata( erp1ind        , g.addavg , g.addstd , g.addall , g.mode, 'Add' , addnames, 'b', allcolors1 );
+    [erps2, colors2, legend2] = preparedata( erp2ind        , g.subavg , g.substd , g.suball , g.mode, 'Sub' , subnames, 'r', allcolors2 );
+    [erps3, colors3, legend3] = preparedata( erp1ind-erp2ind, g.diffavg, g.diffstd, g.diffall, g.mode, 'Diff', { addnames subnames }, 'k', allcolors3 );
+    erptoplot  = [ erps1      erps2      erps3      ];
+    colors     = { colors1{:} colors2{:} colors3{:} };
+    legends    = { legend1{:} legend2{:} legend3{:} };
+    
+    % highlight significant regions
+    % -----------------------------
     if ~isempty(g.alpha)
         pvalues = pttest(erp1ind, erp2ind, 3);
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
     end;
-    if strcmpi(g.diffonly, 'off') & strcmpi(g.allerps, 'on')
-        error('can not plot individual averages with grand erps, set ''diffonly'' to ''on''');
-    end;
     
-    % plot individual differences
-    % ---------------------------
-    if strcmpi(g.allerps, 'on')
-        erptoplot = [ erpsub erp1ind(:,:)-erp2ind(:,:) ];
-        for index=1:size(erp1ind,3)
-            legend{index+1} = [ 'Datasets ' int2str(datadd(index)) '-' int2str(datsub(index)) ];
-        end;
-    else 
-        erptoplot = erpsub;   
-    end;
-    
-    % plot grand averages
-    % -------------------
-    if strcmpi(g.diffonly, 'off')
-        erptoplot = [ erpsub erp1 erp2];
-        legend    = { legend{:} 'Dataset(s) added' 'Dataset(s) subtracted' };
-        colors    = { colors{:} 'r' 'b' };
-        if strcmpi(g.std, 'on')
-            legend    = { legend{:} 'Std. diff.' 'Std. added' 'Std. subtracted' };
-            stdsub    = std(erp1ind-erp2ind, [], 3);
-            std1      = std(erp1ind, [], 3);
-            std2      = std(erp2ind, [], 3);
-            erptoplot = [ erptoplot erpsub+stdsub erp1+std1 erp2+std2 erpsub-stdsub erp1-std1 erp2-std2 ];
-            colors    = { colors{:} 'k:' 'r:' 'b:' 'k:' 'r:' 'b:' };
-        end;
-    else 
-        if strcmpi(g.std, 'on')
-            stdsub    = std(erp1ind-erp2ind, [], 3);
-            erptoplot = [ erptoplot erpsub+stdsub erpsub-stdsub ];
-            legend    = { legend{:} 'Std. diff.' };
-            colors    = { colors{:} 'k:' 'k:' };
-        end;
-    end;
 else
-    erpsub = []; erp2 = [];
-    std1 = std(erp1ind, [], 3);
-    if strcmpi(g.mode, 'ave')
-         erp1   = mean(erp1ind,3);
-         legend = { 'Avg.' };
-    else erp1 = sqrt(mean(erp1ind.^2,3));
-         legend = { 'RMS' };
-    end;
-    erptoplot = erp1;
-    colors    = {{'k' 'linewidth' 2 }};
-
+    [erptoplot, colors, legend] = preparedata( erp1ind, g.addavg, g.addstd, g.addall, g.mode, 'Add', addnames, 'k', allcolors);
+    
     % highlight significant regions
     % -----------------------------
     if ~isempty(g.alpha)
         pvalues = ttest(erp1ind, 0, 3);
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
     end;
-
-    % plot individual differences
-    % ---------------------------
-    if strcmpi(g.allerps, 'on')
-        erptoplot = [ erptoplot erp1ind(:,:) ];
-        for index=1:size(erp1ind,3)
-            legend{index+1} = [ 'Dataset ' int2str(datadd(index)) ];
-            colors    = { colors{:} allcolors{index} };
-        end;
-    end;
-    
-    % plot standard deviation
-    % -----------------------
-    if strcmpi(g.std, 'on')
-        erptoplot = [ erptoplot erp1+std1 erp1-std1 ];
-        legend    = { legend{:} 'Std.' };
-        colors    = { colors{:} 'k:' 'k:' };
-    end;
-
 end;
     
+% lowpass data
+% ------------
 if ~isempty(g.lowpass)
     erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
 end;
 if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
 
+% plot data
+% ---------
 plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
-          'limits', [xmin xmax 0 0]*1000, 'title', g.title, 'colors', ...
-          colors, 'legend', legend, 'regions', regions, g.tplotopt{:});
+          'limits', [xmin xmax 0 0]*1000, 'title', g.title, 'colors', colors, ...
+          'chans', g.chans, 'legend', legend, 'regions', regions, g.tplotopt{:});
 times = linspace(xmin, xmax, pnts);
 
 if nargin < 3 & nargout == 1
@@ -347,6 +328,58 @@ function regions = p2regions( pvalues, alpha, limits);
         regions{index} = [neg;pos];
     end;
     
+% process data
+% ------------
+function [erptoplot, colors, legend] = preparedata( erpind, plotavg, plotstd, plotall, mode, tag, dataset, coloravg, allcolors);
+
+    colors    = {};
+    legend    = {};
+    erptoplot = [];
+
+    % plot individual differences
+    % ---------------------------
+    if strcmpi(plotall, 'on')
+        erptoplot = [ erptoplot erpind(:,:) ];
+        for index=1:size(erpind,3)
+            if iscell(dataset)
+                if strcmpi(tag, 'Diff')
+                    legend = { legend{:} [ dataset{1}{index} ' - ' dataset{2}{index} ] };
+                else
+                    legend = { legend{:} dataset{index} };
+                end;
+            else
+                legend = { legend{:} [ 'Dataset ' int2str(dataset(index)) ] };
+            end;
+            colors = { colors{:}  allcolors{index} };
+        end;
+    end;
+    
+    % plot average
+    % ------------
+    if strcmpi( plotavg, 'on')
+        if strcmpi(mode, 'ave')
+             granderp    = mean(erpind,3);
+             legend      = { legend{:} [ tag ' Avg.' ] };
+        else granderp    = sqrt(mean(erpind.^2,3));
+             legend      = { legend{:} [ tag ' RMS' ] };
+        end;
+        colors    = { colors{:}  {coloravg 'linewidth' 2 }};
+        erptoplot = [ erptoplot granderp];
+    else
+    end;
+
+    % plot standard deviation
+    % -----------------------
+    if strcmpi(plotstd, 'on')
+        if strcmpi(plotavg, 'on')
+            std1      = std(erpind, [], 3);
+            erptoplot = [ erptoplot granderp+std1 granderp-std1 ];
+            legend    = { legend{:} [ tag ' Std.' ] };
+            colors    = { colors{:} [ coloravg ':' ] [ coloravg ':' ] };
+        end;
+        disp('Warning: cannot show standard deviation without showing average');
+    end;
+
 % ------------------------------------------------------------------
     
 function [p, t, df] = pttest(d1, d2, dim)
