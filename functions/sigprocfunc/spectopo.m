@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2003/12/03 18:28:54  scott
+% percentage -> percent
+%
 % Revision 1.78  2003/12/03 02:44:27  arno
 % indenting
 %
@@ -670,7 +673,9 @@ if strcmpi(g.plot, 'on')
     end;
     set(pl,'LineWidth',2);
     set(gca,'TickLength',[0.02 0.02]);
-    axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
+    try, 
+        axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
+    catch, disp('Could not adjust axis'); end;
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',16);
     % yl=ylabel('Rel. Power (dB)');
