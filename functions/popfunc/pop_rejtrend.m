@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/26 16:35:57  arno
+% chaning icacomp
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -119,6 +122,7 @@ else
 	calldisp = 0;
 end;
 
+fprintf('Selecting trials...\n');
 if icacomp == 1
 	[rej rejE] = rejtrend( EEG.data(elecrange, :, :), winsize, minslope, minstd);
 else
