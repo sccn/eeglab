@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/08/30 18:01:11  arno
+% same
+%
 % Revision 1.35  2002/08/30 18:00:22  arno
 % debug erp axis and average
 %
@@ -1518,7 +1521,7 @@ if Erpflag == YES
     end;
  end;
  xticklabel = strvcat(xticklabel);
- erp=nan_mean(data');           % compute erp average, ignoring nan's
+ erp=nan_mean(oridata');           % compute erp average, ignoring nan's
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
