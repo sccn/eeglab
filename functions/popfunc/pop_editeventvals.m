@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/05/21 20:45:23  scott
+% removed ; from evalin() calls -sm
+%
 % Revision 1.11  2002/05/03 02:35:15  arno
 % allowing sorting on latency
 %
@@ -105,7 +108,7 @@ end;
 allfields = fieldnames(EEG.event);
 if nargin<2
     % transfer events to global workspace
-    evalin('base', [ 'eventtmp = ' inputname(1) '.event' ]);
+    evalin('base', [ 'eventtmp = ' inputname(1) '.event;' ]);
 
     % add field values
     % ----------------
