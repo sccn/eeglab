@@ -29,10 +29,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
-function EEG = iniset();
+function EEG = eeg_emptyset();
 
 EEG.setname    = '';
 EEG.filename   = '';
@@ -52,6 +55,7 @@ EEG.icaact    = [];
 EEG.event     = [];
 EEG.epoch  = [];
 EEG.chanlocs    = '';
+EEG.comments    = '';
 
 %EEG.reject.threshold  = [1 0.8 0.85];
 %EEG.reject.icareject  = [];
