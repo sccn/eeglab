@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/04/24 02:19:01  arno
+% message for circfactor
+%
 % Revision 1.44  2003/04/24 01:56:43  arno
 % fixing coordinate problem
 %
@@ -720,7 +723,6 @@ end;
 
 % scan time windows
 % -----------------
-g.coordinates
 for indeximage = alltimepoints
     
 	fprintf('Processing image %d\n', indeximage);
