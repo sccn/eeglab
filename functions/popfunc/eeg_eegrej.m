@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/08 14:46:46  arno
+% boundary events
+%
 % Revision 1.3  2002/08/08 01:20:13  arno
 % same
 %
@@ -98,5 +101,5 @@ if ~isempty(boundevents)
 end;
 EEG.icaact = [];
 
-com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions(:,1:4) })); 
+com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions(:,3:4) })); 
 return;
