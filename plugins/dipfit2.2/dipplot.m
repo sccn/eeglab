@@ -25,8 +25,9 @@
 %               matrix to go from voxel space to electrode space:
 %               mri.anatomy   contains a 3-D anatomical data array
 %               mri.transfrom contains a 4-D homogenous transformation matrix.
-%  'sph2spm'  - Uniform transformation matrix to transform Spherical coordinates
-%               of dipoles into SPM coordinates. (Irrelevant for BEM model).
+%  'coordformat' - ['MNI'|'spherical'] Consider that dipole coordinates are in
+%               MNI or spherical coordinates (for spherical, the radius of the 
+%               head is assumed to be 85 (mm)). See also function sph2spm().
 %  'image'    - ['besa'|'mri'] Background image. 
 %               'mri' (or 'fullmri') uses mean-MRI brain images from the Montreal 
 %               Neurological Institute. This option can also contain a 3-D MRI
@@ -154,6 +155,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.112  2005/03/17 16:16:03  arno
+%reading anatomical image
+%
 %Revision 1.111  2005/03/14 18:28:56  arno
 %implementing tailarach coordinate display
 %
@@ -491,6 +495,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
+                                 'coordformat' 'string' { 'MNI' 'spherical' 'auto' } 'auto';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
@@ -504,7 +509,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'dipnames'   'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
                                  'projcol'   ''         []       [];
-                                 'sph2spm'   ''         []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
@@ -520,153 +524,95 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if isstr(g), error(g); end;
     g.zoom = 1500;
 
+    if strcmpi(g.image, 'besa')
+        error('BESA image not supported any more. Use EEGLAB version 4.512 or earlier. (BESA dipoles can still be plotted in MNI brain.)');
+    end;
+    
+    % trying to determine coordformat
+    % -------------------------------
+    if strcmpi(g.coordformat, 'auto')
+        if ~isempty(g.meshdata)
+            g.coordformat = 'MNI';
+            disp('Coordinate format unknown: using ''MNI'' since mesh data was provided as input');
+        else
+            maxdiplen = 0;
+            for ind = 1:length(sourcesori)
+                maxdiplen = max(maxdiplen, max(sourcesori(ind).momxyz(:)));
+            end;
+            if maxdiplen>2000
+                disp('Coordinate format unknown: using ''MNI'' because of large dipole moments');
+            else
+                g.coordformat = 'spherical';
+                disp('Coordinate format unknown: using ''spherical'' since no mesh data was provided as input');
+            end;
+        end;
+    end;
+
     % axis image and limits
     % ---------------------
-    dat.mode       = g.image;
-    dat.maxcoord   = [ 90 100 100 ]; % location of images in 3-D, Z then Y then X
     dat.axistight  = strcmpi(g.axistight, 'on');
     dat.drawedges  = g.drawedges;
     dat.cornermri  = strcmpi(g.cornermri, 'on');
     radius = 85;
-    if isstr(g.image) & strcmpi(g.image, 'besa')
-        scaling = 1.05;
-        
-        % read besa images
-        % ----------------
-        warning off; imgt = double(imread('besatop.pcx' ))/255; warning on;
-        warning off; imgc = double(imread('besarear.pcx'))/255; warning on;
-        warning off; imgs = double(imread('besaside.pcx'))/255; warning on;
-        dat.imgs        = { imgt imgc imgs };
-        
-        allcoords1 = ([-1.12 1.12]*size(imgt,2)/200+0.01)*radius; 
-        allcoords2 = ([-1.12 1.12]*size(imgt,1)/200+0.08)*radius;
-        allcoords3 = [-1.12 1.12]*size(imgs,1)/200*radius; 
-        dat.imgcoords = { allcoords3        allcoords2        allcoords1 };
 
-        valinion  = [ 1  0  0 ]*radius;
-        valnasion = [-1  0  0 ]*radius;
-        vallear   = [ 0 -1  0 ]*radius;
-        valrear   = [ 0  1  0 ]*radius;
-        valvertex = [ 0  0  1 ]*radius;
-        dat.tcparams = { valinion valnasion vallear valrear valvertex 0 };
-
-        %dat.imageaxis   = { -1  1 -1 };
-        %dat.imageoffset = { [0.0  0.08 NaN ]  [0.01    NaN -0.01]  [ NaN -0.01   -0.025 ] };
-        %dat.imagemult   = { 1.01 1.06 0.96 };
-        %dat.axislim     = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
-        COLORMESH       = [.5 .5 .5];
-        BACKCOLOR       = 'w';
-    elseif isstr(g.image)
-        fid = fopen('VolumeMNI.bin', 'rb', 'ieee-le');
-        if fid == -1
-            error('Cannot find MRI data file');
-        end;
-        V = double(fread(fid, [108 129*129], 'uint8'))/255;
-        V = reshape(V, 108, 129, 129);
-        fclose(fid);
-        
-        %V = floatread('VolumeMNI.fdt');
-        %load('/home/arno/matlab/MNI/VolumeMNI.mat');
-        
-        dat.imgs   = V; %smooth3(V,'gaussian', [3 3 3]);
-        coordinc   = 2; % 2 mm
-        allcoords1 = [0.5:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
-        allcoords2 = [0.5:coordinc:size(V,2)*coordinc]-size(V,2)/2*coordinc;
-        allcoords3 = [0.5:coordinc:size(V,3)*coordinc]-size(V,3)/2*coordinc;
-        
-        dat.imgcoords = { allcoords3        allcoords2        allcoords1 };
-        if strcmpi(g.cornermri, 'on') % make the corner of the MRI volume match
-            dat.maxcoord = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
-        end;
-
-        COLORMESH = 'w';
-        BACKCOLOR = 'k';
-        %valinion  = [ 58.5413  -10.5000  -30.8419 ]*2;
-        %valnasion = [-56.8767  -10.5000  -30.9566 ]*2;
-        %vallear   = [ 0.1040   -59.0000  -30.9000 ]*2;
-        %valrear   = [ 0.1040    38.0000  -30.9000 ]*2;
-        %valvertex = [ 0.0238   -10.5000   49.8341 ]*2;
-        valinion  = [ 52.5413  -10.5000  -30.8419 ]*2;
-        valnasion = [-50.8767  -10.5000  -30.9566 ]*2;
-        vallear   = [ 0.1040   -51.0000  -30.9000 ]*2;
-        valrear   = [ 0.1040    31.0000  -30.9000 ]*2;
-        valvertex = [ 0.0238   -10.5000   40.8341 ]*2;
-        zoffset   = 27.1190/(27.1190+radius) * (valvertex(3)-vallear(3));
-        dat.tcparams = { valinion valnasion vallear valrear valvertex zoffset };
-       
-        %plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [57 85 65]);
-        %view(30, 45); axis equal; return;
-    else  % custom MRI
-        
-        V            = -g.image;
-        dat.imgs     = -g.image; %smooth3(V,'gaussian', [3 3 3]);
-        valinion  = [ 56.5413  0.000  -20.8419 ]*3.5;
-        valnasion = [-52.8767  0.000  -20.9566 ]*3.5;
-        vallear   = [ -3.1040   -53.0000  -20.9000 ]*3.5;
-        valrear   = [ -3.1040    33.0000  -20.9000 ]*3.5;
-        valvertex = [ 0.0238   -10.5000   50.8341 ]*3.5;
-        zoffset   = 27.1190/(27.1190+radius) * (valvertex(3)-vallear(3));
-        dat.tcparams = { valinion valnasion vallear valrear valvertex zoffset };
-        dat.coreg    = [];
-        coordinc   = 2; % 2 mm
-        allcoords1 = [0.5:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
-        allcoords2 = [0.5:coordinc:size(V,2)*coordinc]-size(V,2)/2*coordinc;
-        allcoords3 = [0.5:coordinc:size(V,3)*coordinc]-size(V,3)/2*coordinc;
-        dat.imgcoords = { allcoords3        allcoords2        allcoords1 };
-        if strcmpi(g.cornermri, 'on') % make the corner of the MRI volume match
-            dat.maxcoord = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
-        end;
-
-        COLORMESH = 'w';
-        BACKCOLOR = 'k';        
+    % look up an MRI file if necessary
+    % --------------------------------
+    if isempty(g.mri)
+        disp('No MRI file given as input. Looking up one.');
+        folder = which('pop_dipfit_settings');
+        folder = folder(1:end-21);
+        delim  = folder(end);
+        g.mri = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
     end;
-    if ~isempty(g.mri)
-        if isstr(g.mri);
-            try, 
-                g.mri = load('-mat', g.mri);
-                g.mri = g.mri.mri;
+        
+    % read anatomical MRI using Fieldtrip and SPM2 functons
+    % -----------------------------------------------------
+    if isstr(g.mri);
+        try, 
+            g.mri = load('-mat', g.mri);
+            g.mri = g.mri.mri;
+        catch,
+            disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
+            try,
+                warning off;
+                g.mri = read_fcdc_mri(g.mri);
+                %g.mri.anatomy(find(g.mri.anatomy > 255)) = 255;
+                %g.mri.anatomy = uint8(g.mri.anatomy);
+                g.mri.anatomy = round(gammacorrection( g.mri.anatomy, 0.8));
+                g.mri.anatomy = uint8(round(g.mri.anatomy/max(reshape(g.mri.anatomy, prod(g.mri.dim),1))*255));
+                % WARNING: if using double instead of int8, the scaling is different 
+                % [-128 to 128 and 0 is not good]
+                % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
+                % misplaced
+                warning on;
             catch,
-                disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
-                try,
-                    warning off;
-                    g.mri = read_fcdc_mri(g.mri);
-                    %g.mri.anatomy(find(g.mri.anatomy > 255)) = 255;
-                    %g.mri.anatomy = uint8(g.mri.anatomy);
-                    g.mri.anatomy = round(gammacorrection( g.mri.anatomy, 0.8));
-                    g.mri.anatomy = uint8(round(g.mri.anatomy/max(reshape(g.mri.anatomy, prod(g.mri.dim),1))*255));
-                    % WARNING: if using double instead of int8, the scaling is different 
-                    % [-128 to 128 and 0 is not good]
-                    % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
-                    % misplaced
-                    warning on;
-                catch,
-                    error('Cannot load file using read_fcdc_mri');
-                end;
+                error('Cannot load file using read_fcdc_mri');
             end;
         end;
-        dat.sph2spm    = g.sph2spm;
-        dat.imgs       = g.mri.anatomy;
-        dat.tcparams   = []; % only for spherical model
-        dat.imgcoords  = {};
-        dat.transform  = g.mri.transform;
-
-        % MRI coordinates for slices
-        % --------------------------
-        if ~isfield(g.mri, 'xgrid')
-            g.mri.xgrid = [1:size(dat.imgs,1)]; 
-            g.mri.ygrid = [1:size(dat.imgs,2)];
-            g.mri.zgrid = [1:size(dat.imgs,3)];
-        end;
-        dat.imgcoords = { g.mri.xgrid g.mri.ygrid g.mri.zgrid };            
-        dat.maxcoord  = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
-        COLORMESH = 'w';
-        BACKCOLOR = 'k';
-        
     end;
-
+    
+    if strcmpi(g.coordformat, 'spherical')
+        dat.sph2spm    = sph2spm;
+    else dat.sph2spm    = [];
+    end;
+    dat.imgs       = g.mri.anatomy;
+    dat.transform  = g.mri.transform;    
+    
+    % MRI coordinates for slices
+    % --------------------------
+    if ~isfield(g.mri, 'xgrid')
+        g.mri.xgrid = [1:size(dat.imgs,1)]; 
+        g.mri.ygrid = [1:size(dat.imgs,2)];
+        g.mri.zgrid = [1:size(dat.imgs,3)];
+    end;
+    dat.imgcoords = { g.mri.xgrid g.mri.ygrid g.mri.zgrid };            
+    dat.maxcoord  = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
+    COLORMESH = 'w';
+    BACKCOLOR = 'k';
+    
     % point 0
     % -------
-    [xx yy zz] = sph2spm(0, 0, 0, dat.sph2spm); % nothing happens for BEM
+    [xx yy zz] = transform(0, 0, 0, dat.sph2spm); % nothing happens for BEM since dat.sph2spm is empty
     dat.zeroloc = [ xx yy zz ];
     
     % conversion
@@ -704,28 +650,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     outsources = sources;
     for index = 1:length(sources)
         sources(index).momxyz = sources(index).momxyz/1000;
-    end;
-    if 0
-        tmp = sources(index).posxyz(:,1);
-        sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
-        sources(index).posxyz(:,2) = -tmp;
-        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05;
-        tmp = sources(index).momxyz(:,1);
-        sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
-        sources(index).momxyz(:,2) = -tmp;
-        if isfield(sources, 'stdX')
-            tmp = sources(index).stdX;
-            sources(index).stdX = sources(index).stdY;
-            sources(index).stdY = -tmp;
-        end;
-        if strcmpi(g.normlen, 'on')
-            warning off;
-            sources(index).momxyz(1,:) = 0.2*sources(index).momxyz(1,:)/ norm(abs(sources(index).momxyz(1,:)));
-            if size(sources(index).momxyz,1) > 1 & sources(index).momxyz(1) ~= 0
-                sources(index).momxyz(2,:) = 0.2*sources(index).momxyz(2,:)/ norm(abs(sources(index).momxyz(2,:)));
-            end;
-            warning on;
-        end;
     end;
     
     % remove sources with out of bound Residual variance
@@ -843,8 +767,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         SPHEREGRAIN = 20; % 20 is also Matlab default
         [x y z] = sphere(SPHEREGRAIN);
         hold on; 
-        [xx yy zz] = sph2spm(x*0.085, y*0.085, z*0.085, dat.sph2spm);
-        [xx yy zz] = sph2spm(x*85   , y*85   , z*85   , dat.sph2spm);
+        [xx yy zz] = transform(x*0.085, y*0.085, z*0.085, dat.sph2spm);
+        [xx yy zz] = transform(x*85   , y*85   , z*85   , dat.sph2spm);
         %xx = x*100;
         %yy = y*100;
         %zz = z*100;
@@ -904,15 +828,21 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             x = sources(index).posxyz(dip,1);
             y = sources(index).posxyz(dip,2);
             z = sources(index).posxyz(dip,3);
-            xo = sources(index).momxyz(dip,1)*g.dipolelength;
-            yo = sources(index).momxyz(dip,2)*g.dipolelength;
-            zo = sources(index).momxyz(dip,3)*g.dipolelength;
+            if strcmpi(g.normlen, 'on')
+                len    = sqrt(sum(sources(index).momxyz(dip,:).^2));
+                factor = 15/len;
+            else
+                if strcmpi(g.coordformat, 'spherical')
+                     factor = 100;
+                else factor = 1.5;
+                end;            
+            end;
             
-            if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
-                xo1 = x+xo;
-                yo1 = y+yo;
-                zo1 = z+zo;
-            elseif strcmpi(g.pointout,'on')
+            xo = sources(index).momxyz(dip,1)*g.dipolelength*factor;
+            yo = sources(index).momxyz(dip,2)*g.dipolelength*factor;
+            zo = sources(index).momxyz(dip,3)*g.dipolelength*factor;
+            
+            if strcmpi(g.pointout,'on') & abs([x+xo,y+yo,z+zo]) < abs([x,y,z])
                 xo1 = x-xo; % make dipole point outward from head center
                 yo1 = y-yo;
                 zo1 = z-zo; 
@@ -929,14 +859,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             % from spherical to electrode space
             % ---------------------------------
-            if ~isempty( dat.tcparams ) % sphere mode
-                [xx   yy   zz]   = sph2spm(x,   y,   z,   dat.sph2spm);             
-                [xxo1 yyo1 zzo1] = sph2spm(xo1, yo1, zo1, dat.sph2spm); 
-            else
-                xx = x; xxo1 = xo1;
-                yy = y; yyo1 = yo1;
-                zz = z; zzo1 = zo1;
-            end;
+            [xx   yy   zz]   = transform(x,   y,   z,   dat.sph2spm); % nothing happens for BEM            
+            [xxo1 yyo1 zzo1] = transform(xo1, yo1, zo1, dat.sph2spm); 
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
@@ -1100,7 +1024,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw elipse for group of dipoles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % may not work because of new scheme, have to be redone
+    % does not work because of new scheme, have to be reprogrammed
     
     %if ~isempty(g.std)
     %    for index = 1:length(g.std)
@@ -1148,7 +1072,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
              'set(gca, ''userdata'', tmpuserdat);' ...
              'clear tmpuserdat;' ...
              'dipplot(gcbf);' ];
-    viewstyle  = fastif(strcmpi(dat.mode, 'besa'), 'text', 'pushbutton');
     viewstring = fastif(dat.axistight, 'Loose view', 'Tight view');
     
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
@@ -1161,7 +1084,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.15 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Sagital view', 'callback', 'view([1 0 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
-                  'style',  viewstyle   , 'string', viewstring, 'callback', cbview);
+                  'style', 'pushbutton', 'string', viewstring, 'callback', cbview);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.25 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', cbmesh);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.3 .15 .05], 'tag', 'tmp', ...
@@ -1234,22 +1157,7 @@ return;
 
 % electrode space to MRI space
 % ============================
-function [xx,yy,zz] = transform(x, y, z, transmat);
-    xx = zeros(size(x));
-    yy = zeros(size(y));
-    zz = zeros(size(z));
-    for i = 1:size(x,1)
-        for j = 1:size(x,2)
-            tmparray = transmat * [ x(i,j) y(i,j) z(i,j) 1 ]';
-            xx(i,j) = tmparray(1);
-            yy(i,j) = tmparray(2);
-            zz(i,j) = tmparray(3);
-        end;
-    end;
-
-% from spherical to electrode space
-% ---------------------------------
-function [x,y,z] = sph2spm(x, y, z, transmat);
+function [x,y,z] = transform(x, y, z, transmat);
     
     if isempty(transmat), return; end;
     for i = 1:size(x,1)
@@ -1261,13 +1169,16 @@ function [x,y,z] = sph2spm(x, y, z, transmat);
         end;
     end;
     
+    
+% does not work any more
+% ----------------------
 function sc = plotellipse(sources, ind, nstd, TCPARAMS, coreg);
 
     for i = 1:length(ind)
         tmpval(1,i) = -sources(ind(i)).posxyz(1);    
         tmpval(2,i) = -sources(ind(i)).posxyz(2);    
         tmpval(3,i) = sources(ind(i)).posxyz(3);
-        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = sph2spm(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
+        [tmpval(1,i) tmpval(2,i) tmpval(3,i)] = transform(tmpval(1,i), tmpval(2,i), tmpval(3,i), TCPARAMS);
     end;
     
     % mean and covariance
@@ -1402,7 +1313,6 @@ function updatedipplot(fig)
    
    % adapt the MRI to the dipole depth
    % ---------------------------------
-   %if ~strcmpi(dat.mode, 'besa') % not besa mode
    delete(findobj('parent', gca, 'tag', 'img'));
    
    tmpdiv1 = dat.imgcoords{1}(2)-dat.imgcoords{1}(1);
@@ -1436,19 +1346,10 @@ function plotimgs(dat, mricoord, transmat);
    
     % loading images
     % --------------
-    if strcmpi(dat.mode, 'besa')
-        img1 = dat.imgs{1};
-        img2 = dat.imgs{2};
-        img3 = dat.imgs{3};
-    else
-        imgt = squeeze(dat.imgs(:,:,mricoord(1))); 
-        imgc = squeeze(dat.imgs(:,mricoord(2),:)); 
-        imgs = squeeze(dat.imgs(mricoord(3),:,:)); 
-        
-        img1 = rot90(squeeze(dat.imgs(mricoord(1),:,:))); 
-        img2 = rot90(squeeze(dat.imgs(:,mricoord(2),:))); 
-        img3 = rot90(squeeze(dat.imgs(:,:,mricoord(3)))); 
-    end;
+    img1 = rot90(squeeze(dat.imgs(mricoord(1),:,:))); 
+    img2 = rot90(squeeze(dat.imgs(:,mricoord(2),:))); 
+    img3 = rot90(squeeze(dat.imgs(:,:,mricoord(3)))); 
+
     if ndims(img1) == 2, img1(:,:,3) = img1; img1(:,:,2) = img1(:,:,1); end;
     if ndims(img2) == 2, img2(:,:,3) = img2; img2(:,:,2) = img2(:,:,1); end;
     if ndims(img3) == 2, img3(:,:,3) = img3; img3(:,:,2) = img3(:,:,1); end;
