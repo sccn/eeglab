@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.220  2004/11/22 05:39:05  arno
+% function was crashing on regular topoplot, debuging
+%
 % Revision 1.219  2004/11/22 05:02:51  scott
 % fixing topoplot([],EEG.chanlocs,'emarker','o')
 %
@@ -1025,7 +1028,7 @@ end;
 labels = labels(indices); % remove labels for electrodes without locations
 labels = strvcat(labels); % make a label string matrix
 
-if ~isempty(Values)
+if ~isempty(Values) & ~strcmpi( STYLE, 'blank')
   plotchans = 1:length(Th);
 end
 %
