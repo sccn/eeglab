@@ -105,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/22 02:10:10  arno
+% still commenting the revertangle function
+%
 % Revision 1.14  2002/11/21 22:57:17  arno
 % commenting revertangle
 %
@@ -461,9 +464,7 @@ if ~strcmpi(g.mode, 'compute')
         
         % Run makemovie
         % -------------
-        if length(g.freqindices) == 1, outname = g.moviename;
-        else                           outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
-        end;
+        outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
         if strcmpi(g.quality, 'ultrafast')
             unix(sprintf('mkavi -file %s.avi image*.ppm', outname));
         else
