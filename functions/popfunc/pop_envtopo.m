@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/05/12 23:47:44  arno
+% removing extra blanks
+%
 % Revision 1.18  2003/05/12 23:37:28  arno
 % verbose off
 %
@@ -198,7 +201,7 @@ end;
 
 % plot the datas
 % --------------
-options = [ options ', ''verbose'', ''off''' ];
+options = [ options ', ''verbose'', ''off'',''pvaf'',''on''' ];
 if any(isnan(sigtmp(:)))
     disp('NaN detected: using nan_mean');
     if length(EEG) == 2
