@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/11/05 18:00:49  scott
+% added variable EEG_VERSION giving current version of EEGLAB (for SCCN, currently 4.7a = alpha). -sm
+%
 % Revision 1.27  2004/10/15 15:17:49  scott
 % added YDIR to get postive up/down standard -sm
 %
@@ -115,7 +118,7 @@
 % -------------- EEGLAB DEFINITION (V 4.0) -------------
 % ------------------------------------------------------
 
-EEG_VERSION = '4.7a'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
+EEGLAB_VERSION = '4.6a'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
 % for local copies of the web site, uncomment and edit one of the following lines
