@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2002/08/19 19:46:16  arno
+% for non cellfun compatibility
+%
 % Revision 1.57  2002/08/14 02:01:08  arno
 % debugging epoch info
 %
@@ -442,7 +445,7 @@ end;
 	if ~isempty(EEG.icasphere)
 		if ~isempty(EEG.icaweights)
 			if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
- 	  			if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10
+	  			if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ...
  	  			') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
  	  			'Should EEGLAB clear these matrices?' 10 '(press Cancel to fix the problem from the command line)']) 
                     res = com;
