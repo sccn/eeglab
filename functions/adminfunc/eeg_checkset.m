@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/06/25 13:40:00  arno
+% adding EEG.times
+%
 % Revision 1.32  2002/06/25 02:31:06  arno
 % gcompreject initialized to zeros for all components
 %
@@ -206,6 +209,18 @@ end;
 
 com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
 res = [];
+
+% read data if necessary
+% ----------------------
+if isstr(EEG.data)
+	fid = fopen(EEG.data, 'r', 'ieee-le');
+	if fid == -1
+		error(['Can not open data file ''' EEG.data ''', check directory']);
+	end;
+	fprintf('Reading float file ''%s''...', EEG.data);
+	EEG.data = fread(fid, [EEG.nchan Inf], 'float32');
+end;
+
 % verify the type of the variables
 % --------------------------------
 	% data dimensions -------------------------
