@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/20 01:05:44  arno
+% take into account duplicate parameters
+%
 % Revision 1.13  2002/11/18 17:15:18  arno
 % adding float arg (=real)
 %
@@ -191,12 +194,12 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
       if ~isnumeric(tmpval)
           g = [ callfunc 'error: argument ''' fieldname ''' must be numeric' ]; return;
       end;
-      if strcmp(fieldtype, 'boolean')
+      if strcmpi(fieldtype, 'boolean')
           if tmpval ~=0 & tmpval ~= 1
               g = [ callfunc 'error: argument ''' fieldname ''' must be 0 or 1' ]; return;
           end;  
       else 
-          if strcmp(fieldtype, 'integer')
+          if strcmpi(fieldtype, 'integer')
               if ~isempty(fieldval)
                   if (isnan(tmpval) & ~any(isnan(fieldval))) ...
                           & (~ismember(tmpval, fieldval))
@@ -218,8 +221,8 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
           g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
       end;
       if ~isempty(fieldval)
-          if isempty(strmatch(lower(tmpval), fieldval))
-              g = [ callfunc 'error: wrong value for argument''' fieldname '''' ]; return;
+          if isempty(strmatch(lower(tmpval), lower(fieldval)))
+              g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
           end;
       end;
 
