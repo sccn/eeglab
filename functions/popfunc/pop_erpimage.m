@@ -3,7 +3,7 @@
 %                  in a specific condition) input arguments.
 %
 % Usage:
-%   >> pop_erpimage(EEG, typeplot); % pop_up window
+%   >> pop_erpimage(EEG, typeplot);          % pop_up window
 %   >> pop_erpimage(EEG, typeplot, lastcom); % pop_up window
 %   >> pop_erpimage(EEG, typeplot, channel); % do not pop-up
 %   >> pop_erpimage(EEG, typeplot, channel, title, smooth, decimate, ...
@@ -17,7 +17,7 @@
 %                the function output.
 %
 % Commandline options:
-%   channel    - channel or component to plot
+%   channel    - channel or component number to plot
 %   title      - plot title
 %   smooth     - smoothing parameter (in terms of trial). Default is 5.
 %   decimate   - decimate parameter (i.e. number of lines to suppress
@@ -44,7 +44,7 @@
 % Notes:
 %   1) A new figure is created only when the pop_up window is called, 
 %   so you may call this command to draw topographic maps in a tiled 
-%   windows. 
+%   window. 
 %   2) To sort epochs, first define the event field to be used with
 %   the argument 'sortingeventfield' (for instance 'latency'). Then 
 %   because they may be several event with different latencies in a
@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/23 17:19:45  arno
+% contextual help modif
+%
 % Revision 1.7  2002/04/23 02:01:32  arno
 % New graphic interface
 %
