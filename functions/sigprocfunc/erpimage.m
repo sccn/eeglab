@@ -161,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.212  2004/07/29 23:16:50  arno
+% convert to double for Matlab 7
+%
 % Revision 1.211  2004/06/09 01:48:43  arno
 % make limits and image data consistent
 %
@@ -2685,6 +2688,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         end
     end
     
+    limit = double(limit);
     ydelta = double(1/10*(limit(2)-limit(1))); 
     ytextoffset = double(limit(1)-1.1*ydelta);
     ynumoffset  = double(limit(1)-0.3*ydelta); % double for Matlab 7
