@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.191  2004/01/24 21:04:09  scott
+% same
+%
 % Revision 1.190  2004/01/24 21:01:18  scott
 % same
 %
@@ -2522,8 +2525,10 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                  [gcapos(1) gcapos(2) ...
                   gcapos(3) image_loy*gcapos(4)]);
     end
+    fprintf('Plotting the ERP trace below the ERP image\n');
+    size(winloc)
     if Erpstdflag == YES
-        plot1trace(ax2,times,erp,limit, NaN, stdev,[],winloc); % plot ERP +/-stdev
+        plot1trace(ax2,times,erp,limit, [], stdev,[],winloc); % plot ERP +/-stdev
     elseif ~isempty('erpsig')
         erpsig = [erpsig;-1*erpsig];
         plot1trace(ax2,times,erp,limit,erpsig,[],winloc); % plot ERP and 0+/-alpha threshold
@@ -2710,6 +2715,8 @@ if ~isnan(coherfreq)
             end
         end
         
+        fprintf('Plotting the ERSP amplitude trace below the ERP\n');
+        size(winloc)
         fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
         fprintf('     relative to baseamp: %g dB\n',baseamp);
         if Cohsigflag
@@ -2809,6 +2816,8 @@ if ~isnan(coherfreq)
         if isnan(mincoh)
             mincoh = 0;
         end
+        fprintf('Plotting the ITC trace below the ERSP\n');
+        size(winloc)
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
             coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],winloc); 
