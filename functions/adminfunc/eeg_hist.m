@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/12/05 20:08:44  arno
+% debug output
+%
 % Revision 1.1  2003/12/05 20:06:57  arno
 % Initial revision
 %
@@ -46,4 +49,8 @@ end;
 if ~isfield(EEG, 'history')
     EEG.history = '';
 end;
-EEG.history = strvcat(EEG.history, command);
+try
+    EEG.history = [ EEG.history 10 command ];
+catch
+    EEG.history = strvcat(EEG.history, command);
+end;
