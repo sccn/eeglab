@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/12/15 23:28:34  arno
+% debug nochangeupdate
+%
 % Revision 1.13  2003/12/11 17:51:11  arno
 % stoping rule debug if more than 32 channels
 %
@@ -593,7 +596,7 @@ end;
 %
 if verbose,
    fprintf( ...
-            '\nInput data size [%d,%d] = %d channels, %d frames.\n', ...
+            '\nInput data size [%d,%d] = %d channels, %d frames/n', ...
                         chans,frames,chans,frames);
    if strcmp(pcaflag,'on')
       fprintf('After PCA dimension reduction,\n  finding ');
@@ -614,7 +617,10 @@ if verbose,
                                         nsub);
       end
    end
-   fprintf('Initial learning rate will be %g, block size %d.\n',lrate,block);
+   fprintf('Decomposing %d frames per ICA weight ((%d)^2 = %d weights, %d frames)\n',...
+           floor(frames/comps.^2),comps.^2,frames);
+   fprintf('Initial learning rate will be %g, block size %d.\n',...
+           lrate,block);
    if momentum>0,
       fprintf('Momentum will be %g.\n',momentum);
    end
