@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2004/02/19 15:49:58  scott
+% plot dipoles inside head in 'skirt' mode
+%
 % Revision 1.141  2004/02/18 01:16:53  scott
 % help message adjust
 %
@@ -907,50 +910,6 @@ elseif strcmp(ELECTRODES,'numbers')
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%% Plot dipole on the scalp map  %%%%%%%%%%%%%%%%%%%%%
-%
-if ~isempty(DIPOLE)
-    hold on;
-    % Note: invert x and y from dipplot usage
-    tmp = DIPOLE;
-    if isstruct(DIPOLE)
-        if ~isfield(tmp,'posxyz')
-           error('dipole structure is not an EEG.dipfit.model')
-        end
-        DIPOLE = [];
-        DIPOLE(:,1) = -tmp.posxyz(:,2)/DIPSPHERE;
-        DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE;
-        DIPOLE(:,3) = -tmp.momxyz(:,2);
-        DIPOLE(:,4) =  tmp.momxyz(:,1);
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
-           DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
-        end                                            % plot dipole(s) inside head
-        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500; % ???
-    else
-        DIPOLE(:,1) = -tmp(:,2);
-        DIPOLE(:,2) =  tmp(:,1);
-        DIPOLE(:,3) = -tmp(:,4);
-        DIPOLE(:,4) =  tmp(:,3);
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
-    end;
-    if strcmpi(DIPNORM, 'on')
-        for index = 1:size(DIPOLE,1)
-            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
-        end;
-    end;
-    DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
-    for index = 1:size(DIPOLE,1)
-        hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
-        set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
-        hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
-                   [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
-        set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
-    end;
-end;
-
-%
 %%%%%%%%%%%%%%%%%%%%% Plot head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 circ = 0:2*pi/100:2*pi; % circle vertices
@@ -980,6 +939,53 @@ else % no 'skirt'
   plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
   plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
 end
+
+%
+%%%%%%%%%%%%%%%%%%%%%% Plot dipole on the scalp map  %%%%%%%%%%%%%%%%%%%%%
+%
+if ~isempty(DIPOLE)
+    hold on;
+    % Note: invert x and y from dipplot usage
+    tmp = DIPOLE;
+    if isstruct(DIPOLE)
+        if ~isfield(tmp,'posxyz')
+           error('dipole structure is not an EEG.dipfit.model')
+        end
+        DIPOLE = [];
+        DIPOLE(:,1) = -tmp.posxyz(:,2)/DIPSPHERE;
+        DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE;
+        DIPOLE(:,3) = -tmp.momxyz(:,2);
+        DIPOLE(:,4) =  tmp.momxyz(:,1);
+        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
+        if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+           DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
+        end                                            % plot dipole(s) inside head
+        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500; % ???
+    else
+        DIPOLE(:,1) = -tmp(:,2);
+        DIPOLE(:,2) =  tmp(:,1);
+        DIPOLE(:,3) = -tmp(:,4);
+        DIPOLE(:,4) =  tmp(:,3);
+        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
+        if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+           DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
+        end                                            % plot dipole(s) inside head
+        DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
+    end;
+    if strcmpi(DIPNORM, 'on')
+        for index = 1:size(DIPOLE,1)
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
+        end;
+    end;
+    DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
+    for index = 1:size(DIPOLE,1)
+        hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
+        set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
+        hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
+                   [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
+        set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
+    end;
+end;
 
 %
 %%%%%%%%%%%%%%%%%%%% Set standard background color %%%%%%%%%%%%%%%%%%%%%%%%
