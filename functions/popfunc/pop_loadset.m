@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/22 00:04:44  arno
+% old format compatibility
+%
 % Revision 1.9  2002/08/11 19:20:36  arno
 % removing eeg_consts
 %
@@ -186,23 +189,38 @@ function EEG = checkoldformat(EEG)
 		
 		% modify the eegtype to match the new one
 		
-		if EEG.trials > 1
-			tmpepoch  = [ EEG.rt(:) EEG.eegtype(:) EEG.eegresp(:) ];
-			
-			EEG = rmfield( EEG, {'accept', 'eegtype' 'accept' 'eegresp' });
-			EEG = eeg_checkset(EEG);;
-			EEG = pop_importepoch(EEG, tmpepoch, { 'rt' 'eegtype' 'eegresp' }, {'rt'}, 1E-3);
-		end;
-		EEG = eeg_checkset(EEG, 'eventconsistency');
+		try, 
+			if EEG.trials > 1
+				EEG.events  = [ EEG.rt(:) EEG.eegtype(:) EEG.eegresp(:) ];
+			end;
+		catch, end;
 	end;
 	% check modified fields
 	% ---------------------
-	if isfield(EEG,'icadata')
-		EEG.icaact = EEG.icadata;
-		EEG = rmfield(EEG, 'icadata');
-	end;  
-	if isfield(EEG,'poschan')
-		EEG.chanlocs = EEG.poschan;
-		EEG = rmfield(EEG, 'poschan');
-	end;  
+	if isfield(EEG,'icadata'), EEG.icaact = EEG.icadata; end;  
+	if isfield(EEG,'poschan'), EEG.chanlocs = EEG.poschan; end;  
+	if ~isfield(EEG, 'icaact'), EEG.icaact = []; end;
+	if ~isfield(EEG, 'chanlocs'), EEG.chanlocs = []; end;
+	
+	if isfield(EEG, 'events')
+		try, 
+			if EEG.trials > 1
+				EEG.events  = [ EEG.rt(:) ];
+				
+				EEG = eeg_checkset(EEG);;
+				EEG = pop_importepoch(EEG, EEG.events, { 'rt'}, {'rt'}, 1E-3);
+			end;
+			if isfield(EEG, 'trialsval')
+				EEG = pop_importepoch(EEG, EEG.trialsval(:,2:3), { 'eegtype' 'response' }, {},1,0,0);
+			end;
+			EEG = eeg_checkset(EEG, 'eventconsistency');
+		catch, disp('warning: could not import events'); end;			
+	end;
+	rmfields = {'icadata' 'events' 'accept' 'eegtype' 'eegresp' 'trialsval' 'poschan' 'icadata' 'namechan' };
+	for index = 1:length(rmfields)
+		if isfield(EEG, rmfields{index}), 
+			disp(['Warning: field ' rmfields{index} ' is deprecated']);
+		end;
+	end;
+	
 	
