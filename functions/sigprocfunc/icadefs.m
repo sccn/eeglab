@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/02/12 23:33:41  arno
+% changing default color if less or equal to 256 colors
+%
 % Revision 1.18  2002/11/15 17:57:33  arno
 % update example tutorials
 % URLs
@@ -96,18 +99,18 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
 
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
-
+                            % If none, use []
 % COLORS
 % ------
 
-if get(0, 'screendepth') <=8
+if get(0, 'screendepth') <=8 % if mono or 8-bit color
     BACKCOLOR           = [1 1 1];    % Background figure color 
     BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = [1 1 1];    % Buttons colors in figures
     GUIPOPBUTTONCOLOR   = [1 1 1];    % Buttons colors in GUI windows
     GUIBACKCOLOR        = [1 1 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0];      % GUI foreground color for text    
-else
+else % if full color screen
     BACKCOLOR           = [.93 .96 1];    % Background figure color 
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
@@ -119,17 +122,17 @@ end;
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
 % -------------------------------------------------------------
 
-MAXENVPLOTCHANS   = 256;  % maximum number of channels to plot in envproj.m
-MAXPLOTDATACHANS  = 256;  % maximum number of channels to plot in dataplot.m
-MAXPLOTDATAEPOCHS = 256;  % maximum number of epochs to plot in dataplot.m
-MAXEEGPLOTCHANS   = 256;  % maximum number of channels to plot in eegplot.m
-MAXTOPOPLOTCHANS  = 256;  % maximum number of channels to plot in topoplot.m
+MAXENVPLOTCHANS   = 264;  % maximum number of channels to plot in envproj.m
+MAXPLOTDATACHANS  = 264;  % maximum number of channels to plot in dataplot.m
+MAXPLOTDATAEPOCHS = 264;  % maximum number of epochs to plot in dataplot.m
+MAXEEGPLOTCHANS   = 264;  % maximum number of channels to plot in eegplot.m
+MAXTOPOPLOTCHANS  = 264;  % maximum number of channels to plot in topoplot.m
 
-DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL RATE
+DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL DEFAULT SRATE
 DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
 SC  =  ['binica.sc'];           % Master .sc script file for binica.m
                                 % MATLAB will use first such file found
                                 % in its path of script directories.
-                                % Copy to pwd to alter ica defaults
+                                % Copy to pwd to alter ICA defaults
