@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/13 00:03:10  scott
+% text
+%
 % Revision 1.15  2002/08/13 00:01:34  scott
 % text
 %
@@ -166,7 +169,11 @@ if nargin<2
 	    for index = 1:length(allfields) 
 	        geometry = { geometry{:} [1 1 1 1 0.45 0.35 0.45] };
 	        description = '';
-	        try, description = fastif(isempty(EEG.eventdescription{index}), '', EEG.eventdescription{index});
+	        try, 
+				description = fastif(isempty(EEG.eventdescription{index}), '', EEG.eventdescription{index});
+				description = description(1,:);
+				tmplines = find(description == 10);
+				if ~isempty(tmplines), description = description(1:tmplines(1)-1); end;
 	        catch, end;
 	        uilist   = { uilist{:}, ...
 	         { 'Style', 'text', 'string', allfields{index} }, ...
