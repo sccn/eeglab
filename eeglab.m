@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.321  2004/07/10 00:09:09  arno
+% same
+%
 % Revision 1.320  2004/07/10 00:07:55  arno
 % same
 %
@@ -1489,7 +1492,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     end;
                 end;
             end;
-        elseif ~isempty(findstr(dircontent{index}, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
+        elseif ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
             funcname = dircontent{index}(1:end-2); % remove .m
         end;
         
