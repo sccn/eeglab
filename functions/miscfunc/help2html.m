@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/16 16:53:14  arno
+% debug
+%
 % Revision 1.10  2002/08/16 16:43:58  arno
 % debug componly
 %
@@ -369,7 +372,7 @@ function str = deblank2( str ); % deblank two ways
 return;
 
 function strout = formatstr( str, refcall );
-		[tok1 strrm] = strtok( str );
+	[tok1 strrm] = strtok( str );
 		strout = [];
 		while ~isempty(tok1)
 			tokout = functionformat( tok1, refcall );
@@ -401,6 +404,7 @@ return;
 function [test, realtokin, tail] = testfunc1( tokin ) % test if is string is 'function()[,]'  
 	test = 0; realtokin = ''; tail = '';
 	if ~isempty( findstr( tokin, '()' ) )
+		if length(tokin)<3, return; end;
 		realtokin = tokin( 1:findstr( tokin, '()' )-1);
 		if length(realtokin) < (length(tokin)-2) tail = tokin(end); else tail = []; end;
 		test = 1;
