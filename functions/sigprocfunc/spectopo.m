@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/01/28 17:37:25  arno
+% debugging freqency range if no topoplot
+%
 % Revision 1.49  2003/01/21 17:21:30  arno
 % debug last
 %
@@ -732,7 +735,7 @@ end;
 % Draw title
 %%%%%%%%%%%%%%%%
 if ~isempty(g.title)
-	axes(mainfig); axis off;
+	axes(mainfig);
 	tl = text(-0.1,1.06,g.title);
 	set(tl,'fontsize',15)
 end
