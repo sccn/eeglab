@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/05/19 02:57:24  scott
+% *** empty log message ***
+%
 % Revision 1.28  2002/05/19 02:55:45  scott
 % *** empty log message ***
 %
@@ -320,7 +323,7 @@ else % showchan==0
   axis([limits(1:4)]);
   caxis([cmin cmax]);
   hold on;
-  cbar
+  % cbar
 end
 axes(imgax)
 xl=xlabel('Time (ms)');
