@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/06/23 17:47:58  arno
+% adding threshold and continuity options
+%
 % Revision 1.56  2003/06/23 17:16:40  arno
 % remove debug message
 %
@@ -313,8 +316,8 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'circfactor'  'real'          []                                       [];
                             'title'       'string'        []                                       '';
                             'freqs'       'real'          []                                       [];
-                            'continuity'  'integer'       [1 Inf]                                  [];
-                            'threshold'   'float'         [0 Inf]                                  [];
+                            'continuity'  'integer'       [1 Inf]                                  3;
+                            'threshold'   'float'         [0 Inf]                                  [0.1 0.1 0.1];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'makemovie'   'cell'          {}                                       {};
@@ -425,9 +428,6 @@ end;
 % threshold activities (so that lines do not flash)
 % -------------------------------------------------
 try, 
-    if ~isempty(g.continuity) | ~isempty(g.threshold)
-        error('go to thresholding');
-    end;
 	if exist([g.tffolder g.tfname]) == 2
         eval(['load -mat ' g.tffolder g.tfname '.thresh' ]);
 	else 
@@ -437,16 +437,21 @@ try,
         eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
     end;
 catch,
-    if isempty(g.continuity), g.continuity = 3; end;
-    if isempty(g.threshold),  g.threshold = [0.1 0.1 0.1]; end;
-    
-	newERSP   = moviethresh( ALLERSP, g.threshold(1), g.continuity, 2);
-	newITC    = moviethresh( ALLITC , g.threshold(2), g.continuity, 2);
-	newCROSSF = moviethresh( ALLCROSSF, g.threshold(3), g.continuity, 2);
-	newANGLE  = ALLCROSSFANGLE;
-	%newERSP   = ALLERSP;
-	%newITC    = ALLITC;
-	%newCROSSF = ALLCROSSF;
+    if isempty(g.continuity) & isempty(g.threshold)
+        disp('Skipping thresholding');
+        newERSP   = ALLERSP;
+        newITC    = ALLITC;
+        newCROSSF = ALLCROSSF;
+        newANGLE  = ALLCROSSFANGLE;
+    else
+        if isempty(g.continuity), g.continuity = 1; end;
+        if isempty(g.threshold),  g.threshold = [0 0 0]; end;
+        
+        newERSP   = moviethresh( ALLERSP, g.threshold(1), g.continuity, 2);
+        newITC    = moviethresh( ALLITC , g.threshold(2), g.continuity, 2);
+        newCROSSF = moviethresh( ALLCROSSF, g.threshold(3), g.continuity, 2);
+        newANGLE  = ALLCROSSFANGLE;
+	end;
     %newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
 	
 	if exist([g.tffolder g.tfname]) == 2
