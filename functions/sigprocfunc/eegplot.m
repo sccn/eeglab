@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/08/12 01:15:09  arno
+% update color
+%
 % Revision 1.36  2002/08/12 00:27:16  arno
 % color
 %
@@ -234,7 +237,7 @@ DEFAULT_PLOT_COLOR = { [0 0 1], [0.7 0.7 0.7]};         % EEG line color
 try, icadefs;
 	DEFAULT_FIG_COLOR = BACKCOLOR;
 	BUTTON_COLOR = GUIBUTTONCOLOR;
-else 
+catch
 	DEFAULT_FIG_COLOR = [1 1 1];
 	BUTTON_COLOR =[0.8 0.8 0.8];
 end;
