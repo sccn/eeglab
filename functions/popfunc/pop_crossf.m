@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/04/22 21:34:58  arno
+% run newcrossf at SCCN
+%
 % Revision 1.22  2003/02/23 08:25:16  scott
 % header edits -sm
 %
@@ -208,7 +211,6 @@ if popup
 		 otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Phase Coherence''' ];
 		end;
-        options
 	end;
 	if ~isempty( result{6} )
 		options      = [ options ', ''alpha'',' result{6} ];
