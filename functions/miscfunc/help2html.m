@@ -22,6 +22,8 @@
 %                  write title and link.
 %   'outputtext' - Text used in the outputlink. Default is the function
 %                  name.
+%   'outputonly' - ['on'|'off'] Only generate output text for mother web 
+%                  page. Default is 'off'. 
 %
 % Output:
 %   linktext   - html text link to the output file
@@ -82,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/15 21:42:23  arno
+% add default for outputtext
+%
 % Revision 1.6  2002/08/15 21:16:07  arno
 % debug
 %
@@ -128,6 +133,7 @@ g.normcol2     = '<td VALIGN=BOTTOM NOSAVE>';
 g.doublecol    = '<td ALIGN=CENTER COLSPAN="2" NOSAVE>';
 g.seefile      = [ '<FONT FACE="'  g.font '">See the matlab file <A HREF="%s" target="_blank">%s</A> (may require other functions)</FONT><BR><BR>' ]; 
 
+try, g.outputonly; 		catch, g.outputonly	= 'off'; end;
 try, g.background; 		catch, g.background	= ''; 	end;
 try, g.header; 			catch, g.header		= ''; 	end; 
 try, g.footer; 			catch, g.footer		= ''; 	end; 
@@ -141,13 +147,6 @@ if nargin < 1
 	return;
 end;	
 
-% input file
-% ---------- 
-fid = fopen( filename, 'r');
-if fid == -1
-	error('File not found');
-end;
-
 % output file
 % -----------
 if nargin < 2 | isempty(htmlfile);
@@ -157,9 +156,26 @@ if nargin < 2 | isempty(htmlfile);
 else
 	indexdot = findstr( filename, '.');
 end;
-fo = fopen(htmlfile, 'w');
+
+% generate the output command
+% ---------------------------
 try, g.outputtext; 		catch, g.outputtext	= ''; 	end; 
 if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end;
+linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
+if strcmp(g.outputonly, 'on')
+	return;
+end;
+
+% open files
+% ---------- 
+fid = fopen( filename, 'r');
+if fid == -1
+	error('Input file not found');
+end;
+fo = fopen(htmlfile, 'w');
+if fo == -1
+	error('Cannot open output file');
+end;
 
 % write header
 % ------------
@@ -330,9 +346,6 @@ fprintf( fo, [ '</table>\n<BR>' g.seefile '%s</BODY></HTML>'], lower(filename), 
 fclose( fid );
 fclose( fo  );
 
-% generate the output command
-% ---------------------------
-linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
 return;
 
 % -----------------
