@@ -31,6 +31,7 @@
 %   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to times range.
 %               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
 %   'noplot' - Do not plot sortvar {default: Do plot sortvar if in times range}
+%   'noshow' - ['yes'|'no'] do not plot erpimage, simply return outputs {default: 'no'}
 % Optionally sort input epochs: 
 %  {default} - Sort data epochs by sortvar
 %   'nosort' - Do not sort data epochs.
@@ -141,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2003/03/23 22:46:39  scott
+% *** empty log message ***
+%
 % Revision 1.82  2003/03/15 18:01:34  scott
 % help msg
 %
@@ -479,6 +483,7 @@ Ampflag   = NO;     % don't sort by amplitude
 Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
+Noshowflag  = NO;
 Renormflag = NO;
 yerplabel = '\muV';
 yerplabelflag = NO;
@@ -495,7 +500,8 @@ timelimits= nan;
 topomap   = [];     % topo map vector
 lospecHz  = [];     % spec lo frequency
 topphase = 180;     % default top phase for 'phase' option
-renorm    ='no';
+renorm    = 'no';
+noshow    = 'no';
 
 minerp = NaN; % default limits
 maxerp = NaN;
@@ -667,6 +673,9 @@ if nargin > 6
 	  elseif Renormflag == YES
 		  renorm = Arg;
 		  Renormflag = NO;
+	  elseif Noshowflag == YES
+		  noshow = Arg;
+		  Noshowflag = NO;
 	  elseif Alignflag == YES
 		  if length(Arg) ~= 1 
 			  help erpimage
@@ -856,6 +865,8 @@ if nargin > 6
 		  Nosort = YES;
 	  elseif strcmp(Arg,'renorm')
 		  Renormflag = YES;
+	  elseif strcmp(Arg,'noshow')
+		  Noshowflag = YES;
 	  elseif strcmp(Arg,'noplot')|strcmp(Arg,'noshow')
 		  Noshow = YES;
 	  elseif strcmp(Arg,'caxis')
@@ -1266,47 +1277,47 @@ elseif Nosort == YES
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on (mean) value %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 elseif exist('valargs')
-  [sttime stframe] = min(abs(times-valargs(1)));
-   sttime = times(stframe);
-  if length(valargs)>1
-     [endtime endframe] = min(abs(times-valargs(2)));
-     endtime = times(endframe);
-  else
-     endframe = stframe;
-     endtime = times(endframe);
-  end
-  if length(valargs)==1 | sttime == endtime
-     fprintf('Sorting data on value at time %4.0f ms.\n',sttime);
-  elseif length(valargs)>1
-     fprintf('Sorting data on mean value between %4.0f and %4.0f ms.\n',...
-            sttime,endtime);
-  end
-  if endframe>stframe
-     sortval = mean(data(stframe:endframe,:));
-  else
-     sortval = data(stframe,:);
-  end
-  [sortval,sortidx] = sort(sortval);
-  if length(valargs)>2
-   if valargs(3) <0
-    sortidx = sortidx(end:-1:1); % plot largest values on top
-                                 % if direction < 0   
-   end
-  end
-  data = data(:,sortidx);
-  if ~isempty(auxvar)
-    auxvar = auxvar(:,sortidx);
-  end
+    [sttime stframe] = min(abs(times-valargs(1)));
+    sttime = times(stframe);
+    if length(valargs)>1
+        [endtime endframe] = min(abs(times-valargs(2)));
+        endtime = times(endframe);
+    else
+        endframe = stframe;
+        endtime = times(endframe);
+    end
+    if length(valargs)==1 | sttime == endtime
+        fprintf('Sorting data on value at time %4.0f ms.\n',sttime);
+    elseif length(valargs)>1
+        fprintf('Sorting data on mean value between %4.0f and %4.0f ms.\n',...
+                sttime,endtime);
+    end
+    if endframe>stframe
+        sortval = mean(data(stframe:endframe,:));
+    else
+        sortval = data(stframe,:);
+    end
+    [sortval,sortidx] = sort(sortval);
+    if length(valargs)>2
+        if valargs(3) <0
+            sortidx = sortidx(end:-1:1); % plot largest values on top
+                                         % if direction < 0   
+        end
+    end
+    data = data(:,sortidx);
+    if ~isempty(auxvar)
+        auxvar = auxvar(:,sortidx);
+    end
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 else 
-  fprintf('Sorting data on input sortvar.\n');
-  [sortvar,sortidx] = sort(sortvar);
-  data = data(:,sortidx);
-  if ~isempty(auxvar)
-    auxvar = auxvar(:,sortidx);
-  end
+    fprintf('Sorting data on input sortvar.\n');
+    [sortvar,sortidx] = sort(sortvar);
+    data = data(:,sortidx);
+    if ~isempty(auxvar)
+        auxvar = auxvar(:,sortidx);
+    end
 end
 
 %if max(sortvar)<0
@@ -1317,79 +1328,78 @@ end
 %%%%%%%%%%%%%%%%%%% Adjust decfactor if phargs or ampargs %%%%%%%%%%%%%%%%%%%%%
 %
 if decfactor > sqrt(ntrials) % if large, output this many trials
-  n = 1:ntrials;
-  if exist('phargs') & length(phargs)>1
-    if phargs(2)>0
-      n = n(ceil(phargs(2)*ntrials)+1:end); % trials after rejection
-    elseif phargs(2)<0
-      n = n(1:floor(phargs(2)*length(n)));  % trials after rejection
+    n = 1:ntrials;
+    if exist('phargs') & length(phargs)>1
+        if phargs(2)>0
+            n = n(ceil(phargs(2)*ntrials)+1:end); % trials after rejection
+        elseif phargs(2)<0
+            n = n(1:floor(phargs(2)*length(n)));  % trials after rejection
+        end
+    elseif exist('ampargs') & length(ampargs)>1
+        if ampargs(2)>0
+            n = n(ceil(ampargs(2)*ntrials)+1:end); % trials after rejection
+        elseif ampargs(2)<0
+            n = n(1:floor(ampargs(2)*length(n)));  % trials after rejection
+        end
     end
-  elseif exist('ampargs') & length(ampargs)>1
-    if ampargs(2)>0
-      n = n(ceil(ampargs(2)*ntrials)+1:end); % trials after rejection
-    elseif ampargs(2)<0
-      n = n(1:floor(ampargs(2)*length(n)));  % trials after rejection
-    end
-  end
-  decfactor = length(n)/decfactor;
+    decfactor = length(n)/decfactor;
 end
+
 % 
 %%%%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-% if ~isnan(coherfreq)
-  urdata = data; % compute amp, coher on unsmoothed data
-% end
+urdata = data; % compute amp, coher on unsmoothed data
 if ~Allampsflag & ~exist('data2') % if imaging potential,
- if avewidth > 1 | decfactor > 1
-  if Nosort == YES
-    fprintf('Smoothing the data using a window width of %g epochs ',avewidth);
-  else
-    fprintf('Smoothing the sorted epochs with a %g-epoch moving window.',...
-                       avewidth);
-  end
-  fprintf('\n');
-  fprintf('  and a decimation factor of %g\n',decfactor);
-  [data,outtrials]    = movav(data,1:ntrials,avewidth,decfactor); 
-                        % Note: movav here sorts using square window
-  [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
-  if ~isempty(auxvar)
-         [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
-  end
-  fprintf('Output data will be %d frames by %d smoothed trials.\n',...
-                          frames,length(outtrials));
- else % don't smooth
-  outtrials = 1:ntrials;
-  outsort = sortvar;
- end
+    if avewidth > 1 | decfactor > 1
+        if Nosort == YES
+            fprintf('Smoothing the data using a window width of %g epochs ',avewidth);
+        else
+            fprintf('Smoothing the sorted epochs with a %g-epoch moving window.',...
+                    avewidth);
+        end
+        fprintf('\n');
+        fprintf('  and a decimation factor of %g\n',decfactor);
+        [data,outtrials]    = movav(data,1:ntrials,avewidth,decfactor); 
+        % Note: movav here sorts using square window
+        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+        if ~isempty(auxvar)
+            [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
+        end
+        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+                frames,length(outtrials));
+    else % don't smooth
+        outtrials = 1:ntrials;
+        outsort = sortvar;
+    end
 
- %
- %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- if ~isempty(Caxis) 
-  mindat = Caxis(1);
-  maxdat = Caxis(2);
-  fprintf('Using the specified caxis range of [%g,%g].\n',...
-                                           mindat,maxdat);
- else
-  mindat = min(min(data));
-  maxdat = max(max(data));
-  maxdat =  max(abs([mindat maxdat])); % make symmetrical about 0
-  mindat = -maxdat;
-  if ~isempty(caxfraction)
-     adjmax = (1-caxfraction)/2*(maxdat-mindat);
-     mindat = mindat+adjmax;
-     maxdat = maxdat-adjmax;
-     fprintf(...
- 'The caxis range will be %g times the sym. abs. data range -> [%g,%g].\n',...
-                                  caxfraction,mindat,maxdat);
-  else
-     fprintf(...
- 'The caxis range will be the sym. abs. data range -> [%g,%g].\n',...
-                                  mindat,maxdat);
-  end
- end
+    %
+    %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if ~isempty(Caxis) 
+        mindat = Caxis(1);
+        maxdat = Caxis(2);
+        fprintf('Using the specified caxis range of [%g,%g].\n', mindat, maxdat);
+    else
+        mindat = min(min(data));
+        maxdat = max(max(data));
+        maxdat =  max(abs([mindat maxdat])); % make symmetrical about 0
+        mindat = -maxdat;
+        if ~isempty(caxfraction)
+            adjmax = (1-caxfraction)/2*(maxdat-mindat);
+            mindat = mindat+adjmax;
+            maxdat = maxdat-adjmax;
+            fprintf(...
+                'The caxis range will be %g times the sym. abs. data range -> [%g,%g].\n',...
+                caxfraction,mindat,maxdat);
+        else
+            fprintf(...
+                'The caxis range will be the sym. abs. data range -> [%g,%g].\n',...
+                mindat,maxdat);
+        end
+    end
 end % if ~Allampsflag & ~exist('data2')
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% Set time limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1397,31 +1407,33 @@ if isnan(timelimits(1))
     timelimits = [min(times) max(times)];
 end
 fprintf('Data will be plotted between %g and %g ms.\n',timelimits(1),timelimits(2));
+
 %
 %%%%%%%%%%%%% Image the aligned/sorted/smoothed data %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~any(isnan(coherfreq))       % if plot three time axes
-     image_loy = 3*PLOT_HEIGHT;
-elseif Erpflag == YES   % elseif if plot only one time axes
-     image_loy = 1*PLOT_HEIGHT;
-else                    % else plot erp-image only
-     image_loy = 0*PLOT_HEIGHT;
-end
-gcapos=get(gca,'Position');
-delete(gca)
-if isempty(topomap)
-  image_top = 1;
-else
-  image_top = 0.9;
-end
-ax1=axes('Position',...
-    [gcapos(1) gcapos(2)+image_loy*gcapos(4) ...
-     gcapos(3) (image_top-image_loy)*gcapos(4)]);
-
+if strcmpi(noshow, 'no')  
+    if ~any(isnan(coherfreq))       % if plot three time axes
+        image_loy = 3*PLOT_HEIGHT;
+    elseif Erpflag == YES   % elseif if plot only one time axes
+        image_loy = 1*PLOT_HEIGHT;
+    else                    % else plot erp-image only
+        image_loy = 0*PLOT_HEIGHT;
+    end
+    gcapos=get(gca,'Position');
+    delete(gca)
+    if isempty(topomap)
+        image_top = 1;
+    else
+        image_top = 0.9;
+    end
+    ax1=axes('Position',...
+             [gcapos(1) gcapos(2)+image_loy*gcapos(4) ...
+              gcapos(3) (image_top-image_loy)*gcapos(4)]);
+end;    
 ind = isnan(data);    % find nan's in data
 [i j]=find(ind==1);
 if ~isempty(i)
-  data(i,j) = 0;      % plot shifted nan data as 0 (=green)
+    data(i,j) = 0;      % plot shifted nan data as 0 (=green)
 end
 
 %
@@ -1444,240 +1456,247 @@ end
 
 if ~Allampsflag & ~exist('data2') %%%%%%%%%%%%%%% Plot ERP image %%%%%%%%%%%%%%
 
- if TIMEX
-  imagesc(times,outtrials,data',[mindat,maxdat]);% plot time on x-axis
-  set(gca,'Ydir','normal');
-  axis([timelimits(1) timelimits(2) ...
-       min(outtrials) max(outtrials)]);
- else
-  imagesc(outtrials,times,data,[mindat,maxdat]); % plot trials on x-axis
-  axis([min(outtrials) max(outtrials)...
-       timelimits(1) timelimits(2)]);
- end
- hold on
- drawnow
+    if strcmpi(noshow, 'no')
+        if TIMEX
+            imagesc(times,outtrials,data',[mindat,maxdat]);% plot time on x-axis
+            set(gca,'Ydir','normal');
+            axis([timelimits(1) timelimits(2) ...
+                  min(outtrials) max(outtrials)]);
+        else
+            imagesc(outtrials,times,data,[mindat,maxdat]); % plot trials on x-axis
+            axis([min(outtrials) max(outtrials)...
+                  timelimits(1) timelimits(2)]);
+        end
+        hold on
+        drawnow
+    end;
+    
 elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
 
- if freq > 0 
-    coherfreq = freq; % use phase-sort frequency
- end
+    if freq > 0 
+        coherfreq = freq; % use phase-sort frequency
+    end
+    
+    if ~isnan(signifs) % plot received significance levels
+        fprintf('Computing and plotting received amp and ITC significance levels...\n');
+        [amps,cohers,cohsig,ampsig,allamps] = ...
+            phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+        % need to receive cohsig and ampsig to get allamps
+        ampsig = signifs([1 2]); % assume these already in dB
+        cohsig = signifs(3);
+        
+    elseif alpha>0 % compute significance levels
+        fprintf('Computing and plotting %g amp and ITC significance level...\n',alpha);
+        [amps,cohers,cohsig,ampsig,allamps] = ...
+            phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+        % need to receive cohsig and ampsig to get allamps
+        ampsig = 20*log10(ampsig); % convert to dB
+        fprintf('Coherence significance level: %g\n',cohsig);
 
- if ~isnan(signifs) % plot received significance levels
-   fprintf('Computing and plotting received amp and ITC significance levels...\n');
-   [amps,cohers,cohsig,ampsig,allamps] = ...
-     phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
-     % need to receive cohsig and ampsig to get allamps
-   ampsig = signifs([1 2]); % assume these already in dB
-   cohsig = signifs(3);
+    else % no plotting of significance
+        [amps,cohers,cohsig,ampsig,allamps] = ...
+            phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+        % need to receive cohsig and ampsig to get allamps
+    end
+    
+    % fprintf('#1 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
+    
+    base = find(times<=DEFAULT_BASELINE_END);
+    if length(base)<2
+        base = 1:floor(length(times)/4); % default first quarter-epoch
+        fprintf('Using %g to %g ms as amplitude baseline.\n',...
+                times(1),times(base(end)));
+    end
+    amps = 20*log10(amps); % convert to dB
+    
+    if alpha>0
+        fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
+    end
 
- elseif alpha>0 % compute significance levels
-   fprintf('Computing and plotting %g amp and ITC significance level...\n',alpha);
-   [amps,cohers,cohsig,ampsig,allamps] = ...
-     phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
-     % need to receive cohsig and ampsig to get allamps
-   ampsig = 20*log10(ampsig); % convert to dB
-   fprintf('Coherence significance level: %g\n',cohsig);
+    % baseall = mean(mean(allamps(base,:)));
+    % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
- else % no plotting of significance
-   [amps,cohers,cohsig,ampsig,allamps] = ...
-     phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
-     % need to receive cohsig and ampsig to get allamps
- end
-
- % fprintf('#1 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-
- base = find(times<=DEFAULT_BASELINE_END);
- if length(base)<2
-     base = 1:floor(length(times)/4); % default first quarter-epoch
-     fprintf('Using %g to %g ms as amplitude baseline.\n',...
-                          times(1),times(base(end)));
- end
- amps = 20*log10(amps); % convert to dB
-
- if alpha>0
-   fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
- end
-
- % baseall = mean(mean(allamps(base,:)));
- % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-
- fprintf('Subtracting the mean baseline log amplitude \n');
- %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
- % allamps = allamps./baseall;
-
- % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-
- if avewidth > 1 | decfactor > 1
-   % Note: using square window
-   if Nosort == YES
-    fprintf(...
-       'Smoothing the amplitude epochs using a window width of %g epochs ',...
-            avewidth);
-   else
-    fprintf(...
-       'Smoothing the sorted amplitude epochs with a %g-epoch moving window.',...
-            avewidth);
-   end
-   fprintf('\n');
-   fprintf('  and a decimation factor of %g\n',decfactor);
-   %fprintf('4 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-   [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor); 
-                                            % Note: using square window
-   %fprintf('5 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-   [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
-   fprintf('Output data will be %d frames by %d smoothed trials.\n',...
-                          frames,length(outtrials));
- else
-  outtrials = 1:ntrials;
-  outsort = sortvar;
- end
- allamps = 20*log10(allamps);
-
- if isnan(baseamp) % if not specified in 'limits'
-    [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
- 	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
- else
-    amps = amps-baseamp; % use specified (log) baseamp
-	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
-	if isnan(signifs);
-		ampsig = ampsig-baseamp;
-	end
- end
- %
- %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- if ~isempty(Caxis) 
-   mindat = Caxis(1);
-   maxdat = Caxis(2);
-  fprintf('Using the specified caxis range of [%g,%g].\n',...
-                                           mindat,maxdat);
- else
-  mindat = min(min(allamps));
-  maxdat = max(max(allamps));
-  maxdat =  max(abs([mindat maxdat])); % make symmetrical about 0
-  mindat = -maxdat;
-  if ~isempty(caxfraction)
-     adjmax = (1-caxfraction)/2*(maxdat-mindat);
-     mindat = mindat+adjmax;
-     maxdat = maxdat-adjmax;
-     fprintf(...
- 'The caxis range will be %g times the sym. abs. data range -> [%g,%g].\n',...
-                                  caxfraction,mindat,maxdat);
-  else
-     fprintf(...
-     'The caxis range will be the sym. abs. data range -> [%g,%g].\n',...
-                                  mindat,maxdat);
-  end
- end
- %
- %%%%%%%%%%%%%%%%%%%%% Image amplitudes at coherfreq %%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- fprintf('Plotting amplitudes at freq %g Hz instead of potentials.\n',coherfreq);
- if TIMEX
-  imagesc(times,outtrials,allamps',[mindat,maxdat]);% plot time on x-axis
-  set(gca,'Ydir','normal');
-  axis([timelimits(1) timelimits(2) ...
-       min(outtrials) max(outtrials)]);
- else
-  imagesc(outtrials,times,allamps,[mindat,maxdat]); % plot trials on x-axis
-  axis([min(outtrials) max(outtrials)...
-       timelimits(1) timelimits(2)]);
- end
-  drawnow
-  hold on
-
+    fprintf('Subtracting the mean baseline log amplitude \n');
+    %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
+    % allamps = allamps./baseall;
+    
+    % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
+    
+    if avewidth > 1 | decfactor > 1
+        % Note: using square window
+        if Nosort == YES
+            fprintf(...
+                'Smoothing the amplitude epochs using a window width of %g epochs ',...
+                avewidth);
+        else
+            fprintf(...
+                'Smoothing the sorted amplitude epochs with a %g-epoch moving window.',...
+                avewidth);
+        end
+        fprintf('\n');
+        fprintf('  and a decimation factor of %g\n',decfactor);
+        %fprintf('4 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
+        [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor); 
+        % Note: using square window
+        %fprintf('5 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
+        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+                frames,length(outtrials));
+    else
+        outtrials = 1:ntrials;
+        outsort = sortvar;
+    end
+    allamps = 20*log10(allamps);
+    
+    if isnan(baseamp) % if not specified in 'limits'
+        [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
+        allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+    else
+        amps = amps-baseamp; % use specified (log) baseamp
+        allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+        if isnan(signifs);
+            ampsig = ampsig-baseamp;
+        end
+    end
+    %
+    %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if ~isempty(Caxis) 
+        mindat = Caxis(1);
+        maxdat = Caxis(2);
+        fprintf('Using the specified caxis range of [%g,%g].\n',...
+                mindat,maxdat);
+    else
+        mindat = min(min(allamps));
+        maxdat = max(max(allamps));
+        maxdat =  max(abs([mindat maxdat])); % make symmetrical about 0
+        mindat = -maxdat;
+        if ~isempty(caxfraction)
+            adjmax = (1-caxfraction)/2*(maxdat-mindat);
+            mindat = mindat+adjmax;
+            maxdat = maxdat-adjmax;
+            fprintf(...
+                'The caxis range will be %g times the sym. abs. data range -> [%g,%g].\n',...
+                caxfraction,mindat,maxdat);
+        else
+            fprintf(...
+                'The caxis range will be the sym. abs. data range -> [%g,%g].\n',...
+                mindat,maxdat);
+        end
+    end
+    %
+    %%%%%%%%%%%%%%%%%%%%% Image amplitudes at coherfreq %%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if strcmpi(noshow, 'no')
+        fprintf('Plotting amplitudes at freq %g Hz instead of potentials.\n',coherfreq);
+        if TIMEX
+            imagesc(times,outtrials,allamps',[mindat,maxdat]);% plot time on x-axis
+            set(gca,'Ydir','normal');
+            axis([timelimits(1) timelimits(2) ...
+                  min(outtrials) max(outtrials)]);
+        else
+            imagesc(outtrials,times,allamps,[mindat,maxdat]); % plot trials on x-axis
+            axis([min(outtrials) max(outtrials)...
+                  timelimits(1) timelimits(2)]);
+        end
+        drawnow
+        hold on
+    end;
+    
 elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
-
- if freq > 0 
-    coherfreq = freq; % use phase-sort frequency
- end
- if alpha>0
-   fprintf('Computing and plotting %g coherence significance level...\n',alpha);
-   %[amps,cohers,cohsig,ampsig,allcohers] = ...
-     %crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
-   fprintf('Inter-Trial Coherence significance level: %g\n',cohsig);
-   fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
- else
-   %[amps,cohers,cohsig,ampsig,allcohers] = ...
-     % crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
- end
- if ~exist('allcohers')
-     fprintf('erpimage(): allcohers not returned....\n')
-     return
- end
- allamps = allcohers; % output variable
- % fprintf('Size allcohers = (%d, %d)\n',size(allcohers,1),size(allcohers,2));
- % fprintf('#1 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
- base = find(times<=0);
- if length(base)<2
-     base = 1:floor(length(times)/4); % default first quarter-epoch
- end
- amps = 20*log10(amps); % convert to dB
- ampsig = 20*log10(ampsig); % convert to dB
- if isnan(baseamp)
-  [amps,baseamp] = rmbase(amps,length(times),base); % remove baseline
- else
-   amps = amps - baseamp;
- end
- % fprintf('#2 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
-
- if avewidth > 1 | decfactor > 1
-     % Note: using square window
-   if Nosort == YES
-    fprintf(...
-      'Smoothing the amplitude epochs using a window width of %g epochs '...
-            ,avewidth);
-   else
-    fprintf(...
-       'Smoothing the sorted amplitude epochs with a %g-epoch moving window.'...
-            ,avewidth);
-   end
-   fprintf('\n');
-   fprintf('  and a decimation factor of %g\n',decfactor);
-   % fprintf('4 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
-
-   [allcohers,outtrials] = movav(allcohers,1:ntrials,avewidth,decfactor); 
-                                            % Note: using square window
-   % fprintf('5 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
-   [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
-   fprintf('Output data will be %d frames by %d smoothed trials.\n',...
-                          frames,length(outtrials));
- else
-  outtrials = 1:ntrials;
-  outsort = sortvar;
- end
- %
- %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- if ~isempty(Caxis) 
-   mindat = Caxis(1);
-   maxdat = Caxis(2);
-  fprintf('Using the specified caxis range of [%g,%g].\n',...
-                                           mindat,maxdat);
- else
-  mindat = -1;
-  maxdat = 1
-  fprintf(...
-     'The caxis range will be the sym. abs. data range [%g,%g].\n',...
-                                                     mindat,maxdat);
- end
- %
- %%%%%%%%%%%%%%%%%%%%% Image coherences at coherfreq %%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- fprintf('Plotting coherences at freq %g Hz instead of potentials.\n',coherfreq);
- if TIMEX
-  imagesc(times,outtrials,allcohers',[mindat,maxdat]);% plot time on x-axis
-  set(gca,'Ydir','normal');
-  axis([timelimits(1) timelimits(2) ...
-       min(outtrials) max(outtrials)]);
- else
-  imagesc(outtrials,times,allcohers,[mindat,maxdat]); % plot trials on x-axis
-  axis([min(outtrials) max(outtrials)...
-       timelimits(1) timelimits(2)]);
- end
-  drawnow
-  hold on
-
+                      %%%%%%%%% DEPRECATED %%%%%%%%%%%%
+    if freq > 0 
+        coherfreq = freq; % use phase-sort frequency
+    end
+    if alpha>0
+        fprintf('Computing and plotting %g coherence significance level...\n',alpha);
+        %[amps,cohers,cohsig,ampsig,allcohers] = ...
+        %crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+        fprintf('Inter-Trial Coherence significance level: %g\n',cohsig);
+        fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
+    else
+        %[amps,cohers,cohsig,ampsig,allcohers] = ...
+        % crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+    end
+    if ~exist('allcohers')
+        fprintf('erpimage(): allcohers not returned....\n')
+        return
+    end
+    allamps = allcohers; % output variable
+                         % fprintf('Size allcohers = (%d, %d)\n',size(allcohers,1),size(allcohers,2));
+                         % fprintf('#1 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
+    base = find(times<=0);
+    if length(base)<2
+        base = 1:floor(length(times)/4); % default first quarter-epoch
+    end
+    amps = 20*log10(amps); % convert to dB
+    ampsig = 20*log10(ampsig); % convert to dB
+    if isnan(baseamp)
+        [amps,baseamp] = rmbase(amps,length(times),base); % remove baseline
+    else
+        amps = amps - baseamp;
+    end
+    % fprintf('#2 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
+    
+    if avewidth > 1 | decfactor > 1
+        % Note: using square window
+        if Nosort == YES
+            fprintf(...
+                'Smoothing the amplitude epochs using a window width of %g epochs '...
+                ,avewidth);
+        else
+            fprintf(...
+                'Smoothing the sorted amplitude epochs with a %g-epoch moving window.'...
+                ,avewidth);
+        end
+        fprintf('\n');
+        fprintf('  and a decimation factor of %g\n',decfactor);
+        % fprintf('4 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
+        
+        [allcohers,outtrials] = movav(allcohers,1:ntrials,avewidth,decfactor); 
+        % Note: using square window
+        % fprintf('5 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
+        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+                frames,length(outtrials));
+    else
+        outtrials = 1:ntrials;
+        outsort = sortvar;
+    end
+    %
+    %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if ~isempty(Caxis) 
+        mindat = Caxis(1);
+        maxdat = Caxis(2);
+        fprintf('Using the specified caxis range of [%g,%g].\n',...
+                mindat,maxdat);
+    else
+        mindat = -1;
+        maxdat = 1
+        fprintf(...
+            'The caxis range will be the sym. abs. data range [%g,%g].\n',...
+            mindat,maxdat);
+    end
+    %
+    %%%%%%%%%%%%%%%%%%%%% Image coherences at coherfreq %%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if strcmpi(noshow, 'no')
+        fprintf('Plotting coherences at freq %g Hz instead of potentials.\n',coherfreq);
+        if TIMEX
+            imagesc(times,outtrials,allcohers',[mindat,maxdat]);% plot time on x-axis
+            set(gca,'Ydir','normal');
+            axis([timelimits(1) timelimits(2) ...
+                  min(outtrials) max(outtrials)]);
+        else
+            imagesc(outtrials,times,allcohers,[mindat,maxdat]); % plot trials on x-axis
+            axis([min(outtrials) max(outtrials)...
+                  timelimits(1) timelimits(2)]);
+        end
+        drawnow
+        hold on
+    end;
+    
 end %%%%%%%%%%%%%%%%%%%%%%%%%%% End image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~isempty(verttimes)
@@ -1685,66 +1704,72 @@ if ~isempty(verttimes)
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
     return
  end;
-  if size(verttimes,1) == 1
-    fprintf('Plotting %d lines at times: ',size(verttimes,2));
-  else
-    fprintf('Plotting %d traces starting at times: ',size(verttimes,2));
-  end
-  for vt = verttimes % for each column
-     fprintf('%g ',vt(1));
-     if isnan(aligntime) % if nor re-aligned data
-       if TIMEX          % overplot vt on image
-         if length(vt)==1
-           plot([vt vt],[0 max(outtrials)],DOTSTYLE,'Linewidth',VERTWIDTH);
-         elseif length(vt)==ntrials
-           [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-           plot(outvt,outtrials,DOTSTYLE,'Linewidth',VERTWIDTH);
-         end
-       else
-         if length(vt)==1
-           plot([0 max(outtrials)],[vt vt],DOTSTYLE,'Linewidth',VERTWIDTH);
-         elseif length(vt)==ntrials
-           [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-           plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
-         end
-       end
-     else                % re-aligned data
-       if TIMEX          % overplot vt on image
-         if length(vt)==ntrials
-           [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-           plot(aligntime+outvt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
-         elseif length(vt)==1
-           plot(aligntime+vt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
-         end
-       else
-         if length(vt)==ntrials
-           [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-           plot(outtrials,aligntime+outvt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
-         elseif length(vt)==1
-           plot(outtrials,aligntime+vt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
-         end
-       end
+ if strcmpi(noshow, 'no')
+     if size(verttimes,1) == 1
+         fprintf('Plotting %d lines at times: ',size(verttimes,2));
+     else
+         fprintf('Plotting %d traces starting at times: ',size(verttimes,2));
      end
-  end
- %end
-  fprintf('\n');
+     for vt = verttimes % for each column
+         fprintf('%g ',vt(1));
+         if isnan(aligntime) % if nor re-aligned data
+             if TIMEX          % overplot vt on image
+                 if length(vt)==1
+                     plot([vt vt],[0 max(outtrials)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                 elseif length(vt)==ntrials
+                     [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
+                     plot(outvt,outtrials,DOTSTYLE,'Linewidth',VERTWIDTH);
+                 end
+             else
+                 if length(vt)==1
+                     plot([0 max(outtrials)],[vt vt],DOTSTYLE,'Linewidth',VERTWIDTH);
+                 elseif length(vt)==ntrials
+                     [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
+                     plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
+                 end
+             end
+         else                % re-aligned data
+             if TIMEX          % overplot vt on image
+                 if length(vt)==ntrials
+                     [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
+                     plot(aligntime+outvt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                 elseif length(vt)==1
+                     plot(aligntime+vt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                 end
+             else
+                 if length(vt)==ntrials
+                     [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
+                     plot(outtrials,aligntime+outvt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                 elseif length(vt)==1
+                     plot(outtrials,aligntime+vt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                 end
+             end
+         end
+     end
+     %end
+     fprintf('\n');
+ end;
 end
 
-set(gca,'FontSize',TICKFONT)
-hold on;
+if strcmpi(noshow, 'no')
+    set(gca,'FontSize',TICKFONT)
+    hold on;
+end;
 %
 %%%%%%%%%%% plot vertical line at 0 or align time %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isnan(aligntime) % if trials time-aligned 
- if times(1) <= aligntime & times(frames) >= aligntime
-  plot([aligntime aligntime],[0 ntrials],'k','Linewidth',ZEROWIDTH); 
-     % plot vertical line at aligntime
- end
-else % trials not time-aligned 
- if times(1) <= 0 & times(frames) >= 0
-  plot([0 0],[0 ntrials],'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
- end
-end
+if strcmpi(noshow, 'no')
+    if ~isnan(aligntime) % if trials time-aligned 
+        if times(1) <= aligntime & times(frames) >= aligntime
+            plot([aligntime aligntime],[0 ntrials],'k','Linewidth',ZEROWIDTH); 
+            % plot vertical line at aligntime
+        end
+    else % trials not time-aligned 
+        if times(1) <= 0 & times(frames) >= 0
+            plot([0 0],[0 ntrials],'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
+        end
+    end
+end;
 
 if Noshow == NO & ( min(outsort) < timelimits(1) ...
                    |max(outsort) > timelimits(2))
@@ -1757,555 +1782,574 @@ if Noshow == NO & ( min(outsort) < timelimits(1) ...
   outsort(i) = timelimits(2);
 end
 
-if TIMEX
- if Nosort == YES
-  l=ylabel('Trial Number');
- else
-  if exist('phargs')
-    l=ylabel('Phase-sorted Trials');
-    l=ylabel('Trials');
-  elseif exist('ampargs')
-    l=ylabel('Amplitude-sorted Trials');
-    l=ylabel('Trials');
-  else
-    l=ylabel('Sorted Trials');
-  end
- end
-else % if switch x<->y axes
- if Nosort == YES & NoTimeflag==NO
-  l=xlabel('Trial Number');
- else
-  if exist('phargs')
-    l=ylabel('Phase-sorted Trials');
-    l=ylabel('Trials');
-  elseif NoTimeflag == NO
-    l=xlabel('Sorted Trials');
-  end
- end
-end
-set(l,'FontSize',LABELFONT);
+if strcmpi(noshow, 'no')
+    if TIMEX
+        if Nosort == YES
+            l=ylabel('Trial Number');
+        else
+            if exist('phargs')
+                l=ylabel('Phase-sorted Trials');
+                l=ylabel('Trials');
+            elseif exist('ampargs')
+                l=ylabel('Amplitude-sorted Trials');
+                l=ylabel('Trials');
+            else
+                l=ylabel('Sorted Trials');
+            end
+        end
+    else % if switch x<->y axes
+        if Nosort == YES & NoTimeflag==NO
+            l=xlabel('Trial Number');
+        else
+            if exist('phargs')
+                l=ylabel('Phase-sorted Trials');
+                l=ylabel('Trials');
+            elseif NoTimeflag == NO
+                l=xlabel('Sorted Trials');
+            end
+        end
+    end
+    set(l,'FontSize',LABELFONT);
+    
+    t=title(titl);
+    set(t,'FontSize',LABELFONT);
+    
+    set(gca,'Box','off');
+    set(gca,'Fontsize',TICKFONT);
+    set(gca,'color',BACKCOLOR);
+    if Erpflag == NO & NoTimeflag == NO
+        if exist('NoTimesPassed')~=1
+            l=xlabel('Time (ms)');
+        else
+            l=xlabel('Frames');
+        end
+        set(l,'Fontsize',LABELFONT);
+    end
+end;
 
-t=title(titl);
-set(t,'FontSize',LABELFONT);
-
-set(gca,'Box','off');
-set(gca,'Fontsize',TICKFONT);
-set(gca,'color',BACKCOLOR);
-if Erpflag == NO & NoTimeflag == NO
-  if exist('NoTimesPassed')~=1
-     l=xlabel('Time (ms)');
-  else
-     l=xlabel('Frames');
-  end
-  set(l,'Fontsize',LABELFONT);
-end
 %
 %%%%%%%%%%%%%%%%%%%% Overplot sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if Noshow == YES
-  fprintf('Not overplotting sorted sortvar on data.\n');
+if strcmpi(noshow, 'no')
 
-elseif isnan(aligntime) % plot sortvar on un-aligned data
+    if Noshow == YES
+        fprintf('Not overplotting sorted sortvar on data.\n');
+        
+    elseif isnan(aligntime) % plot sortvar on un-aligned data
+        
+        if Nosort == NO;
+            fprintf('Overplotting sorted sortvar on data.\n');
+        end
+        hold on; 
+        if TIMEX      % overplot sortvar
+            plot(outsort,outtrials,'k','LineWidth',SORTWIDTH); 
+        else
+            plot(outtrials,outsort,'k','LineWidth',SORTWIDTH);
+        end                                                 
+        drawnow
+    else % plot re-aligned zeros on sortvar-aligned data
+        if Nosort == NO;
+            fprintf('Overplotting sorted sortvar on data.\n');
+        end
+        hold on; 
+        if TIMEX      % overplot aligned sortvar on image
+            plot([aligntime aligntime],[0 ntrials],'k','LineWidth',SORTWIDTH);
+        else
+            plot([[0 ntrials],aligntime aligntime],'k','LineWidth',SORTWIDTH);
+        end
+        fprintf('Overplotting realigned times-zero on data.\n');
+        hold on; 
+        
+        if TIMEX      % overplot realigned 0-time on image
+            plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
+        else
+            plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
+        end                                                 
+        drawnow
+    end
+end;
 
-  if Nosort == NO;
-    fprintf('Overplotting sorted sortvar on data.\n');
-  end
-  hold on; 
-  if TIMEX      % overplot sortvar
-    plot(outsort,outtrials,'k','LineWidth',SORTWIDTH); 
-  else
-    plot(outtrials,outsort,'k','LineWidth',SORTWIDTH);
-  end                                                 
-  drawnow
-else % plot re-aligned zeros on sortvar-aligned data
-  if Nosort == NO;
-    fprintf('Overplotting sorted sortvar on data.\n');
-  end
-  hold on; 
-  if TIMEX      % overplot aligned sortvar on image
-    plot([aligntime aligntime],[0 ntrials],'k','LineWidth',SORTWIDTH);
-  else
-    plot([[0 ntrials],aligntime aligntime],'k','LineWidth',SORTWIDTH);
-  end
-  fprintf('Overplotting realigned times-zero on data.\n');
-  hold on; 
-
-  if TIMEX      % overplot realigned 0-time on image
-    plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
-  else
-    plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
-  end                                                 
-  drawnow
-end
 %
 %%%%%%%%%%%%%%%%%%%% Overplot auxvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isempty(auxvar)
- % here first smooth auxvar and apply sorting!!!
- fprintf('Overplotting auxvar(s) on data.\n');
- hold on; 
- auxtrials = outtrials(:)' ; % make row vector
+if strcmpi(noshow, 'no')
+    if ~isempty(auxvar)
+        % here first smooth auxvar and apply sorting!!!
+        fprintf('Overplotting auxvar(s) on data.\n');
+        hold on; 
+        auxtrials = outtrials(:)' ; % make row vector
+        
+        if exist('auxcolors')~=1 % If no auxcolors specified
+            auxcolors = cell(1,size(auxvar,1));
+            for c=1:size(auxvar,1)
+                auxcolors(c) = {'k'};       % plot auxvars as black trace(s)
+            end
+        end
+        for c=1:size(auxvar,1)
+            if isnan(aligntime) % plot sortvar on un-aligned data
+                auxcolor = auxcolors{c};
+                if TIMEX      % overplot auxvar
+                    plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH); 
+                else
+                    plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
+                end                                                 
+                drawnow
+            else % plot re-aligned zeros on sortvar-aligned data
+                if TIMEX      % overplot realigned 0-time on image
+                    plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
+                else
+                    plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH); 
+                end                                                 
+                drawnow
+            end % aligntime
+        end % c
+    end % auxvar
+end;
 
- if exist('auxcolors')~=1 % If no auxcolors specified
-  auxcolors = cell(1,size(auxvar,1));
-  for c=1:size(auxvar,1)
-    auxcolors(c) = {'k'};       % plot auxvars as black trace(s)
-  end
- end
- for c=1:size(auxvar,1)
-  if isnan(aligntime) % plot sortvar on un-aligned data
-    auxcolor = auxcolors{c};
-   if TIMEX      % overplot auxvar
-     plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH); 
-   else
-     plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
-   end                                                 
-   drawnow
-  else % plot re-aligned zeros on sortvar-aligned data
-   if TIMEX      % overplot realigned 0-time on image
-     plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
-   else
-     plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH); 
-   end                                                 
-   drawnow
-  end % aligntime
- end % c
-end % auxvar
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Plot colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if Colorbar == YES
-   pos=get(ax1,'Position');
-   axcb=axes('Position',...
-       [pos(1)+pos(3)+0.02 pos(2) ...
-        0.03 pos(4)]);
-   cbar(axcb,0,[mindat,maxdat]); % plot colorbar to right of image
-   set(axcb,'fontsize',TICKFONT);
-   % drawnow
-   axes(ax1); % reset current axes to the erpimage
-end
+if strcmpi(noshow, 'no')
+    if Colorbar == YES
+        pos=get(ax1,'Position');
+        axcb=axes('Position',...
+                  [pos(1)+pos(3)+0.02 pos(2) ...
+                   0.03 pos(4)]);
+        cbar(axcb,0,[mindat,maxdat]); % plot colorbar to right of image
+        set(axcb,'fontsize',TICKFONT);
+        % drawnow
+        axes(ax1); % reset current axes to the erpimage
+    end
+end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%% Compute ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if Erpflag == YES
- axes(ax1); % reset current axes to the erpimage
- xtick = get(ax1,'Xtick');     % remember x-axis tick locations
- xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
- set(ax1, 'xticklabel', []);
- widthxticklabel = size(xticklabel,2);
- xticklabel = cellstr(xticklabel);
- for tmpindex = 1:length(xticklabel)
-    if length(xticklabel{tmpindex}) < widthxticklabel
-        spaces = char( ones(1,ceil((widthxticklabel - length(xticklabel{tmpindex}))/2) )*32);
-        xticklabel{tmpindex} = [spaces xticklabel{tmpindex}];
+erp = [];
+if Erpflag == YES & strcmpi(noshow, 'yes')
+    erp=nan_mean(urdata');           % compute erp average, ignoring nan's
+end;          
+if Erpflag == YES & strcmpi(noshow, 'no')
+    axes(ax1); % reset current axes to the erpimage
+    xtick = get(ax1,'Xtick');     % remember x-axis tick locations
+    xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
+    set(ax1, 'xticklabel', []);
+    widthxticklabel = size(xticklabel,2);
+    xticklabel = cellstr(xticklabel);
+    for tmpindex = 1:length(xticklabel)
+        if length(xticklabel{tmpindex}) < widthxticklabel
+            spaces = char( ones(1,ceil((widthxticklabel - length(xticklabel{tmpindex}))/2) )*32);
+            xticklabel{tmpindex} = [spaces xticklabel{tmpindex}];
+        end;
     end;
- end;
- xticklabel = strvcat(xticklabel);
- erp=nan_mean(urdata');           % compute erp average, ignoring nan's
- if Erpstdflag == YES
-     stdev = nan_std(urdata');
- end;
- %
- %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- if isnan(maxerp)
-  fac = 10;
-  maxerp = 0;
-  while maxerp == 0
-   maxerp = round(fac*YEXPAND*max(erp))/fac; % minimal decimal places
-   fac = 10*fac;
-  end
-  if Erpstdflag == YES
-      fac = fac/10;
-      maxerp = max(maxerp, round(fac*YEXPAND*max(erp+stdev))/fac);
-  end;
- end
- if isnan(minerp)
-  fac = 1;
-  minerp = 0;
-  while minerp == 0
-    minerp = round(fac*YEXPAND*min(erp))/fac; % minimal decimal places
-    fac = 10*fac;
-  end
-  if Erpstdflag == YES
-      fac = fac/10;
-      minerp = min(minerp, round(fac*YEXPAND*min(erp-stdev))/fac);
-  end;
- end
- limit = [timelimits(1:2) -max(abs([minerp maxerp])) max(abs([minerp maxerp]))];
+    xticklabel = strvcat(xticklabel);
+    erp=nan_mean(urdata');           % compute erp average, ignoring nan's
+    if Erpstdflag == YES
+        stdev = nan_std(urdata');
+    end;
+    
+    %
+    %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if isnan(maxerp)
+        fac = 10;
+        maxerp = 0;
+        while maxerp == 0
+            maxerp = round(fac*YEXPAND*max(erp))/fac; % minimal decimal places
+            fac = 10*fac;
+        end
+        if Erpstdflag == YES
+            fac = fac/10;
+            maxerp = max(maxerp, round(fac*YEXPAND*max(erp+stdev))/fac);
+        end;
+    end
+    if isnan(minerp)
+        fac = 1;
+        minerp = 0;
+        while minerp == 0
+            minerp = round(fac*YEXPAND*min(erp))/fac; % minimal decimal places
+            fac = 10*fac;
+        end
+        if Erpstdflag == YES
+            fac = fac/10;
+            minerp = min(minerp, round(fac*YEXPAND*min(erp-stdev))/fac);
+        end;
+    end
+    limit = [timelimits(1:2) -max(abs([minerp maxerp])) max(abs([minerp maxerp]))];
           
- if ~isnan(coherfreq)
-  set(ax1,'Xticklabel',[]);     % remove tick labels from bottom of image
-  ax2=axes('Position',...
-     [gcapos(1) gcapos(2)+2/3*image_loy*gcapos(4) ...
-      gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
- else
-  ax2=axes('Position',...
-     [gcapos(1) gcapos(2) ...
-      gcapos(3) image_loy*gcapos(4)]);
- end
- if Erpstdflag == YES
-      plot1erp(ax2,times,erp,limit, stdev); % plot ERP
- else plot1erp(ax2,times,erp,limit); % plot ERP
- end;
- if ~isnan(aligntime)
-   line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
- end
-
- set(ax2,'Xtick',xtick);        % use same Xticks as erpimage above
- if ~isnan(coherfreq)
-   set(ax2,'Xticklabel',[]);    % remove tick labels from ERP x-axis
- else % bottom axis
-   set(ax2,'Xticklabel',xticklabel); % add ticklabels to ERP x-axis
- end
-
- set(ax2,'Yticklabel',[]);      % remove tick labels from left of image
- set(ax2,'YColor',BACKCOLOR);
- if isnan(coherfreq)            % if no amp and coher plots below . . .
-  if TIMEX & NoTimeflag == NO
-  if exist('NoTimesPassed')~=1
-     l=xlabel('Time (ms)');
-  else
-     l=xlabel('Frames');
-  end
-   set(l,'FontSize',LABELFONT);
-  else
-   if exist('NoTimesPassed')~=1
-     l=ylabel('Time (ms)');
-   else
-     l=ylabel('Frames');
-   end
-   set(l,'FontSize',LABELFONT);
-  end
- end
-
- if ~isempty(verttimes) 
-  if size(verttimes,1) == ntrials
-   vts=sort(verttimes); 
-   vts = vts(ceil(ntrials/2),:); % plot median verttimes values if a matrix
-  else 
-   vts = verttimes(:)';  % make verttimes a row vector
-  end
-  for vt = vts
-     if isnan(aligntime)
-       if TIMEX      % overplot vt on ERP
-         plot([vt vt],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
-       else
-         plot([0 max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
-       end
-     else
-       if TIMEX      % overplot realigned vt on ERP
-         plot(repmat(median(aligntime+vt-outsort),1,2),[limit(3),limit(4)],...
-                                  DOTSTYLE,'LineWidth',VERTWIDTH); 
-       else
-         plot([limit(3),limit(4)],repmat(median(aligntime+vt-outsort),1,2),...
-                                  DOTSTYLE,'LineWidth',VERTWIDTH); 
-       end                                                 
-     end
-  end
- end
-
- ydelta = 1/10*(limit(2)-limit(1)); 
- ytextoffset = limit(1)-1.1*ydelta;
- ynumoffset = limit(1)-0.3*ydelta; 
-
- t=text(ynumoffset,0.7*limit(3), num2str(limit(3)));
- set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
-
- t=text(ynumoffset,0.7*limit(4), num2str(limit(4)));
- set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
-
- ynum = 0.7*(limit(3)+limit(4))/2;
- t=text(ytextoffset,ynum,yerplabel,'Rotation',90);
- set(t,'HorizontalAlignment','center','FontSize',LABELFONT)
-
- set(ax2,'Fontsize',TICKFONT);
- set(ax2,'Box','off','color',BACKCOLOR);
-  drawnow
-else
-  erp = [];
+    if ~isnan(coherfreq)
+        set(ax1,'Xticklabel',[]);     % remove tick labels from bottom of image
+        ax2=axes('Position',...
+                 [gcapos(1) gcapos(2)+2/3*image_loy*gcapos(4) ...
+                  gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
+    else
+        ax2=axes('Position',...
+                 [gcapos(1) gcapos(2) ...
+                  gcapos(3) image_loy*gcapos(4)]);
+    end
+    if Erpstdflag == YES
+        plot1erp(ax2,times,erp,limit, stdev); % plot ERP
+    else plot1erp(ax2,times,erp,limit); % plot ERP
+    end;
+    if ~isnan(aligntime)
+        line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
+    end
+    
+    set(ax2,'Xtick',xtick);        % use same Xticks as erpimage above
+    if ~isnan(coherfreq)
+        set(ax2,'Xticklabel',[]);    % remove tick labels from ERP x-axis
+    else % bottom axis
+        set(ax2,'Xticklabel',xticklabel); % add ticklabels to ERP x-axis
+    end
+    
+    set(ax2,'Yticklabel',[]);      % remove tick labels from left of image
+    set(ax2,'YColor',BACKCOLOR);
+    if isnan(coherfreq)            % if no amp and coher plots below . . .
+        if TIMEX & NoTimeflag == NO
+            if exist('NoTimesPassed')~=1
+                l=xlabel('Time (ms)');
+            else
+                l=xlabel('Frames');
+            end
+            set(l,'FontSize',LABELFONT);
+        else
+            if exist('NoTimesPassed')~=1
+                l=ylabel('Time (ms)');
+            else
+                l=ylabel('Frames');
+            end
+            set(l,'FontSize',LABELFONT);
+        end
+    end
+    
+    if ~isempty(verttimes) 
+        if size(verttimes,1) == ntrials
+            vts=sort(verttimes); 
+            vts = vts(ceil(ntrials/2),:); % plot median verttimes values if a matrix
+        else 
+            vts = verttimes(:)';  % make verttimes a row vector
+        end
+        for vt = vts
+            if isnan(aligntime)
+                if TIMEX      % overplot vt on ERP
+                    plot([vt vt],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                else
+                    plot([0 max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                end
+            else
+                if TIMEX      % overplot realigned vt on ERP
+                    plot(repmat(median(aligntime+vt-outsort),1,2),[limit(3),limit(4)],...
+                         DOTSTYLE,'LineWidth',VERTWIDTH); 
+                else
+                    plot([limit(3),limit(4)],repmat(median(aligntime+vt-outsort),1,2),...
+                         DOTSTYLE,'LineWidth',VERTWIDTH); 
+                end                                                 
+            end
+        end
+    end
+    
+    ydelta = 1/10*(limit(2)-limit(1)); 
+    ytextoffset = limit(1)-1.1*ydelta;
+    ynumoffset = limit(1)-0.3*ydelta; 
+    
+    t=text(ynumoffset,0.7*limit(3), num2str(limit(3)));
+    set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
+    
+    t=text(ynumoffset,0.7*limit(4), num2str(limit(4)));
+    set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
+    
+    ynum = 0.7*(limit(3)+limit(4))/2;
+    t=text(ytextoffset,ynum,yerplabel,'Rotation',90);
+    set(t,'HorizontalAlignment','center','FontSize',LABELFONT)
+    
+    set(ax2,'Fontsize',TICKFONT);
+    set(ax2,'Box','off','color',BACKCOLOR);
+    drawnow
 end
+
 %
 %%%%%%%%%%%%%%%%%%%%% Plot amp, coher time series %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isnan(coherfreq) 
-   if freq > 0 
-      coherfreq = freq; % use phase-sort frequency
-   end
-   %
-   %%%%%% Plot amp axis below ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   %
-   if ~Allampsflag %%%% don't repeat computation if already done for 'allamps'
-
-    fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
-
-    if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
-     [amps,cohers] = ...
-       phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
-       if ~isnan(signifs) 
-         ampsig = signifs([1 2]);
-         fprintf('Using supplied amplitude significance levels: [%g,%g]\n',...
-                            ampsig(1),ampsig(2));
-         cohsig = signifs(3);
-         fprintf('Using supplied coherence significance level: %g\n',cohsig);
-       end
-    else % compute amps, cohers with significance
-       fprintf(...
-       'Computing and plotting %g coherence significance level at %g Hz...\n',...
-                           alpha,                          coherfreq);
-       [amps,cohers,cohsig,ampsig] = ...
-       phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
-       fprintf('Coherence significance level: %g\n',cohsig);
-       ampsig = 20*log10(ampsig); % convert to dB
+    if freq > 0 
+        coherfreq = freq; % use phase-sort frequency
     end
-
-    amps   = 20*log10(amps);      % convert to dB
-    fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
-    if alpha>0 % if computed significance levels
-       fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
-    end
-
-    if isnan(baseamp) % if baseamp not specified in 'limits'
-      base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
-      if length(base)<2
-         base = 1:floor(length(times)/4); % default first quarter-epoch
-         fprintf('Using %g to %g ms as amplitude baseline.\n',...
-                          times(1),times(base(end)));
-      end
-       [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
-      fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
-    else
-      fprintf('Removing specified baseline amplitude of %d dB for plotting.\n',...
-               baseamp);
-      amps = amps-baseamp;
-    end
-    if Cohsigflag
-		ampsig = ampsig - baseamp;
-	end;
-   end % ~Allampsflag
-
-   axis('off') % rm ERP axes axis and labels
-   ax3=axes('Position',...
-     [gcapos(1) gcapos(2)+1/3*image_loy*gcapos(4) ...
-      gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
-
-   if isnan(maxamp) % if not specified
-    fac = 1;
-    maxamp = 0;
-    while maxamp == 0
-     maxamp = floor(YEXPAND*fac*max(amps))/fac; % minimal decimal place
-     fac = 10*fac;
-    end
-    maxamp = maxamp + 10/fac;
-    if Cohsigflag
-     if ampsig(2)>maxamp
-       if ampsig(2)>0
-        maxamp = 1.01*(ampsig(2));
-       else
-        maxamp = 0.99*(ampsig(2));
-       end
-     end
-	end
-   end
-
-   if isnan(minamp) % if not specified
-    fac = 1;
-    minamp = 0;
-    while minamp == 0
-     minamp = floor(YEXPAND*fac*max(-amps))/fac; % minimal decimal place
-     fac = 10*fac;
-    end
-    minamp = minamp + 10/fac;
-    minamp = -minamp;
-	if Cohsigflag
-		if ampsig(1)< minamp
-			if ampsig(1)<0
-				minamp = 1.01*(ampsig(1));
-			else
-				minamp = 0.99*(ampsig(1));
-			end
-		end
-	end
-   end
-
-   fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
-   fprintf('     relative to baseamp: %g dB\n',baseamp);
-   plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
-
-   if ~isnan(aligntime)
-     line([aligntime aligntime],[minamp(1) maxamp(1)]*1.1,'Color','k'); 
-                                                      % x=median sort value
-   end
-   set(ax3,'Xtick',xtick);
-   set(ax3,'Xticklabel',[]);   % remove tick labels from bottom of image
-   set(ax3,'Yticklabel',[]);   % remove tick labels from left of image
-   set(ax3,'YColor',BACKCOLOR);
-   axis('off');
-   set(ax3,'Box','off','color',BACKCOLOR);
-
-   if ~isempty(verttimes)
-	if size(verttimes,1) == ntrials
-     vts=sort(verttimes); 
-     vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
-    else 
-		vts=verttimes(:)';	
-	end
-     for vt = vts
-      if isnan(aligntime)
-       if TIMEX      % overplot vt on amp
-         plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
-                  'Linewidth',VERTWIDTH);
-       else
-         plot([0 max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
-                  'Linewidth',VERTWIDTH);
-       end
-      else
-       if TIMEX      % overplot realigned vt on amp
-         plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
-                  'LineWidth',VERTWIDTH); 
-       else
-         plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
-                  'LineWidth',VERTWIDTH); 
-       end                                                 
-      end
-     end
-   end
-
-   if Cohsigflag % plot amplitude significance levels
-     hold on
-      plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
-                  'linewidth',SIGNIFWIDTH);
-      plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)] - mean(ampsig),'r',...
-                  'linewidth',SIGNIFWIDTH);
-   end
-
-   t=text(ynumoffset,maxamp, num2str(maxamp,3));
-   set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
-
-   t=text(ynumoffset,0, num2str(0));
-   set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
-
-   t=text(ynumoffset,minamp, num2str(minamp,3));
-   set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
-
-   t=text(ytextoffset,(maxamp+minamp)/2,'dB','Rotation',90);
-   set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
-
-   axtmp = axis;
-   dbtxt= text(1/13*(axtmp(2)-axtmp(1))+axtmp(1), ...
-        11/13*(axtmp(4)-axtmp(3))+axtmp(3), ...
-        [num2str(baseamp,4) ' dB']);
-   set(dbtxt,'fontsize',TICKFONT);
-    drawnow;
-	set(ax3, 'xlim', timelimits);
-	set(ax3, 'ylim', [minamp(1) maxamp(1)]);
-   %
-   %%%%%% Make coher axis below amp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   %
-   ax4=axes('Position',...
-     [gcapos(1) gcapos(2) ...
-      gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
-   if isnan(maxcoh)
-    fac = 1;
-    maxcoh = 0;
-    while maxcoh == 0
-     maxcoh = floor(YEXPAND*fac*max(cohers))/fac; % minimal decimal place
-     fac = 10*fac;
-    end
-    maxcoh = maxcoh + 10/fac;
-    if maxcoh>1
-       maxcoh=1; % absolute limit
-    end
-   end
-   if isnan(mincoh)
-     mincoh = 0;
-   end
-   coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
-   if ~isnan(aligntime)
-     line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
-                                  % x=median sort value
-   end
-   % set(ax4,'Xticklabel',[]);    % remove tick labels from bottom of image
-   set(ax4,'Xtick',xtick);
-   set(ax4,'Xticklabel',xticklabel);
-   set(ax4,'Ytick',[]);
-   set(ax4,'Yticklabel',[]);      % remove tick labels from left of image
-   set(ax4,'YColor',BACKCOLOR);
-
-   if ~isempty(verttimes)
-	if size(verttimes,1) == ntrials
-     vts=sort(verttimes); 
-     vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
-    else 
-       vts = verttimes(:)';  % make verttimes a row vector
-	end
-     for vt = vts
-      if isnan(aligntime)
-       if TIMEX      % overplot vt on coher
-         plot([vt vt],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
-       else
-         plot([0 max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
-       end
-      else
-       if TIMEX      % overplot realigned vt on coher
-         plot(repmat(median(aligntime+vt-outsort),1,2),[mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH); 
-       else
-         plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,'LineWidth',VERTWIDTH); 
-       end                                                 
-      end
-     end
-   end
-
-   t=text(ynumoffset,0, num2str(0));
-   set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
-
-   t=text(ynumoffset,maxcoh, num2str(maxcoh));
-   set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
-
-   t=text(ytextoffset,maxcoh/2,'ITCoh','Rotation',90);
-   set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
-    drawnow
-
-   if Cohsigflag % plot coherence significance level
-     hold on
-     plot([timelimits(1) timelimits(2)],[cohsig cohsig],'r',...
-           'linewidth',SIGNIFWIDTH);
-   end
-
-   set(ax4,'Box','off','color',BACKCOLOR);
-   set(ax4,'Fontsize',TICKFONT);
-   if NoTimeflag==NO
-     if exist('NoTimesPassed')~=1
-      l=xlabel('Time (ms)');
-     else
-      l=xlabel('Frames');
-     end
-     set(l,'Fontsize',LABELFONT);
-   end
-   axtmp = axis;
-   hztxt=text(10/13*(axtmp(2)-axtmp(1))+axtmp(1), ...
-        8/13*(axtmp(4)-axtmp(3))+axtmp(3), ...
-        [num2str(coherfreq,4) ' Hz']);
-   set(hztxt,'fontsize',TICKFONT);
+    %
+    %%%%%% Plot amp axis below ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    if ~Allampsflag %%%% don't repeat computation if already done for 'allamps'
+        
+        fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
+        
+        if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
+            [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
+            if ~isnan(signifs) 
+                ampsig = signifs([1 2]);
+                fprintf('Using supplied amplitude significance levels: [%g,%g]\n',...
+                        ampsig(1),ampsig(2));
+                cohsig = signifs(3);
+                fprintf('Using supplied coherence significance level: %g\n',cohsig);
+            end
+        else % compute amps, cohers with significance
+            fprintf(...
+                'Computing and plotting %g coherence significance level at %g Hz...\n',...
+                alpha,                          coherfreq);
+            [amps,cohers,cohsig,ampsig] = ...
+                phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
+            fprintf('Coherence significance level: %g\n',cohsig);
+            ampsig = 20*log10(ampsig); % convert to dB
+        end
+        
+        amps   = 20*log10(amps);      % convert to dB
+        fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
+        if alpha>0 % if computed significance levels
+            fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
+        end
+        
+        if isnan(baseamp) % if baseamp not specified in 'limits'
+            base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
+            if length(base)<2
+                base = 1:floor(length(times)/4); % default first quarter-epoch
+                fprintf('Using %g to %g ms as amplitude baseline.\n',...
+                        times(1),times(base(end)));
+            end
+            [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
+            fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
+        else
+            fprintf('Removing specified baseline amplitude of %d dB for plotting.\n',...
+                    baseamp);
+            amps = amps-baseamp;
+        end
+        if Cohsigflag
+            ampsig = ampsig - baseamp;
+        end;
+    end % ~Allampsflag
+    
+    if strcmpi(noshow, 'no')
+        axis('off') % rm ERP axes axis and labels
+        ax3=axes('Position',...
+                 [gcapos(1) gcapos(2)+1/3*image_loy*gcapos(4) ...
+                  gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
+        
+        if isnan(maxamp) % if not specified
+            fac = 1;
+            maxamp = 0;
+            while maxamp == 0
+                maxamp = floor(YEXPAND*fac*max(amps))/fac; % minimal decimal place
+                fac = 10*fac;
+            end
+            maxamp = maxamp + 10/fac;
+            if Cohsigflag
+                if ampsig(2)>maxamp
+                    if ampsig(2)>0
+                        maxamp = 1.01*(ampsig(2));
+                    else
+                        maxamp = 0.99*(ampsig(2));
+                    end
+                end
+            end
+        end
+        
+        if isnan(minamp) % if not specified
+            fac = 1;
+            minamp = 0;
+            while minamp == 0
+                minamp = floor(YEXPAND*fac*max(-amps))/fac; % minimal decimal place
+                fac = 10*fac;
+            end
+            minamp = minamp + 10/fac;
+            minamp = -minamp;
+            if Cohsigflag
+                if ampsig(1)< minamp
+                    if ampsig(1)<0
+                        minamp = 1.01*(ampsig(1));
+                    else
+                        minamp = 0.99*(ampsig(1));
+                    end
+                end
+            end
+        end
+        
+        fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
+        fprintf('     relative to baseamp: %g dB\n',baseamp);
+        plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
+        
+        if ~isnan(aligntime)
+            line([aligntime aligntime],[minamp(1) maxamp(1)]*1.1,'Color','k'); 
+            % x=median sort value
+        end
+        set(ax3,'Xtick',xtick);
+        set(ax3,'Xticklabel',[]);   % remove tick labels from bottom of image
+        set(ax3,'Yticklabel',[]);   % remove tick labels from left of image
+        set(ax3,'YColor',BACKCOLOR);
+        axis('off');
+        set(ax3,'Box','off','color',BACKCOLOR);
+        
+        if ~isempty(verttimes)
+            if size(verttimes,1) == ntrials
+                vts=sort(verttimes); 
+                vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
+            else 
+                vts=verttimes(:)';	
+            end
+            for vt = vts
+                if isnan(aligntime)
+                    if TIMEX      % overplot vt on amp
+                        plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
+                             'Linewidth',VERTWIDTH);
+                    else
+                        plot([0 max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
+                             'Linewidth',VERTWIDTH);
+                    end
+                else
+                    if TIMEX      % overplot realigned vt on amp
+                        plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
+                             'LineWidth',VERTWIDTH); 
+                    else
+                        plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
+                             'LineWidth',VERTWIDTH); 
+                    end                                                 
+                end
+            end
+        end
+        
+        if Cohsigflag % plot amplitude significance levels
+            hold on
+            plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
+                 'linewidth',SIGNIFWIDTH);
+            plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)] - mean(ampsig),'r',...
+                 'linewidth',SIGNIFWIDTH);
+        end
+        
+        t=text(ynumoffset,maxamp, num2str(maxamp,3));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+        
+        t=text(ynumoffset,0, num2str(0));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+        
+        t=text(ynumoffset,minamp, num2str(minamp,3));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+        
+        t=text(ytextoffset,(maxamp+minamp)/2,'dB','Rotation',90);
+        set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
+        
+        axtmp = axis;
+        dbtxt= text(1/13*(axtmp(2)-axtmp(1))+axtmp(1), ...
+                    11/13*(axtmp(4)-axtmp(3))+axtmp(3), ...
+                    [num2str(baseamp,4) ' dB']);
+        set(dbtxt,'fontsize',TICKFONT);
+        drawnow;
+        set(ax3, 'xlim', timelimits);
+        set(ax3, 'ylim', [minamp(1) maxamp(1)]);
+   
+        %
+        %%%%%% Make coher axis below amp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        ax4=axes('Position',...
+                 [gcapos(1) gcapos(2) ...
+                  gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
+        if isnan(maxcoh)
+            fac = 1;
+            maxcoh = 0;
+            while maxcoh == 0
+                maxcoh = floor(YEXPAND*fac*max(cohers))/fac; % minimal decimal place
+                fac = 10*fac;
+            end
+            maxcoh = maxcoh + 10/fac;
+            if maxcoh>1
+                maxcoh=1; % absolute limit
+            end
+        end
+        if isnan(mincoh)
+            mincoh = 0;
+        end
+        coh_handle = plot1erp(ax4,times,cohers,[timelimits mincoh maxcoh]); % plot COHER
+        if ~isnan(aligntime)
+            line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k'); 
+            % x=median sort value
+        end
+        % set(ax4,'Xticklabel',[]);    % remove tick labels from bottom of image
+        set(ax4,'Xtick',xtick);
+        set(ax4,'Xticklabel',xticklabel);
+        set(ax4,'Ytick',[]);
+        set(ax4,'Yticklabel',[]);      % remove tick labels from left of image
+        set(ax4,'YColor',BACKCOLOR);
+        
+        if ~isempty(verttimes)
+            if size(verttimes,1) == ntrials
+                vts=sort(verttimes); 
+                vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
+            else 
+                vts = verttimes(:)';  % make verttimes a row vector
+            end
+            for vt = vts
+                if isnan(aligntime)
+                    if TIMEX      % overplot vt on coher
+                        plot([vt vt],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+                    else
+                        plot([0 max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+                    end
+                else
+                    if TIMEX      % overplot realigned vt on coher
+                        plot(repmat(median(aligntime+vt-outsort),1,2),[mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH); 
+                    else
+                        plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,'LineWidth',VERTWIDTH); 
+                    end                                                 
+                end
+            end
+        end
+        
+        t=text(ynumoffset,0, num2str(0));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+        
+        t=text(ynumoffset,maxcoh, num2str(maxcoh));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+        
+        t=text(ytextoffset,maxcoh/2,'ITCoh','Rotation',90);
+        set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
+        drawnow
+        
+        if Cohsigflag % plot coherence significance level
+            hold on
+            plot([timelimits(1) timelimits(2)],[cohsig cohsig],'r',...
+                 'linewidth',SIGNIFWIDTH);
+        end
+        
+        set(ax4,'Box','off','color',BACKCOLOR);
+        set(ax4,'Fontsize',TICKFONT);
+        if NoTimeflag==NO
+            if exist('NoTimesPassed')~=1
+                l=xlabel('Time (ms)');
+            else
+                l=xlabel('Frames');
+            end
+            set(l,'Fontsize',LABELFONT);
+        end
+        axtmp = axis;
+        hztxt=text(10/13*(axtmp(2)-axtmp(1))+axtmp(1), ...
+                   8/13*(axtmp(4)-axtmp(3))+axtmp(3), ...
+                   [num2str(coherfreq,4) ' Hz']);
+        set(hztxt,'fontsize',TICKFONT);
+    end; % noshow
 else
-   amps   = [];    % null outputs unless coherfreq specified
-   cohers = [];
+    amps   = [];    % null outputs unless coherfreq specified
+    cohers = [];
 end
 axhndls = [ax1 axcb ax2 ax3 ax4];
 if exist('ur_outsort')
-   outsort = ur_outsort; % restore outsort clipped values, if any
+    outsort = ur_outsort; % restore outsort clipped values, if any
 end
 if nargout<1
-   data = []; % don't spew out data if no args out and no ;
+    data = []; % don't spew out data if no args out and no ;
 end
 
 %   
 %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-if (~isempty(topomap)) 
+if (~isempty(topomap)) & strcmpi(noshow, 'no') 
     h(12)=axes('Position',...
-    [gcapos(1)+0.10*gcapos(3) gcapos(2)+0.92*gcapos(4),...
-        0.20*gcapos(3) 0.14*gcapos(4)]);
+               [gcapos(1)+0.10*gcapos(3) gcapos(2)+0.92*gcapos(4),...
+                0.20*gcapos(3) 0.14*gcapos(4)]);
     % h(12) = subplot('Position',[.10 .86 .20 .14]); 
     fprintf('Plotting a topo map in upper left.\n');
 	if length(topomap) == 1
@@ -2317,32 +2361,33 @@ if (~isempty(topomap))
     axis('square')
     axhndls = [axhndls h(12)];
 end 
+
 %   
 %%%%%%%%%%%%%%% plot a spectrum %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
 SPECFONT = 10;
-if (~isempty(lospecHz)) 
+if (~isempty(lospecHz)) & strcmpi(noshow, 'no')  
     h(13)=axes('Position',...
-        [gcapos(1)+0.82*gcapos(3) ...
-         gcapos(2)+0.96*gcapos(4),...
-         0.15*gcapos(3)*(0.8/gcapos(3))^0.5 ...
-         0.10*gcapos(4)*(0.8/gcapos(4))^0.5]);
-
+               [gcapos(1)+0.82*gcapos(3) ...
+                gcapos(2)+0.96*gcapos(4),...
+                0.15*gcapos(3)*(0.8/gcapos(3))^0.5 ...
+                0.10*gcapos(4)*(0.8/gcapos(4))^0.5]);
+    
     % h(13) = subplot('Position',[.75 .88 .15 .10]); 
     fprintf('Plotting the data spectrum in upper right.\n');
     winlength = frames;
     if winlength > 512
-       for k=2:5
-          if rem(winlength,k) == 0
-            break
-          end
-       end
-       winlength = winlength/k;
+        for k=2:5
+            if rem(winlength,k) == 0
+                break
+            end
+        end
+        winlength = winlength/k;
     end
-        
-  % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
+    
+    % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
     [Pxx,Pxxc,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
-                              512,srate,winlength,0,0.05);
+                       512,srate,winlength,0,0.05);
     plot(F,10*log10(Pxx));
     goodfs = find(F>= lospecHz & F <= hispecHz);
     maxgfs = max(10*log10(Pxx(goodfs)));
@@ -2354,9 +2399,9 @@ if (~isempty(lospecHz))
     l=ylabel('dB');
     set(l,'Fontsize',SPECFONT);
     if ~isnan(coherfreq)
-      hold on; plot([coherfreq,coherfreq],[mingfs maxgfs],'r');
-   end
-   axhndls = [axhndls h(13)];
+        hold on; plot([coherfreq,coherfreq],[mingfs maxgfs],'r');
+    end
+    axhndls = [axhndls h(13)];
 end 
 
 %   
@@ -2364,20 +2409,24 @@ end
 %   
 limits = [timelimits(1:2) minerp maxerp minamp maxamp mincoh maxcoh];
 limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
+
 %   
 %%%%%%%%%%%%%%% turn on axcopy() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   
-axcopy(gcf);
-% eegstr = 'img=get(gca,''''children''''); if (strcmp(img(end),''''type''''),''''image''''), img=get(img(end),''''CData''''); times=get(img(end),''''Xdata''''); clf; args = [''''limits'''' '''','''' times(1) '''','''' times(end)]; if exist(''''EEG'''')==1, args = [args '''','''' ''''srate'''' '''','''' EEG.srate]; end eegplot(img,args); end';
-% axcopy(gcf,eegstr);
-
-% turn on popup zoom windows
+%
+if strcmpi(noshow, 'no')  
+    axcopy(gcf);
+    % eegstr = 'img=get(gca,''''children''''); if (strcmp(img(end),''''type''''),''''image''''), img=get(img(end),''''CData''''); times=get(img(end),''''Xdata''''); clf; args = [''''limits'''' '''','''' times(1) '''','''' times(end)]; if exist(''''EEG'''')==1, args = [args '''','''' ''''srate'''' '''','''' EEG.srate]; end eegplot(img,args); end';
+    % axcopy(gcf,eegstr);
+end;
 
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-axes('position',gcapos);
-axis off
+if strcmpi(noshow, 'no')  
+    axes('position',gcapos);
+    axis off
+end;
+
 return
 %
 %%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
