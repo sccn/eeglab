@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/04 21:33:18  arno
+% debugging command line call with empty values
+%
 % Revision 1.16  2002/12/06 03:43:23  arno
 % debuging event sorting
 %
@@ -112,37 +115,210 @@ if nargin < 1
    return;
 end;	
 
+if nargin >=1 & isstr(EEG)
+    strcom = EEG;
+    
+    % user data
+    % ---------
+    userdata  = get(gcf, 'userdata');
+    EEG       = userdata{1};
+    eventtmp  = userdata{2};
+    oldcom    = userdata{3};
+    allfields = fieldnames(eventtmp);
+    tmpind    = strmatch('urevent', allfields);
+    allfields(tmpind) = [];
+    
+    % current event
+    % -------------
+    objevent  = findobj('parent', gcf, 'tag', 'numval');
+    valnum    = str2num(get(objevent, 'string'));
+    
+    switch strcom
+    
+     case 'goto', % **********************************************************
+      
+      % shift time
+      % ----------
+      shift     = varargin{1};
+      valnum    = valnum + shift;
+      if valnum < 1,                valnum = 1;                end;
+      if valnum > length(eventtmp), valnum = length(eventtmp); end;
+      set(objevent, 'string', num2str(valnum));
+
+      % update fields
+      % -------------
+      for index = 1:length(allfields) 
+          
+          if strcmp( allfields{index}, 'latency') & ~isempty(eventtmp(valnum).latency)
+              if isfield(eventtmp, 'epoch')
+                   value = eeg_point2lat( eventtmp(valnum).latency, eventtmp(valnum).epoch, ...
+                                          EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+              else value = (eventtmp(valnum).latency-1)/EEG.srate+EEG.xmin;
+              end;
+          else value = getfield( eventtmp(valnum), allfields{index});
+          end;
+          
+          % update interface
+          % ----------------
+          tmpobj = findobj('parent', gcf, 'tag', allfields{index});
+          set(tmpobj, 'string', num2str(value));
+      end;
+      
+      % update original
+      % --------------- 
+      tmpobj = findobj('parent', gcf, 'tag', 'original');
+      if isfield(eventtmp, 'urevent') & eventtmp(valnum).urevent ~= valnum
+           set(tmpobj, 'string', [ 'originally ' int2str(eventtmp(valnum).urevent)], ...
+                       'horizontalalignment', 'center');
+      else set(tmpobj, 'string', ' '); 
+      end;
+          
+     case 'append', % **********************************************************
+
+      shift     = varargin{1}; % shift is for adding before or after the event
+      if isfield(eventtmp, 'epoch'), curepoch = eventtmp(valnum).epoch; end;
+      valnum    = valnum + shift;
+      
+      % update events
+      % -------------
+      eventtmp(end+3)          = eventtmp(end);
+      eventtmp(valnum+1:end-2) = eventtmp(valnum:end-3);
+      eventtmp(valnum)         = eventtmp(end-1);
+      eventtmp                 = eventtmp(1:end-2);
+      if isfield(eventtmp, 'epoch'), eventtmp(valnum).epoch = curepoch; end;
+
+      % update gui
+      % ----------
+      userdata{2} = eventtmp;
+      set(gcf, 'userdata', userdata);
+      pop_editeventvals('goto', shift);
+      
+      % update commands
+      % ---------------
+      tmpcell    = cell(1,1+length(fieldnames(eventtmp))); 
+      tmpcell{1} = valnum;
+      oldcom     = { oldcom{:} 'add', tmpcell };
+      
+     case 'delete', % **********************************************************
+      
+      eventtmp(valnum) = []; 
+      valnum           = min(valnum,length(eventtmp));
+      set(objevent, 'string', num2str(valnum));
+      
+      % update gui
+      % ----------
+      userdata{2} = eventtmp;
+      set(gcf, 'userdata', userdata);
+      pop_editeventvals('goto', 0);
+
+      set(gcf, 'userdata', userdata);
+      pop_editeventvals('goto', 0);
+
+      % update commands
+      % ---------------
+      oldcom = { oldcom{:} 'delete', valnum };
+    
+     case 'assign', % **********************************************************
+      
+      field    = varargin{1};
+      objfield = findobj('parent', gcf, 'tag', field);
+      editval  = get(objfield, 'string');
+      if ~isempty(str2num(editval)), editval =str2num(editval); end;
+      
+      % latency case
+      % ------------
+      if strcmp( field, 'latency') & ~isempty(editval)
+          if isfield(eventtmp, 'epoch')
+               editval = eeg_lat2point( editval, eventtmp(valnum).epoch, ...
+                                       EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+          else editval = (editval- EEG.xmin)*EEG.srate+1;
+          end;
+      end;
+      eventtmp(valnum) = setfield(eventtmp(valnum), field, editval);
+      
+      % update history
+      % --------------
+      oldcom = { oldcom{:} 'changefield' { valnum field editval }};
+     
+     case 'sort', % **********************************************************
+      
+      field1 = get(findobj('parent', gcf, 'tag', 'listbox1'), 'value');
+      field2 = get(findobj('parent', gcf, 'tag', 'listbox2'), 'value');
+      order1 = get(findobj('parent', gcf, 'tag', 'order1'),   'value');
+      order2 = get(findobj('parent', gcf, 'tag', 'order2'),   'value');
+      
+      newcom = {};
+      if field1 > 1, newcom    = { newcom{:} allfields{field1-1} order1 }; end;
+      if field2 > 1, newcom    = { newcom{:} allfields{field2-1} order2 }; end;
+      if ~isempty(newcom)
+          oldevents = EEG.event;
+          EEG.event = eventtmp;
+          EEG = pop_editeventvals( EEG, 'sort',  newcom );
+          eventtmp  = EEG.event;
+          EEG.event = oldevents;
+      else
+          return;
+      end;
+      
+      % update gui
+      % ----------
+      userdata{2} = eventtmp;
+      set(gcf, 'userdata', userdata);
+      pop_editeventvals('goto', 0);
+      
+      
+      % update history
+      % --------------
+      oldcom = { oldcom{:} 'sort' newcom };
+      
+      % warn user
+      % ---------
+      warndlg2('Sorting done');
+      
+    end;
+    
+    % save userdata
+    % -------------
+    userdata{2} = eventtmp;
+    userdata{3} = oldcom;
+    set(gcf, 'userdata', userdata);
+    return;
+end;
+
 if isempty(EEG.event)
     disp('Getevent: cannot deal with empty event structure');
     return;
 end;   
 
 allfields = fieldnames(EEG.event);
+tmpind = strmatch('urevent', allfields);
+allfields(tmpind) = [];
+
 if nargin<2
     % transfer events to global workspace
     evalin('base', [ 'eventtmp = ' inputname(1) '.event;' ]);
 
     % add field values
     % ----------------
-    geometry = { 1 };
+    geometry = { [2 0.5] };
     tmpstr = sprintf('Edit event field values (currently %d events)',length(EEG.event));
-    uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
+    uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } ...
+               { 'Style', 'pushbutton', 'string', 'Delete event', 'callback', 'pop_editeventvals(''delete'');'  }};
+
     for index = 1:length(allfields) 
+
         geometry = { geometry{:} [1 1 1 1] };
+        
+        % input string
+        % ------------
         if strcmp( allfields{index}, 'latency')
             if EEG.trials > 1
-               inputstr =  [ allfields{index} ' (ms)'];
-               valuestr = num2str(eeg_point2lat( getfield(EEG.event,{1}, allfields{index}), EEG.event(1).epoch,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3));
-               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= eeg_lat2point(editval,eventtmp(valnum).epoch,EEG.srate,[EEG.xmin EEG.xmax]*1000, 1E-3);'']);'];
-            else
-               inputstr =  [ allfields{index} ' (sec)'];
-               valuestr = num2str((getfield(EEG.event,{1}, allfields{index})-1)/EEG.srate+EEG.xmin);
-               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= (editval- EEG.xmin)*EEG.srate+1;'' ]);'];
+                 inputstr =  [ allfields{index} ' (ms)'];
+            else inputstr =  [ allfields{index} ' (sec)'];
             end;   
 		else inputstr =  allfields{index};
-            valuestr = num2str(getfield(EEG.event,{1}, allfields{index}));
-            strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= editval;'']);'];
 		end;
+        
 		% callback for displaying help
 		% ----------------------------
         if index <= length( EEG.eventdescription )
@@ -155,103 +331,70 @@ if nargin<2
 			 end;
         else stringtext = 'no-description'; tmptext = 'no-description';
         end;
-		callbackpushbutton = ['questdlg2(' vararg2str(tmptext) ...
+		cbbutton = ['questdlg2(' vararg2str(tmptext) ...
 					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ];
-		if strcmp(allfields{index}, 'ori_time') | strcmp(allfields{index}, 'ori_index'), enabling = 'off';
-		else enabling = 'on'; end;
-		uilist   = { uilist{:}, ...
-					 { }, ...
-					 { 'Style', 'pushbutton', 'string', inputstr, 'callback',callbackpushbutton  }, ...
-					 { 'Style', 'edit', 'tag', allfields{index}, 'string', valuestr, 'enable', enabling, 'callback', ...
-					   [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string''));' ...
-						 'editval = get(gcbo, ''string'');' ...
-						 'if ~isempty(str2num(editval)), editval =str2num(editval);  end;' ...
-						 strassign ...
-						 'olduserdat = get( gcbf, ''userdata'');' ...
-						 'if isempty(olduserdat), olduserdat = {}; end;' ...
-						 'set( gcbf, ''userdata'', { olduserdat{:} ''changefield'' { valnum ''' allfields{index} ''' editval }});' ...
-						 'clear editval valnum olduserdat;' ] } { } };
+
+        % create control
+        % --------------
+        cbedit = [ 'pop_editeventvals(''assign'', ''' allfields{index} ''');' ]; 
+		uilist   = { uilist{:}, { }, ...
+					 { 'Style', 'pushbutton', 'string', inputstr, 'callback',cbbutton  }, ...
+					 { 'Style', 'edit', 'tag', allfields{index}, 'string', '', 'callback', cbedit } ...
+                     { } };
     end;
 
     % add buttons
     % -----------
-    geometry = { geometry{:} [1] [1 0.7 0.7 1 0.7 0.7 1] [1 0.7 0.7 1 0.7 0.7 1] };
-    callpart1 = [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string''));' ];
-    callpart2 = [ 'set(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string'', num2str(valnum));' ];
-    for index = 1:length(allfields) 
-        if strcmp( allfields{index}, 'latency')
-            if EEG.trials > 1
-	             callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
-							   '''), ''string'', num2str(eeg_point2lat(eventtmp(valnum).' allfields{index} ...
-							   ',eventtmp(valnum).epoch, EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3)));' ];
-            else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
-							           '''), ''string'', num2str((eventtmp(valnum).' allfields{index} '-1)/EEG.srate+EEG.xmin));' ]; 
-			end;
-		else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} ...
-						   '''), ''string'', num2str(eventtmp(valnum).' allfields{index} '));'  ];
-      end;
-    end;
-    callpart2 = [ callpart2 'clear valnum;' ];
+    geometry = { geometry{:} [1] [1.2 0.6 0.6 1 0.6 0.6 1.2] [1.2 0.6 0.6 1 0.6 0.6 1.2] [2 1 2] };
     
+    uilist   = { uilist{:}, ...
+          { }, ...
+          { },{ },{ }, {'Style', 'text', 'string', 'Event Num', 'fontweight', 'bold' }, { },{ },{ }, ...
+          { 'Style', 'pushbutton', 'string', 'Append event',  'callback', 'pop_editeventvals(''append'', 0);' }, ...
+          { 'Style', 'pushbutton', 'string', '<<',            'callback', 'pop_editeventvals(''goto'', -10);' }, ...
+          { 'Style', 'pushbutton', 'string', '<',             'callback', 'pop_editeventvals(''goto'', -1);' }, ...
+          { 'Style', 'edit',       'string', '1',             'callback', 'pop_editeventvals(''goto'', 0);', 'tag', 'numval' }, ...
+          { 'Style', 'pushbutton', 'string', '>',             'callback', 'pop_editeventvals(''goto'', 1);' }, ...
+          { 'Style', 'pushbutton', 'string', '>>',            'callback', 'pop_editeventvals(''goto'', 10);' }, ...
+          { 'Style', 'pushbutton', 'string', 'Insert event',  'callback', 'pop_editeventvals(''append'', 1);' }, ...
+          { }, { 'Style', 'text',  'string', ' ', 'tag', 'original' 'horizontalalignment' 'center' } { } };
+
+    % add sorting options
+    % -------------------
     listboxtext = 'No field selected';  
     for index = 1:length(allfields) 
          listboxtext = [ listboxtext '|' allfields{index} ]; 
     end;
-
-    uilist   = { uilist{:}, ...
-          { }, ...
-          { },{ },{ }, {'Style', 'text', 'string', 'Event Num', 'fontweight', 'bold' }, { },{ },{ }, ...
-          { 'Style', 'pushbutton', 'string', 'Delete event',  'callback', [callpart1 'eventtmp(valnum) = []; valnum = min(valnum,length(eventtmp));' ...
-                'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
-                'set( gcbf, ''userdata'', { olduserdat{:} ''delete'', valnum }); clear olduserdat' callpart2 ] }, ...
-          { 'Style', 'pushbutton', 'string', '<<', 'callback', [callpart1 'valnum = max(valnum-10,1);' callpart2 ] }, ...
-          { 'Style', 'pushbutton', 'string', '<',  'callback', [callpart1 'valnum = max(valnum-1,1);' callpart2 ] }, ...
-          { 'Style', 'edit', 'string', '1', 'tag', 'numval', 'callback', [callpart1 'valnum = min(str2num(get(gcbo, ''string'')),length(eventtmp));' callpart2 ] }, ...
-          { 'Style', 'pushbutton', 'string', '>',  'callback', [callpart1 'valnum = min(valnum+1,length(eventtmp));' callpart2 ] }, ...
-          { 'Style', 'pushbutton', 'string', '>>', 'callback', [callpart1 'valnum = min(valnum+10,length(eventtmp));' callpart2 ] }, ...
-          { 'Style', 'pushbutton', 'string', 'Insert event',  'callback', [callpart1 ...
-                'eventtmp(end+3) = eventtmp(end);' ...
-                'eventtmp(valnum+1:end-2) = eventtmp(valnum:end-3);' ...
-                'eventtmp(valnum) = eventtmp(end-1);' ...
-                'if isfield(eventtmp, ''epoch''), eventtmp(valnum).epoch = eventtmp(valnum+1).epoch; end;' ...
-                'eventtmp = eventtmp(1:end-2);' ...
-                'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
-                'tmpcell = cell(1,1+length(fieldnames(eventtmp))); tmpcell{1} =valnum;' ...
-                'set( gcbf, ''userdata'', { olduserdat{:} ''add'', tmpcell }); clear tmpcell olduserdat' callpart2 ] }, ...
-          };
-
-    % add sorting options
-    % -------------------
-    geometry = { geometry{:} [1] [1] [1 1 1] [1 1 1] [1 1.5 0.5] };
-    uilist = {  uilist{:},...
-         {}, { 'Style', 'text', 'string', 'Re-order events (for review only)', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Main sorting field:'  }, ...
-         { 'Style', 'listbox', 'string', listboxtext }, ...
-         { 'Style', 'checkbox', 'string', 'Click for decreasing order' } ...
-         { 'Style', 'text', 'string', 'Secondary sorting field:'  }, ...
-         { 'Style', 'listbox', 'string', listboxtext }, ...
-         { 'Style', 'checkbox', 'string', 'Click for decreasing order' }, ...
-         { 'Style', 'pushbutton', 'string', 'Re-sort', 'callback', 'set(findobj(''parent'', gcf, ''tag'', ''ok''), ''userdata'', ''retuninginputui'')' }, ...
-         { 'Style', 'text', 'string', 'NB: after re-sorting call back this window' }, { }};
+    geometry = { geometry{:} [1] [1 1 1] [1 1 1] [1 1.5 0.5] };
+    uilist = {  uilist{:}, ...
+         { 'Style', 'text',       'string', 'Re-order events (for review only)', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text',       'string', 'Main sorting field:'  }, ...
+         { 'Style', 'listbox',    'string', listboxtext, 'tag', 'listbox1' }, ...
+         { 'Style', 'checkbox',   'string', 'Click for decreasing order', 'tag', 'order1' } ...
+         { 'Style', 'text',       'string', 'Secondary sorting field:'  }, ...
+         { 'Style', 'listbox',    'string', listboxtext, 'tag', 'listbox2' }, ...
+         { 'Style', 'checkbox',   'string', 'Click for decreasing order', 'tag', 'order2' }, ...
+         { 'Style', 'pushbutton', 'string', 'Re-sort', 'callback', 'pop_editeventvals(''sort'');' }, ...
+         { }, { }};
    
-    [results userdat] = inputgui( geometry, uilist, 'pophelp(''pop_editeventvals'');', 'Edit event values -- pop_editeventvals()' );
-    if length(results) == 0, return; end;
-
-    % transfer events back from global workspace
-    eventtmp = evalin('base', 'eventtmp');
-    evalin('base', 'clear eventtmp');
-    EEG.event = eventtmp;
-
-    % handle sorting
-    % --------------
-    args = {};
-    if results{end-3} ~= 1
-        sortval = { allfields{ results{end-3}-1 } results{end-2} };
-        if results{end-1} ~= 1
-            sortval = { sortval{:} allfields{ results{end-1}-1 } results{end} };
-        end;  
-        args = { args{:}, 'sort', sortval }; 
-    end;  
+    userdata = { EEG EEG.event {} };
+    inputgui( geometry, uilist, 'pophelp(''pop_editeventvals'');', ...
+                                  'Edit event values -- pop_editeventvals()', userdata, 'plot');
+    pop_editeventvals('goto', 0);
+    
+    % wait for figure
+    % ---------------
+    fig = gcf;
+    waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+    try, userdata = get(fig, 'userdata'); close(fig); % figure still exist ?
+    catch, return; end;
+    
+    % transfer events
+    % ---------------
+    tmpevents = userdata{2};
+    EEG.event = tmpevents;
+    com       = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
+    return;
     
 else % no interactive inputs
     args = varargin;
@@ -281,7 +424,7 @@ for curfield = 1:2:length(args)
 	            events = EEG.event(I);
 	        else
 	            events = EEG.event;
-	        end;       
+	        end;  
             try, eval(['tmparray = cell2mat( { events.' tmparg{1} ' } );']);
             catch, eval(['tmparray = { events.' tmparg{1} ' };']);
 	        end;
