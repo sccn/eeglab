@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/09 01:42:40  arno
+% debugging filter over smal time period
+%
 % Revision 1.2  2002/08/09 00:41:22  arno
 % updating for boundaries
 %
@@ -88,7 +91,7 @@ if EEG.trials == 1
 		else
 			options{4} = 0;
 			disp('Pop_eegfilt:finding continuous data boundaries');
-			boundaries = [0 round(boundaries-0.5) EEG.pnts]
+			boundaries = [0 round(boundaries-0.5) EEG.pnts];
 			for n=1:length(boundaries)-1
 				try
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
