@@ -1,12 +1,12 @@
-% pop_readlocs() - load a EGI-format EEG file (pop out window if no arguments).
+% pop_readlocs() - load a EGI-format EEG file (pop up an interactive window if no arguments).
 %
 % Usage:
-%   >> EEG = pop_readlocs;             % a window pops up
+%   >> EEG = pop_readlocs;                             % a window pops up
 %   >> EEG = pop_readlocs( filename, 'key', val, ...); % no window
 %
 % Inputs:
 %   filename       - Electrode location file name
-%   'key',val      - Same options as readlocs()
+%   'key',val      - Same options as readlocs() (see >> help readlocs)
 % 
 % Outputs: same as readlocs()
 %
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/12/27 20:37:48  scott
+% minor header edit -sm
+%
 % Revision 1.4  2002/12/27 18:50:14  arno
 % debugging
 %
