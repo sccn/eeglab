@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/30 21:40:37  arno
+% *** empty log message ***
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -61,10 +64,10 @@ if exist('color') == 1
    		tmpcol1 = TMPREJINIT(:,3) + 255*TMPREJINIT(:,4) + 255*255*TMPREJINIT(:,5);
    		tmpcol2 = color(index,1)+255*color(index,2)+255*255*color(index,3);   
    		I = find( tmpcol1 == tmpcol2);   
-   		if isempty(I)
-      		fprintf('Warning: color [%d %d %d] not found\n', ...
-      			color(index,1), color(index,2), color(index,3));
-   		end;
+   		%if isempty(I)
+      	%	fprintf('Warning: color [%d %d %d] not found\n', ...
+      	%		color(index,1), color(index,2), color(index,3));
+   		%end;
    		TMPREJ = [ TMPREJ; TMPREJINIT(I,:)];
    	end;	
 else 
