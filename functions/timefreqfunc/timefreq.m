@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/05/29 15:14:30  arno
+% allowing vector for timesout
+%
 % Revision 1.23  2003/05/29 14:59:07  arno
 % nothing
 %
@@ -411,6 +414,9 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize)
             % ------------------------------
             if (timevar > frames-winsize)
                 timevar = frames-winsize;
+                if timevar < 0
+                    error('Not enough data points, reduce the window size or lowest frequency');
+                end;
                 disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(timevar) ]);
             end
             npoints = timevar(1);
