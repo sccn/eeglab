@@ -12,7 +12,6 @@
 %  'lddur'      - duration of segment to load, default = whole file
 %  'ldnsamples' - number of samples to load, default = whole file, 
 %                 overrides lddur
-%  'blockread'  - size of the blocks to read. Default is 1.
 %  'avgref'     - ['yes'|'no'] average reference. Default 'no'.
 %  'avrefchan'  - reference channels. Default none.  
 %
@@ -20,18 +19,9 @@
 %  cnt          - structure with the continuous data and other informations
 %
 % Known limitations: 
-%   Initially I couldn't get the continuous data as they would appear 
-% using CNTTOASC or CNTTOBIN (www.neuro.com/neuroscan/download.html). 
-% We don't have the code for these functions, so we don't really know how
-% the raw data is read. After extensive searches, I realized that for
-% my continuous CNT files, data was stored in blocks of 40 unsigned short 
-% integers for each channel. I couldn't find where this parameter was 
-% specified in the header, so I added the option 'blockread' and input 
-% the number 40 by hand { cnt = loadcnt('file.cnt', 'blockread', 40) }.
-%   By default the size of the block is 1 and this work for most CNT
-% files. For more see http://www.cnl.salk.edu/~arno/cntload/index.html    
+%  For more see http://www.cnl.salk.edu/~arno/cntload/index.html    
 %
-% Authors: Andrew James & Arnaud Delorme 2000-2001 
+% Authors: Andrew James & Arnaud Delorme 2000-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -53,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/07/25 00:42:41  arno
+% *** empty log message ***
+%
 % Revision 1.5  2003/07/22 15:42:48  arno
 % allow type 0
 %
@@ -114,6 +107,7 @@ r.dt=1/r.rate;
 r.scale=freadat(f, 378, 1, 'double');
 r.ampsensitivity=freadat(f, 438, 1, 'float');
 r.refelectrode=freadat(f, 540, 10, 'text');
+r.blockread   =freadat(f, 900-6, 1, 'long')/2;
 if all(r.refelectrode==0), 
    %%disp('No reference electrode set in file, setting to CZ')
    r.refelectrode(1:2)='CZ'; 
@@ -207,16 +201,18 @@ if ~isempty(ldchan)
    if length(ldchan)==r.nchannels
       % all channels
 
-	  if r.blockread == 1	
+	  if r.blockread <= 1
       	  dat=freadat(f, startpos, [r.nchannels ldnsamples], 'short');
  	  else
-     	  dat=zeros( length(ldchan), ldnsamples);
-      	  dat(:, 1:r.blockread)=freadat(f, startpos, [r.blockread r.nchannels], 'short')';
+     	  dat = zeros( length(ldchan), ldnsamples);
+      	  dat(:, 1:r.blockread) = freadat(f, startpos, [r.blockread r.nchannels], 'short')';
 
 		  counter = 1;	
  		  while counter*r.blockread < ldnsamples
-	      	dat(:, counter*r.blockread+1:counter*r.blockread+r.blockread) = freadat(f, [], [40 r.nchannels], 'short')';
-			counter = counter + 1;
+              tmp    = freadat(f, [], [r.blockread r.nchannels], 'short')';
+              maxind = counter*r.blockread+r.blockread;
+              dat(:, counter*r.blockread+1:maxind) = tmp;
+              counter = counter + 1;
 		  end;
 	  end;	
 
