@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/08/29 01:10:02  arno
+% imaging component square
+%
 % Revision 1.31  2002/08/22 15:36:56  arno
 % decoupling window length and fft length
 %
@@ -492,9 +495,9 @@ if ~isempty(g.weights)
 end;
 
 if ~isempty(g.freq)
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot lines through channel trace bundle at each headfreq
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot vertical lines through channel trace bundle at each headfreq
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.weights)
 		for f=1:length(g.freq)
 			hold on; 
@@ -512,9 +515,9 @@ if ~isempty(g.freq)
 		plot([freqs(freqidx(1)) freqs(freqidx(1))],[mincompdB maxcompdB],'k', 'LineWidth',2.5);
 	end
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot connecting lines using changeunits()
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% create axis for topoplot
+	%%%%%%%%%%%%%%%%%%%%%%%%%%
 	tmpmainpos = get(gca, 'position');
 	headax = zeros(1,length(g.freq));
 	for f=1:length(g.freq)+length(g.icamaps)
@@ -540,21 +543,28 @@ if ~isempty(g.freq)
 		realpos = 1:length(g.freq); % indices giving order of plotting positions
 	end;
 	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Plot connecting lines using changeunits()
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	for f=1:length(g.freq)+length(g.icamaps)
-		if f>length(g.freq) % special case of ica components
-			from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
-			%g.icafreqsval contains the sorted frequency values at the specified frequency
-		else 
+		if ~isempty(g.weights)
+			if f>length(g.freq) % special case of ica components
+				from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
+				%g.icafreqsval contains the sorted frequency values at the specified frequency
+			else 
+				from = changeunits([freqs(freqidx(f)),max(eegspecdBtoplot(:,:))],specaxes,large);
+			end;
+		else
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
 		end;
 		pos = get(headax(realpos(f)),'position');
 		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/1.7];
 		hold on;
-    if f<=length(g.freq)
-      colr = 'k';
-    else
-      colr = colrs{mod((f-2),5)+1};
-    end
+		if f<=length(g.freq)
+			colr = 'k';
+		else
+			colr = colrs{mod((f-2),5)+1};
+		end
 		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',2);
 		axis([0 1 0 1]);
 		axis off;
