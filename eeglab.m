@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.223  2003/02/24 19:54:53  arno
+% do not crash eeglab if bad plugin
+%
 % Revision 1.222  2003/02/24 19:35:58  arno
 % adding plugin functionality
 %
@@ -1106,7 +1109,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
             funcname = dircontent.m{index}(1:end-2);
             disp(['eeglab: executing plugin "' funcname '"' ]);
             eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
-                 ['disp(''eeglab: error while executing plugin "' funcname '"''); disp(lasterr);']  );
+                 ['disp(''eeglab: error while executing plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
     end;
 
