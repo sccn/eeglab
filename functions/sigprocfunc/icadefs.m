@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/18 23:54:06  arno
+% changing ica executable
+%
 % Revision 1.13  2002/08/14 16:58:59  arno
 % update for new release
 %
@@ -72,7 +75,7 @@
 % -------------- EEGLAB DEFINITION (V 4.0) -------------
 % ------------------------------------------------------
 
-TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglab.html'; % online version
+TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
 
