@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/12/06 03:18:39  arno
+% same
+%
 % Revision 1.6  2002/12/06 03:07:19  arno
 % debuging channel import
 %
@@ -58,7 +61,7 @@ EEG = [];
 command = '';
 if nargin < 1 
 	% ask user
-	[filename, filepath] = uigetfile('*.RAW', 'Choose an EGI RAW file -- pop_readegi()'); 
+	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose an EGI RAW file -- pop_readegi()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];

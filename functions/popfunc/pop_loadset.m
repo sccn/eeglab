@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/26 02:34:34  arno
+% debug if file changed on disk
+%
 % Revision 1.16  2002/11/05 18:27:47  luca
 % load fix for reading bug October 2002
 %
@@ -93,7 +96,7 @@ command = '';
 VAROUT  = [];
 %eeg_emptyset;
 if nargin < 2  
-	[inputname, inputpath] = uigetfile('*.set*', 'Load dataset(s) -- pop_loadset()');
+	[inputname, inputpath] = uigetfile('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
 end;
