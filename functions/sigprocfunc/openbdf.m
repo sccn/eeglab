@@ -204,9 +204,9 @@ EDF.AS.IDX2=idx2;
 
 
 if strcmp(mode, 'EDF')
-    DAT.Head.databits = 'int16';
+    EDF.databits = 'int16';
 else
-    DAT.Head.databits = 'bit24';
+    EDF.databits = 'bit24';
 end;    
 DAT.Head=EDF;
 DAT.MX.ReRef=1;
