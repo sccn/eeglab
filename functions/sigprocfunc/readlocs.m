@@ -173,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/09/18 00:07:05  arno
+% further checks for neuroscan
+%
 % Revision 1.49  2003/07/16 18:52:21  arno
 % allowing file type locs
 %
@@ -470,13 +473,13 @@ if isstr(filename)
 
        % converting XYZ coordinates to polar
        % -----------------------------------
-   elseif isfield(eloc, 'X')
-       try
-           eloc = convertlocs(eloc, 'cart2all');  
-       catch, disp('Warning: coordinate conversion failed'); end;
    elseif isfield(eloc, 'sph_theta')
        try
            eloc = convertlocs(eloc, 'sph2all');  
+       catch, disp('Warning: coordinate conversion failed'); end;
+   elseif isfield(eloc, 'X')
+       try
+           eloc = convertlocs(eloc, 'cart2all');  
        catch, disp('Warning: coordinate conversion failed'); end;
    else 
        try
