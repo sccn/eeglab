@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2004/02/15 16:28:15  scott
+% same
+%
 % Revision 1.77  2004/02/15 16:26:54  scott
 % same
 %
@@ -862,7 +865,7 @@ tip = rmax*1.15; base = rmax-.004;
 EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-plot(cos(circ).*rmax,sin(circ).*rmax,...
+hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
@@ -875,6 +878,7 @@ if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
+  set(hd,'color',HCOLOR);
 else
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
