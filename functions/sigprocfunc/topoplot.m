@@ -26,6 +26,8 @@
 %                       'blank'    -> plot electrode locations only {default: 'both'}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
 %                       options below. {default: 'on' -> mark electrode locations with points}. 
+%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
+%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside 
@@ -37,14 +39,13 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
-% Dipole plotting options:
+% Dipole plotting:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
 %                       Coordinates returned by dipplot() may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
 %                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
-% Dipole plotting options:
 %   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'off'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
 %   'diplen'          - [real] scale dipole length {default: 1}.
@@ -53,13 +54,14 @@
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' -> black}.
 % Plot detail options:
+%   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
+%                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
+%                       values from electrodes shown in the plotting disk only. {default: 'on'}
 %   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{var}
 %                       electrode marking details and their {defaults}. 
 %   'shading'         - 'flat','interp'  {default: 'flat'}
-%   'numcontour'      - number of contour lines {default: 6}
-%   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
-%                       'head'-> interpolate the whole disk {default: 'head'}.
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
+%   'numcontour'      - number of contour lines {default: 6}
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
@@ -84,6 +86,8 @@
 %                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
 %                       so the channel max is 0.5. factor -> Apply a specified shrink
 %                       factor (range (0,1) = shrink fraction). {default: 'off'}
+%   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
+%                       'head'-> interpolate the whole disk {default: 'head'}.
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -102,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.169  2004/03/22 03:25:41  scott
+% re-implmenting shrink options
+%
 % Revision 1.168  2004/03/21 19:19:18  scott
 % help message
 %
@@ -443,6 +450,8 @@ Zi = [];
 chanval = NaN;
 rmax = 0.5;             % head radius - don't change this!
 INTERPLIMITS = 'head';  % head, electrodes
+INTSQUARE = 'on';       % default, interpolate electrodes located though the whole square containing
+                        % the plotting disk
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
 AXHEADFAC = 1.3;        % head to axes scaling factor
@@ -460,6 +469,7 @@ EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electr
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = [];      % shrink mode (dprecated)
+intrad       = [];      % default interpolation square is to outermost electrode (<=1.0)
 plotrad      = [];      % plotting radius ([] = auto, based on outermost channel location)
 headrad      = [];      % default plotting radius for cartoon head is 0.5
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
@@ -531,28 +541,33 @@ end
 
 if nargs > 2
   if ~(round(nargs/2) == nargs/2)
-    error('topoplot(): Odd number of inputs?')
+    error('Odd number of inputs?')
   end
   for i = 3:2:nargs
     Param = eval(['p',int2str((i-3)/2 +1)]);
     Value = eval(['v',int2str((i-3)/2 +1)]);
     if ~isstr(Param)
-      error('topoplot(): Parameter must be a string')
+      error('Flag arguments must be strings')
     end
     Param = lower(Param);
     switch lower(Param)
 	 case 'colormap'
 	  if size(Value,2)~=3
-          error('topoplot(): Colormap must be a n x 3 matrix')
+          error('Colormap must be a n x 3 matrix')
 	  end
 	  colormap(Value)
+	 case 'intsquare'
+          INTSQUARE = lower(Value);
+          if ~strcmp(INTSQUARE,'on') & ~strcmp(INTSQUARE,'off')
+             error('Value of ''intsquare'' must be ''on'' or ''off''.');
+          end
 	 case {'interplimits','headlimits'}
 	  if ~isstr(Value)
-          error('topoplot(): interplimits value must be a string')
+          error('''interplimits'' value must be a string')
 	  end
 	  Value = lower(Value);
 	  if ~strcmp(Value,'electrodes') & ~strcmp(Value,'head')
-          error('topoplot(): Incorrect value for interplimits')
+          error('Incorrect value for interplimits')
 	  end
 	  INTERPLIMITS = Value;
 	 case 'verbose'
@@ -581,8 +596,7 @@ if nargs > 2
             & ~strcmp(ELECTRODES,'off') ...
             & ~strcmp(ELECTRODES,'labels') ...
             & ~strcmpi(ELECTRODES,'numbers') 
-                fprintf('topoplot(): Unknown value for keyword ''electrodes''.\n');
-            return
+              error('Unknown value for keyword ''electrodes''');
          end
 	 case 'dipole'
 	  DIPOLE = Value;
@@ -602,6 +616,11 @@ if nargs > 2
 	  EMARKER = Value;
 	 case 'shrink'
 	  shrinkfactor = Value;
+	 case 'intrad'
+	  intrad = Value;
+          if isstr(intrad) | (intrad < MINPLOTRAD | intrad > 1)
+	     error('intrad argument should be a number between 0.15 and 1.0');
+	  end
 	 case 'plotrad'
 	  plotrad = Value;
           if isstr(plotrad) | (plotrad < MINPLOTRAD | plotrad > 1)
@@ -653,11 +672,10 @@ if nargs > 2
          case 'gridscale'
           GRID_SCALE = Value;
           if GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 4
-               fprintf('topoplot(): ''gridscale'' value must be integer > 4.\n');
-               return
+               error('''gridscale'' value must be integer > 4.\n');
           end
 	 otherwise
-	  error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
+	  error(['Unknown input parameter ''' Param ''' ???'])
     end
   end
 end
@@ -667,9 +685,13 @@ if isempty(Values)
 end
 [r,c] = size(Values);
 if r>1 & c>1,
-  error('topoplot(): input data must be a single vector');
+  error('input data must be a single vector');
 elseif r==1 & c==1
   STYLE = 'blank'; % plot channels only, marking the indicated channel number
+end
+
+if intrad<plotrad
+   error('intrad must be >= plotrad');
 end
 
 %
@@ -714,7 +736,7 @@ if isempty(plotrad) & isfield(tmpeloc, 'plotrad'),
         plotrad = str2num(plotrad)           % just checking
     end
     if plotrad < MINPLOTRAD | plotrad > 1.0
-       fprintf('Bad value (%g) for plotrad.\n');
+       fprintf('Bad value (%g) for plotrad.\n',plotrad);
        error(' ');
     end
     if strcmpi(VERBOSE,'on') & ~isempty(plotrad)
@@ -724,6 +746,9 @@ end;
 if isempty(plotrad) 
   plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
 end                                           % don't plot channels with Rd > 1 (below head)
+if isempty(intrad) 
+  intrad = min(1.0,max(Rd)*1.02);             % default: just outside the outermost electrode location
+end                                           % don't interpolate channels with Rd > 1 (below head)
 
 if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
    error('plotrad must be between 0.15 and 1.0');
@@ -754,12 +779,12 @@ end
 %
 if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
   if strcmpi(VERBOSE,'on')
-    fprintf('     Using specified ''shrink'' (deprecated). Recommend moving to ''headrad'', ''plotrad''.\n');
+    fprintf('     Using specified ''shrink'' (deprecated). Recommended: ''intrad'', ''headrad'', ''plotrad''.\n');
   end
 
 if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
     if strcmpi(VERBOSE,'on')
-       fprintf('EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
+       fprintf('Use of EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
     end
     shrinkfactor = tmpeloc.shrink;
 end;
@@ -801,11 +826,19 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%% Find plotting channels  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
-enum = find(Rd <= plotrad); % only interpolate and plot channels inside potting radius
+pltchans = find(Rd <= plotrad); % plot channels inside plotting circle
 
-if length(enum) < length(Rd) & strcmpi(VERBOSE, 'on')
-        fprintf('Not using or showing the outermost %d of the %d electrodes.\n', ...
-                   length(Rd)-length(enum),length(Rd));    
+[x,y] = pol2cart(Th,Rd);  % transform from polar to cartesian coordinates
+
+if strcmpi(INTSQUARE,'on') &  ~strcmpi(STYLE,'blank') % interpolate channels in the radius intrad square
+  intchans = find(x <= intrad & y <= intrad); % interpolate and plot channels inside interpolation square
+else
+  intchans = find(Rd <= intrad); % interpolate channels in the radius intrad circle only
+end
+
+if length(pltchans) < length(Rd) & strcmpi(VERBOSE, 'on')
+        fprintf('Interpolating %d and plotting %d of the %d electrodes.\n', ...
+                   length(intchans),length(pltchans),length(Rd));    
 end;	
 %
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -813,12 +846,13 @@ end;
 
 if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
-		Values = Values(enum);
+		intValues = Values(intchans);
+		Values = Values(pltchans);
 	else if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
             tmpValues=[];
             cc=1;
             for kk=1:length(Values)
-                tmpind = find(enum == Values(kk));
+                tmpind = find(pltchans == Values(kk));
                 if ~isempty(tmpind)
                     tmpValues(cc) = tmpind;
                     cc=cc+1;
@@ -829,20 +863,32 @@ if ~isempty(Values)
 	end;	
 end;   % now channel parameters and values all refer to plotting channels only
 
-Th = Th(enum);              % eliminate channels outside the ploting area
-Rd = Rd(enum);
-labels = labels(enum,:);
+intTh = Th(intchans);           % eliminate channels outside the interpolation area
+intRd = Rd(intchans);
+intx  = x(intchans);
+inty  = y(intchans);
+
+Th    = Th(pltchans);              % eliminate channels outside the plotting area
+Rd    = Rd(pltchans);
+x     = x(pltchans);
+y     = y(pltchans);
+
+labels= labels(pltchans,:);
 
 %
 %%%%%%%%%%%%%%% Squeeze channel locations to <= rmax %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 
-squeezefac = rmax/plotrad;          
+squeezefac = rmax/plotrad;
+intRd = intRd*squeezefac; % squeeze electrode arc_lengths towards the vertex
 Rd = Rd*squeezefac;       % squeeze electrode arc_lengths towards the vertex
                           % to plot all inside the head cartoon
-% Note: Now outermost channel will be plotted just inside rmax
+intx = intx*squeezefac;   
+inty = inty*squeezefac;  
+x    = x*squeezefac;    
+y    = y*squeezefac;   
 
-[x,y] = pol2cart(Th,Rd);  % transform from polar to cartesian coordinates
+% Note: Now outermost channel will be plotted just inside rmax
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -851,12 +897,13 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  if strcmp(INTERPLIMITS,'head')
-    xmin = min(-rmax,min(x)); xmax = max(rmax,max(x));
-    ymin = min(-rmax,min(y)); ymax = max(rmax,max(y));
-  else % interplimits = rectangle containing electrodes
-    xmin = max(-rmax,min(x)); xmax = min(rmax,max(x));
-    ymin = max(-rmax,min(y)); ymax = min(rmax,max(y));
+  if strcmpi(INTERPLIMITS,'head')
+    xmin = min(-rmax,min(intx)); xmax = max(rmax,max(intx));
+    ymin = min(-rmax,min(inty)); ymax = max(rmax,max(inty));
+
+  else % INTERPLIMITS = rectangle containing electrodes   ??? SAME ???
+    xmin = max(-rmax,min(intx)); xmax = min(rmax,max(intx));
+    ymin = max(-rmax,min(inty)); ymax = min(rmax,max(inty));
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Interpolate scalp map data %%%%%%%%%%%%%%%%%%%%%%%%
@@ -864,18 +911,18 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
 
-  [Xi,Yi,Zi] = griddata(y,x,Values,yi',xi,'invdist'); % interpolate data
+  [Xi,Yi,Zi] = griddata(inty,intx,intValues,yi',xi,'invdist'); % interpolate data
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
   %
-  mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
+  mask = (sqrt(Xi.^2 + Yi.^2) <= rmax); % mask outside the plotting circle
   ii = find(mask == 0);
-  Zi(ii) = NaN;
+  Zi(ii) = NaN;                         % mask non-plotting voxels with NaNs
 
   %
   %%%%%%%%%% Return interpolated value at designated scalp location %%%%%%%%%%
   %
-  if exist('chanrad') % indicates optional 'noplot' (first argument)
+  if exist('chanrad')   % optional first argument to 'noplot' 
       chantheta = (chantheta/360)*2*pi;
       chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),...
                                                       -sin(-chantheta)]);
@@ -892,8 +939,10 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%%%% Return interpolated image only  %%%%%%%%%%%%%%%%%
   %
    if strcmpi(noplot, 'on') 
+    if strcmpi(VERBOSE,'on')
        fprintf('topoplot(): no plot requested.\n')
-       return;
+    end
+    return;
    end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Calculate colormap limits %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -907,8 +956,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       amin = min(min(Zi));
       amax = max(max(Zi));
     else
-      fprintf('topoplot(): unknown ''maplimits'' value.\n');
-      return
+      error('unknown ''maplimits'' value.');
     end
   else
     amin = MAPLIMITS(1);
@@ -929,8 +977,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
                           % shrunk enough by the 'skirt' option
   end
 
-  set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
-
+  set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC);
+                          % specify size of head axes in gca
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -969,7 +1017,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %     <- 'not line objects.' Why does 'both' work above???
 
   else
-    error('topoplot(): Invalid style')
+    error('Invalid style')
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set color axis  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -981,8 +1029,10 @@ else % if STYLE 'blank'
 %%%%%%%%%%%%%%%%%%%%%%% Draw blank head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
   if strcmpi(noplot, 'on') 
+   if strcmpi(VERBOSE,'on')
       fprintf('topoplot(): no plot requested.\n')
-      return;
+   end
+   return;
   end
   cla
   hold on
@@ -1073,7 +1123,7 @@ elseif strcmp(ELECTRODES,'labelpoint')
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
     hh(i) = text(y(i)+0.01,x(i),labels(i,:),'HorizontalAlignment','left',...
-	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(enum(i)), ...
+	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(pltchans(i)), ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
@@ -1085,7 +1135,7 @@ elseif strcmp(ELECTRODES,'labelpoint')
 elseif strcmp(ELECTRODES,'numpoint') 
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(y(i)+0.01,x(i),num2str(enum(i)),'HorizontalAlignment','left',...
+    hh(i) = text(y(i)+0.01,x(i),num2str(pltchans(i)),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -1097,7 +1147,7 @@ elseif strcmp(ELECTRODES,'numpoint')
 %
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
-    text(y(i),x(i),int2str(enum(i)),'HorizontalAlignment','center',...
+    text(y(i),x(i),int2str(pltchans(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
@@ -1106,7 +1156,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%% Mark specified electrode locations %%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
-  if length(Values) < length(enum)  % mark selected electrodes
+  if length(Values) < length(pltchans)  % mark selected electrodes
       for kk = 1:length(Values)
         hp2 = plot(y(Values(kk)),x(Values(kk)),'.','Color', EMARKERCOLOR1CHAN, ...
                                               'markersize', EMARKERSIZE1CHAN);
