@@ -22,6 +22,8 @@
 %   ALLCOM    - all the commands   
 %   EEG       - EEG structure
 %
+% Author: Arnaud Delorme, SCCN/INC/UCSD, 2001
+%
 % See also:
 %  eeglab() (a graphical interface for eeg plotting, space frequency
 %  decomposition, ICA, ... under Matlab for which this command
@@ -29,7 +31,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) 2001 Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -48,6 +50,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/12/05 00:48:51  arno
+% comment
+%
 % Revision 1.5  2003/12/05 00:26:54  arno
 % comment
 %
@@ -130,6 +135,7 @@ else % nargin == 2
     else
         % warning also some code present in eeg_store and pop_newset
         h(command); % add to history
+        EEG = eeg_hist(EEG, command);
         if ~isfield(EEG, 'history')
             EEG.history = '';
         end;
