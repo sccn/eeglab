@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/11/12 19:33:24  arno
+% remove last channel of eloc structure if necessary (common ref)
+%
 % Revision 1.20  2002/11/01 03:50:08  erik
 % same
 %
@@ -328,8 +331,8 @@ if isstr(loc_file)
 else % a locs struct
 	[tmpeloc labels Th Rd] = readlocs(loc_file);
 end
-if length(tmpelocs) == length(V1) + 1 % remove last channel if necessary (common reference channel)
-    tmpelocs(end) = [];
+if length(tmpeloc) == length(V1) + 1 % remove last channel if necessary (common reference channel)
+    tmpeloc(end) = [];
 end;
 if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
