@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.222  2004/09/03 19:02:22  scott
+% fixed fprintf ...s -sm
+%
 % Revision 1.221  2004/09/02 16:35:07  scott
 % modified 'showwin' for smoothing over amp in multiple windows
 % improved amp-sorting printout messages. -sm
@@ -1779,24 +1782,20 @@ elseif exist('ampargs') == 1 % if amplitude-sort
         end
         if ~isinf(ampargs(1)) % single time given
             if length(freq) == 1
-        	fprintf(...
-  '   in a %1.1f-cycle (%1.0f ms) time window centered at %1.0f ms.\n',...
-			DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(minx));
+        	fprintf('   in a %1.1f-cycle (%1.0f ms) time window centered at %1.0f ms.\n',...
+			DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,ampargs(1));
            else
-        	fprintf(...
-  '   in %1.1f-cycle (%1.0f-%1.0f ms) time windows centered at %1.0f ms.\n',...
-	  DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,times(minx));
+        	fprintf('   in %1.1f-cycle (%1.0f-%1.0f ms) time windows centered at %1.0f ms.\n',...
+	  DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,ampargs(1));
            end
         else % range of times
             [dummy sortwin_st ] = min(abs(times-ampwins(1)));
             [dummy sortwin_end] = min(abs(times-ampwins(end)));
             if length(freq) == 1
-        	fprintf(...
-  '   in %d %1.1f-cycle (%1.0f ms) time windows centered from %1.0f to  %1.0f ms.\n',...
+        	fprintf('   in %d %1.1f-cycle (%1.0f ms) time windows centered from %1.0f to  %1.0f ms.\n',...
 			length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
            else
-        	fprintf(...
-'   in %d %1.1f-cycle (%1.0f-%1.0f ms) time windows centered from %1.0f to %1.0f ms.\n',...
+        	fprintf('   in %d %1.1f-cycle (%1.0f-%1.0f ms) time windows centered from %1.0f to %1.0f ms.\n',...
 			length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
            end
         end
