@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 01-26-02 change format for events and trial conditions -ad
@@ -97,13 +100,6 @@ if EEG.trials > 1 | INEEG2.trials > 1
 		fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
 	end;
 end;	
-if length(EEG.chanlocs) ~= length(INEEG2.chanlocs)
-	fprintf('Warning: the two datasets do not have the same channel file, adjusted');
-else
-	if ~all(EEG.chanlocs == INEEG2.chanlocs)
-		fprintf('Warning: the two datasets do not have the same channel file, adjusted');
-	end;
-end;
 
 fprintf('Merging the two datasets...\n');		
 EEG.data    = [ EEG.data(:,:) INEEG2.data(:,:) ];
@@ -112,39 +108,48 @@ EEG.setname	= 'Merge datasets';
 % concatenate events
 % ------------------
 if ~isempty(INEEG2.event)
-    for index = 1:length(INEEG2.event(:))
-        INEEG2.event(index).trial = INEEG2.event(index).trial + EEG.trials;
-    end;    
+	if isfield( EEG.event, 'epoch')
+		for index = 1:length(INEEG2.event(:))
+			INEEG2.event(index).epoch = INEEG2.event(index).epoch + EEG.trials;
+		end;    
+	end;
+	if isfield( EEG.event, 'latency')
+		for index = 1:length(INEEG2.event(:))
+			INEEG2.event(index).latency = INEEG2.event(index).latency + EEG.trials*EEG.pnts;
+		end;    
+	end;
+			
 	EEG.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
 end;
 
 % concatenate epoch
 % ---------------------
-if ~isempty(INEEG2.epoch) & ~isempty(EEG.epoch)
-    fields1 = fieldnames( EEG.epoch );
-    fields2 = fieldnames( INEEG2.epoch );
-    fieldsdiff = setdiff( fields2, fields1 );
-    if ~isempty(fieldsdiff)
-        for f = 1:length(fieldsdiff)
-            for index = 1:EEG.trials
-                eval( [ 'EEG.epoch(' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
-             end;
-        end;
-    end;
-    fieldsdiff = setdiff( fields1, fields2 );
-    fieldscom  = intersect( fields2, fields1 );
-    for f = 1:length(fieldsdiff)
-        for index = 1:INEEG2.trials
-            eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
-        end;
-    end;
-    for f = 1:length(fieldscom)
-        for index = 1:INEEG2.trials
-            eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldscom{f} ...
-                    '= INEEG2.epoch(' int2str(index) ').' fieldscom{f} ';' ] );
-        end;
-    end;
-end;             
+EEG.epoch = [];
+% $$$ if ~isempty(INEEG2.epoch) & ~isempty(EEG.epoch)
+% $$$     fields1 = fieldnames( EEG.epoch );
+% $$$     fields2 = fieldnames( INEEG2.epoch );
+% $$$     fieldsdiff = setdiff( fields2, fields1 );
+% $$$     if ~isempty(fieldsdiff)
+% $$$         for f = 1:length(fieldsdiff)
+% $$$             for index = 1:EEG.trials
+% $$$                 eval( [ 'EEG.epoch(' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
+% $$$              end;
+% $$$         end;
+% $$$     end;
+% $$$     fieldsdiff = setdiff( fields1, fields2 );
+% $$$     fieldscom  = intersect( fields2, fields1 );
+% $$$     for f = 1:length(fieldsdiff)
+% $$$         for index = 1:INEEG2.trials
+% $$$             eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldsdiff{f} ' = 0;' ] );
+% $$$         end;
+% $$$     end;
+% $$$     for f = 1:length(fieldscom)
+% $$$         for index = 1:INEEG2.trials
+% $$$             eval( [ 'EEG.epoch(EEG.trials+' int2str(index) ').' fieldscom{f} ...
+% $$$                     '= INEEG2.epoch(' int2str(index) ').' fieldscom{f} ';' ] );
+% $$$         end;
+% $$$     end;
+% $$$ end;             
 
 if EEG.trials > 1 | INEEG2.trials > 1
 	EEG.trials  =  EEG.trials + INEEG2.trials;
