@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/01/02 04:17:09  cooper
+% fixed a couple of typos
+%
 % Revision 1.29  2002/12/04 22:32:15  arno
 % trying to debug tites for multiple conditions
 %
@@ -842,7 +845,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	tmpprod = alltfX .* conj(alltfY);
 	switch g.type
 	 case 'coher',
-	  coherresout = [];
+	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(alltfX .* conj(alltfY), 3) ./ sqrt( sum(abs(alltfX).^2,3) .* sum(abs(alltfY).^2,3) );
 	 case 'phasecoher2',
 	  coherresout = alltfX .* conj(alltfY);
