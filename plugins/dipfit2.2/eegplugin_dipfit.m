@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/03/17 02:08:43  arno
+% add path to fieldtrip
+%
 % Revision 1.3  2005/03/05 02:56:27  arno
 % adding fieldtrip folder
 %
@@ -171,10 +174,11 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     
     % menu callback commands
     % ----------------------
-    comauto    = [ trystrs.check_ica check_chans  '[EEG LASTCOM] = pop_multifit(EEG);'     catchstrs.store_and_hist ];
+    comauto    = [ trystrs.check_ica check_chans  '[EEG LASTCOM] = pop_multifit(EEG);'        catchstrs.store_and_hist ];
     comsetting = [ trystrs.check_ica check_chans '[EEG LASTCOM]=pop_dipfit_settings(EEG);'    catchstrs.store_and_hist ]; 
     combatch   = [ check_dipfit check_chans  '[EEG LASTCOM] = pop_dipfit_gridsearch(EEG);'    catchstrs.store_and_hist ];
-    comfit     = [ check_dipfitnocheck check_chans 'EEG = pop_dipfit_nonlinear(EEG);'         catchstrs.store_and_hist ];
+    comfit     = [ check_dipfitnocheck check_chans [ 'EEG = pop_dipfit_nonlinear(EEG); ' ...
+                        'LASTCOM = ''% History not supported for manual dipole fitting'';'    catchstrs.store_and_hist ];
     complot    = [ check_dipfit check_chans 'LASTCOM = pop_dipplot(EEG);'                     catchstrs.add_to_hist ];
 
     
