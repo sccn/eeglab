@@ -24,6 +24,8 @@
 %   'average'  - [real] moving average in the dimension of timesin
 %                note that extreme values might be inacurate. Default
 %                none or [].
+%   'border'   - ['on'|'off'] correct border effect when smoothing.
+%                default is 'off'.
 %
 % Outputs:
 %   interparray - interpolated array
@@ -52,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/02/06 00:55:28  arno
+% conv2 -> convolve
+%
 % Revision 1.9  2004/02/05 23:11:51  arno
 % remove debug msg
 %
@@ -90,6 +95,7 @@ end;
 g = finputcheck( varargin, { 'timesout'   'real'  []           [];
                              'average'    'real'  []           [];
                              'gauss'      'real'  []           [];
+                             'border'     'string' { 'on' 'off' } 'off';
                              'method'     'string' { 'linear' 'cubic' 'nearest' 'v4' } 'linear'});
 if isstr(g), error(g); end;
 
@@ -112,8 +118,11 @@ if ~isempty(g.average)
         fprintf('Moving average updated from %3.2f to %3.2f (=%d points)\n', ...
                 oldavg, g.average*(timevect(2)-timevect(1)), g.average);
     end;
-    array = convolve(array, ones(1, g.average));
-    %array = conv2(array, ones(1, g.average)/g.average, 'same');
+    if strcmpi(g.border, 'on')
+        array = convolve(array, ones(1, g.average));
+    else
+        array = conv2(array, ones(1, g.average)/g.average, 'same');
+    end;
 end;
 
 interparray = interpolate( array, timevect, g.timesout, g.method);
