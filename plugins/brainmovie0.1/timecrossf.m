@@ -76,6 +76,10 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/20 01:34:44  arno
+% nbcompo for difference
+% timef and crossf
+%
 % Revision 1.6  2002/11/20 01:27:54  arno
 % redebugging bootstrap
 %
@@ -126,7 +130,8 @@ for numcompo = 1:nbcompo
         ALLERSP{numcompo,3}     = applyboot( ersp{3}, erspboot{3});
         ALLITC {numcompo,1}     = applyboot( abs(itc{1}) , itcboot{1});
         ALLITC {numcompo,2}     = applyboot( abs(itc{2}) , itcboot{2});
-        ALLITC {numcompo,3}     = applyboot( abs(itc{3}) , itcboot{3});
+        if ~isreal(itc{3}), itc{3} = abs(itc{3}); end;
+        ALLITC {numcompo,3}     = applyboot( itc{3}, itcboot{3});
     else
         [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
                                                       frames, tlimits, srate, cycle, varargin{:});   
@@ -151,9 +156,9 @@ for index1 = 1:nbcompo
                 [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
                                                                   { data1(index2,:) data2(index2,:)}, frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
-                ALLCROSSF      { index1, index2, 1 } = applyboot(abs(coh{1}), cohboot{1});
-                ALLCROSSF      { index1, index2, 2 } = applyboot(abs(coh{2}), cohboot{2});
-                ALLCROSSF      { index1, index2, 3 } = applyboot(abs(coh{3}), cohboot{3});
+                ALLCROSSF      { index1, index2, 1 } = applyboot(coh{1}, cohboot{1});
+                ALLCROSSF      { index1, index2, 2 } = applyboot(coh{2}, cohboot{2});
+                ALLCROSSF      { index1, index2, 3 } = applyboot(coh{3}, cohboot{3});
                 ALLCROSSFANGLE { index1, index2, 1 } = cohangles{1};
                 ALLCROSSFANGLE { index1, index2, 2 } = cohangles{2};
                 ALLCROSSFANGLE { index1, index2, 3 } = cohangles{3};
