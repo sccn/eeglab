@@ -59,7 +59,8 @@
 %                      level. Show non-signif output values as green. {0}
 %       'naccu'     = Number of bootstrap replications to compute {200}
 %       'baseboot'  = Bootstrap baseline subtract (0=same as 'baseline';
-%                      1=whole epoch)                              {0}
+%                      1=whole epoch). 'baseboot' is not relevant when 
+%                      'boottype' is set to trials {0}
 %       'boottype'  = ['trials'|'times'|'both'] Bootstrap type: Either shuffle
 %                      trials but not windows ('trials'), windows but not trials
 %                      ('times') or both ('both')                  {'times' }
@@ -115,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/11 02:39:34  arno
+% updated header message
+%
 % Revision 1.5  2002/04/10 01:29:45  arno
 % adding vert optional input
 %
@@ -395,14 +399,11 @@ end
 wintime = 500*g.winsize/g.srate;
 times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
 
-if g.baseboot
-   baseln = 1:length(times); % use all times as baseline
-else   baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
-   if isempty(baseln)
-       baseln = 1:length(times); % use all times as baseline
-       disp('Bootstrap baseline empty, using the whole epoch');
-   end;     
-end
+baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
+if isempty(baseln)
+	baseln = 1:length(times); % use all times as baseline
+	disp('Bootstrap baseline empty, using the whole epoch');
+end;
 dispf = find(freqs <= g.maxfreq);
 stp = (g.frame-g.winsize)/(g.timesout-1);
 trials = length(X)/g.frame;
@@ -446,8 +447,9 @@ switch g.detrep
         Y = Y - mean(Y,2)*ones(1, length(Y(:))/g.frame);
 end;        
 
+baselength = length(baseln);
 firstboot = 1;
-Rn=zeros(1,g.timesout);
+Rn=zeros(trials,g.timesout);
 X = X(:)'; % make X and Y column vectors
 Y = Y(:)';
 for t=1:trials,
@@ -500,35 +502,43 @@ for t=1:trials,
 		      case 'phasecoher',
 		          R(:,j) = R(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
           end;
-          Rn(j) = Rn(j)+1;
+          Rn(t,j) = Rn(t,j)+1;
         end % ~any(isnan())
 	end % time window
 	
 	if ~isnan(g.alpha) & isnan(g.rboot)
 	   if strcmp(g.boottype, 'times') % get g.naccu bootstrap estimates for each trial
-        j=1;
-		while j<=g.naccu
-           s = ceil(rand([1 2])*g.timesout); % random ints [1,g.timesout]
-           tmpX = tmpsX(:,s(1));
-           tmpY = tmpsY(:,s(2));
-           if ~any(isnan(tmpX)) & ~any(isnan(tmpY))
-		      switch g.type
-		          case 'coher',
-		              Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
-                      cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-                      cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
-		          case 'phasecoher',
-		              Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
-              end;
-              j = j+1;
-           end
-        end
-      else
-        alltmpsX{t} = tmpsX;
-        alltmpsY{t} = tmpsX;
-      end;
+		   goodbasewins = find(Rn(t,:)==1);
+		   if g.baseboot % use baseline windows only
+			   goodbasewins = find(goodbasewins<=baselength); 
+		   end
+		   ngdbasewins = length(goodbasewins);
+		   j=1;
+		   if ngdbasewins > 1
+			   while j<=g.naccu
+				   s = ceil(rand([1 2])*ngdbasewins); % random ints [1,g.timesout]
+				   s =goodbasewins(s);
+				   tmpX = tmpsX(:,s(1));
+				   tmpY = tmpsY(:,s(2));
+				   if ~any(isnan(tmpX)) & ~any(isnan(tmpY))
+					   switch g.type
+						case 'coher',
+						 Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
+						 cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
+						 cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
+						case 'phasecoher',
+						 Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
+					   end;
+					   j = j+1;
+				   end
+			   end
+		   end;
+		   
+	   else
+		   alltmpsX{t} = tmpsX;
+		   alltmpsY{t} = tmpsX;
+	   end;
 	end
-	
 end % t = trial
 
 % handle specific bootstrap types
@@ -545,42 +555,55 @@ if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times') & isnan(g.rboot)
 	    j=1;
 	    while j<=g.naccu
 	        switch g.boottype
-	            case 'trials',
-	                t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
-	                tmpsX = alltmpsX{t(1)};
-	                tmpsY = alltmpsY{t(2)};
-	                if ~any(isnan(tmpsX(:))) & ~any(isnan(tmpsY(:)))
-	 	               switch g.type
-				          case 'coher',
-				              Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY); % complex coher.
-		                      cumulXboot(:,:,j) = cumulXboot(:,:,j)+abs(tmpsX);
-		                      cumulYboot(:,:,j) = cumulYboot(:,:,j)+abs(tmpsY);
-				          case 'phasecoher',
-				              Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY) ./ (abs(tmpsX).*abs(tmpsY)); % complex coher.
-		               end;
-			           j = j+1;
-			        end
-	            case 'both',
-	                t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
-	                tmpsX = alltmpsX{t(1)};
-	                tmpsY = alltmpsY{t(2)};
-	                tmpX = tmpsX(:,s(1));
-	                tmpY = tmpsY(:,s(2));
-			        if ~any(isnan(tmpX)) & ~any(isnan(tmpY))
-				        switch g.type
-					          case 'coher',
-					              Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
-			                      cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-			                      cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
-					          case 'phasecoher',
-					              Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
-			            end;
-			            j = j+1;
-			        end
+			 case 'trials',
+			  t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
+			  tmpsX = alltmpsX{t(1)};
+			  tmpsY = alltmpsY{t(2)};
+			  if all(Rn(t(1),:) == 1) & all(Rn(t(2),:) == 1)
+				  switch g.type
+				   case 'coher',
+					Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY); % complex coher.
+					cumulXboot(:,:,j) = cumulXboot(:,:,j)+abs(tmpsX);
+					cumulYboot(:,:,j) = cumulYboot(:,:,j)+abs(tmpsY);
+				   case 'phasecoher',
+					Rboot(:,:,j) = Rboot(:,:,j) + tmpsX.*conj(tmpsY) ./ (abs(tmpsX).*abs(tmpsY)); % complex coher.
+				  end;
+				  j = j+1;
+			  end
+			 case 'both',
+			  t = ceil(rand([1 2])*trials); % random ints [1,g.timesout]
+			  
+			  goodbasewins = find((Rn(t(1),:) & Rn(t(2),:)) ==1);
+			  if g.baseboot % use baseline windows only
+				  goodbasewins = find(goodbasewins<=baselength); 
+			  end
+			  ngdbasewins = length(goodbasewins);
+			  
+			  if ngdbasewins>1
+				  s = ceil(rand([1 2])*ngdbasewins); % random ints [1,g.timesout]
+				  s=goodbasewins(s);
+				  
+				  tmpsX = alltmpsX{t(1)};
+				  tmpsY = alltmpsY{t(2)};
+				  tmpX = tmpsX(:,s(1));
+				  tmpY = tmpsY(:,s(2));
+				  if all(Rn(t(1),s(1)) == 1) & all(Rn(t(2),s(2)) == 1)
+					  switch g.type
+					   case 'coher',
+						Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
+						cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
+						cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
+					   case 'phasecoher',
+						Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
+					  end;
+					  j = j+1;		
+				  end 
+			  end
 	        end;            
 	    end
 	end;    
 end;
+Rn = sum(Rn, 1);
 
 % if coherence, perform the division
 % ----------------------------------
@@ -672,8 +695,6 @@ switch lower(g.plotamp)
 	if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
         switch g.boottype
 	       case 'trials',
-	          size(RR)
-	          size(Rboot)
 		      RR(find((RR > Rbootplus) & (RR < Rbootminus))) = 0;
 		      Rraw(find(Rsignif >= Rraw))=0;
 		      Rboottime = [mean(Rbootplus(dispf,:),1); mean(Rbootminus(dispf,:),1)];
