@@ -47,6 +47,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/25 17:10:07  scott
+% editting msg
+%
 % Revision 1.8  2002/04/25 00:21:54  scott
 % improving wording -sm
 %
@@ -116,7 +119,7 @@ if nargin < 3
 else
 	if isempty(storeSetIndex) | storeSetIndex == 0
 		storeSetIndex = 1;
-	end;	
+	end;
 end;
 
 if ~isempty( ALLEEG )
