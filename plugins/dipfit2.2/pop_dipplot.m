@@ -53,6 +53,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/03/11 22:18:22  arno
+% adding meshfile
+% .,
+%
 % Revision 1.22  2005/03/04 23:19:57  arno
 % use new dipplot with MNI coordinates
 %
@@ -221,7 +225,7 @@ else
     
     % plotting
     % --------
-    if ~isempty(findstr(EEG.dipfit.coordformat, 'spherical'))
+    if strcmpi(EEG.dipfit.coordformat, 'spherical')
         dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'sph2spm', sph2spm, options{:});
     else
         dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'meshdata', EEG.dipfit.hdmfile, options{:});
