@@ -85,8 +85,9 @@
 % Optional Plot and Compute Features:
 %       'compute'   = ['matlab'|'C'] use C sub-routine to speed up the
 %                     computation {'matlab'}
-%       'plotamp'   = ['on'|'off'], Plot coherence magnitude      {'on'}
-%       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
+%       'plotamp'   = ['on'|'off'], Plot coherence magnitude       {'on'}
+%       'maxamp'    = [real] set the maximum for the amp. scale    { auto }
+%       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
 %       'plotbootsub' = ['on'|'off'], Plot coherence for shuffled trials
 %                    if made available using 'bootsub'           {'on'}
 %       'title'     = Optional figure title                       {none}
@@ -146,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/07/11 17:01:30  arno
+% implementing phase coherence 2, speeding up 'coher' and 'phasecoher'
+%
 % Revision 1.30  2002/07/10 19:12:56  arno
 % removing warning messages
 %
@@ -376,6 +380,7 @@ try, g.boottype;   catch, g.boottype = 'times'; end;
 try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.memory;     catch, g.memory = 'high'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
+try, g.maxamp;     catch, g.maxamp = []; end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
@@ -798,7 +803,11 @@ case 'on'
    colormap(map);
    
    imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % plot the coherence image
-
+   if ~isempty(g.maxamp)
+	   caxis([0 g.maxamp]);
+   end;
+   tmpscale = caxis;
+   
    hold on
    plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth)
    for i=1:length(g.marktimes)
@@ -810,7 +819,7 @@ case 'on'
    %title('Event-Related Coherence')
    
    h(8) = axes('Position',[.95 ordinate1 .05 height].*s+q);
-   cbar(h(8),151:300,[0 coh_caxis(2)]); % use only positive colors (gyorv) 
+   cbar(h(8),151:300,tmpscale); % use only positive colors (gyorv) 
    
    %
    % Plot delta-mean min and max coherence at each time point on bottom of image
