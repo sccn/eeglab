@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/02/26 17:48:01  arno
+% correcting corrections
+%
 % Revision 1.35  2003/02/26 17:42:11  scott
 % header edits -sm
 %
@@ -241,7 +244,7 @@ if nargin < 3
 			geometry(3) = [];
 			promptstr(7:8) = [];
 		end;
-		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
+		result       = inputgui( geometry, promptstr, 'pophelp(''pop_spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
 		if size(result,1) == 0 return; end;
 		timerange    = eval( [ '[' result{1} ']' ] );
 		options = [];
