@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2003/07/21 21:36:36  scott
+% debug
+%
 % Revision 1.113  2003/07/21 21:33:48  scott
 % debug
 %
@@ -1512,14 +1515,14 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
                                         sortvar,...
                                         sortvar(1:fronthalf)],...
                                         1:(ntrials+backhalf+fronthalf),avewidth,decfactor); 
-            outtrials = 1:size(data,2);
+            outtrials = 1:ntrials;
            else % avewidth==2
             [data,outtrials] = movav([data(:,end),data],...
                                        [1:(ntrials+1)],avewidth,decfactor); 
             % Note: movav here sorts using square window
             [outsort,outtrials] = movav([sortvar(end) sortvar],...
                                         1:(ntrials+1),avewidth,decfactor); 
-            outtrials = 1:size(data,2);
+            outtrials = 1:ntrials;
            end
         end
         if ~isempty(auxvar)
