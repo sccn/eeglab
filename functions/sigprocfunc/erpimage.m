@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.195  2004/01/24 21:17:00  scott
+% same
+%
 % Revision 1.194  2004/01/24 21:16:32  scott
 % same
 %
@@ -1747,7 +1750,7 @@ elseif exist('valargs')
     if ~isempty(auxvar)
         auxvar = auxvar(:,sortidx);
     end
-    winloc = [sttime,endtime];
+    winloc = [stframe,endframe];
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
