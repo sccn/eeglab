@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/08/19 19:48:25  arno
+% commenting crosscoher for Mac compatibility
+%
 % Revision 1.32  2002/08/12 01:37:00  arno
 % color
 %
@@ -794,6 +797,7 @@ if any(isnan(sortvar))
 		end;
 	end;
 	ntrials = size(data,2);
+	if ntrials <= 1, close(gcf); error('Too few trials'); end;
 end;
 
 %
