@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.143  2005/02/16 19:47:24  hilit
+% Trying to solve compatible problems between Matlab 7 and 6
+%
 % Revision 1.142  2004/11/17 02:08:58  arno
 % save filename
 %
@@ -817,7 +820,7 @@ end;
                     res = com;
                     % Make compatible with Matlab 7
                     EEG.icaweights = double(EEG.icaweights);
-                    EEG.icawinv = double(icawinv);
+                    EEG.icawinv = double(EEG.icawinv);
                     if any(isnan(EEG.data(:)))
                         fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
                         tmpindices = find(~isnan(EEG.data(1,:)));
