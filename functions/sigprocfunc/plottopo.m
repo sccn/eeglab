@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/01/29 00:58:04  arno
+% allowing to plot channels with no coordinates
+%
 % Revision 1.29  2003/09/17 01:44:57  arno
 % debuging for icademo
 %
@@ -571,10 +574,16 @@ if isempty(g.chanlocs) % plot in a rectangular grid
 else % read chan_locs file
      % read the channel location file
      % ------------------------------
-    nonemptychans = cellfun('isempty', { g.chanlocs.theta });
-    nonemptychans = find(~nonemptychans);
-	[tmp channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
-	channames = strvcat({ g.chanlocs.labels });
+    if isstruct(g.chanlocs)
+        nonemptychans = cellfun('isempty', { g.chanlocs.theta });
+        nonemptychans = find(~nonemptychans);
+        [tmp channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
+        channames = strvcat({ g.chanlocs.labels });
+    else
+        [tmp channames Th Rd] = readlocs(g.chanlocs);
+        channames = strvcat(channames);
+        nonemptychans = [1:length(channames)];
+    end;
 	Th = pi/180*Th;                 % convert degrees to radians
 	Rd = Rd; 
 	
