@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/30 23:37:51  arno
+% debugging
+%
 % Revision 1.7  2002/07/30 23:33:47  arno
 % new rejection type
 %
@@ -152,7 +155,7 @@ end;
 
 sizewin = 2^nextpow2(EEG.pnts);
 if icacomp == 1
-    [allspec, Irej, Erej, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
+    [allspec, Irej, rejE, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
 							elecrange, EEG.srate, negthresh, posthresh, startfreq, endfreq);
 else
     % test if ICA was computed
@@ -166,22 +169,14 @@ else
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
    	try, oldspec   = EEG.specicaact(elecrange, :, :); catch, oldspec = []; end;
-    [allspec, Irej, Erejtmp, freqs ] = spectrumthresh( icaacttmp, oldspec, 1:length(elecrange), ...
+    [allspec, Irej, rejE, freqs ] = spectrumthresh( icaacttmp, oldspec, 1:length(elecrange), ...
 								EEG.srate, negthresh, posthresh, startfreq, endfreq);
-    Erej = zeros(size(EEG.icaweights,1), size(Erejtmp,2));
-    Erej(elecrange,:) = Erejtmp;
 end;
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials rejected\n', length(Irej), EEG.trials);
 rej = zeros( 1, EEG.trials);
 rej(Irej) = 1;
-if icacomp == 1
-   rejE = zeros(EEG.nbchan, EEG.trials);
-else
-   rejE = zeros(size(EEG.icaweights,1), EEG.trials);
-end;
-rejE(elecrange,:) = Erej;
 
 if calldisp
 	nbpnts = fastif( icacomp == 1, size(EEG.specdata,2), size(EEG.specicaact,2));
@@ -192,7 +187,6 @@ if calldisp
     end;
 	colrej = EEG.reject.rejfreqcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
-     
 	if icacomp == 1
 		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], ...
 				'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
@@ -246,7 +240,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
     freqs = [freqs(1) freqs(end)]*srate;	
     
     Irej    = [];
-    Erej    = zeros(size(data,1), size(data,2));
+    Erej    = zeros(size(data,1), size(data,3));
 	fprintf('Computing spectrum (using slepian tapers; done only once):\n');    
     for index = 1:length(elecrange)
 	   if testgoinloop( specdata, index )
