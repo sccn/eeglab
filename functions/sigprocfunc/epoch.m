@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/20 00:12:53  arno
+% debuging fro 3 dimensions epoching
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -111,6 +114,7 @@ epochdat = zeros( size(data,1), newdatalength, length(events) );
 g.allevents =  g.allevents(:)';
 datawidth  = size(data,2)*size(data,3);
 dataframes = size(data,2);
+indexes = zeros(length(events),1);
 for index = 1:length(events)
    posinit = round(events(index)*g.srate + lim(1)*g.srate); % compute offset
    posend  = round(events(index)*g.srate + lim(2)*g.srate-1); % compute offset
@@ -125,7 +129,6 @@ for index = 1:length(events)
       end;   
    else
       switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end;
-      indexes(index) = 0;
    end;
 
    % rereference events
