@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/01/01 02:24:20  arno
+% searching why one component was invisible -> plotting error
+%
 % Revision 1.40  2003/01/01 01:55:43  arno
 % removing debugging messages
 %
@@ -680,6 +683,7 @@ for i=1:nbconditions
 		if ~isempty(g.condtitleformat)
 			set(h, g.condtitleformat{:} );
 		end;
+        axis image;
 	end;	
 	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q, ...
 				 'xlim', g.xlimaxes, 'ylim', g.ylimaxes, 'color', 'none', 'ydir', 'reverse', 'visible', g.visible);
