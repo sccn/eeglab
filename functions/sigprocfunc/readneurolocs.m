@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/03/04 20:04:17  arno
+% debuging
+%
 % Revision 1.1  2003/03/04 19:18:35  arno
 % Initial revision
 %
@@ -92,23 +95,42 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
     
     % find Cz and Fz
     % --------------
+    x = chans(:,3);
+    y = chans(:,4);    
     if exist('indexcz') ~= 1
-        indexcz = strmatch( 'cz', lower(names') );
-        if isempty(indexcz), 
+        indexcz = strmatch( 'cz', lower(names'), 'exact' );
+        if ~isempty(indexcz), 
+            centerx = x(indexcz);
+            centery = y(indexcz);
             error('Can not find Cz electrode, define the electrode index manually in readneurolocs()');
         end;
     end;
     if exist('indexfz') ~= 1
-        indexfz = strmatch( 'fz', lower(names') );
+        indexfz = strmatch( 'fz', lower(names'), 'exact' );
+        if exist('indexpz') ~= 1
+            indexpz = strmatch( 'pz', lower(names'), 'exact' );
+            if exist('centerx') ~= 1 & ~isempty(indexpz) & ~isempty(indexfz)
+                centerx = (x(indexfz)+x(indexpz))/2;
+                centery = (y(indexfz)+y(indexpz))/2;
+            end;
+        end;
     end;
     if exist('indexc3') ~= 1
-        indexc3 = strmatch( 'c3', lower(names') );
+        indexc3 = strmatch( 'c3', lower(names'), 'exact' );
+        if exist('indexc4') ~= 1
+            indexpz = strmatch( 'c4', lower(names'), 'exact' );
+            if exist('centerx') ~= 1 & ~isempty(indexc4) & ~isempty(indexc3)
+                centerx = (x(indexc3)+x(indexc4))/2;
+                centery = (y(indexc3)+y(indexc4))/2;
+            end;
+        end;
+    end;
+    if exist('centerx') ~= 1 
+        error('Unable to find electrode names for rescaling, define the electrode index manually in readneurolocs()');
     end;
     
     % plot all channels
     % -----------------
-    x = chans(:,3);
-    y = chans(:,4);    
     if plottag
         figure;
         for index = 1:length(x)
@@ -118,8 +140,8 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
         end;
     end;
     
-    x = - x + x(indexcz);
-    y = - y + y(indexcz);
+    x = - x + centerx;
+    y = - y + centery;
 
     % shrink coordinates
     % ------------------
