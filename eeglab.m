@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2002/08/17 20:40:30  scott
+% Plot > ERP maps -> Plot > ERP map series
+%
 % Revision 1.148  2002/08/17 20:38:49  scott
 % Plot > ERP plots -> Plot > Averaged ERP
 %
@@ -797,8 +800,8 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
     uimenu( third_m, 'Label', 'Component activations (scroll)', 'CallBack', [ checkica  '[LASTCOM] = pop_eegplot(EEG, 0, 0, 0);' e_hist],'Separator', 'on');
 	uimenu( third_m, 'Label', 'Component spectra and maps' , 'CallBack', [ checkicaplot   'LASTCOM = pop_spectopo(EEG, 0);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
 	topoica_m = uimenu( third_m, 'Label', 'Component maps');
-		uimenu( topoica_m, 'Label', 'As 2-D scalp maps'  , 'CallBack', [ checkicaplot   'LASTCOM = pop_topoplot(EEG, 0);' e_hist]);
-		uimenu( topoica_m, 'Label', 'As 3-D head plots'  , 'CallBack', [ checkicaplot   '[EEG LASTCOM] = pop_headplot(EEG, 0);' e_store]);
+		uimenu( topoica_m, 'Label', 'In 2-D', 'CallBack', [ checkicaplot   'LASTCOM = pop_topoplot(EEG, 0);' e_hist]);
+		uimenu( topoica_m, 'Label', 'In 3-D', 'CallBack', [ checkicaplot   '[EEG LASTCOM] = pop_headplot(EEG, 0);' e_store]);
 	uimenu( third_m, 'Label', 'Component properties'     , 'CallBack', [ checkicaplot   'LASTCOM = pop_compprop(EEG);' e_hist]);
 	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
