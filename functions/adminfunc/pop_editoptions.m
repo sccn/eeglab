@@ -21,9 +21,9 @@
 %                   with limited memory.
 %
 % Outputs:
-%   In the output workspace, variables 'option_computeica', 
-%   'option_keepdataset' are updated, and a new 'eeg_options.m' file saved in
-%   the working directory.
+%   In the output workspace, variables 'option_computeica', 'option_keepdataset',
+%   and 'option_savematlab'  are updated, and a new 'eeg_options.m' file may be
+%   saved in the working directory.
 %
 % Note:
 %   Place a copy of 'eeg_options.m' in your working directory to overwrite system
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/20 22:36:47  arno
+% debug for windows
+%
 % Revision 1.12  2002/08/19 21:55:40  arno
 % add Mac statement
 %
@@ -100,7 +103,7 @@ fid = fopen( filename, 'r+');
 storelocal = 0;
 if	fid == -1
 	if exist(filename) == 2 
-		if ~popask(['Can not modify read-only file ''' filename '''' 10 'do you want EEGLAB to store a copy in the current directory ?']);
+		if ~popask(['Cannot modify read-only file ''' filename '''' 10 'Should EEGLAB use a writable copy in the current directory ?']);
 			return;
 		else 
 			fid = fopen( filename, 'r');
@@ -141,7 +144,7 @@ fclose(fid);
 if nargin == 0
     geometry = { [4 1] };
     uilist = { ...
-         { 'Style', 'text', 'string', 'Desciption', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', 'Description', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Set/Unset', 'fontweight', 'bold'   } };
 
     % add all fields to graphic interface
