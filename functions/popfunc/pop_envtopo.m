@@ -1,15 +1,15 @@
-% pop_envtopo() - envtopo function for datasets. Enveloppe of EEG data
-%                 visualization with head plots of specific components or
-%                 components of maximum amplitude.
+% pop_envtopo() - Call envtopo() function for datasets. Envelope of EEG data
+%                 is plotted plus head plots of specified or largest components 
+%                 reference to their time point maximum amplitude.
 %
 % Usage:
 %   >> pop_envtopo( EEG, timerange, topotimes, title, 'key', 'val', ...);
 %
 % Inputs:
 %   EEG        - input dataset
-%   timerange  - timerange in millisecond to plot the enveloppe
+%   timerange  - [min max] time range (in msec) to plot the envelope
 %   compnums   - vector of component numbers to plot {default|0 -> all}
-%                ELSE n<0, the number largest-comp. maps to plot 
+%                ELSE n<0, the number of "largest" comp. maps to plot 
 %                {default|[] -> 7}   
 %   title      - plot title
 %
@@ -17,7 +17,7 @@
 %   'key','val' - optional topoplot() arguments (see topoplot())
 %
 % Outputs: same as envtopo(), no outputs are returned when a
-%          window pops-up to ask for additional arguments
+%          window pops-up to ask for additional arguments.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 add all topoplot options -ad
@@ -55,10 +58,10 @@ if nargin < 1
 	return;
 end;	
 if isempty( EEG.icasphere )
-	disp('Error: you must run ICA first'); return;
+	disp('Error: you must run ICA first. Use Tools/Run ICA.'); return;
 end;
 if isempty(EEG.chanlocs)
-	fprintf('Can not plot witout channel location\n');
+	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info.\n');
 	return;
 end;
 if exist('envtitle') ~= 1
@@ -78,7 +81,7 @@ if nargin < 3
 	                 '', ...
 	                 ['Largest ERP components' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] ...
 	                 '' };
-	result       = inputdlg( promptstr, 'Components and ERP enveloppe -- pop_envtopo()', 1, inistr);
+	result       = inputdlg( promptstr, 'Components and ERP envelope -- pop_envtopo()', 1, inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	timerange    = eval( [ '[' result{1} ']' ] );
@@ -120,7 +123,7 @@ if ~isempty(EEG.chanlocs)
 	com =  sprintf('%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, EEG.chanlocs, [timerange(1) timerange(2) 0 0], compnums, envtitle, [], [], [], [], [] %s);', outstr, options);
 	eval(com)
 else
-	fprintf('Can not plot witout channel location\n');
+	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info.\n');
 	return;
 end;
 

@@ -1,6 +1,6 @@
-% pop_erpimage() - simple erpimage of EEG channels or an independent
-%                  components with a pop-up window if only
-%                  two (or three in specific condition) arguments.
+% pop_erpimage() - plot an erpimage of a given EEG channel or independent
+%                  component. Uses a pop-up window if only two (or three 
+%                  in a specific condition) input arguments.
 %
 % Usage:
 %   >> pop_erpimage(EEG, typeplot); % pop_up window
@@ -28,9 +28,9 @@
 %   sortingeventfield - Sorting field name. Default is none. 
 %   renorm      - ['yes'|'no'|'a*x+b'] renormalize sorting variable.
 %                Default is 'no'. Ex: '3*x+2'. 
-%   options    - ERPIMAGE options. Default is none. Separate the options
-%                using comma. Example 'erp', 'cbar'. See erpimage() help 
-%                for further details. 
+%   options    - erpimage() options. Default is none. Separate the options
+%                by commas. Example 'erp', 'cbar'. See erpimage() help 
+%                and >> erpimage moreargs for further details. 
 %
 % Outputs from pop-up: 
 %   string containing the command used to evaluate this plotting function
@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/11 20:02:42  arno
+% adding last command history
+%
 % Revision 1.3  2002/04/11 19:06:43  arno
 % adding option to default parameters
 %
@@ -111,7 +114,7 @@ if typeplot == 0 & isempty(EEG.icasphere)
    error('no ICA data for this set, first run ICA');
 end;   
 if EEG.trials == 1
-   error('pop_erpimage can not be applied if there is only one trial');
+   error('erpimage of one trial cannot be plotted');
 end;   
 
 if nargin < 2	

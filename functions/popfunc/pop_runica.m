@@ -1,4 +1,4 @@
-% pop_runica() - run ica on a dataset
+% pop_runica() - run ica decomposition on a dataset
 %
 % Usage:
 %   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options );
@@ -14,21 +14,21 @@
 % 
 % Note:
 % 1) Infomax is the ICA algorithm we use most. It is based on Tony Bell's
-%    algorithm, implemented by Scott Makeig using the natural gradient of 
-%    Amari. It can also extract sub-Gaussian sources using the 'extended'
-%    ICA option of Lee and Girolami. 
+%    algorithm implemented for automated use by Scott Makeig using the 
+%    natural gradient of Amari et al.. It can also extract sub-Gaussian 
+%    sources using the 'extended' ICA option of Lee and Girolami. 
 %    runica() is the all-Matlab version. binica() calls the (12x faster) 
-%    binary version (separate download) translated to C by Sigurd Enghoff
+%    binary version (separate download) translated to C by Sigurd Enghoff.
 % 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
-%    It is included in the EEGLAB toolbox.
+%    It is included in the EEGLAB toolbox by his permission. See >> help jader
 % 3) To run fastica(), download the fastICA toolbox from
 %    http://www.cis.hut.fi/projects/ica/fastica/ and make it available 
-%    in your Matlab path. According to the authors, defaults parameters
+%    in your Matlab path. According to the authors, default parameters
 %    are not optimal: try 'approach', 'sym' to estimate components in
 %    parallel.
 %
 % Outputs:
-%   OUT_EEG     - output dataset with ica computed
+%   OUT_EEG     - output dataset with ica weights computed
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 add the eeglab options -ad
@@ -106,7 +109,7 @@ switch lower(icatype)
         end;
         icadefs;
         if exist(ICABINARY) ~= 2
-            error('Pop_runica: binica C program can not be found. Edit icadefs.m file and change ICABINARY variable');
+            error('Pop_runica: binary ica program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
         if length(options) < 2
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001 );
@@ -122,7 +125,7 @@ switch lower(icatype)
         EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'fastica'
         if exist('fastica') ~= 2
-            error('Pop_runica: for fast ica, you must first download the toolbox (see >> help pop_runica)');
+            error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
         end;     
         if length(options) < 2
             [ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, 'displayMode', 'off' );
@@ -133,7 +136,7 @@ switch lower(icatype)
 end;
 EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
 
-eeg_options; % changed from eeglaboptions 3/30/02 -sm
+eeg_options; 
 if option_computeica
     EEG.icaact    = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
     EEG.icaact    = reshape( EEG.icaact, EEG.nbchan, EEG.pnts, EEG.trials);

@@ -1,13 +1,13 @@
-% pop_headplot() - plot spherically-splined EEG field map on a semi-
-%                  realistic 3-D head model.
+% pop_headplot() - plot spherically-splined EEG field map on a semi-realistic 
+%                  3-D head model.
 % Usage:
 %   >> EEGOUT = pop_headplot( EEG, typeplot, 
-%               latencies/components, title, rowscols, 'key', 'val' ...);
+%                    latencies/components, title, rowscols, 'key', 'val' ...);
 %
 % Inputs:
 %   EEG        - dataset structure
 %   typeplot   - 1=channel, 0=component (default:1)
-%   latencies/components  - for EEG: array of latencies (in millisecond)
+%   latencies/components  - array of latencies (in msec)
 %                at which the head should be plotted.  
 %                For components: array of index of components to plot.
 %   title      - plot title.
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/07 20:47:23  scott
+% worked on no-spline-file msg -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -64,7 +67,7 @@ if nargin < 1
 end;   
 
 if isempty(EEG.chanlocs)
-    error('Pop_headplot: can not plot without channel location');
+    error('Pop_headplot: cannot plot without channel locations. Use Edit/Dataset info');
 end;
 
 if nargin < 3
@@ -93,7 +96,7 @@ if nargin < 3
     end;
     
 	if isempty(EEG.splinefile) | exist(EEG.splinefile) ~= 2
-	    errmsg = sprintf('Pop_headplot: can not find spline file %s. Check path. Aborting',EEG.splinefile);
+	    errmsg = sprintf('Pop_headplot: cannot find spline file %s. Check path. Aborting...',EEG.splinefile);
 	    error(errmsg);
 	end;
 
@@ -149,7 +152,7 @@ if ~exist('topotitle')
     topotitle = '';
 end;    
 if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
-    error('Pop_headplot: can not find spline file, abording');
+    error('Pop_headplot: cannot find spline file, aborting...');
 end;
 
 SIZEBOX = 150;

@@ -1,5 +1,5 @@
 % pop_plottopo() - plot concatenated multichannel data epochs in a
-%                 topographic format. 
+%                  topographic array format using plottopo()
 % Usage:
 %   >> pop_plottopo( EEG, channels, title, singletrials);
 %
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-16-02 text interface editing -sm & ad 
@@ -48,7 +51,7 @@ if nargin < 1
 end;	
 
 if isempty(EEG.chanlocs)
-	fprintf('Can not plot witout channel location\n');
+	fprintf('Cannot plot without knowing channel locations. Use Edit/Dataset info\n');
 	return;
 end;
 
