@@ -80,7 +80,7 @@
 %                   Requires arg 'coher' with alpha significance. 
 %                   Shows projection on grand mean coherence vector at each time 
 %                   and trial. {default: no}
-
+ 
 % $LOG$
 % 3/5/98 added nosort option -sm
 % 3/22/98 added colorbar ylabel, sym. range finding -sm
