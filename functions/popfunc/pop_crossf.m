@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/25 02:54:18  arno
+% debugging topovec
+%
 % Revision 1.10  2002/04/24 22:08:58  arno
 % adding tabs
 %
@@ -149,7 +152,7 @@ else
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
 		else
-			if size(varargin{i},1) > 1 & size(varargin{i},2) > 1
+			if ~isnumeric(varargin) | (size(varargin{i},1) > 1 & size(varargin{i},2) > 1)
 				options = [ options ', varargin{' int2str(i) '}' ];
 			else
 				options = [ options ', [' num2str(varargin{i}) ']' ];	
@@ -204,8 +207,7 @@ if length( options ) < 2
     options = '';
 end;
 varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], %d %s);', ...
-          inputname(1), typeproc, num1, num2, ...
-			int2str(tlimits), cycles, options);
+          inputname(1), typeproc, num1, num2, int2str(tlimits), cycles, options);
 com = sprintf(...
     '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);',... 
           outstr, options);
