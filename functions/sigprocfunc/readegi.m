@@ -1,24 +1,24 @@
-% readegi() - reads in version 2 and 3 of EGI Simple Binary data files
+% readegi() - read EGI Simple Binary ver. 2 or 3 datafile
+%	      and return header info, EEG data, and any
+%             Event data.
 %
 % Usage:
-%   >> ?? = readegi( filename );
+%   >> [head, TrialData, EventData] = readegi(filename)
 %
 % Inputs:
-% [TrialData] = EGIread(filename)
-% reads in version 2 and 3 of EGI Simple Binary data files,
-% filename = EGI data filename
-% TrialData = EEG channel data 
-% EventCodes = event codes 
-% Samp_Rate = sampling rate
-% NChan = #of channels
-% NSamp = sampling rate
-% Segments = # of epochs
-% NEvent = number of events
+%   filename = EGI data filename
 %
 % Outputs:
-%   OUTEEG         - EEGLAB data structure
+%   head = struct containing header info (see readEGIhdr() )
+%   TrialData = EEG channel data
+%   EventData = event codes
 %
-% Author: 
+% Author: Cooper Roddey, SCCN, 13 Nov 2002
+%
+% Note: code derived from C source code written by
+%       Tom Renner at EGI.
+%
+% See also: readegihdr()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -39,83 +39,50 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/13 02:33:56  arno
+% help
+%
 % Revision 1.2  2002/11/13 02:23:09  arno
 % header ...
 %
 
-function  [TrialData] = readegi(filename)
+function  [head, TrialData, EventData] = readegi(filename)
 
-if nargin < 1
+if nargin < 1,
     help readegi;
     return;
-end;
-    
+end
+
+if nargout < 2 | nargout > 3,
+	error('2 or 3 output args required');
+end
+
 [fid,message] = fopen(filename,'rb','b');
 if (fid == 0),
    error(message);
 end
 
-version = fread(fid,1,'integer*4');
+% get our header structure
+head = readEGIhdr(fid);
 
-if (version == 2 | version == 3),
-	disp('Reading EGI Simple Binary format data...');
-else
-	error('EGI Simple Binary Version 2 and 3 supported only.');
-end;
+% each type of event has a dedicated "channel"
+FrameVals = head.nchan + head.eventtypes;
+TrialData = zeros(FrameVals,head.segsamps*head.segments);
 
-year = fread(fid,1,'integer*2');
-month = fread(fid,1,'integer*2');
-day = fread(fid,1,'integer*2');
-hour = fread(fid,1,'integer*2');
-minute = fread(fid,1,'integer*2');
-second = fread(fid,1,'integer*2');
-millisecond = fread(fid,1,'integer*4');
-Samp_Rate = fread(fid,1,'integer*2');
-NChan = fread(fid,1,'integer*2');
-Gain = fread(fid,1,'integer*2');
-Bits = fread(fid,1,'integer*2');
-Range = fread(fid,1,'integer*2');
-
-Segments = 1;
-
-if (version == 3),
-	Categories = fread(fid,1,'integer*2');
-	if (Categories),
-		for i=1:Categories,
-			catname_len(i) = fread(fid,1,'uchar');
-			Catname{i} = char(fread(fid,catname_len(i),'uchar'));
-		end
-	end
-	Segments = fread(fid,1,'integer*2');
-end 
-
-NSamp = fread(fid,1,'integer*4');
-NEvent = fread(fid,1,'integer*2');
-
-if (NEvent == 0)
-	EventCodes(1,1:4) = 'none';
-else
-	for i = 1:NEvent
-		EventCodes(i,1:4) = fread(fid,[1,4],'uchar');
-	end
-end;
-
-FrameVals = NChan + NEvent;
-TrialData = zeros(FrameVals,NSamp*Segments);
-
-for i=1:Segments,
-	if (version == 3),
+for i=1:head.segments,
+	if (head.version == 3),
 		SegmentCatIndex(i) = fread(fid,1,'integer*2');
 		SegmentStartTime(i) = fread(fid,1,'integer*4');
 	end
 
-	TrialData(:,[1+(i-1)*NSamp:i*NSamp]) = ...
-	   fread(fid,[FrameVals,NSamp],'integer*2');
+	TrialData(:,[1+(i-1)*head.segsamps:i*head.segsamps]) = ...
+	   fread(fid,[FrameVals,head.segsamps],'integer*2');
 end
 
 fclose(fid);
 
-if (NEvent > 0),
-	EventData = TrialData(NChan+1:end,:);
-	TrialData = TrialData(1:NChan,:);
+EventData = [];
+if (head.eventtypes > 0),
+	EventData = TrialData(head.nchan+1:end,:);
+	TrialData = TrialData(1:head.nchan,:);
 end 
