@@ -1,16 +1,26 @@
-% eeg_store() - Store the current dataset (global variable)
-%              into an global variable array
+% eeg_store() - store a dataset into the variable containing
+%               all datasets
 %
-% Usage: >> index = eeg_store(index);
+% Usage: >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG);
+%        >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG, index);
 %
 % Inputs:
-%   index  - index for storing the dataset. If no index is given,
-%            the first free index is used.
+%   ALLEEG     - variable containing all datasets
+%   EEG        - current dataset to store. EEG can also contain an 
+%                array of dataset that will be appended to the current
+%                array of dataset.
+%   index      - (optional), index of where to store the new
+%                dataset. If no index is given, the first 
+%                empty slot in the ALLEEG array is selected.
 %
 % Outputs:
-%   EEG    - the global name of the current EEG dataset is updated 
-%   index  - if automatically generated, the function returns this
-%            index.
+%   ALLEEG - variable containing all datasets
+%   EEG    - EEG dataset after syntax checking 
+%   index  - index of the new dataset
+%
+% Note: given 3 arguments, after checking the input dataset 
+%       structure syntax consistency, this function simply perfroms 
+%       >> ALLEEG(index) = EEG;
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +47,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/23 21:28:34  arno
+% correcting typo
+%
 % Revision 1.5  2002/04/23 17:57:52  arno
 % allowing store of multiple datasets
 %
@@ -57,8 +70,7 @@
 
 % store set
 % ------------------
-function storeSetIndex = eeg_store( storeSetIndex);
-eeg_global;
+function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex);
 
 % considering multiple datasets
 % -----------------------------
@@ -66,7 +78,7 @@ if length(EEG) > 1
 	TMPEEG = EEG;
 	for index=1:length(TMPEEG)
 		EEG = TMPEEG(index);
-		eeg_store;
+		[ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG);
 	end;
 	return;
 end;
@@ -82,7 +94,7 @@ end;
 
 % find first free index
 % ---------------------
-if nargin < 1
+if nargin < 3
 	i = 1;
 	while (i<200)
 		try
@@ -119,5 +131,4 @@ else
  		ALLEEG = ALLEEG(1:storeSetIndex);
  	end;	
 end;	
-CURRENTSET = storeSetIndex;
 return;

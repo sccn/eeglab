@@ -1,13 +1,16 @@
-% eeg_retrieve() - Retrieve an EEG dataset from the global variable
-%                 containing all datasets
+% eeg_retrieve() - Retrieve an EEG dataset from the variable
+%                  containing all datasets
 %
-% Usage: >> EEG = eeg_retrieve( index );
+% Usage: >> EEG = eeg_retrieve( ALLEEG, index );
 %
 % Inputs:
+%   ALLEEG     - variable containing all datasets
 %   index      - index of the dataset to retrieve
 %
 % Outputs:
 %   EEG        - output dataset. The global variable EEG is also updated 
+%
+% Note: at this point the function only performs >> EEG = ALLEEG(index);
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -32,17 +35,18 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/18 19:49:29  arno
+% Initial revision
+%
 % Revision 1.1  2002/04/05 17:46:04  jorn
 % Initial revision
 %
 % 01-25-02 reformated help & license -ad 
 
-function EEG = eeg_retrieve( retrieveSetIndex);
-eeg_global;
-eeg_consts;
+function EEG = eeg_retrieve( ALLEEG, retrieveSetIndex);
 
-if nargin < 1
-	error('Not enought arguments');
+if nargin < 2
+	help eeg_retrieve;
 	return;
 end;	
 
@@ -52,8 +56,6 @@ catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', retrieveSetIndex); 
 	return;
 end;
-
-CURRENTSET = retrieveSetIndex;
 
 return;
 
