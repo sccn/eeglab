@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/12/02 03:21:39  arno
+% neuroscan format
+%
 % Revision 1.54  2003/11/27 00:38:13  arno
 % conversion elc
 %
@@ -399,8 +402,8 @@ if isstr(filename)
    % assign format from filetype
    % ---------------------------
    if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') ...
-           & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') & ~strcmpi(g.filetype, 'dat') 
-      indexformat = strmatch(g.filetype, listtype, 'exact');
+           & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') & ~strcmpi(g.filetype, 'dat')
+      indexformat = strmatch(lower(g.filetype), lower(listtype), 'exact');
       g.format = listimportformat{indexformat};
       if isempty(g.skiplines)
          g.skiplines = listskipline(indexformat);
@@ -427,7 +430,7 @@ if isstr(filename)
            [eloc labels X Y Z]= readelp( filename );
        catch, error('Error while reading Polhemus (for BESA .elp file force file type to BESA)'); end;
        if strcmp(g.filetype, 'polhemusy')
-           tmp = X; X = Y; Y = TMP;
+           tmp = X; X = Y; Y = tmp;
        end;
        for index = 1:length( eloc )
            eloc(index).X = X(index);
