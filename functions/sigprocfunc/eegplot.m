@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2003/03/13 03:04:16  scott
+% commenting error msg
+%
 % Revision 1.75  2003/03/12 03:15:48  arno
 % adding help menu
 %
@@ -454,8 +457,12 @@ end
 if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
    try
-   		if ~isempty( varargin ), g=struct(varargin{:}); 
-   		else g= []; end;
+       options = varargin;
+       for index = 1:length(options)
+           if iscell(options{index}), options{index} = { options{index} }; end;
+       end;
+       if ~isempty( varargin ), g=struct(options{:}); 
+       else g= []; end;
    catch
    		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
    end;	
