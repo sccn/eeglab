@@ -1,6 +1,6 @@
 % pop_erpimage() - draw an ERP-image plot of a given EEG channel or independent
 %                  component. Uses a pop-up window if less than three (or four 
-%                  in one condition) input arguments are supplied.  Calls erpimage(). 
+%                  in one condition) input arguments are supplied. Calls erpimage(). 
 %                  For futher details see >> help erpimage
 % Usage:
 %   >> pop_erpimage(EEG, typeplot);          % pop-up a data entry window
@@ -102,7 +102,7 @@
 %                 >> help erpimage() 
 % Inputs:
 %   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component {default: ?}
+%   typeplot   - 1=channel, 0=component {default: 1}
 %   lastcom    - string containing previous pop_erpimage command (from LASTCOM) 
 %                or from the previous function call output.  The values from this 
 %                function call are used as default in the graphic interface.
@@ -135,7 +135,7 @@
 %   
 % Notes:
 %   1) A new figure is created only when the pop-up window is called, 
-%      so you may call this command to draw in (e.g.) sbplot() axes.
+%      so you may call this command with >3 args to draw in sbplot() axes.
 %   2) To sort epochs, first define the event field to be used with
 %      the argument 'sortingeventfield' (for instance 'latency'). Then,
 %      because there may be several events with different latencies in a
@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2003/03/12 19:21:37  arno
+% same
+%
 % Revision 1.104  2003/03/12 19:15:00  arno
 % debug renorm
 %
