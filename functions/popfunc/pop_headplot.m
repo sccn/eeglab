@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/12/17 01:06:20  arno
+% processing empty coordinates
+%
 % Revision 1.22  2003/05/12 16:11:18  arno
 % debuging output command
 %
@@ -256,7 +259,7 @@ end;
 	
 % plot the graphs
 % ---------------
-chanind = find(~cellfun('isempty', (EEG.chanlocs.X }));
+chanind = find(~cellfun('isempty', { EEG.chanlocs.X }));
 
 counter = 1;
 for index = 1:size(arg2(:),1)
