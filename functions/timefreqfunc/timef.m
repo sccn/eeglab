@@ -40,7 +40,7 @@
 %
 %    Optional detrending:
 %       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across trialsk {'off'}
+%       'detrep'    = ['on'|'off'], Detrend data across trials  {'off'}
 %
 %    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
@@ -144,6 +144,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/08/05 22:01:52  scott
+% header msg edits
+%
 % Revision 1.60  2003/08/04 16:38:36  arno
 % plot description and curve color
 %
