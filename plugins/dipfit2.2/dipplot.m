@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.42  2003/07/16 18:39:14  arno
+%nothing
+%
 %Revision 1.41  2003/07/03 00:02:43  arno
 %undo last change
 %
@@ -309,7 +312,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         COLORMESH       = [.5 .5 .5];
         BACKCOLOR       = 'w';
     else 
-        load('/home/arno/matlab/MNI/VolumeMNI.mat');
+        fid = fopen('VolumeMNI.bin', 'rb', 'ieee-le');
+        if fid == -1
+            error('Cannot find MRI data file');
+        end;
+        V = fread(fid, [108 129*129], 'uint8=>double')/255;
+        V = reshape(V, 108, 129, 129);
+        fclose(fid);
+        
+        %V = floatread('VolumeMNI.fdt');
+        %load('/home/arno/matlab/MNI/VolumeMNI.mat');
+        
         dat.imgs   = V; %smooth3(V,'gaussian', [3 3 3]);
         coordinc   = 2; % 2 mm
         allcoords1 = [0.5:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
