@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/09/07 22:51:11  scott
+% help msg -sm & ad
+%
 % Revision 1.8  2002/09/07 22:11:58  scott
 % help msg -scott
 %
@@ -158,7 +161,7 @@ rmpath('.');
 % write .html file
 % ----------------
 fo = fopen([ outputdir g.outputfile], 'w');
-if fo == -1, error(['can not open file ''' [ outputdir g.outputfile] '''']); end;
+if fo == -1, error(['cannot open file ''' [ outputdir g.outputfile] '''']); end;
 
 fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g.fontindex);
 

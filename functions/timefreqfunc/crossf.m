@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2002/10/24 15:08:12  arno
+% debugging plot scalp map for channel
+%
 % Revision 1.51  2002/10/18 16:50:40  arno
 % win' -> transpose(win)
 %
@@ -583,7 +586,7 @@ case { 'low', 'high' },;
 otherwise error('memory must be either ''low'' or ''high''');
 end;
 if strcmp(g.memory, 'low') & ~strcmp(g.boottype, 'times')
-   error(['Bootstrap type ''' g.boottype ''' can not be used in low memory mode']);
+   error(['Bootstrap type ''' g.boottype ''' cannot be used in low memory mode']);
 end;
 switch g.compute
 case { 'matlab', 'c' },;

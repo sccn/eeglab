@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/16 21:42:25  arno
+% default for highcuroff
+%
 % Revision 1.5  2002/08/12 16:25:02  arno
 % inputdlg2
 %
@@ -108,7 +111,7 @@ if EEG.trials == 1
 					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
 						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
-					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter can not be applied\n', boundaries(n),boundaries(n+1));
+					fprintf('\nPop_eegfilt: data portion from point %d to %d is too small, filter cannot be applied\n', boundaries(n),boundaries(n+1));
 					disp('Pop_eegfilt: Filter being applied over the whole time range (ignoring discontinuities)');
 				end;
 			end

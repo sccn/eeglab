@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/11/14 01:29:41  arno
+% new mechanism
+%
 % Revision 1.18  2002/08/15 15:23:25  arno
 % debug
 %
@@ -96,7 +99,7 @@
 
 if ~exist('elecrange')
 	help eeg_rejmacro;
-	error('Error: eeg_rejmacro can not be called from the command line');
+	error('Error: eeg_rejmacro cannot be called from the command line');
 end;	
 
 if ~exist('nbpnts') nbpnts = EEG.pnts; end;

@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/12 23:39:57  arno
+% convert numerical labels to string
+%
 % Revision 1.15  2002/10/23 15:36:43  arno
 % header comment
 %
@@ -314,7 +317,7 @@ function array = load_file_or_array( varname, skipline );
     else % variable in the global workspace
          % --------------------------
          try, array = evalin('base', varname);
-	     catch, error('readlocs: can not find file or variable, check syntax');
+	     catch, error('readlocs: cannot find file or variable, check syntax');
 		 end;
     end;     
 return;

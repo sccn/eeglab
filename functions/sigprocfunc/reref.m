@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/11/15 01:41:04  arno
+% header for web
+%
 % Revision 1.11  2002/11/14 18:14:02  arno
 % updating elocs parameter filter
 %
@@ -202,7 +205,7 @@ else % common re-reference
                 g.elocs(ref).theta  = g.refloc{2};
                 g.elocs(ref).radius = g.refloc{3};
             else 
-                error('No location for old common reference, can not introduce it as a new channel');
+                error('No location for old common reference, cannot introduce it as a new channel');
             end;            
         else
             % dealing with a single ref. channel
@@ -220,7 +223,7 @@ else % common re-reference
                     g.elocs(ref).theta  = g.refloc{2};
                     g.elocs(ref).radius = g.refloc{3};
                 else 
-                    error('No location for old common reference, can not introduce it as a new channel');
+                    error('No location for old common reference, cannot introduce it as a new channel');
                 end;
             end;
         end;
