@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/11/25 22:56:32  arno
+% plugin menu color
+%
 % Revision 1.20  2003/07/18 14:22:44  scott
 % commented, increased max channel defaults
 %
@@ -113,7 +116,7 @@ if get(0, 'screendepth') <=8 % if mono or 8-bit color
     GUIPOPBUTTONCOLOR   = [1 1 1];    % Buttons colors in GUI windows
     GUIBACKCOLOR        = [1 1 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0];      % GUI foreground color for text    
-    PLUGINMENUCOLOR     = [0.8 0.8 0.8];  % plugin menu color
+    PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
 else % if full color screen
     BACKCOLOR           = [.93 .96 1];    % Background figure color 
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
@@ -121,7 +124,7 @@ else % if full color screen
     GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
     GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
-    PLUGINMENUCOLOR     = [0.8 0.8 0.8];  % plugin menu color
+    PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
 end;
 
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
