@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/01/29 01:51:16  arno
+% debug cancel button
+%
 % Revision 1.13  2004/01/29 01:39:34  arno
 % debug history
 %
@@ -84,7 +87,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, align); 
+function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, align, varargin); 
 command = '';
 
 if nargin < 1 
@@ -181,7 +184,7 @@ end;
 if isempty(EEG.event), align = NaN; end;
 
 EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
-                           'delim', 9, 'align', align, 'fields', fields);
+                           'delim', 9, 'align', align, 'fields', fields, varargin{:});
 
 command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield align })); 
 
