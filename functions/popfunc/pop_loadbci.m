@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/08/30 23:56:17  arno
+% only positive events
+%
 % Revision 1.16  2004/08/30 22:37:24  arno
 % cdnew revision
 %
@@ -198,7 +201,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
         
     % find block size
     % ---------------
-    tmpevent = find( diff(getfield(bci, 'SourceTime')) > 0);
+    tmpevent = find( diff(getfield(bci, 'SourceTime')) ~= 0);
     diffevent = tmpevent(2:end)-tmpevent(1:end-1);
     blocksize = unique(diffevent);
     if length(blocksize) > 1, error('Error in determining block size'); 
@@ -232,7 +235,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
     sourcetime  = getfield(bci, allfields{ indexsource });
 	for index = 1:length(indeximport)
         tmpdata  = getfield(bci, allfields{indeximport(index)});
-		tmpevent = find( diff(tmpdata) ~= 0);
+		tmpevent = find( diff(tmpdata) > 0);
 		tmpevent = tmpevent+1;
         tmpcorresp = find(indexcorresp == indeximport(index));
         
