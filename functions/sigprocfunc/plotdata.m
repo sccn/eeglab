@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/05 15:46:04  arno
+% update header
+%
 % Revision 1.3  2002/08/15 00:43:31  arno
 % corrected fontsize and plot problem
 %
@@ -385,7 +388,7 @@ end
           if ymin <= 0 & ymax >= 0,
                 yht = 0;
           else
-                yht = mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
+                yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
           end
           axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
             set(h,'HorizontalAlignment','right');      % print before traces
@@ -543,3 +546,17 @@ if 0,    % START DETOUR XXXXXXXXXXXXX
      end
    end
 end       % END DETOUR XXXXXXXXXXXXX
+
+function out = nan_mean(in)
+
+    nans = find(isnan(in));
+    in(nans) = 0;
+    sums = sum(in);
+    nonnans = ones(size(in));
+    nonnans(nans) = 0;
+    nonnans = sum(nonnans);
+    nononnans = find(nonnans==0);
+    nonnans(nononnans) = 1;
+    out = sum(in)./nonnans;
+    out(nononnans) = NaN;
+
