@@ -19,9 +19,14 @@
 %               (though internally this information is stored in 
 %               real frames).
 % Outputs:
-%   epochval  - A value of the selected field for each epoch. This is
-%               NaN if no selected event occurred during the epoch.
-%               Latencies are measured in msec relative to epoch onset.
+%   epochval    - A value of the selected field for each epoch. This is
+%                 NaN if no selected event occurred during the epoch. If
+%                 several vales are available for each epoch, only the
+%                 first one is taken into consideration.
+%                 Latencies are measured in msec relative to epoch onset.
+%   allepochval - cell array with same length as the number of epoch 
+%                 containing all values for all epochs. This output is
+%                 usefull when several value are found within each epoch.
 %
 % Notes: 1) Each epoch structure refers to the events that occurred
 %        during its time window. This function allows the user to return 
@@ -71,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/06/02 16:49:00  arno
+% allowing to process continuous data
+%
 % Revision 1.11  2004/06/01 21:43:06  arno
 % adding more examples in header
 %
@@ -107,7 +115,7 @@
 
 % 02/15/02 modified function according to new event structure -ad
 
-function epochval = eeg_getepochevent(EEG, type, timewin, fieldname, timeformat);
+function [epochval, allepochval] = eeg_getepochevent(EEG, type, timewin, fieldname, timeformat);
 
 if nargin <2
     help eeg_getepochevent;
@@ -199,26 +207,36 @@ end;
 
 % select events
 % -------------
-epochval = zeros(1,EEG.trials); epochval(:) = nan;
+epochval       = zeros(1,EEG.trials); epochval(:) = nan;
+allepochval    = cell(1, EEG.trials);
+allepochval(:) = { NaN };
 if strcmp(fieldname, 'latency')
+    count = 1;
 	for index = 1:length(Ieventtmp)
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
         else                             epoch = EEG.event(Ieventtmp(index)).epoch;
         end;
-		if isnan(epochval(epoch))
-			epochval(epoch) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
+        allepochval{epoch}(end+1) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
                                             EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+		if count == 1
+			epochval(epoch) = allepochval{epoch}(end);
 		else
-			disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ', ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
+            if count == 2
+                disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ]); 
+                %, ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
+            end;
 		end;
 	end;
 else
 	for index = 1:length(Ieventtmp)
 		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
 		if ~isempty(val)
-            if ~isfield(EEG.event, 'epoch'), epochval(1) = val;
-            else                             epochval(EEG.event(Ieventtmp(index)).epoch) = val;
+            if ~isfield(EEG.event, 'epoch'), epoch = 1;
+            else                             epoch = EEG.event(Ieventtmp(index)).epoch;
             end;
+            epochval(epoch) = val;
+            allepochval{epoch}(enf) = val;
+            count = count+1;
 		end;
 	end;
 end;    
