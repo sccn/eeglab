@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/11/06 02:12:57  arno
+% put RV to title
+%
 % Revision 1.34  2003/11/06 01:54:14  arno
 % adding dipole plot
 %
@@ -252,7 +255,7 @@ end;
 % additional options
 % ------------------
 options    = { options{:} 'masksurf' 'on' };
-outoptions = { options{:} 'masksurf' 'on' }; % for command
+outoptions = { options{:} }; % for command
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
@@ -385,7 +388,7 @@ set(allobj(1:countobj-1), 'visible', 'on');
 
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
-com = [com sprintf('pop_topoplot(%s,%d, %s %s);', ...
+com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
                    inputname(1), typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
 return;
 
