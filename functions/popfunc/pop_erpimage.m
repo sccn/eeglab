@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/07/29 00:20:00  arno
+% debugging
+%
 % Revision 1.35  2002/07/27 01:21:56  arno
 % debugging last command
 %
@@ -571,83 +574,3 @@ function txt = context(var, allvars, alltext);
 		txt = '';
 	end;
 
-% get default from command string
-% -------------------------------
-function txt = getdef(lastcom, var, mode, default)
-    % mode can be present for 0 and 1 if the variable is present
-	if nargin < 4
-		default = '';
-	end;
-	if isempty(lastcom)
-		txt = default; return;
-	end;
-	if nargin < 3
-		mode = [];
-	end;
-	if isstr(mode) & strcmp(mode, 'present')
-		if ~isempty(findstr(var, lastcom))
-			txt = 1; return;
-		else
-			txt = 0; return;
-		end;
-	end;
-	if isnumeric(var)
-		comas = findstr(lastcom, ',');
-		if length(comas) >= var
-			txt = lastcom(comas(var-1)+1:comas(var)-1);
-			txt = deblank(txt(end:-1:1));
-			txt = deblank(txt(end:-1:1));
-			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end;
-			if ~isempty(txt)
-				txt = deblank(txt(end:-1:1));
-				txt = deblank(txt(end:-1:1));
-			end;
-			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end;
-			if ~isempty(txt)
-				txt = deblank(txt(end:-1:1));
-				txt = deblank(txt(end:-1:1));
-			end;
-			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end;
-		else
-			txt = default;
-		end;
-		%fprintf('%s:%s\n', var, txt);		
-		return;
-	else
-		comas  = findstr(lastcom, ','); % finding all comas
-		comas  = [ comas  findstr(lastcom, ');') ]; % and end of lines
-		varloc = findstr(lastcom, var);
-		if ~isempty(varloc)
-			% finding comas surrounding 'val' var in 'key', 'val' sequence
-			comas = comas(find(comas >varloc(end)));
-			txt = lastcom(comas(1)+1:comas(2)-1); 
-			txt = deblank(txt(end:-1:1));
-			txt = deblank(txt(end:-1:1));
-			if strcmp(mode, 'full')
-				parent = findstr(lastcom, '}');
-				if ~isempty(parent)
-					comas = comas(find(comas >parent(1)));
-					txt = lastcom(comas(1)+1:comas(2)-1);
-				end;
-				txt = [ '''' var ''', ' txt ];	
-			elseif isnumeric(mode)
-				txt = str2num(txt);
-				if ~isempty(mode)
-					if length(txt) >= max(mode)
-						if all(isnan(txt(mode))), txt = '';
-						else txt = num2str(txt(mode));
-						end;	
-					elseif length(txt) >= mode(1)
-						if all(isnan(txt(mode(1)))), txt = '';
-						else txt = num2str(txt(mode(1)));
-						end;
-					else 
-						txt = default;
-					end;
-				end;
-			end;
-		else
-			txt = default;
-		end;
-	end;
-	%fprintf('%s:%s\n', var, txt);		
