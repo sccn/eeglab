@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2003/12/18 01:21:24  arno
+% same
+%
 % Revision 1.80  2003/12/18 01:17:23  arno
 % warning message
 %
@@ -394,7 +397,7 @@ if nargin < 2
 	totaluserdat = {};
     % lookup channel locations if necessary
     % -------------------------------------
-    if all(cellfun('isempty', {chans.theta}))
+    if ~all(cellfun('isempty', {chans.labels})) & all(cellfun('isempty', {chans.theta}))
         standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
                           'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
                           'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
