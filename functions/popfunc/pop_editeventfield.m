@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/27 16:28:44  arno
+% optimizing window size
+%
 % Revision 1.21  2002/08/26 22:06:19  arno
 % update message
 %
@@ -199,7 +202,7 @@ if nargin<2
 			   'set(gcf, ''userdata'', tmpuserdata); clear tmpuserdata;' ] }, ...
 	         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  allfields{index} }, ...
 	         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''' allfields{index} ''';' commandload ] }, ...
-	         { }, fastif(strcmp(allfields{index}, 'epoch'), {}, { 'Style', 'checkbox', 'string', '    ' }),{ } };
+	         { }, { 'Style', 'checkbox', 'string', '    ', 'visible', fastif(strcmp(allfields{index}, 'epoch'),'off', 'on')}, { } };
 	         listboxtext = [ listboxtext '|' allfields{index} ]; 
 	    end;
 	    geometry = { geometry{:} geometry{end} [1] [1 1.2 0.6 1.3 1.7] };
@@ -233,7 +236,7 @@ if nargin<2
 	        if results{index*2+2} == 1, args = { args{:}, allfields{index}, [] };
 	        else 
 				if ~isempty( results{index*2+1} )
-	                if exist(results{index*2+1}) == 2,  args = { args{:}, allfields{index}, [ results{index*2+1} ] }; % file
+                    if exist(results{index*2+1}) == 2,  args = { args{:}, allfields{index}, [ results{index*2+1} ] }; % file
 	                else                                args = { args{:}, allfields{index}, results{index*2+1} }; end;
 				end;
 				try, 
