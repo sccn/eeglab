@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.168  2004/03/21 19:19:18  scott
+% help message
+%
 % Revision 1.167  2004/03/21 18:02:08  scott
 % debugged deprecated 'shrink' mode code
 %
@@ -751,41 +754,37 @@ end
 %
 if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
   if strcmpi(VERBOSE,'on')
-    fprintf('Using deprecated mode ''shrink''. Recommend moving to using headrad, plotrad.\n');
+    fprintf('     Using specified ''shrink'' (deprecated). Recommend moving to ''headrad'', ''plotrad''.\n');
   end
 
-%  'shrink' - ['on'|'off'|'force'|factor] 
-%  'on' -> If max channel arc_length > 0.5, shrink electrode coordinates towards vertex 
-%           to plot all channels by making max arc_length 0.5. 
-%  'force' -> Normalize arc_length so the channel max is 0.5. 
-%  [factor] -> Apply a specified shrink factor (range (0,1) = shrink fraction). {default: 'on'}
-
 if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
-   shrinkfactor = tmpeloc(1).shrink;         % read default shrinkfactor from chanlocs
+    if strcmpi(VERBOSE,'on')
+       fprintf('EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
+    end
+    shrinkfactor = tmpeloc.shrink;
 end;
 
 if isstr(shrinkfactor)
-  if strcmpi(shrinkfactor, 'off') 
-     plotrad = 0.5; headrad = 0.5;
-     if strcmpi(VERBOSE,'on')
-       fprintf('    Shrink flag "off" -> making plotrad 0.5, headrad 0.5\n');
-     end
-  elseif strcmpi(shrinkfactor, 'on') 
-     headrad = plotrad;
-     if strcmpi(VERBOSE,'on')
-       fprintf('    Shrink flag "on" -> making headrad = plotrad\n');
-     end
-  elseif strcmpi(shrinkfactor, 'force')  % 'on' and 'force' were different ???
-     headrad = plotrad;
-     if strcmpi(VERBOSE,'on')
-       fprintf('    Shrink flag "on" -> making headrad = plotrad\n');
-     end
+  if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force')  
+      if strcmpi(VERBOSE,'on')
+         fprintf('     Shrink flag -> plotting cartoon head at plotrad\n');
+      end
+      headrad = plotrad; % plot head around outer electrodes, no matter if 0.5 or not
   end
-else   
-    if shrinkfactor<0.15 | shrinkfactor>1
-      error('shrink factor out of bounds (0.15, 1.0)')
+else % apply shrinkfactor
+    if shrinkfactor < 0 | shrinkfactor > 1-1e-3
+        error('shrink factor out of bounds [0,.999)')
     else
-      headrad = plotrad;  % make deprecated 'shrink' mode plot 
+        plotrad = rmax/(1-shrinkfactor);
+        headrad = plotrad;  % make deprecated 'shrink' mode plot 
+        if strcmpi(VERBOSE,'on')
+           fprintf('    %g%% shrink  applied.');
+           if abs(headrad-rmax) > 1e-2
+             fprintf(' Cartoon head is not anatomically correct.\n');
+           else
+             fprintf('\n');
+           end
+        end
     end
 end
 end; % if shrink
@@ -795,9 +794,9 @@ end; % if shrink
 % 
 
 if headrad ~= 0.5 & strcmpi(VERBOSE, 'on')
-   fprintf('NB: Plotting map using: plotrad %-4.3g,',plotrad);
-   fprintf(    ' headrad %-4.3g\n',headrad);
-   fprintf('    The cartoon head is NOT anatomically correct (should be 0.5).\n')
+   fprintf('     NB: Plotting map using ''plotrad'' %-4.3g,',plotrad);
+   fprintf(    ' ''headrad'' %-4.3g\n',headrad);
+   fprintf('Warning: The plotting radius of the cartoon head is NOT anatomically correct (0.5).\n')
 end
 %
 %%%%%%%%%%%%%%%%%%%%% Find plotting channels  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1016,11 +1015,10 @@ if headrad > 0                         % if cartoon head to be plotted
   EarX  = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489]; % rmax = 0.5
   EarY  = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
-  if headrad == plotrad                       % plot head outline at plot rim
-     brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
-      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
-     set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);      % hide the disk edge jaggies 
-  end
+  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
+      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
+  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
+  
 
   plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
@@ -1028,9 +1026,9 @@ if headrad > 0                         % if cartoon head to be plotted
   sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
                                                                  % by this factor
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
-         'Color',HCOLOR,'LineWidth',HLINEWIDTH);                % plot nose
-  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)   % plot left ear
-  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)  % plot right ear
+         'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
+  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
+  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)   % plot right ear
 end
 
 %
