@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/10/13 23:35:51  scott
+% debug
+%
 % Revision 1.48  2002/10/13 23:33:10  scott
 % valsort debug
 %
@@ -1111,19 +1114,9 @@ elseif Nosort == YES
   fprintf('Not sorting data on input sortvar.\n');
   sortidx = 1:ntrials;	
 %
-%%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-else 
-  fprintf('Sorting data on input sortvar.\n');
-  [sortvar,sortidx] = sort(sortvar);
-  data = data(:,sortidx);
-  if ~isempty(auxvar)
-    auxvar = auxvar(:,sortidx);
-  end
-%
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on (mean) value %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-else 
+elseif exist(valargs)
   [sttime stframe] = min(times-valargs(1));
   if length(valargs)>1
      [endtime endframe] = min(times-valargs(2));
@@ -1138,6 +1131,16 @@ else
   end
   sortval = mean(data(stframe:endframe,:));
   [sortval,sortidx] = sort(sortval);
+  data = data(:,sortidx);
+  if ~isempty(auxvar)
+    auxvar = auxvar(:,sortidx);
+  end
+%
+%%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+else 
+  fprintf('Sorting data on input sortvar.\n');
+  [sortvar,sortidx] = sort(sortvar);
   data = data(:,sortidx);
   if ~isempty(auxvar)
     auxvar = auxvar(:,sortidx);
