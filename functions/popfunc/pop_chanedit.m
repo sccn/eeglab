@@ -10,7 +10,6 @@
 %   "Channel information ('field name')" - [edit boxes] display channel field 
 %                   content the current channel. Use 'transform' from the command
 %                   line to modify these fields.
-%
 % Input:
 %   EEG      - EEG dataset
 %   chanlocs - EEG.chanlocs structure
@@ -77,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2003/12/05 22:58:23  arno
+% same thing
+%
 % Revision 1.71  2003/12/05 22:54:08  arno
 % debug transform
 %
@@ -547,7 +549,7 @@ if nargin < 2
 	end;
 	evalin('base', 'clear global chantmp; clear chantmp;');
 else 
-	 args = varargin;
+     args = varargin;
 	 % no interactive inputs
 	 % scan all the fields of g
 	 % ------------------------
@@ -569,7 +571,8 @@ else
 		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
 			   tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
 					'Are you sure you want to apply this function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
-			   if ~strcmp(tmpButtonName, 'Yes'), return; end;
+			   tmpButtonName
+               if ~strcmpi(tmpButtonName, 'Yes'), return; end;
 		   end;
 		   switch method
 			case 'chancenter',
@@ -587,7 +590,7 @@ else
              disp('Note: automatically convert XYZ coordinates to spherical and polar');
              chans = convertlocs(chans, 'cart2all');
             otherwise
-             chans = convertlocs(chans, lower(args{curfield}), 'verbose', 'on');
+             chans = convertlocs(chans, lower(args{curfield+1}), 'verbose', 'on');
 		   end;
 		  case 'transform'
 		   try, tmpoper = args{curfield+1}; catch, return; end;
