@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2002/09/05 00:04:05  arno
+% disp-> error
+%
 % Revision 1.67  2002/09/04 22:13:55  luca
 % adding dataset name check -arno
 %
@@ -318,6 +321,8 @@ end;
 
 % checking multiple datasets
 if isempty(EEG), return; end;
+if ~isfield(EEG, 'data'), return; end;
+if isempty(EEG.data), return; end;
 if length(EEG) > 1
 	for index = 1:length(EEG)
 		if ~isempty(EEG(index))
