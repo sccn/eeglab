@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2004/03/01 19:49:19  arno
+% diffmovieoff
+%
 % Revision 1.72  2004/02/27 23:03:13  arno
 % typo
 %
@@ -370,7 +373,7 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'eventprob'   ''              []                                       [] });
 if isstr(g), error(g); end;
 clear functions;
-g.diffmovie = 'off';
+%g.diffmovie = 'off';
 
 % checking parameters
 % -------------------
