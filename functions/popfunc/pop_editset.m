@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/11/14 17:38:31  arno
+% gui text
+%
 % Revision 1.26  2002/11/08 19:05:05  arno
 % test if array=string before importing it
 %
@@ -200,7 +203,7 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } ...
 	     ...
 		 { 'Style', 'text', 'string', 'Averaged referenced data ?'} { } ...
-		 { 'Style', 'checkbox', 'string', '(set = Yes)', 'value', strcmp(EEG.averef, 'Yes')| strcmp(EEG.averef, 'yes') }, { 'Style', 'text', 'string', '(EEG.averef)'} ...
+		 { 'Style', 'checkbox', 'string', '(set = Yes)', 'value', ~strcmpi(EEG.ref, 'common') }, { 'Style', 'text', 'string', '(EEG.ref)'} ...
 			 };
 
     if EEG.trials == 1,  uilist(21:24) = []; geometry(6) = []; end;
@@ -220,8 +223,7 @@ if nargin < 2                 % if several arguments, assign values
 	if ~strcmp( results{i  }, fastif(isempty(EEG.chanlocs), '', 'EEG.chanlocs')  ) , args = { args{:}, 'chanlocs' , results{i} }; end;
 	if ~strcmp( results{i+1}, fastif(isempty(EEG.icaweights), '', 'EEG.icaweights') ), args = { args{:}, 'icaweights', results{i+1} }; end;
 	if ~strcmp( results{i+2}, fastif(isempty(EEG.icasphere), '', 'EEG.icasphere') ) , args = { args{:}, 'icasphere', results{i+2} }; end;
-	results{i+3} = fastif(results{i+3}, 'yes', 'no');
-	if ~strcmp( EEG.averef, results{i+3} ), args = { args{:}, 'averef', results{i+3} }; end;
+	if strcmpi(EEG.ref, 'averef') ~= results{i+3}, args = { args{:}, 'averef', fastif(results{i+3}, 'yes', 'no') }; end;
 	if ~strcmp(EEG.comments, newcomments), args = { args{:}, 'comments' , newcomments }; end;
 else % no interactive inputs
     args = varargin;
@@ -254,24 +256,9 @@ for curfield = tmpfields'
         case 'setname' , EEGOUT.setname = getfield(g, {1}, curfield{1});
         case 'pnts'    , EEGOUT.pnts = getfield(g, {1}, curfield{1});
         case 'comments', EEGOUT.comments = getfield(g, {1}, curfield{1});
-	    case 'averef'  , EEGOUT.averef = getfield(g, {1}, curfield{1});
-	                     if strcmp(EEGOUT.averef, 'yes')
-							 disp('Computing average reference...');
-							 EEGOUT = pop_averef(EEGOUT, 0);
-						 else
-							 if nargin < 2
-								 if popask(strvcat('Warning: do you really want to remove average','reference flag while keeping data unchanged')),
-									 disp('Warning: average reference flag changed but data unchanged');
-								 else	 
-									 EEGOUT.averef = 'yes';
-									 for index = 1:2:length(args)
-										 if strcmp(args{index}, 'averef')
-											 args(index:index+1) = [];
-											 break;
-										 end;
-									 end;
-								 end;
-							 end;
+	    case 'averef'  , reref = getfield(g, {1}, curfield{1});
+	                     if (strcmpi(EEGOUT.ref, 'common') & strcmpi(reref, 'yes')) | (~strcmpi(EEGOUT.ref, 'common') & strcmpi(reref, 'no'))
+							 EEGOUT = pop_reref(EEG, []);
 						 end;
         case 'nbchan'  , EEGOUT.nbchan = getfield(g, {1}, curfield{1});
         case 'xmin'    , oldxmin = EEG.xmin;
