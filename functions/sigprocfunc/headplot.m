@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/27 00:35:39  arno
+% closing current figure
+%
 % Revision 1.4  2002/08/14 16:48:54  arno
 % remove ICADIR
 %
@@ -153,7 +156,8 @@ if isstr(values)
     else
        loctype = 'spherical';
     end
-    spline_file = p1;
+    spline_file = p1
+    return
     if nargin >= 4
       comment = v1;
     end
