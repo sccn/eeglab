@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/13 23:58:35  arno
+% update error message
+%
 % Revision 1.8  2002/08/12 02:37:13  arno
 % inputdlg2
 %
@@ -157,7 +160,8 @@ else
 		INEEG1.event(end+1:end+length(INEEG2.event)) = INEEG2.event(:);			
 	end;
 
-	if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch')
+	if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
+			& ~isempty(INEEG1.epoch) & ~isempty(INEEG2.epoch)
 		try 
 			INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
 		catch
