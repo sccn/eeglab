@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2003/07/21 20:46:19  scott
+% debug
+%
 % Revision 1.106  2003/07/21 20:45:01  scott
 % fg
 %
@@ -1480,22 +1483,32 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
            % Note: movav here sorts using square window
            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
         else % if phase-sorted trials
-           halfwidth = ceil(avewidth/2);
-           [data,outtrials] = movav([data(:,[(end-halfwidth):end]),...
-                                        data,...
-                                        data(:,[1:(halfwidth-1)]),...
-                        [1:(ntrials+2*halfwidth-1)],avewidth,decfactor); 
-           % Note: movav here sorts using square window
-           [outsort,outtrials] = movav(sortvar,1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
+           backhalf  = floor(avewidth/2);
+           fronthalf = floor((avewidth-1)/2);
+           if avewidth > 2
+            [data,outtrials] = movav([data(:,[(end-backhalf+1):end]),...
+                                      data,...
+                                      data(:,[1:fronthalf])],...
+                                      [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
+            [outsort,outtrials] = movav(sortvar,1:(ntrials+backhalf+fronthalf),...
+                                            avewidth,decfactor); 
+           else % avewidth==2
+            [data,outtrials] = movav([data(:,end),data],[1:(ntrials+1)],avewidth,decfactor); 
+            % Note: movav here sorts using square window
+            [outsort,outtrials] = movav(sortvar,1:(ntrials+1),avewidth,decfactor); 
+          end
         end
         if ~isempty(auxvar)
           if ~exist('phargs') % if not phase-sorted trials
             [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
           else % if phase-sorted trials
-            [auxvar,tmp] = movav([auxvar(:,(end-halfwidth):end),...
-                                        auxvar,...
-                                        auxvar(:,1:(halfwidth-1)), ...
-                           1:(ntrials+2*halfwidth-1),avewidth,decfactor); 
+           if avewidth>2 
+            [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
+                                      auxvar,...
+                                      auxvar(:,[1:fronthalf])],...
+                                      [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
+           else % avewidth==2
+            [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor); 
           end
         end
         fprintf('Output data will be %d frames by %d smoothed trials.\n',...
