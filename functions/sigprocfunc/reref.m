@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/07/27 00:59:49  arno
+% debuging re-referencing
+%
 % Revision 1.19  2003/07/26 01:13:56  arno
 % debuging reref to several channels
 %
@@ -178,7 +181,7 @@ if chans < 2
   help reref
   return
 end
-if ref > chans
+if ref > chans+1
     error('reference channel index out of range');
 end;
 
