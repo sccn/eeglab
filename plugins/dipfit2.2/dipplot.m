@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.51  2003/08/04 21:29:06  arno
+%scale besa for summary plot
+%
 %Revision 1.50  2003/08/04 21:15:54  arno
 %num color on MRI
 %
