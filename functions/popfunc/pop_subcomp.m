@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/11 00:58:12  arno
+% updating result size check
+%
 % Revision 1.3  2002/04/08 02:50:11  scott
 % *** empty log message ***
 %
@@ -96,7 +99,7 @@ eeg_options;
 if option_computeica  
     [ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:EEG.nbchan, components));
 else
-    [ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweight }, EEG.icawinv, setdiff(1:EEG.nbchan, components));
+    [ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:EEG.nbchan, components));
 end;    
 compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
 
