@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/08/14 01:20:41  arno
+% close or cancel
+%
 % Revision 1.40  2002/08/13 00:06:29  arno
 % [Aslidder color and scale title
 %
@@ -1254,7 +1257,7 @@ else
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-	result = inputdlg2( { 'Enter number of electrodes to show:' } , 'Change number of electrode to show', 1,  { num2str(g.dispchans) });
+	result = inputdlg2( { 'Enter number of electrodes to show:' } , 'Change number of electrodes to show', 1,  { num2str(g.dispchans) });
 	if size(result,1) == 0 return; end;
 
    g.dispchans = eval(result{1});
