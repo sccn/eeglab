@@ -25,6 +25,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/09/05 01:34:13  arno
+% menu editing
+%
 % Revision 1.10  2002/09/04 23:21:18  arno
 % updating menu help
 %
@@ -147,7 +150,7 @@ allmenus = { ...
 '   Component properties' 'pop_prop'       ... %    Component properties      
 '   Component ERP image' 'pop_erpimage'       ... %    Component ERP image      
 '   Component ERPs' ''      ...
-'      On same axis (with maps)' 'pop_envtopo'        ... %       Largest ERP components      
+'      With component maps)' 'pop_envtopo'        ... %       Largest ERP components      
 '      In rectangular array' 'pop_plotdata'       ... %       Comp. ERP time courses      
 '   Data statistics' ''      ...
 '      Channel statistics' 'pop_signalstat'      ...
