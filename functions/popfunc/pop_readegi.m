@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/12/05 02:50:25  arno
+% debugging event reading
+%
 % Revision 1.2  2002/11/14 23:35:36  arno
 % header
 %
@@ -57,7 +60,7 @@ end;
 EEG = eeg_emptyset;
 
 [Head EEG.data Eventdata] = readegi( filename );
-if ~isempty(Eventdata) & length(Eventdata) == size(EEG.data,2)
+if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
 EEG.filename        = filename;
@@ -69,6 +72,14 @@ EEG.trials          = Head.segments;
 EEG.pnts            = Head.segsamps;
 EEG.xmin            = 0; 
 
+% importing the events
+% --------------------
+if ~isempty(Eventdata)
+    for index = 1:size(Eventdata,2)
+        EEG = pop_chanevent( EEG, EEG.nbchan-size(Eventdata,1)+index, ...
+                             'delevent', 'off', 'typename', Head.eventcode(index,:));
+    end;
+end;
 EEG = eeg_checkset(EEG);
 command = sprintf('EEG = pop_readegi(''%s'');', filename); 
 
