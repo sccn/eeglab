@@ -142,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2003/04/18 17:20:13  arno
+% noshow option
+%
 % Revision 1.83  2003/03/23 22:46:39  scott
 % *** empty log message ***
 %
@@ -1477,8 +1480,10 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         coherfreq = freq; % use phase-sort frequency
     end
     
+    DEFAULT_CYCLE = 18*coherfreq/(coherfreq+10); % 3 cycles at 2 Hz, 15 at 50 Hz
+    
     if ~isnan(signifs) % plot received significance levels
-        fprintf('Computing and plotting received amp and ITC significance levels...\n');
+        fprintf('Computing and plotting received amp and ITC signif. levels (%1.1f cycle)...\n', DEFAULT_CYCLE);
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
         % need to receive cohsig and ampsig to get allamps
@@ -1486,7 +1491,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         cohsig = signifs(3);
         
     elseif alpha>0 % compute significance levels
-        fprintf('Computing and plotting %g amp and ITC significance level...\n',alpha);
+        fprintf('Computing and plotting %g amp and ITC signif. level (%1.1f cycle)...\n',alpha, DEFAULT_CYCLE);
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
         % need to receive cohsig and ampsig to get allamps
