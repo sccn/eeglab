@@ -8,6 +8,7 @@
 %   oldcomments - old comments, string or cell array of strings
 %   title       - optional title window
 %   newcomments - new comments, string or cell array of strings
+%                 to assign (command line calls only)
 %
 % Outputs:
 %   newcomments - new comments, string
@@ -43,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/10 19:17:12  arno
+% setting title propertie to no interpreter
+%
 % Revision 1.4  2002/04/08 20:52:45  arno
 % removing debug msg
 %
@@ -62,6 +66,10 @@
 function [newcomments, com] = pop_comments( comments, plottitle, newcomments );
 
 com = '';
+if exist('comments') ~=1, comments = '';
+elseif iscell(comments), comments = strvcat(comments{:}); 
+end;
+newcomments = comments;
 if nargin < 3
 	figure('menubar', 'none', 'numbertitle', 'off', 'name', 'About this dataset -- pop_comment()');
 	pos = get(gca,'position'); % plot relative to current axes
@@ -69,9 +77,6 @@ if nargin < 3
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
 	set(gcf, 'userdata', 0);
 	if exist('plottitle') ~=1, plottitle = ''; end;
-	if exist('comments') ~=1, comments = '';
-	elseif iscell(comments), comments = strvcat(comments{:}); 
-	end;
 	
 	h = title(plottitle);
 	set(h, 'fontweight', 'bold', 'interpreter', 'none');
