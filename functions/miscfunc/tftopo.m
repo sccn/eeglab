@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2002/05/19 14:15:03  scott
+% *** empty log message ***
+%
 % Revision 1.41  2002/05/19 14:12:53  scott
 % *** empty log message ***
 %
@@ -423,7 +426,9 @@ for n=1:tfpoints
       pos = get(cb,'position');
       set(cb,'position',[pos(1:2) 0.023 pos(4)]);
    end
+end
 
+for n=1:tfpoints
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    % Plot connecting lines using changeunits()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -444,10 +449,10 @@ if showchan>0
      sbplot(3,3,1,'ax',imgax);
      topoplot(showchan,chanlocs,'electrodes','off', ...
                   'style', 'blank', 'emarkersize1chan', 10)
+     axis('square')
 end
 
 
-% for n=1:tfpoints
 
 % end % topoplot loop
 
