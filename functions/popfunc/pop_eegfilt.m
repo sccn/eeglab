@@ -1,7 +1,7 @@
 % pop_eegfilt() - interactively filter EEG dataset data using eegfilt()
 %
 % Usage:
-%   >> eegout = pop_eegfilt( eegin, locutoff, hicutoff, filtorder);
+%   >> EEGOUT = pop_eegfilt( EEG, locutoff, hicutoff, filtorder);
 %
 % Graphical interface:
 %   "Lower edge ..." - [edit box] Lower edge of the frequency pass band (Hz) 
@@ -17,14 +17,14 @@
 %                 >> help pop_eegfilt). Same as 'filtorder' optional input.
 %
 % Inputs:
-%   eegin     - input dataset
+%   EEG       - input dataset
 %   locutoff  - lower edge of the frequency pass band (Hz)  {0 -> lowpass}
 %   hicutoff  - higher edge of the frequency pass band (Hz) {0 -> highpass}
 %   filtorder - length of the filter in points {default 3*fix(srate/locutoff)}
 %   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter). 
 %                     Default is 0 (bandpass).
 % Outputs:
-%   eegout   - output dataset
+%   EEGOUT   - output dataset
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/08/06 00:22:05  arno
+% removing debug message
+%
 % Revision 1.20  2003/08/02 21:29:50  arno
 % text
 %
@@ -122,7 +125,7 @@ end;
 if isempty(EEG.data)
     disp('Pop_eegfilt() error: cannot filter an empty dataset'); return;
 end;    
-if nargin < 3
+if nargin < 2
 	% which set to save
 	% -----------------
    	promptstr = { 'Highpass: lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
@@ -155,7 +158,7 @@ else
     if nargin < 4
         filtorder = [];
     end;
-    if nargin < 4
+    if nargin < 5
         revfilt = 0;
     end;
 end;
