@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/12/09 21:57:13  arno
+% now can process logical values
+%
 % Revision 1.11  2003/12/09 21:48:58  arno
 % convert 2 double
 %
@@ -198,6 +201,14 @@ return;
 function str = contarray( array )
     array = double(array);
 	tmpind = find( round(array) ~= array );
+    if prod(size(array)) == 1
+        str =  num2str(array);
+        return;
+    end;
+    if size(array,1) == 1 & size(array,2) == 2
+        str =  [num2str(array(1)) ' ' num2str(array(2))];
+        return;
+    end;
     if isempty(tmpind) | all(isnan(array(tmpind)))
 		str = num2str(array(1));
 		skip = 0;
