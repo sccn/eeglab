@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/10 18:01:51  arno
+% file filter
+%
 % Revision 1.7  2003/03/12 00:42:20  arno
 % removing namechan field
 %
@@ -123,7 +126,7 @@ fullFileName = sprintf('%s%s', filepath, filename);
 [EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response);
 EEG.filename        = filename;
 EEG.filepath        = filepath;
-EEG.setname 		= 'rawdatas';
+EEG.setname 		= 'Neuroscan EEG data';
 EEG.nbchan          = size(EEG.data,1);
 EEG = eeg_checkset(EEG);
 if any(rt)
