@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.190  2004/01/24 21:01:18  scott
+% same
+%
 % Revision 1.189  2004/01/24 20:59:53  scott
 % same
 %
@@ -2988,10 +2991,10 @@ return
 %%%%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
-%                           If signif is NaN, plot erp +/- stdev
+%                           If signif is [], plot erp +/- stdev
 %                           Else if signif, plot erp and signif(1,:)&signif(2,:) fill
 %                           Else, plot erp alone
-%                           If winloc vector, plot grey back image in sort window
+%                           If winloc not [], plot grey back image in sort window
 %                                       winloc(1)-> winloc(end) (ms)
   FILLCOLOR    = [.66 .76 1];
   WINFILLCOLOR    = [.66 .76 1];
@@ -3003,6 +3006,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
          fprintf('plot1trace(): signif array must be size (2,frames)\n')
          return
       end
+winloc
       if ~isempty(winloc)
          fillwinx = [winloc winloc(end:-1:1)];
          if ~isempty(axlimits) & sum(isnan(axlimits))==0
