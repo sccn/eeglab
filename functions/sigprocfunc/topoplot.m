@@ -7,8 +7,8 @@
 %
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
-%                            if a single channel number, show location of that 
-%                            channel 	 
+%                        if a single channel number, show location of that 
+%                        channel 	 
 %   		chan_locs  - name of an EEG electrode position file (See
 %                             >> topoplot example   for format.
 % Optional Parameters:
@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/17 18:40:23  arno
+% display real electrode number
+%
 % Revision 1.3  2002/04/06 03:47:44  arno
 % adding emarkersize1chan input
 %
@@ -256,7 +259,7 @@ end
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
-if length(Vl) ~= 1 & length(Vl) ~= length(Th),
+if length(Vl) > 1 & length(Vl) ~= length(Th),
  fprintf('topoplot(): data vector length (%d) must be the same as chan_locs file rows (%d)\n',...
                length(Vl),length(Th));
 end
