@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/05/01 01:23:44  luca
+% same
+%
 % Revision 1.17  2002/05/01 01:22:56  luca
 % same
 %
@@ -246,7 +249,7 @@ for curfield = tmpfields'
                             fprintf('Pop_editset: filename ''%s'' found for channel location\n', varname); 
                             EEGOUT.chanlocs = readlocs(varname);
                          else
-                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname);' );
+                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2
@@ -258,7 +261,7 @@ for curfield = tmpfields'
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
 							 else
-								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname);' );
+								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
 							 end;
 						 end;
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
@@ -274,7 +277,7 @@ for curfield = tmpfields'
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
 							 else
-								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname);' );
+								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
 							 end;
                          end;
         case 'data'    , varname = getfield(g, {1}, curfield{1});
