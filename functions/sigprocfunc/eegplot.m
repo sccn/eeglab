@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/08/11 23:10:04  arno
+% text edit
+%
 % Revision 1.34  2002/08/11 23:07:48  arno
 % done for title
 %
@@ -224,7 +227,7 @@ function [outvar1] = eegplot(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
 % Defaults (can be re-defined):
 
-DEFAULT_PLOT_COLOR = { 'k', [0.7 0.7 0.7]};         % EEG line color
+DEFAULT_PLOT_COLOR = { [0 0 1], [0.7 0.7 0.7]};         % EEG line color
 DEFAULT_AXIS_BGCOLOR = [.8 .8 .8];% EEG Axes Background Color
 try, icadefs;
 	DEFAULT_FIG_COLOR = BACKCOLOR;
@@ -333,7 +336,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    
    switch lower(g.color)
 	   case 'on', g.color = { 'k', 'm', 'c', 'b', 'g' }; 
-	   case 'off', g.color = { 'k' };  
+	   case 'off', g.color = { [ 0 0 0.4] };  
 	   otherwise disp('Error: color must be either ''on'' or ''off'''); return;
    end;	
 	if length(g.dispchans) > size(data,1)
@@ -644,7 +647,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   % window grid %%%%%%%%%%%%%
   % userdata = 4 cells : display yes/no, color, electrode yes/no, trial boundary adapt yes/no (1/0)  
-  m(11) = uimenu('Parent',m(1),'Label','Marking colors', 'tag', 'displaywin', ...
+  m(11) = uimenu('Parent',m(1),'Label','Marking color', 'tag', 'displaywin', ...
 				 'userdata', { 1, [0.8 1 0.8], 0, fastif( g.trialstag(1) == -1, 0, 1)} );
   uimenu('Parent',m(11),'Label','Hide marks','Callback', ...
   	['g = get(gcbf, ''userdata'');' ...
@@ -658,7 +661,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   	 'eegplot(''drawb''); clear g;'] )
 
 	% color
-	uimenu('Parent',m(11),'Label','Marking color', 'Callback', ...
+	uimenu('Parent',m(11),'Label','Choose color', 'Callback', ...
   	[ 'g = get(gcbf, ''userdata'');' ...
   	  'g.wincolor = uisetcolor(g.wincolor);' ...
       'set(gcbf, ''userdata'', g ); ' ...
@@ -748,7 +751,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'Callback','eegplot(''window'')')
   
   % Electrode window %%%%%%%%
-  uimenu('Parent',m(2),'Label','Number of channels to to display',...
+  uimenu('Parent',m(2),'Label','Number of channels to display',...
       'Callback','eegplot(''winelec'')')
   
   % Electrodes %%%%%%%%
@@ -765,7 +768,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'Callback','eegplot(''loadelect'');')
   
   % Zooms %%%%%%%%
-  zm = uimenu('Parent',m(2),'Label','Enalbel/Disable zoom');
+  zm = uimenu('Parent',m(2),'Label','Zoom off/on');
   commandzoom1 = 'set(gcbf, ''windowbuttondownfcn'',''';
   commandzoom2 = ['eegplot(''''zoom'''', gcbf);'');' ...
         'set(gcbf, ''windowbuttonupfcn'','''');'...
@@ -969,6 +972,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   	   eegplot('zoom', gcf);
   end;  
   
+  h = findobj(gcf, 'style', 'pushbutton');
+  set(h, 'backgroundcolor', [1 1 1]);
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1156,8 +1162,13 @@ else
 		axes(ax1);
 		tagpos  = [];
 		tagtext = [];
-		alltag = [alltag alltag(end)+g.trialstag];
-		%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
+		if isempty(alltag)
+			alltag = [alltag(1)-g.trialstag alltag alltag(end)+g.trialstag];
+		else
+			alltag = mod(lowlim, g.trialstag);
+			%alltag = 
+		end;
+			%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
 
 		nbdiv = 20/g.winlength; % approximative number of divisions
 		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5 10 20]]; % possible increments
@@ -1165,7 +1176,7 @@ else
 
 		incrementtime  = divpossible(indexdiv);
 		incrementpoint = divpossible(indexdiv)/1000*g.srate;
-		tagzerooffset  = -g.limits(1)/1000*g.srate;
+		tagzerooffset  = -g.limits(1)/1000*g.srate; 
 
 		for i=1:length(alltag)-1
 			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
