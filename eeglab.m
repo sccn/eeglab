@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.257  2003/10/29 18:31:48  arno
+% polishing message
+%
 % Revision 1.256  2003/10/29 18:29:11  arno
 % same
 %
@@ -974,6 +977,8 @@ eeg_global;
 
 % for the history function
 % ------------------------
+evalin('base'  , 'if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h cleared''); end;');
+
 comtmp = 'warning off MATLAB:mir_warning_variable_used_as_function';
 evalin('base'  , comtmp, '');
 evalin('caller', comtmp, '');
@@ -1013,7 +1018,7 @@ colordef white
 
 % checking strings
 % ----------------
-e_try = 'try,';
+e_try = 'try, if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h cleared''); end;';
 e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP; end;';
 nocheck           = e_try;
 check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' e_try];
