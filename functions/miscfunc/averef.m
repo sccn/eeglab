@@ -7,6 +7,7 @@
 % Inputs:
 %   data - 2D data matrix (chans,frames*epochs) 
 %   W    - ICA weight matrix
+%
 % Outputs:
 %   data_out - Input data converted to average reference.
 %   W_out    - ICA weight matrix converted to average reference
@@ -40,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/09/05 00:30:23  scott
+% added meandata output -sm
+%
 % Revision 1.6  2002/08/21 02:08:19  arno
 % nothing
 %
