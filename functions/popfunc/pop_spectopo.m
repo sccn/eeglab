@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/25 17:05:21  scott
+% fruther editting -sm
+%
 % Revision 1.2  2002/04/25 17:00:47  scott
 % editted help nd msgs, added % spectopo call to history -sm
 %
@@ -75,14 +78,7 @@ if nargin < 4
 	options      =  [ ',' result{4} ];
 	figure;
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
-		end;
-	end;	
+	options = [',' vararg2str(varargin)];
 end;
 
 if isempty(topofreqs)
