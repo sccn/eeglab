@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/07/24 00:21:29  arno
+% buttons ...
+%
 % Revision 1.23  2003/07/23 18:36:54  arno
 % adding more algos
 %
@@ -390,11 +393,12 @@ switch lower(icatype)
      case 'ng_ol' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icaweights = ng_ol( tmpdata );
+             [tmp EEG.icaweights] = ng_ol( tmpdata );
         else    
-            eval(sprintf('EEG.icaweights = ng_ol( tmpdata %s );', options));
+            eval(sprintf('[ EEG.icaweights tmp ] = ng_ol( tmpdata %s );', options));
         end;
         EEG.icasphere = eye(size(EEG.icaweights,2));
+        clear tmp;
         close(fig);
      case 'acsobiro' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
