@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/08/04 21:19:14  arno
+% command line call bug
+%
 % Revision 1.10  2003/08/04 18:59:03  arno
 % now plot for scanned dipoles
 %
@@ -151,6 +154,7 @@ if strcmpi(typedip, 'besa')
     end;      
 else 
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
+    options = { options{:} 'sphere' max(EEG.dipfit.vol.r) };
     if ~isempty(comps)
         if ~isfield(EEG.dipfit.model, 'component')
             for index = comps(:)'
