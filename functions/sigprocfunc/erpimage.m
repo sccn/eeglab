@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.238  2005/02/15 02:35:39  arno
+% return amplitude image if 'plotamps' is used
+%
 % Revision 1.237  2005/02/14 01:35:49  arno
 % [Amore debugging
 %
@@ -2373,8 +2376,8 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         end
         drawnow
         hold on
-        data = allamps;
     end;
+    data = allamps;
     
 elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
                       %%%%%%%%% UNDOCUMENTED AND DEPRECATED OPTION %%%%%%%%%%%%
