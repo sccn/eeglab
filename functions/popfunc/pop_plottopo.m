@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 16:34:05  arno
+% same
+%
 % Revision 1.6  2002/08/12 02:35:29  arno
 % [6~[6~inputdlg2
 %
@@ -81,7 +84,7 @@ if nargin < 2
 					 'Plot title:' ...
 					 'Plot single trials (yes|no)' 'Vertical lines (ms)' };
 	inistr       = { [ '1:' num2str( EEG.nbchan ) ] ...
-					 ['ERP in scalp order' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] ...
+					 fastif(isempty(EEG.setname), '',EEG.setname) ...
 					 'no' ''};
 	result       = inputdlg2( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr, 'plottopo');
 	if size(result,1) == 0 return; end;
