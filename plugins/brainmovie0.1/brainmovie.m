@@ -106,6 +106,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/09/06 14:37:56  scott
+% worked on help msg -sm & ad
+%
 % Revision 1.11  2002/08/01 23:41:39  arno
 % debugging
 %
@@ -497,7 +500,7 @@ end;
 for i=1:nbconditions
 	h(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, 1-ordinate].*s+q );
 	if ~isempty(g.head)
-		try, img = imread(g.head, 'pcx'); catch, disp('Error: unable to load PCX image file'); return; end;
+		try, img = imread(g.head, 'pcx'); pwd, g.head, catch, disp('Error: unable to load PCX image file'); return; end;
 		imagesc(img); colormap(gray);
 	end;
 	axis off;
