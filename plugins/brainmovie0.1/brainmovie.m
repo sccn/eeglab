@@ -70,9 +70,9 @@
 % 'envylabel'   - ordinate label for envelope. {Default 'Potential \muV'}
 % 'envvert'     - cell array of vector(s) of time indices at which to draw vertical lines. 
 %                 In multiple vector case, use 1 vector per condition. Also can be a cell array
-%                 of structure vector(s). Structure fields: time =  line time in ms
-%                                                           color = line color  (e.g. 'b')
-%                                                           style = line style (e.g. '--'). 
+%                 of structure vector(s). Structure fields: time:  line time in ms
+%                                                           color: line color  (e.g. 'b')
+%                                                           style: line style (e.g. '--'). 
 % 'flashes'     - vector of time indices at which the background flashes.  Specify the color 
 %                 of the flash with a cell array of [1,2] cell arrays. 
 %                 Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
@@ -115,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/11/19 00:42:57  arno
+% debug last
+%
 % Revision 1.22  2002/11/19 00:41:22  arno
 % default for framesout
 %
@@ -356,10 +359,9 @@ switch lower(g.framesout)
 	otherwise disp('Error: Framesout must be either ''eps'' or ''fig'''); return;
 end;	
 if ~isempty(g.envvert),
-   %if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
-   %     disp('Error: Invalid type for Envvert.'); return;
-   %end
-   % check did not work for my data -ad 
+    if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
+        disp('Error: Invalid type for Envvert.'); return;
+    end
 end
 if ~isempty(g.latency) & ~isnumeric(g.latency)
 	disp('Error: Latency must be a vector'); return;
@@ -712,8 +714,8 @@ for indeximage = alltimepoints
 		maxordinate = max(max(max(g.envelope)));
 		for tmpcond = 1:nbconditions
 			axes(e(tmpcond)); cla; set (gcf, 'visible', g.visible);
-			plot(times, g.envelope(:,:,tmpcond), 'k', 'linewidth', 2*g.resmult); hold on;
-			set(gca, 'ylim', [minordinate maxordinate]);
+            plot(times, g.envelope(:,:,tmpcond), 'k', 'linewidth', 2*g.resmult); hold on;
+            set(gca, 'ylim', [minordinate maxordinate]);
 			set(gca, 'xlim', [times(1) times(end)]);
 			plot([times(indeximage) times(indeximage)], [minordinate maxordinate], 'b', 'linewidth', 2*g.resmult);
 			xlabel('time (ms)', 'fontweight', 'bold', 'fontsize', 12*g.resmult); set(gca, 'box', 'off');
