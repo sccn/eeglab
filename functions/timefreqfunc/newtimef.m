@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/06/19 00:16:06  arno
+% nothing
+%
 % Revision 1.36  2003/06/18 00:37:02  arno
 % debuging lowmem
 %
@@ -882,7 +885,7 @@ if iscell(X)
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(alltfX1power,1)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
-                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
+                  [resdifftmp resimagestmp res1tmp res2tmp] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
                                { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) alltfX2(indarr,:,:)});
                   resdiff{1}(indarr,:)     = resdifftmp{1};   resdiff{2}(indarr,:)     = resdifftmp{2};
@@ -901,7 +904,7 @@ if iscell(X)
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(alltfX1abs,1)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
-                  [resdiff(indarr,:,:) resimages(indarr,:,:) res1(indarr,:,:) res2(indarr,:,:)] = ...
+                  [resdifftmp resimagestmp res1tmp res2tmp] = ...
                       condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
                                { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, {alltfX1(indarr,:,:) ...
                                       alltfX2(indarr,:,:)}, { alltfX1abs(indarr,:,:) alltfX2abs(indarr,:,:) });
