@@ -10,7 +10,7 @@
 % Usage:
 %        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
 %        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
-%        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...);
+%        >>  [h val_or_grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...);
 %
 % Required Inputs:
 %   datavector        - single vector of channel values. Else, if a vector of selected 
@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.209  2004/10/07 15:55:15  scott
+% made Values==[] work with plotchans  -sm
+%
 % Revision 1.208  2004/09/29 15:44:46  scott
 % added 'plotchans' option. upgraded 'plotgrid' (still unimplemented) -sm
 %
