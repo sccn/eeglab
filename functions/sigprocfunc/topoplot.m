@@ -27,6 +27,7 @@
 %                        map from coordinate XI,YI to coordinates XE, YE, ZE (head is 
 %                        radius one). If several rows, plot one dipole per row.
 %   'dipnorm'         - ['on'|'off'] normlaize deipole length. { default = 'off'}.
+%   'diporient'       - [-1|1] invert dipole orientation. { default = 1 }.
 %   'diplen'          - [real] scale dipole lenght. { default = 1 }.
 %   'dipscale'        - [real] scale dipole size. { default = 1 }.
 %   'dipcolor'        - [color] change dipole color. { default = 'k' (black) }.
@@ -96,6 +97,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/11/06 01:00:57  arno
+% adjusting corrdinates
+% for dipole
+%
 % Revision 1.62  2003/11/05 20:35:21  arno
 % dipole options
 %
@@ -295,6 +300,7 @@ DIPOLE  = [];
 DIPNORM   = 'off';
 DIPLEN    = 1;
 DIPSCALE  = 1;
+DIPORIENT  = 1;
 DIPCOLOR  = [0 0 0];
 VERBOSE = 'on';
 MASKSURF = 'off';
@@ -410,6 +416,8 @@ if nargs > 2
 	  DIPLEN = Value;
 	 case 'dipscale'
 	  DIPSCALE = Value;
+	 case 'diporient'
+	  DIPORIENT = Value;
 	 case 'dipcolor'
 	  DIPCOLOR = Value;
 	 case 'emarker'
@@ -787,7 +795,7 @@ if ~isempty(DIPOLE)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.05;
         end;
     end; 
-    DIPOLE(:, 3:4) =  DIPOLE(:, 3:4)*DIPLEN;
+    DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
     for index = 1:size(DIPOLE,1)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
         set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
