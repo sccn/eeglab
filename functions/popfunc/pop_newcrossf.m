@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/24 21:15:40  scott
+% editing topovec call -sm
+%
 % Revision 1.6  2002/04/24 21:13:45  scott
 % adjust topovec args -sm
 %
@@ -174,10 +177,11 @@ tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
 if ~isempty(EEG.chanlocs)
   if typeproc == 1
       options = [options ', ''topovec'', ' int2str([num1 num2]) ', ''elocs'', EEG.chanlocs' ];
-  else
+  else % typeproc == 0
       options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) ']), ''elocs'', EEG.chanlocs' ];
   end;
 end;
+
 %
 % outputs
 % -------
