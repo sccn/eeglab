@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2002/08/23 20:17:20  scott
+% help msg
+%
 % Revision 1.66  2002/08/23 18:31:26  arno
 % new features, complete gui reprogrammation with tags, new components only options
 %
@@ -405,7 +408,7 @@ if popup
 	limits(1:8)  = NaN;
 	channel   	 = eval( [ '[' res.chan ']' ]);
 	titleplot    = res.title;
-	if isfield(res, 'projchan'), projchan = eval( res.projchan ); else, projchan = []; end;
+	if isfield(res, 'projchan'), projchan =num2str(res.projchan); else, projchan = []; end;
 	options = '';
     if isempty(titleplot)
         titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
