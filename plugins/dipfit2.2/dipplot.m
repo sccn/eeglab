@@ -5,14 +5,18 @@
 %   >> [sources X Y Z XE YE ZE] = dipplot( sources, 'key', 'val', ...);
 %
 % Inputs:
-%   sources   - structure array of dipole information:
+%   sources   -  structure array of dipole information: can contain
+%                either BESA or DIPFIT dipole information
 %                besaexent: BESA eccentricity of the dipole
 %                besathloc: BESA azimuth angle of the dipole
 %                besaphloc: BESA horizontal angle of the dipole
 %                besathori: BESA azimuth angle of the dipole orientation
 %                besaphori: BESA horiz. angle of the dipole orientation
-%                optional fields: component: component number
-%                rv:              residual variance
+%                posxyz: DIPFIT dipole 3D carthesian position in mm
+%                momxyz: DIPFIT dipole 3D carthesian orientation
+%                optional fields for BESA and DIPFIT dipole info
+%                     component: component number
+%                     rv:        residual variance
 %
 % Optional input:
 %  'color'    - [cell array of color strings or (1,3) color arrays]. For
@@ -104,14 +108,16 @@
 % - All buttons have a tag 'tmp' so they can be removed
 % - The component-number buttons have 'userdata' equal to 'editor' and 
 %   can be found easily by other buttons find('userdata', 'editor')
-% - All dipoles have a tag 'dipolex' (x=their number) and can be made 
+% - All dipoles have a tag 'dipoleX' (X=their number) and can be made 
 %     visible/invisible
-% - All dipoles have also 'userdata' equal to 'dipole' and can be
-%     selected easily
-% - The gcf object stores the handle of the dipole that is currently
-%     being modified
+% - The gcf object 'userdat' field stores the handle of the dipole that 
+%     is currently being modified
+% - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.14  2003/03/14 17:06:42  arno
+%adding error message if plotting non-BESA dipoles on the BESA head model
+%
 %Revision 1.13  2003/03/14 02:11:33  arno
 %automatic scaling for dipfit
 %
@@ -147,7 +153,10 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % -----------------------------
     sources = sourcesori;
     if ~isstruct(sources)
-        error('dipplot: ''sources'' must be a strcuture');
+       updatedipplot(sources(1), sources(2)); 
+       % sources(1) countain the figure handler, sources(2) the number of sources
+       % (this is a callback function call to update the dipole plot)
+       return
     end;
     
     %                             key        type       range             default
@@ -164,9 +173,43 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'dipolesize' 'real'   [0 Inf]            30;
                                  'dipolelength' 'real' [0 Inf]            1;
                                  'sphere'   'real'     [0 Inf]              1;
-                                 'image'    'string'   { 'besa' 'mri' }   'besa' }, 'dipplot');
+                                 'image'    'string'   { 'besa' 'mri' 'fullmri'}   'besa' }, 'dipplot');
     if isstr(g), error(g); end;
     
+    % axis image and limits
+    % ---------------------
+    if strcmpi(g.image, 'besa')
+        IMAGESLOC   = { { 'besatop.pcx' } { 'besarear.pcx' } { 'besaside.pcx' } };
+        IMAGESAXIS  = { -1  1 -1 };
+        IMAGESOFFSET  = { [0.0  0.07 NaN ]  [0    NaN -0.01]  [ NaN -0.01   -0.025 ] };
+        IMAGESMULT    = { [1.23 1.20 NaN ]  [1.28 NaN  1.13]  [ NaN 1.15   1.15 ] };
+        %IMAGESOFFSET = { [0 -0.07]   [0 -0.03]  [ -0.12 -0.02 ] };
+        %IMAGESMULT   = { [1.22 1.22] [1.28 1.3] [ 1.325 1.02 ] };
+        COLORMESH = [.5 .5 .5];
+        BACKCOLOR = 'w';
+        AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
+    elseif strcmpi(g.image, 'mri')
+        IMAGESLOC   = { { 'mritop.pcx' } { 'mrirear.pcx' } { 'mriside.pcx' } };
+        IMAGESAXIS  = { -1  1 -1 };
+        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
+        IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;%[ 1.4 1.15 ] };
+        COLORMESH = 'w';
+        BACKCOLOR = 'k';
+        %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
+        AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
+    else 
+       [IMAGESLOC IMAGESAXIS] = getmriimgs;
+       addpath('c:\eeglab\MRIimages\Allimgs\');
+       IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
+       IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;%[ 1.4 1.15 ] };
+       %IMAGESOFFSET = { [0 0  NaN]   [0 NaN 0]  [NaN 0 0] } ;% [ -0.12 0] };
+       %IMAGESMULT   = { [1 1  NaN]   [1 NaN 1]  [NaN 1 1]} ;%[ 1.4 1.15 ] };
+       COLORMESH = 'w';
+       BACKCOLOR = 'k';
+       %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
+       AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
+    end;
+
     % conversion
     % ----------
     if strcmpi(g.normlen, 'on')
@@ -219,25 +262,6 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         end;
     end;
     
-    if strcmpi(g.image, 'besa')
-        IMAGESLOC   = { 'besatop.pcx' 'besarear.pcx' 'besaside.pcx' };
-        IMAGESOFFSET  = { [0.0  0.07 NaN ]  [0    NaN -0.01]  [ NaN -0.01   -0.025 ] };
-        IMAGESMULT    = { [1.23 1.20 NaN ]  [1.28 NaN  1.13]  [ NaN 1.15   1.15 ] };
-        %IMAGESOFFSET = { [0 -0.07]   [0 -0.03]  [ -0.12 -0.02 ] };
-        %IMAGESMULT   = { [1.22 1.22] [1.28 1.3] [ 1.325 1.02 ] };
-        COLORMESH = [.5 .5 .5];
-        BACKCOLOR = 'w';
-        AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
-    else
-        IMAGESLOC   = { 'mritop.pcx' 'mrirear.pcx' 'mriside.pcx' };
-        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
-        IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;%[ 1.4 1.15 ] };
-        COLORMESH = 'w';
-        BACKCOLOR = 'k';
-        %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
-        AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
-    end;
-
     % build summarized figure
     % -----------------------
     if strcmp(g.summary, 'on')
@@ -271,10 +295,6 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if colorcount >= 15, set(h, 'fontsize', 8);end;
             if colorcount >= 20, set(h, 'fontsize', 6);end;
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', 'w'); end;
-        else 
-            for index = 1:length(sources)
-                textforgui(index) = { '' };
-            end;
         end;
         axis off;
         return;
@@ -299,48 +319,14 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmp(g.gui, 'on')
         figure;
     end;
-    try,
-        warning off;  a = double(imread(IMAGESLOC{1}))/255; warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = ([-1 1; -1 1]+IMAGESOFFSET{1}(1))*IMAGESMULT{1}(1);
-        wy = ([-1 -1; 1 1]+IMAGESOFFSET{1}(2))*IMAGESMULT{1}(2);
-        wz = [-1 -1; -1 -1]*1.07;
-        % DISPLAY IF REAL RATIO OF IMAGE CORRESPOND TO RATIO SHOWN ON SCREEN
-        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
-        %       IMAGESMULT{1}(1)/ IMAGESMULT{1}(2) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(4)-AXISLIM(3)) );
-        surface(wx, wy, wz, a(end:-1:1,:,:), 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping','direct');
-        hold on; %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
-    catch, error(lasterr); end;
-    try,
-        warning off; a = double(imread(IMAGESLOC{2}))/255;  warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = ([-1 1; -1 1]+IMAGESOFFSET{2}(1))*IMAGESMULT{2}(1);
-        wy = [1 1; 1 1]*1.07;
-        wz = ([1 1; -1 -1]+IMAGESOFFSET{2}(3))*IMAGESMULT{2}(3);
-        hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping','direct');
-        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
-        %        IMAGESMULT{2}(1)/ IMAGESMULT{2}(3) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(6)-AXISLIM(5)));
-        %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
-    catch, error(lasterr); end;
-    try,
-        warning off; a = double(imread(IMAGESLOC{3}))/255;  warning on;
-        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = [-1 -1; -1 -1]*1.07;
-        wy = ([-1 1; -1 1]+IMAGESOFFSET{3}(2))*IMAGESMULT{3}(2);
-        wz = ([1 1; -1 -1]+IMAGESOFFSET{3}(3))*IMAGESMULT{3}(3);
-        hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping','direct');
-        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1), ...
-        %        IMAGESMULT{3}(2)/ IMAGESMULT{3}(3) / (AXISLIM(4)-AXISLIM(3)) * (AXISLIM(6)-AXISLIM(5)));
-        %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
-    catch, error(lasterr); end;
+	 plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, [1 1 1]);
     set(gca, 'color', BACKCOLOR);
     %warning off; a = imread('besaside.pcx'); warning on;
     % BECAUSE OF A BUG IN THE WARP FUNCTION, THIS DOES NOT WORK (11/02)
     %hold on; warp([], wy, wz, a);
     if ~isempty(g.view)
-        view(g.view);
-    else
-        view(DEFAULTVIEW);
+         view(g.view);
+    else view(DEFAULTVIEW);
     end;
     axis square;
     axis(AXISLIM);
@@ -404,13 +390,15 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tag = [ 'dipole' num2str(index) ];
             h = line( [x xo]', [y yo]', [z zo]');
-            set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+            dipstruct.pos3d = [x y z];
+            dipstruct.rv    = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
+            set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', g.color{index}); end;
             
             % draw point
             hold on;
             h = plot3(x,  y,  z); 
-            set(h, 'userdata', 'dipole', 'tag', tag, ...
+            set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
             
             % project onto images
@@ -432,19 +420,19 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 h = line( [x xo]', [y yo]', [-1 -1]');
-                set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(x,  y,  -1); 
-                set(h, 'userdata', 'dipole', 'tag', tag, ...
+                set(h, 'userdata', dipstruct, 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 h = line( [x xo]', [-1 -1]', [z zo]');
-                set(h, 'userdata', 'dipole', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(x,  -1,  z); 
-                set(h, 'userdata', 'dipole', 'tag', tag, ...
+                set(h, 'userdata', dipstruct, 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
             
@@ -456,15 +444,15 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 stdZ = num2str(sources(index).stdZ); strZ = num2str(z);
                 if isempty(g.view) | g.view(3) ~= 0
                     h = myezplot3([strX '+cos(t)*' stdX], [strY '+sin(t)*' stdY], strZ, [0,2*pi]);
-                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
                 end;
                 if isempty(g.view) | g.view(2) ~= 0
                     h = myezplot3([strX '+cos(t)*' stdX], strY, [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
                 end;
                 if isempty(g.view) | g.view(1) ~= 0
                     h = myezplot3(strX, [strY '+cos(t)*' stdY], [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                    set(h, 'color', g.color{index}, 'tag', tag, 'userdata', 'dipole' );
+                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
                 end;
             end;
             
@@ -473,28 +461,20 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if isfield(sources, 'component')
                 if strcmp(g.num, 'on')
                     h = text(x,  y,  z, [ '  ' int2str(sources(index).component)]);
-                    set(h, 'userdata', 'dipole', 'tag', tag, 'fontsize', g.dipolesize/2 );
+                    set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize/2 );
                 end;
-                if index~=length(sources) 
-                    if sources(index).component ~= sources(index+1).component
-                        textforgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
-                    end;
-                else 
-                    textforgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
-                end;
-            else
-                textforgui(index) = { '' };
             end;
         end;
     end;
         
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% buttons %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    nbsrc = int2str(length(sources));
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Top view', 'callback', 'view([0 0 1]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.05 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Coronal view', 'callback', 'view([0 -1 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.1 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Sagital view', 'callback', 'view([1 0 0]);');
+                  'style', 'pushbutton', 'string', 'Sagital view', 'callback', 'view([-1 0 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.15 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
@@ -530,47 +510,38 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                   'style', 'pushbutton', 'string', 'Next', 'callback', ...
                 [ 'editobj = findobj(''parent'', gcf, ''userdata'', ''editor'');' ...
                   'set(editobj, ''string'', num2str(str2num(get(editobj, ''string''))+1));' ...
-                  'eval(get(editobj, ''callback''));' ...
+                  'dipplot([ gcbf ' nbsrc ' ]);' ...
                   'clear editobj;' ]);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.65 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Keep|Next', 'callback', ...
                 [ 'editobj = findobj(''parent'', gcf, ''userdata'', ''editor'');' ...
                   'set(editobj, ''string'', num2str(str2num(get(editobj, ''string''))+1));' ...
                   'tmpobj = get(gcf, ''userdata'');' ...
-                  'eval(get(editobj, ''callback''));' ...
+                  'dipplot([ gcbf ' nbsrc ' ]);' ...
                   'set(tmpobj, ''visible'', ''on'');' ...
                   'clear editobj tmpobj;' ]);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.7 .15 .05], 'tag', 'tmp', 'userdata', 'rv', ...
                   'style', 'text', 'string', '');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.75 .15 .05], 'tag', 'tmp', 'userdata', 'editor', ...
                   'style', 'edit', 'string', '1', 'callback', ...
-                [ 'editobj = findobj(''parent'', gcf, ''userdata'', ''editor'');' ...
-                  'tmpnum = str2num(get(editobj, ''string''));' ...
-                  'if tmpnum < 1, tmpnum = 1; end;' ...
-                  'if tmpnum >' num2str(length(sources)) ', tmpnum = ' num2str(length(sources)) '; end;' ...
-                  'set(editobj, ''string'', num2str(tmpnum));' ...
-                  'set(get(gcf, ''userdata''), ''visible'', ''off'');' ...
-                  'newdip = findobj(''parent'', gca, ''tag'',' ...
-                       '[''dipole'' get(editobj, ''string'')]);' ...
-                  'set(newdip, ''visible'', ''on'');' ...
-                  'set(gcf, ''userdata'', newdip);' ...
-                  'tmprvobj = findobj(''parent'', gcf, ''userdata'', ''rv'');' ...
-                  'tmpallrv = get( gca, ''userdata'');' ...
-                  'set( tmprvobj, ''string'', tmpallrv{tmpnum});' ...
-                  'clear newdip editobj tmpnum tmprvobj tmpallrv;' ] );
+                  [ 'dipplot([ gcbf ' nbsrc ' ]);' ] );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.8 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Plot one', 'callback', ...
-                   [ 'set(findobj(''parent'', gca, ''userdata'', ''dipole''), ''visible'', ''off'');' ...
-                  'eval(get(findobj(''parent'', gcf, ''userdata'', ''editor''), ''callback''));' ]);
+                   'style', 'pushbutton', 'string', 'Plot one', 'callback', ...
+             	    [ 'for tmpi = 1:' nbsrc ',' ...
+                   '   set(findobj(''parent'', gca, ''tag'', [ ''dipole'' int2str(tmpi) ]), ''visible'', ''off'');' ...
+                   'end; clear tmpi;' ...
+                   'dipplot([ gcbf ' nbsrc ' ]);' ]);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.85 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Plot All', 'callback', ...
-                   'set(findobj(''parent'', gca, ''userdata'', ''dipole''), ''visible'', ''on'');');
+                   'style', 'pushbutton', 'string', 'Plot All', 'callback', ...
+                   [ 'for tmpi = 1:' nbsrc ',' ...
+                   '   set(findobj(''parent'', gca, ''tag'', [ ''dipole'' int2str(tmpi) ]), ''visible'', ''on'');' ...
+                   'end; clear tmpi;' ]);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.9 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', [num2str(length(sources)) ' dipoles:'], 'fontweight', 'bold' );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.95 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '   ' );
     set(gcf, 'userdata', findobj('parent', gca, 'tag', 'dipole1'));
-    set(gca, 'userdata', textforgui);
+    set(gca, 'userdata', { IMAGESLOC IMAGESOFFSET, IMAGESMULT IMAGESAXIS } );
     set(gcf, 'color', BACKCOLOR);
     
     if strcmp(g.gui, 'off')
@@ -607,7 +578,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     rotate3d;
 return;
 
-    % 2D projection
+    % 2D projection DEPRECATED
     % -------------
     % internal constants
     scaling = 0.89;
@@ -700,4 +671,245 @@ function src = computexyzforbesa(src);
             src(index).momxyz(index2,:) = [-yo xo zo];
                     
         end;
-    end;
+     end;
+     
+% update dipplot (callback call)
+% ------------------------------
+function updatedipplot(fig, nbsources)
+   
+   % find current dipole index and test for authorized range
+   editobj = findobj('parent', fig, 'userdata', 'editor');
+   tmpnum = str2num(get(editobj, 'string'));
+   if tmpnum < 1, tmpnum = 1; end;
+   if tmpnum > nbsources, tmpnum = nbsources; end;
+   set(editobj, 'string', num2str(tmpnum));
+   
+   % hide current dipole
+   set(get(gcf, 'userdata'), 'visible', 'off');
+   
+   % find next dipole and show it
+   newdip = findobj('parent', gca, 'tag', [ 'dipole' get(editobj, 'string')]);
+   set(newdip, 'visible', 'on');
+   set(gcf, 'userdata', newdip);
+   
+   % set the new RV
+   tmprvobj = findobj('parent', gcf, 'userdata', 'rv');
+   userdat = get(newdip(1), 'userdata');
+   set( tmprvobj, 'string', userdat.rv);
+   
+   % adapt the MRI to the dipole depth
+   imginfos  = get(gca, 'userdata');
+   imglocs   = imginfos{1};
+   imgoffset = imginfos{2};
+   imgmult   = imginfos{3};
+   imgaxis   = imginfos{4};
+   if length(imginfos{1}) > 1 % several images
+      delete(findobj('parent', gca, 'tag', 'img'));
+      
+      tmp = userdat.pos3d(1)
+      indx = minpos(imgaxis{1} - userdat.pos3d(1));
+      indy = minpos(imgaxis{2} - userdat.pos3d(2) - 4/84);
+      indz = minpos(imgaxis{3} - userdat.pos3d(3));
+      [indx indy indz]
+      plotimgs( imglocs, imgoffset, imgmult, imgaxis, [indx indy indz]);
+   end;
+   	
+% plot images
+% -----------
+function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, index);
+   
+    try,
+        fprintf('Reading img: %s\n', IMAGESLOC{1}{index(1)} );
+        warning off;  a = double(imread(IMAGESLOC{1}{index(1)}))/255; warning on;
+        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+        wx = ([-1 1; -1 1]+IMAGESOFFSET{1}(1))*IMAGESMULT{1}(1);
+        wy = ([-1 -1; 1 1]+IMAGESOFFSET{1}(2))*IMAGESMULT{1}(2);
+        wz = [ 1 1; 1 1]*IMAGESAXIS{1}(index(1))*1.07;
+        % DISPLAY IF REAL RATIO OF IMAGE CORRESPOND TO RATIO SHOWN ON SCREEN
+        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
+        %       IMAGESMULT{1}(1)/ IMAGESMULT{1}(2) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(4)-AXISLIM(3)) );
+        surface(wx, wy, wz, a(end:-1:1,:,:), 'FaceColor','texturemap', ...
+           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+        hold on; %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
+    catch, error(lasterr); end;
+    try,
+        fprintf('Reading img: %s\n', IMAGESLOC{2}{index(2)} );
+        warning off; a = double(imread(IMAGESLOC{2}{index(2)}))/255;  warning on;
+        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+        wx = ([-1 1; -1 1]+IMAGESOFFSET{2}(1))*IMAGESMULT{2}(1);
+        wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2))*1.07;
+        wz = ([1 1; -1 -1]+IMAGESOFFSET{2}(3))*IMAGESMULT{2}(3);
+        hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
+           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
+        %        IMAGESMULT{2}(1)/ IMAGESMULT{2}(3) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(6)-AXISLIM(5)));
+        %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
+    catch, error(lasterr); end;
+    try,
+        fprintf('Reading img: %s\n', IMAGESLOC{3}{index(3)} );
+        warning off; a = double(imread(IMAGESLOC{3}{index(3)}))/255;  warning on;
+        if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
+        wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3))*1.07
+        wy = ([-1 1; -1 1]+IMAGESOFFSET{3}(2))*IMAGESMULT{3}(2);
+        wz = ([1 1; -1 -1]+IMAGESOFFSET{3}(3))*IMAGESMULT{3}(3);
+        hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
+           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+        %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1), ...
+        %        IMAGESMULT{3}(2)/ IMAGESMULT{3}(3) / (AXISLIM(4)-AXISLIM(3)) * (AXISLIM(6)-AXISLIM(5)));
+        %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
+    catch, error(lasterr); end;
+     
+% return MRI images
+function [LOCS, AXIS] = getmriimgs;
+coronal = { ...		
+'c13.JPG'	-100	;
+'c15.JPG'	-96	;
+'c17.JPG'	-92	;
+'c19.JPG'	-88	;
+'c21.JPG'	-84	;
+'c23.JPG'	-80	;
+'c25.JPG'	-76	;
+'c27.JPG'	-72	;
+'c29.JPG'	-68	;
+'c31.JPG'	-64	;
+'c33.JPG'	-60	;
+'c35.JPG'	-56	;
+'c37.JPG'	-52	;
+'c39.JPG'	-48	;
+'c41.JPG'	-44	;
+'c43.JPG'	-40	;
+'c45.JPG'	-36	;
+'c47.JPG'	-32	;
+'c49.JPG'	-28	;
+'c51.JPG'	-24	;
+'c53.JPG'	-20	;
+'c55.JPG'	-16	;
+'c57.JPG'	-12	;
+'c59.JPG'	-8	;
+'c61.JPG'	-4	;
+'c63.JPG'	0	;
+'c65.JPG'	4	;
+'c67.JPG'	8	;
+'c69.JPG'	12	;
+'c71.JPG'	16	;
+'c73.JPG'	20	;
+'c75.JPG'	24	;
+'c77.JPG'	28	;
+'c79.JPG'	32	;
+'c81.JPG'	36	;
+'c83.JPG'	40	;
+'c85.JPG'	44	;
+'c87.JPG'	48	;
+'c89.JPG'	52	;
+'c91.JPG'	56	;
+'c93.JPG'	60	;
+'c95.JPG'	64	;
+'c97.JPG'	68	;
+'c99.JPG'	72	;
+'c101.JPG'	76	;
+'c103.JPG'	80	;
+'c105.JPG'	84	;
+'c107.JPG'	88	;
+'c109.JPG'	92	;
+'c111.JPG'	96	;
+'c113.JPG'	100	;
+'c115.JPG'	104	;
+'c117.JPG'	108	};
+sagital = { ...		
+'s20.JPG'	-88	;
+'s22.JPG'	-84	;
+'s24.JPG'	-80	;
+'s26.JPG'	-76	;
+'s28.JPG'	-72	;
+'s30.JPG'	-68	;
+'s32.JPG'	-64	;
+'s34.JPG'	-60	;
+'s36.JPG'	-56	;
+'s38.JPG'	-52	;
+'s40.JPG'	-48	;
+'s42.JPG'	-44	;
+'s44.JPG'	-40	;
+'s46.JPG'	-36	;
+'s48.JPG'	-32	;
+'s50.JPG'	-28	;
+'s52.JPG'	-24	;
+'s54.JPG'	-20	;
+'s56.JPG'	-16	;
+'s58.JPG'	-12	;
+'s60.JPG'	-8	;
+'s62.JPG'	-4	;
+'s64.JPG'	0	;
+'s66.JPG'	4	;
+'s68.JPG'	8	;
+'s70.JPG'	12	;
+'s72.JPG'	16	;
+'s74.JPG'	20	;
+'s76.JPG'	24	;
+'s78.JPG'	28	;
+'s80.JPG'	32	;
+'s82.JPG'	36	;
+'s84.JPG'	40	;
+'s86.JPG'	44	;
+'s88.JPG'	48	;
+'s90.JPG'	52	;
+'s92.JPG'	56	;
+'s94.JPG'	60	;
+'s96.JPG'	64	;
+'s98.JPG'	68	;
+'s100.JPG'	84	;
+'s102.JPG'	88	;
+'s104.JPG'	92	;
+'s106.JPG'	96	;
+'s108.JPG'	100	};
+transverse = { ...		
+'t17.JPG'	-72	;
+'t19.JPG'	-68	;
+'t21.JPG'	-64	;
+'t23.JPG'	-60	;
+'t25.JPG'	-56	;
+'t27.JPG'	-52	;
+'t29.JPG'	-48	;
+'t31.JPG'	-44	;
+'t33.JPG'	-40	;
+'t35.JPG'	-36	;
+'t37.JPG'	-32	;
+'t39.JPG'	-28	;
+'t41.JPG'	-24	;
+'t43.JPG'	-20	;
+'t45.JPG'	-16	;
+'t47.JPG'	-12	;
+'t49.JPG'	-8	;
+'t51.JPG'	-4	;
+'t53.JPG'	0	;
+'t55.JPG'	4	;
+'t57.JPG'	8	;
+'t59.JPG'	12	;
+'t61.JPG'	16	;
+'t63.JPG'	20	;
+'t65.JPG'	24	;
+'t67.JPG'	28	;
+'t69.JPG'	32	;
+'t71.JPG'	36	;
+'t73.JPG'	40	;
+'t75.JPG'	44	;
+'t77.JPG'	48	;
+'t79.JPG'	52	;
+'t81.JPG'	56	;
+'t83.JPG'	60	;
+'t85.JPG'	64	;
+'t87.JPG'	68	;
+'t89.JPG'	72	;
+'t91.JPG'	76	;
+'t93.JPG'	80	;
+'t95.JPG'	84	;
+'t97.JPG'	88	;
+'t99.JPG'	92	;
+'t101.JPG'	72	;
+'t103.JPG'	76	;
+'t105.JPG'	80	};
+LOCS = { transverse(:,1)' coronal(:,1)' sagital(:,1)' };
+AXIS = { cell2mat(transverse(:,2)')/84.747 cell2mat(coronal(:,2)')/84.747 cell2mat(sagital(:,2)')/84.747 };
+
+function index = minpos(vals);
+	vals(find(vals < 0)) = inf;
+	[tmp index] = min(vals);
