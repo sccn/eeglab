@@ -1,4 +1,6 @@
 % qqdiagram() - Empirical quantile-quantile diagram.
+%
+% Description:
 %               The quantiles (percentiles) of the input distribution Y are plotted (Y-axis)
 %               against the corresponding quantiles of the input distribution X.
 %               If only X is given, the corresponding quantiles are plotted (Y-axis)
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/28 00:45:56  luca
+% modified qq-line
+%
 % Revision 1.3  2002/08/22 02:05:17  luca
 % added some ;
 %

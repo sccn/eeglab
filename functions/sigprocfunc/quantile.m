@@ -1,10 +1,11 @@
-% quantile() - computes the quantiles of the data sample from distribution X
-%              If F is the cumulative distribution function (CDF) of X,
-%              the p-th-quantile Qp of distribution X is the value for which holds:
-%                                F(x) <  p,  for x < Qp, and 
-%                                F(x) >= p,  for x >= Qp.
-%              Example: for p = 0.5, Qp is the median of X. 
-%              p must be in [0..1].
+% quantile() - computes the quantiles of the data sample from a distribution X
+%
+% Description:
+%      If F is the cumulative distribution function (CDF) of X,
+%      the p-th-quantile Qp of distribution X is the value for which holds
+%                        F(x) <  p,  for x < Qp, and 
+%                        F(x) >= p,  for x >= Qp.
+%      for example, for p = 0.5, Qp is the median of X. p must be in [0..1].
 %
 % Usage:
 %   >>  q = quantile( data, pc );
@@ -38,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/22 00:45:16  luca
+% Initial revision
+%
 
 function q = quantile(data,pc); 
 

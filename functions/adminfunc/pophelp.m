@@ -1,4 +1,4 @@
-% pophelp() - Same as hthelp() but does not crash under windows.
+% pophelp() - Same as matlab HTHELP but does not crash under windows.
 %
 % Usage: >> pophelp( function );
 %        >> pophelp( function, nonmatlab );
@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/23 15:05:15  arno
+% isppc -> computer
+%
 % Revision 1.6  2002/10/15 17:15:15  arno
 % windows -> removing last function character
 %

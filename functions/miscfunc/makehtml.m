@@ -6,14 +6,14 @@
 %   >> makehtml(list, outputdir, 'key1', val1, 'key2', val2, ...);
 %
 % Input:
-%    list        - 1) List (cell array) of filenames to convert. 
+%    list        - (1) List (cell array) of filenames to convert. 
 %                     Ex: {'filename1' 'filename2' 'filename3'} 
 %                     By default, the filename extension .m is understood.
-%                  2) Cell array of filenames to convert and the text link 
+%                  (2) Cell array of filenames to convert and the text link 
 %                     on the summary page for them.
 %                      {{'filename1' 'link1'} {'filename2' 'link2'}} ...
-%                     Ex: 'link1' = 'Reject by kurtosis'
-%                  3) Cell array of 2 or 3 cell array elements containing
+%                     Ex: 'link1' = 'Reject by kurtosis'. 
+%                  (3) Cell array of 2 or 3 cell array elements containing
 %                     info to generate .html function-index and help pages. 
 %                   Ex: { {'directory1' 'heading1' 'dirindexfunc1'} ...
 %                         {'directory2' 'heading2' 'dirindexfunc2'} }
@@ -21,7 +21,7 @@
 %                   - 'heading': Index-file heading for the directory functions 
 %                   - 'dirindexfunc': A optional Matlab pop-up help function for
 %                     referencing the directory functions {default: none}
-%                  4) To scan several directories under the same heading, use 
+%                  (4) To scan several directories under the same heading, use 
 %                  {{{'directory1' 'directory2'} 'heading1' 'dirindexfunc1' ... }
 %    outputdir   - Directory for output .html help files 
 %
@@ -32,7 +32,7 @@
 %                  function. See help2htm() code for details.}
 %   'footer'     - Command to insert at the end of all .html files (e.g., back
 %                  button. {default: reference back to the function-index file}
-%   'refcall'    - Syntax format to call references. {default: 
+%   'refcall'    - Syntax format to call references. {default is  
 %                  'javascript:openhelp(''%s.js'')'} Use '%s.html' for an .html link.     
 %   'font'       - Font name (default: 'Helvetica')
 %   'background' - Background image (Ex: 'img.jpg' -> '<body BACKGROUND="img.jpg">'). 
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/11/15 01:46:47  scott
+% can not -> cannot
+%
 % Revision 1.9  2002/09/07 22:51:11  scott
 % help msg -sm & ad
 %
