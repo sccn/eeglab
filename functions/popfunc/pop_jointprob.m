@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/30 23:21:55  arno
+% debugging
+%
 % Revision 1.5  2002/07/30 22:27:55  arno
 % new type of rejection
 %
@@ -213,11 +216,11 @@ else
 end;
 if ~isempty(rej)
 	if icacomp	== 1
-		EEG.reject.rejkurt = rej;
-		EEG.reject.rejkurtE = rejE;
+		EEG.reject.rejjp = rej;
+		EEG.reject.rejjpE = rejE;
 	else
-		EEG.reject.icarejkurt = rej;
-		EEG.reject.icarejkurtE = rejE;
+		EEG.reject.icarejjp = rej;
+		EEG.reject.icarejjpE = rejE;
 	end;
 end;
 nrej = sum(rej);
