@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/01/10 17:27:13  arno
+% str2num -> str2double
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -107,8 +110,8 @@ while isempty(inputline) | inputline~=-1
 			     while ~isempty(deblank(inputline))
 			         [tmp inputline] = strtok(inputline, g.delim);
 			         tmp2 = str2num( tmp );
-			         if isnan( tmp2 )  , array{linenb, colnb} = tmp;
-			         else                array{linenb, colnb} = tmp2;
+			         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
+			         else                  array{linenb, colnb} = tmp2;
 			         end;
 			         colnb = colnb+1;
 			     end;
