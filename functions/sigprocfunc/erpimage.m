@@ -20,19 +20,19 @@
 %   times    - Vector of times (ms) (length(times) = frames) {Def|0: [0:frames-1]}
 %               ELSE [startms ntimes srate] Give start time (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz),
-%  'title'   - ['string'] Plot titla {Default: none}
+%  'title'   - ['string'] Plot titla {default: none}
 %   avewidth - Number of trials to moving-average (NB: may be non-int) {Def|0->1}
 %   decimate - Factor to decimate ntrials out by (NB: may be non-int) {Def|0->1}
 %               If this is large ( > sqrt(num. trials)), output this many trials.
 % Unordered options ('keyword',argument):
 % Optionally realign data epochs: 
 %   'align'  - [time] Time-lock data to sortvar. Plot sortvar as at time (ms)
-%               If time == Inf, plot at sortvar median {Default: no align}
+%               If time == Inf, plot at sortvar median {default: no align}
 %   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to times range.
-%               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {Default: 'no'}
-%   'noplot' - Do not plot sortvar {Default: Do plot sortvar if in times range}
+%               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
+%   'noplot' - Do not plot sortvar {default: Do plot sortvar if in times range}
 % Optionally sort input epochs: 
-%  [Default] - Sort data epochs by sortvar
+%  {default} - Sort data epochs by sortvar
 %   'nosort' - Do not sort data epochs.
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
@@ -53,25 +53,25 @@
 %               Note: Currently Requires 'coher' (below) with alpha signif. {default: no}
 % Specify plot parameters:
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
-%               PLot axes limits. Can use NaN for missing items and omit late items. 
-%               Use last input bamp to fix the baseline amplitude.
+%               PLot axes limits. Can use NaN (or nan, not Nan) for missing items 
+%               and omit late items. Use last input bamp to fix the baseline amplitude.
 %   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
 %               levels to save computation time. {default: none}
 %   'caxis'  - [lo hi] Set color axis limits ELSE [fraction] Set caxis limits at 
-%               (+/-)fraction*max(abs(data)) {Default: data bounds}
+%               (+/-)fraction*max(abs(data)) {default: data bounds}
 % Add epoch-mean ERP to plot:
-%   'erp'    - Plot ERP time average of the trials below the image {Default no}
-%   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {Default no}
+%   'erp'    - Plot ERP time average of the trials below the image {default no}
+%   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {default no}
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
 %               given range (NB: phasesort freq (above) overwrites these parameters).
 %               ELSE [minfrq maxfrq alpha] Add coher. signif. level line at 
-%               probability alpha (range: [0,0.1]) {Default: none}
+%               probability alpha (range: [0,0.1]) {default: none}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg times) {default: as in icadefs.m}
 % Add other features to plot:
-%   'cbar'   - Plot color bar to right of ERP-image {Default no}
+%   'cbar'   - Plot color bar to right of ERP-image {default no}
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2003/03/13 03:20:33  scott
+% restoring
+%
 % Revision 1.80  2003/03/07 22:21:46  scott
 % same
 %
