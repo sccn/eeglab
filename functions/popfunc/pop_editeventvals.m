@@ -1,0 +1,294 @@
+% pop_editeventvals() - Edit events contained in a EEG dataset structure. 
+%               If the dataset is the only input, a window pops up 
+%               to ask the user for the relevant parameter values.
+%
+% Usage: >> EEGOUT = pop_editeventvals( EEG, 'key1', value1, ...
+%                                    'key2', value2, ... );
+% Input:
+%   EEG  - EEG dataset
+%
+% Optional inputs:
+%   'sort'        - { field1 dir1 field2 dir2 } Sort events based on field1
+%                   then otional field2. Arg dir1 indicates the direction 
+%                   (0 = increasing, 1 = decreasing).
+%   'changefield' - {num field value} Change the value of a specified 
+%                   field in event num.
+%   'changeevent' - {num value1 value2 value3 ...} Change the value of
+%                   all fields in event num.
+%   'add'         - {num value1 value2 value3 ...} Insert event before
+%                   event num having the specified values.
+%   'delete'      - vector of indices of events to delete
+%
+% Outputs:
+%   EEGOUT        - EEG dataset with the selected events only
+%
+% Ex:  EEG = pop_editeventvals(EEG,'changefield', { 1 'type' 'target'});
+%        % set field type of event number 1 to 'target'
+%
+% Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2002
+%
+% See also: pop_selectevent(), pop_importevent()
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Arnaud Delorme, CNL / Salk Institute, 15 March 2002, arno@salk.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
+
+% 03-16-02 text interface editing -sm & ad 
+% 03-18-02 automatic latency switching display (epoch/continuous) - ad & sm 
+% 03-18-02 debug soring order - ad
+% 03-18-02 put latencies in ms - ad, lf & sm
+% 03-29-02 debug latencies in ms - ad & sm
+% 04-02-02 debuging test - ad & sm
+
+function [EEG, com] = pop_editeventvals(EEG, varargin);
+
+com ='';
+if nargin < 1
+   help pop_editeventvals;
+   return;
+end;	
+
+if isempty(EEG.event)
+    disp('Getevent: can not deal with empty event structure');
+    return;
+end;   
+
+allfields = fieldnames(EEG.event);
+if nargin<2
+    % transfer events to global workspace
+    evalin('base', [ 'eventtmp = ' inputname(1) '.event;' ]);
+
+    % add field values
+    % ----------------
+    geometry = { 1 };
+    uilist = { { 'Style', 'text', 'string', 'Edit event field values:', 'fontweight', 'bold'  } };
+    for index = 1:length(allfields) 
+        geometry = { geometry{:} [1 1 1 1] };
+        if strcmp( allfields{index}, 'latency')
+            if EEG.trials > 1
+               inputstr =  [ allfields{index} ' (ms)'];
+               latencypoint = mod(getfield(EEG.event,{1}, allfields{index})-1, EEG.pnts);
+               valuestr = num2str(((latencypoint)/EEG.srate+EEG.xmin)*1000);
+               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= (editval/1000-EEG.xmin)*EEG.srate+1 + (eventtmp(valnum).epoch-1)*EEG.pnts;'']);'];
+            else
+               inputstr =  [ allfields{index} ' (sec)'];
+               valuestr = num2str((getfield(EEG.event,{1}, allfields{index})-1)/EEG.srate+EEG.xmin);
+               strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= (editval-EEG.xmin)*EEG.srate+1;'];
+            end;   
+       else inputstr =  allfields{index};
+            valuestr = num2str(getfield(EEG.event,{1}, allfields{index}));
+            strassign = [ 'eval([ ''eventtmp(valnum).' allfields{index} '= editval;'']);']; 
+       end;
+       uilist   = { uilist{:}, ...
+         { }, ...
+         { 'Style', 'text', 'string', inputstr }, ...
+         { 'Style', 'edit', 'tag', allfields{index}, 'string', valuestr, 'callback', ...
+               [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string''));' ...
+                'editval = get(gcbo, ''string'');' ...
+                'if ~isempty(str2num(editval)), editval =str2num(editval);  end;' ...
+                strassign ...
+                'olduserdat = get( gcbf, ''userdata'');' ...
+                'if isempty(olduserdat), olduserdat = {}; end;' ...
+                'set( gcbf, ''userdata'', { olduserdat{:} ''changefield'' { valnum ''' allfields{index} ''' editval }});' ...
+                'clear editval valnum olduserdat;' ] } { } };
+    end;
+
+    % add buttons
+    % -----------
+    geometry = { geometry{:} [1] [1 0.7 0.7 1 0.7 0.7 1] [1 0.7 0.7 1 0.7 0.7 1] };
+    callpart1 = [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string''));' ];
+    callpart2 = [ 'set(findobj(''parent'', gcbf, ''tag'', ''numval''), ''string'', num2str(valnum));' ];
+    for index = 1:length(allfields) 
+        if strcmp( allfields{index}, 'latency')
+            if EEG.trials > 1
+	             callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str((mod(eventtmp(valnum).' allfields{index} '-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000));' ];
+            else callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str((eventtmp(valnum).' allfields{index} '-1)/EEG.srate+EEG.xmin));' ]; end;
+        else     callpart2 = [ callpart2 'set(findobj(''parent'', gcbf, ''tag'', ''' allfields{index} '''), ''string'', num2str(eventtmp(valnum).' allfields{index} '));'  ];
+      end;
+    end;
+    callpart2 = [ callpart2 'clear valnum;' ];
+    
+    listboxtext = 'No field selected';  
+    for index = 1:length(allfields) 
+         listboxtext = [ listboxtext '|' allfields{index} ]; 
+    end;
+
+    uilist   = { uilist{:}, ...
+          { }, ...
+          { },{ },{ }, {'Style', 'text', 'string', 'Event Num', 'fontweight', 'bold' }, { },{ },{ }, ...
+          { 'Style', 'pushbutton', 'string', 'Rm event',  'callback', [callpart1 'eventtmp(valnum) = []; valnum = min(valnum,length(eventtmp));' ...
+                'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
+                'set( gcbf, ''userdata'', { olduserdat{:} ''delete'', valnum }); clear olduserdat' callpart2 ] }, ...
+          { 'Style', 'pushbutton', 'string', '<<', 'callback', [callpart1 'valnum = max(valnum-10,1);' callpart2 ] }, ...
+          { 'Style', 'pushbutton', 'string', '<',  'callback', [callpart1 'valnum = max(valnum-1,1);' callpart2 ] }, ...
+          { 'Style', 'edit', 'string', '1', 'tag', 'numval', 'callback', [callpart1 'valnum = min(str2num(get(gcbo, ''string'')),length(eventtmp));' callpart2 ] }, ...
+          { 'Style', 'pushbutton', 'string', '>',  'callback', [callpart1 'valnum = min(valnum+1,length(eventtmp));' callpart2 ] }, ...
+          { 'Style', 'pushbutton', 'string', '>>', 'callback', [callpart1 'valnum = min(valnum+10,length(eventtmp));' callpart2 ] }, ...
+          { 'Style', 'pushbutton', 'string', 'Insert event',  'callback', [callpart1 ...
+                'eventtmp(end+3) = eventtmp(end);' ...
+                'eventtmp(valnum+1:end-2) = eventtmp(valnum:end-3);' ...
+                'eventtmp(valnum) = eventtmp(end-1);' ...
+                'if isfield(eventtmp, ''epoch''), eventtmp(valnum).epoch = eventtmp(valnum+1).epoch; end;' ...
+                'eventtmp = eventtmp(1:end-2);' ...
+                'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
+                'tmpcell = cell(1,1+length(fieldnames(eventtmp))); tmpcell{1} =valnum;' ...
+                'set( gcbf, ''userdata'', { olduserdat{:} ''add'', tmpcell }); clear tmpcell olduserdat' callpart2 ] }, ...
+          };
+
+    % add sorting options
+    % -------------------
+    geometry = { geometry{:} [1] [1] [1 1 1] [1 1 1] [1 1.5 0.5] };
+    uilist = {  uilist{:},...
+         {}, { 'Style', 'text', 'string', 'Re-sort event list (optional)', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', 'Main sorting field:'  }, ...
+         { 'Style', 'listbox', 'string', listboxtext }, ...
+         { 'Style', 'checkbox', 'string', 'Click for decreasing order' } ...
+         { 'Style', 'text', 'string', 'Secondary sorting field:'  }, ...
+         { 'Style', 'listbox', 'string', listboxtext }, ...
+         { 'Style', 'checkbox', 'string', 'Click for decreasing order' }, ...
+         { 'Style', 'pushbutton', 'string', 'Re-sort', 'callback', 'set(findobj(''parent'', gcf, ''tag'', ''ok''), ''userdata'', ''retuninginputui'')' }, ...
+         { 'Style', 'text', 'string', 'NB: after re-sorting call back this window' }, { }};
+   
+    [results userdat] = inputgui( geometry, uilist, 'pophelp(''pop_editeventvals'');', 'Edit event values -- pop_editeventvals()' );
+    if length(results) == 0, return; end;
+
+    % transfer events back from global workspace
+    eventtmp = evalin('base', 'eventtmp;');
+    evalin('base', 'clear eventtmp;');
+    EEG.event = eventtmp;
+
+    % handle sorting
+    % --------------
+    args = {};
+    if results{end-3} ~= 1
+        sortval = { allfields{ results{end-3}-1 } results{end-2} };
+        if results{end-1} ~= 1
+            sortval = { sortval{:} allfields{ results{end-1}-1 } results{end} };
+        end;  
+        args = { args{:}, 'sort', sortval }; 
+    end;  
+    
+else % no interactive inputs
+    args = varargin;
+end;
+
+% scan all the fields of g
+% ------------------------
+for curfield = 1:2:length(args)
+    switch lower(args{curfield})
+        case 'sort', 
+            tmparg = args{ curfield+1 };
+            if length(tmparg) < 2, dir1 = 0;
+            else                   dir1 = tmparg{2}; 
+            end;
+            if length(tmparg) > 2
+	            if length(tmparg) < 4, dir2 = 0;
+	            else                   dir2 = tmparg{4}; 
+	            end;
+	            try, eval(['tmparray = cell2mat( { [ EEG.event.' tmparg{3} '] } );']);
+	            catch, eval(['tmparray = { [ EEG.event.' tmparg{3} '] };']);
+	            end;
+	            [X I] = sort( tmparray );
+	            if dir2 == 1, I = I(end:-1:1); end;
+	            events = EEG.event(I);
+	        else
+	            events = EEG.event;
+	        end;       
+            try, eval(['tmparray = cell2mat( { [ EEG.event.' tmparg{1} '] } );']);
+            catch, eval(['tmparray = { [ EEG.event.' tmparg{1} '] };']);
+	        end;
+	        [X I] = sort( tmparray );
+	        if dir1 == 1, I = I(end:-1:1); end;
+	        EEG.event = events(I);
+	   case 'delete'
+	        EEG.event(args{ curfield+1 })=[];
+	   case 'changefield'
+            tmpargs = args{ curfield+1 };
+            if length( tmpargs ) < 3
+                error('Pop_editeventvals: not enough arguments to change field value');
+            end;
+            valstr = reformat(tmpargs{3}, strcmp(tmpargs{2}, 'latency'), EEG.trials > 1, tmpargs{1} );
+            eval([ 'EEG.event(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' valstr ';' ]);
+	   case 'add'
+            tmpargs = args{ curfield+1 };
+            allfields = fieldnames(EEG.event);
+            if length( tmpargs ) < length(allfields)+1
+                error('Pop_editeventvals: not enough arguments to change all field values');
+            end;
+            num = tmpargs{1};
+            EEG.event(end+1) = EEG.event(end);
+            EEG.event(num+1:end) = EEG.event(num:end-1);
+            for index = 1:length( allfields )
+                valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
+                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' valstr ';' ]);
+	        end;
+	   case 'changeevent'
+            tmpargs = args{ curfield+1 };
+            num = tmpargs{1};
+            allfields = fieldnames(EEG.event);
+            if length( tmpargs ) < length(allfields)+1
+                error('Pop_editeventvals: not enough arguments to change all field values');
+            end;
+            for index = 1:length( allfields )
+                valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
+                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' valstr ';' ]);
+	        end;
+	end;
+end;
+
+% generate the output command
+% ---------------------------
+if exist('userdat') == 1
+    if ~isempty(userdat)
+        args = { args{:} userdat{:} };
+    end;
+end; 
+com = sprintf('EEG = pop_editeventvals( %s', inputname(1));
+for i=1:2:length(args)
+    if iscell(args{i+1})
+        com = sprintf('%s, ''%s'', {', com, args{i} );
+        tmpcell = args{i+1};
+        for j=1:length(tmpcell);
+            if isstr( tmpcell{j} )   com = sprintf('%s ''%s'',', com, tmpcell{j} );
+            else                     com = sprintf('%s [%s],',   com, num2str(tmpcell{j}) );
+            end;
+        end;
+        com = sprintf('%s } ', com(1:end-1));     
+    else
+        com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+    end;       
+end;
+com = [com ');'];
+
+return;
+
+% format the output field
+% -----------------------
+function strval = reformat( val, latencycondition, trialcondition, eventnum)
+    if latencycondition
+        if trialcondition > 1
+            strval = [ '(' num2str(val) '/1000-EEG.xmin)*EEG.srate+1+ (EEG.event(' int2str(eventnum) ').epoch-1)*EEG.pnts;' ];
+        else    
+            strval = [ '(' num2str(val) '-EEG.xmin)*EEG.srate+1;' ]; 
+        end;
+    else
+        if isstr(val), strval = [ '''' val '''' ];
+        else           strval = num2str(val);
+        end;
+    end;
