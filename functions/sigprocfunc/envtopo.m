@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/05 01:50:34  arno
+% new function with 'key', 'val' args, extra params: envmode, limcontrib, icawinv...
+%
 % Revision 1.4  2002/09/05 00:57:22  arno
 % colorbar->cbar for removing menu bug
 %
@@ -167,7 +170,7 @@ else
     g.limcontrib = 0;
     g.icawinv = pinv(weights);
     g.subcomps = [];
-    g.evnmode = 'avg';
+    g.envmode = 'avg';
     if nargin > 12, varargin =varargin(10:end); end;
 end;
 
