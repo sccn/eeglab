@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.47  2003/07/31 23:30:05  arno
+%*** empty log message ***
+%
 %Revision 1.46  2003/07/24 17:08:03  arno
 %making component number for dipfit
 %
@@ -581,8 +584,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             [xx   yy   zz]   = transformcoords(x,   y,   z,   dat.tcparams); 
             [xxo1 yyo1 zzo1] = transformcoords(xo1, yo1, zo1,  dat.tcparams); 
             h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
-            dipstruct.pos3d = [xx yy zz]; % value used for fitting MRI
-            dipstruct.rv    = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
+            dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
+            dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
+            dipstruct.rv     = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
             set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
             if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
             
