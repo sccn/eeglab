@@ -16,12 +16,13 @@
 %  'rtitle'    = right-side plot title {0 -> none}
 %  ydir        = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
 %
-% Authors: Scott Makeig & Tzyy-Ping Jung, SCCN/INC/UCSD, La Jolla, 05-01-96 
+% Authors: Scott Makeig, Arnaud Delorme, Tzyy-Ping Jung, 
+%          SCCN/INC/UCSD, La Jolla, 05-01-96 
 %
 % See also: plottopo(), timtopo(), envtopo(), headplot(), compmap(), eegmovie()
 
-% Copyright (C) 05-01-96 Scott Makeig & Tzyy-Ping Jung, SCCN/INC/UCSD, 
-% scott@sccn.ucsd.edu
+% Copyright (C) 05-01-96 Scott Makeig, Arnaud Delorme & Tzyy-Ping Jung, 
+% SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -38,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/07/26 21:11:37  arno
+% fixed problem if flat channel
+%
 % Revision 1.9  2003/07/25 17:39:14  arno
 % allowing to plot more trials
 %
