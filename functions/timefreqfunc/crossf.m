@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/01/02 19:33:55  arno
+% removing reverse angle for wavelet
+%
 % Revision 1.54  2002/11/15 01:54:52  arno
 % header for web
 %
@@ -1367,8 +1370,8 @@ function [coherimage, coherimage1, coherimage2] = coher2conddiff( allsavedcoher,
 	t2s = alltrials(cond1trials+1:end);
 	switch type
 	 case 'coher',
-	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) ./ sqrt(sum(tfx(:,:,t1s))) ./ sqrt(sum(tfy(:,:,t1s)));
-	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) ./ sqrt(sum(tfx(:,:,t2s))) ./ sqrt(sum(tfy(:,:,t1s)));
+	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) ./ sqrt(sum(tfx(:,:,t1s),3)) ./ sqrt(sum(tfy(:,:,t1s),3));
+	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) ./ sqrt(sum(tfx(:,:,t2s),3)) ./ sqrt(sum(tfy(:,:,t1s),3));
 	 case 'phasecoher2',
 	  coherimage1 = sum(allsavedcoher(:,:,t1s),3) ./ sum(abs(allsavedcoher(:,:,t1s)),3);
 	  coherimage2 = sum(allsavedcoher(:,:,t2s),3) ./ sum(abs(allsavedcoher(:,:,t2s)),3);
