@@ -33,7 +33,8 @@
 % 'bias'      = ['on'/'off'] perform bias adjustment    (default -> 'on')
 % 'momentum'  = [0<f<1] training momentum               (default -> 0)
 % 'extended'  = [N] perform tanh() "extended-ICA" with sign estimation 
-%               every N training blocks. If N < 0, fix number of sub-Gaussian
+%               every N training blocks. If N > 0, automatically estimate the 
+%               number of sub-Gaussian sources. If N < 0, fix number of sub-Gaussian
 %               components to -N [faster than N>0]      (default|0 -> off)
 % 'specgram'  = [srate loHz hiHz frames winframes] decompose a complex time/frequency
 %               transform of the data (Note: winframes must divide frames) 
@@ -94,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/01/15 22:08:21  arno
+% typo
+%
 % Revision 1.2  2002/10/23 18:09:54  arno
 % new interupt button
 %
