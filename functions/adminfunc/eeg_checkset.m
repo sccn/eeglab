@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2003/12/02 22:29:40  arno
+% adding urchan
+%
 % Revision 1.110  2003/12/02 17:07:59  arno
 % debug urchanlocs
 %
@@ -776,7 +779,7 @@ if ~isfield(EEG, 'urchanlocs')
     for index = 1:length(EEG.chanlocs)
         EEG.chanlocs(index).urchan = index;
     end;
-    disp('Note: creating backup chanlocs structure (urchanlocs)');
+    disp('eeg_checkset note: creating backup chanlocs structure (urchanlocs)');
 end;
 
 % check reference
