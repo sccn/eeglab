@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/07/29 23:32:26  arno
+% fixing spectra limits
+%
 % Revision 1.19  2004/07/29 23:13:55  arno
 % debug typecomp
 %
@@ -214,10 +217,10 @@ axis off;
 h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 %topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs); axis square; 
 if typecomp == 1 % plot single channel locations
-	topoplot( numcompo, EEG.chanlocs, ...
+	topoplot( numcompo, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
              'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10); axis square;
 else             % plot component map
-	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, ...
+	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
              'shading', 'interp', 'numcontour', 3); axis square;
 end;
 title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
