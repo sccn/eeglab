@@ -61,6 +61,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/10/15 00:35:41  arno
+% fastica
+%
+%
+%
+%
+% debug fastica
+%
 % Revision 1.28  2003/09/02 21:40:59  lee
 % debug last
 %
@@ -455,7 +463,7 @@ switch lower(icatype)
         EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'fastica'
-        if exist('fastica', 'file') | exist('fastica', 'dir')
+        if ~exist('fastica', 'file') & ~exist('fastica', 'dir')
             error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
         end;     
         if length(options) < 2
