@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2003/10/29 22:07:10  arno
+% nothing
+%
 % Revision 1.157  2003/09/24 19:36:19  scott
 % fixed auxvar bug
 %
@@ -701,6 +704,9 @@ DEFAULT_PHARGS = [0 25 8 13]; % Default arguments for phase sorting
 DEFAULT_ALPHA     = 0.01;
 alpha     = 0;      % default alpha level for coherence significance
 
+MIN_ERPALPHA = 0.001; % significance bounds for ERP 
+MAX_ERPALPHA = 0.1; 
+
 Noshow    = NO;     % show sortvar by default
 Nosort    = NO;     % sort on sortvar by default
 Caxflag   = NO;     % use default caxis by default
@@ -1113,8 +1119,9 @@ if nargin > 6
           Valflag = NO;
       elseif Erpalphaflag == YES
           erpalpha = Arg(1);
-          if erpalpha < .002 | erpalpha > 0.1
-             error('erpimage(): erpalpha value is out of bounds [0.002, 0.1]\n');
+          if erpalpha < MIN_ERPALPHA | erpalpha > MAX_ERPALPHA
+             fprintf('erpimage(): erpalpha value is out of bounds [%g, %g]\n',...
+                               MIN_ERPALPHA,MAX_ERPALPHA);
              return
           end
           Erpalphaflag = NO;
@@ -2934,7 +2941,8 @@ prctl = interp1(pt,sortdata,pc);
 %%%%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
-% nan_mean() - take the column means of a matrix, ignoring NaN values
+% nan_mean() - Take the column means of a matrix, ignoring NaN values.
+%              Return significance bounds if alpha (0 < alpha< <1) is given.
 % 
 function [out, outalpha]  = nan_mean(in,alpha)
    intrials = size(in,1);
@@ -2948,10 +2956,12 @@ function [out, outalpha]  = nan_mean(in,alpha)
    nononnans = find(nonnans==0);
    nonnans(nononnans) = 1;
    out = sum(in)./nonnans;
-
-   NBOOT = 500;
    outalpha = [];
    if nargin>1 
+     NBOOT = 500;
+     if NBOOT < round(3/alpha)
+        NBOOT = round(3/alpha);
+     end
      booterps = zeros(NBOOT,inframes);
      for n=1:NBOOT
          signs = sign(randn(1,intrials)'-0.5);
