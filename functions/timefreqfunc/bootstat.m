@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/07/09 21:37:39  arno
+% typo
+%
 % Revision 1.15  2003/07/09 00:34:19  arno
 % implementing correctp
 %
@@ -220,7 +223,7 @@ if (size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1
         Rbootout = g.accarray;
     end;
     tmpsort = sort(abs(Rbootout));
-    i = g.alpha*g.naccu;
+    i = round(g.alpha*g.naccu);
     sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
     if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
     accarrayout = sigval;
