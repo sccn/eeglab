@@ -24,7 +24,8 @@
 %    sdfeof and dt have been included in the code of the function.
 %
 % Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
-%         EEGLAB format and subfunctions inserted in the code, Arnaud Delorme, 27 Dec 2002)
+%         EEGLAB format and subfunctions inserted in the code, Arnaud Delorme and 
+%         Scott Makeig, 27 Dec 2002)
 %
 % See also: fread, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
 
