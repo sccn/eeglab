@@ -21,9 +21,10 @@
 %               columns in the event text file. If column names are defined 
 %               in the text file, they cannnot be used and you must copy 
 %               the names into this edit box (and skip the name row). Must
-%               provide a name for each column. The keywords "type" and
-%               "latency" should be used to define the columns containing
-%               event types and event latencies. Columns names can be
+%               provide a name for each column. The keywords "type",
+%               "latency", and "duration" are recognized EEGLAB keyword and 
+%               should be used to define the columns containing event types, 
+%               event latencies, and event durations. Columns names can be
 %               separated by comas, quoted or not. 
 %               Command line equivalent: fields.
 %  "Latency time unit (sec)" - [edit box] Specify the time unit for the 
@@ -243,8 +244,8 @@ if nargin<2
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];
-		helpfields = ['latency field (lowercase) must be present' 10 ...
-				   'field type is also a recognized keyword and it is recommended to define it'];
+		helpfields = ['latency field (lowercase) must be present; field ''type'' and' 10 ...
+				   '''duration'' are also recognized keywords and it is recommended to define them'];
         uilist = { ...
          { 'Style', 'text', 'string', 'Event indices', 'fontweight', 'bold' }, ...
          { 'Style', 'text', 'string', 'Append events?', 'fontweight', 'bold' } };
@@ -257,12 +258,12 @@ if nargin<2
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'globfile' }, ...
          { }, { 'Style', 'text', 'string', 'NB: No = overwrite', 'value', 0 }, { }, ...
          { 'Style', 'text', 'string', 'Input field (column) names       ', 'fontweight', 'bold', 'tooltipstring', helpfields } ...
-         { 'Style', 'edit', 'string', '' } { 'Style', 'text', 'string', 'Ex: latency type position', 'tooltipstring', helpfields } };
+         { 'Style', 'edit', 'string', '' } { 'Style', 'text', 'string', 'Ex: type latency duration', 'tooltipstring', helpfields } };
          geometry = { geometry{:} [1.2 1 1] [1.2 1 1] [1.2 1 1] [1.2 0.2 1.8] };
          uilist   = { uilist{:}, ...
                 { 'Style', 'text', 'string', 'Number of file header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, ...
-					  { 'Style', 'text', 'string', '     Note: latency required', 'tooltipstring', helpfields },...
-                { 'Style', 'text', 'string', 'Latency time unit (sec)', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' } ...
+					  { 'Style', 'text', 'string', '(latency field required above)', 'tooltipstring', helpfields },...
+                { 'Style', 'text', 'string', 'Time unit (sec)', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' } ...
 					  { 'Style', 'text', 'string', 'Ex: If ms, 1E-3' },...
                 { 'Style', 'text', 'string', 'Align event latencies to data events', 'horizontalalignment', 'left' }, ...
 					  { 'Style', 'edit', 'string', fastif(isempty(EEG.event),'NaN','0') } { 'Style', 'text', 'string', 'See Help' },...
@@ -352,7 +353,8 @@ if ~isnan(g.align.val)
     end
     g.align.nbevent = length(EEG.event);
     g.oldevents = EEG.event;
-    g.align.txt = sprintf('Check alignment between pre-existing (old) and loaded event latencies:\nOld event latencies (10 first): %s ...\n', ...
+    g.align.txt = sprintf([ 'Check alignment between pre-existing (old) and loaded event' ...
+                          ' latencies:\nOld event latencies (10 first): %s ...\n' ], ...
                           int2str(cell2mat({ EEG.event(1:min(10, length(EEG.event))).latency })));
 else
     g.oldevents = [];
@@ -413,8 +415,8 @@ if isempty(EEG.event) % usefull 0xNB empty structure
     EEG.event = [];
 end;
 
-% remove the events which latency are out of boundary
-% ---------------------------------------------------
+% remove the events wit out-of-bound latencies
+% --------------------------------------------
 if isfield(EEG.event, 'latency')
     try 
         res = cellfun('isempty', { EEG.event.latency });
@@ -466,10 +468,24 @@ return;
 % update latency values
 % ---------------------
 function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign);
-    if ~isfield(event, 'latency'), return; end;
-    for index = indices
-        event(index).latency = event(index).latency*srate*timeunit;
+
+    % update time unit 
+    % ----------------
+    if ~isfield(event, 'latency'), 
+        if isfield(event, 'duration')
+            error('A duration field cannot be defined if a latency field has not been defined');
+        end;
+        return; 
     end;
+    for index = indices
+        event(index).latency  = event(index).latency*srate*timeunit;
+        if isfield(event, 'duration')
+            event(index).duration = event(index).duration*srate*timeunit;
+        end;
+    end;
+
+    % alignment with old events
+    % -------------------------
     if ~isnan( align.val )
         if align.val >= 0, alignlatency = event(1).latency;
         else               alignlatency = event(-align.val+1).latency;
