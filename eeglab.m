@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/11 19:09:09  arno
+% typo in LASTCOM
+%
 % Revision 1.11  2002/04/11 19:08:02  arno
 % adding lastcom argument for erpimage
 %
@@ -258,7 +261,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'Import Matlab array or ASCII file', 'CallBack', [ check '[EEG LASTCOM] = pop_importevent(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']);
 	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check 'eeg_global; [EEG LASTCOM]= pop_importpres(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']); 
 
-	uimenu( first_m, 'Label', 'Load dataset(s)' , 'Separator', 'on', 'CallBack', [ 'eeg_global; [TMPVAR LASTCOM]= pop_loadset; h(LASTCOM); clear TMPVAR; eeg_updatemenu;']); 
+	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ 'eeg_global; [TMPVAR LASTCOM]= pop_loadset; h(LASTCOM); clear TMPVAR; eeg_updatemenu;']); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check 'LASTCOM = pop_saveset(EEG); h(LASTCOM); eeg_updatemenu;']);
 	uimenu( first_m, 'Label', 'Save datasets'   , 'CallBack', [ check 'LASTCOM = pop_saveset; h(LASTCOM); eeg_updatemenu;' ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)' , 'CallBack', [ 'LASTCOM = pop_delset; eeg_updatemenu; h(LASTCOM);' ]);
