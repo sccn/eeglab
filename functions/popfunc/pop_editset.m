@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/05/01 01:21:18  luca
+% transpose bug
+%
 % Revision 1.15  2002/04/30 18:38:21  arno
 % adding about button
 %
@@ -288,7 +291,7 @@ for curfield = tmpfields'
 								  EEGOUT.data = load(varname, '-mat');
 							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
 							  end;
-							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'float32', if EEGOUT.nbchan == 0,
 								  error(['Pop_editset error: to read float32 data you must first specify the number of channels']);
 							 end;     
