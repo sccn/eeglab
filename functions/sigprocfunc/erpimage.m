@@ -14,16 +14,17 @@
 % Necessary inputs:
 %   data     - [vector or matrix] Single-channel input data to image. 
 %               Formats (1,frames*trials) or (frames,trials)
-%   sortvar  - [vector] Variable to sort epochs on (length(sortvar) = nepochs)
-%              Example: sortvar may by subject response time in each epoch (in ms)
 %
-% Additional ordered inputs {with defaults}:
-%   times    - Vector of latencies (ms) (length(times) = frames) {Def|0: [0:frames-1]}
+% Optional ordered inputs {with defaults}:
+%   sortvar  - [vector | []] Variable to sort epochs on (length(sortvar) = nepochs)
+%              Example: sortvar may by subject response time in each epoch (in ms)
+%              {default|[]: plot in input order}
+%   times    - [vector | []] of latencies (ms) (length(times) = frames) 
 %               ELSE [startms ntimes srate] Give start latency (ms), time points 
-%               (i.e. frames) per epoch, sampling rate (Hz),
+%               (i.e. frames) per epoch, sampling rate (Hz), {default|[]: 0:nframes-1}
 %  'title'   - ['string'] Plot titla {default: none}
-%   avewidth - Number of trials to moving-average (NB: may be non-int) {Def|0->1}
-%   decimate - Factor to decimate ntrials out by (NB: may be non-int) {Def|0->1}
+%   avewidth - Number of trials to moving-average (NB: may be non-int) {default|0->1}
+%   decimate - Factor to decimate ntrials out by (NB: may be non-int)  {default|0->1}
 %               If this is large ( > sqrt(num. trials)), output this many trials.
 %
 % Unordered options ('keyword',argument pairs):
@@ -103,7 +104,7 @@
 %               (See also: 'vert' above).
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
-% 'yerplabel' - ['string'] ERP ordinate axis label (default is uV)
+% 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Get uV with '\muV'
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
@@ -160,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.207  2004/03/26 00:21:06  arno
+% same
+%
 % Revision 1.206  2004/03/26 00:19:48  arno
 % minimum number of trials
 %
@@ -928,13 +932,16 @@ if nargin < 1
   return
 end
 
-if nargin<2
+if nargin < 3 | isempty(times)
   if size(data,1)==1 | size(data,2)==1
-   fprintf('erpimage(): either specify times vector or size-(frames,trials) data.\n')
+   fprintf('erpimage(): either input a times vector or make data size = (frames,trials).\n')
    return
   end
   times = 1:size(data,1);
   NoTimesPassed= 1;
+end
+
+if nargin < 2 | isempty(sortvar)
   sortvar = 1:size(data,2);
   Noshow = 1; % don't plot the dummy sortvar
 end
