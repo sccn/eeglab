@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/05/03 22:11:07  arno
+% debugging rename
+%
 % Revision 1.5  2002/04/18 18:23:14  arno
 % typo can not
 %
@@ -207,7 +210,6 @@ if nargin<2
         % handle rename 
         % -------------
         if results{end-1} ~= 1, args = { args{:}, 'rename', [ allfields{results{end-1}-1} '->' results{end} ] }; end;  
-        args
 else % no interactive inputs
     args = varargin;
     % scan args to modify array/file format
@@ -231,7 +233,6 @@ if ~isempty(args)
 else
     g = [];
 end;
-g
 
 % test the presence of variables
 % ------------------------------
