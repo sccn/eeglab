@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2004/08/03 22:01:47  arno
+% time in seconds
+%
 % Revision 1.63  2004/07/30 01:26:14  arno
 % changed the figure to be the current figure
 %
@@ -265,7 +268,7 @@ if nargin < 2
    return
 end
 if nargin <= 2 | isstr(varargin{1})
-	% 'key' 'val' sequency
+	% 'key' 'val' sequences
 	fieldlist = { 'chanlocs'      ''         []                       [] ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       0;
