@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.128  2004/07/26 15:49:52  arno
+% convert to single for Matlab 7
+%
 % Revision 1.127  2004/06/16 21:38:30  arno
 % resorting urevents
 %
@@ -573,7 +576,7 @@ if isstr(EEG.data)
 end;
 if isnumeric(EEG.data)
     v = version;
-    if ~findstr(v, 'R14')
+    if isempty(findstr(v, 'R14'))
         EEG.data = double(EEG.data);
     else
         EEG.data = single(EEG.data);
