@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/11/13 23:05:53  arno
+% problem from command line call
+%
 % Revision 1.11  2002/11/13 17:08:26  scott
 % help msg
 % .,
@@ -143,9 +146,11 @@ switch lower(icatype)
         end;
      case 'binica'
         if ~isunix | strcmp(computer, 'MAC')
-            error('Pop_runica: binica can now only be used under UNIX');
+            error('Pop_runica: binica can now only be used under specific UNIX OS');
         end;
         icadefs;
+        fprintf(['Warning: if the binary function does not work, check that you have added the\n' ...
+                 'binary file location (in the eeglab directory) to you BIN Unix directory (.cshrc file)\n']);
         if exist(ICABINARY) ~= 2
             error('Pop_runica: binary ica program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
