@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/23 15:01:50  arno
+% isppc -> computer
+%
 % Revision 1.14  2002/09/26 14:00:44  scott
 % help msg -sm
 %
@@ -111,7 +114,7 @@ if	fid == -1
 		else 
 			fid = fopen( filename, 'r');
 			if	fid == -1
-				error('Can not open file');
+				error('Cannot open file');
 			end;
 			storelocal = 1;
 		end;
