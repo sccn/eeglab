@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/02/05 23:11:13  arno
+% minspace problem
+%
 % Revision 1.7  2003/10/15 18:48:54  arno
 % *** empty log message ***
 %
@@ -91,7 +94,6 @@ if size(array,2) == 1
     array = transpose(array);
 end;
 
-dsaf
 if ~isempty(g.average)
     timediff = timevect(2:end) -timevect(1:end-1);
     if any( (timediff - mean(timediff)) > 1e-8 ) % not uniform values
