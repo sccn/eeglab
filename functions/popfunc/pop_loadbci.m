@@ -104,77 +104,175 @@ catch
 		end;
 	end;
 	eventindices = setdiff(1:length(colnames), indices);
-	ISIind = eventindices(3 + 9);
-	eventindices(3 + [ 1 2 3 4 7 8 9 10 11 12]) = [];
-	eventindices(1:3) = []; % suppress these event 
-	
-	% add the trial number
-	% --------------------
-	tmptrial = find( diff(tmpdata(ISIind, :)) ~= 0);
-	tmptrial = tmptrial+1;
-
+    
+    % ask for which event to import
+    % -----------------------------
+    geom = {[0.7 0.7 0.7 0.7]};
+    uilist = { { 'style' 'text' 'string' 'State name' 'fontweight' 'bold' } ...
+               { 'style' 'text' 'string' 'Import state' 'fontweight' 'bold'  } ...
+               { 'style' 'text' 'string' 'Adjust time'  'fontweight' 'bold' } ...
+               { 'style' 'text' 'string' 'Attribute of'  'fontweight' 'bold' } };
+    allfields = strvcat('none', colnames{eventindices});
+    for index = 1:length(eventindices)
+        if strcmpi( colnames{eventindices(index)}, 'sourcetime')
+            geom   = { geom{:} [1.3 0.3 0.3 0.5 0.1 1] };
+            uilist = { uilist{:} { 'style' 'text' 'string' colnames{eventindices(index)} } ...
+                                 { } { } { 'style' 'text' 'string' 'ref' } {} ...
+                                 { } };
+        else 
+            geom   = { geom{:} [1.3 0.3 0.3 0.3 0.3 1] };
+            uilist = { uilist{:} { 'style' 'text' 'string' colnames{eventindices(index)} } };
+            if ~isempty(findstr( lower(colnames{eventindices(index)}), 'time')) 
+                uilist = { uilist{:} { 'style' 'checkbox' 'value' 1 } { } { 'style' 'checkbox' 'value' 1 } {} ...
+                           { 'style' 'listbox' 'string' '' } };
+            elseif ~isempty(findstr( lower(colnames{eventindices(index)}), 'type'))
+                uilist = { uilist{:} { 'style' 'checkbox' 'value' 1 } { } { 'style' 'checkbox' } {}  ...
+                         { 'style' 'listbox' 'string' allfields 'value' min(length(eventindices), 6) ...
+                         'listboxtop' min(length(eventindices), 6) }};
+            else
+                uilist = { uilist{:} { 'style' 'checkbox' } { } { 'style' 'checkbox' } {} ...
+                         { 'style' 'listbox' 'string' allfields } };
+            end;
+        end;
+    end;
+    result = inputgui( geom, uilist, 'pophelp(''pop_loadbci'')', 'Import BCI2000 data files - pop_loadbci()');
+    if isempty(result), return; end;
+    
+    % decoding result
+    % ---------------
+    listimport = {};
+    s = 0;
+    for index = 0:length(eventindices)-1
+        tmplist = {};
+        if strcmpi( colnames{eventindices(index+1)}, 'SourceTime')
+            s = 1;
+        else
+            i = index-s;
+            if result{3*i+1}, tmplist{1} = colnames{eventindices(index+1)}; else tmplist{1} = []; end;
+            if result{3*i+2}, tmplist{2} = 1; else tmplist{2} = 0; end;
+            if result{3*i+3}~=1 && result{3*i+3}~=0, tmplist{3} = colnames{ eventindices(result{3*i+3}-1+s) }; end;
+            if ~isempty(tmplist{1}), listimport = { listimport{:} 'event' tmplist}; end;
+        end;
+    end;
+    
+    % find indices
+    % ------------
+    indexsource =  strmatch('SourceTime', colnames);
+    count = 1;
+    for index = 2:2:length(listimport)
+        tmpindmatch = strmatch(listimport{index}{1}, colnames);
+        if ~isempty(tmpindmatch), indeximport(count) = tmpindmatch; 
+        else error(['State ''' listimport{index}{1} ''' not found']); 
+        end;
+        if length( listimport{index} ) > 1
+             adjust(count) = listimport{index}{2};
+        else adjust(count) = 0;
+        end;
+        if length( listimport{index} ) > 2
+            tmpindmatch = strmatch(listimport{index}{3}, colnames);
+            if ~isempty(tmpindmatch), corresp(count) = tmpindmatch; 
+            else error(['State ''' listimport{index}{3} ''' not found']); 
+            end;
+        else
+            corresp(count) = 0;
+        end;
+        count = count+1;
+    end;
+    indeximport
+    corresp
+    adjust
+    
+    % find block size
+    % ---------------
+    tmpevent = find( diff(tmpdata(indexsource, :)) ~= 0);
+    diffevent = tmpevent(2:end)-tmpevent(1:end-1);
+    blocksize = unique(diffevent);
+    if length(blocksize) > 1, error('Error in determining block size'); 
+    else                      fprintf('Blocksize: %d\n', blocksize); end;
+    
+    % segregate type and latency
+    % --------------------------
+    tmpcorresp = find(corresp);
+    if length(tmpcorresp) ~= length(intersect(corresp, indeximport))
+        disp('Warning: correspondance problem, some information will be lost');
+    end;
+    indexcorresp =  indeximport(tmpcorresp);
+    indeximport(tmpcorresp) = [];
+    adjust(tmpcorresp)      = [];
+    
 	% process events
 	% --------------
 	fprintf('Pop_loadbci: importing events...\n');
 	counte = 1; % event counter
 	events(10000).latency = 0;
-	for index = eventindices
-		counttrial = 1;
-		tmpevent = find( diff(tmpdata(index, :)) ~= 0);
+	for index = 1:length(indeximport)
+		tmpevent = find( diff(tmpdata(indeximport(index), :)) ~= 0);
 		tmpevent = tmpevent+1;
+        tmpcorresp = find(indexcorresp == indeximport(index));
+        if adjust(index)
+             fprintf('Latency of event ''%s'' adjusted\n', colnames{ indeximport(index) });
+        else fprintf('WARNING: Latency of event ''%s'' not adjusted (latency uncertainty %2.1f ms)\n', ...
+                     colnames{ indeximport(index) }, blocksize/srate*1000);
+        end;
+        
 		for tmpi = tmpevent
-			if tmpdata(index, tmpi)
-				events(counte).type    = [ colnames{index} int2str(tmpdata(index, tmpi)) ];
-				events(counte).latency = tmpi;
-				%events(counte).value   = tmpdata(index, tmpi);
-				%while tmpi > tmptrial(counttrial) & counttrial < length(tmptrial)
-				%	counttrial = counttrial+1;
-				%end;
-				%events(counte).trial = counttrial;				
+            curlatency  = tmpdata(indeximport(index), tmpi);
+			if curlatency % non zero
+                if ~isempty(tmpcorresp)
+                    events(counte).type = colnames{ indexcorresp(tmpcorresp) };
+                else 
+                    events(counte).type = colnames{ indeximport(index) };
+                end;
+                if adjust(index)
+                    baselatency = tmpdata(indexsource, tmpi); % note that this is the first bin a block
+                    realtmpi    = tmpi+blocksize;             % jump to the end of the block+1
+                    if curlatency < baselatency, curlatency = curlatency+65536; end; % in ms
+                    events(counte).latency = realtmpi+(curlatency-baselatency)/1000*srate;
+                    % there is still a potentially large error between baselatency <-> realtmpi
+                else
+                    events(counte).latency = tmpi+(blocksize-1)/2;
+                end;
 				counte = counte+1;
-				%if mod(counte, 100) == 0, fprintf('%d ', counte); end;
 			end;
 		end;
 	end;
 	
-	% add up or down events
-	% ---------------------
 	EEG.data = tmpdata(indices,:);
 	EEG.nbchan = size(EEG.data, 1);
 	EEG.srate  = srate;
 	EEG = eeg_checkset(EEG);
 	EEG.event = events(1:counte-1);	
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	for index=1:length(EEG.event)
-		if strcmp(EEG.event(index).type(1:6), 'Target')
-			targetcode = str2num(EEG.event(index).type(end));
-			if targetcode == 1
-				EEG.event(index).type = 'toptarget';
-			else
-				EEG.event(index).type = 'bottomtarget';
-			end;
-		else 
-			if strcmp(EEG.event(index).type(1:6), 'Result')
-				resultcode = str2num(EEG.event(index).type(end));
-				if resultcode == 1
-					EEG.event(index).type = 'topresp';
-				else
-					EEG.event(index).type = 'bottomresp';
-				end;
-				EEG.event(end+1).latency = EEG.event(index).latency;
-				if (resultcode == targetcode) 
-					EEG.event(end).type = 'correct';
-				else
-					EEG.event(end).type = 'miss';
-				end;
-			end;
-		end;
-	end;
-	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	%EEG.data = tmpdata([72 73 75],:);
+	
+	% add up or down events
+	% ---------------------
+% $$$     for index=1:length(EEG.event)
+% $$$ 		if strcmp(EEG.event(index).type(1:6), 'Target')
+% $$$ 			targetcode = str2num(EEG.event(index).type(end));
+% $$$ 			if targetcode == 1
+% $$$ 				EEG.event(index).type = 'toptarget';
+% $$$ 			else
+% $$$ 				EEG.event(index).type = 'bottomtarget';
+% $$$ 			end;
+% $$$ 		else 
+% $$$ 			if strcmp(EEG.event(index).type(1:6), 'Result')
+% $$$ 				resultcode = str2num(EEG.event(index).type(end));
+% $$$ 				if resultcode == 1
+% $$$ 					EEG.event(index).type = 'topresp';
+% $$$ 				else
+% $$$ 					EEG.event(index).type = 'bottomresp';
+% $$$ 				end;
+% $$$ 				EEG.event(end+1).latency = EEG.event(index).latency;
+% $$$ 				if (resultcode == targetcode) 
+% $$$ 					EEG.event(end).type = 'correct';
+% $$$ 				else
+% $$$ 					EEG.event(end).type = 'miss';
+% $$$ 				end;
+% $$$ 			end;
+% $$$ 		end;
+% $$$ 	end;
+% $$$ 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 end;
-EEG = eeg_checkset(EEG, 'eventconsistency');
-EEG = eeg_checkset(EEG, 'makeur');
 
 command = sprintf('EEG = pop_loadbci(''%s'', %f);',filename, srate); 
 return;
