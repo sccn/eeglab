@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/09/14 23:31:11  arno
+% nothing
+%
 % Revision 1.24  2004/04/29 17:13:17  arno
 % ignoring keystroke events
 %
@@ -209,7 +212,7 @@ EEG.nbchan          = r.header.nchannels;
 I = 1:length(r.event);
 if ~isempty(I)
     EEG.event(1:length(I),1) = cell2mat( { r.event(I).stimtype } );
-    EEG.event(1:length(I),2) = cell2mat( { r.event(I).offset   } );
+    EEG.event(1:length(I),2) = cell2mat( { r.event(I).offset+1 } );
     EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 end;
 
