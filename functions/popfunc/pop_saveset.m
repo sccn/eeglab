@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2004/12/17 17:34:02  hilit
+% correcting 'savemode' help message
+%
 % Revision 1.43  2004/12/16 22:33:02  arno
 % removing EEGDATA
 %
@@ -295,7 +298,7 @@ if mode == 0  % single datasets
         EEG.data = [ noextcurfilename '.dat' ];
 		try, 
             fprintf('Saving dataset...\n');
-            try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+            try, save([ curfilepath curfilename ], '-v6', '-mat', 'EEG');
             catch, 
                 try, save([ curfilepath curfilename ], '-mat', 'EEG');
                 catch, error('Pop_saveset: save error, out of space or file permission problem');
@@ -322,7 +325,7 @@ if mode == 0  % single datasets
         end;
         EEG.data = single(EEG.data);
         fprintf('Saving dataset...\n');
-        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG'); % Matlab 7
+        try, save([ curfilepath curfilename ], '-v6', '-mat', 'EEG'); % Matlab 7
         catch, 
             try, save([ curfilepath curfilename ], '-mat', 'EEG');
             catch, error('Pop_saveset: save error, out of space or file permission problem');
@@ -410,7 +413,7 @@ else
 		end;        
     end;
 	disp('Pop_saveset: saving datasets...');
-	try, save([ curfilepath curfilename ], '-V6', '-mat', 'ALLEEG');
+	try, save([ curfilepath curfilename ], '-v6', '-mat', 'ALLEEG');
 	catch, 
         try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
         catch, error('Pop_saveset: save error, out of space or file permission problem');
