@@ -3,12 +3,12 @@
 %                  fit.
 % Usage:
 %   >> pop_rejtrend( INEEG, typerej); % pop up interactive window
-%   >> OUTEEG = pop_rejtrend( INEEG, typerej, electrodes, ...
+%   >> OUTEEG = pop_rejtrend( INEEG, typerej, elec_comp, ...
 %                winsize, maxslope, minR, superpose, reject);
 %
 % Graphical interface:
-%   "Electrode" - [edit box] electrodes (number) to take into 
-%                 consideration for rejection. Same as the 'electrodes'
+%   "Electrode" - [edit box] electrodes or components (number) to take into 
+%                 consideration for rejection. Same as the 'elec_comp'
 %                 parameter from the command line.
 %   "Consecutive alike values" - [edit box] integer determining the
 %                 number of consecutive points for the detection of linear
@@ -29,7 +29,7 @@
 %   INEEG      - input dataset
 %   typerej    - type of rejection (0 = independent components; 1 = eeg
 %                data). Default is 1.
-%   electrodes - [e1 e2 ...] electrodes (number) to take into 
+%   elec_comp  - [e1 e2 ...] electrodes or components (number) to take into 
 %                consideration for rejection
 %   winsize    - integer determining the number of consecutive points
 %                for the detection of linear patterns
@@ -72,6 +72,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/02/18 22:20:21  arno
+% update header for GUI
+% /
+%
 % Revision 1.11  2002/11/13 01:19:42  arno
 % debug for command line call
 %
