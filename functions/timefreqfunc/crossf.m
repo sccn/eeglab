@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/07/25 23:05:15  arno
+% implementing condition comparison
+%
 % Revision 1.39  2002/07/16 23:08:25  arno
 % correcting freqs for wavelet output
 %
@@ -566,8 +569,8 @@ if iscell(X)
 	end;
 	for index = 1:2:length(vararginori)
 		if index<=length(vararginori) % needed: if elemenets are deleted
-			if strcmp(vararginori{index}, 'alpha'), vararginori(index:index+1) = [];
-			elseif strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
+			%if strcmp(vararginori{index}, 'alpha'), vararginori(index:index+1) = [];
+			if strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
 			end;
 		end;
 	end;
