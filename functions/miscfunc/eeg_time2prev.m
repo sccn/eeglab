@@ -35,8 +35,13 @@ nevents = length(EEG.event);
 %%%%%%%%%%%%%%%%%%%% Test input arguments %%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~iscell(target)
-  error('2nd argument "target" must be a {cell array} of event types.');
+  error('2nd argument "target" must be a {cell array} of event type strings.');
   return
+end
+for k=1:length(target)
+   if ~ischar(cell2mat(target{k})
+       error('2nd argument "target" must be a {cell array} of event type strings.');
+   end
 end
 if ~iscell(previous)
   error('3rd argument "previous" must be a {cell array} of event types.');
