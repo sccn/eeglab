@@ -37,6 +37,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 02:17:50  arno
+% inputdlg2
+% /
+%
 % Revision 1.5  2002/08/12 01:46:22  arno
 % color
 %
@@ -68,16 +72,14 @@ end;
 
 if nargin < 3
 	promptstr    = { 'Plotting time range (ms):', ...
-			         ['Latency(ies) for topolot (in ms):' 10 ...
-			         '(NaN -> latency of max variance)'], ...
+			         ['Latency(ies) for topolot (in ms; NaN->max variance lat.)'], ...
 					 'Plot title:' ...
 			         'Scalp map options: See >> help topoplot' };
 	inistr       = { [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
 			         'nan', ...
 	                 ['ERP data and scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ], ...
 			         ''  };
-    help topoplot;
-	result       = inputdlg2( promptstr, 'ERP data and scalp maps -- pop_timtopo()', 1, inistr, 'timtopo';
+	result       = inputdlg2( promptstr, 'ERP data and scalp maps -- pop_timtopo()', 1, inistr, 'timtopo');
 	if size(result,1) == 0 return; end;
 	timerange    = eval( [ '[' result{1} ']' ] );
 	topotime     = eval( [ '[' result{2} ']' ] );
