@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2004/05/26 23:12:02  arno
+% epoch duration in ms
+%
 % Revision 1.121  2004/05/24 17:24:08  arno
 % assign 0 to empty durations
 %
@@ -988,7 +991,7 @@ if ~isempty( varargin)
               try, alllatencies = cell2mat( { EEG.event.latency } );
               catch, error('Checkset: error empty latency entry for new events added by user');
               end;
-              I1 = find(alllatencies < 1);
+              I1 = find(alllatencies < 0.5);
               I2 = find(alllatencies > EEG.pnts*EEG.trials);
               if (length(I1) + length(I2)) > 0 
                   fprintf('eeg_checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
