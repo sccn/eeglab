@@ -141,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2003/03/04 20:29:18  arno
+% header typo
+%
 % Revision 1.71  2003/01/31 23:23:34  arno
 % adding erpstd for ploting standard deviation of ERP
 %
@@ -2334,7 +2337,10 @@ limits = [limits baseamp coherfreq];  % add coherfreq to output limits array
 %   
 %%%%%%%%%%%%%%% turn on axcopy() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-axcopy; % turn on popup zoom windows
+axcopy(gcf,...
+   'img=get(gca,''children''); if (strcmp(img(end),''type''),''image''), img=get(img(end),''CData''); times=get(img(end),''Xdata''); clf; args = [''limits'' '','' times(1) '','' times(end)]; if exist(''EEG'')==1, args = [args '','' ''srate'' '','' EEG.srate]; end eegplot(img,args); end')
+
+% turn on popup zoom windows
 
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
