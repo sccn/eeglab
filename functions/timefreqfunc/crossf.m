@@ -75,7 +75,7 @@
 %       'plotamps'  = ['on'|'off'], Plot coherence magnitude      {'on'}
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
 %       'title'     = Optional figure title                       {none}
-%       'marktimes' = Times to mark with a dotted vertical line   {none}
+%       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
 %       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/09 19:36:38  arno
+% corrected bootstrap optional input
+%
 % Revision 1.3  2002/04/09 18:59:06  arno
 % corrected typo in header that made the function to crash
 %
@@ -238,6 +241,7 @@ try, g.topovec;    catch, g.topovec = []; end;
 try, g.elocs;      catch, g.elocs = ''; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
 try, g.marktimes;  catch, g.marktimes = []; end; % default no vertical lines
+try, g.marktimes = g.vert;       catch, g.vert = []; end; % default no vertical lines
 try, g.powbase;    catch, g.powbase = nan; end;
 try, g.rboot;      catch, g.rboot = nan; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
