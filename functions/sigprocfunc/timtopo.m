@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/03/04 18:06:21  scott
+% using changeunits -sm
+%
 % Revision 1.14  2003/03/04 17:49:36  scott
 % debug oblique lines -sm
 %
@@ -367,7 +370,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
                   topowidth ...
                        topowidth*head_sep]); % this will be the topoplot axes
   postp = axis(axtp);
-  axis([-1 1 -1 1];
+  axis([-1 1 -1 1]);
 
   to   = changeunits([0,-1],axtp,axall);
   l1 = plot([from(1) from(2)],[to(1) to(2)]);
