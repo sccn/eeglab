@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/08/14 21:07:05  arno
+% hanning debug
+%
 % Revision 1.48  2002/08/14 21:02:19  arno
 % implementing hanning funciton
 %
@@ -747,11 +750,11 @@ for i=1:trials
           else % wavelet
             if ~isempty(g.mtaper)  % apply multitaper
 			    tmpXMT = g.alltapers .* (tmpX(:) * ones(1,size(g.alltapers,2)));
-			    tmpXMT = win' * tmpXMT;
+			    tmpXMT = transpose(win) * tmpXMT;
                 PP(:,j) = mean(abs(tmpXMT).^2, 2); % power
-		        tmpX = win' * tmpX(:);
+		        tmpX = transpose(win) * tmpX(:);
             else
-		        tmpX = win' * tmpX(:); 
+		        tmpX = transpose(win) * tmpX(:); 
                 PP(:,j) = abs(tmpX).^2; % power
             end    
           end

@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2002/09/26 00:40:48  arno
+% updating header
+%
 % Revision 1.49  2002/09/12 03:22:44  scott
 % help msg -sm
 %
@@ -1271,7 +1274,7 @@ for trial = trials
                tmpX = fft(tmpX,Tf.padratio*Tf.winsize);
                tmpX = tmpX(2:Tf.padratio*Tf.winsize/2+1);
             else 
-               tmpX = Tf.win' * tmpX(:);
+               tmpX = transpose(Tf.win) * tmpX(:);
             end
          else
             tmpX = NaN;
