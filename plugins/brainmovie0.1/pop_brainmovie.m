@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/04/24 02:20:59  arno
+% debuging showcomps
+%
 % Revision 1.38  2003/04/24 02:17:35  arno
 % debugging coords
 %
@@ -404,26 +407,21 @@ end
 
 % pern10 movie parameters
 % -----------------------
-if ~isempty(g.circfactor)
-    g.circfactor = g.circfactor(g.showcomps, g.showcomps);
-end;
 if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         
     % -------------------
     % movie from the side
     % -------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
+        coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,1) );
         coordinates = coordinates(:, [2 3]); % remove X   
+        plotorder = plotorder(g.showcomps);
     else
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
     end;
     coordinates(:,1) = -coordinates(:,1);   
-    size(coordinates')
-    size(g.circfactor)
-    size(g.showcomps)
     
     brainmovieoptions = { 'plotorder', plotorder, ... 
                          'resolution', 'low', ...
@@ -447,8 +445,9 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     % movie from the top
     % ------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
+        coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,3) );
+        plotorder = plotorder(g.showcomps);
         coordinates = coordinates(:, [1 2]); % remove Z
     else
         plotorder   = g.showcomps;
@@ -479,8 +478,9 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
     % movie from the rear
     % ------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
+        coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,2) );
+        plotorder = plotorder(g.showcomps);
         coordinates = coordinates(:, [1 3]); % remove Z
     else
         plotorder   = g.showcomps;
@@ -512,7 +512,7 @@ else
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates(g.showcomps), ...
+    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
