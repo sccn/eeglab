@@ -20,11 +20,11 @@
 % >> target = {'novel'};           % target event type 'novel'
 % >> previous = {'novel', 'rare'}; % either 'novel' or 'rare'
 % >> [delays,targets] = eeg_time2prev(EEG,target,previous);
-%
+%%
 %% Vector delays now contains delays in ms from each 'novel' event to the previous
 %% 'rare' or 'novel' event (else 0 when none such). Vector targets now contains the
 %% 'novel' event indices.
-%
+%%
 % Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, August 28, 2003
 
 function [delays,targets,urtargets,urprevs] = eeg_time2prev(EEG,target,previous);
