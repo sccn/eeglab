@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/11/10 16:33:18  arno
+% maximum height
+%
 % Revision 1.6  2004/06/28 15:44:43  arno
 % redrawing figure
 %
@@ -88,13 +91,14 @@ else
 end;
 listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'value', g.initval, 'min', 1, 'max', maxval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
-		  { 'Style', 'pushbutton', 'string', 'Ok', 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
+		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
 
 if ~isempty(g.promptstring)
 	geometry = {[1] geometry{:}};
 	geomvert = [1 geomvert];
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
 end;
+geomvert
 [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
 
 if ~isempty(g.listsize)
