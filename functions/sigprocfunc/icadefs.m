@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/11/25 23:01:29  arno
+% changing pluginmenucolor
+%
 % Revision 1.21  2003/11/25 22:56:32  arno
 % plugin menu color
 %
@@ -137,7 +140,7 @@ MAXEEGPLOTCHANS   = 264;  % maximum number of channels to plot in eegplot.m
 MAXTOPOPLOTCHANS  = 264;  % maximum number of channels to plot in topoplot.m
 
 DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL DEFAULT SRATE
-DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
+DEFAULT_ELOC  = EEG.chanlocs; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
 SC  =  ['binica.sc'];           % Master .sc script file for binica.m
