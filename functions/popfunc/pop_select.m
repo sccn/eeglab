@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/12/06 03:21:56  arno
+% correcting typos
+%
 % Revision 1.19  2002/10/11 01:22:37  arno
 % debugging min time when time select
 %
@@ -151,12 +154,12 @@ if nargin < 2
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ }, ...
          ...
-		 {} ...
-	   { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'callback', ...
-			  'eegplot(EEG.data, ''winlength'', 5, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
+                 {} ...
+           { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'callback', ...
+                          'eegplot(EEG.data, ''winlength'', 5, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
    if length(results) == 0, return; end;
-   
+
    % decode inputs
    % -------------
    args = {};
@@ -164,7 +167,7 @@ if nargin < 2
        if ~results{2}, args = { args{:}, 'time', eval( [ '[' results{1} ']' ] ) };
        else            args = { args{:}, 'notime', eval( [ '[' results{1} ']' ] ) }; end;
    end;
-   
+
    if ~isempty( results{3} )
        if ~results{4}, args = { args{:}, 'point', eval( [ '[' results{3} ']' ] ) };
        else            args = { args{:}, 'nopoint', eval( [ '[' results{3} ']' ] ) }; end;
@@ -181,7 +184,7 @@ if nargin < 2
    end;
 
 else
-	args = varargin;
+        args = varargin;
 end;
 % create structure
 if ~isempty(args)
@@ -191,58 +194,56 @@ else
     g = [];
 end;
 
-try, g.time; 	 catch, g.time = []; end;
-try, g.notime; 	 catch, g.notime = []; end;
-try, g.trial; 	 catch, g.trial = [1:EEG.trials]; end;
-try, g.notrial;	 catch, g.notrial = []; end;
-try, g.point; 	 catch, g.point = []; end; % will be set up later
-try, g.nopoint;	 catch, g.nopoint = []; end;
-try, g.channel;	 catch, g.channel = [1:EEG.nbchan]; end;
-try, g.nochannel;	 catch, g.nochannel = []; end;
-try, g.trialcond;	 catch, g.trialcond = []; end;
-try, g.notrialcond;	 catch, g.notrialcond = []; end;
+try, g.time;     catch, g.time = []; end;
+try, g.notime;   catch, g.notime = []; end;
+try, g.trial;    catch, g.trial = [1:EEG.trials]; end;
+try, g.notrial;  catch, g.notrial = []; end;
+try, g.point;    catch, g.point = []; end; % will be set up later
+try, g.nopoint;  catch, g.nopoint = []; end;
+try, g.channel;  catch, g.channel = [1:EEG.nbchan]; end;
+try, g.nochannel;        catch, g.nochannel = []; end;
+try, g.trialcond;        catch, g.trialcond = []; end;
+try, g.notrialcond;      catch, g.notrialcond = []; end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
-	switch allfields{index}
-	 case { 'time' 'notime' 'trial' 'notrial' 'point' 'nopoint' 'channel' 'nochannel' 'trialcond' 'notrialcond' };
-	 otherwise disp('pop_select error: unrecognized option'); beep; return;
-	end;
+        switch allfields{index}
+         case { 'time' 'notime' 'trial' 'notrial' 'point' 'nopoint' 'channel' 'nochannel' 'trialcond' 'notrialcond' };
+         otherwise disp('pop_select error: unrecognized option'); beep; return;
+        end;
 end;
 
-if isempty( g.point ) &  isempty( g.nopoint )
-    if ~isempty( g.time )
-        g.point = round((g.time(1)/1000-EEG.xmin)*EEG.srate+1):round((g.time(2)/1000-EEG.xmin)*EEG.srate);
-    end;
-    if ~isempty( g.notime )
-        if g.notime(2) == EEG.xmax
-            g.point = round((g.notime(1)/1000-EEG.xmin)*EEG.srate+1):EEG.pnts;
-        else      
-            if g.notime(1) == EEG.xmin
-                g.point = 1:round((g.notime(2)/1000-EEG.xmin)*EEG.srate);
-            else error('Wrong notime range. Remember that it is not possible to remove a slice of time.');
-            end;    
-        end;
-    end;
-end;
-if isempty( g.point )
-    g.point = [1:EEG.pnts];
-end;
-g.point   = setdiff( g.point, g.nopoint );
 g.trial   = setdiff( g.trial, g.notrial );
 g.channel = setdiff( g.channel, g.nochannel );
 
 if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
 end;
-if (min(g.point) < 1) | (max( g.point ) > EEG.pnts)  
-   error('Wrong point range');
-end;
 if min(g.trial) < 1 | max( g.trial ) > EEG.trials  
    error('Wrong trial range');
 end;
 if min(g.channel) < 1 | max( g.channel ) > EEG.nbchan  
    error('Wrong channel range');
+end;
+
+if ~isempty( g.point )
+    g.time(1) = eeg_point2lat(g.point(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    g.time(2) = eeg_point2lat(g.point(end)+1, 1, EEG.srate, [EEG.xmin EEG.xmax]);
+end;
+if ~isempty( g.nopoint )
+    g.notime(1) = eeg_point2lat(g.nopoint(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    g.notime(2) = eeg_point2lat(g.nopoint(end), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+end;
+if ~isempty( g.notime )
+    if g.notime(2) == EEG.xmax
+        g.time = [EEG.xmin g.notime(1)];
+    else
+        if g.notime(1) == EEG.xmin
+            g.time = [g.notime(2) EEG.xmax];
+        else 
+            error('Wrong notime range. Remember that it is not possible to remove a slice of time.');
+        end;
+    end;
 end;
 
 % select trial values
@@ -271,9 +272,6 @@ if length(g.trial) ~= EEG.trials
 end;
 if length(g.channel) ~= EEG.nbchan
 	fprintf('Removing %d channel(s)...\n', EEG.nbchan - length(g.channel));
-end;
-if length(g.point) ~= EEG.pnts
-	fprintf('Selecting data points...\n');
 end;
 
 % recompute latency and epoch number for events
@@ -306,8 +304,47 @@ end;
 
 % performing removal
 % ------------------
-EEG.data      = EEG.data(g.channel, g.point, g.trial);
-EEG.xmin      = eeg_point2lat(g.point(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+if ~isempty(g.time)
+    % select new time window
+    % ----------------------    
+    try,   tmpeventlatency = cell2mat({EEG.event.latency});
+    catch, tmpeventlatency = [];
+    end;
+    alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
+    alllatencies = linspace( alllatencies, EEG.pnts*(EEG.trials-1)+alllatencies, EEG.trials);
+    [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
+               [g.time(1) g.time(2)]*EEG.srate, 'allevents', tmpeventlatency);
+    tmptime = tmptime/EEG.srate;
+    if g.time(1) ~= tmptime(1) & g.time(2)-1/EEG.srate ~= tmptime(2)
+        fprintf('pop_select(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
+    end;
+    EEG.xmin = tmptime(1);
+    EEG.xmax = tmptime(2);
+    EEG.pnts = size(EEG.data,2);
+    alllatencies = alllatencies(indices);
+
+    % modify the event structure accordingly (latencies and add epoch field)
+    % ----------------------------------------------------------------------
+    allevents = [];
+    newevent = [];
+    count = 1;
+    if ~isempty(epochevent)
+        for index=1:EEG.trials
+            for indexevent = epochevent{index}
+                newevent(count)         = EEG.event(indexevent);
+                newevent(count).epoch   = index;
+                newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
+                count = count + 1;
+            end;
+        end;
+    end;
+    EEG.event = newevent;
+    EEG.epoch = [];
+end;
+
+% performing removal
+% ------------------
+EEG.data      = EEG.data(g.channel, :, g.trial);
 EEG.trials    = length(g.trial);
 EEG.pnts      = length(g.point);
 EEG.nbchan    = length(g.channel);
@@ -336,7 +373,7 @@ if ~isempty(EEG.icawinv)
 end;
 if ~isempty(EEG.icaact)
 	if length(g.channel) == size( EEG.icaact,1)
-   		EEG.icaact = EEG.icaact(:, g.point, g.trial);
+   		EEG.icaact = [];
 		if ~isempty(EEG.specicaact)
 			if length(g.point) == EEG.pnts
    				EEG.specicaact = EEG.specicaact(:, :, g.trial);
@@ -346,7 +383,6 @@ if ~isempty(EEG.icaact)
    			end;	
 	   	end;
    	else
-   		fprintf('Warning: ica data removed because of the change in the numner of channel\n');
    		EEG.icaact = [];
    		EEG.specicaact = [];
    	end;		
