@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/11 01:13:25  arno
+% confirm->0 by default
+%
 % Revision 1.4  2002/10/10 22:31:04  arno
 % debugging command call
 %
@@ -63,12 +66,6 @@ if nargin < 2
    return;
 end;
 if nargin < 3
-   tmprejelec = [];
-end;
-if nargin < 4
-   icacomp = 1;
-end;
-if nargin < 5
    confirm = 1;
 end;
    
