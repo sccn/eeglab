@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/03/04 20:09:46  arno
+% header typo
+%
 % Revision 1.11  2003/02/18 22:29:05  arno
 % update header for GUI
 %
@@ -196,7 +199,7 @@ else
         icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
-	[Itmp Irej NS Erejtmp] = eegthresh( icaacttmp, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+	[Itmp Irej NS Erejtmp] = eegthresh( icaacttmp, EEG.pnts, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
     tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
     tmpelecIout(elecrange,Irej) = Erejtmp;
 end;
