@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/01/26 00:53:17  scott
+% same
+%
 % Revision 1.30  2004/01/26 00:51:39  scott
 % same
 %
@@ -514,11 +517,15 @@ if strcmpi(g.pvaf, 'on')
     pvaf = 100-100*pvaf / vardat;
     pvafcomps = g.compnums;
     [sortpvaf spx] = sort(pvaf);
-    spx = spx(end:-1:1);
     sortpvaf = pvaf(spx);
+    pvafcomps = pvafcomps(spx);
+    pvafcomps = pvafcomps(end:-1:1);
+    sortpvaf  = sortpvaf(end:-1:1);
     k = 1;
     for index =1:ncomps-ntopos
         fprintf('   IC%d pvaf: %6.2f%%      ', pvafcomps(index),sortpvaf(index));
+        if index<100, fprintf(' ');
+        if index<10, fprintf(' ');
         if rem(k,3)==0
           fprintf('\n')
         end
@@ -526,7 +533,7 @@ if strcmpi(g.pvaf, 'on')
     end;
     fprintf('\nHighest-contributing %d components:\n',ntopos)
     for index =ncomps-ntopos+1:ncomps
-        fprintf('  IC%d pvaf: %6.2f%\n', pvafcomps(index),sortpvaf(index));
+        fprintf('  IC%d pvaf: %6.2f%%\n', pvafcomps(index),sortpvaf(index));
     end;
 end;
 %
