@@ -77,6 +77,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/11 18:08:47  arno
+% adding average reference variable check
+% ,
+%
 % Revision 1.11  2002/04/10 00:42:55  arno
 % reprograming eventconsistency for higher speed
 %
@@ -344,7 +348,7 @@ end;
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
 if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
-if ~isfield(EEG, 'averef') EEG.averef = 'no'; res = com; end;
+if ~isfield(EEG, 'averef') | isempty(EEG.averef) EEG.averef = 'no'; res = com; end;
 
 % create fields if absent
 % -----------------------
