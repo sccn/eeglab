@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/02/28 00:00:22  arthur
+% edit commandline output text
+%
 % Revision 1.8  2003/10/25 23:52:05  arno
 % remove asking for permission to remove file
 %
@@ -201,7 +204,7 @@ while arg <= nargin
     return
   end
   eval(['Arg = var' int2str(arg+1) ';']);
-  if strcmp(Flag,'pca') | strcmp(Flag,'PCA') | strcmp(Flag,'Pca')
+  if strcmpi(Flag,'pca')
         ncomps = Arg; % get number of components out for reading wts.
   end
   arg = arg+2;
