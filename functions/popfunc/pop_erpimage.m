@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/05/01 23:43:05  arno
+% additional test
+%
 % Revision 1.25  2002/04/29 20:22:22  arno
 % typo
 %
@@ -515,7 +518,7 @@ end;
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
 popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
-com = sprintf('%s erpimage( %s, %s, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
+com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
 disp(' '); disp(com); disp(' ');
 eval(com)
