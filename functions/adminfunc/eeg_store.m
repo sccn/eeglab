@@ -22,6 +22,12 @@
 %       structure syntax consistency, this function simply perfroms 
 %       >> ALLEEG(index) = EEG;
 %
+% Typical use:
+% [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
+% creates a new dataset in variable ALLEEG
+% [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+% erase current dataset in variable ALLEEG
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: eeg_retrieve(), eeglab()
@@ -47,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/25 19:05:12  arno
+% default output for single dataset option
+%
 % Revision 1.10  2002/04/25 18:53:12  arno
 % tabs
 %
