@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/03/18 00:31:45  arno
+% remove skirt
+%
 % Revision 1.23  2004/02/23 15:30:18  scott
 % added 'shrink','skirt' to topoplot call
 %
@@ -187,6 +190,12 @@ end;
 
 % figure rows and columns
 % -----------------------  
+if EEG.nbchan > 64
+    disp('More than 64 electrodes: electrode locations not shown');
+    plotelec = 0;
+else
+    plotelec = 1;
+end;
 count = 1;
 for ri = compnum
 	if exist('fig')
@@ -211,8 +220,13 @@ for ri = compnum
 			return;
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
-		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
-                            'off', 'style' , 'fill','electrodes','off');
+        if plotelec
+            topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
+                      'off', 'style' , 'fill');
+        else
+            topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
+                      'off', 'style' , 'fill','electrodes','off');
+        end;
 		axis square;
 
 		% plot the button
