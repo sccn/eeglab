@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2002/07/22 18:12:33  arno
+% debugging eeg_retreive
+%
 % Revision 1.79  2002/07/18 18:06:20  arno
 % same
 %
@@ -489,6 +492,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'Read ascii/float data file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
 	uimenu( neuromenu, 'Label', 'Read BCI2000 data file (txt/Matlab)'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .SMA data file (Snapmaster)'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'Read .ELP data file (Biosemi)'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadedf;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .CNT data file (Neuroscan continuous)',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .EEG data file (Neuroscan epochs)'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info'); 
