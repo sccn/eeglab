@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/06/25 02:31:06  arno
+% gcompreject initialized to zeros for all components
+%
 % Revision 1.31  2002/06/25 00:45:59  arno
 % removing epoch info unofor;isation
 % ,
@@ -404,6 +407,15 @@ if ~isempty( EEG.chanlocs )
     end;
 end;
 
+% EEG.times (only for epoched datasets)
+% ---------
+if (EEG.trials > 1)
+	EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
+else
+	if isfield(EEG, 'times')
+		EEG = rmfield(EEG, 'times');
+	end;
+end;
 if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
 if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
