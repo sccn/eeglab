@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2004/09/15 01:51:14  arno
+% nothing
+%
 % Revision 1.104  2004/09/14 18:04:00  arno
 % implementing GUI to set channel types
 %
@@ -1017,5 +1020,5 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
             chans = setfield(chans, {1}, fields{index}, []);
         end;
     end;
-    chans = orderfields(chans, fields);
+    %chans = orderfields(chans, fields);
     
