@@ -2,24 +2,24 @@
 %                  at specified frequencies. Calls spectopo(). 
 %
 % Usage:
-%   >> pop_spectopo( EEG, timerange, percent, topofreqs, 'key', 'val',...);
+%   >> pop_spectopo( EEG, dataflag); % pops-up
+%   >> pop_spectopo( EEG, dataflag, timerange, 'key', 'val',...);
 %
 % Inputs:
 %   EEG        - input dataset
+%   dataflag   - 1 to process EEG data and 0 to process ICA activity.
+%                Default is EEG data.
 %   timerange  - epoch timerange (in msec) to use in computing the spectra
-%   percent    - percentage of possible data windows to sample. Use <<100
-%                to speed the computation. Range: 0 to 100. {Default: 100}
-%   topofreqs  - array of frequencies tgo plot scalp maps showing power
 %
 % Optional inputs:
-%   'key','val' - optional topoplot() arguments (see topoplot())
+%   'key','val' - optional spectopo() and topoplot() arguments 
 %
-% Outputs: Those of spectopo(). When nargin<4, a query window pops-up 
+% Outputs: Those of spectopo(). When nargin<2, a query window pops-up 
 %          to ask for additional arguments and no output is returned.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 March 2002
 %
-% See also: spectopo()
+% See also: spectopo(), topoplot()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/28 21:23:00  arno
+% adding message
+%
 % Revision 1.9  2002/07/28 21:00:36  arno
 % debugging
 %
@@ -72,7 +75,7 @@
 % 03-16-02 add all topoplot options -ad
 % 04-04-02 added outputs -ad & sm
 
-function varargout = pop_spectopo( EEG, timerange, percent, topofreqs, varargin);
+function varargout = pop_spectopo( EEG, dataflag, timerange, varargin);
 
 varargout{1} = '';
 if nargin < 1
@@ -81,19 +84,69 @@ if nargin < 1
 end;	
 
 if nargin < 2
-	promptstr    = { 'Epoch time range (ms) to include [min max]:', ...
-	                 'Percent windows to sample (0 to 100):', ...
-			         'Scalp map frequencies (Hz):', ...
-			         'Scalp map plotting options: See >> help topoplot' };
-	inistr       = { [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
-			         '20' '10 20 30' '''electrodes'',''off''' };
-    help topoplot;
-	result       = inputdlg( promptstr, 'Channel spectra and maps -- pop_spectopo()', 1, inistr);
-	if size(result,1) == 0 return; end;
-	timerange    = eval( [ '[' result{1} ']' ] );
-	percent      = eval( [ '[' result{2} ']' ] ); 
-	topofreqs    = eval( [ '[' result{3} ']' ] );
-	options      =  [ ',' result{4} ];
+	dataflag = 1;
+end;
+
+if nargin < 3
+	if dataflag
+		geometry = { [2 1] [2 1] [2 1] [2 1] };
+		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include [min max]:' }, ...
+						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
+						 { 'style' 'text' 'string' 'Percent windows to sample (0 to 100):'}, ...
+						 { 'style' 'edit' 'string' '20' }, ...
+						 { 'style' 'text' 'string' 'Scalp map frequencies (Hz):'}, ...
+						 { 'style' 'edit' 'string' '10 20 30' }, ...
+						 { 'style' 'text' 'string' 'Scalp map plotting options: See >> help topoplot' } ...
+						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
+		result       = inputgui( geometry, promptstr, 'pophelp(''pop_spectopo'')', 'Channel spectra and maps -- pop_spectopo()');
+		if size(result,1) == 0 return; end;
+		timerange    = eval( [ '[' result{1} ']' ] );
+		options = [];
+		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
+		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
+		if ~isempty(result{4}),    options = [ options ',' result{4} ]; end;
+	else
+		if isempty(EEG.chanlocs)
+			error('Pop_spectopo: cannot plot component contribution without channel locations');
+		end;
+		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 0.18 0.78] [2 1]  };
+		promptstr    = { { 'style' 'text' 'string' 'Epoch time range (ms) to include [min max]:' }, ...
+						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
+						 { 'style' 'text' 'string' 'Percent windows to sample (0 to 100):'}, ...
+						 { 'style' 'edit' 'string' '20' }, ...
+						 { 'style' 'text' 'string' 'Scalp map frequency (Hz):'}, ...
+						 { 'style' 'edit' 'string' '10' }, ...
+						 { 'style' 'text' 'string' 'Channel number for comp. contributions:', 'tooltipstring', ...
+						 ['The component contribution will be plotted at that channel' 10 ...
+						 'If no channel is given, the contribution of component at' 10 ...
+						 'the channel of max. power is returned' ] }, ...
+						 { 'style' 'edit' 'string' '' }, ...
+						 { 'style' 'text' 'string' 'Component indices to compute spectra of:' }, ...
+						 { 'style' 'edit' 'string' ['1:' int2str(size(EEG.icaweights,1))] }, ...
+						 { 'style' 'text' 'string' 'Number of component''s scalp map of  to plot:' }, ...
+						 { 'style' 'edit' 'string' '' }, ...
+						 { 'style' 'text' 'string' 'Component indices for plotting scalp map:', 'tooltipstring', ...
+						 ['By default the map of the components of maximum power at the selected' 10 ...
+						 'channel (or power at channel of max. power) are plotted' ] }, ...
+						 { 'style' 'edit' 'string' '' }, ...
+						 { 'style' 'text' 'string' 'Compute component or (data-component) spectra:', 'tooltipstring' ...
+						 ['Either compute the spectra of the components'' activity (set)' 10 ...
+						 'or the spectra of the data minus every single slected component (unset)']}, ...
+						 { 'style' 'checkbox' 'value' 1 } { }, ...
+						 { 'style' 'text' 'string' 'Scalp map plotting options: See >> help topoplot' } ...
+						 { 'style' 'edit' 'string' '''electrodes'',''off''' } };
+		result       = inputgui( geometry, promptstr, 'pophelp(''pop_spectopo'')', 'Component spectra and maps -- pop_spectopo()');
+		if size(result,1) == 0 return; end;
+		timerange    = eval( [ '[' result{1} ']' ] );
+		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
+		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
+		if ~isempty(result{4})   , options = [ options ', ''plotchan'', ' result{4} ]; end;
+		if ~isempty(result{5})   , options = [ options ', ''icacomps'', [' result{5} ']' ]; end;
+		if ~isempty(result{6})   , options = [ options ', ''nicamaps'', ' result{6} ]; end;
+		if ~isempty(result{7})   , options = [ options ', ''icamaps'', [' result{7} ']' ]; end;
+		if ~result{8}, options = [ options ', ''icamode'', ''sub''' ]; end;
+		if ~isempty(result{9}), options      =  [ options ',' result{9} ]; end;
+	end;		
 	figure;
 else
 	options = [',' vararg2str(varargin)];
@@ -108,51 +161,46 @@ else
 	end;
 end;
 
-%if isempty(topofreqs)
-%    close(gcf);
-%    error('Pop_spectopo: you must enter at least one frequency for scalp map plotting.');
-%end;    
-
 if ~isempty(EEG.chanlocs)
-    % The programming here is a bit redundant but it tries to optimize 
-    % memory use.
-    % ----------------------------------------------------------------
-    if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
-		posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
-		posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
-		pointrange = posi:posf;
-		if posi == posf, error('pop_spectopo: empty time range'); end;
-		fprintf('pop_spectopo: slecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
-				timerange(1), timerange(2), posi, posf);
+	spectopooptions = [ options ', ''chanlocs'', EEG.chanlocs' ];
+	if dataflag == 0 % i.e. components
+		spectopooptions = [ spectopooptions ', ''weights'', EEG.icaweights*EEG.icasphere' ];
 	end;
-    if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
-    else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
-    end;
-	SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
-
-	% outputs
-	% -------
-	outstr = '';
-	if nargin >= 4
-	    for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
-	    if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
-	end;
-
-	% plot the data and generate output and history commands
-	% ------------------------------------------------------
-	if length( options ) < 2
-	    options = '';
-	end;
-	popcom = sprintf('figure; pop_spectopo(%s, [%s], %s, [%s] %s);', inputname(1), num2str(timerange), num2str(percent), num2str(topofreqs), options);
-	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''freq'', topofreqs, ''chanlocs'', EEG.chanlocs, ''percent'', percent %s);', outstr, options);
-	eval(com)
-	if nargin < 2
-		varargout{1} = [10 popcom 10 '% ' com];
-	end;
-	%title(['Spectrum head plots (time range ' num2str(timerange(1)) '-' num2str(timerange(2)) ')' ]);
 else
-	fprintf('Cannot plot scalp maps without channel locations...\n');
-	return;
+	spectopooptions = options;
+end;
+
+% The programming here is a bit redundant but it tries to optimize 
+% memory usage.
+% ----------------------------------------------------------------
+if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
+	posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
+	posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
+	pointrange = posi:posf;
+	if posi == posf, error('pop_spectopo: empty time range'); end;
+	fprintf('pop_spectopo: slecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
+			timerange(1), timerange(2), posi, posf);
+end;
+if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
+else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
+end;
+SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
+
+% outputs
+% -------
+outstr = '';
+if nargin >= 2
+	for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
+	if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
+end;
+
+% plot the data and generate output and history commands
+% ------------------------------------------------------
+popcom = sprintf('figure; pop_spectopo(%s, %d, [%s] %s);', inputname(1), dataflag, num2str(timerange), options);
+com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate %s);', outstr, spectopooptions);
+eval(com)
+if nargout < 2 & nargin < 3
+	varargout{1} = popcom;
 end;
 
 return;
