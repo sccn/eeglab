@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/12/09 22:01:52  arno
+% debug reject trials
+%
 % Revision 1.7  2003/12/04 23:25:48  arno
 % simplifyaing for history
 %
@@ -67,15 +70,18 @@
 function [EEG, com] = pop_rejepoch( EEG, tmprej, confirm);
 
 com = '';
-if nargin < 2
+if nargin < 1
    help pop_rejepoch;
    return;
+end;
+if nargin < 2
+    tmprej =  find(EEG.reject.rejglobal);
 end;
 if nargin < 3
    confirm = 1;
 end;
    
-if all(ismember(sort(unique(tmprej)), [0 1]))
+if all(ismember(sort(unique(tmprej)), [0 1])) && any(~tmprej)
     format0_1 = 1;
     fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
 else 
@@ -104,6 +110,6 @@ else
     EEG = pop_select( EEG, 'notrial', tmprej);
 end;
 
-com = sprintf( '%s = pop_rejepoch( %s, %s);', inputname(1), ...
-			inputname(1), vararg2str({ find(tmprej>0) 0}));		
+com = sprintf( '%s = pop_rejepoch( %s, find(%s.reject.rejglobal), 0);', inputname(1), ...
+			inputname(1), inputname(1));		
 return;
