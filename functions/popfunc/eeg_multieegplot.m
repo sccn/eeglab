@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/30 16:44:38  arno
+% edit header
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -87,8 +90,8 @@ if ndims(data) > 2 % --------------- considering epoched EEG data
 
    		% remove duplicates
    		% -----------------
-		[tmp I] = unique( rejeegplot(:,1) );
-		rejeegplot = rejeegplot(I,:);
+		%[tmp I] = unique( rejeegplot(:,1) );
+		%rejeegplot = rejeegplot(I,:);
    end;
 else % ---------------------------------------- considering continuous EEG
    % for continuous EEG, electrodes (rejE and oldrejE) are not considered yet
