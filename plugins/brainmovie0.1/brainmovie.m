@@ -94,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/16 04:02:01  arno
+% adding color to the flashes
+%
 % Revision 1.5  2002/07/10 18:29:55  arno
 % adding flash arguement
 %
@@ -410,6 +413,8 @@ if ~isempty(g.flashes)
 	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', []); set (gcf, 'visible', g.visible);
 	hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch, 'facecolor', 'w');
 	posf = 0; % used as a counter to preserve color
+	allflashes
+	flashescol
 end;	
 
 % draw captions if necessary
@@ -494,7 +499,7 @@ for indeximage = alltimepoints
 	if ~isempty(g.flashes)
 		%axes(hback); set (gcf, 'visible', g.visible);
 		if ~isempty(find(indeximage == allflashes))
-			posf = find(allflashes == find(indeximage == allflashes));
+			posf = find(indeximage == allflashes);
 			set(hpatch, 'facecolor', flashescol{posf});
 		elseif posf == 0 % allow the color to stay 2 images
 			set(hpatch, 'facecolor', 'w');
