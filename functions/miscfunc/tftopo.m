@@ -1,7 +1,8 @@
 % tftopo()  - Generates a figure showing a selected image (e.g., an ERSP or ITC) from 
 %             a supplied set of images for every scalp channel, plus topoplot() scalp 
 %             maps at specified (x,y) (e.g., time,frequency) points.  Else, images the 
-%             signed (selected) channel std(). Inputs may be outputs of timef().
+%             signed (selected) channel std(). Inputs may be outputs of timef(); else,
+%             e.g., can be used to image a set of smoothed erpimage() images.
 % Usage:
 %        >> tftopo(tfdata,times,freqs,timefreqs,showchan,chanlocs,...
 %                                                  limits,signifs,selchans)
@@ -45,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/05/19 13:52:24  scott
+% showchans=0 -> image std() of selchans images -sm
+%
 % Revision 1.33  2002/05/19 13:35:16  scott
 % *** empty log message ***
 %
@@ -232,7 +236,8 @@ if min(timefreqs(:,2))<0
 end
 nchans = size(tfdata,2)/length(times);
 
-if 0 % BAD IDEA? - USE USER-SUPPLIED ORDER
+if 0 % USE USER-SUPPLIED SCALP MAP ORDER. A GOOD ALGORITHM FOR SELECTING
+     % timefreqs POINT ORDER GIVING MAX UNCROSSED LINES IS DIFFICULT!
   [tmp tfi] = sort(timefreqs(:,1)); % sort on times
   tmp = timefreqs;
   for t=1:size(timefreqs,1)
