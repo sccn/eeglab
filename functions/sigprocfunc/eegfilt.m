@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-08-97 fixed frequency bound computation -sm
 % 10-22-97 added MINFREQ tests -sm
@@ -61,11 +64,12 @@ if chans > 1 & frames == 1,
     error('input data should be a row vector.');
 end
 nyq            = srate*0.5;  % Nyquist frequency
-MINFREQ = 0.1/nyq;
+%MINFREQ = 0.1/nyq;
+MINFREQ = 0;
 
 minfac         = 3;    % this many (lo)cutoff-freq cycles in filter 
 min_filtorder  = 15;   % minimum filter length
-trans          = 0.25; % fractional width of transition zones
+trans          = 0.15; % fractional width of transition zones
 
 if locutoff>0 & hicutoff > 0 & locutoff > hicutoff,
     help eegfilt
@@ -102,7 +106,7 @@ if filtorder==0,
 end
 
 if nargin<5
-       epochframes = 0;
+	epochframes = 0;
 end
 if epochframes ==0,
     epochframes = frames;    % default
@@ -116,6 +120,9 @@ if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
     fprintf('filter order is %d. ',filtorder);
     error('epochframes must be 3 times the filtorder.');
 end
+if (1+trans)*hicutoff/nyq > 1
+	error('high cutoff frequency to close to Nyquist frequency');
+end;
 
 if locutoff > 0 & hicutoff > 0,    % bandpass filter
   fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
