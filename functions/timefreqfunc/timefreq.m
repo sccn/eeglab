@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/10/30 18:46:06  arno
+% time limits in ms
+%
 % Revision 1.35  2003/10/29 01:43:27  arno
 % typo in error msg
 %
@@ -261,34 +264,42 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 
 % finding frequencies
 % -------------------
-if length(g.freqs) == 1
-    g.freqs(2) = g.freqs(1);
-end;
-if g.freqs(1) == 0 & g.cycles ~= 0
-    g.freqs(1) = srate*g.cycles/g.winsize;
-end;
-if isempty(g.nfreqs)
-    g.nfreqs = g.winsize/2*g.padratio+1;
-    if g.cycles ~= 0
+if length(g.freqs) == 2
+    
+    % min and max
+    % -----------
+    if g.freqs(1) == 0 & g.cycles ~= 0
+        g.freqs(1) = srate*g.cycles/g.winsize;
+    end;
+
+    % default number of freqs using padratio
+    % --------------------------------------
+    if isempty(g.nfreqs)
+        g.nfreqs = g.winsize/2*g.padratio+1;
+        % adjust nfreqs depending on frequency range
         tmpfreqs = linspace(0, srate/2, g.nfreqs); 
         tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
         g.nfreqs = length(tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2)))));
         if g.freqs(1)==g.freqs(2), g.nfreqs = 1; end;
     end;
+    
+    if strcmpi(g.freqscale, 'log')
+        g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
+        g.freqs = exp(g.freqs);
+    else
+        g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
+    end;
 end;
+
+% find closest freqs for FFT
 if g.cycles == 0
     tmpfreqs = linspace(0, srate/2, g.nfreqs); 
     tmpfreqs = tmpfreqs(2:end);  % remove DC (match the output of PSD)
     if g.freqs(1)==g.freqs(2), g.freqs = g.freqs(1); 
     else g.freqs  = tmpfreqs( intersect( find(tmpfreqs >= g.freqs(1)), find(tmpfreqs <= g.freqs(2))));
     end;
-else
-    g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
 end;
-if strcmpi(g.freqscale, 'log')
-    g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
-    g.freqs = exp(g.freqs);
-end;
+g.nfreqs = length(g.freqs);
 
 % function for time freq initialisation
 % -------------------------------------
@@ -480,6 +491,16 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize,
         end;
     else
         timevals = timevar;
+        % check boundaries
+        % ----------------
+        wintime = 500*winsize/srate;
+        tmpind  = find( (timevals >= tlimits(1)+wintime) & (timevals <= tlimits(2)-wintime) );
+        if ~isempty(tmpind)
+            fprintf('Warning: %d out of %d time values were removed (now %3.2f to %3.2f ms) so the lowest\n', ...
+                    length(timevals)-length(tmpind), length(timevals), timevals(tmpind(1)), timevals(tmpind(end)));
+            fprintf('         frequency could be computed with the requested accuracy\n');
+            timevals = timevals(tmpind);
+        end;        
     end;
     
     % find closet points in data
