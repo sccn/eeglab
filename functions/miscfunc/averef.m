@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/11 18:37:33  scott
+% revised help msg
+%
 % Revision 1.2  2002/04/11 18:02:03  arno
 % computing average reference of components
 %
@@ -74,7 +77,7 @@ if nargin == 2
 end;
 if nargin == 3
 	winv = pinv(W*S);
+	S = eye(size(W,1), size(W,1));
 	avematrix = eye(chans)-ones(chans)*1/chans;
 	W = pinv(avematrix*winv);
-	S = eye(size(W,1), size(W,1));
 end;
