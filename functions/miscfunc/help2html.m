@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/15 22:23:25  arno
+% add outputonly param
+%
 % Revision 1.7  2002/08/15 21:42:23  arno
 % add default for outputtext
 %
@@ -155,15 +158,6 @@ if nargin < 2 | isempty(htmlfile);
 	htmlfile = [ filename(1:indexdot(end)-1) '.html' ];
 else
 	indexdot = findstr( filename, '.');
-end;
-
-% generate the output command
-% ---------------------------
-try, g.outputtext; 		catch, g.outputtext	= ''; 	end; 
-if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end;
-linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
-if strcmp(g.outputonly, 'on')
-	return;
 end;
 
 % open files
@@ -302,6 +296,16 @@ while (str(1) == '%')
          if maindescription
             if ~isempty(oldvartext) % FUNCTION TITLE
                maintext = oldvartext;
+
+			   % generate the output command
+			   % ---------------------------
+			   try, g.outputtext; 		catch, g.outputtext	= ''; 	end; 
+			   if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end;
+			   linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
+			   if strcmp(g.outputonly, 'on')
+				   return;
+			   end;
+			   
                maindescription = 0;
                functioname = oldvarname( 1:findstr( oldvarname, '()' )-1);
                fprintf( fo, [g.normrow g.normcol1 g.functionname '</td>\n'],upper(functioname));
