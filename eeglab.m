@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.175  2002/10/15 16:15:52  arno
+% message
+%
 % Revision 1.174  2002/10/13 23:23:05  arno
 % also clear EEGTMP if error
 %
@@ -967,6 +970,7 @@ W_MAIN = figure('Units','points', ...
 	'Position',[545.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ], ...
 	'color', COLOR, ...
 	'Tag','EEGLAB', ...
+    'visible', 'off', ...   
 	'Userdata', {[] []});
 BackgroundColor = get(gcf, 'color'); %[0.701960784313725 0.701960784313725 0.701960784313725];
 H_MAIN(1) = uicontrol('Parent',W_MAIN, ...
@@ -1030,7 +1034,7 @@ alltexth = setdiff(alltexth, titleh);
 set(gcf, 'Position',[545.6028543307087 192.1136811023622 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
 set(titleh, 'fontsize', 14, 'fontweight', 'bold');
 set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
-set(W_MAIN, 'userdata', {[] []});
+set(W_MAIN, 'userdata', {[] []}, 'visible', 'on');
 return;
 
 % eeglab(''redraw'')() - Update EEGLAB menus based on values of global variables.
