@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/11 23:34:49  arno
+% adding event check in event consistency
+%
 % Revision 1.13  2002/04/11 18:21:43  arno
 % add furhter check for EEG.averef
 %
@@ -140,7 +143,7 @@ if nargin < 1
 end;    
 if ~isempty( varargin)
     if isempty(EEG.data)
-        helpdlg('Empty dataset', 'Error');
+        helpdlg('Empty dataset -> File/Load data or dataset', 'Error');
         error('eeg_checkset: empty dataset');
     end;    
 end;
