@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/04/17 18:06:05  arno
+% adding newfig option
+%
 % Revision 1.40  2003/01/09 16:00:31  arno
 % correcting typo
 %
@@ -593,7 +596,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' ...
-		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' };
+		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
