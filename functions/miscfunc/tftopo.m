@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/08/27 00:31:09  arno
+% fix rms/average
+%
 % Revision 1.59  2003/03/08 02:26:32  arno
 % document the shiftimgs option
 %
@@ -538,7 +541,7 @@ if g.showchan>0
    % tl=title(['Channel ',int2str(g.showchan)]);
    % set(tl,'fontsize',14);
 else
-    if strcmpi(mode, 'rms')
+    if strcmpi(g.mode, 'rms')
         tl=title(['Signed channel rms']);
     else
         tl=title(['Signed channel average']);
