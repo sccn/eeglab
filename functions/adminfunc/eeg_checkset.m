@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2002/08/21 02:22:54  arno
+% debug
+%
 % Revision 1.60  2002/08/21 02:19:38  arno
 % add continuous data statement
 %
@@ -635,7 +638,7 @@ if ~isempty( varargin)
 		 case 'data',; % already done at the top 
 		 case 'contdata',; % already done at the top 
 		  if EEG.trials > 1
-			  errordlg2(strvcat('Can not reject artifact on data epochs'), 'Error');
+			  errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
 			  error('eeg_checkset: data is not continuous');
 		  end;
 		 case 'ica', 
