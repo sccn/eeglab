@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/06/12 00:31:15  arno
+% debug last
+%
 % Revision 1.60  2003/06/12 00:23:55  arno
 % header typo, returns std
 %
@@ -945,5 +948,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     
     n = length(epoch_subset);
 	eegspecdB = eegspec/n; % convert power to dB
-	specstd   = sqrt( (specstd +  eegspecdB.^2/n)/(n-1) ); % convert power to dB
+    if n>0
+         specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % convert power to dB
+    else specstd   = [];
+    end;
 	return;
