@@ -1,10 +1,19 @@
 % pop_copyset() - Copy the current dataset into another dataset.
 %
 % Usage:
-%   >> pop_copyset( index );
+%   >> ALLEEG = pop_copyset(ALLEEG, index1); % pop-up
+%   >> ALLEEG = pop_copyset(ALLEEG, index1, index2 );
 %
 % Inputs:
-%   index  - outputset number
+%   ALLEEG - array of dataset structure
+%   index1  - input dataset number
+%   index2  - index of dataset to copy into
+%
+% Inputs:
+%   ALLEEG - array of dataset structure
+%
+% Note: this function performs ALLEEG(index2) = ALLEEG(index1);
+%       with dataset checks
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -29,30 +38,33 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
-function com = pop_copyset( set_out);
-eeg_global;
+function [ALLEEG, com] = pop_copyset(ALLEEG, set_in, set_out);
 
 com = '';
-if isempty(EEG.data)
+if nargin < 2
+	help pop_copyset;
+	return;
+end;
+if isempty(EEG(set_in).data)
     disp('Pop_copyset error: cannot copy empty dataset'); return;
 end;    
 if nargin < 1
-
 	% which set to save
 	% -----------------
 	promptstr    = { 'Enter the destination dataset:' };
-	inistr       = { int2str(CURRENTSET+1) };
+	inistr       = { int2str(set_in+1) };
 	result       = inputdlg( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	set_out   	 = eval( result{1} );
-
 end;
+ALLEEG = eeg_store(ALLEEG, eeg_retrieve(ALLEEG, set_in), set_out);
 
-eeg_store(set_out);
-
-com = sprintf('pop_copyset( %d );', set_out);
+com = sprintf('%s = pop_copyset( %s, %d, %d);', inputname(1), inputname(1), set_in, set_out);
 return;
