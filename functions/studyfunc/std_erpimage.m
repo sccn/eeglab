@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.2  2005/02/15 02:21:43  arno
+%plot_indiv option
+%
 %Revision 1.1  2005/02/03 00:10:48  arno
 %Initial revision
 %
@@ -169,8 +172,9 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = subjer
                 allphases = allphases (1:length(tmpdata),:);
             end;
         end;
-        outdata (:,:,ival) = tmpdata(:,1:size(outdata,2));     %/sum(sum(abs(tmpdata)));        
-        allsortvar(:,ival) = tmpvar   (1:size(allsortvar,1))';
+        minsize = min( size(outdata,2), size(tmpdata, 2) );
+        outdata (:,1:minsize,ival) = tmpdata(:,1:minsize);     %/sum(sum(abs(tmpdata)));        
+        allsortvar(1:minsize,ival) = tmpvar   (1:minsize)';
         
         if ~isempty(phsangls)
             tmp = movav(phsangls, [1:length(phsangls)], abs(movewin(1)), ...
