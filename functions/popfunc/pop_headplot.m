@@ -1,5 +1,9 @@
-% pop_headplot() - plot a spherically-splined EEG field map on 
-%                  a semi-realistic 3-D head model.
+% pop_headplot() - plot one or more spherically-splined EEG field maps 
+%                  using a semi-realistic 3-D head model. Requires a
+%                  spline file, which is created first if not found.
+%                  This may take some time, but does not need to be 
+%                  done again for this channel locations montage. A wait 
+%                  bar will pop up to indicate how much time remains.
 % Usage:
 %   >> EEGOUT = pop_headplot( EEG, typeplot, ...
 %                    latencies/components, title, rowscols, 'key', 'val' ...);
@@ -16,15 +20,15 @@
 % Optional inputs:
 %   'setup'    - ['setupfile.spl'] Make the headplot spline file
 %   'load'     - ['setupfile.spl'] Load the headplot spline file
-%   others...  - All headplot options. See >> help headplot
+%   others...  - Other headplot options. See >> help headplot
 %
 % Output:
-%   EEGOUT - EEG dataset, possibly with modified splinefile. 
+%   EEGOUT - EEG dataset, possibly with a new or modified splinefile. 
 %
 % Note:
 %   A new figure is created only when the pop_up window is called or when
-%   several channels/components are plotted. Thus, you may call this command 
-%   to draw 3-D topographic maps in a tiled figure.     
+%   several channels/components are plotted. Therefore you may call this 
+%   command to draw single 3-D topographic maps in an existing figure.     
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 March 2002
 %
@@ -49,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2004/07/26 19:01:57  arno
+% debug detection of old channel location file
+%
 % Revision 1.25  2004/07/01 22:44:45  arno
 % detect if using old spline file
 %
@@ -134,7 +141,7 @@ if nargin < 1
 end;   
 
 if isempty(EEG.chanlocs)
-    error('Pop_headplot: cannot plot without channel locations. Use Edit/Dataset info');
+    error('Pop_headplot: this dataset does not contain channel locations. Use menu item: Edit > Dataset info');
 end;
 
 if nargin < 3
@@ -145,14 +152,14 @@ if nargin < 3
         byteperelec = splfile.bytes/EEG.nbchan;
         if byteperelec/EEG.nbchan < 625, % old head plot file
             EEG.splinefile = [];
-            disp('Warning: old spline file version detected and removed; spline file has to be recomputed');
+            disp('Warning: Old spline file version detected and removed; a new spline file must be recomputed');
         end;
     end;
     if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
-		 ButtonName=questdlg2( strvcat('3D head plot need to generate a spline file', ...
-		                      'the first time it is called (and for every new channel', ...
-		                      'location file). Do you want to generate this file now ?'), ...
-		                      'Spline File', 'Cancel', 'Load file', 'Yes','Yes');
+		 ButtonName=questdlg2( strvcat('headplot() must generate a spline file the first', ...
+		                 'time it is called and after changes in the channel location file.', ...
+		                 'Should it generate a spline file now (takes time - see wait bar)?'), ...
+		                 'Spline File', 'Cancel', 'Load file', 'Yes','Yes');
 		 switch lower(ButtonName),
 		      case 'cancel', return;
 		      case 'load file', 
@@ -163,7 +170,7 @@ if nargin < 3
 		            pop_options = [ ', ''load'', ''' EEG.splinefile '''' ]; 
                     com = 'EEG = ';
 		      case 'yes',
-				    [filename, filepath] = uiputfile('*.spl', 'Save spline file with .spl extension');
+				    [filename, filepath] = uiputfile('*.spl', 'Save the spline file with an .spl extension');
                     drawnow;
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
@@ -184,10 +191,10 @@ if nargin < 3
 	% -----------------
 	if typeplot
 		%txt = sprintf('ERP head plot at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
-		txt = sprintf('ERP head plot at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = sprintf('Making headplots for these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
 		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
-		txt = ['Component numbers (negate index to invert component polarity):' ];
+		txt = ['Component numbers to plot (negative numbers invert component polarities):' ];
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...
@@ -202,7 +209,7 @@ if nargin < 3
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
 	if length(arg2) > EEG.nbchan
-		tmpbut = questdlg2(['This involve drawing ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
+		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
 	topotitle    = result{2};
