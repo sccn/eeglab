@@ -6,7 +6,7 @@
 %
 % Inputs:
 %   INEEG          - input dataset structure
-%   chanindexes    - indexes of event channels
+%   chanindexes    - index of an event channel
 %
 % Optionnal inputs:
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/12/06 02:32:25  arno
+% adding type name
+%
 % Revision 1.7  2002/10/09 22:28:47  arno
 % update text
 %
@@ -71,6 +74,11 @@
 
 function [EEG, command] = pop_chanevent(EEG, chans, varargin); 
 command = '';
+
+if nargin < 1
+    help pop_chanevent;
+    return;
+end;
 
 if nargin < 2
 	geometry = { [1.465 2.05] [1.5 1 1] [1.5 0.21 1] [1.5 0.21 1] [1.5 0.21 1] };
