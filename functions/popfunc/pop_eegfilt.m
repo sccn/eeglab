@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 16:25:02  arno
+% inputdlg2
+%
 % Revision 1.4  2002/08/09 01:43:18  arno
 % [6~[6~same
 %
@@ -77,8 +80,13 @@ if nargin < 3
 	else
 		filtorder    = eval( result{3} );
 	end;
-elseif nargin < 4
-	filtorder = [];
+else
+    if nargin < 3
+        hicutoff = 0;
+    end;
+    if nargin < 4
+        filtorder = [];
+    end;
 end;
  
 options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
