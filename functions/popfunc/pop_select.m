@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/06/25 01:55:02  arno
+% adding parameter check
+%
 % Revision 1.10  2002/05/01 01:58:50  arno
 % removing extra gui parameters
 %
@@ -296,7 +299,7 @@ if ~isempty(EEG.icasphere)
    EEG.icasphere = EEG.icasphere(:,g.channel);
 end;
 if ~isempty(EEG.icawinv)
-   EEG.icawinv = EEG.icawinv(:,g.channel);
+   EEG.icawinv = EEG.icawinv(g.channel,:);
 end;
 if ~isempty(EEG.icaact)
 	if length(g.channel) == size( EEG.icaact,1)
