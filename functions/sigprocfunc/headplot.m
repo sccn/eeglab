@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2005/01/28 00:26:43  arno
+% change wait bar color
+%
 % Revision 1.47  2004/10/25 19:04:16  hilit
 % compatibility between Matlab 7 and 6 in spline file saving
 %
@@ -444,7 +447,7 @@ if isstr(values)
       for i = 1:length(ei)
         gx(j,i) = calcgx(ei(i));  
       end
-      waitbar(j/hwbend)
+      waitbar(j/hwbend, hwb)
     end
     close(hwb)
 
