@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/15 17:01:13  arno
+% drawnow
+%
 % Revision 1.3  2002/08/12 02:40:59  arno
 % inputdlg2
 %
@@ -63,7 +66,7 @@ if nargin < 1
 	% -----------------------
 	promptstr    = { 'Average reference ?' ...
 					 'Enter block size in CNT file (1 or 40):' };
-	inistr       = { 'YES', '40'  };
+	inistr       = { 'YES', '1'  };
 	pop_title    = sprintf('Load a CNT dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
