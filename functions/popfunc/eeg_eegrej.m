@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/06/02 17:26:53  arno
+% index to old event
+%
 % Revision 1.16  2004/06/02 17:21:54  arno
 % typo
 %
@@ -124,7 +127,7 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 % -------------------
 if ~isempty(boundevents)
     [ EEG.event indold ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
-    EEG                        = eeg_checkset(EEG, 'eventconsistency');
+    EEG                  = eeg_checkset(EEG, 'eventconsistency');
 else
     indold = 1:length(EEG.event);
 end;
@@ -132,14 +135,14 @@ end;
 % change event latencies
 % ----------------------
 if ~isempty(tmpalllatencies)
-	tmpnanloc = find(~isnan(tmpalllatencies));
-	EEG.event = EEG.event(indold(tmpnanloc));
-	fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
-			length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
-	tmpalllatencies = tmpalllatencies(tmpnanloc);
-	for tmpindex = 1:length(EEG.event)
+	for tmpindex = 1:length(tmpalllatencies)
 		EEG.event = setfield(EEG.event, { indold(tmpindex) }, 'latency', tmpalllatencies(tmpindex));
 	end;
+
+	tmpnanloc = find(isnan(tmpalllatencies));
+	EEG.event(indold(tmpnanloc)) = [];
+	fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
+			length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
 end;
 EEG.icaact = [];
  
