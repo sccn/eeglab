@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/12/29 00:17:33  scott
+% header
+%
 % Revision 1.3  2002/12/27 23:05:18  scott
 % edit header message - needs more details!! -sm
 % .,
@@ -148,17 +151,13 @@ if ~isempty(g.customheader)
 end;
 if  strcmpi(g.header, 'on') | g.skipline == 2
    for index=1:length(g.format)
-      fprintf(fid, '%s', g.format{index});
-      if index == length(g.format)
-         fprintf(fid, '\t');
-      end;         
+      fprintf(fid, '%s ', g.format{index});
    end;
+   fprintf(fid, '\n');
    for index=1:length(g.format)
-      fprintf(fid, '%s', char(ones(1,length(g.format{index}))*45));
-      if index == length(g.format)
-         fprintf(fid, '\t');
-      end;         
+      fprintf(fid, '%s', char(ones(1,length(g.format{index})+1)*45));
    end;
+   fprintf(fid, '\n');
 end;
 if g.skipline == 1
    fprintf(fid, '%d\n', length(chans));
