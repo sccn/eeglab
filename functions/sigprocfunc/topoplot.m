@@ -1,91 +1,88 @@
-% topoplot() - plot a topographic map of a scalp data field in a 2-D
-%              circular view (looking down at the top of the head) 
-%              using interpolation on a fine cartesian grid.
+% topoplot() - plot a topographic map of a scalp data field in a 2-D circular view 
+%              (looking down at the top of the head) using interpolation on a fine 
+%              cartesian grid. Can also show specified channnel location(s), or return 
+%              an interpolated value at an arbitrary scalp location (see 'noplot').
+%              By default, channel locations below head center are shown in a 'skirt'
+%              outside the cartoon head boundaries (see 'plotrad' option below).
 % Usage:
-%        >>  topoplot(datavector, chan_locs);
-%        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
-% Inputs:
-%    		datavector - vector of values at the corresponding locations.
-%                        if a single channel number, show location of that 
-%                        channel (use with 'style', 'blank' only)
-%   		chan_locs  - name of an EEG electrode position file (see
-%                        >> topoplot 'example' for format). May also be an
-%                        EEG.chanlocs structure (see >> help pop_editset)
-% Optional Parameters:
+%        >>  topoplot(datavector, EEG.chanlocs); % use a channel locations structure
+%        >>  topoplot(datavector, 'my_chan.locs'); % use a channel locations file
+%        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...);
+%
+% Required Inputs:
+%   datavector        - single vector of channel values. Else, if a vector of selected 
+%                       channel numbers -> mark their location(s) using 'style' 'blank'.
+%   chan_locs         - name of an EEG electrode position file (>> topoplot example),
+%                       else an EEG.chanlocs structure (>> help pop_editset)
+% Optional Inputs:
 %   'maplimits'       - 'absmax' scale to +/- the absolute-max; 'maxmin', scale to 
-%                        the data range; [clim1,clim2], user-definined lo/hi limits
-%                        {default = 'absmax'}
+%                       the data range; [clim1,clim2], user-definined lo/hi limits
+%                       {default: 'absmax'}
 %   'style'           - 'straight' - plot colored map only
 %                       'contour'  - plot contour lines only
 %                       'both'     - plot both colored map and contour lines
 %                       'fill'     - plot constant color between contour lines
-%                       'blank'    - plot electrode locations only
-%                                    {default = 'both'}
-%   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
-%   'numcontour'      - number of contour lines {default = 6}
-%   'shading'         - 'flat','interp'  {default = 'flat'}
-%   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
-%                       'head', to edge of head {default 'head'}.
+%                       'blank'    - plot electrode locations only {default: 'both'}
+%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'
+%                       {default: 'on', marks electrode location points}
+%   'numcontour'      - number of contour lines {default: 6}
+%   'shading'         - 'flat','interp'  {default: 'flat'}
+%   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
+%                       'head'-> interpolate the whole disk {default: 'head'}.
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius. (See >> topoplot example). If 
-%                       plotrad > 0.5, plot electrodes in lower head (with arc_length>0.5)
+%                       plotrad > 0.5, plot electrodes below head center (arc_length > 0.5)
 %                       in a circular 'skirt' outside the cartoon head outline. 
 %                       {default: max of 0.5 and the max channel arc_length)}. 
-%   'shrink'          - ['on'|'off'|'force'|factor] 'on': If max channel arc_length > 0.5, 
-%                        normalize electrode polar coordinates to make the maximum
-%                        arc_length 0.5 (to plot all locations). 'force': Normalize arc_length 
-%                        so the channel max is 0.5. 'factor': Apply a specified shrink
-%                        factor (range (0,1), fraction of the maximum).
-%                        {default = chan_locs 'shrink' value, if any, else 'off'}
-%   'colormap'        -  (n,3) any size colormap
-%   'verbose'         - ['on'|'off'] default is 'on'.
+%   'colormap'        -  (n,3) any size colormap {default: existing colormap}
+%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
-%                        If [rad theta] are coordinates of a (possibly missing) channel, 
-%                        returns interpolated value for channel location. For location 
-%                        conventions, see >> topoplot 'example'
-%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
+%                       If [rad theta] are coordinates of a (possibly missing) channel, 
+%                       returns interpolated value for channel location. For location 
+%                       conventions, see >> topoplot 'example' {default: 'off'}
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
-%   'efontsize'|'electcolor'|'emarker'|'emarkersize'|'emarkersize1chan' - electrode details
-%
+%   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
+%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{}
+%                        electrode marking details {defaults}
+%   'shrink'          - ['on'|'off'|'force'|factor] 'on': If max channel arc_length > 0.5, 
+%                       shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force': Normalize arc_length 
+%                       so the channel max is 0.5. 'factor': Apply a specified shrink
+%                       factor (range (0,1), fraction of the maximum). {default: 'off'}
+%  'forcehead'       -  ['on'|'off] force plotting of head cartoon (nose, ears) even when 
+%                       'shrink' is used or when the plotted area is above the ears 
+%                        (i.e., 'plotrad' < 0.5). {default: 'off'}
 % Dipole plotting options:
-%   'dipole'          - [XI YI XE YE ZE] plot dipole on the top of the scalp
-%                       map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
+%   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
+%                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
-%                       Coordinates returned by dipplot() may be used. Can also accept 
+%                       Coordinates returned by dipplot() may be used. Can accepts
 %                       an EEG.dipfit.model structure (See >> help dipplot).
-%                       Ex: 'dipole',EEG.dipfit.model(17),. . .  % Use dipole(s) for
-%                                                                % component 17.
-%   'dipnorm'         - ['on'|'off'] normalize dipole length {default = 'off'}.
-%   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
-%   'diplen'          - [real] scale dipole length {default = 1}.
-%   'dipscale'        - [real] scale dipole size {default = 1}.
-%   'dipsphere'       - [real] size of the sphere. Default is 85 mm.
-%   'dipcolor'        - [color] change dipole color {default = 'k' (black)}.
-%                        The dipole bar is scaled by length L. Dipole size (scaling) 
-%                        is S and its color is C (3 real numbers between 0 and 1).
+%                       Ex: 'dipole',EEG.dipfit.model(17) % Use dipole(s) for comp. 17.
+%   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'off'}.
+%   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
+%   'diplen'          - [real] scale dipole length {default: 1}.
+%   'dipscale'        - [real] scale dipole size {default: 1}.
+%   'dipsphere'       - [real] size of the dipole sphere. {default: 85 mm}.
+%   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
+%                       {default: 'k' -> black}.
 % Outputs:
-%         h           - axes handle
+%         h           - plot axes handle
 %         val         - interpolated value at given 'noplot' channel location, if any.
-%         grid        - interpolated data image (gridscale,gridscale) (off-head points = NaN).
+%         grid        - interpolated data image matrix (off-head points = NaN).
 %
 % Eloc_file format:
-%    chan_number degrees radius reject_level amp_gain channel_name
-%    (Angle-0 =Cz-to-Fz; C3-angle =-90; Radius at edge of image = 0.5)
-%    For a sample eloc file: >> topoplot 'example'
+%    chan_number degrees arc_length reject_level amp_gain channel_name
+%    (Angle-0 =Cz-to-Fz; C3-angle =-90; arc_length at edge of image = 0.5)
+%    For more information and sample file: >> topoplot 'example'
 %
-% Note: 1) topoplot() only works when map limits are >= the max and <= min of the 
-%          interpolated data values, respectively.
-%       2) Unless, 'shrink' is set to 'on' or 'skirt' (or EEG.shrink == 'on'|'skirt'), 
-%          topoplot will ignore any electrode with a position outside 
-%          the head (radius > 0.5). To make the head round, >> axis square
-%
-% Authors: Andy Spydell, Colin Humphries & Arnaud Delorme 
-%          CNL / Salk Institute, Aug, 1996
+% Authors: Andy Spydell, Colin Humphries, Scott Makeig & Arnaud Delorme 
+%          CNL / Salk Institute, Aug, 1996 - SCCN/INC/UCSD, Nov. 2001 -
 %
 % See also: timtopo(), envtopo()
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
-%
+%                                          
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
@@ -101,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2004/03/19 02:33:40  scott
+% plotting head, ears and/or skirt as appropriate from plotrad and shrink args
+%
 % Revision 1.157  2004/03/19 01:49:07  scott
 % plotrad
 %
@@ -385,16 +385,16 @@
 % 5-24-01 made default emarkersize vary with number of channels -sm
 % 01-25-02 reformated help & license, added link -ad 
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
-% 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
+% 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,chanval,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,chanval,Zi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC and BACKCOLOR
-if ~exist('BACKCOLOR')
+if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
    BACKCOLOR = [.93 .96 1];  % EEGLAB standard
 end
 noplot  = 'off';
@@ -412,12 +412,16 @@ HCOLOR = [0 0 0];       % default head color
 CCOLOR = [0 0 1];       % default contour color
 ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = 'on';      % default 'electrodes': on|off|label
-EMARKER = '.';
+EMARKER = '.';          % mark electrode locations with small disks
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
+EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
+EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = 'off';   % shrinking mode
+forcehead = 'off';      % by default, do not force plotting of the head cartoon
+                        %   when anatomically inappropriate
 plotrad      = [];      % plotting radius( [] = aurto )
 MINPLOTRAD = 0.15;      % can't make a topoplot with smaller plotrad (contours fail)
 DIPOLE  = [];           % dipole defaults
@@ -442,8 +446,8 @@ if nargs < 2
   loc_file = DEFAULT_ELOC;
 end
 if nargs == 1
-  if isstr(Vl)
-    if any(strcmp(lower(Vl),{'example','demo'}))
+  if isstr(Values)
+    if any(strcmp(lower(Values),{'example','demo'}))
       fprintf(['This is an example of an electrode location file,\n',...
                'an ascii file consisting of the following four columns:\n',...
                ' channel_number degrees arc_length channel_name\n\n',...
@@ -459,13 +463,13 @@ if nargs == 1
                '11                 0    .181       Fz  \n',...
                '12                 0    0          Cz  \n',...
                '13               180    .181       Pz  \n\n',...
-               'The model head sphere has a circumference of +/-1.\n',...
-               'The vertex (Cz) has 0 arc_length. Channels with arc_length > 0.5\n',...
-               '(i.e., below head center) are plotted outside the head cartoon\n',...
-               '(unless the shrink option is set). The plotrad option\n',...
-               'controls how much of this lower-head "skirt" is shown. In\n',...
-               'topoplot() coordinates, 0 deg. is towards the nasion. Positive\n',...
-               'angles point to the right hemisphere; negative to the left.\n',...
+                                                             ...
+               'In topoplot() coordinates, 0 deg. points to the nose, positive\n',...
+               'angles point to the right hemisphere, and negative to the left.\n',...
+               'The model head sphere has a circumference of 2; the vertex\n',...
+               '(Cz) has arc_length 0. Locations with arc_length > 0.5 are below\n',...
+               'head center and are plotted outside the head cartoon. The option\n'....
+               'plotrad controls how much of this lower-head "skirt" is shown.\n',...
                ])
       return
     end
@@ -518,10 +522,10 @@ if nargs > 2
 	  CONTOURNUM = Value;
 	 case 'electrodes'
 	  ELECTRODES = lower(Value);
-         if strcmpi(ELECTRODES,'pointlabels')
+         if strcmpi(ELECTRODES,'pointlabels') | strcmpi(ELECTRODES,'ptslabels')
              ELECTRODES = 'labelpoint'; % backwards compatability
          end
-         if strcmpi(ELECTRODES,'pointnumbers')
+         if strcmpi(ELECTRODES,'pointnumbers') | strcmpi(ELECTRODES,'ptsnumbers')
              ELECTRODES = 'numpoint'; % backwards compatability
          end
          if ~strcmpi(ELECTRODES,'labelpoint') ...
@@ -530,7 +534,7 @@ if nargs > 2
             & ~strcmp(ELECTRODES,'off') ...
             & ~strcmp(ELECTRODES,'labels') ...
             & ~strcmpi(ELECTRODES,'numbers') 
-		 	   fprintf('topoplot(): Unknown value for keyword ''electrodes''.\n');
+                fprintf('topoplot(): Unknown value for keyword ''electrodes''.\n');
             return
          end
 	 case 'dipole'
@@ -551,6 +555,8 @@ if nargs > 2
 	  EMARKER = Value;
 	 case 'shrink'
 	  shrinkfactor = Value;
+         case 'forcehead'
+          forcehead = Value;
 	 case 'plotrad'
 	  plotrad = Value;
 	 case {'headcolor','hcolor'}
@@ -593,34 +599,46 @@ if nargs > 2
   end
 end
 
-[r,c] = size(Vl);
+if isempty(Values)
+   STYLE = 'blank';
+end
+[r,c] = size(Values);
 if r>1 & c>1,
   error('topoplot(): input data must be a single vector');
+elseif r==1 & c==1
+  STYLE = 'blank'; % plot channels only, marking the indicated channel number
 end
+
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if isstr(loc_file)
-	[tmpeloc labels Th Rd ind] = readlocs(loc_file,'filetype','loc');
+	[tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
 else % a locs struct
-	[tmpeloc labels Th Rd ind] = readlocs(loc_file);
+	[tmpeloc labels Th Rd indices] = readlocs(loc_file);
 end
-if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common reference channel)
+if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
+                                         % (common reference channel)
     tmpeloc(end) = [];
     labels(end) = [];
     Th(end) = [];
     Rd(end) = [];
 end;
 
-if length(Vl) > 1
-   if max(ind)>length(Vl)
-      fprintf('max channel index in locs (%d) > number of channels in plot data (%d) ',...
-                                   max(ind),length(Vl));
-      error(' ')
+if length(Values) > 1
+   if max(indices)>length(Values)
+      if strcmpi(VERBOSE, 'on')
+        fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
+                                   max(indices),length(Values));
+        fprintf('            Marking the locations of the %d indicated channels.\n', ...
+                                    length(Values));
+      end
+      STYLE = 'blank';
+   else
+      Values     = Values(indices);
    end
-    Vl     = Vl(ind);
 end;
-labels = labels(ind);
+labels = labels(indices);
 
 % shrink and skirt factor decoding
 % --------------------------------
@@ -637,9 +655,9 @@ end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
-%if length(Vl) > 1 & length(Vl) ~= length(Th),
+%if length(Values) > 1 & length(Values) ~= length(Th),
 % fprintf('topoplot(): data vector length (%d) must be the same as chan_locs file rows (%d)\n',...
-%               length(Vl),length(Th));
+%               length(Values),length(Th));
 %end
 
 % shrink mode
@@ -659,52 +677,54 @@ if isstr(shrinkfactor) % if shrink arg is a string option
                 shrinkfactor);
         end;
 		Rd = Rd*shrinkfactor; % squeeze electrodes by (squeezefac*100)%
-	end;	                        % to plot all inside the head cartoon
+	end;	                      % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): electrode arc_lengths shrunk by (1 -> %2.3g)\n',...
                                                                       shrinkfactor);
 	end;
     Rd = Rd/shrinkfactor*rmax; % squeeze electrodes by (squeezefac*100)% 
-                        % to fit inside plotting circle
+                                      % to fit inside plotting circle
 end;
 
-% (default) skirt mode
-% ----------
+%
+%%%%%%%%%%%%%%%%%%%%%%%% (default) skirt mode %%%%%%%%%%%%%%%%%%%%%%%%%
+% 
 if isempty(plotrad)
-    plotrad = max(Rd);
+    plotrad = max(Rd)*1.015; % default plotting radius just outside lowest electrode
     RESET_PLOTRAD=1;
 end;
-enum = find(Rd <= plotrad);                     % interpolate plotted channels only
+enum = find(Rd <= plotrad);           % interpolate plotted channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): %d/%d electrodes NOT shown (radius>plotrad)\n', ...
+        fprintf('topoplot(): %d of %d electrodes not shown (radius>plotrad)\n', ...
                    length(enum)-length(Rd),length(Rd),plotrad);    
     end; 
 end;	
 if exist('RESET_PLOTRAD') & plotrad<rmax
   plotrad=rmax;
 end
-if ~isempty(Vl)
-	if length(Vl) == length(Th)
-		Vl = Vl(enum);
+
+if ~isempty(Values)
+	if length(Values) == length(Th)
+		Values = Values(enum);
 	else if strcmp(STYLE,'blank')
-            tmpVl=[];
+            tmpValues=[];
             cc=1;
-            for kk=1:length(Vl)
-                tmpind = find(enum == Vl(kk));
+            for kk=1:length(Values)
+                tmpind = find(enum == Values(kk));
                 if isempty(tmpind)
-                    if strcmpi(VERBOSE, 'on')
-                        disp( [ ...
-    'topoplot() Warning: one or more channels are not visible (use "Edit' ...
-    ' > Channel locations" to modify the montage plotting limits).' ] );
-                    end;
+    %                 if strcmpi(VERBOSE, 'on')
+    %                     disp( [ ...
+    % 'topoplot() Warning: one or more channels are not visible (use "Edit' ...
+    % ' > Channel locations" to modify the montage plotting limits).' ] );
+    %                end;
                 else
-                    tmpVl(cc) = tmpind;
+                    tmpValues(cc) = tmpind;
                     cc=cc+1;
                 end;
             end
-            Vl=tmpVl;
+            Values=tmpValues;
 		end;
 	end;	
 end;
@@ -715,16 +735,35 @@ labels = labels(enum,:);
 if ~isstr(plotrad) & (plotrad < MINPLOTRAD | plotrad> 1.0)
    error('argument plotrad must be between 0.15 and 1.0');
 end
-if ~isstr(plotrad) & (plotrad < 0.5)
-  fprintf('topoplot(): not plotting nose or ears since plotrad (%5.4g) < 0.5\n',plotrad);
+%
+%%%%%%%%%%%%%%%%%%%%%% Give info about plotting of head cartoon %%%%%%%%%%%%%%%
+%
+if ~isstr(plotrad) & (plotrad < 0.5) & ~strcmpi(forcehead,'on')
+  if strcmpi(VERBOSE, 'on')
+    fprintf('topoplot(): not plotting nose or ears since plotrad (%5.4g) < 0.5\n',...
+                                                                 plotrad);
+  end
+elseif strcmpi(forcehead,'on')
+  if strcmpi(VERBOSE, 'on')
+    fprintf('topoplot(): forcing plotting of nose or ears though plotrad (%5.4g) < 0.5\n',...
+                                                                 plotrad);
+  end
 end
-if ~isstr(shrinkfactor) & (shrinkfactor < 1.0)
-  fprintf('topoplot(): not plotting nose or ears since shrinkfactor (%5.4g) < 1\n',shrinkfactor);
+if ~isstr(shrinkfactor) & (shrinkfactor < 1.0) & ~strcmpi(forcehead,'on')
+  if strcmpi(VERBOSE, 'on')
+    fprintf('topoplot(): not plotting nose or ears since shrinkfactor (%5.4g) < 1\n',...
+                                                                 shrinkfactor);
+  end
+elseif strcmpi(forcehead,'on')
+  if strcmpi(VERBOSE, 'on')
+    fprintf('topoplot(): forcing plotting of nose or ears though shrinkfactor (%5.4g) < 1\n',...
+                                                                 shrinkfactor);
+  end
 end
 
-
-% squeeze all to 0.5
-% ------------------
+%
+%%%%%%%%%%%%%%%%% Squeeze all channel locations to <= rmax %%%%%%%%%%%%%%%%%%%%
+% 
 squeezefac = rmax/plotrad;   % was (2*max(r)-1)/(2*rmax);
 if squeezefac > 1
     squeezefac = 1;
@@ -734,7 +773,7 @@ end;	                % to plot all inside the head cartoon
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 
-if ~strcmpi(STYLE,'blank') % if draw scalp map
+if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -751,7 +790,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   xi = linspace(xmin,xmax,GRID_SCALE);   % x-axis description (row vector)
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
-  [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % interpolate data
+  [Xi,Yi,Zi] = griddata(y,x,Values,yi',xi,'invdist'); % interpolate data
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%
   %
@@ -759,12 +798,16 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   ii = find(mask == 0);
   Zi(ii) = NaN;
   %
-  %%%%%%%%%%%%%%%%%%%%%%% return designated channel value %%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%% Return designated channel value %%%%%%%%%%%%%%%%
   %
   if exist('chanrad') % 'noplot' (first argument)
       chantheta = (chantheta/360)*2*pi;
-      chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),-sin(-chantheta)]);
-      if chancoords(1)<1 | chancoords(1) > GRID_SCALE | chancoords(2)<1 | chancoords(2)>GRID_SCALE
+      chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),...
+                                                      -sin(-chantheta)]);
+      if chancoords(1)<1 ...
+         | chancoords(1) > GRID_SCALE ...
+            | chancoords(2)<1 ...
+               | chancoords(2)>GRID_SCALE
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
@@ -799,7 +842,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   delta = xi(2)-xi(1); % length of grid entry
 
   %
-  %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%%%%%
   %
   cla  % clear current axis
   hold on
@@ -813,11 +856,15 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 
   % pos = get(gca,'position');
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
-
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
   if strcmp(STYLE,'contour')                     % plot surface contours only
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
     % for h=chs, set(h,'color',CCOLOR); end
-
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%% Plot map and contours %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
   elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
@@ -827,7 +874,9 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
     end;
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
     for h=chs, set(h,'color',CCOLOR); end
-
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%% Plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
   elseif strcmp(STYLE,'straight')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -835,7 +884,9 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-
+  %
+  %%%%%%%%%%%%%%%%%%%%%%%% Fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
+  %
   elseif strcmp(STYLE,'fill')
     [cls chs] = contourf(Xi,Yi,Zi,CONTOURNUM,'k');
     % for h=chs, set(h,'color',CCOLOR); end <- 'not line objects.' Why does 'both' work above???
@@ -844,17 +895,16 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
     error('topoplot(): Invalid style')
   end
   caxis([amin amax]) % set coloraxis
-else % if style 'blank'
+else % if STYLE 'blank'
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Draw blank head %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-   if strcmpi(noplot, 'on') 
-       fprintf('topoplot(): no plot requested.\n')
-       return;
-   end
-
-   cla
-   hold on
+  if strcmpi(noplot, 'on') 
+      fprintf('topoplot(): no plot requested.\n')
+      return;
+  end
+  cla
+  hold on
   if ~isstr('plotrad')
     AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
                       % shrunk by the 'skirt' option
@@ -872,17 +922,6 @@ else % if style 'blank'
     a = title('Channel locations');
     set(a, 'fontweight', 'bold');
   end;
-
-  if length(Vl) < length(enum)
-      for kk = 1:length(Vl)
-          if exist('EMARKERSIZE1CHAN') == 1
-              hp2 = plot(y(Vl(kk)),x(Vl(kk)),'.','Color', 'red', 'markersize', EMARKERSIZE1CHAN);
-          else
-              hp2 = plot(y(Vl(kk)),x(Vl(kk)),'.','Color', 'red', 'markersize', 40);
-              hold on
-          end;
-      end
-  end;
 end
 
 if exist('handle') ~= 1
@@ -890,17 +929,48 @@ if exist('handle') ~= 1
 end;
 
 %
-% %%%%%%%%%%%%%%%%%%% Plot electrodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-for k = 1:size(labels,1)
-  if abs(Rd(k)-0.5)<0.01   % move electrodes at plotting edge in slightly to show
-    x(k) = x(k)*0.98;
-    y(k) = y(k)*0.98;
-    fprintf('topoplot(): Location for electrode %d moved in slgihtly to show on plot\n',k);
+%%%%%%%%%%%%%%%%%%%%% Plot head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+circ = 0:2*pi/100:2*pi;                 % circle vertices
+basex = 0.18*rmax;                      % nose width
+tip = rmax*1.15; base = rmax-.004;
+EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
+EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
+
+if isstr('plotrad') % if 'skirt' mode
+  sf = squeezefac;
+  if sf < 0.98 | strcmpi(forcehead,'on')
+   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
+   set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);        % hide the disk edge jaggies 
+  end
+    plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
+  if plotrad>=0.5  | strcmpi(forcehead,'on')
+   if isstr(shrinkfactor) | shrinkfactor==1 | strcmpi(forcehead,'on')
+    plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
+    plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
+    plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
+   end
+  end
+else % no 'skirt'
+    plot(cos(circ).*rmax,sin(circ).*rmax,...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head
+  if plotrad>=0.5 | strcmpi(forcehead,'on')
+   if isstr(shrinkfactor) | shrinkfactor==1 | strcmpi(forcehead,'on')
+    plot([basex;0;-basex],[base;tip;base],...
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
+    plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
+    plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
+   end
   end
 end
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations only %%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%% Show electrode infor %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations only %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
   if isempty(EMARKERSIZE)
@@ -918,9 +988,8 @@ if strcmp(ELECTRODES,'on')   % plot electrodes as spots
    end
   end
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
-
 %
-%%%%%%%%%%%%%%%%%%%%%%%%% print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
     for i = 1:size(labels,1)
@@ -929,7 +998,7 @@ elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
 	'FontSize',EFSIZE)
   end
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations plus labels %%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus labels %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labelpoint') 
  if isempty(EMARKERSIZE)
@@ -954,7 +1023,7 @@ elseif strcmp(ELECTRODES,'labelpoint')
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%% mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus numbers %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'numpoint') 
  if isempty(EMARKERSIZE)
@@ -979,7 +1048,7 @@ elseif strcmp(ELECTRODES,'numpoint')
 	     'set(gco, ''string'', tmpstr); clear tmpstr;'] );
   end
 %
-%%%%%%%%%%%%%%%%%%%%%%%%% print electrode numbers only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Print electrode numbers only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
@@ -988,48 +1057,20 @@ elseif strcmp(ELECTRODES,'numbers')
 	'FontSize',EFSIZE)
   end
 end
-
 %
-%%%%%%%%%%%%%%%%%%%%% Plot head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-circ = 0:2*pi/100:2*pi; % circle vertices
-basex = 0.18*rmax;      % nose width
-tip = rmax*1.15; base = rmax-.004;
-EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
-EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
-
-if isstr('plotrad') % if 'skirt' mode
-  sf = squeezefac;
-  if sf < 0.99
-   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot skirt outline
-   set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+4);         % hide the disk edge jaggies 
-  end
-    plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
-  if plotrad>=0.5 
-   if isstr(shrinkfactor) | shrinkfactor==1
-    plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
-    plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
-    plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
-   end
-  end
-else % no 'skirt'
-    plot(cos(circ).*rmax,sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head
-  if plotrad>=0.5  
-   if isstr(shrinkfactor) | shrinkfactor==1
-    plot([basex;0;-basex],[base;tip;base],...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
-    plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
-    plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
-   end
-  end
+%%%%%%%%%%%%%%%%%%%%%%%%% Mark selected electrode locations %%%%%%%%%%%%%%%%%%%%%%%%
+%
+if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
+  if length(Values) < length(enum)  % mark selected electrodes
+      for kk = 1:length(Values)
+        hp2 = plot(y(Values(kk)),x(Values(kk)),'.','Color', EMARKERCOLOR1CHAN, ...
+                                              'markersize', EMARKERSIZE1CHAN);
+        hold on
+      end
+  end;
 end
-
 %
-%%%%%%%%%%%%%%%%%%%%%% Plot dipole on the scalp map  %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Plot dipole(s) on the scalp map  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(DIPOLE)
     hold on;
@@ -1076,7 +1117,7 @@ if ~isempty(DIPOLE)
 end;
 
 %
-%%%%%%%%%%%%%%%%%%%% Set standard background color %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
 try, 
   icadefs; 
@@ -1084,49 +1125,11 @@ try,
   catch, 
 end; 
 
-hold off
-axis off
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Keep head round  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 axis square; % keep head round!
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%%%%
-% NOT IN USE
-function [newTh] = skirt_Th(Th,Rd,maxr)
-   pi2 = pi/2;
-   q1 = find(Th>=0 & Th<pi/2 & Rd>maxr); % electrodes to move
-   q2 = find(Th>=pi/2 & Th<pi & Rd>maxr);
-   q3 = find(Th<-pi/2 & Th>=-pi & Rd>maxr);
-   q4 = find(Th<0 & Th>=-pi/2 & Rd>maxr);
+hold off
+axis off
 
-   if ~isempty(q1)
-     dr = Rd(q1)-0.5;
-     x = abs(asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi))));
-     Th(q1) = x+Th(q1)*(pi2-2*x)/(pi2);
-   end
-
-   if ~isempty(q2)
-     Th(q2) = Th(q2)-pi2; % rotate to q1
-     dr = Rd(q2)-0.5;
-     x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q2) = x+Th(q2)*(pi2-2*x)/pi2;
-     Th(q2) = Th(q2)+pi2; % rotate back
-   end
-
-   if ~isempty(q3)
-     Th(q3) = Th(q3)+pi; % rotate to q1
-     dr = Rd(q3)-0.5;
-     x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q3) = x+Th(q3)*(pi2-2*x)/pi2;
-     Th(q3) = Th(q3)-pi; % rotate back
-   end
-
-   if ~isempty(q4)
-     Th(q4) = Th(q4)+pi2; % rotate to q1
-     dr = Rd(q4)-0.5;
-     x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q4) = x+Th(q4)*(pi2-2*x)/pi2;
-     Th(q4) = Th(q4)-pi/2; % rotate back
-   end
-
-   newTh = Th;
-return
