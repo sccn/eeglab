@@ -93,7 +93,7 @@
 %               ELSE [minfrq maxfrq alpha] = plot coher. signif. level line at 
 %               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
-%               implicit in third arg times) {default: as in icadefs.m}
+%               implicit in third arg, times) {default: as in icadefs.m}
 %   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
 % Add other features:
@@ -166,6 +166,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.227  2004/11/15 17:22:46  scott
+% compute spectrum on urdata instead of data, for consistency
+%
 % Revision 1.226  2004/11/12 23:02:10  scott
 % making spectral peak estimates more consistent
 %
@@ -901,7 +904,7 @@ BACKCOLOR = [0.8 0.8 0.8]; % grey background
 try, icadefs; catch, end;
                     % read BACKCOLOR for plot from defs file (edit this)
                     % read DEFAULT_SRATE for coher,phase,allamps, etc.
-
+                    % read YDIR for plotting ERP
 % Fix plotting text and line style parameters
 SORTWIDTH = 2.5;    % Linewidth of plotted sortvar
 ZEROWIDTH = 3.0;    % Linewidth of vertical 0 line
@@ -2750,7 +2753,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         else
           tmph = plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
         end
-    else
+    else % plot ERP alone - no significance or std dev plotted
         if Showwin
           tmph = plot1trace(ax2,times,erp,limit,[],[],times(winlocs)); % plot ERP alone
         else
@@ -2793,7 +2796,6 @@ if Erpflag == YES & strcmpi(noshow, 'no')
             set(l,'FontSize',LABELFONT);
         end
     end
-    
     if ~isempty(verttimes) 
         if size(verttimes,1) == ntrials
             vts=sort(verttimes); 
@@ -2834,6 +2836,15 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     ynum = 0.7*(limit(3)+limit(4))/2;
     t=text(ytextoffset,ynum,yerplabel,'Rotation',90);
     set(t,'HorizontalAlignment','center','FontSize',LABELFONT)
+    
+    if ~exist('YDIR')
+       error('Default YDIR not read from ''icadefs.m''');
+    end
+    if YDIR == 1
+        set(ax2,'ydir','normal')
+    else
+        set(ax2,'ydir','reverse')
+    end 
     
     set(ax2,'Fontsize',TICKFONT);
     set(ax2,'Box','off','color',BACKCOLOR);
@@ -3228,10 +3239,10 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winlocs)
-%                           If signif is [], plot erp +/- stdev
-%                           Else if signif, plot erp and signif(1,:)&signif(2,:) fill
-%                           Else, plot erp alone
+function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs)
+%                           If signif is [], plot trace +/- stdev
+%                           Else if signif, plot trace and signif(1,:)&signif(2,:) fill.
+%                           Else, plot trace alone.
 %                           If winlocs not [], plot grey back image(s) in sort window
 %                                       winlocs(1,1)-> winlocs(1,end) (ms)
 %                                        ...
@@ -3252,8 +3263,8 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winlocs)
        % fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
        fillwiny = [hannwin*axlimits(3) hannwin*axlimits(4)];
     else
-       % fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
-       fillwiny = [hannwin*2*min(erp) hannwin*2*max(erp)];
+       % fillwiny = [repmat(min(trace)*1.1,1,length(winloc)) repmat(max(trace)*1.1,1,length(winloc))];
+       fillwiny = [hannwin*2*min(trace) hannwin*2*max(trace)];
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
     set(fillwh,'edgecolor',WINFILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
@@ -3272,10 +3283,10 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winlocs)
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
   end
   if ~isempty(stdev)
-      [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
-      [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
+      [st1] = plot(times,trace+stdev, 'r--','LineWidth',1); hold on % plot trace+stdev
+      [st2] = plot(times,trace-stdev, 'r--','LineWidth',1); hold on % plot trace-stdev
   end
-  [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
+  [plot_handle] = plot(times,trace,'LineWidth',ERPDATAWIDTH); hold on
   if ~isempty(axlimits) & sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
       axis([axlimits(1:2) 1.1*axlimits(3:4)])
@@ -3343,7 +3354,6 @@ prctl = interp1(pt,sortdata,pc);
 %
 %%%%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%
 % nan_mean() - Take the column means of a matrix, ignoring NaN values.
 %              Return significance bounds if alpha (0 < alpha< <1) is given.
 % 
@@ -3381,7 +3391,9 @@ function [out, outalpha]  = nan_mean(in,alpha)
      outalpha = booterps(end+1-alpha,:);
    end
    out(nononnans) = NaN;
-
+%
+%%%%%%%%%%%%%%%%%%%%%%% function nan_std() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 function out = nan_std(in)
     
     nans = find(isnan(in));
