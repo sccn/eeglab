@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/01/01 02:19:01  arno
+% debugging axes orientation
+%
 % Revision 1.23  2002/12/06 19:12:18  arno
 % mrirear debug
 %
@@ -465,6 +468,9 @@ end;
 if ~isempty(g.addmovparams)
     brainmovieoptions = { brainmovieoptions{:} g.addmovparams{:} };
 end;
+coordinates
+size(coordinates)
+size(g.circfactor)
 
 % data enveloppe
 % --------------
