@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2005/03/07 21:24:54  arno
+% chaninfo
+%
 % Revision 1.73  2005/01/28 00:47:32  arno
 % fix timesout
 %
@@ -757,7 +760,7 @@ for index = 1:length(allfields)
 		  'marktimes' 'vert' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' 'plottype' ...
 		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' 'amplag' ...
-          'highlightmode' 'plotmean' };
+          'highlightmode' 'plotmean' 'chaninfo' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
