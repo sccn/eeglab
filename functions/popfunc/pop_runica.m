@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/19 21:37:29  arno
+% debugging fastica for mac
+%
 % Revision 1.4  2002/08/12 02:28:24  arno
 % inputdlg2
 %
@@ -136,9 +139,9 @@ switch lower(icatype)
             error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
         end;     
         if length(options) < 2
-            eval('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' );' ]);
+            eval([ '[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' );' ]);
         else    
-            eval(sprintf('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata %s );', options));
+            eval(sprintf('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' %s );', options));
         end;
      otherwise, error('Pop_runica: unrecognized algorithm');
 end;
