@@ -107,16 +107,13 @@ r.nchannels=freadat(f, 370, 1, 'ushort');
 numsamples=freadat(f, 864, 1, 'long');  % not accurate, see calculation below
 samplespos=900 + 75*r.nchannels;
 event.tablepos=freadat(f, 886, 1, 'long');
-r.nsamples       = (event.tablepos - samplespos)/(2*r.nchannels);
-r.rate           = freadat(f, 376, 1, 'ushort');
-r.channeloffset  = freadat(f, 932, 1, 'long');
-r.dt             = 1/r.rate;
-r.scale          = freadat(f, 378, 1, 'double');
-r.ampsensitivity = freadat(f, 438, 1, 'float');
-r.refelectrode   = freadat(f, 540, 10, 'text');
-r.channeloffset  = freadat(f, 900-6, 1, 'long')
-r.blockread      = r.channeloffset;
-
+r.nsamples=(event.tablepos - samplespos)/(2*r.nchannels);
+r.rate=freadat(f, 376, 1, 'ushort');
+r.channeloffset=freadat(f, 932, 1, 'long');
+r.dt=1/r.rate;
+r.scale=freadat(f, 378, 1, 'double');
+r.ampsensitivity=freadat(f, 438, 1, 'float');
+r.refelectrode=freadat(f, 540, 10, 'text');
 if all(r.refelectrode==0), 
    %%disp('No reference electrode set in file, setting to CZ')
    r.refelectrode(1:2)='CZ'; 
@@ -133,13 +130,13 @@ end
 
 % channel parameters
 chandat=freadat(f, 900, [75 r.nchannels], 'char');
-r.chan.names       = setstr(chandat(1:9,:))';
-r.chan.reference   = chandat(11,:);
-r.chan.gain        = chandat(1+63,:);
-r.chan.baseline    = freadat(f, 900+47, [1 r.nchannels], 'short', 75);
-r.chan.sensitivity = freadat(f, 900+59, [1 r.nchannels], 'float', 75);
-r.chan.calib       = freadat(f, 900+71, [1 r.nchannels], 'float', 75);
-r.microvoltscalar  = r.chan.sensitivity.*r.chan.calib/204.8;
+r.chan.names=setstr(chandat(1:9,:))';
+r.chan.reference=chandat(11,:);
+r.chan.gain=chandat(1+63,:);
+r.chan.baseline=freadat(f, 900+47, [1 r.nchannels], 'short', 75);
+r.chan.sensitivity=freadat(f, 900+59, [1 r.nchannels], 'float', 75);
+r.chan.calib=freadat(f, 900+71, [1 r.nchannels], 'float', 75);
+r.microvoltscalar=r.chan.sensitivity.*r.chan.calib/204.8;
 
 r.nevent=0;
 fseek(f, event.tablepos, 'bof');
@@ -162,7 +159,7 @@ end
 r.event.stimtype=freadat(f, event.tablepos+9, r.nevent, 'short', event.bytes);  % stimtype
 r.event.keyboard=freadat(f, event.tablepos+9+2, r.nevent, 'uchar', event.bytes);  % keyboard
 r.event.keypadaccept=freadat(f, event.tablepos+9+3, r.nevent, 'uchar', event.bytes);  % keypadaccept
-offset = freadat(f, event.tablepos+9+4, r.nevent, 'long', event.bytes);   % offset
+offset=freadat(f, event.tablepos+9+4, r.nevent, 'long', event.bytes);   % offset
 r.event.frame=(offset-samplespos)/(r.nchannels*2);  % samplenumber
 r.event.time=r.event.frame/r.rate;
 
@@ -205,7 +202,6 @@ r.event.frame(i)=[];
 r.event.time(i)=[];
 
 try, ldraw=r.ldraw; catch, ldraw=0; end;
-r.blockread = 40;
 
 if ~isempty(ldchan)
    if length(ldchan)==r.nchannels
@@ -219,8 +215,7 @@ if ~isempty(ldchan)
 
 		  counter = 1;	
  		  while counter*r.blockread < ldnsamples
-	      	dat(:, counter*r.blockread+1:counter*r.blockread+r.blockread) = freadat(f, [], ...
-                                                              [r.blockread r.nchannels], 'short')';
+	      	dat(:, counter*r.blockread+1:counter*r.blockread+r.blockread) = freadat(f, [], [40 r.nchannels], 'short')';
 			counter = counter + 1;
 		  end;
 	  end;	
