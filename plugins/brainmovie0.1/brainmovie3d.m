@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/10/21 19:24:30  arno
+% new look for caption ...
+%
 % Revision 1.11  2003/10/09 01:01:34  arno
 % fixing coordinate problem for multiple conditions
 %
@@ -631,7 +634,7 @@ switch lower(g.caption)
       material shiny;
       axis equal;
       set(gca, 'zlim', [-2 4]);
-      text(0, 1.3, 2, [ num2str(g.scalepower(2),2) ], 'fontweight', 'bold');
+      text(0, 1.3, 2, [ '+' num2str(g.scalepower(2),2) ], 'fontweight', 'bold');
       text(0, 1, 0, '0', 'fontweight', 'bold');
       text(0, 0.5, -1.5, [ num2str(g.scalepower(1),2) ' dB' ], 'fontweight', 'bold');
       %scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
@@ -795,7 +798,7 @@ for indeximage = alltimepoints
             set(gca, 'ylim', [minordinate maxordinate]);
 			set(gca, 'xlim', [times(1) times(end)]);
 			plot([times(indeximage) times(indeximage)], [minordinate maxordinate], 'b', 'linewidth', 2*g.resmult);
-			xlabel('time (ms)', 'fontweight', 'bold', 'fontsize', 12*g.resmult); set(gca, 'box', 'off');
+			xlabel('Time (ms)', 'fontweight', 'bold', 'fontsize', 12*g.resmult); set(gca, 'box', 'off');
 			set(gca, 'fontsize', 10*g.resmult);
 			if tmpcond == 1
 				ylabel(g.envylabel, 'fontweight', 'bold', 'fontsize', 12*g.resmult);
