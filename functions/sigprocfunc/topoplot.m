@@ -137,6 +137,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.230  2004/12/20 22:05:44  scott
+% if intrad specified, then make plotrad <= intrad
+%
 % Revision 1.229  2004/12/20 21:13:41  scott
 % made specifying 'intrad' -> actually use intrad to define the interp grid.
 % returned Xi, Yi for toporeplot() (undocumented)
@@ -1275,8 +1278,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     ymin = max(-rmax,min(inty)); ymax = min(rmax,max(inty));
    end
   else % intrad specified
-    xmin = -intrad; xmax = intrad;   % use the specified intrad value 
-    ymin = -intrad; ymax = intrad;
+    xmin = -intrad*squeezefac; xmax = intrad*squeezefac;   % use the specified intrad value 
+    ymin = -intrad*squeezefac; ymax = intrad*squeezefac;
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Interpolate scalp map data %%%%%%%%%%%%%%%%%%%%%%%%
