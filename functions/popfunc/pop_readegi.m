@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Nov 2002
 %
-% See also: eeglab(), readegi()
+% See also: eeglab(), readegi(), readegihdr()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/11/13 02:34:22  arno
+% Initial revision
+%
 
 function [EEG, command] = pop_readegi(filename); 
     
@@ -50,12 +53,17 @@ end;
 % ----------
 EEG = eeg_emptyset;
 
-EEG.data = readegi( filename );
+[Head EEG.data Eventdata] = readegi( filename );
+if ~isempty(Eventdata) & length(Eventdata) == size(EEG.data,2)
+    EEG.data(end+1,:) = Eventdata;
+end;
 EEG.filename        = filename;
 EEG.filepath        = '';
 EEG.setname 		= 'EGI file';
 EEG.nbchan          = size(EEG.data,1);
-EEG.srate           = XX;
+EEG.srate           = Head.samp_rate;
+EEG.trials          = Head.segments;
+EEG.pnts            = Head.segsamps;
 EEG.xmin            = 0; 
 
 EEG = eeg_checkset(EEG);
