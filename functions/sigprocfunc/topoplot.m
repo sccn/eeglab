@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2004/03/19 01:49:07  scott
+% plotrad
+%
 % Revision 1.156  2004/03/19 00:30:08  scott
 % plotrad minmax
 %
@@ -729,24 +732,7 @@ else
     Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
 end;	                % to plot all inside the head cartoon
 
-
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%fid = fopen(loc_file);
-%if fid<1,
-%  fprintf('topoplot(): cannot open chan_locs file (%s).\n',loc_file);
-%  return
-%end
-%A = fscanf(fid,'%d %f %f %s',[7 MAXTOPOPLOTCHANS]);
-%fclose(fid);
-%A = A';
-%labels = setstr(A(:,4:7));
-%idx = find(labels == '.');                       % some labels have dots
-%labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
-%Th = pi/180*A(:,2);                              % convert degrees to radians
-%Rd = A(:,3);
 
 if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
@@ -906,11 +892,11 @@ end;
 %
 % %%%%%%%%%%%%%%%%%%% Plot electrodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-plotrad
-for i = 1:size(labels,1)
-  if abs(Rd(i)-plotrad)<0.001   % move electrodes at plotting edge in slightly to show
-    x(i) = x(i)*0.99;
-    y(i) = y(i)*0.99;
+for k = 1:size(labels,1)
+  if abs(Rd(k)-0.5)<0.01   % move electrodes at plotting edge in slightly to show
+    x(k) = x(k)*0.98;
+    y(k) = y(k)*0.98;
+    fprintf('topoplot(): Location for electrode %d moved in slgihtly to show on plot\n',k);
   end
 end
 %
