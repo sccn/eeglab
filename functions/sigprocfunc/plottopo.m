@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2004/09/08 02:09:39  scott
+% insert figure(curfig) before plotting commands to squelch Matlab 7.0.0 bug -sm
+%
 % Revision 1.33  2004/04/06 17:21:38  arno
 % draw full vertical lines
 %
@@ -164,7 +167,6 @@
 %
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
-%
 
 % 5-11-98 added channels arg -sm
 % 7-15-98 added ydir arg, made pos-up the default -sm
@@ -234,8 +236,7 @@ if length(varargin) > 0
         if nargin > 7, options = { options{:} 'colors' varargin{7} }; end;
         if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end;
         if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end;
-        if nargin > 4 & ~isequal(varargin{4}, 0), options = { options{:} 'title'  varargin{4} }; end;
-        
+        if nargin > 4 & ~isequal(varargin{4}, 0), options = {options{:} 'title'  varargin{4} }; end;
         %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
     else
         options = varargin;
