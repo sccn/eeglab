@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/10/17 01:45:02  arno
+% editing thanks to cooper
+%
 % Revision 1.16  2002/10/16 01:29:49  arno
 % display -> ms
 %
@@ -350,7 +353,7 @@
 
 % 11-20-98 defined g.linewidth constant -sm
 % 04-01-99 made number of frequencies consistent -se
-% 06-29-99 fixed constant-Q freq indexing -se
+% 06-29-99 fixed constant-Q freq indexing  -se 
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
 % 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
