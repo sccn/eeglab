@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/07/30 18:03:59  arno
+% allowing empty channel location
+%
 % Revision 1.20  2003/07/28 17:53:39  arno
 % channel ref index
 %
@@ -360,10 +363,13 @@ end;
 EEG.icaact  = [];
 EEG.icawinv = [];
 EEG.nbchan  = size(EEG.data,1);
+
+EEG = eeg_checkset(EEG);
 if ~isempty(EEG.chanlocs)
     EEG = eeg_checkset(EEG, 'chanlocs_homogenous');
-else
-    EEG = eeg_checkset(EEG);
+    if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(end).X)
+        EEG.chanlocs(edn) = convertlocs(EEG.chanlocs(end), 'topo2all');
+    end;
 end;
 
 % generate the output command
