@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/08/12 18:50:47  arno
+% errordlg2
+%
 % Revision 1.42  2002/08/12 01:35:59  arno
 % allamp debug
 %
@@ -284,8 +287,8 @@ if popup
 				   'end;' ...
 				   'clear tmps tmpv tmpfieldnames;' ];
 	
-	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
-				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 1 1.1] [1 1 1 1 1.1] [1] [1 3.1 0.8 0.1 0.1]};
+	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
+				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 2.2] [1 1 1 2.2]};
     uilist = { { 'Style', 'text', 'string', fastif(typeplot, 'Channel', 'Component'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') } { } ...
 			   { 'Style', 'text', 'string', 'Figure title', 'fontweight', 'bold'  } ...
@@ -293,11 +296,15 @@ if popup
 			   ...
 			   { 'Style', 'text', 'string', 'Smoothing', 'fontweight', 'bold', 'tooltipstring', context('avewidth',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 5, [], int2str(min(max(EEG.trials-5,0), 10))) } ...
+			   { 'Style', 'checkbox', 'string', 'Plot scalp map', 'tooltipstring', 'plot a 2-d head map (vector) at upper left', ...
+				 'value', getkeyval(lastcom, 'topo', 'present', 1)  } { } { } ...
+			   { 'Style', 'text', 'string', 'Downsampling', 'fontweight', 'bold', 'tooltipstring', context('decimate',vars,txt) } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 6, [], '1') } ...
 			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getkeyval(lastcom, '''erp''', 'present', 1) } ...
 			   { 'Style', 'text', 'string', 'ERP limits (uV)'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [3:4])  } ...
-			   { 'Style', 'text', 'string', 'Downsampling', 'fontweight', 'bold', 'tooltipstring', context('decimate',vars,txt) } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 6, [], '1') } ...
+			   { 'Style', 'text', 'string', 'Time limits (ms)', 'fontweight', 'bold', 'tooltipstring',  'Select time subset in ms' } ...
+			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits', [1:2], num2str(1000*[EEG.xmin EEG.xmax])) } ...
 			   { 'Style', 'checkbox', 'string', 'Plot colorbar','tooltipstring', context('caxis',vars,txt), 'value', getkeyval(lastcom, 'cbar', 'present', 1)  } ...
 			   { 'Style', 'text', 'string', 'Color limits','tooltipstring', context('caxis',vars,txt)  } ...
 			   { 'Style', 'edit', 'string',  getkeyval(lastcom, 'caxis') } ...
@@ -348,15 +355,11 @@ if popup
 			   { 'Style', 'text', 'string', 'Plot spectrum','tooltipstring',  context('spec',vars,txt)} ...
 			   { 'Style', 'text', 'string', 'Baseline amp.', 'tooltipstring', 'Use it to fix baseline amplitude' } ...
 			   { 'Style', 'text', 'string', 'Mark times (ms)','tooltipstring',  context('vert',vars,txt)} ...
-			   { 'Style', 'text', 'string', 'Time limits (ms)', 'tooltipstring',  'Select time subset in ms' } ...
-			   { 'Style', 'checkbox', 'string', 'Plot scalp map', 'tooltipstring', 'plot a 2-d head map (vector) at upper left', 'value', getkeyval(lastcom, 'topo', 'present', 1)  } ...
+			   { 'Style', 'text', 'string', 'Other options (see help)' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'spec') } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',9) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'vert') } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'limits',[1:2]) } {} ...
-			   {} ...
-			   { 'Style', 'text', 'string', 'Etc...(see help)'  } ...
-			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'auxvar', 'full') } {} {} {} ...
+			   { 'Style', 'edit', 'string', '' } ...
 			};
 		
     result = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
@@ -373,49 +376,62 @@ if popup
         titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
     end;
 	smooth       = eval( result{3} );
-	if result{4}
+    if result{4}
+		if ~isempty(EEG.chanlocs)
+			if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
+			else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
+			end;	
+		end;
+	end;
+	
+	decimate     = eval( result{5} );
+	if result{6}
 		options = [options ',''erp'''];
 	end;
-	if ~isempty(result{5})
+	if ~isempty(result{7})
 		limits(3:4) = eval( [ '[' result{5} ']' ]); 
 	end;
-	decimate     = eval( result{6} );
-	if result{7}
+	if ~isempty(result{8}) % time limits
+		if ~strcmp(result{8}, num2str(1000*[EEG.xmin EEG.xmax]))
+			limits(1:2) = eval( [ '[' result{8} ']' ]);
+		end;
+	end;
+	if result{9}
 		options = [options ',''cbar'''];
 	end;
-	if ~isempty(result{8})
+	if ~isempty(result{10})
 		options = [options ',''caxis'', ' result{8} ];
 	end;
 	
 	% event rows
 	% ----------
-	if result{9}
+	if result{11}
 		options = [options ',''nosort'''];
 	end;
-	try, sortingeventfield = eval( result{10} ); catch, sortingeventfield = result{10}; end;
-	sortingtype  = parsetxt(result{11});
-	sortingwin   = eval( [ '[' result{12} ']' ] );
-	if ~isempty(result{13}) & ~strcmp(result{13}, 'no')
-		options = [options ',''renorm'', ''' result{13} '''' ];
+	try, sortingeventfield = eval( result{12} ); catch, sortingeventfield = result{12}; end;
+	sortingtype  = parsetxt(result{13});
+	sortingwin   = eval( [ '[' result{14} ']' ] );
+	if ~isempty(result{13}) & ~strcmp(result{15}, 'no')
+		options = [options ',''renorm'', ''' result{15} '''' ];
 	end;
-	if ~isempty(result{14})
-		options = [options ',''align'', ' result{14} ];
+	if ~isempty(result{16})
+		options = [options ',''align'', ' result{16} ];
 	end;
-	if result{15}
+	if result{17}
 		options = [options ',''noplot'''];
 	end;
 
 	% phase rows
 	% ----------
 	tmpphase = [];
-	if ~isempty(result{16})
-		tmpphase = eval( [ '[ 0 0 ' result{16} ']' ]);
-	end;
-	if ~isempty(result{17})
-		tmpphase(2) = eval( result{17} );
-	end;
 	if ~isempty(result{18})
-		tmpphase(1) = eval( result{18} );
+		tmpphase = eval( [ '[ 0 0 ' result{18} ']' ]);
+	end;
+	if ~isempty(result{19})
+		tmpphase(2) = eval( result{19} );
+	end;
+	if ~isempty(result{20})
+		tmpphase(1) = eval( result{20} );
 	end;
 	if ~isempty(tmpphase)
 		options = [ options ',''phasesort'',[' num2str(tmpphase) ']' ];
@@ -424,48 +440,38 @@ if popup
 	% coher row
 	% ----------
 	tmpcoher = [];
-	if result{19}
+	if result{21}
 		options = [options ',''plotamps'''];
 	end;
-	if ~isempty(result{20})
-		tmpcoher = eval( [ '[' result{20} ']' ]);
+	if ~isempty(result{22})
+		tmpcoher = eval( [ '[' result{22} ']' ]);
 	end;
-	if ~isempty(result{21})
+	if ~isempty(result{23})
 		if length(tmpcoher) == 1
 			tmpcoher(2) = tmpcoher(1);
 		end;
-		tmpcoher(3) = eval( result{21} );
+		tmpcoher(3) = eval( result{23} );
 	end;
 	if ~isempty(tmpcoher)
 		options = [ options ',''coher'',[' num2str(tmpcoher) ']' ];
 	end;
-	if ~isempty(result{22})
-		limits(5:6) = eval( [ '[' result{22} ']' ]);
+	if ~isempty(result{24})
+		limits(5:6) = eval( [ '[' result{24} ']' ]);
 	end;
-	if ~isempty(result{23})
-		limits(7:8) = eval( [ '[' result{23} ']' ]);
+	if ~isempty(result{25})
+		limits(7:8) = eval( [ '[' result{25} ']' ]);
 	end;
 
 	% options row
 	% ------------
-    if result{24}
-		if ~isempty(EEG.chanlocs)
-			if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-			else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
-			end;	
-		end;
-	end;
-	if ~isempty(result{25})
-		options = [options ',''spec'', [' result{25} ']' ];
-	end;
 	if ~isempty(result{26})
-		limits(9) = eval( result{26} ); %bamp
+		options = [options ',''spec'', [' result{26} ']' ];
 	end;
 	if ~isempty(result{27})
-		options = [options ',''vert'', [' result{27} ']' ];
+		limits(9) = eval( result{27} ); %bamp
 	end;
 	if ~isempty(result{28})
-		limits(1:2) = eval( [ '[' result{28} ']' ]);
+		options = [options ',''vert'', [' result{28} ']' ];
 	end;
 	if ~all(isnan(limits))
 		options = [ options ',''limits'',[' num2str(limits) ']' ];
