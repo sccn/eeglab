@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/04/29 14:12:33  scott
+% used switches to test g.phsamp -sm
+%
 % Revision 1.20  2002/04/29 14:07:08  scott
 % fixed typo -sm
 %
@@ -534,10 +537,15 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
-	    case 'coher',
+	  case 'coher',
            cumulX = zeros(size(win,2),g.timesout);
            cumulXboot = zeros(size(win,2),g.naccu);
-    end;        
+      case 'phasecoher'
+           switch g.phsamp
+             case 'on'
+               cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
+           end
+   end;        
 end
 
 switch g.phsamp
