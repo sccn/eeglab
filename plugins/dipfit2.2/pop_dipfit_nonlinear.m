@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/09 19:42:52  arno
+% deactivating diffmap
+%
 % Revision 1.1  2005/03/09 19:42:37  arno
 % Initial revision
 %
@@ -363,7 +366,9 @@ elseif nargin>=3
       drawnow;
       % start the dipole fitting
       try
-           EEG = dipfit_nonlinear(EEG, arg{:});
+          warning backtrace off;
+          EEG = dipfit_nonlinear(EEG, arg{:});
+          warning backtrace on;
       catch,
           disp('Dipole localization failed');
       end;
