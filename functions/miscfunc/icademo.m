@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/12/03 00:28:50  arno
+% channel location file
+%
 % Revision 1.8  2003/09/20 01:10:56  arno
 % add try, catch clause for movie
 %
@@ -95,9 +98,16 @@ if v(1) < 5
   fprintf('Not all segments may work for Matlab version 4.\n')
 end
 
+% add path to access 
+if ~exist('pnas.flt')
+    p = which('eeglab');
+    p = p(1:findstr(p,'eeglab.m')-1);
+    addpath([ p 'sample_data' ] );
+end;
+
 % name of channel locations file
-chan_locs  = 'chan14.locs';
-chan_locs2 = 'chan.locs';
+chan_locs  = 'pnas_chan14.locs';
+chan_locs2 = 'pnas_chan.locs';
 
 figure
 set(gcf,'Color',BACKCOLOR);
