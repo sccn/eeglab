@@ -13,13 +13,12 @@
 %   overlap - window overlap
 %              
 % Outputs:
-%   power  - spectral estimate in dB
+%   power  - spectral estimate (amplitude not dB)
 %   freqs  - frequency array
 %
-%
-% Note: this function is just an approximation of the psd method. We
-%       strongly recommend to use the psd function if you have access
-%       to it.
+% Note: this function is just an approximation of the psd() (not pwelch) 
+%       method. We strongly recommend to use the psd function if you have 
+%       access to it.
 %
 % Known problems: 
 %  1) normalization formula was determined manually by comparing
@@ -29,6 +28,8 @@
 %     timef function cannot use a single time window).
 %  3) FOR FILTERED DATA, THE POWER OVER THE FILTERED REGION IS WRONG
 %     (TOO HIGH)
+%  4) the result of this function differs (in scale) from the pwelch 
+%     function since the normalization is different for pwelch.
 %
 % Author: Arnaud Delorme, SCCN, Dec 2, 2003
 
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/12/04 23:01:07  arno
+% warnings
+%
 % Revision 1.10  2003/12/04 22:56:43  arno
 % warnings off
 %
@@ -125,10 +129,10 @@ warning on;
 ersp = 10.^(ersp/10); % back to amplitude
 power = mean(ersp,2)*2.7/win; % this formula is a best approximation (I couldn't find the actual one)
                              % in practice the difference with psd is less than 0.1 dB
-power = 10*log10(power);
+%power = 10*log10(power);
 if nargout < 1
     hold on;
-    h = plot(freqs, power);
+    h = plot(freqs,  10*log10(power));
     set(h, 'linewidth', 2);
 end;
 return;
