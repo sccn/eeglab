@@ -6,11 +6,84 @@
 %      else
 %           >> eegplot('noui', data, 'key1', value1 ...);
 %
+% Graphical interface:
+%   "Figure > print" - [menu] Use to print figure in portrait or landscape.
+%   "Figure > Edit figure" - [menu] remove menus and buttons and call back the 
+%                  standard Matlab figure menu. Use Tools > Edit to format the figure
+%                  for publication. Use the 'noui' option to obtain the same effect 
+%                  from the command line.
+%   "Figure > Accept and Close" - [menu] Same as bottom right button "Reject". 
+%   "Figure > Cancel and Close" - [menu] Same as "Cancel" bottom. Cancel all editing.
+%   "Display > Marking color > [Hide marks|Show marks]" - [menu] show or hide marks 
+%                  on the EEG background. Mark portions of continuous EEG data 
+%                  by draging the mouse horizontally over the main activity 
+%                  plot. For EEG data epochs, simply click on the selected epochs.
+%                  Clicked on the marked region to remove the marks. If the function
+%                  is called from the command line, the marks are returned in the TMPREJ
+%                  variable in the global workspace when the "Reject" button
+%                  is pressed (see outputs). If the function is called from
+%                  pop_eegplot() or eeglab(), the current dataset is automatically 
+%                  updated.
+%    "Display > Marking color > Choose color" - [menu] change the color for marking
+%                  trials. Color of previously marked trials is preserved. If
+%                  the function is called from command line, the functions
+%                  eegplot2event() or eegplot2trials() allow to process the trials 
+%                  marked with different colors in the TMPREJ output variable. Use the 
+%                  'wincolor' parameter from the command line to select the marking
+%                  color at startup.
+%    "Display > Grid > ..." - [menu] toggle on or off the grid for the time axis or
+%                  the channel axis in the activity plot. Submenus alow allow to
+%                  modify the grid's aspect. Use the 'xgrid' and 'ygrid' parameter from
+%                  the command line to toggle on or off the grids at startup.
+%    "Display > Show scale" - [menu] show or hide the scale on the bottom right corner
+%                  of the activity window. Use the 'scale' parameter from the command
+%                  line to toggle on or off the scale at startup.
+%    "Display > Title" - [menu] change the title of the figure.
+%    "Settings > Time range to display" - [menu] for continuous EEG data, this menu 
+%                  pops up a query window for entering the number of second to show
+%                  in the main activity window. For EEG data epochs, the query window
+%                  ask for the number of epochs to display (can be fractional). Use
+%                  the 'winlength' command line parameter to specify length at startup.
+%    "Settings > Number of channels to display" - [menu] Number of channels to display
+%                  in the main activity window. Use the 'dispchans' command line 
+%                  parameter to specify number of channels to display at startup. If not
+%                  all channels are visible, you can scroll through them using the slidder 
+%                  on the left of the main activity plot. 
+%    "Settings > Channel labels > ..." - [menu] use numbers for channel labels or load
+%                  a channel location file on disk. See also the 'eloc_file' input
+%                  parameter from the command line.
+%    "Settings > Zoom on/off" - [menu] toggle on or off zoom for the time axis, the 
+%                  electrode axis or both. Simply left click to zoom x2 and right click
+%                  to unzoom. You might also draw a rectange in the main activity window
+%                  to zoom over that region. When the zoom is on, EEG data can not be
+%                  marked for rejection.
+%    "Main activity plot" - [plotting window] this window contain the channel activity.
+%                  The time axis depict time in second for continuous data. For data
+%                  epochs, the axis label contain time tags within each epoch.
+%    "Cancel" - [button] close the window and cancel all editing.
+%    "<<" - [button] scroll backward though time or epoch by one window length.
+%    "<" - [button] scroll backward though time or epoch by 1/5 of window length.
+%    "Navigation edit box" - [edit box] enter a number here to jump to that time or
+%                  epoch.
+%    ">" - [button] scroll forward though time or epoch by 1/5 of window length.
+%    ">>" - [button] scroll forward though time or epoch by one window length.
+%    "Elec Time Value" - [text] when the mouse is within the main activity plot window,
+%                  indicate which electrode, time and activity the mouse is pointing to.
+%    "Amplitude edit box" - [edit box] indicate the current the amplitude in unit of
+%                  activity. Use command line parameter 'spacing' to specify amplitude
+%                  at startup.
+%    "+ and -" - [buttons] use these button to increase/decrease the scale by 10%. 
+%    "Reject" - [button] When pressed, accept modifications and close the figure; the 
+%                  optional input parameter 'command' is evaluated at that time. Note that
+%                  this button label might also be redefined at stratup using the 'butlabel'
+%                  command line parameter.
+%
 % Required Input:
 %    data         - Input data matrix, either continuous 2-D (channels,timepoints) or 
 %                    epoched 3-D (channels,timepoints, epochs) data. If the data matrix 
 %                    is preceded by keyword 'noui', GUI control elements are omitted
 %                    (Use the 'noui' mode to plot data for presentation).
+%
 % Optional inputs:
 %    'srate'      - Sampling rate in Hz {default|0: 256 Hz}
 %    'spacing'    - Display range per channel (default|0: max(data)-min(data))
@@ -23,7 +96,8 @@
 %    'freqlimits' - [start end] Frequency limits for each epoch if plotting spectrum of
 %                   epoch instead of data (data has to contain spectral values).
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
-%    'dispchans'  - [integer] Number of channels to display in window {default: 32}    ???
+%    'dispchans'  - [integer] Number of channels to display in the main activity
+%                   window {default: 32}
 %                    If < number of channels a vertical slider will allow scrolling. 
 %    'title'      - Figure title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
@@ -39,9 +113,10 @@
 %                    [start end] Period limits; [R G B] Marking color; 
 %                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
 %                    to reject (1); its length must be the number of data channels. 
-%    'color'      - ['on'|'off'|cell array] Plot channels with different colors {default: 'off'}. 
-%                   Entering a nested cell array, channels will be plotted using cell array colors 
-%                   elements. {default: 'off'}. 
+%    'color'      - ['on'|'off'|cell array] Plot channels with different colors {default:
+%                   'off'}. 
+%                   Entering a nested cell array, channels will be plotted using cell 
+%                   array colors elements. {default: 'off'}. 
 %    'wincolor'   - [color] color used when selecting EEG.
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
 %    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
@@ -85,6 +160,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2003/02/17 03:04:57  arno
+% typo in header
+%
 % Revision 1.69  2003/01/10 01:17:20  arno
 % default position once more
 %
@@ -731,8 +809,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % Figure Menu %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   m(7) = uimenu('Parent',figh,'Label','Figure');
   m(8) = uimenu('Parent',m(7),'Label','Print');
-  uimenu('Parent',m(7),'Label','Accept & close', 'Callback', acceptcommand );
-  uimenu('Parent',m(7),'Label','Close','Callback','delete(gcbf)')
+  uimenu('Parent',m(7),'Label','Edit figure', 'Callback', 'eegplot(''noui'');');
+  uimenu('Parent',m(7),'Label','Accept and close', 'Callback', acceptcommand );
+  uimenu('Parent',m(7),'Label','Cancel and close', 'Callback','delete(gcbf)')
   
   % Portrait %%%%%%%%
   timestring = ['[OBJ1,FIG1] = gcbo;',...
@@ -1508,25 +1587,26 @@ else
 		 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
     
   case 'noui'
-      eegplot( varargin{:} );
-
-      % suppres menu bar
-      %set(gcf, 'menubar', 'none');
-      %set(gcf, 'menubar', 'figure');
-
+      if ~isempty(varargin)
+          eegplot( varargin{:} ); fig = gcf;
+      else 
+          fig = findobj('tag', 'EEGPLOT');
+      end;
+      set(fig, 'menubar', 'figure');
+      
       % find button and text
-      obj = findobj(gcf, 'style', 'pushbutton'); delete(obj);
-      obj = findobj(gcf, 'style', 'edit'); delete(obj);
-      obj = findobj(gcf, 'style', 'text'); 
+      obj = findobj(fig, 'style', 'pushbutton'); delete(obj);
+      obj = findobj(fig, 'style', 'edit'); delete(obj);
+      obj = findobj(fig, 'style', 'text'); 
       %objscale = findobj(obj, 'tag', 'thescale');
       %delete(setdiff(obj, objscale));
-	  obj = findobj(gcf, 'tag', 'Eelec');delete(obj);
-	  obj = findobj(gcf, 'tag', 'Etime');delete(obj);
-	  obj = findobj(gcf, 'tag', 'Evalue');delete(obj);
-	  obj = findobj(gcf, 'tag', 'Eelecname');delete(obj);
-	  obj = findobj(gcf, 'tag', 'Etimename');delete(obj);
-	  obj = findobj(gcf, 'tag', 'Evaluename');delete(obj);
-	  obj = findobj(gcf, 'type', 'uimenu');delete(obj);
+	  obj = findobj(fig, 'tag', 'Eelec');delete(obj);
+	  obj = findobj(fig, 'tag', 'Etime');delete(obj);
+	  obj = findobj(fig, 'tag', 'Evalue');delete(obj);
+	  obj = findobj(fig, 'tag', 'Eelecname');delete(obj);
+	  obj = findobj(fig, 'tag', 'Etimename');delete(obj);
+	  obj = findobj(fig, 'tag', 'Evaluename');delete(obj);
+	  obj = findobj(fig, 'type', 'uimenu');delete(obj);
  
 	case 'zoom' % if zoom
       fig = varargin{1};
