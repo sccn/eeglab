@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/21 01:07:59  scott
+% edited help msg -sm
+%
 % Revision 1.2  2002/04/18 18:09:57  arno
 % updating error message
 %
@@ -62,9 +65,18 @@ com = '';
 % ----------------------------
 filename = which('eeg_options.m');
 fid = fopen( filename, 'r+');
+storelocal = 0;
 if	fid == -1
 	if exist(filename) == 2 
-		error(['Can not modify read-only file ''' filename '''' 10 'move a copy to your working directory']);
+		if ~popask(['Can not modify read-only file ''' filename '''' 10 'do you want EEGLAB to store a copy in the current directory ?']);
+			return;
+		else 
+			fid = fopen( filename, 'r');
+			if	fid == -1
+				error('Can not open file');
+			end;
+			storelocal = 1;
+		end;
 	else
 		error('File not found');
 	end;
@@ -141,7 +153,11 @@ else % no interactive inputs
 end;
 
 % write to eeg_options file
-% ---------------------------
+% -------------------------
+if storelocal
+	delimloc = findstr(filename, '/');
+	filename = filename(delimloc(end)+1:end);
+end;
 fid = fopen( filename, 'w');
 if fid == -1
 	error('File not found');
@@ -173,3 +189,10 @@ function  chopedtext = choptext( tmptext )
     chopedtext = chopedtext(7:end);
 return;
 
+function num = popask( text )
+	 ButtonName=questdlg( text, ...
+	        'Confirmation', 'Cancel', 'Yes','Yes');
+	 switch lower(ButtonName),
+	      case 'cancel', num = 0;
+	      case 'yes',    num = 1;
+	 end;
