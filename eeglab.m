@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2002/04/30 18:41:05  scott
+% editting help msg -sm
+%
 % Revision 1.54  2002/04/30 18:34:30  scott
 % *** empty log message ***
 %
@@ -533,7 +536,7 @@ mat0 = colormap;
 close;
 WINMINX         = 17;
 WINMAXX         = 260;
-COLOR           = 0.85*[0.77    0.87    0.9908];
+COLOR           = 0.87*[0.77    0.87    0.9408];
 WINYDEC			= 13;
 NBLINES         = 16;
 WINY		    = WINYDEC*NBLINES;
