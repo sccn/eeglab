@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2003/03/12 02:43:51  arno
+% two help buttons
+%
 % Revision 1.100  2003/02/25 00:59:31  scott
 % edit header -sm
 %
@@ -591,7 +594,7 @@ if popup
 												  'This allow to plot component activity in microvolt'] };
 		uilist{7} = { 'Style', 'edit', 'string', getkeyval(lastcom, 4), 'tag', 'projchan' };
 	end;
-    [oldres a b res] = inputgui( geometry, uilist, { 'pophelp(''pop_erpimage'');' 'pophelp(''erpimage'');'}, ...
+    [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
 							 fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'));
 	if isempty(oldres), return; end;
 
