@@ -1,24 +1,25 @@
-% eegrej() - reject eeg regions in continuous eeg data.
+% eegrej() - reject/excise arbitrary periods from continuous EEG data 
+%            (e.g., EEG.data).
 %
 % Usage:
 %   >> [outdata newt newevents boundevents] = ...
 %            eegrej( indata, regions, timelength, eventlatencies);
 %
 % Inputs:
-%   indata     - input data nbchannel x nbpoints. If indata is a
-%                string of character, the function use the disk to
-%                perform the rejection
+%   indata     - input data (channels, frames). If indata is a string, 
+%                the function use the disk to perform the rejection
 %   regions    - array of regions to suppress. [beg end] x number of 
 %                regions. 'beg' and 'end' are expressed in term of points
-%                in the input dataset. Size of the array is
-%                2xnumber of regions.
-%   timelength - time length. Only used to compute new total time length.
+%                in the input dataset. The size() of the array should be
+%                (2, number of regions).
+%   timelength - length in time (s) of the input data. Only used to compute 
+%                new total data length after rejections (newt).
 %   eventlatencies - vector of event latencies in data points. 
 %                    Default []=none.
 %
 % Outputs:
 %   outdata    - output dataset
-%   newt       - new timelength
+%   newt       - new total data length 
 %   newevents  - new event latencies. If the event was in a removed
 %                region, NaN is returned.
 %   boundevents - boundary events latencies 
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/08 01:16:56  arno
+% adding boundary return
+%
 % Revision 1.3  2002/07/31 16:11:15  arno
 % debugging
 %
@@ -131,7 +135,7 @@ if isstr(indata)
   evalin('base', 'clear global elecIndices');  
   evalin('base', [ indata '=[]; clear ' indata '']);  
   evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''r'')');
-  evalin('base', [ indata '= fread(fid, [numberrow ' int2str(nbpoint) '], ''float'')']);
+  evalin('base', [ indata '= fread(fid, [numberrow ' int2str(datlen) '], ''float'')']);
   evalin('base', 'fclose(fid)');
   evalin('base', 'clear numberrow indextmp endtmp fid');  
   evalin('base', 'delete(''tmpeegrej.fdt'')');  
