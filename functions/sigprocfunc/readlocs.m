@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/12/17 00:55:07  arno
+% debug last
+%
 % Revision 1.57  2003/12/17 00:50:10  arno
 % adding index for non-empty electrodes
 %
@@ -449,9 +452,9 @@ if isstr(filename)
        % --------------
        array = load_file_or_array( filename, max(g.skiplines,0));
        if size(array,2) < length(g.format)
-           fprintf('Readlocs warning: # of columns in file inferior to # format entries\n');
+           fprintf('Readlocs warning: fewer columns in the file than expected\n');
        elseif size(array,2) > length(g.format)
-           fprintf('Readlocs warning: # of columns in file superior to # format entries\n');
+           fprintf('Readlocs warning: more columns in the file than expected\n');
        end;
        
        % removing lines BESA
