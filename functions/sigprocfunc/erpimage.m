@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2003/09/11 22:19:49  scott
+% made 'plotamps' and 'auxvar' work together
+%
 % Revision 1.148  2003/09/09 23:26:48  arno
 % change && to &
 %
@@ -1883,7 +1886,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                                         % Note: using square window
             %fprintf('5 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
             [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
-            [auxvar,tmp] = movav([auxvar,1:ntrials,avewidth,decfactor); 
+            [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor); 
         end
         fprintf('Output allamps data will be %d frames by %d smoothed trials.\n',...
                                       frames,length(outtrials));
