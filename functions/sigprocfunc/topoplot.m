@@ -132,6 +132,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.218  2004/11/22 04:58:21  scott
+% fixed topoplot(32,EEG.chanlocs) and topoplot([],EEG.chanlocs,'emarker','o')
+% to plot marked channel 32 in red disk
+%
 % Revision 1.217  2004/11/18 20:29:14  hilit
 % enabled the 'example' option
 %
@@ -1617,10 +1621,15 @@ end
 if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
   if strcmpi(ELECTRODES,'on') | strcmpi(ELECTRODES,'off')
    for kk = 1:length(plotchans)
+     if strcmpi(EMARKER,'.')
         hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
                                               'markersize', EMARKERSIZE1CHAN);
-        hold on
+     else
+        hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
+                                              'markersize', EMARKERSIZE);
+     end
    end
+   hold on
   end
 end
 
