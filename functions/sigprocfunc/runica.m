@@ -53,8 +53,8 @@
 % activations = activation time courses of the output components (ncomps,frames*epochs)
 %
 % Authors: Scott Makeig with contributions from Tony Bell, Te-Won Lee, 
-% Tzyy-Ping Jung, Sigurd Enghoff, Michael Zibulevsky, CNL/The Salk Institute,
-% La Jolla, 1996-
+% Tzyy-Ping Jung, Sigurd Enghoff, Michael Zibulevsky, Delorme Arnaud,
+% CNL/The Salk Institute, La Jolla, 1996-
 
 % Uses: posact()
 
@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/08/19 18:56:14  scott
+% added third output arg compvar -sm
+%
 % Revision 1.6  2003/08/07 18:33:15  arno
 % same
 %
@@ -1013,28 +1016,27 @@ end
     fprintf(...
    'Sorting components in descending order of mean projected variance ...\n');
   end
-  if wts_passed == 0
-    %
-    %%%%%%%%%%%%%%%%%%%% Find mean variances %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %
-    meanvar  = zeros(ncomps,1);      % size of the projections
-    if ncomps == urchans % if weights are square . . .
+  %
+  %%%%%%%%%%%%%%%%%%%% Find mean variances %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
+  meanvar  = zeros(ncomps,1);      % size of the projections
+  if ncomps == urchans % if weights are square . . .
       winv = inv(weights*sphere);
-    else
+  else
       fprintf('Using pseudo-inverse of weight matrix to rank order component projections.\n');
       winv = pinv(weights*sphere);
   end
   for s=1:ncomps
-    if verbose,
-      fprintf('%d ',s);         % construct single-component data matrix
-    end
-   					% project to scalp, then add row means 
-    compproj = winv(:,s)*activations(s,:);
-    meanvar(s) = mean(sum(compproj.*compproj)/(size(compproj,1)-1));
-                                        % compute mean variance 
+      if verbose,
+          fprintf('%d ',s);         % construct single-component data matrix
+      end
+      % project to scalp, then add row means 
+      compproj = winv(:,s)*activations(s,:);
+      meanvar(s) = mean(sum(compproj.*compproj)/(size(compproj,1)-1));
+      % compute mean variance 
   end                                   % at all scalp channels
   if verbose,
-   fprintf('\n');
+      fprintf('\n');
   end
   %
   %%%%%%%%%%%%%% Sort components by mean variance %%%%%%%%%%%%%%%%%%%%%%%%
@@ -1046,20 +1048,18 @@ end
   %%%%%%%%%%%%%%%%%%%%% Filter data using final weights %%%%%%%%%%%%%%%%%%
   %
   if nargout>6, % if activations are to be returned
-   if verbose,
-     fprintf('Permuting the activation wave forms ...\n');
-   end
-   activations = activations(windex,:);
+      if verbose,
+          fprintf('Permuting the activation wave forms ...\n');
+      end
+      activations = activations(windex,:);
   else
-   clear activations
+      clear activations
   end
   weights = weights(windex,:);% reorder the weight matrix
   bias  = bias(windex);       % reorder them
   signs = diag(signs);        % vectorize the signs matrix
   signs = signs(windex);      % reorder them
-else
-  fprintf('Components not ordered by variance.\n');
-end
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
