@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/03/17 17:43:17  arno
+% nothing
+%
 % Revision 1.5  2005/03/17 17:41:34  arno
 % change BESA to 4Shell
 %
@@ -247,7 +250,6 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                                 eval(xgridstr), eval(ygridstr), eval(zgridstr), 100);
         disp('Scanning terminated. Refining dipole locations...');
     end;
-    EEG.dipfit.model  = dipfit_reject(EEG.dipfit.model, g.threshold/100);
    
     % Searching dipole localization
     % -----------------------------
@@ -280,6 +282,10 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         end;
     end;
     
+    % set RV to 1 for dipole with higher than 40% residual variance
+    % -------------------------------------------------------------
+    EEG.dipfit.model  = dipfit_reject(EEG.dipfit.model, g.threshold/100);
+
     % removing dipoles outside the head
     % ---------------------------------
     if strcmpi(g.rmout, 'on') & strcmpi(EEG.dipfit.coordformat, 'spherical')
