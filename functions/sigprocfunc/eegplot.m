@@ -54,9 +54,6 @@
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
 
-%    'freq'       - Maximum frequency when plotting frequencies (instead of activities).
-%                   This number is only used for the scale of the ordinate axis.
-
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) 2001 Arnaud Delorme & Colin Humphries, Salk Institute, arno@salk.edu
@@ -76,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/06/27 01:42:48  scott
+% completed help message editing -sm & ad
+%
 % Revision 1.10  2002/06/26 22:12:30  arno
 % debugging slider and editing
 %
@@ -195,7 +195,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.xgrid;			   catch, g.xgrid		= 'off'; end;
    try, g.ygrid;			   catch, g.ygrid		= 'off'; end;
    try, g.color;			   catch, g.color		= 'off'; end;
-   try, g.freq;				catch, g.freq		= []; end;
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;			   catch, g.limits	    = [0 1]; end;
@@ -248,9 +247,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	   case 'on', g.submean  = 1;
 	   case 'off', g.submean = 0;  
 	   otherwise disp('Error: submean must be either ''on'' or ''off'''); return;
-   end;	
-   if length(g.freq) > 1
-   		disp('Error: winlength must be a single number'); return;
    end;	
    
    switch lower(g.color)
