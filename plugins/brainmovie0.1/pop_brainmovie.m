@@ -80,12 +80,12 @@
 %                are present in the dataset.
 %  'oneframe'    - ['on'|'off'] only plot one slide of the movie (the first one). This
 %                can be usefull to optimize the movie parameters.
+%  'title'       - [string] overwrite brainmovie title option.
 %
 % Makemovie arguments:
 %  'makemovie'   - [cell array]  makemovie() parameters. See >> help makemovie
 %                for makemovie() arguments (movie output quality, crop ...). 
-%                Default is output with same size as the plotted figure and using
-%                { 'mode' 'fast' }.
+%                Default is output with same size as the plotted figure.
 %
 % Example:
 %   pop_brainmovie(ALLEEG, 'comps', [1 3 4 5 6], 'freqs', 5);
@@ -109,6 +109,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/05/31 18:15:10  arno
+% implement type
+%
 % Revision 1.51  2003/05/30 15:42:12  scott
 % header
 %
@@ -206,7 +209,7 @@
 % Revision 1.20  2002/12/05 15:49:42  arno
 % debuging plotorder
 %
-% Revision 1.19  2002/12/04 22:50:22  arno
+% Revision 1.19  2002/12/04 22:50:22  aron
 % implementing plotorder
 %
 % Revision 1.18  2002/11/26 18:58:20  arno
@@ -292,6 +295,7 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
 							'showcomps'   'integer'       []									   [];
 							'coordinates' 'real'          []                                       [];
                             'circfactor'  'real'          []                                       [];
+                            'title'       'string'        []                                       '';
                             'freqs'       'real'          []                                       [];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
@@ -412,9 +416,9 @@ try,
         eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
     end;
 catch,
-	newERSP   = moviethresh( ALLERSP, 0.05, 2, 2);
-	newITC    = moviethresh( ALLITC , 0.05, 2, 2);
-	newCROSSF = moviethresh( ALLCROSSF, 0.03, 2, 2);
+	newERSP   = moviethresh( ALLERSP, 0.1, 3, 2);
+	newITC    = moviethresh( ALLITC , 0.1, 3, 2);
+	newCROSSF = moviethresh( ALLCROSSF, 0.1, 3, 2);
 	newANGLE  = ALLCROSSFANGLE;
 	%newERSP   = ALLERSP;
 	%newITC    = ALLITC;
@@ -468,6 +472,7 @@ if strcmpi(g.type, '2d') & isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(g.showcomps,1) );
+        plotorder = plotorder(end:-1:1);
         coordinates = coordinates(:, [2 3]); % remove X   
         plotorder   = g.showcomps(plotorder);
     else
@@ -482,7 +487,6 @@ if strcmpi(g.type, '2d') & isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.15 1.25], ...
                         'ylimaxes', [-1.42 0.98], ...
-                        'title', '', ...
                         'rthistloc', [9 9 1.3 1], ...
                         'envylabel', 'uV', ...
                         'visible', 'on', ...
@@ -501,6 +505,7 @@ elseif strcmpi(g.type, '2d') & isstr(g.movparams) & strcmpi(g.movparams, 'mritop
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(g.showcomps,3) );
         plotorder   = g.showcomps(plotorder);
+        plotorder = plotorder(end:-1:1);
         coordinates = coordinates(:, [1 2]); % remove Z
     else
         plotorder   = g.showcomps;
@@ -534,6 +539,7 @@ elseif strcmpi(g.type, '2d') & isstr(g.movparams) & strcmpi(g.movparams, 'mrirea
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(g.showcomps,2) );
         plotorder   = g.showcomps(plotorder);
+        plotorder = plotorder(end:-1:1);
         coordinates = coordinates(:, [1 3]); % remove Z
     else
         plotorder   = g.showcomps;
@@ -623,11 +629,18 @@ end;
 
 % BRAINMOVIE 
 % ----------
-brainmovieoptions  =removedup(brainmovieoptions);
 if ~strcmpi(g.mode, 'compute')
 	origdir = pwd;
     
 	for freqindex = g.freqindices
+        
+        brainmovieoptionsfinal = removedup(brainmovieoptions);
+        
+        if ~isempty(g.title)
+            brainmovieoptionsfinal{end+1} = 'title'; 
+            brainmovieoptionsfinal{end+1} = [ g.title ' ' num2str(freqs(freqindex),2) ' Hz         ' ]; 
+        end;
+        
         [tmp1 tmp2] = mkdir('/', g.framefolder(2:end) );
         cd(g.framefolder);
         
@@ -650,10 +663,10 @@ if ~strcmpi(g.mode, 'compute')
         % --------------
         if strcmpi(g.type, '3d')
             brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                        brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+                        brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         else
             brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                        brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+                        brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         end;            
         if strcmp(g.oneframe, 'on')
             disp('Only one frame generated');
