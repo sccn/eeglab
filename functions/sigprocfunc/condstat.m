@@ -1,0 +1,170 @@
+% condstat() - accumulate surrogate data for comparing two conditions 
+%
+% Usage:
+%     >> [diffres, accres, res1, res2] = condstat(formula, naccu, arg1, arg2 ...);
+%
+% Inputs:
+%    formula - [string] formula to compute a given measure. Takes arguments
+%              'arg1', 'arg2' ... as inputs. i.e.
+%              'sum(arg1(:,:,X),3) ./ sqrt(sum(tfx(:,:,X))) ./ sqrt(sum(tfy(:,:,X)))'
+%    naccu   - [integer] number of accumulation. i.e. 200
+%    arg1    - [cell_array] of 2 nD array of values to compare. The last dimensions
+%              of the array is the dimention that will be shuffled to accumulate
+%              data.
+%    arg2... - same as arg1
+%
+% Outputs: 
+%    diffres  - differential array computed on the non-shuffled data
+%    accdres  - result for shuffled data
+%    res1     - result for first condition
+%    res2     - result for second condition
+%
+% Authors: Arnaud Delorme, Lars & Scott Makeig
+%          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
+%
+% See also: timef()
+
+% NOTE: one hidden parameter 'savecoher', 0 or 1
+
+% Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
+
+function [diffres, accres, res1, res2] = condstat(formula, naccu, varargin);
+
+if nargin < 2
+	help condstat;
+	return;
+end;
+
+if ~isstr(formula)
+	error('The first argument must be a string formula');
+end;
+
+for index = 1:length(varargin)
+	if ~iscell(varargin) | length(varargin{index}) ~=2
+		error('Except for the first arguments, all other arguments given to the function must be cell arrays of two numerical array');
+	end;
+end;
+
+% accumulate coherence images (all arrays [nb_points x timesout x trials])
+% ---------------------------
+for index=1:length(varargin)
+	tmpvar1 = varargin{index}{1};
+	tmpvar2 = varargin{index}{2};
+	if index == 1
+		cond1trials = size(tmpvar1,ndims(tmpvar1));
+		cond2trials = size(tmpvar2,ndims(tmpvar2));
+		accres = zeros(size(tmpvar1,1), size(tmpvar1,2), naccu);
+	end;
+	
+	if ndims(tmpvar1) == 2
+		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), cond1trials+cond2trials);' ] );
+		eval( [ 'arg' int2str(index) '(:,1:cond1trials)=tmpvar1;' ] );
+		eval( [ 'arg' int2str(index) '(:,cond1trials1+1:end)=tmpvar2;' ] );
+	else
+		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), size(tmpvar1,2), cond1trials+cond2trials);' ] );
+		eval( [ 'arg' int2str(index) '(:,:,1:cond1trials)=tmpvar1;' ] );
+		eval( [ 'arg' int2str(index) '(:,:,cond1trials+1:end)=tmpvar2;' ] );
+	end;
+end;
+
+fprintf('Accumulating bootstrap:');
+alltrials = [1:cond1trials+cond2trials];
+
+% computing difference (non-shuffled)
+% -----------------------------------
+X = 1:cond1trials;
+eval( [ 'res1 = ' formula ';'] );
+X = cond1trials+1:cond1trials+cond2trials;
+eval( [ 'res2 = ' formula  ';'] );
+diffres = res1-res2;
+
+% accumulating (shufling)
+% -----------------------
+for index=1:naccu
+	if rem(index,10) == 0,  fprintf(' %d',index); end
+	if rem(index,120) == 0, fprintf('\n'); end
+	
+	alltrials = shuffle(alltrials);
+	if ndims(tmpvar1) == 2 % 2 dimensions
+		X = alltrials(1:cond1trials);
+		eval( [ 'accres(:,index) = ' formula ';'] );
+		X = alltrials(cond1trials+1:end);
+		eval( [ 'accres(:,index) = accres(:,index) - ' formula  ';'] );	
+	else % 3 dimensions
+		X = alltrials(1:cond1trials);
+		eval( [ 'accres(:,:,index) = ' formula  ';'] );
+		X = alltrials(cond1trials+1:end);
+		eval( [ 'accres(:,:,index) = accres(:,:,index) - ' formula  ';'] );	
+	end;
+end;
+fprintf('\n');
+return;
+
+% writing a function
+% ------------------
+% $$$ fid = fopen('tmpfunc.m', 'w');
+% $$$ fprintf(fid, 'function [accres] = tmpfunc(alltrials, cond1trials, naccu,'); 
+% $$$ for index=1:length(varargin)
+% $$$ 	fprintf(fid, 'arg%d', index);
+% $$$ 	if index ~=length(varargin), fprintf(fid,','); end;
+% $$$ end;
+% $$$ fprintf(fid, ')\n');
+% $$$ commandstr = [ 'for index=1:naccu, ' ]
+% $$$ % 			   'if rem(index,10) == 0,  disp(index); end;' ];
+% $$$ % 			   'if rem(index,10) == 0,  fprintf('' %d'',index); end;' ...
+% $$$ %	           'if rem(index,120) == 0, fprintf(''\n''); end;' ];
+% $$$ commandstr = [ 	commandstr 'shuffle(alltrials);' ];
+% $$$ commandstr = [ 	commandstr 'X = alltrials(1:cond1trials);' ];
+% $$$ if ndims(tmpvar1) == 2 % 2 dimensions
+% $$$ 	commandstr = [ 	commandstr 'accres(:,index) = ' formula ';'];
+% $$$ 	commandstr = [ 	commandstr 'X = alltrials(cond1trials+1:end);'];
+% $$$ 	commandstr = [ 	commandstr 'accres(:,index) = accres(:,index)-' formula ';end;'];	
+% $$$ else
+% $$$ 	commandstr = [ 	commandstr 'res1 = ' formula ';' 10];
+% $$$ 	commandstr = [ 	commandstr 'X = alltrials(cond1trials+1:end);' 10];
+% $$$ 	commandstr = [ 	commandstr 'res2 = ' formula ';' 10];	
+% $$$ 	commandstr = [ 	commandstr 'accres(:,:,index) = res1 - res2; end;'];	
+% $$$ end;	
+% $$$ fprintf(fid, commandstr);
+% $$$ fclose(fid);
+% $$$ profile on;
+% $$$ accres = tmpfunc(alltrials, cond1trials, naccu, arg1);
+% $$$ profile report;
+% $$$ profile off;
+% $$$ return;
+
+% evaluating a command
+% --------------------
+% $$$ commandstr = [ 'for index=1:naccu, ' ...
+% $$$ 			   'if rem(index,10) == 0,  fprintf('' %d'',index); end;' ...
+% $$$ 	           'if rem(index,120) == 0, fprintf(''\n''); end;' ];
+% $$$ commandstr = [ 	commandstr 'shuffle(alltrials);' ];
+% $$$ commandstr = [ 	commandstr 'X = alltrials(1:cond1trials);' ];
+% $$$ if ndims(tmpvar1) == 2 % 2 dimensions
+% $$$ 	commandstr = [ 	commandstr 'accres(:,index) = ' formula ';'];
+% $$$ 	commandstr = [ 	commandstr 'X = alltrials(cond1trials+1:end);'];
+% $$$ 	commandstr = [ 	commandstr 'accres(:,index) = accres(:,index)-' formula ';end;'];	
+% $$$ else
+% $$$ 	commandstr = [ 	commandstr 'accres(:,:,index) = ' formula ';'];
+% $$$ 	commandstr = [ 	commandstr 'X = alltrials(cond1trials+1:end);'];
+% $$$ 	commandstr = [ 	commandstr 'accres(:,:,index) = accres(:,:,index)-' formula ';end;'];	
+% $$$ end;	
+% $$$ eval(commandstr);
+% $$$ return;
+% $$$ 
