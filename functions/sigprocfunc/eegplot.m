@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2002/09/06 19:49:03  arno
+% custum colors for channels
+%
 % Revision 1.50  2002/09/06 19:34:31  arno
 % noui optimize
 %
@@ -766,7 +769,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		        '  set(gcbo,''label'',''Y grid off'');',...
 		        'end;' ...
 		        'clear FIGH AXESH;' ];
-  uimenu('Parent',m(3),'Label',fastif(strcmp(g.ygrid, 'off'), 'X grid on','X grid off'), 'Callback',timestring)
+  uimenu('Parent',m(3),'Label',fastif(strcmp(g.ygrid, 'off'), 'Y grid on','Y grid off'), 'Callback',timestring)
 
   % Grid Style %%%%%%%%%
   m(5) = uimenu('Parent',m(3),'Label','Grid Style');
