@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/11/07 02:22:18  arno
+% fixing history problem
+%
 % Revision 1.31  2003/10/22 18:10:36  arno
 % typo in gui
 %
@@ -490,5 +493,5 @@ if nargin < 2
         com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1), icatype, options);
     end;
 end;
-com
+
 return;
