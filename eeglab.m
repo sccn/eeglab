@@ -6,7 +6,7 @@
 %   University of California San Diego (http://sccn.ucsd.edu/). 
 %   User feedback welcome: email eeglab@sccn.ucsd.edu
 %
-% Author: Arnaud Delorme, Scott Makeig, et al.
+% Authors: Arnaud Delorme, Scott Makeig, et al.
 %
 % Description:
 %   EEGLAB is Matlab software for processing continuous or epoched event-related 
@@ -17,17 +17,15 @@
 %   Matlab scripts.  A single data structure ('EEG') containing all dataset 
 %   parameters may be accessed and modified directly from the Matlab commandline. 
 %
-% Usage: 1) To (re)start EEGLAB from scratch, type: 
+% Usage: 1) To (re)start EEGLAB from scratch, type
 %            >> eeglab           % Ignores any loaded datasets
-%        2) To redaw and update the EEGLAB interface, type:
+%        2) To redaw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
 %
 % See: license.txt: The software distribution license 
 %      http://sccn.ucsd.edu/eeglab/tutorial/: The EEGLAB tutorial
 %      >> help eeg_checkset(), % Shows the structure of the EEG dataset 
-%
-% Author: Arnaud Delorme (arno@salk.edu) with Scott Makeig (smakeig@ucsd.edu)
 %
 % Main files:
 % ---------- 
@@ -179,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2002/08/15 22:15:43  arno
+% EDF
+%
 % Revision 1.140  2002/08/15 16:57:30  arno
 % update text
 %
