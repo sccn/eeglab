@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2003/12/03 19:25:24  arno
+% add message
+%
 % Revision 1.79  2003/12/03 18:28:54  scott
 % percentage -> percent
 %
@@ -980,10 +983,13 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	else
         fftlength = g.nfft;
     end;
-    fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);
-	
     if exist('pwelch') == 2, usepwelch = 1; else usepwelch=0; end;
-    
+    if ~usepwelch
+        disp('Signal processing toolbox absent: spectrum computed using spec() function');
+        disp('THIS FUNCTION (SPEC()) RETURNS INNACURATE POWER OVER FILTERED REGIONS');
+    end;
+    fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
+        
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
 			if strcmp(g.icamode, 'normal')
