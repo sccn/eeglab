@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/06/28 19:03:31  arno
+% switching button locations
+%
 % Revision 1.36  2004/06/28 18:21:40  arno
 % switching insert and append
 %
@@ -226,7 +229,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       valnum    = valnum + shift;
       if valnum < 1,                valnum = 1;                end;
       if valnum > length(EEG.event), valnum = length(EEG.event); end;
-      set(objevent, 'string', num2str(valnum,3));
+      set(objevent, 'string', num2str(valnum));
 
       % update fields
       % -------------
@@ -253,7 +256,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           % update interface
           % ----------------
           tmpobj = findobj('parent', gcf, 'tag', allfields{index});
-          set(tmpobj, 'string', num2str(value,3), 'enable', enable);
+          set(tmpobj, 'string', num2str(value), 'enable', enable);
       end;
       
       % update original
