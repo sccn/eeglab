@@ -107,6 +107,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/04 20:00:42  cooper
+% Used textsc() to make title. Still needs work...
+%
 % Revision 1.15  2002/09/12 15:23:36  arno
 % implementing frames
 %
@@ -458,7 +461,8 @@ if ~isempty(g.flashes)
 	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', [], 'box', 'off'); set (gcf, 'visible', g.visible);
 	%hpatch = patch([ 0.02 .11 .11 0.02], [0.05 0.05 0.925 0.925], [0.5 0.5 0.5]); lateral
 	%hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); full
-	hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.92 0.92 1 1], [0.5 0.5 0.5]); %up
+	%hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.92 0.92 1 1], [0.5 0.5 0.5]); %up
+        hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.8 0.8 0.93 0.93], [0.5 0.5 0.5]);
 	set(hpatch, 'facecolor', 'w', 'edgecolor', 'none');
 	xlim([0 1]); ylim([0 1]);
 	posf = 0; % used as a counter to preserve color
@@ -510,10 +514,12 @@ end;
 %	end;
 %end;
 
-% draw axis and display images
+% draw axes and display images
 % ----------------------------
+max_ordinate = 1-1.4*ordinate;   % makes space at top for figure title  
+
 for i=1:nbconditions
-	h(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, 1-ordinate].*s+q );
+	h(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q );
 	if ~isempty(g.head)
 		try, img = imread(g.head, 'pcx'); catch, pwd, g.head, disp('Error: unable to load PCX image file'); return; end;
 		imagesc(img); colormap(gray);
@@ -528,7 +534,7 @@ for i=1:nbconditions
 			set(h, g.condtitleformat{:} );
 		end;
 	end;	
-	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, 1-ordinate].*s+q, ...
+	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q, ...
 				 'xlim', g.xlimaxes, 'ylim', g.ylimaxes, 'color', 'none', 'ydir', 'reverse', 'visible', g.visible);
 	axis off;
 	if ~isempty(g.envelope) % draw axis for the envelope
@@ -570,11 +576,12 @@ for indeximage = alltimepoints
 	for i=1:nbconditions
 		axes(hh(i)); 	cla; set (gcf, 'visible', g.visible); 
 		if ~isempty(g.title) & i == 1
-			x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
-			y = (g.ylimaxes(2)-g.ylimaxes(1))*(-0.06) + g.ylimaxes(1);
+			%x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
+			%y = (g.ylimaxes(2)-g.ylimaxes(1))*(-0.06) + g.ylimaxes(1);
 			%text(x, y, g.title, 'fontsize', 14, 'fontweight', 'bold' );
-                        textsc(g.title,'title');
-		end;	
+                        t = textsc(g.title,'title');
+                        set(t,'VerticalAlignment','top', 'fontsize', 15);
+		end;  
 	end;
 
 	% draw the images if necessary
