@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2003/12/17 23:25:39  arno
+% different check for chanlocs
+%
 % Revision 1.116  2003/12/17 00:45:57  arno
 % adding E prefix to electrodes
 %
@@ -673,41 +676,36 @@ end;
             if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
                   if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) ')' 10 ...
                    'does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
-                   'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
-                    error('eeg_checkset error: user abort');
-                    %res = com;
-                    %EEG.icasphere = [];
-                    %EEG.icaweights = [];
-                    %EEG = eeg_checkset(EEG);
-                    %return;
+                   'Should EEGLAB remove ICA information ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                    res = com;
+                    EEG.icasphere = [];
+                    EEG.icaweights = [];
+                    EEG = eeg_checkset(EEG);
+                    return;
                 else
+                    error('eeg_checkset error: user abort');
                     res = com;
                     return;
                     %error('eeg_checkset error: invalid weight and sphere array sizes');
                 end;    
             end;
             if size(EEG.icasphere,2) ~= size(EEG.data,1)
-                   disp( [ 'eeg_checkset warning: number of columns in ica matrix (' int2str(size(EEG.icasphere,2)) ...
-                   ') does not match the number of rows in data (' int2str(size(EEG.data,1)) ')' ]); 
-                res = com;
+                  if popask( [ 'eeg_checkset error: number of colums in sphere array (' int2str(size(EEG.icasphere,2)) ')' 10 ...
+                   'does not match the number of rows in the sphere array (' int2str(size(EEG.data,1)) ')' 10 ...
+                   'Should EEGLAB remove ICA information ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                    res = com;
+                    EEG.icasphere = [];
+                    EEG.icaweights = [];
+                    EEG = eeg_checkset(EEG);
+                    return;
+                else
+                    error('eeg_checkset error: user abort');
+                    res = com;
+                    return;
+                    %error('eeg_checkset error: invalid weight and sphere array sizes');
+                end;    
             end;
             if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
-                if size(EEG.data,1) ~= size(EEG.icasphere,2)
-                       if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10 ')' ...
-                       'does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
-                       'Do you want to want to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
-                        error('eeg_checkset error: user abort');
-                        %res = com;
-                        %EEG.icasphere = [];
-                        %EEG.icaweights = [];
-                        %EEG = eeg_checkset(EEG);
-                        %return;
-                    else
-                        res = com;
-                        return;
-                        %error('eeg_checkset error: invalid weight and sphere array size');
-                    end;    
-                end;
                 if option_computeica
                      fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
                     res = com;
@@ -727,9 +725,9 @@ end;
                 res = com;
             end;     
         else
-               disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
+            disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
             res = com;
-               EEG.icasphere = [];
+            EEG.icasphere = [];
         end;
         if option_computeica
             if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
