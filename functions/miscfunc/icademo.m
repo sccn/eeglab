@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/06 19:48:40  arno
+% updating eegplot calls
+%
 % Revision 1.3  2002/09/05 17:28:13  arno
 % debugging
 %
@@ -80,7 +83,10 @@ if v(1) < 5
   fprintf('Not all segments may work for Matlab version 4.\n')
 end
 
-chan_locs = 'chan14.locs';  % name of channel locations file
+tmpdir = which('runica');
+tmpdir = [ tmpdir(1:end-8) 'locfiles' tmpdir(end-8) ];
+chan_locs = [ tmpdir 'chan14.locs'];
+% name of channel locations file
 
 figure
 set(gcf,'Color',BACKCOLOR);
@@ -143,7 +149,7 @@ fprintf('        of %d chans by %d frames using plotdata()...\n\n', ...
                                size(data,1),size(data,2));
 figure('Position',pos+off/2); % #2a
 
-  plotdata(data,frames,[0 995 -10 10],'ERP Data','chan.locs',0,'(2 conditions)');
+  plotdata(data,frames,[0 995 -10 10],'ERP Data',[ tmpdir 'chan.locs'],0,'(2 conditions)');
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
@@ -288,7 +294,7 @@ figure('Position',pos+4*off);
 %   [projdata] = plotproj(data,weights,compnums, ...
 %                            title,limits,chanlist,channames,colors);
  [projdata] = plotproj(data(:,1:frames),weights*sphere,windex(1:10), ...
-               'First epoch (comps. 1-10)',limits,[1:10],'chan.locs');
+               'First epoch (comps. 1-10)',limits,[1:10],[ tmpdir 'chan.locs']);
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
@@ -333,8 +339,8 @@ figure('Position',pos+5.5*off);
 %  >> envtopo(data,weights,chan_locs,[limits],[compnums],...
 %                                   'title',[plotchans],[voffsets]);
 
-  envtopo(data(:,1:floor(0.6*frames)),weights*sphere,chan_locs,...
-                            [0 995*0.6 0 0],[2 3 4 6],'Largest Components');
+  envtopo(data(:,1:floor(0.6*frames)),weights*sphere,'chanlocs',chan_locs,...
+                            'limits', [0 995*0.6 0 0],'compnums',[2 3 4 6],'title', 'Largest Components');
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
