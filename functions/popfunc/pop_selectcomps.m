@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/26 21:21:08  arno
+% updating eeg_store call
+%
 % Revision 1.2  2002/04/18 18:40:01  arno
 % retrIeve
 %
@@ -59,7 +62,7 @@ if nargin < 1
 	return;
 end;	
 if exist('compnum') ~= 1
-    compnum = [1:EEG.nbchan];
+    compnum = [1:size(EEG.icaweights,1)];
 end;    
 fprintf('Drawing figure...\n');
 
@@ -72,8 +75,8 @@ if length(compnum) > PLOTPERFIG
         pop_selectcomps(EEG, compnum([index:min(length(compnum),index+PLOTPERFIG-1)]));
     end;
 
-	if length(compnum) == EEG.nbchan
-	    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(EEG.nbchan) ']);' ];
+	if length(compnum) == size(EEG.icaweights,1)
+	    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(size(EEG.icaweights,1)) ']);' ];
 	else
 	    com = [ 'pop_selectcomps(' inputname(1) ',[' int2str(compnum) ']);' ];
 	end;
@@ -158,8 +161,8 @@ if ~exist('fig')
 		    %		' end; pop_compproj(%d,%d,1); close(gcf); eeg_retrieve(%d); eeg_updatemenu; '], rejtrials, set_in, set_out, fastif(rejtrials, set_out, set_in), set_out, set_in));
 end;
 
-if length(compnum) == EEG.nbchan
-    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(EEG.nbchan) ']);' ];
+if length(compnum) == size(EEG.icaweights,1)
+    com = [ 'pop_selectcomps(' inputname(1) ',[1:' int2str(size(EEG.icaweights,1)) ']);' ];
 else
     com = [ 'pop_selectcomps(' inputname(1) ',[' int2str(compnum) ']);' ];
 end;
