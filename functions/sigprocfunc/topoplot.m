@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.144  2004/02/23 16:55:51  scott
+% don't let ears go outside axes if shrink is 'skirt' but shrink factor is 0 or small
+%
 % Revision 1.143  2004/02/19 15:56:28  scott
 % plot dipole(s) last
 %
@@ -585,16 +588,18 @@ Th = pi/180*Th;                              % convert degrees to radians
 %end
 
 squeezefac=1;
-if isstr(shrinkfactor)
+if isstr(shrinkfactor) % if shrink arg is a string option
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) ...
                    | strcmp(lower(shrinkfactor),'force') ...
                          | strcmp(lower(shrinkfactor),'skirt') 
 		squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
-		if strcmpi(VERBOSE, 'on')
+                if squeezefac > 1
+                   squeezefac = 1;
+                elseif strcmpi(VERBOSE, 'on')
                    fprintf(...
                    'topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
                                                                       1-squeezefac);
-               end;
+                end;
 		Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
@@ -602,8 +607,8 @@ else  % if numeric shrinkfactor given
         fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
                                                                       shrinkfactor);
 	end;
-    Rd = Rd*(1-shrinkfactor); % squeeze electrodes by shrinkfactor*100% to plot all inside head
     squeezefac = 1-shrinkfactor;
+    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)% to fit inside plotting circle
 end;
 	  
 enum = find(Rd <= rmax);                     % interpolate on-head channels only
