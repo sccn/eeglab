@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2004/02/17 22:48:39  arno
+% add dipsphere
+%
 % Revision 1.37  2004/01/30 15:59:23  arno
 % topoplot msg displayed only for 1st plot
 %
@@ -211,7 +214,7 @@ if nargin < 3
                { } ...
                { 'style'   'text'     'string'    [ '-> Additional scalp map' fastif(typeplot,'',' (and dipole)') ...
                                                   ' plotting options (see help)' ] } ...
-               { 'style'   'edit'     'string'    '''electrodes'', ''off''' } };
+               { 'style'   'edit'     'string'    '''electrodes'', ''off'', ''shrink'', ''skirt''' } };
     uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
     if typeplot
         uilist(9:11) = [];
