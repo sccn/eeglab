@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.98  2004/06/09 21:15:01  arno
+%debug projcol
+%
 %Revision 1.97  2004/06/09 21:12:34  arno
 %fixing projcolor
 %
@@ -669,9 +672,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         if strcmp(BACKCOLOR, 'w'), g.color = { g.color{:} 'k' }; end;
     end;
     g.color = g.color(mod(0:length(sources)-1, length(g.color)) +1);
-    if ~iscell(g.color)
-        error('dipplot: ''color'' must be a cell array');
-    end;
     if ~isempty(g.color)
         g.color = strcol2real( g.color, jet(64) );
     end;
@@ -882,9 +882,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                     h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
                 end;                    
                 set(h(1), 'userdata', dipstruct, 'tag', tag);
-                lighting phong;
-                material shiny;
-                camlight left;
             else % plot dipole markers
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
@@ -969,6 +966,14 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         end;
     end;
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D settings
+    if strcmpi(g.spheres, 'on')
+        lighting phong;
+        material shiny;
+        camlight left;
+        camlight right;
+    end;
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw elipse for group of dipoles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     if ~isempty(g.std)
