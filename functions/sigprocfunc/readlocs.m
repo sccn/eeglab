@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/05/13 22:09:01  arno
+% updating sph format
+%
 % Revision 1.45  2003/05/13 22:07:07  arno
 % removing labels in sfp format
 %
@@ -303,7 +306,7 @@ listskipline = [ ...
    0 ...
    0 ...
    0 ...
-   2 ]; % skip the 2 lines header for the chanedit format
+   1 ]; % skip the 2 lines header for the chanedit format
 
 % ------------------------------------------------------
 % special mode for getting the infos
