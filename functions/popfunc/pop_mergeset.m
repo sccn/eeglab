@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/11/18 16:56:33  scott
+% text
+%
 % Revision 1.14  2003/11/18 16:50:36  scott
 % text
 %
@@ -173,6 +176,13 @@ else
 			end;    
 		end;
 		
+        % add discontinuity event if continuous
+        % -------------------------------------
+        if INEEG1.trials  == 1 & INEEG2.trials == 1
+            disp('Adding a discontinuity event between datasets');
+            INEEG1.event(end+1).type    = 'boundary';
+            INEEG1.event(end  ).latency = INEEG1.pnts+0.5;            
+        end;
         orilen = length(INEEG1.event);
         allfields = union(fieldnames(INEEG1.event), fieldnames(INEEG2.event) );
 		for i=1:length( allfields )
