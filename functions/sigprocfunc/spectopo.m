@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2005/01/28 01:30:14  arno
+% omitting 0-channel for display (avoid crashes
+%
 % Revision 1.91  2005/01/24 01:54:53  arno
 % allowing to display channel/component index
 %
@@ -556,7 +559,7 @@ if isempty(g.weights)
     if length(tmpc) ~= size(eegspecdB,1)
         fprintf('\nWarning: channels [%s] have 0 value and are omitted for display', int2str(find(eegspecdB(:,1) == 0)));
         eegspecdB = eegspecdB(tmpc,:);
-        specstd   = specstd(tmpc,:);
+        if ~isempty(specstd),  specstd = specstd(tmpc,:); end;
         g.chanlocs2 = g.chanlocs(tmpc);
     end;
     eegspecdB = 10*log10(eegspecdB);
