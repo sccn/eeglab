@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/03/06 00:35:30  arno
+% same
+%
 % Revision 1.43  2003/03/06 00:34:28  arno
 % handling numeric shrink factors
 %
@@ -599,7 +602,7 @@ function [chans, shrinkfact]= checkchans(chans);
 	if isfield(chans, 'shrink'), 
 		shrinkfact = chans(1).shrink; 
 		chans = rmfield(chans, 'shrink');
-        if ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
+        if isstr(shrinkfact) & ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
 	end;
     try, allfields = fieldnames(chans); catch, allfields = []; end;
 	newstruct{1}  = 'labels';
