@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2005/04/01 00:56:20  hilit
+% disable data loading in savemode option 2
+%
 % Revision 1.46  2005/03/31 23:40:16  hilit
 % added another option to savemode, saves the data structure without the data
 %
@@ -308,7 +311,9 @@ if mode == 0  % single datasets
         eeg_options;
     end;
 	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
-        tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+        if option_savematlab == 0
+            tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+        end
         EEG.data = [ noextcurfilename '.dat' ];
 		try, 
             fprintf('Saving dataset...\n');
@@ -324,8 +329,10 @@ if mode == 0  % single datasets
 		catch, 
 			error('Pop_saveset: save error, out of space or file permission problem');
 		end;
-		EEG.data   = reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials);
-		EEG.icaact = tmpica;
+        if option_savematlab == 0
+            EEG.data   = reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials);
+            EEG.icaact = tmpica;
+        end
 	else % saving data as a single Matlab file
         tmpfilename = [ noextcurfilename '.dat' ];
         del = 0;
@@ -419,7 +426,9 @@ else
     del = 0;
 	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
 		for index = 1:length(ALLEEG)
-			tmpdata = reshape(ALLEEG(index).data, ALLEEG(index).nbchan,  ALLEEG(index).pnts*ALLEEG(index).trials);
+            if option_savematlab == 0
+                tmpdata = reshape(ALLEEG(index).data, ALLEEG(index).nbchan,  ALLEEG(index).pnts*ALLEEG(index).trials);
+            end            
 			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
             ALLEEG(index).filepath = '';
             if option_savematlab == 0
