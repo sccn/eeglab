@@ -74,9 +74,9 @@
 %                                                     0 -> use whole trial) {1}
 %    Optional scalp map:
 %       'topovec'   = Scalp topography (map) to plot                       {none}
-%       'elocs'     = Electrode location file for scalp map   {no default}
+%       'elocs'     = Electrode location file for scalp map   
 %                     File should be ascii in format of  >> topoplot example   
-%
+%                     May also be an EEG.chanlocs struct. {file named in icadefs.m}
 %    Optional plotting parameters:
 %       'ploterps'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2004/03/09 17:35:33  arno
+% msg
+%
 % Revision 1.71  2004/03/01 16:17:49  arno
 % default baseboot 1
 %
