@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/07/24 18:52:10  arno
+% typo
+% /
+%
 % Revision 1.19  2003/07/21 15:25:31  arno
 % allowing to select component to reject
 %
@@ -135,6 +139,7 @@ if length(compnum) > PLOTPERFIG
     end;
 
     com = [ 'pop_selectcomps(' inputname(1) ', ' vararg2str(compnum) ');' ];
+    return;
 end;
 
 if isempty(EEG.reject.gcompreject)
