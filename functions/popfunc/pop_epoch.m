@@ -15,9 +15,6 @@
 %                time-locking event (default: [-1 2])
 %
 % Optional inputs:
-%   'timeunit' - Time unit ['seconds'|'points'] If 'seconds,' consider events 
-%                times to be in seconds. If 'points,' consider events as
-%                indices into the data array. {Default: 'points'}
 %   'valuelim' - Upper and lower limit values that data in a trial should not
 %                exceed. If one positive value is given, use the negative
 %                of this as lower bound. The given values are also considered
@@ -35,6 +32,11 @@
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: eeglab(), epoch() 
+
+% deprecated
+%   'timeunit' - Time unit ['seconds'|'points'] If 'seconds,' consider events 
+%                times to be in seconds. If 'points,' consider events as
+%                indices into the data array. {Default: 'points'}
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -55,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/11/12 00:08:26  arno
+% debugging eventindices
+%
 % Revision 1.27  2002/11/10 02:48:01  arno
 % debugging g.eventindices
 %
