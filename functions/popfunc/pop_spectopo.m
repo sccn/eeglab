@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/26 01:59:53  arno
+% debugging
+%
 % Revision 1.7  2002/07/24 18:16:49  arno
 % changing default freqs
 %
@@ -138,8 +141,9 @@ if ~isempty(EEG.chanlocs)
 	popcom = sprintf('figure; pop_spectopo(%s, [%s], %s, [%s] %s);', inputname(1), num2str(timerange), num2str(percent), num2str(topofreqs), options);
 	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''freq'', topofreqs, ''chanlocs'', EEG.chanlocs, ''percent'', percent %s);', outstr, options);
 	eval(com)
-	varargout{1} = [10 popcom 10 '% ' com];
-
+	if nargin < 2
+		varargout{1} = [10 popcom 10 '% ' com];
+	end;
 	%title(['Spectrum head plots (time range ' num2str(timerange(1)) '-' num2str(timerange(2)) ')' ]);
 else
 	fprintf('Cannot plot scalp maps without channel locations...\n');
