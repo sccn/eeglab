@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/04/10 17:31:03  arno
+% header edit
+%
 % Revision 1.17  2002/12/04 19:13:19  arno
 % debuging for MacOS6 Matlab 6 directories
 %
