@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/08/08 21:03:56  arno
+% debugging continuous window select
+%
 % Revision 1.31  2002/08/08 00:24:43  arno
 % header
 %
@@ -217,7 +220,11 @@ function [outvar1] = eegplot(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
 DEFAULT_PLOT_COLOR = { 'k', [0.7 0.7 0.7]};         % EEG line color
 DEFAULT_AXIS_BGCOLOR = [.8 .8 .8];% EEG Axes Background Color
-DEFAULT_FIG_COLOR = [.8 .8 .8];   % Figure Background Color
+try, icadefs;
+	DEFAULT_FIG_COLOR = BACKCOLOR;
+catch, 
+	DEFAULT_FIG_COLOR = [.66 .76 1];   % Figure Background Color
+end;
 DEFAULT_AXIS_COLOR = 'k';         % X-axis, Y-axis Color, text Color
 DEFAULT_GRID_SPACING = 1;         % Grid lines every n seconds
 DEFAULT_GRID_STYLE = '-';         % Grid line style
