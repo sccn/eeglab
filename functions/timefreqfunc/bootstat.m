@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/06 19:26:56  arno
+% implementing new bootstrap type
+%
 % Revision 1.4  2002/12/31 04:37:19  scott
 % header edits
 %
@@ -160,13 +163,13 @@ if isempty(Boot.basevect)
 	Boot.basevect = 1:times;
 end;
 
-fprintf('Bootstrap baseline length is %d (out of %d) points\n', length(Boot.basevect));
+fprintf('\nBootstrap baseline length is %d (out of %d) points\n', length(Boot.basevect), times);
 
 if isnan(Boot.accarray)
 	eval( Boot.formulainit );
 	if strcmpi( Boot.boottype, 'second') % get g.naccu bootstrap estimates for each time window
-        fprintf('Bootstrap type is 2-D (best but slowliest)\n');
-		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu, unitname, times(end));
+        fprintf('Bootstrap type is 3-D, shuffling oalong dimension 3 only.\n');
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu, unitname, times(end));
 		
 		arg2 = zeros(nb_points, Boot.naccu);
 		arg1 = zeros(nb_points, Boot.naccu);
@@ -198,7 +201,7 @@ if isnan(Boot.accarray)
             end;
 		end;
 	elseif strcmpi(Boot.boottype, 'both') % handle timestrials bootstrap
-        fprintf('Bootstrap type is 1-D with full shuffling along dimension 2\n');
+        fprintf('Bootstrap type is 2-D, shuffling along dimension 2 and 3\n');
 		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
         arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
@@ -226,8 +229,8 @@ if isnan(Boot.accarray)
             eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
         end;
 	elseif strcmpi(Boot.boottype, 'both2') % handle timestrials bootstrap, shuffle time only once
-        fprintf('Bootstrap type is 1-D with shuffling along dimension 2 (once per bootstrap)\n');
-		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
+        fprintf('Bootstrap type is 2-D, shuffling along dimension 2 and 3 (once per accumulation for 3)\n');
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
         arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );	
         
@@ -254,7 +257,8 @@ if isnan(Boot.accarray)
             eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
         end;
 	elseif strcmpi(Boot.boottype, 'first') % boottype is 'times'
-		fprintf('\nProcessing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, Boot.naccu,unitname,trials);
+        fprintf('Bootstrap type is 2-D, shuffling along dimension 2 only\n');
+		fprintf('Processing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, Boot.naccu,unitname,trials);
 		arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
 		for allt=1:trials
