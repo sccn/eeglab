@@ -26,14 +26,14 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
 %                       'head', to edge of head {default 'head'}.
-%   'shrink'           - ['on'|'off'|'force'|factor] 'on': normalize electrode 
-%                        polar coordinates if maximum radius > 0.5 so that
-%                        maximu radius is 0.5. 'force': normalize radius so 
-%                        that the maximum is 0.5. 'factor': apply a normalizing
+%   'shrink'           - ['on'|'off'|'force'|factor] 'on': If maximum radius > 0.5, 
+%                        normalize electrode polar coordinates to make the maximum
+%                        radius 0.5 (to plot all locations). 'force': normalize radius 
+%                        so the maximum is 0.5. 'factor': apply a normalizing
 %                        factor (percentage of the maximum) {default = 'off'}.
 %                        Note that the chan_locs structure may have an optional
 %                        shrink field (same format as this parameter).
-%   'colormap'        -  (n,3) any sized colormap
+%   'colormap'        -  (n,3) any size colormap
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
 %                        map from coordinate XI,YI to coordinates XE, YE, ZE (head 
 %                        model has radius 1). If several rows, plot one dipole per row.
@@ -95,6 +95,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2004/01/20 04:25:05  scott
+% help msg edit
+% .,
+%
 % Revision 1.70  2003/12/17 15:49:45  arno
 % debug chan with no coordinates
 %
@@ -269,13 +273,13 @@
 %
 
 % Topoplot Version 2.1
-% Original development history:
+% Early development history:
 % Begun by Andy Spydell and Scott Makeig, NHRC,  7-23-96
 % 8-96 Revised by Colin Humphries, CNL / Salk Institute, La Jolla CA
 %   -changed surf command to imagesc (faster)
 %   -can now handle arbitrary scaling of electrode distances
 %   -can now handle non integer angles in chan_locs
-% 4-4-97 Revised again by Colin Humphries, reformat by SM
+% 4-4-97 Revised again by Colin Humphries, reformatted by SM
 %   -added parameters
 %   -changed chan_locs format
 % 2-26-98 Revised by Colin
@@ -300,27 +304,30 @@ handle = [];
 Zi = [];
 
 chanval = NaN;
-icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
+rmax = 0.5;             % head radius - don't change this!
+icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC
 INTERPLIMITS = 'head';  % head, electrodes
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
-GRID_SCALE = 67;
-CONTOURNUM = 6;
-STYLE = 'both';       % both,straight,fill,contour,blank
-HCOLOR = [0 0 0];ECOLOR = [0 0 0];
-CONTCOLOR = [0 0 0];
-ELECTRODES = 'on';      % ON OFF LABEL
+GRID_SCALE = 67;        % plot map on a 67X67 grid
+AXHEADFAC = 1.3;        % axes to head scaling factor
+CONTOURNUM = 6;         % number of contour levels to plot
+STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
+HCOLOR = [0 0 0];       % default head color
+ECOLOR = [0 0 0];       % default electrode color
+ELECTRODES = 'on';      % default 'electrodes': on|off|label
 EMARKER = '.';
-EMARKERSIZE = [];     % DEFAULTS SET IN CODE 
-EFSIZE = get(0,'DefaultAxesFontSize');
-HLINEWIDTH = 2;
-SHADING = 'flat';     % flat or interp
+EMARKERSIZE = [];       % default depends on number of electrodes, set in code
+EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
+HLINEWIDTH = 2;         % default linewidth for head, nose, ears
+SHADING = 'flat';       % default 'shading': flat|interp
 shrinkfactor = 'off';
-DIPOLE  = [];
+DIPOLE  = [];           % dipole defaults
 DIPNORM   = 'off';
 DIPLEN    = 1;
 DIPSCALE  = 1;
 DIPORIENT  = 1;
 DIPCOLOR  = [0 0 0];
+
 VERBOSE = 'on';
 MASKSURF = 'off';
 
@@ -485,23 +492,6 @@ end
 if r>1 & c>1,
   error('topoplot(): input data must be a single vector');
 end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%fid = fopen(loc_file);
-%if fid<1,
-%  fprintf('topoplot(): cannot open chan_locs file (%s).\n',loc_file);
-%  return
-%end
-%A = fscanf(fid,'%d %f %f %s',[7 MAXTOPOPLOTCHANS]);
-%fclose(fid);
-%A = A';
-%labels = setstr(A(:,4:7));
-%idx = find(labels == '.');                       % some labels have dots
-%labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
-%Th = pi/180*A(:,2);                              % convert degrees to radians
-%Rd = A(:,3);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -521,7 +511,9 @@ if length(Vl) > 1
     Vl     = Vl(ind);
 end;
 labels = labels(ind);
-if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
+if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), 
+   shrinkfactor = tmpeloc(1).shrink; 
+end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
@@ -531,26 +523,27 @@ Th = pi/180*Th;                              % convert degrees to radians
 %end
 
 if isstr(shrinkfactor)
-	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), ...
+	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) | strcmp(lower(shrinkfactor), ...
                        'force')
-		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
+		squeezefac = 1 - rmax/max(Rd); %(2*max(r)-1)/(2*rmax);
 		if strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radii shrunk towards vertex by %2.3g to show all\n', ...
-                       squeeze);
-        end;
-		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
-	end;	
+                   fprintf(...
+                   'topoplot(): electrode radii shrunk towards vertex by %2.3g to show all\n', ...
+                                                                      squeezefac);
+               end;
+		Rd = Rd-squeezefac*Rd; % squeeze electrodes by squeezefac*100% 
+	end;	                       % to plot all inside the head cartoon
 else 
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): electrode radius shrunk towards vertex by %2.3g\n', shrinkfactor);
 	end;
-    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes by squeeze*100% to have all inside
+    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes by squeezefac*100% to plot all inside head
 end;
 	  
-enum = find(Rd <= 0.5);                     % interpolate on-head channels only
+enum = find(Rd <= rmax);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', ...
+        fprintf('topoplot(): %d/%d electrodes not shown (radius>0.5)\n', ...
                    length(enum)-length(Rd),length(Rd));    
     end; 
 end;	
@@ -581,18 +574,33 @@ Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
-rmax = 0.5;
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%fid = fopen(loc_file);
+%if fid<1,
+%  fprintf('topoplot(): cannot open chan_locs file (%s).\n',loc_file);
+%  return
+%end
+%A = fscanf(fid,'%d %f %f %s',[7 MAXTOPOPLOTCHANS]);
+%fclose(fid);
+%A = A';
+%labels = setstr(A(:,4:7));
+%idx = find(labels == '.');                       % some labels have dots
+%labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
+%Th = pi/180*A(:,2);                              % convert degrees to radians
+%Rd = A(:,3);
 
 if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   if strcmp(INTERPLIMITS,'head')
-    xmin = min(-.5,min(x)); xmax = max(0.5,max(x));
-    ymin = min(-.5,min(y)); ymax = max(0.5,max(y));
+    xmin = min(-rmax,min(x)); xmax = max(rmax,max(x));
+    ymin = min(-rmax,min(y)); ymax = max(rmax,max(y));
   else % interplimits = rectangle containing electrodes
-    xmin = max(-.5,min(x)); xmax = min(0.5,max(x));
-    ymin = max(-.5,min(y)); ymax = min(0.5,max(y));
+    xmin = max(-rmax,min(x)); xmax = min(rmax,max(x));
+    ymin = max(-rmax,min(y)); ymax = min(rmax,max(y));
   end
   
   %
@@ -612,8 +620,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   if exist('chanrad')
       chantheta = (chantheta/360)*2*pi;
-      chancoords = round(34+33.5*2*chanrad*[cos(-chantheta),-sin(-chantheta)]);
-      if chancoords(1)<1 | chancoords(1) > 67 | chancoords(2)<1 | chancoords(2)>67
+      chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),-sin(-chantheta)]);
+      if chancoords(1)<1 | chancoords(1) > GRID_SCALE | chancoords(2)<1 | chancoords(2)>GRID_SCALE
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords(1),chancoords(2));
@@ -652,7 +660,9 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   cla  % clear current axis
   hold on
-  set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+  h = gca; % uses current axes
+  set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
+
   % pos = get(gca,'position');
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
@@ -691,7 +701,7 @@ else % if style 'blank'
 
    cla
    hold on
-   set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+  set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
    % pos = get(gca,'position');
    % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
@@ -720,15 +730,6 @@ end
 if exist('handle') ~= 1
     handle = gca;
 end;
-
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%% Draw head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-l = 0:2*pi/100:2*pi;
-basex = .18*rmax;  
-tip = rmax*1.15; base = rmax-.004;
-EarX = [.497 .510 .518 .5299 .5419 .54 .547 .532 .510 .489];
-EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 %
 % %%%%%%%%%%%%%%%%%%% Plot electrodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -806,7 +807,7 @@ elseif strcmp(ELECTRODES,'numbers')
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%% Plot dipole on top of the plot %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Plot dipole on the scalp map  %%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(DIPOLE)
     hold on;
@@ -817,7 +818,7 @@ if ~isempty(DIPOLE)
     DIPOLE(:,2) =  tmp(:,1);
     DIPOLE(:,3) = -tmp(:,4);
     DIPOLE(:,4) =  tmp(:,3);
-    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*0.5;
+    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
     DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
     if strcmpi(DIPNORM, 'on')
         for index = size(DIPOLE,1)
@@ -835,20 +836,37 @@ if ~isempty(DIPOLE)
 end;
 
 %
-%%%%%%%%%%%%%%%%%%%%% Plot Head, Ears, Nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+%%%%%%%%%%%%%%%%%%%%% Plot head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+l = 0:2*pi/100:2*pi; % circle vertices
+basex = 0.18*rmax;  
+tip = rmax*1.15; base = rmax-.004;
+EarX = [.497 .510 .518 .5299 .5419 .54 .547 .532 .510 .489];
+EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
+
 plot(cos(l).*rmax,sin(l).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 
-plot([.18*rmax;0;-.18*rmax],[base;tip;base],...
+if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+  plot(cos(l).*max(Rd),sin(l).*max(Rd),...
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot skirt 
+end
+
+plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH); % plot nose
    
 plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)  % plot left ear
 plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot right ear
 
+%
+%%%%%%%%%%%%%%%%%%%% Set standard background color %%%%%%%%%%%%%%%%%%%%%%%%
+%
+try, 
+  icadefs; 
+  set(gcf, 'color', BACKCOLOR); 
+  catch, 
+end; 
+
 hold off
 axis off
-axis square;
-
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; % set std background color
-
+axis square; % keep head round!
