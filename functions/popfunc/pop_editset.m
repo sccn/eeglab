@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/12/08 18:03:37  arno
+% do not copy variable names
+%
 % Revision 1.42  2003/12/05 23:24:47  arno
 % command line call problem
 %
@@ -376,7 +379,13 @@ for curfield = tmpfields'
                             fprintf('Pop_editset: ICA weight matrix file ''%s'' found\n', varname); 
 							try, EEGOUT.icaweights = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
-                            catch, fprintf('Pop_editset warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                            catch, 
+                                try
+                                    EEGOUT.icaweights = floatread(varname, [1 Inf]);
+                                    EEGOUT.icaweights = reshape( EEGOUT.icaweights, [length(EEGOUT.icaweights)/EEG.nbchan EEG.nbchan]);
+                                catch
+                                    fprintf('Pop_editset warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                end;
                             end;
                          else
 							 if isempty(varname) 
@@ -397,7 +406,13 @@ for curfield = tmpfields'
                             fprintf('Pop_editset: ICA sphere matrix file ''%s'' found\n', varname); 
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
-                            catch, fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                            catch,
+                                try
+                                    EEGOUT.icasphere = floatread(varname, [1 Inf]);
+                                    EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/EEG.nbchan EEG.nbchan]);
+                                catch
+                                    fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                end;
                             end;
                          else
 							 if isempty(varname) 
