@@ -105,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/26 18:58:20  arno
+% scale power duplicate debugging
+%
 % Revision 1.17  2002/11/26 18:42:50  arno
 % moviefolder now functionnal
 %
@@ -188,7 +191,6 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'freqs'       'real'          []                                       [];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
-                            'showcomps'   'integer'       []                                       [];
                             'makemovie'   'cell'          {}                                       {};
                             'eventprob'   ''              []                                       [] });
 if isstr(g), error(g); end;
@@ -346,11 +348,13 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     % -------------------
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
+        [tmp plotorder] = sort( coordinates(:,1) );
         coordinates = coordinates(:, [2 3]); % remove X
     else
         coordinates = g.coordinates;
     end;
-    brainmovieoptions = { 'resolution', 'low', ...
+    brainmovieoptions = { 'plotorder', g.showcomps(plotorder), 
+                         'resolution', 'low', ...
                         'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.15 1.15], ...
@@ -372,12 +376,14 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     % ------------------
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
+        [tmp plotorder] = sort( coordinates(:,3) );
         coordinates = coordinates(:, [1 2]); % remove Z
     else
         coordinates = g.coordinates;
     end;
     
-    brainmovieoptions = { 'resolution', 'low', ...
+    brainmovieoptions = {  'plotorder', g.showcomps(plotorder), 
+                         'resolution', 'low', ...
                         'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
