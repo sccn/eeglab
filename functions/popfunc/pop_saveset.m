@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 18:34:13  arno
+% questdlg2
+%
 % Revision 1.3  2002/08/12 02:27:13  arno
 % inputdlg2
 %
@@ -68,6 +71,7 @@
 
 function [EEG, com] = pop_saveset( EEG, inarg, curfilename, curfilepath);
 
+com = '';
 if nargin < 1
 	help pop_saveset;
 	return;
