@@ -2,18 +2,34 @@
 %
 % Usage:
 %   >> pop_dipplot( EEG ); % pop up interactive window
-%   >> pop_dipplot( EEG, type, comps, 'key1', 'val1', 'key2', 'val2', ...);
+%   >> pop_dipplot( EEG, comps, 'key1', 'val1', 'key2', 'val2', ...);
 %
 % Graphic interface:
 %   "Components" - [edit box] enter component number to plot. By
 %                all the localized components are plotted. Command
 %                line equivalent: components.
-%   "Background image" - [list box] use BESA background image or average
-%                MRI image. Dipplot command line equivalent: 'image'.
+%   "Background image" - [edit box] MRI background image. This image 
+%               has to be normalized to the MNI brain using SPM2 for
+%               instance. Dipplot() command line equivalent: 'image'.
 %   "Summary mode" - [Checkbox] when checked, plot the 3 views of the
-%                head model and dipole locations.
+%                head model and dipole locations. Dipplot() equivalent 
+%               is 'summary'.
+%   "Plot edges" - [Checkbox] plot edges at the intersection between
+%               MRI slices. Diplot() equivalent is 'drawedges'.
+%   "Plot closest MRI slide" - [Checkbox] plot closest MRI slice to
+%               dipoles although not using the 'tight' view mode.
+%               Dipplot() equivalent is 'cornermri' and 'axistight'.
+%   "Plot dipole's 2-D projections" - [Checkbox] plot a dimed dipole
+%               projection on each 2-D MRI slice. Dipplot() equivalent 
+%               is 'projimg'.
+%   "Plot projection lines" - [Checkbox] plot lines originating from
+%               dipoles and perpendicular to each 2-D MRI slice. 
+%               Dipplot() equivalent is 'projline'.
+%   "Make all dipole point out" - [Checkbox] make all dipole point 
+%               toward outside the brain. Dipplot() equivalent is 
+%               'pointout'.
 %   "Normalized dipole length" - [Checkbox] normalize the length of
-%               all dipoles. Dipplot command line equivalent: 'normlen'.
+%               all dipoles. Dipplot() command line equivalent: 'normlen'.
 %   "Additionnal dipfit() options" - [checkbox] enter additionnal 
 %               sequence of 'key', 'val' argument in this edit box.
 %
@@ -23,9 +39,9 @@
 %           all the localized components are plotted.
 %
 % Optional inputs:
-%   Same as dipplot().
+%   'key','val' - same as dipplot()
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 26 Feb 2003
+% Author: Arnaud Delorme, CNL / Salk Institute, 26 Feb 2003-
 %
 % See also: dipplot()
 
@@ -51,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/03/17 19:18:51  arno
+% fix typo
+%
 % Revision 1.26  2005/03/17 18:07:28  arno
 % beginning to remove BESA
 %
@@ -136,26 +155,46 @@ if nargin < 1
     return;
 end;
 
+% check input structure
+% ---------------------
+if ~isfield(EEG, 'dipfit') & ~isfield(EEG, 'sources')
+    if ~isfield(EEG.dipfit.hdmfile) & ~isfield(EEG, 'sources')
+        error('No dipole information in dataset'); 
+    end;
+    error('No dipole information in dataset'); 
+end;
+if nargin == 1
+    if isfield(EEG, 'sources')
+        typedip = 'BESA';
+        disp('Besa sources detected');
+    else 
+        typedip = 'DIPFIT';
+    end;
+end;
+
 if nargin < 2
 	% popup window parameters
 	% -----------------------
-    varstr = '';;
-    if isfield(EEG, 'dipfit'), varstr = 'DIPFIT|'; typedip = 'dipfit'; end;
-    if isfield(EEG, 'sources'), varstr = [varstr 'BESA|']; typedip = 'besa';end;
-    if isempty(varstr), error('No dipole information in dataset'); end;
+    commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
+                    'if filename ~=0,' ...
+                    '   set(findobj(''parent'', gcbf, ''tag'', ''mrifile''), ''string'', [ filepath filename ]);' ...
+                    'end;' ...
+                    'clear filename filepath tagtest;' ];
     
-    geometry = { [2 1] [2 1] [2 1] [2 1] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2 1] };
+    geometry = { [2 1] [2 1] [0.8 0.3 1.5] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] ...
+                 [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2 1] };
     uilist = { { 'style' 'text' 'string' 'Components indices ([]=all avaliable)' } ...
                { 'style' 'edit' 'string' '' } ...
-               { 'style' 'text' 'string' 'Use dipoles from (scroll, then click to select)' } ...
-               { 'style' 'listbox' 'string' varstr(1:end-1) 'value' 1 } ...
-               { 'style' 'text' 'string' 'Background image (click to select)' } ...
-               { 'style' 'listbox' 'string' fastif(strcmpi(typedip, 'dipfit'), 'Average MRI', 'average MRI|BESA head') } ...
                { 'style' 'text' 'string' 'Plot dipoles within RV (%) range ([min max])' } ...
                { 'style' 'edit' 'string' '' } ...
-               { 'style' 'text' 'string' 'Plot sumary mode' } ...
+               { 'style' 'text' 'string' 'Background image' } ...
+               { 'style' 'pushbutton' 'string' '...' 'callback' commandload } ...
+               { 'style' 'edit' 'string' EEG.dipfit.mrifile 'tag' 'mrifile' } ...
+               { 'style' 'text' 'string' 'Plot summary mode' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Plot edges' } ...
+               { 'style' 'checkbox' 'string' '' } {} ...
+               { 'style' 'text' 'string' 'Plot closest MRI slide' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Plot dipole''s 2-D projections' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
@@ -168,9 +207,6 @@ if nargin < 2
                { 'style' 'text' 'string' 'Additionnal dipplot() options' } ...
                { 'style' 'edit' 'string' '' } };
      
-    if length(varstr) < 7,
-        uilist(3:4) = []; geometry(2) = [];
-    end;
 	result = inputgui( geometry, uilist, 'pophelp(''pop_dipplot'')', 'Plot dipoles - pop_dipplot');
 	if length(result) == 0 return; end;
 
@@ -178,28 +214,20 @@ if nargin < 2
 	% -----------------
     options = {};
     if ~isempty(result{1}), comps = eval( [ '[' result{1} ']' ] ); else comps = []; end;
-    if length(varstr) >= 7,
-        if result{2} == 1, typedip = 'DIPFIT';
-        else               typedip = 'BESA';
-        end;
-        ind = 3;
-    else
-        ind = 2;
-    end;
-    options = { options{:} 'image' fastif(result{ind} == 1, 'mri', 'besa') };
-    if ~isempty(result{ind+1}), options = { options{:} 'rvrange' eval(  [ '[' result{ind+1} ']' ] ) }; end;
-    if result{ind+2} == 1, options = { options{:} 'summary'   'on' }; end;
-    if result{ind+3} == 1, options = { options{:} 'drawedges' 'on' }; end;
-    if result{ind+4} == 1, options = { options{:} 'projimg'   'on' }; end;
-    if result{ind+5} == 1, options = { options{:} 'projlines' 'on' }; end;
-    if result{ind+6} == 1, options = { options{:} 'pointout'  'on' }; end; 
-    if result{ind+7} == 1, options = { options{:} 'normlen'   'on' }; end;
-    if ~isempty( result{ind+8} ), tmpopt = eval( [ '{' result{ind+8} '}' ] ); options = { options{:} tmpopt{:} }; end;
+    if ~isempty(result{2}), options = { options{:} 'rvrange' eval(  [ '[' result{2} ']' ] ) }; end;
+    options = { options{:} 'mri' result{3} };
+    if result{4} == 1, options = { options{:} 'summary'   'on' }; end;
+    if result{5} == 1, options = { options{:} 'drawedges' 'on' }; end;
+    if result{6} == 1, options = { options{:} 'cornermri' 'on' 'axistight' 'on' }; end;
+    if result{7} == 1, options = { options{:} 'projimg'   'on' }; end;
+    if result{8} == 1, options = { options{:} 'projlines' 'on' }; end;
+    if result{9} == 1, options = { options{:} 'pointout'  'on' }; end; 
+    if result{10} == 1, options = { options{:} 'normlen'   'on' }; end;
+    if ~isempty( result{11} ), tmpopt = eval( [ '{' result{11} '}' ] ); options = { options{:} tmpopt{:} }; end;
 else 
     if isstr(comps)
-        options = { comp varargin{:} };
-        comp = typedip;
-        typedip = 'dipfit';
+        options = { comps varargin{:} };
+        comps = typedip;
     else
         options = varargin;
     end;
@@ -210,7 +238,7 @@ if strcmpi(typedip, 'besa')
     if ~isempty(comps)
         [tmp1 int] = intersect(cell2mat({EEG.sources.component}), comps);
         if isempty(int), error ('Localization not found for selected components'); end;
-        dipplot(EEG.sources(int), options{:});
+        dipplot(EEG.sources(int), 'sphere', 1, options{:});
     else
         dipplot(EEG.sources, options{:});
     end;      
@@ -247,6 +275,6 @@ else
 end;
     
 if nargin < 3
-    com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ typedip comps options{:}}));
+    com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ comps options{:}}));
 end;
 return;
