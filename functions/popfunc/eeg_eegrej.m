@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/22 17:16:53  arno
+% debug command line call
+%
 % Revision 1.4  2002/08/08 14:46:46  arno
 % boundary events
 %
@@ -70,8 +73,12 @@ else tmpalllatencies = [];
 end;
 
 eeg_options; 
-[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
+[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( EEG.data, ...
 												  regions(:,3:4), EEG.xmax-EEG.xmin, tmpalllatencies);
+% the string option has been disable since it was causing problems
+% ----------------------------------------------------------------
+%[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
+%												  regions(:,3:4), EEG.xmax-EEG.xmin, tmpalllatencies);
 EEG.pnts = size(EEG.data,2);
 EEG.xmax = EEG.xmax+EEG.xmin;
 
