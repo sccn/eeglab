@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/07/31 16:08:35  arno
+% debugging epoch problem
+%
 % Revision 1.26  2002/07/31 01:08:46  arno
 % resizing button
 %
@@ -400,7 +403,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   posbut(16,:) = [ 0.4006    0.05    0.0582    0.0390 ]; % value tag
   posbut(10,:) = [ 0.5437    0.0458    0.0275    0.0270 ]; % +
   posbut(11,:) = [ 0.5437    0.0134    0.0275    0.0270 ]; % -
-  posbut(12,:) = [ 0.6    0.02    0.12    0.05 ]; % cancel
+  posbut(12,:) = [ 0.6    0.02    0.14    0.05 ]; % cancel
   posbut(13,:) = [-0.1    0.02    0.09    0.05 ]; % accept
   posbut(20,:) = [-0.17    0.15     0.015    0.8 ]; % slider
   posbut(:,1) = posbut(:,1)+0.2;
