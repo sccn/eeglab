@@ -9,8 +9,9 @@
 %  comps    - component to fit
 %
 % Optional inputs:
-%  'settings'  - [cell array] dipfit settings (arguments to the 
-%                pop_dipfit_settings() function). Default is none.
+%  'model'     - ['BESA'|'BEM'] dipfit template model settings.
+%  'settings'  - [cell array] optional arguments for pop_dipfit_settings
+%                such as electrodes to omit.
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
 %                symetry. Default is 1.
 %  'dipplot'   - ['on'|'off'] plot dipoles. Default is 'off'.
@@ -47,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/10 19:02:25  arno
+% Initial revision
+%
 % Revision 1.20  2004/05/20 18:06:46  arno
 % header
 %
@@ -125,8 +129,8 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         
         uilist = { { 'style' 'text' 'string' 'Component indices' } ...
                    { 'style' 'edit' 'string' [ '1:' int2str(ncomps) ] } ... 
-                   { 'style' 'text' 'string' 'pop_dipfit_settings() options' } ...
-                   { 'style' 'edit' 'string' '' } ... 
+                   { 'style' 'text' 'string' 'Template dipole model' } ...
+                   { 'style' 'listbox' 'string' '4 shell (BESA)|Boundary Element Model' } ... 
                    { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''pop_dipfit_settings'')' } ... 
                    { 'style' 'text' 'string' 'Omit the following channels' } ...
                    { 'style' 'edit' 'string' '' 'tag' 'chans' } ... 
@@ -148,9 +152,12 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                             'Fit multiple ICA components -- pop_multifit()');
         if length(results) == 0 return; end;
         comps        = eval( [ '[' results{1} ']' ] );
+        
+        % selecting model
+        % ---------------
+        options = { 'model' fastif(results{2} == 1, 'BESA', 'BEM') };        
         if ~isempty(results{3})
-             options      = { 'settings' eval( [ '{' results{2} ', ''electrodes'', setdiff(1:EEG.nbchan,[' results{3} ']) }' ] ) };
-        else options      = { 'settings' eval( [ '{' results{2} '}' ] ) };
+             options      = { options{:} 'settings' { 'electrodes' setdiff(1:EEG.nbchan, eval( [ '[' results{3} ']' ] )) } };
         end;
         if ~isempty(results{4})
             options      = { options{:} 'threshold' eval( results{4} ) };
@@ -166,6 +173,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     % checking parameters
     % -------------------
     g = finputcheck(options, { 'settings'  'cell'     []        {}; 
+                               'model'     'string'   { 'BESA' 'BEM' } 'BESA';
                                'dipoles'   'integer'  [1 2]      1;
                                'threshold' 'float'    [0 100]   40;
                                'dipplot'   'string'   { 'on' 'off' } 'off';
@@ -194,15 +202,18 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     %else
     %    EEG     = pop_dipfit_settings( EEG, g.settings{:}, 'electrodes', elecsel);
     %end;
-    if isempty(g.settings)
-        EEG     = pop_dipfit_settings( EEG, 'electrodes', [1:EEG.nbchan]);        
-    else
-        EEG     = pop_dipfit_settings( EEG, g.settings{:} );        
-    end;
+    
+    if strcmpi(g.model, 'BESA'), ind = 1; else ind = 2; end;
+    dipfitdefs;
+    if isempty(g.settings), g.settings = { 'electrodes', [1:EEG.nbchan] }; end;
+    g.settings = { g.settings{:} 'hdmfile'     template_models{ind}{1} ...
+                                 'coordformat' template_models{ind}{2} ...
+                                 'mrifile'     template_models{ind}{3} ...
+                                 'chanfile'    template_models{ind}{4} };
+    EEG     = pop_dipfit_settings( EEG, g.settings{:} );        
         
     % Scanning dipole locations
     % -------------------------
-    dipfitdefs;
     skipscan = 0;
     try 
         alls = cellfun('size', { EEG.dipfit.model.posxyz }, 2);
@@ -219,7 +230,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         xg  = linspace(-floor(meanradius), floor(meanradius),11);
         yg  = linspace(-floor(meanradius), floor(meanradius),11);
         zg  = linspace(0                 , floor(meanradius), 6);
-        EEG = pop_dipfit_batch( EEG, [1:ncomps], ...
+        EEG = pop_dipfit_gridsearch( EEG, [1:ncomps], ...
                                 eval(xgridstr), eval(ygridstr), eval(zgridstr), 100);
         disp('Scanning terminated. Refining dipole locations...');
     end;
@@ -230,7 +241,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     % -----------------------------
     disp('Searching dipoles locations...');
     chansel =  EEG.dipfit.chansel;
-    elc     = getelecpos(EEG.chanlocs, EEG.dipfit);
+    %elc     = getelecpos(EEG.chanlocs, EEG.dipfit);
     plotcomps = [];
     for i = comps(:)'
         if i <= length(EEG.dipfit.model) & ~isempty(EEG.dipfit.model(i).posxyz)
@@ -243,27 +254,27 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                 EEG.dipfit.model(i).active = [1];
                 EEG.dipfit.model(i).select = [1];
             end;
+            warning backtrace on;
             try,
                 if g.dipoles == 2,
-                    EEG.dipfit.model(i) = dipfit_manual(EEG.dipfit.model(i), EEG.icawinv(chansel,i), ...
-                                                        elc(chansel,:), EEG.dipfit.vol, 'method', 'position', 'constraint', defaultconstraint);
+                    EEG.dipfit.model(i) = dipfit_nonlinear(EEG, 'component', i, 'symetry', defaultconstraint);
                 else
-                    EEG.dipfit.model(i) = dipfit_manual(EEG.dipfit.model(i), EEG.icawinv(chansel,i), ...
-                                                        elc(chansel,:), EEG.dipfit.vol, 'method', 'position' );
+                    EEG.dipfit.model(i) = dipfit_nonlinear(EEG, 'component', i, 'symetry', []);
                 end;
-            catch, EEG.dipfit.model(i).rv =NaN; disp('Maximum number of iterations reached. Fitting failed');
+            catch, EEG.dipfit.model(i).rv = NaN; disp('Maximum number of iterations reached. Fitting failed');
             end;
+            warning backtrace on;
             plotcomps = [ plotcomps i ];
         end;
     end;
     
     % removing dipoles outside the head
     % ---------------------------------
-    if strcmpi(g.rmout, 'on')
+    if strcmpi(g.rmout, 'on') & strcmpi(EEG.dipfit.coordformat, 'spherical')
         rmdip = [];
         for index = plotcomps
             if ~isempty(EEG.dipfit.model(index).posxyz)
-                if any(sqrt(sum(EEG.dipfit.model(index).posxyz.^2,2)) > EEG.dipfit.vol.r(1))
+                if any(sqrt(sum(EEG.dipfit.model(index).posxyz.^2,2)) > 85)
                     rmdip = [ rmdip index];
                     EEG.dipfit.model(index).posxyz = [];
                     EEG.dipfit.model(index).momxyz = [];
