@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/07/30 18:13:23  arno
+% same
+%
 % Revision 1.13  2002/07/30 18:11:04  arno
 % debugging
 %
@@ -195,6 +198,9 @@ if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length(
 else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
 end;
 SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
+
+% put warning if boundaries in continuous data
+% --------------------------------------------
 
 % outputs
 % -------
