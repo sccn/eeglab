@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/02/12 23:09:19  scott
+% same
+%
 % Revision 1.15  2004/02/12 23:08:02  scott
 % text output edit
 %
@@ -146,7 +149,7 @@ if isempty(filtorder) | filtorder==0,
    end
      
    if filtorder < min_filtorder
-        filtorder == min_filtorder;
+        filtorder = min_filtorder;
     end
 end
 
