@@ -17,10 +17,10 @@
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if n < 0, the number largest-comp. maps  to plot (component with max
 %                  variance) {default|[] -> 7}
-%  'times'     = starting and ending epoch latencies (in ms) {default: from 'limits'}
+%  'timerange' = starting and ending epoch latencies (in ms) {default: from 'limits'}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end latencies 
 %                  (in ms), min/max potential values (uV). If minmx & maxms = 0 -> get time limits
-%                  from 'times' or use 0:frames-1. If minuV and maxuV = 0 -> use data uV limits
+%                  from 'timerange' or use 0:frames-1. If minuV and maxuV = 0 -> use data uV limits
 %                  {default: 0}
 %  'title'     = [string] plot title {default|[] -> none}
 %  'plotchans' = [integer array] data channels to use in computing contributions and envelopes 
@@ -49,9 +49,9 @@
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
 %                  +/-max(abs(map value)) {default: 'off'}
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. {default: 'on'}
-%  'pvaf'      = ['mv'|'pv'|'rv'] use max back-projected variance (if 'mv'), percent variance 
-%                  accounted for (pvaf, if 'pv'), or relative variance (rv, if 'rv') to select 
-%                  components contributing the most during the selected ('limcontrib') interval, 
+%  'pvaf'      = ['mv'|'pv'|'rv'] if 'mv', use max back-projected variance , if 'pv', sort by 
+%                  percent variance accounted for (pvaf). If 'rv', sort by relative variance to
+%                  select components contributing the most during the selected ('limcontrib') interval, 
 %                  where pvaf(component) = 100-100*variance(data-component))/variance(data)
 %                        rv(component)   = 100*variance(component)/variance(data) {default: 'mv'}
 % Outputs:
@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2004/11/11 15:12:33  scott
+% clean up
+%
 % Revision 1.69  2004/11/11 14:41:48  scott
 % made new 'times' option [minms, maxms]
 %
@@ -296,7 +299,7 @@ if nargin <= 2 | isstr(varargin{1})
 	fieldlist = { 'chanlocs'      ''         []                       [] ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       0;
-				  'times'         'real'     []                       [];
+				  'timerange'     'real'     []                       [];
 				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
 				  'icawinv'       'real'     []                       pinv(weights) ;
 				  'icaact'        'real'     []                       [] ;
@@ -309,7 +312,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'subcomps'      'integer'  []                       []; ...
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
-				  'pvaf'          'string'   {'mv' 'rv' 'pvaf' 'pv' 'on' 'off'} 'mv'; ...
+				  'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv'; ...
 				  'actscale'      'string'   {'on' 'off'}             'off'; ...
 				  'limcontrib'    'real'     []                       0;  ...
                                   'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
@@ -357,15 +360,20 @@ if ~isempty(g.colors)
 end
 
 %
-%%%%%%%%%%%%%%%%% Convert limits, limcontrib and g.times to seconds from ms %%%%%%%
+%%%%%%%%%%%%%%%%% Convert limits, limcontrib and g.timerange to seconds from ms %%%%%%%
 %
-g.limits(1) = g.limits(1)/1000;
+g.limits(1) = g.limits(1)/1000; % convert ms -> s
 if length(g.limits)>1, 
-    g.limits(2) = g.limits(2)/1000; 
+    g.limits(2) = g.limits(2)/1000;  % convert ms -> s
 end;
-g.limcontrib = g.limcontrib/1000;
-if ~isempty(g.times) 
-    g.times = g.times/1000;
+g.limcontrib = g.limcontrib/1000; % convert ms -> s
+
+if ~isempty(g.timerange) 
+    g.timerange = g.timerange/1000; % convert ms -> s
+    if (g.limits(1) == 0 & (length(g.limits)>1 & g.limits(2) == 0)) | length(g.limits)==1
+         g.limits(1) = min(timerange);
+         g.limits(2) = max(timerange);
+    end
 end
 
 uraxes = gca; % the original figure or subplot axes
@@ -472,15 +480,15 @@ end;
 	%
 	if length(g.limits) < 2 % 'limits',0
             if g.limits == 0 
-              if isempty(g.times)
+              if isempty(g.timerange)
 	        xmin = 0;
 	        xmax = frames-1;  % use dummy times
 	        times = (0:1:frames-1);
                 fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
                 xframes = 1;
               else
-                xmin = min(g.times);
-                xmax = max(g.times);
+                xmin = min(g.timerange);
+                xmax = max(g.timerange);
               end
             else
 	      fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
@@ -504,9 +512,9 @@ end;
           if g.limits(1)~=0 | g.limits(2)~=0 
 	     xmin = g.limits(1);
 	     xmax = g.limits(2);
-          elseif ~isempty(g.times)
-	     xmin = min(g.times);
-	     xmax = max(g.limits);
+          elseif ~isempty(g.timerange)
+	     xmin = min(g.timerange);
+	     xmax = max(g.timerange);
           end
           if g.limits(3)==0 & g.limits(4)==0 % compute y limits from data
 	     ymin = min(min(data));
@@ -523,7 +531,7 @@ end;
             return
 	end;
 
-	if xmax == 0 & xmin == 0 & isempty(g.times)
+	if xmax == 0 & xmin == 0 & isempty(g.timerange)
 	  times = (0:1:frames-1);
 	  xmin = 0;
 	  xmax = frames-1;
