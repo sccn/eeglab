@@ -120,6 +120,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/12/04 22:51:31  arno
+% debugging plotorder
+%
 % Revision 1.36  2002/12/04 22:43:56  arno
 % adding plotorder option
 %
@@ -289,7 +292,7 @@ try, g.condtitle;		catch, g.condtitle = []; end;
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
-try, g.plotorder;       catch, g.plotorder = [1:length(selected)]; end;
+try, g.plotorder;       catch, g.plotorder = selected; end;
 try, g.colmapcoh;       catch, 
     colormtmp = hot(64);
     colormtmp(end,3) = (colormtmp(end,3)+colormtmp(end-1,3))/2; % white does not come out when the
@@ -469,8 +472,8 @@ end;
 if length(g.plotorder) ~= length(selected)
     error([ 'Error: ''plotorder'' must be the same size as the number of selected components:' int2str(length(selected)) ]);
 end;
-if max(g.plotorder) >= length(selected)
-    error([ 'Error: ''plotorder'' must be below the number of selected components:' int2str(length(selected)) ]);
+if max(g.plotorder) > max(selected)
+    error([ 'Error: ''plotorder'' must be below the number of selected components:' int2str(max(selected)) ]);
 end;
 
 % other variables
@@ -762,7 +765,7 @@ for indeximage = alltimepoints
 
 	% draw circles
 	% ------------
-	for index1 = g.plotorder
+	for index1 = g.plotorder(:)'
 		for tmpcond = 1:nbconditions
 			axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
 
