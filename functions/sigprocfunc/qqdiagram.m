@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/15 02:52:42  arno
+% header for web
+%
 % Revision 1.4  2002/08/28 00:45:56  luca
 % modified qq-line
 %
@@ -136,12 +139,14 @@ if nargin ==1
 	plot([0 (maxy-mean(y))/std(y)],[mean(y) maxy],'k-.') % the ideal line
 	
 	xlim=get(gca,'XLim');
-	plot([1 1],[ymin  (mean(y)+std(y))],'k--')
-	plot([1 1],[mean(y)  (mean(y)+std(y))],'k-','LineWidth',2)
-	text(1, mean(y)+3*rangey/50,' St.dev. < X > ')
+	plot([1 1],[ymin  mean(y)+std(y)],'k--')
+	plot([1 1],[mean(y)  mean(y)+std(y)],'k-','LineWidth',2)
+        textx = 1.0;
+        texty = mean(y)+3.0*rangey/50.0;
+	% text(textx, texty,0,' St.dev.  < X > ')
 	plot([0 0],[ymin  mean(y)],'k--')
 	plot(xlim,[mean(y) mean(y)],'k--')
-    text(xlim(1), mean(y)+rangey/50,' Mean < X > ')
+	% text(xlim(1), mean(y)+rangey/50,' Mean < X > ')
 	plot([xqrt1  xqrt3],[yqrt1 yqrt3],'k.','MarkerSize',10)
 	set(gca,'XLim',[xmin xmax],'YLim',[ymin ymax])
 	xlabel('Standard Normal Quantiles')
