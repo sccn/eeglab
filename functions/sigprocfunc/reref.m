@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/07/29 16:58:18  arno
+% debuging exclude
+%
 % Revision 1.21  2003/07/28 16:44:26  arno
 % allowing to include current ref channel
 %
@@ -219,11 +222,17 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
         avematrix(end+1,:) = -1/(nbchans+1);                           % potential for the new electrode (previously ref)
         if ~( length(g.elocs) > chans )
             if ~isempty(g.refloc) & ~isempty(g.refloc{1})
-                g.elocs(end+1).labels = g.refloc{1};
-                g.elocs(end  ).theta  = g.refloc{2};
-                g.elocs(end  ).radius = g.refloc{3};
+                if ~isempty(g.elocs)
+                    g.elocs(end+1).labels = g.refloc{1};
+                    g.elocs(end  ).theta  = g.refloc{2};
+                    g.elocs(end  ).radius = g.refloc{3};
+                else
+                    disp('Reference-channel location ignored (no channel location structure provided)');
+                end;
             else
-                error('Need a old reference location to include it as a data channel');
+                if ~isempty(g.elocs)
+                    error('Need a old reference location to include it as a data channel');
+                end;
             end;
         end;
         rerefchansout(end+1) = chans+1;
