@@ -154,6 +154,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.109  2005/03/11 16:22:38  arno
+%mesh for boundary element model
+%
 %Revision 1.108  2005/03/04 23:18:55  arno
 %use MNI coordinates, completelly remodeled function
 %
@@ -483,6 +486,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
+                                 'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on' 'off' }     'off';
                                  'view'      'real'     []                 [0 0 1];
@@ -835,10 +839,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         end;
     else
         if isstr(g.meshdata)
-            tmp = load('-mat', g.meshdata)
-            g.meshdata = { 'vertices' tmp.vol.bnd(3).pnt 'faces' vol.bnd(3).tri };
+            tmp = load('-mat', g.meshdata);
+            g.meshdata = { 'vertices' tmp.vol.bnd(3).pnt 'faces' tmp.vol.bnd(3).tri };
         end;
-        p1 = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH);
+        hh = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH, 'tag', 'mesh');
     end;
     
     %x = x*100*scaling; y = y*100*scaling; z=z*100*scaling;
