@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2004/10/27 01:01:05  arno
+% msg format
+%
 % Revision 1.64  2004/03/23 00:37:56  scott
 % clarifying help msg re meaning of 'indices' output
 %
@@ -602,7 +605,7 @@ if ~isempty(g.elecind)
 end;
 if nargout > 2
     tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
-    indices = find(~cellfun('isempty', tmptheta));
+    indices = intersect(find(cellfun('length', tmptheta) == 1), find(~cellfun('isempty', tmptheta)));
     theta = cell2mat(tmptheta(indices));
 end;
 if nargout > 3
