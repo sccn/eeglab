@@ -1,5 +1,5 @@
 % eeg_retrieve() - Retrieve an EEG dataset from the variable
-%                  containing all datasets
+%                  containing all datasets (standard:ALLEEG).
 %
 % Usage: >> EEG = eeg_retrieve( ALLEEG, index );
 %
@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/22 21:06:52  arno
+% nothing
+%
 % Revision 1.2  2002/04/23 23:48:21  arno
 % standalone version
 %
