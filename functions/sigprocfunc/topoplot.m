@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2003/08/08 17:34:41  arno
+% -cos -> cos
+%
 % Revision 1.58  2003/08/07 20:49:12  arno
 % option 'masksurf' to speed up display
 %
@@ -463,7 +466,7 @@ if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common 
     Th(end) = [];
     Rd(end) = [];
 end;
-if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
+if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
