@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.184  2004/03/31 03:19:02  scott
+% adjust ear lines
+%
 % Revision 1.183  2004/03/31 02:53:35  scott
 % made blanking ring and head filled rings; made default electrodes 'off' iff chans>64; made contour color
 % dark grey; adjusted nose and ear shapes
@@ -605,6 +608,8 @@ if nargs > 2
     end
     Param = lower(Param);
     switch lower(Param)
+         case 'conv'
+           CONVHULL = lower(Value);
 	 case 'colormap'
 	  if size(Value,2)~=3
           error('Colormap must be a n x 3 matrix')
@@ -1136,6 +1141,7 @@ if headrad > 0                         % if cartoon head to be plotted
 %
 %%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+
 circ = linspace(0,2*pi,CIRCGRID);
 
 hwidth = HEADRINGWIDTH;                   % width of head ring 
@@ -1147,14 +1153,27 @@ if hin>rin
   rin = hin;                              % dont blank inside the head ring
 end
 
-rx = sin(circ); rX = rx(end:-1:1);
-ry = cos(circ); rY = ry(end:-1:1);
-for k=2:2:CIRCGRID
-  rx(k) = rx(k)*(1+rwidth);
-  ry(k) = ry(k)*(1+rwidth);
+rx = sin(circ); 
+ry = cos(circ); 
+
+if ~exist('CONVHULL')
+  ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
+  ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
+
+else % plot CONVHULL
+  cnv = convhull(x,y);
+  cnvfac = round(CIRCGRID/length(cnv)); % spline interpolate the convex hull
+  if cnvfac < 1, cnvfac=1; end;
+  xx =spline(linspace(0,1,length(cnv)+1), [x(cnv) x(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
+  yy =spline(linspace(0,1,length(cnv)+1), [y(cnv) y(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
+  ringx = [[ry(:)' ry(1) ]*(rin+rwidth)  [yy]*1.02];
+  ringy = [[rx(:)' rx(1) ]*(rin+rwidth)  [xx]*1.02];
 end
-f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
-f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
+
+ringh= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+
+%f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+%f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
 
 % Former line-style border smoothing - width did not scale with plot
 %  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
@@ -1164,14 +1183,18 @@ f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BAC
 %
 %%%%%%%%%%%%%%%%%%% Plot head outline %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-rx = sin(circ); rX = rx(end:-1:1);
-ry = cos(circ); rY = ry(end:-1:1);
-for k=2:2:CIRCGRID
-  rx(k) = rx(k)*(1+hwidth);
-  ry(k) = ry(k)*(1+hwidth);
-end
-f3= fill(hin*[rx rX],hin*[ry rY],HEADCOLOR,'edgecolor',HEADCOLOR); hold on
-f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],HEADCOLOR,'edgecolor',HEADCOLOR);
+headx = [[rx(:)' rx(1) ]*(hin+hwidth)  [rx(:)' rx(1)]*hin];
+heady = [[ry(:)' ry(1) ]*(hin+hwidth)  [ry(:)' ry(1)]*hin];
+ringh= fill(headx,heady,HEADCOLOR,'edgecolor',HEADCOLOR); hold on
+
+% rx = sin(circ); rX = rx(end:-1:1);
+% ry = cos(circ); rY = ry(end:-1:1);
+% for k=2:2:CIRCGRID
+%   rx(k) = rx(k)*(1+hwidth);
+%   ry(k) = ry(k)*(1+hwidth);
+% end
+% f3= fill(hin*[rx rX],hin*[ry rY],HEADCOLOR,'edgecolor',HEADCOLOR); hold on
+% f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],HEADCOLOR,'edgecolor',HEADCOLOR);
 
 % Former line-style head
 %  plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
