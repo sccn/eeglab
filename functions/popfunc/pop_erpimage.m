@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2003/05/10 18:49:18  arno
+% same
+%
 % Revision 1.110  2003/05/10 18:47:23  arno
 % condense output string
 %
@@ -730,7 +733,7 @@ if popup
 		tmpphase(1) = eval( res.phase3 );
 	end;
 	if ~isempty(tmpphase)
-		options = [ options ',''phasesort'',[' num2str(tmpphase) ']' ];
+		options = [ options ',''phasesort'',[' vararg2str(tmpphase) ']' ];
 	end;
 	
 	% coher row
@@ -749,7 +752,7 @@ if popup
 		tmpcoher(3) = eval( res.coher2 );
 	end;
 	if ~isempty(tmpcoher)
-		options = [ options ',''coher'',[' num2str(tmpcoher) ']' ];
+		options = [ options ',''coher'',' varar2str(tmpcoher)  ];
 	end;
 
 	% options row
