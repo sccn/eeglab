@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.198  2004/05/05 21:57:23  hilit
+% removed text from the previous log message
+%
 % Revision 1.197  2004/05/05 20:56:20  hilit
 % change the defult setting of dipnorm to 'on'.
 %
@@ -1334,12 +1337,34 @@ end
 %
 % %%%%%%%%%%%%%%%%%%% Show electrode information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
- axis square
- ax = axis;
+ plotax = gca;
+ axis square                                           % make plotax square
  axis off
+
  pos = get(gca,'position');
- %textax = axes('position',pos);  % make new axes so clicking numbers <-> labels 
- %axes(textax);                   % will work inside head cartoon patch
+ xlm = get(gca,'xlim');
+ ylm = get(gca,'ylim');
+ textax = axes('position',pos,'xlim',xlm,'ylim',ylm);  % make new axes so clicking numbers <-> labels 
+                                                       % will work inside head cartoon patch
+ % axes(textax);                   
+ axis square                                           % make textax square
+
+ pos = get(gca,'position');
+ set(plotax,'position',pos);
+
+ xlm = get(gca,'xlim');
+ set(plotax,'xlim',xlm);
+
+ ylm = get(gca,'ylim');
+ set(plotax,'ylim',ylm);                               % copy position and axis limits again
+
+%get(textax,'pos')    % test if equal!
+%get(plotax,'pos')
+%get(textax,'xlim')
+%get(plotax,'xlim')
+%get(textax,'ylim')
+%get(plotax,'ylim')
+
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -1490,12 +1515,7 @@ try,
   catch, 
 end; 
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Keep head round  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% axis square; % keep head round!
 
-axis(ax); % make textax axes limits same as head axes limits
 hold off
 axis off
 return
