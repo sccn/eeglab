@@ -1,9 +1,8 @@
-% pop_newset() - Edit dataset info. 
+% pop_newset() - Edit EEG dataset info. 
 %
 % Usage:
 %   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET, ...
 %                                            'key', val,...);
-%
 % Inputs and outputs:
 %   ALLEEG     - array of dataset structures
 %   EEG        - dataset structure
@@ -45,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/05/30 16:48:31  arno
+% removing debug message
+%
 % Revision 1.16  2003/05/12 15:35:22  arno
 % updated output command
 %

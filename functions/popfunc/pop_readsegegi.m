@@ -1,9 +1,8 @@
-% pop_readsegegi() - load a segmented EGI EEG file (pop out window 
-%                    if no arguments).
-%
+% pop_readsegegi() - load a segmented EGI EEG file. Pop up query 
+%                    window if no arguments.
 % Usage:
 %   >> EEG = pop_readsegegi;             % a window pops up
-%   >> EEG = pop_readsegegi( filename );
+%   >> EEG = pop_readsegegi( filename ); % no pop-up window
 %
 % Inputs:
 %   filename       - first EGI file name
@@ -34,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/07/11 22:17:36  arno
+% adding more messages
+%
 % Revision 1.4  2003/06/19 16:11:52  arno
 % typo
 %
