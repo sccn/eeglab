@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/07/11 15:18:40  arno
+% programing phase coherence 2
+%
 % Revision 1.40  2002/07/11 00:04:57  arno
 % same
 %
@@ -790,9 +793,9 @@ end % trial
 % ----------------------------------
 switch g.type
  case 'coher',
-  R = R ./ (trials * sqrt( cumulX ) );
+  R = R ./ ( sqrt( trials*cumulX ) );
   if ~isnan(g.alpha)
-	  Rboot = Rboot ./ (trials * sqrt( cumulXboot ) );
+	  Rboot = Rboot ./ ( sqrt( trials*cumulXboot ) );
   end;
  case 'phasecoher2',
   R = R ./ ( cumulX );
