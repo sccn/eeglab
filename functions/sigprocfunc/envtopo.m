@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Edit History:
 % 3-18-98 fixed bug in LineStyle for fifth component, topoplot maxproj with 
@@ -120,6 +123,7 @@ if wchans ~= chans
 end
 
 icadefs;    % read toolbox defaults
+ENVCOLORS = strvcat('w..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..');
 
 if nargin < 11
     vert = [];
@@ -221,8 +225,7 @@ if limits==0,      % == 0 or [0 0 0 0]
   ymax = ymax+0.05*datarange;
 else
   if length(limits)~=4,
-    fprintf( ...
- 'envtopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
+    fprintf('envtopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
     return
   end;
   xmin = limits(1);
@@ -266,29 +269,33 @@ if length(colorfile)== 4 & colorfile == 'bold'
    all_bold = 1;
    colorfile = ENVCOLORS; % filename read from icadefs
 end
-cid = fopen(colorfile,'r');
-if cid <3,
-  fprintf('^Genvproj(): cannot open file %s.\n',colorfile);
-  return
+if length(colorfile(:)) < 50
+	cid = fopen(colorfile,'r');
+	if cid <3,
+		fprintf('envproj(): cannot open file %s.\n',colorfile);
+		return
+	else
+		colors = fscanf(cid,'%s',[3 MAXENVPLOTCHANS]);
+		colors = colors';
+	end;
 else
-  colors = fscanf(cid,'%s',[3 MAXENVPLOTCHANS]);
-  colors = colors';
-  [r c] = size(colors);
-  for i=1:r
-      for j=1:c
-          if colors(i,j)=='.',
+	colors = colorfile;
+end;
+[r c] = size(colors);
+for i=1:r
+	for j=1:c
+		if colors(i,j)=='.',
             if j==1
-              fprintf(...
-   'envtopo(): colors file should have color letter in 1st column.\n');
-              return
+				fprintf(...
+					'envtopo(): colors file should have color letter in 1st column.\n');
+				return
             elseif j==2
-              colors(i,j)='-';
+				colors(i,j)='-';
             elseif j>2
-              colors(i,j)=' ';
+				colors(i,j)=' ';
             end
-          end;
-      end;
-  end;
+		end;
+	end;
 end;
 colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
 % [rr cc] = size(colors);
