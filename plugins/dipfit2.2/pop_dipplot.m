@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/14 22:40:24  arno
+% error fif besa head used for dipfit
+%
 % Revision 1.5  2003/03/14 00:53:04  arno
 % debug for dipfit
 %
@@ -120,10 +123,11 @@ if nargin < 3
     options = { options{:} 'image' fastif(result{ind} == 1, 'mri', 'besa') };
     if result{ind+1} == 1, options = { options{:} 'summary' 'on' }; end;
     if result{ind+2} == 1, options = { options{:} 'normlen' 'on' }; end;
-    if ~isempty( result{ind+3} ), options = { options{:} eval( [ '{' result{ind+3} '}' ] ) }; end;
+    if ~isempty( result{ind+3} ), tmpopt = eval( [ '{' result{ind+3} '}' ] ); options = { options{:} tmpopt{:} }; end;
 else 
     options = varargin;
 end;
+options
 
 if strcmpi(typedip, 'besa')
     if ~isfield(EEG, 'sources'), error('No BESA dipole information in dataset');end;
