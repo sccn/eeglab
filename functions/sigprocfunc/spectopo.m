@@ -1,7 +1,8 @@
 % spectopo() - Plot the mean log spectrum of a set of data epochs at
 %              all channels as a bundle of traces. At specified frequencies,
 %              plot the relative topographic distribution of power.
-%              Uses pwelch() from the Matlab signal processing toolbox.
+%              Uses pwelch() from the Matlab signal processing toolbox or
+%              EEGLAB spec() function.
 % Usage:
 %        >> spectopo(data, frames, srate);
 %        >> [spectra,freqs,speccomp,contrib,specstd] = ...
@@ -107,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2003/11/26 17:14:29  arno
+% 10*lochanging log label
+%
 % Revision 1.75  2003/11/19 22:55:31  arno
 % changing unit
 %
@@ -967,6 +971,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     end;
     fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);
 	
+    if exist('pwelch') == 2, usepwelch = 1; else usepwelch=0; end;
+    
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
 			if strcmp(g.icamode, 'normal')
@@ -982,10 +988,15 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 		end;
 		for e=epoch_subset
 			if isempty(g.boundaries)
-				%[tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
-				%					  winlength,g.overlap,fftlength,srate);
-				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
-									  winlength,g.overlap);
+                if usepwelch
+                    [tmpspec,freqs] = pwelch(matsel(tmpdata,frames,0,1,e),...
+                                             winlength,g.overlap,fftlength,srate);
+                else
+                    [tmpspec,freqs] = spec(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
+                                           winlength,g.overlap);
+                end;
+				%[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,srate,...
+				%					  winlength,g.overlap);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 					specstd = zeros(nchans,length(freqs));
@@ -995,8 +1006,13 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 			else
 				for n=1:length(g.boundaries)-1
                     if g.boundaries(n+1) - g.boundaries(n) >= winlength % ignore segments of less than winlength
-                        [tmpspec,freqs] =  pwelch(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-                                               winlength,g.overlap,fftlength,srate);
+                        if usepwelch
+                            [tmpspec,freqs] =  pwelch(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
+                                                      winlength,g.overlap,fftlength,srate);
+                        else
+                            [tmpspec,freqs] =  spec(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
+                                                      fftlength,srate,winlength,g.overlap);
+                        end;
                         if exist('eegspec') ~= 1
                             eegspec = zeros(nchans,length(freqs));
                             specstd = zeros(nchans,length(freqs));
