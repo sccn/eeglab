@@ -42,7 +42,7 @@
 %              pre-labelling (using different colors). Default is 0.
 %   reject     - 0=do not reject labelled trials (but still store the 
 %              labels. 1=reject labelled trials. Default is 1.
-%   vistype    - visualization type. 0 is rejepoch() and 1 is eegplot()
+%   vistype    - visualization type. 0 calls rejstatepoch() and 1 calls eegplot()
 %              default is 0.  
 %
 % Outputs:
@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/12/24 16:55:39  scott
+% pop-window text edits
+%
 % Revision 1.17  2003/12/17 18:16:55  arno
 % reject
 %
@@ -165,13 +168,13 @@ if nargin < 3
 					[ fastif(icacomp, 'All-channel', 'All-component') ' limit (std. dev(s).: Ex: 2.1 2 2):'], ...
                		'Display with previously marked rejections? (YES or NO)', ...
          			'Reject marked trial(s)? (YES or NO)', ...
-         			'Visualization mode (REJECTRIALS or EEGPLOT)' };
+         			'Visualization mode (REJECTTRIALS or EEGPLOT)' };
 	inistr      = { fastif(icacomp, ['1:' int2str(EEG.nbchan)], ['1:' int2str(size(EEG.icaweights,1))])...
 					fastif(icacomp, '3', '5'),  ...
 					fastif(icacomp, '3', '5'), ...
                		'YES', ...
             		'NO', ...
-            		'REJECTRIALS' };
+            		'REJECTTRIALS' };
 
 	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trial rejection using comp. kurtosis -- pop_rejkurt()', 'Trial rejection using data kurtosis -- pop_rejkurt()'), 1,  inistr, 'pop_rejkurt');
 	size_result  = size( result );
@@ -181,7 +184,7 @@ if nargin < 3
 	globthresh   = result{3};
 	switch lower(result{4}), case 'yes', superpose=1; otherwise, superpose=0; end;
 	switch lower(result{5}), case 'yes', reject=1; otherwise, reject=0; end;
-	switch lower(result{6}), case 'rejepoch', vistype=0; otherwise, vistype=1; end;
+	switch lower(result{6}), case 'rejecttrials', vistype=0; otherwise, vistype=1; end;
 end;
 
 if ~exist('vistype') vistype = 0; end;
