@@ -152,6 +152,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/04/30 00:07:28  arno
+% removing all ref to dispf
+% /
+%
 % Revision 1.24  2003/04/29 18:41:06  arno
 % implementing log vizualization
 %
@@ -510,7 +514,6 @@ try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
 try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end;
 try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end;
-try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
 try, g.topovec;    catch, g.topovec = []; end;
 try, g.elocs;      catch, g.elocs = DEFAULT_ELOC; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
@@ -527,7 +530,8 @@ try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
-try, g.freqs;      catch, g.freqs = [0 50]; end;
+try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
+try, g.freqs;      catch, g.freqs = [0 g.maxfreq]; end;
 try, g.nfreqs;     catch, g.nfreqs = []; end;
 try, g.freqscale;  catch, g.freqscale = 'linear'; end;
 try, g.vert;       catch, g.vert = []; end;
@@ -867,7 +871,7 @@ end;
 % ----------------------------------------------------
 g.subitc = 'off';
 [alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
-                                'tlimits', g.tlimits, 'maxfreq', g.maxfreq, 'detrend', g.detret, 'itctype', ...
+                                'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
                                 g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                       'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 
 P  = mean(alltfX.*conj(alltfX), 3); % power
