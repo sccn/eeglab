@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/06 01:19:26  arno
+% changing lines increments between title-text
+%
 % Revision 1.2  2002/04/06 00:37:46  arno
 % multiple lines for title
 %
@@ -110,7 +113,7 @@ if isnumeric(g.fontsize), tmp2(1:nblines) = {g.fontsize}; g.fontsize = tmp2; end
 if isstr(g.fontweight),   tmp3(1:nblines) = {g.fontweight}; g.fontweight = tmp3; end;
 switch g.fontname{1}
     case 'courrier', CHAR_WIDTH = 11; % pixels
-    case 'times', CHAR_WIDTH = 7; % pixels
+    case 'times', CHAR_WIDTH = 11; % pixels
     otherwise, CHAR_WIDTH = 11;
 end;
 
@@ -143,7 +146,7 @@ if ~isempty(g.title)
     end;    
 end;
 
-maxlen = length(g.title);
+maxlen = size(g.title,2);
 for i=1:nblines
 	if iscell(textmenu)	tmptext = textmenu{i};
 	else			tmptext = textmenu(i,:);
