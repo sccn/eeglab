@@ -1,22 +1,22 @@
 % crossf() - Returns estimates and plots event-related coherence (ERCOH) changes
-%            between two input time series (x,y). A lower panel (optionally) shows 
-%            the coherence phase difference between the processes. In this panel: 
-%               -90 degrees (blue)   means x leads y by a quarter cycle.
-%                90 degrees (orange) means y leads x by a quarter cycle.
-%            Click on each subplot to view separately and zoom in/out.
+%        between two input time series (x,y). A lower panel (optionally) shows 
+%        the coherence phase difference between the processes. In this panel: 
+%           -90 degrees (blue)   means x leads y by a quarter cycle.
+%            90 degrees (orange) means y leads x by a quarter cycle.
+%        Click on each subplot to view separately and zoom in/out.
 %
 % Function description:
-%            Uses EITHER fixed-window, zero-padded FFTs (faster) OR constant-Q 
-%            0-padded wavelet DFTs (better sensitivity), both Hanning-tapered. 
-%            Output frequency spacing is the lowest frequency ('srate'/'winsize') 
-%            divided by the 'padratio'.
+%        Uses EITHER fixed-window, zero-padded FFTs (faster) OR constant-Q 
+%        0-padded wavelet DFTs (better sensitivity), both Hanning-tapered. 
+%        Output frequency spacing is the lowest frequency ('srate'/'winsize') 
+%        divided by the 'padratio'.
 %
-%            If an 'alpha' value is given, then bootstrap statistics are 
-%            computed (from a distribution of 200 ('naccu') surrogate baseline
-%            data epochs) for the baseline epoch, and non-significant features 
-%            of the output plots are zeroed (e.g., plotted in green). The baseline
-%            epoch is all windows with center times < the 'baseline' value or, 
-%            if 'baseboot' is 1, the whole epoch. 
+%        If an 'alpha' value is given, then bootstrap statistics are 
+%        computed (from a distribution of 200 ('naccu') surrogate baseline
+%        data epochs) for the baseline epoch, and non-significant features 
+%        of the output plots are zeroed (e.g., plotted in green). The baseline
+%        epoch is all windows with center times < the 'baseline' value or, 
+%        if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
 %                       = crossf(x,y,frames,tlimits,titl,          ...
@@ -24,82 +24,82 @@
 %                                              padratio,maxfreq,alpha,verts);
 %
 % Required inputs:
-%       x           = first single-channel data  (1,frames*nepochs)      {none}
-%       y           = second single-channel data (1,frames*nepochs)      {none}
-%       frames      = frames per epoch                                   {750}
-%       tlimits     = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                            {250}
-%       cycles      = If >0 -> Number of cycles in each analysis wavelet 
-%                     If==0 -> Use FFTs (constant window length 'winsize') {0}
+%       x       = first single-channel data  (1,frames*nepochs)      {none}
+%       y       = second single-channel data (1,frames*nepochs)      {none}
+%       frames  = frames per epoch                                   {750}
+%       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
+%       srate   = data sampling rate (Hz)                            {250}
+%       cycles  = If >0 -> Number of cycles in each analysis wavelet 
+%                 If==0 -> Use FFTs (constant window length 'winsize') {0}
 %
 %    Optional Coherence Type:
-%       'type'      = ['coher'|'phasecoher'] Compute either linear coherence
-%                      ('coher') or phase coherence ('phasecoher') also known
-%                      as phase coupling factor' { 'phasecoher' }.
-%       'shuffle'   = integer indicating the number of time to compute 
-%                     the (phase) coherence using shuffle trials 
-%                     in order to obtain the amplitude or phase coherence time 
-%                     locked to the stimulus {0=no shuffling}. See also the option
-%                     'boottype'.
+%       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
+%                 ('coher') or phase coherence ('phasecoher') also known
+%                 as phase coupling factor' { 'phasecoher' }.
+%       'shuffle' =integer indicating the number of time to compute 
+%                 the (phase) coherence using shuffle trials 
+%                 in order to obtain the amplitude or phase coherence 
+%                 time locked to the stimulus {0=no shuffling}. 
+%                 See also the option 'boottype'.
 %
 %    Optional Detrend:
-%       'detret'    = ['on'|'off'], Detrend data within epochs.   {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across trials    {'off'}
+%       'detret' = ['on'|'off'], Detrend data within epochs.   {'off'}
+%       'detrep' = ['on'|'off'], Detrend data across trials    {'off'}
 %
 %    Optional FFT/DFT:
-%       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                      if cycles >0: *longest* window length to use. This
-%                      determines the lowest output frequency  {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winsize) {200}
-%       'padratio'  = FFTlength/winsize (2^k)                     {2}
-%                      Multiplies the number of output frequencies by
-%                      dividing their spacing. When cycles==0, frequency
-%                      spacing is (low_frequency/padratio).
-%       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
-%                      If cycles==0, all FFT frequencies are output.
-%       'baseline'  = Coherence baseline end time (ms). NaN=no baseline  {NaN}
-%       'powbase'   = Baseline spectrum to log-subtract.          {from data}
+%       'winsize' = If cycles==0: data subwindow length (fastest, 2^n<frames);
+%                   if cycles >0: *longest* window length to use. This
+%                   determines the lowest output frequency  {~frames/8}
+%       'timesout' = Number of output times (int<frames-winsize) {200}
+%       'padratio' = FFTlength/winsize (2^k)                     {2}
+%                   Multiplies the number of output frequencies by
+%                   dividing their spacing. When cycles==0, frequency
+%                   spacing is (low_frequency/padratio).
+%       'maxfreq' = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
+%                   If cycles==0, all FFT frequencies are output.
+%       'baseline' = Coherence baseline end time (ms). NaN=no baseline  {NaN}
+%       'powbase'  = Baseline spectrum to log-subtract.          {from data}
 %
 %    Optional Bootstrap:
-%       'alpha'     = If non-0, compute Two-tailed bootstrap significance prob. 
-%                      level. Show non-signif output values as green. {0}
-%       'naccu'     = Number of bootstrap replications to compute {200}
-%       'baseboot'  = Bootstrap extend (0=same as 'baseline'; 1=whole epoch). 
-%                     If no baseline is given (NaN), bootstrap extend is the 
-%                     whole epoch {0}
-%       'boottype'  = ['times'|'timestrials'] Bootstrap type: Either shuffle
-%                      windows ('times') or windows and trials
-%                      ('timestrials')                             {'times'}
-%       'bootsub'   = [naccuboot_integer] subtract stimulus locked coherence
-%                     obtained from shuffled trials {0=off}. The integer 
-%                     indicates how many shuffled trial averages to
-%                     accumulate. Note that this number also determines 
-%                     the number of bootstrap replication for significance of
-%                     the returned coherence image, which is equal to
-%                     naccu = ceil(timeout/naccuboot_integer).
-%                     Also plot and the shuffled trial coherence on the right and
-%                     uses bootstrap function arguments for significance of
-%                     the shuffled trial image ('boottype' is forced to 'timestrials')
-%       'rboot'     = Bootstrap coherence limits (e.g., from crossf()) {from data}
-%                     be sure that the bootstrap type is identical to
-%                     the one used to obtain bootstrap coherence limits.
+%       'alpha'    = If non-0, compute Two-tailed bootstrap significance prob.
+%                    level. Show non-signif output values as green. {0}
+%       'naccu'    = Number of bootstrap replications to compute {200}
+%       'baseboot' = Bootstrap extend (0=same as 'baseline'; 1=whole epoch). 
+%                    If no baseline is given (NaN), bootstrap extend is the 
+%                    whole epoch {0}
+%       'boottype' = ['times'|'timestrials'] Bootstrap type: Either shuffle
+%                    windows ('times') or windows and trials
+%                    ('timestrials')                             {'times'}
+%       'bootsub'  = [naccuboot_integer] subtract stimulus locked coherence
+%                    obtained from shuffled trials {0=off}. The integer 
+%                    indicates how many shuffled trial averages to
+%                    accumulate. Note that this number also determines 
+%                    the number of bootstrap replication for significance of
+%                    the returned coherence image, which is equal to
+%                        naccu = ceil(timeout/naccuboot_integer).
+%                    Also plot the bootstrap trial coherence on the left.
+%                    Uses bootstrap function arguments for significance of
+%                    the shuffled trial image ('boottype' is forced to 'timestrials')
+%       'rboot'    = Bootstrap coherence limits (e.g., from crossf()) {from data}
+%                    Be sure that the bootstrap type is identical to
+%                    the one used to obtain bootstrap coherence limits.
 %    Optional Scalp Map:
-%       'topovec'   = Scalp topography (map) to plot              {[]}
-%       'elocs'     = Electrode location file for scalp map       {none}
-%                      File should be ascii in format of  >> topoplot example   
+%       'topovec'  = Scalp topography (map) to plot              {[]}
+%       'elocs'    = Electrode location file for scalp map       {none}
+%                    File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plot Features:
-%       'plotamp'     = ['on'|'off'], Plot coherence magnitude      {'on'}
-%       'plotphase'   = ['on'|'off'], Plot coherence phase angle    {'on'}
+%       'plotamp'   = ['on'|'off'], Plot coherence magnitude      {'on'}
+%       'plotphase' = ['on'|'off'], Plot coherence phase angle    {'on'}
 %       'plotbootsub' = ['on'|'off'], Plot coherence for shuffled trials
-%                       if made available using 'bootsub'           {'on'}
-%       'title'       = Optional figure title                       {none}
-%       'vert'        = Times to mark with a dotted vertical line   {none}
-%       'linewidth'   = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'cmax'        = Maximum amplitude for color scale  { use data limits }
-%       'angleunit'   = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
-%       'axesfont'    = Axes font size                               {10}
-%       'titlefont'   = Title font size                              {8}
+%                    if made available using 'bootsub'           {'on'}
+%       'title'     = Optional figure title                       {none}
+%       'vert'      = Times to mark with a dotted vertical line   {none}
+%       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
+%       'cmax'      = Maximum amplitude for color scale  { use data limits }
+%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
+%       'axesfont'  = Axes font size                               {10}
+%       'titlefont' = Title font size                              {8}
 %
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
@@ -112,9 +112,8 @@
 %
 % Notes: 1) when cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
-%        3) strandard bootstrap method would be 'both' but it necessitates a
-%           lot of memory, so the 'times' method may be prefered in some
-%           cases.
+%        3) strandard bootstrap method would be 'both' but it uses much
+%           memory, so the 'times' method may be prefered in some cases.
 %        4) if 'boottype' is 'trials', the average of the complex bootstrap
 %           is subtracted from the coherence in order to compensate for
 %           phase differences (the average is also subtracted from the 
@@ -123,12 +122,12 @@
 %        5) if baseline is non-NaN, the baseline is subtracted from
 %           the complex coherence. On the left hand side of the coherence
 %           amplitude image, the baseline is displayed as a magenta line
-%           (if no baseline is selectted, this curve represents the average
+%           (if no baseline is selected, this curve represents the average
 %           power at every given frequency).
 %
-% Maths:
+% Math:
 % if X(t,f) and Y(t,f) are the spectral estimates of X and Y at frequency f
-% and time t (* being the conjugate, || the norm, n the number of trials)
+% and time t (* being the conjugate, || the norm, and n the number of trials)
 %  coher      = sum_over_trials(X(t,f)Y(t,f)*)/sum_over_trials(|X(t,f)Y(t,f)|)
 %  phasecoher = sum_over_trials(X(t,f)Y(t,f)*/|X(t,f)Y(t,f)|)/n
 %
@@ -154,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/04/24 02:43:18  arno
+% debugging amplitude coherence
+%
 % Revision 1.14  2002/04/20 00:53:14  arno
 % restorings some outputs options
 %
@@ -327,6 +329,7 @@ try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.boottype;   catch, g.boottype = 'times'; end; 
 try, g.bootsub;    catch, g.bootsub = 0; end;
+
 g.type     = lower(g.type);
 g.boottype = lower(g.boottype);
 g.detrep   = lower(g.detrep);
@@ -383,8 +386,8 @@ end
 
 if isempty(g.topovec)
 	g.topovec = [];
-elseif (min(size(g.topovec))~=1)
-	error('tvec must be a row or column vector.');
+elseif (size(g.topovec,1))~=2)
+	error('tvec must be two column vectors.');
 end
 
 if isempty(g.elocs)
@@ -980,5 +983,19 @@ if g.plot
 	   set(h(13),'HorizontalAlignment','left')
 	   set(h(13),'FontSize',g.TITLE_FONT)
    end
+   %
+   %%%%%%%%%%%%%%% plot topoplot() %%%%%%%%%%%%%%%%%%%%%%%
+   %
+   if (~isempty(g.topovec))
+         h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
+         topoplot(g.topovec(:,1),g.elocs,'electrodes','off', ...
+                    'style', 'blank', 'emarkersize1chan', 10);
+
+         h(15) = subplot('Position',[.9 .43 .2 .14].*s+q);
+         topoplot(g.topovec(:,2),g.elocs,'electrodes','off', ...
+                    'style', 'blank', 'emarkersize1chan', 10);
+        axis('square')
+   end
+
    axcopy(gcf);
 end;
