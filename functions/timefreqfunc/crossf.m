@@ -83,7 +83,7 @@
 %       'rboot'    = Bootstrap coherence limits (e.g., from crossf()) {from data}
 %                    Be sure that the bootstrap type is identical to
 %                    the one used to obtain bootstrap coherence limits.
-nel%    Optional Scalp Map:
+% Optional Scalp Map:
 %       'topovec'  = (2,nchans) matrix, plot scalp topographies (maps) to plot {[]}
 %                    ELSE (chan1,chan2), plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
@@ -154,6 +154,9 @@ nel%    Optional Scalp Map:
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/04/24 21:43:00  scott
+% editing topovec code -sm
+%
 % Revision 1.16  2002/04/24 21:02:28  scott
 % added topoplots of two heads -sm
 %
