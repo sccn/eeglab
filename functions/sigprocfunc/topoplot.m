@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.194  2004/04/29 18:58:48  scott
+% removed new axes - scaling problem. Toggling pts|numbers doesnt work inside head cartoon.
+%
 % Revision 1.193  2004/04/29 18:36:46  scott
 % test
 %
@@ -1427,8 +1430,8 @@ if ~isempty(DIPOLE)
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
     end;
-    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax^2/plotrad; % scale radius from 1 -> rmax 
-    DIPOLE(:,3:end) = (DIPOLE(:,3:end)/10000)*rmax^2/plotrad; % NB: 10000 was 500 !?!?
+    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax*(rmax/plotrad); % scale radius from 1 -> rmax (0.5)
+    DIPOLE(:,3:end) = (DIPOLE(:,3:end))*rmax*(rmax/plotrad); 
     if strcmpi(DIPNORM, 'on')
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
@@ -1443,13 +1446,14 @@ if ~isempty(DIPOLE)
       end
       PLOT_DIPOLE = 0;
     end
-    if sum(DIPOLE(1,1:2).^2) > plotrad
+    if 0 % sum(DIPOLE(1,1:2).^2) > plotrad
       if strcmpi(VERBOSE,'on')
         fprintf('Note: dipole is outside plotting area - not plotted\n')
       end
       PLOT_DIPOLE = 0;
     end
     if PLOT_DIPOLE
+    DIPOLE
       for index = 1:size(DIPOLE,1)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
         set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
