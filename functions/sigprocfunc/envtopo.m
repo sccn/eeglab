@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/25 17:22:33  scott
+% editted help msg -sm
+%
 % Revision 1.2  2002/04/09 02:13:22  arno
 % make the color file internal
 %
@@ -696,7 +699,7 @@ axcopy(gcf);
 %
 % axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
 axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
-h=colorbar(axt);                        % colorbar axes
+h=cbar(axt);                        % colorbar axes
 set(h,'Ytick',[]);
 
 axes(axall)
