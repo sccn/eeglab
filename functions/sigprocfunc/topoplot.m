@@ -25,6 +25,13 @@
 %   'interplimits'    - 'electrodes' to furthest electrode 'head' to edge of
 %                        head {default 'head'}
 %   'gridscale'       -  scaling grid size {default 67}
+%   'dipole'          -  [XI YI XE YE L S C] plot dipole on the top of the scalp
+%                        map from coordinate XI,YI to coordinates XE, YE. The
+%                        dipole bar is scaled by length L. Dipole size (scaling) 
+%                        is S and its color is C (3 real numbers between 0 and 1).
+%                        Coordinates returned by besaplot can be used. Note that 
+%                        the dipole exact location has been tuned by hand and is 
+%                        not perfectly exact.
 %   'maplimits'       - 'absmax' +/- the absolute-max 
 %                       'maxmin' scale to data range
 %                        [clim1,clim2] user-definined lo/hi
@@ -77,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/26 20:09:35  arno
+% error typo
+%
 % Revision 1.14  2002/10/14 00:40:44  arno
 % *** empty log message ***
 %
@@ -163,6 +173,7 @@ EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
+DIPOLE = [];
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -247,6 +258,8 @@ if nargs > 2
 	  CONTOURNUM = Value;
 	 case 'electrodes'
 	  ELECTROD = lower(Value);
+	 case 'dipole'
+	  DIPOLE = Value;
 	 case 'emarker'
 	  EMARKER = Value;
 	 case 'shrink'
@@ -501,7 +514,30 @@ elseif strcmp(ELECTROD,'numbers')
   end
 end
 
+% plot dipole on the top of the plot
+% ----------------------------------
+if ~isempty(DIPOLE)
+    hold on;
+    color = 'k';
+    DIPOLE(:,1:4)   = DIPOLE(:,1:4)/2;
+    DIPOLE(:,[2,4]) = - DIPOLE(:,[2,4]);
+    for index = 1:size(DIPOLE,1)
+        if size(DIPOLE,2) >=9, tmpcolor  = DIPOLE(index, 7:9); else, tmpcolor = 'k'; end;
+        if size(DIPOLE,2) >=6, tmpscale  = DIPOLE(index, 6); else, tmpscale = 1; end;
+        if size(DIPOLE,2) >=5, tmplength = DIPOLE(index, 5); else, tmplength = 1; end;
+        hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
+        set(hh, 'color', tmpcolor, 'markersize', tmpscale*30);
+        if tmplength ~= 1
+            DIPOLE(index, 3) = DIPOLE(index,1) + (DIPOLE(index,3)-DIPOLE(index,1))*tmplength;
+            DIPOLE(index, 4) = DIPOLE(index,2) + (DIPOLE(index,4)-DIPOLE(index,2))*tmplength;
+		end;
+        hh = line( [DIPOLE(index, 1) DIPOLE(index, 3)]', [DIPOLE(index, 2) DIPOLE(index, 4)]');
+        set(hh, 'color', 'k', 'linewidth', tmpscale*30/7.5);
+    end;
+end;
+
 % Plot Head, Ears, Nose
+% ---------------------
 plot(cos(l).*rmax,sin(l).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);
 
