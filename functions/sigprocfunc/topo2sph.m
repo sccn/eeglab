@@ -3,18 +3,21 @@
 %              file for use with headplot()
 %
 % Usage: 
-%   >> [c h] = topo2sph('eloc_file','eloc_angles_file', method);
-%   >> [c h] = topo2sph( topoarray, method );
+%   >> [c h] = topo2sph('eloc_file','eloc_outfile', method, unshrink);
+%   >> [c h] = topo2sph( topoarray, method, unshrink );
 %
 % Inputs:
-%   'eloc_file' = filename of polar 2-d electrode locations file used by topoplot()
-%                 See >> topoplot example or cart2topo()
-%   'eloc_angles_file' = output file of electrode locations in spherical angle coords.
-%                        for use in headplot().
-%   topoarray = polar array of 2-d electrode locations, with polar angle in the
-%               first column and radius in the second one.
-%   method        = [1|2], optional. 1 is for Besa compatibility, 2 is for
-%                   compatibility with Matla function cart2sph(). Default is 2.
+%   'eloc_file'    = filename of polar 2-d electrode locations file used by 
+%                    topoplot(). See >> topoplot example or cart2topo()
+%   'eloc_outfile' = output file of electrode locations in spherical angle coords.
+%                    for use in headplot().
+%   topoarray      = polar array of 2-d electrode locations, with polar angle
+%                    in the first column and radius in the second one.
+%   method         = [1|2], optional. 1 is for Besa compatibility, 2 is for
+%                    compatibility with Matla function cart2sph(). Default is 2.
+%   unshrink       = [0<real<1] unshrink factor. Enter the shrink factor used
+%                    to convert spherical to topo (see sph2topo()). Only 
+%                    implemented for method 1.
 %
 % Outputs:
 %   c = coronal rotation
@@ -43,6 +46,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/06/29 22:55:21  arno
+% type
+% typo
+%
 % Revision 1.2  2002/06/29 01:25:09  arno
 % adding besa compatibility
 % ,
@@ -55,7 +62,7 @@
 % 01-25-02 reformated help & license -ad 
 % 03-22-02 complete remodeling for returning arguments and taking arrays -ad 
 
-function [c, h] = topo2sph(eloc_locs,eloc_angles, method)
+function [c, h] = topo2sph(eloc_locs,eloc_angles, method, unshrink)
 
 MAXCHANS = 1024;
 
@@ -64,6 +71,9 @@ if nargin < 1
     return;
 end;
 if nargin > 1 & ~isstr(eloc_angles)
+	if nargin > 2
+		unshrink = method;
+	end;
 	method = eloc_angles;
 else
 	method = 2;
@@ -106,6 +116,7 @@ else
 		
 		t = E(e,2); % theta
 		r = E(e,3); % radius
+		r = r*unshrink;
 		if t>=0
 			h(e) = 90-t; % horizontal rotation
 		else
@@ -122,7 +133,6 @@ else
 end;
 
 for e=1:size(E,1)
-
    if nargin > 1 & isstr(eloc_angles)
         chan = E(e,4:7);
         fprintf('%d	%g	%g	%s\n',E(e,1),c(e),h(e),chan);
