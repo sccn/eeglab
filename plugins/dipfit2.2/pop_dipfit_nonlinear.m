@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/10 18:14:52  arno
+% warning backtrace
+%
 % Revision 1.2  2005/03/09 19:42:52  arno
 % deactivating diffmap
 %
@@ -372,8 +375,10 @@ elseif nargin>=3
       catch,
           disp('Dipole localization failed');
       end;
-      % should the following string be put into com? -> ask Arno
-      fprintf('%s = dipfit_nonlinear(%s,%s)\n', inputname(1), inputname(1), vararg2str(arg));
+      
+      % should the following string be put into com? ->NOT SUPPORTED
+      % --------------------------------------------------------
+      com = sprintf('%s = dipfit_nonlinear(%s,%s)\n', inputname(1), inputname(1), vararg2str(arg));
       
       % this GUI always requires two sources in the dipole model
       % first put the original model back in and then replace the dipole parameters that have been fitted
@@ -400,25 +405,4 @@ elseif nargin>=3
     
   end		% if nargin
   
-  % get electrode positions from eeglag
-  % -----------------------------------
-  function elc = getelecpos(chanlocs, dipfitstruct);
-  try,
-    elc = cell2mat({chanlocs.X; chanlocs.Y; chanlocs.Z}');
-  catch
-    disp('No 3-D carthesian coordinates; re-computing them from 2-D polar coordinates');
-    EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
-    elc = cell2mat({chanlocs.X; chanlocs.Y; chanlocs.Z}');
-  end;
-  % constrain electrode to sphere
-  % -----------------------------
-  disp('Constraining electrodes to sphere');
-  elc = elc - repmat( dipfitstruct.vol.o, [size(elc,1) 1]); % recenter 
-  % (note the step above is not needed since the origin should always be 0)
-  elc = elc ./ repmat( sqrt(sum(elc.*elc,2)), [1 3]); % normalize
-  elc = elc * max(dipfitstruct.vol.r);         % head size
-  
-  %for index= 1:size(elc,1)
-  %    elc(index,:) = max(dipfitstruct.vol.r) * elc(index,:) /norm(elc(index,:));
-  %end;
   
