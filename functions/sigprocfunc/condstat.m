@@ -43,16 +43,25 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/09/24 23:28:02  arno
+% Initial revision
+%
 
-function [diffres, accres, res1, res2] = condstat(formula, naccu, varargin);
+function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootside, varargin);
 
 if nargin < 2
 	help condstat;
 	return;
 end;
 
-if ~isstr(formula)
-	error('The first argument must be a string formula');
+if ~isstr(formula) & ~iscell(formula)
+	error('The first argument must be a string formula or cell array of string');
+end;
+if isstr(formula)
+	formula = { formula };
+end;
+if isstr(bootside)
+	bootside = { bootside };
 end;
 
 for index = 1:length(varargin)
@@ -69,7 +78,9 @@ for index=1:length(varargin)
 	if index == 1
 		cond1trials = size(tmpvar1,ndims(tmpvar1));
 		cond2trials = size(tmpvar2,ndims(tmpvar2));
-		accres = zeros(size(tmpvar1,1), size(tmpvar1,2), naccu);
+		for tmpi = 1:length(formula)
+			accres{tmpi} = zeros(size(tmpvar1,1), size(tmpvar1,2), naccu);
+		end;
 	end;
 	
 	if ndims(tmpvar1) == 2
@@ -86,13 +97,30 @@ end;
 fprintf('Accumulating bootstrap:');
 alltrials = [1:cond1trials+cond2trials];
 
-% computing difference (non-shuffled)
-% -----------------------------------
-X = 1:cond1trials;
-eval( [ 'res1 = ' formula ';'] );
-X = cond1trials+1:cond1trials+cond2trials;
-eval( [ 'res2 = ' formula  ';'] );
-diffres = res1-res2;
+% processing formulas
+% -------------------
+formula1 = [];
+formula2 = [];
+for index = 1:length(formula)
+	% computing difference (non-shuffled)
+	% -----------------------------------
+	X = 1:cond1trials;
+	eval( [ 'res1{index} = ' formula{index} ';'] );
+	X = cond1trials+1:cond1trials+cond2trials;
+	eval( [ 'res2{index} = ' formula{index}  ';'] );
+	diffres{index} = res1{index}-res2{index};
+	
+	% build formula to execute
+	% ------------------------
+	arrayname = [ 'accres{' int2str(index) '}' ];
+	if ndims(tmpvar1) == 2 % 2 dimensions
+		formula1 = [ formula1 arrayname '(:,index) = ' formula{index} ';'];
+		formala2 = [ formula2 arrayname '(:,index) = ' arrayname '(:,index) - ' formula{index}  ';'];	
+	else % 3 dimensions
+		formula1 = [ formula1 arrayname '(:,:,index) = ' formula{index}  ';'];
+		formula2 = [ formula2 arrayname '(:,:,index) = ' arrayname '(:,:,index) - ' formula{index}  ';'];	
+	end;
+end;
 
 % accumulating (shufling)
 % -----------------------
@@ -101,17 +129,64 @@ for index=1:naccu
 	if rem(index,120) == 0, fprintf('\n'); end
 	
 	alltrials = shuffle(alltrials);
-	if ndims(tmpvar1) == 2 % 2 dimensions
-		X = alltrials(1:cond1trials);
-		eval( [ 'accres(:,index) = ' formula ';'] );
-		X = alltrials(cond1trials+1:end);
-		eval( [ 'accres(:,index) = accres(:,index) - ' formula  ';'] );	
-	else % 3 dimensions
-		X = alltrials(1:cond1trials);
-		eval( [ 'accres(:,:,index) = ' formula  ';'] );
-		X = alltrials(cond1trials+1:end);
-		eval( [ 'accres(:,:,index) = accres(:,:,index) - ' formula  ';'] );	
-	end;
+	X = alltrials(1:cond1trials);
+	eval( formula1 );
+	X = alltrials(cond1trials+1:end);
+	eval( formula2 );
+end;
+
+% significance level
+% ------------------
+for index= 1:length(formula) 
+	accarray = accres{index};
+    
+    % size = nb_points*naccu
+    % size = nb_points*naccu*times
+    if ~isreal(accarray)
+		accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
+    end;
+	
+    % compute bootstrap significance level
+    i = round(naccu*alpha);
+    switch ndims(accarray)
+	 case 3, 
+	     accarray = sort(accarray,3); % always sort on naccu (when 3D, naccu is the second dim)
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
+			 accarray = mean(accarray(:,:,naccu-i+1:naccu),3);
+	     else
+			 accarray = accarray(:,:,[end:-1:1]); 
+			 accarraytmp(:,:,2) = mean(accarray(:,:,1:i),3);
+			 accarraytmp(:,:,1) = mean(accarray(:,:,naccu-i+1:naccu),3);
+			 accarray = accarraytmp;
+		 end;
+	 
+	 case 2, 
+	     accarray = sort(accarray,2); % always sort on naccu (when 3D, naccu is the second dim)
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
+			 accarray = mean(accarray(:,naccu-i+1:naccu),2);
+	     else
+			 accarraytmp(:,2) = mean(accarray(:,1:i),2);
+			 accarraytmp(:,1) = mean(accarray(:,naccu-i+1:naccu),2);
+			 accarray = accarraytmp;
+		 end;
+	 case 3, 
+	     accarray = sort(accarray,1); % always sort on naccu (when 3D, naccu is the second dim)
+         if strcmpi(bootside{min(length(bootside), index)}, 'upper');
+			 accarray = mean(accarray(naccu-i+1:naccu),1);
+	     else
+			 accarraytmp(2) = mean(accarray(1:i),1);
+			 accarraytmp(1) = mean(accarray(naccu-i+1:naccu),1);
+			 accarray = accarraytmp;
+		 end;
+    end;
+    accres{index} = accarray;
+end;
+
+if length(res1) == 1
+	res1 = res1{1};
+	res2 = res2{1};
+	diffres = diffres{1};
+	accres = accres{1};
 end;
 fprintf('\n');
 return;
