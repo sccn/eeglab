@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/19 16:27:14  arno
+% adding ignore mode
+%
 % Revision 1.3  2002/07/10 02:18:32  arno
 % header info
 %
@@ -99,6 +102,8 @@ function g = finputcheck( vararg, fieldlist, callfunc, mode )
 		catch
 			g = [ callfunc 'error: bad ''key'', ''val'' sequence' ]; return;
 		end;
+	else 
+		g = [];
 	end;
 	
 	for index = 1:size(fieldlist,NAME)
