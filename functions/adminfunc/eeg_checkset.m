@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/04/18 02:34:08  scott
+% improved "empty dataset" msg -sm
+%
 % Revision 1.14  2002/04/11 23:34:49  arno
 % adding event check in event consistency
 %
@@ -143,7 +146,7 @@ if nargin < 1
 end;    
 if ~isempty( varargin)
     if isempty(EEG.data)
-        helpdlg('Empty dataset -> File/Load data or dataset', 'Error');
+        helpdlg('Empty dataset -> File/Import data or Load existing dataset', 'Error');
         error('eeg_checkset: empty dataset');
     end;    
 end;
