@@ -22,9 +22,9 @@
 % Outputs:
 %   signal       - output signal of size (trials,  points)	
 %   accept       - [1/0] vector of values for the accept field (one per trial)
-%   typeeeg      - [???] values for the accept type (size trials) 
-%   rt           - [???] values for the accept rt (size trials) 
-%   response     - [???] values for the accept response (size trials) 
+%   typeeeg      - [Integer] values for the accept type (size trials) 
+%   rt           - [float] values for the accept rt (size trials) 
+%   response     - [Integer] values for the accept response (size trials) 
 %   chan_names   - ['string' array] containing channel names 
 %   pnts         - Number of points per trial
 %   ntrials      - Number of trials
@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/02/28 19:20:39  scott
+% header edits - see ??? -sm
+%
 % Revision 1.2  2003/02/21 17:26:20  arno
 % updating header
 %
