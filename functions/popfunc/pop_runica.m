@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/12/11 16:29:27  arno
+% debug history
+%
 % Revision 1.33  2003/12/11 16:28:01  arno
 % remove debug mesg
 %
@@ -241,7 +244,7 @@ switch lower(icatype)
                 [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
         else % if there are defined 'options'   
-            if rank(tmpdata) == size(EEG.data,1), 
+            if rank(tmpdata) == size(EEG.data,1) | ~isempty(findstr('pca', options))
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
             else
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s, ''pca'', %d );', options, tmprank));
