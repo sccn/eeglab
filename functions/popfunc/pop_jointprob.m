@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/30 22:27:55  arno
+% new type of rejection
+%
 % Revision 1.4  2002/07/26 17:29:54  arno
 % output command debug
 %
@@ -183,10 +186,10 @@ if calldisp
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
 	    if icacomp == 1
-	        eegplot( EEG.data(elecrange,:,:), rej, rejE, oldrej, oldrejE, 'srate', ...
+	        eegplot( EEG.data(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	    else
-	        eegplot( tmpdata(elecrange,:,:), rej, rejE, oldrej, oldrejE, 'srate', ...
+	        eegplot( tmpdata(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	    end;	
     else % REJECTRIALS -------------------------
