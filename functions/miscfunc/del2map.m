@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/09/04 23:20:38  arno
+% draw
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -50,22 +53,9 @@ GRID_SCALE = 2*MAXCHANS+5;
 
 % Read the channel file
 % ---------------------
-if isstr( filename )
-	fid = fopen(filename); 
-	locations = fscanf(fid,'%d %f %f %s',[7 MAXCHANS]);
-	fclose(fid);
-	if size(locations,2) ~=  MAXCHANS
-		fprintf('\nWarning: different number of in input array(%d) and location file(%d), ignoring last row(s)\n', MAXCHANS, size(locations,2));
-		MAXCHANS = min( MAXCHANS, size(locations,2));
-		locations = locations(:, 1:MAXCHANS);
-		map = map(1:MAXCHANS);
-	end;	
-	locations = locations';
-	Th = pi/180*locations(:,2);                               % convert degrees to rads
-	Rd = locations(:,3);
-	%ii = find(Rd <= 0.5); % interpolate on-head channels only
-	%Th = Th(ii);
-	%Rd = Rd(ii);
+if isstr( filename ) | isstruct( filename )
+    [tmp lb Th Rd] = readlocs(filename);
+	Th = pi/180*Th;                               % convert degrees to rads
 	[x,y] = pol2cart(Th,Rd);
 else
 	x = real(filename);
