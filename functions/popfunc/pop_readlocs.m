@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/12/27 18:26:01  arno
+% making it compatible with besa formats
+%
 % Revision 1.2  2002/12/24 16:52:32  arno
 % debuging
 %
