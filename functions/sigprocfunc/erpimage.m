@@ -16,6 +16,7 @@
 %               Formats (1,frames*trials) or (frames,trials)
 %   sortvar  - [vector] Variable to sort epochs on (length(sortvar) = nepochs)
 %              Example: sortvar may by subject response time in each epoch (in ms)
+%
 % Additional ordered inputs {with defaults}:
 %   times    - Vector of times (ms) (length(times) = frames) {Def|0: [0:frames-1]}
 %               ELSE [startms ntimes srate] Give start time (ms), time points 
@@ -24,7 +25,9 @@
 %   avewidth - Number of trials to moving-average (NB: may be non-int) {Def|0->1}
 %   decimate - Factor to decimate ntrials out by (NB: may be non-int) {Def|0->1}
 %               If this is large ( > sqrt(num. trials)), output this many trials.
-% Unordered options ('keyword',argument):
+%
+% Unordered options ('keyword',argument pairs):
+%
 % Optionally realign data epochs: 
 %   'align'  - [time] Time-lock data to sortvar. Plot sortvar as at time (ms)
 %               If time == Inf, plot at sortvar median {default: no align}
@@ -32,6 +35,7 @@
 %               and plot. 'yes'= autoscale. Ex. of formula(x): '3*x+2'. {default: 'no'}
 %   'noplot' - Do not plot sortvar {default: Do plot sortvar if in times range}
 %   'noshow' - ['yes'|'no'] do not plot erpimage, simply return outputs {default: 'no'}
+%
 % Optionally sort input epochs: 
 %  {default} - Sort data epochs by sortvar
 %   'nosort' - Do not sort data epochs.
@@ -40,41 +44,46 @@
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
 % 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in a 3-cycle
 %                window centered at time ms_center (ms). Percentile (prct) in range [0,100] 
-%                gives percent of trials to reject for low amplitude. Else if in range
-%               [-100,0], gives percent of trials to reject for high amplitude.
+%                gives percent of trials to reject for low amplitude. Else, if in range
+%               [-100,0], gives percent of trials to reject for high amplitude;
 %               freq (Hz) is the phase-sorting frequency. With optional maxfreq,
 %               sort by phase at freq of max power in the data in range [freq,maxfreq]
 %               (Note: 'phasesort' arg freq overrides frequency specified in 'coher').
 %               With optional topphase, sort by phase, putting topphase (degrees, in 
-%               range [-180,180]) at the top of the image {Default: [0 25 8 13 180]}
-%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. See 'phasesort' 
-%               explanation above.
+%               range [-180,180]) at the top of the image. NB: 'phasesort' uses circular 
+%               smoothing. {Default: [0 25 8 13 180]}
+%               
+%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude. See 'phasesort'.
+%
 % Plot time-varying spectral amplitude instead of potential:
 % 'plotamps' - Image amplitudes at each time and trial instead of potential values. 
-%               Note: Currently Requires 'coher' (below) with alpha signif. {default: no}
+%               NB: Currently Requires 'coher' (below) with alpha signif. {default: no}
+%
 % Specify plot parameters:
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
-%               PLot axes limits. Can use NaN (or nan, not Nan) for missing items 
-%               and omit late items. Use last input bamp to fix the baseline amplitude.
+%               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items 
+%               and omit late items. Use last input, bamp, to fix the baseline amplitude.
 %   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
 %               levels to save computation time. {default: none}
 %   'caxis'  - [lo hi] Set color axis limits ELSE [fraction] Set caxis limits at 
-%               (+/-)fraction*max(abs(data)) {default: data bounds}
+%               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
+%
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {default no}
 %   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {default no}
 %   'rmerp'  - Subtract the mean ERP from each trial before processing {default no}
+%
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
-%               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
-%               given range (NB: phasesort freq (above) overwrites these parameters).
-%               ELSE [minfrq maxfrq alpha] Add coher. signif. level line at 
-%               probability alpha (range: [0,0.1]) {default: none}
+%               ELSE [minfrq maxfrq] = same, but select frequency with max power in 
+%               given range (NB: 'phasesort' freq (above) overwrites these parameters).
+%               ELSE [minfrq maxfrq alpha] = use coher. signif. level line at 
+%               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg times) {default: as in icadefs.m}
-%   'cycles' - number of cycle for wavelet decomposition. Default is 3 at all
-%              frequency (to preserve time resolution).
-% Add other features to plot:
+%   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
+%
+% Add other features:
 %   'cbar'   - Plot color bar to right of ERP-image {default no}
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
@@ -87,6 +96,7 @@
 %               ELSE  [times_matrix] Plot vertical dashed time series at times 
 %               specified by the columns of the 'vert' arg matrix. Matrix must  
 %               have ntrials rows (See also: 'auxvar').
+%
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' - ['string'] ERP ordinate axis label (default is uV)
@@ -145,6 +155,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.119  2003/07/22 15:40:26  scott
+% adding circular smoothing to phase-sorted, allamps plots -sm
+%
 % Revision 1.118  2003/07/22 00:52:02  scott
 % debug
 %
