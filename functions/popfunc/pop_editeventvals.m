@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/05/21 21:21:49  arno
+% debug history if no modification
+%
 % Revision 1.20  2003/08/29 19:05:19  arno
 % first shot at urevent inserting ...
 %
@@ -124,7 +127,7 @@ if nargin < 1
    return;
 end;	
 
-if nargin >=1 & isstr(EEG)
+if nargin >=1 & isstr(EEG) % interpreting command from GUI
     strcom = EEG;
     
     % user data
@@ -152,25 +155,34 @@ if nargin >=1 & isstr(EEG)
       valnum    = valnum + shift;
       if valnum < 1,                valnum = 1;                end;
       if valnum > length(eventtmp), valnum = length(eventtmp); end;
-      set(objevent, 'string', num2str(valnum));
+      set(objevent, 'string', num2str(valnum,3));
 
       % update fields
       % -------------
       for index = 1:length(allfields) 
           
+          enable = 'on';
           if strcmp( allfields{index}, 'latency') & ~isempty(eventtmp(valnum).latency)
+              if isfield(eventtmp, 'type') & strcmpi(eventtmp(valnum).type, 'boundary'), enable = 'off'; end;
               if isfield(eventtmp, 'epoch')
                    value = eeg_point2lat( eventtmp(valnum).latency, eventtmp(valnum).epoch, ...
                                           EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
               else value = (eventtmp(valnum).latency-1)/EEG.srate+EEG.xmin;
               end;
-          else value = getfield( eventtmp(valnum), allfields{index});
+          elseif strcmp( allfields{index}, 'duration') & ~isempty(eventtmp(valnum).duration)
+              if isfield(eventtmp, 'type') & strcmpi(eventtmp(valnum).type, 'boundary'), enable = 'off'; end;
+              if isfield(eventtmp, 'epoch')
+                   value = eventtmp(valnum).duration/EEG.srate*1000; % milliseconds
+              else value = eventtmp(valnum).duration/EEG.srate;      % seconds
+              end;
+          else
+              value = getfield( eventtmp(valnum), allfields{index});
           end;
           
           % update interface
           % ----------------
           tmpobj = findobj('parent', gcf, 'tag', allfields{index});
-          set(tmpobj, 'string', num2str(value));
+          set(tmpobj, 'string', num2str(value,3), 'enable', enable);
       end;
       
       % update original
@@ -252,16 +264,23 @@ if nargin >=1 & isstr(EEG)
       
       field    = varargin{1};
       objfield = findobj('parent', gcf, 'tag', field);
-      editval  = get(objfield, 'string');
+      editval     = get(objfield, 'string');
       if ~isempty(str2num(editval)), editval =str2num(editval); end;
+      editvalori  = editval;
       
-      % latency case
-      % ------------
+      % latency and duration case
+      % -------------------------
       if strcmp( field, 'latency') & ~isempty(editval)
           if isfield(eventtmp, 'epoch')
                editval = eeg_lat2point( editval, eventtmp(valnum).epoch, ...
                                        EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
           else editval = (editval- EEG.xmin)*EEG.srate+1;
+          end;
+      end;
+      if strcmp( field, 'duration') & ~isempty(editval)
+          if isfield(eventtmp, 'epoch')
+               editval = editval/1000*EEG.srate; % milliseconds
+          else editval = editval*EEG.srate;      % seconds
           end;
       end;
       eventtmp(valnum) = setfield(eventtmp(valnum), field, editval);
@@ -277,6 +296,7 @@ if nargin >=1 & isstr(EEG)
           if strcmp( field, 'latency') & ~isempty(editval)
               if isfield(EEG.urevent, 'epoch')
                   urepoch = EEG.urevent(urvalnum).epoch;
+                  
                   
                   % find closest event latency
                   % --------------------------
@@ -301,8 +321,17 @@ if nargin >=1 & isstr(EEG)
                       editval = urlatency - ( latency - editval ); % new latency value
                   end;
               else 
-                  disp('Warning: urevent latency might be innacurate if portion of data has been removed');
+                  editval = eeg_urlatency(EEG.event, eventtmp(valnum).latency);
               end;                  
+          end;
+          
+          % duration case
+          % ------------
+          if strcmp( field, 'duration') & ~isempty(editval)
+              if isfield(eventtmp, 'epoch')
+                   editval = editval/1000*EEG.srate; % milliseconds
+              else editval = editval*EEG.srate;      % seconds
+              end;
           end;
           
           EEG.urevent(urvalnum) = setfield(EEG.urevent(urvalnum), field, editval);
@@ -310,7 +339,7 @@ if nargin >=1 & isstr(EEG)
 
       % update history
       % --------------
-      oldcom = { oldcom{:} 'changefield' { valnum field editval }};
+      oldcom = { oldcom{:} 'changefield' { valnum field editvalori }};
      
      case 'sort', % **********************************************************
       
@@ -384,7 +413,7 @@ if nargin<2
         
         % input string
         % ------------
-        if strcmp( allfields{index}, 'latency')
+        if strcmp( allfields{index}, 'latency') | strcmp( allfields{index}, 'duration') 
             if EEG.trials > 1
                  inputstr =  [ allfields{index} ' (ms)'];
             else inputstr =  [ allfields{index} ' (sec)'];
@@ -467,11 +496,17 @@ if nargin<2
     
     % transfer events
     % ---------------
-    EEG       = userdata{1};
-    tmpevents = userdata{2};
-    EEG.event = tmpevents;
     if ~isempty(userdata{3})
         com = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
+    end;
+    if isempty(findstr('''sort''', com))
+        EEG       = userdata{1};
+        EEG.event = userdata{2};
+    else 
+        com = '';
+        disp('WARNING: all edits discarded because of event resorting. The EEGLAB event structure');
+        disp('            must contain events sorted by latency (you may obtain an event structure');
+        disp('            with resorted event by calling this function from the command line).');
     end;
     return;
     
@@ -521,6 +556,12 @@ for curfield = 1:2:length(args)
                 error('Pop_editeventvals: not enough arguments to change field value');
             end;
             valstr = reformat(tmpargs{3}, strcmp(tmpargs{2}, 'latency'), EEG.trials > 1, tmpargs{1} );
+            if strcmp(tmpargs{2}, 'duration'), 
+                if EEG.trials > 1
+                     valstr = num2str( tmpargs{3}/1000*EEG.srate ); % millisecond
+                else valstr = num2str( tmpargs{3}*EEG.srate );      % second
+                end;
+            end;
             eval([ 'EEG.event(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
 	   case 'add'
             tmpargs = args{ curfield+1 };
@@ -555,8 +596,8 @@ return;
 % -----------------------
 function strval = reformat( val, latencycondition, trialcondition, eventnum)
     if latencycondition
-        if trialcondition > 1
-            strval = ['eeg_point2lat(' num2str(val) ', EEG.event(' int2str(eventnum) ').epoch, EEG.srate,[EEG.xmin EEG.xmax]*1000, 1E-3);' ];
+        if trialcondition
+            strval = ['eeg_lat2point(' num2str(val) ', EEG.event(' int2str(eventnum) ').epoch, EEG.srate,[EEG.xmin EEG.xmax]*1000, 1E-3);' ];
         else    
             strval = [ '(' num2str(val) '-EEG.xmin)*EEG.srate+1;' ]; 
         end;
