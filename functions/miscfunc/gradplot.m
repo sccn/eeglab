@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/01/29 03:17:31  scott
+% same
+%
 % Revision 1.5  2004/01/29 02:15:56  scott
 % update locs_file reading from topoplot.m
 %
@@ -55,7 +58,7 @@
 
 % 01-25-02 reformated help & license, added links -ad 
 
-function [gradx, grady] = gradplot( map, loc_file, draw ) 
+function [gradx, grady] = gradplot( map, locs_file, draw ) 
 
 if nargin < 2
 	help gradplot;
@@ -70,9 +73,9 @@ MAX_RADIUS = 0.5;
 % Read the electrode location file
 % --------------------------------
 if isstr(locs_file) % a locs file
-        [tmpeloc labels Th Rd ind] = readlocs(loc_file,'filetype','loc');
+        [tmpeloc labels Th Rd ind] = readlocs(locs_file,'filetype','loc');
 elseif isstruct(locs_file)  % a locs struct
-        [tmpeloc labels Th Rd ind] = readlocs(loc_file);
+        [tmpeloc labels Th Rd ind] = readlocs(locs_file);
         if max(abs(Rd))>0.5
           fprintf('gradplot(): Shrinking radio from max %4.3f to 0.5\n',...
                           max(abs(Rd)));
