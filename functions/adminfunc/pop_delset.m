@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/11 19:31:34  arno
+% editing text
+%
 % Revision 1.4  2002/04/23 23:47:12  arno
 % debuging command call
 %
@@ -68,7 +71,7 @@ if nargin < 2 | set_in < 0
 	else
 		inistr       = { '1' };
 	end;
-	result       = inputdlg( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Delete dataset -- pop_delset()', 1,  inistr, 'pop_delset');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	set_in   	 = eval( [ '[' result{1} ']' ] );
