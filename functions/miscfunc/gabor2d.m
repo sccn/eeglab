@@ -10,7 +10,7 @@
 % Inputs:
 %   rows        - number of rows 
 %   columns     - number of columns 
-%   freq        - frequency of sinus function  (default: 2*pi/rows)
+%   freq        - frequency of sinus function in degree (default: 360/rows)
 %   angle       - angle for rotation of the resulting 2D array. In
 %                 degree of angle. Default is 0.
 %   sigmaR      - standart deviation for rows (default: rows/5)
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
 function mat = gabor2d( sizeX, sizeY, freq, angle, sigmaX, sigmaY, meanX, ...
@@ -57,7 +60,7 @@ if nargin < 2
 	return; 
 end;
 if nargin < 3
-	freq = 2*pi/sizeX;
+	freq = 360/sizeX;
 end;
 if nargin < 4
 	angle = 0;
@@ -80,17 +83,29 @@ end;
 if nargin < 10
 	cut = 0;
 end;
+freq = freq/180*pi;
 
 X = linspace(1, sizeX, sizeX)'* ones(1,sizeY);
 Y = ones(1,sizeX)'   		  * linspace(1, sizeY, sizeY);
 %[-sizeX/2:sizeX/2]'*ones(1,sizeX+1);
 %Y = ones(1,sizeY+1)'   *[-sizeY/2:sizeY/2];
 
-rotatedmat = (X+i*Y) * exp(i*angle/180*pi);
-
+rotatedmat = ((X-meanX)+i*(Y-meanY)) * exp(i*angle/180*pi);
 mat = sin(real(rotatedmat)*freq + dephase/180*pi).*exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
 				+((Y-meanY)/sigmaY).*((Y-meanY)/sigmaY)))... 
             			/((sigmaX*sigmaY)^(0.5)*pi); 
+
+return;
+
+for X = 1:sizeX
+    for Y = 1:sizeY
+        mat(X,Y) = sin(real((X-meanX+j*(Y-meanY))*exp(i*angle/180*pi))*freq + dephase/180*pi) ...
+            .*exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
+                          +((Y-meanY)/sigmaY).*((Y-meanY)/sigmaY)))... 
+            			/((sigmaX*sigmaY)^(0.5)*pi); 
+    end;
+end;
+
 
 if cut > 0
 	maximun = max(max(mat))*cut;
