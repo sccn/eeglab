@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/07/14 03:17:57  arno
+% making allamps moving average of log power
+%
 % Revision 1.21  2002/07/14 02:39:16  arno
 % same
 %
@@ -1733,6 +1736,7 @@ if ~isnan(coherfreq)
    set(dbtxt,'fontsize',TICKFONT);
     drawnow;
 	set(ax3, 'xlim', timelimits);
+	set(ax3, 'ylim', [minamp(1) maxamp(1)]);
    %
    %%%%%% Make coher axis below amp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    %
