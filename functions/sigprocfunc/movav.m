@@ -11,8 +11,8 @@
 %   xwidth = smoothing-window width in xvals {def|0 -> (lastx-firstx)/4}
 %   xadv   = xvals step size {default|0 -> 1}
 %            NOTE: to reduce yyy frames to xxx, use yyy/(xxx+2)
-%   firstx = low xval of first averaging window {def|0 -> low xvals}
-%   lastx  = high xval of last averaging window {def|0 -> high xvals}
+%   firstx = low xval of first averaging window {def|[] -> low xvals}
+%   lastx  = high xval of last averaging window {def|[] -> high xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
 %            May be long, since linear interp. is NOT used between values.
 %            An example is >> gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/05/23 17:33:59  scott
+% adjusting verbose output -sm
+%
 % Revision 1.11  2002/05/23 17:32:42  scott
 % *** empty log message ***
 %
@@ -139,9 +142,9 @@ if nargin < 7 | isempty(xwin)
 end
 
 if nargin < 6 | isempty(lastx)
-  lastx = 0;
+  lastx = [];
 end
-if lastx == 0,
+if isempty(lastx),
   if fastave
     lastx = frames;
   else
@@ -150,9 +153,9 @@ if lastx == 0,
 end
 
 if nargin<5 | isempty(firstx)
-  firstx = 0;
+  firstx = [];
 end
-if firstx==0,
+if isempty(firstx),
   if fastave
     firstx = 1;
   else
