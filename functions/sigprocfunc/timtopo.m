@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/03/04 17:20:23  scott
+% debug last -sm
+%
 % Revision 1.7  2003/03/04 17:16:01  scott
 % debug last -sm
 %
@@ -357,7 +360,7 @@ set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+text(0.50,1.01,titl,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
 text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
 text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
 
