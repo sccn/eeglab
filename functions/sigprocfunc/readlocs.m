@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/05/01 03:27:40  arno
+% removing sperical
+%
 % Revision 1.4  2002/05/01 02:11:56  arno
 % new .txt format
 %
@@ -128,11 +131,14 @@ if isstr(filename)
             [eloc labels X Y Z]= readelp( filename );
             if exist('elpmaindir') ~= 1, elpmaindir = 'X'; end;
  			if strcmp(lower(elpmaindir), 'x')
-                [theta radius] = cart2topo( -X', -Y', Z',[]);  
+                [theta radius] = cart2topo( -X', -Y', Z');  
             else
-                [theta radius] = cart2topo( -Y', -X', Z',[]);  
+                [theta radius] = cart2topo( -Y', -X', Z','optim',1);  
             end;
 			for index = 1:length( eloc )
+			  tmp = eloc(index).X;
+			  eloc(index).X = -eloc(index).Y;
+			  eloc(index).Y = -tmp;			  
 			  eloc(index).theta  = theta(index);
 			  eloc(index).radius = radius(index);
 			  eloc(index).labels = labels{index};
