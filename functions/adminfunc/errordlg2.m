@@ -2,7 +2,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
-% See also: inpudlg2(), quesdlg2()
+% See also: inputdlg2(), questdlg2()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/28 01:04:34  arno
+% debugging beep
+%
 % Revision 1.2  2002/08/14 16:44:54  arno
 % beep update
 %
