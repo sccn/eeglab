@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.238  2003/05/12 15:58:15  arno
+% updated store call
+%
 % Revision 1.237  2003/04/18 00:54:45  arno
 % update menu label for compare ERPs
 %
@@ -1152,13 +1155,13 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
             if exist(dircontent.m{index}) == 7
                 addpath(dircontent.m{index})
                 funcname = dircontent.m{index};
-                disp(['eeglab: executing plugin "' funcname '" (path added)' ]);    
+                disp(['eeglab: adding plugin "' funcname '" (path added)' ]);    
             else 
                 funcname = dircontent.m{index}(1:end-2);
-                disp(['eeglab: executing plugin "' funcname '"' ]);    
+                disp(['eeglab: adding plugin "' funcname '"' ]);    
             end;
             eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
-                 ['disp(''eeglab: error while executing plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
+                 ['disp(''eeglab: error while adding plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
     end;
 
