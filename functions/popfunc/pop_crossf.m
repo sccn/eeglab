@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/11 20:50:28  arno
+% color
+%
 % Revision 1.14  2002/08/09 22:32:26  arno
 % updating for wavelet facotr
 %
@@ -191,7 +194,7 @@ if popup
 	if ~result{9}
 		options = [ options ', ''plotitc'', ''off''' ];
 	end;
-    figure('color', [1 1 1]);
+    figure;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -206,6 +209,7 @@ else
 		end;
 	end;	
 end;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
 % compute epoch limits
 % --------------------
