@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2004/04/28 06:00:53  scott
+% debug 'compnums',[2 3 4 6] etc
+%
 % Revision 1.57  2004/04/25 16:44:41  scott
 % converted limits and limcontrib inputs back to ms (for compatibility with pop_envtopo)
 %
@@ -312,7 +315,7 @@ end
 %%%%%%%%%%%%%%%%% convert limits and limcontrib times to seconds from ms %%%%%%%
 %
 g.limits(1) = g.limits(1)/1000;
-g.limits(2) = g.limits(2)/1000;
+if length(g.limits)>1, g.limits(2) = g.limits(2)/1000; end;
 g.limcontrib = g.limcontrib/1000;
 
 uraxes = gca; % the original figure or subplot axes
@@ -322,10 +325,10 @@ delete(gca)
 pvaf = [];
 
 all_bold = 0;
-BOLD_COLORS = 1;  % 1 = use solid lines for first 5 components plotted
-                  % 0 = use std lines according to component rank only
+BOLD_COLORS = 1;    % 1 = use solid lines for first 5 components plotted
+                    % 0 = use std lines according to component rank only
 FILL_COMP_ENV = 0;  % default no fill
-MAXTOPOS = 20;  % max topoplots to plot
+MAXTOPOS = 20;      % max topoplots to plot
 
 if ndims(data) == 3
     data = mean(data,3);
