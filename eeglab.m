@@ -124,13 +124,11 @@
 % pop_importevent()    - import event info ASCII file
 % pop_importpres()     - import Presentation info file
 % pop_loadset()        - load dataset
-% pop_loadwks()        - load workspace
 % pop_mergeset()       - merge two datasets
 % pop_rejepoch()       - reject pre-identified epochs in a EEG dataset
 % pop_rejspec()        - reject based on spectrum (computes spectrum -% eegthresh)
 % pop_saveh()          - save EEGLAB command history
 % pop_saveset()        - save dataset
-% pop_savewks()        - save workspace
 % pop_select()         - select data (epochs, time points, channels ...)
 % pop_selectevent()    - select events
 % pop_subcomp()        - subtract components from data
@@ -181,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.201  2002/11/14 23:33:44  arno
+% merging .EDF and .BDF menu lines
+%
 % Revision 1.200  2002/11/14 18:15:10  arno
 % Average reference -> Re-reference
 %
