@@ -12,7 +12,7 @@
 %              sphere and the weight matrix { sphere weight } that will
 %              be used to recompute the ICA activity.
 %   frames     - number of points per epoch.
-%   winv       - inverse of (sphere * weights) matrices returned by the
+%   winv       - inverse of (weights*sphere) matrices returned by the
 %              ica function. It represent the component distribution of
 %              activity across the electrodes.
 %   components - array of components to project.
@@ -43,6 +43,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/01/09 18:29:34  arno
+% debuging compvar
+% absolute value instead of square
+%
 % Revision 1.3  2002/04/10 19:34:39  arno
 % futher debuging
 %
