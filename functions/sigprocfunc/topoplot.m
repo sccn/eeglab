@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/05/12 22:23:38  arno
+% adding verbose option
+%
 % Revision 1.25  2002/11/27 01:23:53  arno
 % change warning message
 %
@@ -205,7 +208,7 @@ HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
 DIPOLE = [];
-VERBOSE = 'off';
+VERBOSE = 'on';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -371,8 +374,10 @@ if isstr(shrinkfactor)
 		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
 	end;	
 else 
-	fprintf('topoplot(): electrode radius shrinked by %2.3g\n', shrinkfactor);
-	Rd = Rd-shrinkfactor*Rd; % squeeze electrodes in squeeze*100% to have all inside
+    if strcmpi(VERBOSE, 'on')
+        fprintf('topoplot(): electrode radius shrinked by %2.3g\n', shrinkfactor);
+	end;
+    Rd = Rd-shrinkfactor*Rd; % squeeze electrodes in squeeze*100% to have all inside
 end;
 	  
 enum = find(Rd <= 0.5);                     % interpolate on-head channels only
