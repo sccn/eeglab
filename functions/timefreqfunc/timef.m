@@ -70,8 +70,8 @@
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                     level. Show non-signif. output values in green       {0}
 %       'naccu'     = Number of bootstrap replications to accumulate       {200}
-%       'baseboot'  = Bootstrap baseline to subtract (0 -> use 'baseline'(see above)
-%                                                     1 -> use whole trial)   {0}
+%       'baseboot'  = Bootstrap baseline to subtract (1 -> use 'baseline'(see above)
+%                                                     0 -> use whole trial)   {0}
 %    Optional scalp map:
 %       'topovec'   = Scalp topography (map) to plot                       {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2004/02/09 18:01:27  arno
+% debug multitaper
+%
 % Revision 1.68  2004/01/23 02:55:15  scott
 % documenting maxersp
 %
