@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2004/12/10 23:07:00  arno
+% add text message
+%
 % Revision 1.65  2004/12/07 22:29:58  arno
 % new version with new bootstrap
 %
@@ -1119,10 +1122,14 @@ end;
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
 g.subitc = 'off';
-[alltfX freqs timesout R] = timefreq(X, g.srate, 'ntimesout', g.timesout, 'winsize', g.winsize, ...
-                                'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
-                                g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
-                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 
+if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
+else                       tmioutopt = { 'ntimesout', g.timesout };
+end;
+[alltfX freqs timesout R] = timefreq(X, g.srate, timoutopt{:}, 'winsize', g.winsize, ...
+                                     'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
+                                     g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
+                                     'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
+                                     'nfreqs', g.nfreqs); 
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
 % ----------------

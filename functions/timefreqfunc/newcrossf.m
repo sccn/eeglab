@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2004/12/07 22:30:41  arno
+% new version with new bootstrap
+%
 % Revision 1.71  2004/06/14 15:46:16  arno
 % fixing baseline problem
 %
@@ -1112,7 +1115,10 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% -------------------------------------
 	% compute time frequency decompositions
 	% -------------------------------------
-    spectraloptions = { 'ntimesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
+    if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
+    else                       tmioutopt = { 'ntimesout', g.timesout };
+    end;
+    spectraloptions = { tmioutopt{:}, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
                 g.detrend, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
                 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
     if ~strcmpi(g.type, 'amp') & ~strcmpi(g.type, 'crossspec')
