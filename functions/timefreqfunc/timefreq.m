@@ -10,7 +10,7 @@
 %       srate   = sampling rate
 %
 % Optional inputs:
-%       wavelet = 0  -> Use FFTs (with constant window length) { Default } 
+%      'wavelet' = 0  -> Use FFTs (with constant window length) { Default } 
 %               = >0 -> Number of cycles in each analysis wavelet 
 %               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
 %                 of wavelet cycles expands with frequency from cycles
@@ -30,19 +30,35 @@
 %      'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
 %
 %    Optional FFT/DFT:
+%      'tlimits'  = [min max] time limits in ms.
 %      'winsize'  = If cycles==0 (FFT, see 'wavelet' input): data subwindow 
 %                   length (fastest, 2^n<frames);
 %                   if cycles >0: *longest* window length to use. This
 %                   determines the lowest output frequency  {~frames/8}
-%      'timesout' = Number of output times (int<frames-winsize) {def: 200}
+%      'timesout' = Number of output times (int<frames-winsize). Enter a 
+%                   negative value [-S] to subsample original time by S. 
+%                   {def: 200}
+%      'freqs'    = [min max] frequency limits. Default [minfreq srate/2], 
+%                   minfreq being determined by the number of data points, 
+%                   cycles and sampling frequency. Enter a single value
+%                   to compute spectral decompisition at a single frequency
+%                   (note: for FFT the closest frequency will be estimated).
 %      'padratio' = FFTlength/winsize (2^k)                     {def: 2}
 %                    Multiplies the number of output frequencies by
 %                    dividing their spacing. When cycles==0, frequency
 %                    spacing is (low_frequency/padratio).
-%      'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
+%      'nfreqs'   = number of output frequencies. Cannot be used with FFT.
+%                   Overwrite previous option for wavelets.
+%      'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                    Note that for FFT, computation is always performed in 
+%                    the linear space. For obtaining 'log' spaced freqs, 
+%                    closest frequencies in the 'linear' space are computed and
+%                    returned.
+%      'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                    If wavelet==0, all FFT frequencies are output.
 %                    For wavelet, reducing the max frequency reduce
-%                    the computation load {def: 50}
+%                    the computation load {def: 50}. Deprecated, use 'freqs'
+%                    option instead.
 %
 % Outputs: 
 %       tf      - time frequency array for all trials (freqs, times, trials)
@@ -56,6 +72,12 @@
 %
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
+%
+% Note: it is not advised to use a FFT decomposition in a log scale. Output
+%       value are accurate but plotting might not be because of the non-uniform
+%       frequency output values in log-space. If you have to do it, use a 
+%       padratio as large as possible, or interpolate time-freq image at
+%       exact log scale values before plotting.
 %
 % See also: timef()
 
@@ -76,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/01/10 01:26:59  arno
+% nothing
+%
 % Revision 1.14  2003/01/08 23:32:04  arno
 % typo in linear coherence formula
 %
@@ -124,7 +149,7 @@
 % function for bootstrap initialisation
 % -------------------------------------
 
-function [tmpall, freqs, times, itcvals] = timefreq(data, srate, varargin)
+function [tmpall, freqs, timesout, itcvals] = timefreq(data, srate, varargin)
 %	nb_points, timesout, naccu, baselength, baseboot, boottype, alpha, rboot);
 	
 if nargin < 2
@@ -140,7 +165,9 @@ g = finputcheck(varargin, ...
                   'basevect'      'integer'  [0 Inf]                  []; ...
                   'detrend'       'string'   {'on' 'off'}              'off'; ...
 				  'maxfreq'       'real'     [0 Inf]                  (srate/2); ...
-				  'freq'          'real'     [0 Inf]                  []; ...
+				  'freqs'         'real'     [0 Inf]                  [0 srate/2]; ...
+				  'nfreqs'        'integer'  [0 Inf]                  []; ...
+				  'freqscale'     'string'   { 'linear' 'log' }       'linear'; ...
 				  'trial'         'integer'  [0 Inf]                  []; ...
 				  'wavelet'       'real'     [0 Inf]                   0; ...
 				  'padratio'      'integer'  [1 Inf]                   2; ...
@@ -161,11 +188,7 @@ if (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
    error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > frame)
    error('Value of winsize must be less than frame length.');
-end 
-if (g.timesout > frame-g.winsize)
-   g.timesout = frame-g.winsize;
-   disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
-end
+end     
 if (pow2(nextpow2(g.padratio)) ~= g.padratio)
    error('Value of padratio must be an integer power of two [1,2,4,8,16,...]');
 end
@@ -173,55 +196,118 @@ if (g.maxfreq > srate/2)
    fprintf('Warning: value of g.maxfreq greater that Nyquist rate\n\n');
 end
 
-% compute time limits
+% finding frequency limits
+% ------------------------
+if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
+if g.maxfreq ~= srate/2
+    g.freqs(2) = g.maxfreq;
+end;
+
+% finding frequencies
 % -------------------
-wintime = 500*g.winsize/srate;
-times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
+if isempty(g.nfreqs)
+    if g.cycles == 0 % FFT
+        g.nfreqs = g.winsize/2*g.padratio;
+    else
+        g.nfreqs = length([2:2/g.padratio:g.winsize]);
+    end;
+end;
+if g.freqs(1) == 0 & g.cycles == 0
+    g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs+1);
+    g.freqs = g.freqs(2:end); % remove DC (match the output of PSD)
+else
+    if g.freqs(1) == 0
+        g.freqs(1) = srate*g.cycles/g.winsize;
+    end;
+    g.freqs = linspace(g.freqs(1), g.freqs(2), g.nfreqs);
+end;
+if strcmpi(g.freqscale, 'log')
+    g.freqs = linspace(log(g.freqs(1)), log(g.freqs(end)), g.nfreqs);
+    g.freqs = exp(g.freqs);
+end;
 
 % function for time freq initialisation
 % -------------------------------------
-g.stp       = (frame-g.winsize)/(g.timesout-1);
 if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
-   freqs = srate/g.winsize*[1:2/g.padratio:g.winsize]/2;
-   g.win   = hanning(g.winsize);
-   g.nb_points = g.padratio*g.winsize/2;   
+    freqs = linspace(0, srate/2, g.winsize*g.padratio/2+1);
+    freqs = freqs(2:end); % remove DC (match the output of PSD)
+                          %srate/g.winsize*[1:2/g.padratio:g.winsize]/2
+    g.win   = hanning(g.winsize);
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
-   g.win = dftfilt(g.winsize,g.maxfreq/srate,g.cycles,g.padratio,g.cyclesfact);
-   g.nb_points = size(g.win,2);
-end;
-%tmpall      = repmat(nan,[trials g.timesout g.nb_points]);
-tmpall      = repmat(nan,[g.nb_points g.timesout trials]);
+     %freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
+     %g.win = dftfilt(g.winsize,g.maxfreq/srate,g.cycles,g.padratio,g.cyclesfact);
 
-% ------------------------------------
+    freqs = g.freqs;
+    if g.cyclesfact ~= 1, 
+        g.cycles = [ g.cycles g.cycles*g.freqs(end)/g.freqs(1)*(1-g.cyclesfact)]; 
+    end;
+    g.win    = dftfilt2(g.freqs,g.cycles,srate, g.freqscale);
+    
+    g.winsize = 0;
+    for index = 1:length(g.win)
+        g.winsize = max(g.winsize,length(g.win{index}));
+    end;
+end;
+tmpall      = repmat(nan,[length(freqs) g.timesout trials]);
+
+% compute time vector
+% -------------------
+[ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize);
+
+% -------------------------------
 % compute time freq decomposition
-% ------------------------------------
-for trial = 1:trials
-	if rem(trial,10) == 0,  fprintf(' %d',trial); end
-	if rem(trial,120) == 0, fprintf('\n'); end
-	for index = 1:g.timesout
-		tmpX = data([1:g.winsize]+floor((index-1)*g.stp)+(trial-1)*frame);
-		
-		tmpX = tmpX - mean(tmpX);
-		if strcmpi(g.detrend, 'on'),
-			tmpX = detrend(tmpX); 
-		end;
+% -------------------------------
+if g.cycles(1) == 0
+    for trial = 1:trials
+        if rem(trial,10) == 0,  fprintf(' %d',trial); end
+        if rem(trial,120) == 0, fprintf('\n'); end
+        for index = 1:length(g.indexout)
+            tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
             
-		if g.cycles == 0 % use FFTs
-			tmpX = g.win .* tmpX(:);
-			tmpX = fft(tmpX,g.padratio*g.winsize);
-			tmpX = tmpX(2:g.padratio*g.winsize/2+1);
-		else 
-			tmpX = transpose(g.win) * tmpX(:);
-		end
-		tmpall(:,index, trial) = tmpX(:);
-
-		%if g.ITCdone
-        %    tmpX = (tmpX - abs(tmpX) .* g.ITC(:,index)) ./ abs(tmpX);
-		%end;
-   end;
-end;
-
+            tmpX = tmpX - mean(tmpX);
+            if strcmpi(g.detrend, 'on'),
+                tmpX = detrend(tmpX); 
+            end;
+            
+            tmpX = g.win .* tmpX(:);
+            tmpX = fft(tmpX,g.padratio*g.winsize);
+            tmpX = tmpX(2:g.padratio*g.winsize/2+1);
+            tmpall(:,index, trial) = tmpX(:);            
+        end;
+    end;
+else % wavelet
+    % prepare wavelet filters
+    % -----------------------
+    for index = 1:length(g.win)
+        g.win{index} = transpose(repmat(g.win{index}, [trials 1]));
+    end;
+    size(tmpall)
+    
+    % apply filters
+    % -------------
+    for index = 1:length(g.indexout)
+        trialind = index/length(g.timesout)*trials;
+        if rem(trialind,10) == 0,  fprintf(' %d',trialind); end
+        if rem(trialind,120) == 0, fprintf('\n'); end
+        for freqind = 1:length(g.win)
+            wav = g.win{freqind}; sizewav = size(wav,1)-1;
+            %g.indexout(index), size(wav,1), g.freqs(freqind)
+            tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
+            
+            tmpX = tmpX - ones(size(tmpX,1),1)*mean(tmpX);
+            if strcmpi(g.detrend, 'on'),
+                for trial = 1:trials
+                    tmpX(:,trial) = detrend(tmpX(:,trial)); 
+                end;
+            end;
+            
+            tmpX = sum(wav .* tmpX);
+            tmpall( freqind, index, :) = tmpX;            
+        end;
+    end;
+    size(tmpall)
+end;    
+    
 % compute and subtract ITC
 % ------------------------
 if nargout > 3 | strcmpi(g.subitc, 'on')
@@ -231,6 +317,24 @@ if strcmpi(g.subitc, 'on')
     %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
 	tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
 end;
+
+% find closest output frequencies
+% -------------------------------
+if length(g.freqs) ~= length(freqs) | any(g.freqs ~= freqs)
+    allindices = zeros(1,length(g.freqs));
+    for index = 1:length(g.freqs)
+        [dum ind] = min(abs(freqs-g.freqs(index)));
+        allindices(index) = ind;
+    end;
+    fprintf('finding closest frequencies: %d freqs removed\n', length(freqs)-length(allindices));
+    freqs = freqs(allindices);
+    tmpall = tmpall(allindices,:,:);
+    if nargout > 3 | strcmpi(g.subitc, 'on')
+        itcvals = itcvals(allindices,:,:);
+    end;
+end;    
+
+timesout = g.timesout;
 %figure; imagesc(abs(sum(itcvals,3))); cbar;
 return;
 
@@ -266,6 +370,54 @@ else
    w = [w; w(end-1:-1:1)];
 end
 
+% get time points
+% ---------------
+function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize);
+    timevect = linspace(tlimits(1), tlimits(2), frames);
+    srate = 1000*(frames-1)/(tlimits(2)-tlimits(1));
+    
+    if length(timevar) == 1 
+
+        if timevar(1) > 0
+            % generate linearly space vector
+            % ------------------------------
+            if (timevar > frames-winsize)
+                timevar = frames-winsize;
+                disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(timevar) ]);
+            end
+            npoints = timevar(1);
+            wintime = 500*winsize/srate;
+            timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
+            fprintf('Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
+        else            
+            % subsample data
+            % --------------
+            nsub     = -timevar(1);
+            timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
+            timevals    = timevect( timeindices );
+            fprintf('Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
+        end;
+    
+    end;
+    
+    % find closet points in data
+    % --------------------------
+    oldtimevals = timevals;
+    for index = 1:length(timevals)
+        [dum ind] = min(abs(timevect-timevals(index)));
+        timeindices(index) = ind;
+        timevals(index)    = timevect(ind);
+    end;
+    if length(timevals) < length(unique(timevals))
+        disp('Warning: duplicate times, reduce the number of output times');
+    end;
+    if all(oldtimevals == timevals)
+        disp('Debug msg: Time value unchanged by finding closest in data');        
+    else 
+        disp('Debug msg: Time value updated by finding closest points in data');
+    end;    
+
+% DEPRECATED, FOR C INTERFACE
 function nofunction()
    % C PART %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    filename = [ 'tmpcrossf' num2str(round(rand(1)*1000)) ];
