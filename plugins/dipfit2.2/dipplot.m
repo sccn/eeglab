@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.65  2004/01/28 15:26:14  arno
+%detecting empty dipoles
+%
 %Revision 1.64  2003/11/05 20:30:51  arno
 %nothing
 %
