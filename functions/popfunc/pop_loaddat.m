@@ -2,11 +2,13 @@
 %                (pop out window if no arguments).
 %
 % Usage:
-%   >> [ OUTEEG ] = pop_loaddat( INEEG, filename);
+%   >> [ OUTEEG ] = pop_loaddat( INEEG, filename, no_rt);
 %
 % Inputs:
 %   filename       - file name
 %   INEEG          - input EEGLAB data structure
+%   no_rt          - no reaction time integer code (ex: 1000).
+%                    default none.
 %
 % Outputs:
 %   OUTEEG         - EEGLAB data structure
@@ -34,11 +36,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 13/02/02 removed the no latency option -ad
 
-function [EEG, command] = pop_loaddat(EEG, filename); 
+function [EEG, command] = pop_loaddat(EEG, filename, no_rt); 
 command = '';
 
 if nargin < 1
@@ -50,6 +55,14 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.DAT', 'Choose a DAT file -- pop_loaddat'); 
 	if filename == 0 return; end;
+	result       = inputdlg( {strvcat('Code for absence of reaction time/event in a trial', ...
+									 '(none=all latencies are imported)')}, ...
+									 'Load Neruoscan DATA file -- pop_loaddat()', 1,  {'1000'});
+	if length(result) == 0 return; end;
+	no_rt = eval( result{1} );
+end;
+if exist('no_rt') ~= 1 | isempty(no_rt)
+	no_rt = NaN;
 end;
 
 % load datas
@@ -64,11 +77,27 @@ disp('Loading dat file...');
 
 if n ~= EEG.trials
 	error('pop_loaddat, number of trials in input dataset and DAT file different, abording');
-end;	   
+end;	  
 
-EEG.epoch = eeg_epochformat([rt(:) typeeeg(:) response(:) ], 'struct', {'eventlatency', 'type', 'response'});
-EEG = eeg_checkset(EEG);
+for index = 1:length(EEG.event)
+	EEG.event(index).eegtype  = typeeeg (EEG.event(index).epoch);
+	EEG.event(index).response = response(EEG.event(index).epoch);
+end;
 
-command = sprintf('%s = pop_loaddat(''%s'', %s);', inputname(1), inputname(1), fullFileName); 
+for index = 1:n
+	if rt(index) ~= no_rt
+		EEG.event(end+1).type   = 'rt';
+		EEG.event(end).latency  = eeg_lat2point(rt(index)/1000, index, EEG.srate, [EEG.xmin EEG.xmax]);
+		EEG.event(end).epoch    = index;
+		EEG.event(end).eegtype  = typeeeg(index);
+		EEG.event(end).response = response(index);
+	end
+end;
+tmp = cell2mat({EEG.event.latency});
+[tmp indexsort] = sort(tmp);
+EEG.event = EEG.event(indexsort);
+EEG = eeg_checkset(EEG, 'eventconsistency');
+
+command = sprintf('%s = pop_loaddat(''%s'', %s, %d);', inputname(1), inputname(1), fullFileName, no_rt); 
 
 return;
