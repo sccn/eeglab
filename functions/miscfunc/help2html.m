@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/15 21:16:07  arno
+% debug
+%
 % Revision 1.5  2002/08/15 18:23:17  arno
 % implementing outputtext
 %
@@ -155,7 +158,8 @@ else
 	indexdot = findstr( filename, '.');
 end;
 fo = fopen(htmlfile, 'w');
-try, g.outputtext; 		catch, g.outputtext	=  filename(1:indexdot(end)-1); 	end; 
+try, g.outputtext; 		catch, g.outputtext	= ''; 	end; 
+if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end;
 
 % write header
 % ------------
