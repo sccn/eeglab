@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/26 01:13:56  arno
+% debuging reref to several channels
+%
 % Revision 1.18  2003/07/26 00:01:32  arno
 % brand new function
 %
@@ -206,8 +209,8 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
             error('Cannot include old reference if multiple references had been used');
         end;
         disp('Note: old reference electrode included in average reference computation');
-        avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans-1); % reference is a relrevant channel i.e. Cz
-        avematrix(end+1,:) = -1/(nbchans-1);                           % potential for the new electrode (previously ref)
+        avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans+1); % reference is a relrevant channel i.e. Cz
+        avematrix(end+1,:) = -1/(nbchans+1);                           % potential for the new electrode (previously ref)
         if ~( length(g.elocs) > chans )
             if ~isempty(g.refloc) & ~isempty(g.refloc{1})
                 g.elocs(end+1).labels = g.refloc{1};
@@ -219,7 +222,7 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
         end;
         rerefchansout(end+1) = chans+1;
     else
-        disp('Note: old reference (unless present in dataset) electrode not included in average reference computation');
+        disp('Note: old reference electrode (unless present as data channel) not included in average reference computation');
         if length(g.refstate) > 1
             avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
         else
