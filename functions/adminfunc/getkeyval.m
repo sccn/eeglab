@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/29 23:44:31  arno
+% debugging
+%
 % Revision 1.1  2002/07/29 23:43:44  arno
 % Initial revision
 %
@@ -107,6 +110,7 @@ function txt = getkeyval(lastcom, var, mode, default)
 			elseif isnumeric(mode)
 				txt = str2num(txt);
 				if ~isempty(mode)
+					txt = str2num(txt);
 					if length(txt) >= max(mode)
 						if all(isnan(txt(mode))), txt = '';
 						else txt = num2str(txt(mode));
@@ -118,6 +122,8 @@ function txt = getkeyval(lastcom, var, mode, default)
 					else 
 						txt = default;
 					end;
+				else 
+					txt = num2str(txt);
 				end;
 			end;
 		else
