@@ -3,6 +3,7 @@
 %
 % Usage:
 %   >> pop_topoplot( EEG, typeplot, items, title, options...);
+%   >> pop_topoplot( EEG, typeplot, items, title, plotdip, options...);
 %
 % Inputs:
 %   EEG      - Input EEG dataset structure (see >> help eeglab)
@@ -16,6 +17,8 @@
 %   rowscols - Vector of the form [m,n] giving [rows, cols] per page.
 %              If the number of maps exceeds m*n, multiple figures 
 %              are produced {default|0 -> one near-square page}.
+%   plotdip  - [0|1] plot associated dipole(s) for scalp map if present
+%              in dataset.
 %   options  - topoplot() argument options. Separate using commas. 
 %              Example 'style', 'straight'. See >> help topoplot
 %              for further details. {default: none}
@@ -48,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/10/29 01:06:08  arno
+% remove debuging message
+%
 % Revision 1.31  2003/10/11 02:26:01  arno
 % modify default title
 %
@@ -168,60 +174,73 @@ if nargin < 3
 	% which set to save
 	% -----------------
 	if typeplot
-		txt = strvcat('Plotting ERP scalp maps at these latencies:', ...
-                             sprintf('(range: %d to %d ms, NaN -> empty):', ...
-                                  round(EEG.xmin*1000), round(EEG.xmax*1000)));
+		txtwhat2plot1 = 'Plotting ERP scalp maps at these latencies';
+        txtwhat2plot2 = sprintf('(range: %d to %d ms, NaN -> empty):', ...
+                                round(EEG.xmin*1000), round(EEG.xmax*1000));
+        editwhat2plot = [''];
 	else
-		txt = strvcat('Component numbers (negate index to invert component polarity):', ...
-                             '(NaN -> empty subplot)(Ex: -1 NaN 3)');
-	end;	
-	txt = { txt ...
-	        'Plot title:' ...
-	        ['Plot geometry (rows,columns):' ...
-             '(Default [] -> near square)'] ...
-	        '-> Scalp map plotting options (see >> help topoplot):' };
-    if typeplot
-        inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-                         [fastif(~isempty(EEG.setname), [EEG.setname], '') ] ...
-                         '' ['''electrodes'', ''off''' ] };
-    else
-        inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-                         [fastif(~isempty(EEG.setname), [EEG.setname], '') ] ...
-                         '' ['''electrodes'', ''off''' ] };
-    end
-	result       = inputdlg2( txt, ...
-                              fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', ...
-                                      'Component scalp map(s) -- pop_topoplot()'), ...
-                              1,  inistr, 'pop_topoplot');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
-	arg2   	     = eval( [ '[' result{1} ']' ] );
+		txtwhat2plot1 = 'Component numbers';
+		txtwhat2plot2 = '(negate index to invert component polarity; NaN -> empty subplot; Ex: -1 NaN 3)';
+        editwhat2plot = ['1:' int2str(size(EEG.icaweights,1))];
+ 	end;	
+    uilist = { { 'style'   'text'     'string'    txtwhat2plot1 } ...
+               { 'style'   'edit'     'string'    editwhat2plot } ...
+               { 'style'   'text'     'string'    txtwhat2plot2 } ...
+               { } ...
+               { 'style'   'text'     'string'    'Plot title' } ...
+               { 'style'   'edit'     'string'    fastif(~isempty(EEG.setname), [EEG.setname], '') } ...
+               { 'style'   'text'     'string'    'Plot geometry (rows,col.); [] -> near square' } ...
+               { 'style'   'edit'     'string'    '[]' } ...
+               { 'style'   'text'     'string'    'Plot associated dipole(s) (if present)' } ...
+               { 'style'   'checkbox' 'string'    '' } { } ...
+               { } ...
+               { 'style'   'text'     'string'    '-> Additional scalp map (and dipole) plotting options (see help)' } ...
+               { 'style'   'edit'     'string'    '''electrodes'', ''off''' } };
+    uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
+    uivert = [ 1   1       1    1       1       1             1   1   1   ];
+    guititle = fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', ...
+                       'Component scalp map(s) -- pop_topoplot()');
+    
+    result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal', uivert);
+	if length(result) == 0 return; end;
+	
+    % reading first param
+    % -------------------
+    arg2   	     = eval( [ '[' result{1} ']' ] );
 	if length(arg2) > EEG.nbchan
 		tmpbut = questdlg2(...
                   ['This involves drawing ' int2str(length(arg2)) ' plots. Continue ?'], ...
                          '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
-	topotitle    = result{2};
+    if isempty(arg2), error('Nothing to plot; enter parameter in first edit box'); end;
+    
+    % reading other params
+    % --------------------
+	topotitle   = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
-    if ~isempty(deblank( result{4} )) options      = [ ',' result{4} ];
-	else                              options      = '';
+	plotdip     = result{4};
+    try, options      = eval( [ '{ ' result{5} ' }' ]);
+    catch, error('Invalid scalp map options'); 
     end;
 	if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
-		end;
-	end;	
+    if ~isempty(varargin) & isnumeric(varargin{1})
+        plotdip = varargin{1};
+        varargin = varargin(2:end);
+    else
+        plotdip = 0;
+    end;
+    options = varargin;
 end;
-options = [ options ', ''masksurf'', ''on''' ];
+
+% additional options
+% ------------------
+options    = { options{:} 'masksurf' 'on' };
+outoptions = { options{:} 'masksurf' 'on' }; % for command
 
 nbgraph = size(arg2(:),1);
-if ~exist('topotitle')  
+if ~exist('topotitle')
     topotitle = '';
 end;    
 if ~exist('rowcols') | isempty(rowcols) | rowcols == 0
@@ -272,33 +291,38 @@ for index = 1:size(arg2(:),1)
         set(gca, 'visible', 'off')
 	end;
 
-	if ~isnan(arg2(index))
+	% add dipole location if present
+    % ------------------------------
+    options = outoptions;
+    if plotdip & typeplot == 0
+        if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
+            if length(EEG.dipfit.model) >= index
+                curpos = EEG.dipfit.model(index).posxyz/EEG.dipfit.vol.r(end);
+                curmom = EEG.dipfit.model(index).momxyz;
+                if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
+                else
+                    if  any(curpos(1,:) ~= 0)
+                        options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:2) ] };
+                    end;
+                end;
+            end;
+        end;
+    end;
+    
+    if ~isnan(arg2(index))
 		if typeplot
-			if length( options ) < 2
-				tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, ...
-                          'verbose', 'off');
-			else	
-				eval([ 'tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
-			end;
+            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, 'verbose', 'off', options{:});
 			if nbgraph == 1, 
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
                  title([int2str(arg2(index)) ' ms']);
 			end;
 		else
-			if length( options ) < 2
-			    if arg2(index) < 0
-	    			tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs );
-	    		else
-	    			tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs );
-	            end;    			
-			else	
-			    if arg2(index) < 0
-				    eval( [ 'tmpobj = topoplot(  -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
-	            else
-	    			eval( [ 'tmpobj = topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
-	            end;    			
-			end;
+            if arg2(index) < 0
+                tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, options{:} );
+            else
+                tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
+            end;    			
 			if nbgraph == 1, title( [ 'IC ' int2str(arg2(index)) ' from ' topotitle] );
 			else title(['' int2str(arg2(index))]);
 			end;
@@ -335,13 +359,8 @@ set(allobj(1:countobj-1), 'visible', 'on');
 
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
-if length( options ) < 2
-	com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
-              inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}))];
-else
-	com = [com sprintf('pop_topoplot(%s,%d, %s %s);', ...
-              inputname(1), typeplot, vararg2str({arg2 topotitle rowcols}), options)];
-end;
+com = [com sprintf('pop_topoplot(%s,%d, %s %s);', ...
+                   inputname(1), typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
 return;
 
 		
