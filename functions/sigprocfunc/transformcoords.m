@@ -99,7 +99,6 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
         rot3d = [ cy*cr+sy*sp*sr    sy*cr-cy*sp*sr     cp*sr  ;
                   -sy*cp            cy*cp               sp     ;
                   sy*sp*cr-cy*sr    -cy*sp*cr-sy*sr     cp*cr  ];
-        dsf
         coords = rot3d*coords;
         
         % scaling and centering
