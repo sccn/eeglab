@@ -1,10 +1,10 @@
-% testelp() -  Plots the 3D configuration from a Polhemus ELP
-%           file. The axis of the cartesian coordinate system are
-%           plotted. The nose is plotted as a bold red segment.
+% plotchans3d() -  Plots the 3D configuration from a Polhemus ELP
+%                  file. The axis of the cartesian coordinate system are
+%                  plotted. The nose is plotted as a bold red segment.
 %
 % Usage:
-%        >> testelp( elpfile, zs)
-%        >> testelp( [X,Y,Z], elecnames, zs)
+%        >> plotchans3d( elpfile, zs)
+%        >> plotchans3d( [X,Y,Z], elecnames, zs)
 %
 % Inputs:
 %        elpfile = ELP file from Polhemus.
@@ -16,8 +16,8 @@
 %
 % Author: Luca A. Finelli, SCCN/INC/UCSD, La Jolla, 02/2002
 %  
-% See also:
-%        topoplot(), readlocs(), readelp(), polhemus2topo()
+% See also: topoplot(), readlocs(), readelp(), 
+%           polhemus2topo(), pop_chanedit()
         
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/27 02:37:38  arno
+% Initial revision
+%
 % Revision 1.1  2002/04/05 17:48:29  jorn
 % Initial revision
 %
@@ -44,10 +47,10 @@
 % 04/01/02 debuging zs -ad
 % 04/01/02 adding extra optional [X,Y,Z] argument -ad
 
-function  testelp(elpfile, arg2, arg3)
+function  plotchans3d(elpfile, arg2, arg3)
 
 if nargin<1
-    help testelp;
+    help plotchans3d;
     return;
 end;
 zs = [];
