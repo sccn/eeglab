@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2004/09/10 21:07:23  hilit
+% more changes
+%
 % Revision 1.46  2004/09/10 21:02:15  hilit
 % corrected a problem with the current axes
 %
@@ -382,7 +385,7 @@ for index = 1:size(arg2(:),1)
     else 
         addopt = { 'verbose', 'off' };
     end;
-    fprintf('Printing to figure %d.\n',curfig);
+    %fprintf('Printing to figure %d.\n',curfig);
     if ~isnan(arg2(index))
 		if typeplot
             figure(curfig); if nbgraph > 1, subplot(curax); end;
