@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/14 18:35:53  luca
+% set default optim = 0
+%
 % Revision 1.3  2002/05/03 00:49:44  arno
 % editing header
 %
@@ -80,7 +83,7 @@
 % 03-31-02 center fitting is optional
 % 04-01-02 automatic squeeze calculation -ad & sm
  
-function [x,y,z,newcenter] = chancenter(x,y,z, center, gui)
+function [ x, y, z, newcenter, optim] = chancenter( x, y, z, center, gui)
 
 optim = 0;
 
