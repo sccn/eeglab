@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/15 01:39:58  scott
+% Can not -> cannot
+%
 % Revision 1.2  2002/04/21 23:11:17  scott
 % edited help msg -sm
 %
@@ -68,7 +71,7 @@ while noteof
   if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
     if (tmpstr(1) == '%') & (tmpstr(2) == 'N')
       tmpstr = deblank( tmpstr(end:-1:3) );
-      eloc(index).name = deblank(tmpstr(end:-1:1));
+      eloc(index).labels = deblank(tmpstr(end:-1:1));
       tmpstr = fgetl(fid);
       tmp = sscanf(tmpstr, '%f');
       eloc(index).X  = tmp(1); x(index) = tmp(1);
@@ -83,4 +86,4 @@ while noteof
   end;  
 end;  
 
-names = { eloc.name };
+names = { eloc.labels };
