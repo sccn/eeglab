@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2004/08/03 23:24:11  arno
+% detect multiple strings with quotes
+%
 % Revision 1.52  2004/07/09 16:26:38  arno
 % debug duration selection
 %
@@ -510,13 +513,18 @@ if strcmp(g.select, 'inverse')
 end;
 
 % checking if trying to remove boundary events (in continuous data)
-if isfield(EEG.event, 'type') & isstr(EEG.event(1).type) & EEG.trials == 1 
-	Ieventrem = setdiff([1:length(EEG.event)], Ievent );
-	boundaryindex = strmatch('boundary', { EEG.event(Ieventrem).type });
-	if ~isempty(boundaryindex)
-		Ievent = [ Ievent Ieventrem(boundaryindex)];
-	end;
-	Ievent = sort(Ievent);
+if isfield(EEG.event, 'type')
+    if isstr(EEG.event(1).type) & EEG.trials == 1 
+        Ieventrem = setdiff([1:length(EEG.event)], Ievent );
+        boundaryindex = strmatch('boundary', { EEG.event(Ieventrem).type });
+        if ~isempty(boundaryindex)
+            boundaryindex = Ieventrem(boundaryindex);
+            Ievent = [ Ievent boundaryindex ];
+        end;
+        Ievent = sort(Ievent);
+    else boundaryindex = [];
+    end;
+else boundaryindex = [];
 end;
 
 % rename events if necessary
@@ -524,12 +532,12 @@ end;
 if ~isempty(g.renametype)
     fprintf('Pop_selectevent: renaming %d selected events (out of %d)\n', length(Ievent), length(EEG.event));
     if ~isempty(g.oldtypefield)
-        for index = Ievent
+        for index = setdiff(Ievent, boundaryindex)
             eval([ 'EEG.event(index).' g.oldtypefield '= EEG.event(index).type;']);
             EEG.event(index).type = g.renametype;
         end;
     else
-        for index = Ievent
+        for index = setdiff(Ievent, boundaryindex)
             EEG.event(index).type = g.renametype;
         end;
     end;
