@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/03/05 01:07:26  arno
+% no error if types is "[]"
+%
 % Revision 1.32  2003/02/23 09:16:09  scott
 % header edits -sm
 %
@@ -182,8 +185,18 @@ com = '';
 indices = [];
 
 if isempty(EEG.event)
-   disp('Cannot epoch data with no events'); beep;
-   return;
+    if EEG.trials > 1 & EEG.xmin <= 0 & EEG.xmax >=0
+        disp('No event found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
+        EEG.event(EEG.trials).epoch = EEG.trials; 
+        for trial = 1:EEG.trials
+            EEG.event(trial).epoc    = trial; 
+            EEG.event(trial).type    = 'TLE';
+            EEG.event(trial).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
+        end;
+    else
+        disp('Cannot epoch data with no events'); beep;
+        return;
+    end;
 end;
 if ~isfield(EEG.event, 'latency'),
     disp( 'Absent latency field in event array/strcuture: first rename one of the field to ''latency''');
@@ -312,7 +325,11 @@ EEG.setname = g.newname;
 totlen = 0;
 for index=1:EEG.trials, totlen = totlen + length(epochevent{index}); end;
 EEG.event(1).epoch = 0;          % create the epoch field (for assignment consistency afterwards)
-newevent(totlen) = EEG.event(1); % reserv array
+if totlen ~= 0
+    newevent(totlen) = EEG.event(1); % reserv array
+else 
+    newevent = [];
+end;
 
 % modify the event structure accordingly (latencies and add epoch field)
 % ----------------------------------------------------------------------
