@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 add eeglab option & optimize variable sizes -ad
@@ -90,8 +93,12 @@ if nargin < 3
     % add title
     % ---------
 	if isempty( strmatch(  '''title''', result{6}))
-	   options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num) ...
-	       ' time frequency decomposition' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ''''];
+	    switch lower(result{4})
+	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num) ...
+	       ' power and inter-trial coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
+	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num) ...
+	       ' power and inter-trial phase coherence' fastif(~ isempty(EEG.setname), [' (' EEG.setname ')''' ], '''') ];
+	    end;
 	end;
 	if ~isempty( result{5} )
 		options      = [ options ', ''alpha'',' result{5} ];
