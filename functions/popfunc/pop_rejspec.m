@@ -2,6 +2,7 @@
 %               thresholding of frequencies in the data.
 %
 % Usage:
+%   >>  pop_rejspec(INEEG, typerej); % pops-up
 %   >> [OUTEEG, Indexes] = pop_rejspec( INEEG, typerej, electrodes, ...
 %         negthresh, posthresh, startfreq, endfreq, superpose, reject);
 %
@@ -58,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/26 16:44:35  arno
+% switching icacomp
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -193,9 +197,11 @@ if option_keepdataset
     end;
 end;
     
-com = [com sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
-   num2str(posthresh), num2str(startfreq ) , num2str(endfreq), superpose, reject ) ]; 
+com = [com sprintf('%s = pop_rejspec( %s, %s);', inputname(1), ...
+   inputname(1), vararg2str({icacomp, elecrange,  negthresh, posthresh, startfreq, endfreq, superpose, reject })) ]; 
+if nargin < 3 & nargout == 2
+	I1 = com;
+end;
 
 return;
 
@@ -223,9 +229,10 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
     
     Irej    = [];
     Erej    = zeros(size(data,1), size(data,2));
+	fprintf('Computing spectrum (using slepian tapers; done only once):\n', elecrange(index));    
     for index = 1:length(elecrange)
 	   if testgoinloop( specdata, index )
-	      fprintf('Computing spectrum (using slepian tapers) of electrode %d\n', elecrange(index));    
+	      fprintf('%d\t', elecrange(index));    
 		  for indextrials = 1:size(data,3)
 			[ tmpspec(1,:,indextrials) freqs] = pmtm( data(elecrange(index),:,indextrials) );
 		  end;
@@ -236,7 +243,8 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	   else
 	       tmpspec = specdata(index,:,:);
 	   end;
- 
+	   fprintf('\n');    
+
        % perform the rejection
        % ---------------------	
 	   [I1 Itmprej NS Etmprej] = eegthresh( tmpspec, size(tmpspec,2), 1, negthresh, posthresh, ...
