@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.189  2002/11/11 15:33:22  arno
+% adding checks for BESA
+%
 % Revision 1.188  2002/11/09 18:33:08  scott
 % BESA menu item edit
 %
@@ -838,6 +841,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Biosemi .EDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Biosemi .BDF file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readbdf;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 
@@ -849,8 +853,8 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'From data channel'          , 'CallBack', [ check   '[EEG LASTCOM]= pop_chanevent(EEG);' e_store]); 
 	uimenu( importevent, 'Label', 'From Presentation .LOG file'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_load]); 
-	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_store]);
+	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load]); 
+	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
 	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG);' e_hist ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall]);
