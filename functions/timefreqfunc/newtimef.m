@@ -96,8 +96,11 @@
 %                     You may also enter one row per region for baseline
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
 %                     300 to 400 ms.
-%       'boottype'  = ['times'|'timestrials'] shuffle time only or time and
-%                     trials for computing bootstrap. Both options should
+%       'boottype'  = ['shuffle'|'rand'|'randall'] shuffle time and trials or
+%                     invert polarity of spectral data points in ERSP (or
+%                     randomize phase in ITC) ('rand'). 'randall' compute 
+%                     significance by accumulating radom polarity invertions 
+%                     for each times/frequencies points (time consuming).
 %                     return identical results {'times'}.
 %       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
 %                     either subtract ITC absolute vales ('abs'), angles 
@@ -113,9 +116,17 @@
 %                     File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plotting Parameters:
+%       'plottype'  = ['image'|'curve'] plot time frequency images or
+%                     curves (one curve per frequency). Default is 'image'.
+%       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
+%                     frequencies given as input. Default: 'on'.
+%       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
+%                     display significant time regions either in the plot background
+%                     or underneatht the curve.
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
-%       'plotphase' = ['on'|'off'] Plot phase in the inter trial coherence {'on'}
+%       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
+%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude {'off'}
 %       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
 %       'itcmax'    = [real] set the ITC maximum for the scale       { auto }
 %       'title'     = Optional figure title                              {none}
@@ -175,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2004/10/25 18:37:02  hilit
+% 'ploterps' -> 'plotersp'
+%
 % Revision 1.63  2004/08/10 01:13:33  arno
 % cheking baseline
 %
@@ -644,7 +658,7 @@ if length(varwin)>1
 else 
 	g.cyclesfact = 1;
 end;
-try, g.boottype;   catch, g.boottype = 'times'; end;
+try, g.boottype;   catch, g.boottype = 'shuffle'; end;
 try, g.condboot;   catch, g.condboot = 'abs'; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
@@ -675,12 +689,16 @@ try, g.vert;       catch, g.vert = []; end;
 try, g.newfig;     catch, g.newfig = 'on'; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
 try, g.phsamp;     catch, g.phsamp = 'off'; end;
-try, g.plotphase;  catch, g.plotphase = 'on'; end;
+try, g.plotphase;  catch, g.plotphase = 'off'; end;
+try, g.plotphasesign;  catch, g.plotphasesign = 'on'; end;
 try, g.outputformat;  catch, g.outputformat = 'new'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
 try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
+try, g.plottype;   catch, g.plottype = 'image'; end;
+try, g.plotmean;   catch, g.plotmean = 'on'; end;
+try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -748,7 +766,7 @@ if isempty(g.elocs)
 elseif (~ischar(g.elocs)) & ~isstruct(g.elocs)
 	error('Channel location file must be a valid text file.');
 end
-if ~strcmpi(g.boottype, 'times') & ~strcmpi(g.boottype, 'timestrials')
+if ~strcmpi(g.boottype, 'shuffle') & ~strcmpi(g.boottype, 'rand')  & ~strcmpi(g.boottype, 'randall')
 	error('Boottype must be either ''times'' or ''timestrials''.');
 end;	
 if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
@@ -822,7 +840,7 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
   
 end;           
 
-switch lower(g.plotphase)
+switch lower(g.plotphasesign)
     case { 'on', 'off' }, ;
     otherwise error('plotphase must be either on or off');
 end;
@@ -881,12 +899,12 @@ if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
+                          'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
             alltfX(index,:,:)] = ...
                 newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                          'plotamp', 'off', 'plotphase', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
+                          'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         end;
     end;
     
@@ -904,9 +922,6 @@ if iscell(X)
     vararginori = varargin;
 	if length(X) ~= 2
 		error('timef: to compare conditions, data must be 2-elements cell arrays');
-	end;
-	if ~strcmp(g.boottype, 'times')
-		disp('timef warning: significance bootstrap type is only use for subcondition plots');
 	end;
 	
     % deal with titles
@@ -1172,29 +1187,6 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         Rboot = g.rboot;
         Pboot = g.pboot;
 	else	
-		formulaout = { 'power' 'itc' };
-		switch g.type
-		 case 'coher',
-		  formulainit = [ 'power   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumul   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + arg2.*conj(arg2);';
-		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-						  'itc     = itc ./ sqrt(cumul) / sqrt(' int2str(trials) ')' ];
-		 case 'phasecoher',
-		  formulainit = [ 'power   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2;';
-		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-						  'itc     = itc /' int2str(trials) ];
-		 case 'phasecoher2',
-		  formulainit = [ 'power   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumul   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + sqrt(arg2.*conj(arg2));';
-		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-						  'itc     = itc ./ cumul;' ];
-		end;
         if size(g.baseboot,2) == 1
             if g.baseboot == 0, baselntmp = [];
             elseif ~isnan(g.baseline(1))
@@ -1215,18 +1207,33 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         elseif g.baseboot
             fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
         end;        
-		resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
-						   'formulapost', formulapost, 'formulainit', formulainit, ...
-						   'formulaout', formulaout, 'bootside', {'both' 'upper'}, 'naccu', g.naccu, ...
-                           'basevect', baselntmp, 'alpha', g.alpha );
-		Pboot = resboot{1};
-		Rboot = resboot{2};
-		
+
+        % power significance
+        % ------------------
+        formula = 'mean(arg1,3);';
+        inputdata = alltfX.*conj(alltfX);
         if ~isnan( g.baseline ) 
-			Pboot = 10*(log10(Pboot) - repmat(log10(mbase)', [1 size(Pboot,2) size(Pboot,3)])); 
-        else
-            Pboot = 10 * log10(Pboot);
-        end;  
+           inputdata = inputdata ./ repmat(mbase', [1 size(inputdata,2) size(inputdata,3)]);
+        end;
+        Pboot = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
+							   'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
+                               'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
+    	Pboot = 10*log10(Pboot);
+                     
+        % ITC significance
+        % ----------------
+        inputdata = alltfX;
+		switch g.type
+		 	case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3)/ sqrt(' int2str(trials) ');' ];
+		 	case 'phasecoher',  formula = [ 'mean(arg1,3);' ]; inputdata = alltfX./sqrt(alltfX.*conj(alltfX));
+		 	case 'phasecoher2', formula = [ 'sum(arg1,3)./sum(sqrt(arg1.*conj(arg1)),3);' ];
+		end;
+        if strcmpi(g.boottype, 'randall'), dimaccu = []; g.boottype = 'rand';
+        else										 dimaccu = 2;
+        end;
+		Rboot = bootstat(inputdata, formula, 'boottype', g.boottype, ...
+						   'label', 'ITC', 'bootside', 'upper', 'naccu', g.naccu, ...
+                           'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
 	end;
 else 
     Pboot = []; Rboot = [];
@@ -1237,7 +1244,13 @@ end
 % --------
 ERP = mean(X,2);
 mbase = log10(mbase)*10;
-plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
+if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+    if strcmpi(g.plottype, 'image')
+        plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
+    else    
+        plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
+    end;
+end;
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
     mbase = 10^(mbase/10);
@@ -1260,6 +1273,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
     ERP = ERP(ERPindices);
     
 	if ~isreal(R)
+        Rangle = angle(R);
 		Rsign = sign(imag(R));
 		R = abs(R); % convert coherence vector to magnitude
 		setylim = 1;
@@ -1420,7 +1434,12 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       h(6) = subplot('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
       set(h(1), 'tag', 'itc');
 
-      RR = R;
+      if abs(R(1,1)-1) < 0.0001, g.plotphase = 'on'; end;
+      if strcmpi(g.plotphase, 'on')
+          RR = Rangle/pi*180;
+      else
+          RR = R;
+      end;
       if ~isnan(g.alpha)
           if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
               tmp = gcf;
@@ -1439,18 +1458,28 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           coh_caxis = g.ITC_CAXIS_LIMIT*[-1 1];
       end
 
-      if ~strcmpi(g.freqscale, 'log')
-          if exist('Rsign') & strcmp(g.plotphase, 'on')
+      if strcmpi(g.plotphase, 'on')
+        if ~strcmpi(g.freqscale, 'log')
+              imagesc(times,freqs,RR(:,:)); % <---
+        else 
+              imagesclogy(times,freqs,RR(:,:)); % <---
+        end;
+        g.itcmax = 180;
+        setylim = 0;
+      else          
+        if ~strcmpi(g.freqscale, 'log')
+          if exist('Rsign') & strcmp(g.plotphasesign, 'on')
               imagesc(times,freqs,Rsign(:,:).*RR(:,:),coh_caxis); % <---
           else
               imagesc(times,freqs,RR(:,:),coh_caxis); % <---
           end
-      else 
-          if exist('Rsign') & strcmp(g.plotphase, 'on')
+        else 
+          if exist('Rsign') & strcmp(g.plotphasesign, 'on')
               imagesclogy(times,freqs,Rsign(:,:).*RR(:,:),coh_caxis); % <---
           else
               imagesclogy(times,freqs,RR(:,:),coh_caxis); % <---
           end
+        end;
       end;
 
       if ~isempty(g.itcmax)
@@ -1482,7 +1511,11 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 	  if setylim
 		  set(h(8),'YLim',[0 tmpcaxis(2)]); 
       end;
-	  title('ITC')
+      if strcmpi(g.plotphase, 'on')
+	    title('ITC phase')
+      else  
+	    title('ITC')
+      end;
 
       %
       %%%%% plot the ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1588,6 +1621,152 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
         try, axcopy(gcf); catch, end;
     end;
 
+% ---------------
+% Plotting curves
+% ---------------
+function plotallcurves(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
+
+	if ~isreal(R)
+		Rangle = angle(R);
+		R = abs(R); % convert coherence vector to magnitude
+		setylim = 1;
+    else 
+		Rsign = ones(size(R));
+		setylim = 0;
+	end;
+
+    if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
+        myprintf(g.verbose, '\nNow plotting...\n');
+        pos = get(gca,'position');
+        q = [pos(1) pos(2) 0 0];
+        s = [pos(3) pos(4) pos(3) pos(4)];
+    end;
+
+    % time unit
+    % ---------
+    if times(end) > 10000
+        times = times/1000;
+        timeunit = 's';
+    else
+        timeunit = 'ms';
+    end;
+    
+    if strcmpi(g.plotersp, 'on')
+      %
+      %%%%%%% image the ERSP %%%%%%%%%%%%%%%%%%%%%%%%%%
+      %
+      if strcmpi(g.plotitc, 'on'), subplot(2,1,1); end; 
+      set(gca, 'tag', 'ersp');
+      alllegend = {};
+      if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+          alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
+                      'Hz mean baseline ' num2str(mean(mbase)) ' dB' ] };
+      else
+          for index = 1:length(freqs)
+             alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
+          end;
+      end;
+      plotcurve(times, P, 'maskarray', Pboot, 'title', 'ERSP', ...
+                'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', 'dB', 'ylim', [-g.erspmax g.erspmax], ...
+                'vert', g.vert, 'marktimes', g.marktimes, 'legend', alllegend, ...
+                'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
+    end;
+
+    if strcmpi(g.plotitc, 'on')
+      %
+      %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
+      %
+      if strcmpi(g.plotersp, 'on'), subplot(2,1,2); end; 
+      set(gca, 'tag', 'itc');
+      if abs(R(1,1)-1) < 0.0001, g.plotphase = 'on'; end;
+      if strcmpi(g.plotphase, 'on') % plot ITC phase instead of amplitude (e.g. for continuous data)
+           RR = Rangle/pi*180;
+      else RR = R;
+      end; 
+      
+      % find regions of significance
+      % ----------------------------
+      alllegend = {};
+      if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+          alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) 'Hz' ] };
+      else 
+          for index = 1:length(freqs)
+              alllegend{index} = [ num2str(freqs(index)) 'Hz' ];
+          end;
+      end;
+      plotcurve(times, RR, 'maskarray', Rboot, 'val2mask', R, 'title', 'ITC', ...
+                'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', 'dB', 'ylim', g.itcmax, ...
+                'vert', g.vert, 'marktimes', g.marktimes, 'legend', alllegend, ...
+                'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
+    end;
+
+    if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
+      %
+      %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
+      %
+      if (~isempty(g.topovec))
+          h(12) = subplot('Position',[-.1 .43 .2 .14].*s+q);
+          if length(g.topovec) == 1
+              topoplot(g.topovec,g.elocs,'electrodes','off', ...
+                       'style', 'blank', 'emarkersize1chan', 10);
+          else
+              topoplot(g.topovec,g.elocs,'electrodes','off');
+          end;
+          axis('square')
+      end
+
+      try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+        if (length(g.title) > 0) & ~iscell(g.title)
+            axes('Position',pos,'Visible','Off');               
+            h(13) = text(-.05,1.01,g.title);
+            set(h(13),'VerticalAlignment','bottom')     
+            set(h(13),'HorizontalAlignment','left') 
+            set(h(13),'FontSize',g.TITLE_FONT);
+        end
+
+        try, axcopy(gcf); catch, end;
+    end;
+
+%
+%%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+function highlight(ax, times, regions, highlightmode);
+color1 = [0.75 0.75 0.75];
+color2 = [0 0 0];
+yl  = ylim;
+
+if ~strcmpi(highlightmode, 'background')
+    yl2 = [ yl(1)-(yl(2)-yl(1))*0.15   yl(1)-(yl(2)-yl(1))*0.1 ];
+    tmph = patch([times(1) times(end) times(end) times(1)], ...
+             [yl2(1) yl2(1) yl2(2) yl2(2)], [1 1 1]); hold on;
+    ylim([ yl2(1) yl(2)]);
+    set(tmph, 'edgecolor', [1 1 1]);
+end;
+
+if ~isempty(regions)
+    axes(ax);
+    in_a_region = 0;
+    for index=1:length(regions)
+        if regions(index) & ~in_a_region
+            tmpreg(1) = times(index);
+            in_a_region = 1;
+        end;
+        if ~regions(index) & in_a_region
+            tmpreg(2) = times(index);
+            in_a_region = 0;
+            if strcmpi(highlightmode, 'background')
+                tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                    [yl(1) yl(1) yl(2) yl(2)], color1); hold on;
+                set(tmph, 'edgecolor', color1);
+            else
+                tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                    [yl2(1) yl2(1) yl2(2) yl2(2)], color2); hold on;
+                set(tmph, 'edgecolor', color2);
+            end;
+        end;
+    end;
+end;
+            
 % reshaping X
 % -----------
 function [X, frame] = reshapeX(X, frame)

@@ -114,12 +114,11 @@
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
 %                    level. Show non-signif output values in neutral green. {0}
 %       'naccu'    = Number of bootstrap replications to compute {200}
-%       'boottype' = ['times'|'timestrials'|'trials'] Bootstrap type: Either 
-%                    shuffle windows ('times') or windows and trials ('timestrials')
-%                    or trials only using a separate bootstrap for each time window
-%                    ('trials'). Option 'times' is not recommended but requires 
-%                    less memory and provide similar results to other options.
-%                    {default: 'timestrials'}
+%       'boottype' = ['shuffle'|'shufftrials'|'rand'|'randall'] Bootstrap type: Either 
+%                    shuffle time and trial windows ('shuffle' default) or trials only 
+%                    using a separate  bootstrap for each time window ('shufftrials'). 
+%                    Option 'rand' randomize the phase. Option 'randall' randomize the 
+%                    phase for each individual time/frequency point.
 %       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline'; Default
 %                                                  0 -> use whole trial
 %                                                  [min max] -> use time range)
@@ -135,15 +134,20 @@
 %       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
-% Optional scalp map:
+% Optional scalp map plot:
 %       'topovec'  = (2,nchans) matrix. Scalp maps to plot {[]}
 %                    ELSE [c1,c2], plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
 %                    File should be ascii in format of >> topoplot example   
 %
 % Optional plot and compute features:
-%       'compute'   = ['matlab'|'C'] Use C sub-routine to speed up the
-%                     computation                      {default 'matlab'}
+%       'plottype'  = ['image'|'curve'] plot time frequency images or
+%                     curves (one curve per frequency). Default is 'image'.
+%       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
+%                     frequencies given as input. Default: 'on'.
+%       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
+%                     display significant time regions either in the plot background
+%                     or underneatht the curve.
 %       'plotamp'   = ['on'|'off']. Plot coherence magnitude       {'on'}
 %       'maxamp'    = [real] Set the maximum for the amplitude scale {auto}
 %       'plotphase' = ['on'|'off']. Plot coherence phase angle     {'on'}
@@ -209,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2004/06/14 15:46:16  arno
+% fixing baseline problem
+%
 % Revision 1.70  2004/06/02 23:23:52  arno
 % default for baseboot is baseline
 %
@@ -721,7 +728,7 @@ try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.newfig;     catch, g.newfig = 'on'; end;
-try, g.boottype;   catch, g.boottype = 'timestrials'; end; 
+try, g.boottype;   catch, g.boottype = 'shuffle'; end; 
 try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
@@ -729,6 +736,9 @@ try, g.savecoher;  catch, g.savecoher = 0; end;
 try, g.amplag;     catch, g.amplag = 0; end;
 try, g.noinput;    catch, g.noinput = 'no'; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
+try, g.plottype;   catch, g.plottype = 'image'; end;
+try, g.plotmean;   catch, g.plotmean = 'on'; end;
+try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
 
 if isfield(g, 'detret'), g.detrend = g.detret; end;
 if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
@@ -738,8 +748,9 @@ for index = 1:length(allfields)
 	switch allfields{index}
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
-		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' ...
-		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' 'amplag' };
+		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' 'plottype' ...
+		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' 'amplag' ...
+          'highlightmode' 'plotmean' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
@@ -831,8 +842,8 @@ case { 'coher', 'phasecoher' 'phasecoher2' 'amp' 'crossspec' },;
 otherwise error('Type must be either ''coher'', ''phasecoher'', ''crossspec'', or ''amp''');
 end;    
 switch g.boottype
-case { 'times' 'timestrials' 'timestrials2' 'trials'},;
-otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
+case { 'shuffle' 'shufftrials' 'rand' 'randall'},;
+otherwise error('Invalid boot type');
 end;    
 if ~isnumeric(g.shuffle) & ~iscell(g.shuffle)
    error('Shuffle argument type must be numeric');
@@ -891,9 +902,7 @@ if iscell(X)
 	if length(X) ~= 2 | length(Y) ~= 2
 		error('crossf: to compare conditions, X and Y input must be 2-elements cell arrays');
 	end;
-	if ~strcmp(g.boottype, 'times')
-		disp('crossf warning: significance bootstrap type is only use for subcondition plots');
-	end;
+
     % deal with titles
     % ----------------
 	for index = length(vararginori)-1:-2:1
@@ -1030,7 +1039,7 @@ if iscell(X)
 		%Boot.Coherboot.R = coherimages;
 		%Boot = bootcomppost(Boot, [], [], []);
 		g.title = g.title{3};
-		g.boottype = 'trials';
+		g.boottype = 'shufftrials';
         if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
             plotall(Rdiff, coherimages, timesout, freqs, mbase, g);
         end;
@@ -1126,7 +1135,6 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	  coherres = alltfX .* conj(alltfY); % no normalization
       
 	 case 'coher',
-	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(alltfX .* conj(alltfY), 3) ./ sqrt( sum(abs(alltfX).^2,3) .* sum(abs(alltfY).^2,3) );
      
      case 'amp'
@@ -1151,43 +1159,27 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	if ~isempty(g.rboot)
 		Rbootout = g.rboot;
 	else
-		formulaout = 'coher';
-		switch g.type
-		 case 'crossspec',
-		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ];
-		  formulapost =   ''; 
-		 case 'coher',
-		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumulY = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ...
-						  'cumulX = cumulX + arg1.*conj(arg1);' ...
-						  'cumulY = cumulY + arg2.*conj(arg2);' ];
-		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
-		 case 'amp',
-		  formulainit = [ 'ampX   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-                          'ampY   = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumulY = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula =     [ 'ampX   = ampX + arg1.*conj(arg2);' ...
-                          'ampY   = ampY + arg1.*conj(arg2);' ...
-						  'cumulX = cumulX + arg1.*conj(arg1);' ...
-						  'cumulY = cumulY + arg2.*conj(arg2);' ];
-		  formulapost =   'coher = coher ./ sqrt(cumulX) ./ sqrt(cumulY);'; 
-		 case 'phasecoher2',
-		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
-						  'cumul  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula =     [ 'tmpprod = arg1.*conj(arg2); coher  = coher  + tmpprod;' ...
-						  'cumul   = cumul + abs(tmpprod);' ];
-		  formulapost =   'coher = coher ./ cumul;'; 
-		 case 'phasecoher',
-		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
-		  formula     =   'tmpprod = arg1.*conj(arg2); coher = coher + tmpprod ./ abs(tmpprod)';
-		  formulapost = [ 'coher = coher /' int2str(g.trials) ];
-		end;
-		
 		if ~isnan(g.alpha)
+            % getting formula for coherence
+            % -----------------------------
+            switch g.type
+               case 'coher', 
+                inputdata = { alltfX alltfY }; % default
+                formula = 'sum(arg1 .* conj(arg2), 3) ./ sqrt( sum(abs(arg1).^2,3) .* sum(abs(arg2).^2,3) );';
+               case 'amp', % not implemented 
+                inputdata = { abs(alltfX) abs(alltfY) }; % default
+			   case 'phasecoher2',
+                inputdata = { alltfX alltfY }; % default
+			    formula = [ 'tmp = arg1 .* conj(arg2);' ...
+			                'res = sum(tmp, 3) ./ sum(abs(tmp),3);' ];
+               case 'phasecoher',
+                inputdata = { alltfX./abs(alltfX) alltfY./abs(alltfY) };
+			    formula = [ 'mean(arg1 .* conj(arg2),3);' ];
+               case 'crossspec',
+                inputdata = { alltfX./abs(alltfX) alltfY./abs(alltfY) };
+				formulainit = [ 'arg1 .* conj(arg2);' ];
+           	end;
+            
             % finding baseline for bootstrap
             % ------------------------------
             if size(g.baseboot,2) == 1
@@ -1211,17 +1203,27 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
                 fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
             end;        
 
-            options = { formula, 'boottype', g.boottype, ...
-                        'formulapost', formulapost, 'formulainit', formulainit, ...
-                        'formulaout', formulaout, 'bootside', 'upper', ...
-                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp };
-            Rbootout = bootstat(alltfX, alltfY, options{:});               
-            % NOTE: it is not necessary to implement lowmem for this function (automatic)
+            if strcmpi(g.boottype, 'shuffle') | strcmpi(g.boottype, 'rand')
+                Rbootout = bootstat(inputdata, formula, 'boottype', g.boottype, 'label', 'coherence', ...
+                        'bootside', 'upper', 'shuffledim', [2 3], 'dimaccu', 2, ...
+                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp);
+            elseif strcmpi(g.boottype, 'randall') 
+                 % randomize phase but do not accumulate over time
+                 % dimension (NOT TESTED)
+                 % note the absence of dimaccu and the shuffledim 3
+                Rbootout = bootstat(inputdata, formula, 'boottype', 'rand', ...
+                        'bootside', 'upper', 'shuffledim', 3, ...
+                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp);
+            else % shuffle only trials (NOT TESTED)
+                 % note the absence of dimaccu and the shuffledim 3
+                Rbootout = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
+                        'bootside', 'upper', 'shuffledim', 3, ...
+                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp);
+            end;                    
         else Rbootout = [];
         end;
         % note that the bootstrap thresholding is actually performed in the display subfunction plotall()
-	end;
-	
+	end;	
 end;
 
 %%%%%%%%%%
@@ -1251,7 +1253,13 @@ mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
 
 % plot everything
 % ---------------
-plotall( coherres, Rbootout, timesout, freqs, mbase, g);
+if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+    if strcmpi(g.plottype, 'image')
+        plotall  ( coherres, Rbootout, timesout, freqs, mbase, g);
+    else    
+        plotallcurves( coherres, Rbootout, timesout, freqs, mbase, g);
+    end;
+end;
 
 % proces outputs
 % --------------
@@ -1580,6 +1588,104 @@ if g.plot
    
    try, axcopy(gcf); catch, end;
 end;
+
+% ---------------
+% Plotting curves
+% ---------------
+function plotallcurves(R, Rboot, times, freqs, mbase, g) 
+
+	% compute angles
+	% --------------
+	Rangle = angle(R);
+	pos = get(gca,'position'); % plot relative to current axes
+	q     = [pos(1) pos(2) 0 0];
+	s = [pos(3) pos(4) pos(3) pos(4)];
+	if ~isreal(R)
+        R = abs(R);
+        Rraw =R; % raw coherence values
+        if ~isnan(g.baseline)
+         	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
+        end;
+	else
+        Rraw = R;
+        setylim = 0;
+	end;
+
+    % time unit
+    % ---------
+    if times(end) > 10000
+        times = times/1000;
+        timeunit = 's';
+    else
+        timeunit = 'ms';
+    end;
+
+    % legend
+    % ------
+    alllegend = {};
+    if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+      alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) 'Hz' ] };
+    else
+      for index = 1:length(freqs)
+         alllegend{index} = [ num2str(freqs(index)) 'Hz' ];
+      end;
+    end;
+    
+	fprintf('\nNow plotting...\n');
+	if strcmpi(g.plotamp, 'on')
+      %
+      % Plot coherence amplitude in top panel
+      %
+      if strcmpi(g.plotphase, 'on'), subplot(2,1,1); end; 
+      if isempty(g.maxamp), g.maxamp = 0; end;
+      plotcurve(times, R, 'maskarray', Rboot, 'title', 'Coherence amplitude', ...
+                'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', '0-1', 'ylim', g.maxamp, ...
+                'vert', g.vert, 'marktimes', g.marktimes, 'legend', alllegend, ...
+                'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
+	end;
+	
+	if strcmpi(g.plotphase, 'on')
+      %
+      % Plot coherence phase lags in bottom panel
+      %
+      if strcmpi(g.plotamp, 'on'), subplot(2,1,2); end; 
+      plotcurve(times, Rangle/pi*180, 'maskarray', Rboot, 'val2mask', R, 'title', 'Coherence phase', ...
+                'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', 'Angle (deg.)', 'ylim', [-180 180], ...
+                'vert', g.vert, 'marktimes', g.marktimes, 'legend', alllegend, ...
+                'linewidth', g.linewidth, 'highlightmode', g.highlightmode, 'plotmean', g.plotmean);
+	end
+	
+	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
+       try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+       if (length(g.title) > 0) % plot title
+          h(13) = textsc(g.title, 'title');
+       end
+	
+       %
+       %%%%%%%%%%%%%%% plot topoplot() %%%%%%%%%%%%%%%%%%%%%%%
+       %
+       if (~isempty(g.topovec))
+          h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
+          if size(g.topovec,2) <= 2
+             topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
+                'style', 'blank', 'emarkersize1chan', 10);
+          else
+             topoplot(g.topovec(1,:),g.elocs,'electrodes','off');
+          end;
+          axis('square')
+          
+          h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
+          if size(g.topovec,2) <= 2
+             topoplot(g.topovec(2),g.elocs,'electrodes','off', ...
+                'style', 'blank', 'emarkersize1chan', 10);
+          else
+             topoplot(g.topovec(2,:),g.elocs,'electrodes','off');
+          end;
+          axis('square')
+       end
+       
+       try, axcopy(gcf); catch, end;
+	end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    COHERENCE OBSOLETE   %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
