@@ -1,16 +1,18 @@
-% pop_rmbase() - remove channel baseline means from an epoched or continuous EEG dataset.
+% pop_rmbase() - remove channel baseline means from an epoched or 
+%                continuous EEG dataset.
 %
 % Usage:
 %   >> OUTEEG = pop_rmbase( EEG ); % pop up an interactive window
 %   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange);
 %
 % Graphic interface:
-%    "Baseline time range" - [edit box] Same as the 'timerange' command line input.
-%    "Baseline points vector" - [edit box] Same as the 'pointrange' command line option.
-%                                          Overwritten by the time limits option. 
+%    "Baseline time range" - [edit box] Same as the 'timerange' command 
+%                       line input.
+%    "Baseline points vector" - [edit box] Same as the 'pointrange' command 
+%                       line option. Overwritten by the time limits option. 
 % Inputs:
 %   EEG        - Input dataset
-%   timerange  - Baseline time range [min_ms max_ms]. 
+%   timerange  - Baseline time range in seconds [min_s max_s]. 
 %   pointrange - Baseline points vector [min:max] (overwritten by timerange).
 % Outputs:
 %   OUTEGG     - Output dataset
@@ -42,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/07/18 14:50:28  scott
+% commenting, editting help message
+%
 % Revision 1.11  2003/05/12 15:39:51  arno
 % debug command line call
 %
@@ -96,7 +101,7 @@ end;
 if nargin < 2 & EEG.trials > 1
 	% popup window parameters
 	% -----------------------
-    promptstr    = {'Baseline time range (min_ms max_ms):',...
+    promptstr    = {'Baseline time range (min_s max_s):',...
          		   strvcat('Baseline points vector (ex:1:56):', ...
                                   '(Overwrite time limits).') };
 	inistr       = { [num2str(EEG.xmin*1000) ' 0'], '' };
