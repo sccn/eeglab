@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2002/11/12 23:12:49  arno
+% compatibility if one extra channel
+%
 % Revision 1.61  2002/10/22 17:25:56  arno
 % add max for selecting regions
 %
@@ -1193,8 +1196,8 @@ else
 				tmpwins1 = g.winrej(indices,1)';
 				tmpwins2 = g.winrej(indices,2)';
 				tmpcols  = g.winrej(indices,3:5);
-				try, eval('[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));');
-				catch, [cumul indicescount] = myhistc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
+				try, eval('[cumul indicescount] = histc(tmpwins1, (min(tmpwins1)-1):g.trialstag:max(tmpwins2));');
+				catch, [cumul indicescount] = myhistc(tmpwins1, (min(tmpwins1)-1):g.trialstag:max(tmpwins2));
 				end;
 				count = zeros(size(cumul));
 				%if ~isempty(find(cumul > 1)), find(cumul > 1), end;
@@ -1573,7 +1576,7 @@ function [reshist, allbin] = myhistc(vals, intervals);
 	allbin = zeros(1, length(vals));
 	
 	for index=1:length(vals)
-		minvals = intervals-vals(index);
+		minvals = vals(index)-intervals;
 		bintmp  = find(minvals >= 0);
 		[mintmp indextmp] = min(minvals(bintmp));
 		bintmp = bintmp(indextmp);
