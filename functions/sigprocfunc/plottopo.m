@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/09/14 09:30:04  arno
+% fix matlab 7
+%
 % Revision 1.36  2004/09/08 20:55:32  scott
 % same
 %
@@ -667,18 +670,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             
             axis('off');
 
-            %
-            %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
-            %
-            if ~isempty(g.regions)
-                for index=1:size(g.regions{c},2)
-                    tmpreg = g.regions{c}(:,index);
-                    figure(curfig); tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
-                                 [-100 -100 100 100], [1 1 0.9]); hold on;
-                    set(tmph, 'edgecolor', [1 1 0.9]);
-                end;
-            end;
-            
             % secondx = 200;                             % draw second vert axis 
             % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
             %
@@ -770,6 +761,20 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 end
             end
         end
+        
+        if P == datasets-1 % last pass
+            %
+            %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if ~isempty(g.regions)
+                for index=1:size(g.regions{c},2)
+                    tmpreg = g.regions{c}(:,index);
+                    figure(curfig); tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                                                 [-100 -100 100 100], [0.9 0.9 0.9]); hold on;
+                    set(tmph, 'edgecolor', [0.9 0.9 0.9]);
+                end;
+            end;
+        end;
         
         fprintf(' %d',c); % finished with channel plot
     end; % c, chans / subplot
