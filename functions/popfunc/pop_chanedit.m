@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/04/17 01:55:35  arno
+% automatically convert coordinates for 3-d center
+%
 % Revision 1.47  2003/04/16 02:06:08  arno
 % adding forcelocs option
 %
@@ -418,7 +421,7 @@ if nargin < 2
 		if evalin('base', 'exist(''tmpshrink'')') == 1
 			tmpshrink = evalin('base', 'tmpshrink');
 			evalin('base', 'clear tmpshrink');
-            if ~strcmp(tmpshrink, 'off')
+            if ~isequal(tmpshrink, shrinkfact)
 				if  isstr(tmpshrink)  chans(1).shrink = num2str(tmpshrink);
 				else                  chans(1).shrink = tmpshrink;
 				end;
