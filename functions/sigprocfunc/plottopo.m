@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/02/10 16:56:27  arno
+% error msg
+%
 % Revision 1.31  2004/01/29 16:44:32  arno
 % fix icademo bug
 %
@@ -743,7 +746,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 vmin = ymean-0.5*(ymean-ymin);
                 vmax = ymean+0.5*(ymax-ymean);
                 for v = g.vert
-                    plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+                    plot([v v],[ymin ymax],'color',vertcolor); % draw vertical lines 
                 end
             else
                 for v = g.vert
