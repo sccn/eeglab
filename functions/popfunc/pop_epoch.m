@@ -1,39 +1,36 @@
-% pop_epoch() - epoching a continuous EEGLAB dataset. 
-%
+% pop_epoch() - Convert a continuous EEG dataset to epoched data by extracting
+%               data epochs time locked to the specified events. Calls epoch().
 % Usage:
-%   >> OUTEEG = pop_epoch( EEG); % pop up window
-%   >> OUTEEG = pop_epoch( EEG, events, timelim);
-%   >> [OUTEEG, indices] = ...
-%        pop_epoch( EEG, typerange, timelim, 'key1', value1 ...);
+%   >> OUTEEG = pop_epoch( EEG); % pop-up a data entry window
+%   >> OUTEEG = pop_epoch( EEG, events, timelimits);
+%   >> [OUTEEG, indices] = pop_epoch( EEG, typerange, timelimits, ...
+%                               'key1', value1 ...);
 %
-% Graphical interface:
-%   "Enter time-locking event type(s)" - [edit box] Select 'Edit > 
-%                 Event values' to see type values.
-%                 Same as the 'typerange' command line input.
+% Graphic interface:
+%   "Enter time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
+%                 to see type values. epoch() equivalent: 'typerange' 
 %   "Epoch limits" - [edit box] time range [start, end] in seconds.
-%                 Same as the 'timelim' command line input.
-%   "Name for the new dataset" - [edit box] Same as the 'newname'
-%                 optional input from the command line.
+%                 epoch() equivalent: 'timelim' 
+%   "Name for the new dataset" - [edit box] epoch() equivalent: 'newname'
 %   "Out-of-bounds EEG ..." - [edit box] Rejection limits ([min max], []=none).
-%                 Same as 'valuelim' optional input from the command line.
+%                 epoch() equivalent: 'valuelim' 
 %
 % Inputs:
-%   EEG        - Input dataset. Data can already be epoched. In this case,
-%                extract (shorter) subepochs time locked to any epoch events.
-%   typerange  - Cell array of events type to consider for epoching. 
+%   EEG        - Input dataset. Data may already be epoched. In this case,
+%                extract (shorter) subepochs time locked to epoch events.
+%   typerange  - Cell array of event types to time lock to.
 %                {} --> all types of  events. Note: An event field 
 %                called 'type' must be defined in the 'EEG.event' structure.
 %   timelim    - Epoch limits [start end] in seconds relative to the
-%                time-locking event (default: [-1 2])
+%                time-locking event {Default: [-1 2]}
 %
 % Optional inputs:
-%   'valuelim' - [min max] Upper and lower limit values that data in a trial
-%                should not exceed. If one positive value is given, use the 
-%                negative of this as lower bound. The given values are also 
-%                considered outliers. {Default: none}
-%   'verbose'  - ['yes'|'no']. Default is 'yes'.
-%   'newname'  - [string] New dataset name {Default: "old_dataset epochs"}
-%   'eventindices'- [indices] Use event indices to epoch data.
+%   'valuelim' - [min max] Lower and upper bounds for trial data.  If one 
+%                positive value is given, use its negative as the lower bound. 
+%                The given values are also considered outliers. {Default: none}
+%   'verbose'  - ['yes'|'no']. {Default: 'yes'}
+%   'newname'  - [string] New dataset name {Default: "[old_dataset] epochs"}
+%   'eventindices'- [indices] Extract data epochs time locked to the indexed events. 
 %   'epochinfo'- ['yes'|'no']. Propagate event information into the new
 %                epoch structure. {Default: 'yes'}
 %   
@@ -69,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/02/17 02:40:14  arno
+% reformating text for new functionality in help2html
+%
 % Revision 1.30  2003/02/16 22:53:02  arno
 % update header for gui info
 %
