@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/03/05 02:54:49  scott
+% topoargs
+%
 % Revision 1.55  2003/03/05 02:53:26  scott
 % same
 %
@@ -367,16 +370,16 @@ else
    axfont = 8;
 end
 
-head_sep = 1.2;
+head_sep = 0.2;
 pos
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth> 0.25*pos(4) % dont make too high
   topowidth = 0.25*pos(4);
 end
 if rem(ntopos,2) == 1  % odd number of topos
-   topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep + 0.5)*topowidth;
+   topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep) + 0.5)*topowidth;
 else % even number of topos
-   topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep)*topowidth;
+   topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep))*topowidth;
 end
 if 0
  if ntopos == 3
@@ -478,12 +481,11 @@ axis([0 1 0 1])
 for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(data(:,plotframes(t))); % max data value at plotframe
 
-  head_sep = 1.2;
   axtp = axes('Units','Normalized','Position',...
        [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
-                       topowidth*head_sep]); % this will be the topoplot axes
+                       topowidth*(1+head_sep)]); % this will be the topoplot axes
   postp = axis(axtp);
   axis([-1 1 -1 1]);
 
@@ -504,10 +506,10 @@ end
 for t=1:ntopos
 
   axtp = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth ...
+       [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
-                       topowidth*head_sep]);
+                       topowidth*(1+head_sep)]);
   axes(axtp)                             % topoplot axes
   cla
 
@@ -551,7 +553,7 @@ set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.16,0.625,titl,'FontSize',titlefont,'HorizontalAlignment','Center','FontWeight','Bold');
+text(0.16,0.625,titl,'FontSize',titlefont,'HorizontalAlignment','Center'); % 'FontWeight','Bold');
 
 text(0.966,0.695,'+','FontSize',axfont,'HorizontalAlignment','Center');
 text(0.966,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
