@@ -2,11 +2,14 @@
 %
 % Usage:
 %   >> EEGOUT = pop_importpres( EEGIN, filename );
+%   >> EEGOUT = pop_importpres( EEGIN, filename, typefield, align );
 %
 % Inputs:
 %   EEGIN          - input dataset
 %   filename       - file name
 %   typefield      - [string] type field name. Default is 'code'.
+%   align          - [integer] alignment with preexisting events
+%                    see pop_importevent().
 % 
 % Outputs:
 %   EEGOUT         - data structure
@@ -40,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/11/19 19:28:29  arno
+% allow to import different fields for type
+%
 % Revision 1.9  2003/11/19 18:28:57  arno
 % debug code and event type
 %
@@ -68,12 +74,16 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_importpres(EEG, filename, typefield); 
+function [EEG, command] = pop_importpres(EEG, filename, typefield, align); 
 command = '';
 
 if nargin < 1 
     help pop_importpres;
     return
+end;
+
+if nargin < 4
+    align =0;
 end;
 
 if nargin < 2 
@@ -150,11 +160,10 @@ end;
 
 % import file
 % -----------
-if isempty(EEG.event), align = NaN; 
-else                   align = 0; end;
+if isempty(EEG.event), align = NaN; end;
 EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields);
 
-command = sprintf('EEG = pop_importpres(%s, ''%s'');', inputname(1), filename); 
+command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield align })); 
 
 return;
