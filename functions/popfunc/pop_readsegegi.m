@@ -34,30 +34,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.8  2003/04/10 17:58:36  arno
-% filter for file read
-%
-% Revision 1.7  2002/12/06 03:18:39  arno
-% same
-%
-% Revision 1.6  2002/12/06 03:07:19  arno
-% debuging channel import
-%
-% Revision 1.5  2002/12/06 02:50:05  arno
-% use leading edge
-%
-% Revision 1.4  2002/12/06 02:44:39  arno
-% adding event import
-%
-% Revision 1.3  2002/12/05 02:50:25  arno
-% debugging event reading
-%
-% Revision 1.2  2002/11/14 23:35:36  arno
-% header
-%
-% Revision 1.1  2002/11/13 02:34:22  arno
+% Revision 1.1  2003/04/11 00:37:15  arno
 % Initial revision
-%
 
 function [EEG, command] = pop_readegi(filename); 
     
@@ -78,10 +56,10 @@ EEG = eeg_emptyset;
 tailname = filename(end-3:end);
 basename = filename(1:end-7);
 index = 1;
-continue = 1;
+cont = 1;
 Eventdata = [];
-while continue
-    tmpfilename = [ filename sprintf('%3.3d', index) tailname ];
+while cont
+    tmpfilename = [ basename sprintf('%3.3d', index) tailname ]
     try,
         disp(['Importing ' tmpfilename ]);
         [Head tmpdata tmpevent] = readegi( tmpfilename );
@@ -89,7 +67,7 @@ while continue
         Eventdata = [ Eventdata tmpevent ];
         index = index + 1;
     catch,
-        continue = 0;
+        cont = 0;
     end;
 end;
 
