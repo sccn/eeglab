@@ -1,7 +1,7 @@
-% pop_eegplot() - Visually inspect EEG data in a scrolling display.
-%                 Perform rejection or marking for rejection of manually 
-%                 (and/or previously manually) selected data portions 
-%                 (= stretches of continuous data or whole data epochs).
+% pop_eegplot() - Visually inspect EEG data using a scrolling display.
+%                 Perform rejection or marking for rejection of visually 
+%                 (and/or previously) selected data portions (i.e., stretches 
+%                 of continuous data or whole data epochs).
 % Usage:
 %   >> pop_eegplot( EEG ) % Scroll EEG channel data. Allow marking for rejection via
 %                         % button 'Update Marks' but perform no actual data rejection.
@@ -10,27 +10,27 @@
 %   >> pop_eegplot( EEG, typerej, superpose, reject );
 %
 % Graphic interface:
-%   "Add to previously marked rejections" - [edit box] Can be either YES or NO. 
-%                    Command line eqivalent: 'superpose'.
-%   "Reject marked trials" - [edit box] Can be either YES or NO. Command line
+%   "Add to previously marked rejections" - [edit box] Either YES or NO. 
+%                    Command line equivalent: 'superpose'.
+%   "Reject marked trials" - [edit box] Either YES or NO. Command line
 %                    equivalent 'reject'.
 % Inputs:
 %   EEG        - input EEG dataset
-%   typerej    - type of rejection 0 = EEG independent components; 
-%                                  1 = EEG data channels. {default: 1, data channels}
+%   typerej    - type of rejection 0 = independent components; 
+%                                  1 = data channels. {Default: 1 = data channels}
 %   superpose  - 0 = Show new marks only: Do not color the background of data portions 
-%                    previously marked for rejection by visual inspection. Mark data 
+%                    previously marked for rejection by visual inspection. Mark new data 
 %                    portions for rejection by first coloring them (by dragging the left 
-%                    mouse button) and then pressing the 'Update Marks' or 'Reject' 
-%                    button (see 'reject' below). Previous markings from visual inspection 
+%                    mouse button), finally pressing the 'Update Marks' or 'Reject' 
+%                    buttons (see 'reject' below). Previous markings from visual inspection 
 %                    will be lost.
 %                1 = Show data portions previously marked by visual inspection plus 
 %                    data portions selected in this window for rejection (by dragging 
 %                    the left mouse button in this window). These are differentiated 
 %                    using a lighter and darker hue, respectively). Pressing the 
-%                    'Update Marks' or 'Reject' button (see 'reject' below)
+%                    'Update Marks' or 'Reject' buttons (see 'reject' below)
 %                    will then mark or reject all the colored data portions.
-%                     {default: 0, show and act on new marks only}
+%                {Default: 0, show and act on new marks only}
 %   reject     - 0 = Mark for rejection. Mark data portions by dragging the left mouse 
 %                    button on the data windows (producing a background coloring indicating 
 %                    the extent of the marked data portion).  Then press the screen button 
@@ -45,7 +45,9 @@
 % Outputs:
 %   Modifications are applied to the current EEG dataset at the end of the
 %   eegplot() call, when the user presses the 'Update Marks' or 'Reject' button.
-%   NOTE: The modifications made are not saved into EEGLAB history.
+%   NOTE: The modifications made are not saved into EEGLAB history. As of v4.2,
+%   events contained in rejected data portions are remembered in the EEG.urevent
+%   structure (see EEGLAB tutorial).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -70,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/12/05 00:19:52  arno
+% history in dataset
+%
 % Revision 1.30  2003/07/29 15:43:00  arno
 % always plot events
 %
@@ -192,9 +197,9 @@ if nargin < 3 & EEG.trials > 1
 
 	% which set to save
 	% -----------------
-    uilist       = { { 'style' 'text' 'string' 'Add to previously marked rejections (checked=yes)'} , ...
+    uilist       = { { 'style' 'text' 'string' 'Add to previously marked rejections? (checked=yes)'} , ...
          	         { 'style' 'checkbox' 'string' '' 'value' 1 } , ...
-                     { 'style' 'text' 'string' 'Reject marked trials (checked=yes)'} , ...
+                     { 'style' 'text' 'string' 'Reject marked trials? (checked=yes)'} , ...
          	         { 'style' 'checkbox' 'string' '' 'value' 0 } };
     result = inputgui( { [ 2 0.2] [ 2 0.2]} , uilist, 'pophelp(''pop_eegplot'');', ...
                        fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
