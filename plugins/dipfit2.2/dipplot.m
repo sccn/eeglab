@@ -111,6 +111,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.7  2003/03/06 16:50:08  arno
+%adding log message
+%
 
 function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
     
@@ -222,16 +225,16 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
             for index = 1:length(sources)
                 if index~=1 
                     if sources(index).component ~= sources(index-1).component
-                        textgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                        textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
                         colorcount = colorcount+1;
                     end;
                 else 
-                    textgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                    textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
                     colorcount = colorcount+1;
                 end;
             end;
             colorcount = colorcount-1;
-            allstr = strvcat(textgui{:});
+            allstr = strvcat(textforgui{:});
             h = text(0,0.5, allstr);
             if colorcount >= 15, set(h, 'fontsize', 8);end;
             if colorcount >= 20, set(h, 'fontsize', 6);end;
@@ -438,13 +441,13 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
                 end;
                 if index~=length(sources) 
                     if sources(index).component ~= sources(index+1).component
-                        textgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
+                        textforgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
                     end;
                 else 
-                    textgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
+                    textforgui(index) = { sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100) };
                 end;
             else
-                textgui(index) = { '' };
+                textforgui(index) = { '' };
             end;
         end;
     end;
@@ -531,7 +534,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.95 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '   ' );
     set(gcf, 'userdata', findobj('parent', gca, 'tag', 'dipole1'));
-    set(gca, 'userdata', textgui);
+    set(gca, 'userdata', textforgui);
     set(gcf, 'color', BACKCOLOR);
     
     if strcmp(g.gui, 'off')
