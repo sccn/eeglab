@@ -38,7 +38,7 @@
 %   ">>" - [button] scroll channel forward (+10).
 %   "Append chan" - [button] append channel after the current channel. Command line 
 %                 equivalent: 'append'.
-%   "Plot 2d" - [button] plot channel positions in 2-D using topoplot() function.  
+%   "Plot 2D" - [button] plot channel positions in 2-D using topoplot() function.  
 %   "2-D shrink factor" - [edit box] enter a value to shrink channel location in the
 %                 2-D polar view. This DOES NOT AFFECT channel locations and is only
 %                 used for visualization. This parameter is attached to the dataset
@@ -46,7 +46,7 @@
 %                 is 'shink'.
 %   "Auto shrink" - [button] automatically computes the shrinking factor so all
 %                 channels are visible on the 2-D topographical plot.
-%   "Plot 3d" - [button] plot channel positions in 3-D using plotchans3d() function.                 
+%   "Plot 3D" - [button] plot channel positions in 3-D using plotchans3d() function.                 
 %   "Read locations" - [button] read location file using readlocs() function. 
 %                 Command line equivalent is 'load'.
 %   "Read help" - [button] readlocs() function help.
@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2004/01/01 19:16:09  scott
+% 3d center -> Opt. 3D center
+%
 % Revision 1.82  2003/12/20 01:47:09  arno
 % debug call with empty array
 %
@@ -448,7 +451,7 @@ if nargin < 2
                       'set( gcbf, ''userdata'', { olduserdat{:} ''convert'', { ''chancenter'' newcenter 0 } });' ...
                       'clear tmpcell olduserdat tmpoptim tpmpX tmpY tmpZ newcenter;' ];
 
-		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
+		uiconvert = { { 'Style', 'pushbutton', 'string', 'Opt. 3D center', 'callback', ...
 						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Rotate axis'  , 'callback', ...
 						['[ comtmp tmpforce ] = forcelocs(chantmp); if ~isempty(tmpforce), ' ...
