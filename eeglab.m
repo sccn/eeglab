@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.194  2002/11/12 16:54:42  scott
+% TIP text edit
+%
 % Revision 1.193  2002/11/12 02:15:49  scott
 % Biosemi BDF -> standard BDF
 %
@@ -884,7 +887,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''WARNING: The number of channel locations must match the number of'');' ... 
                         'disp(''         data channels (otherwise channel locations are ignored)'');' ...
                         'disp(''TIP: To edit channel info only, ">> chanlocs = pop_chanedit([]);" on the command line'');' ...
-    '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
+    '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize''); clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); h(LASTCOM); eeglab(''redraw'');' e_hist], 'Separator', 'on');
