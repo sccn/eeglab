@@ -25,9 +25,6 @@
 % 'latency'   - plot only a subset of latencies. The time point closest to the 
 %               latency given are plotted. Default = empty, all latencies.
 % 'frames'    - vector of frame indices to compute
-% 'resolution' - ['low' or 'high'], 'high' -> multiply the size of the image by 3 
-%               for subsequent antialiasing and high quality movie generation 
-%               {default: 'low'}
 % 'framesout' - ['eps'|'ppm'|'fig'] Default format for saving frames on disk. Default is '.eps'.
 % 'framefolder' - [string] frames output folder. Default uses current directory.
 %               the directory is created if it does not exist.
@@ -48,6 +45,7 @@
 %               [exttheta extphi] to specify theta and phi multiplicative factor (default is
 %               [1 0.75]. Use parameter 'view' to specify starting view point. Default is
 %               'off'.
+% 'backcolor' - [float array] background color. Default is [1 1 1] (white).
 % 'stereo'    - [Real] Create a stereo movie. The figure should contain a [left right]
 %               display of two identical 3-D plots. The left plot view will follow the 
 %               given 'path' (see above). The right plot axis will be 3-D rotated by an 
@@ -134,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/10/09 01:01:34  arno
+% fixing coordinate problem for multiple conditions
+%
 % Revision 1.10  2003/10/08 23:59:03  arno
 % removing s to framesfolder
 %
@@ -197,7 +198,6 @@ nbcomponents = size(ALLERSP,1);
 try, g.head; 			catch, g.head=''; end;
 try, g.visible; 		catch, g.visible='on'; end;
 try, g.square; 		    catch, g.square='on'; end;
-try, g.resolution; 		catch, g.resolution='low'; end;
 try, g.rt; 	        	catch, g.rt={}; end;
 try, g.power; 	    	catch, g.power='on'; end;
 try, g.latency; 	   	catch, g.latency=[]; end;
@@ -227,6 +227,7 @@ try, g.title;			catch, g.title = []; end;
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
 try, g.plotorder;       catch, g.plotorder = selected; end;
 try, g.stereo;          catch, g.stereo = []; end;
+try, g.backcolor;       catch, g.backcolor = [0 0 0]; end;
 try, g.path3d;          catch, g.path3d = 'off'; end;
 try, g.project3d;       catch, g.project3d = 'off'; end;
 try, g.view;            catch, g.view = [43.6650 30.4420]; end;
@@ -316,10 +317,6 @@ if ~isempty(g.rt)
 	if length(g.rt) ~= nbconditions
 		disp('Error: Rt must be either an array of the size of the number of conditions (might be 0 for some conditions)'); return;
 	end;
-end;	
-switch lower(g.resolution)
-	case {'low', 'high'} ;  
-	otherwise disp('Error: Resolution must be either ''low'' or ''high'''); return;
 end;	
 switch lower(g.visible)
 	case {'on', 'off'} ;  
@@ -436,10 +433,7 @@ end;
 %limits: coherence angle -180 to 180 
 g.maxc         = 100;
 g.rthistcolor  = [1 1 1];
-switch lower(g.resolution)
- case 'low', g.resmult = 1;
- case 'high', g.resmult = 3;
-end;
+g.resmult = 1;
 currentphase   = zeros( length(selected), length(selected), nbconditions);
 tmp = ALLERSP{1,1};
 nwin = size(tmp,2);
@@ -469,19 +463,8 @@ if ~isempty(g.rt)
 	RTdist = RTdist/max(RTdist(:));
 end;	
 
-% create image
-% ------------
-switch lower(g.resolution)
- case 'high', figure( 'position', [100, 100, nbconditions*g.size(1)*3, g.size(2)*3], ...
-                      'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
- otherwise    figure( 'position', ...
-                      [100, 100, ceil(nbconditions*g.size(1)/4)*4, ceil(g.size(2)/4)*4], ...
-                      'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
-end;
-
-% make black patch behind figure
-% ------------------------------
-
+figure( 'position', [100, 100, ceil(nbconditions*g.size(1)/4)*4, ceil(g.size(2)/4)*4], ...
+        'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
 
 axis off
 if strcmpi(g.framesout, 'ppm')
@@ -509,6 +492,12 @@ else
 	end;
 end;
 
+% make black patch behind figure
+% ------------------------------
+hback = axes('position' , [0 0 1 1], 'xtick', [], 'ytick', [], 'box', 'off');
+hpatch = patch([0 1 1 0], [0 0 1 1], g.backcolor); xlim([0 1]); ylim([0 1]);
+set(hpatch, 'facecolor' , g.backcolor, 'edgecolor', 'none');
+
 % compute flashes latency
 % -----------------------
 if ~isempty(g.flashes)
@@ -528,7 +517,6 @@ if ~isempty(g.flashes)
 		[tmp tmptimepoint] = min(abs(flasheslat(index)-times));
 		allflashes = [ allflashes tmptimepoint];
 	end;
-	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', [], 'box', 'off'); set (gcf, 'visible', g.visible);
 	%hpatch = patch([ 0.02 .11 .11 0.02], [0.05 0.05 0.925 0.925], [0.5 0.5 0.5]); lateral
 	%hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); full
 	%hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.92 0.92 1 1], [0.5 0.5 0.5]); %up
@@ -546,12 +534,12 @@ maxcoordx    = 1.1-1/nbconditions/4;
 coords = g.coordinates;
 g.coordinates = {};
 for i=1:nbconditions
-	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q );
     
     % plot 3d head
     % ------------
+	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q );
     gr = [ 0.3 0.3 0.3 ];
-    g.dipplotopt = { 'gui', 'off', 'image', 'mri', 'color', { gr gr gr gr gr gr gr gr gr } };
+    g.dipplotopt = { 'gui', 'off', 'image', 'fullmri', 'cornermri', 'on', 'color', { gr gr gr gr gr gr gr gr gr } };
     if iscell(coords)
         for index = 1:size(coords{1}, 1);
             dipstruct(index).posxyz = coords{1}(index,:);
@@ -612,45 +600,79 @@ end;
 
 % draw captions if necessary
 % --------------------------
+countl = 1;
 switch lower(g.caption)
  case 'on' , 
   xlimnorm = (1.1-maxcoordx)/(maxcoordx/nbconditions) * g.xlimaxes;
   ylimnorm = 0.45/(1-ordinate) * g.ylimaxes;
   switch g.power, case 'on',
-      c(1) = axes('position', [maxcoordx, -0.1,    (1.1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
-                  'ylim', ylimnorm,'visible', g.visible );
-      scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
+      c(countl) = axes('position', [maxcoordx, -0.1,    (1.1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
+                  'ylim', ylimnorm,'visible', g.visible, 'color', 'w' );
+      % draw 3 spheres
+      [xstmp ystmp zs] = sphere(15);
+      l=sqrt(xstmp.*xstmp+ystmp.*ystmp+zs.*zs);
+      normals = reshape([xstmp./l ystmp./l zs./l],[16 16 3]);
+      tmpsize = 0.5; xs1 = tmpsize*ystmp; ys1 = tmpsize*xstmp; zs1 = tmpsize*zs;
+      tmpsize = 0.9; xs2 = tmpsize*ystmp; ys2 = tmpsize*xstmp; zs2 = tmpsize*zs + 2;
+      tmpsize = 0.1; xs3 = tmpsize*ystmp; ys3 = tmpsize*xstmp; zs3 = tmpsize*zs - 1.5;
+      colorarray = repmat(reshape([1 1 1],  1,1,3), [size(zs,1) size(zs,2) 1]);
+      handles = surf(xs1, ys1, zs1, colorarray, 'tag', 'tmpmov', 'EdgeColor','none', 'VertexNormals', normals, ...
+                     'backfacelighting', 'lit', 'facelighting', 'phong', 'facecolor', 'interp', 'ambientstrength', 0.3); hold on;
+      handles = surf(xs2, ys2, zs2, colorarray, 'tag', 'tmpmov', 'EdgeColor','none', 'VertexNormals', normals, ...
+                     'backfacelighting', 'lit', 'facelighting', 'phong', 'facecolor', 'interp', 'ambientstrength', 0.3);
+      handles = surf(xs3, ys3, zs3, colorarray, 'tag', 'tmpmov', 'EdgeColor','none', 'VertexNormals', normals, ...
+                     'backfacelighting', 'lit', 'facelighting', 'phong', 'facecolor', 'interp', 'ambientstrength', 0.3);
       axis off;
+      camlight left
+      camlight right
+      view([1 0 0])
+      lightangle(45,0);
+      lighting phong;
+      material shiny;
+      axis equal;
+      set(gca, 'zlim', [-2 4]);
+      text(0, 1.3, 2, [ num2str(g.scalepower(2),2) ], 'fontweight', 'bold');
+      text(0, 1, 0, '0', 'fontweight', 'bold');
+      text(0, 0.5, -1.5, [ num2str(g.scalepower(1),2) ' dB' ], 'fontweight', 'bold');
+      %scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
+      %axis off;
+      %countl = countl + 1;
   end;
   switch g.itc, case 'on',
-	  c(2) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.29 , (1.1-maxcoordx)/2, 0.14].*s+q, ...
+	  c(countl) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.29 , (1.1-maxcoordx)/2, 0.14].*s+q, ...
 				  'visible', g.visible, 'color', 'none' );
+      countl = countl + 1;
       if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcoh, 'vert', 'circle', g);
           ylabel('ITC', 'fontweight', 'bold');
-          set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
+          set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', [], 'box', 'off');
 	  else 
           cbar( [0 1], [0 1], g.colmapcoh(length(g.colmapcoh)/2:end,:), 'vert', 'circle', g);
           ylabel('ITC', 'fontweight', 'bold');
-          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
+          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', [], 'box', 'off');
       end; 
       axis off;
+      text(-0.2, 0, '0', 'fontsize', 10);
+      text(-0.2, 1, num2str(g.scaleitc,2), 'fontsize', 10);
+      text(-0.8, 0.55, 'ITC', 'fontsize', 11, 'fontweight', 'bold');
   end;
   switch g.crossf, case 'on',
-      c(3) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.47 , (1.1-maxcoordx)/4, 0.14].*s+q, ...
-                  'visible', g.visible );
+      c(countl) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.47 , (1.1-maxcoordx)/4, 0.14].*s+q, ...
+                  'visible', g.visible, 'color', 'none' );
+      countl = countl + 1;
       if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcrossf, 'vert', '', g);
           ylabel('Cross-Coh' , 'fontweight', 'bold');
-          set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
+          set(gca, 'ytick', [-1 0 1], 'yticklabel', [g.scalecoher(1) 0 g.scalecoher(2)], 'xticklabel', []);
       else
           cbar( [0 1], [0 1], g.colmapcrossf(length(g.colmapcrossf)/2:end,:), 'vert', '', g);
           ylabel('Cross-Coh' , 'fontweight', 'bold');
-          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);      
+          set(gca, 'ytick', [0 1], 'yticklabel', [g.scalecoher(1) g.scalecoher(2)], 'xticklabel', []);      
       end;
       switch g.crossfphasespeed, case 'on',
-          c(4) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.69,(1.1-maxcoordx)/2, 0.25 ].*s+q, ...
+          c(countl) = axes('position', [maxcoordx+(1.1-maxcoordx)/2, 0.69,(1.1-maxcoordx)/2, 0.25 ].*s+q, ...
                       'visible', g.visible );
+          countl = countl + 1;
           scalecoher([0.02 1], [0.04 0.96], 5, g); % see function at the end
       end;
   end;
@@ -743,7 +765,7 @@ for indeximage = alltimepoints
             drawcircle( g.coordinates{tmpcond}( index1,: ), tmppow, tmpitc, g);
 		end;
 	end;
-			
+
 	% draw a bar for time probability
 	% -------------------------------
 	for tmpcond = 1:nbconditions
@@ -790,7 +812,7 @@ for indeximage = alltimepoints
         % ----------------------------
         %coordx1 = (g.xlimaxes(2)-g.xlimaxes(1))*0.1 + g.xlimaxes(1);
         %coordy1 = (g.ylimaxes(2)-g.ylimaxes(1))*0.87 + g.ylimaxes(1);
-        tt = text(0, -0.2, sprintf('%d ms', round(times(indeximage))), 'unit', 'normalized');
+        tt = text(-0.1, -0.25, sprintf('%d ms', round(times(indeximage))), 'unit', 'normalized');
         set(tt, 'fontsize', 12*g.resmult, 'horizontalalignment', 'right', 'tag', 'tmpmov', 'color', 'w');
 	end;		   
 
@@ -798,9 +820,11 @@ for indeximage = alltimepoints
     % -----------------
     lighting phong;
     material shiny;
-    %for index = 1:length(c), axes(c(index)); end;
-    %axes(c(1)); setfont(gca, 'color', 'w');
-
+    setfont(gcf, 'color', [0.99 0.99 0.99]); % warning, for some reasons white does not print
+    for index = 1:length(c)
+        axes(c(index)); % bring back legend to front
+    end;
+    
 	% save the file for a movie
 	% -------------------------
     if strcmpi(g.framesout, 'eps')
@@ -1018,7 +1042,6 @@ function cbar( X, Y, colors, orientation, style, g );
 		case 'vert'
 			inc = (X(2)-X(1))/NSEGMENTS;
 			for i=linspace(Y(1),Y(2)-(Y(2)-Y(1))/NSEGMENTS,NSEGMENTS);
-				compter = compter + 1;
 				hold on;
 				switch style
 					case 'circle', 
@@ -1032,6 +1055,7 @@ function cbar( X, Y, colors, orientation, style, g );
 						coordx = real([coordx1 coordx2 coordx3 coordx4]);
 					otherwise,	coordx = [X(1) X(2) X(2) X(1)];
 				end;	
+                compter = compter + 1;
 				h = fill( coordx, [i i i+inc i+inc], colors(compter, :));
 				set(h, 'edgecolor', 'none');
 			end;
