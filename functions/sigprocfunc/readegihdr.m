@@ -1,4 +1,4 @@
-% readegihdr() - read header from EGI ver. 2 or 3 datafile.
+% readegihdr() - read header information from EGI (version 2 or 3) data file.
 %
 % Usage:
 %   >> [head] = readegihdr(fid)
@@ -9,23 +9,23 @@
 % Output:
 %   head - structure containing header information.
 %          Structure fields are:
-%           version = 2 or 3
-%           samp_rate= sampling rate in samples/s
-%           nchan= # of EEG channels
-%           gain= gain of amplifier
-%           bits= # of bits/sample
-%           range= abs(max. value)
-%           segments= # of epochs
-%           categories= # of categories
-%           catname= cell array of category names
-%           segsamps= # of samples/segment
-%           eventtypes= # of event types
-%           eventcode= string array of event codes
+%           version     = 2 or 3
+%           samp_rate   = sampling rate in samples/s
+%           nchan       = number of EEG channels
+%           gain        = gain of amplifier
+%           bits        = number of bits/sample
+%           range       = abs(max. value)
+%           segments    = number of epochs
+%           categories  = number of categories
+%           catname     = cell array of category names
+%           segsamps    = number of samples/segment
+%           eventtypes  = number of event types
+%           eventcode   = string array of event codes
 %
 % Author: Cooper Roddey, SCCN, 13 Nov 2002
 %
 % Note: this code derived from C source code written by 
-%       Tom Renner at EGI.
+%       Tom Renner at EGI, Inc. (www.egi.com)
 %
 % See also: readegi()
 

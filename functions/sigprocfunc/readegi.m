@@ -1,6 +1,5 @@
-% readegi() - read EGI Simple Binary ver. 2 or 3 datafile
-%	      and return header info, EEG data, and any
-%             Event data.
+% readegi() - read EGI Simple Binary (version 2 or 3) data file
+%	      Return header info, EEG data, and any event data.
 %
 % Usage:
 %   >> [head, TrialData, EventData] = readegi(filename)
@@ -16,7 +15,7 @@
 % Author: Cooper Roddey, SCCN, 13 Nov 2002
 %
 % Note: code derived from C source code written by
-%       Tom Renner at EGI.
+%       Tom Renner at EGI, Inc.
 %
 % See also: readegihdr()
 
@@ -39,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/14 18:01:20  arno
+% adding messave
+%
 % Revision 1.6  2002/11/14 18:00:23  arno
 % readEGIhr -> readegihdr
 %
