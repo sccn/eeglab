@@ -1,7 +1,7 @@
 % eeglab() - EEGLAB (v4.0) Matlab graphic user interface environment for 
-%   electrophysiological data analysis incorporating the ICA EEG toolbox 
+%   electrophysiological data analysis incorporating the ICA/EEG toolbox 
 %   (Makeig et al.) developed at CNL / The Salk Institute, 1997-2001. 
-%   Released 2002- as EEGLAB (Delorme, Makeig, et al.) at the Swartz Center 
+%   Released 11/2002- as EEGLAB (Delorme, Makeig, et al.) at the Swartz Center 
 %   for Computational Neuroscience, Institute for Neural Computation, 
 %   University of California San Diego (http://sccn.ucsd.edu/). 
 %   User feedback welcome: email eeglab@sccn.ucsd.edu
@@ -9,30 +9,30 @@
 % Authors: Arnaud Delorme, Scott Makeig, et al.
 %
 % Description:
-%   EEGLAB is Matlab software for processing continuous or epoched event-related 
+%   EEGLAB is Matlab software for processing continuous or event-related 
 %   EEG or other physiological data. It is designed for use by both novice and 
 %   expert Matlab users. In normal use, the EEGLAB graphic interface calls 
-%   graphic functions via pop-up function windows. the EEGLAB history mechanism 
+%   graphic functions via pop-up function windows. The EEGLAB history mechanism 
 %   can save the resulting Matlab calls to disk for later incorporation into 
 %   Matlab scripts.  A single data structure ('EEG') containing all dataset 
 %   parameters may be accessed and modified directly from the Matlab commandline. 
 %
-% Usage: 1) To (re)start EEGLAB from scratch, type
+% Usage: 1) To (re)start EEGLAB, type
 %            >> eeglab           % Ignores any loaded datasets
 %        2) To redaw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
 %
-% See: license.txt: The software distribution license 
-%      http://sccn.ucsd.edu/eeglab/tutorial/: The EEGLAB tutorial
-%      >> help eeg_checkset(), % Shows the structure of the EEG dataset 
+%   >> type "license.txt" % the GNU public license
+%   >> web http://sccn.ucsd.edu/eeglab/tutorial/ % the EEGLAB tutorial
+%   >> help eeg_checkset  % the EEG dataset structure
 %
 % Main files:
 % ---------- 
 % eeglab()        - main graphic interface
-% license.tx      - GNU license
+% license.txt     - GNU license
 % 
-% Functions recently added to EEGLAB: 
+% Functions added recently to EEGLAB: 
 % --------------------------------------------------------------------
 % cell2mat()      - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.190  2002/11/12 01:32:35  arno
+% adding read bdf format
+%
 % Revision 1.189  2002/11/11 15:33:22  arno
 % adding checks for BESA
 %
