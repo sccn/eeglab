@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.182  2003/12/04 17:53:52  arno
+% debug spec()
+%
 % Revision 1.181  2003/12/03 02:18:48  arno
 % use spec if psd is absent
 %
@@ -806,7 +809,8 @@ Vertflag  = NO;
 Horzflag  = NO;
 Noshowflag  = NO;
 Renormflag = NO;
-yerplabel = '\muV';
+% yerplabel = '\muV';
+yerplabel = 'ERP';
 yerplabelflag = NO;
 verttimes = [];
 horzepochs = [];
@@ -2748,7 +2752,7 @@ if ~isnan(coherfreq)
         t=text(ynumoffset,minamp, num2str(minamp,3));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
-        t=text(ytextoffset,(maxamp+minamp)/2,'dB','Rotation',90);
+        t=text(ytextoffset,(maxamp+minamp)/2,'ERSP (dB)','Rotation',90);
         set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
         
         axtmp = axis;
@@ -2828,7 +2832,7 @@ if ~isnan(coherfreq)
         t=text(ynumoffset,maxcoh, num2str(maxcoh));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
-        t=text(ytextoffset,maxcoh/2,'ITCoh','Rotation',90);
+        t=text(ytextoffset,maxcoh/2,'ITC (r)','Rotation',90);
         set(t,'HorizontalAlignment','center','FontSize',LABELFONT);
         drawnow
         
