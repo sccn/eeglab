@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/05/18 19:03:58  scott
+% typo -sm
+%
 % Revision 1.9  2002/05/02 01:34:56  arno
 % getting XYZ back
 %
@@ -204,7 +207,7 @@ return;
 function array = load_file_or_array( varname, skipline );
 
     if exist( varname ) == 2
-        array = loadtxt(varname);
+        array = loadtxt(varname,'verbose','off');
     else % variable in the global workspace
          % --------------------------
          array = evalin('base', varname);
