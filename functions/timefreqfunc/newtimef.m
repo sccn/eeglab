@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2004/03/01 16:18:20  arno
+% default basebott 1
+%
 % Revision 1.56  2004/03/01 02:24:31  arno
 % help message
 %
@@ -1096,13 +1099,15 @@ if ~isempty(find(timesout < g.baseline))
    baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
 else
    baseln = 1:length(timesout); % use all times as baseline
+   myprintf(g.verbose, '   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
+   g.baseboot = 0;
 end
 if ~isnan(g.alpha) & length(baseln)==0
   myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
 elseif ~isnan(g.alpha) & g.baseboot
-  myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
-          g.baseline,length(baseln))
+    myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
+             length(baseln), g.baseline)
 end
 if isnan(g.powbase)
   myprintf(g.verbose, 'Computing the mean baseline spectrum\n');

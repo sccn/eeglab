@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2004/03/01 16:17:49  arno
+% default baseboot 1
+%
 % Revision 1.70  2004/03/01 02:25:06  arno
 % change help message
 %
@@ -768,7 +771,7 @@ if ~isnan(g.alpha) & length(baseln)==0
   return
 elseif ~isnan(g.alpha) & g.baseboot
   myprintf(g.verbose,'   %d bootstrap windows in baseline (times<%g).\n',...
-          g.baseline,length(baseln))
+          length(baseln), g.baseline)
 end
 dispf = find(freqs <= g.maxfreq);
 stp = (g.frame-g.winsize)/(g.timesout-1);
