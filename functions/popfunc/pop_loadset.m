@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/11 23:26:27  arno
+% changing structure check
+%
 % Revision 1.4  2002/04/11 03:34:26  arno
 % fully synthesis between pop_loadset and pop_loadwks, pop_loadwks removed
 %
@@ -78,17 +81,20 @@ if isempty(ALLEEG)
 else 
 	% load multiple dataset
 	% ---------------------
+	TMPSAVE2 = ALLEEG;
 	if ~isempty(TMPSAVE) & (length(TMPSAVE) > 1 | ~isempty(TMPSAVE(1).data)) 
 		disp('Pop_loadset: appending datasets');
-		TMPSAVE(end+1:end+length(ALLEEG)) = ALLEEG(:);
 		ALLEEG = TMPSAVE;
 		clear TMPSAVE;
+		increment = length(ALLEEG);
+	else 
+		increment = 0;
 	end;
 	
-	for index = 1:length(ALLEEG)
-		if ~isempty(ALLEEG(index).data)
-			EEG = eeg_checkset(ALLEEG(index));
-			eeg_store(index);
+	for index = 1:length(TMPSAVE2)
+		if ~isempty(TMPSAVE2(index).data)
+			EEG = eeg_checkset(TMPSAVE2(index));
+			eeg_store(index+increment);
 		end;
 	end;
 	VAROUT = ALLEEG;
