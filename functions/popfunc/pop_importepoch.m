@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/11 19:37:51  arno
+% additional warning for file and array with the same name
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -203,7 +206,7 @@ end;
 % ----------------------
 if ~isfield(EEG.event, 'epoch')
     for trial = 1:EEG.trials
-        EEG.event(end).epoch = trial;
+        EEG.event(end+1).epoch = trial;
     end;
 end;
 for indexevent = 1:length(EEG.event)
