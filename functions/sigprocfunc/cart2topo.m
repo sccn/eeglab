@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/05/02 01:33:18  arno
+% returning XYZ
+%
 % Revision 1.11  2002/05/02 01:24:41  arno
 % debugging radius
 %
@@ -100,7 +103,7 @@
 % 03-31-02 center fitting is optional
 % 04-01-02 automatic squeeze calculation -ad & sm
  
-function [th,r,x,y,z] = cart2topo(x,varargin)
+function [th,r,xx,yy,zz] = cart2topo(x,varargin)
 
 if nargin<1
     help cart2topo
@@ -159,7 +162,7 @@ else
 	end;
 end;
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
-
+xx=x; yy=y; zz=z;
 x = x./radius; % make radius 1
 y = y./radius;
 z = z./radius;
