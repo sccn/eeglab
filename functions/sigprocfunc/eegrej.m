@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 % 03-27-02 added event latency recalculation -ad 
 
@@ -61,7 +64,7 @@ if nargin < 2
 end;
 
 if isstr(indata)
-  datlen = evalin('base', [ 'size(' indata ',2);' ]);
+  datlen = evalin('base', [ 'size(' indata ',2)' ]);
 else
   datlen = size(indata, 2);
 end;
@@ -99,23 +102,23 @@ if isstr(indata)
   disp('Using disk to reject data');
   increment = 10000;
   global elecIndices;
-  evalin('base', 'global elecIndices;');
+  evalin('base', 'global elecIndices');
   elecIndices = find(reject == 0);
   nbpoint = length(elecIndices);
-  evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''w'');');
-  evalin('base', ['numberrow = size(' indata ',1);']);
+  evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''w'')');
+  evalin('base', ['numberrow = size(' indata ',1)']);
   evalin('base', ['for indextmp=1:10000:length(elecIndices),', ...
 		  '   endtmp = min(indextmp+9999, length(elecIndices));' ...
 		  '   fwrite(fid,' indata '(:,elecIndices(indextmp:endtmp)), ''float'');'...
-		  'end;']);
-  evalin('base', 'fclose(fid);');
-  evalin('base', 'clear global elecIndices;');  
-  evalin('base', [ indata '=[]; clear ' indata ';']);  
-  evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''r'');');
-  evalin('base', [ indata '= fread(fid, [numberrow ' int2str(nbpoint) '], ''float'');']);
-  evalin('base', 'fclose(fid);');
-  evalin('base', 'clear numberrow indextmp endtmp fid;');  
-  evalin('base', 'delete(''tmpeegrej.fdt'');');  
+		  'end']);
+  evalin('base', 'fclose(fid)');
+  evalin('base', 'clear global elecIndices');  
+  evalin('base', [ indata '=[]; clear ' indata '']);  
+  evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''r'')');
+  evalin('base', [ indata '= fread(fid, [numberrow ' int2str(nbpoint) '], ''float'')']);
+  evalin('base', 'fclose(fid)');
+  evalin('base', 'clear numberrow indextmp endtmp fid');  
+  evalin('base', 'delete(''tmpeegrej.fdt'')');  
 else
   elecIndices = find(reject == 0);
   nbpoint = length(elecIndices);
