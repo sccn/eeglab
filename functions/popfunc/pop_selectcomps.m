@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/02/10 23:25:52  arno
+% allowing to plot less than 35 components
+%
 % Revision 1.14  2002/09/04 23:31:22  arno
 % spetial abording plot feature
 %
@@ -139,8 +142,12 @@ if ~exist('fig')
     incx = 120;
     incy = 110;
     sizewx = 100/column;
-    sizewy = 90/rows;
-	pos = get(gca,'position'); % plot relative to current axes
+    if rows > 2
+        sizewy = 90/rows;
+	else 
+        sizewy = 80/rows;
+    end;
+    pos = get(gca,'position'); % plot relative to current axes
 	hh = gca;
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
@@ -164,7 +171,7 @@ for ri = compnum
 		% compute coordinates
 		% -------------------
 		X = mod(count-1, column)/column * incx-10;  
-        Y = (rows-floor((count-1)/column))/rows * incy - sizewy*1.4;  
+        Y = (rows-floor((count-1)/column))/rows * incy - sizewy*1.3;  
 
 		% plot the head
 		% -------------
