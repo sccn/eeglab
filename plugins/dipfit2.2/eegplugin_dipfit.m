@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/05 02:56:27  arno
+% adding fieldtrip folder
+%
 % Revision 1.2  2005/03/04 23:35:29  arno
 % menu text
 %
@@ -135,7 +138,14 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
         p = which('eegplugin_dipfit2_0');
         p = p(1:findstr(p,'eegplugin_dipfit2_0.m')-1);
         addpath([ p 'dipfit2.0' ] );
-        addpath([ p '..' p(end) '..' p(end) 'fieldtrip-*' ] );
+        dircontent  = dir([ p '..' p(end) '..' p(end) '..'  ]);
+        dircontent  = { dircontent.name };
+        ind = strmatch('fieldtrip', lower(dircontent));
+        if ~isempty(ind)
+            addpath([ p '..' p(end) '..' p(end) '..' p(end) dircontent{ind} ] );
+        else
+            disp('Warning: Add Fieldtrip folder path manualy or dipfit2 will not be functional');
+        end;
     end;
 
     % find tools menu
