@@ -112,6 +112,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.191  2004/04/28 18:19:06  scott
+% put labels/numbers on another axes so that clicking numbers<->labels
+% will work inside the head cartoon patch
+%
 % Revision 1.190  2004/04/28 17:00:42  scott
 % no blanking ring when style is 'blank'
 %
@@ -1310,9 +1314,11 @@ end
 % %%%%%%%%%%%%%%%%%%% Show electrode information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
  axis square
+ ax = axis;
  axis off
  pos = get(gca,'position');
  textax = axes('position',pos);  % make new axes so clicking numbers <-> labels 
+ axis(ax);
  axis off                        % will work inside head cartoon patch
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
