@@ -93,6 +93,7 @@
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
 % Note: when cycles==0, nfreqs is total number of FFT frequencies.
+% Note: 'blue' coherence lag -> x leads y; 'red' -> y leads x
 %
 % Authors: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          SCCN/INC/UCSD, La Jolla, 1998-2002 
@@ -116,6 +117,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/12 01:30:43  arno
+% compatibility for returning frequencies with timef
+%
 % Revision 1.9  2002/04/12 01:13:40  arno
 % debuging no ploting option
 %
