@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/03/04 18:15:06  scott
+% debug last -sm
+%
 % Revision 1.19  2003/03/04 18:13:58  scott
 % debug last -sm
 %
@@ -362,15 +365,6 @@ axis([0 1 0 1])
   axis([0 1 0 1]);
   set(gca,'Visible','off');
 
-%   >> large = sbplot(1,1,1);   % normal whole figure axes
-%   >> % Now draw line from point [0.3 0.4] in small1 axes
-%   >> %                 to point [0.6 0.7] in small2 axes
-%   >> from = changeunits([0.3 0.4],small1,large); % point in small1 axes
-%   >> to   = changeunits([0.6 0.7],small2,large); % point in small2 axes
-%   >> plot([from(1) to(1)],[from(2) to(2)])
-%   >> axis([0 1 0 1]); % set large axes limits
-%   >> axis off % finally, hide large axes
-
 for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(matsel(data,frames,plotframes(t))); % max data value at plotframe
 
@@ -383,12 +377,21 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   postp = axis(axtp);
   axis([-1 1 -1 1]);
 
-  from = changeunits([plotframes(t),maxdata],axdata,axall);
+%   >> large = sbplot(1,1,1);   % normal whole figure axes
+%   >> % Now draw line from point [0.3 0.4] in small1 axes
+%   >> %                 to point [0.6 0.7] in small2 axes
+%   >> from = changeunits([0.3 0.4],small1,large); % point in small1 axes
+%   >> to   = changeunits([0.6 0.7],small2,large); % point in small2 axes
+%   >> plot([from(1) to(1)],[from(2) to(2)])
+%   >> axis([0 1 0 1]); % set large axes limits
+%   >> axis off % finally, hide large axes
+
+  from = changeunits([plottimes(t),maxdata],axdata,axall);
   to   = changeunits([0,-1],axtp,axall);
   delete(axtp);
 
   axes(axall);
-  l1 = plot([from(1) from(2)],[to(1) to(2)]);
+  l1 = plot([from(1) to(1)],[from(2) to(2)]);
 
   % data_y = 0.6*(voffsets(t)+maxdata-ymin)/height;
   % if (data_y > pos(2)+0.6*pos(4))
