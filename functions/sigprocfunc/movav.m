@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/05/23 17:27:56  scott
+% allow []=default args -sm
+%
 % Revision 1.7  2002/05/23 17:24:13  scott
 % *** empty log message ***
 %
@@ -203,7 +206,7 @@ if verbose,
   if wlen>1,
     fprintf(' using the specified %d-point window.\n',wlen);
   else
-    fprintf(' using a square window.\n');
+    fprintf(' using a %d-point square window.\n',xwidth);
   end
 end
  %fprintf('   firstx = %g, lastx= %g, xwidth = %g xadv = %g\n',...
