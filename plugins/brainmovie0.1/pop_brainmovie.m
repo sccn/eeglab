@@ -105,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/21 22:57:17  arno
+% commenting revertangle
+%
 % Revision 1.13  2002/11/21 20:29:38  arno
 % positive and neg scale
 %
@@ -287,7 +290,8 @@ catch,
 	newERSP   = moviethresh( ALLERSP, 0.2, 4, 2);
 	newITC    = moviethresh( ALLITC , 0.2, 4, 2);
 	newCROSSF = moviethresh( ALLCROSSF, 0.2, 4, 2);
-	%newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
+	newANGLE  = ALLCROSSFANGLE;
+    %newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
 	
 	eval(['save ' g.tffolder g.tfname '_newERSP   newERSP' ]);
 	eval(['save ' g.tffolder g.tfname '_newITC    newITC' ]);
