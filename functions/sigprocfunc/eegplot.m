@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/07/31 01:05:07  arno
+% optional button label
+%
 % Revision 1.23  2002/07/30 19:37:49  arno
 % debug wincolor
 %
@@ -252,7 +255,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' ...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
