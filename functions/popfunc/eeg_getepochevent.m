@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/27 00:24:26  arno
+% updating header
+%
 % Revision 1.7  2002/05/03 01:53:54  arno
 % using eeg_point2lat
 %
@@ -184,7 +187,7 @@ if strcmp(fieldname, 'latency')
 		if isnan(epochval(epoch))
 			epochval(epoch) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 		else
-			disp(['Getepochevent warning: more than one event selected in epoch ' int2str(epoch) ' -- only the field value for the first event returned']);
+			disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ', ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
 		end;
 	end;
 else
