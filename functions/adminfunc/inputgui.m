@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/03/02 19:57:11  hilit
+% added a listbox object to the returned output structure
+%
 % Revision 1.24  2004/11/10 17:04:04  arno
 % nothing
 %
