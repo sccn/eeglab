@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.145  2005/03/04 23:45:15  arno
+% implementing chaninfo
+%
 % Revision 1.144  2005/02/16 19:49:10  hilit
 % typo
 %
@@ -909,6 +912,9 @@ if ~isempty( EEG.chanlocs )
         EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
         EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
     end;
+end;
+if ~isfield(EEG, 'chaninfo')
+    EEG.chaninfo = [];
 end;
 %if ~isfield(EEG, 'urchanlocs')
 %    EEG.urchanlocs = EEG.chanlocs;
