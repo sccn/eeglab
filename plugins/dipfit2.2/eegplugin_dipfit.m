@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/03/17 19:03:03  arno
+% same
+%
 % Revision 1.10  2005/03/17 19:01:37  arno
 % searching for gridsearch
 %
@@ -158,7 +161,6 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     if ~exist('dipolefitting')
         p = which('eegplugin_dipfit2_0');
         p = p(1:findstr(p,'eegplugin_dipfit2_0.m')-1);
-        addpath([ p 'dipfit2.0' ] );
         dircontent  = dir([ p '..' p(end) '..' p(end) '..'  ]);
         dircontent  = { dircontent.name };
         ind = strmatch('fieldtrip', lower(dircontent));
