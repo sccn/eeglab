@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/10/30 16:41:21  arno
+% adding the dipole option
+%
 % Revision 1.15  2002/10/26 20:09:35  arno
 % error typo
 %
@@ -532,7 +535,7 @@ if ~isempty(DIPOLE)
             DIPOLE(index, 4) = DIPOLE(index,2) + (DIPOLE(index,4)-DIPOLE(index,2))*tmplength;
 		end;
         hh = line( [DIPOLE(index, 1) DIPOLE(index, 3)]', [DIPOLE(index, 2) DIPOLE(index, 4)]');
-        set(hh, 'color', 'k', 'linewidth', tmpscale*30/7.5);
+        set(hh, 'color', tmpcolor, 'linewidth', tmpscale*30/10);
     end;
 end;
 
