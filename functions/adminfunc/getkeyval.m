@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/21 18:55:23  arno
+% same
+%
 % Revision 1.3  2002/08/21 18:52:07  arno
 % debug
 %
@@ -124,9 +127,11 @@ function txt = getkeyval(lastcom, var, mode, default)
 					else 
 						txt = default;
 					end;
-				else 
-					txt = num2str(txt);
+				else
+                    txt = num2str(txt);
 				end;
+            else
+                txt = txt(2:end-1); % remove quotes for text
 			end;
 		else
 			txt = default;
