@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/10/29 16:12:19  arno
+% default sphere for dipfit
+%
 % Revision 1.11  2003/08/04 21:19:14  arno
 % command line call bug
 %
@@ -175,5 +178,5 @@ else
     end;
 end;
     
-com = sprintf('pop_dipplot( %s, ''%s'', %s);', inputname(1), typedip, vararg2str(options));
+com = sprintf('pop_dipplot( %s, %s);', inputname(1), vararg2str({ typedip comps options{:}}));
 return;
