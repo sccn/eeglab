@@ -80,7 +80,7 @@
 %                     File should be ascii in format of  >> topoplot example   
 %                     May also be an EEG.chanlocs struct. {file named in icadefs.m}
 %    Optional plotting parameters:
-%       'ploterps'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
+%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
 %       'plotphase' = ['on'|'off'] Plot sign of the phase in the ITC panel, i.e.
 %                     green->red, pos.-phase ITC, green->blue, neg.-phase ITC {'on'}
@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2004/08/31 00:28:24  arno
+% help msg
+%
 % Revision 1.73  2004/03/25 15:12:08  scott
 % help message re EEG.chanlocs struct possibility
 %
