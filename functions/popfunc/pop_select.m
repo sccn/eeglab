@@ -28,6 +28,7 @@
 %                  Command line equivalent: 'channel' and 'nochannel'
 %   "Channel range" - [checkbox] invert channel selection. Command line
 %                  equivalent: 'channel' [unchecked] and 'nochannel' [checked]
+%   "..." - [button] select channels by name.
 %   "Scroll dataset" - [button] call the eegplot function to scroll
 %                  channel activities.
 %
@@ -88,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/03/05 18:47:28  arno
+% [Aadding channel selection window
+%
 % Revision 1.30  2003/03/03 22:06:28  arno
 % debuging single interval selection
 %
