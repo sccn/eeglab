@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/12/29 21:57:21  arno
+% skipline -> skiplines
+%
 % Revision 1.6  2002/12/28 23:10:39  scott
 % header
 %
@@ -65,8 +68,8 @@ command = '';
 
 % get infos from readlocs
 % -----------------------
-[listtype formatinfo listcolformat formatskip] = readlocs('getinfos');
-formatskip = [ formatskip 0];
+[chanformat listcolformat] = readlocs('getinfos');
+listtype = { chanformat.type };
 
 if nargin < 1 
    [filename, filepath] = uigetfile('*', 'Importing electrode location file -- pop_readlocs()'); 
@@ -83,7 +86,7 @@ if nargin < 1
    % ------------------
    periods = find(filename == '.');
    fileextension = filename(periods(end)+1:end);
-	switch lower(fileextension),
+   switch lower(fileextension),
 		 case {'loc' 'locs' }, filetype = 'loc';
 		 case 'xyz', filetype = 'xyz';
 		 case 'sph', filetype = 'sph';
@@ -94,16 +97,30 @@ if nargin < 1
    end;
    indexfiletype = strmatch(filetype, listtype, 'exact'); 
    
-	% convert format info
+   % convert format info
    % -------------------
-   indexlist = ones(length(formatinfo), 10)*22;
-	for index = 1:length(formatinfo)
-      for index2 = 1:length(formatinfo{index})
-         indexformat = strmatch(formatinfo{index}{index2}, listcolformat, 'exact');
-         indexlist(index, index2) = indexformat;
-      end;
+   formatinfo     = { chanformat.importformat };
+   formatskipcell = { chanformat.skipline };
+   rmindex    = [];
+   count      = 1;
+   for index = 1:length(formatinfo)
+       if ~isstr(formatinfo{index})
+           for index2 = 1:length(formatinfo{index})
+               indexformat = strmatch(formatinfo{index}{index2}, listcolformat, 'exact');
+               indexlist(count, index2) = indexformat;
+           end;
+           if isempty(formatskipcell{index}), formatskip(count) = 0; 
+           else                               formatskip(count) = formatskipcell{index}; 
+           end;
+           count = count+1;
+       else
+           rmindex = [ rmindex index ];
+       end;
    end;
-   indexlist(end+1,:) = -1; % custom
+   listtype(rmindex) = [];
+   listtype  (end+1) = { 'custom' };
+   formatskip(end+1) = 0;
+   indexlist(end+1,:) = -1;
    
    % ask user
    formatcom = [  ...
