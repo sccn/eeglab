@@ -1,4 +1,4 @@
-{% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
+% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series (X,Y). A lower panel (optionally) 
 %        shows the coherence phase difference between the processes. 
 %        In this panel:
@@ -165,6 +165,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2005/03/29 16:46:32  scott
+% added to help ms that Rangle output is in radians
+% added option 'rad' to 'angleunit' plotting options
+%
 % Revision 1.64  2005/03/07 21:24:02  arno
 % adding chninfo
 %
