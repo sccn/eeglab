@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2004/10/25 19:04:16  hilit
+% compatibility between Matlab 7 and 6 in spline file saving
+%
 % Revision 1.46  2004/07/26 21:05:22  arno
 % remove index1
 %
@@ -424,7 +427,8 @@ if isstr(values)
     fprintf('Computing %d vertices. Should take a while (see wait bar)\n',...
                       length(x))
     fprintf('            but doesnt have to be done again for this montage...\n');
-    hwb = waitbar(0,'Computing spline file (percent done)...');
+    icadefs;
+    hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
 
     %figure; plot3(x (:),  y(:),  z(:), '.' );
     %figure; plot3(Xe(:), Ye(:), Ze(:), '.' );
