@@ -1,9 +1,10 @@
 % readlocs() - read electrode location information from a file. Several standard file
-%              formats are supported. Users may also give readlocs() any custom format.
+%              formats are supported. Users may also specify a custom column format.
 %              Examples of the defined formats are given below (File Formats).
 % Usage:
-%   >> [eloc, labels, theta, radius] = readlocs( filename );
-%   >> [eloc, labels, theta, radius] = readlocs( filename, 'key', 'val', ... );
+%   >>  eloc = readlocs( filename );
+%   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
+%   >>  [eloc, labels, theta, radius] = readlocs( filename, 'key', 'val', ... );
 %
 % Inputs:
 %   filename   - Name of the file containing the electrode locations
@@ -65,7 +66,8 @@
 %                 the electrode locations read. Default is [0 0 0].
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
-%               It has three fields: 'labels', 'theta' and 'radius'.
+%               It has three fields: 'labels', 'theta' and 'radius', identical
+%               to the EEGLAB struct EEG.chanlocs.
 %   labels    - cell array of strings giving the  names of the electrodes
 %   theta     - vector of polar angles for the electrodes (in degrees).
 %   radius    - vector of polar coordinate radius values for the electrodes
@@ -166,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/12/29 22:37:15  arno
+% txt -> ced
+%
 % Revision 1.30  2002/12/29 22:35:35  arno
 % adding coords. info for file format in header, programming .sph, ...
 %
