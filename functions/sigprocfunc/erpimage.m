@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.154  2003/09/24 00:43:15  scott
+% debug same
+%
 % Revision 1.153  2003/09/24 00:42:10  scott
 % debug same
 %
@@ -673,6 +676,7 @@ VERTWIDTH = 2.5;    % Linewidth of optional vertical lines
 HORZWIDTH = 2.1;    % Linewidth of optional vertical lines
 SIGNIFWIDTH = 1.9;  % Linewidth of red significance lines for amp, coher
 DOTSTYLE   = 'k--'; % line style to use for vetical dotted/dashed lines
+LINESTYLE = '-';    % solid line
 LABELFONT = 14;     % font sizes for axis labels, tick labels
 TICKFONT  = 11;
 
@@ -2122,7 +2126,7 @@ if ~isempty(verttimes)
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%% plot horz lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% plot horizontal ('horz') lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(horzepochs)
  if size(horzepochs,1) > 1 & size(horzepochs,1) > 1
@@ -2134,9 +2138,9 @@ if ~isempty(horzepochs)
      for he = horzepochs % for each horizontal line
          fprintf('%g ',he);
              if TIMEX          % overplot he on image
-                 plot([timelimits(1) timelimits(2)],[he he],DOTSTYLE,'Linewidth',HORZWIDTH);
+                 plot([timelimits(1) timelimits(2)],[he he],LINESTYLE,'Linewidth',HORZWIDTH);
              else
-                 plot([he he], [timelimits(1) timelimits(2)],DOTSTYLE,'Linewidth',HORZWIDTH);
+                 plot([he he], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
              end
      end
      %end
