@@ -44,6 +44,11 @@
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
 %  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
 %  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
+%  'std'      - [cell array] plot standard deviation of dipoles. i.e.
+%               { [1:6] [7:12] } plot two elipsoids that best fit all the dipoles
+%               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
+%               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
+%               first elipsoid is 2 standard-dev and the lines are thicker.
 %
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
@@ -115,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.21  2003/04/22 21:18:44  arno
+%standard dev
+%
 %Revision 1.20  2003/04/19 01:15:07  arno
 %debugging 2 besa dipoles
 %
@@ -158,7 +166,7 @@
 %adding log message
 %
 
-function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
+function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     DEFAULTVIEW = [0 0 1];
         
@@ -186,6 +194,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'rvrange'  'real'     [0 Inf]            [];
                                  'normlen'  'string'   { 'on' 'off' }     'off';
                                  'num'      'string'   { 'on' 'off' }     'off';
+                                 'std'      'cell'     []                 {};
                                  'projimg'  'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'   [0 Inf]            30;
@@ -233,7 +242,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmpi(g.normlen, 'on')
         try, sources = rmfield(sources, 'besaextori'); catch, end;
     end;
-    if ~isfield(sources, 'besathloc') & strcmpi(g.image, 'besa')
+    if ~isfield(sources, 'besathloc') & strcmpi(g.image, 'besa') & ~is_sccn
         error(['For copyright reasons, it is not possible to use the BESA ' ...
                'head model to plot non-BESA dipoles']);
     end;
@@ -259,6 +268,9 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         fact = 1;
     end;
     
+    % transform coordinates
+    % ---------------------
+    outsources = sources;
     for index = 1:length(sources)
         sources(index).posxyz = sources(index).posxyz/g.sphere;
         tmp = sources(index).posxyz(:,1);
@@ -268,6 +280,11 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         tmp = sources(index).momxyz(:,1);
         sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
         sources(index).momxyz(:,2) = -tmp;
+        if isfield(sources, 'stdX')
+            tmp = sources(index).stdX;
+            sources(index).stdX = sources(index).stdY;
+            sources(index).stdY = -tmp;
+        end;
     end;
     
     % remove sources with out of bound Residual variance
@@ -468,27 +485,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 set(h, 'userdata', dipstruct, 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw circle  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
-            if isfield(sources, 'stdX') & sources(index).stdX ~= 0
-                stdX = num2str(sources(index).stdX); strX = num2str(x);
-                stdY = num2str(sources(index).stdY); strY = num2str(y);
-                stdZ = num2str(sources(index).stdZ); strZ = num2str(z);
-                if isempty(g.view) | g.view(3) ~= 0
-                    h = myezplot3([strX '+cos(t)*' stdX], [strY '+sin(t)*' stdY], strZ, [0,2*pi]);
-                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
-                end;
-                if isempty(g.view) | g.view(2) ~= 0
-                    h = myezplot3([strX '+cos(t)*' stdX], strY, [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
-                end;
-                if isempty(g.view) | g.view(1) ~= 0
-                    h = myezplot3(strX, [strY '+cos(t)*' stdY], [strZ '+sin(t)*' stdZ], [0,2*pi]);
-                    set(h, 'userdata', dipstruct, 'color', g.color{index}, 'tag', tag );
-                end;
-            end;
-            
+                        
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw text  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             if isfield(sources, 'component')
@@ -499,7 +496,22 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             end;
         end;
     end;
-        
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw elipse for group of dipoles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    if ~isempty(g.std)
+        for index = 1:length(g.std)
+            if ~iscell(g.std{index})
+                plotellipse(sources, g.std{index}, 1);
+            else
+                sc = plotellipse(sources, g.std{index}{1}, g.std{index}{2});
+                if length( g.std{index} ) > 2
+                    set(sc, g.std{index}{3:end});
+                end;
+            end;
+        end;
+    end;
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% buttons %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     nbsrc = int2str(length(sources));
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
@@ -650,6 +662,36 @@ function h = myezplot3(strX, strY, strZ, range);
     close;
     h = plot3(xdata, ydata, zdata);
 
+function sc = plotellipse(sources, ind, nstd);
+
+    for i = 1:length(ind)
+        tmpval(1,i) = -sources(ind(i)).posxyz(1);    
+        tmpval(2,i) = -sources(ind(i)).posxyz(2);    
+        tmpval(3,i) = sources(ind(i)).posxyz(3);    
+    end;
+    
+    % mean and covariance
+    C = cov(tmpval');
+    M = mean(tmpval,2);
+    [U,L] = eig(C);
+    
+    % For N standard deviations spread of data, the radii of the eliipsoid will
+    % be given by N*SQRT(eigenvalues).
+    radii = nstd*sqrt(diag(L));
+    
+    % generate data for "unrotated" ellipsoid
+    [xc,yc,zc] = ellipsoid(0,0,0,radii(1),radii(2),radii(3), 10);
+    
+    % rotate data with orientation matrix U and center M
+    a = kron(U(:,1),xc); b = kron(U(:,2),yc); c = kron(U(:,3),zc);
+    data = a+b+c;  n = size(data,2);
+    x = data(1:n,:)+M(1); y = data(n+1:2*n,:)+M(2); z = data(2*n+1:end,:)+M(3);
+    
+    % now plot the rotated ellipse
+    c = ones(size(z));
+    sc = mesh(x,y,z);
+    alpha(0.5)
+    
 function newsrc = convertbesaoldformat(src);
     newsrc = [];
     count = 1;
@@ -666,11 +708,8 @@ function newsrc = convertbesaoldformat(src);
         % copy other fields
         % -----------------
         if isfield(src, 'stdX')
-            newsrc(count).meanX = src(index).meanX;
-            newsrc(count).meanY = src(index).meanY;
-            newsrc(count).meanZ = src(index).meanZ;
-            newsrc(count).stdX = src(index).stdX;
-            newsrc(count).stdY = src(index).stdY;
+            newsrc(count).stdX = -src(index).stdY;
+            newsrc(count).stdY = src(index).stdX;
             newsrc(count).stdZ = src(index).stdZ;
         end;
         if isfield(src, 'rv')
