@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/07/26 01:15:49  arno
+% adding percentage of variance
+%
 % Revision 1.19  2002/07/25 20:58:33  luca
 % divide sum of epoch spectra by length(epoch_subset).
 %
@@ -360,14 +363,18 @@ end;
 [tmp minfreqidx] = min(abs(g.limits(1)-freqs)); % adjust min frequency
 
 if length(g.limits)<3|isnan(g.limits(3))
-  g.limits(3) = min(min(eegspecdB(:,minfreqidx:maxfreqidx)));
+	reallimits(1) = min(min(eegspecdB(:,minfreqidx:maxfreqidx)));
+else 
+	reallimits(1) = g.limits(3);
 end
 if length(g.limits)<4|isnan(g.limits(4))
-  g.limits(4) = max(max(eegspecdB(:,minfreqidx:maxfreqidx)));
+	reallimits(2) = max(max(eegspecdB(:,minfreqidx:maxfreqidx)));
+	dBrange = reallimits(2)-reallimits(1);   % expand range a bit beyond data g.limits
+	reallimits(1) = reallimits(1)-dBrange/7;
+	reallimits(2) = reallimits(2)+dBrange/7;
+else 
+	reallimits(2) = g.limits(4);
 end
-dBrange = g.limits(4)-g.limits(3);   % expand range a bit beyond data g.limits
-g.limits(3) = g.limits(3)-dBrange/7;
-g.limits(4) = g.limits(4)+dBrange/7;
 
 if length(g.limits)<5 % default caxis plotting g.limits
   g.limits(5) = nan;
@@ -395,7 +402,7 @@ else
 end;
 set(pl,'LineWidth',2);
 set(gca,'TickLength',[0.02 0.02]);
-axis([freqs(minfreqidx) freqs(maxfreqidx) g.limits(3) g.limits(4)]);
+axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
 xl=xlabel('Frequency (Hz)');
 set(xl,'fontsize',16);
 yl=ylabel('Rel. Power (dB)');
@@ -418,11 +425,13 @@ if ~isempty(g.weights)
 	if ~isempty(othercomps)
 		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
 	end;
-	newaxis = axis;
-	newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
-	newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
-	axis(newaxis);
-
+	if length(g.limits)<3|isnan(g.limits(3))
+		newaxis = axis;
+		newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
+		newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
+		axis(newaxis);
+	end;
+	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% indicate component contribution %
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
