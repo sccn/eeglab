@@ -11,42 +11,42 @@
 %  weights    = final weight matrix from runica() (=weights*sphere)
 %
 % Optional inputs:
-%  'chanlocs'  = [string] channel location file or structure. See >> topoplot example 
+%  'chanlocs'  = [string] channel location file or EEG.chanlocs structure. 
+%                  See >> topoplot example 
 %  'limits'    = [xmin xmax ymin ymax]  x values in ms 
-%                {def|[] or both y's 0 -> y data limits}
-%  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution 
-%                {def|[] or both y's 0 -> y data limits}
+%                  {def|[] or both y's 0 -> y data limits}
+%  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution
+%                  {def|[] or both y's 0 -> y data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
-%                ELSE n<0, the number largest-comp. maps  to plot (component with max
-%                variance) {default|[] -> 7}
+%                  ELSE n<0, the number largest-comp. maps  to plot (component with max
+%                  variance) {default|[] -> 7}
 %  'title'     = [string] plot title {default|[] -> none}
 %  'plotchans' = [integer array] data channels to use in computing envelopes 
-%                {default|[] -> all}
+%                  {default|[] -> all}
 %  'voffsets'  = [float array] vert. line extentions above the data max to disentangle
-%                plot lines (left->right heads, values in y-axis units) {def|[] -> none}
+%                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
 %  'colorfile' = [string] filename of file containing colors for envelopes, 3 chars
-%                per line, (. = blank). First color should be "w.." (white)
-%                Colorfile argument 'bold' uses default colors, all thick lines.
-%                {default|[] -> standard color order}
+%                  per line, (. = blank). First color should be "w.." (white)
+%                  Colorfile argument 'bold' uses default colors, all thick lines.
+%                  {default|[] -> standard color order}
 %  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
-%                solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
+%                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
 %  'vert'      = vector of times to plot vertical lines {default|[] -> none}
 %  'icawinv'   = [float array] inverse weigth matrix. By default computed by inverting
-%                the weight matrix (but if some components have been removed, then
-%                weight's pseudo-inverse matrix does not represent component's maps).
+%                  the weight matrix (but if some components have been removed, then
+%                  weight's pseudo-inverse matrix does not represent component's maps).
 %  'icaact'    = [float array] ICA component activity. By default computed using the
-%                weight matrix.
+%                  weight matrix.
 %  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
-%                envelope { Default -> 'avg' }
+%                  envelope { Default -> 'avg' }
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
-%                plotting.
+%                  plotting.
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %  'actscale'  = ['on'|'off'] scale component scalp map by component activity at the
-%                designated point in time. Default 'off'.
+%                  designated point in time. Default 'off'.
 %  'pvaf'      = ['on'|'off'] display percent variance accounted for by each 
-%                component over the interval selected by limcontrib. Default is 'on'
-%                pvaf(component) = 100-100*variance(data-component))/variance(data)
-%
+%                  component over the interval selected by limcontrib. Default is 'on'
+%                  pvaf(component) = 100-100*variance(data-component))/variance(data)
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
 %  compvars      = component max variances
@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/01/26 02:22:13  scott
+% same
+%
 % Revision 1.41  2004/01/26 02:10:24  scott
 % same
 %
@@ -864,6 +867,17 @@ if strcmpi(g.dispmaps, 'on')
     
     [tmp tmpsort] = sort(maporder);
     [tmp tmpsort] = sort(tmpsort);
+    if isstr(g.chanlocs)
+        if exist(g.chanlocs) ~= 2  % if no such file
+            fprintf('envtopo(): named channel location file not found.\n',chans);
+            return
+        end
+        eloc = readlocs(g.chanlocs);
+        if length(eloc) ~= chans
+            fprintf('envtopo(): %d channels not read from the named channel location file.\n',chans);
+            return
+        end
+    end
     for t=1:ntopos % left to right order 
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
@@ -873,8 +887,10 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(g.chanlocs)
-            if ~isempty(varargin) topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
-            else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+            if ~isempty(varargin) 
+                topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+            else 
+                topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
