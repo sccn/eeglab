@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/25 17:17:15  scott
+% editting msg -sm
+%
 % Revision 1.8  2002/04/25 02:14:43  arno
 % debugging multi-line event field description
 %
@@ -253,10 +256,23 @@ for index = 1:length(allfields)
             eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<')-1));
             max = eval(tmpvar(findstr(tmpvar, '<')+1:end));
-            Ieventlow  = find( tmpvarvalue >= min);
-            Ieventhigh = find( tmpvarvalue <= max);
-            Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) )
+			if strcmp(allfields{index}, 'latency')
+				if EEG.trials > 1
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, {EEG.event.epoch}, EEG.srate, ...
+											[EEG.xmin EEG.xmax]*1000, 1E-3);
+				else
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
+											[EEG.xmin EEG.xmax], 1);
+				end;
+			end;
+			Ieventlow  = find( tmpvarvalue >= min);
+			Ieventhigh = find( tmpvarvalue <= max);
+			Ievent = intersect( Ievent, intersect( Ieventlow, Ieventhigh ) )
         else
+			if strcmp(allfields{index}, 'latency')
+				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
+						 'so you may use the ''a<b'' notation to select these values\n']);
+			end;
             eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
@@ -290,10 +306,23 @@ for index = 1:length(allfields)
             eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<')-1));
             max = eval(tmpvar(findstr(tmpvar, '<')+1:end));
+			if strcmp(allfields{index}, 'latency')
+				if EEG.trials > 1
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, {EEG.event.epoch}, EEG.srate, ...
+											[EEG.xmin EEG.xmax]*1000, 1E-3);
+				else
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
+											[EEG.xmin EEG.xmax], 1);
+				end;
+			end;
             Ieventlow  = find( tmpvarvalue >= min);
             Ieventhigh = find( tmpvarvalue <= max);
             Ieventrem = union( Ieventrem, intersect( Ieventlow, Ieventhigh ) );
         else
+			if strcmp(allfields{index}, 'latency')
+				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
+						 'so you may use the ''a<b'' notation to select these values\n']);
+			end;
             eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
@@ -301,7 +330,7 @@ for index = 1:length(allfields)
             end;
             Ieventrem = union( Ieventrem, Ieventtmp );
         end;
-     end;
+	end;
 end;
 Ievent = setdiff( Ievent, Ieventrem);
 
