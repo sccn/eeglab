@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.32  2003/06/10 19:04:11  arno
+%nothing
+%
 %Revision 1.31  2003/06/03 16:37:16  arno
 %tag images
 %
@@ -328,6 +331,14 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             tmp = sources(index).stdX;
             sources(index).stdX = sources(index).stdY;
             sources(index).stdY = -tmp;
+        end;
+        if strcmpi(g.normlen, 'on')
+            warning off;
+            sources(index).momxyz(1,:) = 0.2*sources(index).momxyz(1,:)/ norm(abs(sources(index).momxyz(1,:)));
+            if size(sources(index).momxyz,1) > 1 & sources(index).momxyz(1) ~= 0
+                sources(index).momxyz(2,:) = 0.2*sources(index).momxyz(2,:)/ norm(abs(sources(index).momxyz(2,:)));
+            end;
+            warning on;
         end;
     end;
     
