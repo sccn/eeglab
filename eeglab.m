@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.332  2004/08/31 18:52:50  arno
+% fix typo
+%
 % Revision 1.331  2004/08/31 18:00:07  arno
 % move checks
 %
@@ -1329,6 +1332,7 @@ trystrs.check_epoch_ica_chanlocs = checkepochicaplot;
 catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
+catchstrs.new_non_empty          = e_newnonempty;
 
 % detecting icalab
 % ----------------
