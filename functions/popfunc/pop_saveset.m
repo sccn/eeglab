@@ -15,9 +15,11 @@
 %   filepath   - path of the file to save to (optional)
 %
 % Optional arguments
-%   'savemode' - [0|1] 1 saves all the structure in a Matlab file and 0 
+%   'savemode' - [0|1|2] 1 saves all the structure in a Matlab file, 0 
 %                saves the structure without the data in a Matlab file and
-%                the data in a binary float file.
+%                the data in a binary float file, 2 saves the structure in a 
+%                matlab file and doesn't save the data (assumes data is
+%                already saved in binary float file and has'nt changed).
 %
 % Outputs:
 %   EEG        - saved dataset (after extensive syntax checks)
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/02/16 19:42:51  hilit
+% in save changing '-V6' to '-v6'
+%
 % Revision 1.44  2004/12/17 17:34:02  hilit
 % correcting 'savemode' help message
 %
@@ -293,7 +298,7 @@ if mode == 0  % single datasets
     if ~exist('option_savematlab')
         eeg_options;
     end;
-	if exist('option_savematlab') == 1 & option_savematlab == 0
+	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
         tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
         EEG.data = [ noextcurfilename '.dat' ];
 		try, 
@@ -304,7 +309,9 @@ if mode == 0  % single datasets
                 catch, error('Pop_saveset: save error, out of space or file permission problem');
                 end;
             end;
-			floatwrite( tmpdata', [curfilepath EEG.data], 'ieee-le');
+            if option_savematlab == 0
+                floatwrite( tmpdata', [curfilepath EEG.data], 'ieee-le');
+            end
 		catch, 
 			error('Pop_saveset: save error, out of space or file permission problem');
 		end;
@@ -385,16 +392,18 @@ else
         eeg_options;
     end;
     del = 0;
-	if exist('option_savematlab') == 1 & option_savematlab == 0
+	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
 		for index = 1:length(ALLEEG)
 			tmpdata = reshape(ALLEEG(index).data, ALLEEG(index).nbchan,  ALLEEG(index).pnts*ALLEEG(index).trials);
 			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
             ALLEEG(index).filepath = '';
-			try, 
-				floatwrite( tmpdata', [ curfilepath ALLEEG(index).data], 'ieee-le');
-			catch, 
-				error('Pop_saveset: saving error, out of space or file permission problem');
-			end;
+            if option_savematlab == 0
+				try, 
+					floatwrite( tmpdata', [ curfilepath ALLEEG(index).data], 'ieee-le');
+				catch, 
+					error('Pop_saveset: saving error, out of space or file permission problem');
+				end;
+            end
 		end;
 	else % standard file saving
         if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
