@@ -45,6 +45,8 @@
 %%    See also:                                  
 %%     function1(), function2()                     
 %    
+% Author:  Arnaud Delorme, Salk Institute 2001
+%
 % Notes: 1) In Title2, the text lines are considered as is (e.g., 
 %           preserving Matlab carriage returns) unless there is a 
 %           matlab continuation cue ('...'). In this case, lines are 
@@ -77,8 +79,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
-function linktext = help2html( filename, htmlfile, varargin)
+function [linktext,allvars,alltext] = help2html( filename, htmlfile, varargin)
 
 if nargin < 1
 	help help2html;
@@ -154,6 +159,9 @@ varname = [];
 oldvarname = [];
 vartext = []; 	
 newvar  	 = 0;
+allvars = {};
+alltext = {};
+indexout = 1;
 
 while (str(1) == '%')
    str = deblank(str(2:end-1));
@@ -232,6 +240,9 @@ while (str(1) == '%')
       if str(1) ~= '%'
   	 	 if ~newtitle
   	 	 	if ~isempty(oldvarname)
+				allvars{indexout} = oldvarname;
+				alltext{indexout} = oldvartext;
+				indexout = indexout + 1;
            		fprintf( fo, [ '</tr>' g.normrow g.normcol1 g.var '</td>\n' ], oldvarname);
            		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], oldvartext);
        	 	else
@@ -265,6 +276,9 @@ while (str(1) == '%')
 		       end;
             end;             
    		elseif ~isempty(oldvarname)
+			allvars{indexout} = oldvarname;
+			alltext{indexout} = oldvartext;
+			indexout = indexout + 1;
        		fprintf( fo, [ '</tr>' g.normrow g.normcol1 g.var '</td>\n' ], oldvarname);
        		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], oldvartext);
    	 	else
