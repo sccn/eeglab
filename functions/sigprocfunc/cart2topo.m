@@ -14,7 +14,7 @@
 %    'squeeze' = plotting  squeeze-in factor (0[default]->1). -1 optimize
 %                the squeeze factor automatically so that maximum radius
 %                is 0.5. 
-%    'optim'   = find best fitting sphere center based on standard
+%    'optim'   = [0|1] find best fitting sphere center based on standard
 %                deviation of radius values.
 %    'gui'     = ['on'|'off'] pops up a gui for optional arguments. 
 %                Default is off.
@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/27 01:45:18  arno
+% debuged center
+%
 % Revision 1.6  2002/04/26 20:33:37  arno
 % updating message
 % ,
