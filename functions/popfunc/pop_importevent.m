@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/11/01 03:05:34  arno
+% removing some double brackets
+%
 % Revision 1.17  2003/11/01 02:58:46  arno
 % implementing finputcheck
 %
@@ -225,13 +228,8 @@ if nargin<2
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
 	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
-	    if ~isempty( results{3} ) 
-	        if exist(results{3}) == 2,  args = { args{:}, 'event', [ '''' results{3} '''' ] }; 
-	        else                        args = { args{:}, 'event', results{3} }; end; 
-	    end;
-	    if ~isempty( results{4} )  % FIELDS
-	        args = { args{:}, 'fields', { parsetxt(results{4}) } };
-	    end;
+	    if ~isempty( results{3} ), args = { args{:}, 'event', results{3} }; end; 
+	    if ~isempty( results{4} ), args = { args{:}, 'fields', parsetxt(results{4}) }; end;
 	    % handle skipline 
 	    % ---------------     
 	    if ~isempty(eval(results{end-2})), if eval(results{end-2}) ~= 0,  args = { args{:}, 'skipline', eval(results{end-2}) }; end; end;
@@ -252,7 +250,8 @@ else % no interactive inputs
     % --------------------------------------------------------------
     for index=1:2:length(args)
         if iscell(args{index+1}), if iscell(args{index+1}{1}) args{index+1} = args{index+1}{1}; end; end; % double nested 
-        %if isstr(args{index+1})                 args{index+1} = [ '''' args{index+1} '''' ]; % string 
+        if isstr(args{index+1}) & length(args{index+1}) > 2 & args{index+1}(1) == '''' & args{index+1}(end) == ''''             
+            args{index+1} = args{index+1}(2:end-1); end;
         %else if ~isempty( inputname(index+2) ), args{index+1} = inputname(index+2); end;
         %end;
     end;                
@@ -261,22 +260,14 @@ end;
 g = finputcheck( args, { 'fields'    'cell'     []         {};
                          'skipline'  'integer'  [0 Inf]    0;
                          'indices'   'integer'  [1 Inf]    [];
-                         'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         '''yes''';
+                         'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         'yes';
                          'timeunit'  'real'     [0 Inf]    1;
+                         'event'     { 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'delim'     'string'   []         char([9 32])}, 'pop_importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
     
-% create structure
-% ----------------
-%if ~isempty(args)
-%   try, g = struct(args{:});
-%   catch, disp('Setevent: wrong syntax in function arguments'); return; end;
-%else
-%    g = [];
-%end;
-
 % test the presence of variables
 % ------------------------------
 %try, g.fields; 	 	  catch, g.fields = {}; end;
@@ -388,9 +379,8 @@ com = sprintf('%s = pop_importevent( %s, %s);', inputname(1), inputname(1), vara
 % interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
-    if varname(1) == '''', % mean that it is a filename
-                          % --------------------------
-        varname = eval(varname);
+    if isstr(varname) & exist(varname(1)) == 2  % mean that it is a filename
+                                                % --------------------------
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
         
     else % variable in the global workspace
