@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/07/30 18:01:24  arno
+% handling empty chanlocs
+%
 % Revision 1.40  2003/07/28 17:50:18  arno
 % same
 %
@@ -355,14 +358,16 @@ for curfield = tmpfields'
         case 'chanlocs', varname = getfield(g, {1}, curfield{1});
                          if isempty(varname)
                              EEGOUT.chanlocs = [];
-                         elseif exist( varname ) == 2
+                         elseif isstr(varname) & exist( varname ) == 2
                             fprintf('Pop_editset: channel locations file ''%s'' found\n', varname); 
                             EEGOUT.chanlocs = readlocs(varname);
-                         else
+                         elseif isstr(varname)
                             EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
+                         else
+                             EEGOUT.chanlocs = varname;
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
-                         if exist( varname ) == 2
+                         if isstr(varname) & exist( varname ) == 2
                             fprintf('Pop_editset: ICA weight matrix file ''%s'' found\n', varname); 
 							try, EEGOUT.icaweights = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
@@ -371,16 +376,19 @@ for curfield = tmpfields'
                          else
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
-							 else
+							 elseif isstr(varname)
 								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
+                             else
+								 EEGOUT.icaweights = varname;
+								 EEGOUT.icawinv = [];                                 
 							 end;
 						 end;
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
-                         if exist( varname ) == 2
+                         if isstr(varname) & exist( varname ) == 2
                             fprintf('Pop_editset: ICA sphere matrix file ''%s'' found\n', varname); 
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
@@ -389,9 +397,12 @@ for curfield = tmpfields'
                          else
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
-							 else
+							 elseif isstr(varname)
 								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
+                             else
+  								 EEGOUT.icaweights = varname;
+								 EEGOUT.icawinv = [];                                 
 							 end;
                          end;
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
@@ -467,17 +478,19 @@ end;
 
 % generate the output command
 % ---------------------------
-com = sprintf( '%s = pop_editset(%s', inputname(1), inputname(1) );
-for i=1:2:length(args)
-    if ~isempty( args{i+1} )
-        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
-        else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+if nargout > 1
+    com = sprintf( '%s = pop_editset(%s', inputname(1), inputname(1) );
+    for i=1:2:length(args)
+        if ~isempty( args{i+1} )
+            if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
+            else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+            end;
+        else
+            com = sprintf('%s, ''%s'', []', com, args{i} );
         end;
-    else
-        com = sprintf('%s, ''%s'', []', com, args{i} );
     end;
+    com = [com ');'];
 end;
-com = [com ');'];
 return;
 
 function num = popask( text )
