@@ -1,6 +1,6 @@
-% This function is obsolete. See pop_reref() instead.
-%
 % pop_averef() - Convert an EEG dataset to average reference.
+%                This function is obsolete. See pop_reref() instead.
+%
 %
 % Usage:
 %       >> EEGOUT = pop_averef( EEG, confirm);
@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/12/10 02:44:03  arno
+% msg
+%
 % Revision 1.11  2002/11/12 19:02:37  arno
 % debugging command line call
 %
