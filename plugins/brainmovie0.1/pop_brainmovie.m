@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/04/23 16:45:45  arno
+% more flipping
+%
 % Revision 1.31  2003/04/23 16:44:07  arno
 % more flipping
 %
@@ -421,7 +424,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,3) );
-        coordinates = -coordinates(:, [1 2]); % remove Z
+        coordinates = coordinates(:, [1 2]); % remove Z
     else
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
