@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/02/04 00:38:50  arno
+% upgrading to use finputcheck
+%
 % Revision 1.7  2004/07/29 21:06:17  arno
 % coma separated file debug
 %
@@ -91,7 +94,7 @@ end;
 g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' }   'on';
                              'skipline'  'integer'  [0 Inf]          0;
                              'verbose'   'string'   { 'on' 'off' }   'on';
-                             'delim'     'integer'  []               [9 32];
+                             'delim'     { 'integer' 'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
 if isstr(g), error(g); end;
 g.convert = lower(g.convert);
