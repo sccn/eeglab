@@ -17,9 +17,9 @@
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if n < 0, the number largest-comp. maps  to plot (component with max
 %                  variance) {default|[] -> 7}
-%  'timerange' = starting and ending input data latencies (in ms) {default: from 'limits'}
-%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify plotting start/end 
-%                  latencies (in ms) and min/max potential values (uV). If 0, or if both
+%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
+%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plotting
+%                  limits (in ms) and min/max data limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'title'     = [string] plot title {default|[] -> none}
@@ -87,6 +87,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2004/11/12 18:35:34  scott
+% reformed the limit setting code. Adjusted component label text, [ymin,ymax].
+% Added xunitframes and ylimset variables.
+%
 % Revision 1.72  2004/11/12 07:21:02  scott
 % debug imerange
 %
