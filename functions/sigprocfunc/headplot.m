@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2004/02/08 16:32:46  scott
+% same
+%
 % Revision 1.25  2004/02/08 16:31:41  scott
 % trying newupper.mat again for 252 channels
 %
@@ -165,8 +168,9 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-mesh_file  = ['/home/scott/matlab/old' '/newupper.mat']; % whole head model file (183K)
-% mesh_file  = ['mhead.mat'];      % upper head model file (987K)
+% mesh_file  = ['/home/scott/matlab/old' '/newupper.mat']; 
+                                 % whole head model file (183K)
+mesh_file  = ['mhead.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
@@ -300,7 +304,6 @@ if isstr(values)
         Xe = Xe./dists;
         Ye = Ye./dists;
         Ze = Ze./dists;
-
 		Xetmp = Xe;
 		Xe = -Ye;
 		Ye = Xetmp;
@@ -318,8 +321,6 @@ if isstr(values)
     for i = 1:enum
         ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
                          (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
-        %ei = onemat-((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
-        %             (Ze(i)*onemat-Ze).^2)/2;
         gx = zeros(1,enum);
         for j = 1:enum
             gx(j) = calcgx(ei(j));
@@ -339,8 +340,8 @@ if isstr(values)
     try, load(mesh_file,'-mat');
     catch,
         POS  = load('mheadpos.txt', '-ascii');
-        TRI1 = load('mheadtri1.txt', '-ascii');
-        TRI2 = load('mheadtri2.txt', '-ascii');
+        TRI1 = load('mheadtri1.txt', '-ascii'); % upper head
+        TRI2 = load('mheadtri2.txt', '-ascii'); % lower head
         index1 = load('mheadindex1.txt', '-ascii');
         center = load('mheadcenter.txt', '-ascii');
     end;
@@ -365,9 +366,9 @@ if isstr(values)
       npoints = I(1:3);
       diffe = newPOS(npoints,:)-spherePOS(npoints,:);
       newElect(i,:) = elect+mean(diffe)*ElectDFac;
-      %if Ze(i) < -1 % Was 0, to plot superior electrodes only 
-      %  newElect(i,:) = [0 0 0]; % mark as electrode position not to be plotted
-      %end
+      if Ze(i) < 0               % Plot superior electrodes only.
+        newElect(i,:) = [0 0 0]; % Mark lower electrodes  as having
+      end                        % an electrode position not to be plotted
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -380,14 +381,15 @@ if isstr(values)
 
     %figure; plot3(x (:),  y(:),  z(:), '.' );
     %figure; plot3(Xe(:), Ye(:), Ze(:), '.' );
+
     hwbend = length(x);
     for j = 1:length(x)
       % fprintf('%d ',j)
       X = x(j);
       Y = y(j);
       Z = z(j);
-      ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); %default /2  no sqrt
-      %ei = onemat-((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2)/2;
+      ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); 
+                                  % default was /2, no sqrt
       for i = 1:length(ei)
         gx(j,i) = calcgx(ei(i));  
       end
@@ -570,18 +572,18 @@ else
   enum = length(values);
   if enum ~= length(Xe)
 	  close;
-	  error(['headplot(): Number of values in spline file should equal number of electrodes.'])
+	  error([...
+'headplot(): Number of values in spline file should equal number of electrodes.'])
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Perform interpolation
   %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  meanval = mean(values);
-  values = values - meanval;
+  meanval = mean(values); values = values - meanval; % make mean zero
   onemat = ones(enum,1);
   lamd = 0.1;
-  C = pinv([(G + lamd);ones(1,enum)])*[values(:);0]; % fixing division error
+  C = pinv([(G + lamd);ones(1,enum)]) * [values(:);0]; % fixing division error
   P = zeros(1,size(gx,1));
   for j = 1:size(gx,1)
     P(j) = dot(C,gx(j,:));
@@ -766,8 +768,7 @@ out = 0;
 m = 4;       % 4th degree Legendre polynomial
 for n = 1:7  % compute 7 terms
   L = legendre(n,in);
-  % out = out + ((2*n+1)/n^m*(n+1)^m)*L(1) ;
-  out = out + ((2*n+1)/(n^m*(n+1)^m))*L(1) ; % bug fix by Colin 7/00
+    out = out + ((2*n+1)/(n^m*(n+1)^m))*L(1);
 end
 out = out/(4*pi);
 
