@@ -94,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/16 04:15:43  arno
+% same
+%
 % Revision 1.7  2002/07/16 04:14:54  arno
 % debuging flashes
 %
@@ -413,8 +416,10 @@ if ~isempty(g.flashes)
 		[tmp tmptimepoint] = min(abs(flasheslat(index)-times));
 		allflashes = [ allflashes tmptimepoint];
 	end;
-	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', []); set (gcf, 'visible', g.visible);
-	hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch, 'facecolor', 'w');
+	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', [], 'box', 'off'); set (gcf, 'visible', g.visible);
+	hpatch = patch([ 0.02 .11 .11 0.02], [0.05 0.05 0.925 0.925], [0.5 0.5 0.5]); 
+	set(hpatch, 'facecolor', 'w', 'edgecolor', 'none');
+	xlim([0 1]); ylim([0 1]);
 	posf = 0; % used as a counter to preserve color
 end;	
 
@@ -454,6 +459,16 @@ switch lower(g.caption)
  case 'off', maxcoordx = 1;
 end;	
 
+% draw white axis on envelop if flashes DOES NOT WORK WHEN PRINTING IN EPS
+% -------------------------------------
+%if ~isempty(g.flashes)
+%	if ~isempty(g.envelope) % draw axis for the envelope
+%		eflash = axes('position', [0 0 maxcoordx-0.1 ordinate].*s+q, ...
+%					  'xtick', [], 'ytick', [], 'box', 'off', 'visible', g.visible, 'color', 'none'); 
+%		hpatch2 = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch2, 'facecolor', 'w', 'edgecolor', 'none');
+%	end;
+%end;
+
 % draw axis and display images
 % ----------------------------
 for i=1:nbconditions
@@ -477,7 +492,7 @@ for i=1:nbconditions
 	axis off;
 	if ~isempty(g.envelope) % draw axis for the envelope
 		e(i) = axes('position', [0.1/nbconditions+maxcoordx/nbconditions*(i-1), 0, ...
-					maxcoordx/nbconditions-0.1/nbconditions, ordinate].*s+q, 'visible', g.visible);
+					maxcoordx/nbconditions-0.1/nbconditions, ordinate].*s+q,'visible', g.visible);
 	end;
 end;
 
