@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/04/29 14:15:58  scott
+% insured cumulX sized -sm
+%
 % Revision 1.21  2002/04/29 14:12:33  scott
 % used switches to test g.phsamp -sm
 %
@@ -665,10 +668,10 @@ for i=1:trials
                   cumulX(:,j) = cumulX(:,j)+abs(tmpX);
 		        case 'phasecoher',
 		          RR(:,j) = tmpX ./ abs(tmpX); % normalized cross-spectral vector
-                  switch g.phsamp
-                   case 'on'
-                     cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
-                  end
+         		  switch g.phsamp
+             		  case 'on'
+                		  cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
+          		  end
               end;
          end
           Wn(j) = 1;
