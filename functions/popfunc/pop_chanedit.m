@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2004/03/19 19:45:16  arno
+% conversion
+%
 % Revision 1.94  2004/03/19 19:04:53  scott
 % help message and plotrad gui text
 %
@@ -686,7 +689,7 @@ if nargin < 2
             totaluserdat{end+1} = 'auto';
         end;
         if ~isempty(tmpval)
-            chans(1).plotrad  = num2str(tmpval);
+            chans(1).plotrad  = str2num(tmpval);
             totaluserdat{end+1} = 'plotrad';
             totaluserdat{end+1} = chans(1).plotrad;
         end;
