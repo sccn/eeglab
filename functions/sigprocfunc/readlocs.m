@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/05/13 23:31:25  arno
+% number of lines to skip in chanedit format
+%
 % Revision 1.46  2003/05/13 22:09:01  arno
 % updating sph format
 %
@@ -326,7 +329,7 @@ elseif isstr(filename) & strcmp(filename, 'getinfoswrite')
 end;
 
 g = finputcheck( varargin, ...
-   { 'filetype'	'string'	 listtype '';
+   { 'filetype'	'string' { listtype{:} '' } '';
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'    'integer' [1 Inf]				[];
      'format'		'cell'	 []					{} }, 'readlocs');
