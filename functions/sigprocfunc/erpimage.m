@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/25 17:52:51  arno
+% removing debug message
+%
 % Revision 1.13  2002/04/25 17:51:50  arno
 % including renorm inside function
 %
@@ -1018,27 +1021,30 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
  base = find(times<=DEFAULT_BASELINE_END);
  if length(base)<2
      base = 1:floor(length(times)/4); % default first quarter-epoch
+     fprintf('Using %g to %g ms as amplitude baseline.\n',...
+                          times(1),times(base(end)));
  end
  amps = 20*log10(amps); % convert to dB
 
  if isnan(baseamp) % if not specified in 'limits'
-    [amps,baseamp] = rmbase(amps,length(times),base); % remove baseline
+    [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
  else
-    amps = amps-baseamp;
+    amps = amps-baseamp; % use specified (log) baseamp
  end
  if isnan(signifs);
     ampsig = ampsig-baseamp;
  end
  if alpha>0
-   fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
+   fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
  end
 
  % baseall = mean(mean(allamps(base,:)));
  % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
- % fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
+ fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
  % allamps = allamps./baseall;
- allamps = allamps./10^(baseamp/20);
+
+ allamps = allamps./10^(baseamp/20); % divide by (non-log) baseline amplitude
 
  % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
@@ -1569,18 +1575,20 @@ if ~isnan(coherfreq)
     end
 
     amps   = 20*log10(amps);      % convert to dB
-    fprintf('Data amplitude levels: [%g %g]\n',min(amps),max(amps));
+    fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
     if alpha>0 % if computed significance levels
-       fprintf('Data amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
+       fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
     end
 
     if isnan(baseamp) % if baseamp not specified in 'limits'
       base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
       if length(base)<2
          base = 1:floor(length(times)/4); % default first quarter-epoch
+         fprintf('Using %g to %g ms as amplitude baseline.\n',...
+                          times(1),times(base(end)));
       end
-       [amps,baseamp] = rmbase(amps,length(times),base); % remove baseline
-      fprintf('Removing baseline amplitude of %d dB for plotting.\n',baseamp);
+       [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
+      fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
     else
       fprintf('Removing specified baseline amplitude of %d dB for plotting.\n',...
                baseamp);
@@ -1630,7 +1638,8 @@ if ~isnan(coherfreq)
        end
      end
    end
-   fprintf('    amps range: [%g,%g]\n',minamp,maxamp);
+   fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
+   fprintf('     relative to baseamp: %g dB\n',baseamp);
    plot1erp(ax3,times,amps,[timelimits(1) timelimits(2) minamp maxamp]); % plot AMP
 
    if ~isnan(aligntime)
@@ -1917,7 +1926,7 @@ end
 %
 %%%%%%%%%%%%%% function prctle() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function prctl = prctle(data,pc);
+function prctl = prctle(data,pc); % return percentile of a distribution
 [prows pcols] = size(pc);
 if prows ~= 1 & pcols ~= 1
     error('pc must be a scalar or a vector.');
