@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/01/02 03:15:27  cooper
+% corrected text output msg.
+%
 % Revision 1.17  2002/11/20 01:33:39  arno
 % crossf diff no plot
 %
@@ -913,7 +916,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 						  'cumul   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + arg2.*conj(arg2);';
 		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
-						  'itc     = itc ./ sqrt(cumul) /' int2str(trials) ];
+						  'itc     = itc ./ sqrt(cumul) / sqrt(' int2str(trials) ')' ];
 		 case 'phasecoher',
 		  formulainit = [ 'power   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
 						  'itc     = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
