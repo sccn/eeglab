@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.139  2004/11/15 22:54:31  arno
+% read data from .dat file
+%
 % Revision 1.138  2004/11/09 02:05:11  arno
 % same
 %
@@ -603,11 +606,19 @@ if isstr(EEG.data)
     else 
         fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
     end;
-    EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+
+    % old format = .fdt; new format = .dat (transposed)
+    % -------------------------------------------------
+    datformat = 0;
     if length(filename) > 3
         if strcmpi(filename(end-2:end), 'dat')
-            EEG.data = EEG.data';
+            datformat = 1;
         end;
+    end;
+    if datformat
+        EEG.data = fread(fid, [Inf EEG.nbchan], 'float32')';
+    else
+        EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
     end;
     fclose(fid);
 end;
