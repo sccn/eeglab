@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/02/16 22:59:40  arno
+% adding text for GUI in header
+%
 % Revision 1.2  2002/08/12 02:30:30  arno
 % [6~[6~inputdlg2
 %
@@ -101,6 +104,11 @@ if isfield(EEG.event, 'latency')
     fprintf('resampling event latencies...\n');
     for index1 = 1:length(EEG.event)
         EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
+    end;
+    if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
+        for index1 = 1:length(EEG.event)
+            EEG.urevent(index1).latency = EEG.urevent(index1).latency * EEG.pnts /oldpnts;
+        end;
     end;
 end;
 
