@@ -161,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.211  2004/06/09 01:48:43  arno
+% make limits and image data consistent
+%
 % Revision 1.210  2004/06/05 01:52:45  arno
 % aligntime as string to avoid really realigning
 %
@@ -2682,9 +2685,9 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         end
     end
     
-    ydelta = 1/10*(limit(2)-limit(1)); 
-    ytextoffset = limit(1)-1.1*ydelta;
-    ynumoffset = limit(1)-0.3*ydelta; 
+    ydelta = double(1/10*(limit(2)-limit(1))); 
+    ytextoffset = double(limit(1)-1.1*ydelta);
+    ynumoffset  = double(limit(1)-0.3*ydelta); % double for Matlab 7
     
     t=text(ynumoffset,0.7*limit(3), num2str(limit(3)));
     set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
