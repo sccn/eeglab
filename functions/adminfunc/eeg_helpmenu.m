@@ -24,7 +24,10 @@
 % along with this program; if not write to the Free Software      
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
-% $Log: not supported by cvs2svn $      
+% $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/16 16:27:28  arno
+% new version with HTML menu generation
+%      
 % Revision 1.8  2002/07/29 18:37:55  arno       
 % updating the menus       
 %       
@@ -123,6 +126,7 @@ allmenus = { ...
 '      By number' 'topoplot'           ... %       Numbers      
 '   EEG data (scroll)' 'pop_eegplot'        ... %    Scroll EEG data      
 '   Channel spectra and maps' 'pop_spectopo'       ... %    Channel spectra and maps      
+'   Channel properties' 'pop_prop'       ... %    Component properties      
 '   Channel ERP image' 'pop_erpimage'       ... %    Channel ERP image      
 '   ERP plots' ''      ...
 '      With scalp maps' 'pop_timtopo'        ... %       ERP and scalp maps      
@@ -137,7 +141,7 @@ allmenus = { ...
 '   Component maps' ''      ...
 '      As 2-D scalp maps' 'pop_topoplot'       ... %       Component scalp maps      
 '      As 3-D head plots' 'pop_headplot'       ... %       Component head plots      
-'   Component properties' 'pop_compprop'       ... %    Component properties      
+'   Component properties' 'pop_prop'       ... %    Component properties      
 '   Component ERP image' 'pop_erpimage'       ... %    Component ERP image      
 '   Component ERPs' ''      ...
 '      On same axis (with maps)' 'pop_envtopo'        ... %       Largest ERP components      
