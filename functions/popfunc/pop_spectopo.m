@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/09 00:54:35  arno
+% adding boundaries for cont. data
+%
 % Revision 1.15  2002/08/09 00:45:42  arno
 % text
 %
@@ -190,7 +193,7 @@ end;
 % ----------------------------------
 if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
 	boundaries = strmatch({EEG.event.type}, 'boundary');
-	if isempty(boundaries)
+	if ~isempty(boundaries)
 		spectopooptions = { spectopooptions{:} 'boundaries' cell2mat({EEG.event(boundaries).latency}) }; 
 	end;	
 end;
