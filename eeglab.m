@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.316  2004/07/09 23:41:55  arno
+% update plugin
+%
 % Revision 1.315  2004/07/02 18:17:23  arno
 % saving a dataset is recorded in dataset history
 %
@@ -1478,7 +1481,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
         if ~isempty(funcname)
             vers = ''; % version
             try,
-                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs)' ]);
+                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
                 disp(['eeglab: adding plugin "' vers '" (see >> help ' funcname ')' ]);    
            catch
                 try,
