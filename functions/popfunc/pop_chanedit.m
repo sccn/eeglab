@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/08/04 18:49:56  arno
+% automatic conversion for 'transform' parameter
+%
 % Revision 1.55  2003/07/19 01:24:47  arno
 % remving double &
 %
