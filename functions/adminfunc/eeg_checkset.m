@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2004/06/04 01:05:02  arno
+% allowing latencies of 0.5
+%
 % Revision 1.122  2004/05/26 23:12:02  arno
 % epoch duration in ms
 %
@@ -1096,6 +1099,20 @@ if ~isempty( varargin)
                   for index = find(valempt)
                       EEG.event(index).duration = 0;
                   end;
+              end;
+          end;
+
+          % resort events
+          % -------------
+          if isfield(EEG.event, 'latency')
+              try, 
+                  TMPEEG = pop_editeventvals(EEG, 'sort', { 'latency' });
+                  if ~isequal(TMPEEG.event, EEG.event)
+                      EEG = TMPEEG;
+                      disp('Event resorted by increasing latencies. Some event indices have changed.');
+                  end;
+              catch,
+                  disp('eeg_checkset: problem when attempting to resort event latencies.');     
               end;
           end;
           
