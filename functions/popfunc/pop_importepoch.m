@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/04/10 17:31:29  arno
+% header edit
+%
 % Revision 1.23  2003/02/28 17:04:14  arno
 % smarter warning
 %
@@ -408,6 +411,7 @@ end;
 % ----------------------------
 EEG = pop_editeventvals( EEG, 'sort', { 'epoch', 0 } ); % resort fields
 EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
 
 % generate the output command
 % ---------------------------

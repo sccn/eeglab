@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/04/10 17:30:33  arno
+% header edit
+%
 % Revision 1.14  2002/12/06 03:49:35  arno
 % resorint events
 %
@@ -204,8 +207,9 @@ else
     else
         EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
     end;
-	EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
+EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
 
 % delete channels
 % ---------------

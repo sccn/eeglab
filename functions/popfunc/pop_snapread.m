@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/04/10 17:36:28  arno
+% header edit
+%
 % Revision 1.2  2003/03/02 22:51:56  arno
 % gain
 %
@@ -97,10 +100,11 @@ EEG.xmin            = 0;
 A = find(events ~= 0);
 if ~isempty(A)
     EEG.event = struct( 'type', mat2cell(events(A), [1], ones(1,length(events(A)))), ...
-                    'latency', mat2cell(A(:)', [1], ones(1,length(A))) );
+                        'latency', mat2cell(A(:)', [1], ones(1,length(A))) );
 end;
 
-EEG = eeg_checkset(EEG);
+EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
 command = sprintf('EEG = pop_snapread(''%s'', %f);', filename, gain); 
 
 return;

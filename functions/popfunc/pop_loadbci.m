@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/10 18:05:22  arno
+% default argument
+%
 % Revision 1.8  2002/11/13 17:09:12  scott
 % help msg
 %
@@ -170,6 +173,8 @@ catch
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 	%EEG.data = tmpdata([72 73 75],:);
 end;
+EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
 
 command = sprintf('EEG = pop_loadbci(''%s'', %f);',filename, srate); 
 return;
