@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/08 02:50:11  scott
+% *** empty log message ***
+%
 % Revision 1.2  2002/04/08 02:48:32  scott
 % worked on spelling, made text msg depend on number of pre-labeled comps -sm
 %
@@ -71,8 +74,7 @@ if nargin < 2
    end;
 	inistr       = { int2str(components) };
 	result       = inputdlg( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr);
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+	if length(result) == 0 return; end;
 	components   = eval( [ '[' result{1} ']' ] );
 end;
  
