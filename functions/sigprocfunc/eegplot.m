@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2003/12/06 02:13:36  arno
+% header
+%
 % Revision 1.90  2003/11/18 16:24:36  scott
 % Enter new channel -> New channel
 %
@@ -1217,15 +1220,26 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       
   if ~isempty(g.events)
       if isstr(g.events(1).type)
-           [g.eventtypes tmpind indexcolor] = unique({g.events.type});
+           [g.eventtypes tmpind indexcolor] = unique({g.events.type}); % indexcolor countinas the event type
       else [g.eventtypes tmpind indexcolor] = unique(cell2mat({g.events.type}));
       end;
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
-      g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};  
+      g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};
+      g.eventwidths     = [ 2.5 1 ];
       g.eventtypecolors = g.eventcolors(mod([1:length(g.eventtypes)]-1 ,length(g.eventcolors))+1);
       g.eventcolors     = g.eventcolors(mod(indexcolor-1               ,length(g.eventcolors))+1);
       g.eventtypestyle  = g.eventstyle (mod([1:length(g.eventtypes)]-1 ,length(g.eventstyle))+1);
       g.eventstyle      = g.eventstyle (mod(indexcolor-1               ,length(g.eventstyle))+1);
+      
+      % for width, only boundary events have width 2
+      for index = 1:length(g.eventtypes)
+          if strcmpi(g.eventtypes{index}, 'boundary'), indexwidth(index) = 1;
+          else                                         indexwidth(index) = 2;
+          end;
+      end;
+      g.eventtypewidths = g.eventwidths (mod(indexwidth([1:length(g.eventtypes)])-1 ,length(g.eventwidths))+1);
+      g.eventwidths     = g.eventwidths (mod(indexwidth(indexcolor)-1               ,length(g.eventwidths))+1);
+      
       g.eventlatencies  = cell2mat({g.events.latency});
       g.plotevent       = 'on';
   end;
@@ -1463,7 +1477,8 @@ else
         for index = 1:length(event2plot)
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
             tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) }, ...
-                     'linestyle', g.eventstyle{ event2plot(index) } );
+                          'linestyle', g.eventstyle { event2plot(index) }, ...
+                          'linewidth', g.eventwidths( event2plot(index) ) );
             %if g.trials == 1
             %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.4f s');
             %else
@@ -1819,7 +1834,7 @@ else
           
           for index = 1:nleg
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
-                          g.eventtypestyle{ index }); hold on;
+                          g.eventtypestyle{ index }, 'linewidth', g.eventtypewidths( index )); hold on;
               if iscell(g.eventtypes)
                   text(35, (index-0.5)*10, g.eventtypes{index});
               else
