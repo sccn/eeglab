@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.64  2003/11/05 20:30:51  arno
+%nothing
+%
 %Revision 1.63  2003/11/05 18:50:28  arno
 %nothing
 %
@@ -439,7 +442,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % conversion
     % ----------
     if strcmpi(g.normlen, 'on')
-        try, sources = rmfield(sources, 'besaextori'); catch, end;
+        if isfield(sources, 'besaextori')
+            sources = rmfield(sources, 'besaextori'); 
+        end;
     end;
     if ~isfield(sources, 'besathloc') & strcmpi(g.image, 'besa') & ~is_sccn
         error(['For copyright reasons, it is not possible to use the BESA ' ...
@@ -472,6 +477,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     else 
         fact = 1;
     end;
+    
+    % find non-empty sources
+    % ----------------------
+    noempt = cellfun('isempty', { sources.posxyz } );
+    sources = sources( find(~noempt) );
     
     % transform coordinates
     % ---------------------
