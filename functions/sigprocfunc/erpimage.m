@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2003/11/10 16:57:46  arno
+% msg typo
+%
 % Revision 1.159  2003/10/29 22:15:52  scott
 % adjust erp alpha NBOOT to (low) alpha
 %
@@ -2866,17 +2869,20 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
 %                           else, plot erp alone
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
-  [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
   if exist('signif') == 1 
     if ~isnan(signif);
-      [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
-      [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
+      filltimes = [times times(end:-1:1)];
+      fillsignif = [signif -1*signif(end:-1:1)];
+      [fill] = fill(filltimes,fillsignif, 'r'); hold on    % plot 0+alpha
+      % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
+      % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
     if exist('stdev') == 1
       [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
       [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
     end
   end;
+  [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
   if sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
       axis([axlimits(1:2) 1.1*axlimits(3:4)])
