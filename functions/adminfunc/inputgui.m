@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [ outparam userdat ] = ...
-%             inputgui( geometry, listui, help, title );
+%             inputgui( geometry, listui, help, title, userdat );
 % 
 % Inputs:
 %   geometry   - see supergui()
@@ -17,6 +17,7 @@
 %                'String', 'hello' }. See supergui() for details.
 %   help       - optional help command 
 %   title      - optional figure title
+%   userdat    - optional userdata input for the figure
 %
 % Output:
 %   outparam   - list of outputs. The function scan all lines and
@@ -51,10 +52,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat] = inputgui( geometry, listui, helpcom, mytitle);
+function [result, userdat] = inputgui( geometry, listui, helpcom, mytitle, userdat);
 
 if nargin < 2
    help inputgui;
@@ -63,6 +67,7 @@ end;
 
 fig = figure;
 if exist('mytitle') == 1, set(gcf, 'name', mytitle); end;
+if exist('userdat') == 1, set(gcf, 'userdata', userdat); end; 
 geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
 
 % add the three buttons
