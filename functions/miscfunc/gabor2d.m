@@ -1,28 +1,27 @@
-% gabor2d() - generate a 2 dimensional gabor matrice.
+% gabor2d() - generate a two-dimensional gabor matrice.
 %
 % Usage:
+%   >> [ matrix ] = gabor2d(rows, columns);
 %   >> [ matrix ] = gabor2d( rows, columns, freq, ...
-%                 angle, sigmaR, sigmaC, meanR, meanC, dephase, cut)
-%
+%                             angle, sigmaR, sigmaC, meanR, meanC, dephase, cut)
 % Example :
 %	>> imagesc(gabor2d( 50, 50))
 %
 % Inputs:
 %   rows        - number of rows 
 %   columns     - number of columns 
-%   freq        - frequency of sinus function in degree (default: 360/rows)
-%   angle       - angle for rotation of the resulting 2D array. In
-%                 degree of angle. Default is 0.
-%   sigmaR      - standart deviation for rows (default: rows/5)
-%   sigmaC      - standart deviation for columns (default: columns/5)
-%   meanR       - mean for rows (default: center of the row)
-%   meanC       - mean for columns (default: center of the column)
-%   dephase     - dephase in  degrees (default:0). A Gabor wavelet can be
-%                 build using gabor2dd(...., 0) + i*gabor2d(...., 90), 0
-%                 and 90 being the dephasage
-%   cut	        - percentage (0->1) of the maximum value for removing 
-%                 values in the matrix (default: 0)
-%
+%   freq        - frequency of the sinusoidal function in degrees (default: 360/rows)
+%   angle       - angle of rotation of the resulting 2-D array in
+%                 degrees of angle {default: 0}.
+%   sigmaR      - standard deviation for rows {default: rows/5}
+%   sigmaC      - standard deviation for columns {default: columns/5}
+%   meanR       - mean for rows {default: center of the row}
+%   meanC       - mean for columns {default: center of the column}
+%   dephase     - phase offset in  degrees {default: 0}. A complex Gabor wavelet 
+%                 can be build using gabor2dd(...., 0) + i*gabor2d(...., 90), 
+%                 0 and 90 being the phase offset of the real and imaginary parts
+%   cut	        - percentage (0->1) of maximum value below which to remove values 
+%                 from the matrix {default: 0}
 % Ouput:
 %   matrix - output gabor matrix
 %
@@ -47,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/01/10 03:10:40  arno
+% debuging rotation (recentering)
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
