@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2004/08/03 01:22:56  arno
+% debug cellfun for Matlab 7
+%
 % Revision 1.130  2004/07/30 16:59:02  arno
 % new version detection
 %
@@ -1042,7 +1045,7 @@ if ~isempty( varargin)
                   EEG.event(union(I1, I2)) = [];
               end;
           end;
-          
+                    
           % save information for non latency fields updates
           % -----------------------------------------------
           difffield = [];
@@ -1125,6 +1128,18 @@ if ~isempty( varargin)
                       if valreal(indexevent)
                           EEG.event = setfield(EEG.event, { indexevent }, allfields{index}, num2str(allvalues{indexevent}) );
                       end;
+                  end;
+              end;
+          end;
+
+          % check that numeric format is double (Matlab 7)
+          % -----------------------------------
+          allf = fieldnames(EEG.event);
+          for index = 1:length(allfields)
+              clear tmpval; tmpval = getfield(EEG.event,{ 1 },allf{index});
+              if isnumeric(tmpval) && ~isequal(tmpval, double(tmpval))
+                  for indexevent = 1:length(EEG.event)
+                      EEG.event = setfield(EEG.event, { indexevent }, allf{index},  tmpval );
                   end;
               end;
           end;
