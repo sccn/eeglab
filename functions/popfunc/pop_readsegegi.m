@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/04/11 00:40:11  arno
+% debug
+%
 % Revision 1.1  2003/04/11 00:37:15  arno
 % Initial revision
 
@@ -59,7 +62,7 @@ index = 1;
 cont = 1;
 Eventdata = [];
 while cont
-    tmpfilename = [ basename sprintf('%3.3d', index) tailname ]
+    tmpfilename = [ basename sprintf('%3.3d', index) tailname ];
     try,
         disp(['Importing ' tmpfilename ]);
         [Head tmpdata tmpevent] = readegi( tmpfilename );
