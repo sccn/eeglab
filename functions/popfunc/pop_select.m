@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/30 18:27:11  arno
+% adding scroll button
+%
 % Revision 1.8  2002/04/22 23:43:44  arno
 % debugging for no latency event structure
 %
@@ -145,11 +148,6 @@ if nargin < 2
    if ~isempty( results{7} )
        if ~results{8}, args = { args{:}, 'channel', eval( [ '[' results{7} ']' ] ) };
        else            args = { args{:}, 'nochannel', eval( [ '[' results{7} ']' ] ) }; end;
-   end;
-
-   if ~isempty( results{9} )
-       if ~results{11}, args = { args{:}, 'trialcond',   eval( [ '{ { ''' results{9} ''' [ ' results{10} ' ]} }' ] ) };
-       else             args = { args{:}, 'notrialcond', eval( [ '{ { ''' results{9} ''' [ ' results{10} ' ]} }' ] ) }; end;
    end;
 
 else
