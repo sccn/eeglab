@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/03/05 02:04:58  scott
+% emarkersize
+%
 % Revision 1.40  2003/03/05 02:04:07  scott
 % emarkersize -sm
 %
@@ -472,9 +475,9 @@ for t=1:ntopos
   end
   if topowidth<0.12
     if ~isempty(topoargs)
-        topoargs = ['\'emarkersize\',8,' topoargs];
+        topoargs = ['''emarkersize'',8,' topoargs];
     else
-        topoargs = ['\'emarkersize\',8'];
+        topoargs = ['''emarkersize'',8'];
     end
   end
   if ~isempty(varargin)
