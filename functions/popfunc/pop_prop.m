@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/13 21:41:23  arno
+% undo last change
+%
 % Revision 1.7  2002/10/12 01:24:10  arno
 % update mean power
 %
@@ -184,15 +187,15 @@ if EEG.trials > 1
 	hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 	EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
 	if typecomp == 1
-        offset = mean(EEG.data(numcompo,:));
+        offset = nan_mean(EEG.data(numcompo,:));
 		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp');   
 	else
 		if option_computeica  
-            offset = mean(EEG.icaact(numcompo,:));
+            offset = nan_mean(EEG.icaact(numcompo,:));
 			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
 		else
 			icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-            offset = mean(icaacttmp);
+            offset = nan_mean(icaacttmp);
 			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
 		end;
 	end;
@@ -323,4 +326,18 @@ else
 end;
 
 return;
+
+function out = nan_mean(in)
+
+    nans = find(isnan(in));
+    in(nans) = 0;
+    sums = sum(in);
+    nonnans = ones(size(in));
+    nonnans(nans) = 0;
+    nonnans = sum(nonnans);
+    nononnans = find(nonnans==0);
+    nonnans(nononnans) = 1;
+    out = sum(in)./nonnans;
+    out(nononnans) = NaN;
+
 
