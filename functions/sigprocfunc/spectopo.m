@@ -67,6 +67,8 @@
 %                   only computes the spectrum of the components given as input using 
 %                   the 'icacomps' parameter. Other component spectrum are filled  
 %                   with 0.
+%        contrib  = contribution of each component (if 'icamode' is 'normal', relative
+%                   variance, if 'icamode' is 'sub', percentage variance accounted for)
 %
 % Notes: The old function call is still function for backward compatibility
 %        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
@@ -95,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/02/26 03:00:34  arno
+% header edit
+%
 % Revision 1.51  2003/01/28 18:02:20  arno
 % debuging ERP plot if no channel location file
 %
@@ -260,7 +265,7 @@
 
 % Uses: MATLAB psd(), changeunits(), topoplot(), textsc()
 
-function [eegspecdB,freqs,compeegspecdB]=spectopo(data,frames,srate,varargin) 
+function [eegspecdB,freqs,compeegspecdB,resvar]=spectopo(data,frames,srate,varargin) 
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
@@ -579,11 +584,11 @@ if ~isempty(g.weights)
     [tmp indexfreq] = min(abs(g.freq-freqs));
     for index = 1:length(g.icacomps)
         if strcmp(g.icamode, 'normal')
-            resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
+            resvar(index)  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+            fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar(index));
         else
-            resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-            fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar);
+            resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+            fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar(index));
         end;
     end;
 end;
@@ -692,6 +697,7 @@ if ~isempty(g.freq)
 			else
 				tl=title([ 'c' int2str(g.plotchan)]);
 			end;
+            
 		else	
 			if ~isempty(varargin)
 				topoplot(topodata,g.chanlocs,'maplimits',maplimits, varargin{:}); 
@@ -726,6 +732,13 @@ if ~isempty(g.freq)
 			set(tl,'fontsize',16);
 			axis square;
 			drawnow
+            try,
+                if strcmpi(g.icamode, 'normal')
+                    set(gca, 'userdata', ['text(-0.6, -0.6, ''Rel. Var.: ' sprintf('%6.2f', resvar(g.icacomps(compnum))) ''');'] );
+                else
+                    set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', resvar(g.icacomps(compnum))) ''');'] );
+                end;
+            catch, end;
 			if realpos(index+1) == max(realpos), plotcolbar(g); end;
 		end;
 	else 
@@ -754,7 +767,7 @@ end;
 %%%%%%%%%%%%%%%%
 % Turn on axcopy
 %%%%%%%%%%%%%%%%
-axcopy
+axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
 
 
 %%%%%%%%%%%%%%%%
