@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/02 00:35:47  arno
+% update condstat, debug
+%
 % Revision 1.1  2002/10/01 16:06:44  arno
 % Initial revision
 %
@@ -586,7 +589,7 @@ if iscell(X)
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
 	figure; 
 	subplot(1,3,1); title(g.title{1});
-	if ~strcmp(g.type, 'coher')
+	if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
 								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ', vararginori{:});
 	else
@@ -598,7 +601,7 @@ if iscell(X)
 	
 	fprintf('\nRunning crossf on condition 2 *********************\n');
 	subplot(1,3,2); title(g.title{2});
-	if ~strcmp(g.type, 'coher')
+	if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
 								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
 	else
@@ -609,9 +612,10 @@ if iscell(X)
 
 	subplot(1,3,3); title(g.title{3});
 	if isnan(g.alpha)
-		plotall(R2-R1, [], [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+        Rdiff = R1-R2;
+		plotall(Rdiff, [], [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
+        Rbootout = [];
 	else 
-		
 		% preprocess data and run compstat
 		% --------------------------------
 		switch g.type
@@ -619,18 +623,18 @@ if iscell(X)
 		  Tfx1 = Tfx1.*conj(Tfx1); Tfx2 = Tfx2.*conj(Tfx2);
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X).*conj(arg2(:,:,X),3) ./ sqrt(sum(arg1(:,:,X))) ./ sqrt(sum(arg2(:,:,X)))';
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
+		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
 						'upper', g.condboot, { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
 		 case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
 														   { savecoher1 savecoher2 });
 		 case 'phasecoher2',
 		  formula = 'sum(arg1(:,:,X),3) ./ sum(sqrt(arg1(:,:,X).*conj(arg1(:,:,X)))),3)'; 
 		  % sqrt(a.*conj(a)) is about twice faster than abs()
-		  [coherdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
 														   { savecoher1 savecoher2 });
 		end;
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
@@ -638,9 +642,18 @@ if iscell(X)
 		%Boot = bootcomppost(Boot, [], [], []);
 		g.title = '';
 		g.boottype = 'trials';
-		plotall(coherdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
-			
+		plotall(Rdiff, coherimages, times, freqs, mbase, find(freqs <= g.maxfreq), g);
+
+        % outputs
+        Rbootout = {Rbootout1 Rbootout2 coherimages};
 	end;
+    R        = { abs(R1) abs(R2) abs(Rdiff) };
+    Rangle   = { angle(R1) angle(R2) angle(Rdiff) };
+    coherresout = [];
+    if nargout >=9
+        alltfX = { Tfx1 Tfx2 };
+        alltfY = { Tfy1 Tfy2 };
+    end;
 	return; % ********************************** END FOR SEVERAL CONDITIONS
 end;
 
