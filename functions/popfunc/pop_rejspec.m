@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad
@@ -73,10 +76,10 @@ if nargin < 1
    return;
 end;  
 if nargin < 2
-   icacomp = 0;
+   icacomp = 1;
 end;  
-icacomp = ~icacomp;
-if icacomp == 1
+
+if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
@@ -105,7 +108,7 @@ if nargin < 3
                		'NO', ...
             		'NO' };
 
-	result       = inputdlg( promptstr, fastif(icacomp, 'Spectral thresholding comp. rejection -- pop_rejspec()', 'Spectral thresholding rejection -- pop_rejspec()'), 1,  inistr);
+	result       = inputdlg( promptstr, fastif(~icacomp, 'Spectral thresholding comp. rejection -- pop_rejspec()', 'Spectral thresholding rejection -- pop_rejspec()'), 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};
@@ -129,8 +132,9 @@ else
 end;
 
 sizewin = 2^nextpow2(EEG.pnts);
-if icacomp == 0
-    [allspec, Irej, Erej, freqs ] = spectrumthresh( EEG.data, EEG.specdata, elecrange, EEG.srate, negthresh, posthresh, startfreq, endfreq);
+if icacomp == 1
+    [allspec, Irej, Erej, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
+							elecrange, EEG.srate, negthresh, posthresh, startfreq, endfreq);
 else
     % test if ICA was computed
     % ------------------------
@@ -138,11 +142,13 @@ else
  	if option_computeica  
     	icaacttmp = EEG.icaact(elecrange, :, :);
 	else
-        icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+        icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, ...
+												  EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
    	try, oldspec   = EEG.specicaact(elecrange, :, :); catch, oldspec = []; end;
-    [allspec, Irej, Erejtmp, freqs ] = spectrumthresh( icaacttmp, oldspec, 1:length(elecrange), EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    [allspec, Irej, Erejtmp, freqs ] = spectrumthresh( icaacttmp, oldspec, 1:length(elecrange), ...
+								EEG.srate, negthresh, posthresh, startfreq, endfreq);
     Erej = zeros(size(EEG.icaweights,1), size(Erejtmp,2));
     Erej(elecrange,:) = Erejtmp;
 end;
@@ -151,7 +157,7 @@ fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials rejected\n', length(Irej), EEG.trials);
 tmprejectelec = zeros( 1, EEG.trials);
 tmprejectelec(Irej) = 1;
-if icacomp
+if icacomp == 1
    tmpelecIout = zeros(EEG.nbchan, EEG.trials);
 else
    tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
@@ -159,15 +165,15 @@ end;
 tmpelecIout = Erej;
 
 if calldisp
-	nbpnts = fastif( icacomp == 0, size(EEG.specdata,2), size(EEG.specicaact,2));
-    if icacomp == 0 macrorej  = 'EEG.reject.rejfreq';
+	nbpnts = fastif( icacomp == 1, size(EEG.specdata,2), size(EEG.specicaact,2));
+    if icacomp == 1 macrorej  = 'EEG.reject.rejfreq';
         			macrorejE = 'EEG.reject.rejfreqE';
     else			macrorej  = 'EEG.reject.icarejfreq';
         			macrorejE = 'EEG.reject.icarejfreqE';
     end;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
      
-	if icacomp == 0
+	if icacomp == 1
 		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], 'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
 	else
 		eegplot(icaacttmp, 'winlength', 5, 'position', [100 800 800 500], 'limits', [EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
@@ -180,7 +186,7 @@ end;
 % -----------------------------
 eeg_options; % changed from eeglaboptions 3/30/02 -sm
 if option_keepdataset
-    if icacomp == 0, EEG.specdata = zeros(EEG.nbchan, size(allspec,2), size(allspec,3));
+    if icacomp == 1, EEG.specdata = zeros(EEG.nbchan, size(allspec,2), size(allspec,3));
                      EEG.specdata(elecrange, :, :) = allspec;
     else,            EEG.specicaact = zeros(EEG.nbchan, size(allspec,2), size(allspec,3));
                      EEG.specicaact(elecrange, :, :) = allspec;
@@ -188,7 +194,7 @@ if option_keepdataset
 end;
     
 com = [com sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), ~icacomp, num2str(elecrange),  num2str(negthresh), ...
+   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
    num2str(posthresh), num2str(startfreq ) , num2str(endfreq), superpose, reject ) ]; 
 
 return;

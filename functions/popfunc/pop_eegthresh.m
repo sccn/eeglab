@@ -9,8 +9,7 @@
 %   INEEG      - input dataset
 %   typerej    - type of rejection (0 = independent components; 1 = eeg
 %              data). Default is 1. For independent components, before
-%              thresholding, the activity is normalized for each 
-%              component.
+%              thresholding, the activity is normalized.
 %   elec_comp  - [e1 e2 ...] electrodes (number) or components to take 
 %              into consideration for rejection
 %   negthresh  - negative threshold limit in mV (can be an array if 
@@ -56,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad
@@ -70,11 +72,10 @@ if nargin < 1
    return;
 end;  
 if nargin < 2
-   icacomp = 0;
+   icacomp = 1;
 end;  
 
-icacomp = ~icacomp;
-if icacomp == 1
+if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must run ICA first'); return;
 	end;
@@ -89,17 +90,18 @@ if nargin < 3
 					fastif(icacomp==0, 'Positive thresholds (std: ex:3 4 2):', 'Positive thresholds (mV; ex:20 10 15):'), ...
 					'Starttime(s;ex -0.1 0.3):', ...
 					'Entime(s;ex 0.2):', ...
-               'Cumulate/compare with current rejection', ...
-         		'Actually reject trial (YES or NO for just labelling them' };
-	inistr      = { fastif(icacomp==0, ['1:' int2str(EEG.nbchan)], '1:5'), ...
-					fastif(icacomp==0, '-10', '-20'),  ...
-					fastif(icacomp==0, '10', '20'), ...
+                    'Cumulate/compare with current rejection', ...
+         		    'Actually reject trial (YES or NO for just labelling them' };
+	inistr      = { fastif(icacomp==1, ['1:' int2str(EEG.nbchan)], '1:5'), ...
+					fastif(icacomp==1, '-10', '-20'),  ...
+					fastif(icacomp==1, '10', '20'), ...
 					num2str(EEG.xmin), ...
 					num2str(EEG.xmax), ...
-               'NO', ...
-            	'NO' };
+                    'NO', ...
+            	    'NO' };
 
-	result       = inputdlg( promptstr, fastif(icacomp, 'Trial rejection using components -- pop_eegthresh()', 'Classic trials rejection -- pop_eegthresh()'), 1,  inistr);
+	result       = inputdlg( promptstr, fastif(icacomp == 0, 'Trial rejection using components -- pop_eegthresh()', ...
+											   'Classic trials rejection -- pop_eegthresh()'), 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};
@@ -122,10 +124,16 @@ else
 	calldisp = 0;
 end;
 
-if any(starttime < EEG.xmin) fprintf('Warning : starttime inferior to minimum time, adjusted'); starttime(find(starttime < EEG.xmin)) = EEG.xmin; end;
-if any(endtime   > EEG.xmax) fprintf('Warning : starttime inferior to minimum time, adjusted'); endtime(find(endtime > EEG.xmax)) = EEG.xmax;end;
+if any(starttime < EEG.xmin) 
+	fprintf('Warning : starttime inferior to minimum time, adjusted'); 
+	starttime(find(starttime < EEG.xmin)) = EEG.xmin; 
+end;
+if any(endtime   > EEG.xmax) 
+	fprintf('Warning : starttime inferior to minimum time, adjusted'); 
+	endtime(find(endtime > EEG.xmax)) = EEG.xmax;
+end;
 
-if icacomp == 0
+if icacomp == 1
 	[I1 Irej NS Erej] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
 else
     % test if ICA was computed
@@ -146,7 +154,7 @@ fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials rejected\n', size(I2(:), 1), EEG.trials);
 tmprejectelec = zeros( 1, EEG.trials);
 tmprejectelec(I2) = 1;
-if icacomp
+if icacomp == 1
    tmpelecIout = zeros(EEG.nbchan, EEG.trials);
 else
    tmpelecIout = zeros(size(EEG.icaweight,1), EEG.trials);
@@ -154,14 +162,14 @@ end;
 tmpelecIout(elecrange, I2) = tmprej;
 
 if calldisp
-    if icacomp == 0 macrorej  = 'EEG.reject.rejthresh';
+    if icacomp == 1 macrorej  = 'EEG.reject.rejthresh';
         			macrorejE = 'EEG.reject.rejthreshE';
     else			macrorej  = 'EEG.reject.icarejthresh';
         			macrorejE = 'EEG.reject.icarejthreshE';
     end;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 	     
-    if icacomp == 0
+    if icacomp == 1
         eeg_multieegplot( EEG.data(elecrange,:,:), tmprejectelec, tmpelecIout(elecrange,:), oldrej, oldrejE, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
     else
@@ -171,7 +179,7 @@ if calldisp
 end;
 
 com = sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), ~icacomp, num2str(elecrange),  num2str(negthresh), ...
+   inputname(1), icacomp, num2str(elecrange),  num2str(negthresh), ...
    num2str(posthresh), num2str(starttime ) , num2str(endtime), superpose, reject ); 
 
 return;

@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad
@@ -70,10 +73,10 @@ if nargin < 1
    return;
 end;  
 if nargin < 2
-   icacomp = 0;
+   icacomp = 1;
 end;  
-icacomp = ~icacomp;
-if icacomp == 1
+
+if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
@@ -88,20 +91,20 @@ if nargin < 3
 
 	% which set to save
 	% -----------------
-	promptstr   = { fastif(icacomp, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
+	promptstr   = { fastif(~icacomp, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
 					'Local thresholds (standard deviation: ex: 3 4 2):', ...
 					'Global thresholds (standard deviation: ex: 3 4 2):', ...
                		'Cumulate/compare with current rejection', ...
          			'Actually reject trial (YES or NO for just labelling them', ...
          			'visualization type (REJECTRIALS|EEGPLOT)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
-					fastif(icacomp, '5', '3'),  ...
-					fastif(icacomp, '5', '3'), ...
+					fastif(icacomp, '3', '5'),  ...
+					fastif(icacomp, '3', '5'), ...
                		'YES', ...
             		'NO', ...
             		'REJECTRIALS' };
 
-	result       = inputdlg( promptstr, fastif( icacomp, 'Trial reject. using component proba. -- pop_jointprob()', 'Trial rejection using probability -- pop_jointprob()'), 1,  inistr);
+	result       = inputdlg( promptstr, fastif( ~icacomp, 'Trial reject. using component proba. -- pop_jointprob()', 'Trial rejection using probability -- pop_jointprob()'), 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};
@@ -131,7 +134,7 @@ end;
 
 % compute the joint probability
 % -----------------------------
-if icacomp == 0
+if icacomp == 1
 	fprintf('Computing joint probability for channels...\n');
 	[ EEG.stats.jpE rejE ] = jointprob( EEG.data, locthresh, EEG.stats.jpE, 1); 
 
@@ -161,14 +164,14 @@ fprintf('%d/%d trials rejected\n', sum(rej), EEG.trials);
 
 if calldisp
 	if vistype == 1 % EEGPLOT -------------------------
-	    if icacomp == 0 macrorej  = 'EEG.reject.rejjp';
+	    if icacomp == 1 macrorej  = 'EEG.reject.rejjp';
 	        			macrorejE = 'EEG.reject.rejjpE';
 	    else			macrorej  = 'EEG.reject.icarejjp';
 	        			macrorejE = 'EEG.reject.icarejjpE';
 	    end;
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
-	    if icacomp == 0
+	    if icacomp == 1
 	        eeg_multieegplot( EEG.data(elecrange,:,:), rej, rejE, oldrej, oldrejE, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 	    else
@@ -176,7 +179,7 @@ if calldisp
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 	    end;	
     else % REJECTRIALS -------------------------
-	  	if icacomp	== 0 
+	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
 				rejstatepoch( EEG.data, EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off'  );
@@ -195,7 +198,7 @@ else
 	fprintf('%d trials rejected\n', nrej);
 end;
 if ~isempty(rej)
-	if icacomp	== 0 
+	if icacomp	== 1
 		EEG.reject.rejkurt = rej;
 		EEG.reject.rejkurtE = rejE;
 	else
@@ -206,7 +209,7 @@ end;
 nrej = sum(rej);
 
 com = [ com sprintf('Indexes = pop_jointprop( %s, %d, [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), ~icacomp, num2str(elecrange),  num2str(locthresh), ...
+   inputname(1), icacomp, num2str(elecrange),  num2str(locthresh), ...
    num2str(globthresh), superpose, reject ) ]; 
 
 return;

@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/08 22:03:02  arno
+% nothing
+%
 % Revision 1.4  2002/06/25 22:23:56  scott
 % *** empty log message ***
 %
@@ -57,16 +60,18 @@
 % 03-07-02 added srate argument to eegplot call -ad
 % 03-27-02 added event latency recalculation for continuous data -ad
 
-function [com] = pop_eegplot( EEG, typerej, superpose, reject, topcommand);
+function [com] = pop_eegplot( EEG, icacomp, superpose, reject, topcommand);
 
 com = '';
-if nargin < 2
+if nargin < 1
 	help pop_eegplot;
 	return;
 end;	
+if nargin < 2
+	icacomp = 1;
+end;	
 
-typerej = ~typerej;
-if typerej == 1
+if icacomp == 0
 	if isempty( EEG.icasphere )
 		disp('Error: you must run ICA first'); return;
 	end;
@@ -82,7 +87,8 @@ if nargin < 3 & EEG.trials > 1
          	         'Reject labelled trials (yes/no)', ...
 						 };
 	inistr       = { 'yes', 'no' };
-	result       = inputdlg( promptstr, fastif(typerej, 'Manual component rejection -- pop_eegplot()', 'Manual trials rejection -- pop_eegplot()'), 1,  inistr);
+	result       = inputdlg( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
+											   'Manual trials rejection -- pop_eegplot()'), 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    
@@ -92,7 +98,7 @@ if nargin < 3 & EEG.trials > 1
 end;
 
 if EEG.trials > 1
-    if typerej == 0 macrorej  = 'EEG.reject.rejmanual';
+    if icacomp == 1 macrorej  = 'EEG.reject.rejmanual';
         			macrorejE = 'EEG.reject.rejmanualE';
     else			macrorej  = 'EEG.reject.icarejmanual';
         			macrorejE = 'EEG.reject.icarejmanualE';
@@ -101,7 +107,7 @@ if EEG.trials > 1
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
 else % case of a single trial (continuous data)
-	     %if typerej, 
+	     %if icacomp, 
     	 %    	command = ['if isempty(EEG.event) EEG.event = [eegplot2event(TMPREJ, -1)];' ...
          %         'else EEG.event = [EEG.event(find(EEG.event(:,1) ~= -1),:); eegplot2event(TMPREJ, -1, [], [0.8 1 0.8])];' ...
          %         'end;']; 
@@ -143,7 +149,7 @@ else % case of a single trial (continuous data)
       oldrej = []; oldrejE = [];
 end;
 
-if typerej == 0
+if icacomp == 1
 	eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, 'eloc_file', EEG.chanlocs); 
 else
@@ -158,5 +164,5 @@ else
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 end;
 
-com = [ com sprintf('pop_eegplot( %s, %d, %d, %d);', inputname(1), ~typerej, superpose, reject) ]; 
+com = [ com sprintf('pop_eegplot( %s, %d, %d, %d);', inputname(1), icacomp, superpose, reject) ]; 
 return;
