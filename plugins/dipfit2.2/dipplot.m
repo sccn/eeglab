@@ -334,6 +334,15 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
             xo = sources(index).momxyz(dip,1)*g.dipolelength;
             yo = sources(index).momxyz(dip,2)*g.dipolelength;
             zo = sources(index).momxyz(dip,3)*g.dipolelength;
+
+            % copy for output
+            % ---------------
+            XX(index) = x;
+            YY(index) = y;
+            ZZ(index) = z;
+            XO(index) = xo;
+            YO(index) = yo;
+            ZO(index) = zo;
             
             if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
                 xo = x+xo;
@@ -350,12 +359,6 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
             end
             x = -x; xo=-xo;
             y = -y; yo=-yo;
-            XX(index) = x;
-            YY(index) = y;
-            ZZ(index) = z;
-            XO(index) = xo;
-            YO(index) = yo;
-            ZO(index) = zo;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tag = [ 'dipole' num2str(index) ];
