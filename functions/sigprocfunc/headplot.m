@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2004/07/26 21:05:22  arno
+% remove index1
+%
 % Revision 1.45  2004/07/26 21:04:32  arno
 % remove tri2
 %
@@ -445,7 +448,12 @@ if isstr(values)
     % Save spline file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     comment = g.comment;
-    save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');
+    try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');   
+    catch,
+        try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');
+        catch, error('headplot: save spline file error, out of space or file permission problem');
+        end;
+    end;
     tmpinfo = dir(spline_file);
     fprintf('Saving (%dk) file %s\n',round(tmpinfo.bytes/1000), spline_file);
     return
