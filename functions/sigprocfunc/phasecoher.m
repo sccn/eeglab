@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/23 00:49:07  arno
+% debug ploting is alpha == nan
+%
 % Revision 1.7  2003/03/16 18:46:48  scott
 % printout edit
 %
@@ -235,7 +238,7 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
       allamps(f,t) = amp;
     end
     if nargout > 5
-      allphs(f,t) = 180/pi*phase(realpart+i*imagpart);
+      allphs(f,t) = 180/pi*angle(realpart+i*imagpart);
     end
   end
   if nsums(f)>0
