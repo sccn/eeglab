@@ -11,7 +11,7 @@
 %        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
 %        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
 %        >>  topoplot('example'); % Gives an example of an electrode location file
-%        >>  [h grid_or_val [grid]]= topoplot(datavector, chan_locs, 'Param1','Value1', ...);
+%        >>  [h grid_or_val plotrad_or_grid]]= topoplot(datavector, chan_locs, 'Param1','Value1', ...);
 %
 % Required Inputs:
 %   datavector        - single vector of channel values. Else, if a vector of selected 
@@ -36,17 +36,14 @@
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
-%                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5)}. 
+%                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5);
+%                       If the chanlocs structure includes a field chanlocs.plotrad, its value 
+%                       is used by default}.
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
 %                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
-%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
-%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
 %                       values from electrodes shown in the plotting disk only. {default: 'on'}
@@ -83,11 +80,13 @@
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Outputs:
-%         h           - plot axes handle
+%                   h - plot axes handle
 %         grid_or_val - [matrix] the interpolated data image (with off-head points = NaN).  
-%                       ELSE, single interpolated value at the specified 'noplot' arg channel 
+%                       Else, single interpolated value at the specified 'noplot' arg channel 
 %                       location ([rad theta]), if any.
-%         [grid]      - IF interpolated value returned above, then the interpolated image grid
+%     plotrad_or_grid - IF grid image returned above, then the 'plotrad' radius of the grid.
+%                       Else, the grid image
+%
 % Chan_locs format:
 %    See >> topoplot 'example'
 %
@@ -100,6 +99,11 @@
 %
 % See also: timtopo(), envtopo()
 
+% Deprecated option: 'shrink' - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
+%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 % Unimplemented future options:
 %   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
 %                       channel numbers - in which 0s plot 0-values and negative integers, 
@@ -132,6 +136,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.225  2004/11/23 01:52:12  hilit
+% fixing 'style' 'blank' problems
+%
 % Revision 1.224  2004/11/22 21:55:46  hilit
 % undo some of the changes
 %
@@ -1250,8 +1257,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   mask = (sqrt(Xi.^2 + Yi.^2) <= rmax); % mask outside the plotting circle
   ii = find(mask == 0);
   Zi(ii) = NaN;                         % mask non-plotting voxels with NaNs
-  grid = [];
-
+  grid = plotrad;                       % unless 'noplot', then 3rd output arg is plotrad
   %
   %%%%%%%%%% Return interpolated value at designated scalp location %%%%%%%%%%
   %
