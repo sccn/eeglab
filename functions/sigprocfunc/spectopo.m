@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/06/12 00:51:35  arno
+% adding 'plot' option
+%
 % Revision 1.62  2003/06/12 00:41:17  arno
 % same
 %
@@ -940,7 +943,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                     if g.boundaries(n+1) - g.boundaries(n) > 20 % ignore segments of less than 20 points
                         [tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
                                                fftlength,srate,winlength,g.overlap);
-                        if c==1 & e==epoch_subset(1)
+                        if c==1 & n==1 & e==epoch_subset(1)
                             eegspec = zeros(nchans,length(freqs));
                             specstd = zeros(nchans,length(freqs));
                         end
