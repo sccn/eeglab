@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.254  2003/10/29 18:27:33  arno
+% adding biosign optional menu
+%
 % Revision 1.253  2003/10/29 00:50:57  arno
 % check epoch when importing epoch info
 %
@@ -1072,7 +1075,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
         if stccmpi(pathsload, pathloadeeg)
             disp('Warning: BIOSIG function ''loadeeg'' is in conflict with EEGLAB ''loadeeg'' function');
             disp('         Note: ''loadeeg'' in BIOSIG is redundant with BIOSIG ''sload'' function');
-            input('        We advise that you remove ' which('loadeeg'));
+            disp( [ '        We advise that you remove ' which('loadeeg') ]);
         end;
         uimenu( neuromenu, 'Label', 'From other formats using BIOSIG',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_biosig;' e_newnonempty ], 'Separator', 'on'); 
     end;
