@@ -69,9 +69,10 @@
 %               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
 %
 % Add epoch-mean ERP to plot:
-%   'erp'    - Plot ERP time average of the trials below the image {default no}
+%   'erp'    - Plot ERP time average of the trials below the image {default no ERP plotted}
 %   'erpalpha' - [alpha] One-sided significance threshold (range: [.001 0.1]). 
-%              Requires 'erp' option. {default no +/-alpha thresholds shown}
+%              Requires 'erp' {default no +/-alpha significance thresholds plotted}
+%   'erpstd' - Plot ERP +/- stdev. Requires 'erp' {default no +/-stdev plotted}
 %   'rmerp'  - Subtract the average ERP from each trial before processing {default no}
 %
 % Add time/frequency information:
@@ -153,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.139  2003/08/24 04:38:18  scott
+% same
+%
 % Revision 1.138  2003/08/24 04:37:47  scott
 % debug last
 %
@@ -2285,9 +2289,9 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                   gcapos(3) image_loy*gcapos(4)]);
     end
     if Erpstdflag == YES
-        plot1erp(ax2,times,erp,limit, stdev); % plot ERP with +/-stdev
+        plot1erp(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
     elseif exist('erpalphaout')
-        plot1erp(ax2,times,erp,limit,erpalphaout); % plot ERP with +/-alpha threshold
+        plot1erp(ax2,times,erp,limit,erpalphaout); % plot ERP and 0+/-alpha threshold
     else
         plot1erp(ax2,times,erp,limit); % plot ERP alone
     end;
@@ -2732,17 +2736,21 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1erp(ax,times,erp,axlimits,stdev)
-
+function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
+%                           if signif is NaN, plot erp +/- stdev
+%                           else if signif, plot erp and +/-signif
+%                           else, plot erp alone
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
-  if exist('stdev') == 1
-      [plot_handle] = plot(times,stdev, 'r','LineWidth',1); hold on    % plot +alpha
-      [plot_handle] = plot(times,-1*stdev, 'r','LineWidth',1); hold on % plot -alpha
-
-      % [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on
-      % [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on
+  if exist('signif') == 1 
+    if ~isnan(signif);
+      [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
+      [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
+    else
+      [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
+      [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
+    end
   end;
   if sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
