@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/18 02:52:05  scott
+% [same] -sm
+%
 % Revision 1.10  2002/04/18 02:44:08  scott
 % edited error messages -sm
 %
@@ -262,13 +265,14 @@ for curfield = tmpfields'
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
-								  if length(x) > 1, error('Pop_editset error: .mat file must contain a single variable'); end;
+								  if length(x) > 1, 
+            error('Pop_editset error: .mat file must contain a single variable'); end;
 								  EEGOUT.data = load(varname, '-mat');
 							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
 							  end;
 							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'float32', if EEGOUT.nbchan == 0,
-								  error(['Pop_editset error: cannot read float32 data file without knowing the number of channels']);
+								  error(['Pop_editset error: to read float32 data you must first specify the number of channels']);
 							 end;     
 							 try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf]);
 							 catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
@@ -281,10 +285,10 @@ for curfield = tmpfields'
 							try 
 							     res = evalin('base', ['exist(''' varname ''') == 1']);
 							catch
-							     error('Pop_editset: cannot fined variable. Is it a filename?');
+							     error('Pop_editset: cannot find specified variable!');
 							end;
 							if ~res, 
-           error('Pop_editset: cannot evaluate variable. Is it a filename?'); 
+           error('Pop_editset: cannot find specified variable.'); 
        end;
 						    testval = evalin('base', ['isglobal(' varname ')']);
 							warning off;
