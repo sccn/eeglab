@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/11/04 18:39:11  arno
+% header
+%
 % Revision 1.18  2003/08/06 14:42:58  arno
 % *** empty log message ***
 %
@@ -331,7 +334,7 @@ else
             end;
         elseif strcmpi(g.boottype, 'first') % boottype is 'times'
             fprintf('Bootstrap type is 2-D, shuffling along dimension 2 only\n');
-            fprintf('Processing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, g.naccu,unitname,trials);
+            fprintf('Processing %s (naccu=%d) 1-D bootstrap (of %s %d):\n',bootname, g.naccu,unitname,trials);
             arg1 = zeros(nb_points, g.naccu);
             arg2 = zeros(nb_points, g.naccu );
             for allt=1:trials
