@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/12 19:20:26  arno
+% warning for rejecting continuous data
+%
 % Revision 1.16  2002/08/24 02:04:06  scott
 % help msg
 %
@@ -187,7 +190,7 @@ else % case of a single trial (continuous data)
         if strcmpi(res, 'Cancel'), return; end;
     end; 
     eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500] };
-    if ~isempty(EEG.chanlocs)
+    if ~isempty(EEG.chanlocs) & icacomp
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
     end;
 end;
