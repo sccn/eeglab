@@ -4,7 +4,7 @@
 %   mewcoords = transformcoords(coords, rotate, scale, center, reverse);
 %
 % Inputs:
-%   coords    - array of 3-D coordinates (N by 3)
+%   coords    - array of 3-D coordinates (3 by N or N by 3)
 %   rotate    - [pitch roll yaw] rotate in 3-D using pitch (x plane), 
 %               roll (y plane) and yaw (z plane). An empty array does
 %               not perform any rotation.
@@ -41,9 +41,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function mewcoords = transformcoords(coords, rotate, scale, center, reverse);
+function coords = transformcoords(coords, rotate, scale, center, reverse);
     
-    if naring < 2
+    if nargin < 2
         help transformcoords;
         return;
     end;
@@ -56,10 +56,16 @@ function mewcoords = transformcoords(coords, rotate, scale, center, reverse);
     if nargin < 5
         reverse = 0;
     end;
-    if size(coords, 2) ~= 3
+    if size(coords, 1) ~= 3
+        coords = coords';
+        trp    = 1;
+    else
+        trp = 0;
+    end;
+    if size(coords, 1) ~= 3
         error('Number of columns must be 3 for the coordinate input');
     end;
-    if length(rotate) > 0 & length(rotate) ~= 0
+    if length(rotate) > 0 & length(rotate) ~= 3
         error('rotate parameter must have 3 values');
     end;
     
@@ -85,6 +91,8 @@ function mewcoords = transformcoords(coords, rotate, scale, center, reverse);
     if ~reverse
         % pitch roll yaw rotation
         % -----------------------
+        % pitch (x-axis); roll = y axis rotation; yaw = z axis
+        % see http://bishopw.loni.ucla.edu/AIR5/homogenous.html
         cp = cos(pitch); sp = sin(pitch);
         cr = cos(roll);  sr = sin(roll);
         cy = cos(yaw);   sy = sin(yaw);
@@ -116,3 +124,6 @@ function mewcoords = transformcoords(coords, rotate, scale, center, reverse);
         coords = rot3d*coords;
     end;
     
+    if trp
+        coords = coords';
+    end;
