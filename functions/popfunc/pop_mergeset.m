@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/03/19 19:15:58  arno
+% merging data differently to save mem
+%
 % Revision 1.21  2004/03/17 23:10:16  arno
 % fixing urevents
 %
@@ -176,7 +179,9 @@ else
 		end;
 	end;	
 
-    if INEEG1.trials > 1 |  INEEG2.trials > 1
+    % concatenate data
+    % ----------------
+    if INEEG1.trials > 1 | INEEG2.trials > 1
         INEEG1.data(:,:,end+1:end+size(INEEG2.data,3)) = INEEG2.data;
     else
         INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data;
@@ -197,31 +202,9 @@ else
 				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1.trials*INEEG1.pnts;
 			end;    
 		end;
-		
-        % add discontinuity event if continuous
-        % -------------------------------------
-        if INEEG1.trials  == 1 & INEEG2.trials == 1
-            INEEG1.event(end+1).type    = 'boundary';
-            INEEG1.event(end  ).latency = INEEG1.pnts+0.5;            
-            if isfield(INEEG2, 'urevent') & isfield(INEEG1, 'urevent') & ...
-                    ~isempty(INEEG2.urevent) %UREVENT discontinuity
-                disp('Adding a discontinuity event and urevent between datasets');
-                INEEG1.urevent(end+1).type    = 'boundary';
-                INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;
-                INEEG1.event(end  ).urevent   = length(INEEG1.urevent);            
-            else 
-                disp('Adding a discontinuity event between datasets');
-            end; 
-       end;
-        
-        % updating urevent field if present
-        % ---------------------------------
-        if isfield(INEEG2.event, 'urevent') & isfield(INEEG1, 'urevent')
- 			for index = 1:length(INEEG2.event(:))
-                INEEG2.event(index).urevent = INEEG2.event(index).urevent + length(INEEG1.urevent);
-            end;
-        end;    
- 
+
+        % concatenate events
+        % ------------------
         orilen = length(INEEG1.event);
         allfields = union(fieldnames(INEEG1.event), fieldnames(INEEG2.event) );
 		for i=1:length( allfields )
@@ -231,25 +214,29 @@ else
             end;
 		end;
         INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
-	end;
-    
-	% concatenate events
-	% ------------------
-	if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
-        disp('Concatenating urevents...');
-        
-        % add discontinuity urevent if continuous
-        % -------------------------------------
-        orilen = length(INEEG1.urevent);
-        allfields = union(fieldnames(INEEG1.urevent), fieldnames(INEEG2.urevent) );
-		for i=1:length( allfields )
-            for e=1:length(INEEG2.urevent)
-                tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
-                INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+
+        % concatenate urevents
+        % --------------------
+        if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
+            disp('Concatenating urevents...');
+            orilen = length(INEEG1.urevent);
+            allfields = union(fieldnames(INEEG1.urevent), fieldnames(INEEG2.urevent) );
+            for i=1:length( allfields )
+                for e=1:length(INEEG2.urevent)
+                    tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
+                    INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+                end;
             end;
-		end;
+        end;
+
+        % add discontinuity event if continuous
+        % -------------------------------------
+        if INEEG1.trials  == 1 & INEEG2.trials == 1
+            INEEG1 = eeg_insertbound(INEEG1, INEEG1.pnts+0.5, INEEG1.pnts+0.5, 0, 0);
+        end;
+ 
 	end;
-    
+        
 	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
 	%		& ~isempty(INEEG1.epoch) & ~isempty(INEEG2.epoch)
 	%	try 
