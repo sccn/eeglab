@@ -6,17 +6,15 @@
 %
 % Inputs:
 %   sources   -  structure array of dipole information: can contain
-%                either BESA or DIPFIT dipole information
-%                besaexent: BESA eccentricity of the dipole
-%                besathloc: BESA azimuth angle of the dipole
-%                besaphloc: BESA horizontal angle of the dipole
-%                besathori: BESA azimuth angle of the dipole orientation
-%                besaphori: BESA horiz. angle of the dipole orientation
-%                posxyz: DIPFIT dipole 3-D Cartesian position in mm
-%                momxyz: DIPFIT dipole 3-D Cartesian orientation
-%                optional fields for BESA and DIPFIT dipole info
-%                     component: component number
-%                     rv:        residual variance
+%                either BESA or DIPFIT dipole information. BESA dipole
+%                information are still supported but may disapear in the 
+%                future. For DIPFIT
+%                   sources.posxyz: contains 3-D location of dipole in each 
+%                                   column. 2 rows indicate 2 dipoles.
+%                   sources.momxyz: contains 3-D moments for dipoles above.
+%                   sources.rv    : residual variance from 0 to 1.
+%                   other fields  : used for graphic interface.
+%
 % Optional input:
 %  'rvrange'  - [min max] Only plot dipoles with residual variace within the
 %               given range. Default: plot all dipoles.
@@ -76,45 +74,39 @@
 %  'dipnames' - [cell array] cell array of string with a name for each dipole (or
 %               pair of dipole).
 % Outputs:
-%   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
-%   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
-%               more than one dipole per components, the last dipole is returned.
+%   sources   - EEG.source structure with two extra fiels 'mnicoord' and 'talcoord'
+%               containing the MNI and talairach coordinates of the dipoles. Note
+%               that for the BEM model, dipoles are already in MNI coordinates.
+%   X,Y,Z     - Locations of dipole heads (Cartesian coordinates in MNI space). 
+%               If there is more than one dipole per components, the last dipole 
+%               is returned.
 %   XE,YE,ZE  - Locations of dipole ends (Cartesian coordinates). The same
 %               remark as above applies.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 1st July 2002
 %
-% Notes: Visualized locations are not exactly the same as in BESA (because of
-% manual tuning of the size of the head textures).  Because of a bug in the 
-% Matlab warp() function, the side-view texture cannot be displayed. 
-% To diplay head textures, the files 'besarear.pcx' and 'besasagittal.pcx' 
-% are required. The Matlab image processing toolbox is also required.
+% Notes: See DIPFIT web tutorial at sccn.ucsd.edu/eeglab/dipfittut/dipfit.html
+%        for more details about MRI co-registration etc...
 %
 % Example:
-%  % position and orientation of the first dipole
-%  sources(1).besaexent= 69.036;
-%  sources(1).besathloc= -26.71;
-%  sources(1).besaphloc= 19.702;
-%  sources(1).besathori= -80.02;
-%  sources(1).besaphori= 87.575;
-%  sources(1).rv = 0.1;
-%  % position and orientation of the second dipole
-%  sources(2).besaexent= 69.036;
-%  sources(2).besathloc= 46;
-%  sources(2).besaphloc= 39;
-%  sources(2).besathori= 150;
-%  sources(2).besaphori= -3;
-%  sources(2).rv = 0.05;
+%  % define dipoles
+%  sources(1).posxyz = [-59 48 -28];   % position for the first dipole
+%  sources(1).momxyz = [  0 58 -69];   % orientation for the first dipole
+%  sources(1).rv     = 0.036;          % residual variance for the first dipole
+%  sources(2).posxyz = [74 -4 -38];    % position for the second dipole
+%  sources(2).momxyz = [43 -38 -16]; % orientation for the second dipole
+%  sources(2).rv     = 0.027;          % residual variance for the second dipole
+%
 %  % plot of the two dipoles (first in green, second in blue)
 %  dipplot( sources, 'color', { 'g' 'b' }); 
 %
 %  % To make a stereographic plot
-%  figure; 
-%  subplot(1,2,1); dipplot( sources, 'view', [43 10], 'gui', 'off');
-%  subplot(1,2,2); dipplot( sources, 'view', [37 10], 'gui', 'off');
+%  figure( 'position', [153 553 1067 421]; 
+%  subplot(1,3,1); dipplot( sources, 'view', [43 10], 'gui', 'off');
+%  subplot(1,3,3); dipplot( sources, 'view', [37 10], 'gui', 'off');
 %
 %  % To make a summary plot
-%  dipplot( sources, 'summary', 'on', 'dipolesize', 15, 'mesh', 'off');
+%  dipplot( sources, 'summary', 'on', 'num', 'on');
 %
 % See also: eeglab(), dipfit()
 
@@ -155,6 +147,10 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.114  2005/03/18 17:14:26  arno
+%fixing besa coordinates
+%.,
+%
 %Revision 1.113  2005/03/17 17:14:18  arno
 %re-implemented normlen, autodetect MRI etc...
 %
@@ -694,43 +690,32 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen };
-        axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
-        axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
-        axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
+        axes('position', [0 0 0.5 0.5]);  newsources = dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; 
+        axes('position', [0 0.5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; 
+        axes('position', [.5 .5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; 
         axes('position', [0.5 0 0.5 0.5]); 
-        %p = get(gcf, 'position');
-        %p(2) = p(2)+p(4)-800;
-        %p(4) = 800;
-        %p(3) = 800;
-        %set(gcf, 'position', p);
         colorcount = 1;
-        if isfield(sources, 'component')
-            for index = 1:length(sources)
-                if index~=1 
-                    if sources(index).component ~= sources(index-1).component
-                        if isempty(g.dipnames)
-                            textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', ...
-                                                        sources(index).component, 100*sources(index).rv) };
-                        else
-                            textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
-                                                               g.dipnames{index}, 100*sources(index).rv) };
-                        end;
-                        colorcount = colorcount+1;
-                    end;
-                else 
-                    if isempty(g.dipnames)
-                        textforgui(colorcount) = { sprintf( 'Component %d (R.V. %3.2f)', ...
-                                                        sources(index).component, 100*sources(index).rv) };
-                    else
-                        textforgui(colorcount) = { sprintf('%s (R.V. %3.2f)', ...
-                                                           g.dipnames{index}, 100*sources(index).rv) };
-                    end;
-                    colorcount = colorcount+1;
+        if isfield(newsources, 'component')
+            for index = 1:length(newsources)
+                if isempty(g.dipnames), tmpname = sprintf( 'Component %d', newsources(index).component);
+                else                    tmpname = g.dipnames{index};
                 end;
+                talpos = newsources(index).talcoord;
+                if size(talpos,1) == 1
+                    textforgui(colorcount) = { sprintf( 'Comp. %d (RV:%3.2f%%; Tal:%d,%d,%d)', ...
+                                                        sources(index).component, 100*newsources(index).rv, ...
+                                                        round(talpos(1,1)), round(talpos(1,2)), round(talpos(1,3))) };
+                else
+                    textforgui(colorcount) = { sprintf( 'Comp. %d (RV:%3.2f%%; Tal:%d,%d,%d & %d,%d,%d)', ...
+                                                        sources(index).component, 100*newsources(index).rv, ...
+                                                        round(talpos(1,1)), round(talpos(1,2)), round(talpos(1,3)), ...
+                                                        round(talpos(2,1)), round(talpos(2,2)), round(talpos(2,3))) };
+                end;
+                colorcount = colorcount+1;
             end;
             colorcount = colorcount-1;
             allstr = strvcat(textforgui{:});
-            h = text(0,0.5, allstr);
+            h = text(0,0.45, allstr);
             if colorcount >= 15, set(h, 'fontsize', 8);end;
             if colorcount >= 20, set(h, 'fontsize', 6);end;
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', 'w'); end;
@@ -893,15 +878,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.mricoord  = [xxmri yymri zzmri];   % Coordinates in MRI space
             dipstruct.eleccoord = [ xx yy zz ];          % Coordinates in elec space
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
+            outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
+            outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
             
             % copy for output
             % ---------------
-            XX(index) = xx;
-            YY(index) = yy;
-            ZZ(index) = zz;
-            XO(index) = xxo1;
-            YO(index) = yyo1;
-            ZO(index) = zzo1;
+            XX(index) = xxmri;
+            YY(index) = yymri;
+            ZZ(index) = zzmri;
+            XO(index) = xxmrio1;
+            YO(index) = yymrio1;
+            ZO(index) = zzmrio1;
 
             if isempty(g.dipnames)
                 dipstruct.rv   = sprintf('%3.2f', sources(index).rv*100);
