@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.144  2005/02/16 19:49:10  hilit
+% typo
+%
 % Revision 1.143  2005/02/16 19:47:24  hilit
 % Trying to solve compatible problems between Matlab 7 and 6
 %
@@ -897,6 +900,14 @@ if ~isempty( EEG.chanlocs )
                 EEG.chanlocs(index).shrink = EEG.chanlocs(1).shrink;
             end;
         end;
+    end;
+    if isfield( EEG.chanlocs, 'plotrad')
+        EEG.chaninfo.plotrad = EEG.chanlocs(1).plotrad;
+        EEG.chanlocs = rmfield( EEG.chanlocs, 'plotrad');
+    end;
+    if isfield( EEG.chanlocs, 'shrink')
+        EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
+        EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
     end;
 end;
 %if ~isfield(EEG, 'urchanlocs')
