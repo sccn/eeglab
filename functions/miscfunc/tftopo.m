@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/27 01:10:29  scott
+% same -sm
+%
 % Revision 1.3  2002/04/27 01:06:00  scott
 % same -sm
 %
@@ -81,10 +84,10 @@ if nargin<5
   showchan = 1; % default tfdata image to show
 end
 
-if dim(tftopo)==2
+if length(size(tfdata))==2
    nchans = round(size(tfdata,2)/length(times));
-elseif dim(tftopo)==3
-   tftopo=tfopo(:,:); % convert to 2-d
+elseif length(size(tfdata))==3
+   tfdata=tfdata(:,:); % convert to 2-d
 else
    help tftopo
    return
