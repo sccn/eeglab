@@ -83,6 +83,7 @@
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (one condition title per row)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
+% 'plotorder'   - [integer vector] component plot order from 1 to the number of components. 
 %
 %Outputs to disk:
 % imageX      - brainmovie() saves a sequence of image files to disk (image0001.eps, ...)
@@ -118,6 +119,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/12/04 22:21:49  arno
+% changing default circfactor
+%
 % Revision 1.34  2002/11/27 22:58:21  cooper
 % Added 'diskscale' option to scale the sizes
 % of the component disks.
@@ -281,6 +285,7 @@ try, g.condtitle;		catch, g.condtitle = []; end;
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
+try, g.plotorder;       catch, g.plotorder = [1:length(selected)]; end;
 try, g.colmapcoh;       catch, 
     colormtmp = hot(64);
     colormtmp(end,3) = (colormtmp(end,3)+colormtmp(end-1,3))/2; % white does not come out when the
@@ -456,6 +461,12 @@ if ~isempty(g.condtitle)
 	if size( g.condtitle,1 ) ~= nbconditions
 		fprintf('Error: The number of rows in the title array(%d) must match the number of conditions (%d)\n', size(g.condtitle,1), nbconditions); return;
 	end;
+end;
+if length(g.plotorder) ~= length(selected)
+    error([ 'Error: ''plotorder'' must be the same size as the number of selected components:' int2str(length(selected)) ]);
+end;
+if max(g.plotorder) >= length(selected)
+    error([ 'Error: ''plotorder'' must be below the number of selected components:' int2str(length(selected)) ]);
 end;
 
 % other variables
@@ -747,7 +758,7 @@ for indeximage = alltimepoints
 
 	% draw circles
 	% ------------
-	for index1 = selected
+	for index1 = g.plotorder(selected)
 		for tmpcond = 1:nbconditions
 			axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
 
