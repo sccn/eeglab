@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/04/24 15:20:12  arno
+% debuging plotorder
+%
 % Revision 1.46  2003/04/24 02:26:37  arno
 % removing debug message
 %
@@ -790,6 +793,7 @@ for indeximage = alltimepoints
 						tmpangle  = mean(tmpcrossfang( FREQS, indeximage));
 						
 						if strcmp(lower(g.crossfphaseunit), 'radian'), tmpangle = tmpangle/pi*180; end;
+                        %fprintf('%d-%d -> power %1.1f\n', index1, index2, tmppower);
 						drawconnections( g.coordinates( index1,: ), g.coordinates( index2,: ), ...
 							tmppower, tmpangle, g.circfactor(index1, index2), g);
 					end;	
