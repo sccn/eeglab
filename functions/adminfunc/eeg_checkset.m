@@ -1,35 +1,34 @@
-% eeg_checkset() - check the consistency of fields of an EEGLAB dataset 
+% eeg_checkset() - check the consistency of fields of an EEG dataset 
 %
 % Structure of an EEG dataset under EEGLAB:
 %    EEG.data         - two-dimensional continuous data array (chans, frames)
-%                       OR three-dimensional data array (chans, frames, epochs)
+%                       OR three-dim. epoched data array (chans, frames, epochs)
 %    EEG.setname      - name of the dataset
 %    EEG.filename     - filename of the dataset
 %    EEG.filepath     - filepath of the dataset
 %    EEG.chanlocs     - structure array containing names and positions 
 %                       of the channels on the scalp
-%    EEG.pnts         - number of frames (time points) per epoch (trial).
-%                       If data is continuous, total number of points
+%    EEG.pnts         - number of time points (data frames) per epoch (trial).
+%                       OR if data is continuous, total number of time points
 %    EEG.nbchan       - number of channels
 %    EEG.trials       - number of epochs (trials) in the dataset. If data
 %                       is continuous, automatically set to 1.
 %    EEG.srate        - channel sampling rate (in Hz)
 %    EEG.xmin         - epoch start time (in seconds)
 %    EEG.xmax         - epoch end time (in seconds)
-%    EEG.times        - time vector (one time value per data point)
+%    EEG.times        - time vector (one value per time point)
 %    EEG.ref          - ['common'|'averef'|'averefwithref'] average reference flag
 %    EEG.comments     - comments about the dataset
 %
 % ICA variables:
 %    EEG.icaact       - ICA activations (components, frames, epochs)
-%                       Empty means compute_ica option is set to 0 in the
+%                       [] means compute_ica option is set to 0 under
 %                       EEGLAB options -> activations are computed on the fly.
-%    EEG.icasphere    - sphere array returned by ICA decomposition
-%    EEG.icaweights   - weight array returned by ICA decomposition
-%    EEG.icawinv      - inverse ICA weight matrix giving the projected
+%    EEG.icasphere    - sphere array returned by linear (ICA) decomposition
+%    EEG.icaweights   - weight array returned by linear (ICA) decomposition
+%    EEG.icawinv      - inverse (ICA) weight matrix giving the projected
 %                       activity of the components to the electrodes.
-%                       NOTE: Any linear unmixing matrix may be used, not
-%                       those obtained by ICA.
+%                       NOTE: Any linear unmixing matrix may be used. 
 %
 % Event and epoch structures:    
 %       EEG.event     - event structure (any number of events per epoch)
@@ -93,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2003/02/28 15:30:00  arno
+% updating warning message
+%
 % Revision 1.91  2003/02/26 02:18:55  arno
 % debugging if file has changed of location
 %
