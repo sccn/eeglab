@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/08/11 18:27:36  arno
+% making subplot possible
+%
 % Revision 1.26  2002/08/09 01:54:06  arno
 % weighting by boundary interval length
 %
@@ -614,8 +617,9 @@ end;
 % Draw title
 %%%%%%%%%%%%%%%%
 if ~isempty(g.title)
-  tl = textsc(g.title,'title');
-  set(tl,'fontsize',15)
+	axes(mainfig); axis off;
+	tl = text(-0.1,1,g.title);
+	set(tl,'fontsize',15)
 end
 
 %%%%%%%%%%%%%%%%
