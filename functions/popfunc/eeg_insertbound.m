@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/05/04 19:01:08  arno
+% removing nested urevent boundarie
+%
 % Revision 1.1  2004/04/20 02:09:31  arno
 % Initial revision
 %
@@ -59,8 +62,8 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
         return;
     end;
     if size(regions,1) ~= 1 & size(regions,2) ~= 1
-        regions = regions(:,1);
         lengths = regions(:,2)-regions(:,1)+1;
+        regions = regions(:,1);
     end;
     if exist('lengths') ~= 1
         lengths = zeros(size(regions));
