@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/08 01:18:33  arno
+% empty regions ?
+%
 % Revision 1.1  2002/08/08 01:17:31  arno
 % Initial revision
 %
@@ -55,37 +58,42 @@ if isempty(regions)
 	return;
 end;
 
-if ~isempty(regions),
-	if isfield(EEG.event, 'latency'), 
-		tmpalllatencies = cell2mat( { EEG.event.latency } );
-	else tmpalllatencies = []; 
-	end;
-	
-	eeg_options; 
-	[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
+if isfield(EEG.event, 'latency'), 
+	tmpalllatencies = cell2mat( { EEG.event.latency } );
+else tmpalllatencies = []; 
+end;
+
+eeg_options; 
+[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
 												  regions(:,3:4), EEG.xmax-EEG.xmin, tmpalllatencies);
-	EEG.pnts = size(EEG.data,2);
-	EEG.xmax = EEG.xmax+EEG.xmin;
-	if ~isempty(tmpalllatencies)
-		tmpnanloc = find(~isnan(tmpalllatencies));
-		EEG.event = EEG.event(tmpnanloc);
-		fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
-		                 length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
-		tmpalllatencies = tmpalllatencies(tmpnanloc);
-		for tmpindex = 1:length(EEG.event)
-			EEG.event = setfield(EEG.event, { tmpindex }, 'latency', tmpalllatencies(tmpindex));
-		end;
-	end;
-	if ~isempty(boundevents)
-		fprintf('eeg_eegrej(): boundary events added.\n');
-		for tmpindex = 1:length(EEG.event)
-			EEG.event(end+1).type  = 'boundary';
-			EEG.event(end).latency = boundevents(tmpindex);
-		end;
-        EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-		EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG.pnts = size(EEG.data,2);
+EEG.xmax = EEG.xmax+EEG.xmin;
+
+% change event latencies
+% ----------------------
+if ~isempty(tmpalllatencies)
+	tmpnanloc = find(~isnan(tmpalllatencies));
+	EEG.event = EEG.event(tmpnanloc);
+	fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
+			length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
+	tmpalllatencies = tmpalllatencies(tmpnanloc);
+	for tmpindex = 1:length(EEG.event)
+		EEG.event = setfield(EEG.event, { tmpindex }, 'latency', tmpalllatencies(tmpindex));
 	end;
 end;
+
+% add boundary events
+% -------------------
+if ~isempty(boundevents)
+	fprintf('eeg_eegrej(): boundary events added.\n');
+	for tmpindex = 1:length(EEG.event)
+		EEG.event(end+1).type  = 'boundary';
+		EEG.event(end).latency = boundevents(tmpindex);
+	end;
+	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
+	EEG = eeg_checkset(EEG, 'eventconsistency');
+end;
+EEG.icaact = [];
 
 com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions(:,1:4) })); 
 return;
