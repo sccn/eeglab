@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/07/09 21:29:57  arno
+% implementing ntimesout
+%
 % Revision 1.27  2003/06/27 15:29:45  arno
 % removing deprecated arguments
 %
@@ -285,7 +288,7 @@ tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 % -------------------------------
 % compute time freq decomposition
 % -------------------------------
-fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 2*1000/srate*g.winsize);
+fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 1000/srate*g.winsize);
 fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
         fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
 
