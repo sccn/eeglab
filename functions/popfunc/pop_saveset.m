@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/07/30 17:02:17  arno
+% debug last
+%
 % Revision 1.30  2004/07/30 16:57:26  arno
 % allow to save under Matlab 7
 %
@@ -368,6 +371,7 @@ else
 	catch, 
         try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
         catch, error('Pop_saveset: save error, check permissions on file or directory');
+        end;
 	end;
     
     % delete .fdt files
