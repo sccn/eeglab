@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/15 17:03:37  arno
+% drawnow
+%
 % Revision 1.14  2002/08/27 00:38:22  arno
 % more optimal auto location
 %
@@ -155,7 +158,7 @@ if nargin < 3
 	inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
 	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
 	               '' '' };
-	result       = inputdlg2( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', 'Component head plot(s) -- pop_headplot()'), 1,  inistr, 'headplot');
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', 'Component head plot(s) -- pop_headplot()'), 1,  inistr, 'pop_headplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );

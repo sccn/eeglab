@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/03/06 02:20:39  arno
+% use vararg2str
+%
 % Revision 1.20  2002/10/26 20:26:50  arno
 % help msg
 %
@@ -153,7 +156,7 @@ if nargin < 3
 	                 [fastif(~isempty(EEG.setname), [EEG.setname ' components'], '') ] ...
 	                 '' ['''electrodes'', ''off''' ] };
         end
-	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'topoplot');
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'pop_topoplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
