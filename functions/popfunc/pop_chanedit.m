@@ -10,9 +10,6 @@
 %   "Channel information ('field name')" - [edit boxes] display channel field 
 %                   content the current channel. Use 'transform' from the command
 %                   line to modify these fields.
-%   "
-
-%
 %
 % Input:
 %   EEG      - EEG dataset
@@ -77,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/08/05 18:30:46  arno
+% nothing
+%
 % Revision 1.56  2003/08/04 18:49:56  arno
 % automatic conversion for 'transform' parameter
 %
@@ -92,32 +92,6 @@
 %
 % Revision 1.52  2003/07/16 01:38:07  scott
 % help topoplot
-% help topoplot
-%
-% return
-%
-%
-%
-%
-% whos
-%
-%
-% exit
-%
-%
-% exit
-% reutnr
-% return
-% k
-% debug off
-% :vi
-%
-%
-%
-%
-% quit
-% stop
-%
 % Revision 1.51  2003/07/10 18:30:03  arno
 % debuging rotate axis cancelation
 %
