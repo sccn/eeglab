@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2003/05/23 16:05:47  arno
+% debug last
+%
 % Revision 1.78  2003/05/23 15:12:11  arno
 % same
 %
@@ -995,19 +998,19 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   % Zooms %%%%%%%%
   zm = uimenu('Parent',m(2),'Label','Zoom off/on');
-  commandzoom1 = 'set(gcbf, ''windowbuttondownfcn'',''';
-  commandzoom2 = ['eegplot(''''zoom'''', gcbf);'');' ...
-        'set(gcbf, ''windowbuttonupfcn'','''');'...
-        'set(gcf, ''windowbuttonmotionfcn'', '''');' ];
-            
-  uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
-               [commandzoom1  'zoom xdown;' commandzoom2 ]);
-  uimenu('Parent',zm,'Label','Zoom electrodes', 'callback', ...
-               [commandzoom1  'zoom ydown;' commandzoom2 ]);
-  uimenu('Parent',zm,'Label','Zoom both', 'callback', ...
-               [commandzoom1  'zoom down;' commandzoom2 ]);
+  commandzoom = [ 'tmpstr = get(gcbf, ''windowbuttondownfcn'');' ...
+                  'set(gcbf, ''windowbuttondownfcn'', [ tmpstr ''; eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
+                  'tmpg = get(gcbf, ''userdata'');' ...
+                  'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg; tmpstr;'];
+    
+  %uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
+  %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
+  %uimenu('Parent',zm,'Label','Zoom electrodes', 'callback', ...
+  %             [ 'zoom(gcbf, ''yon'');' commandzoom ]);
+  uimenu('Parent',zm,'Label','Zoom on', 'callback', ...
+               [ 'zoom(gcbf, ''on'');' commandzoom ]);
   uimenu('Parent',zm,'Label','Zoom off', 'separator', 'on', 'callback', ...
-     ['tmpg = get(gcbf, ''userdata'');' ...
+     ['zoom(gcbf, ''off''); tmpg = get(gcbf, ''userdata'');' ...
      'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
      'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
      'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
@@ -1490,8 +1493,8 @@ else
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-	result = inputdlg2( { 'Enter number of electrodes to show:' } , 'Change number of electrodes to show', 1,  { num2str(g.dispchans) });
-	if size(result,1) == 0 return; end;
+   result = inputdlg2( { 'Enter number of electrodes to show:' } , 'Change number of electrodes to show', 1,  { num2str(g.dispchans) });
+   if size(result,1) == 0 return; end;
 
    g.dispchans = eval(result{1});
    if g.dispchans<0 | g.dispchans>g.chans
@@ -1578,36 +1581,34 @@ else
 	end;
 	
 	eyeaxes = findobj('tag','eyeaxes','parent',figh);
-	
+    ax1 = findobj('tag','eegaxis','parent',gcf); % axes handle
+	YLim = get(ax1, 'ylim');
+    
 	ESpacing = findobj('tag','ESpacing','parent',figh);
 	g.spacing= str2num(get(ESpacing,'string'));
 	
 	axes(eyeaxes); cla; axis off;
-	YLim = get(eyeaxes,'Ylim');
-	Xl = [.35 .65 .5 .5 .35 .65];
-	Yl = [ [g.spacing g.spacing g.spacing]*g.chans/g.dispchans 0 0 0] + 0.2;
-	line(Xl,Yl,'color',DEFAULT_AXIS_COLOR,'clipping','off',...
-		 'tag','eyeline')
-	text(.5,YLim(2)/23+Yl(1),num2str(g.spacing,4),...
+    set(eyeaxes, 'ylim', YLim);
+    
+	Xl = [.35 .65; .5 .5; .35 .65];
+    Yl = [ g.spacing g.spacing; g.spacing 0; 0 0] + YLim(1);
+	plot(Xl(1,:),Yl(1,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline'); hold on;
+	plot(Xl(2,:),Yl(2,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline');
+	plot(Xl(3,:),Yl(3,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline');
+	text(.5,(YLim(2)-YLim(1))/23+Yl(1),num2str(g.spacing,4),...
 		 'HorizontalAlignment','center','FontSize',10,...
 		 'tag','thescalenum')
-	if strcmp(YAXIS_NEG,'off')
-        text(Xl(2)+.1,Yl(1),'+','HorizontalAlignment','left',...
-			 'verticalalignment','middle', 'tag', 'thescale')
-        text(Xl(2)+.1,Yl(4),'-','HorizontalAlignment','left',...
-			 'verticalalignment','middle', 'tag', 'thescale')
-	else
-        text(Xl(2)+.1,Yl(4),'+','HorizontalAlignment','left',...
-			 'verticalalignment','middle', 'tag', 'thescale')
-        text(Xl(2)+.1,Yl(1),'-','HorizontalAlignment','left',...
-			 'verticalalignment','middle', 'tag', 'thescale')
-	end
+    text(Xl(2)+.1,Yl(1),'+','HorizontalAlignment','left',...
+         'verticalalignment','middle', 'tag', 'thescale')
+    text(Xl(2)+.1,Yl(4),'-','HorizontalAlignment','left',...
+         'verticalalignment','middle', 'tag', 'thescale')
 	if ~isempty(SPACING_UNITS_STRING)
         text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
 			 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
 	end
-	text(.5,YLim(2)/10+Yl(1),'Scale',...
+	text(.5,(YLim(2)-YLim(1))/10+Yl(1),'Scale',...
 		 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
+    set(eyeaxes, 'tag', 'eyeaxes');
     
   case 'noui'
       if ~isempty(varargin)
@@ -1631,7 +1632,7 @@ else
 	  obj = findobj(fig, 'tag', 'Evaluename');delete(obj);
 	  obj = findobj(fig, 'type', 'uimenu');delete(obj);
  
-	case 'zoom' % if zoom
+   case 'zoom' % if zoom
       fig = varargin{1};
       ax1 = findobj('tag','eegaxis','parent',fig); 
       ax2 = findobj('tag','backeeg','parent',fig); 
@@ -1661,11 +1662,21 @@ else
       % ------------------
       g.elecoffset = tmpylim(1)/g.spacing;
       g.dispchans  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
-         
+      
       set(fig,'UserData', g);
       eegplot('updateslidder', fig);
       eegplot('drawp', 0);
-      
+      eegplot('scaleeye', [], fig);
+
+      % reactivate zoom if 3 arguments
+      % ------------------------------
+      if exist('p2') == 1
+          zoom on;
+          tmpstr = get(gcbf, 'windowbuttondownfcn');
+          set(gcbf, 'windowbuttondownfcn', [ tmpstr '; eegplot(''zoom'', gcbf, 1);' ]);
+          set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
+      end;
+
 	case 'updateslidder' % if zoom
       fig = varargin{1};
       g = get(fig,'UserData');
