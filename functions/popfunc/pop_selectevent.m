@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/18 18:25:51  arno
+% typo can not
+%
 % Revision 1.4  2002/04/10 22:39:47  arno
 % removing debuging comment
 %
@@ -201,7 +204,7 @@ for index = 1:length(allfields)
    try, eval(['g.' allfields{index} ';']); catch, eval(['g.' allfields{index} '=[];' ]); end; 
    try, eval(['g.omit' allfields{index} ';']); catch, eval(['g.omit' allfields{index} '=[];' ]); end; 
 end;
-
+g
 
 % select the events to keep
 % -------------------------
