@@ -84,6 +84,7 @@
 %       'axesfont'  = Axes text font size                                {10}
 %       'titlefont' = Title text font size                               {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
+%                     in ms.
 %                     
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
@@ -119,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/09 00:21:17  arno
+% adding vertical bars
+%
 % Revision 1.5  2002/04/08 19:57:19  arno
 % Editing, maxfreq-> Niquist
 %
