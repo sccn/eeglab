@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/08/19 19:33:57  arno
+% bebugging for mac
+%
 % Revision 1.43  2002/08/15 01:05:35  arno
 % debug continuous
 %
@@ -1102,10 +1105,8 @@ else
 				tmpwins1 = g.winrej(indices,1)';
 				tmpwins2 = g.winrej(indices,2)';
 				tmpcols  = g.winrej(indices,3:5);
-				if ~ispc & ~isunix
-					[cumul indicescount] = myhistc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
-				else
-					eval('[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));');
+				try, eval('[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));');
+				catch, [cumul indicescount] = myhistc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
 				end;
 				count = zeros(size(cumul));
 				%if ~isempty(find(cumul > 1)), find(cumul > 1), end;
