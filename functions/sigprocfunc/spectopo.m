@@ -43,6 +43,8 @@
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([]=all).
 %   'icamaps'  = [integer array] force plotting of selected ica compoment maps ([]=the
 %                'nicamaps' largest).
+%   'memory'   = ['low'|'high'] setting to low will use less memory for ICA component 
+%                computing, but will be longer.
 %
 % Topoplot options:
 %    opther 'key','val' options are propagated to topoplot() for map display
@@ -79,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/07/20 01:55:54  arno
+% add ignore extras
+%
 % Revision 1.12  2002/07/20 01:51:14  arno
 % back to old way of computing average of power
 %
@@ -138,8 +143,9 @@ if nargin<3
 end
 if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequency
-	fieldlist = { 'freq'         'real'     []                       [] ;
+	fieldlist = { 'freq'          'real'     []                        [] ;
 				  'chanlocs'      ''         []                       [] ;
+				  'memory'        'string'   {'low' 'high'}           'high' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
@@ -246,32 +252,36 @@ else
 		[tmp indexfreq] = min(abs(g.freq-freqs));
 		[tmp g.plotchan] = min(eegspecdB(:,indexfreq));
 		fprintf('Maximum power found at channel %d\n', g.plotchan);
-	end;
-	if g.plotchan == 0
+		eegspecdBtoplot = eegspecdB(g.plotchan, :);		
+	elseif g.plotchan == 0
 		fprintf('Averaging power at all channels\n');
 		eegspecdBtoplot = mean(eegspecdB, 1);
 	else 
-		eegspecdBtoplot = eegspecdB(g.plotchan, :);
+		eegspecdBtoplot = eegspecdB;
 	end;
 	
 	% computing component spectra
-	fprintf('Computing spectra: ')
-	[compeegspecdB freqs] = spectcomp( g.weights*data, frames, srate, epoch_subset, g);
+	fprintf('Computing component spectra: ')
+	if g.plotchan ~= 0
+		newweights = diag(g.icawinv(g.plotchan,:)) * g.weights;
+	else
+		newweights = diag(sum(g.icawinv,1)) * g.weights;
+	end;
+	if strcmp(g.memory, 'high')
+		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g);
+	else % in case out of memory error, multiply conmponent sequencially
+		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g, newweights);
+	end;
 	fprintf('\n');
 	
 	% selecting components to plot
 	if isempty(g.icamaps)
-		% weight power by channel projection weight
-		if g.plotchan == 0
-			compeegspecdB = repmat(mean(g.weights, [1 size(compeegspecdB,2)])) .* compeegspecdB;
-		else
-			compeegspecdB = repmat(g.weights(:,g.plotchan), [1 size(compeegspecdB,2)]) .* compeegspecdB;
-		end;
-		
+		% weight power by channel projection weight		
 		[tmp indexfreq] = min(abs(g.freq-freqs));
 		g.icafreqsval   = compeegspecdB(:, indexfreq);
 		[g.icafreqsval g.icamaps] = sort(g.icafreqsval);
 		g.icamaps = g.icamaps(end:-1:1);
+		g.icafreqsval = g.icafreqsval(end:-1:1);
 		if g.nicamaps < length(g.icamaps), g.icamaps = g.icamaps(1:g.nicamaps); end;
 	else 
 		[tmp indexfreq] = min(abs(g.freq-freqs));
@@ -389,7 +399,8 @@ if ~isempty(g.freq)
 		else 
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
 		end;
-		to = changeunits([0,0],headax(f),large);
+		pos = get(headax(f),'position');
+		to = changeunits([0,0],headax(f),large)+[0 -min(pos(3:4))/1.7];
 		hold on;
 		li(f) = plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
 		axis([0 1 0 1]);
@@ -406,16 +417,31 @@ if ~isempty(g.freq)
 		if isnan(g.limits(5)),     maplimits = 'absmax';
 		else                       maplimits = [g.limits(5) g.limits(6)];
 		end;
-		if ~isempty(varargin)
-			topoplot(topodata,g.chanlocs,'maplimits',maplimits, varargin{:}); 
-		else
-			topoplot(topodata,g.chanlocs,'maplimits',maplimits); 
-		end
-		if f<length(g.freq)
-			tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
-		else
-			tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
-		end
+		if length(topodata) == 1
+			if ~isempty(varargin)
+				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
+						 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
+			else
+				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
+						 'style', 'blank', 'emarkersize1chan', 10);
+			end
+			if isstruct(g.chanlocs)
+				tl=title(g.chanlocs(g.plotchan).labels);
+			else
+				tl=title([ 'c' int2str(g.plotchan)]);
+			end;
+		else	
+			if ~isempty(varargin)
+				topoplot(topodata,g.chanlocs,'maplimits',maplimits, varargin{:}); 
+			else
+				topoplot(topodata,g.chanlocs,'maplimits',maplimits); 
+			end
+			if f<length(g.freq)
+				tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
+			else
+				tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
+			end
+		end;
 		set(tl,'fontsize',16);
 		axis square;
 		drawnow
@@ -472,16 +498,25 @@ axcopy
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function computing spectrum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g);
-	nchans = size(data,1);
+function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
+	if exist('newweights') == 1
+		nchans = size(newweights,1);
+	else 
+		nchans = size(data,1);		
+	end;
 	fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	for c=1:nchans
+		if exist('newweights') == 1
+			tmpdata = newweights(c,:)*data;
+		else
+			tmpdata = data(c,:);
+		end;
 		for e=epoch_subset
 			if strcmp(g.reref, 'averef')
-				[tmpspec,freqs] = psd(averef(matsel(data,frames,0,c,e)),fftlength,...
+				[tmpspec,freqs] = psd(averef(matsel(tmpdata,frames,0,1,e)),fftlength,...
 									  srate,fftlength/2,fftlength/8);
 			else
-				[tmpspec,freqs] = psd(matsel(data,frames,0,c,e),fftlength,...
+				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,...
 									  srate,fftlength/2,fftlength/8);
 			end
 			if c==1 & e==epoch_subset(1)
