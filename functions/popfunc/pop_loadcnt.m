@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/07/25 00:59:26  arno
+% removing blockread option
+%
 % Revision 1.14  2003/06/19 16:14:59  arno
 % makeur
 %
@@ -121,13 +124,14 @@ if nargin < 1
     promptstr    = { 'Time interval in seconds (i.e. [0 100]; default all):' ...
                      'Import keystrokes (off|on -> import as type 0):' ...
                      'loadcnt() ''key'', ''val'' params' };
-	inistr       = { '1'  '' 'off' '' };
+	inistr       = { '' 'off' '' };
 	pop_title    = sprintf('Load a CNT dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
+    options = [];
     if ~isempty(result{1}), 
         timer =  eval( [ '[' result{1} ']' ]);
         options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
