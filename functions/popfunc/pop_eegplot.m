@@ -1,4 +1,4 @@
-% pop_eegplot() - manual rejection of artifact in a dataset.
+% pop_eegplot() - reject by visual inspection of artifact in a dataset.
 %
 % Usage:
 %   >> pop_eegplot( INEEG, typerej, superpose, reject );
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/07/31 17:16:15  arno
+% debugging
+%
 % Revision 1.10  2002/07/31 16:32:09  arno
 % debugging
 %
