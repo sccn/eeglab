@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/11/01 02:58:46  arno
+% implementing finputcheck
+%
 % Revision 1.16  2003/06/18 22:24:40  arno
 % ur events
 %
@@ -221,7 +224,7 @@ if nargin<2
 	    % -----------------
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
-	    if results{2} == 0       , args = { args{:}, 'append', '''no''' }; end;
+	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
 	    if ~isempty( results{3} ) 
 	        if exist(results{3}) == 2,  args = { args{:}, 'event', [ '''' results{3} '''' ] }; 
 	        else                        args = { args{:}, 'event', results{3} }; end; 
