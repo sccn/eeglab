@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/01/28 21:52:52  scott
+% same
+%
 % Revision 1.3  2004/01/28 21:38:40  scott
 % added auto-shrink ... -sm
 %
@@ -49,7 +52,7 @@
 
 % 01-25-02 reformated help & license, added links -ad 
 
-function [gradx, grady] = gradplot( map, filename, draw ) 
+function [gradx, grady] = gradplot( map, locs_file, draw ) 
 
 if nargin < 2
 	help gradplot;
@@ -63,21 +66,15 @@ MAX_RADIUS = 0.5;
 % --------------------------------
 % Read the electrode location file
 % --------------------------------
-if isstr( filename )
-	fid = fopen(filename); 
-	locations = fscanf(fid,'%d %f %f %s',[7 NCHANS]);
-	fclose(fid);
-	locations = locations';
-	Th = pi/180*locations(:,2);  % convert degrees to rads
-	Rd = locations(:,3);
-	% ii = find(Rd <= MAX_RADIUS); % interpolate on-scalp channels only
+if isstr(locs_file) % a locs file
+        [tmpeloc labels Th Rd ind] = readlocs(loc_file,'filetype','loc');
+elseif isstruct(locs_file)  % a locs struct
+        [tmpeloc labels Th Rd ind] = readlocs(loc_file);
         if max(abs(Rd))>0.5
-          Rd = Rd/(2*max(abs(Rd))); % shrink to max radius = 0.5
           fprintf('gradplot(): Shrinking radio from max %4.3f to 0.5\n',...
                           max(abs(Rd)));
+          Rd = Rd/(2*max(abs(Rd))); % shrink to max radius = 0.5
         end
-	% Th = Th(ii);
-	% Rd = Rd(ii);
 	[x,y] = pol2cart(Th,Rd);
         if length(x) ~= NCHANS
          fprintf(...
@@ -85,9 +82,9 @@ if isstr( filename )
                                             length(x),              NCHANS);
          return
        end
-else                         % what is this complex format ??? -sm
-	x = real(filename);
-	y = imag(filename);
+else                % what is this complex number format ??? -sm
+	x = real(locs_file);
+	y = imag(locs_file);
 end;	
 
 % ------------------------------------------------
@@ -99,7 +96,7 @@ delta = xi(2)-xi(1); % length of grid entry
 
 for c=1:NCHANS
    [useless_var horizidx(c)] = min(abs(y(c) - xi)); % find pointers to electrode
-   [useless_var vertidx(c)] = min(abs(x(c) - yi));  % positions in Zi
+   [useless_var  vertidx(c)] = min(abs(x(c) - yi));  % positions in Zi
 end;
    
 % -------------------
