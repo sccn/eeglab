@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/06/15 18:40:10  arno
+% debuging urevent number
+%
 % Revision 1.31  2004/06/15 17:05:29  arno
 % avoid infinite recursion with eeg_checkset
 %
@@ -514,6 +517,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
     else
         if ~exist('noeventcheck')
             EEG = eeg_checkset(EEG, 'eventconsistency');
+            EEG = eeg_checkset(EEG, 'checkur');
         end;
     end;
     return;
