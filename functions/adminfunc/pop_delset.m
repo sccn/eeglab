@@ -1,4 +1,4 @@
-% pop_delset() - Delete a dataset into the global variable containing
+% pop_delset() - Delete a dataset from the variable containing
 %                all datasets.
 %
 % Usage: >> ALLEEG = pop_delset(ALLEEG, indices);
@@ -31,9 +31,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% uses the global variable ALLEEG CURRENTSET 
-
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/23 23:47:12  arno
+% debuging command call
+%
 % Revision 1.3  2002/04/23 19:09:45  arno
 % debuging for pop_delset standalone call
 %
