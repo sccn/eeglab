@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/03/14 00:53:04  arno
+% debug for dipfit
+%
 % Revision 1.4  2003/03/13 19:51:07  arno
 % updated for release
 %
@@ -88,7 +91,7 @@ if nargin < 3
                { 'style' 'text' 'string' 'Use dipoles from (scroll, then click to select)' } ...
                { 'style' 'listbox' 'string' varstr(1:end-1) 'value' 1 } ...
                { 'style' 'text' 'string' 'Background image (click to select)' } ...
-               { 'style' 'listbox' 'string' 'BESA Head|average MRI' } ...
+               { 'style' 'listbox' 'string' fastif(strcmpi(typedip, 'dipfit'), 'Average MRI', 'average MRI|BESA head') } ...
                { 'style' 'text' 'string' 'Sumary mode' } ...
                { 'style' 'checkbox' 'string' '' } {} ...
                { 'style' 'text' 'string' 'Normalized dipole length' } ...
@@ -114,7 +117,7 @@ if nargin < 3
     else
         ind = 2;
     end;
-    options = { options{:} 'image' fastif(result{ind} == 2, 'mri', 'besa') };
+    options = { options{:} 'image' fastif(result{ind} == 1, 'mri', 'besa') };
     if result{ind+1} == 1, options = { options{:} 'summary' 'on' }; end;
     if result{ind+2} == 1, options = { options{:} 'normlen' 'on' }; end;
     if ~isempty( result{ind+3} ), options = { options{:} eval( [ '{' result{ind+3} '}' ] ) }; end;
