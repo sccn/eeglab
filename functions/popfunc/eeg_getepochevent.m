@@ -15,7 +15,7 @@
 %   timewin   - Event time window [start, end] in milliseconds
 %               (default []=whole epoch).
 %   fieldname - Name of the field to return the values for. 
-%               Default field is 'EEG.event.latency' in seconds
+%               Default field is 'EEG.event.latency' in milliseconds
 %               (though internally this information is stored in 
 %               real frames).
 % Outputs:
@@ -43,9 +43,9 @@
 %  % Return the latencies (by default) in milliseconds of events having 
 %  % type 'rt' (reaction time)
 %
-%  >> latencies = eeg_getepochevent(EEG, {'target','rare'}, [0 0.3], 'position');
+%  >> latencies = eeg_getepochevent(EEG, {'target','rare'}, [0 300], 'position');
 %  % Return the position (field 'position') of 'target' or 'rare' type
-%  % events occurring between 0 and 0.3 sec of each epoch.
+%  % events occurring between 0 and 300 milliseconds of each epoch.
 %  % Returns NaN for epochs with no such events. (See Notes above).
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 15 Feb 2002
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/06/01 21:43:06  arno
+% adding more examples in header
+%
 % Revision 1.10  2003/01/03 20:46:38  scott
 % header edits -sm
 %
@@ -131,7 +134,7 @@ end;
 % check if EEG.epoch contain references to events
 % -----------------------------------------------
 if ~isfield( EEG.event, 'epoch' )
-    disp('Getepochevent: no epoch indices in events, aborting.'); return;
+    disp('Getepochevent: no epoch indices in events, considering continuous values.');
 end;
     
 % check if EEG.epoch and EEG.event contains 'latency' field
@@ -182,7 +185,10 @@ end;
 if isfield(EEG.event, 'latency') & (timewin(1) ~= -Inf | timewin(2) ~= Inf)
 	selected = ones(size(Ieventtmp));
 	for index=1:length(Ieventtmp)
-		reallat = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, EEG.event(Ieventtmp(index)).epoch, ...
+        if ~isfield(EEG.event, 'epoch'), epoch = 1;
+        else                             epoch = EEG.event(Ieventtmp(index)).epoch;
+        end;
+		reallat = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
 								EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3); 
 		if reallat < timewin(1) | reallat > timewin(2)
 			selected(index) = 0;
@@ -196,9 +202,12 @@ end;
 epochval = zeros(1,EEG.trials); epochval(:) = nan;
 if strcmp(fieldname, 'latency')
 	for index = 1:length(Ieventtmp)
-		epoch = EEG.event(Ieventtmp(index)).epoch;
+        if ~isfield(EEG.event, 'epoch'), epoch = 1;
+        else                             epoch = EEG.event(Ieventtmp(index)).epoch;
+        end;
 		if isnan(epochval(epoch))
-			epochval(epoch) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+			epochval(epoch) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
+                                            EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 		else
 			disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ', ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
 		end;
@@ -207,7 +216,9 @@ else
 	for index = 1:length(Ieventtmp)
 		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
 		if ~isempty(val)
-			epochval(EEG.event(Ieventtmp(index)).epoch) = val;
+            if ~isfield(EEG.event, 'epoch'), epochval(1) = val;
+            else                             epochval(EEG.event(Ieventtmp(index)).epoch) = val;
+            end;
 		end;
 	end;
 end;    
