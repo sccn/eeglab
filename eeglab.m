@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.225  2003/02/25 01:20:07  scott
+% header edit -sm
+%
 % Revision 1.224  2003/02/24 19:56:40  arno
 % debuginh last
 %
@@ -897,6 +900,7 @@ if nargin == 1
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
 			updatemenu;
+            if nargout < 1, clear ALLEEG; end; % do not return output var
 			return;
 		else
 			h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
