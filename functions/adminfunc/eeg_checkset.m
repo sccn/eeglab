@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/05/04 01:44:26  arno
+% correcting typo
+%
 % Revision 1.26  2002/05/04 01:42:38  arno
 % cellfun bug correction
 %
@@ -564,7 +567,7 @@ if ~isempty( varargin)
 				  end;
 			  end;
 			  if strcmp(format, 'str')
-				  fprintf('eeg_checkset: uniformize value type of event field ''%s''\n', allfield{index});
+				  fprintf('eeg_checkset: uniformize value type of event field ''%s''\n', allfields{index});
 				  % get the field content
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
