@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/20 01:31:03  arno
+% same
+%
 % Revision 1.4  2002/07/20 01:23:28  arno
 % debuging varargin decoding
 %
@@ -92,12 +95,11 @@ else
 		topofreqs = [];
 	end;
 end;
-timerange
 
-if isempty(topofreqs)
-    close(gcf);
-    error('Pop_spectopo: you must enter at least one frequency for scalp map plotting.');
-end;    
+%if isempty(topofreqs)
+%    close(gcf);
+%    error('Pop_spectopo: you must enter at least one frequency for scalp map plotting.');
+%end;    
 
 if ~isempty(EEG.chanlocs)
     % The programming here is a bit redundant but it tries to optimize 
@@ -127,10 +129,9 @@ if ~isempty(EEG.chanlocs)
 	    options = '';
 	end;
 	popcom = sprintf('figure; pop_spectopo(%s, [%s], %s, [%s] %s);', inputname(1), num2str(timerange), num2str(percent), num2str(topofreqs), options);
-	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, topofreqs, EEG.chanlocs, [nan nan nan nan nan nan], '''', 4, percent %s);', outstr, options);
+	com = sprintf('%s spectopo( SIGTMP, totsiz, EEG.srate, ''freq'', topofreqs, ''chanlocs'', EEG.chanlocs, ''limits'', [nan nan nan nan nan nan], ''percent'', percent %s);', outstr, options);
 	eval(com)
-
-        varargout{1} = [10 popcom 10 '% ' com];
+	varargout{1} = [10 popcom 10 '% ' com];
 
 	%title(['Spectrum head plots (time range ' num2str(timerange(1)) '-' num2str(timerange(2)) ')' ]);
 else
