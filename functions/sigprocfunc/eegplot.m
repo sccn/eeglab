@@ -42,8 +42,6 @@
 %    'color'      - ['on'|'off'|cell array] Plot channels with different colors {default: 'off'}. 
 %                   Entering a nested cell array, channels will be plotted using cell array colors 
 %                   elements. {default: 'off'}. 
-%    'colmodif'   - nested cell array of window colors that can be marked/unmarked. Default
-%                   is current color only.
 %    'wincolor'   - [color] color used when selecting EEG.
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
 %    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
@@ -64,6 +62,10 @@
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
 
+% deprecated 
+%    'colmodif'   - nested cell array of window colors that can be marked/unmarked. Default
+%                   is current color only.
+
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) 2001 Arnaud Delorme & Colin Humphries, Salk Institute, arno@salk.edu
@@ -83,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2002/11/13 00:47:45  arno
+% debug multiple color display
+%
 % Revision 1.62  2002/11/12 23:12:49  arno
 % compatibility if one extra channel
 %
@@ -775,7 +780,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   	['g = get(gcbf, ''userdata'');' ...
   	 'g.setelectrode = ~g.setelectrode;' ...
   	 'set(gcbf, ''userdata'', g); ' ...
-     'if ~g.setelectrode set(gcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;'...
+     'if ~g.setelectrode setgcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;'...
      ' clear g;'] )
 
 	% trials boundaries
@@ -898,7 +903,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   commandpush = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
   			 'g = get(gcbf,''UserData'');' ... % get data of backgroung image {g.trialstag g.winrej incallback}
-			 'if g.incallback ~= 1' ... % interception of nestest calls
+             'if tmpcallback ~= 1' ... % interception of nestest calls
  			 '   if g.trialstag ~= -1,' ...
 			 '   	lowlim = round(g.time*g.trialstag+1);' ...
  			 '   else,' ...
@@ -916,13 +921,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     		 '      tmpelec = min(max(tmpelec, 1), g.chans);' ...
 			 '      g.winrej(lowlim,tmpelec+5) = ~g.winrej(lowlim,tmpelec+5);' ... % set the electrode
 			 '    else' ...  % remove mark
-			 '      for tmpi = lowlim''' ...
-			 '          tmpcolor = g.winrej(tmpi,3)+10*g.winrej(tmpi,4)+100*g.winrej(tmpi,5);' ...
-		     '          if any(tmpcolor == g.colmodif);' ...
-			 '              g.winrej = [ g.winrej(1:tmpi-1,:)'' g.winrej(tmpi+1:end,:)'']''; ' ...
-			 '          end;' ...
-			 '      end;' ...
-			 '    end;' ...
+			 ... % '      for tmpi = lowlim''' ...
+			 ... %'          tmpcolor = g.winrej(tmpi,3)+10*g.winrej(tmpi,4)+100*g.winrej(tmpi,5);' ...
+		     ... %'          if any(tmpcolor == g.colmodif);' ...
+			 ... %'              g.winrej(tmpi,:) = []; ' ...
+			 ... %'          end;' ...
+			 ... %'       end;' ... % THIS PART WAS TO DESELECT COLOR SELECTIVELLY 
+             '       g.winrej(lowlim,:) = [];' ...
+             '    end;' ...
 			 '  else' ...
 			 '    if g.trialstag ~= -1' ... % find nearest trials boundaries if epoched data
 			 '      alltrialtag = [0:g.trialstag:g.frames];' ...
@@ -1017,6 +1023,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   set(gcf, 'windowbuttondownfcn', commandpush);
   set(gcf, 'windowbuttonmotionfcn', commandmove);
   set(gcf, 'windowbuttonupfcn', commandrelease);
+  set(gcf, 'interruptible', 'off');
+  set(gcf, 'busyaction', 'cancel');
   
   g.commandselect = { commandpush commandmove commandrelease };           
   set(gcf, 'userdata', g);
@@ -1150,7 +1158,6 @@ else
   			end;	
     	end;
     end;		
-
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
     set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
@@ -1201,7 +1208,7 @@ else
 				end;
 				count = zeros(size(cumul));
 				%if ~isempty(find(cumul > 1)), find(cumul > 1), end;
-				for tmpi = 1:length(tmpwins1)
+                for tmpi = 1:length(tmpwins1)
 					poscumul = indicescount(tmpi);
 					heightbeg = count(poscumul)/cumul(poscumul);
 					heightend = heightbeg + 1/cumul(poscumul);
