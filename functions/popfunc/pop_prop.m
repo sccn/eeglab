@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/04/18 00:51:16  arno
+% nromalizing component spectrum by map RMS
+%
 % Revision 1.13  2003/04/16 15:42:32  arno
 % help command
 %
@@ -195,10 +198,12 @@ axis off;
 % -----------------
 h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 %topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs); axis square; 
-if typecomp == 1
-	topoplot( numcompo, EEG.chanlocs, 'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10); axis square;
-else
-	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 'shading', 'interp', 'numcontour', 3); axis square;
+if typecomp == 1 % plot single channel locations
+	topoplot( numcompo, EEG.chanlocs, ...
+             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10,'shrink','skirt'); axis square;
+else             % plot component map
+	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 
+             'shading', 'interp', 'numcontour', 3,'shrink','skirt'); axis square;
 end;
 title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
 
