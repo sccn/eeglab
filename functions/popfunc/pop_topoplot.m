@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2004/08/31 19:32:16  scott
+% still trying - but plot 2 is drawn on plot 1 (Matlab7) ?? -sm
+%
 % Revision 1.43  2004/08/31 18:59:49  scott
 % debug same
 %
@@ -336,7 +339,8 @@ for index = 1:size(arg2(:),1)
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
        end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
-        set(gca, 'visible', 'off')
+        curax = gca;
+        set(curax, 'visible', 'off')
 	end;
 
 	% add dipole location if present
@@ -375,23 +379,27 @@ for index = 1:size(arg2(:),1)
     fprintf('Printing to figure %d.\n',curfig);
     if ~isnan(arg2(index))
 		if typeplot
-            figure(curfig); tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
+            figure(curfig); subplot(curax);
+            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
-                 figure(curfig); title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
+                 figure(curfig); subplot(curax);
+                 title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
-                 figure(curfig); title([int2str(arg2(index)) ' ms']);
+                 figure(curfig); subplot(curax); title([int2str(arg2(index)) ' ms']);
 			end;
 		else
             if arg2(index) < 0
-                 figure(curfig); tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 figure(curfig); subplot(curax);
+                 tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             else
-                 figure(curfig); tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 figure(curfig); subplot(curax);
+                 tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
 			end;
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
-            figure(curfig); title(texttitle);
+            figure(curfig); subplot(curax); title(texttitle);
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
@@ -399,8 +407,8 @@ for index = 1:size(arg2(:),1)
 		axis square; 
 		if index == size(arg2(:),1)
 	        if nbgraph == 1
-                clim = get(gca, 'clim');
-                pos = get(gca,'position');
+                clim = get(curax, 'clim');
+                pos = get(curax,'position');
                 q = [pos(1) pos(2) 0 0];
                 s = [pos(3) pos(4) pos(3) pos(4)];
                 col = colormap;
