@@ -2,6 +2,8 @@
 %                   the delay (in ms) since the preceding event (if any) of specified 
 %                   ("previous") type(s). Requires the EEG.urevent structure, plus 
 %                   EEG.event().urevent pointers to it. 
+%
+%           NOW SUPERCEDED BY eeg_context()
 % Usage:
 %           >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,{target},{previous});
 % Inputs:
