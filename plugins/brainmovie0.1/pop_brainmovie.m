@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/10/09 01:01:37  arno
+% framesfolder ...
+%
 % Revision 1.60  2003/09/18 22:44:22  arno
 % adding frames output for brainmovie
 %
@@ -705,6 +708,7 @@ if ~strcmpi(g.mode, 'compute')
         if strcmpi(g.type, '3d')
             allframes = brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
                         brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+                        %brainmovieoptionsfinal{:}, 'framesout', 'eps');  
         else
             allframes = brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
                         brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
