@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/08/07 18:25:27  arno
+% default lrate for more than 32 channels
+%
 % Revision 1.4  2003/05/23 15:31:53  arno
 % adding more details for extended option of runica
 %
@@ -485,14 +488,7 @@ wts_passed = 0;                      % flag weights passed as argument
          return
       end
    end
-% 
-% adjust lrate if necessary
-%
-if lrate ~= DEFAULT_LRATE & size(data,1) > 32
-    lrate = 1E-7;
-    disp('More than 32 channels: default lrate 1E-7');
-end;
-   
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize weights, etc. %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -549,6 +545,17 @@ elseif nsub > ncomps
     fprintf('runica(): there can be at most %d sub-Gaussian components!\n',ncomps);
     return
 end;
+
+% 
+% adjust nochange if necessary
+%
+if nochange == DEFAULT_STOP & size(data,1) > 32
+    nochange = 1E-7;
+    nochangeupdated = 1; % for fprinting purposes
+else 
+    nochangeupdated = 0;
+end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process the data %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -582,7 +589,11 @@ if verbose,
    fprintf( ...
 'Learning rate will be multiplied by %g whenever angledelta >= %g deg.\n', ...
                annealstep,annealdeg);
- fprintf('Training will end when wchange < %g or after %d steps.\n', ...
+
+   if nochangeupdated 
+       fprintf('More than 32 channels: default stopping weight change 1E-7\n');
+   end;
+   fprintf('Training will end when wchange < %g or after %d steps.\n', ...
                     nochange,maxsteps);
   if biasflag,
     fprintf('Online bias adjustment will be used.\n');
