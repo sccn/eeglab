@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/24 18:19:52  scott
+% [same] -sm
+%
 % Revision 1.2  2002/04/24 17:53:46  scott
 % added 'vert' vertical line plotting -sm
 %
@@ -111,6 +114,7 @@ set(gca,'Color',BACKCOLOR);               % set the background color
 [chans,framestotal]=size(data);           % data size
 
 axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
+vertcolor = 'b';
 plotfile = 'plottopo.ps';
 ls_plotfile = 'ls -l plottopo.ps';
 %
