@@ -1,21 +1,20 @@
 % caliper() - Measure a set of spatial components of a given data epoch relative to 
 %           a reference epoch and decomposition. 
-%
 % Usage: 
 %   >> [amp,window]=caliper(newepoch,refepoch,weights,compnums,filtnums,times,'noplot');
 %
 % Inputs:
-%     newepoch = a (nchannels,ntimes) new data epoch
+%     newepoch = (nchannels,ntimes) new data epoch
 %     refepoch = a (nchannels,ntimes) reference data epoch
-%     weights  = a (nchannels,ncomponents) unmixing matrix (e.g., ICA weights*sphere)
-%     compnums = vector of comp. numbers to return amplitudes for {def|0: all}
+%     weights  = (nchannels,ncomponents) unmixing matrix (e.g., ICA weights*sphere)
+%     compnums = vector of component numbers to return amplitudes for {def|0: all}
 %     filtnums = [srate highpass lowpass] filter limits for refepoch {def|0: allpass}
-%     times    = [start_ms end_ms] epoch time limits, else times vector {def|0: 0:times-1}
-%     'noplot' = no plots {default: plots windows for the first <=3 components}
+%     times    = [start_ms end_ms] epoch latency limits, else latencies vector {def|0: 0:EEG.pnts-1}
+%     'noplot' = produce no plots {default: plots windows for the first <=3 components}
 %
 % Outputs:
 %     amps = (1,length(compnums)) vector of mean signed component rms amplitudes 
-%     windows = (length(compnums)),times) matrix of tapering windows used
+%     windows = (length(compnums)),length(times)) matrix of tapering windows used
 %
 % Notes:
 %   Function caliper() works as follows: First the reference epoch is decomposed using 
@@ -51,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Edit History:
 % 12/05/00 -- added fig showing data, ref activation, and window vector -mw
