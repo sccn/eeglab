@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/05/05 01:49:25  arno
+% debug regions input
+%
 % Revision 1.5  2004/05/05 01:43:11  arno
 % don't know
 %
@@ -71,7 +74,7 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
         return;
     end;
     sdf
-    if size(regions,1) ~= 1 & size(regions,2) ~= 1 & ~exist(length)
+    if size(regions,2) ~= 1 & ~exist(length)
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
     end;
