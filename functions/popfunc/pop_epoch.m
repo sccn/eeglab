@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/09/23 23:06:10  arno
+% debugging limits
+%
 % Revision 1.22  2002/09/04 22:26:03  luca
 % removing EEG.epoch mistmatch error message -arno
 %
@@ -247,6 +250,9 @@ fprintf('pop_epoch():%d epochs generated\n', length(indices));
 
 % update other fields
 % -------------------
+if lim(1) ~= tmptime(1) & lim(2)-1/EEG.srate ~= tmptime(2)
+	fprintf('pop_epoch(): time limits have been adjusted to [%3.2f %3.2f] to fit data points limits', tmptime(1), tmptime(2)+1/EEG.srate);
+end;
 EEG.xmin = tmptime(1);
 EEG.xmax = tmptime(2);
 EEG.pnts = size(EEG.data,2);
