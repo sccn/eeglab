@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/20 19:21:39  arno
+% new spectopo compatibility
+%
 % Revision 1.5  2002/07/20 01:31:03  arno
 % same
 %
@@ -74,7 +77,7 @@ if nargin < 2
 			         'Scalp map frequencies (Hz):', ...
 			         'Scalp map plotting options: See >> help topoplot' };
 	inistr       = { [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
-			         '20' '10' '''electrodes'',''off''' };
+			         '20' '10 20 30' '''electrodes'',''off''' };
     help topoplot;
 	result       = inputdlg( promptstr, 'Channel spectra and maps -- pop_spectopo()', 1, inistr);
 	if size(result,1) == 0 return; end;
