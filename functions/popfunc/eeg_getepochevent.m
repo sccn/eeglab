@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/10/15 18:47:14  hilit
+% added a check if the field is a string convert to number
+%
 % Revision 1.16  2004/06/03 18:32:59  arno
 % msg
 %
@@ -244,13 +247,8 @@ else
             if ~isfield(EEG.event, 'epoch'), epoch = 1;
             else                             epoch = EEG.event(Ieventtmp(index)).epoch;
             end;
-            if isstr(val)
-                epochval(epoch)           = str2num(val);
-                allepochval{epoch}(end+1) = str2num(val);
-            else
-                epochval(epoch)           = val;
-                allepochval{epoch}(end+1) = val;
-            end
+            epochval(epoch)           = val;
+            allepochval{epoch}(end+1) = val;
 		end;
 	end;
 end;    
