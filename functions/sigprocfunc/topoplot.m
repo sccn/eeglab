@@ -45,6 +45,8 @@
 %                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5);
 %                       If the chanlocs structure includes a field chanlocs.plotrad, its value 
 %                       is used by default}.
+%   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose. Default is '+X'.
+%   'chaninfo'        - [struct] structure containing fields 'nosedir', 'plotrad', 'shrink'.
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
@@ -61,6 +63,7 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
+%
 % Plot detail options:
 %   'emarker'         - Matlab marker char | {markerchar color size linewidth} char, else cell array 
 %                       specifying the electrode 'pts' marker. Ex: {'s','r',32,1} -> 32-point solid 
@@ -77,6 +80,7 @@
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
 %   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
@@ -151,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.246  2005/01/28 17:26:10  arno
+% fix typo
+%
 % Revision 1.245  2005/01/25 18:47:01  scott
 % fixed recent bug that made all topoplot colors positive!!
 % worked on bug when removing gridchans from specified plotchans (using setxor)
@@ -791,6 +798,8 @@ DIPLEN    = 1;
 DIPSCALE  = 1;
 DIPORIENT  = 1;
 DIPCOLOR  = [0 0 0];
+NOSEDIR   = '+X';
+CHANINFO  = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
@@ -885,6 +894,16 @@ if nargs > 2
 	  INTERPLIMITS = Value;
 	 case 'verbose'
 	  VERBOSE = Value;
+	 case 'nosedir'
+	  NOSEDIR = Value;
+      if isempty(strmatch(lower(NOSEDIR), { '+x', '-x', '+y', '-y' }))
+          error('Invalid nose direction');
+      end;
+	 case 'chaninfo'
+	  CHANINFO = Value;
+      if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end;
+      if isfield(CHANINFO, 'plotrad'), plotrad      = CHANINFO.plotrad; end;
+      if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end;          
 	 case 'maplimits'
 	  MAPLIMITS = Value;
 	 case 'masksurf'
