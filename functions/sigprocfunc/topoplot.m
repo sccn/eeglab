@@ -46,11 +46,14 @@
 %   'efontsize'|'electcolor'|'emarker'|'emarkersize'|'emarkersize1chan' - electrode details
 %
 % Dipole plotting options:
-%   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
-%                        map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
-%                        model has radius 1). If several rows, plot one dipole per row.
-%                        May also accept a dipfit structure (see help dipplot()).
-%   'dipnorm'         - ['on'|'off'] normalize deipole length {default = 'off'}.
+%   'dipole'          - [XI YI XE YE ZE] plot dipole on the top of the scalp
+%                       map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
+%                       model has radius 1). If several rows, plot one dipole per row.
+%                       Coordinates returned by dipplot() may be used. Can also accept 
+%                       an EEG.dipfit.model structure (See >> help dipplot).
+%                       Ex: 'dipole',EEG.dipfit.model(17),. . .  % Use dipole(s) for
+%                                                                % component 17.
+%   'dipnorm'         - ['on'|'off'] normalize dipole length {default = 'off'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
 %   'diplen'          - [real] scale dipole length {default = 1}.
 %   'dipscale'        - [real] scale dipole size {default = 1}.
@@ -58,8 +61,6 @@
 %   'dipcolor'        - [color] change dipole color {default = 'k' (black)}.
 %                        The dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
-%                        Coordinates returned by dipplot() may be used.
-%  
 % Outputs:
 %         h           - axes handle
 %         val         - interpolated value at given 'noplot' channel location, if any.
@@ -97,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.139  2004/02/17 22:44:54  arno
+% now processing DIPFIT structure and fixed normalization bug
+%
 % Revision 1.138  2004/02/17 18:16:35  scott
 % adjust EMARKERSIZE
 %
@@ -344,7 +348,7 @@ rmax = 0.5;             % head radius - don't change this!
 INTERPLIMITS = 'head';  % head, electrodes
 MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;        % plot map on a 67X67 grid
-AXHEADFAC = 1.01; % 1.3 % head to axes scaling factor
+AXHEADFAC = 1.3;        % head to axes scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
@@ -711,10 +715,10 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   end
   delta = xi(2)-xi(1); % length of grid entry
 
-if exist('QUAD_SKIRT') % not-ready!!!
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
 %
+if exist('QUAD_SKIRT') % not-ready!!!
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
@@ -733,6 +737,11 @@ end % exist
   cla  % clear current axis
   hold on
   h = gca; % uses current axes
+
+  if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+    AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
+                      % shrunk by the 'skirt' option
+  end
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
 
   % pos = get(gca,'position');
@@ -779,6 +788,10 @@ else % if style 'blank'
 
    cla
    hold on
+  if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
+    AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
+                      % shrunk by the 'skirt' option
+  end
   set(gca,'Xlim',[-rmax rmax]*AXHEADFAC,'Ylim',[-rmax rmax]*AXHEADFAC)
    % pos = get(gca,'position');
    % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
@@ -891,9 +904,12 @@ end
 %
 if ~isempty(DIPOLE)
     hold on;
-    % invert x and y from dipplot
+    % Note: invert x and y from dipplot usage
     tmp = DIPOLE;
     if isstruct(DIPOLE)
+        if ~isfield(tmp,'posxyz')
+           error('dipole structure is not an EEG.dipfit.model')
+        end
         DIPOLE = [];
         DIPOLE(:,1) = -tmp.posxyz(:,2)/DIPSPHERE;
         DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE;
@@ -937,18 +953,18 @@ EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
-  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+5);
+  set(hd,'color',BACKCOLOR,'linewidth',HLINEWIDTH+5); % hide the disk edge jaggiess with BACKCOLOR
   sf = squeezefac;
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head *inside* circle
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
-  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
-  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
+  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH) % plot left ear
+  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)% plot right ear
 
 else % no 'skirt'
   plot(cos(circ).*rmax,sin(circ).*rmax,...
-    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
+    'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);   % plot head
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
   plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
