@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/12/03 02:32:12  arno
+% document verbose
+%
 % Revision 1.47  2003/12/03 02:31:34  arno
 % verbose
 %
@@ -883,15 +886,15 @@ if iscell(X)
     % -----------------------------
     if ~isnan( g.baseline ) & ~isnan( mbase1 )
         mbase = (mbase1 + mbase2)/2;
-        P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
-        P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
-        P1 = P1 - repmat(mbase (1:size(P1,1))',[1 size(P1,2)]); 
-        P2 = P2 - repmat(mbase (1:size(P1,1))',[1 size(P1,2)]);        
+        P1 = P1 - repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
+        P2 = P2 - repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
+        P1 = P1 + repmat(mbase (1:size(P1,1))',[1 size(P1,2)]); 
+        P2 = P2 + repmat(mbase (1:size(P1,1))',[1 size(P1,2)]);        
         if ~isnan(g.alpha)
-			Pboot1 = Pboot1 + repmat(mbase1(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
-			Pboot2 = Pboot2 + repmat(mbase2(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
-			Pboot1 = Pboot1 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
-			Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
+			Pboot1 = Pboot1 - repmat(mbase1(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot2 = Pboot2 - repmat(mbase2(1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot1 = Pboot1 + repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
+			Pboot2 = Pboot2 + repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
         end;
         myprintf(g.verbose, '\nSubtracting common baseline\n');
     end;
