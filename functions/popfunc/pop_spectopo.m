@@ -1,11 +1,12 @@
-% pop_spectopo() - Plot spectra of all data channels (or ICA components)
-%                  plus scalp maps showing power at specified frequencies. 
+% pop_spectopo() - Plot spectra of specified data channels (or ICA components).
+%                  Show scalp maps of power at specified frequencies. 
 %                  Calls spectopo(). 
 %
 % Usage:
-%   >> pop_spectopo( EEG, dataflag);         % pops-up interactive window
-%   >> [ ] = pop_spectopo( EEG, dataflag, timerange, ... % returns output
-%                                   process, 'key', 'val',...); 
+%   >> pop_spectopo( EEG, dataflag);                            % pops-up interactive window
+%  OR
+%   >> [spectopo_outputs] = pop_spectopo( EEG, dataflag, timerange, ...
+%                                   process, 'key', 'val',...); % returns spectopo() outputs
 %
 % Inputs:
 %   EEG         - Input EEGLAB dataset
@@ -50,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/08/16 19:15:50  scott
+% worked on help msg and legends
+%
 % Revision 1.24  2002/08/13 18:37:24  scott
 % make output window title 'spectopo()'
 %
@@ -191,7 +195,7 @@ if nargin < 3
 						  'If [], plot contributions at channel with max. power' 10 ...
 						  'If 0, plot component contributions to global (RMS) power'] }, ...
 						 { 'style' 'edit' 'string' '0' }, ...
-						 { 'style' 'text' 'string' 'Component range to consider:' }, ...
+						 { 'style' 'text' 'string' 'Components to consider:' }, ...
 						 { 'style' 'edit' 'string' ['1:' int2str(size(EEG.icaweights,1))] }, ...
 						 { 'style' 'text' 'string' 'Number of largest-contributing comps. to map:' }, ...
 						 { 'style' 'edit' 'string' '' }, ...
