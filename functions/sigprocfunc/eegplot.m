@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/07/22 23:14:40  arno
+% adding one to the epoch number
+%
 % Revision 1.12  2002/06/27 01:48:02  arno
 % removing frequency option
 %
@@ -1022,11 +1025,21 @@ else
 		tagpos  = [];
 		tagtext = [];
 		alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
-		for i=1:length(alltag)-1;
-			tagpos  = [ tagpos linspace(alltag(i), alltag(i+1), 5) ];
-			tagpos  = tagpos(1:end-1);
-			tagtext = [ tagtext linspace(g.limits(1), g.limits(2), 5) ];
-			tagtext  = tagtext(1:end-1);
+
+		nbdiv = 20/g.winlength; % approximative number of divisions
+		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5]]; % possible increments
+		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
+
+		incrementtime  = divpossible(indexdiv);
+		incrementpoint = divpossible(indexdiv)/1000*g.srate+0.01;
+
+		for i=1:length(alltag)-1
+			if ~isempty(tagpos) & tagpos(end)-alltag(i)<incrementpoint
+				tagpos  = tagpos(1:end-1);
+				tagtext  = tagtext(1:end-1);
+			end;
+			tagpos  = [ tagpos [alltag(i):incrementpoint:alltag(i+1)]];
+			tagtext = [ tagtext [g.limits(1):incrementtime:g.limits(2)] ];
 		end;
      	set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
 			
@@ -1252,6 +1265,9 @@ else
          set(slidder, 'visible', 'off');
       else
          set(slidder, 'visible', 'on');         
+		 set(slidder, 'value', g.elecoffset/g.chans, ...
+					  'sliderstep', [1/(g.chans-g.dispchans) g.dispchans/(g.chans-g.dispchans)]);
+         %'sliderstep', [1/(g.chans-1) g.dispchans/(g.chans-1)]);
       end;
       if g.elecoffset < 0
          g.elecoffset = 0;
@@ -1259,9 +1275,6 @@ else
       if g.elecoffset > g.chans-g.dispchans
          g.elecoffset = g.chans-g.dispchans;
       end;
-      set(slidder, 'value', g.elecoffset/g.chans, ...
-         'sliderstep', [1/(g.chans-g.dispchans) g.dispchans/(g.chans-g.dispchans)]);
-         %'sliderstep', [1/(g.chans-1) g.dispchans/(g.chans-1)]);
       set(fig,'UserData', g);
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
