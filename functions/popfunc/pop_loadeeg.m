@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/03/17 22:30:03  arno
+% debug filepath...
+%
 % Revision 1.16  2003/12/17 23:19:52  arno
 % importing channel labels
 %
@@ -161,7 +164,7 @@ if exist('range_response') ~= 1 | isempty(range_response), range_response     = 
 % ----------
 EEG = eeg_emptyset;
 if ~isempty(filepath)
-    if filepath(end) ~= '/' & filepath(end) ~= '/' & filepath(end) ~= ':'
+    if filepath(end) ~= '/' & filepath(end) ~= '\' & filepath(end) ~= ':'
         error('The file path last character must be a delimiter');
     end;
     fullFileName = sprintf('%s%s', filepath, filename);
