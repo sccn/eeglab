@@ -22,6 +22,10 @@
 %  'title'     = [string] plot title {def|'' -> none}
 %  'chan'      = vector of channel numbers to plot {def|0 -> all}
 %  'axsize'    = [x y] axis size {default [.07 .07]}
+%  'legend'    = [cell array] cell array of string for the legend. Note
+%                the last element can be an integer to set legend 
+%                position.
+%  'showleg'   = ['on'|'off'] show or hide legend.
 %  'colors'    = [cell array] cell array of plot aspect. E.g. { 'k' 'k--' }
 %                for plotting the first curve in black and the second one
 %                in black dashed. Can also contain additional formating.
@@ -56,6 +60,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/03/16 01:49:09  arno
+% debug
+% last
+%
 % Revision 1.12  2003/03/16 01:47:24  arno
 % allowing setting of each curve color and aspect
 %
@@ -144,28 +152,31 @@ DEFAULT_SIGN = 1;                         % Default - plot positive-up
 ISRECT = 0;                               % default
 ISSPEC = 0;                               % Default - not spectral data 
     
-if nargin < 1 | nargin > 10
+if nargin < 1
     help plottopo
     return
 end
 
-if length(varargin) == 1 | ( length(varargin) > 0 & ~isstr(varargin{1}))
-    options = { 'chanlocs' varargin{1} };
-    if nargin > 2, options = { options{:} 'frames' varargin{2} }; end;
-    if nargin > 3, options = { options{:} 'limits' varargin{3} }; end;
-    if nargin > 5, options = { options{:} 'chans'  varargin{5} }; end;
-    if nargin > 6, options = { options{:} 'axsize' varargin{6} }; end;
-    if nargin > 7, options = { options{:} 'colors' varargin{7} }; end;
-    if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end;
-    if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end;
-
-    if nargin > 4 & ~isequal(varargin{4}, 0), options = { options{:} 'title'  varargin{4} }; end;
-
-    %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
+if length(varargin) > 0
+    if length(varargin) == 1 | ~isstr(varargin{1}) | isempty(varargin{1})
+        options = { 'chanlocs' varargin{1} };
+        if nargin > 2, options = { options{:} 'frames' varargin{2} }; end;
+        if nargin > 3, options = { options{:} 'limits' varargin{3} }; end;
+        if nargin > 5, options = { options{:} 'chans'  varargin{5} }; end;
+        if nargin > 6, options = { options{:} 'axsize' varargin{6} }; end;
+        if nargin > 7, options = { options{:} 'colors' varargin{7} }; end;
+        if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end;
+        if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end;
+        if nargin > 4 & ~isequal(varargin{4}, 0), options = { options{:} 'title'  varargin{4} }; end;
+        
+        %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
+    else
+        options = varargin;
+    end;
 else
     options = varargin;
 end;
-g = finputcheck(options, { 'chanlocs'  {'struct' 'string'}     []          '';
+g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'frames'    'integer'               [1 Inf]     size(data,2);
                     'chans'     'integer'               [1 Inf]     0;
                     'geom'      'integer'               [1 Inf]     [];
@@ -173,6 +184,8 @@ g = finputcheck(options, { 'chanlocs'  {'struct' 'string'}     []          '';
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
                     'colors'    'cell'                  []          {};
+                    'legend'    'cell'                  []          {};
+                    'showleg'   'string'                {'on' 'off'} 'on';
                     'ydir'      'integer'               [-1 1]      DEFAULT_SIGN;
                     'vert'      'float'                 []          []});
 if isstr(g), error(g); end;
@@ -196,14 +209,14 @@ else
    channelnos = 1:size(data,1);
 end
 
+nolegend = 0;
+if isempty(legend), nolegend = 1; end;
+
 limitset = 0;
 if length(g.limits)>1
     limitset = 1;
 end
 
-if nargin < 2
-  g.chanlocs = '';
-end
 if isempty(g.chanlocs) & isempty(g.geom)
   n = ceil(sqrt(length(channelnos)));
   g.geom = [n n];
@@ -432,9 +445,9 @@ chans = length(channelnos);
 
   for c=1:datasets
       if iscell(g.colors{c})
-          msg = [msg  '''' g.colors{c}{1} '''' ];
+          msg = [msg  '''' g.colors{c}{1} ''' ' ];
       else
-          msg = [msg  '''' g.colors{c} '''' ];
+          msg = [msg  '''' g.colors{c} ''' ' ];
       end;
   end
   msg = [msg '\n'];    % print starting info on screen . . .
@@ -573,14 +586,10 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     set(h,'HorizontalAlignment','right');      
                     set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
-                    if xmin<0
-                        xmn = 0;
-                    else
-                        xmn = xmin;
-                    end
-                    axis('off'),h=text(xmn,ymax,[channames(c,:)]); 
+                    xmn = xdiff/2+xmin;
+                    axis('off'),h=text(xmn,ymax+0.05*ymax,[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
-                    set(h,'FontSize',TICKFONTSIZE);            % choose font size
+                    set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
             end % ~ISSPEC
         end; % P=0 
@@ -636,6 +645,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         
         fprintf(' %d',c); % finished with channel plot
     end; % c, chans / subplot
+    % handle legend
+    if nolegend, g.legend{P+1} = ['Data ' int2str(P) ]; end;
+        
     fprintf('\n');
   end; % P / epoch
 
@@ -741,7 +753,21 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                           'Clipping','off');  % center text
     end; % if ISSPEC
 
-    axcopy(gcf, 'axis on; clear xlabel ylabel; xlabel(''''Time (ms)''''); ylabel(''''Voltage (\muV)'''');'); % turn on popup feature
+    if length(g.legend) > 1 & strcmpi(g.showleg, 'on')
+        tmpleg = vararg2str(g.legend);
+        quotes = find(tmpleg == '''');
+        for index = length(quotes):-1:1
+            tmpleg(quotes(index)+1:end+1) = tmpleg(quotes(index):end);
+            tmpleg(quotes(index)) = '''';
+        end;
+        tmpleg = [ 'legend(' tmpleg ');' ];
+    else tmpleg = '';
+    end;
+    com = [ 'axis on;' ...
+            'clear xlabel ylabel;' tmpleg ...
+            'xlabel(''''Time (ms)'''');' ...
+            'ylabel(''''Voltage (\muV)'''');' ];
+    axcopy(gcf, com); % turn on popup feature
 %
 %%%%%%%%%%%%%%%%%% Make printed figure fill page %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
