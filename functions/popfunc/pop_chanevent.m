@@ -11,9 +11,12 @@
 %                  formula or function to the selected data channel(s) X, 
 %                  transforming X into the command output before edge
 %                  extraction. Command line equivalent 'oper'.
-%   "Edge type to extract" - [list box] extract events when the event
+%   "Transition to extract" - [list box] extract events when the event
 %                  channel values go up ('leading'), down ('trailing')
 %                  or both ('both'). Command line equivalent: 'edge'.
+%   "Transition length" - [edit box] Increase this number to avoid having 
+%                  events very close to each other due to a not perfectly 
+%                  straight edge. Command line equivalent: 'edgelen'.
 %   "Assign duration to events?" - [checkbox] . Assign duration to each 
 %                  extracted event.  This option can only be used when 
 %                  extracting events on leading edges. Event will last
@@ -38,6 +41,9 @@
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
 %                    in the event channel go up ('leading'), down ('trailing')
 %                    or both ('both'). {Default is 'both'}.
+%   'edgelen'      - [integer] maximum edge length (for some data edge do not
+%                    take whole value and it takes a few sample points for
+%                    signal to rise. Default is 1 (perfect edges).
 %   'oper'         - [string] prior to extracting edges, preprocess data
 %                    channel(s) using the string command argument.
 %                    In this command, the data channel(s) are designated by
@@ -87,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/05/24 17:17:27  arno
+% extracting event duration
+%
 % Revision 1.34  2004/05/13 22:27:10  arno
 % debug operation
 %
@@ -199,7 +208,7 @@ if nargin < 1
 end;
 
 if nargin < 2
-	geometry = { [1.5 1 1] [1] [1.5 1 1] [1.5 1 1] [1.5 0.2 0.36 0.84] ...
+	geometry = { [1.5 1 1] [1] [1.5 1 1] [1.5 1 1] [1.5 1 1] [1.5 0.2 0.36 0.84] ...
                  [1] [1.5 0.21 1] [1.5 0.21 1] [1.5 0.21 1] };
     
     % callback from listbox to disable duration checkbox (if leading event is not selected)
@@ -224,6 +233,10 @@ if nargin < 2
 				   'AFTER SCROLLING CLICK TO SELECT' ] } ...
 			   { 'style' 'listbox' 'string' 'up (leading)|both|down (trailing)' 'value' 1 'callback' cb_list } ...
                { 'style' 'text' 'string' '(click to select)'} ...
+			   { 'style' 'text' 'string' 'Transition length (1=perfect edges)' 'tooltipstring'  ...
+                 [ 'Increase this number to avoid having events very close to each other due.' 10 ...
+                   'to a not perfectly straight edge' ] } ...
+			   { 'style' 'edit' 'string' '1' } { } ...
 			   { 'style' 'text' 'string' 'Assign duration to each events?' 'tag' 'dur' 'tooltipstring' ...
 				 [ 'You may assign an event duration to each event if you select to detect' 10 ...
 				   'event on the leading edge above. Event will last as long as the signal is non-0.' ] } ...
@@ -250,13 +263,15 @@ if nargin < 2
 		case 2, g.edge = 'both';
 		case 3, g.edge = 'trailing';
 	end;
-    if result{4}, g.duration = 'on'; else g.duration = 'off'; end;
-	if result{5}, g.delchan  = 'on'; else g.delchan  = 'off'; end;
-	if result{6}, g.delevent = 'on'; else g.delevent = 'off'; end;
-	if result{7}, g.nbtype   = 1;    else g.nbtype   = NaN; end;
+    g.edgelen = eval( [ '[' result{4} ']' ] );
+    if result{5}, g.duration = 'on'; else g.duration = 'off'; end;
+	if result{6}, g.delchan  = 'on'; else g.delchan  = 'off'; end;
+	if result{7}, g.delevent = 'on'; else g.delevent = 'off'; end;
+	if result{8}, g.nbtype   = 1;    else g.nbtype   = NaN; end;
     g.typename =  [ 'chan' int2str(chan) ];
 else 
 	listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
+                  'edgelen'   'integer'    [1 Inf]                            1;
 				  'delchan'   'string'     { 'on' 'off' }                     'on';
 				  'oper'      'string'     []                                 '';
 				  'delevent'  'string'     { 'on' 'off' }                     'on';
@@ -295,19 +310,28 @@ for ci = chan
     
     % extract edges
     % -------------
+    tmpdiff =  diff(X);
     switch g.edge
-     case 'both'    , tmpevent = find( diff(X) ~= 0);
-     case 'trailing', tmpevent = find( diff(X) < 0);
-     case 'leading' , tmpevent = find( diff(X) > 0); tmpdur = find( diff(X) < 0);
+     case 'both'    , tmpevent = find( tmpdiff ~= 0);
+     case 'trailing', tmpevent = find( tmpdiff < 0);
+     case 'leading' , tmpevent = find( tmpdiff > 0); tmpdur = find( tmpdiff < 0);
     end;
+    
+    % fuse close events if necessary
+    % ------------------------------
+    tmpclose = find( tmpevent(2:end)-tmpevent(1:end-1) < 3)+1;
+    tmpevent(tmpclose) = [];
     
     % adjust edges for duration  if necessary
     % ---------------------------------------
     if strcmpi(g.duration, 'on')
+        tmpclose = find( tmpdur(2:end)-tmpdur(1:end-1) < 4); % not +1 (take out the first)
+        tmpdur(tmpclose) = [];
         if tmpdur(1) < tmpevent(1), tmpdur(1) = []; end;
         if length(tmpevent) > length(tmpdur), tmpdur(end+1) = EEG.pnts; end;
         if length(tmpevent) ~= length(tmpdur)
-            error('Error while attempting to extract event duration');
+            error([ 'Error while attempting to extract event durations' 10 ...
+                    'Maybe edges are not perfectly defined, try increasing edge length' ]);
         end;
     end;
     
@@ -344,7 +368,7 @@ else
 	for index = 1:length(events)
 		EEG.event(end+1).type  = events(index).type;
 		EEG.event(end).latency = events(index).latency;
-        if EEG.trials > 1
+        if EEG.trials > 1 | isfield(EEG.event, 'epoch');
             EEG.event(end).epoch = 1+floor((EEG.event(end).latency-1) / EEG.pnts);
         end;
 	end;
@@ -354,6 +378,7 @@ else
         EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
     end;
 end;
+if isfield(EEG.event, 'urevent'), EEG.event = rmfield(EEG.event, 'urevent'); end;
 EEG = eeg_checkset(EEG, 'eventconsistency');
 EEG = eeg_checkset(EEG, 'makeur');
 
