@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2004/06/16 22:24:33  arno
+% no scalp map if only channel labels
+%
 % Revision 1.121  2004/06/16 22:21:20  arno
 % debug for numercial types
 %
@@ -665,8 +668,8 @@ if popup
    		options = [options ',''yerplabel'',''\muV''' ];
 	end;
 	if isempty(titleplot)
-        if typeplot==1
-            if isempty(EEG.chanlocs) % if channel plot
+        if typeplot==1 % if channel plot
+            if ~isempty(EEG.chanlocs) % if channel information exist
                   titleplot = [ EEG.chanlocs(channel).labels ];
             else, titleplot = [ int2str(channel) ];
             end
