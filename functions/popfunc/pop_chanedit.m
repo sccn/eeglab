@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.120  2005/03/11 18:48:56  arno
+% lookup button
+%
 % Revision 1.119  2005/03/11 01:59:27  arno
 % autodetecting BEM file for nose orientation
 %
@@ -942,27 +945,37 @@ else
 		   if isempty(deblank(tmpoper)), return; end;
 		   if iscell(tmpoper), tmpoper = tmpoper{1}; end;
            tmpoper = [ tmpoper ';' ];
+           [eloc, labels, theta, radius, indices] = readlocs(chans);
 		   if isempty(findstr(tmpoper, 'chans'))
-			   try, X          = cell2mat({chans.X});          catch, X(1:length(chans)) = NaN; end;
-			   try, Y          = cell2mat({chans.Y});          catch, Y(1:length(chans)) = NaN; end;
-			   try, Z          = cell2mat({chans.Z});          catch, Z(1:length(chans)) = NaN; end;
-			   try, theta      = cell2mat({chans.theta});      catch, theta(1:length(chans)) = NaN; end;
-			   try, radius     = cell2mat({chans.radius});     catch, radius(1:length(chans)) = NaN; end;
-			   try, sph_theta  = cell2mat({chans.sph_theta});  catch, sph_theta(1:length(chans)) = NaN; end;
-			   try, sph_phi    = cell2mat({chans.sph_phi});    catch, sph_phi(1:length(chans)) = NaN; end;
-			   try, sph_radius = cell2mat({chans.sph_radius}); catch, sph_radius(1:length(chans)) = NaN; end;
-			   eval(tmpoper)
-			   chans = struct('labels', { chans.labels }, 'X', mat2cell(X), 'Y', mat2cell(Y), 'Z', mat2cell(Z), ...
-							  'theta', mat2cell(theta), 'radius', mat2cell(radius), 'sph_theta', mat2cell(sph_theta), ...
-							  'sph_phi', mat2cell(sph_phi), 'sph_radius', mat2cell(sph_radius));
-               if     ~isempty(findstr(tmpoper, 'X')),          chans = convertlocs(chans, 'cart2all'); end;
-               if     ~isempty(findstr(tmpoper, 'Y')),          chans = convertlocs(chans, 'cart2all'); end;
-               if     ~isempty(findstr(tmpoper, 'Z')),          chans = convertlocs(chans, 'cart2all'); end;
-               if     ~isempty(findstr(tmpoper, 'sph_theta')),  chans = convertlocs(chans, 'sph2all');
-               elseif ~isempty(findstr(tmpoper, 'theta')),      chans = convertlocs(chans, 'topo2all'); end;
-               if     ~isempty(findstr(tmpoper, 'sph_phi')),    chans = convertlocs(chans, 'sph2all');  end;
-               if     ~isempty(findstr(tmpoper, 'sph_radius')), chans = convertlocs(chans, 'sph2all');
-               elseif ~isempty(findstr(tmpoper, 'radius')),     chans = convertlocs(chans, 'topo2all'); end;
+			   try, 
+                   X          = [ chans(indices).X ];
+                   Y          = [ chans(indices).Y ];
+                   Z          = [ chans(indices).Z ];
+                   sph_theta  = [ chans(indices).sph_theta ];
+                   sph_phi    = [ chans(indices).sph_phi ];
+                   sph_radius = [ chans(indices).sph_radius ];
+                   eval(tmpoper);
+                   
+                   for ind = 1:length(indices)
+                       chans(indices(ind)).X = X(min(length(X),ind));
+                       chans(indices(ind)).Y = Y(min(length(Y),ind));
+                       chans(indices(ind)).Z = Z(min(length(Z),ind));
+                       chans(indices(ind)).theta  = theta(min(length(theta),ind));
+                       chans(indices(ind)).radius = radius(min(length(radius),ind));
+                       chans(indices(ind)).sph_theta  = sph_theta(min(length(sph_theta),ind));
+                       chans(indices(ind)).sph_phi    = sph_phi(min(length(sph_phi),ind));
+                       chans(indices(ind)).sph_radius = sph_radius(min(length(sph_radius),ind));
+                   end;
+                       
+                   if     ~isempty(findstr(tmpoper, 'X')),          chans = convertlocs(chans, 'cart2all'); end;
+                   if     ~isempty(findstr(tmpoper, 'Y')),          chans = convertlocs(chans, 'cart2all'); end;
+                   if     ~isempty(findstr(tmpoper, 'Z')),          chans = convertlocs(chans, 'cart2all'); end;
+                   if     ~isempty(findstr(tmpoper, 'sph_theta')),  chans = convertlocs(chans, 'sph2all');
+                   elseif ~isempty(findstr(tmpoper, 'theta')),      chans = convertlocs(chans, 'topo2all'); end;
+                   if     ~isempty(findstr(tmpoper, 'sph_phi')),    chans = convertlocs(chans, 'sph2all');  end;
+                   if     ~isempty(findstr(tmpoper, 'sph_radius')), chans = convertlocs(chans, 'sph2all');
+                   elseif ~isempty(findstr(tmpoper, 'radius')),     chans = convertlocs(chans, 'topo2all'); end;
+               catch, disp('Unknown error when applying transform'); end;
 		   else 
 			   eval(tmpoper);
 		   end;
@@ -976,7 +989,7 @@ else
                   chans = pop_chanedit(chans, 'transform', [ 'sph_radius = sph_radius*' num2str( factor ) ';' ]);
                   disp('Warning: electrodes do not lie on a sphere. Sphere model fitting for');
                   disp('         dipole localization will work but generate many warnings');
-              end;  
+              end;
               chans = convertlocs(chans, 'sph2all');
            
 		  case 'shrink'
