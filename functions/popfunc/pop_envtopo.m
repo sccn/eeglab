@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/05/12 23:37:28  arno
+% verbose off
+%
 % Revision 1.17  2003/04/15 16:55:43  arno
 % allowing to plot 20 components
 %
@@ -147,11 +150,11 @@ if nargin < 3
     end;
     timerange    = eval( [ '[' result{1} ']' ] );
     options = ',';
-	if ~isempty( result{2} ), options = [ options '''limcontrib'',  [' result{2} '],' ]; end;
-	if ~isempty( result{4} ), options = [ options '''compnums'',  [' result{4} '],' ]; 
-    else                      options = [ options '''compnums'',   -' result{3} ',' ];
+	if ~isempty( result{2} ), options = [ options '''limcontrib'',[' result{2} '],' ]; end;
+	if ~isempty( result{4} ), options = [ options '''compnums'',[' result{4} '],' ]; 
+    else                      options = [ options '''compnums'',-' result{3} ',' ];
     end;
-    if ~isempty(result{5}),   options = [ options '''subcomps'',   [' result{5} '],' ]; end;
+    if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end;
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end;
 	options      =  [ options result{7} ];
 	figure;
