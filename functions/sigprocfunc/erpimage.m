@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2003/08/24 04:12:33  scott
+% added (erpalpha) bootstrap ERP estimation -sm
+%
 % Revision 1.126  2003/07/26 17:18:51  scott
 % debug same
 %
@@ -2254,7 +2257,6 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         plot1erp(ax2,times,erp,limit); % plot ERP alone
     end;
         
-    end;
     if ~isnan(aligntime)
         line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
     end
