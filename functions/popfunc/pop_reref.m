@@ -2,7 +2,31 @@
 %               new common reference.
 %
 % Usage:
+%       >> EEGOUT = pop_reref( EEG ); % pop up interactive window
 %       >> EEGOUT = pop_reref( EEG, ref, 'key', 'val' ...);
+%
+% Graphical interface:
+%   1st checkbox: Compute average reference. Checking this box is the same 
+%                 as giving an empty value to the 'ref' command line parameter.
+%   2nd checkbox: Re-reference data to channel number(s). Checking this option
+%                 automatically uncheck the first checkbox and allow to enter a
+%                 value in the edit box on the right of the checkbox. It does not
+%                 correspond to any command line input.
+%   1st edit box: on the right of the previous checkbox. Enter the index of the 
+%                 electrode for re-referencing in this box. Same as using the 
+%                 'ref' command line input.
+%   3rd checkbox: Include old reference channel. When re-referencing the data,
+%                 checking this checkbox allow to generate data for the old 
+%                 reference channel. The location for this channel might not
+%                 have been defined and can be specified using the following 
+%                 textbox. Using this option is the same as setting the 'method'
+%                 option to 'withref'.
+%   other edit boxes: use these edit boex to specify the old reference channel
+%                 location. Same as using the 'refloc' optional input. 
+%                 (note that if the channel location structure contains
+%                 one more channel that the data, the last channel is considered
+%                 to be the reference and the location for this channel does not
+%                 have to be specified here). 
 %
 % Inputs:
 %   EEG         - input dataset
@@ -11,7 +35,7 @@
 %
 % Optional inputs:
 %   'method'    - ['standard'|'withref'] can be either 'standard' or 'withref' 
-%                 to recompute the old reference potential
+%                 to recompute the old reference potential. See also reref().
 %   'refloc'    - old common reference location (can also be included as
 %                 the last channel of the EEG.chanlocs struture
 %
@@ -41,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/13 23:13:51  arno
+% gui mutual exclusion problem
+%
 % Revision 1.5  2002/11/13 23:04:40  arno
 % removing extra electrode in average ref
 %
