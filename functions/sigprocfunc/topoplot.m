@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2003/11/06 02:04:41  arno
+% correct orientation
+%
 % Revision 1.64  2003/11/06 01:40:31  arno
 % diporient
 %
@@ -800,7 +803,7 @@ if ~isempty(DIPOLE)
     DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
     if strcmpi(DIPNORM, 'on')
         for index = size(DIPOLE,1)
-            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.05;
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
         end;
     end; 
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
