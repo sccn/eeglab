@@ -70,7 +70,8 @@ function [eeg,ev,header] = read_erpss(filename)
     fclose(fp);
     fp = fopen(filename,'rb','ieee-le');
     fseek(fp,552,-1);
-    header.srate  = fread(fp,1,'uint16');
+    temp = fread(fp,1,'uint16');
+    header.srate = 1000000.0/temp;
     fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
 
