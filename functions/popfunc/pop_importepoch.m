@@ -40,7 +40,7 @@
 %  "Number of header lines to ignore" - [edit box] for some text files, the first
 %                      rows do not contain epoch information and have to be
 %                      skipped. Command line equivalent: 'headerlines'.
-%  "Remove current epoch and event info" - [checkbox] check this checkbox
+%  "Remove old epoch and event info" - [checkbox] check this checkbox
 %                      to remove any prior event or epoch information. Command
 %                      line equivalent: 'clearevents'.
 %
@@ -67,7 +67,7 @@
 %                      in the epoch). 
 %   'headerlines'    - [int] Number of header lines in the input file to ignore. 
 %                      {Default 0}.
-%   'clearevents'    - ['on'|'off'], 'on'-> clear the current event array. 
+%   'clearevents'    - ['on'|'off'], 'on'-> clear the old event array. 
 %                      {Default 'on'}
 %
 % Output:
@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/01/30 19:33:28  arno
+% testing existence of eventdescription
+%
 % Revision 1.26  2003/06/19 16:15:36  arno
 % nothing
 %
@@ -228,7 +231,7 @@ if nargin < 2
          { } ...
          { 'Style', 'text', 'string', 'Latency time unit rel. to seconds. Ex: ms -> 1E-3', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' }, { } ...         
          { 'Style', 'text', 'string', 'Number of file header lines to ignore', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, { },...        
-         { 'Style', 'text', 'string', 'Remove current epoch and event info (set = yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
+         { 'Style', 'text', 'string', 'Remove old epoch and event info (set = yes)', 'horizontalalignment', 'left' }, { 'Style', 'checkbox', 'value', isempty(EEG.event) }, { } };         
     result = inputgui( geometry, uilist, 'pophelp(''pop_importepoch'');', 'Import epoch info (data epochs only) -- pop_importepoch()');
     if length(result) == 0, return; end;
 
