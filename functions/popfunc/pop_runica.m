@@ -2,7 +2,16 @@
 %                binica(), or other ICA algorithm.
 %
 % Usage:
+%   >> OUT_EEG = pop_runica( IN_EEG ); % pop-p widow mode
 %   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options );
+%
+% Graphical interface:
+%   "ICA algorithm to use" - [edit box] The type of ICA algorithm 
+%                 to use for the ICA decomposition. Same as 'rhe ica_type'
+%                 parameter from the command line.
+%   "Commandline options" - [edit box] Command line options to forward
+%                 to the ICA algorithm. Same as the 'options' parameter
+%                 from the command line.
 %
 % Inputs:
 %   IN_EEG      - input dataset
@@ -18,10 +27,11 @@
 %    algorithm implemented for automated use by Scott Makeig using the 
 %    natural gradient of Amari et al.. It can also extract sub-Gaussian 
 %    sources using the 'extended' ICA option of Lee and Girolami. 
-%    runica() is the all-Matlab version; binica() calls the (12x faster) 
+%    runica() is the all-Matlab version; binica() calls the (1.5x faster) 
 %    binary version (separate download) translated to C by Sigurd Enghoff.
 % 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
-%    It is included in the EEGLAB toolbox by his permission. See >> help jader
+%    It is included in the EEGLAB toolbox by his permission. 
+%    See >> help jader
 % 3) To run fastica(), download the fastICA toolbox from
 %    http://www.cis.hut.fi/projects/ica/fastica/ and make it available 
 %    in your Matlab path. According to the authors, default parameters
@@ -54,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/01/15 22:07:59  arno
+% typo
+%
 % Revision 1.15  2002/12/24 01:27:55  arno
 % debug for 'pca' option
 %
