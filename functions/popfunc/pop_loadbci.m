@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/09 23:30:50  arno
+% selecting interesting events
+%
 % Revision 1.2  2002/07/08 19:28:15  arno
 % changing function filter
 %
@@ -124,15 +127,25 @@ catch
 	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 	for index=1:length(EEG.event)
 		if strcmp(EEG.event(index).type(1:6), 'Target')
-			targetcode = int2str(EEG.event(index).type(end));
+			targetcode = str2num(EEG.event(index).type(end));
+			if targetcode == 1
+				EEG.event(index).type = 'toptarget';
+			else
+				EEG.event(index).type = 'bottomtarget';
+			end;
 		else 
 			if strcmp(EEG.event(index).type(1:6), 'Result')
-				resultcode = int2str(EEG.event(index).type(end));
-				EEG.event(end+1).latency = EEG.event(index).latency;
-				if (resultcode ~= targetcode) 
-					EEG.event(end).type = 'up';
+				resultcode = str2num(EEG.event(index).type(end));
+				if resultcode == 1
+					EEG.event(index).type = 'topresp';
 				else
-					EEG.event(end).type = 'down';
+					EEG.event(index).type = 'bottomresp';
+				end;
+				EEG.event(end+1).latency = EEG.event(index).latency;
+				if (resultcode == targetcode) 
+					EEG.event(end).type = 'correct';
+				else
+					EEG.event(end).type = 'miss';
 				end;
 			end;
 		end;
