@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2003/02/03 20:07:45  arno
+% error if no data
+%
 % Revision 1.89  2003/01/24 19:32:02  arno
 % debugging ICA for NaN
 %
@@ -435,9 +438,16 @@ end;
 if isstr(EEG.data)
     fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
     if fid == -1
-        errordlg2(['Cannot open data file ''' [EEG.filepath EEG.data] ''', check directory'], 'error');
+        disp(['file ' [EEG.filepath EEG.data] ' not found, trying local folder']);
+        fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+        if fid == -1
+            errordlg2(['Cannot open data file ''' [EEG.data] ''''], 'error');
+            error('File not found');
+        end;
+        fprintf('Reading float file ''%s''...\n', [EEG.data]);
+    else 
+        fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
     end;
-    fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
     EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
 end;
 
