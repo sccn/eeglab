@@ -64,7 +64,11 @@ for nrec=1:length(Records),
 	fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
 	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
 
-	S(EDF.AS.IDX2)=s;
+    try, 
+        S(EDF.AS.IDX2)=s;
+    catch,
+        error('File is incomplete (try reading begining of file)');
+    end;
 
 	%%%%% Test on  Over- (Under-) Flow
 %	V=sum([(S'==EDF.DigMax(:,ones(RecLen,1))) + (S'==EDF.DigMin(:,ones(RecLen,1)))])==0;
