@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.236  2005/02/14 01:32:47  arno
+% debuging ampsort
+%
 % Revision 1.235  2005/02/11 03:27:38  arno
 % help msg
 %
@@ -1817,7 +1820,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
           end;
 	  pxx = 10*log10(pxx);
       if ampargs(3) == ampargs(4)
-          [tmp n] = min(freqs - ampargs(3));
+          [freq n] = min(abs(freqs - ampargs(3)));
       else
           n = find(freqs >= abs(ampargs(3)) & freqs <= abs(ampargs(4)));
       end;
