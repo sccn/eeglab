@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/08/21 01:57:57  arno
+% undo changes
+%
 % Revision 1.17  2002/08/21 01:57:16  arno
 % nothing
 %
@@ -301,6 +304,7 @@ end;
 % performing removal
 % ------------------
 EEG.data      = EEG.data(g.channel, g.point, g.trial);
+EEG.xmin      = eeg_point2lat(g.point(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
 EEG.trials    = length(g.trial);
 EEG.pnts      = length(g.point);
 EEG.nbchan    = length(g.channel);
