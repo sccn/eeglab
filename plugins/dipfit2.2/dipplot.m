@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.52  2003/08/13 00:46:07  arno
+%*** empty log message ***
+%
 %Revision 1.51  2003/08/04 21:29:06  arno
 %scale besa for summary plot
 %
@@ -285,29 +288,30 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
    end;
     
     %                             key        type       range             default
-    g = finputcheck( varargin, { 'color'    ''         []                 [];
+    g = finputcheck( varargin, { 'color'     ''         []                 [];
                                  'axistight' 'string'  { 'on' 'off' }     'off';
-                                 'mesh'     'string'   { 'on' 'off' }     'off';
-                                 'gui'      'string'   { 'on' 'off' }     'on';
-                                 'summary'  'string'   { 'on' 'off' }     'off';
-                                 'view'     'real'     []                 [0 0 1];
-                                 'rvrange'  'real'     [0 Inf]            [];
-                                 'normlen'  'string'   { 'on' 'off' }     'off';
-                                 'num'      'string'   { 'on' 'off' }     'off';
-                                 'std'      'cell'     []                 {};
-                                 'projimg'  'string'   { 'on' 'off' }     'off';
+                                 'mesh'      'string'   { 'on' 'off' }     'off';
+                                 'gui'       'string'   { 'on' 'off' }     'on';
+                                 'summary'   'string'   { 'on' 'off' }     'off';
+                                 'view'      'real'     []                 [0 0 1];
+                                 'rvrange'   'real'     [0 Inf]            [];
+                                 'normlen'   'string'   { 'on' 'off' }     'off';
+                                 'num'       'string'   { 'on' 'off' }     'off';
+                                 'cornermri' 'string'   { 'on' 'off' }     'off';
+                                 'std'       'cell'     []                 {};
+                                 'projimg'   'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'   [0 Inf]            30;
                                  'dipolelength' 'real' [0 Inf]            1;
-                                 'sphere'   'real'     [0 Inf]              1;
-                                 'image'    'string'   { 'besa' 'mri' 'mriinfant' 'fullmri'}   'besa' }, 'dipplot');
+                                 'sphere'    'real'     [0 Inf]              1;
+                                 'image'     'string'   { 'besa' 'mri' 'mriinfant' 'fullmri'}   'besa' }, 'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
     
     % axis image and limits
     % ---------------------
     dat.mode       = g.image;
-    dat.maxcoord   = 100;
+    dat.maxcoord   = [ 100 100 100 ]; % location of images in 3-D
     dat.axistight  = strcmpi(g.axistight, 'on');
     radius = 85;
     if strcmpi(g.image, 'besa')
@@ -355,9 +359,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         allcoords1 = [0.5:coordinc:size(V,1)*coordinc]-size(V,1)/2*coordinc; 
         allcoords2 = [0.5:coordinc:size(V,2)*coordinc]-size(V,2)/2*coordinc;
         allcoords3 = [0.5:coordinc:size(V,3)*coordinc]-size(V,3)/2*coordinc;
-        %IMAGESAXIS  = { allcoords3/84.747 allcoords2/84.747 allcoords1/84.747 };
-        %               transverse(horiz)    sagital(side)    coronal(rear)
+        
         dat.imgcoords = { allcoords3        allcoords2        allcoords1 };
+        if strcmpi(g.cornermri, 'on') % make the corner of the MRI volume match
+            dat.maxcoord = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
+        end;
+
         COLORMESH = 'w';
         BACKCOLOR = 'k';
         %valinion  = [ 58.5413  -10.5000  -30.8419 ]*2;
@@ -628,33 +635,33 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo1]', [yy yyo1]', [-1 -1]'*dat.maxcoord);
+                    h = line( [xx xxo1]', [yy yyo1]', [-1 -1]'*dat.maxcoord(1));
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(xx,  yy,  -dat.maxcoord); 
+                h = plot3(xx,  yy,  -dat.maxcoord(1)); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo1]', [1 1]'*dat.maxcoord, [zz zzo1]');
+                    h = line( [xx xxo1]', [1 1]'*dat.maxcoord(2), [zz zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(xx,  dat.maxcoord,  zz); 
+                h = plot3(xx,  dat.maxcoord(2),  zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [-1 -1]'*dat.maxcoord, [yy yyo1]', [zz zzo1]');
+                    h = line( [-1 -1]'*dat.maxcoord(3), [yy yyo1]', [zz zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(-dat.maxcoord,  yy,  zz); 
+                h = plot3(-dat.maxcoord(3),  yy,  zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
@@ -1013,9 +1020,9 @@ function plotimgs(dat, index);
         wyc = [ 1 1; 1 1]*dat.imgcoords{2}(index(2));
         wxs = [ 1 1; 1 1]*dat.imgcoords{3}(index(3));
     else
-        wzt = -[ 1 1; 1 1]*dat.maxcoord;
-        wyc =  [ 1 1; 1 1]*dat.maxcoord;
-        wxs = -[ 1 1; 1 1]*dat.maxcoord;
+        wzt = -[ 1 1; 1 1]*dat.maxcoord(1);
+        wyc =  [ 1 1; 1 1]*dat.maxcoord(2);
+        wxs = -[ 1 1; 1 1]*dat.maxcoord(3);
     end;
     
     % ploting surfaces
