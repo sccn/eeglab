@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/02/27 19:07:07  arno
+% fixing fft limits
+%
 % Revision 1.42  2004/02/24 18:46:33  arno
 % debug FFT log ...
 %
@@ -284,6 +287,12 @@ if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 % -------------------
 if length(g.freqs) == 2
     
+    % min and max
+    % -----------
+    if g.freqs(1) == 0 & g.cycles ~= 0
+        g.freqs(1) = srate*g.cycles/g.winsize;
+    end;
+
     % default number of freqs using padratio
     % --------------------------------------
     if isempty(g.nfreqs)
