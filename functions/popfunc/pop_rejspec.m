@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/30 15:17:16  arno
+% debugging
+%
 % Revision 1.4  2002/07/26 18:09:31  arno
 % debugging
 %
@@ -238,7 +241,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	fprintf('Computing spectrum (using slepian tapers; done only once):\n');    
     for index = 1:length(elecrange)
 	   if testgoinloop( specdata, index )
-	      fprintf('%d\t', elecrange(index));    
+	      fprintf('%d ', elecrange(index));    
 		  for indextrials = 1:size(data,3)
 			[ tmpspec(1,:,indextrials) freqs] = pmtm( data(elecrange(index),:,indextrials) );
 		  end;
