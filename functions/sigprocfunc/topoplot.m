@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.241  2005/01/07 22:39:40  scott
+% fixed 'labelpoint' keyword for 'electrodes' (used in eeglab.m)
+%
 % Revision 1.240  2005/01/07 19:55:47  scott
 % remove traces of 'gridpos'
 %
@@ -718,6 +721,7 @@ if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
 end
 cmap = colormap;
 cmaplen = size(cmap,1);
+whitebk = 'off';  % by default, make gridplot background color = EEGLAB screen background color
 
 plotgrid = 'off';
 plotchans = [];
@@ -1021,6 +1025,8 @@ if nargs > 2
                error('''plotchans'' values must be > 0');
            end
            % if max(abs(plotchans))>max(Values) | max(abs(plotchans))>length(Values) -sm ???
+         case {'whitebk','whiteback'}
+            whitebk = Value;
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
     end
@@ -1507,9 +1513,12 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          if ~isnan(gridvalues(j,k))
              gridcolors(j,k,:) = cmap(gridvalues(j,k),:);
          else
-             gridcolors(j,k,:) = BACKCOLOR; % gridchans == 0 -> background color
-             % This allows the plot to show 'space' between separate sub-grids or strips
-             % gridcolors(j,k,:) = [1 1 1]; BACKCOLOR; % gridchans == 0 -> white for printing
+            if strcmpi(whitebk,'off')
+                gridcolors(j,k,:) = BACKCOLOR; % gridchans == 0 -> background color
+                % This allows the plot to show 'space' between separate sub-grids or strips
+            else % 'on'
+                gridcolors(j,k,:) = [1 1 1]; BACKCOLOR; % gridchans == 0 -> white for printing
+            end
          end
       end
     end
