@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2002/11/13 17:10:09  arno
+% forcing channel labels to string
+%
 % Revision 1.78  2002/11/12 22:51:55  arno
 % adding a warning for additional reference electrode location
 %
@@ -755,15 +758,15 @@ if ~isempty( varargin)
 		  if isempty(EEG.chanlocs)
 			  errordlg2( strvcat('Cannot process without channel location file.', ...
 						 'Enter the name of the file via "/Edit/Edit dataset info".', ...
-						 'For the file format, enter ''>> help totoplot'' from the command line.'), 'Error');
+						 'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
 			  error('eeg_checkset: cannot process without channel location file.'); return;
 		  end;
 		 case 'chanlocsize', 
 		  if ~isempty(EEG.chanlocs)
               if length(EEG.chanlocs) > EEG.nbchan
                   questdlg2(strvcat('Warning: there is one more electrode location than', ...
-                                    'data channel. The last electrode is considered to be the', ...
-                                    'common reference. If it is not the case, please remove the', ...
+                                    'data channels. EEGLAB will consider the last electrode to be the', ...
+                                    'common reference channel. If this is not the case, remove the', ...
                                     'extra channel'), 'Warning', 'Ok', 'Ok');
               end;    
           end;
