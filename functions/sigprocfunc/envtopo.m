@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2004/11/30 17:12:21  scott
+% debugging use of g.plotchans only in plotting and computations
+%
 % Revision 1.83  2004/11/29 23:13:45  scott
 % compute variances accounted for ONLY from g.plotchans, if any
 %
@@ -622,8 +625,9 @@ if ~isempty(g.subcomps)
               fprintf('%d ',c);
             end
             fprintf('\n');
-	    proj = icaproj(data,weights,g.subcomps); % updated arg list 12/00 -sm
-	    data = data - proj;
+	    tmpproj = icaproj(data,weights,g.subcomps); % updated arg list 12/00 -sm
+	    data = data - tmpproj;
+            clear tmpproj;
 end;
 	    
 %
@@ -669,7 +673,7 @@ for i=1:ncomps-1
     end
 
     plotframes = ones(ncomps);
-    maxproj = zeros(chans,ncomps);
+    maxproj = zeros(length(g.plotchans),ncomps);
     %
     % first, plot the data envelope
     %
