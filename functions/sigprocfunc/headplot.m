@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/23 19:01:51  arno
+% nothing
+%
 % Revision 1.8  2002/10/23 17:19:10  arno
 % cleaning up, removing ls for windows
 %
@@ -519,7 +522,7 @@ else
   values = values - meanval;
   onemat = ones(enum,1);
   lamd = 0.1;
-  C = [(G + lamd);ones(1,enum)]\[values(:);0];
+  C = pinv([(G + lamd);ones(1,enum)])*[values(:);0]; % fixing division error
   P = zeros(1,size(gx,1));
   for j = 1:size(gx,1)
     P(j) = dot(C,gx(j,:));
@@ -558,7 +561,7 @@ else
 
   axis([-125 125 -125 125 -125 125])
   axis off % hide axis frame
-
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%
   % Draw colorbar - Note: uses enhanced cbar() function by Colin Humphries
   %%%%%%%%%%%%%%%%%%%%%%%%%      
