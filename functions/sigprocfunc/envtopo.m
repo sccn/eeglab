@@ -40,6 +40,7 @@
 %                envelope { Default -> 'avg' }
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
 %                plotting.
+%  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
@@ -73,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/03/08 21:02:57  arno
+% debugging
+%
 % Revision 1.13  2003/03/08 00:11:06  arno
 % allowing input of ICA component activity
 %
@@ -167,6 +171,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'compnums'      'integer'  []                       []; ...
 				  'subcomps'      'integer'  []                       []; ...
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
+				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
 				  'limcontrib'    'real'     []                       0 };
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
@@ -203,6 +208,7 @@ else
     g.icawinv = pinv(weights);
     g.subcomps = [];
     g.envmode = 'avg';
+    g.dispmaps = 'on';
     if nargin > 12, varargin =varargin(10:end); end;
 end;
 
@@ -549,82 +555,82 @@ else
 end
 envx = [1;compx+1];
 
-for c = 1:ntopos+1   % plot the computed component envelopes %%%%%%%%%%%%%%%%%%
-
-  p=plot(x,matsel(envdata,frames,0,1,envx(c)),colors(mapcolors(c),1));% plot the max
-  set(gca,'FontSize',12,'FontWeight','Bold')
-  if c==1                                % Note: use colors in original
-    set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-  else
-    set(p,'LineWidth',1);
-  end
-  if mapcolors(c)>15                                % thin/dot 16th-> comp. envs.
-    set(p,'LineStyle',':','LineWidth',1);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>10                            % 
-    set(p,'LineStyle',':','LineWidth',2);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
-    set(p,'LineStyle',':','LineWidth',3);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>1
-    set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
-      if colors(mapcolors(c),2) == ':'
-        set(l1,'LineWidth',2);  % embolden dotted env lines
-      end
-  end
-  hold on
-  p=plot(x,matsel(envdata,frames,0,2,envx(c)),colors(mapcolors(c),1));% plot the min
-  if c==1
-    set(p,'LineWidth',2);
-  else
-    set(p,'LineWidth',1);
-  end
-  if mapcolors(c)>15                                % thin/dot 11th-> comp. envs.
-    set(p,'LineStyle',':','LineWidth',1);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>10                            
-    set(p,'LineStyle',':','LineWidth',2);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
-    set(p,'LineStyle',':','LineWidth',3);
-    if all_bold
-      set(p,'LineStyle','-','LineWidth',3);
-    end
-  elseif mapcolors(c)>1
-    set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
-      if colors(mapcolors(c),2) == ':'
-        set(l1,'LineWidth',2);  % embolden dotted env lines
-      end
-  end
-  if c==1 & ~isempty(g.vert)
-   for v=g.vert
-      vl=plot([v v], [ymin ymax],'k--'); % plot specified vertical lines
-      set(vl,'linewidth',2.5);           % if any
-   end
-  end
-  %
-  % plot the n-th component filled 
-  %
-  if g.fillcomp(1)>0 & find(g.fillcomp==c-1) 
-    fprintf('filling component %d\n',c);
-     mins = matsel(envdata,frames,0,2,envx(c));
-     p=fill([x x(frames:-1:1)],...
-       [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
-       colors(mapcolors(c),1));
-  end
-  axis([xmin xmax ymin ymax]);
-end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for c = 1:ntopos+1   % plot the computed component envelopes %%%%%%%%%%%%%%%%%%
+        
+        p=plot(x,matsel(envdata,frames,0,1,envx(c)),colors(mapcolors(c),1));% plot the max
+        set(gca,'FontSize',12,'FontWeight','Bold')
+        if c==1                                % Note: use colors in original
+            set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
+        else
+            set(p,'LineWidth',1);
+        end
+        if mapcolors(c)>15                                % thin/dot 16th-> comp. envs.
+            set(p,'LineStyle',':','LineWidth',1);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>10                            % 
+            set(p,'LineStyle',':','LineWidth',2);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
+            set(p,'LineStyle',':','LineWidth',3);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>1
+            set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
+            if colors(mapcolors(c),2) == ':'
+                set(l1,'LineWidth',2);  % embolden dotted env lines
+            end
+        end
+        hold on
+        p=plot(x,matsel(envdata,frames,0,2,envx(c)),colors(mapcolors(c),1));% plot the min
+        if c==1
+            set(p,'LineWidth',2);
+        else
+            set(p,'LineWidth',1);
+        end
+        if mapcolors(c)>15                                % thin/dot 11th-> comp. envs.
+            set(p,'LineStyle',':','LineWidth',1);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>10                            
+            set(p,'LineStyle',':','LineWidth',2);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
+            set(p,'LineStyle',':','LineWidth',3);
+            if all_bold
+                set(p,'LineStyle','-','LineWidth',3);
+            end
+        elseif mapcolors(c)>1
+            set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
+            if colors(mapcolors(c),2) == ':'
+                set(l1,'LineWidth',2);  % embolden dotted env lines
+            end
+        end
+        if c==1 & ~isempty(g.vert)
+            for v=g.vert
+                vl=plot([v v], [ymin ymax],'k--'); % plot specified vertical lines
+                set(vl,'linewidth',2.5);           % if any
+            end
+        end
+        %
+        % plot the n-th component filled 
+        %
+        if g.fillcomp(1)>0 & find(g.fillcomp==c-1) 
+            fprintf('filling component %d\n',c);
+            mins = matsel(envdata,frames,0,2,envx(c));
+            p=fill([x x(frames:-1:1)],...
+                   [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
+                   colors(mapcolors(c),1));
+        end
+        axis([xmin xmax ymin ymax]);
+    end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 set(axe,'Color',axcolor);
 l= xlabel('time (ms)');
@@ -650,152 +656,158 @@ axis([0 1 0 1])
 width  = xmax-xmin;
 height = ymax-ymin;
 
-for t=1:ntopos % draw oblique lines from max env vals (or plot top)
-               % to map bases, in left to right order
-  if BOLD_COLORS==1
-     linestyles = 1:ntopos;
-  else
-     linestyles = maporder;
-  end
-  axes(axall) 
-  axis([0 1 0 1]);
-  set(axall,'Visible','off');
-  maxenv = matsel(envdata,frames,plotframes(t),1,compx(t)+1); 
-                                        % max env val
-  data_y = 0.6*(g.voffsets(t)+maxenv-ymin)/height;
-  if (data_y > pos(2)+0.6*pos(4)) 
-      data_y = pos(2)+0.6*pos(4);
-  end
-  l1 = plot([(plottimes(t)-xmin)/width  ...
-               topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
-                 [data_y 0.68], ...
-            colors(linestyles(t)+1)); % 0.68 is bottom of topo maps
-  if linestyles(t)>15                        % thin/dot 11th-> comp. envs.
-    set(l1,'LineStyle',':','LineWidth',1);
-    if all_bold
-     set(l1,'LineStyle','-','LineWidth',3);
-    end
-  elseif linestyles(t)>10 
-    set(l1,'LineStyle',':','LineWidth',2);
-    if all_bold
-     set(l1,'LineStyle','-','LineWidth',3);
-    end
-  elseif linestyles(t)>5                     % dot 6th-> comp. envs.
-    set(l1,'LineStyle',':','LineWidth',3);
-    if all_bold
-     set(l1,'LineStyle','-','LineWidth',3);
-    end
-  elseif linestyles(t)>1
-    set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
-      if colors(linestyles(t)+1,2) == ':'
-        set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',2);
-      end
-  end
-  hold on
+if strcmpi(g.dispmaps, 'on')
 
-  if g.voffsets(t) > 0                    % if needed add vertical lines
-    l2 = plot([(plottimes(t)-xmin)/width  ...
-               (plottimes(t)-xmin)/width],...
-              [0.6*(maxenv-ymin)/height ...
-               0.6*(g.voffsets(t)+maxenv-ymin)/height],...
-               colors(linestyles(t)+1));
-    if linestyles(t)>15                      % thin/dot 11th-> comp. envs.
-      set(l2,'LineStyle',':','LineWidth',1);
-      if all_bold
-        set(l2,'LineStyle','-','LineWidth',3);
-      end
-    elseif linestyles(t)>10                   
-      set(l2,'LineStyle',':','LineWidth',2);
-      if all_bold
-        set(l2,'LineStyle','-','LineWidth',3);
-      end
-    elseif linestyles(t)>5                   % dot 6th-> comp. envs.
-      set(l2,'LineStyle',':','LineWidth',3);
-      if all_bold
-        set(l2,'LineStyle','-','LineWidth',3);
-      end
-    else
-      set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
-      if colors(linestyles(t)+1,2) == ':'
-        set(l1,'LineWidth',2);
-      end
+    for t=1:ntopos % draw oblique lines from max env vals (or plot top)
+                   % to map bases, in left to right order
+        if BOLD_COLORS==1
+            linestyles = 1:ntopos;
+        else
+            linestyles = maporder;
+        end
+        axes(axall) 
+        axis([0 1 0 1]);
+        set(axall,'Visible','off');
+        maxenv = matsel(envdata,frames,plotframes(t),1,compx(t)+1); 
+        % max env val
+        data_y = 0.6*(g.voffsets(t)+maxenv-ymin)/height;
+        if (data_y > pos(2)+0.6*pos(4)) 
+            data_y = pos(2)+0.6*pos(4);
+        end
+        l1 = plot([(plottimes(t)-xmin)/width  ...
+                   topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+                  [data_y 0.68], ...
+                  colors(linestyles(t)+1)); % 0.68 is bottom of topo maps
+        if linestyles(t)>15                        % thin/dot 11th-> comp. envs.
+            set(l1,'LineStyle',':','LineWidth',1);
+            if all_bold
+                set(l1,'LineStyle','-','LineWidth',3);
+            end
+        elseif linestyles(t)>10 
+            set(l1,'LineStyle',':','LineWidth',2);
+            if all_bold
+                set(l1,'LineStyle','-','LineWidth',3);
+            end
+        elseif linestyles(t)>5                     % dot 6th-> comp. envs.
+            set(l1,'LineStyle',':','LineWidth',3);
+            if all_bold
+                set(l1,'LineStyle','-','LineWidth',3);
+            end
+        elseif linestyles(t)>1
+            set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
+            if colors(linestyles(t)+1,2) == ':'
+                set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',2);
+            end
+        end
+        hold on
+        
+        if g.voffsets(t) > 0                    % if needed add vertical lines
+            l2 = plot([(plottimes(t)-xmin)/width  ...
+                       (plottimes(t)-xmin)/width],...
+                      [0.6*(maxenv-ymin)/height ...
+                       0.6*(g.voffsets(t)+maxenv-ymin)/height],...
+                      colors(linestyles(t)+1));
+            if linestyles(t)>15                      % thin/dot 11th-> comp. envs.
+                set(l2,'LineStyle',':','LineWidth',1);
+                if all_bold
+                    set(l2,'LineStyle','-','LineWidth',3);
+                end
+            elseif linestyles(t)>10                   
+                set(l2,'LineStyle',':','LineWidth',2);
+                if all_bold
+                    set(l2,'LineStyle','-','LineWidth',3);
+                end
+            elseif linestyles(t)>5                   % dot 6th-> comp. envs.
+                set(l2,'LineStyle',':','LineWidth',3);
+                if all_bold
+                    set(l2,'LineStyle','-','LineWidth',3);
+                end
+            else
+                set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
+                if colors(linestyles(t)+1,2) == ':'
+                    set(l1,'LineWidth',2);
+                end
+            end
+        end
+        set(gca,'Visible','off');
+        axis([0 1 0 1]);
     end
-  end
-  set(gca,'Visible','off');
-  axis([0 1 0 1]);
-end
+end;
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-for t=1:ntopos % left to right order 
-  % axt = axes('Units','Normalized','Position',...
-  axt = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
-        topowidth topowidth*head_sep]);
-  axes(axt)                             % topoplot axes
-  cla
-
-  if ~isempty(g.chanlocs)
-      if ~isempty(varargin) topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
-      else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
-      end
-      axis square
-  else axis off;
-  end;
-  %ELSE headplot(g.icawinv(:,t),chan_spline);% make a 3-d headplot
-                                          % if available
-  if t==1
-    chid = fopen('envtopo.labels','r');
-    if chid <3,
-     numlabels = 1;
-    else
-     fprintf('Will label scalp maps with labels from pwd file %s\n','envtopo.labels');
-     compnames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
-     compnames = compnames';
-     [r c] = size(compnames);
-     for i=1:r
-        for j=1:c
-            if compnames(i,j)=='.',
-                compnames(i,j)=' ';
-            end;
+if strcmpi(g.dispmaps, 'on')
+    for t=1:ntopos % left to right order 
+                   % axt = axes('Units','Normalized','Position',...
+        axt = axes('Units','Normalized','Position',...
+                   [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
+                    topowidth topowidth*head_sep]);
+        axes(axt)                             % topoplot axes
+        cla
+        
+        if ~isempty(g.chanlocs)
+            if ~isempty(varargin) topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+            else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+            end
+            axis square
+        else axis off;
         end;
-     end;
-     numlabels=0;
-    end
-  end
-  if numlabels == 1
-     complabel = int2str(maporder(t));        % label comp. numbers
-  else
-     complabel = compnames(t,:);              % use labels in file
-  end
-  text(0.00,0.70,complabel,'FontSize',14,...
+        %ELSE headplot(g.icawinv(:,t),chan_spline);% make a 3-d headplot
+        % if available
+        if t==1
+            chid = fopen('envtopo.labels','r');
+            if chid <3,
+                numlabels = 1;
+            else
+                fprintf('Will label scalp maps with labels from pwd file %s\n','envtopo.labels');
+                compnames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
+                compnames = compnames';
+                [r c] = size(compnames);
+                for i=1:r
+                    for j=1:c
+                        if compnames(i,j)=='.',
+                            compnames(i,j)=' ';
+                        end;
+                    end;
+                end;
+                numlabels=0;
+            end
+        end
+        if numlabels == 1
+            complabel = int2str(maporder(t));        % label comp. numbers
+        else
+            complabel = compnames(t,:);              % use labels in file
+        end
+        text(0.00,0.70,complabel,'FontSize',14,...
              'FontWeight','Bold','HorizontalAlignment','Center');
-  % axt = axes('Units','Normalized','Position',[0 0 1 1],...
-  axt = axes('Position',[0 0 1 1],...
-               'Visible','Off','Fontsize',16);
-  set(axt,'Color',axcolor);           % topoplot axes
-  drawnow
-end
+        % axt = axes('Units','Normalized','Position',[0 0 1 1],...
+        axt = axes('Position',[0 0 1 1],...
+                   'Visible','Off','Fontsize',16);
+        set(axt,'Color',axcolor);           % topoplot axes
+        drawnow
+    end
+    %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    % axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
+    axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+    h=cbar(axt);                        % colorbar axes
+    set(h,'Ytick',[]);
+    
+    axes(axall)
+    set(axall,'Color',axcolor);
+    text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+    text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
+    text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
+    
+    axes(axall)
+    set(axall,'layer','top'); % bring component lines to top
+    
+end;
 axcopy(gcf);
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
-axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
-h=cbar(axt);                        % colorbar axes
-set(h,'Ytick',[]);
-
-axes(axall)
-set(axall,'Color',axcolor);
-text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
-text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
-text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
-
-axes(axall)
-set(axall,'layer','top'); % bring component lines to top
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
