@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/15 03:07:45  arno
+% header for web
+%
 % Revision 1.4  2002/08/28 00:52:30  arno
 % allow to plot NaN with other latencies
 %
@@ -231,12 +234,13 @@ fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-clf % clear the current figure
-set(gcf,'Color',BACKCOLOR); % set the background color
+pos = get(gca,'Position');
+cla % clear the current axes
+set(gca,'Color',BACKCOLOR); % set the background color
 
 % site the plot at bottom of the figure
-axe = axes('Units','Normalized','Position',[.12 .12 .76 .44],'FontSize',16);
-set(gca,'Color',BACKCOLOR);
+axe = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
+set(axe,'Color',BACKCOLOR);
 
 limits = get(axe,'Ylim');
 set(axe,'GridLineStyle',':')
@@ -282,7 +286,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axall = axes('Units','Normalized','Position',[0 0 1 1],...
+% axall = axes('Units','Normalized','Position',[0 0 1 1],...
+axall = axes('Position',pos,...
              'Visible','Off','Fontsize',16);    % whole-figure invisible axes
 axes(axall)
 set(axall,'Color',BACKCOLOR);
@@ -308,25 +313,28 @@ end
 %
 
 for t=1:ntopos
-  axt = axes('Units','Normalized','Position',...
-                 [topoleft+(t-1)*6*topowidth/5 0.68 topowidth topowidth*1.2]);
+%  axt = axes('Units','Normalized','Position',...
+%                 [topoleft+(t-1)*6*topowidth/5 0.68 topowidth topowidth*1.2]);
 
-  axes(axt)                                           % topoplot axes
+  axt = axes('Units','Normalized','Position',...
+       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
+        topowidth topowidth*head_sep]);
+  axes(axt)                             % topoplot axes
   cla
+
   % topoplot(data(:,plotframes(t)),chan_locs,'style','both'); % make a topoplot
   if ~isempty(varargin)
     topoplot(data(:,plotframes(t)),chan_locs, varargin{:}); 
   else
     topoplot(data(:,plotframes(t)),chan_locs); 
   end
-               % make a topoplot
+  %
+  % ELSE make a 3-D headplot
+  %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
-               % else make a 3-d headplot
+  
   timetext = num2str(plottimes(t),'%4.0f');
   text(0.00,0.70,timetext,'FontSize',14,'HorizontalAlignment','Center');
-  axt = axes('Units','Normalized','Position',[0 0 1 1],...
-               'Visible','Off','Fontsize',16);        % topoplot axes
-  set(axt,'Color',BACKCOLOR);
 end
 
 %
