@@ -9,7 +9,8 @@
 %  chanlocs  - channel location structure (returned by readlocs()).
 %
 % Optional inputs:
-%  'settings'  - [cell array] dipfit settings. Default is none.
+%  'settings'  - [cell array] dipfit settings (arguments to the 
+%                pop_dipfit_settings() function). Default is none.
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
 %                symetry. Default is 1.
 %  'dipplot'   - ['on'|'off'] plot dipoles. Default is 'off'.
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/05/05 21:50:38  arno
+% test before rmfield
+%
 % Revision 1.1  2003/11/06 18:28:54  arno
 % Initial revision
 %
