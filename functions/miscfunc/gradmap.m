@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/07/26 18:02:23  arno
+% *** empty log message ***
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -57,20 +60,15 @@ GRID_SCALE = 2*MAXCHANS+5;
 
 % Read the channel file
 % ---------------------
-if isstr( filename )
-	fid = fopen(filename); 
-	locations = fscanf(fid,'%d %f %f %s',[7 MAXCHANS]);
-	fclose(fid);
-	locations = locations';
-	Th = pi/180*locations(:,2);                               % convert degrees to rads
-	Rd = locations(:,3);
-	ii = find(Rd <= 0.5); % interpolate on-head channels only
-	Th = Th(ii);
-	Rd = Rd(ii);
-	[x,y] = pol2cart(Th,Rd);
-else
+if isnumeric( filename )
 	x = real(filename);
 	y = imag(filename);
+else
+    tmploc = readlocs( filename);
+    fe = find(cellfun('isempty', { tmploc.theta }));
+    tmploc(fe) = [];
+    map(fe,:) = [];
+	[x,y] = pol2cart(cell2mat({tmploc.theta}),cell2mat({tmploc.radius}));
 end;	
 
 % locates nearest position of electrod in the grid 
@@ -82,11 +80,13 @@ for i=1:MAXCHANS
    [useless_var vertidx(i)] = min(abs(x(i) - yi));     % positions in Zi
 end;
    
+draw = 1;
+
 % Compute gradient
 % ----------------
 for i=1:size(map,2) 
    	[Xi,Yi,Zi] = griddata(y,x,map(:,i),yi',xi, 'invdist');   % interpolate data
-   	[FX,FY] = del2(Zi);
+   	[FX,FY] = gradient(Zi);
 	positions = horizidx + (vertidx-1)*GRID_SCALE;
 
 	gradx(:,i) = FX(positions(:));
