@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.246  2003/07/28 15:21:16  arno
+% remove averef
+%
 % Revision 1.245  2003/07/22 17:14:09  arno
 % automatic reject button for channel scroll
 %
@@ -1486,7 +1489,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	end;
 	%set( g.val7, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
 	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
-	set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'common'), 'No', 'Yes'));
+	set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'averef'), 'Yes', 'No'));
 	set( g.val10, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
 	set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
 	tmp = whos('EEG');
