@@ -1,6 +1,6 @@
 % eeg_helphelp() - how to use EEGLAB help.
 %
-% Menus: 
+% \muMenus: 
 % Each EEGLAB menu calls a Matlab function from the commandline. If this 
 % function pops up a graphic interface window, the figure title usually 
 % contains the name of the function that the window will call. EEGLAB help 
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/11 17:29:34  arno
+% editing header
+%
 % Revision 1.3  2002/05/01 03:35:25  arno
 % editing header
 %
