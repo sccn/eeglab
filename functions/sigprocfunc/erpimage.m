@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2003/07/26 17:18:51  scott
+% debug same
+%
 % Revision 1.125  2003/07/26 17:16:50  scott
 % debug same
 %
@@ -614,6 +617,7 @@ Topoflag  = NO;     % don't plot a topoplot in upper left
 Specflag  = NO;     % don't plot a spectrum in upper right
 Erpflag   = NO;     % don't show erp average by default
 Erpstdflag= NO; 
+Erpalphaflag= NO; 
 Alignflag = NO;     % don't align data to sortvar by default
 Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
@@ -1005,6 +1009,13 @@ if nargin > 6
 			  		error('erpimage(): Value sorting direction must be +1 or -1.');
           end
           Valflag = NO;
+      elseif Erpalphaflag == YES
+          erpalpha = Arg(1);
+          if erpalpha < .002 | erpalpha > 0.1
+             error('erpimage(): erpalpha value is out of bounds [0.002, 0.1]\n');
+             return
+          end
+          Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
 	  elseif strcmp(Arg,'renorm')
@@ -1029,6 +1040,8 @@ if nargin > 6
 		  Erpflag = YES;
 	  elseif strcmpi(Arg,'erpstd')
 		  Erpstdflag = YES;
+	  elseif strcmpi(Arg,'erpalpha')
+		  Erpalphaflag = YES;
 	  elseif strcmpi(Arg,'rmerp')
 		  Rmerp = 'yes';
 	  elseif strcmp(Arg,'align')
@@ -2170,8 +2183,12 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%% Compute ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 erp = [];
-if Erpflag == YES & strcmpi(noshow, 'yes')
-    erp=nan_mean(urdata');           % compute erp average, ignoring nan's
+if Erpflag == YES 
+  if exist('erpalpha')
+    [erp erpalpha] = nan_mean(urdata',erpalpha);   
+  else
+    [erp] = nan_mean(urdata');   % compute erp average, ignoring nan's
+  end
 end;          
 if Erpflag == YES & strcmpi(noshow, 'no')
     axes(ax1); % reset current axes to the erpimage
@@ -2182,16 +2199,14 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     xticklabel = cellstr(xticklabel);
     for tmpindex = 1:length(xticklabel)
         if length(xticklabel{tmpindex}) < widthxticklabel
-            spaces = char( ones(1,ceil((widthxticklabel - length(xticklabel{tmpindex}))/2) )*32);
+            spaces = char(ones(1,ceil((widthxticklabel-length(xticklabel{tmpindex}))/2) )*32);
             xticklabel{tmpindex} = [spaces xticklabel{tmpindex}];
         end;
     end;
     xticklabel = strvcat(xticklabel);
-    erp=nan_mean(urdata');           % compute erp average, ignoring nan's
     if Erpstdflag == YES
         stdev = nan_std(urdata');
     end;
-    
     %
     %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
@@ -2232,8 +2247,13 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                   gcapos(3) image_loy*gcapos(4)]);
     end
     if Erpstdflag == YES
-        plot1erp(ax2,times,erp,limit, stdev); % plot ERP
-    else plot1erp(ax2,times,erp,limit); % plot ERP
+        plot1erp(ax2,times,erp,limit, stdev); % plot ERP with +/-stdev
+    elseif exist('erpalpha')
+        plot1erp(ax2,times,erp,limit,erpalpha); % plot ERP with +/-alpha threshold
+    else
+        plot1erp(ax2,times,erp,limit); % plot ERP alone
+    end;
+        
     end;
     if ~isnan(aligntime)
         line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
@@ -2675,14 +2695,17 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1erp(ax,Time,erp,axlimits,stdev)
+function [plot_handle] = plot1erp(ax,times,erp,axlimits,stdev)
 
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
-  [plot_handle] = plot(Time,erp,'LineWidth',ERPDATAWIDTH); hold on
+  [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
   if exist('stdev') == 1
-      [plot_handle] = plot(Time,erp+stdev, 'r--','LineWidth',1); hold on
-      [plot_handle] = plot(Time,erp-stdev, 'r--','LineWidth',1); hold on
+      [plot_handle] = plot(times,stdev, 'r--','LineWidth',1); hold on    % plot +alpha
+      [plot_handle] = plot(times,-1*stdev, 'r--','LineWidth',1); hold on % plot -alpha
+
+      % [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on
+      % [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on
   end;
   if sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
@@ -2751,7 +2774,9 @@ prctl = interp1(pt,sortdata,pc);
 %
 % nan_mean() - take the column means of a matrix, ignoring NaN values
 % 
-function out = nan_mean(in)
+function [out outalpha]  = nan_mean(in,alpha)
+   intrials = size(in,1);
+   inframes = size(in,2);
    nans = find(isnan(in));
    in(nans) = 0;
    sums = sum(in);
@@ -2761,6 +2786,20 @@ function out = nan_mean(in)
    nononnans = find(nonnans==0);
    nonnans(nononnans) = 1;
    out = sum(in)./nonnans;
+
+   NBOOT = 500;
+   outalpha = [];
+   if nargin>1 
+     booterps = zeros(NBOOT,inframes);
+     for n=1:NBOOT
+         signs = sign(randn(1,intrials)'-0.5));
+         booterps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
+     end
+     booterps = sort(abs(booterps));
+     alpha = 1+floor(alpha*NBOOT);
+     outalpha = booterps(alpha,:);
+    end
+
    out(nononnans) = NaN;
 
 function out = nan_std(in)
