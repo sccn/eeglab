@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.181  2002/10/25 23:40:05  arno
+% h -> hh
+%
 % Revision 1.180  2002/10/23 22:28:26  arno
 % releasing the timtopo ploting for continuous data
 %
@@ -1279,7 +1282,7 @@ function num = popask( text )
 function g = myguihandles(fig)
 	g = [];
 	hh = findobj('parent', gcf);
-	for index = 1:length(h)
+	for index = 1:length(hh)
 		if ~isempty(get(hh(index), 'tag'))
 			g = setfield(g, get(hh(index), 'tag'), hh(index));
 		end;
