@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 18:33:09  arno
+% quesdlg2
+%
 % Revision 1.6  2002/08/06 21:49:46  arno
 % spelling
 %
@@ -197,7 +200,7 @@ if ~isempty(args)
 else
     g = [];
 end;
-g
+g;
 
 % test the presence of variables
 % ------------------------------
