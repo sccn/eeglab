@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 16:20:06  arno
+% debug
+%
 % Revision 1.3  2002/08/12 16:12:32  arno
 % updating messages
 %
@@ -68,7 +71,7 @@ end;
 if nargin < 3
 	% which set to save
 	% -----------------
-	promptstr    = { 'Enter the destination dataset:'};
+	promptstr    = { 'Index of the new dataset:'};
 	inistr       = { int2str(set_in+1) };
 	result       = inputdlg2( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr, 'pop_copyset');
 	size_result  = size( result );
