@@ -1,4 +1,5 @@
-% pop_runica() - run ica decomposition on a dataset
+% pop_runica() - Run ICA decomposition on a dataset using runica() or (other
+%                ICA algorithms).
 %
 % Usage:
 %   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options );
@@ -17,7 +18,7 @@
 %    algorithm implemented for automated use by Scott Makeig using the 
 %    natural gradient of Amari et al.. It can also extract sub-Gaussian 
 %    sources using the 'extended' ICA option of Lee and Girolami. 
-%    runica() is the all-Matlab version. binica() calls the (12x faster) 
+%    runica() is the all-Matlab version; binica() calls the (12x faster) 
 %    binary version (separate download) translated to C by Sigurd Enghoff.
 % 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
 %    It is included in the EEGLAB toolbox by his permission. See >> help jader
@@ -28,7 +29,7 @@
 %    parallel.
 %
 % Outputs:
-%   OUT_EEG     - output dataset with ica weights computed
+%   OUT_EEG = Input EEGLAB dataset with new (OUT_EEG.weights, OUT_EEG.sphere). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -53,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/19 21:53:40  arno
+% same
+%
 % Revision 1.5  2002/08/19 21:37:29  arno
 % debugging fastica for mac
 %
