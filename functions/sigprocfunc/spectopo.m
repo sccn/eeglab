@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/01/21 17:21:30  arno
+% debug last
+%
 % Revision 1.48  2003/01/21 17:19:32  arno
 % adding strvcat to the y-label
 %
@@ -326,7 +329,7 @@ data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
-if g.plotchan == 0 & strcmpi(g.icamode, 'sub')
+if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
     if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
     error('Cannot plot data component at all channels (option not implemented)');
 end;
@@ -478,8 +481,10 @@ if ~isempty(g.freq)
 		[tmp fi] = min(abs(freqs-g.freq(f)));
 		freqidx(f)=fi;
 	end
-else 
-	g.limits(2) = 50;
+else
+    if isnan(g.limits(2))
+        g.limits(2) = 50;
+    end;
 end;
 
 [tmp maxfreqidx] = min(abs(g.limits(2)-freqs)); % adjust max frequency
