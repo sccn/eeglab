@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/06/03 21:25:25  arno
+% undo last change
+%
 % Revision 1.8  2004/06/03 21:19:02  arno
 % changing latency of boundevent
 %
@@ -96,6 +99,7 @@ end;
 
 reject = zeros(1,datlen);
 regions = round(regions);
+regions = sort(regions,1);
 for i=1:size(regions,1)
    try
       reject(regions(i,1):regions(i,2)) = 1;
