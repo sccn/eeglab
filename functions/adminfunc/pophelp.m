@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/03/12 03:12:34  arno
+% special help for pop_functions
+%
 % Revision 1.9  2003/03/12 02:59:32  arno
 % adding pop and eponymous help
 %
@@ -116,28 +119,23 @@ if fid == -1
 	error('File not found');
 end;
 
+sub = 1;
+try, 
+    if strcmpi(computer, 'PCWIN') | strcmp(computer, 'MAC'), sub = 0; end;
+catch, end;
+
 if nonmatlab
 	str = fgets( fid );
 	while ~feof(fid)
-		str = deblank(str(1:end-1));
-		
-		if ~strcmp(computer, 'MAC') & ~isunix % windows
-            doc = { doc{:} str(1:end-1) };    
-        else 
-            doc = { doc{:} str(1:end) };
-        end;
+		str = deblank(str(1:end-sub));
+        doc = { doc{:} str(1:end) };    
         str = fgets( fid );
 	end;
 else
 	str = fgets( fid );
 	while (str(1) == '%')
-		str = deblank(str(1:end-1));
-		
-		if ~strcmp(computer, 'MAC') & ~isunix % windows
-            doc = { doc{:} str(2:end-1) };    
-        else 
-            doc = { doc{:} str(2:end) };
-        end;
+		str = deblank(str(1:end-sub));
+        doc = { doc{:} str(2:end) };    
 		str = fgets( fid );
 	end;
 end;
