@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/18 15:26:41  scott
+% added number of events to title -sm
+%
 % Revision 1.2  2002/04/09 20:54:55  arno
 % debuging latency display for latency in continuous data
 %
@@ -83,7 +86,7 @@ if nargin<2
     % add field values
     % ----------------
     geometry = { 1 };
-    tmpstr = sprintf('Edit events field values (%d events):',length(EEG.event));
+    tmpstr = sprintf('Edit event field values (currently %d events)',length(EEG.event));
     uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
     for index = 1:length(allfields) 
         geometry = { geometry{:} [1 1 1 1] };
@@ -139,7 +142,7 @@ if nargin<2
     uilist   = { uilist{:}, ...
           { }, ...
           { },{ },{ }, {'Style', 'text', 'string', 'Event Num', 'fontweight', 'bold' }, { },{ },{ }, ...
-          { 'Style', 'pushbutton', 'string', 'Rm event',  'callback', [callpart1 'eventtmp(valnum) = []; valnum = min(valnum,length(eventtmp));' ...
+          { 'Style', 'pushbutton', 'string', 'Delete event',  'callback', [callpart1 'eventtmp(valnum) = []; valnum = min(valnum,length(eventtmp));' ...
                 'olduserdat = get( gcbf, ''userdata''); if isempty(olduserdat), olduserdat = {}; end;' ...
                 'set( gcbf, ''userdata'', { olduserdat{:} ''delete'', valnum }); clear olduserdat' callpart2 ] }, ...
           { 'Style', 'pushbutton', 'string', '<<', 'callback', [callpart1 'valnum = max(valnum-10,1);' callpart2 ] }, ...
