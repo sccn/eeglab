@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/07 19:18:51  scott
+% rm'd int2str() attempt for topovec -sm
+%
 % Revision 1.4  2002/04/07 19:14:20  scott
 % worked on menu text, int2str(num) for topovec call -sm
 %
@@ -103,9 +106,10 @@ if nargin < 3
     % ------------
     if ~isempty(EEG.chanlocs)
       if typeproc == 1
-	options = [options ', ''topovec'', num, ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', ' int2str(num) ', ''elocs'', EEG.chanlocs' ];
       else
-	options = [options ', ''topovec'', EEG.icawinv(:,num), ''elocs'', EEG.chanlocs' ];
+	options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
+		   '), ''elocs'', EEG.chanlocs' ];
       end;
     end;
     
@@ -132,12 +136,16 @@ else
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
-		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
+		else 
+		  if isstruct( varargin{ i } )
+		    options = [ options ', EEG.chanlocs' ];
+		  else
+		    options = [ options ', [' num2str(varargin{i}(:)') ']' ];
+		  end;
 		end;
 	end;	
 end;
-
+options
 % compute epoch limits
 % --------------------
 if isempty(tlimits)
