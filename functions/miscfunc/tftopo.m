@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/08/27 21:49:48  arno
+% fixing mode error
+%
 % Revision 1.60  2003/08/27 00:31:09  arno
 % fix rms/average
 %
@@ -412,8 +415,12 @@ if ~isempty(g.signifs)
     fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
     for subject = 1:size(tfdata,4)
         for elec = 1:size(tfdata,3)
-            tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
-                      (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+            if size(g.signifs,1) == 2
+                tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
+                          (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+            else
+                tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+            end;                
             tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
         end;
     end;
