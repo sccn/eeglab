@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/07/27 01:21:56  arno
+% debugging last command
+%
 % Revision 1.34  2002/07/27 00:45:17  arno
 % adding messages, changing output command
 %
@@ -230,6 +233,11 @@ if popup
 					 '   if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''coher''),''string'')), ' ...
 					 '      set(findobj(''parent'', gcbf, ''tag'', ''coher''), ''string'', get(findobj(''parent'', gcbf, ''tag'', ''phase''),''string''));' ...
 					 'end; end;' ];
+	commandcoher = [ 'if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''coher''),''string'')),' ...
+					 '   if ~isempty(get(findobj(''parent'', gcbf, ''tag'', ''phase''),''string'')), ' ...
+					 '      set(findobj(''parent'', gcbf, ''tag'', ''phase''), ''string'', get(findobj(''parent'', gcbf, ''tag'', ''coher''),''string''));' ...
+					 'end; end;' ];
+	
 	commandfield = ['if isempty(EEG.event)' ...
 				   '   errordlg(''No events'');' ...
 				   'else' ...
@@ -310,7 +318,7 @@ if popup
 			   { 'Style', 'text', 'string', 'Power limits (dB)'  } ...
 			   { 'Style', 'text', 'string', 'Coher limits (<=1)'  } ...
 			   { 'Style', 'checkbox', 'string', 'Image amps', 'tooltipstring',  context('allamp',vars,txt), 'value', getdef(lastcom, 'allamps', 'present', 0) } ...
-			   { 'Style', 'edit', 'string', getdef(lastcom, 'coher', [1:2]), 'tag', 'coher', 'callback', commandphase } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'coher', [1:2]), 'tag', 'coher', 'callback', commandcoher } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 'coher', [3])  } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',[5:6])  } ...
 			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',[7:8])  } {'style', 'text', 'string', '   (Requires signif.)' } ... 
@@ -403,7 +411,7 @@ if popup
 	end;
 	if ~isempty(result{21})
 		if length(tmpcoher) == 1
-			tmpcoher(2) = tmpcoher(1)
+			tmpcoher(2) = tmpcoher(1);
 		end;
 		tmpcoher(3) = eval( result{21} );
 	end;
@@ -603,6 +611,7 @@ function txt = getdef(lastcom, var, mode, default)
 		else
 			txt = default;
 		end;
+		%fprintf('%s:%s\n', var, txt);		
 		return;
 	else
 		comas  = findstr(lastcom, ','); % finding all comas
@@ -625,9 +634,13 @@ function txt = getdef(lastcom, var, mode, default)
 				txt = str2num(txt);
 				if ~isempty(mode)
 					if length(txt) >= max(mode)
-						txt = int2str(txt(mode));	
+						if all(isnan(txt(mode))), txt = '';
+						else txt = num2str(txt(mode));
+						end;	
 					elseif length(txt) >= mode(1)
-						txt = int2str(txt(mode(1)));	
+						if all(isnan(txt(mode(1)))), txt = '';
+						else txt = num2str(txt(mode(1)));
+						end;
 					else 
 						txt = default;
 					end;
