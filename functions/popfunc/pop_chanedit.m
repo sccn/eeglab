@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/07/16 16:45:00  arno
+% debug readlocs pop up window
+%
 % Revision 1.52  2003/07/16 01:38:07  scott
 % help topoplot
 % help topoplot
@@ -615,7 +618,7 @@ else
                    if ~isempty(tmpargs{1}),
                        % test if string == []
                        % --------------------
-                       if length(tmpargs) > 2 & length( tmpargs{3} ) > 2
+                       if length(tmpargs) > 2 & length( tmpargs{3} ) > 1
                            tmpstr = deblank(tmpargs{3});
                            tmpstr = deblank(tmpstr(end:-1:1));
                            if tmpstr(1) == ']' && tmpstr(end) == '['
