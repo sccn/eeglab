@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/07/01 18:13:36  arno
+% nothing
+%
 % Revision 1.36  2004/06/07 22:27:13  scott
 % added 'meshfile' arg
 %
@@ -180,7 +183,6 @@ set(gca,'Color',BACKCOLOR);
 % mesh_file  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
 mesh_file  = ['mhead.mat'];      % upper head model file (987K)
-mesh_file  = ['mhead2.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
