@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/12/19 02:49:43  arno
+% debug rank lowering
+%
 % Revision 1.34  2003/12/11 16:29:27  arno
 % debug history
 %
@@ -438,10 +441,11 @@ switch lower(icatype)
      case 'sobi' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icaweights = sobi( tmpdata );
+             EEG.icawinv = sobi( tmpdata );
         else    
-            eval(sprintf('EEG.icaweights = sobi( tmpdata %s );', options));
+            eval(sprintf('EEG.icawinv = sobi( tmpdata %s );', options));
         end;
+        EEG.icaweight = pinv(EEG.icawinv);
         EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'ng_ol' 
@@ -457,19 +461,21 @@ switch lower(icatype)
      case 'acsobiro' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icaweights = acsobiro( tmpdata, size(tmpdata,1) );
+             EEG.icawinv = acsobiro( tmpdata, size(tmpdata,1) );
         else    
-            eval(sprintf('EEG.icaweights = acsobiro( tmpdata %s );', options));
+            eval(sprintf('EEG.icawinv = acsobiro( tmpdata %s );', options));
         end;
+        EEG.icaweight = pinv(EEG.icawinv);
         EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'acrsobibpf' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icaweights = acrsobibpf( tmpdata, size(tmpdata,1) );
+             EEG.icawinv = acrsobibpf( tmpdata, size(tmpdata,1) );
         else    
-            eval(sprintf('EEG.icaweights = acrsobibpf( tmpdata %s );', options));
+            eval(sprintf('EEG.icawinv = acrsobibpf( tmpdata %s );', options));
         end;
+        EEG.icaweight = pinv(EEG.icawinv);
         EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'fastica'
