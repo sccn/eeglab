@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/13 17:57:03  arno
+% tutorial link update
+%
 % Revision 1.14  2002/08/18 23:54:06  arno
 % changing ica executable
 %
@@ -76,6 +79,8 @@
 % ------------------------------------------------------
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
+% warning for local web tutorial: end the directory path with a folder delimiter 
+% '\' for windows, '/' for Unix and ':' for Mac
 
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
 
