@@ -25,7 +25,7 @@
 %   called or when more than one page of maps are plotted. Thus, this 
 %   command may be used to draw topographic maps in a figure sub-axis.
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001-
 %
 % See also: topoplot(), eeglab()
 
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/07/03 16:51:16  arno
+% header text
+%
 % Revision 1.23  2003/05/12 22:27:56  arno
 % verbose option off
 %
