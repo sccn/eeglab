@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/03/17 23:38:08  arno
+% programing ylim option
+%
 % Revision 1.18  2003/03/17 23:33:28  arno
 % debuging regions of interest
 %
@@ -203,7 +206,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'ylim'      'float'                 []          [];
                     'title'     'string'                []          '';
                     'axsize'    'float'                 [0 1]       [nan nan];
-                    'regions'   'cell'                  []          [];
+                    'regions'   'cell'                  []          {};
                     'colors'    'cell'                  []          {};
                     'legend'    'cell'                  []          {};
                     'showleg'   'string'                {'on' 'off'} 'on';
