@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -72,7 +75,14 @@ if nargin<5
   showchan = 1; % default tfdata image to show
 end
 
-nchans = round(size(tfdata,2)/length(times));
+if dim(tftopo)==2
+   nchans = round(size(tfdata,2)/length(times));
+elseif dim(tftopo)==3
+   tftopo=tftopo(:);
+else
+   help tftopo
+   return
+end
 if nchans*length(times) ~= size(tfdata,2)
    fprintf('tftopo(): tfdata columns must be a multiple of the length of times (%d)\n',...
                  length(times));
