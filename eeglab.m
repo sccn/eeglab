@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.227  2003/03/03 17:08:20  arno
+% adding path detection for plugins
+%
 % Revision 1.226  2003/02/28 17:48:34  arno
 % do not return output var for eeglab redraw
 %
@@ -1122,11 +1125,12 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
         if ~isempty(findstr(dircontent.m{index}, 'eegplugin'))
             if exist(dircontent.m{index}) == 7
                 addpath(dircontent.m{index})
+                funcname = dircontent.m{index};
                 disp(['eeglab: executing plugin "' funcname '" (path added)' ]);    
             else 
+                funcname = dircontent.m{index}(1:end-2);
                 disp(['eeglab: executing plugin "' funcname '"' ]);    
             end;
-            funcname = dircontent.m{index}(1:end-2);
             eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
                  ['disp(''eeglab: error while executing plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
