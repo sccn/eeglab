@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/09 03:02:38  arno
+% debuging epoch selection
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -160,6 +163,7 @@ if nargin<2
         if isempty(findstr(tmpres, '<')), 
             try, tmpres = eval( [ '[' tmpres ']' ] ); 
             catch, tmpres = parsetxt( tmpres ); end;
+			if iscell(tmpres), tmpres = { tmpres }; end;
         end;
         if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
         else                    args = { args{:}, [ 'omit' allfields{index}], tmpres }; 
@@ -184,14 +188,14 @@ end;
 
 % test the presence of variables
 % ------------------------------
-try, if isempty(g.event) g.event = [1:length(EEG.event)]; end; catch, g.event = [1:length(EEG.event)]; end;
+try, if isempty(g.event), g.event = [1:length(EEG.event)]; end; catch, g.event = [1:length(EEG.event)]; end;
 try, g.omitevent; 	 	 catch, g.omitevent = []; end;
 try, g.deleteothers; 	 catch, g.deleteothers = 'no'; end;
 for index = 1:length(allfields) 
    try, eval(['g.' allfields{index} ';']); catch, eval(['g.' allfields{index} '=[];' ]); end; 
    try, eval(['g.omit' allfields{index} ';']); catch, eval(['g.omit' allfields{index} '=[];' ]); end; 
 end;
-g
+
 
 % select the events to keep
 % -------------------------
@@ -200,15 +204,27 @@ Ieventrem = g.omitevent;
 
 for index = 1:length(allfields)
 
+    % convert the value if the field is a string field
+    % ------------------------------------------------
+	tmpvar = eval(['g.' allfields{index} ]);
+	if isstr(eval(['EEG.event(1).' allfields{index} ';' ])) & isnumeric(tmpvar) & ~isempty(tmpvar)
+		for tmpind = 1:length(tmpvar) 
+			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
+		end;
+		tmpvar = tmpvartmp;
+	end;
+	if isstr(tmpvar) & isempty( findstr(tmpvar, '<'))
+		tmpvar = { tmpvar };
+	end;
+
     % scan each field of EEG.event
     % ----------------------------
-    tmpvar = eval(['g.' allfields{index} ]);
     if ~isempty( tmpvar )
         if  iscell( tmpvar )
             eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                Ieventtmp = unique( [ Ieventtmp strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
+                Ieventtmp = unique( [ Ieventtmp; strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
             end;
             Ievent = intersect( Ievent, Ieventtmp );
         elseif isstr( tmpvar )
@@ -231,12 +247,21 @@ for index = 1:length(allfields)
     % scan each field of EEG.event (omit)
     % -----------------------------------
     tmpvar = eval(['g.omit' allfields{index} ]);
+	if isstr(eval(['EEG.event(1).' allfields{index} ';' ])) & isnumeric(tmpvar) & ~isempty(tmpvar)
+		for tmpind = 1:length(tmpvar) 
+			tmpvartmp{tmpind} = num2str(tmpvar(tmpind));
+		end;
+		tmpvar = tmpvartmp;
+	end;
+	if isstr(tmpvar) & isempty( findstr(tmpvar, '<'))
+		tmpvar = { tmpvar };
+	end;
     if ~isempty( tmpvar )
         if  iscell( tmpvar )
             eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                Ieventtmp = unique( [ Ieventtmp strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
+                Ieventtmp = unique( [ Ieventtmp; strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
             end;
             Ieventrem = union( Ieventrem, Ieventtmp );
          elseif isstr( tmpvar )
@@ -256,52 +281,52 @@ for index = 1:length(allfields)
         end;
      end;
 end;
-
 Ievent = setdiff( Ievent, Ieventrem);
 
 % Events: delete epochs
 % ---------------------
-switch lower(g.deleteothers)
- case 'yes', % ask for confirmation
-			 % --------------------
-			 Iepoch = ones(1, EEG.trials);
-			 for index = 1:length(Ievent)
-				 Iepoch(EEG.event(Ievent(index)).epoch) = 0;
-			 end;
-			 Iepoch = find(Iepoch == 0);
-			 if nargin < 2 
-				 ButtonName=questdlg([ 'Warning: ' num2str(length(Ievent)) ' events selected' 10 ...
+if strcmp( lower(g.deleteothers), 'yes') & EEG.trials > 1
+	% ask for confirmation
+	% --------------------
+	Iepoch = ones(1, EEG.trials);
+	for index = 1:length(Ievent)
+		Iepoch(EEG.event(Ievent(index)).epoch) = 0;
+	end;
+	Iepoch = find(Iepoch == 0);
+	if nargin < 2 
+		ButtonName=questdlg([ 'Warning: ' num2str(length(Ievent)) ' events selected' 10 ...
 					'Delete '  num2str(EEG.trials-length(Iepoch)) ' un-referenced epochs ?' ], ...
-									 'Confirmation', ...
-									 'No', 'Cancel', 'Yes','Yes');
-			 else ButtonName = 'Yes'; end;
-			 
-			 switch lower(ButtonName),
-			  case 'cancel', return; 
-			  case 'yes',
-			   length(Ievent)
-			   EEG.event = EEG.event(Ievent);
-			   EEG = pop_select(EEG, 'trial', Iepoch);
-			  case 'no',
-			   EEG.event = EEG.event(Ievent);
-			 end % switch
-			 
- otherwise, EEG.event = EEG.event(Ievent);
+							'Confirmation', ...
+							'No', 'Cancel', 'Yes','Yes');
+	else ButtonName = 'Yes'; end;
+	
+	switch lower(ButtonName),
+	 case 'cancel', return; 
+	 case 'yes',
+	  length(Ievent)
+	  EEG.event = EEG.event(Ievent);
+	  EEG = pop_select(EEG, 'trial', Iepoch);
+	 case 'no',
+	  EEG.event = EEG.event(Ievent);
+	end % switch
+else
+	if EEG.trials == 1
+		disp('Pop_selectevent: delete trials option ignored since the data is continuous');
+	end;
+	EEG.event = EEG.event(Ievent);
 end;
 
 event_indices = Ievent;
 
 % generate the output command
 % ---------------------------
-com = sprintf('EEG = getevent( %s', inputname(1));
-for i=1:2:length(args)
-    if ~isempty( args{i+1} )
-        if isstr( args{i+1} )   com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
-        else                    com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-        end;
-    end;    
+argsout = {};
+for index =1:2:length(args)
+	if ~isempty(args{index+1})
+		argsout = { argsout{:} args{index}  args{index+1}};
+	end;
 end;
-com = [com ');'];
+com = sprintf('EEG = pop_selectevent( %s, %s)', inputname(1), vararg2str(argsout));
 
 % chop the text so that it fits into the description window
 % ---------------------------------------------------------
