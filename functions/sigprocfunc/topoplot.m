@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2004/02/15 20:18:03  scott
+% same
+%
 % Revision 1.113  2004/02/15 20:16:35  scott
 % same
 %
@@ -1077,4 +1080,5 @@ function [newTh] = skirt_Th(Th,Rd)
      Th(q4) = Th(q4)-pi/2; % rotate back
    end
   fprintf('rotated %d q4 angles\n',length(q4)); % DEBUG
+  newTh = Th;
 return
