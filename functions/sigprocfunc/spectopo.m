@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2003/09/09 23:26:17  arno
+% change && to &
+%
 % Revision 1.72  2003/09/08 15:41:15  arno
 % changing test to eegspec
 %
@@ -466,6 +469,10 @@ if isempty(g.weights)
     if ~isempty(g.mapnorm) % normalize by component map RMS power (if data contain 1 component
         disp('Scaling spectrum by component RMS of scalp map power');
         eegspecdB       = sqrt(mean(g.mapnorm.^4)) * eegspecdB;
+        % the idea is to take the RMS of the component activity (compact) projected at each channel
+        % spec = sqrt( power(g.mapnorm(1)*compact).^2 + power(g.mapnorm(2)*compact).^2 + ...)
+        % spec = sqrt( g.mapnorm(1)^4*power(compact).^2 + g.mapnorm(1)^4*power(compact).^2 + ...)
+        % spec = sqrt( g.mapnorm(1)^4 + g.mapnorm(1)^4 + ... )*power(compact)
     end;
 	eegspecdB = 10*log10(eegspecdB);
     specstd   = 10*log10(specstd);
