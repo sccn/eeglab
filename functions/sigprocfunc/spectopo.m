@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/10/08 22:13:39  arno
+% typo
+%
 % Revision 1.35  2002/10/04 16:07:16  arno
 % adding icawinv parameter
 %
@@ -232,6 +235,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
+				  'specdata'      'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
 				  'icamaps'       'integer'  []                       [] };
 	
