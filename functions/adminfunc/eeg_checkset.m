@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2002/08/28 01:02:48  arno
+% changing error messages to disp
+%
 % Revision 1.65  2002/08/22 21:21:00  arno
 % typo
 %
@@ -335,6 +338,21 @@ end;
 
 com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
 res = [];
+
+% check name consistency
+% ----------------------
+if ~isempty(EEG.setname)
+	if ~isstr(EEG.setname)
+		EEG.setname = '';
+	else
+		if size(EEG.setname,1) > 1
+			disp('eeg_checkset warning: invalid dataset name, removed');
+			EEG.setname = '';
+		end;
+	end;
+else
+	EEG.setname = '';
+end;	
 
 % read data if necessary
 % ----------------------
