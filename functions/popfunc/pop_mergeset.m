@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/02/21 00:23:04  arno
+% urevent update
+%
 % Revision 1.17  2004/02/20 23:53:25  arno
 % urevent merging
 %
@@ -182,6 +185,20 @@ else
 			end;    
 		end;
 		
+        % add discontinuity event if continuous
+        % -------------------------------------
+        if INEEG1.trials  == 1 & INEEG2.trials == 1
+            INEEG1.event(end+1).type    = 'boundary';
+            INEEG1.event(end  ).latency = INEEG1.pnts+0.5;            
+            if ~isempty(INEEG2.urevent) %UREVENT discontinuity
+                disp('Adding a discontinuity event and urevent between datasets');
+                INEEG1.urevent(end+1).type    = 'boundary';
+                INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;
+            else 
+                disp('Adding a discontinuity event between datasets');
+            end; 
+       end;
+        
         % updating urevent field if present
         % ---------------------------------
         if isfield(INEEG2.event, 'urevent') & isfield(INEEG1, 'urevent')
@@ -189,14 +206,7 @@ else
                 INEEG2.event(index).urevent = INEEG2.event(index).urevent + length(INEEG1.urevent);
             end;
         end;    
-        
-        % add discontinuity event if continuous
-        % -------------------------------------
-        if INEEG1.trials  == 1 & INEEG2.trials == 1
-            disp('Adding a discontinuity event between datasets');
-            INEEG1.event(end+1).type    = 'boundary';
-            INEEG1.event(end  ).latency = INEEG1.pnts+0.5;            
-        end;
+ 
         orilen = length(INEEG1.event);
         allfields = union(fieldnames(INEEG1.event), fieldnames(INEEG2.event) );
 		for i=1:length( allfields )
@@ -215,11 +225,6 @@ else
         
         % add discontinuity urevent if continuous
         % -------------------------------------
-        if INEEG1.trials  == 1 & INEEG2.trials == 1
-            disp('Adding a discontinuity urevent between datasets');
-            INEEG1.urevent(end+1).type    = 'boundary';
-            INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;            
-        end;
         orilen = length(INEEG1.urevent);
         allfields = union(fieldnames(INEEG1.urevent), fieldnames(INEEG2.urevent) );
 		for i=1:length( allfields )
