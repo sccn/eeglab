@@ -30,7 +30,7 @@
 %       >> dataout = matsel(dataout,frames,...
 %              1+max(shifts(find(shifts>=0))):frames+min(shifts(find(shifts<=0))));
 %
-% Authors: Scott Makeig, SCCN/INC/UCSD, La Jolla, 8/20/99
+% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 8/20/99
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 8/23/99 debugged right shifts -sm
 % 8/25/99 allowed single- or multiple-channel data -sm
