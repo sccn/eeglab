@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/09/02 21:33:52  lee
+% changed data rank warning
+%
 % Revision 1.26  2003/07/26 00:53:32  arno
 % computing matrix rank and reducing number of comps accordingly
 %
@@ -209,9 +212,9 @@ switch lower(icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
-        tmprank = rank(tmpdata(:,floor(size(tmpdata,2)/2)));
+        tmprank = rank(tmpdata(:,1:floor(size(tmpdata,2)/2)));
         if rank(tmpdata) < size(EEG.data,1), 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels.']);
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
         end;
         if length(options) < 2
             if rank(tmpdata) == size(EEG.data,1), 
@@ -236,9 +239,9 @@ switch lower(icatype)
         if exist(ICABINARY) ~= 2
             error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
-        tmprank = rank(tmpdata(:,floor(size(tmpdata,2)/2)));
+        tmprank = rank(tmpdata(:,1:floor(size(tmpdata,2)/2)));
         if rank(tmpdata) < size(EEG.data,1), 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels.']);
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
         end;
         if length(options) < 2
             if rank(tmpdata) == size(EEG.data,1), 
