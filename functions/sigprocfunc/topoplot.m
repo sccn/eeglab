@@ -43,10 +43,11 @@
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
-%                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
+%                       'intsquare' below). Interpolate electrodes in this area and use this
+%                       limit to define boundaries of the interpolation grid {default: channel max}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
-%                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
-%                       values from electrodes shown in the plotting disk only. {default: 'on'}
+%                       square containing the (radius intrad) interpolation disk; 'off' -> Interpolate
+%                       values from electrodes shown in the interpolation disk only {default: 'on'}.
 %   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
 %                       the electrode locations to minimize extrapolation.  {default: 'off'}
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
@@ -136,6 +137,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.228  2004/12/17 16:36:53  scott
+% cleaning up 'plotgrid' code
+%
 % Revision 1.227  2004/12/17 06:49:57  scott
 % tested if isstruct or string chan_loc; worked on plotgrid - still unimplemented
 %
@@ -651,7 +655,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,Zi,grid] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi,grid,Xi,Yi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1088,7 +1092,10 @@ if isempty(plotrad)
   plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
 end                                           % don't plot channels with Rd > 1 (below head)
 if isempty(intrad) 
+  default_intrad = 1;                         % indicator for (no) specified intrad
   intrad = min(1.0,max(Rd)*1.02);             % default: just outside the outermost electrode location
+else
+  default_intrad = 0;                         % indicator for (no) specified intrad
 end                                           % don't interpolate channels with Rd > 1 (below head)
 
 if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
@@ -1250,13 +1257,18 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  if strcmpi(INTERPLIMITS,'head')
+  if default_intrad % if no specified intrad
+   if strcmpi(INTERPLIMITS,'head')
     xmin = min(-rmax,min(intx)); xmax = max(rmax,max(intx));
     ymin = min(-rmax,min(inty)); ymax = max(rmax,max(inty));
 
-  else % INTERPLIMITS = rectangle containing electrodes   ??? SAME ???
+   else % INTERPLIMITS = rectangle containing electrodes -- DEPRECATED OPTION!
     xmin = max(-rmax,min(intx)); xmax = min(rmax,max(intx));
     ymin = max(-rmax,min(inty)); ymax = min(rmax,max(inty));
+   end
+  else % intrad specified
+    xmin = -intrad; xmax = intrad;   % use the specified intrad value 
+    ymin = -intrad; ymax = intrad;
   end
   %
   %%%%%%%%%%%%%%%%%%%%%%% Interpolate scalp map data %%%%%%%%%%%%%%%%%%%%%%%%
