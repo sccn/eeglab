@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/01/26 00:51:39  scott
+% same
+%
 % Revision 1.29  2004/01/26 00:47:52  scott
 % same
 %
@@ -519,6 +522,7 @@ if strcmpi(g.pvaf, 'on')
         if rem(k,3)==0
           fprintf('\n')
         end
+        k = k+1;
     end;
     fprintf('\nHighest-contributing %d components:\n',ntopos)
     for index =ncomps-ntopos+1:ncomps
