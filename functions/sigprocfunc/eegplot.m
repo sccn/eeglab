@@ -39,7 +39,9 @@
 %                    [start end] Period limits; [R G B] Marking color; 
 %                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
 %                    to reject (1); its length must be the number of data channels. 
-%    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
+%    'color'      - ['on'|'off'|cell array] Plot channels with different colors {default: 'off'}. 
+%                   Entering a nested cell array, channels will be plotted using cell array colors 
+%                   elements. {default: 'off'}. 
 %    'colmodif'   - nested cell array of window colors that can be marked/unmarked. Default
 %                   is current color only.
 %    'wincolor'   - [color] color used when selecting EEG.
@@ -81,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2002/09/06 19:34:31  arno
+% noui optimize
+%
 % Revision 1.49  2002/09/06 19:29:40  arno
 % addscale scale argument to toggle on/off the scale at startup
 %
@@ -384,13 +389,16 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
    end;	
    
-   switch lower(g.color)
-	   case 'on', g.color = { 'k', 'm', 'c', 'b', 'g' }; 
-	   case 'off', g.color = { [ 0 0 0.4] };  
-	   otherwise disp('Error: color must be either ''on'' or ''off'''); return;
-   end;	
-	if length(g.dispchans) > size(data,1)
-		g.dispchans = size(data,1);
+   if ~iscell(g.color)
+	   switch lower(g.color)
+		case 'on', g.color = { 'k', 'm', 'c', 'b', 'g' }; 
+		case 'off', g.color = { [ 0 0 0.4] };  
+		otherwise 
+		 disp('Error: color must be either ''on'' or ''off'' or a cell array'); return;
+	   end;	
+   end;
+   if length(g.dispchans) > size(data,1)
+	   g.dispchans = size(data,1);
    end;
    if ~iscell(g.colmodif)
    		g.colmodif = { g.colmodif };
