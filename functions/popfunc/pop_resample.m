@@ -1,7 +1,13 @@
 % pop_resample() - resample dataset (pop up window).
 %
 % Usage:
+%   >> [OUTEEG] = pop_resample( INEEG ); % pop up interactive window
 %   >> [OUTEEG] = pop_resample( INEEG, freq);
+%
+% Graphical interface:
+%   The edit box entitled "New sampling rate" contains the frequency in
+%   Hz for resampling the data. Entering a value in this box  is the same 
+%   as providing it in the 'freq' input from the command line.
 %
 % Inputs:
 %   INEEG      - input dataset
@@ -33,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/12 02:30:30  arno
+% [6~[6~inputdlg2
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
