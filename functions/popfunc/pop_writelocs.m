@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/05/13 22:32:10  arno
+% debuging for pop_chanedit
+%
 % Revision 1.4  2003/05/13 22:27:10  arno
 % debug for pop_chanedit
 %
@@ -169,7 +172,7 @@ end;
 
 % execute writelocs
 % -----------------
-writelocs(chans, filename, 'unicoord', 'off', options{:});
+writelocs(chans, filename, options{:});
 
 % generate history
 % ----------------
