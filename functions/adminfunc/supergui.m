@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 00:41:41  arno
+% updating default colors
+%
 % Revision 1.5  2002/07/18 17:18:31  arno
 % offscreen correction
 %
@@ -160,10 +163,17 @@ end;
 
 % setting defaults
 %-----------------
+try, icadefs;
+catch,
+	BACKCOLOR  =  [.8 .8 .8];     
+	GUIBUTTONCOLOR   = [.8 .8 .8];    
+	GUITEXTCOLOR     = [0 0 0];
+end;
+
 hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
 %set(hh, 'BackgroundColor', get(gcf, 'color'), 'horizontalalignment', 'left');
-set(hh, 'Backgroundcolor', [.846 .892 .956]);
-set(hh, 'foregroundcolor', [0 0 0.4]);
+set(hh, 'Backgroundcolor', BACKCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(gcf, 'color', get(hh(1), 'BackgroundColor'));
 set(hh, 'horizontalalignment', 'left');
 
@@ -178,8 +188,10 @@ else
 end;
 
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
-set(hh, 'backgroundcolor', [.66 .76 1]);
+set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
-set(hh, 'backgroundcolor', [.66 .76 1]);
+set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
+hh =findobj(allhandlers, 'parent', gcf, 'style', 'listbox');
+set(hh, 'backgroundcolor', GUIBUTTONCOLOR);
 
 return;
