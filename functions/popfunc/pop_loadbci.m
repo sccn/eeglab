@@ -33,6 +33,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/09/23 20:31:39  arno
+% revert version 1.9
+% /
+%
 % Revision 1.9  2003/04/10 18:05:22  arno
 % default argument
 %
@@ -103,75 +107,79 @@ catch
 			indices = [indices index ];
 		end;
 	end;
-	eventindices = setdiff(1:length(colnames), indices);
-	ISIind = eventindices(3 + 9);
-	eventindices(3 + [ 1 2 3 4 7 8 9 10 11 12]) = [];
-	eventindices(1:3) = []; % suppress these event 
+    
+    EEG.data = tmpdata(indices,:);
+    EEG.nbchan = size(EEG.data, 1);
+    EEG.srate  = srate;
+    try
+        eventindices = setdiff(1:length(colnames), indices);
+        ISIind = eventindices(3 + 9);
+        eventindices(3 + [ 1 2 3 4 7 8 9 10 11 12]) = [];
+        eventindices(1:3) = []; % suppress these event 
+        
+        % add the trial number
+        % --------------------
+        tmptrial = find( diff(tmpdata(ISIind, :)) ~= 0);
+        tmptrial = tmptrial+1;
+        
+        % process events
+        % --------------
+        fprintf('Pop_loadbci: importing events...\n');
+        counte = 1; % event counter
+        events(10000).latency = 0;
+        for index = eventindices
+            counttrial = 1;
+            tmpevent = find( diff(tmpdata(index, :)) ~= 0);
+            tmpevent = tmpevent+1;
+            for tmpi = tmpevent
+                if tmpdata(index, tmpi)
+                    events(counte).type    = [ colnames{index} int2str(tmpdata(index, tmpi)) ];
+                    events(counte).latency = tmpi;
+                    %events(counte).value   = tmpdata(index, tmpi);
+                    %while tmpi > tmptrial(counttrial) & counttrial < length(tmptrial)
+                    %	counttrial = counttrial+1;
+                    %end;
+                    %events(counte).trial = counttrial;				
+                    counte = counte+1;
+                    %if mod(counte, 100) == 0, fprintf('%d ', counte); end;
+                end;
+            end;
+        end;
 	
-	% add the trial number
-	% --------------------
-	tmptrial = find( diff(tmpdata(ISIind, :)) ~= 0);
-	tmptrial = tmptrial+1;
-
-	% process events
-	% --------------
-	fprintf('Pop_loadbci: importing events...\n');
-	counte = 1; % event counter
-	events(10000).latency = 0;
-	for index = eventindices
-		counttrial = 1;
-		tmpevent = find( diff(tmpdata(index, :)) ~= 0);
-		tmpevent = tmpevent+1;
-		for tmpi = tmpevent
-			if tmpdata(index, tmpi)
-				events(counte).type    = [ colnames{index} int2str(tmpdata(index, tmpi)) ];
-				events(counte).latency = tmpi;
-				%events(counte).value   = tmpdata(index, tmpi);
-				%while tmpi > tmptrial(counttrial) & counttrial < length(tmptrial)
-				%	counttrial = counttrial+1;
-				%end;
-				%events(counte).trial = counttrial;				
-				counte = counte+1;
-				%if mod(counte, 100) == 0, fprintf('%d ', counte); end;
-			end;
-		end;
-	end;
-	
-	% add up or down events
-	% ---------------------
-	EEG.data = tmpdata(indices,:);
-	EEG.nbchan = size(EEG.data, 1);
-	EEG.srate  = srate;
-	EEG = eeg_checkset(EEG);
-	EEG.event = events(1:counte-1);	
-	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	for index=1:length(EEG.event)
-		if strcmp(EEG.event(index).type(1:6), 'Target')
-			targetcode = str2num(EEG.event(index).type(end));
-			if targetcode == 1
-				EEG.event(index).type = 'toptarget';
-			else
-				EEG.event(index).type = 'bottomtarget';
-			end;
-		else 
-			if strcmp(EEG.event(index).type(1:6), 'Result')
-				resultcode = str2num(EEG.event(index).type(end));
-				if resultcode == 1
-					EEG.event(index).type = 'topresp';
-				else
-					EEG.event(index).type = 'bottomresp';
-				end;
-				EEG.event(end+1).latency = EEG.event(index).latency;
-				if (resultcode == targetcode) 
-					EEG.event(end).type = 'correct';
-				else
-					EEG.event(end).type = 'miss';
-				end;
-			end;
-		end;
-	end;
-	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-	%EEG.data = tmpdata([72 73 75],:);
+        % add up or down events
+        % ---------------------
+        EEG = eeg_checkset(EEG);
+        EEG.event = events(1:counte-1);	
+        EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
+        for index=1:length(EEG.event)
+            if strcmp(EEG.event(index).type(1:6), 'Target')
+                targetcode = str2num(EEG.event(index).type(end));
+                if targetcode == 1
+                    EEG.event(index).type = 'toptarget';
+                else
+                    EEG.event(index).type = 'bottomtarget';
+                end;
+            else 
+                if strcmp(EEG.event(index).type(1:6), 'Result')
+                    resultcode = str2num(EEG.event(index).type(end));
+                    if resultcode == 1
+                        EEG.event(index).type = 'topresp';
+                    else
+                        EEG.event(index).type = 'bottomresp';
+                    end;
+                    EEG.event(end+1).latency = EEG.event(index).latency;
+                    if (resultcode == targetcode) 
+                        EEG.event(end).type = 'correct';
+                    else
+                        EEG.event(end).type = 'miss';
+                    end;
+                end;
+            end;
+        end;
+        EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
+        %EEG.data = tmpdata([72 73 75],:);
+    catch, disp('Failed to import data events');
+    end;
 end;
 
 command = sprintf('EEG = pop_loadbci(''%s'', %f);',filename, srate); 
