@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/04/29 15:13:50  scott
+% debugging PA -sm
+%
 % Revision 1.31  2002/04/29 15:06:51  scott
 % same -sm
 %
@@ -706,9 +709,7 @@ for i=1:trials
 
         switch g.phsamp
          case 'on'
-          PA(:,:,j) = PA(:,:,j) ...
-              + repmat((tmpX ./ abs(tmpX)),1,size(PP,1))   ...
-                   .* repmat(sqrt(PP(:,j))',size(PP,1),1);
+          PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * (PP(:,j))';
                                            % x-product: unit phase column
                                            % times amplitude row
         end
@@ -759,8 +760,8 @@ end;
 switch g.phsamp
  case 'on'
   tmpcx(1,:,:) = cumulX; % allow ./ below
-  for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
-    PA(j,:,:) = PA(j,:,:) ./ tmpcx;
+  for j=1:g.timesout
+    PA(:,:,j) = PA(:,:,j) ./ repmat(PP(:,j)', [size(PP,1) 1]);
   end
 end
 
