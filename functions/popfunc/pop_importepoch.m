@@ -20,12 +20,6 @@
 %                      "latency" should not be used. Columns names can be
 %                      separated by comas, quoted or not. Command line 
 %                      equivalent: fieldlist.
-%  "Field name containing time locking event type(s)" - [edit box] if one column
-%                      contain the epoch type, its name must be defined in the 
-%                      previous edit box and copied here. It is not necessary to 
-%                      define a type field for the time-locking event (TLE). By 
-%                      default it is defined as type ''TLE'' at time 0 for all 
-%                      epochs. Command line equivalent: 'typefield'.
 %  "Field name(s) containing event latencies" - [edit box] enter columns name(s)
 %                      containing latency information. It is not necessary to 
 %                      define a latency field for epoch information. All fields 
@@ -43,6 +37,12 @@
 %                      "'dr1' 'dr2'". If duration is not defined for event latency
 %                      'tr1', you may enter "0 'rt2'". Command line 
 %                      equivalent: 'durationfields'.
+%  "Field name containing time locking event type(s)" - [edit box] if one column
+%                      contain the epoch type, its name must be defined in the 
+%                      previous edit box and copied here. It is not necessary to 
+%                      define a type field for the time-locking event (TLE). By 
+%                      default it is defined as type ''TLE'' at time 0 for all 
+%                      epochs. Command line equivalent: 'typefield'.
 %  "Latency time unit rel. to seconds" - [edit box] specify the time unit for 
 %                      latency columns defined above. Command line 
 %                      equivalent: 'timeunit'.
@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/05/21 22:24:55  arno
+% adding duration field
+%
 % Revision 1.28  2004/04/29 21:16:09  arno
 % current -> old
 %
