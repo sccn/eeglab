@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/12/03 19:18:35  arno
+% same
+%
 % Revision 1.3  2003/12/03 19:17:50  arno
 % debuging filter
 %
@@ -99,7 +102,7 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
             X=fft(data(c,(e-1)*epochframes+1:e*epochframes));
             if revfilt
                 X(idxl+1:idxh-1)=0;
-                X(end-idxh-1:end-idxl+1)=0;
+                X(end/2:end)=0;
             else
                 X(1:idxl)=0;
                 X(end-idxl:end)=0;
