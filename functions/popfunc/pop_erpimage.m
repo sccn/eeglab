@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2003/05/10 19:01:13  arno
+% num2str -> vararg2str
+%
 % Revision 1.111  2003/05/10 18:49:18  arno
 % same
 %
@@ -752,7 +755,7 @@ if popup
 		tmpcoher(3) = eval( res.coher2 );
 	end;
 	if ~isempty(tmpcoher)
-		options = [ options ',''coher'',' varar2str(tmpcoher)  ];
+		options = [ options ',''coher'',' vararg2str(tmpcoher)  ];
 	end;
 
 	% options row
