@@ -3,7 +3,7 @@
 %              using cointerpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
-%        >>  [h grid val] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
+%        >>  [h val grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
 %                        if a single channel number, show location of that 
@@ -58,8 +58,8 @@
 %  
 % Outputs:
 %         h           - axes handle
+%         val         - interpolated value at given 'noplot' channel location, if any.
 %         grid        - interpolated data image (gridscale,gridscale) (off-head points = NaN).
-%         val         - interpolated value at 'noplot' channel location (default = NaN);
 %
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/08/07 15:56:54  scott
+% debug
+%
 % Revision 1.54  2003/08/07 15:54:49  scott
 % debug last
 %
@@ -240,7 +243,8 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function [handle,Zi,chanval] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+
+function [handle,chanval,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 noplot  = 'off';
@@ -542,9 +546,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
       if chancoords(1)<1 | chancoords(1) > 67 | chancoords(2)<1 | chancoords(2)>67
           error('designated ''noplot'' channel out of bounds')
       else
-        chanval = Zi(chancoords);
-        chancoords
-        chanval
+        chanval = Zi(chancoords(1),channcoords(2));
       end
   end
   %
