@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/10/21 21:55:19  arno
+% + for dB
+%
 % Revision 1.12  2003/10/21 19:24:30  arno
 % new look for caption ...
 %
@@ -896,8 +899,8 @@ function [tmpsize, tmpcolor, handles] = drawcircle( tmpcoord, tmpersp, tmpitc, g
                 %axis off; axis equal; lighting phong; camlight left; rotate3d
                 if strcmpi(g.project3d, 'on')
                     colorarray  = repmat(reshape([0.15 0.15 0.15], 1,1,3), [size(zs,1) size(zs,2) 1]);
-                    surf(xs, ys, -g.maxc*0.98*ones(size(zs)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-                    surf(xs,  g.maxc*0.98*ones(size(ys)), zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+                    surf(xs, ys, -g.maxc*1.25*ones(size(zs)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+                    surf(xs,  g.maxc*1.25*ones(size(ys)), zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
                     surf(-g.maxc*0.98*ones(size(xs)), ys, zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
                 end;
             else
@@ -969,8 +972,8 @@ function handles = drawconnections( pos1, pos2, crossfpower, crossfangle, circfa
         %axis off; axis equal; lighting phong; camlight left; rotate3d
         if strcmpi(g.project3d, 'on')
             colorarray  = repmat(reshape([0.15 0.15 0.15], 1,1,3), [size(zc,1) size(zc,2) 1]);
-            surf(xc, yc, -g.maxc*0.98*ones(size(zc)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-            surf(xc,  g.maxc*0.98*ones(size(yc)), zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+            surf(xc, yc, -g.maxc*1.25*ones(size(zc)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+            surf(xc,  g.maxc*1.25*ones(size(yc)), zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
             surf(-g.maxc*0.98*ones(size(xc)), yc, zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
         end;
         %if round(tmpthick) == 7, asdf; end;
