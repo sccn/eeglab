@@ -1,8 +1,8 @@
 % eegrej() - reject eeg regions in continuous eeg data.
 %
 % Usage:
-%   >> [outdata newt newevents] = eegrej( indata, regions, ...
-%                                      timelength, eventlatencies);
+%   >> [outdata newt newevents boundevents] = ...
+%            eegrej( indata, regions, timelength, eventlatencies);
 %
 % Inputs:
 %   indata     - input data nbchannel x nbpoints. If indata is a
@@ -12,7 +12,7 @@
 %                regions. 'beg' and 'end' are expressed in term of points
 %                in the input dataset. Size of the array is
 %                2xnumber of regions.
-%   timelength - time length 
+%   timelength - time length. Only used to compute new total time length.
 %   eventlatencies - vector of event latencies in data points. 
 %                    Default []=none.
 %
@@ -21,6 +21,7 @@
 %   newt       - new timelength
 %   newevents  - new event latencies. If the event was in a removed
 %                region, NaN is returned.
+%   boundevents - boundary events latencies 
 %
 % Exemple: 
 %   [outdat t] = eegrej( 'EEG.data', [1 100; 200 300]', [0 10]);
@@ -50,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/31 16:11:15  arno
+% debugging
+%
 % Revision 1.2  2002/05/21 20:51:29  scott
 % removed ; from evalin() calls -sm
 %
@@ -59,7 +63,7 @@
 % 01-25-02 reformated help & license -ad 
 % 03-27-02 added event latency recalculation -ad 
 
-function [indata, times, newevents] = eegrej( indata, regions, times, eventtimes );
+function [indata, times, newevents, boundevents] = eegrej( indata, regions, times, eventtimes );
 
 if nargin < 2
    help eegrej;
@@ -100,14 +104,23 @@ if exist('eventtimes') == 1
 	    end;
     end;
 end;                    
-            
+
+% generate boundaries latencies
+% -----------------------------
+boundevents = regions(:,1)-1;
+for i=1:size(regions,1)
+	for index=i+1:size(regions)
+		boundevents(index) = boundevents(index) - (regions(i,2)-regions(i,1)+1);
+    end;
+end;
+boundevents = boundevents+0.5;
+
 if isstr(indata)
   disp('Using disk to reject data');
   increment = 10000;
   global elecIndices;
   evalin('base', 'global elecIndices');
   elecIndices = find(reject == 0);
-  nbpoint = length(elecIndices);
   evalin('base', 'fid = fopen(''tmpeegrej.fdt'', ''w'')');
   evalin('base', ['numberrow = size(' indata ',1)']);
   evalin('base', ['for indextmp=1:10000:length(elecIndices),', ...
@@ -124,9 +137,8 @@ if isstr(indata)
   evalin('base', 'delete(''tmpeegrej.fdt'')');  
 else
   elecIndices = find(reject == 0);
-  nbpoint = length(elecIndices);
   indata = indata(:,elecIndices);
 end;
-times = times * length(reject) / nbpoint;
+times = times * length(find(reject ==0)) / length(reject);
 
 return;
