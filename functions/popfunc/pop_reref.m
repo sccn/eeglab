@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/28 16:46:49  arno
+% remove redundancy
+%
 % Revision 1.18  2003/07/28 16:42:03  arno
 % text with scott
 %
@@ -339,7 +342,7 @@ if isempty(ref)
 else 
     if length(ref) == 1
         if withref == 1
-            EEG.ref = ref;
+            EEG.ref = EEG.nbchan+1;
         else
             EEG.ref = -ref;
         end;
@@ -353,6 +356,7 @@ else
 end;
 EEG.icaact  = [];
 EEG.icawinv = [];
+EEG.nbchan  = size(EEG.data,1);
 EEG = eeg_checkset(EEG, 'chanlocs_homogenous');
 
 % generate the output command
