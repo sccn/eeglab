@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/31 18:02:26  arno
+% adding more options
+%
 % Revision 1.6  2002/05/02 23:55:22  arno
 % auto file type selection
 %
@@ -150,13 +153,14 @@ if nargin < 1                 % if several arguments, assign values
 else % no interactive inputs
     args = varargin;
     for index=1:2:length(args)
-        if ~isempty(inputname(index+1)) & ~isstr(args{index+1}) , args{index+1} = { inputname(index+1) }; end;
+        if ~iscell(args{index+1}) , args{index+1} = { inputname(index+1) }; end;
     end;                
 end;
 
 % generate the output command
 % ---------------------------
 com = '';
+args
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
         if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
