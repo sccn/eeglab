@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/06/26 21:29:14  arno
+% editing header
+%
 % Revision 1.8  2002/06/26 18:39:33  scott
 % Edited help message -- see ??? for points needing more clarification. -sm
 %
@@ -342,7 +345,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   posbut(11,:) = [ 0.5437    0.0134    0.0275    0.0270 ]; % -
   posbut(12,:) = [ 0.6    0.02    0.09    0.05 ]; % cancel
   posbut(13,:) = [-0.1    0.02    0.09    0.05 ]; % accept
-  posbut(20,:) = [-0.15    0.15     0.015    0.8 ]; % slider
+  posbut(20,:) = [-0.17    0.15     0.015    0.8 ]; % slider
   posbut(:,1) = posbut(:,1)+0.2;
 
 % Five move buttons: << < text > >> 
@@ -396,7 +399,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Units', 'normalized', ...
 	'Position', posbut(20,:), ...
    'Style','slider', ...
-   'enable', 'off', ...
+   'visible', 'off', ...
    'sliderstep', [0.9 1], ...
    'Tag','eegslider', ...
    'callback', [ 'tmpg = get(gcbf, ''userdata'');' ... 
@@ -646,11 +649,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'Callback','eegplot(''window'')')
   
   % Electrode window %%%%%%%%
-  uimenu('Parent',m(2),'Label','Electrode window',...
+  uimenu('Parent',m(2),'Label','Number of channel to show',...
       'Callback','eegplot(''winelec'')')
   
   % Electrodes %%%%%%%%
-  m(6) = uimenu('Parent',m(2),'Label','Electrodes');
+  m(6) = uimenu('Parent',m(2),'Label','Channels');
   
   timestring = ['FIGH = gcbf;',...
 	        'AXESH = findobj(''tag'',''eegaxis'',''parent'',FIGH);',...
@@ -1091,7 +1094,7 @@ else
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-	result = inputdlg( { 'Enter new window length (in number of electrodes):' } , 'Change electrode window length', 1,  { num2str(g.elecrange) });
+	result = inputdlg( { 'Enter number of electrodes to show:' } , 'Change number of electrode to show', 1,  { num2str(g.elecrange) });
 	if size(result,1) == 0 return; end;
 
    g.elecrange = eval(result{1});
@@ -1243,9 +1246,9 @@ else
       if g.elecrange >= g.chans
          g.elecrange = g.chans;
          g.elecoffset = 0;
-         set(slidder, 'enable', 'off');
+         set(slidder, 'visible', 'off');
       else
-         set(slidder, 'enable', 'on');         
+         set(slidder, 'visible', 'on');         
       end;
       if g.elecoffset < 0
          g.elecoffset = 0;
@@ -1254,7 +1257,8 @@ else
          g.elecoffset = g.chans-g.elecrange;
       end;
       set(slidder, 'value', g.elecoffset/g.chans, ...
-         'sliderstep', [1/g.chans g.elecrange/g.chans]);
+         'sliderstep', [1/(g.chans-g.elecrange) g.elecrange/(g.chans-g.elecrange)]);
+         %'sliderstep', [1/(g.chans-1) g.elecrange/(g.chans-1)]);
       set(fig,'UserData', g);
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
