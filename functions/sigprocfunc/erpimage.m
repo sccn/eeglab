@@ -153,6 +153,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.143  2003/09/06 22:15:23  scott
+% adjust auxvar if phase sort or amp sort
+%
 % Revision 1.142  2003/08/27 17:45:07  scott
 % header
 %
@@ -1257,7 +1260,7 @@ if size(data,2) ~= ntrials
    end
    data=reshape(data,frames,ntrials);
 end
-fprintf('Plotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
+fprintf('\nPlotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
                              ntrials,frames,srate);
 %
 %%%%%%%%%%%%%% Reshape data2 to (frames,ntrials) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1436,12 +1439,12 @@ if exist('phargs') == 1 % if phase-sort
 	phsamp  =  phsamp(sortidx);                % sort amps by phase
 	sortvar = sortvar(sortidx);                % sort input sortvar by phase
 	phaseangles = -phaseangles; % Note: phsangles now descend from pi 
-	
-	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
-	sortidx = n(sortidx); % return original trial indices in final sorted order
 	if ~isempty(auxvar)
 	   auxvar = auxvar(:,sortidx);
 	end
+	
+	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
+	sortidx = n(sortidx); % return original trial indices in final sorted order
 %
 % %%%%%%%%%%%%%%% Sort data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
