@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/06/12 23:37:08  arno
+% more messages
+%
 % Revision 1.27  2004/06/12 01:50:09  arno
 % still debuging
 %
@@ -519,6 +522,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         set(gcf, 'userdata', userdata);
     else
         EEG.event = eventtmp;
+        EEG = eeg_checkset(EEG, 'eventconsistency');
     end;
     return;
 end;
@@ -644,11 +648,6 @@ if nargin<2
             EEG       = userdata{1};
             EEG.event = userdata{2};
             disp('Checking event consistency...');
-            TMPEEG = pop_editeventvals(EEG, 'sort', { 'latency' });
-            if ~isequal(TMPEEG.event, EEG.event)
-                EEG = TMPEEG;
-                disp('Event resorted by increasing latencies. Some event indices have changed.');
-            end;
             EEG = eeg_checkset(EEG, 'eventconsistency');
         end;
     else 
@@ -660,54 +659,6 @@ if nargin<2
     return;
     
 end;
-return;
-
-% scan all the fields of g
-% ------------------------
-for curfield = 1:2:length(args)
-    switch lower(args{curfield})
-	   case 'delete'
-	        EEG.event(args{ curfield+1 })=[];
-	   case 'changefield'
-            tmpargs = args{ curfield+1 };
-            if length( tmpargs ) < 3
-                error('Pop_editeventvals: not enough arguments to change field value');
-            end;
-            valstr = reformat(tmpargs{3}, strcmp(tmpargs{2}, 'latency'), EEG.trials > 1, tmpargs{1} );
-            if strcmp(tmpargs{2}, 'duration'), 
-                if EEG.trials > 1
-                     valstr = num2str( tmpargs{3}/1000*EEG.srate ); % millisecond
-                else valstr = num2str( tmpargs{3}*EEG.srate );      % second
-                end;
-            end;
-            eval([ 'EEG.event(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
-	   case { 'add' 'append' }
-            tmpargs = args{ curfield+1 };
-            allfields = fieldnames(EEG.event);
-            if length( tmpargs ) < length(allfields)+1
-                error('Pop_editeventvals: not enough arguments to change all field values');
-            end;
-            num = tmpargs{1};
-            EEG.event(end+1) = EEG.event(end);
-            EEG.event(num+1:end) = EEG.event(num:end-1);
-            for index = 1:length( allfields )
-                valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
-                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
-	        end;
-	   case 'changeevent'
-            tmpargs = args{ curfield+1 };
-            num = tmpargs{1};
-            allfields = fieldnames(EEG.event);
-            if length( tmpargs ) < length(allfields)+1
-                error('Pop_editeventvals: not enough arguments to change all field values');
-            end;
-            for index = 1:length( allfields )
-                valstr = reformat(tmpargs{index+1}, strcmp(allfields{index}, 'latency'), EEG.trials > 1, num );
-                eval([ 'EEG.event(' int2str(num) ').' allfields{index} '=' fastif(isempty(valstr), '[]', valstr) ';' ]);
-	        end;
-	end;
-end;
-
 return;
 
 % format the output field
