@@ -40,7 +40,7 @@
 %                    [e1 e2 e3 ...] Logical vector [0|1] indicating channels 
 %                    to reject (1); its length must be the number of data channels. 
 %    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
-%    'colmodif'   - cell array of window colors that can be marked/unmarked. Default
+%    'colmodif'   - nested cell array of window colors that can be marked/unmarked. Default
 %                   is current color only.
 %    'wincolor'   - [color] color used when selecting EEG.
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/08/08 00:20:59  arno
+% adding colmodif option
+%
 % Revision 1.29  2002/08/07 17:38:26  arno
 % debugging
 %
