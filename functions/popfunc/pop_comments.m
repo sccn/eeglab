@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/06 02:49:39  arno
+% reprogrammed the whole function
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -50,7 +53,7 @@
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 
 
-function [comments, com] = pop_comments( comments, plottitle, newcomments );
+function [newcomments, com] = pop_comments( comments, plottitle, newcomments );
 
 com = '';
 if nargin < 3
@@ -102,20 +105,23 @@ if nargin < 3
 	waitfor(gcf, 'userdata');
 
 	if isstr(get(gcf, 'userdata'))
-		comments = get(gcf, 'userdata'); % ok button
+		newcomments = get(gcf, 'userdata'); % ok button
 	end;		
 
 	close(gcf);
 else
   if iscell(newcomments)
-    comments = strvcat(newcomments{:});
+    newcomments = strvcat(newcomments{:});
   end;
 end;	
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
-
-com =sprintf('EEG.comments = pop_comments('''', '''', %s);', str2str(comments));
+comments
+newcomments
+if ~strcmp( comments, newcomments)
+  com =sprintf('EEG.comments = pop_comments('''', '''', %s);', str2str(newcomments));
+end;
 return;
  
 function str = array2str( array )
