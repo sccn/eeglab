@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/06/16 22:00:20  arno
+% debug for integer
+%
 % Revision 1.4  2002/10/15 17:24:13  arno
 % same
 %
@@ -101,6 +104,8 @@ h = findobj( 'parent', gcf, 'tag', 'listboxvals');
 okornot = 0;
 strval = '';
 vals = [];
+figure(fig);
+drawnow;
 waitfor( fig, 'userdata');
 try,
 	vals = get(h, 'value');
