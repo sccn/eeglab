@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/03/12 06:34:46  scott
+% header edits
+%
 % Revision 1.16  2003/03/12 03:21:38  arno
 % help button
 %
@@ -174,12 +177,12 @@ if nargin < 3
 else
 	% read or generate file if necessary
 	% ----------------------------------
-    loc = strmatch('load', varargin);
+    loc = strmatch('load', varargin(1:2:end)); loc = loc*2-1;
     if ~isempty(loc)
         EEG.splinefile = varargin{ loc+1 };
         varargin(loc:loc+1) = [];
     end;
-    loc = strmatch('setup', varargin);
+    loc = strmatch('setup', varargin(1:2:end)); loc = loc*2-1;
     if ~isempty(loc)
         headplot('setup', EEG.chanlocs, EEG.splinefile);
         varargin(loc:loc+1) = [];
@@ -223,7 +226,11 @@ if typeplot
 	SIGTMPAVG(:, nanpos) = NaN;
 	maxlim = max(SIGTMPAVG(:));
 	minlim = min(SIGTMPAVG(:));
-	maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
+	maplimits = max(maxlim, -minlim);
+    maplimits = maplimits*1.1;
+    maplimits = [ -maplimits maplimits ];
+else
+    maplimits = [-1 1];
 end;
 	
 % plot the graphs
@@ -246,9 +253,9 @@ for index = 1:size(arg2(:),1)
 	if ~isnan(arg2(index))
 		if typeplot
 			if length( options ) < 2
-    			headplot( SIGTMPAVG(:,index), EEG.splinefile);
+    			headplot( SIGTMPAVG(:,index), EEG.splinefile, 'maplimits', maplimits);
 		    else	
-			     eval( [ 'headplot( SIGTMPAVG(:,index), EEG.splinefile ' options ');' ] );
+			     eval( [ 'headplot( SIGTMPAVG(:,index), EEG.splinefile, ''maplimits'', maplimits ' options ');' ] );
 			end;
 			if nbgraph == 1, title( topotitle );
 			else title([int2str(arg2(index)) ' ms']);
@@ -275,12 +282,18 @@ for index = 1:size(arg2(:),1)
 		axis square; 
 		rotate3d off;
 		if index == size(arg2(:),1)
-	        %pos = get(gca,'position');
-	        %q = [pos(1) pos(2) 0 0];
-	        %s = [pos(3) pos(4) pos(3) pos(4)];
-	        %col = colormap;
-	        %ax = subplot('position', [1 0 .05 1].*s+q);
-	        cbar('vert');
+	        pos = get(gca,'position');
+	        q = [pos(1) pos(2) 0 0];
+	        s = [pos(3) pos(4) pos(3) pos(4)];
+	        col = colormap;
+            if nbgraph > 1
+                ax = subplot('position', [1.1 0 .05 1].*s+q);
+	        else 
+                ax = subplot('position', [1 0 .05 1].*s+q);          
+            end;
+            col = col(1:end-3,:);
+            imagesc([], [maplimits(1) 0 maplimits(2)], reshape(col,size(col,1),1,3));
+            set(gca, 'xtick', [], 'yaxislocation', 'right', 'ydir', 'normal');
 	    end;	   
     else
         axis off
