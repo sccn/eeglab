@@ -398,7 +398,12 @@ for curfield = tmpfields'
                       % add new values
                       % ---------------------
                       for eventfield = 1:size(tmparray,2)
-                          EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices, cell2mat(tmparray(:,eventfield)));
+                          if isstr(tmparray{1,eventfield})
+                              for indtmp = 1:length(g.indices)
+                                  EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
+                              end;
+                          else EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices, cell2mat(tmparray(:,eventfield)));
+                          end;
                       end;      
 					  % generate ori fields
 					  % -------------------
