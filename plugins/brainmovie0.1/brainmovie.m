@@ -107,6 +107,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/09/12 15:23:36  arno
+% implementing frames
+%
 % Revision 1.14  2002/09/10 22:26:20  arno
 % same
 %
@@ -569,7 +572,8 @@ for indeximage = alltimepoints
 		if ~isempty(g.title) & i == 1
 			x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
 			y = (g.ylimaxes(2)-g.ylimaxes(1))*(-0.06) + g.ylimaxes(1);
-			text(x, y, g.title, 'fontsize', 14, 'fontweight', 'bold' );
+			%text(x, y, g.title, 'fontsize', 14, 'fontweight', 'bold' );
+                        textsc(g.title,'title');
 		end;	
 	end;
 
