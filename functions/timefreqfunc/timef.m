@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/04/25 02:56:03  arno
+% redebugging topovec
+%
 % Revision 1.12  2002/04/25 02:54:33  arno
 % improved topovec check
 %
@@ -180,7 +183,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,times,freqs,Pboot,Rboot] = timef( X, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,times,freqs,Pboot,Rboot,PC] = timef( X, frame, tlimits, Fs, varwin, varargin);
 
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
@@ -302,6 +305,7 @@ try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
 try, g.vert;       catch, g.vert = []; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
+try, g.phasecouple;   catch, g.phasecouple = 'off'; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -446,6 +450,10 @@ switch lower(g.detret)
     case { 'on', 'off' }, ;
     otherwise error('detret must be either on or off');
 end;
+switch lower(g.phasecouple)
+    case { 'on', 'off' }, ;
+    otherwise error('phasecouple must be either on or off');
+end;
 if ~isnumeric(g.linewidth)
     error('linewidth must be numeric');
 end;
@@ -474,6 +482,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 	RR = zeros(g.padratio*g.winsize/2,g.timesout); % (coherence)
 	Pboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap power
 	Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
+        PC = zeros(size(PP,1),size(PP,1)g.timesout);   % summed phase coupling
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
@@ -502,6 +511,10 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
            cumulX = zeros(size(win,2),g.timesout);
            cumulXboot = zeros(size(win,2),g.naccu);
     end;        
+end
+
+if g.phasecouple
+    PC = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
 end
 
 wintime = 1000/g.srate*(g.winsize/2); % (1000/g.srate)*(g.winsize/2);
@@ -574,15 +587,18 @@ for i=1:trials
 
     Wn = zeros(1,g.timesout);
 	for j=1:g.timesout,
-		tmpX = X([1:g.winsize]+floor((j-1)*stp)+(i-1)*g.frame); % pull out data g.frame
+		tmpX = X([1:g.winsize]+floor((j-1)*stp)+(i-1)*g.frame); 
+                                                      % pull out data g.frame
 		tmpX = tmpX - mean(tmpX); % remove the mean for that window
         switch g.detret, case 'on', tmpX = detrend(tmpX); end;
 		if ~any(isnan(tmpX))
 		  if (g.cycles == 0) % FFT
             if ~isempty(g.mtaper)   % apply multitaper (no hanning window)
-                tmpXMT = fft(g.alltapers .* (tmpX(:) * ones(1,size(g.alltapers,2))), g.pad);
+                tmpXMT = fft(g.alltapers .* ...
+                             (tmpX(:) * ones(1,size(g.alltapers,2))), g.pad);
 			    tmpXMT = tmpXMT(nfk(1)+1:nfk(2),:);
-                PP(:,j) = mean(abs(tmpXMT).^2, 2); % power; can also ponderate multitaper by their eigenvalues v
+                PP(:,j) = mean(abs(tmpXMT).^2, 2); 
+                  % power; can also ponderate multitaper by their eigenvalues v
 		        tmpX = win .* tmpX(:);
                	tmpX = fft(tmpX, g.pad);
     		    tmpX = tmpX(2:g.padratio*g.winsize/2+1);
@@ -616,6 +632,14 @@ for i=1:trials
               end;
          end
           Wn(j) = 1;
+        end
+
+        if g.phasecouple
+          PC(:,:,j) = PC(:,:,j) ...
+              + repmat(sqrt(PP(:,j)),1,nfreqs) ...
+                   .* repmat((tmpX ./ abs(tmpX)),nfreqs,1); 
+                                                   % normalized spectral vector
+                                                   % dot-times amplitude vector
         end
 	end % window
 
@@ -660,6 +684,12 @@ switch g.type
  case 'phasecoher',
   R = R ./ (ones(size(R,1),1)*Rn);
 end;        
+
+if g.phasecouple
+ for j=1:size(PP,1)    % can use Matlab to avoid loop here??
+    PC(j,:,:) = PC(j,:,:) ./ cumulX;
+ end
+end
 
 if min(Rn) < 1
   fprintf('timef(): No valid timef estimates for windows %s of %d.\n',...
