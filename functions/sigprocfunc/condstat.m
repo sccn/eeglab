@@ -7,17 +7,18 @@
 % Inputs:
 %    formula  - [string] formula to compute a given measure. Takes arguments
 %               'arg1', 'arg2' ... as inputs. i.e.
-%               'sum(arg1(:,:,X),3) ./ sqrt(sum(tfx(:,:,X))) ./ sqrt(sum(tfy(:,:,X)))'
-%    naccu    - [integer] number of accumulation. i.e. 200
+%               'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X))) ./ sqrt(sum(arg3(:,:,X)))'
+%    naccu    - [integer] number of accumulation for surrogate data. i.e. 200
 %    alpha    - [float] significance level (0<alpha<0.5)
 %    bootside - ['both'|'upper'] side of the surrogate distribution to
 %               consider for significance. This parameter affect the size
 %               of the last dimension of accumulation array 'accres' (size
 %               is 2 for 'both' and 1 for 'upper').
-%    bootside - ['both'|'upper'] 
 %    condboot - ['abs'|'angle'|'complex'|''] for comparing 2 conditions,
 %               either absolute vales ('abs'), angles ('angles') or complex values 
-%               ('complex'). '' and 'complex' let the formula unchanged.
+%               ('complex'). '' and 'complex' let the formula unchanged, 'abs' takes
+%               its norm before subtraction and 'angle' normalize it (norm 1) before
+%               subtraction.
 %    arg1     - [cell_array] of 2 nD array of values to compare. The last dimensions
 %               of the array is the dimention that will be shuffled to accumulate
 %               data.
@@ -29,14 +30,12 @@
 %    res1     - result for first condition
 %    res2     - result for second condition
 %
-% Authors: Arnaud Delorme, Lars & Scott Makeig
+% Authors: Arnaud Delorme, Lars Kai Hansen & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
 % See also: timef(), crossf()
 
-% NOTE: one hidden parameter 'savecoher', 0 or 1
-
-% Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
+% Copyright (C) 2002  Arnaud Delorme, Lars Kai Hansen & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -53,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/02 00:35:56  arno
+% update condstat, debug
+%
 % Revision 1.2  2002/10/01 16:06:16  arno
 % compute statistics now
 %
@@ -62,7 +64,7 @@
 
 function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootside, condboot, varargin);
 
-if nargin < 2
+if nargin < 6
 	help condstat;
 	return;
 end;
@@ -203,7 +205,7 @@ for index= 1:length(formula)
 			 accarraytmp(:,1) = mean(accarray(:,naccu-i+1:naccu),2);
 			 accarray = accarraytmp;
 		 end;
-	 case 3, 
+	 case 1, 
 	     accarray = sort(accarray,1); % always sort on naccu (when 3D, naccu is the second dim)
          if strcmpi(bootside{min(length(bootside), index)}, 'upper');
 			 accarray = mean(accarray(naccu-i+1:naccu),1);
