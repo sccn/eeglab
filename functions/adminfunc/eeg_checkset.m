@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/07/27 00:08:03  arno
+% debugging
+%
 % Revision 1.42  2002/07/26 18:06:41  arno
 % add warning
 %
@@ -565,7 +568,7 @@ if ~isempty( varargin)
 			   case 'cancel', error('eeg_checkset: ICA components must be derived before running that function'); 
 			  end;
 			  [EEG res] = pop_runica(EEG);
-			  res = [ inputnames(1) ' = eeg_checkset('  inputnames(1) '); ' res ];
+			  res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
 		  else, return; end;
 		 case 'epoch', 
 		  if EEG.trials == 1
