@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/05 23:50:44  arno
+% typo
+%
 % Revision 1.2  2002/04/05 23:28:22  arno
 % typo corection
 %
@@ -233,20 +236,23 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
         disp('Pop_epoch warning: bad event format with epoch dataset, removing events');
         EEG.event = [];
     else
-        removeevent = []
-        for indexevent = 1:length(EEG.event)
-            tmpindex = ismember(EEG.event(indexevent).epoch, g.trial);
-            if any(tmpindex)
-                newindex = find( tmpindex == 1);
-                EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
-                EEG.event(indexevent).epoch   = newindex;
-            else
-                removeevent = [];
-            end;                
-        end;
-        if ~isempty(removeevent)
-            disp(['Pop_select: removing ' int2str(length(removeevent)) ' unreferenced events']);
-        end;    
+		if isfield(EEG.event, 'latency')
+			keepevent = [];
+			for indexevent = 1:length(EEG.event)
+				newindex = find( EEG.event(indexevent).epoch == g.trial );
+				if ~isempty(newindex)
+					newindex
+					keepevent = [keepevent indexevent];
+					EEG.event(indexevent).latency = EEG.event(indexevent).latency - (EEG.event(indexevent).epoch-1)*EEG.pnts + (newindex-1)*EEG.pnts;
+					EEG.event(indexevent).epoch   = newindex;
+				end;                
+			end;
+			diffevent = setdiff([1:length(EEG.event)], keepevent);
+			if ~isempty(diffevent)
+				disp(['Pop_select: removing ' int2str(length(diffevent)) ' unreferenced events']);
+				EEG.event(diffevent) = [];
+			end;    
+		end;
     end;        
 end;
 
