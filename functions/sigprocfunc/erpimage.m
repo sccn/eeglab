@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.181  2003/12/03 02:18:48  arno
+% use spec if psd is absent
+%
 % Revision 1.180  2003/11/26 18:16:23  scott
 % help msg
 %
@@ -2907,10 +2910,10 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
     
     % [Pxx, Pxxc, F] = PSD(X,NFFT,Fs,WINDOW,NOVERLAP,P)
     if exist('psd') == 2
-        [Pxx,Pxxc,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+        [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
                            512,srate,winlength,0,0.05);
     else
-        [Pxx,Pxxc,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+        [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
                            512,srate,winlength,0);
     end;
     plot(F,10*log10(Pxx));
