@@ -16,7 +16,7 @@
 % Note: ignores comments and the sensor type field
 % Note: convert output XYZ locations to polar coordinates using cart2pol()
 %
-% See also: readloc(), snapread(), floatread(), cart2pol()
+% See also: readlocs(), snapread(), floatread(), cart2pol()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/12/27 23:25:45  scott
+% edit header msg -sm
+%
 % Revision 1.4  2002/12/27 22:48:43  arno
 % fg
 % name -> labels
