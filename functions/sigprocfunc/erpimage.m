@@ -8,7 +8,7 @@
 %              them separately and zoom (using axcopy()).
 % Usage:
 %   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
-%         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx] ...
+%         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx,erpsig] ...
 %                  = erpimage(data,sortvar,times,'title',avewidth,decimate,...
 %                             flag1,arg1,flag2,arg2,...);
 % Necessary inputs:
@@ -101,7 +101,7 @@
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
-%     outvar  = (1,epochsout)  sortvar vector (after smoothing)
+%     outvar  = (1,epochsout) actual values trials are sorted on (after smoothing)
 %   outtrials = (1,epochsout)  smoothed trial numbers
 %     limits  = (1,10) array, 1-9 as in 'limits' above, then analysis frequency (Hz) 
 %    axhndls  = vector of 1-7 plot axes handles (img,cbar,erp,amp,coh,topo,spec)
@@ -114,6 +114,7 @@
 %   phsangls  = vector of sorted trial phases at the phase-sorting frequency
 %     phsamp  = vector of sorted trial amplitudes at the phase-sorting frequency
 %    sortidx  = indices of sorted data epochs plotted
+%     erpsig  = trial average significance levels [lo high]
 %
 % Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
 %
@@ -153,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.144  2003/09/06 22:24:55  scott
+% debug last, add \n before first printed line "Plotting input...
+%
 % Revision 1.143  2003/09/06 22:15:23  scott
 % adjust auxvar if phase sort or amp sort
 %
@@ -613,7 +617,7 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been omitted from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx,erpsig] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
 %
 %%%%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -621,7 +625,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % Initialize optional output variables:
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
-auxvar = [];
+auxvar = []; erpsig = [];
 
 YES = 1;  % logical variables
 NO  = 0;
@@ -1866,10 +1870,12 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         end
         fprintf('Output allamps data will be %d frames by %d smoothed trials.\n',...
                 frames,length(outtrials));
-    else
+
+    else % if no smoothing
         outtrials = 1:ntrials;
         outsort = sortvar;
     end
+
     allamps = 20*log10(allamps);
     
     if isnan(baseamp) % if not specified in 'limits'
@@ -1928,7 +1934,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     end;
     
 elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
-                      %%%%%%%%% DEPRECATED %%%%%%%%%%%%
+                      %%%%%%%%% UNDOCUMENTED AND DEPRECATED OPTION %%%%%%%%%%%%
     if freq > 0 
         coherfreq = freq; % use phase-sort frequency
     end
@@ -2256,8 +2262,8 @@ end;
 erp = [];
 if Erpflag == YES 
   if exist('erpalpha')
-    [erp erpalphaout] = nan_mean(urdata',erpalpha);   
-    fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n',erpalpha,mean(erpalphaout));
+    [erp erpsig] = nan_mean(urdata',erpalpha);   
+    fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n',erpalpha,mean(erpsig));
   else
     [erp] = nan_mean(urdata');   % compute erp average, ignoring nan's
   end
@@ -2320,8 +2326,8 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     end
     if Erpstdflag == YES
         plot1erp(ax2,times,erp,limit, NaN, stdev); % plot ERP +/-stdev
-    elseif exist('erpalphaout')
-        plot1erp(ax2,times,erp,limit,erpalphaout); % plot ERP and 0+/-alpha threshold
+    elseif ~isempty('erpsig')
+        plot1erp(ax2,times,erp,limit,erpsig); % plot ERP and 0+/-alpha threshold
     else
         plot1erp(ax2,times,erp,limit); % plot ERP alone
     end;
