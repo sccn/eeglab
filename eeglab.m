@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.353  2004/11/12 18:35:57  arno
+% same
+%
 % Revision 1.352  2004/11/12 18:34:16  arno
 % debug biosig menus ...
 % /
@@ -1404,8 +1407,10 @@ end;
     % BIOSIG plugin (not in plugin folder)
     % ------------------------------------
     p = which('eeglab.m');
+    p = p(1:findstr(p,'eeglab.m')-1);
     delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
     path_biosig = [ p '..' delimiter 'biosig' delimiter 't200' ];
+    biosigflag = 0;
     if exist(path_biosig) == 7
         try,
             addpath(path_biosig);
@@ -1417,7 +1422,6 @@ end;
         catch
             disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
             disp([ '   ' lasterr] );
-            biosigflag = 0;
         end;
     end;        
     
