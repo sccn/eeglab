@@ -88,6 +88,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2002/10/14 00:42:58  scott
+% added valsort direction and help msg -sm
+%
 % Revision 1.60  2002/10/13 23:56:54  scott
 % *** empty log message ***
 %
@@ -695,7 +698,7 @@ if nargin > 6
 			  topphase = phargs(5);
           end
           Phaseflag = NO;
-	  elseif Ampflag == YES
+	  elseif Ampflag == YES % 'ampsort',[center_time,prcnt_reject,minfreq,maxfreq]
           n = length(Arg);
           if n > 4
 			  error('erpimage(): Too many arguments for keyword ''ampsort''');
@@ -867,6 +870,7 @@ if exist('ampargs')
 	end
 	if length(ampargs)==4 & ampargs(4) > srate/2
 		ampargs(4) = srate/2;
+  fprintf('> Reducing max \'ampsort\' frequency to Nyquist (%g Hz)\n',srate/2)
 	end
 end
 if ~any(isnan(coherfreq))
@@ -1106,8 +1110,8 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
-	fprintf('Sorting data epochs by amplitude at %.2f Hz in window centered at %f3. ms.\n',...  
-			freq,ampargs(1));
+	fprintf('Sorting data epochs by amplitude at %.2f Hz in %d-cycle (%.0f-ms) window centered at %f3. ms.\n',...  
+			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
 	fprintf('Amplitude is computed using a filter of length %d frames.\n',...
 			length(winloc));
 	%
