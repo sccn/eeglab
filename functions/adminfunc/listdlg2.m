@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/15 17:24:13  arno
+% same
+%
 % Revision 1.3  2002/10/15 16:56:45  arno
 % drawnow for windows
 %
@@ -58,17 +61,20 @@ try,  g.name;       catch, g.name = ''; end;
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
 if isstr(g.liststring)
-	g.liststring = { g.liststring };
+    allstr =  g.liststring;
+else
+    allstr = '';
+    for index = 1:length(g.liststring)
+        allstr = [ allstr '|' g.liststring{index} ];
+    end;
+    allstr = allstr(2:end);
 end;
-allstr = '';
-for index = 1:length(g.liststring)
-	allstr = [ allstr '|' g.liststring{index} ];
-end;
-allstr = allstr(2:end);
 
 geometry = {[1] [1 1]};
 geomvert = [length(g.liststring)+1 1];
-if ~strcmp(g.selectionmode, 'multiple') | length(g.liststring) == 1
+if ~strcmp(g.selectionmode, 'multiple') | ...
+    (iscell(g.liststring) & length(g.liststring) == 1) | ...
+    (isstr (g.liststring) & size  (g.liststring,1) == 1)
 	maxval = 2;
 	if isempty(g.initval), g.initval = 1; end;
 else
