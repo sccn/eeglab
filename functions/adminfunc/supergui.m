@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/08/14 18:17:23  arno
+% new supergui arg
+%
 % Revision 1.26  2002/08/14 18:07:20  arno
 % changing default checkbox backcolor
 %
@@ -295,7 +298,7 @@ hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
 %set(hh, 'BackgroundColor', get(gcf, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-set(gcf, 'color', get(hh(1), 'BackgroundColor'));
+set(gcf, 'color',GUIBACKCOLOR );
 set(hh, 'horizontalalignment', 'left');
 
 hh = findobj(allhandlers, 'style', 'edit');
