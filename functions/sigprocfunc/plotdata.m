@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/01/29 01:53:51  scott
+% ??
+%
 % Revision 1.15  2005/01/28 22:47:58  scott
 % fixed scaling bug; increased subplot --> sbplot window
 % sizes to be vertically overlapping. Now correctly handles
@@ -544,7 +547,7 @@ end
                   else
                       yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
                   end
-                  axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
+                  axis('off'),h=text(xmin-0.04*xdiff,double(yht),[channames(I,:)]); 
                   set(h,'HorizontalAlignment','right');      % print before traces
                   set(h,'FontSize',FONTSIZE);                % choose font size
                   
