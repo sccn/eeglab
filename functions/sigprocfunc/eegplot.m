@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2004/04/06 01:30:49  arno
+% scaling when selecting a number of channel
+%
 % Revision 1.94  2004/03/18 23:29:49  arno
 % nothing
 %
@@ -1214,6 +1217,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
           'set(gcbf,''UserData'', g);' ...
           'eegplot(''drawp'', 0);' ...
           'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
+  
 
   set(figh, 'windowbuttondownfcn', commandpush);
   set(figh, 'windowbuttonmotionfcn', commandmove);
@@ -1240,7 +1244,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       g.eventtypestyle  = g.eventstyle (mod([1:length(g.eventtypes)]-1 ,length(g.eventstyle))+1);
       g.eventstyle      = g.eventstyle (mod(indexcolor-1               ,length(g.eventstyle))+1);
       
-      % for width, only boundary events have width 2
+      % for width, only boundary events have width 2 (for the line)
+      % -----------------------------------------------------------
       indexwidth = ones(1,length(g.eventtypes))*2;
       if iscell(g.eventtypes)
           for index = 1:length(g.eventtypes)
@@ -1250,7 +1255,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       g.eventtypewidths = g.eventwidths (mod(indexwidth([1:length(g.eventtypes)])-1 ,length(g.eventwidths))+1);
       g.eventwidths     = g.eventwidths (mod(indexwidth(indexcolor)-1               ,length(g.eventwidths))+1);
       
+      % latency and duration of events
+      % ------------------------------
       g.eventlatencies  = cell2mat({g.events.latency});
+      if isfield(g.events, 'duration')
+           g.eventlatencyend   = g.eventlatencies + cell2mat({g.events.duration});
+      else g.eventlatencyend   = [];
+      end;
       g.plotevent       = 'on';
   end;
   if isempty(g.events)
@@ -1429,7 +1440,10 @@ else
 	else
 		multiplier = g.srate;
 	end;		
-   	lowlim = round(g.time*multiplier+1);
+
+    % draw rejection windows
+    % ----------------------   	
+    lowlim = round(g.time*multiplier+1);
    	highlim = round(min((g.time+g.winlength)*multiplier+1));
   	displaymenu = findobj('tag','displaymenu','parent',gcf);
     if ~isempty(g.winrej) & g.winstatus
@@ -1458,14 +1472,16 @@ else
 				end;
 			end;
 		else
-			for tpmi = 1:size(g.winrej,1) % scan rows
-				if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
-						(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)	 
-					h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
-							   g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
-							  [0 0 1 1], [g.winrej(tpmi,3) g.winrej(tpmi,4) g.winrej(tpmi,5)]);  
-					set(h, 'EdgeColor', get(h, 'facecolor')) 
-				end;	
+            event2plot1 = find ( g.winrej(:,1) >= lowlim & g.winrej(:,1) <= highlim );
+            event2plot2 = find ( g.winrej(:,2) >= lowlim & g.winrej(:,2) <= highlim );
+            event2plot3 = find ( g.winrej(:,1) <  lowlim & g.winrej(:,2) >  highlim );
+            event2plot  = union(union(event2plot1, event2plot2), event2plot3);
+      
+			for tpmi = event2plot(:)'
+                h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
+                           g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
+                          [0 0 1 1], [g.winrej(tpmi,3) g.winrej(tpmi,4) g.winrej(tpmi,5)]);  
+                set(h, 'EdgeColor', get(h, 'facecolor')) 
 			end;
 		end;
 	end;
@@ -1483,18 +1499,38 @@ else
     % draw events if any
     % ------------------
     if strcmpi(g.plotevent, 'on')
-        event2plot = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
+        
+        % find event to plot
+        % ------------------
+        event2plot    = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
+        if ~isempty(g.eventlatencyend)            
+            event2plot2 = find ( g.eventlatencyend >= lowlim & g.eventlatencyend <= highlim );
+            event2plot3 = find ( g.eventlatencies  <  lowlim & g.eventlatencyend >  highlim );
+            event2plot  = union(union(event2plot, event2plot2), event2plot3);
+        end;
         for index = 1:length(event2plot)
+            % draw latency line
+            % -----------------
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
             tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) }, ...
                           'linestyle', g.eventstyle { event2plot(index) }, ...
                           'linewidth', g.eventwidths( event2plot(index) ) );
-            %if g.trials == 1
-            %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.4f s');
-            %else
-            %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.2f ms');
-            %end;
-        end;
+            
+            % draw duration is not 0
+            % ----------------------
+            if ~isempty(g.eventlatencyend) ...
+                    & g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
+                tmplatend = g.eventlatencyend(event2plot(index))-lowlim-1;
+                if tmplatend ~= 0, 
+                    tmplim = ylim;
+                    tmpcol = g.eventcolors{ event2plot(index) };
+                    h = patch([ tmplat tmplatend tmplatend tmplat ], ...
+                              [ tmplim(1) tmplim(1) tmplim(2) tmplim(2) ], ...
+                              tmpcol );  % this argument is color
+                    set(h, 'EdgeColor', 'none') 
+                end;
+            end;
+         end;
     end;
 
     if g.trialstag(1) ~= -1
