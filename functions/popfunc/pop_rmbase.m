@@ -48,6 +48,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/04/25 18:35:35  arno
+% now point range overwrite time limits
+% /
+%
 % Revision 1.9  2003/02/17 02:56:16  arno
 % reformating text for new functionality in help2html
 %
@@ -117,7 +121,7 @@ elseif nargin < 2 & EEG.trials == 1
     pointrange = [1:EEG.pnts];
 end;
 
-if isempty(pointrange)
+if exist('pointarange') ~= 1 | isempty(pointrange)
     if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rembase(): Bad time range');
     end;
