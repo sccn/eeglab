@@ -1,60 +1,57 @@
-% eegplot() - display data in a horizontal scrolling fashion 
-%             with gui controls (version 3).
+% eegplot() - Horizontally (and/or vertically) scroll through multichannel data.
+%             This version (3) allows vertical scrolling through channels and
+%             manual marking/unmarking of portions of the data for rejection.
 % Usage: 
-%        >> eegplot(data, 'key1', value1 ...);
-%        >> eegplot('noui', data, 'key1', value1 ...);
+%           >> eegplot(data, 'key1', value1 ...);
+%    else
+%           >> eegplot('noui', data, 'key1', value1 ...);
 %
-% Input:
-%    data         - Input data matrix (chans,timepoints) or (chans x timepoints
-%                   x epohcs). In the case the data varialbe 'data' is
-%                   preceeded by 'noui', the gui control are removed.
-%
+% Required Input:
+%    data         - Input data matrix, either continuous 2-D (channels,timepoints) or 
+%                    epoched 3-D (channels,timepoints, epochs) data. If the data matrix 
+%                    is preceded by keyword 'noui', GUI control elements are omitted
+%                    (Use the 'noui' mode to plot data for presentation).
 % Optional inputs:
 %    'srate'      - Sampling rate in Hz {default|0: 256 Hz}
-%    'spacing'    - scale for the values (default|0: max(data)-min(data))
-%    'eloc_file'  - Electrode filename as in >> topoplot example
-%                    [] -> no labels; default|0 -> integers 1:nchans
-%                    vector of integers -> channel numbers
-%    'winlength'  - Number of seconds of EEG displayed {default 5 (seconds
-%                   for continuous data or epochs for data epochs)}
-%    'elecwin'    - Maximum number of electrode to be displayed {default 32}
-%    'title'      - title of the figure
-%    'position'   - position of the figure [cornerx cornery width height].
-%    'trialstag'  - points to tag (i.e. trials delimitation {default []}
-%    'winrej'     - array of rejection windows, each row being a rejection
-%                   [begpoint endpoint colorR colorV colorB e1 e2 e3 ...]
-%                   begpoint and endpoint are the delimitation of the window
-%                   colorR colorV colorB indicate the color of the window
-%                   e1 e2 e3 ... 0 and 1 represenfing rejected electrode or
-%                   component in the window (1=rejected). There must be as
-%                   many electrode or component as row in the data array
-%    'command'     - command to be evaluated when the button reject is 
-%                   pushed (see Outputs). 'REJECT' button is only present if 
-%                   command is not empty.
-%    'tag'         - tag to identify the EEGPLOT window.
-%    'xgrid'       - ['on'|'off'] toggle the abscice grid on or off. 
-%                  Default is 'off'. 
-%    'ygrid'       - ['on'|'off'] toggle the ordinate grid on or off 
-%                  Default is 'off'. 
-%    'submean'     - ['on'|'off'] subtract the mean before displaying on each 
-%                  window. Default is 'on'.  
-%    'freq'        - maximum frequencies in case on want to plot frequencies.
-%    'limits'      - time limits for trials.
-%    'color'       - ['on'|'off'] toggle the color for plotting on or off. If
-%                  'on' every row has a different color to facilitate
-%                  readability. Default is 'off'. 
-%    'children'   - handler of a dependant eegplot window to call if the 
-%                  current window is affected. Default none {0}. 
+%    'spacing'    - Display range per channel (default|0: max(data)-min(data))
+%    'eloc_file'  - Electrode filename as in  >> topoplot example
+%                    Ascii channel labels (read from the eloc_file) are shown.
+%                    [vector of integers] -> Show specified channel numbers
+%                    [] -> Do not show channel labels 
+%                    {default|0 -> Show channel numbers [1:nchans]}
+%    'limits'     - [start end] Time limits for each epoch.
+%    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
+%    'elecwin'    - [integer] Number of channels to display in window {default: 32}    ???
+%                    If < number of channels a vertical slider will allow scrolling. 
+%    'title'      - Figure title {default: none}
+%    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off']
+%    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
 %
+% Other available inputs:
+%    'command'    - Matlab command to evaluate when the 'REJECT' button is clicked 
+%                    (see Outputs below). The 'REJECT' button is displayed only when 
+%                    'command' is non-empty.
+%    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark, 
+%                    each row indicating a different period. [start end] Window limits;
+%                    [R G B] Marking color; [e1 e2 e3 ...] Logical vector [0|1] 
+%                    indicating rejected channels (1=rejected) -- its length must be 
+%                    the number of data channels. 
+%    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
+%    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
+%    'position'   - Position of the figure [lowleftcorner_x corner_y width height]       ???
+%    'trialstag'  - Points to tag (i.e. trial limits {default []}                   ???
+%    'tag'        - Tag to identify the EEGPLOT window.                               ???
+%    'freq'       - Maximum frequencies in case one wants to plot frequencies.     ???
+%    'children'   - Handler of a dependant eegplot() window to call if the 
+%                    current window is affected. Default none {0}.                  ???
 % Outputs:
-%    TMPREJ       - indexes of rejected trials.
-%                   this variable is assigned into the global workspave
-%                   when the user hit the reject button. If the argument 
-%                   command is defined, it can use this variable to perform
-%                   various operations. See also EEGPLOT2TRIAL and EEGPLOT2EVENT
-%                   for conversion between rejection data types.
+%    TMPREJ       - [integer vector] Indices of rejected epochs (a variable in     ???
+%                    the global workspace). When the user clicks the 'REJECT' button, 
+%                    the 'command'-argument command can use this variable to perform 
+%                    various operations. (Use eegplot2trial() and eegplot2event() 
+%                    to convert between rejected data types).
 %
-% Author: Arnaud Delorme & Colin Humphries, CNL / Salk Institute, 1998-2001
+% Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/UCSD , 1998-2001
 %
 % See also: eeg_multieegplot(), eegplot2event(), eegplot2trial(), eeglab()
 
@@ -77,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/06/25 01:19:49  arno
+% update tag position
+%
 % Revision 1.6  2002/06/25 01:05:45  arno
 % new version with zoom
 %
