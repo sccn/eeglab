@@ -35,6 +35,8 @@
 %  'logfreq'   = ['on'|'off'] use logarithmic base for frequencies { Default: 'off' }
 %  'vert'      = [times vector] -> plot vertical dashed lines at specified times in ms.
 %                { Default: 0 }
+%  'shiftimgs' = [time vector] - shift time frequency images (for several subject) by the
+%                median reaction time of each subject (provided here).
 %
 % Note:
 %  1) Additional topoplot() options can be used.
@@ -69,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/03/08 02:23:54  arno
+% update header
+%
 % Revision 1.57  2003/03/04 18:12:07  arno
 % color limits debug
 %
