@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.260  2003/10/29 19:25:12  arno
+% detecting ICALAB
+%
 % Revision 1.259  2003/10/29 19:06:26  arno
 % text typo
 %
@@ -1196,7 +1199,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	topo_m = uimenu( third_m, 'Label', 'ERP map series');
 		uimenu( topo_m, 'Label', 'In 2-D'     , 'CallBack', [ checkplot      'LASTCOM = pop_topoplot(EEG, 1);' e_hist]);
 		uimenu( topo_m, 'Label', 'In 3-D'     , 'CallBack', [ checkplot      '[EEG LASTCOM] = pop_headplot(EEG, 1);' e_store]);
-	uimenu( third_m, 'Label', 'Plot/Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_comperp(ALLEEG);' e_hist]);
+	uimenu( third_m, 'Label', 'Sum/Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_comperp(ALLEEG);' e_hist]);
 
     uimenu( third_m, 'Label', 'Component activations (scroll)', 'CallBack', [ checkica  '[LASTCOM] = pop_eegplot(EEG, 0, 1, 1);' e_hist],'Separator', 'on');
 	uimenu( third_m, 'Label', 'Component spectra and maps' , 'CallBack', [ checkicaplot   'LASTCOM = pop_spectopo(EEG, 0);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
@@ -1209,7 +1212,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( ERPC_m, 'Label', 'With component maps', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'With comp. maps (compare)', 'CallBack', [ checkica 'if length(ALLEEG) == 1, error(''Need at least 2 datasets''); end; LASTCOM = pop_envtopo(ALLEEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
-	uimenu( third_m, 'Label', 'Plot/Compare comp. ERPs'      , 'CallBack', [ checkepochica     'LASTCOM = pop_comperp(ALLEEG, 0);' e_hist]);
+	uimenu( third_m, 'Label', 'Sum/Compare comp. ERPs'      , 'CallBack', [ checkepochica     'LASTCOM = pop_comperp(ALLEEG, 0);' e_hist]);
 
 	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('kstest'), 'on', 'off'));
 	uimenu( stat_m, 'Label', 'Channel statistics'       , 'CallBack', [ check          'LASTCOM = pop_signalstat(EEG, 1);' e_hist]);
