@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/05/04 01:46:42  arno
+% still correctin eventconsistency
+%
 % Revision 1.28  2002/05/04 01:45:13  arno
 % typo
 %
@@ -575,7 +578,7 @@ if ~isempty( varargin)
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
 					  if valreal(indexevent)
-						  EEG.event = setfield(EEG.event, { indexevent }, allfields{index}, num2str(allvalues(indexevent)) );
+						  EEG.event = setfield(EEG.event, { indexevent }, allfields{index}, num2str(allvalues{indexevent}) );
 					  end;
 				  end;
 			  end;
