@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/12/12 00:26:55  arno
+% debuging oldevents and align
+%
 % Revision 1.27  2003/12/11 19:42:45  arno
 % debuging auto alignment
 %
@@ -410,9 +413,9 @@ end;
 if isfield(EEG.event, 'latency')
     try 
         res = cellfun('isempty', { EEG.event.latency });
+        res = find(res);
         if ~isempty(res)
-            res = find(res);
-            fprintf( 'Pop_importevent warning: %d/%d have no latency and were removed\n', ...
+            fprintf( 'Pop_importevent warning: %d/%d have invalid latencies and were removed\n', ...
                      length(res), length(EEG.event));
             EEG.event( res ) = [];
         end;
