@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 02:34:11  arno
+% questdlg2
+%
 % Revision 1.2  2002/06/25 01:57:00  arno
 % debuging trial select
 %
@@ -85,6 +88,6 @@ end;
 % --------------------------------------
 EEG = pop_select( EEG, 'notrial', find(tmprej > 0));
 
-com = sprintf( '%s = pop_rejepoch( %s, %s, %d);', inputname(1), ...
+com = sprintf( '%s = pop_rejepoch( %s, [%s], %d);', inputname(1), ...
 			inputname(1), int2str( tmprej ), confirm);		
 return;
