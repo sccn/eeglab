@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/22 22:05:53  arno
+% debuggig last change
+%
 % Revision 1.5  2002/04/22 22:01:07  arno
 % corrected time limits
 %
@@ -160,7 +163,8 @@ end;
 if isfield(EEG.event, 'latency') & (timewin(1) ~= -Inf | timewin(2) ~= Inf)
 	selected = ones(size(Ieventtmp));
 	for index=1:length(Ieventtmp)
-		reallat = (mod(EEG.event(Ieventtmp(index)).latency-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000;
+		reallat = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, EEG.event(Ieventtmp(index)).epoch, ...
+								EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3); 
 		if reallat < timewin(1) | reallat > timewin(2)
 			selected(index) = 0;
 		end;
@@ -175,7 +179,7 @@ if strcmp(fieldname, 'latency')
 	for index = 1:length(Ieventtmp)
 		epoch = EEG.event(Ieventtmp(index)).epoch;
 		if isnan(epochval(epoch))
-			epochval(epoch) = (mod(EEG.event(Ieventtmp(index)).latency-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000;
+			epochval(epoch) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 		else
 			disp(['Getepochevent warning: more than one event selected in epoch ' int2str(epoch) ' -- only the field value for the first event returned']);
 		end;
