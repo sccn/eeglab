@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-13-02 introduction of 'key', val arguments -ad
@@ -131,25 +134,22 @@ if ~isempty( events )
     % select the events for epoching
     % ------------------------------
     Ieventtmp = [];
-    tmpeventtype  = { EEG.event(:).type };
+    tmpeventtype  = { EEG.event.type };
     if iscell(events)
-        for newi = 1:length(events)
-            tmpevent = events{newi};
-            if ~isempty(str2num( tmpevent )), tmpevent = str2num( tmpevent ); end;
-            if isstr(tmpevent)
-                for index2 = 1:length( tmpeventtype )
-                    if isstr(tmpeventtype{index2}) & ~isempty( strmatch(tmpevent, tmpeventtype{index2}, 'exact') );
-                        Ieventtmp = [ Ieventtmp index2];
-                    end;
-                end;
-            else
-                for index2 = 1:length( tmpeventtype )
-                    if isnumeric(tmpeventtype{index2}) & (tmpevent == tmpeventtype{index2})
-                        Ieventtmp = [ Ieventtmp index2];
-                    end;
-                end;
-            end;            
-        end;
+		if isstr(EEG.event(1).type)
+			for index2 = 1:length( events )
+				tmpevent = events{index2};
+				if ~isstr( tmpevent ), tmpevent = num2str( tmpevent ); end;
+				Ieventtmp = [ Ieventtmp strmatch(tmpevent, tmpeventtype, 'exact') ];
+			end;
+		else
+			for index2 = 1:length( tmpeventtype )
+				tmpevent = events{index2};
+				if isstr( tmpevent ),tmpevent = str2num( tmpevent ); end;
+				if isempty( tmpevent ), error('Pop_epoch: string type in a numeric field'); end;
+				Ieventtmp = [ Ieventtmp strmatch(tmpevent, tmpeventtype, 'exact') ];
+			end;
+		end;
     else
         error('Pop_epoch: types must be in cell array'); return;
     end;
