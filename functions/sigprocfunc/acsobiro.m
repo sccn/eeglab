@@ -7,12 +7,12 @@
 % Usage:  >>   [H] = acsobiro(X);
 %         >> [H,S] = acsobiro(X,n,p);
 % Inputs: 
-%         X: data matrix of dimension [m,N] where
-%                    m: number of sensors
-%                    N: number of samples
-%         n: number of sources {Default: n=m}
-%         p: number of correlation matrices to be diagonalized {default: p=100}
-%            For noisy data, use at least 100 time delays.
+%         X - data matrix of dimension [m,N] where
+%                    m is the number of sensors
+%                    N is the number of samples
+%         n - number of sources {Default: n=m}
+%         p - number of correlation matrices to be diagonalized {default: p=100}
+%             For noisy data, use at least 100 time delays.
 % Outputs:
 %         H - matrix of dimension [m,n] an estimate of the *mixing* matrix
 %         S - matrix of dimension [n,N] an estimate of the source activities

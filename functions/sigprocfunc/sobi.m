@@ -8,12 +8,13 @@
 %         >> [winv,act] = sobi(data,n,p);
 % Inputs: 
 %   data - data matrix of size [m,N] ELSE of size [m,N,t] where
-%                m: number of sensors
-%                N: number of samples 
-%                t: number of trials (here, correlations avoid epoch boundaries)
+%                m is the number of sensors,
+%                N is the  number of samples, 
+%                t is the  number of trials (here, correlations avoid epoch boundaries)
 %      n - number of sources {Default: n=m}
 %      p - number of correlation matrices to be diagonalized {Default: min(100, N/3)}
-% Note: For noisy data, the authors strongly recommend using at least 100 time delays.
+%          Note that for noisy data, the authors strongly recommend using at least 100 
+%          time delays.
 %
 % Outputs:
 %   winv - Matrix of size [m,n], an estimate of the *mixing* matrix. Its
