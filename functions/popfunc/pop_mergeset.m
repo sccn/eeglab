@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/02/21 03:14:53  arno
+% same
+%
 % Revision 1.19  2004/02/21 03:14:05  arno
 % fixing urevent boundaries
 %
@@ -193,7 +196,8 @@ else
         if INEEG1.trials  == 1 & INEEG2.trials == 1
             INEEG1.event(end+1).type    = 'boundary';
             INEEG1.event(end  ).latency = INEEG1.pnts+0.5;            
-            if ~isempty(INEEG2.urevent) %UREVENT discontinuity
+            if isfield(INEEG2, 'urevent') & isfield(INEEG1, 'urevent') & ...
+                    ~isempty(INEEG2.urevent) %UREVENT discontinuity
                 disp('Adding a discontinuity event and urevent between datasets');
                 INEEG1.urevent(end+1).type    = 'boundary';
                 INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;
@@ -224,7 +228,7 @@ else
     
 	% concatenate events
 	% ------------------
-	if ~isempty(INEEG2.urevent)
+	if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
         disp('Concatenating urevents...');
         
         % add discontinuity urevent if continuous
