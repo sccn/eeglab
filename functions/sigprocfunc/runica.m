@@ -1,11 +1,13 @@
 % runica() - Perform Independent Component Analysis (ICA) decomposition
-%            of input data using the infomax ICA algorithm of Bell 
-%            & Sejnowski (1995) with the natural gradient feature 
-%            of Amari, Cichocki & Yang, the extended-ICA algorithm 
-%            of Lee, Girolami & Sejnowski, and optional PCA dimension 
-%            reduction.
+%            of input data using the logistic infomax ICA algorithm of 
+%            Bell & Sejnowski (1995) with the natural gradient feature 
+%            of Amari, Cichocki & Yang, or optionally the extended-ICA 
+%            algorithm of Lee, Girolami & Sejnowski, with optional PCA 
+%            dimension reduction. Annealing based on weight changes is 
+%            used to automate the separation process. 
 % Usage:
 %         >> [weights,sphere] = runica(data); % train using defaults 
+%    else
 %         >> [weights,sphere,compvars,bias,signs,lrates,activations] ...
 %                             = runica(data,'Key1',Value1',...);
 % Input:
@@ -13,15 +15,16 @@
 %               Note that if data consists of multiple discontinuous epochs, 
 %               each epoch should be separately baseline-zero'd using
 %                  >> data = rmbase(data,frames,basevector);
-% Optional keywords:
+%
+% Optional keywords [argument]:
 % 'extended'  = [N] perform tanh() "extended-ICA" with sign estimation 
 %               N training blocks. If N > 0, automatically estimate the 
 %               number of sub-Gaussian sources. If N < 0, fix number of 
 %               sub-Gaussian comps to -N [faster than N>0] (default|0 -> off)
-% 'ncomps'    = [N] number of ICA components to compute (default -> chans)
-%               using rectangular ICA decomposition
 % 'pca'       = [N] decompose a principal component     (default -> 0=off)
 %               subspace of the data. Value is the number of PCs to retain.
+% 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
+%               using rectangular ICA decomposition
 % 'sphering'  = ['on'/'off'] flag sphering of data      (default -> 'on')
 % 'weights'   = [W] initial weight matrix               (default -> eye())
 %                            (Note: if 'sphering' 'off', default -> spher())
@@ -41,8 +44,8 @@
 % 'posact'    = make all component activations net-positive(default 'on'}
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 %
-% Outputs:    [RO = output in reverse order of projected mean variance 
-%                   unless starting weight matrix passed ('weights' above)]
+% Outputs:    [Note: RO means output in reverse order of projected mean variance
+%                    unless starting weight matrix passed ('weights' above)]
 % weights     = ICA weight matrix (comps,chans)      [RO]
 % sphere      = data sphering matrix (chans,chans) = spher(data)
 %               Note that unmixing_matrix = weights*sphere {if sphering off -> eye(chans)}
@@ -95,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/10/03 18:21:25  arno
+% releasing constraint pca<nchans-1
+%
 % Revision 1.9  2003/09/19 01:42:56  arno
 % documenting stop at 1E-7 for more than 32 channels
 %
@@ -806,9 +812,9 @@ end
       if ~extended
        %%%%%%%%%%%%%%%%%%% Logistic ICA weight update %%%%%%%%%%%%%%%%%%%
        y=1./(1+exp(-u));                                                %
-       weights=weights+lrate*(BI+(1-2*y)*u')*weights;                   %
+       weights = weights + lrate*(BI+(1-2*y)*u')*weights;               %
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      else % extended-ICA
+      else % Tanh extended-ICA weight update
        %%%%%%%%%%%%%%%%%%% Extended-ICA weight update %%%%%%%%%%%%%%%%%%%
        y=tanh(u);                                                       %
        weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;          %
@@ -946,21 +952,19 @@ end
      if verbose,
       if step > 2, 
           if ~extended,
-              fprintf(...
-         'step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg\n', ...
-          step,lrate,change,degconst*angledelta);
+           fprintf('step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg\n', ...
+                       step,      lrate,        change,    degconst*angledelta);
           else
-              fprintf(...
-  'step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg, %d subgauss\n',...
-          step,lrate,change,degconst*angledelta,(ncomps-sum(diag(signs)))/2);
+           fprintf('step %d - lrate %5f, wchange %7.6f, angledelta %4.1f deg, %d subgauss\n',...
+                       step,      lrate,        change, degconst*angledelta,...
+                                                               (ncomps-sum(diag(signs)))/2);
           end
       elseif ~extended
-         fprintf(...
-          'step %d - lrate %5f, wchange %7.6f\n',step,lrate,change);
+         fprintf('step %d - lrate %5f, wchange %7.6f\n',...
+                     step,      lrate,        change);
       else
-         fprintf(...
-          'step %d - lrate %5f, wchange %7.6f, %d subgauss\n',...
-           step,lrate,change,(ncomps-sum(diag(signs)))/2);
+         fprintf('step %d - lrate %5f, wchange %7.6f, %d subgauss\n',...
+                     step,      lrate,        change, (ncomps-sum(diag(signs)))/2);
       end % step > 2
      end; % if verbose
   %
