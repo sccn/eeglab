@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.239  2005/01/06 19:27:17  scott
+% implemented 'gridplot' | 'plotgrid' option
+%
 % Revision 1.238  2005/01/03 02:27:32  scott
 % made 'grid' rectangular (each element square)
 %
@@ -715,7 +718,6 @@ cmaplen = size(cmap,1);
 
 plotgrid = 'off';
 plotchans = [];
-gridpos = 'o';          % default grid position - plot grid only
 noplot  = 'off';
 handle = [];
 Zi = [];
@@ -1008,18 +1010,7 @@ if nargs > 2
           end
          case {'plotgrid','gridplot'}
            plotgrid = 'on';
-           if iscell(Value)
-               if length(Value) > 2
-                 error('''plotgrid'' value must be a matrix or cell array of length 2');
-               end
-               gridchans = Value{1};
-               gridpos   = Value{2};
-               if ~ismember(gridpos,'lro')
-                 error('''plotgrid'' position must be ''l'', ''r'', or ''o''');
-               end
-           else
-               gridchans = Value;
-           end
+           gridchans = Value;
          case 'plotchans'
            plotchans = Value(:);
            if find(plotchans<=0) 
@@ -1036,6 +1027,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmp(plotgrid,'on')
+   STYLE = 'grid';
    if abs(max(max(gridchans))) > length(Values)
         error('''plotgrid'' channel index > the number of input channel values');
    end
@@ -1048,12 +1040,11 @@ if strcmp(plotgrid,'on')
         fprintf('topoplot() warning: ''plotgrid'' and ''plotchans'' have channels in common\n');
      end
    end
-   if strcmp(gridpos,'o')    % if plot grid only
-     STYLE = 'grid';
-   end
-   % error('''plotgrid'' option not yet implemented.'); % <============
 end
 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% misc arg tests %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 if isempty(ELECTRODES)                     % if electrode labeling not specified
   if length(Values) > MAXDEFAULTSHOWLOCS   % if more channels than default max
     ELECTRODES = 'off';                    % don't show electrodes
@@ -1062,9 +1053,6 @@ if isempty(ELECTRODES)                     % if electrode labeling not specified
   end
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% misc arg tests %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 if isempty(Values)
    STYLE = 'blank';
 end
@@ -1516,7 +1504,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
              gridcolors(j,k,:) = cmap(gridvalues(j,k),:);
          else
              gridcolors(j,k,:) = BACKCOLOR; % gridchans == 0 -> background color
-             % This allows showing 'space' between separate sub-grids or strips
+             % This allows the plot to show 'space' between separate sub-grids or strips
+             % gridcolors(j,k,:) = [1 1 1]; BACKCOLOR; % gridchans == 0 -> white for printing
          end
       end
     end
