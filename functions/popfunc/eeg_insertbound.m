@@ -9,7 +9,7 @@
 %                event(s)
 %   abslatency - absolute latency of regions in original dataset. Can
 %                also be an array of [beg end] latency with one row
-%                per region removed.
+%                per region removed. Then 'lengths' is ignored.
 %   lengths    - length of removed regions
 %
 % Outputs:
@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/05/05 01:43:11  arno
+% don't know
+%
 % Revision 1.4  2004/05/04 23:19:52  arno
 % typo
 %
@@ -67,7 +70,8 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
         help eeg_insertbound;
         return;
     end;
-    if size(regions,1) ~= 1 & size(regions,2) ~= 1
+    sdf
+    if size(regions,1) ~= 1 & size(regions,2) ~= 1 & ~exist(length)
         lengths = regions(:,2)-regions(:,1)+1;
         regions = regions(:,1);
     end;
@@ -104,7 +108,7 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
                 end;
                 newur(tmpind2).latency = urlatency;
                 newur(tmpind2).length  = lengths(tmpindex);
-                rmnested = [ rmnested removenestedur(newur, tmpind2) ];
+                rmnested = [ rmnested findnestedur(newur, tmpind2) ];
                 
                 % update indices in event structure
                 % ---------------------------------
@@ -138,7 +142,7 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths );
 % retrun indices of nested events and
 % their total length
 % -----------------------------------
-function [ indnested, addlen ] = removenestedur(newur, ind);
+function [ indnested, addlen ] = findnestedur(newur, ind);
     indnested = [];
     addlen = 0;
     tmpind = ind+1;
@@ -160,10 +164,12 @@ function [ indnested, addlen ] = removenestedur(newur, ind);
 % ------------------------------------
 function [event, urevent] = removenested(event, urevent, nestind);
     
-    fprintf('Debug msg: removing %d nested urevents\n', length(nestind));
-    nestind = sort(nestind);
-    urind = cell2mat({ event.urevent }); % this must not be done in the loop
-                                         % since the indices are dyanmically updated
+    if length(nestind) > 1
+        fprintf('Debug msg: removing %d nested urevents\n', length(nestind));
+        nestind = sort(nestind);
+        urind = cell2mat({ event.urevent }); % this must not be done in the loop
+                                             % since the indices are dyanmically updated
+    end;
     
     for ind = 1:length(nestind)
         % find event urindices higher than the urevent to suppress
@@ -171,8 +177,7 @@ function [event, urevent] = removenested(event, urevent, nestind);
         tmpind = find( urind > nestind(ind) );
         for indevent = tmpind
             event(indevent).urevent = event(indevent).urevent-1;
-        end;
-        
+        end;    
     end;
     
     urevent(nestind) = [];
