@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/05/13 23:24:20  arno
+% nothing
+%
 % Revision 1.7  2003/05/13 23:21:27  arno
 % debug unicoord
 %
@@ -75,7 +78,19 @@ end;
 
 % get infos from readlocs
 % -----------------------
-[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
+[chanformat listcolformat] = readlocs('getinfos');
+indformat  = [];
+for index = 1:length(chanformat), 
+    if ~isstr(chanformat(index).importformat)
+        indformat = [ indformat index ];
+    end;
+    if isempty(chanformat(index).skipline), chanformat(index).skipline = 0; end;
+end;
+listtype   = { chanformat(indformat).type };
+formatinfo = { chanformat(indformat).importformat };
+formatskip = [ chanformat(indformat).skipline ];
+   
+%[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
 
 listtype{end+1} = 'custom';
 formatinfo{end+1} = {};
