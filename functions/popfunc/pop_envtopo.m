@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/03/03 19:11:47  arno
+% fixed pvaf on
+%
 % Revision 1.20  2003/08/18 21:22:28  scott
 % made option 'pvaf,'on' the default
 %
@@ -140,7 +143,7 @@ if nargin < 3
 	                 '', ...
                      '', ...
 	                 ['Largest ERP components' fastif(isempty(EEG(end).setname), '',[' of ' EEG(end).setname])] ...
-	                 '''electrodes'',''off'', ''pvaf'', ''on''' };
+	                 '''electrodes'',''off''' };
     if length(EEG) > 1
         promptstr = { 'Dataset indices to subtracts (''1 2''=1-2)' promptstr{:} };
         inistr    = { '2 1' inistr{:} };
