@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/28 19:00:47  arno
+% making ouput nicer for arrays
+%
 % Revision 1.4  2003/01/28 18:47:33  arno
 % alowing to find non unitary intervals
 %
@@ -206,6 +209,8 @@ function str = contarray( array )
             if skip ~= 0      
                 if indent == 1
                     str = [str ':' num2str(array(index)) ];
+                elseif indent == 0
+                    str = [str ',' num2str(array(index)) ];
                 else
                     str = [str ':' num2str(indent) ':' num2str(array(index)) ];
                 end;
