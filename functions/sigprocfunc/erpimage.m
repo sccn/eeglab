@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.146  2003/09/06 22:45:04  scott
+% same
+%
 % Revision 1.145  2003/09/06 22:43:57  scott
 % add erpsig output
 %
@@ -2786,7 +2789,8 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
     if ~isnan(signif);
       [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
-    else
+    end
+    if exist('stdev') == 1
       [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on % plot erp+stdev
       [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on % plot erp-stdev
     end
