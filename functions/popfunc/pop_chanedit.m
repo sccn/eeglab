@@ -1,4 +1,4 @@
-% pop_chanedit() - Edit channel locations.
+% pop_chanedit() - Edit channel locations structure of an EEGLAB EEG dataset
 %
 % Usage: >> newchans = pop_chanedit( chans, 'key1', value1, ...
 %                                           'key2', value2, ... );
@@ -6,37 +6,37 @@
 %   chans - channel EEGLAB structure
 %
 % Optional inputs:
-%   'convert'     - { conversion_type args } conversion type is 'cart2topo'
-%                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', 'chancenter'. 
-%                   Help can be found in the function having the same name. Args are
-%                   only relevant for 'chancenter'.
-%   'transform'     - string command for manipulating arrays. 'chan' is a full 
-%                   electrode info. Fields can be manipulated using 'labels', 'theta'
-%                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3D) or
+%   'convert'     - { conversion_type args } Conversion type may be: 'cart2topo'
+%                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', or 'chancenter'. 
+%                   See help messages for these functions. Args are only relevant 
+%                   for 'chancenter'.
+%   'transform'   - String command for manipulating arrays. 'chan' is full 
+%                   electrode info. Fields that can be manipulated are 'labels', 'theta'
+%                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 3-D) or
 %                   'sph_theta', 'sph_phi', 'sph_radius' for spherical horizontal angle, 
-%                   azimut and radius. Ex: 'chans(3) = chans(14)'. 'X = -X' or a more complex 
-%                   transform separated by ';': 'TMP = X; X = Y; Y = TMP'
+%                   azimuth and radius. Ex: 'chans(3) = chans(14)', 'X = -X' or a multi- 
+%                   step transform with steps separated by ';': 'TMP = X; X = Y; Y = TMP'
 %   'changechan'  - {num value1 value2 value3 ...} Change the values of
-%                   all fields the channel.
-%   'changefield' - {num field value} change field value for channel number num. 
-%                   (Ex: {34 'theta' 320.4}).
+%                   all fields for the given channel num.
+%   'changefield' - {num field value} Change field value for channel number num. 
+%                   Ex: {34 'theta' 320.4}.
 %   'add'         - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
-%                   Insert channel before channel number num with the specified values. 
-%                   If the number of values if less than ten, fields are filled with 0.
-%   'delete'      - vector of indices of channel to delete
-%   'shrink'      - topographical polar shrink factor (see >> help topoplot) 
-%   'load'        - [filename|{filename, 'key', 'val'}] load channel location file
+%                   Insert new channel before channel number num with the specified values. 
+%                   If the number of values if less than ten, remaining fields are made 0.
+%   'delete'      - Vector of channel numbers to delete
+%   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
+%   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
 %                   optional arguments (such as file format) to the function readlocs()
-%                   can be given if the input is a cell array.
-%   'save'        - 'filename' save text file with channel info
+%                   can be specified if the input is a cell array.
+%   'save'        - 'filename' Save text file with channel info.
 %
 % Outputs:
-%   newchans      - channel EEGLAB structure
+%   newchans      - new EEGLAB channel locations structure
 %
 % Ex:  EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
-%          'convert', { 'xyz->polar' [] -1 1 }, 'save', 'myfile.loc' )
-%        % load polhemus file, delete two channels, convert to polar (see 
-%        % cart2topo() for arguments) and save into 'myfile.loc'.
+%          'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
+%        % Load polhemus file, delete two channels, convert to polar (see 
+%        % cart2topo() for arguments) and save into 'mychans.loc'.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 April 2002
 %
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/11/12 23:02:21  arno
+% debugging message when number of channel does not match
+%
 % Revision 1.31  2002/10/23 15:51:35  arno
 % more bug fixed
 %
