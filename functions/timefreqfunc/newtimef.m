@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/08/04 14:43:09  arno
+% updating ERP plot as for timef
+%
 % Revision 1.41  2003/08/01 21:05:12  arno
 % commenting h(9)
 %
@@ -1247,17 +1250,17 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                                % to left of ERSP image
       if ~strcmpi(g.freqscale, 'log')
+          plot(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
-              plot(freqs,Pboot(:,:)'+[E;E],'LineWidth',g.linewidth)
-          else
-              plot(freqs,E,'LineWidth',g.linewidth)
+              plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
+              plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
           end
           axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])     
       else
+          semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
-              semilogx(freqs,Pboot(:,:)'+[E;E],'LineWidth',g.linewidth)
-          else
-              semilogx(freqs,E,'LineWidth',g.linewidth)
+              semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
+              semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
           end
           axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
           set(h(5),'View',[90 90])
@@ -1376,19 +1379,21 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                                 % ITC left of the ITC image
       if ~strcmpi(g.freqscale, 'log')
+          plot(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
-              plot(freqs,E,freqs,Rboot,'LineWidth',g.linewidth)
-              axis([freqs(1) freqs(end) 0 max([E Rboot(:)'])+max(E)/3])
+              plot(freqs,Rboot,'g', 'LineWidth',g.linewidth)
+              plot(freqs,Rboot,'k:','LineWidth',g.linewidth)
+              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
           else
-              plot(freqs,E,'LineWidth',g.linewidth)
               axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
           end
       else
+          semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
-              semilogx(freqs,E,freqs,Rboot(:),'LineWidth',g.linewidth)
-              axis([freqs(1) freqs(end) 0 max([E Rboot(:)'])+max(E)/3])
-          else
-              semilogx(freqs,E,'LineWidth',g.linewidth)
+              semilogx(freqs,Rboot(:),'g', 'LineWidth',g.linewidth)
+              semilogx(freqs,Rboot(:),'k:','LineWidth',g.linewidth)
+              axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
+          else 
               axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
           end
           divs = linspace(log(freqs(1)), log(freqs(end)), 10);
