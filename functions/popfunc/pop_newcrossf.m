@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
@@ -87,8 +90,12 @@ if nargin < 3
     % add title
     % ---------
 	if isempty( strmatch(  '''title''', result{7}))
-	   options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
-	       ' time frequency decomposition' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ''''];
+	    switch lower(result{5})
+	       case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+	           ' Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''], '''')];
+	       otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') int2str(num1) '-' int2str(num2) ...
+	           ' Phase Coherence' fastif(~isempty(EEG.setname), [' (' EEG.setname ')'''],'''') ];
+        end;
 	end;
 	if ~isempty( result{6} )
 		options      = [ options ', ''alpha'',' result{6} ];
@@ -157,6 +164,7 @@ end;
 varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], %d %s);', inputname(1), typeproc, num1, num2, ...
 			int2str(tlimits), cycles, options);
 com = sprintf('%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
+com
 eval(com)
 
 return;
