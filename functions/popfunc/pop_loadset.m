@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/11 19:20:36  arno
+% removing eeg_consts
+%
 % Revision 1.8  2002/04/23 18:00:17  arno
 % modifying help message
 %
@@ -83,15 +86,18 @@ elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
 else
-	error('Pop_loadset: non-EEGLAB dataset file');
+	VAROUT = checkoldformat(TMPVAR);
+	if ~isfield( VAROUT, 'data')
+		error('Pop_loadset: non-EEGLAB dataset file');
+	end;
 end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
 
 function EEG = checkoldformat(EEG)
 	if ~isfield( EEG, 'data')
-		fprintf('Incompatible with new format, trying old format...\n');
-		eegset = cellArray;
+		fprintf('Incompatible with new format, trying old format and converting...\n');
+		eegset = EEG.cellArray;
 		
 		off_setname             = 1;  %= filename
 		off_filename            = 2;  %= filename
@@ -179,22 +185,15 @@ function EEG = checkoldformat(EEG)
 		%end;
 		
 		% modify the eegtype to match the new one
-		EEG.epoch  = [ EEG.rt(:) EEG.eegtype(:) EEG.eegresp(:) EEG.accept(:) ];
-		I = find( EEG.rt < 1000 ); 	
-		EEG.event      = [ ones(1, length(I)); EEG.rt(I) ]'; % type is 1, meaing reaction time
-		EEG = rmfield( EEG, {'accept', 'eegtype', 'eegresp', 'accept' });
 		
 		if EEG.trials > 1
-			if size(EEG.event,1) == EEG.trials
-				EEG.event = eeg_eventformat([  EEG.event [1:EEG.trials]'], 'struct', {'type', 'latency' 'epoch' });
-			else
-				EEG.event = eeg_eventformat( EEG.event, 'struct', {'type', 'latency'});
-			end;
-		else
-			EEG.event = eeg_eventformat([ ones(length(EEG.trials)) EEG.event], 'struct', {'type', 'latency'});
+			tmpepoch  = [ EEG.rt(:) EEG.eegtype(:) EEG.eegresp(:) ];
+			
+			EEG = rmfield( EEG, {'accept', 'eegtype' 'accept' 'eegresp' });
+			EEG = eeg_checkset(EEG);;
+			EEG = pop_importepoch(EEG, tmpepoch, { 'rt' 'eegtype' 'eegresp' }, {'rt'}, 1E-3);
 		end;
-		
-		EEG.epoch = eeg_epochformat(EEG.epoch, 'struct', { 'rt' 'type' 'resp' 'accept' });
+		EEG = eeg_checkset(EEG, 'eventconsistency');
 	end;
 	% check modified fields
 	% ---------------------
