@@ -29,18 +29,23 @@
 
 function [delays,targets,urtargets,urprevs] = eeg_time2prev(EEG,target,previous);
 
-verbose = 1; % 1=on, 0=off
-targetcount = 0;
+verbose = 1; % 1=on|0=off
 nevents   = length(EEG.urevent);
 
 if ~iscell(target)
   error('2nd arg "target" must be a cell array.\n');
   return
 end
+
+%for k=1:length(target)
+%   if ~ischar(cell2mat(target(k))) % <--- bug in cell2mat()?
+%end
+
 if ~iscell(previous)
   error('3rd arg "previous" must be a cell array.\n');
   return
 end
+
 if ~isfield(EEG,'urevent')
   error('requires the urevent structure be present.\n');
   return
@@ -54,45 +59,68 @@ delays    = zeros(1,nevents); % holds output times in ms
 targets   = zeros(1,nevents); % holds indxes of targets
 urtargets = zeros(1,nevents); % holds indxes of targets
 urprevs   = zeros(1,nevents); % holds indxes of prevs
+targetcount = 0;
 
-for idx = 1:length(EEG.event)
+%
+%%%%%%%%%%%for each event in the dataset %%%%%%%%%%%%%%%%%%%%
+%
+for idx = 1:length(EEG.event)                      % for each event in the dataset
+
+ %
+ %%%%%%%%%%%%%%%%%%%%%%%% find target events %%%%%%%%%%%%%%%%%
+ %
  uridx = EEG.event(idx).urevent;
- istarget = 0; tidx = 1;
- while istarget==0 & tidx<=length(target)
-    if strcmpi(EEG.urevent(uridx).type,target(tidx))
+ istarget = 0; tidx = 1; % target index
+ while istarget==0 & tidx<=length(target)          % for each potential target type
+    if strcmpi(num2str(EEG.urevent(uridx).type),target(tidx))
       istarget=1;
       targetcount = targetcount+1;
       targets(targetcount) = idx;
       urtargets(targetcount) = uridx;
     end
-    tidx = tidx+1;
+    tidx = tidx+1;                                 % try next target type
  end 
 
- if istarget 
-  if urprevs(targetcount) > 0   % fill delays with latency difference in ms
+ %
+ %%%%%%%%%%%%%% compute delay from current target to latest prev event %%%%%%%%%%%%%%
+ %
+ if istarget  % if current event is a target type
+
+  if urprevs(targetcount) > 0                      % if a 'previous' type event was already found
+                                                   % save the latency difference in ms
     delays(targetcount) = 1000/EEG.srate * ...
      (-1)*(EEG.urevent(uridx).latency - EEG.urevent(urprevs(targetcount)).latency);
-  elseif targetcount>1 & urprevs(targetcount-1)>0
-    urprevs(targetcount) = urprevs(targetcount-1);
+
+  elseif targetcount>1 & urprevs(targetcount-1)>0  % if there was an earlier 'previous' event
+    urprevs(targetcount) = urprevs(targetcount-1); % duplicate it here 
+                                                   % and compute its latency difference
     delays(targetcount) = 1000/EEG.srate * ...
      (-1)*(EEG.urevent(uridx).latency - EEG.urevent(urprevs(targetcount)).latency);
+
   end
   if verbose
     fprintf('%4d. target event %4d - previous event %4d = %4.1f ms\n',...
                targetcount,idx,urprevs(targetcount),delays(targetcount));
   end
- end
+ end % istarget
 
- isprevious = 0; pidx = 1;
- while ~isprevious & pidx<=length(previous)
-    if strcmpi(EEG.urevent(uridx).type,previous(pidx))
-      isprevious=1;
-      urprevs(targetcount+1) = uridx;
+ %
+ %%%%%%%%%%%%%% determine whether this is  a potential 'previous' event  %%%%%%%%%%%%
+ %
+ isprevious = 0; pidx = 1; % previous index
+ while ~isprevious & pidx<=length(previous)        % for each previous event type
+    if strcmpi(num2str(EEG.urevent(uridx).type),previous(pidx)) 
+      isprevious=1;                                % find a potential next 'previous' event
+      urprevs(targetcount+1) = uridx;              % mark event as potential next 'previous' 
     end
-    pidx = pidx+1;
+    pidx = pidx+1;                                 % try next 'previous' event type
  end 
-end
 
+end % main event loop
+
+%
+%%%%%%%%%%%%%%%%%%%%% Truncate output arrays %%%%%%%%%%%%%%%%%%%%%%%%
+%
 if targetcount > 0
    targets   = targets(1:targetcount);
    urtargets = urtargets(1:targetcount);
