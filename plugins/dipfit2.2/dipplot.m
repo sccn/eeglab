@@ -65,6 +65,7 @@
 %  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
 %  'spheres'  - ['on'|'off'] {default: 'off'} plot dipole markers as 3-D spheres. 
 %               Does not yet interact with gui buttons, produces non-gui mode.
+%  'spheresize' - [real>0] size of spheres (if 'on'). {default: 5}
 %  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
 %  'std'      - [cell array] plot standard deviation of dipoles. i.e.
 %               { [1:6] [7:12] } plot two elipsoids that best fit all the dipoles
@@ -143,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.80  2004/05/05 00:52:11  scott
+%dipole length 0 + 'spheres' again...
+%
 %Revision 1.79  2004/05/04 17:04:22  scott
 %test for s1, p1 if spheres on
 %
@@ -409,8 +413,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
                                  'dipolelength' 'real'  [0 Inf]             1;
-                                 'sphere'    'real'     [0 Inf]             1;
+                                 'sphere'       'real'     [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
+                                 'spheresize'  'real'    [0 Inf]              5;
                                  'links'    'real'      []                  [];
                                  'image'     'string'   []                 'mri' }, 'dipplot');
     if isstr(g), error(g); end;
@@ -793,7 +798,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if ~strcmpi(g.spheres,'on')
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
-            else
+            else % 'spheres','on'
                  if exist('s1'), 
                    set(s1,'userdata',dipstruct,'tag',tag,'cdatamapping','direct','facecolor','r');
                  end
@@ -805,17 +810,16 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or point %%%%%%%%%%%%%%%%%%%%%%%%%
             %
             hold on;
-            if strcmp(g.spheres,'on')
+            if strcmp(g.spheres,'on') % plot spheres
                 spherecolors = g.color{index};
-                SPHERE_FAC = 0.2;
                 [xs,ys,zs] = sphere;
                 options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
                 'direct','tag','img', 'facelighting', 'none' };
                 for q = 1:length(xx)
                    scolor = repmat(33,size(xs,1),size(xs,2));
-                   sf=surf(xs/SPHERE_FAC+xx(q),...
-                        ys/SPHERE_FAC+yy(q),...
-                        zs/SPHERE_FAC+zz(q),...
+                   sf=surf(xs/g.spheresize+xx(q),...
+                        ys/g.spheresize+yy(q),...
+                        zs/g.spheresize+zz(q),...
                         scolor);
                    % set(sf,{options});
                    shading interp;
