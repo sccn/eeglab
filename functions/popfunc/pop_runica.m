@@ -61,6 +61,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2005/03/13 17:45:04  peter
+% saving wts and sph as EEG.oldwts (cell array) and EEG.oldsph
+% before clearing them
+% NOTE: 'binica' with 'maxsteps',5  doesnt work!!! (maxsteps not changed) ??
+%
 % Revision 1.48  2005/03/07 19:53:42  arno
 % fixing fastica call
 %
@@ -264,18 +269,37 @@ end;
 
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
+fprintf('\n');
 if ~isfield(EEG,'oldwts')
-    EEG.oldwts = {EEG.icaweights};
-    fprintf('Saving current EEG.icaweights as EEG.oldwts.\n');
+    if isfield(EEG,'icaweights') 
+       ow = cell(1);
+       ow{1} = EEG.icaweights
+       EEG.oldwts = ow;
+        fprintf('Saving current EEG.icaweights as EEG.oldwts.\n');
+    end
 else
-    EEG.oldwts = {EEG.oldwts EEG.icaweights};
+    ow = cell(1,length(EEG.oldwts)+1);
+    for k = 1:length(EEG.oldwts)
+        ow{k} = EEG.oldwts{k};
+    end
+    ow{end} = EEG.icaweights;
+    EEG.oldwts = ow;
     fprintf('Appending current EEG.icaweights to EEG.oldwts.\n');
 end
 if ~isfield(EEG,'oldsph')
-    EEG.oldsph = {EEG.icasphere};
-    fprintf('Saving current EEG.icasphere as EEG.oldsph.\n');
+    if isfield(EEG,'icasphere')
+       ow = cell(1);
+       ow{1} = EEG.icasphere
+       EEG.oldsph = ow;
+       fprintf('Saving current EEG.icasphere as EEG.oldsph.\n');
+    end
 else
-    EEG.oldsph = {EEG.oldsph EEG.icasphere};
+    ow = cell(1,length(EEG.oldsph)+1);
+    for k = 1:length(EEG.oldsph)
+        ow{k} = EEG.oldsph{k};
+    end
+    ow{end} = EEG.icasphere;
+    EEG.oldsph = ow;
     fprintf('Appending current EEG.icasphere to EEG.oldsph.\n');
 end
 
@@ -333,6 +357,8 @@ switch lower(icatype)
         else % if defined 'options'
             tmpoptions = eval( [ '{' options '}' ]);
             if tmprank == size(EEG.data,1) | ~isempty(findstr('pca', options))
+                cmd= ['[EEG.icaweights,EEG.icasphere] = binica(tmpdata,' tmpoptions{:} ' );'];
+                fprintf('%s\n',cmd);
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, tmpoptions{:}  );
             else
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'pca', tmprank, tmpoptions{:}  );
