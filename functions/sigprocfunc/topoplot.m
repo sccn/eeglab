@@ -12,32 +12,34 @@
 %   		chan_locs  - name of an EEG electrode position file (See
 %                             >> topoplot example   for format.
 % Optional Parameters:
-%                'colormap'         -  any sized colormap
-%                'interplimits'     - 'electrodes' to furthest electrode
-%                                     'head' to edge of head
-%                                        {default 'head'}
-%                'gridscale'        -  scaling grid size {default 67}
-%                'maplimits'        - 'absmax' +/- the absolute-max 
-%                                     'maxmin' scale to data range
-%                                     [clim1,clim2] user-definined lo/hi
-%                                        {default = 'absmax'}
-%                'style'            - 'straight' colormap only
-%                                     'contour' contour lines only
-%                                     'both' - both colormap and contour lines
-%                                     'fill' - constant color between lines
-%                                     'blank' - just plot electrode locations
-%                                     {default = 'both'}
-%                'numcontour'       - number of contour lines
-%                                        {default = 6}
-%                'shading'          - 'flat','interp'  {default = 'flat'}
-%                'headcolor'        - Color of head cartoon {default black}
-%                'electrodes'       - 'on','off','labels','numbers', 
-%                                     'labelpoint', 'numpoint'
-%                'efontsize'        - detail
-%                'electcolor'       - detail
-%                'emarker'          - detail
-%                'emarkersize'      - detail
-%                'emarkersize1chan' - detail
+%   'shrink'           - ['on'|'off'|'force'|factor] normalize electrode polar
+%                        coordinates if maximum radius > 0.5 ('on') so that
+%                        maximu radius is 0.5. 'force' normalize radius so 
+%                        that the maximum is 0.5. factor apply a normalizing
+%                        factor (percentage of the maximum). {default = 'on'}.
+%   'colormap'         -  any sized colormap
+%   'interplimits'     - 'electrodes' to furthest electrode 'head' to edge of
+%                         head {default 'head'}
+%   'gridscale'        -  scaling grid size {default 67}
+%   'maplimits'        - 'absmax' +/- the absolute-max 
+%                        'maxmin' scale to data range
+%                         [clim1,clim2] user-definined lo/hi
+%                         {default = 'absmax'}
+%   'style'            - 'straight' colormap only
+%                        'contour' contour lines only
+%                        'both' - both colormap and contour lines
+%                        'fill' - constant color between lines
+%                        'blank' - just plot electrode locations
+%                        {default = 'both'}
+%   'numcontour'       - number of contour lines {default = 6}
+%   'shading'          - 'flat','interp'  {default = 'flat'}
+%   'headcolor'        - Color of head cartoon {default black}
+%   'electrodes'       - 'on','off','labels','numbers','labelpoint','numpoint'
+%   'efontsize'        - detail
+%   'electcolor'       - detail
+%   'emarker'          - detail
+%   'emarkersize'      - detail
+%   'emarkersize1chan' - detail
 %  
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -49,7 +51,8 @@
 %       2) topoplot will ignore any electrode with a position outside 
 %       the head (radius > 0.5). To make the head round, >> axis square
 %
-% Authors: Andy Spydell & Colin Humphries, CNL / Salk Institute, Aug, 1996
+% Authors: Andy Spydell, Colin Humphries & Arnaud Delorme 
+%          CNL / Salk Institute, Aug, 1996
 %
 % See also: timtopo(), envtopo()
 
@@ -70,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/24 17:07:28  arno
+% debugging error message problem
+%
 % Revision 1.4  2002/04/17 18:40:23  arno
 % display real electrode number
 %
@@ -107,7 +113,7 @@
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function handle = topoplot(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9)
+function handle = topoplot(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
@@ -125,6 +131,7 @@ EMARKERSIZE = [];     % DEFAULTS SET IN CODE
 EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
+shrinkfactor = 'on';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -185,49 +192,51 @@ if nargs > 2
     end
     Param = lower(Param);
     switch lower(Param)
-      case 'colormap'
-        if size(Value,2)~=3
+	 case 'colormap'
+	  if size(Value,2)~=3
           error('topoplot(): Colormap must be a n x 3 matrix')
-        end
-        colormap(Value)
-      case {'interplimits','headlimits'}
-        if ~isstr(Value)
+	  end
+	  colormap(Value)
+	 case {'interplimits','headlimits'}
+	  if ~isstr(Value)
           error('topoplot(): interplimits value must be a string')
-        end
-        Value = lower(Value);
-        if ~strcmp(Value,'electrodes') & ~strcmp(Value,'head')
+	  end
+	  Value = lower(Value);
+	  if ~strcmp(Value,'electrodes') & ~strcmp(Value,'head')
           error('topoplot(): Incorrect value for interplimits')
-        end
-        INTERPLIMITS = Value;
-      case 'maplimits'
-        MAPLIMITS = Value;
-      case 'gridscale'
-        GRID_SCALE = Value;
-      case 'style'
-	STYLE = lower(Value);
-      case 'numcontour'
-        CONTOURNUM = Value;
-      case 'electrodes'
-	ELECTROD = lower(Value);
-      case 'emarker'
-	EMARKER = Value;
-      case {'headcolor','hcolor'}
-	HCOLOR = Value;
-      case {'electcolor','ecolor'}
-	ECOLOR = Value;
-      case {'emarkersize','emsize'}
-	EMARKERSIZE = Value;
-      case 'emarkersize1chan'
-        EMARKERSIZE1CHAN= Value;
-      case {'efontsize','efsize'}
-	EFSIZE = Value;
-      case 'shading'
-	SHADING = lower(Value);
-	if ~any(strcmp(SHADING,{'flat','interp'}))
-	  error('Invalid Shading Parameter')
-	end
-      otherwise
-	error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
+	  end
+	  INTERPLIMITS = Value;
+	 case 'maplimits'
+	  MAPLIMITS = Value;
+	 case 'gridscale'
+	  GRID_SCALE = Value;
+	 case 'style'
+	  STYLE = lower(Value);
+	 case 'numcontour'
+	  CONTOURNUM = Value;
+	 case 'electrodes'
+	  ELECTROD = lower(Value);
+	 case 'emarker'
+	  EMARKER = Value;
+	 case 'shrink'
+	  shrinkfactor = Value;
+	 case {'headcolor','hcolor'}
+	  HCOLOR = Value;
+	 case {'electcolor','ecolor'}
+	  ECOLOR = Value;
+	 case {'emarkersize','emsize'}
+	  EMARKERSIZE = Value;
+	 case 'emarkersize1chan'
+	  EMARKERSIZE1CHAN= Value;
+	 case {'efontsize','efsize'}
+	  EFSIZE = Value;
+	 case 'shading'
+	  SHADING = lower(Value);
+	  if ~any(strcmp(SHADING,{'flat','interp'}))
+		  error('Invalid Shading Parameter')
+	  end
+	 otherwise
+	  error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
     end
   end
 end
@@ -264,7 +273,21 @@ if length(Vl) > 1 & length(Vl) ~= length(Th),
                length(Vl),length(Th));
 end
 
+if isstr(shrinkfactor)
+	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
+		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
+		fprintf('topoplot(): electrode radius shrinked by %2.3g to show all\n', squeeze);
+		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
+	end;	
+else 
+	fprintf('topoplot(): electrode radius shrinked by %2.3g\n', shrinkfactor);
+	Rd = Rd-shrinkfactor*Rd; % squeeze electrodes in squeeze*100% to have all inside
+end;
+	  
 enum = find(Rd <= 0.5);                     % interpolate on-head channels only
+if length(enum) > length(Rd)
+	fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', length(enum)-length(Rd),length(Rd));
+end;	
 Th = Th(enum);
 Rd = Rd(enum);
 if ~strcmp(STYLE,'blank')
