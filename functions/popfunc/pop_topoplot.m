@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/10/11 02:26:01  arno
+% modify default title
+%
 % Revision 1.30  2003/10/11 02:20:31  arno
 % shift colorbar to left for 1 plot
 %
@@ -329,7 +332,6 @@ if nbgraph== 1,
    com = 'figure;'; 
 end;
 set(allobj(1:countobj-1), 'visible', 'on');
-topotitle
 
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
