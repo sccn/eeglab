@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Version history:
 % 08-04-00  added ICA and SC -sm
@@ -48,10 +51,12 @@ SC  =  [ICADIR 'binica.sc'];           % master .sc file for binica.m
 
 %ENVCOLORS  = [ ICADIR 'envproj.col' ]; % default color-order
 ENVCOLORS  = [ 'envproj.col' ]; % default color-order
+% THIS ENVCOLORS IS NOT USED BY ANY PROGRAM ANY MORE
 %                                        filename for envproj.m here.
 
 %PROJCOLORS = [ ICADIR 'white1st.col' ];% default color-order
 PROJCOLORS = [ 'white1st.col' ];% default color-order
+% THIS PROJCOLORS IS NOT USED BY ANY PROGRAM ANY MORE
 %                                         filename for plotproj.m here.
 BACKCOLOR  = [0.8 0.8 0.8];            % background color for plotting
 
