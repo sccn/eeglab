@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.190  2004/04/28 17:00:42  scott
+% no blanking ring when style is 'blank'
+%
 % Revision 1.189  2004/04/01 17:10:46  scott
 % converted 'conv' interpolation to polar
 %
@@ -1306,6 +1309,11 @@ end
 %
 % %%%%%%%%%%%%%%%%%%% Show electrode information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+ axis square
+ axis off
+ pos = get(gca,'position');
+ textax = axes('position',pos);  % make new axes so clicking numbers <-> labels 
+ axis off                        % will work inside head cartoon patch
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
    if length(y)>=32 
@@ -1378,7 +1386,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%% Mark specified electrode locations %%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
-  if length(Values) < length(pltchans)  % mark selected electrodes
+  if length(Values) < length(pltchans)   % mark selected electrodes
       for kk = 1:length(Values)
         hp2 = plot(y(Values(kk)),x(Values(kk)),'.','Color', EMARKERCOLOR1CHAN, ...
                                               'markersize', EMARKERSIZE1CHAN);
