@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2004/06/16 21:38:30  arno
+% resorting urevents
+%
 % Revision 1.126  2004/06/16 18:58:58  arno
 % same
 %
@@ -553,9 +556,6 @@ end;
 
 % read data if necessary
 % ----------------------
-if isa(EEG.data, 'single')
-    EEG.data = double(EEG.data);
-end;
 if isstr(EEG.data)
     fid = fopen([EEG.filepath EEG.data], 'r', 'ieee-le'); %little endian (see also pop_saveset)
     if fid == -1
@@ -570,6 +570,14 @@ if isstr(EEG.data)
         fprintf('Reading float file ''%s''...\n', [EEG.filepath EEG.data]);
     end;
     EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+end;
+if isnumeric(EEG.data)
+    v = version;
+    if ~findstr(v, 'R14')
+        EEG.data = double(EEG.data);
+    else
+        EEG.data = single(EEG.data);
+    end;
 end;
 
 % verify the type of the variables
