@@ -140,6 +140,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2002/11/09 21:19:57  scott
+% added example
+%
 % Revision 1.67  2002/11/09 21:07:29  scott
 % reorganized help message optional argument list
 %
@@ -1065,7 +1068,7 @@ end
 %
 if exist('phargs') == 1 % if phase-sort
 	if length(phargs) >= 4 % find max frequency in specified band
-		[pxx,freqs] = psd(data(:),1024,srate,frames,0);
+		[pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
 		
 		%gf = gcf;
 		% figure;plot(freqs,pxx);
@@ -1145,7 +1148,7 @@ if exist('phargs') == 1 % if phase-sort
 %
 elseif exist('ampargs') == 1 % if amplitude-sort
 	if length(ampargs) == 4 % find max frequency in specified band
-		[pxx,freqs] = psd(data(:),1024,srate,frames,0);
+		[pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
 		
 		pxx = 10*log10(pxx);
 		n = find(freqs >= ampargs(3) & freqs <= ampargs(4));
@@ -1380,7 +1383,7 @@ end
 %
 if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
 	% find max frequency in specified band
-	[pxx,tmpfreq] = psd(data(:),1024,srate,frames,0);
+	[pxx,tmpfreq] = psd(data(:),max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
 
 	pxx = 10*log10(pxx);
 	n = find(tmpfreq >= coherfreq(1) & tmpfreq <= coherfreq(2));
