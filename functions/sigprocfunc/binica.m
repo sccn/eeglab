@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/03/13 17:14:40  peter
+% comments
+%
 % Revision 1.10  2004/08/19 19:10:41  arno
 % did not change anything
 %
@@ -197,28 +200,44 @@ while isempty(s) | s ~= -1
   end
 end 
 
+flags % DEBUG
+
 %
 % substitute the flags/args pairs in the .sc file
 %
 arg = firstarg;
-while arg <= nargin
-  eval(['Flag = var' int2str(arg) ';']);
+if arg > nargin
+   fprintf('\nbinica(): no optional (flag, argument) pairs received.\n');
+else
+ if (nargin-arg+1)/2 > 1
+    fprintf('\nbinica(): processing %d (flag, arg) pairs.\n',(nargin-arg+1)/2);
+ else
+    fprintf('\nbinica(): processing one (flag, arg) pair.\n');
+ end
+ while arg <= nargin
+
+  eval(['FLAG = var' int2str(arg) ';']); % WHY DOES THIS MAKE FLAG (64,3) ?????
+  fprintf('WARNING: binica() did NOT read the specified flag, arg pair!!!!\n');
+
   if arg == nargin
-    fprintf('\nbinica(): Flag %s needs an argument.\n',Flag)
+    fprintf('\nbinica(): Flag %s needs an argument.\n',FLAG)
     return
   end
   eval(['Arg = var' int2str(arg+1) ';']);
-  if strcmpi(Flag,'pca')
+
+  if strcmpi(FLAG,'pca')
         ncomps = Arg; % get number of components out for reading wts.
   end
   arg = arg+2;
 
   nflags = f;
   for f=1:length(flags)   % replace arg with Arg
-    if strcmp(Flag,flags{f})
+    if strcmp(FLAG,flags{f})
        args{f} = num2str(Arg);
+       fprintf('setting %s, %s.\n',flags{f},args{f});
     end
   end
+ end
 end
 
 %
