@@ -37,6 +37,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/20 17:18:33  arno
+% removing "Done."
+%
 % Revision 1.3  2002/04/18 20:01:34  arno
 % retrIeve
 %
@@ -53,6 +56,17 @@
 % ------------------
 function storeSetIndex = eeg_store( storeSetIndex);
 eeg_global;
+
+% considering multiple datasets
+% -----------------------------
+if length(EEG) > 1
+	TMPEEG = EEG;
+	for index=1:length(TMPEEG)
+		EEG = TMPEEG(1);
+		eeg_store;
+	end;
+	return;
+end;
 EEG = eeg_checkset(EEG);
 
 % test options
