@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/15 15:48:21  arno
+% simplifying
+%
 % Revision 1.2  2002/08/14 17:03:04  arno
 % updating tutdir
 %
@@ -42,6 +45,6 @@ icadefs % load icadefs.m globals including TUTDIR
 %else
 %   fprintf('ICA Matlab Toolbox Tutorial not found in the toolbox directory.\n');
    fprintf('Opening the toolbox www site ...\n\n');
-   eval(['web ' TUTORIAL_URL]);
+   web(TUTORIAL_URL);
 %end
 
