@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/07/25 00:18:23  scott
+% plot diag comp map lines in same colors as comp spec traces. -sm & ad
+%
 % Revision 1.15  2002/07/24 17:47:55  arno
 % making it nicer for components
 %
@@ -384,10 +387,14 @@ colrs = {'r','b','g','m','c'}; % component spectra trace colors
 if ~isempty(g.weights)
 	set(pl, 'linewidth', 2, 'color', 'k');
 	hold on;
-  for f=1:length(g.icamaps)
-    colr = colrs{mod((f-1),5)+1};
-	  pl2=plot(freqs(1:maxfreqidx),compeegspecdB(f,1:maxfreqidx)',colr);
-  end
+	for f=1:length(g.icamaps)
+		colr = colrs{mod((f-1),5)+1};
+		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)',colr);
+	end
+	othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
+	if ~isempty(othercomps)
+		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
+	end;
 	newaxis = axis;
 	newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
 	newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
@@ -398,22 +405,22 @@ if ~isempty(g.freq)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if isempty(g.weights)
-	 for f=1:length(g.freq)
-		hold on; 
-		plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
-			 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
-			 'k','LineWidth',2.5);
-	 end;
-  else
-	 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	 % Plot vertical line at comp analysis freq
-	 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   mincompdB = min([min(eegspecdB(:,freqidx(1))) min(compeegspecdB(:,freqidx(1)))]);
-   maxcompdB = max([max(eegspecdB(:,freqidx(1))) max(compeegspecdB(:,freqidx(1)))]);
-   hold on;
-	 plot([freqs(freqidx(1)) freqs(freqidx(1))],[mincompdB maxcompdB],'k');
-  end
+	if isempty(g.weights)
+		for f=1:length(g.freq)
+			hold on; 
+			plot([freqs(freqidx(f)) freqs(freqidx(f))], ...
+				 [min(eegspecdB(:,freqidx(f))) max(eegspecdB(:,freqidx(f)))],...
+				 'k','LineWidth',2.5);
+		end;
+	else
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		% Plot vertical line at comp analysis freq
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		mincompdB = min([min(eegspecdB(:,freqidx(1))) min(compeegspecdB(:,freqidx(1)))]);
+		maxcompdB = max([max(eegspecdB(:,freqidx(1))) max(compeegspecdB(:,freqidx(1)))]);
+		hold on;
+		plot([freqs(freqidx(1)) freqs(freqidx(1))],[mincompdB maxcompdB],'k', 'LineWidth',2.5);
+	end
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot connecting lines using changeunits()
