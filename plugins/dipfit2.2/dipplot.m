@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.117  2005/03/22 19:03:35  arno
+%rvrange
+%
 %Revision 1.116  2005/03/18 17:57:12  arno
 %disable mesh for MNI coordinate with no mesh data
 %
@@ -1302,7 +1305,7 @@ function updatedipplot(fig)
    if exist('foundind')
       tmp = get(newdip(foundind), 'userdata');
       tal = mni2tal(tmp.mricoord);
-      if isreal( tmp.name )
+      if ~isstr( tmp.name )
            tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', [ 'Comp: ' int2str(tmp.name) ] );
       else tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', tmp.name );
       end;
