@@ -8,6 +8,7 @@
 %   locutoff  - lower edge of the frequency pass band (Hz)  {0 -> lowpass}
 %   hicutoff  - higher edge of the frequency pass band (Hz) {0 -> highpass}
 %   filtorder - length of the filter in points {default 3*fix(srate/locutoff)}
+%   revfilt   - [0|1] reverse filter polarity. Default is 0.
 %
 % Outputs:
 %   eegout   - output dataset
@@ -35,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/15 01:45:53  scott
+% can not -> cannot
+%
 % Revision 1.6  2002/10/16 21:42:25  arno
 % default for highcuroff
 %
@@ -56,7 +60,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder);
+function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt);
 
 com = '';
 if nargin < 1
@@ -71,17 +75,26 @@ if nargin < 3
 	% -----------------
    	promptstr = { 'Lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
    				  'Higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
-   				  'Filter length in points (default: see >> help pop_eegfilt)' };
-	inistr       = { '0', '0', '' };
+   				  strvcat('Notch filter (provide range, i.e. [45 55] for 50 Hz)', ...
+                  '(this option overwrite the low and high edge limits above)'), ...
+                  'Filter length in points (default: see >> help pop_eegfilt)' };
+	inistr       = { '0', '0', '', '' };
    	result       = inputdlg2( promptstr, 'Filter the data -- pop_eegfilt()', 1,  inistr, 'pop_eegfilt');
 	if size(result, 1) == 0 return; end;
 	locutoff   	 = eval( result{1} );
 	hicutoff 	 = eval( result{2} );
-	if locutoff == 0 & hicutoff == 0 return; end;
 	if isempty( result{3} )
-		filtorder = [];
-	else
-		filtorder    = eval( result{3} );
+		 revfilt = 0;
+	else 
+        revfilt    = eval( [ '[' result{3} ']' ] );
+        locutoff = revfilt(1);
+        hicutoff = revfilt(2);
+        revfilt = 1;
+	end;
+	if locutoff == 0 & hicutoff == 0 return; end;
+	if isempty( result{4} )
+		 filtorder = [];
+	else filtorder    = eval( result{4} );
 	end;
 else
     if nargin < 3
@@ -90,11 +103,19 @@ else
     if nargin < 4
         filtorder = [];
     end;
+    if nargin < 4
+        revfilt = 0;
+    end;
 end;
  
 options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
 if ~isempty( filtorder )
 	options = { options{:} filtorder };
+else 
+	options = { options{:} 0 };
+end;
+if revfilt ~= 0
+	options = { options{:} revfilt };
 end;
 
 if EEG.trials == 1 
@@ -125,8 +146,8 @@ else
 	% note: reshape does not reserv new memory while EEG.data(:,:) does
 end;	
 
-com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s]);', inputname(1), inputname(1), ...
-			num2str( locutoff), num2str( hicutoff), num2str( filtorder ) );
+com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
+			num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ) );
 return;			
 
 	 
