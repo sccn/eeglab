@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/08/15 01:05:35  arno
+% debug continuous
+%
 % Revision 1.42  2002/08/15 00:45:47  arno
 % typo
 %
@@ -1099,7 +1102,11 @@ else
 				tmpwins1 = g.winrej(indices,1)';
 				tmpwins2 = g.winrej(indices,2)';
 				tmpcols  = g.winrej(indices,3:5);
-				[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
+				if ~ispc & ~isunix
+					[cumul indicescount] = myhistc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
+				else
+					eval('[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));');
+				end;
 				count = zeros(size(cumul));
 				%if ~isempty(find(cumul > 1)), find(cumul > 1), end;
 				for tmpi = 1:length(tmpwins1)
@@ -1440,3 +1447,19 @@ else
   end  
 end
 
+% function not supported under Mac
+% --------------------------------
+function [reshist, allbin] = myhistc(vals, intervals);
+
+	reshist = zeros(1, length(intervals));
+	allbin = zeros(1, length(vals));
+	
+	for index=1:length(vals)
+		minvals = intervals-vals(index);
+		bintmp  = find(minvals >= 0);
+		[mintmp indextmp] = min(minvals(bintmp));
+		bintmp = bintmp(indextmp);
+		
+		allbin(index) = bintmp;
+		reshist(bintmp) = reshist(bintmp)+1;
+	end;
