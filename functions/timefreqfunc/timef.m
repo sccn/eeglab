@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/04/30 04:27:54  arno
+% trying to debug phsamp, still unsucessfull
+%
 % Revision 1.32  2002/04/29 15:13:50  scott
 % debugging PA -sm
 %
@@ -708,7 +711,7 @@ for i=1:trials
         end
 
         switch g.phsamp
-         case 'on'
+         case 'on' %PA (freq x freq x time)
           PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * (PP(:,j))';
                                            % x-product: unit phase column
                                            % times amplitude row
