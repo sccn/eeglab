@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/20 01:33:39  arno
+% crossf diff no plot
+%
 % Revision 1.16  2002/11/20 01:13:49  arno
 % remove duplicate arguments
 %
@@ -702,14 +705,14 @@ if iscell(X)
 		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
 	end;
 	
-	fprintf('Running timef on condition 1 *********************\n');
+	fprintf('Running newtimef on condition 1 *********************\n');
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
     [P1,R1,mbase1,times,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:});
     
-	fprintf('\nRunning crossf on condition 2 *********************\n');
+	fprintf('\nRunning newtimef on condition 2 *********************\n');
     [P2,R2,mbase2,times,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
                                                       'plotitc', 'off', 'plotersp', 'off', vararginori{:});
     
