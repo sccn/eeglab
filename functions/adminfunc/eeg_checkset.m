@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2003/02/28 16:57:34  arno
+% typo
+%
 % Revision 1.93  2003/02/28 15:35:41  scott
 % header edits -sm
 %
@@ -413,7 +416,7 @@ if length(EEG) > 1
 end;
 if isempty(EEG.data)
     errordlg2(strvcat('Error: no data'), 'Error');
-    error('eeg_checkset() error: no data'); return;
+    error('eeg_checkset error: no data'); return;
 end;              
 
 if ~isempty( varargin)
@@ -471,9 +474,9 @@ end;
 
     if (ndims(EEG.data)) < 3 & (EEG.pnts > 1)
       if mod(size(EEG.data,2), EEG.pnts) ~= 0
-           if popask( [ 'eeg_checkset() error: the number of frames does not divide the number of columns in the data.'  10 ...
+           if popask( [ 'eeg_checkset error: the number of frames does not divide the number of columns in the data.'  10 ...
                           'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the command line)']) 
-               error('eeg_checkset() error: user abort');
+               error('eeg_checkset error: user abort');
                 %res = com;
                 %EEG.pnts = size(EEG.data,2);
                 %EEG = eeg_checkset(EEG);
@@ -481,7 +484,7 @@ end;
            else
                res = com;
                return;
-               %error( 'eeg_checkset() error: number of points does not divide the number of columns in data');
+               %error( 'eeg_checkset error: number of points does not divide the number of columns in data');
             end;        
       else
         if EEG.trials > 1
@@ -508,7 +511,7 @@ end;
 
     % parameters coherence -------------------------
     if     round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts          
-       fprintf( 'eeg_checkset() note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames\n'); 
+       fprintf( 'eeg_checkset note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames\n'); 
        if EEG.srate == 0
           EEG.srate = 1;
        end;
@@ -521,7 +524,7 @@ end;
     if ~isfield(EEG, 'event'), EEG.event = []; res = com; end;
     if ~isempty(EEG.event)
         if EEG.trials > 1 & ~isfield(EEG.event, 'epoch')
-             if popask( [ 'eeg_checkset() error: the event info structure does not contain an ''epoch'' field.'  ...
+             if popask( [ 'eeg_checkset error: the event info structure does not contain an ''epoch'' field.'  ...
                           'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                  error('eeg_checkset error(): user abort');
                 %res = com;
@@ -531,7 +534,7 @@ end;
             else 
                 res = com;
                 return;
-               %error('eeg_checkset() error: no epoch field in event structure');
+               %error('eeg_checkset error: no epoch field in event structure');
             end;
         end;
     else
@@ -562,10 +565,10 @@ end;
         else                     l = size( EEG.epoch, 2); 
         end;   
         if l ~= EEG.trials
-             if popask( [ 'eeg_checkset() error: the number of epoch indices in the epoch array/struct (' ...
+             if popask( [ 'eeg_checkset error: the number of epoch indices in the epoch array/struct (' ...
                    int2str(l) ') is different from the number of epochs in the data (' int2str(EEG.trials) ').' 10 ...
                    'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
-                 error('eeg_checkset() error: user abort');
+                 error('eeg_checkset error: user abort');
                 %res = com;
                 %EEG.epoch = [];
                 %EEG = eeg_checkset(EEG);
@@ -573,7 +576,7 @@ end;
              else
                  res = com;
                  return;
-                %error('eeg_checkset() error: epoch structure size invalid');
+                %error('eeg_checkset error: epoch structure size invalid');
             end;
         end;
     else
@@ -586,7 +589,7 @@ end;
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
             if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
-                  if popask( [ 'eeg_checkset() error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ')' ...
+                  if popask( [ 'eeg_checkset error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ')' ...
                    'does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
                    'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                     error('eeg_checkset error: user abort');
@@ -598,7 +601,7 @@ end;
                 else
                     res = com;
                     return;
-                    %error('eeg_checkset() error: invalid weight and sphere array sizes');
+                    %error('eeg_checkset error: invalid weight and sphere array sizes');
                 end;    
             end;
             if size(EEG.icasphere,2) ~= size(EEG.data,1)
@@ -608,7 +611,7 @@ end;
             end;
             if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
-                       if popask( [ 'eeg_checkset() error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10 ')' ...
+                       if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10 ')' ...
                        'does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
                        'Do you want to want to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                         error('eeg_checkset error: user abort');
@@ -620,14 +623,14 @@ end;
                     else
                         res = com;
                         return;
-                        %error('eeg_checkset() error: invalid weight and sphere array size');
+                        %error('eeg_checkset error: invalid weight and sphere array size');
                     end;    
                 end;
                 if option_computeica
-                     fprintf('eeg_checkset(): recomputing the ICA activation matrix ...\n'); 
+                     fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
                     res = com;
                     if any(isnan(EEG.data(:)))
-                        fprintf('eeg_checkset(): recomputing using NaN indices in first channel ...\n'); 
+                        fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
                         tmpindices = find(~isnan(EEG.data(1,:)));
                         EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
                         EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
@@ -654,7 +657,7 @@ end;
             end;
         else 
             if ~isempty(EEG.icaact)
-                fprintf('eeg_checkset(): removing ICA activation matrix (as per edit options) ...\n'); 
+                fprintf('eeg_checkset: removing ICA activation matrix (as per edit options) ...\n'); 
             end;
             EEG.icaact     = [];
         end;
@@ -678,7 +681,7 @@ if ~isempty( EEG.chanlocs )
         else
             res = com;
             try, EEG.chanlocs = readlocs( EEG.chanlocs );
-                  disp( [ 'eeg_checkset(): channel file read' ]); 
+                  disp( [ 'eeg_checkset: channel file read' ]); 
             catch, EEG.chanlocs = []; end;
         end;     
     end;
@@ -785,12 +788,12 @@ if ~isempty( varargin)
          case 'contdata',;
           if EEG.trials > 1
               errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
-              error('eeg_checkset() error: data is not continuous'); return;
+              error('eeg_checkset error: data is not continuous'); return;
           end;
          case 'ica', 
           if isempty(EEG.icaweights)
               if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
-                  errordlg2('eeg_checkset(): ICA components must be derived before running that function'); 
+                  errordlg2('eeg_checkset: ICA components must be derived before running that function'); 
                   error('no ICA components'); return; 
               end;
               [EEG res] = pop_runica(EEG);
@@ -799,26 +802,26 @@ if ~isempty( varargin)
          case 'epoch', 
           if EEG.trials == 1
               errordlg2(strvcat('Epochs must be extracted before running that function', 'Use Tools > Extract epochs'), 'Error');
-              error('eeg_checkset() error: epochs must be extracted before running that function'); return
+              error('eeg_checkset error: epochs must be extracted before running that function'); return
           end;
          case 'besa', 
           if ~isfield(EEG, 'sources')
               errordlg2(strvcat('No dipole information', '1) Component maps must be exported: Tools > Localize ... BESA > Export ...' ...
                                 , '2) BESA must be run to localize the equivalent dipoles', ...
                                 '3) BESA dipoles must be imported: Tools > Localize ... BESA > Import ...'), 'Error');
-              error('eeg_checkset() error: no BESA dipole information'); return
+              error('eeg_checkset error: no BESA dipole information'); return
           end;
          case 'event', 
           if isempty(EEG.event)
               errordlg2(strvcat('Cannot process if no events. First add events.', 'Use File > Import event info or > Import epoch info'), 'Error');
-              error('eeg_checkset(): no events'); return;
+              error('eeg_checkset: no events'); return;
           end;
          case 'chanloc', 
           if isempty(EEG.chanlocs)
               errordlg2( strvcat('Cannot process without channel location file.', ...
                          'Enter the name of the file via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
-              error('eeg_checkset(): cannot process dataset without channel location file.'); return;
+              error('eeg_checkset: cannot process dataset without channel location file.'); return;
           end;
          case 'chanlocsize', 
           if ~isempty(EEG.chanlocs)
@@ -841,7 +844,7 @@ if ~isempty( varargin)
               I1 = find(alllatencies < 0);
               I2 = find(alllatencies > EEG.pnts*EEG.trials);
               if (length(I1) + length(I2)) > 0 
-                  fprintf('eeg_checkset() warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
+                  fprintf('eeg_checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
                           length(I1) + length(I2), length(EEG.event));
                   EEG.event(union(I1, I2)) = [];
               end;
@@ -899,8 +902,8 @@ if ~isempty( varargin)
                       end;
                    end;
                   if any(valempt)
-                      fprintf(['eeg_checkset(): found empty values for field ''' difffield{index} '''\n']);
-                      fprintf(['eeg_checkset(): filling with values of other events in the same epochs\n']);
+                      fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
+                      fprintf(['eeg_checkset: filling with values of other events in the same epochs\n']);
                   end;
                end;
           end;
@@ -922,7 +925,7 @@ if ~isempty( varargin)
                   end;
               end;
               if strcmp(format, 'str')
-                  fprintf('eeg_checkset(): value format of event field ''%s'' made uniform\n', allfields{index});
+                  fprintf('eeg_checkset: value format of event field ''%s'' made uniform\n', allfields{index});
                   % get the field content
                   % ---------------------
                   for indexevent = 1:length(EEG.event)
@@ -973,7 +976,7 @@ if ~isempty( varargin)
           catch, errordlg2(['warning: minor problem encountered when generating' 10 ...
                         'epoch information (only useful for users using command line scripts)']); return;
           end;
-         otherwise, error('eeg_checkset(): unknown option');
+         otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
 end;            
