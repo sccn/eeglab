@@ -2,14 +2,21 @@
 %                (pop out window if no arguments).
 %
 % Usage:
-%   >> [ OUTEEG ] = pop_loaddat( INEEG, filename, no_rt);
+%   >> OUTEEG = pop_loaddat( INEEG ); % pop-up window mode
+%   >> OUTEEG = pop_loaddat( INEEG, filename, no_rt);
 %
+% Graphic interfance:
+%   "Code signifying no event ..." - [edit box] reaction time 
+%                    no event code. See 'no_rt' command line equivalent
+%                    help.
 % Inputs:
 %   filename       - file name
 %   INEEG          - input EEGLAB data structure
-%   no_rt          - no reaction time integer code (ex: 1000).
-%                    default none.
-%
+%   no_rt          - no reaction time integer code (ex: 1000). Since 
+%                    a number has to be defined for each reaction 
+%                    time, epochs with no reaction time usually have
+%                    a stereotyped reaction time value (such as 1000).
+%                    Default none.
 % Outputs:
 %   OUTEEG         - EEGLAB data structure
 %
@@ -36,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/15 17:01:35  arno
+% *** empty log message ***
+%
 % Revision 1.7  2002/08/22 21:11:18  arno
 % same
 %
