@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/05/10 18:58:21  arno
+% allowing NaN in numerical integer array
+%
 % Revision 1.6  2003/03/06 02:22:10  arno
 % handle spetial case
 %
@@ -219,6 +222,13 @@ function str = contarray( array )
             end;
 		end;
 	else
-		str = num2str(double(array));
+        if length(array) < 10
+            str = num2str(array(1));
+            for index = 2:length(array)
+                str = [str ',' num2str(array(index)) ];
+            end;
+        else        
+            str = num2str(double(array));
+        end;
 	end;
 	
