@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/07/16 00:38:14  arno
+% fixing ydir
+%
 % Revision 1.25  2003/07/16 00:31:18  arno
 % debug ydir
 %
@@ -762,11 +765,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~ISSPEC % not spectral data
                                                     
     signx = xmin-0.15*xdiff;
-    axis('off');h=text(signx,g.ydir*ymin,num2str(ymin,3)); % text ymin
+    axis('off');h=text(signx, ymin,num2str(ymin,3)); % text ymin
     set(h,'FontSize',TICKFONTSIZE);               % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    axis('off');h=text(signx,g.ydir*ymax,['+' num2str(ymax,3)]);  % text +ymax
+    axis('off');h=text(signx, ymax,['+' num2str(ymax,3)]);  % text +ymax
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
