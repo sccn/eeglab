@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2003/07/23 23:45:06  arno
+% change default dispchan
+%
 % Revision 1.87  2003/07/22 17:29:54  arno
 % adding event button
 %
@@ -1811,7 +1814,11 @@ else
           for index = 1:nleg
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
                           g.eventtypestyle{ index }); hold on;
-              text(35, (index-0.5)*10, g.eventtypes{index});
+              if iscell(g.eventtypes)
+                  text(35, (index-0.5)*10, g.eventtypes{index});
+              else
+                  text(35, (index-0.5)*10, num2str(g.eventtypes(index)));
+              end;
           end;
           xlim([0 130]);
           ylim([0 nleg*10]);
