@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/18 18:25:27  arno
+% typo can not
+%
 % Revision 1.3  2002/04/18 00:56:36  arno
 % inserting warning for data epochs
 %
@@ -232,7 +235,13 @@ for curfield = tmpfields'
                       EEG.event = load_file_or_array( g.event, g.skipline, g.delim );
                       allfields = g.fields(1:min(length(g.fields), size(EEG.event,2)));
                       EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
-                      EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
+					  % generate ori fields
+					  % -------------------
+					  for index = 1:length(EEG.event)
+						  EEG.event(index).init_index = index;
+						  EEG.event(index).init_time  = EEG.event(index).latency*g.timeunit;
+					  end;
+					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
                 case '''yes'''
                       % match existing fields
                       % ---------------------
@@ -251,6 +260,13 @@ for curfield = tmpfields'
                       for eventfield = 1:size(tmparray,2)
                           EEG.event = setstruct( EEG.event, g.fields{eventfield}, g.indices, cell2mat(tmparray(:,eventfield)));
                       end;      
+					  % generate ori fields
+					  % -------------------
+					  offset = length(EEG.event)-size(tmparray,2);
+					  for index = 1:size(tmparray,2)
+						  EEG.event(index+offset).init_index = index;
+						  EEG.event(index+offset).init_time  = EEG.event(index+offset).latency*g.timeunit;
+					  end;
                       EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
             end;
       end;
