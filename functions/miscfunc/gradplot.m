@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/01/29 21:04:05  scott
+% more
+%
 % Revision 1.6  2004/01/29 03:17:31  scott
 % same
 %
@@ -74,6 +77,7 @@ MAX_RADIUS = 0.5;
 % --------------------------------
 if isstr(locs_file) % a locs file
         [tmpeloc labels Th Rd ind] = readlocs(locs_file,'filetype','loc');
+	[x,y] = pol2cart(Th,Rd);
 elseif isstruct(locs_file)  % a locs struct
         [tmpeloc labels Th Rd ind] = readlocs(locs_file);
         if max(abs(Rd))>0.5
