@@ -74,7 +74,7 @@
 %                     File should be ascii in format of  >> topoplot example   
 %
 %    Optional Plotting Parameters:
-%       'ploterps'  = ['on'|'off'] Plot power spectrum                   {'on'}
+%       'ploterps'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %       'title'     = Optional figure title                              {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
@@ -118,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/07 02:49:35  scott
+% clarified hlpe message, changed default srate and winsize -sm
+%
 % Revision 1.3  2002/04/06 03:48:07  arno
 % changing input for 1 channel for topoplot
 %
@@ -308,11 +311,13 @@ elseif (pow2(nextpow2(g.padratio)) ~= g.padratio)
 end
 
 if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
-	error('Value of g.maxfreq must be a number.');
+	error('Value of maxfreq must be a number.');
 elseif (g.maxfreq <= 0)
-	error('Value of g.maxfreq must be positive.');
+	error('Value of maxfreq must be positive.');
 elseif (g.maxfreq > Fs/2)
-	fprintf('Warning: value of g.maxfreq greater that Nyquist rate\n\n');
+	fprintf(['Warning: value of maxfreq reduced to Nyquist rate' ...
+		 ' (%3.2f)\n\n'], Fs/2);
+	g.maxfreq = Fs/2;
 end
 
 if isempty(g.topovec)
