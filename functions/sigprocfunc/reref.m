@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/15 03:00:17  arno
+% same
+%
 % Revision 1.14  2002/11/15 02:59:34  arno
 % header for web
 %
@@ -179,6 +182,7 @@ if isempty(ref)
     meandata = sum(data)/chans;
 else % common re-reference
      % -------------------
+    meandata = [];
     
     % compute the inverse average transformation matrix
     % -------------------------------------------------
@@ -197,8 +201,8 @@ else % common re-reference
             for index = 1:length(ref)
                 avematrix(:,ref) = -1/length(ref);
             end;
-            fprintf('Warning: reference channels have been removed');
-            avemaxtrix(ref(2:end),:) = []; % supress references
+            fprintf('Warning: reference channels have been removed\n');
+            avematrix(ref(2:end),:) = []; % supress references
             if ~isempty(g.elocs)
                 g.elocs(ref(2:end)) = [];
             end;
@@ -241,8 +245,8 @@ else % common re-reference
             for index = 1:length(ref)
                 avematrix(:,ref) = -1/length(ref);
             end;
-            fprintf('Warning: reference channels have been removed');
-            avemaxtrix(ref,:) = []; % supress references
+            fprintf('Warning: reference channels have been removed\n');
+            avematrix(ref,:) = []; % supress references
             if ~isempty(g.elocs)
                 g.elocs(ref) = [];        
             end;    
@@ -263,7 +267,7 @@ else % common re-reference
         avematrix = avematrix * pinv(invavematrix);
     end;
 end;
-    
+
 data = avematrix*data; % implement as a matrix multiply
 % there are faster methods but this one is the simpliest
 Elocs = g.elocs;
@@ -279,4 +283,6 @@ if ~isempty(g.icaweight)
         error('Weight matrix size is different from the data size, re-referencing impossible');
     end;
     S = eye(size(W,2));
+else
+    W = []; S = [];
 end;
