@@ -8,11 +8,12 @@
 %                                                  limits,signifs,selchans)
 % Inputs:
 %   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef() (or any other
-%               time/freq matrix), one for each channel.
+%               time/freq matrix), one for each channel. Size (time,freq,chans) or
+%               (time,freq,chans,subject).
 %   times     = Vector of times in msec from timef()
 %   freqs     = Vector of frequencies in Hz from timef() 
 %   timefreqs = Vector of time/frequency points to show topoplot() maps for
-%                      Format: size (2,npoints), each row [ms Hz]
+%                      Format: size (nrows,2), each row [ms Hz]
 %
 % Optional inputs:
 %   showchan = Channel number of tfdata to image, or 0
@@ -25,11 +26,12 @@
 %              tfdata {default: none}
 %   selchans = Channels to include in topoplot() scalp maps (and image std()) {default: all}
 %
-% Authors: Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
+% Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
 % See also: spectopo(), timtopo(), envtopo(), changeunits()
 
-% Copyright (C) Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01
+% Copyright (C) Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
+% La Jolla, 3/01
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -46,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2002/10/03 23:39:44  scott
+% added sbplot() plotting -sm & ad
+%
 % Revision 1.49  2002/05/19 14:30:15  scott
 % *** empty log message ***
 %
@@ -367,6 +372,7 @@ end
 % Plot tfdata image for specified channel or selchans std()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
+axis off;
 colormap(cc);
 curax = gca; % current plot axes to plot into
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
