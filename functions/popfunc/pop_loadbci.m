@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/08/30 23:57:50  arno
+% same
+%
 % Revision 1.17  2004/08/30 23:56:17  arno
 % only positive events
 %
@@ -184,12 +187,12 @@ function [EEG, command] = pop_loadbci(filename, srate);
     % -------------------------
     count = 1;
     for index = 2:2:length(listimport)
-        tmpindmatch = strmatch(listimport{index}{1}, allfields);
+        tmpindmatch = strmatch(listimport{index}{1}, allfields, 'exact');
         if ~isempty(tmpindmatch), indeximport(count) = tmpindmatch; 
         else error(['State ''' listimport{index}{1} ''' not found']); 
         end;
         if length( listimport{index} ) > 1
-            tmpindmatch = strmatch(listimport{index}{2}, allfields);
+            tmpindmatch = strmatch(listimport{index}{2}, allfields, 'exact');
             if ~isempty(tmpindmatch), corresp(count) = tmpindmatch; 
             else error(['State ''' listimport{index}{2} ''' not found']); 
             end;
@@ -231,7 +234,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
 	fprintf('Pop_loadbci: importing events...\n');
 	counte = 1; % event counter
 	events(10000).latency = 0;
-    indexsource =  strmatch('sourcetime', lower( allfields ) );
+    indexsource =  strmatch('sourcetime', lower( allfields ), 'exact' );
     sourcetime  = getfield(bci, allfields{ indexsource });
 	for index = 1:length(indeximport)
         tmpdata  = getfield(bci, allfields{indeximport(index)});
