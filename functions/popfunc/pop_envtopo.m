@@ -12,7 +12,7 @@
 %                In this case, the epoch mean (ERP) of the second is subtracted 
 %                from the epoch mean (ERP) of the first. Note: The ICA weights 
 %                must be the same for the two datasets.
-%   timerange  - [min max] time range (in ms) in epoch to plot 
+%   timerange  - [min max] time range (in ms) in epoch to plot, or if [], from EEG
 %
 % Optional inputs:
 %   'key','val' - optional spectopo() and topoplot() arguments 
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/11/11 14:37:00  scott
+% changed 'limits' option to envtopo() to new 'times'
+%
 % Revision 1.24  2004/05/08 01:47:56  scott
 % line 143 EEG.pnts -> EEG(1).pnts
 %
@@ -139,7 +142,7 @@ if exist('envtitle') ~= 1
 	envtitle = 'Largest ERP components';
 end;
 
-options = ','''times''',''[EEG.times(1) EEG.times(end)]'',';
+options = ',';
 if nargin < 3
 	% which set to save
 	% -----------------
@@ -168,7 +171,7 @@ if nargin < 3
         subindices = eval( [ '[' result{1} ']' ] );
         result(1) = [];
         EEG = EEG(subindices(1:2));
-        fprintf('pop_envtopo(): Subtracting the epoch mean of dataset %d from that of dataset %d\n', ,,,
+        fprintf('pop_envtopo(): Subtracting the epoch mean of dataset %d from that of dataset %d\n', ...
                    subindices(2), subindices(1));
     end;
 
@@ -183,7 +186,10 @@ if nargin < 3
 	figure;
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
-	options = [',' vararg2str( varargin ) ];
+    if isempty(timerange)
+        timerange = [EEG.xmin*1000 EEG.xmax*1000];
+    end
+    options = [options vararg2str( varargin ) ];
 end;
     
 if length(EEG) > 2
@@ -230,7 +236,7 @@ if any(isnan(sigtmp(:)))
                         'EEG(1).icaweights*EEG(1).icasphere, ' ...
                         '''chanlocs'', EEG(1).chanlocs, ''icawinv'', EEG(1).icawinv, ''times'',' ...
                         '[timerange(1) timerange(2)] %s);' ] , outstr, options);
-    else
+    else % length(EEG) == 1
         com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
                         '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''times'',' ...
                         '[timerange(1) timerange(2)] %s);' ] , outstr, options);
@@ -241,7 +247,7 @@ else
                         ' EEG(1).icaweights*EEG(1).icasphere, ' ...
                         '''chanlocs'', EEG(1).chanlocs, ''icawinv'', EEG(1).icawinv, ''times'',' ...
                         '[timerange(1) timerange(2)] %s);' ] , outstr, options);
-    else
+    else % length(EEG) == 1
         com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
                         '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''times'',' ...
                         '[timerange(1) timerange(2)] %s);' ] , outstr, options);
