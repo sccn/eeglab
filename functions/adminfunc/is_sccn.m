@@ -3,10 +3,9 @@
 
 function bool = is_sccn;
     
-    domnane = '';
-    if isunix, [tmp domname] = unix('hostname -d');
-    else return;
-    end;
-    bool = strcmpi(domname(1:end-1), 'sccn.ucsd.edu');
-    return
+    bool = 0;
+    domnane = ' ';
+    eval([ 'if isunix, [tmp domname] = unix(''hostname -d'');' ...
+           'end;' ...
+           'bool = strcmpi(domname(1:end-1), ''sccn.ucsd.edu'');' ], '');
     
