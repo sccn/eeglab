@@ -24,7 +24,7 @@
 %    The licence under which the software is distributed (licence.txt)
 %
 % Main files:
-% ----------
+% ---------- 
 % eeglab()         - main graphic interface
 % license.txt      - GNU license
 % 
@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/10 01:01:10  arno
+% testing version control
+%
 % Revision 1.4  2002/04/08 22:59:17  arno
 % changing rmbase dataset saving status
 %
