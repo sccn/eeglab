@@ -180,6 +180,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2002/08/13 00:13:37  scott
+% menu text
+% ,
+% ,
+%
 % Revision 1.114  2002/08/13 00:09:36  scott
 % menu names
 %
@@ -591,8 +596,8 @@ EEGUSERDAT = get(W_MAIN, 'userdata');
 set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
-	uimenu( neuromenu, 'Label', 'From ASCII/float data file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII data file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
+	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'    ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Biosemi .ELP file'             ,  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
