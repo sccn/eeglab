@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/10 00:37:47  arno
+% debuging string event selection
+%
 % Revision 1.2  2002/04/09 03:02:38  arno
 % debuging epoch selection
 %
@@ -303,7 +306,6 @@ if strcmp( lower(g.deleteothers), 'yes') & EEG.trials > 1
 	switch lower(ButtonName),
 	 case 'cancel', return; 
 	 case 'yes',
-	  length(Ievent)
 	  EEG.event = EEG.event(Ievent);
 	  EEG = pop_select(EEG, 'trial', Iepoch);
 	 case 'no',
