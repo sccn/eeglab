@@ -41,6 +41,8 @@
 %                Useful for comparing component strengths.
 %   'boundaries' = data point indices of discontinuities in the signal
 %   'plot'     = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
+%   'rmdc'     =  ['on'|'off'] 'on' -> remove DC. {default: 'off'}  
+%
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
@@ -63,7 +65,7 @@
 %                weight's pseudo-inverse matrix does not represent component's maps. 
 %   'memory'   = ['low'|'high'] setting to low will use less memory for component 
 %                computing, but computing time will be longer.
-%
+
 % Topoplot options:
 %    opther 'key','val' options are propagated to topoplot() for map display
 %    (see help topoplot())
@@ -105,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2004/04/30 17:40:19  arno
+% max niquest by default
+%
 % Revision 1.87  2004/04/29 16:27:30  scott
 % removed license() call - expanded license function has disappeared from the matlab path!?
 %
@@ -421,7 +426,8 @@ if nargin <= 3 | isstr(varargin{1})
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
-				  'icamaps'       'integer'  []                       [] };
+				  'icamaps'       'integer'  []                       [] ;
+                  'rmdc'           'string'   {'on' 'off'}             'off'  };
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
@@ -474,7 +480,11 @@ if ~isempty(g.freq) & isempty(g.chanlocs)
 	error('spectopo: need channel location file');
 end;
 
-data = reshape(data, size(data,1), size(data,2)*size(data,3));
+if strcmpi(g.rmdc, 'on')
+    data = data - repmat(mean(data,2), [ 1 size(data,2) 1]);
+else
+    data = reshape(data, size(data,1), size(data,2)*size(data,3));
+end
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
@@ -763,7 +773,7 @@ if ~isempty(g.weights)
                 end;
                 resvar(index) = mean(resvartmp); % mean contribution for all channels
                 stdvar(index) = std(resvartmp);
-                fprintf('Component %d percent variance accounted for:%6.2f ± %3.2f\n', ...
+                fprintf('Component %d percent variance accounted for:%6.2f Â± %3.2f\n', ...
                         g.icacomps(index), resvar(index), stdvar(index));
             else
                 resvar(index)  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
