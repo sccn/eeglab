@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.218  2003/02/03 22:24:45  arno
+% removing output if no output
+%
 % Revision 1.217  2003/02/03 17:15:02  arno
 % adding ALLCOM output
 %
@@ -860,7 +863,7 @@ if nargin < 1 | exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
 	eeg_global;
 	EEG = eeg_emptyset;
-	h('eeglab;');
+	h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
 end;
 
 besamenu = 0;
@@ -871,7 +874,7 @@ if nargin == 1
 			updatemenu;
 			return;
 		else
-			h('eeglab rebuild;');
+			h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 		end;
 	elseif strcmp(onearg, 'besa');
 		besamenu = 1;
@@ -880,10 +883,10 @@ if nargin == 1
 			EEG = eeg_emptyset;
 		end;
 		eeg_global;
-		h('eeglab besa;');
+        h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''besa'');');
 		disp('Besa menu activated');
 	else
-		h('eeglab rebuild;');
+        h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 	end;
 end;
 ALLCOM = ALLCOM;
