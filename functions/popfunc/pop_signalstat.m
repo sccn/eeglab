@@ -39,6 +39,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function varargout = pop_signalstat( EEG, typeproc, cnum, percent );
 
 % the command output is a hidden output that does not have to
@@ -67,14 +69,14 @@ end;
 if (nargin < 3 & typeproc==1)
 	promptstr    = { 'Enter EEG channel:'; 'Percent for trimmed statistics:' };
 	inistr       = { '1';'5' };
-	result       = inputdlg2( promptstr, 'EEG channel selection', 1,  inistr, 'signalstat');
+	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
 	percent      = eval( [ '[' result{2} ']' ] );
 elseif (nargin < 3 & typeproc==0)
 	promptstr    = { 'Enter component number:'; 'Percent for trimmed statistics:' };
 	inistr       = { '1'; '5' };
-	result       = inputdlg2( promptstr, 'Component selection', 1,  inistr, 'signalstat');
+	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
     percent      = eval( [ '[' result{2} ']' ] );
@@ -94,6 +96,7 @@ if typeproc == 1
 	tmpsig=EEG.data(cnum,:);
 %	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( EEG.data(cnum,:),1,[], percent);
 	dlabel=[];
+	dlabel2=['Channel ' num2str(cnum)];
 else 
 	if ~isempty( EEG.icasphere )
         eeg_options; 
@@ -102,8 +105,9 @@ else
  	    else
             tmpsig = (EEG.icaweights(cnum,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*size(EEG.data,2));
         end;
-	%	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( tmpsig,1,'Component activity',percent);
-		dlabel='Component activity';
+	%	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( tmpsig,1,'Component Activity',percent);
+		dlabel='Component Activity';
+		dlabel2=['Component ' num2str(cnum)];
 	else
 		error('You must run ICA first');
 	end;	
@@ -121,7 +125,7 @@ end;
 % -------------------------
 fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
-com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent ); %s', outstr);
+com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2 ); %s', outstr);
 
 eval(com)	
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
