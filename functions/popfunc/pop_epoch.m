@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/06/25 00:46:39  arno
+% adding eventconsistency check
+%
 % Revision 1.6  2002/06/25 00:38:03  arno
 % sort event in ascending time before epoching
 %
@@ -162,7 +165,7 @@ if ~isempty( events )
 			for index2 = 1:length( events )
 				tmpevent = events{index2};
 				if ~isstr( tmpevent ), tmpevent = num2str( tmpevent ); end;
-				Ieventtmp = [ Ieventtmp strmatch(tmpevent, tmpeventtype, 'exact') ];
+				Ieventtmp = [ Ieventtmp ; strmatch(tmpevent, tmpeventtype, 'exact') ];
 			end;
 		else
 			for index2 = 1:length( events )
