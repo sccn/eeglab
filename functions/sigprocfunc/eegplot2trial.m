@@ -41,9 +41,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
-function [tmpsig, tmprejelec] = eegplot2trial( TMPREJ, pnts, sweeps, color, colorout );
+function [tmpsig, tmprejelec] = eegplot2trial( TMPREJINIT, pnts, sweeps, color, colorout );
 
 if nargin < 3
    help eegplot2trial;
@@ -52,28 +55,30 @@ end;
 
 % only take into account specific colors
 % --------------------------------------
+TMPREJ = [];
 if exist('color') == 1
 	for index = 1:size(color,1)
-   		tmpcol1 = TMPREJ(:,3) + 255*TMPREJ(:,4) + 255*255*TMPREJ(:,5);
+   		tmpcol1 = TMPREJINIT(:,3) + 255*TMPREJINIT(:,4) + 255*255*TMPREJINIT(:,5);
    		tmpcol2 = color(index,1)+255*color(index,2)+255*255*color(index,3);   
    		I = find( tmpcol1 == tmpcol2);   
    		if isempty(I)
       		fprintf('Warning: color [%d %d %d] not found\n', ...
       			color(index,1), color(index,2), color(index,3));
    		end;
-   		TMPREJ = TMPREJ(I,:);   
+   		TMPREJ = [ TMPREJ; TMPREJINIT(I,:)];
    	end;	
-end;
-
-% remove other specific colors
-% ----------------------------
-if exist('colorout') == 1
-	for index = 1:size(colorout,1)
-   		tmpcol1 = TMPREJ(:,3) + 255*TMPREJ(:,4) + 255*255*TMPREJ(:,5);
-   		tmpcol2 = colorout(index,1)+255*colorout(index,2)+255*255*colorout(index,3);   
-   		I = find( tmpcol1 ~= tmpcol2);   
-   		TMPREJ = TMPREJ(I,:);   
-   	end;	
+else 
+	TMPREJ = TMPREJINIT;
+	% remove other specific colors
+	% ----------------------------
+	if exist('colorout') == 1
+		for index = 1:size(colorout,1)
+			tmpcol1 = TMPREJ(:,3) + 255*TMPREJ(:,4) + 255*255*TMPREJ(:,5);
+			tmpcol2 = colorout(index,1)+255*colorout(index,2)+255*255*colorout(index,3);   
+			I = find( tmpcol1 == tmpcol2);   
+			TMPREJ(I,:) = [];   
+		end;	
+	end;
 end;
 
 % perform the conversion
