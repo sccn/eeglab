@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.303  2003/12/17 01:41:22  arno
+% plugin color
+%
 % Revision 1.302  2003/12/16 23:31:36  arno
 % adding brain vision analyser import function
 %
@@ -1739,7 +1742,16 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	%set( g.val7, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
 	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
 	set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'averef'), 'Yes', 'No'));
-	set( g.val10, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
+    if isempty(EEG.chanlocs)
+        set( g.val10, 'String', 'No');
+    else
+        if ~isfield(EEG.chanlocs, 'theta') & all(cellfun('isempty', { EEG.chanlocs.theta }))
+            set( g.val10, 'String', 'labels only');           
+        else
+            set( g.val10, 'String', 'Yes');
+        end;
+    end;
+        
 	set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
 	tmp = whos('EEG');
 	set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
