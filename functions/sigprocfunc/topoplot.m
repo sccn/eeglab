@@ -3,7 +3,7 @@
 %              using cointerpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
-%        >>  topoplot(datavector, chan_locs, 'Param1','Value1', ...)
+%        >>  [h grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
 %
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
@@ -32,6 +32,7 @@
 %                        Coordinates returned by besaplot can be used. Note that 
 %                        the dipole exact location has been tuned by hand and is 
 %                        not perfectly exact.
+%   'noplot'          -  ['on'|'off'] do not draw the plot. 
 %   'maplimits'       - 'absmax' +/- the absolute-max 
 %                       'maxmin' scale to data range
 %                        [clim1,clim2] user-definined lo/hi
@@ -52,6 +53,10 @@
 %   'emarker'         - detail
 %   'emarkersize'     - detail
 %   'emarkersize1chan' - detail
+%  
+% Outputs:
+%    h    - axes handle
+%    grip - 64x64 output image 
 %  
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -85,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2003/07/12 01:33:58  scott
+% debug noplot
+%
 % Revision 1.34  2003/07/01 23:23:36  julie
 % debug noplot
 %
@@ -231,9 +239,9 @@ EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
-DIPOLE = [];
+DIPOLE  = [];
 VERBOSE = 'on';
-noplot = 0;
+noplot  = 'off';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -294,8 +302,6 @@ if nargs > 2
     end
     Param = lower(Param);
     switch lower(Param)
-	 case 'noplot'
-            noplot = 1;
 	 case 'colormap'
 	  if size(Value,2)~=3
           error('topoplot(): Colormap must be a n x 3 matrix')
@@ -328,6 +334,8 @@ if nargs > 2
 	  EMARKER = Value;
 	 case 'shrink'
 	  shrinkfactor = Value;
+	 case 'noplot'
+	  noplot = Value;
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
 	 case {'electcolor','ecolor'}
@@ -468,7 +476,10 @@ if ~strcmp(STYLE,'blank')
   ii = find(mask == 0);
   Zi(ii) = NaN;
 
-  if ~noplot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  if strcmpi(noplot, 'on') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      fprintf('topoplot(): no plot requested.\n')
+      return;
+  end
   
   % calculate colormap limits
   m = size(colormap,1);
@@ -644,9 +655,5 @@ hold off
 axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
-
-else % noplot
-  fprintf('topoplot(): no plot requested.\n')
-end
 
 handle = gca;
