@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/19 21:56:28  arno
+% debug for MAC
+%
 % Revision 1.5  2002/08/12 18:25:49  arno
 % questdlg2
 %
@@ -76,6 +79,13 @@ EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
 if ~isempty(EEG.icaweights)
 	disp('Pop_averef: converting ICA weight matrix to average reference (see >> help averef)');
 	[EEG.data EEG.icaweights EEG.icasphere] = averef(EEG.data,EEG.icaweights,EEG.icasphere);
+	EEG.icawinv = [];
+	if size(EEG.icaweights,1) > nbchan
+		disp('Warning: channel may have been removed, component weights re-referencing may be is innacurate'); 
+	end;
+	if size(EEG.icasphere,1) < nbchan
+		disp('Warning: component may have been removed, component weights re-referencing could be innacurate'); 
+	end;
 else
 	EEG.data = averef(EEG.data);
 end;	
