@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.258  2003/10/29 19:02:59  arno
+% clearing variable h
+%
 % Revision 1.257  2003/10/29 18:31:48  arno
 % polishing message
 %
@@ -1080,7 +1083,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
     if exist('sload') == 2  & exist('daqread') == 2 % detect BIOSIG
-        disp('BIOSIG detected; Additinal import menu inserted');
+        disp('BIOSIG detected; Additional import menu inserted');
         pathsload   = which('sload');   pathsload   = pathsload(1:end-7);
         pathloadeeg = which('loadeeg'); pathloadeeg = pathloadeeg(1:end-9);
         if strcmpi(pathsload, pathloadeeg)
