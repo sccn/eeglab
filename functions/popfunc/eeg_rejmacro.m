@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/30 23:39:30  arno
+% implement rject superposition
+%
 % Revision 1.5  2002/07/26 16:50:33  arno
 % checking icacomp
 %
@@ -94,11 +97,11 @@ oldrejE = eval(macrorejE);
 % mix all type of rejections
 % --------------------------
 switch superpose
- case 0, rejeegplot = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
- case 1, rejeegplottmp = trial2eegplot(  oldrej, oldrejE, EEG.pnts, min(colrej+0.15, [1 1 1]));
+ case 0, rejeegplot = trial2eegplot(  rej, rejE, nbpnts, colrej);
+ case 1, rejeegplottmp = trial2eegplot(  oldrej, oldrejE, nbpnts, min(colrej+0.15, [1 1 1]));
          if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplottmp ]; 
 		 else rejeegplot = []; end;
-         rejeegplottmp = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
+         rejeegplottmp = trial2eegplot(  rej, rejE, nbpnts, colrej);
          if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
  case 2, 
   rejeegplot = [];
@@ -112,12 +115,12 @@ switch superpose
 				  currentname = [ 'EEG.reject.rej' EEG.reject.disprej{index} ];
 			  end;
 			  eval( [ 'rejeegplottmp = trial2eegplot( ' currentname ',' currentname ...
-					  'E, EEG.pnts, EEG.reject.rej' EEG.reject.disprej{index} 'col);' ]);
+					  'E, nbpnts, EEG.reject.rej' EEG.reject.disprej{index} 'col);' ]);
 			  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
 		  end;
 	  end;
   end;
-  rejeegplottmp = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
+  rejeegplottmp = trial2eegplot(  rej, rejE, nbpnts, colrej);
   if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
 end;
 if ~isempty(rejeegplot)
