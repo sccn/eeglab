@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2003/02/28 00:16:14  arno
+% reprograming data point selection
+%
 % Revision 1.25  2003/02/27 20:29:15  arno
 % same
 %
@@ -277,6 +280,14 @@ if min(g.channel) < 1 | max( g.channel ) > EEG.nbchan
    error('Wrong channel range');
 end;
 
+if size(g.point,2) > 2, 
+    g.point = [g.point(1) g.point(end)];
+    disp('Warning: vector format for point range is deprecated');
+end;
+if size(g.nopoint,2) > 2, 
+    g.nopoint = [g.nopoint(1) g.nopoint(end)];
+    disp('Warning: vector format for point range is deprecated');
+end;
 if ~isempty( g.point )
     g.time = zeros(size(g.point));
     for index = 1:length(g.point(:))
