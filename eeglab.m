@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/04/25 19:03:39  arno
+% single dataset option
+%
 % Revision 1.38  2002/04/25 18:51:15  arno
 % adding extra checks
 %
@@ -724,6 +727,7 @@ if ~option_keepdataset
 			return;
 		end;
 	end;
+	CURRENTSET = 0;
 end;
 
 while( index <= MAX_SET)
@@ -769,7 +773,7 @@ end;
 % print some informations on the main figure
 % ------------------------------------------
 if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
-	if CURRENSET == 0
+	if CURRENTSET == 0
 		set( H_MAIN(2), 'String', sprintf('Parameters of %s dataset', ...
 										  fastif(EEG.trials > 1, 'epoched', 'continuous')));	
 	else  
