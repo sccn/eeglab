@@ -33,8 +33,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/12/05 20:06:57  arno
+% Initial revision
+%
 
-function str = eeg_hist( EEG, command );
+function EEG = eeg_hist( EEG, command );
 
 if nargin < 2
     help eeg_hist;
