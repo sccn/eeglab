@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.237  2003/04/18 00:54:45  arno
+% update menu label for compare ERPs
+%
 % Revision 1.236  2003/04/11 01:52:27  arno
 % same
 %
@@ -972,7 +975,7 @@ storeallcall = 'ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG); h(''ALLE
 e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
 e_load            = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
 e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_storeall        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist            = [e_catch 'h(LASTCOM);'];
 
