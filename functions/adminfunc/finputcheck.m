@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/06/30 02:10:10  arno
+% strmatch exact
+%
 % Revision 1.15  2003/01/31 02:35:38  arno
 % debugging lowercase/upercase problem
 %
@@ -162,8 +165,12 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
             testres = 0;
             tmplist = fieldlist;
             for it = 1:length( fieldlist{index, TYPE} )
-                res{it} = fieldtest(  fieldlist{index, NAME},  fieldlist{index, TYPE}{it}, ...
-                           fieldlist{index, VALS}, tmpval, callfunc );
+                if ~iscell(fieldlist{index, VALS})
+                     res{it} = fieldtest(  fieldlist{index, NAME},  fieldlist{index, TYPE}{it}, ...
+                                           fieldlist{index, VALS}, tmpval, callfunc );
+                else res{it} = fieldtest(  fieldlist{index, NAME},  fieldlist{index, TYPE}{it}, ...
+                                           fieldlist{index, VALS}{it}, tmpval, callfunc );
+                end;
                 if ~isstr(res{it}), testres = 1; end;
             end;
             if testres == 0, g = strvcat(res{:}); return; end;
