@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.230  2003/03/14 03:20:34  arno
+% adding menu to compare 2 envtopo
+%
 % Revision 1.229  2003/03/13 19:35:57  arno
 % removing besa option
 %
@@ -1025,7 +1028,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Re-reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_reref(EEG);' e_store]);
 	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
-	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset], 'Separator', 'on');
+	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store], 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove baseline'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_rmbase(EEG);' e_store]);
 	fourth_sub1 = uimenu( fourth_m, 'Label', 'Reject data epochs');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
