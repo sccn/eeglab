@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/26 20:16:09  arno
+% debugging epoch extraction from integer types
+%
 % Revision 1.4  2002/04/20 00:13:13  arno
 % correcting latency computation bug
 %
@@ -142,7 +145,9 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 % transform string events into a int array of column indices
 % ----------------------------------------------------------
 tmpeventlatency = cell2mat( { EEG.event(:).latency } );
-Ievent = 1:length(EEG.event);    
+[tmpeventlatency Itmp] = sort(tmpeventlatency);
+EEG.event = EEG.event(Itmp);  % sort in ascending time 
+Ievent = 1:length(EEG.event);
 
 if ~isempty( events )
     % select the events for epoching
@@ -172,7 +177,6 @@ end;
 
 % select event latencies for epoching
 alllatencies = tmpeventlatency(Ievent);
-alllatencies =sort(alllatencies(:)');
 
 if isempty(alllatencies)
    error('Pop_epoch error: empty event range'); return;
@@ -220,7 +224,7 @@ for index=1:EEG.trials
 end;
 EEG.event = newevent;
 EEG.event = EEG.event(allevents); % remove events that were not in the selection
-EEG = eeg_checkset(EEG, 'eventconsistency');
+%EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % include the event latencies into EEG.epoch
 % ------------------------------------------
