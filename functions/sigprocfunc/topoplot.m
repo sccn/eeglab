@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2004/02/15 20:43:47  scott
+% same
+%
 % Revision 1.125  2004/02/15 20:39:39  scott
 % same
 %
@@ -1073,7 +1076,7 @@ axis square; % keep head round!
 %%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%
 %
 function [newTh] = skirt_Th(Th,Rd,maxr)
-   q1 = find(Th>=0 & Th<pi/2) & Rd>maxr);
+   q1 = find(Th>=0 & Th<pi/2 & Rd>maxr);
    q2 = find(Th>=pi/2 & Th<pi & Rd>maxr);
    q3 = find(Th<-pi/2 & Th>=-pi & Rd>maxr);
    q4 = find(Th<0 & Th>=-pi/2 & Rd>maxr);
