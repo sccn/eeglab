@@ -137,6 +137,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.229  2004/12/20 21:13:41  scott
+% made specifying 'intrad' -> actually use intrad to define the interp grid.
+% returned Xi, Yi for toporeplot() (undocumented)
+%
 % Revision 1.228  2004/12/17 16:36:53  scott
 % cleaning up 'plotgrid' code
 %
@@ -1091,11 +1095,15 @@ if isempty(plotrad)
   plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
   plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
 end                                           % don't plot channels with Rd > 1 (below head)
+
 if isempty(intrad) 
   default_intrad = 1;                         % indicator for (no) specified intrad
   intrad = min(1.0,max(Rd)*1.02);             % default: just outside the outermost electrode location
 else
   default_intrad = 0;                         % indicator for (no) specified intrad
+  if plotrad > intrad
+     plotrad = intrad;
+  end
 end                                           % don't interpolate channels with Rd > 1 (below head)
 
 if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
