@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/12/04 23:03:34  arno
+% detect resample
+%
 % Revision 1.9  2003/12/03 03:28:34  arno
 % message
 %
@@ -110,18 +113,41 @@ oldpnts   = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
+if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+    bounds = strmatch('boundary', { EEG.event.type });
+    if ~isempty(bounds),
+        if exist('resample') == 2
+            disp('Data break detected and taken into account for resampling');
+        end;
+        bounds = cell2mat({ EEG.event(bounds).latency });
+        if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
+    end;
+    bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];
+else 
+    bounds = [1 size(EEG.data,2)];
+end;
 if exist('resample') == 2
     fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
     for index1 = 1:size(EEG.data,1)
         fprintf('%d ', index1);	
         sigtmp = squeeze (EEG.data(index1,:, :));
-        tmpres = resample( sigtmp, p, q );
+        
         if index1 == 1
+            tmpres = [];
+            indices = [1];
+            for ind = 1:length(bounds)-1
+                tmpres  = [ tmpres resample( sigtmp(bounds(ind):bounds(ind+1)-1), p, q ) ];
+                indices = [ indices length(tmpres)+1 ];
+            end;
             if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
             else                    EEG.pnts  = size(tmpres,1);
             end;
             tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
-        end;
+        else
+            for ind = 1:length(bounds)-1
+                tmpres(indices(ind):indices(ind+1)-1) = resample( sigtmp(bounds(ind):bounds(ind+1)-1), p, q );
+            end;
+        end;        
         tmpeeglab(index1,:, :) = tmpres;
     end;
     fprintf('\n');	
@@ -130,6 +156,7 @@ else
     disp('This method of resampling uses the griddata function and is extremelly slow');
     disp('To speed it up, use the signal processing toolbox (automatically detected)');
     disp('or reprogram this function using spline interpolation (see >> help spline)');
+    disp('This method also ignores data breaks if any');
     EEG.srate   = (round(EEG.pnts*p/q)-1)/(EEG.xmax-EEG.xmin);
     fprintf('resampling data %3.4f Hz\n', EEG.srate);
     tmpeeglab = myresample(EEG.data, EEG.pnts, round(EEG.pnts*p/q));
