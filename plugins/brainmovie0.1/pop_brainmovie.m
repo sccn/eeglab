@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/05/29 23:57:24  arno
+% allowing reading single time-freq file
+%
 % Revision 1.48  2003/05/28 01:25:11  arno
 % updating image coordinates with respect to Lee recomendation
 %
@@ -400,10 +403,13 @@ try,
         eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
     end;
 catch,
-	newERSP   = moviethresh( ALLERSP, 0.2, 4, 2);
-	newITC    = moviethresh( ALLITC , 0.2, 4, 2);
-	newCROSSF = moviethresh( ALLCROSSF, 0.2, 4, 2);
+	newERSP   = moviethresh( ALLERSP, 0.05, 2, 2);
+	newITC    = moviethresh( ALLITC , 0.05, 2, 2);
+	newCROSSF = moviethresh( ALLCROSSF, 0.03, 2, 2);
 	newANGLE  = ALLCROSSFANGLE;
+	%newERSP   = ALLERSP;
+	%newITC    = ALLITC;
+	%newCROSSF = ALLCROSSF;
     %newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
 	
 	if exist([g.tffolder g.tfname]) == 2
