@@ -70,17 +70,21 @@
 %                    spacing is (low_frequency/padratio).
 %       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                    If cycles==0, all FFT frequencies are output.{def: 50}
-%       'baseline' = Coherence baseline end time (ms). Deprecated, this 
-%                    parameter only affect the 'mcoh' output. NaN=no baseline {NaN}
+%       'baseline' = Coherence baseline end time (ms). This parameter
+%                    affect the 'mcoh' output and the bootstrap estimation. 
+%                    Use NaN for full epoch. {0}
 %       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
 %
 %    Optional Bootstrap:
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
 %                    level. Show non-signif output values as green. {0}
 %       'naccu'    = Number of bootstrap replications to compute {200}
-%       'boottype' = ['times'|'timestrials'] Bootstrap type: Either shuffle
-%                    windows ('times') or windows and trials ('timestrials')
-%                    Option 'timestrials' requires more memory {default 'times'}
+%       'boottype' = ['times'|'timestrials'|'trials'] Bootstrap type: Either 
+%                    shuffle windows ('times') or windows and trials ('timestrials')
+%                    or trials only using a separate bootstrap for each time window
+%                    ('trials'). Option 'times' is not recommended but requires less
+%                    memory and provide similar results to other options.
+%                    {default 'timestrials'}
 %       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
 %                    is the whole epoch                         {default: 0}
@@ -158,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/01/06 18:11:40  arno
+% shuffle along the 3rd dimension
+%
 % Revision 1.37  2003/01/06 17:45:52  arno
 % adding shuffle for conditions
 %
@@ -559,13 +566,13 @@ try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
 try, g.detrep;     catch, g.detrep = 'off'; end;
 try, g.detret;     catch, g.detret = 'off'; end;
-try, g.baseline;   catch, g.baseline = NaN; end;
+try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.type;       catch, g.type = 'phasecoher'; end; 
-try, g.boottype;   catch, g.boottype = 'times'; end; 
+try, g.boottype;   catch, g.boottype = 'timestrials'; end; 
 try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
@@ -647,7 +654,7 @@ case { 'coher', 'phasecoher' 'phasecoher2' },;
 otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 switch g.boottype
-case { 'times' 'timestrials' 'trials'},;
+case { 'times' 'timestrials' 'timestrials2' 'trials'},;
 otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
 end;    
 if ~isnumeric(g.shuffle) & ~iscell(g.shuffle)
@@ -938,10 +945,15 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		end;
 		
 		if ~isnan(g.alpha)
+            if g.baseboot == 0
+                baselnboot = find(times < g.baseline);
+            else
+                baselnboot = [];
+            end;
             Rbootout = bootstat(alltfX, alltfY, formula, 'boottype', g.boottype, ...
 							'formulapost', formulapost, 'formulainit', formulainit, ...
 							'formulaout', formulaout, 'bootside', 'upper', ...
-                            'naccu', g.naccu, 'alpha', g.alpha);
+                            'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselnboot);
 		else Rbootout = [];
         end;
         % note that the bootstrap thresholding is actually performed in the display subfunction plotall()
@@ -953,12 +965,6 @@ end;
 % baseline
 %%%%%%%%%%
 if ~isnan(g.baseline)
-   if length(baseln) == length(times), fprintf('\nUsing full time range as baseline\n');
-   else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
-   end;
-else fprintf('\nNo baseline time range specified.\n');	
-end;
-if ~isnan(g.baseline)
    baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
    if isempty(baseln)
       baseln = 1:length(times); % use all times as baseline
@@ -968,6 +974,12 @@ if ~isnan(g.baseline)
 else
    baseln = 1:length(times); % use all times as baseline
    baselength = length(times); % used for bootstrap
+end;
+if ~isnan(g.baseline)
+   if length(baseln) == length(times), fprintf('\nUsing full time range as baseline\n');
+   else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
+   end;
+else fprintf('\nNo baseline time range specified.\n');	
 end;
 mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
 
