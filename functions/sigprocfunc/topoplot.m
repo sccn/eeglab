@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2004/02/15 20:30:46  scott
+% same
+%
 % Revision 1.120  2004/02/15 20:26:59  scott
 % same
 %
@@ -822,7 +825,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
 %
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-  [Thi,Phi,Rdi] = cart2sph(Xi-rmax*squeezefac,Yi,Zi);
+  [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
   size([1:GRID_SCALE^2]')
   size(Thi(:))
   size(Phi(:))
