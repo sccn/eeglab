@@ -2,6 +2,7 @@
 %
 % Usage:
 %   >> h( arg );
+%   >> h( arg1, arg2 );
 %
 % Inputs:
 %   - With no argument, it return the command history.
@@ -11,6 +12,8 @@
 %                        required position.
 %   - arg is a number<0: unstack the required number of elements
 %   - arg is 0         : clear stack
+%   - arg1 is 'find' and arg2 is a string, try to find the closest command
+%     in the stack containing the string
 %
 % Global variables used:
 %   LASTCOM   - last command
@@ -42,12 +45,13 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
-function h( command, mode );
+function str = h( command, str );
 
-if nargin < 1
-   mode = 1;
-end;   
+mode = 1; % mode = 1, full print, mode = 0, truncated print
 
 try
 	eeg_global;
@@ -72,7 +76,7 @@ if nargin < 1
 			end;				
 		end;
 	end;	
-else
+elseif nargin == 1
 	if isempty( command )
 		return;
 	end;
@@ -101,4 +105,14 @@ else
 			end;
 		end;	
 	end;		
+else % nargin == 2
+	if strcmp(command, 'find')
+      for index = 1:length(ALLCOM)
+		  if ~isempty(findstr(ALLCOM{index}, str))
+			  str = ALLCOM{index};  
+			  return;
+		  end;
+	  end;
+	  str = [];
+	end;
 end;
