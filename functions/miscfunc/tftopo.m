@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/05/19 14:16:11  scott
+% *** empty log message ***
+%
 % Revision 1.42  2002/05/19 14:15:03  scott
 % *** empty log message ***
 %
@@ -408,6 +411,22 @@ for n=1:tfpoints
    end
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   % Plot connecting lines using changeunits()
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   from = changeunits([timefreqs(n,:)],imgax,wholeax);
+   to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
+   axes(wholeax);
+   plot([from(1) to(1)],[from(2) to(2)],LINECOLOR,'linewidth',LINEWIDTH);
+   hold on
+   mk=plot(from(1),from(2),[LINECOLOR 'o'],'markersize',9);
+   set(mk,'markerfacecolor',LINECOLOR);
+   axis([0 1 0 1]);
+   axis off;
+   drawnow
+end
+
+for n=1:tfpoints
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    % Plot scalp map using topoplot()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    axes(topoaxes(n));
@@ -428,22 +447,6 @@ for n=1:tfpoints
    end
 end
 
-for n=1:tfpoints
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Plot connecting lines using changeunits()
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   from = changeunits([timefreqs(n,:)],imgax,wholeax);
-   to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
-   axes(wholeax);
-   plot([from(1) to(1)],[from(2) to(2)],LINECOLOR,'linewidth',LINEWIDTH);
-   hold on
-   mk=plot(from(1),from(2),[LINECOLOR 'o'],'markersize',9);
-   set(mk,'markerfacecolor',LINECOLOR);
-   axis([0 1 0 1]);
-   axis off;
-
-   drawnow
-end
 
 if showchan>0
      sbplot(3,3,1,'ax',imgax);
