@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/13 18:25:57  scott
+% help msg
+%
 % Revision 1.8  2002/08/13 16:10:43  arno
 % debugging
 %
@@ -180,7 +183,7 @@ if storelocal
 end;
 fid = fopen( filename, 'w');
 if fid == -1
-	error('File not found');
+	error('File error, check writing permission');
 end;
 fprintf(fid, '%s\n', header);
 for index = 1:2:length(args)
