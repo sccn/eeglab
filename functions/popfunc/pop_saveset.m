@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2003/10/31 18:42:01  arno
+% removing extra spaces
+%
 % Revision 1.27  2003/10/31 01:12:57  scott
 % same
 %
@@ -261,7 +264,7 @@ if mode == 0  % single datasets
         end;
         try, 
             EEG.data = single(EEG.data);
-            fprintf('                Saving dataset...\n');
+            fprintf('Saving dataset...\n');
 			eval(command);
             EEG.data = double(EEG.data);
 		catch, 
