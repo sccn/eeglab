@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2003/03/05 01:56:34  scott
+% topowidth -sm
+%
 % Revision 1.38  2003/03/05 01:55:20  scott
 % topowidth -sm
 %
@@ -317,8 +320,8 @@ end
 
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
-if topowidth>0.24 % dont make too high
-  topowidth = 0.24;
+if topowidth>0.18 % dont make too high
+  topowidth = 0.18;
 end
 topowidth
 if rem(ntopos,2) == 1  % odd number of topos
@@ -459,6 +462,18 @@ for t=1:ntopos
   axes(axtp)                             % topoplot axes
   cla
 
+  if ~isempty(varargin)
+    topoargs = varargin{:};
+  else
+    topoargs = [];
+  end
+  if topowidth<0.12
+    if ~isempty(topoargs)
+        topoargs = ['emarkersize',8,' topoargs];
+    else
+        topoargs = ['emarkersize',8'];
+    end
+  end
   if ~isempty(varargin)
     topoplot(data(:,plotframes(t)),chan_locs, varargin{:}); 
   else
