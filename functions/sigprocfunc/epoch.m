@@ -20,7 +20,7 @@
 %                overpass. If one positive value is given, consider the 
 %                opposite for lower bound. Given values are also consider
 %                outlier (if equal the trial is rejected). Default: none.
-%   'verbose'    - ['yes'|'no']. Default is 'yes'.
+%   'verbose'    - ['on'|'off']. Default is 'on'.
 %   'allevents'  - event vector containing the latencies of all events
 %                (not only those used for epoching). The function
 %                return an array 'rerefevent' which contain the latency
@@ -40,7 +40,8 @@
 %                 indices for each epochs (note that the number of events 
 %                 per trial may vary).
 %   rereflatencies - re-referenced latencies event cell array (same as above
-%                 but indicates event latencies instead of event indices). 
+%                 but indicates event latencies in epochs instead of event 
+%                 indices). 
 %
 % Note: maximum time limit will be reduced by one point with comparison to the
 %       input time limits. For instance at 100 Hz, 3 seconds last 300 points, 
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 % 02-13-02 introduction of 'key', val arguments -ad
 % 02-13-02 rereferencing of events -ad
@@ -102,33 +106,36 @@ try, g.alleventrange; 	 catch, g.alleventrange = lim; end;
 % epoching
 % --------
 fprintf('Epoching...\n');
-epochdat = zeros( size(data,1), lim(2)*g.srate-lim(1)*g.srate, length(events) );
+newdatalength = round(lim(2)*g.srate-1) - round(lim(1)*g.srate)+1;
+epochdat = zeros( size(data,1), newdatalength, length(events) );
 g.allevents =  g.allevents(:)';
+datawidth  = size(data,2)*size(data,3);
+dataframes = size(data,2);
 for index = 1:length(events)
    posinit = round(events(index)*g.srate + lim(1)*g.srate); % compute offset
    posend  = round(events(index)*g.srate + lim(2)*g.srate-1); % compute offset
    
-   if floor((posinit-1)/size(data,2)) == floor((posend-1)/size(data,2)) & posinit >= 1 & posend <= size(data,2) % test if within boundaries
+   if floor((posinit-1)/dataframes) == floor((posend-1)/dataframes) & posinit >= 1 & posend <= datawidth % test if within boundaries
       epochdat(:,:,index) = data(:,posinit:posend);
       if (max(epochdat(:,:,index)) > g.valuelim(1)) & ...
             (max(epochdat(:,:,index)) < g.valuelim(2))
          indexes(index) = 1;
       else
-         switch g.verbose, case 'yes', fprintf('Warning: event %d out of value limits\n', index); end;
+         switch g.verbose, case 'on', fprintf('Warning: event %d out of value limits\n', index); end;
       end;   
    else
-      switch g.verbose, case 'yes', fprintf('Warning: event %d out of data boundary\n', index); end;
+      switch g.verbose, case 'on', fprintf('Warning: event %d out of data boundary\n', index); end;
       indexes(index) = 0;
    end;
 
    % rereference events
    % ------------------
    if ~isempty(g.allevents)
-        posinit = round(events(index))*g.srate + g.alleventrange(1)*g.srate; % compute offset
-        posend  = round(events(index))*g.srate + g.alleventrange(2)*g.srate; % compute offset
+        posinit = events(index)*g.srate + g.alleventrange(1)*g.srate; % compute offset
+        posend  = events(index)*g.srate + g.alleventrange(2)*g.srate; % compute offset
         eventtrial = intersect( find(g.allevents*g.srate >= posinit),  find(g.allevents*g.srate <= posend) );
         alleventout{index} = eventtrial;
-        alllatencyout{index} = g.allevents(eventtrial)*g.srate-events(index)*g.srate+1000000; 
+        alllatencyout{index} = g.allevents(eventtrial)*g.srate-events(index)*g.srate; 
    end;
 end;   
 newtime(1) = lim(1)/g.srate;
