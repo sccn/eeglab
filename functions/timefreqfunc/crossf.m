@@ -36,6 +36,10 @@
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence
 %                      ('coher') or phase coherence ('phasecoher') also known
 %                      as phase coupling factor' { 'phasecoher' }.
+%       'shuffle'   = ['on'|'off'] return the (phase) coherence using shuffle trials 
+%                     in order to obtain the amplitude or phase coherence time 
+%                     locked to the stimulus {'no'}. See also the option 'boottype'.
+%
 %    Optional Detrend:
 %       'detret'    = ['on'|'off'], Detrend data within epochs.   {'off'}
 %       'detrep'    = ['on'|'off'], Detrend data across trials    {'off'}
@@ -51,19 +55,19 @@
 %                      spacing is (low_frequency/padratio).
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) {50}
 %                      If cycles==0, all FFT frequencies are output.
-%       'baseline'  = Coherence baseline end time (ms).           {0}
+%       'baseline'  = Coherence baseline end time (ms). NaN=no baseline  {NaN}
 %       'powbase'   = Baseline spectrum to log-subtract.          {from data}
 %
 %    Optional Bootstrap:
 %       'alpha'     = If non-0, compute Two-tailed bootstrap significance prob. 
 %                      level. Show non-signif output values as green. {0}
 %       'naccu'     = Number of bootstrap replications to compute {200}
-%       'baseboot'  = Bootstrap baseline subtract (0=same as 'baseline';
-%                      1=whole epoch). 'baseboot' is not relevant when 
-%                      'boottype' is set to trials {0}
+%       'baseboot'  = Bootstrap extend (0=same as 'baseline'; 1=whole epoch). 
+%                     If no baseline is given (NaN), bootstrap extend is the 
+%                     whole epoch {0}
 %       'boottype'  = ['trials'|'times'|'both'] Bootstrap type: Either shuffle
-%                      trials but not windows ('trials'), windows but not trials
-%                      ('times') or both ('both')                  {'times' }
+%                     trials but not windows ('trials'), windows but not trials
+%                     ('times') or both ('both'). See notes      {'times' }
 %       'rboot'     = Bootstrap coherence limits (e.g., from crossf()) {from data}
 %                     be sure that the bootstrap type is identical to
 %                     the one used to obtain bootstrap coherence limits.
@@ -92,8 +96,27 @@
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
-% Note: when cycles==0, nfreqs is total number of FFT frequencies.
-% Note: 'blue' coherence lag -> x leads y; 'red' -> y leads x
+% Notes: 1) when cycles==0, nfreqs is total number of FFT frequencies.
+%        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
+%        3) strandard bootstrap method would be 'both' but it necessitates a
+%           lot of memory, so the 'times' method may be prefered in some
+%           cases.
+%        4) if 'boottype' is 'trials', the average of the complex bootstrap
+%           is subtracted from the coherence in order to compensate for
+%           phase differences (the average is also subtracted from the 
+%           bootstrap distribution). For other bootstraps, this is not
+%           necessary since the phase is random.
+%        5) if baseline is non-NaN, the baseline is subtracted from
+%           the complex coherence. On the left hand side of the coherence
+%           amplitude image, the baseline is displayed as a magenta line
+%           (if no baseline is selectted, this curve represents the average
+%           power at every given frequency).
+%
+% Maths:
+% if X(t,f) and Y(t,f) are the spectral estimates of X and Y at frequency f
+% and time t (* being the conjugate, || the norm, n the number of trials)
+%  coher      = sum_over_trials(X(t,f)Y(t,f)*)/sum_over_trials(|X(t,f)Y(t,f)|)
+%  phasecoher = sum_over_trials(X(t,f)Y(t,f)*/|X(t,f)Y(t,f)|)/n
 %
 % Authors: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          SCCN/INC/UCSD, La Jolla, 1998-2002 
@@ -117,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/12 18:10:55  scott
+% added note
+%
 % Revision 1.10  2002/04/12 01:30:43  arno
 % compatibility for returning frequencies with timef
 %
@@ -252,6 +278,7 @@ g.frame   = frame;
 g.srate   = Fs;
 g.cycles  = varwin;
 
+try, g.shuffle;    catch, g.shuffle = 'off'; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
 try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
@@ -269,7 +296,7 @@ try, g.plotamp;    catch, g.plotamp = 'on'; end;
 try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.detrep;     catch, g.detrep = 'off'; end;
 try, g.detret;     catch, g.detret = 'off'; end;
-try, g.baseline;   catch, g.baseline = 0; end;
+try, g.baseline;   catch, g.baseline = NaN; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
@@ -277,6 +304,13 @@ try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.boottype;   catch, g.boottype = 'times'; end; 
+g.type     = lower(g.type);
+g.boottype = lower(g.boottype);
+g.detrep   = lower(g.detrep);
+g.detret   = lower(g.detret);
+g.plotphase = lower(g.plotphase);
+g.plotamp   = lower(g.plotamp);
+g.shuffle   = lower(g.shuffle);
 
 % testing arguments consistency
 % -----------------------------
@@ -361,6 +395,10 @@ switch g.boottype
     case { 'trials', 'times', 'both' },;
     otherwise error('Boot type must be either ''trials'', ''times'' or ''both''');
 end;    
+switch g.shuffle
+    case { 'on', 'off' },;
+    otherwise error('Shuffle type must be either ''on'' or ''off''');
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % winsize, nwin, oversmp, maxfreq, alpha, vert =marktimes
@@ -414,20 +452,34 @@ end
 wintime = 500*g.winsize/g.srate;
 times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
 
-baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
-if isempty(baseln)
+if ~isnan(g.baseline)
+	baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
+	if isempty(baseln)
+		baseln = 1:length(times); % use all times as baseline
+		disp('Bootstrap baseline empty, using the whole epoch');
+	end;
+	baselength = length(baseln);
+else
 	baseln = 1:length(times); % use all times as baseline
-	disp('Bootstrap baseline empty, using the whole epoch');
+	baselength = length(times); % used for bootstrap
 end;
+
 dispf = find(freqs <= g.maxfreq);
 stp = (g.frame-g.winsize)/(g.timesout-1);
 trials = length(X)/g.frame;
 
 fprintf('\nComputing the Event-Related Cross-Coherence image\n');
-fprintf(' based on %d trials of %d frames sampled at %g Hz.\n',...
-                       trials,g.frame,g.srate);
-fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n',...
-                       g.tlimits(1),g.tlimits(2));
+fprintf(' based on %d trials of %d frames sampled at %g Hz.\n', trials,g.frame,g.srate);
+fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
+if ~isnan(g.baseline)
+	if length(baseln) == length(times)
+		fprintf('Using full time range as baseline\n');
+	else
+		fprintf('Using times in under %d ms for baseline\n', g.baseline);
+	end;
+else 
+	fprintf('No baseline is been used\n');	
+end;
 fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
 if g.cycles==0
   fprintf('The data window size is %d samples (%g ms).\n',g.winsize,2*wintime);
@@ -437,12 +489,10 @@ else
   fprintf('The maximum window size is %d samples (%g ms).\n',g.winsize,2*wintime);
 end
 fprintf('The window is applied %d times\n',g.timesout);
-fprintf(' with an average step size of %g samples (%g ms).\n',...
-                       stp,1000*stp/g.srate);
+fprintf(' with an average step size of %g samples (%g ms).\n', stp,1000*stp/g.srate);
 fprintf('Results are oversampled %d times.\n',g.padratio);
 if ~isnan(g.alpha)
-  fprintf('Bootstrap confidence limits will be computed based on alpha = %g\n',...
-              g.alpha);
+  fprintf('Bootstrap confidence limits will be computed based on alpha = %g\n', g.alpha);
 else
   fprintf('Bootstrap confidence limits will NOT be computed.\n'); 
 end
@@ -462,7 +512,6 @@ switch g.detrep
         Y = Y - mean(Y,2)*ones(1, length(Y(:))/g.frame);
 end;        
 
-baselength = length(baseln);
 firstboot = 1;
 Rn=zeros(trials,g.timesout);
 X = X(:)'; % make X and Y column vectors
@@ -616,19 +665,25 @@ if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times') & isnan(g.rboot)
 			  end
 	        end;            
 	    end
-	end;    
+	end;
 end;
-Rn = sum(Rn, 1);
+clear alltmpsX alltmpsY;
 
 % if coherence, perform the division
 % ----------------------------------
 switch g.type
-   case 'coher',
-        R = R ./ ( cumulX .* cumulY );
-	    if ~isnan(g.alpha) & isnan(g.rboot)
-            Rboot = Rboot ./ ( cumulXboot .* cumulYboot );
-	    end;   
-end;        
+ case 'coher',
+  R = R ./ ( cumulX .* cumulY );
+  if ~isnan(g.alpha) & isnan(g.rboot)
+	  Rboot = Rboot ./ ( cumulXboot .* cumulYboot );  
+  end;   
+ case 'phasecoher',
+  Rn = sum(Rn, 1);
+  R = R ./ (ones(size(R,1),1)*Rn);               % coherence magnitude
+  if ~isnan(g.alpha) & isnan(g.rboot)
+	  Rboot = Rboot / trials;  
+  end;
+end;
 
 switch lower(g.plotphase)
    case 'on',  
@@ -641,35 +696,31 @@ switch lower(g.plotphase)
           case 'on', ordinate1 = 0.1; height = 0.9;  g.plot = 1;
           case 'off', g.plot = 0;
        end;     
-end;    
+end; 
 
-if g.plot
-    fprintf('\nNow plotting...\n');
-end;
-
-Rangle = angle(R);
-if g.cycles ~= 0
-   Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
-end
-R = abs(R) ./ (ones(size(R,1),1)*Rn);               % coherence magnitude
-Rraw = R;						% raw coherence values
-mbase = mean(R(:,baseln)');     % mean baseline coherence magnitude
-% R = R - repmat(mbase',[1 g.timesout]);% remove baseline mean
+% compute baseline
+% ----------------
+mbase = mean(abs(R(:,baseln)'));     % mean baseline coherence magnitude
 
 % compute bootstrap significance level
 % ------------------------------------
 if ~isnan(g.alpha) & isnan(g.rboot) % if bootstrap analysis included . . .
     switch g.boottype
 	    case 'trials',
-			i = round(g.naccu*g.alpha);
-			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
-			Rboot = sort(Rboot,3);  
+			meanRboot = mean(Rboot,3);
+			R = R - meanRboot; % must subtract man R boot from R (complex)
+			Rboot = Rboot - repmat(meanRboot, [1 1 g.naccu]); % subtract the man also from Rboot
+			Rboot = sort(abs(Rboot),3);  
+			if ~isnan(g.baseline)
+				Rboot = Rboot - repmat(mbase', [1 g.timesout g.naccu]); % subtract the man also from Rboot
+			end;
 			Rbootout = Rboot;
         otherwise
-			i = round(g.naccu*g.alpha);
-			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
-			Rboot = sort(Rboot');
-			Rboot = Rboot';
+			Rboot = abs(Rboot); % normalize bootstrap magnitude to [0,1]
+			if ~isnan(g.baseline)
+				Rboot = Rboot - repmat(mbase', [1 g.naccu]); % subtract the man also from Rboot
+			end;
+			Rboot = sort(Rboot')';
 			Rbootout = Rboot;
 	end;
 elseif ~isnan(g.rboot)
@@ -681,19 +732,31 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 	    case 'trials',
 			i = round(g.naccu*g.alpha);
 			Rsignif = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3); % significance levels for Rraw
-		%	Rboot = [mean(Rboot(1:i,:))-mbase ; mean(Rboot(g.naccu-i+1:g.naccu,:))-mbase];
 		 	Rbootplus = mean(Rboot(:,:,1:i),3);
 		 	Rbootminus = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3);
         otherwise
 			i = round(g.naccu*g.alpha);
 			Rboot = Rboot';
 			Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
-		%	Rboot = [mean(Rboot(1:i,:))-mbase ; mean(Rboot(g.naccu-i+1:g.naccu,:))-mbase];
-		 	Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
+			Rboot = [mean(Rboot(1:i,:)); mean(Rboot(g.naccu-i+1:g.naccu,:))];
+		 	%Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
 	end;
 end % NOTE: above, mean ?????
 
+% compute angles
+% --------------
+Rangle = angle(R);
+if g.cycles ~= 0
+   Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
+end
+R = abs(R);
+if ~isnan(g.baseline)
+	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
+end;
+Rraw =R; % raw coherence values
+
 if g.plot
+    fprintf('\nNow plotting...\n');
 	set(gcf,'DefaultAxesFontSize',AXES_FONT)
 	colormap(jet(256));
 	
@@ -793,7 +856,7 @@ switch lower(g.plotamp)
 	%
 
 	h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
-	E = mbase(dispf); % baseline mean coherence at each frequency
+	E = abs(mbase(dispf)); % baseline mean coherence at each frequency
 	if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
 		plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
 	    hold on
