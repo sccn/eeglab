@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/04/25 18:51:15  arno
+% adding extra checks
+%
 % Revision 1.37  2002/04/25 18:50:02  arno
 % updating memory options
 %
@@ -707,11 +710,22 @@ try
 	figure(W_MAIN);
 	set_m   = findobj( 'parent', W_MAIN, 'Label', 'Datasets');
 catch, return; end;
-
 index = 1;
 indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU));
 	
+eeg_options;
+if ~option_keepdataset
+	if ~isempty(ALLEEG)
+		if popask( ['Remove all datasets except the present one ?' 10 'Otherwise go back to the memory meu to unset dataset overwrite'])
+			ALLEEG = []; CURRENSET = 0;
+			h('ALLEEG = []; CURRENSET = 0;');
+		else 
+			return;
+		end;
+	end;
+end;
+
 while( index <= MAX_SET)
 	try
 		set( EEGMENU(index), 'Label', '------');
@@ -733,7 +747,6 @@ set(hh, 'Enable', 'off');
 EEGUSERDAT{2} = EEGMENU;
 set(W_MAIN, 'userdata', EEGUSERDAT);
 
-eeg_options;
 if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET | CURRENTSET == 0 | isempty(ALLEEG(CURRENTSET).data))
 	CURRENTSET = 0;
 	for index = 1:length(ALLEEG)
@@ -756,47 +769,60 @@ end;
 % print some informations on the main figure
 % ------------------------------------------
 if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
-  set( H_MAIN(2), 'String', sprintf('Parameters of %s dataset %d', ...
-            fastif(EEG.trials > 1, 'epoched', 'continuous'), CURRENTSET));
-  % set( H_MAIN(3), 'String', '');
-  set( H_MAIN(3), 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
-  fullfilename = [ EEG.filepath EEG.filename];
-  if ~isempty(fullfilename)
-    if length(fullfilename) > 15
-    	set( H_MAIN(4), 'String', sprintf('Filename          \t\t...%s\n', fullfilename(max(1,length(fullfilename)-15):end) ));
-    else
-    	set( H_MAIN(4), 'String', sprintf('Filename          \t\t%s\n', fullfilename));
-    end;        	
-  else
-	set( H_MAIN(4), 'String', sprintf('Filename              \t\tnone\n'));
-  end;
-  set( H_MAIN(5), 'String', sprintf('Channels per frame\t\t%d\n', fastif(isempty(EEG.data), 0, size(EEG.data,1))));
-  set( H_MAIN(6), 'String', sprintf('Frames per epoch   \t\t%d\n', EEG.pnts));
-  set( H_MAIN(7), 'String', sprintf('Epochs             \t\t%d\n', EEG.trials));
-  set( H_MAIN(8), 'String', sprintf('Events\t\t\t\t%s\n', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event)))));
-  set( H_MAIN(9), 'String', sprintf('Sampling rate (Hz) \t\t%d  \n', EEG.srate));
-  set( H_MAIN(10), 'String', sprintf('Epoch start (sec)\t\t%.3f\n', EEG.xmin));
-  set( H_MAIN(11), 'String', sprintf('Epoch end (sec)  \t\t%.3f\n', EEG.xmax));
-  set( H_MAIN(12), 'String', sprintf('Average reference \t\t%s\n', fastif(strcmp(EEG.averef,'Yes'), 'Yes', 'No')));
-  set( H_MAIN(13), 'String', sprintf('Channel locations \t\t%s\n', fastif(isempty(EEG.chanlocs), 'No', 'Yes')));
-  set( H_MAIN(14), 'String', sprintf('ICA weights       \t\t%s\n', fastif(isempty(EEG.icasphere), 'No', 'Yes')));
-  set( H_MAIN(15), 'String', '');
+	if CURRENSET == 0
+		set( H_MAIN(2), 'String', sprintf('Parameters of %s dataset', ...
+										  fastif(EEG.trials > 1, 'epoched', 'continuous')));	
+	else  
+		set( H_MAIN(2), 'String', sprintf('Parameters of %s dataset %d', ...
+										  fastif(EEG.trials > 1, 'epoched', 'continuous'), CURRENTSET));	
+	end;
+	% set( H_MAIN(3), 'String', '');
+	set( H_MAIN(3), 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
+	fullfilename = [ EEG.filepath EEG.filename];
+	if ~isempty(fullfilename)
+		if length(fullfilename) > 15
+			set( H_MAIN(4), 'String', sprintf('Filename          \t\t...%s\n', fullfilename(max(1,length(fullfilename)-15):end) ));
+		else
+			set( H_MAIN(4), 'String', sprintf('Filename          \t\t%s\n', fullfilename));
+		end;        	
+	else
+		set( H_MAIN(4), 'String', sprintf('Filename              \t\tnone\n'));
+	end;
+	set( H_MAIN(5), 'String', sprintf('Channels per frame\t\t%d\n', fastif(isempty(EEG.data), 0, size(EEG.data,1))));
+	set( H_MAIN(6), 'String', sprintf('Frames per epoch   \t\t%d\n', EEG.pnts));
+	set( H_MAIN(7), 'String', sprintf('Epochs             \t\t%d\n', EEG.trials));
+	set( H_MAIN(8), 'String', sprintf('Events\t\t\t\t%s\n', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event)))));
+	set( H_MAIN(9), 'String', sprintf('Sampling rate (Hz) \t\t%d  \n', EEG.srate));
+	set( H_MAIN(10), 'String', sprintf('Epoch start (sec)\t\t%.3f\n', EEG.xmin));
+	set( H_MAIN(11), 'String', sprintf('Epoch end (sec)  \t\t%.3f\n', EEG.xmax));
+	set( H_MAIN(12), 'String', sprintf('Average reference \t\t%s\n', fastif(strcmp(EEG.averef,'Yes'), 'Yes', 'No')));
+	set( H_MAIN(13), 'String', sprintf('Channel locations \t\t%s\n', fastif(isempty(EEG.chanlocs), 'No', 'Yes')));
+	set( H_MAIN(14), 'String', sprintf('ICA weights       \t\t%s\n', fastif(isempty(EEG.icasphere), 'No', 'Yes')));
+	set( H_MAIN(15), 'String', '');
 else
-  set( H_MAIN(2), 'String', 'No current dataset');
-  set( H_MAIN(3), 'String', '- Create a new or load an existing dataset:');
-  set( H_MAIN(4), 'String', '   Use "/File/Import data"           (new)'); 
-  set( H_MAIN(5), 'String', '   Or  "/File/Load existing dataset" (old)');
-  set( H_MAIN(6), 'String', '- If new,');
-  set( H_MAIN(7), 'String', '  "/File/Import epoch info" (data epochs), else');
-  set( H_MAIN(8), 'String', '  "/File/Import event info" (continuous data)');
-  set( H_MAIN(9),'String',  '  "/Edit/Dataset info" (add/edit dataset info)');
-  set( H_MAIN(10),'String', '  "/File/Save dataset" (save dataset)');
-  set( H_MAIN(11),'String', '- Prune data: "/Edit/Select data"');
-  set( H_MAIN(12),'String', '- Reject data: "/Tools/Reject continuous data"');
-  set( H_MAIN(13),'String', '- Epoch data: "/Tools/Extract epochs"');
-  set( H_MAIN(14),'String', '- Remove baseline: "/Tools/Remove baseline"');
-  set( H_MAIN(15),'String', '- Run ICA:    "/Tools/Run ICA"');
+	set( H_MAIN(2), 'String', 'No current dataset');
+	set( H_MAIN(3), 'String', '- Create a new or load an existing dataset:');
+	set( H_MAIN(4), 'String', '   Use "/File/Import data"           (new)'); 
+	set( H_MAIN(5), 'String', '   Or  "/File/Load existing dataset" (old)');
+	set( H_MAIN(6), 'String', '- If new,');
+	set( H_MAIN(7), 'String', '  "/File/Import epoch info" (data epochs), else');
+	set( H_MAIN(8), 'String', '  "/File/Import event info" (continuous data)');
+	set( H_MAIN(9),'String',  '  "/Edit/Dataset info" (add/edit dataset info)');
+	set( H_MAIN(10),'String', '  "/File/Save dataset" (save dataset)');
+	set( H_MAIN(11),'String', '- Prune data: "/Edit/Select data"');
+	set( H_MAIN(12),'String', '- Reject data: "/Tools/Reject continuous data"');
+	set( H_MAIN(13),'String', '- Epoch data: "/Tools/Extract epochs"');
+	set( H_MAIN(14),'String', '- Remove baseline: "/Tools/Remove baseline"');
+	set( H_MAIN(15),'String', '- Run ICA:    "/Tools/Run ICA"');
 end;
 
 return;
+
+function num = popask( text )
+	 ButtonName=questdlg( text, ...
+	        'Confirmation', 'Cancel', 'Yes','Yes');
+	 switch lower(ButtonName),
+	      case 'cancel', num = 0;
+	      case 'yes',    num = 1;
+	 end;
 
