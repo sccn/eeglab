@@ -1,49 +1,49 @@
-% pop_jointprob() - rejection of artifact in a dataset using joint 
-%                   probability (i.e. probability of activity).
-%
+% pop_jointprob() - reject artifacts in an EEG dataset using joint 
+%                   probability of the recorded electrode or component 
+%                   activities observed at each time point.  e.g., Observing 
+%                   large absoluate values at most electrodes or components 
+%                   is improbable and may well mark the presence of artifact.
 % Usage:
 %   >> pop_jointprob( INEEG, typerej) % pop-up interative window mode
 %   >> [OUTEEG, locthresh, globthresh, nrej] = ...
 %		= pop_jointprob( INEEG, typerej, elec_comp, ...
 %                   locthresh, globthresh, superpose, reject, vistype);
 %
-% Graphical interface:
-%   "Electrode" - [edit box] electrodes or components (number) to take into
-%                 consideration for rejection. Same as the 'elec_comp'
-%                 parameter from the command line.
-%   "Single-channel limit" - [edit box] probability of activity limit in 
-%                 terms of standard-dev. Same as 'locthresh' command line
-%                 parameter.
-%   "All-channel limit" - [edit box] probability of activity limit in 
-%                 terms of standard-dev (all channel regrouped). Same as 
-%                 'globthresh' command line parameter.
-%   "Display with previous rejection" - [edit box] can be either YES or
-%                 NO. This edit box corresponds to the command line input
-%                 option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
-%                 box corresponds to the command line input option 'reject'.
-%   "visualization type" - [edit box] can be either REJECTRIALS or EEGPLOT.
-%                 This edit box corresponds to the command line input
-%                 option 'vistype'.
-% 
+% Graphic interface:
+%   "Electrode" - [edit box] electrode|component number(s) to take into
+%                 consideration for rejection. Sets the 'elec_comp'
+%                 parameter in the command line call (see below).
+%   "Single-channel limit(s)" - [edit box] activity probability limit(s) (in 
+%                 std. dev.) Sets the 'locthresh' command line parameter.
+%                 If more than one, defined individual electrode|channel
+%                 limits. If fewer values than the number of electrodes | 
+%                 components specified above, the last input value is used 
+%                 for all remaining electrodes|components.
+%   "All-channel limit(s)" - [edit box] activity probability limit(s) (in std.
+%                 dev.) for all channels (grouped). Sets the 'globthresh' 
+%                 command line parameter.
+%   "Display with previously marked rejections?" - [edit box] either YES or
+%                 NO. Sets the command line option 'superpose'.
+%   "Reject marked trial(s)?" - [edit box] either YES or NO. Sets the
+%                 command line option 'reject'.
+%   "visualization mode" - [edit box] either REJECTRIALS or EEGPLOT.
+%                 Sets the command line option 'vistype'.
 % Inputs:
 %   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
-%              data). Default is 1. For independent components, before
-%              thresholding, the activity is normalized for each 
-%              component.
-%   elec_comp  - [e1 e2 ...] electrodes or component (number) to take into 
+%   typerej    - [1|0] data to reject on (0 = component activations; 
+%              1 = electrode data). {Default: 1 = electrode data}. 
+%   elec_comp  - [n1 n2 ...] electrode|component number(s) to take into 
 %              consideration for rejection
-%   locthresh  - probability of activity limit in terms of standard-dev.
-%   globthresh - global limit (where all electrode activity are 
-%              regrouped). Same units as above.
-%   superpose  - 0=do not superpose pre-labelling with previous
-%              pre-labelling (stored in the dataset). 1=consider both
-%              pre-labelling (using different colors). Default is 0.
-%   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 1.
-%   vistype    - visualization type. 0 is rejepoch() and 1 is eegplot()
-%              default is 0.  
+%   locthresh  - activity probability limit(s) (in std. dev.) See "Single-
+%              channel limit(s)" above.
+%   globthresh - global limit(s) (all activities grouped) (in std. dev.)
+%   superpose  - [0|1] 0 = Do not superpose rejection marks on previously
+%              marks stored in the dataset: 1 = Show both current and 
+%              previous marks using different colors. {Default: 0}.
+%   reject     - 0 = do not reject marked trials (but store the marks: 
+%              1 = reject marked trials {Default: 1}.
+%   vistype    - visualization mode: 0 = rejepoch(); 1 = eegplot()
+%              {Default: 0}.  
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated joint probability array
@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/12/24 16:52:15  scott
+% pop window text edits
+%
 % Revision 1.19  2003/12/17 18:14:38  arno
 % default reject
 %
