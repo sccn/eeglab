@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2004/11/06 02:15:17  scott
+% added 7th output itcphase (internally, Rphase) -sm
+%
 % Revision 1.76  2004/11/02 22:47:52  scott
 % nothing
 %
@@ -403,7 +406,7 @@
 
 function [P,R,mbase,times,freqs,Pboot,Rboot,Rphase,PA] = timef(X,frame,tlimits,Fs,varwin,varargin);
 
-% Note: PA is output of 'phsamp','on' 
+% Note: undocumented arg PA is output of 'phsamp','on' 
 
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
@@ -717,19 +720,19 @@ switch g.type
 end;    
 
 if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
-    %freqs = g.srate/g.winsize*[1:2/g.padratio:g.winsize]/2 % incorect for padratio > 2
     freqs = linspace(0, g.srate/2, g.padratio*g.winsize/2+1);
     freqs = freqs(2:end);
     win = hanning(g.winsize);
 
     P  = zeros(g.padratio*g.winsize/2,g.timesout); % summed power
-	PP = zeros(g.padratio*g.winsize/2,g.timesout); % power
-	R  = zeros(g.padratio*g.winsize/2,g.timesout); % mean coherence
-	RR = zeros(g.padratio*g.winsize/2,g.timesout); % (coherence)
-	Pboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap power
-	Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
+    PP = zeros(g.padratio*g.winsize/2,g.timesout); % power
+    R  = zeros(g.padratio*g.winsize/2,g.timesout); % mean coherence
+    RR = zeros(g.padratio*g.winsize/2,g.timesout); % (coherence)
+    Pboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap power
+    Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
     Rn = zeros(1,g.timesout);
     Rbn = 0;
+
 	switch g.type
 	    case { 'coher' 'phasecoher2' },
            cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
@@ -743,20 +746,20 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 
 else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%
 
-   	freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
+    freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
     dispf = find(freqs <= g.maxfreq);
     freqs = freqs(dispf);
 
-	%win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,0.5);
-	win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,g.cyclesfact);
-	P = zeros(size(win,2),g.timesout);       % summed power
-	R = zeros(size(win,2),g.timesout);       % mean coherence
-	PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
-	RR = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
-	Pboot = zeros(size(win,2),g.naccu);  % summed bootstrap power
-	Rboot = zeros(size(win,2),g.naccu);  % summed bootstrap coher
+    win = dftfilt(g.winsize,g.maxfreq/g.srate,g.cycles,g.padratio,g.cyclesfact);
+    P = zeros(size(win,2),g.timesout);       % summed power
+    R = zeros(size(win,2),g.timesout);       % mean coherence
+    PP = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
+    RR = repmat(NaN,size(win,2),g.timesout); % initialize with NaN
+    Pboot = zeros(size(win,2),g.naccu);  % summed bootstrap power
+    Rboot = zeros(size(win,2),g.naccu);  % summed bootstrap coher
     Rn = zeros(1,g.timesout);
     Rbn = 0;
+
 	switch g.type
 	  case { 'coher' 'phasecoher2' },
            cumulX = zeros(size(win,2),g.timesout);
@@ -901,10 +904,10 @@ for i=1:trials
         end
 
         switch g.phsamp
-         case 'on' %PA (freq x freq x time)
+         case 'on' % PA (freq x freq x time)
           PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((PP(:,j)))';
-                                           % x-product: unit phase column
-                                           % times amplitude row
+                                           % cross-product: unit phase (column)
+                                           %                times amplitude (row)
         end
 	end % window
 
