@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/02/23 15:28:08  scott
+% turned 'electrodes','off' in topoplots
+%
 % Revision 1.21  2003/07/24 23:17:27  arno
 % removing extra plot
 %
@@ -205,7 +208,8 @@ for ri = compnum
 			return;
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
-		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', 'off', 'style' , 'fill','electrodes','off');
+		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
+                            'off', 'style' , 'fill','electrodes','off','shrink','skirt');
 		axis square;
 
 		% plot the button
