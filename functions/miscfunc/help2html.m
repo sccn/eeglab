@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/02/17 02:39:57  arno
+% debug feature and document
+%
 % Revision 1.18  2003/02/17 02:36:15  arno
 % do not force image size to 400 if less than 400
 %
@@ -359,14 +362,14 @@ while (str(1) == '%')
 			   if exist( imagename1 ), imagename = imagename1; end; 
                if ~isempty(imagename) % do not make link if the file does not exist 
                    imageinfo = imfinfo(imagename);
-                   if imageinfo.Width < 400
+                   if imageinfo.Width < 600
                        fprintf(fo, [ g.normrow g.doublecol ...
                                      '<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
                                      '></A></CENTER></td></tr>' ]);
                    else
                        fprintf(fo, [ g.normrow g.doublecol ...
                                      '<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
-                                     ' width=400></A></CENTER></td></tr>' ]);
+                                     ' width=600></A></CENTER></td></tr>' ]);
                    end;
                    
                end;
