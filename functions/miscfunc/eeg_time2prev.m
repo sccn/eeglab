@@ -20,9 +20,8 @@
 % >> target = {'novel'};           % target event type 'novel'
 % >> previous = {'novel', 'rare'}; % either 'novel' or 'rare'
 % >> [delays,targets] = eeg_time2prev(EEG,target,previous);
-%%
-%% Vector delays now contains delays in ms from each 'novel' event to the previous
-%% 'rare' or 'novel' event (else 0 when none such). Vector targets now contains the
+%% Vector 'delays' now contains delays (in ms) from each 'novel' event to the previous
+%% 'rare' OR 'novel' event, else 0 if none such. Vector 'targets' now contains the
 %% 'novel' event indices.
 %%
 % Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, August 28, 2003
@@ -37,21 +36,30 @@ if ~iscell(target)
   return
 end
 
-%for k=1:length(target)
-%   if ~ischar(cell2mat(target(k))) % <--- bug in cell2mat()?
-%end
-
 if ~iscell(previous)
   error('3rd arg "previous" must be a cell array.\n');
   return
+end
+
+for k=1:length(target) % make all target types strings
+  if ~ischar(target{k})
+    target{k} = num2str(target{k});
+  end
+end
+
+for k=1:length(previous) % make all previous types strings
+  if ~ischar(previous{k})
+    previous{k} = num2str(previous{k});
+  end
 end
 
 if ~isfield(EEG,'urevent')
   error('requires the urevent structure be present.\n');
   return
 end
+
 if length(EEG.urevent) < length(EEG.event)
-  error('number of urevents < number of events!?\n');
+  error('WARNING: In dataset, number of urevents < number of events!!\n');
   return
 end
 
@@ -82,10 +90,9 @@ for idx = 1:length(EEG.event)                      % for each event in the datas
  end 
 
  %
- %%%%%%%%%%%%%% compute delay from current target to latest prev event %%%%%%%%%%%%%%
+ %%% Compute delay from current target to latest prev event %%%
  %
  if istarget  % if current event is a target type
-
   if urprevs(targetcount) > 0                      % if a 'previous' type event was already found
                                                    % save the latency difference in ms
     delays(targetcount) = 1000/EEG.srate * ...
@@ -105,7 +112,7 @@ for idx = 1:length(EEG.event)                      % for each event in the datas
  end % istarget
 
  %
- %%%%%%%%%%%%%% determine whether this is  a potential 'previous' event  %%%%%%%%%%%%
+ %%% Determine whether this is  a potential 'previous' event %%%
  %
  isprevious = 0; pidx = 1; % previous index
  while ~isprevious & pidx<=length(previous)        % for each previous event type
@@ -119,7 +126,7 @@ for idx = 1:length(EEG.event)                      % for each event in the datas
 end % main event loop
 
 %
-%%%%%%%%%%%%%%%%%%%%% Truncate output arrays %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% Truncate the output arrays %%%%%%%%%%%%%%%%%%%%%%
 %
 if targetcount > 0
    targets   = targets(1:targetcount);
