@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/15 02:18:25  scott
+% can not -> cannot
+%
 % Revision 1.6  2002/08/13 23:57:45  arno
 % update error message
 %
@@ -68,7 +71,7 @@ if nargin < 2
 	return;
 end;
 if isempty(ALLEEG)
-	error(['Pop_copyset error: cannot copy' 10 'dataset in single dataset mode']);
+	error(['Pop_copyset error: cannot copy' 10 'single dataset mode']);
 end;	
 if isempty(ALLEEG(set_in).data)
     error('Pop_copyset error: cannot copy empty dataset'); return;
