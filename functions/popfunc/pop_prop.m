@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/13 23:49:07  arno
+% use nan_mean instead of mean
+%
 % Revision 1.8  2002/10/13 21:41:23  arno
 % undo last change
 %
@@ -157,9 +160,9 @@ catch,
 end;
 basename = [fastif(typecomp,'Channel ', 'Component ') int2str(numcompo) ];
 
-fh = figure('name', [basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off');
+fh = figure('name', [basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
 pos = get(gcf,'Position');
-set(gcf,'Position', [pos(1) pos(2)-500+pos(4) 500 500]);
+set(gcf,'Position', [pos(1) pos(2)-500+pos(4) 500 500], 'visible', 'on');
 pos = get(gca,'position'); % plot relative to current axes
 hh = gca;
 q = [pos(1) pos(2) 0 0];
