@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/07/07 19:08:06  arno
+% adding history for rejected epochs
+%
 % Revision 1.29  2004/03/08 19:24:10  arno
 % edit box
 %
@@ -251,7 +254,15 @@ eegplotoptions = { 'events', EEG.event, 'winlength', 5, 'winrej', ...
                                    EEG.reject.rejjpcol     EEG.reject.rejkurtcol   EEG.reject.rejfreqcol } } };
 
 if ~isempty(EEG.chanlocs) & icacomp == 1
-	eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
+    if exist('elecrange')
+        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs(elecrange) };
+    else
+        eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
+    end;
+else 
+    if exist('elecrange')
+        eegplotoptions = { eegplotoptions{:}  'eloc_file', struct('labels', mat2cell(elecrange)) };
+    end;
 end;
 if ~reject
 	eegplotoptions = { eegplotoptions{:}  'butlabel', 'UPDATE MARKS' };
