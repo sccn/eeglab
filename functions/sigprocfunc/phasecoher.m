@@ -2,7 +2,6 @@
 %                Removes epoch means. Returns same data length as input frames.
 %                Plots results when nargin>6. Outputs have flat ends 
 %                at data indices [1:halfwin] and [frames-halfwin:frames].
-%
 % Usage:
 %     >> [amps,cohers       ] = phasecoher(data,frames,srate,freq,cycles); 
 %     >> [amps,cohers,cohsig,ampsig,allamps,allphs] = phasecoher(data,frames,...
@@ -14,9 +13,9 @@
 %   srate  = sampling rate (in Hz)
 %   freq   = frequency to work on (in Hz)
 %   cycles = cycles in Gaussian wavelet window (float) {3}
-%   alpha  = (0 0.1] significance probability threshold {default 0}
-%             Requires 3 output arguments. Alpha 0 means no threshold computed.
-%   times  = vector of times for plotting {default -> no plot}
+%   alpha  = (0 0.1] significance probability threshold. Requires 
+%            >=3 output arguments. alpha=0 -> no signif {default: 0}.
+%   times  = vector of times for plotting {default: no plot}
 %   titl   = plot title {default none}
 %
 % Outputs:
@@ -48,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/05 17:46:16  arno
+% putting back revision 1.1
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
