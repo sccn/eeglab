@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/10/24 02:10:15  arno
+% returning outputs of size adjusted to pling frequency
+%
 % Revision 1.19  2002/10/18 21:58:58  arno
 % new bootstrap plot with cooper
 %
@@ -787,7 +790,6 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
     fprintf('\nProcessing trial for second input (of %d):',trials);
 	Y = reshape(Y, g.frame, trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
-	nb_points = size(alltfX,1);
 	dispf     = find(freqs <= g.maxfreq);
 	freqs = freqs(dispf);
     if size(alltfX,1) ~=length(dispf), alltfX = alltfX(dispf,:,:); end;
