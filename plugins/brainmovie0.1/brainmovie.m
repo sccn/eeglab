@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/04/24 02:26:37  arno
+% removing debug message
+%
 % Revision 1.45  2003/04/24 02:19:01  arno
 % message for circfactor
 %
@@ -260,7 +263,7 @@
 %
 
 function brainmovie(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
-
+    
 if nargin < 6
 	help brainmovie;
 	return;

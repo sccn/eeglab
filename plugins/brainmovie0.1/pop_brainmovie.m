@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/04/24 02:26:01  arno
+% debuging showcomps
+%
 % Revision 1.39  2003/04/24 02:20:59  arno
 % debuging showcomps
 %
@@ -414,9 +417,9 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     % -------------------
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
-        [tmp plotorder] = sort( coordinates(:,1) );
+        [tmp plotorder] = sort( coordinates(g.showcomps,1) );
         coordinates = coordinates(:, [2 3]); % remove X   
-        plotorder = plotorder(g.showcomps);
+        plotorder   = g.showcomps(plotorder);
     else
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
@@ -446,8 +449,8 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     % ------------------
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
-        [tmp plotorder] = sort( coordinates(:,3) );
-        plotorder = plotorder(g.showcomps);
+        [tmp plotorder] = sort( coordinates(g.showcomps,3) );
+        plotorder   = g.showcomps(plotorder);
         coordinates = coordinates(:, [1 2]); % remove Z
     else
         plotorder   = g.showcomps;
@@ -479,8 +482,8 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
     % ------------------
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
-        [tmp plotorder] = sort( coordinates(:,2) );
-        plotorder = plotorder(g.showcomps);
+        [tmp plotorder] = sort( coordinates(g.showcomps,2) );
+        plotorder   = g.showcomps(plotorder);
         coordinates = coordinates(:, [1 3]); % remove Z
     else
         plotorder   = g.showcomps;
