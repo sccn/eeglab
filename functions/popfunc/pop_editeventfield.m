@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/18 18:23:14  arno
+% typo can not
+%
 % Revision 1.4  2002/04/09 03:51:32  arno
 % modifying input comments and history
 %
@@ -250,9 +253,9 @@ for curfield = tmpfields'
     switch lower(curfield{1})
        case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
        case 'rename',
-            if isempty( findstr(g.rename, '->') ), disp('Set warning: bad syntax for rename'); end;
-            oldname = g.rename(2:findstr(g.rename, '->'));
-            newname = g.rename(findstr(g.rename, '->')+2:end);
+            if isempty( findstr('->',g.rename) ), disp('Set warning: bad syntax for rename'); end;
+            oldname = g.rename(1:findstr('->',g.rename)-1)
+            newname = g.rename(findstr('->',g.rename)+2:end)
             indexmatch = strmatch(oldname, allfields);
             if isempty(indexmatch), disp('Set warning: name not found for rename'); 
             else
