@@ -47,6 +47,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/23 23:48:34  arno
+% standalone version
+%
 % Revision 1.6  2002/04/23 21:28:34  arno
 % correcting typo
 %
@@ -88,7 +91,7 @@ EEG = eeg_checkset(EEG);
 % ------------
 eeg_options; % changed from eeglaboptions 3/30/02 -sm
 if option_keepdataset == 0
-    disp('Old dataset overwrote (see eeg_options.m file to change feature)');
+    disp('Current dataset changed (see setting in eeg_options.m)');
     return;
 end;    
 
