@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/01/26 01:16:59  scott
+% same
+%
 % Revision 1.34  2004/01/26 01:12:30  scott
 % same
 %
@@ -607,7 +610,7 @@ end
 fprintf('\n');
 fprintf('                          pvaf: ');
 for t=1:ntopos
-  fprintf('%4d ',pvaf(maporder(t)));
+  fprintf('%4.2f ',pvaf(maporder(t)));
 end
 fprintf('\n');
 
