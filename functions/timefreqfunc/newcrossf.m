@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/05 02:08:27  arno
+% outputs for newcrossf
+%
 % Revision 1.2  2002/10/02 00:35:47  arno
 % update condstat, debug
 %
@@ -698,11 +701,11 @@ end;
 fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
 fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
 if g.cycles==0
-   fprintf('The data window size is %d samples (%g ms).\n',g.winsize,g.winsize/g.srate);
+   fprintf('The data window size is %d sample points (%g ms).\n',g.winsize,g.winsize/g.srate);
    fprintf('The FFT length is %d samples\n',g.winsize*g.padratio);
 else
    fprintf('The window size is %d cycles.\n',g.cycles);
-   fprintf('The maximum window size is %d samples (%g ms).\n',g.winsize,2*wintime);
+   fprintf('The maximum window size is %d sample points (%g ms).\n',g.winsize,g.winsize/g.srate);
 end
 fprintf('The window is applied %d times\n',g.timesout);
 %fprintf(' with an average step size of %g samples (%g ms).\n', Tfx.stp,1000*Tfx.stp/g.srate);
