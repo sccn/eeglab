@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2004/10/20 15:20:27  scott
+% still bug at line 551 -sm
+%
 % Revision 1.69  2004/10/20 15:19:03  scott
 % nothing
 %
@@ -542,28 +545,20 @@ for t=1:ntopos
   axtp = axes('Units','Normalized','Position',...
        [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
-                  topowidth ...
-                       topowidth*(1+head_sep)]);
+                  topowidth topowidth*(1+head_sep)]);
   axes(axtp)                             % topoplot axes
   cla
 
   if ~isempty(varargin)
-    topoargs = varargin{:};
+    topoargs = varargin;
   else
-    topoargs = [];
+    topoargs = {};
   end
   if topowidth<0.12
-    if ~isempty(topoargs)
-        % topoargs = [',''emarkersize'',4,' topoargs];
-        topoargs = [',''electrodes'', ''off'', ' topoargs];
-    else
-        % topoargs = [',''emarkersize'',4'];
-        topoargs = [',''electrodes'', ''off'''];
-    end
+      topoargs = { topoargs{:} 'electrodes' 'off' };
   end
-  topostring = [ 'topoplot(data(:,plotframes(t)),chan_locs' topoargs ');']; % plot the scalp map 
-  eval(topostring);
-  %
+  topoplot( data(:,plotframes(t)),chan_locs, topoargs{:});
+
   % Else make a 3-D headplot
   %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
