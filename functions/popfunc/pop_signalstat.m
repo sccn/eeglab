@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/10/03 19:16:56  scott
+% commented out text() calls to work in v7. -sm
+%
 % Revision 1.13  2003/12/03 18:47:21  arno
 % modify command output
 %
@@ -144,11 +147,21 @@ end;
 % -------------------------
 %fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
-if isempty(EEG.chanlocs)
-    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2);', outstr);
-else 
+
+
+plotloc = 0;
+if ~isempty(EEG.chanlocs)
+    if isfield(EEG.chanlocs, 'theta')
+        if ~isempty(EEG.chanlocs(cnum).theta)
+            plotloc = 1;
+        end;
+    end;
+end;
+if plotloc
     com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs );', outstr);
-end
+else
+    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2);', outstr);
+end;
 
 eval(com)	
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
