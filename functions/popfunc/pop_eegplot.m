@@ -1,21 +1,23 @@
-% pop_eegplot() - reject by visual inspection of artifact in a dataset.
+% pop_eegplot() - reject by visual inspection of artifact in a dataset
 %
 % Usage:
 %   >> pop_eegplot( INEEG, typerej, superpose, reject );
 %
 % Inputs:
 %   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
-%              data). Default is 1.
-%   superpose  - 0 = do not superpose pre-labelling with previous
-%              pre-labelling (stored in the dataset). 1=consider both
-%              pre-labelling (using different colors). Default is 0.
-%   reject     - 0 = do not reject labelled trials (but still store the 
-%              them. 1=reject labelled trials). Default is 0.
+%   typerej    - type of rejection (0 = independent components; 
+%                                   1 = eeg data channels). {default: 1}
+%   superpose  - 0 = do not superpose marking on previous marking 
+%                    (stored in the dataset). 
+%                1 = consider both markings (using different colors). 
+%                     {default: 0}
+%   reject     - 0 = do not reject marked trials 
+%                     (but still store the them). 
+%                1 = reject marked trials) {default: 0}
 %
 % Outputs:
 %   Modifications are applied to the current dataset at the end of the
-%   call of eegplot (when the user press the button 'reject').
+%   eegplot() call (e.g., when the user presses the 'reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -40,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/12 21:54:13  arno
+% text
+%
 % Revision 1.14  2002/08/12 16:26:20  arno
 % inputdlg2
 %
@@ -113,8 +118,8 @@ if nargin < 3 & EEG.trials > 1
 
 	% which set to save
 	% -----------------
-    promptstr    = { 'Add to previously labelled rejections (yes/no)', ...
-         	         'Reject labelled trials (yes/no)', ...
+    promptstr    = { 'Add to previously marked rejections (yes/no)', ...
+         	         'Reject marked trials (yes/no)', ...
 						 };
 	inistr       = { 'yes', 'no' };
 	result       = inputdlg2( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
