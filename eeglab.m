@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.286  2003/12/03 00:20:11  arno
+% removing version number once more (why?)
+%
 % Revision 1.285  2003/12/02 17:31:49  arno
 % path debugging
 %
@@ -1263,7 +1266,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
        uimenu( loc_m, 'Label', 'By name'   , 'CallBack'  , [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''');'']; eval(LASTCOM);' e_hist]);
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
     uimenu( third_m, 'Label', 'Channel data (scroll)'        , 'CallBack', [ check          'LASTCOM = pop_eegplot(EEG, 1, 1, 1);' e_hist], 'Separator', 'on');
-	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ check      'LASTCOM = pop_spectopo(EEG, 1);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
+	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ check      'LASTCOM = pop_spectopo(EEG, 1);' e_hist]);
 	uimenu( third_m, 'Label', 'Channel properties'       , 'CallBack', [ checkplot   'LASTCOM = pop_prop(EEG,1);' e_hist]);
 	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch  'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
 	ERP_m = uimenu( third_m, 'Label', 'Channel ERPs');
@@ -1276,7 +1279,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 	uimenu( third_m, 'Label', 'Sum/Compare ERPs'             , 'CallBack', [ checkepoch     'LASTCOM = pop_comperp(ALLEEG);' e_hist]);
 
     uimenu( third_m, 'Label', 'Component activations (scroll)', 'CallBack', [ checkica  '[LASTCOM] = pop_eegplot(EEG, 0, 1, 1);' e_hist],'Separator', 'on');
-	uimenu( third_m, 'Label', 'Component spectra and maps' , 'CallBack', [ checkicaplot   'LASTCOM = pop_spectopo(EEG, 0);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
+	uimenu( third_m, 'Label', 'Component spectra and maps' , 'CallBack', [ checkicaplot   'LASTCOM = pop_spectopo(EEG, 0);' e_hist]);
 	topoica_m = uimenu( third_m, 'Label', 'Component maps');
 		uimenu( topoica_m, 'Label', 'In 2-D', 'CallBack', [ checkicaplot   'LASTCOM = pop_topoplot(EEG, 0);' e_hist]);
 		uimenu( topoica_m, 'Label', 'In 3-D', 'CallBack', [ checkicaplot   '[EEG LASTCOM] = pop_headplot(EEG, 0);' e_store]);
