@@ -10,7 +10,7 @@
 %                            X  = new reference electrode number
 %
 % Optional inputs:
-%   'mode'      - ['standard'|'withref'] can be either 'standard' or 'withref' 
+%   'method'    - ['standard'|'withref'] can be either 'standard' or 'withref' 
 %                 to recompute the old reference potential
 %   'refloc'    - old common reference location (can also be included as
 %                 the last channel of the EEG.chanlocs struture
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/11/12 19:08:34  arno
+% Initial revision
+%
 % Revision 1.1  2002/04/05 17:32:13  arno
 % Initial revision
 %
@@ -93,7 +96,7 @@ if nargin < 2
     end;
     if result{1}, ref = []; end;
     options = { };
-    if result{4}, options = { options{:} 'mode' 'withref' }; end;
+    if result{4}, options = { options{:} 'method' 'withref' }; end;
     if ~isempty(result{5}), options = { options{:} 'refloc' { result{5} eval(result{6}) eval(result{7}) } }; end;
 else 
     options = varargin;
