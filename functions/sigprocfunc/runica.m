@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/10/06 20:40:32  scott
+% same -sm
+%
 % Revision 1.21  2004/10/06 20:39:20  scott
 % fixed block size to integer -sm
 %
@@ -803,7 +806,7 @@ end
   oldweights = startweights;
   prevwtchange = zeros(chans,ncomps);
   oldwtchange = zeros(chans,ncomps);
-  lrates = zeros(1,maxsteps); block
+  lrates = zeros(1,maxsteps); 
   onesrow = ones(1,block); 
   bias = zeros(ncomps,1);
   signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
