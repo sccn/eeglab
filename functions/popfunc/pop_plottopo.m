@@ -1,5 +1,5 @@
-% pop_plottopo() - plot concatenated multichannel data epochs in a
-%                  topographic array format using plottopo()
+% pop_plottopo() - plot one or more concatenated multichannel data epochs 
+%                  in a topographic array format using plottopo()
 % Usage:
 %   >> pop_plottopo( EEG ); % pop-up
 %   >> pop_plottopo( EEG, channels );
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/04/06 17:31:33  arno
+% adding edit box for options
+%
 % Revision 1.13  2003/05/10 02:30:01  arno
 % continuous array
 %
@@ -102,10 +105,10 @@ if nargin < 2
 					 'Plot title:' ...
 					 'Plot single trials (yes|no)' ... 
                      'Vertical lines (ms)' ...
-                     'Plotting options (see help)' };
+                     'Plotting options (see Help)' };
 	inistr       = { [ '1:' num2str( EEG.nbchan ) ] ...
 					 fastif(isempty(EEG.setname), '',EEG.setname) ...
-					 'no' '' '''ydir'', -1'};
+					 'no' '' '''ydir'', 1'};
 	result       = inputdlg2( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr, 'pop_plottopo');
 	if size(result,1) == 0 return; end;
 	channels     = eval( [ '[' result{1} ']' ] );
