@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/04/24 22:13:17  arno
+% removing 0 warning
+%
 % Revision 1.14  2003/04/24 22:08:55  arno
 % updating error message
 %
@@ -164,7 +167,7 @@ if EEG.trials == 1
             boundaries = tmplat(boundaries);
             boundaries = [0 round(boundaries-0.5) EEG.pnts];
             try, warning off MATLAB:divideByZero
-            catch, edn;
+            catch, end;
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing data portion %d to %d\n',boundaries(n),boundaries(n+1)); 
@@ -175,7 +178,7 @@ if EEG.trials == 1
 				end;
 			end
             try, warning on MATLAB:divideByZero
-            catch, edn;
+            catch, end;
 		end
 	else
 		EEG.data = eegfilt( EEG.data, options{:});
