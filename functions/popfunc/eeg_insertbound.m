@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/06/11 14:36:20  arno
+% adding Hilit as functions' author
+%
 % Revision 1.26  2004/06/11 01:26:43  arno
 % recomputing event boundaries ...
 %
@@ -206,10 +209,12 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             % add lengths of previous events (must be done after above
             % --------------------------------------------------------
             if addlength == -1
-                eventout(tmpind2) = rmfield(eventout, 'duration');
-                disp('Warning: old boundary event type present in dataset');
-                disp('         The new boundary events have to be compatible with the old ones');
-                disp('         and will not contain the duration of the removed region');
+                if isfield(eventout, 'duration')
+                    eventout = rmfield(eventout, 'duration');
+                    disp('Warning: old boundary event type present in dataset');
+                    disp('         The new boundary events have to be compatible with the old ones');
+                    disp('         and will not contain the duration of the removed region');
+                end;
             else
                 eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
                 if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
