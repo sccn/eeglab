@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 01:17:42  arno
+% update colors
+%
 % Revision 1.6  2002/08/12 00:41:41  arno
 % updating default colors
 %
@@ -165,14 +168,14 @@ end;
 %-----------------
 try, icadefs;
 catch,
-	BACKCOLOR  =  [.8 .8 .8];     
+	GUIBACKCOLOR  =  [.8 .8 .8];     
 	GUIBUTTONCOLOR   = [.8 .8 .8];    
 	GUITEXTCOLOR     = [0 0 0];
 end;
 
 hh = findobj(allhandlers, 'parent', gcf, 'style', 'text');
 %set(hh, 'BackgroundColor', get(gcf, 'color'), 'horizontalalignment', 'left');
-set(hh, 'Backgroundcolor', BACKCOLOR);
+set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(gcf, 'color', get(hh(1), 'BackgroundColor'));
 set(hh, 'horizontalalignment', 'left');
