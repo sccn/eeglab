@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/11/15 02:16:50  arno
+% header for web
+%
 % Revision 1.11  2002/09/30 15:29:23  arno
 % autorizing cell arrays for types
 %
@@ -180,7 +183,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
     g = [];
     
     switch fieldtype
-     case { 'integer' 'real' 'boolean' }, 
+     case { 'integer' 'real' 'boolean' 'float' }, 
       if ~isnumeric(tmpval)
           g = [ callfunc 'error: argument ''' fieldname ''' must be numeric' ]; return;
       end;
@@ -196,7 +199,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
                       g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
                   end;
               end;
-          else % real
+          else % real or float
               if ~isempty(fieldval)
                   if tmpval < fieldval(1) | tmpval > fieldval(2)
                       g = [ callfunc 'error: value out of range for argument ''' fieldname '''' ]; return;
