@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2004/06/02 22:50:19  arno
+% do not remember
+%
 % Revision 1.59  2004/06/01 23:21:59  arno
 % implementing baseboot and baseline windows
 %
@@ -1120,10 +1123,6 @@ else
         baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
     else
         baseln = 1:length(timesout); % use all times as baseline
-        if length(g.baseboot) == 1 & g.baseboot == 0
-            myprintf(g.verbose, '   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
-            g.baseboot = 0;
-        end;
     end
 end;
 if ~isnan(g.alpha) & length(baseln)==0
@@ -1177,7 +1176,9 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 		end;
         if size(g.baseboot,2) == 1
             if g.baseboot == 0, baselntmp = [];
-            else                baselntmp = baseln; 
+            elseif ~isnan(g.baseline(1))
+                 baselntmp = baseln; 
+            else baselntmp = find(timesout <= 0); % if it is empty use whole epoch
             end;
         else
             baselntmp = [];
@@ -1186,6 +1187,13 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
                 baselntmp = union(baselntmp, tmptime);
             end;
 		end;
+        if prod(size(g.baseboot)) > 2
+            fprintf('Bootstrap analysis will use data in multiple selected windows.\n');
+        elseif size(g.baseboot,2) == 2
+            fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
+        elseif g.baseboot
+            fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
+        end;        
 		resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
 						   'formulapost', formulapost, 'formulainit', formulainit, ...
 						   'formulaout', formulaout, 'bootside', {'both' 'upper'}, 'naccu', g.naccu, ...
