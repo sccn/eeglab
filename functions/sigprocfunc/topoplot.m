@@ -91,7 +91,7 @@
 %
 % Outputs:
 %         h           - plot axes handle
-%         grid/val    - interpolated data image matrix (off-head points = NaN).  
+%         grid_or_val - interpolated data image matrix (off-head points = NaN).  
 %                       ELSE, interpolated value at single input 'noplot' channel location, if any.
 % Chan_locs format:
 %    See >> topoplot 'example'
@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.210  2004/10/08 21:32:09  scott
+% help message clarification on outputs -sm
+%
 % Revision 1.209  2004/10/07 15:55:15  scott
 % made Values==[] work with plotchans  -sm
 %
