@@ -46,7 +46,7 @@
 %   'vals'        - [float array] value for significance. 'alpha' is ignored and 
 %                 rsignif returns the p-value. Have to be used with 'distfit'.
 %                 Option currently only implemented for 1-D data.
-%   'distfit'     - ['norm'] fit distribution with known
+%   'distfit'     - ['on'|'off'] fit distribution with known
 %                 function for computing more accurate limits or exact p-value
 %                 ('vals' option). Statistical toolbox required.
 %                 Option currently only implemented for 1-D data.
@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/05/23 23:16:47  arno
+% aded warning
+%
 % Revision 1.11  2003/05/23 00:58:17  arno
 % larger range for 'vals' parameters
 %
@@ -150,7 +153,7 @@ g = finputcheck(varargin, ...
 				  'boottype'      'string'  {'first' 'second' 'both' 'times' 'trials' 'timestrials' 'timestrials2' 'both2'} 'both'; ...
 				  'alpha'         'real'     [0 1]                    0.05; ...
 				  'vals'          'real'     [0 Inf]                    []; ...
-				  'distfit'       'string'   {'norm' 'none' }         'none'; ...
+				  'distfit'       'string'   {'on' 'off' }            'off'; ...
 				  'accarray'      'integer'  []                       NaN	});
 if isstr(g)
 	error(g);
@@ -365,15 +368,18 @@ else
 end; % 2-D or 3-D
 
 % fit to distribution (currently only for 1-D data)
-if ~strcmpi(g.distfit, 'none')
+if strcmpi(g.distfit, 'on')
     if length(g.vals) ~= 1
         error('For fitting, vals must contain exactly one value');
     end;
     
-    % function fitting and computation of p
-    % -------------------------------------
-    valcomp = linspace(min(abs(Rbootout(:))), max(abs(Rbootout(:))), 100);
+    % fitting with Ramber-Schmeiser distribution
+    % ------------------------------------------
+    accarrayout = 1 - findfit(abs(Rbootout(:)), g.vals);
+    return;
     
+    % fitting with normal distribution (deprecated)
+    % --------------------------------
     [mu sigma] = normfit(abs(Rbootout(:)));
     accarrayout = 1 - normcdf(g.vals, mu, sigma); % cumulative density distribution
                                         % formula of normal distribution
@@ -381,7 +387,8 @@ if ~strcmpi(g.distfit, 'none')
 
     %figure;
     %hist(abs(Rbootout)); tmpax = axis;
-    %hold on;
+    %hold on; 
+    %valcomp = linspace(min(abs(Rbootout(:))), max(abs(Rbootout(:))), 100);
     %normy = normpdf(valcomp, mu, sigma);
     %plot(valcomp, normy/max(normy)*tmpax(4), 'r');
     %return;
