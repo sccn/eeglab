@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/08/12 01:37:00  arno
+% color
+%
 % Revision 1.31  2002/08/11 22:34:04  arno
 % color
 %
@@ -1199,13 +1202,13 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
  end
  if alpha>0
    fprintf('Computing and plotting %g coherence significance level...\n',alpha);
-   [amps,cohers,cohsig,ampsig,allcohers] = ...
-     crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+   %[amps,cohers,cohsig,ampsig,allcohers] = ...
+     %crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
    fprintf('Inter-Trial Coherence significance level: %g\n',cohsig);
    fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
  else
-   [amps,cohers,cohsig,ampsig,allcohers] = ...
-     crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+   %[amps,cohers,cohsig,ampsig,allcohers] = ...
+     % crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
  end
  if ~exist('allcohers')
      fprintf('erpimage(): allcohers not returned....\n')
