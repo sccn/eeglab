@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.197  2004/01/24 21:25:04  scott
+% same
+%
 % Revision 1.196  2004/01/24 21:22:59  scott
 % same
 %
@@ -3026,7 +3029,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
        fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
-    set(fillwh,'edgecolor',FILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
+    set(fillwh,'edgecolor',WINFILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
   end
   if ~isempty(signif);% (2,times) array giving upper and lower signif limits
       filltimes = [times times(end:-1:1)];
