@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/07/30 01:56:06  arno
+% adding 'actscale' option and cbar
+%
 % Revision 1.24  2003/04/15 16:55:10  arno
 % allowing to plot up to 20 components
 %
@@ -495,7 +498,7 @@ if strcmpi(g.pvaf, 'on')
     vardat = mean(mean((data(:,frame1:frame2).^2)));
     pvaf = 100-100*pvaf / vardat;
     for index =1:ncomps
-        fprintf('Component %d percentage variance accounted for: %6.2f\n', index, pvaf(index));
+        fprintf('Component %d percentage variance accounted for: %6.2f\n', g.compnums(index), pvaf(index));
     end;
 end;
 %
@@ -518,7 +521,7 @@ compsplotted = compvarorder(1:ntopos);% (output var)
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
 plottimes  = x(plotframes);           % convert to times in ms
 compx      = compx(ifx);              % indices into compnums, in plotting order
-maporder   = g.compnums(compx);         % comp. numbers, in plotting order (l->r)
+maporder   = g.compnums(compx);       % comp. numbers, in plotting order (l->r)
 maxproj    = maxproj(:,compx);        % maps in plotting order 
 
 vlen = length(g.voffsets); % extend voffsets if necessary
@@ -799,6 +802,8 @@ if strcmpi(g.dispmaps, 'on')
         end;
     end;
     
+    [tmp tmpsort] = sort(maporder);
+    [tmp tmpsort] = sort(tmpsort);
     for t=1:ntopos % left to right order 
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
@@ -813,7 +818,7 @@ if strcmpi(g.dispmaps, 'on')
             end
             axis square
             if strcmpi(g.pvaf, 'on')
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', pvaf(maporder(t))) ''');'] );
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
