@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/13 18:21:24  arno
+% passes on geomvert
+%
 % Revision 1.10  2002/08/13 17:29:07  arno
 % new supergui call
 %
@@ -121,7 +124,7 @@ if isstr(mode)
 		listui = { listui{:}, {} };
 	end;   
 	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-	if exist('geomvert') ~= 1
+	if exist('geomvert') ~= 1 | isempty(geomvert)
 		[tmp tmp2 allobj] = supergui( geometry, [], listui{:} );
 	else
 		[tmp tmp2 allobj] = supergui( geometry, [geomvert(:)' 1 1], listui{:} );
