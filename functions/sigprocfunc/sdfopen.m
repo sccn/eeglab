@@ -9,37 +9,38 @@
 %       >> [S,EDF] = sdfread(EDF, SecRead, SecStart); % reads the opened EDF data file.
 %       >> [S,EDF] = sdfread(EDF, Inf); % reads the whole opened EDF data file.
 %
-% Inputs:
-% CHAN [int vector] Specifies the channel(s) to read. Else, a re-referencing matrix
+% Inputs "CHAN":
+%      [int vector] Specifies the channel(s) to read. Else, a re-referencing matrix
 %                   [Default|0 -> read all channels].
-% MODE 
-%      == 'UCAL' [Default mode] Indicates that no calibration (re-scaling) to physical dim. 
+% Input "MODE": 
+%   'UCAL' [Default mode] Indicates that no calibration (re-scaling) to physical dim. 
 %                  is performed. Outputs are 16-bit integers. 
 % 
-%      == 'SIESTA' Indicates that channels #1-#6 are re-referenced to (M1+M2)/2          
+%   'SIESTA' - Indicates that channels #1-#6 are re-referenced to (M1+M2)/2          
 %                 (Note: 'UCAL' overrides 'SIESTA')
-%      == 'AFIR' Indicates that Adaptive FIR filtering is used for ECG removal.
-%		   Implements Adaptive FIR filtering for ECG removal in EDF/GDF-tb.
-% 		   based on the algorithm of Mikko Koivuluoma <k7320@cs.tut.fi>
+%   'AFIR'   - Indicates that Adaptive FIR filtering is used for ECG removal.
+%		       Implements Adaptive FIR filtering for ECG removal in EDF/GDF-tb.
+% 		       based on the algorithm of Mikko Koivuluoma <k7320@cs.tut.fi>
 %                  A delay of EDF.AFIR.delay number of samples has to be considered. 
-%      == 'SIESTA+AFIR' Does both.
-%      == 'RAW' One column represents one EDF-block
-%      == 'Notch50Hz' Implements a simple FIR-notch filter at 50 Hz
-%      == 'RECG' Implements ECG minimization with regression analysis
-%      == 'TECG' Implements ECG minimization with template removal (test status)
-%      == 'HPF0.0Hz' Implements a high-pass filter (with zero at z=+1, i.e. a differentiator).
-%                  In this case, a notch-filter and/or sub-sampling is recommended. 
-%      == 'TAUx.yS' Compensates time-constant of x.y seconds
-%      == 'EOG[hvr]' Produces HEOG, VEOG and/or REOG output (CHAN not considered)
-%      == 'OVERFLOW' Performs overflow detection
-%      == 'Units_Blocks' Requests the EDF-field arguments to SDFREAD in blocks 
-%                 [default is seconds]
-% TSR [optional] is the target sampling rate
+%   'SIESTA+AFIR' - Does both.
+%   'RAW'       - One column represents one EDF-block
+%   'Notch50Hz' - Implements a simple FIR-notch filter at 50 Hz
+%   'RECG'      - Implements ECG minimization with regression analysis
+%   'TECG'      - Implements ECG minimization with template removal (test status)
+%   'HPF0.0Hz'  - Implements a high-pass filter (with zero at z=+1, i.e. a differentiator).
+%                 In this case, a notch-filter and/or sub-sampling is recommended. 
+%   'TAUx.yS'   - Compensates time-constant of x.y seconds
+%   'EOG[hvr]'  - Produces HEOG, VEOG and/or REOG output (CHAN not considered)
+%   'OVERFLOW'  - Performs overflow detection
+%   'Units_Blocks' - Requests the EDF-field arguments to SDFREAD in blocks 
+%                    [default is seconds]
+% Input "TSR":
+%         [optional] is the target sampling rate
 %         Currently only downsampling from 256 Hz or 200 Hz to 100 Hz is supported.  
 %         The details are described in the appendix of [4].
 %
-% Outputs: 
-%         EDF  - data structure read from the input file header.
+% Outputs "EDF": 
+%         data structure read from the input file header.
 %         EDF.ErrNo   ~= 0  Indicates that an error occurred 
 %              1: First 8 bytes are not '0       ', violating the EDF spec.
 %              2: Invalid date (unable to guess correct date)
@@ -66,7 +67,7 @@
 % Note: Fields EDF.FileName, EDF.NS, EDF.Dur and EDF.EDF.SampleRate must be defined.
 % 
 % Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
-%         EEGLAB format, Arnaud Delorme, 27 Dec 2002)
+%         EEGLAB format, Arnaud Delorme and Scott Makeig, 27 Dec 2002)
 %
 % See also: fopen, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
 
