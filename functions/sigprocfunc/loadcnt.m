@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/03/19 18:52:42  arno
+% blockread msg
+%
 % Revision 1.15  2004/03/19 18:51:26  arno
 % allowing blockread option
 %
@@ -89,7 +92,7 @@ if nargin ==1
     scan=0;
 end     
 
-fid = fopen(filename,'r');
+fid = fopen(filename,'r', 'l');
 disp(['Loading file ' filename ' ...'])
 
 h.rev               = fread(fid,12,'char');
