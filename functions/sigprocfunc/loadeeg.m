@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/11/26 18:17:07  scott
+% help msg
+%
 % Revision 1.5  2003/05/14 16:54:34  arno
 % allowing to read 32-bits data files
 %
@@ -146,7 +149,8 @@ for elec = 1:chan
 	sensitivity(elec) = fread(fid, 1, 'float32');
 	erp = fread(fid, 8, 'uchar');
 	calib(elec) = fread(fid, 1, 'float32');
-	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', chan_names(elec,1:4), baseline(elec), sensitivity(elec), calib(elec));
+	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', ...
+            char(chan_names(elec,1:4)), baseline(elec), sensitivity(elec), calib(elec));
 	factor(elec) = calib(elec) * sensitivity(elec) / 204.8;
 end;
 %fprintf('Electrode configuration\n');
