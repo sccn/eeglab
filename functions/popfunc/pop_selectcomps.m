@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/05/10 17:31:52  arno
+% adding name of dataset to title
+%
 % Revision 1.16  2003/02/11 02:02:16  arno
 % making it compatible for one row
 %
@@ -183,7 +186,7 @@ for ri = compnum
 			return;
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
-		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'style' , 'fill');
+		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', 'off', 'style' , 'fill');
 		axis square;
 
 		% plot the button
