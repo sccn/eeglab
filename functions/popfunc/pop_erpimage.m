@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2003/04/24 21:53:56  arno
+% debuging renorm default option
+%
 % Revision 1.108  2003/04/23 23:14:53  arno
 % cycle
 %
@@ -681,7 +684,7 @@ if popup
 		limits(9) = eval( res.limbaseamp ); %bamp
 	end;
 	if ~all(isnan(limits))
-		options = [ options ',''limits'',[' num2str(limits) ']' ];
+		options = [ options ',''limits'',[' vararg2str(limits) ']' ];
 	end;
 	
 	% color limits
