@@ -4,29 +4,30 @@
 %  >> linktext = help2html( filein, fileout, 'key1', val1, 'key2', val2 ...);
 %
 % Inputs:
-%   filein     - input filename  (with .m extension)
-%   fileout    - output filename (if empty, generated automatically)
+%   filein       - input filename  (with .m extension)
+%   fileout      - output filename (if empty, generated automatically)
 %
 % Optional inputs:
-%   'header'   - command to insert in the header (i.e. javascript 
-%                   declaration or meta-tags). {Default none. 
-%   'footer'   - command to insert at the end of the HTML file (i.e. back
-%                   button. {Default none}. 
-%   'refcall'  - syntax format to call references. Default '%s.html'. For
-%                   javascript function uses 'javascript:funcname(''%s.js'')'
-%   'font'     - font name
+%   'header'     - command to insert in the header (i.e. javascript 
+%                   declaration or meta-tags). {default: none}.
+%   'footer'     - command to insert at the end of the .html file (e.g., 
+%                   back button). {default: none}. 
+%   'refcall'    - syntax to call references. {default: '%s.html'} For
+%                  javascript function uses 'javascript:funcname(''%s.js'')'
+%   'font'       - font name
 %   'background' - background tag (i.e. '<body BACKGROUND="img.jpg">'). 
-%                   {Default none}.
-%   'outputlink' - command to call the generated HTML page. Default is
-%                  standard HTML href. Must contain two '%s' symbol to
-%                  write title and link.
-%   'outputtext' - Text used in the outputlink. Default is the function
-%                  name.
-%   'outputonly' - ['on'|'off'] Only generate output text for mother web 
-%                  page. Default is 'off'. 
+%                   {default: none}.
+%   'outputlink' - html command text to link to the generated .html page. 
+%                  Must contain two '%s' symbols to the function title 
+%                  and to the function link.
+%                  Ex: ... href="%s.html" ... {default: standard .html href}. 
+%   'outputtext' - Text used in the outputlink. {default: the function
+%                  name}
+%   'outputonly' - ['on'|'off'] Only generate the linktext {default: 'off'}
 %
 % Output:
-%   linktext   - html text link to the output file
+%   fileout      - .html file written to disk
+%   linktext      - html-text link to the output file 
 %
 % M-file format:
 %   The following lines describe the header format of an m-file function 
@@ -52,18 +53,20 @@
 %    
 % Author:  Arnaud Delorme, Salk Institute 2001
 %
-% Notes: 1) Below Title2, the text lines are considered as is (e.g., 
+% Notes: 1) The text lines below Title2 are considered as is (i.e.,
 %           preserving Matlab carriage returns) unless there is a 
 %           Matlab continuation cue ('...'). In this case, lines are 
-%           contcatenated. For 'Title1' following each variable name 
-%           all text lines are concatenated by default.
-%        2) The pattern 'function()[,]' is detected 
-%           It is printed in bold if it is the function descriptor
-%           It is used as a web link to another function, but only if the 
-%           file 'function.html' exists.
-%        3) If a 'function.jpg' image file with the same name as the function exists, 
-%           the image is inserted into the .html file following the function description.
-%        4) Lines beginning by '%%' are not interpreted.
+%           contcatenated. As below 'Title1', all text lines following
+%           each variable name (i.e., single_word followed by a ' - ' or ' = ') 
+%           are concatenated. 
+%        2) The pattern 'function()' is detected and is printed in bold 
+%           if it is the first function descriptor. Otherwise,
+%           it is used as a web link to the .html function file 
+%           'function.html' if this exists.
+%        3) If a 'function.jpg' image file (with same 'function' name) exists, 
+%           the image is inserted into the function .html file following 
+%           the function description.
+%        4) Lines beginning by '%%' are not interpreted and will be printed as is.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -84,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/09/07 22:14:54  scott
+% help msg -scott
+%
 % Revision 1.13  2002/08/17 00:52:45  arno
 % [Adebug
 %
