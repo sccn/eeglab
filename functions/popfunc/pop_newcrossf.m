@@ -1,7 +1,7 @@
-% pop_crossf() - Return estimates and plots of event-related spectral coherence 
+% pop_newcrossf() - Return estimates and plots of event-related spectral coherence 
 %
 % Usage:
-%       >> pop_crossf(EEG, typeproc, num1, num2, tlimits,cycles,
+%       >> pop_newcrossf(EEG, typeproc, num1, num2, tlimits,cycles,
 %                                 'key1',value1,'key2',value2, ... );   
 % Inputs:            
 %   INEEG    - Input EEG dataset
@@ -14,9 +14,9 @@
 %   cycles   -   >0 -> Number of cycles in each analysis wavelet 
 %                 0 -> Use FFTs (with constant window length)
 %
-% Optional inputs: As for crossf().  See >> help crossf
+% Optional inputs: As for newcrossf().  See >> help newcrossf
 %    
-% Outputs: Same as crossf(). No outputs are returned when a
+% Outputs: Same as newcrossf(). No outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 11 March 2002
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/11/06 03:18:25  arno
+% plotitc -> plotphase
+%
 % Revision 1.27  2004/09/20 18:18:42  hilit
 % added round() on pointrange2 so, the indices will be integers and not double
 %
@@ -127,13 +130,13 @@
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
 
-function varargout = pop_crossf(EEG, typeproc, num1, num2, tlimits, cycles, varargin );
+function varargout = pop_newcrossf(EEG, typeproc, num1, num2, tlimits, cycles, varargin );
 
 varargout{1} = '';
 % display help if not enough arguments
 % ------------------------------------
 if nargin < 2
-	help pop_crossf;
+	help pop_newcrossf;
 	return;
 end;	
 lastcom = [];
@@ -170,9 +173,9 @@ if popup
 				 'tooltipstring', context('alpha',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,'alpha') } {} ...
 			   { 'Style', 'text', 'string', 'Optional timef() arguments (see Help)', 'fontweight', 'bold', ...
-				 'tooltipstring', 'See crossf() help via the Help button on the right...' } ...
+				 'tooltipstring', 'See newcrossf() help via the Help button on the right...' } ...
 			   { 'Style', 'edit', 'string', '''padratio'', 4' } ...
-			   { 'Style', 'pushbutton', 'string', 'Help', 'callback',  'pophelp(''crossf'');' } ...
+			   { 'Style', 'pushbutton', 'string', 'Help', 'callback',  'pophelp(''newcrossf'');' } ...
 			   {} ...
 			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotersp','present',0), 'string', ...
 				 'Plot coherence amplitude', 'tooltipstring', ...
@@ -182,9 +185,9 @@ if popup
 				 'Plot coherence phase image in the lower panel' } ...
 			 };
 
-	result = inputgui( geometry, uilist, 'pophelp(''pop_crossf'');', ...
-					   fastif(typeproc, 'Plot channel cross-coherence -- pop_crossf()', ...
-							  'Plot component cross-coherence -- pop_crossf()'));
+	result = inputgui( geometry, uilist, 'pophelp(''pop_newcrossf'');', ...
+					   fastif(typeproc, 'Plot channel cross-coherence -- pop_newcrossf()', ...
+							  'Plot component cross-coherence -- pop_newcrossf()'));
 	if length( result ) == 0 return; end;
 
 	num1     = eval( [ '[' result{1} ']' ] ); 
@@ -297,12 +300,12 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
+varargout{1} = sprintf('figure; pop_newcrossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
 %if is_sccn
 %    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 %else 
-    com = sprintf( '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
+    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
  
 %end;
 eval(com)
