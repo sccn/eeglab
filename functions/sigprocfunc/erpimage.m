@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.204  2004/02/24 23:04:40  arno
+% fixed vertical lines in ERP when RT-aligned
+%
 % Revision 1.203  2004/01/24 22:01:23  scott
 % *** empty log message ***
 %
@@ -1482,6 +1485,9 @@ if any(isnan(sortvar))
 	fprintf('Removing %d trials with NaN sortvar values.\n', length(nanlocs));
 	data(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
+    if length(sortvar) < 3
+        error('Not enough trials');
+    end;
 	if exist('data2') == 1
 		data2(:,nanlocs) = [];
 	end;
@@ -1507,9 +1513,11 @@ switch lower(renorm)
 		   0.5 * (max(times) - min(times)) + min(times) + 0.4*(max(times) - min(times));
  case 'no',;
  otherwise,
-  locx = findstr('x', lower(renorm));
-  if length(locx) ~= 1, error('erpimage: unrecognized renormalizing formula'); end;
-  eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
+  if ~isempty(renorm)
+      locx = findstr('x', lower(renorm));
+      if length(locx) ~= 1, error('erpimage: unrecognized renormalizing formula'); end;
+      eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
+  end;
 end;
 %
 %%%%%%%%%%%%%%%%%%% Align data to sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2586,6 +2594,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     
     if ~isnan(aligntime)
         line([aligntime aligntime],[limit(3:4)*1.1],'Color','k','LineWidth',ZEROWIDTH); % x=median sort value
+        line([0 0],[limit(3:4)*1.1],'Color','k','LineWidth',ZEROWIDTH); % x=median sort value
         % remove y axis
         if length(tmph) > 1
             delete(tmph(end));
