@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2003/01/10 01:11:15  arno
+% new default position
+%
 % Revision 1.67  2003/01/10 01:04:31  arno
 % same, making the figure visible at the end of plot
 %
@@ -347,7 +350,7 @@ SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
 DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.788095];
                                   % dimensions of main EEG axes
-ORIGINAL_POSITION = [50 100 800 500];
+ORIGINAL_POSITION = [50 50 800 500];
                                   
 if nargin < 1
    help eegplot
