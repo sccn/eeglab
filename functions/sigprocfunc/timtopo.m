@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/03/04 18:35:02  scott
+% cbar text -sm
+%
 % Revision 1.26  2003/03/04 18:34:07  scott
 % cbar text
 %
@@ -469,14 +472,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axcb = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.62*pos(4) pos(3)*.02 pos(4)*0.09]);
+axcb = axes('Position',[pos(1)+pos(3)*0.985 pos(2)+0.62*pos(4) pos(3)*0.02 pos(4)*0.09]);
 h=cbar(axcb);                        % colorbar axes
 pos_cb = get(axcb,'Position');
 set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.50,1.01,titl,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+text(0.86,0.67,titl,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
 
 text(0.966,0.695,'+','FontSize',16,'HorizontalAlignment','Center');
 text(0.966,0.625,'-','FontSize',16,'HorizontalAlignment','Center');
