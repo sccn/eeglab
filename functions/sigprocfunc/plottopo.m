@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/03/05 02:25:23  arno
+% removing warnings and extra CR
+%
 % Revision 1.7  2003/02/21 00:36:09  scott
 % header edit -sm
 %
@@ -521,106 +524,111 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 
     for c=1:chans, %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-      if P>0 % subsequent pages (Axes specified)
-        axes(Axes(c))
-        hold on;                      % plot down left side of page first
-        axis('off')
-      else   % first page, specify axes
-        xcenter = xvals(c);
-        ycenter = yvals(c);
-        Axes = [Axes axes('Units','Normal','Position', ...
-              [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
-        axes(Axes(c))
-        axis('off')
-     
-        hold on;                      % plot down left side of page first
-        % set(h,'YLim',[ymin ymax]);    % set default plotting parameters
-        % set(h,'XLim',[xmin xmax]);
-
-        axislcolor = get(gca,'Xcolor');   %%CJH
-
-        axis('off');
-        if ISSPEC
-          plot([xmin xmin],[0 ymax],'color',axislcolor); 
-        else
-          plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
-        end  
-        axis('off');
-        plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
-                                                
-        % secondx = 200;                             % draw second vert axis 
-        % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
-       %
-       %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
-       %
-       NAME_OFFSET = -1;
-       NAME_OFFSETY = -0.5;
-       if channels~=0,                               % print channames
-        if ISSPEC
-          axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
-            set(h,'HorizontalAlignment','right');    % print before traces
-            set(h,'FontSize',CHANFONTSIZE);              % choose font size
-        else % ~ISSPEC
-          if ymin <= 0 & ymax >= 0,
-            yht = 0;
-          else
-            yht = mean(SIGN*data(c,1+P*frames:1+P*frames+frames-1));
-          end
-          if ~ISRECT    % print before traces
-             axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
-             set(h,'HorizontalAlignment','right');      
-             set(h,'FontSize',CHANFONTSIZE);           % choose font size
-          else % ISRECT
-            if xmin<0
-               xmn = 0;
+        if P>0 % subsequent pages (Axes specified)
+            axes(Axes(c))
+            hold on;                      % plot down left side of page first
+            axis('off')
+        else   % first page, specify axes
+            xcenter = xvals(c);
+            ycenter = yvals(c);
+            Axes = [Axes axes('Units','Normal','Position', ...
+                              [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
+            axes(Axes(c))
+            axis('off')
+            
+            hold on;                      % plot down left side of page first
+                                          % set(h,'YLim',[ymin ymax]);    % set default plotting parameters
+                                          % set(h,'XLim',[xmin xmax]);
+            
+            axislcolor = get(gca,'Xcolor');   %%CJH
+            
+            axis('off');
+            
+            % secondx = 200;                             % draw second vert axis 
+            % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
+            %
+            %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            NAME_OFFSET = -1;
+            NAME_OFFSETY = -0.5;
+            if channels~=0,                               % print channames
+                if ISSPEC
+                    axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
+                    set(h,'HorizontalAlignment','right');    % print before traces
+                    set(h,'FontSize',CHANFONTSIZE);              % choose font size
+                else % ~ISSPEC
+                    if ymin <= 0 & ymax >= 0,
+                        yht = 0;
+                    else
+                        yht = mean(SIGN*data(c,1+P*frames:1+P*frames+frames-1));
+                    end
+                    if ~ISRECT    % print before traces
+                        axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
+                        set(h,'HorizontalAlignment','right');      
+                        set(h,'FontSize',CHANFONTSIZE);           % choose font size
+                    else % ISRECT
+                        if xmin<0
+                            xmn = 0;
+                        else
+                            xmn = xmin;
+                        end
+                        axis('off'),h=text(xmn,ymax,[channames(c,:)]); 
+                        set(h,'HorizontalAlignment','right');      
+                        set(h,'FontSize',TICKFONTSIZE);            % choose font size
+                    end % ISRECT
+                end % ~ISSPEC
+            end; % channels~=0
+        end; % P=0 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+            
+            plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
+                 'linewidth',LINEWIDTH);   
+            ymn = min(SIGN*[ymax ymin]);
+            ymx = max(SIGN*[ymax ymin]);
+            axis([xmin xmax ymn ymx]);          % set axis bounds
+        else % ISSPEC
+            plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
+                 'linewidth',LINEWIDTH);   
+            ymaxm = ymax;
+            if ymaxm/2. > ymax,
+                ymaxm = ymaxm/2.;
+            end;
+            axis([xmin xmax ymin ymaxm]);      % set axis values
+        end
+        %
+        %%%%%%%%%%%%%%%%%%%%%%% Plot lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        if P == datasets-1
+            if ISSPEC
+                plot([xmin xmin],[0 ymax],'color',axislcolor); 
             else
-               xmn = xmin;
-            end
-            axis('off'),h=text(xmn,ymax,[channames(c,:)]); 
-            set(h,'HorizontalAlignment','right');      
-            set(h,'FontSize',TICKFONTSIZE);            % choose font size
-          end % ISRECT
-        end % ~ISSPEC
-       end; % channels~=0
-      end; % P=0
-      %
-      %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      %
-      if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-                                                    
-        plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
-                       'linewidth',LINEWIDTH);   
-        ymn = min(SIGN*[ymax ymin]);
-        ymx = max(SIGN*[ymax ymin]);
-        axis([xmin xmax ymn ymx]);          % set axis bounds
-      else % ISSPEC
-        plot(x,SIGN*data(c,1+P*frames:1+P*frames+frames-1),colors(P+1),...
-                       'linewidth',LINEWIDTH);   
-        ymaxm = ymax;
-        if ymaxm/2. > ymax,
-            ymaxm = ymaxm/2.;
+                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
+            end  
+            axis('off');
+            plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
         end;
-        axis([xmin xmax ymin ymaxm]);      % set axis values
-      end
-      %
-      %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
-      %
-      if ~isnan(vert)
-       if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-        ymean = (ymin+ymax)/2; 
-        vmin = ymean-0.5*(ymean-ymin);
-        vmax = ymean+0.5*(ymax-ymean);
-        for v = vert
-          plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+        %
+        %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
+        %
+        if ~isnan(vert)
+            if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+                ymean = (ymin+ymax)/2; 
+                vmin = ymean-0.5*(ymean-ymin);
+                vmax = ymean+0.5*(ymax-ymean);
+                for v = vert
+                    plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+                end
+            else
+                for v = vert
+                    plot([v v],[0 ymax],'color',vertcolor); 
+                end
+            end
         end
-       else
-        for v = vert
-          plot([v v],[0 ymax],'color',vertcolor); 
-        end
-       end
-      end
-
-     fprintf(' %d',c); % finished with channel plot
+        
+        fprintf(' %d',c); % finished with channel plot
     end; % c, chans / subplot
     fprintf('\n');
   end; % P / epoch

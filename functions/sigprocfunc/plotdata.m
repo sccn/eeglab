@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/20 21:30:33  arno
+% normalization for all plots
+%
 % Revision 1.6  2002/10/16 15:54:22  arno
 % nothing
 %
@@ -372,48 +375,6 @@ end
         
         axislcolor = get(gca,'Xcolor');   %%CJH
         
-        if P==0 
-            if ~ISSPEC
-                axis('off');
-                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert %%CJH
-                                                            % axis at time 0  
-            else  % ISSPEC
-                axis('off');plot([xmin xmin],[0 ymax],'color',axislcolor); 
-            end  
-            
-      % secondx = 200;                               % draw second vert axis 
-      % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
-      
-      axis('off');
-      plot([xmin xmax],[0 0],'color',axislcolor);   % draw horizontal axis 
-
-      %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
-      
-      if ~isempty(channels),                               % print channames
-          if ~ISSPEC
-              if ymin <= 0 & ymax >= 0,
-                  yht = 0;
-              else
-                  yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
-              end
-              axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
-              set(h,'HorizontalAlignment','right');      % print before traces
-              set(h,'FontSize',FONTSIZE);                % choose font size
-              
-              % axis('off'),h=text(xmax+0.10*xdiff,yht,[channames(I,:)]);
-              %    set(h,'HorizontalAlignment','left');      % print after traces
-              
-          else % ISSPEC
-              axis('off'),h=text(xmin-0.04*xdiff,ymax/2,[channames(I,:)]); 
-              set(h,'HorizontalAlignment','right');      % print before traces
-              set(h,'FontSize',FONTSIZE);                % choose font size
-              
-              % axis('off'),h=text(xmax+0.10*xdiff,ymax/2,[channames(I,:)]);
-              %    set(h,'HorizontalAlignment','left');      % print after traces
-              
-          end;
-       end; 
-        end; 
         %
         %%%%%%%%%%%%%%%%%%%%% Plot two-sided time-series data %%%%%%%%%%%%%%%%%%%
         %
@@ -511,6 +472,50 @@ end
       end % if last data
      end; % if ~ISSPEC
 
+      %%%%%%%%%%%%%%%%%%%%%%% Print channel names and lines %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      if P==datasets-1 
+          if ~ISSPEC
+              axis('off');
+              plot([0 0],[ymin ymax],'color',axislcolor); % draw vert %%CJH
+                                                          % axis at time 0  
+          else  % ISSPEC
+              axis('off');plot([xmin xmin],[0 ymax],'color',axislcolor); 
+          end  
+          
+          % secondx = 200;                               % draw second vert axis 
+          % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
+          
+          axis('off');
+          plot([xmin xmax],[0 0],'color',axislcolor);   % draw horizontal axis 
+          
+          
+          if ~isempty(channels),                               % print channames
+              if ~ISSPEC
+                  if ymin <= 0 & ymax >= 0,
+                  yht = 0;
+                  else
+                      yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
+                  end
+                  axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
+                  set(h,'HorizontalAlignment','right');      % print before traces
+                  set(h,'FontSize',FONTSIZE);                % choose font size
+                  
+                  % axis('off'),h=text(xmax+0.10*xdiff,yht,[channames(I,:)]);
+                  %    set(h,'HorizontalAlignment','left');      % print after traces
+                  
+              else % ISSPEC
+                  axis('off'),h=text(xmin-0.04*xdiff,ymax/2,[channames(I,:)]); 
+                  set(h,'HorizontalAlignment','right');      % print before traces
+                  set(h,'FontSize',FONTSIZE);                % choose font size
+                  
+                  % axis('off'),h=text(xmax+0.10*xdiff,ymax/2,[channames(I,:)]);
+                  %    set(h,'HorizontalAlignment','left');      % print after traces
+                  
+              end;
+          end; 
+      end; 
+      
      fprintf(' %d',I);
     end; % subplot
   end; % dataset
