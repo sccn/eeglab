@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/04/24 22:08:55  arno
+% updating error message
+%
 % Revision 1.13  2003/04/24 22:06:31  arno
 % show message when processing data portion
 %
@@ -160,6 +163,8 @@ if EEG.trials == 1
 			tmplat = cell2mat({EEG.event.latency});
             boundaries = tmplat(boundaries);
             boundaries = [0 round(boundaries-0.5) EEG.pnts];
+            try, warning off MATLAB:divideByZero
+            catch, edn;
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing data portion %d to %d\n',boundaries(n),boundaries(n+1)); 
@@ -169,6 +174,8 @@ if EEG.trials == 1
 					fprintf('\nFilter error: data portion too small (remains unfiltered)\n');
 				end;
 			end
+            try, warning on MATLAB:divideByZero
+            catch, edn;
 		end
 	else
 		EEG.data = eegfilt( EEG.data, options{:});
