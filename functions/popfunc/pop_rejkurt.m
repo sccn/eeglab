@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/14 00:51:47  arno
+% debug multi-elec
+%
 % Revision 1.11  2002/08/12 21:52:30  arno
 % same
 %
@@ -249,10 +252,9 @@ if ~isempty(rej)
 	end;
 end;
 nrej = sum(rej);
-elecrange
 
 com = [ com sprintf('%s = pop_rejkurt(%s,%s);', inputname(1), ...
-		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ]; 
+		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ];
 if nargin < 3 & nargout == 2
 	locthresh = com;
 end;
