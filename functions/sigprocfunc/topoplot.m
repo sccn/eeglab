@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/08/07 20:49:12  arno
+% option 'masksurf' to speed up display
+%
 % Revision 1.57  2003/08/07 16:02:35  scott
 % typo
 %
@@ -551,7 +554,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   if exist('chanrad')
       chantheta = (chantheta/360)*2*pi;
-      chancoords = round(34+33.5*2*chanrad*[-cos(-chantheta),-sin(-chantheta)]);
+      chancoords = round(34+33.5*2*chanrad*[cos(-chantheta),-sin(-chantheta)]);
       if chancoords(1)<1 | chancoords(1) > 67 | chancoords(2)<1 | chancoords(2)>67
           error('designated ''noplot'' channel out of bounds')
       else
