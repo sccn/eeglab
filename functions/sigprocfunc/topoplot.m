@@ -8,11 +8,11 @@
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
 %              options below). Nose is at top of plot; left is left; right is right.
 % Usage:
-%        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
-%        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
-%        >>  topoplot('example'); % Show an example of an electrode location file
-%        >>  [h grid_or_val plotrad_or_grid]]= topoplot(datavector, chan_locs, 'Input1','Value1', ...);
-%
+%        >>  topoplot(datavector, EEG.chanlocs);   % plot using an EEG chanlocs structure
+%        >>  topoplot(datavector, 'my_chan.locs'); % plot by reading a channel locations file
+%        >>  topoplot('example');                  % type an example of an electrode location file
+%        >>  [h grid_or_val plotrad_or_grid, xmesh, ymesh]= ...
+%                           topoplot(datavector, chan_locs, 'Input1','Value1', ...);
 % Required Inputs:
 %   datavector        - single vector of channel values. Else, if a vector of selected subset
 %                       (int) channel numbers -> mark their location(s) using 'style' 'blank'.
@@ -54,7 +54,7 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
-% Dipole plotting:
+% Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
@@ -89,6 +89,7 @@
 %                       location ([rad theta]), if any.
 %     plotrad_or_grid - IF grid image returned above, then the 'plotrad' radius of the grid.
 %                       Else, the grid image
+%     xmesh, ymesh    - x and y values of the returned grid (above)
 %
 % Chan_locs format:
 %    See >> topoplot 'example'
@@ -141,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.232  2004/12/24 01:25:28  scott
+% clarified 'plotchans', added 'emarker2'
+%
 % Revision 1.231  2004/12/21 23:18:48  hilit
 % change x and y axis to depend on squeezfac, in case 'intrad' is provided
 %
