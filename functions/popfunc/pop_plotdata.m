@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 02:15:03  arno
+% changing gui
+%
 % Revision 1.4  2002/08/12 01:38:35  arno
 % color
 %
@@ -76,9 +79,9 @@ end;
 
 if nargin <3
 	if typeplot
-		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP in channel array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] ['ERP in channel array' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'pophelp(''plotdata'');' );
+		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP in channel array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] ['ERP in channel array' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'plotdata' );
 	else
-		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP component array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] ['Component ERPs' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'pophelp(''plotdata'');' );
+		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP component array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] ['Component ERPs' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'plotdata' );
 	end;		
 	if length(result) == 0 return; end;
 	indices   	 = eval( [ '[' result{1} ']' ] );
