@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/12 00:52:53  arno
+% smart load for non-identical structures
+%
 % Revision 1.5  2002/04/11 23:26:27  arno
 % changing structure check
 %
@@ -55,7 +58,6 @@
 
 function [VAROUT, command] = pop_loadset( inputname, inputpath);
 eeg_consts;
-eeg_global;
 
 command = '';
 %eeg_emptyset;
@@ -65,39 +67,17 @@ if nargin < 2
 end;
 
 fprintf('Pop_loadset: loading file %s ...\n', inputname);
-TMPSAVE = ALLEEG;
-ALLEEG = [];
-load([ inputpath inputname ], '-mat');
+TMPVAR = load([ inputpath inputname ], '-mat');
 
-if isempty(ALLEEG)
+if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
-	ALLEEG = TMPSAVE;
-
-	EEG = checkoldformat(EEG);
-	EEG = eeg_checkset(EEG, 'eventconsistency');
-	eeg_store;
-	VAROUT = EEG;
-else 
-	% load multiple dataset
-	% ---------------------
-	TMPSAVE2 = ALLEEG;
-	if ~isempty(TMPSAVE) & (length(TMPSAVE) > 1 | ~isempty(TMPSAVE(1).data)) 
-		disp('Pop_loadset: appending datasets');
-		ALLEEG = TMPSAVE;
-		clear TMPSAVE;
-		increment = length(ALLEEG);
-	else 
-		increment = 0;
-	end;
-	
-	for index = 1:length(TMPSAVE2)
-		if ~isempty(TMPSAVE2(index).data)
-			EEG = eeg_checkset(TMPSAVE2(index));
-			eeg_store(index+increment);
-		end;
-	end;
-	VAROUT = ALLEEG;
+	VAROUT = checkoldformat(TMPVAR.EEG);
+elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
+	disp('Pop_loadset: appending datasets');
+	VAROUT = TMPVAR.ALLEEG;
+else
+	error('Pop_loadset: non-EEGLAB dataset file');
 end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
