@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/06/03 22:07:52  arno
+% fixing when thresholding ICA using 1 electrode
+%
 % Revision 1.12  2003/03/04 20:09:46  arno
 % header typo
 %
@@ -225,7 +228,22 @@ if calldisp
         eegplot( EEG.data(elecrange,:,:), 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     else
         eegplot( icaacttmp, 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-    end;	
+    end;
+else 
+    rej  = tmprejectelec;
+    rejE = tmpelecIout;
+    if ~isempty(tmprejectelec)
+        if icacomp	== 1
+            EEG.reject.rejthresh  = rej;
+            EEG.reject.rejthreshE = rejE;
+        else
+            EEG.reject.icarejthresh  = rej;
+            EEG.reject.icarejthreshE = rejE;
+        end;
+    end;
+    if reject
+        EEG = pop_rejepoch(EEG, rej, 0);
+    end;
 end;
 
 %com = sprintf('Indexes = pop_eegthresh( %s, %d, [%s], [%s], [%s], [%s], [%s], %d, %d);', ...
