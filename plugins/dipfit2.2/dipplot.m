@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.36  2003/07/01 22:10:14  arno
+%debuging for 2 dipoles/component
+%
 %Revision 1.35  2003/07/01 19:04:13  arno
 %fixing view problem
 %
@@ -511,30 +514,44 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             ZO(index) = zo;
             
             if abs([x+xo,y+yo,z+zo]) >= abs([x,y,z])
-                xo = x+xo;
-                yo = y+yo;
-                zo = z+zo;
+                xo1 = x+xo; xo2 = x-xo;
+                yo1 = y+yo; yo2 = y-yo;
+                zo1 = z+zo; zo2 = z-zo;
             elseif strcmpi(g.pointout,'on')
-                xo = x-xo; % make dipole point outward from head center
-                yo = y-yo;
-                zo = z-zo;
+                xo1 = x-xo; xo2 = x+xo; % make dipole point outward from head center
+                yo1 = y-yo; yo2 = y+yo;
+                zo1 = z-zo; zo2 = z+zo;
             else
-                xo = x+xo;
-                yo = y+yo;
-                zo = z+zo;
+                xo1 = x+xo; xo2 = x-xo;
+                yo1 = y+yo; yo2 = y-yo;
+                zo1 = z+zo; zo2 = z-zo;
             end
-            x = -x; xo=-xo;
-            y = -y; yo=-yo;
+            x = -x; xo1 = -xo1; xo2 = -xo2;
+            y = -y; yo1 = -yo1; yo2 = -yo2;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tag = [ 'dipole' num2str(index) ];
-            [xx  yy  zz]  = transformcoords(x,  y,  z, dat.tcparams); 
-            [xxo yyo zzo] = transformcoords(xo, yo, zo, dat.tcparams); 
-            h = line( [xx xxo]', [yy yyo]', [zz zzo]');
+            [xx   yy   zz]   = transformcoords(x,   y,   z,   dat.tcparams); 
+            [xxo1 yyo1 zzo1] = transformcoords(xo1, yo1, zo1,  dat.tcparams); 
+            %[xxo2 yyo2 zzo2] = transformcoords(xo2, yo2, zo2, dat.tcparams); 
+            h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
+            %h2 = line( [xx xxo2]', [yy yyo2]', [zz zzo2]');
             dipstruct.pos3d = [xx yy zz]; % value used for fitting MRI
             dipstruct.rv    = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
-            set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-            if strcmp(BACKCOLOR, 'k'), set(h, 'color', g.color{index}); end;
+            set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+            %set(h2, 'userdata', dipstruct,             'color','k', 'linewidth', g.dipolesize/7.5);
+            if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
+            %if strcmp(BACKCOLOR, 'k'), set(h2, 'color', g.color{index}); end;
+
+            % trying to flip dipoles (without success)
+            % ----------------------
+            %com1 = 'set(gcbo,                 ''visible'', ''off'', ''tag'', '''');';
+            %com2 = [ 'set(' num2str(h1, 32) ',''visible'', ''on'' , ''tag'', ''' tag ''');' ];
+            %com3 = [ 'set(' num2str(h2, 32) ',''visible'', ''on'' , ''tag'', ''' tag ''');' ];
+            %set(h1, 'buttondownfcn', [ com1 com2 ] );
+            %set(h2, 'buttondownfcn', [ com1 com3 ], 'visible', 'off' );
+            %set(h1, 'uicontextmenu', uicontextmenu('callback', [ com1 com2 ]) );
+            %set(h2, 'uicontextmenu', uicontextmenu('callback', [ com1 com3 ]), 'visible', 'off' );
             
             % draw point
             hold on;
@@ -561,18 +578,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo]', [yy yyo]', [-1 -1]');
+                    h = line( [xx xxo1]', [yy yyo1]', [-1 -1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(xxo,  yyo,  -1); 
+                h = plot3(xx,  yy,  -1); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [xx xxo]', [1 1]', [zz zzo]');
+                    h = line( [xx xxo1]', [1 1]', [zz zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
@@ -583,7 +600,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
-                    h = line( [-1 -1]', [yy yyo]', [zz zzo]');
+                    h = line( [-1 -1]', [yy yyo1]', [zz zzo1]');
                     set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
