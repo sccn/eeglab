@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/08/07 16:01:49  scott
+% debug
+%
 % Revision 1.55  2003/08/07 15:56:54  scott
 % debug
 %
@@ -546,7 +549,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
       if chancoords(1)<1 | chancoords(1) > 67 | chancoords(2)<1 | chancoords(2)>67
           error('designated ''noplot'' channel out of bounds')
       else
-        chanval = Zi(chancoords(1),channcoords(2));
+        chanval = Zi(chancoords(1),chancoords(2));
       end
   end
   %
