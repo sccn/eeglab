@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2003/12/05 23:39:09  arno
+% coordinate conversion debug
+%
 % Revision 1.72  2003/12/05 22:58:23  arno
 % same thing
 %
@@ -571,7 +574,6 @@ else
 		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
 			   tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
 					'Are you sure you want to apply this function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
-			   tmpButtonName
                if ~strcmpi(tmpButtonName, 'Yes'), return; end;
 		   end;
 		   switch method
@@ -590,7 +592,7 @@ else
              disp('Note: automatically convert XYZ coordinates to spherical and polar');
              chans = convertlocs(chans, 'cart2all');
             otherwise
-             chans = convertlocs(chans, lower(args{curfield+1}), 'verbose', 'on');
+             chans = convertlocs(chans, method, 'verbose', 'on');
 		   end;
 		  case 'transform'
 		   try, tmpoper = args{curfield+1}; catch, return; end;
