@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2002/10/13 23:43:47  scott
+% debugging
+%
 % Revision 1.52  2002/10/13 23:41:57  scott
 % debug ampargs
 %
@@ -1142,7 +1145,9 @@ elseif exist('valargs')
      fprintf('Sorting data on mean value between %f and %f ms.\n',...
             sttime,endtime);
   end
+  fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
   sortval = mean(data(stframe:endframe,:));
+  fprintf('Size of sortval = [%d,%d]\n',size(sortval,1),size(sortval,2));
   [sortval,sortidx] = sort(sortval);
   data = data(:,sortidx);
   fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
