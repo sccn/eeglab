@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/02/05 23:11:51  arno
+% remove debug msg
+%
 % Revision 1.8  2004/02/05 23:11:13  arno
 % minspace problem
 %
@@ -109,8 +112,8 @@ if ~isempty(g.average)
         fprintf('Moving average updated from %3.2f to %3.2f (=%d points)\n', ...
                 oldavg, g.average*(timevect(2)-timevect(1)), g.average);
     end;
-    %array = convolve(array, ones(1, g.average));
-    array = conv2(array, ones(1, g.average)/g.average, 'same');
+    array = convolve(array, ones(1, g.average));
+    %array = conv2(array, ones(1, g.average)/g.average, 'same');
 end;
 
 interparray = interpolate( array, timevect, g.timesout, g.method);
