@@ -74,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/10/07 17:25:21  arno
+% removing saving filenames
+%
 % Revision 1.12  2003/08/04 21:43:40  arno
 % change applyboot
 %
@@ -134,7 +137,6 @@ end;
 % compute all time frequency maps
 % -------------------------------
 compter = 1;
-asdffdsaf
 for numcompo = 1:nbcompo
 	if iscell(data)
         [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
