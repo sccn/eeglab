@@ -14,12 +14,10 @@
 %   "Time range" - [checkbox] by checking the checkbox, the regions
 %                  selected will be removed. Command line equivalent: 'time' 
 %                  [unchecked] and 'notime' [checked]
-%   "Frame range" - [edit box] select frame vector instead of time range.
-%                  the same restriction as for time range applies. Note that
-%                  for continuous data, unlike in the "Time range" edit box  
-%                  it is not possible to enter several portion of data.
+%   "Point range" - [edit box] select range in data point instead of ms.
+%                  the same remarks as for "Time range" edit box applies.
 %                  Command line equivalent: 'point' and 'nopoint'
-%   "Frame range" - [checkbox] see "Time range" checkbox. Command line 
+%   "Point range" - [checkbox] see "Time range" checkbox. Command line 
 %                  equivalent: 'point' [unchecked] and 'nopoint' [checked]
 %   "Epoch range" - [edit box] select data epoch indices. This checkbox is
 %                  only visible for data epochs. 
@@ -38,19 +36,22 @@
 %
 % Optional inputs
 %   'time'        - time range to include [min max] in milliseconds. For
+%                   data epoch, the range must include either 0 of the max 
+%                   time, as time regions can not be removed from epochs. For
 %                   continuous data, can be [min max] x n to select 
-%                   several regions.
-%   'notime'      - time range to exclude [min max] in milliseconds.For
+%                   several regions. Note that the boundary are both included.
+%   'notime'      - time range to exclude [min max] in milliseconds. For
 %                   continuous data, can be [min max] x n to select 
+%                   several regions. Note that the boundary are both excluded.
+%   'point'       - data points to include [min max]. For
+%                   data epoch, the range must include either 0 of the last 
+%                   point, as time regions can not be removed from epochs.
+%                   For continuous data, can be [min max] x n to select 
 %                   several regions.
-%                   It is not possible however to create a "gap" in the
-%                   the middle of data trials.
-%   'point'       - frame vector to include in points. The vector must
-%                   continuous so the time range is recalculated 
-%                   automatically.
+%                   Note that this parameter used to be a point vector. This
+%                   format is still functional for downward compatibility.
 %   'nopoint'     - frame vector to exclude in points. If points and
-%                   time is set, only the point vector is taken into
-%                   account.
+%                   time is set, the point limit values are used.
 %   'trial'       - array of trial numbers to include
 %   'notrial'     - array of trial numbers to exclude
 %   'channel'     - array of channels to include
@@ -87,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/02/27 20:29:15  arno
+% same
+%
 % Revision 1.24  2003/02/27 20:14:10  arno
 % debugging last
 %
@@ -179,8 +183,8 @@ if isempty(EEG.data)
 end;    
     
 if nargin < 2
-   geometry = { [1 1 1] [1 1 0.25 0.2 0.51] [1 1 0.25 0.2 0.51] [1 1 0.25 0.2 0.51] ...
-           [1 1 0.25 0.2 0.51] [1] [1 1 1]};
+   geometry = { [1 1 1] [1 1 0.25 0.23 0.51] [1 1 0.25 0.23 0.51] [1 1 0.25 0.23 0.51] ...
+           [1 1 0.25 0.23 0.51] [1] [1 1 1]};
    uilist = { ...
          { 'Style', 'text', 'string', 'Select data in:', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Input desired range', 'fontweight', 'bold'  }, ...
@@ -189,7 +193,7 @@ if nargin < 2
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ }, ...
          ...
-         { 'Style', 'text', 'string', 'Frame range (ex: 1:10)' }, ...
+         { 'Style', 'text', 'string', 'Point range (ex: [1 10])' }, ...
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ }, ...
          ...
@@ -274,16 +278,22 @@ if min(g.channel) < 1 | max( g.channel ) > EEG.nbchan
 end;
 
 if ~isempty( g.point )
-    g.time(1) = eeg_point2lat(g.point(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
-    g.time(2) = eeg_point2lat(g.point(end)+1, 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    g.time = zeros(size(g.point));
+    for index = 1:length(g.point(:))
+        g.time(index) = eeg_point2lat(g.point(index), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    end;
+    g.notime = [];
 end;
 if ~isempty( g.nopoint )
-    g.notime(1) = eeg_point2lat(g.nopoint(1), 1, EEG.srate, [EEG.xmin EEG.xmax]);
-    g.notime(2) = eeg_point2lat(g.nopoint(end), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    g.notime = zeros(size(g.nopoint));
+    for index = 1:length(g.nopoint(:))
+        g.notime(index) = eeg_point2lat(g.nopoint(index), 1, EEG.srate, [EEG.xmin EEG.xmax]);
+    end;
+    g.time = [];
 end;
 if ~isempty( g.notime )
     if size(g.notime,2) ~= 2
-        error('Time must contain 2 columns exactly');
+        error('Time/point range must contain 2 columns exactly');
     end;
     if g.notime(2) == EEG.xmax
         g.time = [EEG.xmin g.notime(1)];
@@ -297,7 +307,7 @@ if ~isempty( g.notime )
 end;
 if ~isempty(g.time)
     if size(g.time,2) ~= 2
-        error('Time must contain 2 columns exactly');
+        error('Time/point range must contain 2 columns exactly');
     end;
 end;
 
@@ -428,7 +438,7 @@ end;
 % ------------------
 EEG.data      = EEG.data(g.channel, :, g.trial);
 EEG.trials    = length(g.trial);
-EEG.pnts      = length(g.point);
+EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
 if ~isempty(EEG.chanlocs)
     EEG.chanlocs = EEG.chanlocs(g.channel);
