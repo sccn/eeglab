@@ -76,6 +76,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/20 01:21:05  arno
+% erspboot -> array
+%
 % Revision 1.4  2002/11/18 19:26:30  arno
 % new output format for condition difference
 %
@@ -169,9 +172,11 @@ return;
 function array = applyboot(array, arrayboot)
     if size(arrayboot,3) == 2
         array(find((array > arrayboot(:,:,1)) & (array < arrayboot(:,:,2)))) = 0;
-    elseif size(arrayboot,2) ~= 2
+    elseif size(arrayboot,2) > 2
         array(find(array > arrayboot(:,:))) = 0;
-    else        
+    elseif size(arrayboot,2) == 2        
         array(find((array > repmat(arrayboot(:,1),[1 size(array,2)])) & ...
                    (array < repmat(arrayboot(:,2),[1 size(array,2)])))) = 0;
+    else 
+        array(find(array < repmat(arrayboot(:,1),[1 size(array,2)]))) = 0;    
     end;
