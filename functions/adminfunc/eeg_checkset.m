@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2002/07/23 23:51:25  arno
+% removing error
+%
 % Revision 1.36  2002/07/23 22:23:41  arno
 % removing warning if icaact=[]
 %
@@ -592,25 +595,33 @@ if ~isempty( varargin)
 			  % uniformize fields content for the different epochs
 			  % --------------------------------------------------
 			  % THIS WAS REMOVED SINCE SOME FIELDS ARE ASSOCIATED WITH THE EVENT AND NOT WITH THE EPOCH
-% $$$ 			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
-% $$$ 			  for index = 1:length(difffield)
-% $$$ 			  	  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
-% $$$ 				  valempt = cellfun('isempty', allvalues);
-% $$$ 			 	  arraytmpinfo = cell(1,EEG.trials);
-% $$$ 
-% $$$ 				  % get the field content
-% $$$ 				  % ---------------------
-% $$$ 				  for indexevent = 1:length(EEG.event)
-% $$$ 					  if ~valempt(indexevent)
-% $$$ 						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
-% $$$ 					  end;
-% $$$ 				  end;
-% $$$ 				  % uniformize content for all epochs
-% $$$ 				  % ---------------------------------
-% $$$ 				  for indexevent = 1:length(EEG.event)
-% $$$ 					  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{allepochs(indexevent)});
-% $$$ 				  end;
-% $$$ 			  end;
+			  % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
+ 			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
+ 			  for index = 1:length(difffield)
+ 			  	  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
+ 				  valempt = cellfun('isempty', allvalues);
+ 			 	  arraytmpinfo = cell(1,EEG.trials);
+ 
+ 				  % get the field content
+ 				  % ---------------------
+ 				  for indexevent = 1:length(EEG.event)
+ 					  if ~valempt(indexevent)
+ 						  arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
+ 					  end;
+ 				  end;
+ 				  % uniformize content for all epochs
+ 				  % ---------------------------------
+ 				  for indexevent = 1:length(EEG.event)
+					  if valempt(indexevent)
+						  EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, ...
+														   arraytmpinfo{allepochs(indexevent)});
+					  end;
+ 				  end;
+				  if any(valempt)
+					  fprintf(['Eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
+					  fprintf(['Eeg_checkset: filling with value of other events in the same epochs\n']);
+				  end;
+ 			  end;
 		  end;
 		  
 		  % uniformize fields (str or int) if necessary
