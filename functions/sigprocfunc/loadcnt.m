@@ -50,11 +50,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/10/30 19:41:01  arno
+% updating error message
+%
 % Revision 1.12  2003/10/30 19:23:54  arno
 % adding revision line
 %
 
-function [f,lab,ev2p] = load_scan41(filename,varargin)
+function [f,lab,ev2p] = loadcnt(filename,varargin)
 
 if ~isempty(varargin)
 	 r=struct(varargin{:});
@@ -428,9 +431,15 @@ end
 if ~isempty(ev2)
     ev2p=ev2; 
     ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
-    for i=1:nevents 
-        ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
-    end     
+    if strcmpi(r.dataformat, 'int16')
+        for i=1:nevents 
+            ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+        end     
+    else % 32 bits
+        for i=1:nevents 
+            ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
+        end     
+    end;        
     f.event = ev2p;
 end;
 
