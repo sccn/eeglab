@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/18 14:27:16  arno
+% editing thanks to Cooper
+%
 % Revision 1.3  2002/10/02 00:35:56  arno
 % update condstat, debug
 %
@@ -112,7 +115,7 @@ for index=1:length(varargin)
 	if ndims(tmpvar1) == 2
 		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), cond1trials+cond2trials);' ] );
 		eval( [ 'arg' int2str(index) '(:,1:cond1trials)=tmpvar1;' ] );
-		eval( [ 'arg' int2str(index) '(:,cond1trials1+1:end)=tmpvar2;' ] );
+		eval( [ 'arg' int2str(index) '(:,cond1trials+1:end)=tmpvar2;' ] );
 	else
 		eval( [ 'arg' int2str(index) '=zeros(size(tmpvar1,1), size(tmpvar1,2), cond1trials+cond2trials);' ] );
 		eval( [ 'arg' int2str(index) '(:,:,1:cond1trials)=tmpvar1;' ] );
