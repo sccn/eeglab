@@ -1,22 +1,22 @@
-% eeg_amplitudearea() - Resamples the averaged ERP with spline interpolation 
-%                       at sample rate (resrate) in Hz to get the exact limits 
-%                       of the window of integration. High samples the window 
+% eeg_amplitudearea() - Resamples an ERP average using spline interpolation 
+%                       at a new sample rate (resrate) in Hz to get the exact limits 
+%                       of the window of integration. Finely samples the window 
 %                       and adds together very narrow rectangles capped by 
 %                       right-angled triangles under the window. Output is in uVms. 
 %                       trade-off between speed and number of resamples and 
-%                       channel selected occurs.
+%                       ??? channel selected occurs.
 % Usage:
 %      >> [channels, amplitude] = eeg_amplitudearea(EEG,channels, resrate, wstart, wend);
 % Inputs:
+%   EEG         - EEGLAB data struct containing a (3-D) epoched data matrix 
 %   channels    - vector of channel indices
 %   resrate     - resampling rate for window of integration in Hz
 %   wstart      - start of window of integration in ms post stimulus-onset
 %   wend        - end of window of integration in ms post stimulus-onset
-%   EEG         - EEGLAB data struct containing 3-D epoched data matrix 
 %
 % Outputs:
 %   channels    - a vector of channel indices.
-%   amplitude   - 1 dimensional array in uV for the channels
+%   amplitude   - 1-dimensional array in uV for the channels
 %
 % Example
 %    >> [channels, amplitude] = eeg_amplitudearea(EEG,[12 18 25 29], 2000, 90.52, 120.52);
@@ -40,6 +40,9 @@ return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [channels, overall_area] = amplitudearea_msuV (EEG, channels, resrate, wstart, wend)
 
+if ndim(EEG.data) ~= 3
+  error('EEG.data must be 3-D data epochs');
+end
 erp = mean(EEG.data,3);
 restep = (100/resrate)
 [tmp ind1] =min( abs( EEG.times - wstart ) ); % closest time index to wstart
@@ -67,7 +70,7 @@ end
 
 for x = 1:size(channels,2)
     channel = channels(x)
-    %resamples
+    % resamples
     rerp(x, 1:tr) = spline(tim(:),erp(channel, ind1:ind2), timr(1:tr))
     for y = 1:(tr -1)
           % identify which sample is the height of the rectangle under the
