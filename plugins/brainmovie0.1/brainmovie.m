@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2003/05/06 22:01:14  arno
+% making mesh transparent
+%
 % Revision 1.48  2003/05/06 15:47:59  arno
 % adding debug msg
 %
@@ -538,6 +541,7 @@ nwin = size(tmp,2);
 % optional resqure of all coordinates
 % -----------------------------------
 g.magnify = g.magnify/4;
+g.dimratio = (g.xlimaxes(2) - g.xlimaxes(1)) / (g.ylimaxes(2) - g.ylimaxes(1));
 if strcmp(lower(g.square), 'on') 
     disp('Square option disabled');
 %	for index = selected
@@ -919,7 +923,7 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 		
                 tmpsize = g.diskscale*tmpsize;
 		if tmpsize > 0
-			circle( tmpcoord(1), tmpcoord(2), tmpsize, tmpcolor, 'k', 0, 360, dashed, fastif(dashed, 2, 1));
+			circle( tmpcoord(1), tmpcoord(2), [tmpsize tmpsize*g.dimratio], tmpcolor, 'k', 0, 360, dashed, fastif(dashed, 2, 1));
 		end;
 return;
 
