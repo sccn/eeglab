@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.319  2004/07/10 00:04:16  arno
+% debug msg
+%
 % Revision 1.318  2004/07/09 23:58:59  arno
 % debug plugin
 %
@@ -1477,7 +1480,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                 addpath([ p 'plugins' delimiter dircontent{index} ]);
                 tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
                 for tmpind = 1:length(tmpdir)
-                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin'))
+                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
                         funcname = tmpdir(tmpind).name(1:end-2);
                         tmpind = length(tmpdir);
                     end;
