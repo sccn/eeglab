@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/05/15 21:37:03  arno
+% [Adebug last
+%
 % Revision 1.5  2003/05/15 21:30:32  arno
 % adding properties
 %
@@ -53,15 +56,15 @@
 function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
 
   if size(data,1) ~= length(freqs)
-      fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
+      fprintf('imagesclogy(): data matrix must have %d rows!\n',length(freqs));
       return
   end
   if size(data,2) ~= length(times)
-      fprintf('logfreq(): data matrix must have %d columns!\n',length(times));
+      fprintf('imagesclogy(): data matrix must have %d columns!\n',length(times));
       return
   end
   if min(freqs)<= 0
-      fprintf('logfreq(): frequencies must be > 0!\n');
+      fprintf('imagesclogy(): frequencies must be > 0!\n');
       return
   end
   
