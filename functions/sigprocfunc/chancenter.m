@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/12/02 18:59:20  arno
+% returning optim
+%
 % Revision 1.4  2002/11/14 18:35:53  luca
 % set default optim = 0
 %
@@ -92,7 +95,7 @@ if nargin<4
     return;
 end;
 
-if exist('gui') == 1
+if nargin > 4 & gui
     geometry = { [1 1  1.5 0.25] };
     uilist = { { 'Style', 'text', 'string', 'Specify center', 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', '0 0 0'  } ...
