@@ -6,6 +6,7 @@
 % Inputs:
 %   EEGIN          - input dataset
 %   filename       - file name
+%   typefield      - [string] type field name. Default is 'code'.
 % 
 % Outputs:
 %   EEGOUT         - data structure
@@ -39,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/11/07 02:10:39  arno
+% debuging decoding of fields
+%
 % Revision 1.7  2003/11/07 01:45:11  arno
 % reading fields automatically
 %
@@ -61,7 +65,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_importpres(EEG, filename); 
+function [EEG, command] = pop_importpres(EEG, filename, typefield); 
 command = '';
 
 if nargin < 1 
@@ -81,9 +85,25 @@ fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1, 'verbose', '
 
 % finding fields
 % --------------
-indtype = strmatch('event type', lower(fields));
+if nargin > 1
+    if nargin < 3
+        typefield = 'code'; % backward compatibility
+    end;
+    indtype  = strmatch(lower(typefield), lower(fields));
+else
+    indtype  = strmatch('event type', lower(fields));
+    indtype2 = strmatch('code', lower(fields));
+    if ~isempty(indtype) & ~isempty(indtype2) 
+        typefield = questdlg2(strvcat('What field (column) in the .log file do you','want to use for EEGLAB event type?'), ...
+                       'pop_importpres()', ...
+                       'code','event type','code');
+        indtype = strmatch(lower(res), lower(fields));
+    else 
+        indtype = [indtype indtype2];
+    end;        
+end;
 if isempty(indtype)
-    error('Could not detect field ''Event Type'', try importing the file as ASCII (use delimitor=9 (tab))');
+    error(['Could not detect field ''' typefield ''', try importing the file as ASCII (use delimiter=9 (tab))']);
 end;
 disp('Replacing field ''Event Type'' by ''type'' for EEGLAB compatibility');
 indlat  = strmatch('time', lower(fields), 'exact');
