@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2003/06/27 16:59:11  arno
+% updating ur
+%
 % Revision 1.98  2003/06/18 22:27:53  arno
 % implementing makeur
 %
@@ -567,6 +570,15 @@ end;
             end;
         end;
     end;
+    % create urevent if continuous data
+    % ---------------------------------
+    if ~isempty(EEG.event) & ~isfield(EEG, 'urevent')
+        EEG.urevent = EEG.event;
+        disp('eeg_checkset note: creating backup event table (urevent)');
+        for index = 1:length(EEG.event)
+            EEG.event(index).urevent = index;
+        end;
+    end;
     
      % deal with epoch arrays
     % ----------------------
@@ -857,6 +869,7 @@ if ~isempty( varargin)
           end;
          case 'makeur', 
           if ~isempty(EEG.event)
+              disp('eeg_checkset note: creating backup event table (urevent)');
               EEG.urevent = EEG.event;
               for index = 1:length(EEG.event)
                   EEG.event(index).urevent = index;
