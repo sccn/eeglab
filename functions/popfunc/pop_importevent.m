@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/11/07 01:29:25  arno
+% [Anothing
+%
 % Revision 1.21  2003/11/04 01:11:14  arno
 % fixing reading presentation file problem
 %
@@ -368,6 +371,13 @@ end;
 % remove the events which latency are out of boundary
 % ---------------------------------------------------
 if isfield(EEG.event, 'latency')
+    try 
+        res = cellfun('isempty', { EEG.event.latency });
+        if ~isempty(res)
+            disp('Pop_importevent warning: REMOVING EVENT WITH NO LATENCIES');
+            EEG.event( find(res) ) = [];
+        end;
+    end;
 	alllatencies = cell2mat( { EEG.event.latency } );
 	I1 = find(alllatencies < 0);
 	I2 = find(alllatencies > EEG.pnts*EEG.trials);
