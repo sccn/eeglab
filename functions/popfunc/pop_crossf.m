@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/05 23:59:36  arno
+% correcting figure title.
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -112,7 +115,11 @@ else
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
 		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
+			if size(varargin{i},1) > 1 & size(varargin{i},2) > 1
+				options = [ options ', varargin{' int2str(i) '}' ];
+			else
+				options = [ options ', [' num2str(varargin{i}) ']' ];	
+			end;
 		end;
 	end;	
 end;
