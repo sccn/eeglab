@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2003/12/18 01:17:23  arno
+% warning message
+%
 % Revision 1.79  2003/12/18 01:10:37  arno
 % debug text
 %
@@ -804,7 +807,8 @@ else
                    for index = 1:(length(tmpdiff)-1)
                        fprintf('%s,', chans(tmpdiff(index)).labels);
                    end;
-                   fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu', chans(tmpdiff(end)).labels);
+                   fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
+                           chans(tmpdiff(end)).labels);
                end;
            end;
           case 'eval'
