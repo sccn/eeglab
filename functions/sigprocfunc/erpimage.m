@@ -21,7 +21,7 @@
 %                If this is large (>sqrt(num. trials)), this many trials output.
 % Options:
 %   'align'  - [time] -> time lock data to sortvar aligned to time in msec
-%              (time = Inf -> align to median sortvar) {default: no align}
+%              (time=Inf -> align to median sortvar) {default: no align}
 %   'nosort' - don't sort data on sortvar {default: sort}
 %   'noplot' - don't plot sortvar {default: plot if in times range}
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
