@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/06 21:39:11  arno
+% spelling
+%
 % Revision 1.2  2002/07/29 17:57:12  arno
 % debugging
 %
@@ -54,7 +57,7 @@ function [EEG, command] = pop_chanevent(EEG, chans, varargin);
 command = '';
 
 if nargin < 2
-	geometry = { [1 1.05] [1.5 0.5 1] [1.5 0.18 1.32] [1.5 0.18 1.32] [1.5 0.18 1.32] };
+	geometry = { [1 1.05] [1.5 1 0.5] [1.5 0.18 1.32] [1.5 0.18 1.32] [1.5 0.18 1.32] };
 	strgui = { { 'style' 'text' 'string' 'Event channel(s)' 'tooltipstring' 'indexes of event channels' } ...
 			   { 'style' 'edit' 'string' '' } ...
 			   { 'style' 'text' 'string' 'Edge type to extract' 'tooltipstring' ...
