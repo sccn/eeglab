@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2004/02/15 20:44:12  scott
+% sme
+%
 % Revision 1.126  2004/02/15 20:43:47  scott
 % same
 %
@@ -745,7 +748,7 @@ Rd = Rd(enum);
 labels = labels(enum,:);
 
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-   Th = skirt_Th(Th,Rd,rmax*squeezefactor);  % rotate the angles of the electrodes in the 'skirt'
+   Th = skirt_Th(Th,Rd,rmax*squeezefac);  % rotate the angles of the electrodes in the 'skirt'
 end
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
