@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2004/11/10 17:04:04  arno
+% nothing
+%
 % Revision 1.23  2003/03/12 02:44:36  arno
 % tow buttons
 %
@@ -235,7 +238,7 @@ function g = myguihandles(fig)
 			try, 
 				switch get(h(index), 'style')
 				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
-				 case { 'value' 'radio' 'checkbox' }, ...
+				 case { 'value' 'radio' 'checkbox' 'listbox'}, ...
 					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
 				end;
 			catch, end;
