@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/07 22:44:46  arno
+% creating outputs
+%
 % Revision 1.2  2002/10/02 00:35:53  arno
 % update condstat, debug
 %
@@ -1181,7 +1184,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
             set(h(13),'FontSize',g.TITLE_FONT);
         end
 
-        axcopy(gcf);
+        try, axcopy(gcf); catch, end;
     end;
 
 % reshaping X

@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/09 00:01:48  arno
+% debug
+%
 % Revision 1.3  2002/10/05 02:08:27  arno
 % outputs for newcrossf
 %
@@ -1056,7 +1059,7 @@ if g.plot
       axis('square')
    end
    
-   axcopy(gcf);
+   try, axcopy(gcf); catch, end;
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    COHERENCE OBSOLETE   %%%%%%%%%%%%%%%%%%%%%%%%%
