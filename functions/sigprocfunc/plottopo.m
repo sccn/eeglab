@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2003/09/17 01:44:57  arno
+% debuging for icademo
+%
 % Revision 1.28  2003/07/25 17:24:43  arno
 % allow to plot more than 50 trials
 %
@@ -568,16 +571,33 @@ if isempty(g.chanlocs) % plot in a rectangular grid
 else % read chan_locs file
      % read the channel location file
      % ------------------------------
-	[tmp channames Th Rd] = readlocs(g.chanlocs);
-	channames = strvcat(channames{channelnos});
-	Th = pi/180*Th(channelnos);                 % convert degrees to radians
-	Rd = Rd(channelnos); 
+    nonemptychans = cellfun('isempty', { g.chanlocs.theta });
+    nonemptychans = find(~nonemptychans);
+	[tmp channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
+	channames = strvcat({ g.chanlocs.labels });
+	Th = pi/180*Th;                 % convert degrees to radians
+	Rd = Rd; 
 	
-    if length(channelnos) > length(Th),
+    if length(channelnos) > length(g.chanlocs),
         error('plottopo(): data channels must be <= ''chanlocs'' channels')
     end
     
-    [yvals,xvals] = pol2cart(Th,Rd); % translate from polar to cart. coordinates
+    [yvalstmp,xvalstmp] = pol2cart(Th,Rd); % translate from polar to cart. coordinates
+    xvals(nonemptychans) = xvalstmp;
+    yvals(nonemptychans) = yvalstmp;
+    
+    % find position for other channels
+    % --------------------------------
+    totalchans = length(g.chanlocs);
+    emptychans = setdiff(1:totalchans, nonemptychans);
+    totalchans = floor(sqrt(totalchans))+1;
+    for index = 1:length(emptychans)
+        xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);
+        yvals(emptychans(index)) = -0.4+mod(index-1,totalchans)/totalchans;
+    end;
+    channames = channames(channelnos,:);
+    xvals     = xvals(channelnos);
+    yvals     = yvals(channelnos);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -585,6 +605,7 @@ end
 % yvals = 0.5+PLOT_HEIGHT*yvals;  % controls height of plot array on page!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
 xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot 
                                                   % array on current axes
 yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot 
