@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2003/11/14 16:44:06  scott
+% changed signif fill color
+%
 % Revision 1.173  2003/11/14 16:34:31  scott
 % debug same
 %
@@ -2930,7 +2933,7 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
       end
       fillsignif = [signif(1,:) signif(2,end:-1:1)];
       fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
-      set(fillh,'edgecolor',FILLCOLOR);
+      set(fillh,'edgecolor',FILLCOLOR+[-.01 -.01 0]); % make edges slightly highlighted
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
@@ -3011,6 +3014,8 @@ prctl = interp1(pt,sortdata,pc);
 %              Return significance bounds if alpha (0 < alpha< <1) is given.
 % 
 function [out, outalpha]  = nan_mean(in,alpha)
+   NBOOT = 500;
+
    intrials = size(in,1);
    inframes = size(in,2);
    nans = find(isnan(in));
@@ -3024,15 +3029,19 @@ function [out, outalpha]  = nan_mean(in,alpha)
    out = sum(in)./nonnans;
    outalpha = [];
    if nargin>1 
-     NBOOT = 500;
      if NBOOT < round(3/alpha)
         NBOOT = round(3/alpha);
      end
+     fprintf('Erp bootstrap: ');
      booterps = zeros(NBOOT,inframes);
      for n=1:NBOOT
          signs = sign(randn(1,intrials)'-0.5);
          booterps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
+         if ~rem(n,50)
+             fprintf('%d ',n);
+         end
      end
+     fprintf('\n');
      booterps = sort(abs(booterps));
      alpha = 1+floor(2*alpha*NBOOT); % one-sided probability threshold
      outalpha = booterps(end+1-alpha,:);
