@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/08/14 21:02:54  arno
+% implementing hanning funciton
+%
 % Revision 1.46  2002/08/12 01:48:01  arno
 % color
 %
@@ -1505,10 +1508,10 @@ else
 end % NOTE: above, mean ?????
 
 function w = hanning(n)
-
 if ~rem(n,2)
    w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
+   w = [w; w(end:-1:1)];
 else
    w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
+   w = [w; w(end-1:-1:1)];
 end
-w = [w; w(end-1:-1:1)];
