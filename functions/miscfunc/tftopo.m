@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/05/19 14:20:34  scott
+% *** empty log message ***
+%
 % Revision 1.45  2002/05/19 14:19:35  scott
 % added cartoon of showchan if > 0  -sm
 %
@@ -429,7 +432,6 @@ for n=1:tfpoints
    set(mk,'markerfacecolor',LINECOLOR);
    axis([0 1 0 1]);
    axis off;
-   drawnow
 end
 
 for n=1:tfpoints
@@ -452,6 +454,7 @@ for n=1:tfpoints
       pos = get(cb,'position');
       set(cb,'position',[pos(1:2) 0.023 pos(4)]);
    end
+   drawnow
 end
 
 if showchan>0
