@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/05/06 22:13:38  arno
+% do not make ovals for components
+%
 % Revision 1.49  2003/05/06 22:01:14  arno
 % making mesh transparent
 %
@@ -634,7 +637,7 @@ if ~isempty(g.flashes)
 	%hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.92 0.92 1 1], [0.5 0.5 0.5]); %up
         hpatch = patch([ 0.13 0.84 0.84 0.13 ], [0.8 0.8 0.93 0.93], [0.5 0.5 0.5]);
 	set(hpatch, 'facecolor', 'w', 'edgecolor', 'none');
-	xlim([0 1]); ylim([0 1]);
+	set(hback, 'xlim', [0 1], 'ylim', [0 1]);
 	posf = 0; % used as a counter to preserve color
 end;	
 
