@@ -1,9 +1,21 @@
 % pop_epoch() - epoching a continuous EEGLAB dataset. 
 %
 % Usage:
+%   >> OUTEEG = pop_epoch( EEG); % pop up window
 %   >> OUTEEG = pop_epoch( EEG, events, timelim);
 %   >> [OUTEEG, indices] = ...
 %        pop_epoch( EEG, typerange, timelim, 'key1', value1 ...);
+%
+% Graphical interface:
+%   1st edit box: Enter time-locking event type(s) ([]=all).      
+%                 Select 'Edit > Event values' to see type values.
+%                 Same as the 'typerange' command line input.
+%   2nd edit box: Epoch limits [start, end] in seconds.
+%                 Same as the 'timelim' command line input.
+%   3rd edit box: Name for the new dataset. Same as the 'newname'
+%                 optional input from the command line.
+%   4th edit box: Out-of-bounds EEG rejection limits ([min max], []=none).
+%                 Same as 'valuelim' optional input from the command line.
 %
 % Inputs:
 %   EEG        - Input dataset. Data can already be epoched. In this case,
@@ -15,12 +27,12 @@
 %                time-locking event (default: [-1 2])
 %
 % Optional inputs:
-%   'valuelim' - Upper and lower limit values that data in a trial should not
-%                exceed. If one positive value is given, use the negative
-%                of this as lower bound. The given values are also considered
-%                outliers. {Default: none}
+%   'valuelim' - [min max] Upper and lower limit values that data in a trial
+%                should not exceed. If one positive value is given, use the 
+%                negative of this as lower bound. The given values are also 
+%                considered outliers. {Default: none}
 %   'verbose'  - ['yes'|'no']. Default is 'yes'.
-%   'newname'  - 'string' New dataset name {Default: "old_dataset epochs"}
+%   'newname'  - [string] New dataset name {Default: "old_dataset epochs"}
 %   'eventindices'- [indices] Use event indices to epoch data.
 %   'epochinfo'- ['yes'|'no']. Propagate event information into the new
 %                epoch structure. {Default: 'yes'}
@@ -57,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/11/12 00:15:03  arno
+% updating header
+%
 % Revision 1.28  2002/11/12 00:08:26  arno
 % debugging eventindices
 %
