@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/04/24 15:09:41  scott
+% [same] -sm
+%
 % Revision 1.33  2002/04/24 15:09:07  scott
 % [same] -sm
 %
@@ -302,7 +305,8 @@ else
 	end;
 end;
   
-set(gcf,'color',[0.7 0.7 0.5]);
+colordef white
+
 % checking strings
 % ----------------
 e_try = 'try,';
