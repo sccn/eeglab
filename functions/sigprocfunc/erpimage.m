@@ -162,6 +162,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.215  2004/08/20 00:39:04  arno
+% debut phasearg if only using 1 frequency
+%
 % Revision 1.214  2004/08/13 20:27:12  scott
 % help msg
 %
@@ -2296,6 +2299,9 @@ end %%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(verttimes)
+ if size(verttimes,1) ~= 1 & size(verttimes,2) == 1
+        verttimes = verttimes';
+ end
  if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
     fprintf('\nerpimage(): vert arg matrix must have 1 or %d rows\n',ntrials);
     return
