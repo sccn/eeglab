@@ -148,6 +148,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.122  2005/04/01 16:05:39  arno
+%fixing summary
+%
 %Revision 1.121  2005/03/31 18:44:24  arno
 %debug summary
 %
@@ -1100,7 +1103,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.1 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Coronal view', 'callback', 'view([0 -1 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.15 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Sagital view', 'callback', 'view([1 0 0]);');
+                  'style', 'pushbutton', 'string', 'Sagittal view', 'callback', 'view([1 0 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', viewstring, 'callback', cbview);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.25 .15 .05], 'tag', 'tmp', ...
@@ -1410,9 +1413,9 @@ function plotimgs(dat, mricoord, transmat);
         % removing old edges if any
         delete(findobj( gcf, 'tag', 'edges'));
         if dat.axistight & ~dat.cornermri, col = 'k'; else col = [0.5 0.5 0.5]; end;
-        h(1) = line([elecwx3(1) elecwx3(2)]', [elecwy3(1) elecwy2(1)]', [elecwz1(1) elecwz1(2)]'); % sagital-transverse
+        h(1) = line([elecwx3(1) elecwx3(2)]', [elecwy3(1) elecwy2(1)]', [elecwz1(1) elecwz1(2)]'); % sagittal-transverse
         h(2) = line([elecwx3(1) elecwx2(3)]', [elecwy2(1) elecwy2(2)]', [elecwz1(1) elecwz1(2)]'); % coronal-tranverse
-        h(3) = line([elecwx3(1) elecwx3(2)]', [elecwy2(1) elecwy2(2)]', [elecwz3(1) elecwz1(1)]'); % sagital-coronal
+        h(3) = line([elecwx3(1) elecwx3(2)]', [elecwy2(1) elecwy2(2)]', [elecwz3(1) elecwz1(1)]'); % sagittal-coronal
         set(h, 'color', col, 'linewidth', 2, 'tag', 'edges');
     end;
         
