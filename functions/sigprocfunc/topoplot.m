@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2004/02/15 20:35:56  scott
+% same
+%
 % Revision 1.123  2004/02/15 20:33:10  scott
 % same
 %
@@ -734,18 +737,12 @@ end;
 Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
-[x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 
-%if isstr('shrinkfactor') % DEBUG
-%   fprintf('shrinkfactor: %s\n',shrinkfactor);
-%else
-%   fprintf('shrinkfactor: %g\n',shrinkfactor);
-%end
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
-%   fprintf('max Th: %g\n',max(Th)); % DEBUG
    Th = skirt_Th(Th,Rd);  % rotate the angles of the electrodes in the 'skirt'
-%   fprintf('max Th: %g\n',max(Th)); % DEBUG
 end
+
+[x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -832,9 +829,9 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 %
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi(:)-rmax*squeezefac,Yi(:),Zi(:));
-  size([1:GRID_SCALE^2]')
-  size(Thi(:))
-  size(Phi(:))
+%  size([1:GRID_SCALE^2]') % DEBUG
+%  size(Thi(:)) % DEBUG
+%  size(Phi(:)) % DEBUG
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
   skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2)> rmax*squeezefac & ...
          abs(Thi)<pi/2);
