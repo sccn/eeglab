@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/07/28 22:07:44  arno
+% no more block factor
+%
 % Revision 1.15  2003/07/25 00:59:26  arno
 % removing blockread option
 %
@@ -121,23 +124,33 @@ if nargin < 1
 
 	% popup window parameters
 	% -----------------------
-    promptstr    = { 'Time interval in seconds (i.e. [0 100]; default all):' ...
-                     'Import keystrokes (off|on -> import as type 0):' ...
-                     'loadcnt() ''key'', ''val'' params' };
-	inistr       = { '' 'off' '' };
-	pop_title    = sprintf('Load a CNT dataset');
-	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
+    callback16 = 'set(findobj(gcbf, ''tag'', ''32''), ''value'', ~get(gcbo, ''value''));';
+    callback32 = 'set(findobj(gcbf, ''tag'', ''16''), ''value'', ~get(gcbo, ''value''));';
+    uigeom       = { [1.3 0.5 0.5] [1 0.5] [1.09 0.13 0.4] [1 0.5] };
+    uilist       = { { 'style' 'text' 'string' 'Data format' } ...
+                     { 'style' 'checkbox' 'tag' '16' 'string' '16-bits' 'value' 1 'callback' callback16 } ...
+                     { 'style' 'checkbox' 'tag' '32' 'string' '32-bits' 'value' 0 'callback' callback32 } ...
+                     { 'style' 'text' 'string' 'Time interval in seconds (i.e. [0 100]; default all):' } ...
+                     { 'style' 'edit' 'string' '' } ...
+                     { 'style' 'text' 'string' 'Check to Import keystrokes (import as type 0):' } ...
+                     { 'style' 'checkbox' 'string' '' } { } ...
+                     { 'style' 'text' 'string' 'loadcnt() ''key'', ''val'' params' } ...
+                     { 'style' 'edit' 'string' '' } };
+	result = inputgui( uigeom, uilist, 'pophelp(''pop_loadcnt'')', 'Load a CNT dataset');    
 	if length( result ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
     options = [];
-    if ~isempty(result{1}), 
-        timer =  eval( [ '[' result{1} ']' ]);
+    if result{1}, options = [ options ', ''dataformat'', ''int16''' ];
+    else          options = [ options ', ''dataformat'', ''int32''' ];
+    end;
+    if ~isempty(result{3}), 
+        timer =  eval( [ '[' result{3} ']' ]);
         options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
     end;   
-    if ~strcmpi(result{2}, 'off'), options = [ options ', ''keystroke'', ''' result{2} '''' ]; end;
-    if ~isempty(result{3}), options = [ options ',' result{3} ]; end;
+    if result{4}, options = [ options ', ''keystroke'', ''on''' ]; end;
+    if ~isempty(result{5}), options = [ options ',' result{5} ]; end;
 else
 	options = vararg2str(varargin);
 end;
@@ -160,25 +173,40 @@ else
 	eval( [ 'r = loadcnt( fullFileName ' options ');' ]);
 end;
 
-EEG.data            = r.dat;
+if isfield(r, 'dat')
+    error('pop_loadcnt is not compatible with current loadcnt version, please use latest loadcnt() version');
+end;
+EEG.data            = r.data;
 EEG.filename        = filename;
 EEG.setname 		= 'CNT file';
-EEG.nbchan          = r.nchannels; 
-if isempty(findstr('keystroke', lower(options)))
-    I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
-else
-    I = 1:length(r.event.stimtype);
-end;
+EEG.nbchan          = r.header.nchannels; 
 
+% inport events
+% -------------
+if ~isempty(findstr('keystroke', lower(options)))
+    tmpe = cell2mat( { r.event.stimtype } );
+    I = find( ( tmpe ~= 0 ) & ( tmpe ~= 255 ) );
+else
+    I = 1:length(r.event);
+end;
 if ~isempty(I)
-    EEG.event(1:length(I),1) = r.event.stimtype(I);
-    EEG.event(1:length(I),2) = r.event.frame(I);
+    EEG.event(1:length(I),1) = cell2mat( { r.event(I).stimtype } );
+    EEG.event(1:length(I),2) = cell2mat( { r.event(I).offset   } );
     EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 end;
 
-EEG.srate           = r.rate;
-EEG = eeg_checkset(EEG, 'eventconsistency');
-EEG = eeg_checkset(EEG, 'makeur');
+% import channel locations (Neuroscan coordinates are not wrong)
+% ------------------------
+%x            = cell2mat( { r.electloc.x_coord } );
+%y            = cell2mat( { r.electloc.y_coord } );
+%for index = 1:length(r.electloc)
+%    names{index} = deblank(char(r.electloc(index).lab'));
+%end;
+%EEG.chanlocs = readneurolocs( { names x y } );
+
+EEG.srate    = r.header.rate;
+EEG          = eeg_checkset(EEG, 'eventconsistency');
+EEG          = eeg_checkset(EEG, 'makeur');
 
 if length(options) > 2
     command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
