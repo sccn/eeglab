@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.50  2003/08/04 21:15:54  arno
+%num color on MRI
+%
 %Revision 1.49  2003/08/04 19:08:09  arno
 %[Afixing normlen in summarize mode
 %
@@ -467,9 +470,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength, ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen };
-        axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off;
-        axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off;
-        axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off;
+        axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
+        axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
+        axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; if strcmpi(g.image, 'besa'), scalegca(0.1); end;
         axes('position', [0.5 0 0.5 0.5]); 
         %p = get(gcf, 'position');
         %p(2) = p(2)+p(4)-800;
@@ -1027,3 +1030,12 @@ function plotimgs(dat, index);
 function index = minpos(vals);
 	vals(find(vals < 0)) = inf;
 	[tmp index] = min(vals);
+
+function scalegca(factor)
+    xl = xlim; xf = ( xl(2) - xl(1) ) * factor;
+    yl = ylim; yf = ( yl(2) - yl(1) ) * factor;
+    zl = zlim; zf = ( zl(2) - zl(1) ) * factor;
+    xlim( [ xl(1)-xf xl(2)+xf ]);
+    ylim( [ yl(1)-yf yl(2)+yf ]);
+    zlim( [ zl(1)-zf zl(2)+zf ]);
+    
