@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/27 00:49:02  arno
+% adding extra output parameter
+%
 % Revision 1.5  2002/04/27 00:17:25  arno
 % debugging function call
 %
@@ -141,6 +144,6 @@ for index=1:length(allobj)
    catch, end;
 end;   
 userdat = get(fig, 'userdata');
-if isstr(mode) & strcmp('mode', 'normal')
+if isstr(mode) & strcmp(mode, 'normal')
 	close(fig);
 end;
