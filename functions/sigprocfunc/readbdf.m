@@ -58,7 +58,7 @@ for nrec=1:length(Records),
 	if NREC<0 fprintf(2,'Warning READEDF: invalid Record Number %i \n',NREC);end;
 
 	fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
-	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,EDF.bits);
+	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,EDF.databits);
 
 	S(EDF.AS.IDX2)=s;
 
