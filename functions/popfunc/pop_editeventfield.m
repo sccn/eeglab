@@ -19,9 +19,10 @@
 %  'skipline' - number of rows to skip for text files 
 %  'rename'   - ['USER_VAR1->USER_VAR2'] rename field 'USER_VAR1' into
 %               'USER_VAR2'. Ex: { 'rename', 'type->condition' }.    
-%  'append'   - ['yes'|'no'] 'yes' = Append to the current events of the
-%               EEG dataset {default}: 'no' = Erase the previous events.
-%  'indices'  - vector indicating the indices of the events to modify 
+%  'delold'   - ['yes'|'no'] 'yes' = Erase all previous events. Default
+%               is 'no'.
+%  'indices'  - vector indicating the indices of the events to modify
+%               Default is current events.
 %  'timeunit' - [ latency unit in second ]. Default unit is 1 second. 
 %  'delim'    - delimiting characters in file. Default is tab and space.
 %  'latencyinfo'  - comment string for the latency field
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/10/29 00:35:23  arno
+% update gui
+%
 % Revision 1.24  2002/10/29 00:22:42  arno
 % updating gui text/
 %
@@ -176,11 +180,11 @@ if nargin<2
                     'clear filename filepath tagtest;' ];
         uilist = { ...
          { 'Style', 'text', 'string', 'Event indices to modify', 'fontweight', 'bold' }, ...
-         { 'Style', 'text', 'string', 'Append events (else modify existing events indices) ?', 'fontweight', 'bold' } };
+         { 'Style', 'text', 'string', 'Delete old events (else modify existing events indices) ?', 'fontweight', 'bold' } };
         geometry    = { [ 0.63 1.4 0.2] [ 0.63 0.6 1] };
         uilist = { uilist{:} {} ...
-         { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] 'tag' 'eventindices' 'enable' 'off'} ...
-         { 'Style', 'checkbox', 'string', 'YES / no', 'value', 1, 'callback', ...
+         { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] 'tag' 'eventindices'} ...
+         { 'Style', 'checkbox', 'string', 'Yes / NO', 'value', 0, 'callback', ...
            'set(findobj(gcbf, ''tag'', ''eventindices''), ''enable'', fastif(get(gcbo, ''value''), ''off'', ''on''));' }, ...
          { 'Style', 'text', 'string', 'NB: (unchecked) -> modify selected event indices' }, ...
          { }, ...   
@@ -215,9 +219,14 @@ if nargin<2
 	         listboxtext = [ listboxtext '|' allfields{index} ]; 
 	    end;
 	    geometry = { geometry{:} [1 1 1 0.7 0.77] [1] [1 1.2 0.6 1 2] };
-	    uilist   = { uilist{:}, ...
+	    index = length(allfields) + 1;
+        uilist   = { uilist{:}, ...
 	         { 'Style', 'edit', 'string', ''}, ...
-	         { 'Style', 'edit', 'string', '' }, ...
+	         { 'Style', 'pushbutton', 'string', '', 'callback', ...
+			 [ 'tmpuserdata = get(gcf, ''userdata'');' ...
+			   'tmpuserdata{' int2str(index) '} = pop_comments(tmpuserdata{' int2str(index) '}, ''Comments on new event field:'');' ...
+			   'set(gcbo, ''string'', tmpuserdata{' int2str(index) '});' ...
+			   'set(gcf, ''userdata'', tmpuserdata); clear tmpuserdata;' ] }, ...
 	         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'newfield' }, ...
 	         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''newfield'';' commandload ] }, ...
 	         { 'Style', 'text', 'string', '-> add field'} };
@@ -230,14 +239,14 @@ if nargin<2
                 fastif(isunix,{ 'Style', 'text', 'string', '(Click on field name to select it!)' },{ })};
 
         [results userdat ]= inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', ...
-									  'Edit event field(s) -- pop_editeventfield()', EEG.eventdescription );
+									  'Edit event field(s) -- pop_editeventfield()', { EEG.eventdescription{:} '' } );
         if length(results) == 0, return; end;
 
 	    % decode top inputs
 	    % -----------------
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', results{1} }; end;
-	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
+	    if results{2} == 1       , args = { args{:}, 'delold', 'yes' }; end;
 	    
 	    % dealing with existing fields
 	    %-----------------------------
@@ -258,12 +267,12 @@ if nargin<2
 	    
 	    % dealing with the new field
 	    %---------------------------
-	    sub = 4;
+	    sub = 3;
 	    if ~isempty( results{end-sub} )
-	        if ~isempty( results{end-sub+2} )
-	            if exist(results{end-sub+2}) == 2,  args = { args{:}, results{end-sub}, [ results{end-sub+2} ] }; % file
-	            else                                args = { args{:}, results{end-sub}, results{end-sub+2} }; end;
-	            if ~isempty( results{end-sub+1} ),  args = { args{:}, [ results{end-sub} 'info' ], [ results{end-sub+1} ] }; end;
+	        if ~isempty( results{end-sub+1} )
+	            if exist(results{end-sub+1}) == 2,  args = { args{:}, results{end-sub}, [ results{end-sub+1} ] }; % file
+	            else                                args = { args{:}, results{end-sub}, results{end-sub+1} }; end;
+	            if ~isempty( userdat{end} ),        args = { args{:}, [ results{end-sub} 'info' ], userdat{end} }; end;
 	        else
 	            disp(['The new field' results{end-sub} ' was ignored since no input data were given for it.' ]);
 	        end;
@@ -298,8 +307,8 @@ end;
 % test the presence of variables
 % ------------------------------
 try, g.skipline;      catch, g.skipline = 0; end;
-try, g.indices;  g.append = 'yes'; catch, g.indices = []; end;
-try, g.append; 	      catch, g.append = 'yes'; end;
+try, g.indices;       catch, g.indices = [1:length(EEG.event)]; end;
+try, g.delold; 	      catch, g.delold = 'no'; end;
 try, g.timeunit; 	  catch, g.timeunit = 1; end;
 try, g.align; 	      catch, g.align = NaN; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
@@ -313,7 +322,7 @@ for curfield = tmpfields'
     if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
     else                    allfields = {}; end;
     switch lower(curfield{1})
-       case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
+       case { 'append' 'delold', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
        case 'rename',
             if isempty( findstr('->',g.rename) ), disp('Set warning: bad syntax for rename'); end;
             oldname = g.rename(1:findstr('->',g.rename)-1);
@@ -354,22 +363,26 @@ for curfield = tmpfields'
 						catch, end;
 	                 end;    
 	            else % interpret
-		            switch g.append 
-		                case 'no'
+		            switch g.delold 
+		                case 'yes'
 		                      EEG.event = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      allfields = { curfield{1} };
                               EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
                               EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
-		                 case 'yes' % match existing fields
+		                 case 'no' % match existing fields
 		                            % ---------------------
 		                      tmparray = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      if isempty(g.indices) g.indices = [1:size(tmparray(:),1)] + length(EEG.event); end;
 		                      
 		                      indexmatch = strmatch(curfield{1}, allfields);
 		                      if isempty(indexmatch) % no match
-		                          disp(['Set: field ''' curfield{1} ''' not found, creating new field']);
+		                          disp(['Set: creating new field ''' curfield{1} '''' ]);
 		                      end;
-		                      EEG.event = setstruct(EEG.event, curfield{1}, g.indices, cell2mat(tmparray));     
+                              try
+                                  EEG.event = setstruct(EEG.event, curfield{1}, g.indices, cell2mat(tmparray));
+                              catch,
+                                  error('Wrong size for input array');
+                              end;
 							  if strcmp(curfield{1}, 'latency')
 								  EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
 							  end;
