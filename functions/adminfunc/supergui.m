@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/08/17 02:38:42  arno
+% debugging
+%
 % Revision 1.27  2002/08/14 18:17:23  arno
 % new supergui arg
 %
@@ -262,6 +265,15 @@ if factmultx < 0.3
 	factmultx = 0.3;
 end;
 
+% for MAC (magnify figures that have edit fields)
+% -------
+if isppc
+	hh = findobj(allhandlers, 'style', 'edit');
+	if ~isempty(hh)
+		factmulty = factmulty*1.4;
+	end;
+end;
+	
 % scale and replace the figure in the screen
 % -----------------------------------------
 pos = get(gcf, 'position');
