@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/10/10 16:43:26  arno
+% debugging fdt files
+%
 % Revision 1.10  2002/10/03 16:26:27  arno
 % debugging extension
 %
@@ -136,7 +139,7 @@ if mode == 0 & ( length(curfilename)<=3 | ~strcmp(lower(curfilename(end-3:end)),
 	disp('Adding ''.set'' extension to the file');
 	curfilename = [ curfilename '.set' ];
 end;
-if mode == 1 & ( length(curfilename)<=4 | ~strcmp(lower(curfilename(end-3:end)), '.sets'))
+if mode == 1 & ( length(curfilename)<=4 | ~strcmp(lower(curfilename(end-4:end)), '.sets'))
 	if length(curfilename)>3 & strcmp(lower(curfilename(end-3:end)), '.set')
 		disp('Changing file extension to ''.sets''');
 		curfilename = [ curfilename '.s' ];
