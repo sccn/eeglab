@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/07/11 18:22:07  arno
+% same
+%
 % Revision 1.33  2002/07/11 18:20:21  arno
 % maxamp debug
 %
@@ -825,7 +828,7 @@ case 'on'
    %title('Event-Related Coherence')
    
    h(8) = axes('Position',[.95 ordinate1 .05 height].*s+q);
-   cbar(h(8),151:300,tmpscale); % use only positive colors (gyorv) 
+   cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
    
    %
    % Plot delta-mean min and max coherence at each time point on bottom of image
