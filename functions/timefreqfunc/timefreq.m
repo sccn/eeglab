@@ -43,6 +43,8 @@
 %                   cycles and sampling frequency. Enter a single value
 %                   to compute spectral decompisition at a single frequency
 %                   (note: for FFT the closest frequency will be estimated).
+%                   For wavelet, reducing the max frequency reduce
+%                   the computation load.
 %      'padratio' = FFTlength/winsize (2^k)                     {def: 2}
 %                    Multiplies the number of output frequencies by
 %                    dividing their spacing. When cycles==0, frequency
@@ -54,11 +56,6 @@
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
-%      'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
-%                    If wavelet==0, all FFT frequencies are output.
-%                    For wavelet, reducing the max frequency reduce
-%                    the computation load {def: 50}. Deprecated, use 'freqs'
-%                    option instead.
 %
 % Outputs: 
 %       tf      - time frequency array for all trials (freqs, times, trials)
@@ -98,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/05/02 17:34:12  arno
+% implementing ITC option for very big arrays
+%
 % Revision 1.19  2003/04/30 00:07:25  arno
 % debug if window size changes
 %
@@ -177,7 +177,6 @@ g = finputcheck(varargin, ...
                   'tlimits'       'real'     []                       [0 frame/srate]; ...
                   'basevect'      'integer'  [0 Inf]                  []; ...
                   'detrend'       'string'   {'on' 'off'}              'off'; ...
-				  'maxfreq'       'real'     [0 Inf]                  (srate/2); ...
 				  'freqs'         'real'     [0 Inf]                  [0 srate/2]; ...
 				  'nfreqs'        'integer'  [0 Inf]                  []; ...
 				  'freqscale'     'string'   { 'linear' 'log' }       'linear'; ...
@@ -205,16 +204,10 @@ end
 if (pow2(nextpow2(g.padratio)) ~= g.padratio)
    error('Value of padratio must be an integer power of two [1,2,4,8,16,...]');
 end
-if (g.maxfreq > srate/2)
-   fprintf('Warning: value of g.maxfreq greater that Nyquist rate\n\n');
-end
 
 % finding frequency limits
 % ------------------------
 if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
-if g.maxfreq ~= srate/2
-    g.freqs(2) = g.maxfreq;
-end;
 
 % finding frequencies
 % -------------------
@@ -248,7 +241,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     g.win   = hanning(g.winsize);
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
-     %g.win = dftfilt(g.winsize,g.maxfreq/srate,g.cycles,g.padratio,g.cyclesfact);
+     %g.win = dftfilt(g.winsize,g.freqs(2)/srate,g.cycles,g.padratio,g.cyclesfact);
 
     freqs = g.freqs;
     if g.cyclesfact ~= 1, 
