@@ -52,6 +52,9 @@
 %                  'left'|'l'=[-90 30]; 'right'|'r'=[ 90 30];
 %                  'frontleft'|'bl','backright'|'br', etc.,
 %                  'top'=[0 90]   {default [143 18]}
+%   'orilocs'    - [channel structure or channel file name] Use original 
+%                  channel locations instead of the one extrapolated from 
+%                  spherical locations.
 %   'maplimits'  - 'absmax' -> make limits +/- the absolute-max
 %                  'maxmin' -> scale to data range
 %                   [min,max] -> user-definined values
@@ -88,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/05/10 17:11:02  arno
+% new decoding of arguments
+%
 % Revision 1.32  2004/03/25 23:09:29  arno
 % adding mesh tag to head mesh
 %
@@ -265,13 +271,15 @@ if isstr(values)
     tmpY = { eloc_file.Y };
     tmpZ = { eloc_file.Z };
     indices = find(~cellfun('isempty', tmpX));
-    ElectrodeNames = strvcat({ eloc_file.labels }); 
+    ElectrodeNames = strvcat({ eloc_file.labels });
     ElectrodeNames = ElectrodeNames(indices,:);
     Xe = cell2mat( tmpX(indices) )';
     Ye = cell2mat( tmpY(indices) )';
     Ze = cell2mat( tmpZ(indices) )';
     newcoords = [ Ye Xe Ze ];
-    %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 1000, [6 0 45]);
+    newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 1000, [6 0 46]);
+    % original center was [6 0 16] but the center of the sphere is [0 0 30] 
+    % which compensate (see variable Headcenter)
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 0 -pi/6]);
     Xe = newcoords(:,1);
     Ye = newcoords(:,2);
@@ -471,7 +479,6 @@ else
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Open head mesh and electrode spline files
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
   if ~exist(spline_file)
        error(sprintf('headplot(): spline_file "%s" not found. Run headplot in "setup" mode\n',...
            spline_file));
@@ -482,7 +489,17 @@ else
 	  close;
 	  error('headplot(): Number of values in spline file should equal number of electrodes')
   end
-
+  % change electrode if necessary
+  % -----------------------------
+  if ~isempty(g.orilocs)
+      eloc_file = readlocs( g.orilocs );
+      fprintf('Using original electrode locations on head...\n');
+      indices = find(~cellfun('isempty', { eloc_file.X } ));
+      newElect(:,1) = -cell2mat( { eloc_file(indices).Y } )';
+      newElect(:,2) =  cell2mat( { eloc_file(indices).X } )';
+      newElect(:,3) =  cell2mat( { eloc_file(indices).Z } )';        
+  end;
+  
   % load mesh file
   % --------------
   if ~exist(g.meshfile)
