@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.164  2002/09/05 00:04:29  scott
+% Plus -> With in menu -scott
+%
 % Revision 1.163  2002/09/05 00:03:06  scott
 % Averaged ERP -> Channel ERPs in menu, for symmetry with comps -scott
 %
@@ -861,7 +864,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	uimenu( third_m, 'Label', 'Component properties'     , 'CallBack', [ checkicaplot   'LASTCOM = pop_prop(EEG,0);' e_hist]);
 	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
-	   uimenu( ERPC_m, 'Label', 'On same axis (with maps)', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
+	   uimenu( ERPC_m, 'Label', 'With component maps', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 
 	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('kstest'), 'on', 'off'));
