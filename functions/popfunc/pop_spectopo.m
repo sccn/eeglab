@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/09/05 00:10:09  arno
+% update message
+%
 % Revision 1.27  2002/08/29 17:52:57  arno
 % typo
 %
@@ -220,7 +223,7 @@ if nargin < 3
 		result       = inputgui( geometry, promptstr, 'pophelp(''spectopo'')', 'Component spectra and maps -- pop_spectopo()');
 		if size(result,1) == 0 return; end;
 		timerange    = eval( [ '[' result{1} ']' ] );
-		option = '';
+		options = '';
 		if eval(result{2}) ~= 100, options = [ options ', ''percent'', '  result{2} ]; end;
 		if ~isempty(result{3})   , options = [ options ', ''freq'', ['  result{3} ']' ]; end;
 		if ~isempty(result{4})   , options = [ options ', ''plotchan'', ' result{4} ]; end;
@@ -265,7 +268,10 @@ if ~isempty(EEG.chanlocs)
 else
 	spectopooptions = options;
 end;
-	
+if ~dataflag
+    spectopooptions  = [ spectopooptions ', ''icawinv'', EEG.icawinv' ];
+end;
+
 % The programming here is a bit redundant but it tries to optimize 
 % memory usage.
 % ----------------------------------------------------------------
