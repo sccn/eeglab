@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/23 21:10:02  arno
+% importing type of event
+%
 % Revision 1.5  2002/10/22 23:57:21  arno
 % change default blockread
 %
@@ -57,6 +60,7 @@
 
 function [EEG, command] = pop_loadcnt(filename, varargin); 
 command = '';
+EEG = [];
 
 if nargin < 1 
 
