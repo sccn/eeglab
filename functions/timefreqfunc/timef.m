@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/04/27 21:19:02  scott
+% debugging PC -sm
+%
 % Revision 1.15  2002/04/27 21:17:27  scott
 % debugging PC -sm
 %
@@ -488,7 +491,6 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 	RR = zeros(g.padratio*g.winsize/2,g.timesout); % (coherence)
 	Pboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap power
 	Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
-        PC = zeros(size(PP,1),size(PP,1),g.timesout);  % summed phase coupling
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
@@ -643,7 +645,7 @@ for i=1:trials
         if g.phasecouple
           PC(:,:,j) = PC(:,:,j) ...
               + repmat(sqrt(PP(:,j)),1,size(PP,1)) ...
-                   .* repmat((tmpX ./ abs(tmpX)),size(PP,1),1); 
+                   .* repmat((tmpX ./ abs(tmpX))',size(PP,1),1); 
                                                    % normalized spectral vector
                                                    % dot-times amplitude vector
         end
