@@ -2,7 +2,7 @@
 %                (.RAW or .RDF) 
 %                
 % Usage: 
-%         >> [data,events,datasize] = read_erpss(filename);
+%         >> [data,events,header] = read_erpss(filename);
 % Inputs:
 %   filename - Name of uncompressed ERPSS data file (including extension) 
 %
@@ -12,16 +12,17 @@
 %              events.sample_offset[]: Event offsets in samples
 %                                      from the first sample (0)
 %              events.event_code[]     Event codes (integers: 1-128)
-%   datasize - Data size information structure:
-%              datasize.nchans   Number of channels
-%              datasize.nframes  Number of data frames (i.e., samples, timepoints)
+%   header - header information structure:
+%            header.nchans   Number of channels
+%            header.nframes  Number of data frames (i.e., samples, timepoints)
 %
 % Notes: ERPSS format was developed by Jonathan Hansen at the Hillyard lab 
 %              at UCSD (http://sdepl.ucsd.edu/erpss/).
 %
-% Authors: Jeng-Ren Duann, CNL/Salk & INC/UCSD, 2002-12-12
-%          Arnaud Delorme, debug, spped-up and read compressed data 2003-06
+% Authors: Jeng-Ren Duann & Arnaud Delorme, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov
+
+% $Log: not supported by cvs2svn $
 
 function [eeg,ev,header] = read_erpss(filename)
   
@@ -55,6 +56,7 @@ function [eeg,ev,header] = read_erpss(filename)
     
     cnt = 0;
     ev_cnt = 0;
+    firstpass = 1;
     
     % first pass, scan data
     totalsize = 0;
@@ -75,13 +77,42 @@ function [eeg,ev,header] = read_erpss(filename)
             block_size = fread(fp,1,'uint16');
 
             % Read events
-            if compressed
-                fseek(fp,10,0);
-                block_size_compress = fread(fp,1,'uint16');
-                fseek(fp,48+110*4+block_size_compress*2,0);
+            if ~firstpass
+                if compressed
+                    fseek(fp,10,0);
+                    block_size_compress = fread(fp,1,'uint16');
+                    fseek(fp,48+110*4+block_size_compress*2,0);
+                else
+                    fseek(fp,60+110*4+nchans*block_size*2,0);
+                end;
             else
-                fseek(fp,60+110*4+nchans*block_size*2,0);
-            end;
+                if compressed
+                    fseek(fp,10,0);
+                    block_size_compress = double(fread(fp,1,'uint16'));
+                    header.amplif              = double(fread(fp,1,'uint32'));
+                    header.clock_freq          = double(fread(fp,1,'uint32'));
+                    header.divider             = double(fread(fp,1,'uint32'));
+                    header.ad_range_mv         = double(fread(fp,1,'uint32'));
+                    header.ad_bits             = double(fread(fp,1,'uint32'));
+                    header.nsteps              = double(fread(fp,1,'uint32'));
+                    fseek(fp,24+110*4+block_size_compress*2,0);
+                else
+                    fseek(fp,12,0);
+                    header.amplif              = double(fread(fp,1,'uint32'));
+                    header.clock_freq          = double(fread(fp,1,'uint32'));
+                    header.divider             = double(fread(fp,1,'uint32'));
+                    header.ad_range_mv         = double(fread(fp,1,'uint32'));
+                    header.ad_bits             = double(fread(fp,1,'uint32'));
+                    header.nsteps              = double(fread(fp,1,'uint32'));
+                    fseek(fp,24+110*4+nchans*block_size*2,0);
+                end;
+                if header.divider & header.clock_freq
+                    header.srate     = header.clock_freq/header.divider/header.nsteps;
+                    header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
+                    fprintf('Sampling rate is %4.4f\n', header.srate);
+                end;
+                firstpass = 0;
+            end; 
             totalsize = totalsize + block_size;
         end
         totblocks = totblocks+1;
@@ -96,7 +127,9 @@ function [eeg,ev,header] = read_erpss(filename)
     fp = fopen(filename,'rb','ieee-le');
     fseek(fp,552,-1);
     temp = fread(fp,1,'uint16');
-    header.srate = 1000000.0/temp;
+    if ~isfield(header, 'srate')
+        header.srate = 1000000.0/temp;
+    end;
     fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
 
@@ -152,6 +185,13 @@ function [eeg,ev,header] = read_erpss(filename)
         end
     end
     fprintf('\n');
+    
+    % rescale to  uv
+    % --------------
+    if isfield(header, 'rescaleuv')
+        disp('Rescaling data to microVolt');
+        eeg = eeg*header.rescaleuv;
+    end;
     
     fclose(fp);
     header.nframes = size(eeg,2);
