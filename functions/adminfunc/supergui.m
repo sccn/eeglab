@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/08/13 18:50:31  arno
+% vert align
+%
 % Revision 1.19  2002/08/13 17:40:41  arno
 % same
 %
@@ -231,7 +234,6 @@ for row = 1:length(geomx)
 			if ~strcmp(style, 'pushbutton')
 				factmulty = max(factmulty, curext(4)/curpos(4));
 			end;
-			fprintf('%d/%d\n', curext(4), curpos(4));
 			set( rowhandle(column), 'units', 'normalized');			
         else 
 			rowhandle(column) = 0;
