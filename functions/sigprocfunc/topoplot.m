@@ -10,6 +10,7 @@
 % Usage:
 %        >>  topoplot(datavector, EEG.chanlocs);   % use a channel locations structure
 %        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file
+%        >>  topoplot('example'); % Gives an example of an electrode location file
 %        >>  [h grid_or_val [grid]]= topoplot(datavector, chan_locs, 'Param1','Value1', ...);
 %
 % Required Inputs:
@@ -130,6 +131,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.216  2004/11/18 19:22:22  scott
+% made 3rd output, 'grid'. [] unless interpolated value asked for
+%
 % Revision 1.215  2004/11/09 19:25:08  arno
 % move plotgrid help outsie of header since unimplemented
 %
@@ -674,13 +678,6 @@ if nargin< 1
    return
 end
 nargs = nargin;
-if nargs < 2
-  loc_file = DEFAULT_ELOC;
-  if ~exist(loc_file)
-      fprintf('default locations file "%s" not found - specify chan_locs in topoplot() call.\n',loc_file)
-      error(' ')
-  end
-end
 if nargs == 1
   if isstr(Values)
     if any(strcmp(lower(Values),{'example','demo'}))
@@ -711,6 +708,13 @@ if nargs == 1
                ])
       return
     end
+  end
+end
+if nargs < 2
+  loc_file = DEFAULT_ELOC;
+  if ~exist(loc_file)
+      fprintf('default locations file "%s" not found - specify chan_locs in topoplot() call.\n',loc_file)
+      error(' ')
   end
 end
 if isempty(loc_file)
