@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2004/11/10 16:05:15  arno
+% fix channel type problem
+%
 % Revision 1.108  2004/11/05 18:06:31  arno
 % putting back orderfields with test
 %
