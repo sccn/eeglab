@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/19 19:45:09  arno
+% back to original
+%
 % Revision 1.13  2002/11/19 19:34:00  arno
 % mhead.dat -> mhead
 %
@@ -304,7 +307,14 @@ if isstr(values)
        fprintf('            Change file name in headplot.m.\n');
        return
     end
-    eval(['load ',mesh_file,' -mat'])
+    try, eval(['load ',mesh_file,' -mat']);
+    catch,
+        POS  = load('mheadpos.txt', '-ascii');
+        TRI1 = load('mheadtri1.txt', '-ascii');
+        TRI2 = load('mheadtri2.txt', '-ascii');
+        index1 = load('mheadindex1.txt', '-ascii');
+        center = load('mheadcenter.txt', '-ascii');
+    end;
     fprintf('Loaded mesh file %s\n',mesh_file);
     newPOS = POS(index1,:);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -516,10 +526,17 @@ else
 
   if ~exist(mesh_file)
 	  close;
-	  error(['headplot(): head mesh file ',meshfile,...
+	  error(['headplot(): head mesh file ',mesh_file,...
 	   ' not found.\n  Change file name in headplot.m.\n'])
   end
-  eval(['load ',mesh_file,' -mat'])
+  try, eval(['load ',mesh_file,' -mat'])
+  catch,
+    POS  = load('mheadpos.txt', '-ascii');
+    TRI1 = load('mheadtri1.txt', '-ascii');
+    TRI2 = load('mheadtri2.txt', '-ascii');
+    index1 = load('mheadindex1.txt', '-ascii');
+    center = load('mheadcenter.txt', '-ascii');
+  end;      
   enum = length(values);
   if enum ~= length(Xe)
 	  close;
