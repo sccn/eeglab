@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/02/23 15:37:35  scott
+% same
+%
 % Revision 1.15  2004/02/23 15:36:16  scott
 % added 'shrink','skirt' to topoplot calls
 %
@@ -219,17 +222,22 @@ if EEG.trials > 1
 	axis off
 	hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 	EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
+    if EEG.trials < 6
+      ei_smooth = 1;
+    else
+      ei_smooth = 3;
+    end
 	if typecomp == 1
         offset = nan_mean(EEG.data(numcompo,:));
-		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 2/3, 'cbar','erp');   
+		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp');   
 	else
 		if option_computeica  
             offset = nan_mean(EEG.icaact(numcompo,:));
-			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
+			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
 		else
 			icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
             offset = nan_mean(icaacttmp);
-			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
+			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
 		end;
 	end;
     axes(hhh);
