@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/12/10 01:19:28  arno
+% typo
+%
 % Revision 1.2  2003/12/02 19:16:54  arno
 % remove verbose option
 %
@@ -323,7 +326,8 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         
         % compute average scaling factor
         % ------------------------------
-        hscalefact = mean(abs(Y(elec)+j*X(elec))./vals); % *46/0.25; %/44/0.25;
+        nonzero = find(vals > 0);
+        hscalefact = mean(abs(Y(elec(nonzero))+j*X(elec(nonzero)))./vals(nonzero)); % *46/0.25; %/44/0.25;
         vscalefact = hscalefact;
         showmsg('Using electrode', ['for uniform spherical re-scaling (x' num2str(1/hscalefact,4) ')'], g.scale(1:2:end));
     else
