@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2002/08/14 02:01:08  arno
+% debugging epoch info
+%
 % Revision 1.56  2002/08/12 18:53:14  arno
 % errordlg2
 %
@@ -694,8 +697,10 @@ if ~isempty( varargin)
 			  % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
  			  difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
  			  for index = 1:length(difffield)
- 			  	  allvalues = eval(['{ EEG.event.' difffield{index} ' };']);
- 				  valempt = cellfun('isempty', allvalues);
+ 			  	  eval(['allvalues = { EEG.event.' difffield{index} ' };']);
+ 				  try,   eval(['valempt = cellfun(''isempty'', allvalues);']);
+				  catch, valempt = mycellfun('isempty', allvalues);
+				  end;
  			 	  arraytmpinfo = cell(1,EEG.trials);
  
  				  % get the field content
@@ -725,7 +730,9 @@ if ~isempty( varargin)
 		  allfields = fieldnames(EEG.event);
 		  for index = 1:length(allfields)
 			  eval(['allvalues = { EEG.event.' allfields{index} ' };']);
-			  valreal = cellfun('isclass', allvalues, 'double');
+			  try,   eval(['valreal = cellfun(''isclass'', allvalues, ''double'');']);
+			  catch, valreal = mycellfun('isclass', allvalues, 'double');
+			  end;
 			  
 			  format = 'ok';
 			  if ~all(valreal) % all valreal ok
@@ -800,3 +807,18 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
+
+function res = mycellfun(com, vals, classtype);
+	res = zeros(1, length(vals));
+	switch com
+	 case 'isempty', 
+	  for index = 1:length(vals), res(index) = isempty(vals{index}); end;
+	 case 'isclass'
+	  if strcmp(classtype, 'double')
+		  for index = 1:length(vals), res(index) = isnumeric(vals{index}); end;
+	  else 
+		  error('unknown cellfun command');
+	  end;
+	 otherwise error('unknown cellfun command');
+	end;
+	
