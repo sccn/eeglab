@@ -3,7 +3,7 @@
 %              using cointerpolation on a fine cartesian grid.
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
-%        >>  [h grid] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
+%        >>  topoplot(datavector, chan_locs, 'Param1','Value1', ...)
 %
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
@@ -32,7 +32,6 @@
 %                        Coordinates returned by besaplot can be used. Note that 
 %                        the dipole exact location has been tuned by hand and is 
 %                        not perfectly exact.
-%   'noplot'          -  ['on'|'off'] do not draw the plot. 
 %   'maplimits'       - 'absmax' +/- the absolute-max 
 %                       'maxmin' scale to data range
 %                        [clim1,clim2] user-definined lo/hi
@@ -53,10 +52,6 @@
 %   'emarker'         - detail
 %   'emarkersize'     - detail
 %   'emarkersize1chan' - detail
-%  
-% Outputs:
-%    h    - axes handle
-%    grip - 67x67 output image 
 %  
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -90,39 +85,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.39  2003/07/14 14:50:09  arno
-% ha -> gca
-%
-% Revision 1.38  2003/07/12 01:49:08  arno
-% fixing noplot
-%
-% Revision 1.37  2003/07/12 01:42:00  arno
-% header
-%
-% Revision 1.36  2003/07/12 01:40:49  arno
-% fixing noplot
-%
-% Revision 1.35  2003/07/12 01:33:58  scott
-% debug noplot
-%
-% Revision 1.34  2003/07/01 23:23:36  julie
-% debug noplot
-%
-% Revision 1.33  2003/07/01 23:18:04  julie
-% added 'noplot' arg, undocumented
-%
-% Revision 1.32  2003/07/01 23:11:51  arno
-% adding handle output
-%
-% Revision 1.31  2003/07/01 23:10:17  julie
-% topoplot2() -> topoplot()
-%
-% Revision 1.30  2003/07/01 23:00:54  scott
-% debug
-%
-% Revision 1.29  2003/07/01 22:58:35  scott
-% added optional gridimage output, undocumented -sm
-%
 % Revision 1.28  2003/06/27 18:53:04  arno
 % header msg
 %
@@ -232,7 +194,7 @@
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
 
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
-function [handle, Zi] = topoplot(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function handle = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 % User Defined Defaults:
 icadefs % read defaults:  MAXTOPOPLOTCHANS, DEFAULT_ELOC
@@ -251,9 +213,8 @@ EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
-DIPOLE  = [];
+DIPOLE = [];
 VERBOSE = 'on';
-noplot  = 'off';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -346,8 +307,6 @@ if nargs > 2
 	  EMARKER = Value;
 	 case 'shrink'
 	  shrinkfactor = Value;
-	 case 'noplot'
-	  noplot = Value;
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
 	 case {'electcolor','ecolor'}
@@ -460,8 +419,13 @@ Th = Th(enum);
 Rd = Rd(enum);
 
 labels = labels(enum,:);
+
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 rmax = 0.5;
+
+ha = gca;
+cla
+hold on
 
 if ~strcmp(STYLE,'blank')
   % find limits for interpolation
@@ -477,17 +441,11 @@ if ~strcmp(STYLE,'blank')
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
   
   [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
-
+  
   % Take data within head
   mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
   ii = find(mask == 0);
   Zi(ii) = NaN;
-
-  if strcmpi(noplot, 'on') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      fprintf('topoplot(): no plot requested.\n')
-      return;
-  end
-  hold on
   
   % calculate colormap limits
   m = size(colormap,1);
@@ -523,7 +481,7 @@ if ~strcmp(STYLE,'blank')
   caxis([amin amax]) % set coloraxis
 
 else % style 'blank'
-  if strcmpi(ELECTROD,'labelpoint') |  strcmpi(ELECTROD,'numpoint')
+  if strcmp(ELECTROD,'labelpoint') |  strcmp(ELECTROD,'numpoint')
     text(-0.6,-0.6, ...
     [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']);
     text(-0.6,-0.65, ...
@@ -544,7 +502,7 @@ else % style 'blank'
   end;
 end
 
-set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+set(ha,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
 
 % %%% Draw Head %%%%
 l = 0:2*pi/100:2*pi;
@@ -663,5 +621,3 @@ hold off
 axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
-
-handle = gca;
