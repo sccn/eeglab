@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2005/01/13 22:58:38  arno
+% same
+%
 % Revision 1.66  2005/01/13 22:55:50  arno
 % do not select string in theta
 %
@@ -608,7 +611,7 @@ end;
 % ----------------------
 tmpinds = find(cellfun('length',{ eloc.theta}) > 1);
 for ind = tmpinds
-    eloc(tmpinds).theta = [];
+    eloc(ind).theta = [];
 end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);

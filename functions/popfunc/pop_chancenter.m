@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/01/13 23:01:59  arno
+% omit channels
+%
 % Revision 1.3  2004/11/12 21:41:16  arno
 % fixed channel selectio
 %
@@ -97,7 +100,7 @@ end;
 
 % remove channels
 % ---------------
-c = setdiff([1:length(chanlocs)], union(omitchans, cellfun('isempty', { chanlocs.theta })));
+c = setdiff([1:length(chanlocs)], union(omitchans, find(cellfun('isempty', { chanlocs.theta }))));
 
 % optimize center
 % ---------------
