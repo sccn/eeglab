@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/07/30 15:16:41  arno
+% debugging frequency axis
+%
 % Revision 1.19  2002/07/26 21:58:03  arno
 % same
 %
@@ -751,7 +754,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 			 '    g.winrej = [g.winrej'' [tmppos(1)+lowlim tmppos(1)+lowlim g.wincolor zeros(1,g.chans)]'']'';' ...
 			 '  end;' ...
   			 '  set(gcbf,''UserData'', g);' ...
-			 '  eegplot(''drawb'', 0);' ...  % redraw background
+			 '  eegplot(''drawp'', 0);' ...  % redraw background
              'end;' ...
              'clear g hhdat hh tmpelec tmppos ax2 ESpacing lowlim Allwin Fs winlength EPosition ax1' ];
 			 		
@@ -824,7 +827,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 			 '  end;' ...
 			 'end;' ...
           'set(gcbf,''UserData'', g);' ...
-          'eegplot(''drawb'');' ...
+          'eegplot(''drawp'', 0);' ...
           'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
 
   set(gcf, 'windowbuttondownfcn', commandpush);
@@ -884,6 +887,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     
   end 
   
+  eegplot('drawp', 0);
   eegplot('drawp', 0);
   if g.dispchans ~= g.chans
   	   eegplot('zoom', gcf);
@@ -1014,16 +1018,37 @@ else
    	highlim = round(min((g.time+g.winlength)*multiplier));
   	displaymenu = findobj('tag','displaymenu','parent',gcf);
     if ~isempty(g.winrej) & g.winstatus
-    	for tpmi = 1:size(g.winrej,1) % scan rows
-			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
-				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)	 
-	 			h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
-	 				g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
-	 				[0 0 1 1], ...
-	 				[g.winrej(tpmi,3) g.winrej(tpmi,4) g.winrej(tpmi,5)]);  
+		indices = find((g.winrej(:,1)' >= lowlim & g.winrej(:,1)' <= highlim) | ...
+					   (g.winrej(:,2)' >= lowlim & g.winrej(:,2)' <= highlim));
+		if ~isempty(indices)
+			tmpwins1 = g.winrej(indices,1)';
+			tmpwins2 = g.winrej(indices,2)';
+			tmpcols  = g.winrej(indices,3:5);
+			[cumul indicescount] = histc(tmpwins1, min(tmpwins1):g.trialstag:max(tmpwins1));
+			count = zeros(size(cumul));
+			%if ~isempty(find(cumul > 1)), find(cumul > 1), end;
+			for tmpi = 1:length(tmpwins1)
+				poscumul = indicescount(tmpi);
+				heightbeg = count(poscumul)/cumul(poscumul);
+				heightend = heightbeg + 1/cumul(poscumul);
+				count(poscumul) = count(poscumul)+1;
+				h = patch([tmpwins1(tmpi)-lowlim tmpwins2(tmpi)-lowlim ...
+						   tmpwins2(tmpi)-lowlim tmpwins1(tmpi)-lowlim], ...
+						  [heightbeg heightbeg heightend heightend], ...
+						  tmpcols(tmpi,:));  % this argument is color
 				set(h, 'EdgeColor', get(h, 'facecolor')) 
-   			end;	
-    	end;
+			end;
+		end;
+%    	for tpmi = 1:size(g.winrej,1) % scan rows
+%			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
+%				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)	 
+%	 			h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
+%	 				g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
+%	 				[0 0 1 1], ...
+%	 				[g.winrej(tpmi,3) g.winrej(tpmi,4) g.winrej(tpmi,5)]);  
+%				set(h, 'EdgeColor', get(h, 'facecolor')) 
+%   		end;	
+%    	end;
     end;
     		
 	% plot tags
