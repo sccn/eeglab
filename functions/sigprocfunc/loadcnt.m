@@ -15,6 +15,10 @@
 %  'scale'      - ['on'|'off'] scale data to microvolt (default:'on')
 %  'dataformat' - ['int16'|'int32'] default is 'int16' for 16-bit data.
 %                 Use 'int32' for 32-bit data.
+%  'blockread'  - [integer] by default it is automatically determined 
+%                 from the file header, though sometimes it fails, and
+%                 you may want to enter a value manually here (1 is the
+%                 most standard value).
 %
 % Outputs:
 %  cnt          - structure with the continuous data and other informations
@@ -50,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/11/05 16:38:08  arno
+% reading events for 32-bit data
+%
 % Revision 1.13  2003/10/30 19:41:01  arno
 % updating error message
 %
@@ -69,7 +76,7 @@ try, r.sample1;    catch, r.sample1=[]; end
 try, r.lddur;      catch, r.lddur=[]; end
 try, r.ldnsamples; catch, r.ldnsamples=[]; end
 try, r.scale;      catch, r.scale='on'; end
-try, r.dataformat;  catch, r.dataformat='int16'; end
+try, r.blockread;  catch, r.blockread = []; end
 
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
 sizeEvent2 = 19 ; %%% 19 bytes for Event2 
@@ -327,6 +334,16 @@ if isempty(r.ldnsamples)
           r.ldnsamples = round(r.lddur*h.rate); 
      else r.ldnsamples = nums; 
      end;
+end;
+
+% channel offset
+% --------------
+if ~isempty(r.blockread)
+    h.channeloffset = r.blockread;
+end;
+if h.channeloffset > 1
+    fprintf('WARNING: reading data in blocks of %d, if this fails, try using option "''blockread'', 1"\n', ...
+            h.channeloffset);
 end;
 
 disp('Reading data .....')
