@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/10 02:12:25  arno
+% testing version control
+%
 % Revision 1.5  2002/04/10 01:01:10  arno
 % testing version control
 %
@@ -241,10 +244,10 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check 'eeg_global; [EEG LASTCOM]= pop_importpres(EEG); h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;']); 
 
 	uimenu( first_m, 'Label', 'Load dataset'     , 'Separator', 'on', 'CallBack', [ 'eeg_global; [TMP LASTCOM]= pop_loadset; h(LASTCOM); if ~isempty(LASTCOM), EEG = TMP; eeg_store; clear TMP; end; eeg_updatemenu;']); 
-	uimenu( first_m, 'Label', 'Load workspace'   , 'CallBack', [ 'LASTCOM = pop_loadwks; h(LASTCOM); eeg_updatemenu;' ]);
+	uimenu( first_m, 'Label', 'Load datasets'   , 'CallBack', [ 'LASTCOM = pop_loadwks; h(LASTCOM); eeg_updatemenu;' ]);
 	uimenu( first_m, 'Label', 'Save dataset'     , 'Separator', 'on', 'CallBack', [ check 'LASTCOM = pop_saveset(EEG); h(LASTCOM); eeg_updatemenu;']);
 	uimenu( first_m, 'Label', 'Clear dataset(s)' , 'CallBack', [ 'LASTCOM = pop_delset; eeg_updatemenu; h(LASTCOM);' ]);
-	uimenu( first_m, 'Label', 'Save workspace'   , 'CallBack', [ check 'LASTCOM = pop_savewks; h(LASTCOM); eeg_updatemenu;' ]);
+	uimenu( first_m, 'Label', 'Save all datasets'   , 'CallBack', [ check 'LASTCOM = pop_savewks; h(LASTCOM); eeg_updatemenu;' ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on', 'CallBack', [ 'LASTCOM = pop_editoptions; h(LASTCOM);']);
 	uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on', 'CallBack', [ 'LASTCOM = pop_saveh(ALLCOM); h(LASTCOM);']);
 	uimenu( first_m, 'Label', 'Quit'             , 'Separator', 'on', 'CallBack', ...
