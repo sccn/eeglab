@@ -50,6 +50,11 @@
 %                 the significance threshold is computed using the corrcoef
 %                 function, so can be set arbitrary low without increase in
 %                 computation load.
+%       'amplag' = [integer vector] allow to compute non 0 amplitude correlation 
+%                 (using option 'amp' above). The vector given as parameter 
+%                 indicates the point lags ([-4 -2 0 2 4] would compute the 
+%                 correlation at time t-4, t-2, t, t+2, t+4, and return the 
+%                 maximum correlation at these points).
 %       'subitc' = ['on'|'off'] Subtract stimulus locked Inter-Trial Coherence 
 %                 from x and y. This computes the  'intrinsic' coherence
 %                 x and y not arising from common synchronization to 
@@ -195,6 +200,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2004/04/29 00:59:28  arno
+% implementing amplitude correlation
+%
 % Revision 1.64  2003/11/26 18:10:22  scott
 % help message
 %
@@ -695,6 +703,7 @@ try, g.subitc;     catch, g.subitc = 'off'; end;
 try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
 try, g.savecoher;  catch, g.savecoher = 0; end;
+try, g.amplag;     catch, g.amplag = 0; end;
 try, g.noinput;    catch, g.noinput = 'no'; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
 
@@ -707,7 +716,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' ...
-		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' };
+		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' 'amplag' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
@@ -1088,28 +1097,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
      
      case 'amp'
       alltfX = abs(alltfX);
-      alltfY = abs(alltfY);      
-      corr  = zeros(length(freqs), length(timesout));
-      alpha = zeros(length(freqs), length(timesout));
-      disp('Computing 0 ms lag amplitude correlation, please wait...');
-      for i1 = 1:length(freqs)
-          for i2 = 1:length(timesout)
-              if ~isnan(g.alpha)
-                  [tmp1 tmp2] = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2,:)) );
-                  coherres(i1,i2)   = tmp1(1,2);
-                  alpha(i1,i2)      = tmp2(1,2);
-              else
-                  tmp1 = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2,:)) );
-                  coherres(i1,i2)   = tmp1(1,2);
-              end;
-          end;
-      end;
-      % apply significance mask
-      if ~isnan(g.alpha)
-          tmpind = find(alpha(:) > g.alpha);
-          coherres(tmpind) = 0;
-          g.alpha = NaN;
-      end;
+      alltfY = abs(alltfY);
+      coherres = ampcorr(alltfX, alltfY, freqs, timesout, g);
+      g.alpha = NaN;
       coherresout = [];
       
 	 case 'phasecoher2',
@@ -1211,6 +1201,58 @@ R = abs(coherres);
 
 return; 
 % ***********************************************************************
+
+% ------------------------------
+% amplitude correlation function
+% ------------------------------
+function [coherres, lagmap] = ampcorr(alltfX, alltfY, freqs, timesout, g)
+    
+    % initialize variables
+    % --------------------
+    coherres  = zeros(length(freqs), length(timesout), length(g.amplag));
+    alpha = zeros(length(freqs), length(timesout), length(g.amplag));
+    countlag = 1;
+    for lag = g.amplag
+        fprintf('Computing %d point lag amplitude correlation, please wait...\n', lag);
+        for i1 = 1:length(freqs)
+            for i2 = max(1, 1-lag):min(length(timesout)-lag, length(timesout))
+                if ~isnan(g.alpha)
+                    [tmp1 tmp2] = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2+lag,:)) );
+                    coherres(i1,i2,countlag)   = tmp1(1,2);
+                    alpha(i1,i2,countlag)      = tmp2(1,2);
+                else
+                    tmp1 = corrcoef( squeeze(alltfX(i1,i2,:)), squeeze(alltfY(i1,i2+lag,:)) );
+                    coherres(i1,i2,countlag)   = tmp1(1,2);
+                end;
+            end;
+        end;
+        countlag = countlag + 1;
+    end;
+
+    % find max corr if different lags
+    % -------------------------------
+    if length(g.amplag) > 1
+        [coherres lagmap] = max(coherres, [], 3);
+        dimsize = length(freqs)*length(timesout);
+        alpha = reshape(alpha((lagmap(:)-1)*dimsize+[1:dimsize]'),length(freqs), length(timesout));
+        % above is same as (but faster)
+        % for i1 = 1:length(freqs)
+        %    for i2 = 1:length(timesout)
+        %        alphanew(i1, i2) = alpha(i1, i2, lagmap(i1, i2));
+        %    end;
+        % end;
+        lagmap = g.amplag(lagmap); % real lag
+        coherres = coherres.*exp(j*lagmap/max(abs(g.amplag))); % encode lag in the phase
+    else
+        lagmap = [];
+    end;
+    
+    % apply significance mask
+    % -----------------------
+    if ~isnan(g.alpha)
+        tmpind = find(alpha(:) > g.alpha);
+        coherres(tmpind) = 0;
+    end;
 
 % ------------------
 % plotting functions
@@ -1416,6 +1458,11 @@ case 'on'
            maxangle = 180; % use full-cycle plotting 
        end
        Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
+       
+       if strcmpi(g.type, 'amp') % currrently -1 to 1
+           maxangle = max(abs(g.amplag)) * mean(times(2:end) - times(1:end-1));
+           Rangle  = Rangle * maxangle;
+       end;
        
        if ~strcmpi(g.freqscale, 'log')
            imagesc(times,freqs,Rangle,[-maxangle maxangle]); % plot the coherence phase angles
