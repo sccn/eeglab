@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/10/15 14:42:15  arno
+% button text aspect
+%
 % Revision 1.31  2002/08/20 22:33:34  arno
 % debug for Mac
 %
@@ -289,7 +292,12 @@ try,
 		if ~isempty(hh)
 			factmulty = factmulty*1.4;
 		end;
-	end;
+	elseif ~isunix % windows
+		hh = findobj(allhandlers, 'style', 'edit');
+		if ~isempty(hh)
+			factmulty = factmulty*1.15;
+		end;
+    end;
 catch, end;
 warning on;	
 
