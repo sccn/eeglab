@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/05 23:59:06  arno
+% correcting figure title
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -76,7 +79,7 @@ if nargin < 3
 	inistr       = {  '1' ...
 					  [ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ] ...
 					  '0' ...
-					  'phasecoher' '' ''};
+					  'phasecoher' '' '''padratio'', 4'};
 	result       = inputdlg( promptstr, fastif(typeproc, 'Plot channel time frequency -- pop_timef()', ...
 	                'Plot component time frequency -- pop_timef()'), 1,  inistr );
 	if length( result ) == 0 return; end;
@@ -90,6 +93,16 @@ if nargin < 3
         otherwise, error('Invalid type of coherence');
     end;	
 	
+    % add topoplot
+    % ------------
+    if ~isempty(EEG.chanlocs)
+      if typeproc == 1
+	options = [options ', ''topovec'', num, ''elocs'', EEG.chanlocs' ];
+      else
+	options = [options ', ''topovec'', EEG.icawinv(:,num), ''elocs'', EEG.chanlocs' ];
+      end;
+    end;
+    
     % add title
     % ---------
 	if isempty( strmatch(  '''title''', result{6}))
