@@ -23,6 +23,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 22:25:10  arno
+% *** empty log message ***
+%
 
 function h = superline(X, Y, color, thickness, offset, middle);
 
@@ -45,8 +48,10 @@ end;
 
 % ratio X/Y
 % ---------
-try, 	ratioXY = abs(X(1) - X(2))/abs(Y(1) - Y(2));
-catch,	ratioXY = 1;
+if abs(Y(1) - Y(2)) == 0
+	ratioXY = 1;
+else 
+	ratioXY = abs(X(1) - X(2))/abs(Y(1) - Y(2));
 end;
 		
 PADSTRIPE  = 0.8;
@@ -56,7 +61,7 @@ SIZESTRIPE = 0.2;
 
 % original line vector
 % --------------------
-if ratioXY >= 0.1
+if ratioXY >= 0.05
 	slope = (Y(2)-Y(1)) / (X(2)-X(1));
 	slopenormalize = [1 slope]/sqrt(slope^2+1); % (1,slope) are the coordinate of the non unitary vector
 else
@@ -167,7 +172,7 @@ end;
 return
 
 % tests
-clf;
+figure;
 for i=9:31
 	fprintf('******************************* %d \n', mod(i/10, 1));
 	superline( [ 0+i 1+i ] , [ 10 20 ], 'b', 5, mod(i/10, 1),1);  
