@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/08 23:33:26  arno
+% format conversion for events
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -131,6 +134,6 @@ if isfield(EEG,'poschan')
     EEG.chanlocs = EEG.poschan;
     EEG = rmfield(EEG, 'poschan');
 end;  
-
+EEG = eeg_checkset(EEG, 'eventconsistency');
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
