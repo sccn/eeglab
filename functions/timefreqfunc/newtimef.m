@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/12/09 23:13:03  arno
+% fixing plotimef baseline problem
+%
 % Revision 1.50  2003/12/08 18:32:01  arno
 % undoing baseline
 %
@@ -1006,6 +1009,7 @@ if iscell(X)
 	end;
     P = { P1 P2 P1-P2 };
     R = { R1 R2 Rdiff };
+    
     if nargout >= 8, alltfX = { alltfX1 alltfX2 }; end;
     
 	return; % ********************************** END FOR SEVERAL CONDITIONS
