@@ -1,12 +1,15 @@
 % pop_saveh() - save the EEGLAB session command history stored in ALLCOM
+%               or in the 'history' field of the current dataset
 %
 % Usage:
 %   >> pop_saveh( ALLCOM, filename, filepath);
+%   >> pop_saveh( EEG.history, filename, filepath);
 %
 % Inputs:
-%   ALLCOM     - cell array of strings containing the EEGLAB command history 
-%   filename   - name of the file to save to (optional, default "eeglabhist.m"
-%   filepath   - path of the file to save to (optional, default pwd)
+%   ALLCOM      - cell array of strings containing the EEGLAB command history 
+%   EEG.history - history field of the current dataset
+%   filename    - name of the file to save to (optional, default "eeglabhist.m"
+%   filepath    - path of the file to save to (optional, default pwd)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
@@ -31,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/10/15 17:07:45  arno
+% drawnow
+%
 % Revision 1.3  2002/08/13 16:40:23  scott
 % help msg and text edits
 %
@@ -66,12 +72,20 @@ if fid == -1
 end;    
 fprintf(fid, '%% EEGLAB history file generated on the %s\n', date);
 fprintf(fid, '%% ------------------------------------------------\n');
-for index = length(allcoms):-1:1
-    fprintf(fid, '%s\n', allcoms{index});
+if iscell(allcoms)
+    for index = length(allcoms):-1:1
+        fprintf(fid, '%s\n', allcoms{index});
+    end;
+    fprintf(fid, 'eeglab redraw;\n');
+else
+    fprintf(fid, '%s\n', allcoms);
 end;
-fprintf(fid, 'eeglab redraw;\n');
 fclose(fid);
-    
-com = sprintf('pop_saveset( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
+
+if iscell(allcoms)
+    com = sprintf('pop_saveset( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
+else
+    com = sprintf('pop_saveset( EEG.history, ''%s'', ''%s'');', curfilename, curfilepath);
+end;
 
 return;
