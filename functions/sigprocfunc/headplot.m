@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/12/05 18:10:20  arno
+% loading files differently for windows
+%
 % Revision 1.17  2003/08/02 00:24:10  scott
 % nothing
 %
@@ -260,29 +263,23 @@ if isstr(values)
 	    % Electrode structure
 	    %%%%%%%%%%%%%%%%%%%%%
 	    if ~isfield(eloc_file, 'X') | isempty(eloc_file(1).X) % no X Y Z coordinates
-			[tmp labels Th Rd] = readlocs(eloc_file);
-			ElectrodeNames = strvcat(labels); 
-			labels = strvcat(labels);
-            [Phi Th] = topo2sph( [Th(:) Rd(:)]);
-   	        Th  = pi/180*Th;
-		    Phi = pi/180*Phi;
-            [Xe Ye Ze] = sph2cart( Th, Phi, ones(size(Th)));
-		    fprintf('Headplot: generating XYZ coordinates from polar coordinates\n');
-	        dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-	        Xe = Xe./dists;
-	        Ye = Ye./dists;
-	        Ze = Ze./dists;
-        else
-		    fprintf('Headplot: using existing XYZ coordinates\n');
-		    ElectrodeNames = strvcat({ eloc_file.labels });
-		    Xe = cell2mat( { eloc_file.X } )';
-		    Ye = cell2mat( { eloc_file.Y } )';
-		    Ze = cell2mat( { eloc_file.Z } )';
-	        dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-	        Xe = Xe./dists;
-	        Ye = Ye./dists;
-	        Ze = Ze./dists;
+			[tmp labels Th Rd ind] = readlocs(eloc_file);
         end;
+        fprintf('Headplot: using existing XYZ coordinates\n');
+        tmpX = { eloc_file.X };
+        tmpY = { eloc_file.Y };
+        tmpZ = { eloc_file.Z };
+        indices = find(~cellfun('isempty', tmpX));
+        ElectrodeNames = strvcat({ eloc_file.labels }); 
+        ElectrodeNames = ElectrodeNames(indices);
+        Xe = cell2mat( tmpX(indices) )';
+        Ye = cell2mat( tmpY(indices) )';
+        Ze = cell2mat( tmpZ(indices) )';
+        dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
+        Xe = Xe./dists;
+        Ye = Ye./dists;
+        Ze = Ze./dists;
+
 		Xetmp = Xe;
 		Xe = -Ye;
 		Ye = Xetmp;
