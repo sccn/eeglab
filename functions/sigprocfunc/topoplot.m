@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/07/12 01:49:08  arno
+% fixing noplot
+%
 % Revision 1.37  2003/07/12 01:42:00  arno
 % header
 %
@@ -538,7 +541,7 @@ else % style 'blank'
   end;
 end
 
-set(ha,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
+set(gca,'Xlim',[-rmax*1.3 rmax*1.3],'Ylim',[-rmax*1.3 rmax*1.3])
 
 % %%% Draw Head %%%%
 l = 0:2*pi/100:2*pi;
