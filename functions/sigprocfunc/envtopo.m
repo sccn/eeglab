@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/01/26 01:19:58  scott
+% same
+%
 % Revision 1.36  2004/01/26 01:19:11  scott
 % same
 %
@@ -522,7 +525,7 @@ for c = 1:ncomps %%% find max variances and their frame indices %%%%%
       plotframes(c) = i;
       maxproj(:,c)  = proj(:,i);
   end
-end 
+end %c
 fprintf('\n');
 
 % print percent variance accounted for
@@ -534,14 +537,10 @@ if strcmpi(g.pvaf, 'on')
     [sortpvaf spx] = sort(pvaf);
     sortpvaf = pvaf(spx);
     pvafcomps = pvafcomps(spx);
-    %pvafcomps = pvafcomps(end:-1:1);
-    %sortpvaf  = sortpvaf(end:-1:1);
     k = 1;
     for index =1:ncomps
-        fprintf('   IC%d pvaf: ');
-        if pvafcomps(index)<100, fprintf(' '); end;
-        if pvafcomps(index)<10, fprintf(' '); end;
-        fprintf('%6.2f%%      ', pvafcomps(index),sortpvaf(index));
+        fprintf('   IC%3d ',pvafcomps(index));
+        fprintf('pvaf: %6.2f%%   ', sortpvaf(index));
         if rem(k,3)==0, fprintf('\n'); end;
         k = k+1;
     end;
@@ -599,17 +598,17 @@ if length(g.plotchans) ~= chans
 end
 fprintf('Topo maps will show components: ');
 for t=1:ntopos
-  fprintf('%4d ',maporder(t));
+  fprintf('%4d  ',maporder(t));
 end
 fprintf('\n');
 fprintf('    with max variance at times: ');
 for t=1:ntopos
-  fprintf('%4.0f ',plottimes(t));
+  fprintf('%4.0f  ',plottimes(t));
 end
 fprintf('\n');
 fprintf('                      = frames: ');
 for t=1:ntopos
-  fprintf('%4d ',plotframes(t));
+  fprintf('%4d  ',plotframes(t));
 end
 fprintf('\n');
 fprintf('                          pvaf: ');
