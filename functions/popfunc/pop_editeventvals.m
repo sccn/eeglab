@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/06/27 23:30:53  arno
+% adding contextual help
+%
 % Revision 1.18  2003/06/27 23:12:56  arno
 % new implementation including append and urevents
 %
@@ -180,7 +183,22 @@ if nargin >=1 & isstr(EEG)
 
       shift     = varargin{1}; % shift is for adding before or after the event
       if isfield(eventtmp, 'epoch'), curepoch = eventtmp(valnum).epoch; end;
-      valnum    = valnum + shift;
+      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+          urvalnum = eventtmp(valnum).urevent;
+          if isfield(EEG.urevent, 'epoch'), urcurepoch = EEG.urevent(urvalnum).epoch; end;
+          urvalnum = urvalnum + shift;
+      end;
+      valnum    = valnum   + shift;
+      
+      % update urevents
+      % ---------------
+      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+          EEG.urevent(end+3)            = EEG.urevent(end);
+          EEG.urevent(urvalnum+1:end-2) = EEG.urevent(urvalnum:end-3);
+          EEG.urevent(urvalnum)         = EEG.urevent(end-1);
+          EEG.urevent                   = EEG.urevent(1:end-2);
+          if isfield(EEG.urevent, 'epoch'),  EEG.urevent(urvalnum).epoch = urcurepoch; end;
+      end;
       
       % update events
       % -------------
@@ -188,8 +206,14 @@ if nargin >=1 & isstr(EEG)
       eventtmp(valnum+1:end-2) = eventtmp(valnum:end-3);
       eventtmp(valnum)         = eventtmp(end-1);
       eventtmp                 = eventtmp(1:end-2);
-      if isfield(eventtmp, 'epoch'), eventtmp(valnum).epoch = curepoch; end;
-
+      if isfield(eventtmp, 'epoch'), eventtmp(valnum).epoch = curepoch; end;      
+      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+          eventtmp(valnum).urevent = urvalnum;
+          for index = valnum+1:length(eventtmp)
+              eventtmp(index).urevent = eventtmp(index).urevent+1;
+          end;
+      end;
+      
       % update gui
       % ----------
       userdata{2} = eventtmp;
@@ -200,7 +224,7 @@ if nargin >=1 & isstr(EEG)
       % ---------------
       tmpcell    = cell(1,1+length(fieldnames(eventtmp))); 
       tmpcell{1} = valnum;
-      oldcom     = { oldcom{:} 'add', tmpcell };
+      oldcom     = { oldcom{:} 'append', tmpcell };
       
      case 'delete', % **********************************************************
       
@@ -239,6 +263,48 @@ if nargin >=1 & isstr(EEG)
       end;
       eventtmp(valnum) = setfield(eventtmp(valnum), field, editval);
       
+      % update urevents
+      % ---------------
+      if isfield(EEG, 'urevent') & isfield(eventtmp, 'urevent')
+          urvalnum  = eventtmp(valnum).urevent;
+          disp('Urevent structure updated');
+          
+          % latency case
+          % ------------
+          if strcmp( field, 'latency') & ~isempty(editval)
+              if isfield(EEG.urevent, 'epoch')
+                  urepoch = EEG.urevent(urvalnum).epoch;
+                  
+                  % find closest event latency
+                  % --------------------------
+                  if valnum<length(eventtmp)
+                      if eventtmp(valnum+1).epoch == urepoch
+                          urlatency = EEG.urevent(eventtmp(valnum+1).urevent).latency;
+                          latency   = eventtmp(valnum+1).latency;
+                      end;
+                  end;
+                  if valnum>1
+                      if eventtmp(valnum-1).epoch == urepoch
+                          urlatency = EEG.urevent(eventtmp(valnum-1).urevent).latency;
+                          latency   = eventtmp(valnum-1).latency;
+                      end;
+                  end;
+                  
+                  % update event
+                  % ------------
+                  if exist('urlatency') ~=1
+                      disp('Urevent not updated: could not find other event in the epoch');
+                  else
+                      editval = urlatency - ( latency - editval ); % new latency value
+                  end;
+              else 
+                  disp('Warning: urevent latency might be innacurate if portion of data has been removed');
+              end;                  
+          end;
+          
+          EEG.urevent(urvalnum) = setfield(EEG.urevent(urvalnum), field, editval);
+      end;
+
       % update history
       % --------------
       oldcom = { oldcom{:} 'changefield' { valnum field editval }};
@@ -282,6 +348,7 @@ if nargin >=1 & isstr(EEG)
     
     % save userdata
     % -------------
+    userdata{1} = EEG;
     userdata{2} = eventtmp;
     userdata{3} = oldcom;
     set(gcf, 'userdata', userdata);
@@ -397,6 +464,7 @@ if nargin<2
     
     % transfer events
     % ---------------
+    EEG       = userdata{1};
     tmpevents = userdata{2};
     EEG.event = tmpevents;
     com       = sprintf('%s = pop_editeventvals(%s,%s);', inputname(1), inputname(1), vararg2str(userdata{3}));
