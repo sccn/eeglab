@@ -363,29 +363,37 @@ if type == 'cnt'
       
       if eT.teeg==2
           nevents=eT.size/sizeEvent2;
-          ev2(nevents).stimtype  = [];
-          for i=1:nevents
-              ev2(i).stimtype      = fread(fid,1,'ushort');
-              ev2(i).keyboard      = fread(fid,1,'char');
-              ev2(i).keypad_accept = fread(fid,1,'char');
-              ev2(i).offset        = fread(fid,1,'long');
-              ev2(i).type          = fread(fid,1,'short'); 
-              ev2(i).code          = fread(fid,1,'short');
-              ev2(i).latency       = fread(fid,1,'float');
-              ev2(i).epochevent    = fread(fid,1,'char');
-              ev2(i).accept        = fread(fid,1,'char');
-              ev2(i).accuracy      = fread(fid,1,'char');
-          end     
+          if nevents > 0
+              ev2(nevents).stimtype  = [];
+              for i=1:nevents
+                  ev2(i).stimtype      = fread(fid,1,'ushort');
+                  ev2(i).keyboard      = fread(fid,1,'char');
+                  ev2(i).keypad_accept = fread(fid,1,'char');
+                  ev2(i).offset        = fread(fid,1,'long');
+                  ev2(i).type          = fread(fid,1,'short'); 
+                  ev2(i).code          = fread(fid,1,'short');
+                  ev2(i).latency       = fread(fid,1,'float');
+                  ev2(i).epochevent    = fread(fid,1,'char');
+                  ev2(i).accept        = fread(fid,1,'char');
+                  ev2(i).accuracy      = fread(fid,1,'char');
+              end     
+          else
+              ev2 = [];
+          end;
       elseif eT.teeg==1
           nevents=eT.size/sizeEvent1;
-          ev2(nevents).stimtype  = [];
-          for i=1:nevents
-              ev2(i).stimtype      = fread(fid,1,'ushort');
-              ev2(i).keyboard      = fread(fid,1,'char');
-              ev2(i).keypad_accept = fread(fid,1,'char');
-              ev2(i).offset        = fread(fid,1,'long');
+          if nevents > 0
+              ev2(nevents).stimtype  = [];
+              for i=1:nevents
+                  ev2(i).stimtype      = fread(fid,1,'ushort');
+                  ev2(i).keyboard      = fread(fid,1,'char');
+                  ev2(i).keypad_accept = fread(fid,1,'char');
+                  ev2(i).offset        = fread(fid,1,'long');
+              end;
+          else
+              ev2 = [];
           end;
-      else
+     else
           disp('No !!! teeg <> 2 and teeg <> 1');
           ev2 = [];
       end     
