@@ -63,11 +63,16 @@
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     if cycles >0: *longest* window length to use. This
 %                     determines the lowest output frequency  {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winsize) {def: 200}
-%       'padratio'  = FFTlength/winsize (2^k)                     {def: 2}
-%                     Multiplies the number of output frequencies by
-%                     dividing their spacing. When cycles==0, frequency
-%                     spacing is (low_frequency/padratio).
+%       'timesout'  = Number of output times (int<frames-winframes). Enter a 
+%                     negative value [-S] to subsample original time by S.
+%                     Enter an array to obtain spectral decomposition at 
+%                     specific time values (note: algorithm find closest time 
+%                     point in data and this might result in an unevenly spaced
+%                     time array. {def: 200}
+%       'padratio'  = FFT-length/winframes (2^k)                    {2}
+%                     Multiplies the number of output frequencies by dividing
+%                     their spacing (standard FFT padding). When cycles~=0, 
+%                     frequency spacing is divided by padratio.
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                     If cycles==0, all FFT frequencies are output.{def: 50}
 %                     DEPRECATED, use 'freqs' instead,
@@ -179,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/06/21 01:08:24  arno
+% reshaping Rdiff if one freq output
+%
 % Revision 1.57  2003/05/29 15:00:32  arno
 % debug lowmem option
 %

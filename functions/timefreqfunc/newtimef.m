@@ -48,11 +48,16 @@
 %                      determines the lowest output frequency. Note that this
 %                     parameter is overwritten if the minimum frequency requires
 %                     a longer time window {~frames/8}
-%       'timesout'  = Number of output times (int<frames-winframes) {200}
+%       'timesout'  = Number of output times (int<frames-winframes). Enter a 
+%                     negative value [-S] to subsample original time by S.
+%                     Enter an array to obtain spectral decomposition at 
+%                     specific time values (note: algorithm find closest time 
+%                     point in data and this might result in an unevenly spaced
+%                     time array. {def: 200}
 %       'padratio'  = FFT-length/winframes (2^k)                    {2}
-%                      Multiplies the number of output frequencies by
-%                      dividing their spacing. When cycles==0, frequency
-%                      spacing is (low_freq/padratio).
+%                     Multiplies the number of output frequencies by dividing
+%                     their spacing (standard FFT padding). When cycles~=0, 
+%                     frequency spacing is divided by padratio.
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
 %                     If cycles==0, all FFT frequencies are output. {50}
 %                     DEPRECATED, use 'freqs' instead,
@@ -156,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2003/06/19 01:22:09  arno
+% debuging lowmem for multiple condition and 'coher'
+%
 % Revision 1.37  2003/06/19 00:16:06  arno
 % nothing
 %
@@ -609,7 +617,7 @@ end
 if ~all(isnumeric(g.timesout))
 	error('Value of timesout must be a number.');
 end
-if length(g.timesout) == 1
+if length(g.timesout) == 1 & g.timesout > 0
     if g.timesout > g.frame-g.winsize
         g.timesout = g.frame-g.winsize;
         disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
