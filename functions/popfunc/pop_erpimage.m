@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/08/12 23:34:36  arno
+% reordering fields
+%
 % Revision 1.43  2002/08/12 18:50:47  arno
 % errordlg2
 %
@@ -509,7 +512,7 @@ else
 		end;
 	end;	
 end;
-try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end;
 
 % find sorting latencies
 % ---------------------
