@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/20 17:19:56  arno
+% adding Done to callbacks
+%
 % Revision 1.17  2002/04/18 20:01:13  arno
 % retrIeve
 %
@@ -272,7 +275,7 @@ EEGUSERDAT = get(W_MAIN, 'userdata');
 set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
-	uimenu( neuromenu, 'Label', 'Import Matlab data array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
+	uimenu( neuromenu, 'Label', 'Import data file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
 	uimenu( neuromenu, 'Label', 'Read .SMA datafile (Snapmaster)'       ,     'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .CNT datafile (Neuroscan continuous)',  'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .EEG datafile (Neuroscan epochs)'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
