@@ -1,44 +1,44 @@
-% eeglab() - EEGLAB (Version 3.0) - Graphic user interface by Arnaud Delorme 
-%            with Scott Makeig for the ICA EEG toolbox of Makeig et al. 
-%            (now the EEGLAB toolbox) hosted 1997-2001 by the Computational 
-%            Neuroscience Laboratory of Terrence J. Sejnowski at The Salk 
-%            Institute, La Jolla. EEGLAB is hosted (2002-) by the Swartz Center 
-%            for Computatational Neuroscience, Institute for Neural Computation,
-%            University of California San Diego (http://sccn.ucsd.edu/)
+% eeglab() - EEGLAB (Version 3.0) - Graphic user interface environment using the 
+%   ICA EEG toolbox (Makeig et al., CNL / The Salk Institute, 1997-2001), now the 
+%   EEGLAB toolbox. EEGLAB is hosted by the Swartz Center for Computational 
+%   Neuroscience, Institute for Neural Computation, University of California 
+%   San Diego (http://sccn.ucsd.edu/).
 %
 % Description:
-%   EEGLAB is Matlab software for processing continuous or epoched EEG data
-%   using tools from the ICA/EEG toolbox. 
-%   It is built to be useful either to novice or expert Matlab users. 
+%   EEGLAB is Matlab software for processing continuous or epoched event-related 
+%   EEG or MEG data. It is designed for use either by novice or expert Matlab users. 
 %   In normal use, the EEGLAB graphic interface calls graphic functions via 
-%   pop-up windows. For the more advanced user, a single structure, 'EEG,' 
-%   contains all dataset parameters and may be accessed and modified 
-%   directly from the Matlab command line. Computations are carried out
-%   using functions from the ICA/EEG toolbox (now the EEGLAB toolbox). 
+%   pop-up argument windows. Its history mechanism can be used to write the
+%   resulting Matlab calls to disk for incorporation into Matlab scripts. 
+%   A single structure, 'EEG,' contains all dataset parameters and may be accessed 
+%   and modified directly from the Matlab command line. 
 %
-% Note: 1) To redaw the graphic interface after updating datasets, simply
-%       type >> eeglab redraw (this might also scan for an non-empty dataset)
-%       2) To rebuild the graphic interface without erasing datasets, 
-%       type >> eeglab rebuild
-%       3) to restart from scratch >> eeglab
+% Note: 1) To redaw the graphic interface after updating datasets, simply type 
+%            >> eeglab redraw % this will also scan for non-empty datasets
+%       2) To rebuild the graphic interface without erasing datasets, type 
+%            >> eeglab rebuild
+%       3) To restart EEGLAB from scratch, type 
+%            >> eeglab % this will ignore loaded datasets
 %
-% See first:
-%    eeg_checkset(), for the structure of EEG datasets
-%    The full documentation at http://www.cnl.salk.edu/~arno/eeglab.html
-%    The licence under which the software is distributed (licence.txt)
+% See:
+%    >> help eeg_checkset(), % gives the format of the EEG dataset structure
+%    Full documentation is available at http://sccn.ucsd.edu/eeglab/.
+%    The license under which the software is distributed with the code (license.txt)
+%
+% Author: Arnaud Delorme (arno@salk.edu) with Scott Makeig (smakeig@ucsd.edu)
 %
 % Main files:
 % ---------- 
-% eeglab()         - main graphic interface
-% license.txt      - GNU license
+% eeglab()        - main graphic interface
+% license.tx      - GNU license
 % 
-% Lastest signal processing functions (not in the latest distribution):
+% Functions added in EEGLAB: 
 % --------------------------------------------------------------------
-% cell2mat()      - cell to matrix, overwrite Neural network toolbox function
+% cell2mat()      - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
 % convolve()      - smart conv2 (fewer boundary problems)
 % del2map()       - compute a surface Laplacian transform of the data
-% eegplot()       - scrolling multichannel data viewer
+% eegplot()       - scrolling multichannel data viewer (revised, with data rejection)
 % eegplot2event() - process data rejection info from eegplot()
 % eegplot2trial() - process eegplot() rejection info
 % eegrej()        - reject portions of continuous eeg data
@@ -74,8 +74,8 @@
 % readelp()       - read Polhemus .ELP file
 % textgui()       - create a text window with sliders (for help text)
 %
-% GUI Functions calling eponymous functions:
-% -----------------------------------------
+% GUI Functions calling eponymous processing and plotting functions:
+% ------------------------------------------------------------------
 % pop_eegfilt()   - bandpass filter data (eegfilt())
 % pop_eegplot()   - scrolling multichannel data viewer (eegplot())
 % pop_eegthresh() - simple thresholding method (eegthresh())
@@ -159,7 +159,8 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) 2001 Arnaud Delorme and Scott Makeig, Salk Institute, 
+% arno@salk.edu, smakeig@ucsd.edu.
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -176,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/04/26 21:18:20  arno
+% updating pop_copyset call
+%
 % Revision 1.43  2002/04/26 20:46:50  arno
 % removing old pop_erpimage
 %
@@ -313,7 +317,7 @@
 % 3/19/02 Help msg edited by sm 
 
 function eeglab( onearg )
-eeg_options; % eeglaboptions;  <-- wasnt found 3/30 am -Scott
+eeg_options; 
 eeg_global;
 eeg_consts;
 
