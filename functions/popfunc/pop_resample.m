@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/06/03 19:18:18  arno
+% taking into account boundaries for resampling
+%
 % Revision 1.10  2003/12/04 23:03:34  arno
 % detect resample
 %
@@ -136,7 +139,7 @@ if exist('resample') == 2
             tmpres = [];
             indices = [1];
             for ind = 1:length(bounds)-1
-                tmpres  = [ tmpres resample( sigtmp(bounds(ind):bounds(ind+1)-1), p, q ) ];
+                tmpres  = [ tmpres resample( double( sigtmp(bounds(ind):bounds(ind+1)-1) ), p, q ) ];
                 indices = [ indices length(tmpres)+1 ];
             end;
             if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
@@ -145,7 +148,7 @@ if exist('resample') == 2
             tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
         else
             for ind = 1:length(bounds)-1
-                tmpres(indices(ind):indices(ind+1)-1) = resample( sigtmp(bounds(ind):bounds(ind+1)-1), p, q );
+                tmpres(indices(ind):indices(ind+1)-1) = resample( double( sigtmp(bounds(ind):bounds(ind+1)-1) ), p, q );
             end;
         end;        
         tmpeeglab(index1,:, :) = tmpres;
