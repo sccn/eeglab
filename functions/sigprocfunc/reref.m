@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/12 18:43:31  arno
+% debug
+%
 % Revision 1.1  2002/11/12 17:58:08  arno
 % Initial revision
 %
@@ -99,7 +102,7 @@ if nargin<1
   help reref
   return
 end
-if naring < 2
+if nargin < 2
     ref = [];
 end;
 
@@ -182,11 +185,11 @@ data = reshape(data, size(data,1), dim2, dim3);
 % treat optional ica parameters
 % -----------------------------
 if ~isempty(g.icaweight) 
-	winv = pinv(g.icaweigth);
+	winv = pinv(g.icaweight);
     try, 
         W = pinv(avematrix*winv);
 	catch,
         error('Weight matrix size is different from the data size, re-referencing impossible');
     end;
-    S = eye(chans);
+    S = eye(size(W,2));
 end;
