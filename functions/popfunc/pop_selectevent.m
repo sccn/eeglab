@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/10/29 22:38:15  scott
+% text
+%
 % Revision 1.35  2002/10/29 22:37:09  scott
 % text
 %
@@ -250,7 +253,7 @@ if nargin<2
         % -----------------------------
         geometry = { geometry{:} [0.65 0.85 1.3 0.45 0.25 0.1] };
         uilist   = { uilist{:}, ...
-         { 'Style', 'text', 'string', [allfields{index} '(s)'] }, ...
+         { 'Style', 'text', 'string', [allfields{index} ] }, ...
          { 'Style', 'pushbutton', descrip{:}, 'horizontalalignment', 'left' }, ...
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
