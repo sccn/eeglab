@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2004/02/15 16:44:31  scott
+% same
+%
 % Revision 1.80  2004/02/15 16:30:30  scott
 % same
 %
@@ -549,6 +552,7 @@ Th = pi/180*Th;                              % convert degrees to radians
 %               length(Vl),length(Th));
 %end
 
+squeezefac=1;
 if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) | strcmp(lower(shrinkfactor), ...
                        'force')
