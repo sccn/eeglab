@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/06/25 01:05:45  arno
+% new version with zoom
+%
 % Revision 1.3  2002/05/02 21:27:01  arno
 % reject button debugging
 %
@@ -1000,10 +1003,10 @@ else
 				alltag = [ alltag tmptag ];
    			end;	
     	end;
-    	tagnum = (alltag-1)/g.trialstag;
+    	tagnum = (alltag-1)/g.trialstag+1;
      	set(ax0,'XTickLabel', tagnum,'YTickLabel', [],...
 		'Xlim',[0 g.winlength*multiplier],...
-		'XTick',alltag-lowlim, 'YTick',[], 'tag','backeeg');
+		'XTick',alltag-lowlim+g.trialstag/2, 'YTick',[], 'tag','backeeg');
 		axes(ax1);
 
 		tagpos  = [];
