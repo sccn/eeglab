@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/10 22:11:18  arno
+% *** empty log message ***
+%
 
 function newdipfit = dipfit_1_to_2( dipfit );
 
@@ -38,22 +41,25 @@ function newdipfit = dipfit_1_to_2( dipfit );
     end;
     
     ind = 1; % use first template (BESA)
-    newdipfit.hdmfile     = template_models{ind}{1};
     newdipfit.coordformat = template_models{ind}{2};
     newdipfit.mrifile     = template_models{ind}{3};
     newdipfit.chanfile'   = template_models{ind}{4};
     
-    if isfield(dipfit, 'vol')
-        if length(dipfit.vol) == 4
-            if ~all(dipfit.vol == [85-6-7-1 85-6-7 85-6 85]) | ...
-               ~all(dipfit.c   == [0.33 1.00 0.0042 0.33]) | ...
-               ~all(dipfit.o = [0 0 0])
-                disp('Warning: Conversion from dipfit 1 to dipfit 2 can only deal');
-                disp('         with standard (not modified) BESA model');
-                disp('         See "help dipfit_1_to_2" to convert this model');
-                newdipfit = [];
-            end;
-        end;
+    if ~isfield(dipfit, 'vol')
+        newdipfit.hdmfile = template_models{ind}{1};
+    else
+        newdipfit.vol     = dipfit.vol;
+
+        %if length(dipfit.vol) == 4
+            %if ~all(dipfit.vol == [85-6-7-1 85-6-7 85-6 85]) | ...
+            %   ~all(dipfit.c   == [0.33 1.00 0.0042 0.33]) | ...
+            %   ~all(dipfit.o = [0 0 0])
+            %    disp('Warning: Conversion from dipfit 1 to dipfit 2 can only deal');
+            %    disp('         with standard (not modified) BESA model');
+            %    disp('         See "help dipfit_1_to_2" to convert this model');
+            %    newdipfit = [];
+            %end;
+        %end;
     end;
                 
                 
