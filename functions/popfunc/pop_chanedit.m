@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/12/02 17:15:08  arno
+% adding insert & append button
+%
 % Revision 1.61  2003/12/02 03:31:40  arno
 % current figure problem
 %
@@ -300,21 +303,19 @@ if nargin < 2
 		transform = ['inputdlg2({''Enter transform: (Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc.'' }, ''Transform'', 1, { '''' }, ''pop_chanedit'');'];
 		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
 						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
-						['comtmp = {''convert'' {''cart2topo'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'sph->polar', 'callback', ...
-						['comtmp = {''convert'' {''sph2topo'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'polar->sph', 'callback', ...
-						['comtmp = {''convert'' {''topo2sph'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'sph->xyz'  , 'callback', ...
-						['comtmp = {''convert'' {''sph2cart'' ''gui''}};' endgui] }, ...
-					  { 'Style', 'pushbutton', 'string', 'xyz->sph'  , 'callback', ...
-						['comtmp = {''convert'' {''cart2sph'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Rotate axis'  , 'callback', ...
 						['[ comtmp tmpforce ] = forcelocs(chantmp); if ~isempty(tmpforce), ' ...
                          'comtmp = {''forcelocs'' tmpforce{1} }; else comtmp = {''forcelocs'' [] }; end; clear tmpforce;' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Transform axes', 'callback', ...
 						['comtmp = {''transform'' ' transform '};' endgui] }, ...
+					  {  }, ...
+					  { 'Style', 'pushbutton', 'string', 'xyz -> polar & sph.', 'callback', ...
+						['comtmp = {''convert'' {''cart2all'' ''gui''}};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'sph. -> polar & xyz', 'callback', ...
+						['comtmp = {''convert'' {''sph2all'' ''gui''}};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'polar -> sph. & xyz', 'callback', ...
+						['comtmp = {''convert'' {''topo2all'' ''gui''}};' endgui] }, ...
+					  {  }, ...
 					  { } { } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
@@ -540,45 +541,13 @@ else
 				 chans(index).Y  = Y(index);
 				 chans(index).Z  = Z(index);
 			 end;
-             disp('Convert XYZ coordinates to spherical and polar');
+             disp('Note: automatically convert XYZ coordinates to spherical and polar');
              chans = convertlocs(chans, 'cart2all');
-			case 'cart2topo',
-			 [th rd]=cart2topo([cell2mat({chans.X})' cell2mat({chans.Y})' cell2mat({chans.Z})']);
-			 if isempty(th), return; end;
-			 for index = 1:length(chans)
-				 chans(index).theta  = th(index);
-				 chans(index).radius = rd(index);
-			 end;
-			case 'sph2topo',
-			 disp('Warning: all radii considered to be one for this transformation');
-			 try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
-		     catch, error('Cannot process empty values'); end;
-			 for index = 1:length(chans)
-				 chans(index).theta  = angle(index);
-				 chans(index).radius = radius(index);
-			 end;
-			case 'topo2sph',
-			 [sph_phi sph_theta] = topo2sph( [cell2mat({chans.theta})' cell2mat({chans.radius})'] );
-			 for index = 1:length(chans)
-				 chans(index).sph_theta  = sph_theta(index);
-				 chans(index).sph_phi    = sph_phi  (index);
-				 chans(index).sph_radius = 1;
-			 end;
-			case 'sph2cart',
-			 [x y z] = sph2cart(cell2mat({chans.sph_theta})'/180*pi, cell2mat({chans.sph_phi})'/180*pi, cell2mat({chans.sph_radius})');
-			 for index = 1:length(chans)
-				 chans(index).X = x(index);
-				 chans(index).Y = y(index);
-				 chans(index).Z = z(index);
-			 end;
-			case 'cart2sph',
-			 [th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
-			 for index = 1:length(chans)
-				 chans(index).sph_theta     = th(index)/pi*180;
-				 chans(index).sph_phi       = phi(index)/pi*180;
-				 chans(index).sph_radius    = radius(index);
-			 end;
+            otherwise
+             chans = convertlocs(chans, lower(args{curfield}));
 		   end;
+           if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
+           if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
 		  case 'transform'
 		   tmpoper = args{curfield+1};
 		   if isempty(tmpoper), return; end;
