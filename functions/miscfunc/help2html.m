@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/29 00:51:20  arno
+% adding ref search for variable names
+%
 % Revision 1.2  2002/04/22 22:58:30  arno
 % adding extra output parameters
 %
@@ -208,8 +211,12 @@ while (str(1) == '%')
             newvar = 1;
             oldvarname = varname;
             oldvartext = vartext;
-            varname = formatstr( tok1, g.refcall);
-            strrm = deblank(strrm);            % remove tail blanks
+			if ~maindescription
+				varname = formatstr( tok1, g.refcall);
+            else 
+				varname = tok1;
+			end;
+			strrm = deblank(strrm);            % remove tail blanks
             strrm = deblank(strrm(end:-1:1));	% remove initial blanks 
            	strrm = formatstr( strrm(end:-1:1), g.refcall);
             vartext = strrm;
@@ -345,7 +352,7 @@ function tokout = functionformat( tokin, refcall );
 		i2 = findstr( refcall(i1(1):end), '''');
 		if isempty(i2) i2 = length( refcall(i1(1):end) )+1; end;
 		filename  = [ realtokin refcall(i1+2:i1+i2-2)]; % concatenate filename and extension
-		disp(filename)
+		%disp(filename)
 		if exist( filename ) % do not make link if the file does not exist 
 			tokout =  sprintf( [ '<A HREF="' refcall '">%s</A>' tail ' ' ], realtokin, realtokin );
 		end;
