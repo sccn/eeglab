@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/05/10 02:30:01  arno
+% continuous array
+%
 % Revision 1.12  2003/03/12 03:18:58  arno
 % help button
 %
@@ -97,24 +100,29 @@ end;
 if nargin < 2
 	promptstr    = { 'Channels to plot:' ...
 					 'Plot title:' ...
-					 'Plot single trials (yes|no)' 'Vertical lines (ms)' };
+					 'Plot single trials (yes|no)' ... 
+                     'Vertical lines (ms)' ...
+                     'Plotting options (see help)' };
 	inistr       = { [ '1:' num2str( EEG.nbchan ) ] ...
 					 fastif(isempty(EEG.setname), '',EEG.setname) ...
-					 'no' ''};
+					 'no' '' '''ydir'', -1'};
 	result       = inputdlg2( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr, 'pop_plottopo');
 	if size(result,1) == 0 return; end;
 	channels     = eval( [ '[' result{1} ']' ] );
 	plottitle    = result{2};
 	singletrials = strcmp( lower(result{3}), 'yes');
 	vert         = eval( [ '[' result{4} ']' ] );
+    addoptions   = eval( [ '{' result{5} '}' ] );
     figure('name', ' plottopo()');
 	if ~isempty(vert)
-		options ={ EEG.chanlocs, EEG.pnts, [EEG.xmin EEG.xmax 0 0]*1000, plottitle, channels, [.07 .07],0,1,vert };
-	else 
-		options ={ EEG.chanlocs, EEG.pnts, [EEG.xmin EEG.xmax 0 0]*1000, plottitle, channels };
+		addoptions ={ addoptions{:} 'vert' vert };
 	end;
+    options ={ 'chanlocs' EEG.chanlocs 'frames' EEG.pnts 'limits' [EEG.xmin EEG.xmax 0 0]*1000 ...
+               'title' plottitle 'chans' channels addoptions{:} };
 else 
-	options ={ EEG.chanlocs, EEG.pnts, [EEG.xmin EEG.xmax 0 0]*1000, plottitle, channels varargin{:}};
+	options ={ 'chanlocs' EEG.chanlocs 'frames' EEG.pnts 'limits' [EEG.xmin EEG.xmax 0 0]*1000 ...
+               'title' plottitle 'chans' channels varargin{:}};
+    addoptions = {};
 end;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 	
@@ -131,9 +139,9 @@ else
     plottopo( mean(EEG.data,3), options{:} );
 end;
 
-if ~isempty(options(6:end))
-	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d %s);', ...
-				  inputname(1), vararg2str(channels), plottitle, singletrials, vararg2str(options(6:end)));
+if ~isempty(addoptions)
+	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d, %s);', ...
+				  inputname(1), vararg2str(channels), plottitle, singletrials, vararg2str(addoptions));
 else
 	com = sprintf('figure; pop_plottopo(%s, %s, ''%s'', %d);', ...
 				  inputname(1), vararg2str(channels), plottitle, singletrials);
