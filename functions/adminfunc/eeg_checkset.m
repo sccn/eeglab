@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2002/08/21 00:15:20  arno
+% debug
+%
 % Revision 1.58  2002/08/19 19:46:16  arno
 % for non cellfun compatibility
 %
@@ -627,6 +630,9 @@ if ~isempty( varargin)
     for index = 1:length( varargin )
         switch varargin{ index }
 		 case 'data',; % already done at the top 
+		 case 'contdata',; % already done at the top 
+			  errordlg2(strvcat('Can not reject artifact on data epochs'), 'Error');
+			  error('eeg_checkset: data is not continuous');
 		 case 'ica', 
 		  if isempty(EEG.icaweights)
 			  if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
