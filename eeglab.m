@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.320  2004/07/10 00:07:55  arno
+% same
+%
 % Revision 1.319  2004/07/10 00:04:16  arno
 % debug msg
 %
@@ -1486,7 +1489,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     end;
                 end;
             end;
-        elseif ~isempty(findstr(dircontent{index}, 'eegplugin'))
+        elseif ~isempty(findstr(dircontent{index}, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
             funcname = dircontent{index}(1:end-2); % remove .m
         end;
         
@@ -1502,7 +1505,6 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                     eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
                     disp(['eeglab: adding plugin function "' funcname '"' ]);    
                 catch
-                    sadf
                     disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
                     disp([ '   ' lasterr] );
                 end;
