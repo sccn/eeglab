@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/09/14 23:31:57  arno
+% dataformat
+%
 % Revision 1.17  2004/09/14 23:27:44  arno
 % opening file as little endian
 %
@@ -86,7 +89,8 @@ try, r.lddur;      catch, r.lddur=[]; end
 try, r.ldnsamples; catch, r.ldnsamples=[]; end
 try, r.scale;      catch, r.scale='on'; end
 try, r.blockread;  catch, r.blockread = []; end
-try, r.dataformat; catch, r.datatype = 'int16'; end
+try, r.dataformat; catch, r.dataformat = 'int16'; end
+
 
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
 sizeEvent2 = 19 ; %%% 19 bytes for Event2 
