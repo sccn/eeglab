@@ -76,6 +76,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/18 00:53:43  arno
+% new version
+%
 % Revision 1.1  2002/11/18 00:43:32  arno
 % Initial revision
 %
@@ -108,9 +111,9 @@ for numcompo = 1:nbcompo
         ALLERSP1{numcompo,1}     = applyboot( ersp{1}, erspboot{1});
         ALLERSP2{numcompo,1}     = applyboot( ersp{2}, erspboot{2});
         ALLERSPDIFF{numcompo,1}  = applyboot( ersp{3}, erspboot{3});
-        ALLITC1{numcompo,1}      = applyboot( itc{1} , itcboot{1});
-        ALLITC2{numcompo,1}      = applyboot( itc{2} , itcboot{2});
-        ALLITCDIFF{numcompo,1}   = applyboot( itc{3} , itcboot{3});
+        ALLITC1{numcompo,1}      = applyboot( abs(itc{1}) , itcboot{1});
+        ALLITC2{numcompo,1}      = applyboot( abs(itc{2}) , itcboot{2});
+        ALLITCDIFF{numcompo,1}   = applyboot( abs(itc{3}) , itcboot{3});
     else
         [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
                                                       frames, tlimits, srate, cycle, varargin{:});   
@@ -135,9 +138,9 @@ for index1 = 1:nbcompo
                 [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
                                                                   { data1(index2,:) data2(index2,:)}, frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
-                ALLCROSSF1     { index1, index2 } = applyboot(coh{1}, cohboot{1});
-                ALLCROSSF2     { index1, index2 } = applyboot(coh{2}, cohboot{2});
-                ALLCROSSFDIFF  { index1, index2 } = applyboot(coh{3}, cohboot{3});
+                ALLCROSSF1     { index1, index2 } = applyboot(abs(coh{1}), cohboot{1});
+                ALLCROSSF2     { index1, index2 } = applyboot(abs(coh{2}), cohboot{2});
+                ALLCROSSFDIFF  { index1, index2 } = applyboot(abs(coh{3}), cohboot{3});
                 ALLCROSSFANGLE1{ index1, index2 } = cohangles{1};
                 ALLCROSSFANGLE2{ index1, index2 } = cohangles{2};
                 ALLCROSSFANGLEDIFF{ index1, index2 } = cohangles{3};
