@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/13 00:01:34  scott
+% text
+%
 % Revision 1.14  2002/08/12 23:59:00  scott
 % same
 %
@@ -190,7 +193,7 @@ if nargin<2
                 { 'Style', 'listbox', 'string', listboxtext }, ...
                 { 'Style', 'text', 'string', 'as', 'fontweight', 'bold' }, ...
                 { 'Style', 'edit', 'string', '' } ...
-                fastif(isunix,{ 'Style', 'text', 'string', 'fontweight','bold','Click on select field name!' },{ })};
+                fastif(isunix,{ 'Style', 'text', 'string', 'Click on selected field name!','fontweight','bold' },{ })};
 
         [results userdat ]= inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', ...
 									  'Edit event field(s) -- pop_editeventfield()', EEG.eventdescription );
