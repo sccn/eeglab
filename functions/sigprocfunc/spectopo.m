@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/10/23 00:59:48  arno
+% implementing new component scaling
+%
 % Revision 1.39  2002/10/10 16:00:22  arno
 % cle[A
 % move title a little bit
@@ -292,7 +295,9 @@ data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
-
+if g.plotchan == 0 & strcmpi(g.icamode, 'sub')
+    error('Can not plot data-component for all channels (option not implemented)');
+end;
 if ~isempty(g.freq) & min(g.freq)<0
    fprintf('spectopo(): freqs must be >=0 Hz\n');
    return
@@ -343,14 +348,12 @@ else
 	if isempty(g.plotchan) | g.plotchan == 0
 		fprintf('Computing spectra')
 		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);	
-        eegspecdB = 10*log10(eegspecdB);
-        fprintf('\n');
+        fprintf('\n'); % log below
 	else
 		fprintf('Computing spectra at specified channel')
 		g.reref = 'no';
 		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
-        eegspecdB = 10*log10(eegspecdB);
-        fprintf('\n');
+        fprintf('\n'); % log below
 	end;
 	g.reref = 'no';
 	
@@ -360,15 +363,17 @@ else
 	if isempty(g.plotchan) % find channel of minimum power
 		[tmp indexfreq] = min(abs(g.freq-freqs));
 		[tmp g.plotchan] = min(eegspecdB(:,indexfreq));
-		fprintf('Maximum power found at channel %d\n', g.plotchan);
+		fprintf('Channel %d has maximum power at %g\n', g.plotchan, g.freq);
 		eegspecdBtoplot = eegspecdB(g.plotchan, :);		
 	elseif g.plotchan == 0
-		fprintf('Averaging power at all channels\n');
-		eegspecdBtoplot = mean(eegspecdB, 1);
+		fprintf('Computing RMS power at all channels\n');
+		eegspecdBtoplot = sqrt(mean(eegspecdB.^2,1)); % RMS before log as for components
 	else 
 		eegspecdBtoplot = eegspecdB;
 	end;
-	
+    eegspecdB = 10*log10(eegspecdB);
+	eegspecdBtoplot = 10*log10(eegspecdBtoplot);
+    
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% compute component spectra
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -382,16 +387,20 @@ else
 	fprintf('\n');
     
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% rescaling spectra with respect to projection
-    % all channel: component_i power = sum(inverseweigths(component_i)^2) * power(activation_component_i);
+	% rescaling spectra with respect to projection (rms = root mean square)
+    % all channel: component_i power = rms(inverseweigths(component_i)^2) * power(activation_component_i);
     % one channel: component_i power = inverseweigths(channel_j,component_i)^2) * power(activation_component_i);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    for index = 1:size(compeegspecdB,1) 
-        if g.plotchan == 0
-            compeegspecdB(index,:) = 10*log10( sum(g.icawinv(:,g.icacomps(index)).^2) * compeegspecdB(index,:) );
-        else 
-            compeegspecdB(index,:) = 10*log10( g.icawinv(g.plotchan,g.icacomps(index))^2 * compeegspecdB(index,:) );
+    if strcmpi(g.icamode, 'normal')
+        for index = 1:size(compeegspecdB,1) 
+            if g.plotchan == 0
+                compeegspecdB(index,:) = 10*log10( sqrt(mean(g.icawinv(:,index).^4)) * compeegspecdB(index,:) );
+            else 
+                compeegspecdB(index,:) = 10*log10( g.icawinv(g.plotchan,index)^2 * compeegspecdB(index,:) );
+            end;
         end;
+    else % already spectrum of data-components
+        compeegspecdB = 10*log10( compeegspecdB );
     end;
         
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -496,12 +505,17 @@ box off;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colrs = {'r','b','g','m','c'}; % component spectra trace colors
 if ~isempty(g.weights)
-	set(pl, 'linewidth', 2, 'color', 'k');
+    if strcmpi(g.icamode, 'sub')
+        set(pl,'LineWidth',5, 'color', 'k');
+    else 
+        set(pl, 'linewidth', 2, 'color', 'k');
+    end;
+    
 	hold on;
 	for f=1:length(g.icamaps)
 		colr = colrs{mod((f-1),5)+1};
 		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)',colr);
-	end
+    end
 	othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
 	if ~isempty(othercomps)
 		pl2=plot(freqs(1:maxfreqidx),compeegspecdB(othercomps,1:maxfreqidx)');
@@ -516,22 +530,17 @@ if ~isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% indicate component contribution %
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	if g.plotchan ~= 0
-		maxdatadb = max(eegspecdBtoplot(:,freqidx(1)));
-		[tmp indexfreq] = min(abs(g.freq-freqs));
-		for index = 1:length(g.icacomps)
-			if strcmp(g.icamode, 'normal')
-				resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-				fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
-			else
-				resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
-				fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar);
-			end;
-		end;
-	else
-		fprintf(['Warning: can not compute component percentage contribution\n' ...
-				 'when considering global power (i.e. when using ''plotchan'', 0)\n']);
-	end;
+    maxdatadb = max(eegspecdBtoplot(:,freqidx(1)));
+    [tmp indexfreq] = min(abs(g.freq-freqs));
+    for index = 1:length(g.icacomps)
+        if strcmp(g.icamode, 'normal')
+            resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+            fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
+        else
+            resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+            fprintf('Component %d percentage variance accounted for:%6.2f\n', g.icacomps(index), resvar);
+        end;
+    end;
 end;
 
 if ~isempty(g.freq)
@@ -625,7 +634,7 @@ if ~isempty(g.freq)
 		if isnan(g.limits(5)),     maplimits = 'absmax';
 		else                       maplimits = [g.limits(5) g.limits(6)];
 		end;
-		if length(topodata) == 1
+		if g.plotchan ~= 0
 			if ~isempty(varargin)
 				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
 						 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
@@ -668,7 +677,7 @@ if ~isempty(g.freq)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
 			topoplot(g.icawinv(:,compnum).^2,g.chanlocs,varargin{:}); 
-			tl=title(int2str(compnum));
+			tl=title(int2str(g.icacomps(compnum)));
 			set(tl,'fontsize',16);
 			axis square;
 			drawnow
@@ -708,7 +717,7 @@ function plotcolbar(g)
 			[tmp zi] = find(ticks == 0);
 			ticks = [ticks(1) ticks(zi) ticks(end)];
 			set(cb,'ytick',ticks);
-			set(cb,'yticklabel',{'-','0','+'});
+			set(cb,'yticklabel',{'-','','+'});
 		end
 	catch, end; % in a single channel is plotted
 
@@ -743,7 +752,7 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 			if strcmp(g.icamode, 'normal')
 				tmpdata = newweights(c,:)*data; % component activity
 			else % data - component contribution
-				tmpdata = data(g.plotchan,:) - newweights(c,:)*data;
+                tmpdata = data(g.plotchan,:) - (g.icawinv(g.plotchan,c)*newweights(c,:))*data;
 			end;
 		else
 			tmpdata = data(c,:); % channel activity
