@@ -39,6 +39,7 @@
 %  'dipolelength' - Length of the dipole bar(s) {Default: 1}
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
 %  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
+%  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
 %
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
@@ -111,6 +112,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.10  2003/03/11 01:20:32  arno
+%updating default besaextori, debuging summary
+%
 %Revision 1.9  2003/03/07 00:32:53  arno
 %debugging textforgui
 %
@@ -144,6 +148,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'summary'  'string'   { 'on' 'off' }     'off';
                                  'view'     'real'     []                 [];
                                  'rvrange'  'real'     [0 Inf]            [];
+                                 'normlen'  'string'   { 'on' 'off' }     'off';
                                  'num'      'string'   { 'on' 'off' }     'off';
                                  'projimg'  'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
@@ -155,6 +160,10 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % conversion
     % ----------
+    if strcompi(g.normlen, 'on')
+        try, EEG.sources = rmfield(EEG.sources, 'besaextori'); catch, end;
+    end;
+    
     if isfield(sources, 'besathloc')
         sources = convertbesaoldformat(sources);
     end;
