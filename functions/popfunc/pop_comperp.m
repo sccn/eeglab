@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2005/03/22 16:14:46  arno
+% fixing error
+%
 % Revision 1.30  2005/03/21 17:21:10  scott
 % refine help message
 % made the default 'datsub' = []
@@ -331,7 +334,7 @@ for index = union(datadd, datsub)
     if ALLEEG(index).nbchan ~= nbchan, error(['Dataset '  int2str(index) ' does not have the same number of channels as others']); end;
 end;
     
-if ~isempty(alpha) & length(datadd) == 1
+if ~isempty(g.alpha) & length(datadd) == 1
     error([ 'T-tests require more than one ''' datadd ''' dataset' ]);
 end
 
