@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/04/29 14:32:31  scott
+% adding ; -sm
+%
 % Revision 1.25  2002/04/29 14:29:53  scott
 % debugging cumulX/PA -sm
 %
@@ -679,7 +682,6 @@ for i=1:trials
 		          RR(:,j) = tmpX ./ abs(tmpX); % normalized cross-spectral vector
          		  switch g.phsamp
              		  case 'on'
-disp 'phsamp1'
                 	    cumulX(:,j) = cumulX(:,j)+abs(tmpX); % accumulate for PA
           		  end
               end;
@@ -689,7 +691,6 @@ disp 'phsamp1'
 
         switch g.phsamp
          case 'on'
-disp 'phsamp2'
           PA(:,:,j) = PA(:,:,j) ...
               + repmat((tmpX ./ abs(tmpX)),1,size(PP,1))   ...
                    .* repmat(sqrt(PP(:,j))',size(PP,1),1);
@@ -742,7 +743,6 @@ end;
 
 switch g.phsamp
  case 'on'
-disp 'phsamp3'
   for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
     PA(j,:,:) = PA(j,:,:) ./ cumulX;
   end
