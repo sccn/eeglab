@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/13 21:42:34  arno
+% debug
+%
 % Revision 1.6  2002/08/13 18:21:02  arno
 % auto vert/horiz
 %
@@ -95,7 +98,5 @@ for index = 1:length(Prompt)
 	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
 				{ 'Style', 'edit', 'string', DefAns{index} } };
 end;
-geomvert
-geometry
 
 result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title, [], 'normal', geomvert);
