@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2003/05/19 22:55:47  arno
+% implementing lowmem option for bootstrap
+%
 % Revision 1.46  2003/05/02 21:47:07  arno
 % implementing lowmem option
 %
@@ -1029,14 +1032,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
                         'formulapost', formulapost, 'formulainit', formulainit, ...
                         'formulaout', formulaout, 'bootside', 'upper', ...
                         'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselnboot };
-            if strcmpi(g.lowmem, 'on')
-                for ind = 1:2:size(alltfX,1) % scan frequencies
-                    Rbootout(ind:ind+1,:,:) = bootstat(alltfX(ind:ind+1,:,:), alltfY(ind:ind+1,:,:), options{:});
-                end;
-            else
-                Rbootout = bootstat(alltfX, alltfY, options{:});               
-            end;
-		else Rbootout = [];
+            Rbootout = bootstat(alltfX, alltfY, options{:});               
+            % NOTE: it is not necessary to implement lowmem for this function (automatic)
+        else Rbootout = [];
         end;
         % note that the bootstrap thresholding is actually performed in the display subfunction plotall()
 	end;
