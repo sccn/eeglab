@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2003/06/11 18:02:00  arno
+% color error in drawcircle
+%
 % Revision 1.53  2003/05/31 18:31:10  arno
 % undo last change
 %
@@ -384,7 +387,7 @@ if isempty(g.circfactor), g.circfactor = ones( nbcomponents, nbcomponents )*0.01
     
 % check size of inputs
 % --------------------
-try
+%try
 	if ~all(size(ALLERSP) == size(ALLITC))
 		disp('Error: ERSP and ITC cells array must be the same size'); return;
 	end;	
@@ -409,7 +412,8 @@ try
 		end;
 	end;
 	try, tmp = ALLERSP{1,1}; tmp(FREQS,:); catch, disp('Error: unable to access the defined frequencies in ERSPs (out of bounds) '); return; end;
-	try, ALLERSP{selected,1}; catch, disp('Error: unable to access the defined components in ERSPs (out of bounds)'); return; end;
+	try, ALLERSP{selected,1}; 
+    catch, disp('Error: unable to access the defined components in ERSPs (out of bounds)'); return; end;
 catch
 	disp('Error accessing one of the variable. Remember: Except for selected, freqs, times and circfactor, all vars are cell arrays. Check also: dimensions and content.'); return;
 end;	 
