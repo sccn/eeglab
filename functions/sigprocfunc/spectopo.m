@@ -42,6 +42,9 @@
 %                higest power at 'freq').If 0, plot RMS power at all channels. 
 %   'nicamaps' = [integer] number of ICA component maps to plot (Default 4).
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([]=all).
+%   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectrum of
+%                individual ICA components, the function computes the spectrum of
+%                the data minus their contribution { default: 'normal' }
 %   'icamaps'  = [integer array] force plotting of selected ica compoment maps ([]=the
 %                'nicamaps' largest).
 %   'memory'   = ['low'|'high'] setting to low will use less memory for ICA component 
@@ -64,7 +67,7 @@
 %
 % See also: timtopo(), envtopo(), tftopo(), topoplot()
 
-% Copyright (C) 3/01 Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, 
+% Copyright (C) 3/01 Scott Makeig & Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -82,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/07/25 20:58:33  luca
+% divide sum of epoch spectra by length(epoch_subset).
+%
 % Revision 1.18  2002/07/25 20:44:32  luca
 % *** empty log message ***
 %
@@ -168,6 +174,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'freqfac'       'integer'  []                        FREQFAC;
 				  'percent'       'real'     [0 100]                  100 ;
 				  'reref'         'string'   { 'averef' 'no' }         'no' ;
+				  'icamode'       'string'   { 'normal' 'sub' }        'normal' ;
 				  'weights'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
@@ -177,6 +184,11 @@ if nargin <= 3 | isstr(varargin{1})
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
 	if ~isempty(g.maxfreq), g.limits(2) = g.maxfreq; end;
+	if ~isempty(g.weights)
+		if isempty(g.freq) | length(g.freq) > 2
+			error('spectopo: for computing component contribution, one must specify a (single) frequency');
+		end;
+	end;
 else
 	if nargin > 3,    g.freq = varargin{1};
 	else              g.freq = [];
@@ -231,6 +243,7 @@ if ~isempty(g.weights)
 		g.icacomps = [1:size(g.weights,1)];
 	end;
 end;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute channel spectra using psd()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -291,7 +304,7 @@ else
 	else
 		newweights = diag(sum(g.icawinv,1)) * g.weights;
 	end;
-	if strcmp(g.memory, 'high')
+	if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
 		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g);
 	else % in case out of memory error, multiply conmponent sequencially
 		[compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
@@ -302,12 +315,13 @@ else
 	% select components to plot
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.icamaps)
-		% weight power by channel projection weight		
 		[tmp indexfreq] = min(abs(g.freq-freqs));
 		g.icafreqsval   = compeegspecdB(:, indexfreq);
 		[g.icafreqsval g.icamaps] = sort(g.icafreqsval);
-		g.icamaps = g.icamaps(end:-1:1);
-		g.icafreqsval = g.icafreqsval(end:-1:1);
+		if strcmp(g.icamode, 'normal')
+			g.icamaps = g.icamaps(end:-1:1);
+			g.icafreqsval = g.icafreqsval(end:-1:1);
+		end;
 		if g.nicamaps < length(g.icamaps), g.icamaps = g.icamaps(1:g.nicamaps); end;
 	else 
 		[tmp indexfreq] = min(abs(g.freq-freqs));
@@ -389,6 +403,9 @@ set(yl,'fontsize',16);
 set(gca,'fontsize',16)
 box off;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   plot component contribution   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colrs = {'r','b','g','m','c'}; % component spectra trace colors
 if ~isempty(g.weights)
 	set(pl, 'linewidth', 2, 'color', 'k');
@@ -405,6 +422,20 @@ if ~isempty(g.weights)
 	newaxis(3) = min(newaxis(3), min(min(compeegspecdB(:,1:maxfreqidx))));
 	newaxis(4) = max(newaxis(4), max(max(compeegspecdB(:,1:maxfreqidx))));
 	axis(newaxis);
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% indicate component contribution %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	maxdatadb = max(eegspecdBtoplot(:,freqidx(1)));
+	[tmp indexfreq] = min(abs(g.freq-freqs));
+	for index = 1:length(g.icacomps)
+		if strcmp(g.icamode, 'normal')
+			resvar  = 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+		else
+			resvar  = 100 - 100*exp(-(maxdatadb-compeegspecdB(index, indexfreq))/10*log(10));
+		end;
+		fprintf('Component %d percentage relative variance:%6.2f\n', g.icacomps(index), resvar);
+	end;
 end;
 
 if ~isempty(g.freq)
@@ -562,13 +593,15 @@ function plotcolbar(g)
 	pos = get(cb,'position');
 	set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
 	set(cb,'fontsize',12);
-	if isnan(g.limits(5))
-		ticks = get(cb,'ytick');
-		[tmp zi] = find(ticks == 0);
-		ticks = [ticks(1) ticks(zi) ticks(end)];
-		set(cb,'ytick',ticks);
-		set(cb,'yticklabel',{'-','0','+'});
-	end
+	try
+		if isnan(g.limits(5))
+			ticks = get(cb,'ytick');
+			[tmp zi] = find(ticks == 0);
+			ticks = [ticks(1) ticks(zi) ticks(end)];
+			set(cb,'ytick',ticks);
+			set(cb,'yticklabel',{'-','0','+'});
+		end
+	catch, end; % in a single channel is plotted
 
 %%%%%%%%%%%%%%%%%%%%%%%
 % function closest plot
@@ -591,11 +624,15 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		nchans = size(data,1);		
 	end;
 	fftlength = 2^round(log(srate)/log(2))*g.freqfac;
-	for c=1:nchans
+	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
-			tmpdata = newweights(c,:)*data;
+			if strcmp(g.icamode, 'normal')
+				tmpdata = newweights(c,:)*data; % component activity
+			else % data - component contribution
+				tmpdata = data(g.plotchan,:) - newweights(c,:)*data;
+			end;
 		else
-			tmpdata = data(c,:);
+			tmpdata = data(c,:); % channel activity
 		end;
 		for e=epoch_subset
 			if strcmp(g.reref, 'averef')
@@ -609,15 +646,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 				eegspec = zeros(nchans,length(freqs));
 			end
 			eegspec(c,:) = eegspec(c,:) + tmpspec';
-			%eegspec(c,:) = eegspec(c,:) + log10(tmpspec');
 		end
 		fprintf('.')
 	end
-	epochs = round(size(data,2)/frames);
 	eegspecdB = 10*log10(eegspec/length(epoch_subset)); % convert power to dB
-	%eegspecdB = 10*eegspec/epochs; % convert power to dB
 	return;
-% Before the linear summation was used 
-% ------------------------------------
-% eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
-% and in the loop eegspec(c,:) = eegspec(c,:) + tmpspec'
