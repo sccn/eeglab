@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/13 23:04:40  arno
+% removing extra electrode in average ref
+%
 % Revision 1.4  2002/11/13 20:29:44  arno
 % debugging
 %
@@ -98,7 +101,8 @@ if nargin < 2
     if length(EEG.chanlocs) == EEG.nbchan+1
         geometry = { geometry{1:end-2}  [1] };
         uilist   = { uilist{1:end-8} ...
-                     { 'style' 'checkbox' 'string' 'Include old reference channel (use location from the electrode location structure)' } };
+                     { 'style' 'checkbox' 'tag' 'rerefstr' 'enable' 'off' ...
+                       'string' 'Include old reference channel (use location from the electrode location structure)' } };
     end;
     
     result = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
