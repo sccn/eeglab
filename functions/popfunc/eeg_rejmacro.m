@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/26 16:50:33  arno
+% checking icacomp
+%
 % Revision 1.4  2002/07/08 22:02:42  arno
 % adding a warning for data epoch labelling
 %
@@ -54,14 +57,19 @@
 
 if ~exist('elecrange')
 	help eeg_rejmacro;
-	error('Error using eeg_rejmacro');
+	error('Error: eeg_rejmacro can not be called from the command line');
 end;	
 
 if ~exist('nbpnts') nbpnts = EEG.pnts; end;
 com2 = [ 'if ~isempty(TMPREJ), [tmprej tmprejE] = eegplot2trial(TMPREJ,' ...
-		        int2str(nbpnts) ', EEG.trials, [], []);' ... % include past rejection (see eeg_multieegplot for the color definition
-         'tmprejE2 = zeros(EEG.nbchan, length(tmprej));' ...
-         sprintf('tmprejE2([%s],:) = tmprejE;', int2str(elecrange)) ... 
+		        int2str(nbpnts) ', EEG.trials, [' num2str(colrej) ';' num2str(EEG.reject.rejmanualcol) ...
+		 '], []);' ... % include past rejection
+         'if ~isempty(tmprejE),' ...
+		 '   tmprejE2 = zeros(EEG.nbchan, length(tmprej));' ...
+         '   tmprejE2([' int2str(elecrange) '],:) = tmprejE;' ... 
+		 'else,' ...
+		 '   tmprejE2 = [];' ...
+		 'end;' ...
          macrorej '= tmprej;' macrorejE '= tmprejE2;' ];
 if reject
     com2 = [com2 sprintf(['%s = pop_rejepoch(%s, tmprej, 1);' ...
@@ -73,7 +81,6 @@ else
 			'''To actually reject these epochs'', ''/Tools/Reject data epochs/Reject labelled epochs''));' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
-
 if ~exist('topcommand')
 	topcommand = [];
 end;
@@ -81,13 +88,45 @@ end;
 % the first part is used to convert the eegplot output
 command = [  com2 topcommand 'clear tmprej tmprejE tmprejE2 TMPREJ;' ];
 
+oldrej  = eval(macrorej);
+oldrejE = eval(macrorejE);
+	
+% mix all type of rejections
+% --------------------------
 switch superpose
-	case 0, oldrej  =  []; oldrejE =  [];
-	case 1, oldrej  = eval(macrorej);
-    		oldrejE = eval(macrorejE);
-    case 2, oldrej  = EEG.reject.rejglobal;
-    		oldrejE = EEG.reject.rejglobalE;
+ case 0, rejeegplot = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
+ case 1, rejeegplottmp = trial2eegplot(  oldrej, oldrejE, EEG.pnts, min(colrej+0.15, [1 1 1]));
+         if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplottmp ]; 
+		 else rejeegplot = []; end;
+         rejeegplottmp = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
+         if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
+ case 2, 
+  rejeegplot = [];
+  for index = 1:length(EEG.reject.disprej)
+	  if ~isempty(EEG.reject.disprej{index})
+		  eval([ 'colortmp = EEG.reject.rej' EEG.reject.disprej{index} 'col;']); 
+		  if any(colortmp ~= colrej) % test if current rejection (if color different)
+			  if icacomp == 0 % ica
+				  currentname = [ 'EEG.reject.icarej' EEG.reject.disprej{index} ];
+			  else
+				  currentname = [ 'EEG.reject.rej' EEG.reject.disprej{index} ];
+			  end;
+			  eval( [ 'rejeegplottmp = trial2eegplot( ' currentname ',' currentname ...
+					  'E, EEG.pnts, EEG.reject.rej' EEG.reject.disprej{index} 'col);' ]);
+			  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
+		  end;
+	  end;
+  end;
+  rejeegplottmp = trial2eegplot(  rej, rejE, EEG.pnts, colrej);
+  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
 end;
-
-if ~isempty(oldrejE) oldrejE = oldrejE(elecrange,:); end;
-
+if ~isempty(rejeegplot)
+	rejeegplot = rejeegplot(:,[1:5,elecrange]);
+else
+	rejeegplot = [];
+end;
+eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500], 'winrej', ...
+				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol };
+if ~isempty(EEG.chanlocs)
+	eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
+end;
