@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/14 17:54:09  arno
+% header typo
+%
 % Revision 1.4  2002/11/14 17:49:51  arno
 % new cooper function
 %
@@ -66,7 +69,7 @@ if (fid == 0),
 end
 
 % get our header structure
-head = readEGIhdr(fid);
+head = readegihdr(fid);
 
 % each type of event has a dedicated "channel"
 FrameVals = head.nchan + head.eventtypes;
