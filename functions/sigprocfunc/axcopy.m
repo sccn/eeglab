@@ -1,4 +1,5 @@
-% axcopy() - move, resize, or copy Matlab axes using the mouse
+% axcopy() - Copy a Matlab figure axis and its graphic objects to a new pop-up window 
+%            using the left mouse button.
 %
 % Usage:  >> selaxiscopy
 %         >> selaxiscopy(fig)
@@ -6,13 +7,14 @@
 %         >> selaxiscopy(fig, command)
 %
 % Notes:
-%   1) Clicking the left mouse button on an axis and copy
-%   the objects in the axis to a new (popup) figure. 
-%   Option 'noticks' does not make x and y tickloabelmodes 'auto'
-%   in the popup.
-%   2) The additional command option (a string that will be evaluated
-%   when the figure pops-up allows to customize display).
-%
+%   1) Clicking the left mouse button on a Matlab figure axis copies the graphic objects 
+%      in the axis to a new (pop-up) figure window. 
+%   2) Option 'noticks' does not make x and y tickloabelmodes 'auto' in the pop-up.
+%   2) The command option is an optional string that is evaluated in the new window
+%      when it pops up. This allows the user to customize the pop-up display.
+%   3) Deleting the pop-up window containing the copied axis leaves the clicked axis
+%      as the gca).
+
 % Authors: Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -34,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % requires copyaxes.m
 % 4-2-00 added 'noticks' -sm
