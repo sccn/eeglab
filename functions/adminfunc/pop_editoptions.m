@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/13 23:47:11  arno
+% debugging message
+%
 % Revision 1.9  2002/08/13 18:25:57  scott
 % help msg
 %
@@ -178,7 +181,11 @@ end;
 % write to eeg_options file
 % -------------------------
 if storelocal
-	delimloc = findstr(filename, '/');
+	if ~isunix
+		delimloc = findstr(filename, '\');
+	else 
+		delimloc = findstr(filename, '/');
+	end;
 	filename = filename(delimloc(end)+1:end);
 end;
 fid = fopen( filename, 'w');
