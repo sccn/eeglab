@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/07/24 23:17:27  arno
+% removing extra plot
+%
 % Revision 1.20  2003/07/24 18:52:10  arno
 % typo
 % /
@@ -202,7 +205,7 @@ for ri = compnum
 			return;
 		end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
-		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', 'off', 'style' , 'fill');
+		topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', 'off', 'style' , 'fill','electrodes','off');
 		axis square;
 
 		% plot the button
