@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/29 19:10:31  arno
+% same thing
+%
 % Revision 1.18  2003/07/29 19:01:50  arno
 % handle empty ICA matrices
 %
@@ -338,6 +341,8 @@ if length(datsub) > 0 % dataset to subtract
     if ~isempty(g.alpha)
         pvalues = pttest(erp1ind, erp2ind, 3);
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
+    else 
+        pvalues= [];
     end;
     
 else
@@ -350,6 +355,8 @@ else
     if ~isempty(g.alpha)
         pvalues = ttest(erp1ind, 0, 3);
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
+    else 
+        pvalues= [];
     end;
 end;
     
