@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2003/07/29 17:28:14  arno
+% debuging integer types
+%
 % Revision 1.88  2003/07/23 23:45:06  arno
 % change default dispchan
 %
@@ -905,7 +908,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
   % Print command %%%%%%%
   uimenu('Parent',m(8),'Label','Print','tag','printcommand','callback',...
-  		['RESULT = inputdlg2( { ''Enter command:'' }, ''Print'', 1,  { ''print -r72'' });' ...
+  		['RESULT = inputdlg2( { ''Command:'' }, ''Print'', 1,  { ''print -r72'' });' ...
 		 'if size( RESULT,1 ) ~= 0' ... 
 		 '  eval ( RESULT{1} );' ...
 		 'end;' ...
@@ -1579,7 +1582,7 @@ else
   case 'window'  % change window size
     % get new window length with dialog box
     g = get(gcf,'UserData');
-	result       = inputdlg2( { fastif(g.trialstag==-1,'Enter new window length(secs):', 'Enter number of epoch(s):') }, 'Change window length', 1,  { num2str(g.winlength) });
+	result       = inputdlg2( { fastif(g.trialstag==-1,'New window length (s):', 'Number of epoch(s):') }, 'Change window length', 1,  { num2str(g.winlength) });
 	if size(result,1) == 0 return; end;
 
 	g.winlength = eval(result{1}); 
@@ -1591,7 +1594,7 @@ else
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-   result = inputdlg2( { 'Enter number of channels to show:' } , 'Change number of channels to show', 1,  { num2str(g.dispchans) });
+   result = inputdlg2( { 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
    if size(result,1) == 0 return; end;
 
    g.dispchans = eval(result{1});
@@ -1635,10 +1638,10 @@ else
 	h = findobj('tag', 'eegplottitle');
 	
 	if ~isempty(h)
-		result       = inputdlg2( { 'Enter new title:' }, 'Change title', 1,  { get(h(1), 'string') });
+		result       = inputdlg2( { 'New title:' }, 'Change title', 1,  { get(h(1), 'string') });
 		if ~isempty(result), set(h, 'string', result{1}); end;
 	else 
-		result       = inputdlg2( { 'Enter new title:' }, 'Change title', 1,  { '' });
+		result       = inputdlg2( { 'New title:' }, 'Change title', 1,  { '' });
 		if ~isempty(result), h = textsc(result{1}, 'title'); set(h, 'tag', 'eegplottitle');end;
 	end;
 	
