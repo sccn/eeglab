@@ -109,6 +109,18 @@
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
+% Plot description:
+%   Assuming both 'plotamp' and 'plotphase' options are set (default), the upper plot
+%   represents data's phase coherence (or linear coherence (see parameter 'type'))
+%   amplitude and the lower plot represents the data's coherence angle difference (in
+%   degree). Click on any plot to pop up a new window
+%   -- Upper left marginal plot represents the average coherence during the baseline period
+%      (blue) and when significance is set, the threshold for significance (dotted black-green).
+%   -- Upper horizontal marginal plot (under coherence image) indicates the maximum 
+%      (green) and minimum (blue) coherence across all frequencies. When significance 
+%      is set (using option 'trials' for 'boottype'), an additional curve indicates the 
+%      threshold for significance (dotted black-green).
+%
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
 %        3) The 'boottype' should be ideally 'timesframes', but this creates high 
@@ -150,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/05/05 16:31:18  arno
+% debug last
+%
 % Revision 1.59  2003/05/05 16:25:24  arno
 % debuging FFT freq scale
 %
@@ -1073,27 +1088,18 @@ case 'on'
    h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
    Emax = max(R(dispf,:)); % mean coherence at each time point
    Emin = min(R(dispf,:)); % mean coherence at each time point
+   plot(times,Emin, times, Emax, 'LineWidth',g.linewidth); hold on;
+   plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
+   plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
+   for i=1:length(g.marktimes)
+       plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
+   end;
    if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') 
-      % plot bootstrap significance limits (base mean +/-)
+       % plot bootstrap significance limits (base mean +/-)
       plot(times,mean(Rboot(dispf,:)),'g','LineWidth',g.linewidth); hold on;
       plot(times,mean(Rsignif(dispf,:)),'k:','LineWidth',g.linewidth);
-      plot(times,Emax,'b');
-      plot(times,Emin,'b');
-      plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
-      plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
-      for i=1:length(g.marktimes)
-         plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
-      end;
       axis([min(times) max(times) 0 max([Emax(:)' Rsignif(:)'])*1.2])
    else
-      plot(times,Emax,'b');
-      hold on
-      plot(times,Emin,'b');
-      plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
-      plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
-      for i=1:length(g.marktimes)
-         plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
-      end;
       axis([min(times) max(times) 0 max(Emax)*1.2])
    end;
    tick = get(h(10),'YTick');
@@ -1108,16 +1114,14 @@ case 'on'
    
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
    E = abs(mbase(dispf)); % baseline mean coherence at each frequency
+   plot(freqs(dispf),E,'LineWidth',g.linewidth); % plot mbase
    if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
-      plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
       hold on
       % plot(freqs(dispf),Rboot(:,dispf)+[E;E],'g','LineWidth',g.linewidth);
-      plot(freqs(dispf),mean(Rboot(dispf,:),2),'g','LineWidth',g.linewidth);
+      plot(freqs(dispf),mean(Rboot  (dispf,:),2),'g','LineWidth',g.linewidth);
       plot(freqs(dispf),mean(Rsignif(dispf,:),2),'k:','LineWidth',g.linewidth);
       axis([freqs(1) freqs(max(dispf)) 0 max([E Rsignif(:)'])*1.2]);
    else             % plot marginal mean coherence only
-      plot(freqs(dispf),E,'LineWidth',g.linewidth);
-      % axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3]);
       if ~isnan(max(E))
          axis([freqs(1) freqs(max(dispf)) 0 max(E)*1.2]);
       end;
