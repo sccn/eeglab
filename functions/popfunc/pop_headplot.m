@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/05/12 15:54:20  arno
+% debuging output command if creating spline file
+%
 % Revision 1.19  2003/05/10 02:36:02  arno
 % compress output command
 %
@@ -143,7 +146,6 @@ if nargin < 3
 		            options = [ ', ''setup'',' EEG.splinefile ',' ]; 
                     com = 'EEG = ';
 		 end;
-		 return;
     else
     	options      = [ ',' ];
     end;
