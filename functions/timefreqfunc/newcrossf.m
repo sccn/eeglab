@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/10/24 15:09:18  arno
+% topoplot channel
+%
 % Revision 1.21  2002/10/24 02:13:13  arno
 % remove nb_points, no longer used
 %
@@ -963,8 +966,8 @@ case 'on'
                    Rraw(find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
            case 2, RR  (find(RR < Rboot)) = 0;
                    Rraw(find(RR < Rboot)) = 0;
-           case 1, RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
-                   Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+           case 1, RR  (find(RR < repmat(Rboot(:),[1 size(RR,2)]))) = 0;
+                   Rraw(find(RR < repmat(Rboot(:),[1 size(Rraw,2)]))) = 0;
        end; 
    end
     
