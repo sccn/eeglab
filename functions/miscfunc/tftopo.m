@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/05/19 14:30:15  scott
+% *** empty log message ***
+%
 % Revision 1.48  2002/05/19 14:28:55  scott
 % improved out-of-bounds testing -sm
 %
@@ -363,10 +366,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot tfdata image for specified channel or selchans std()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figure;
+% 
 colormap(cc);
+curax = gca; % current plot axes to plot into
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
-imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
+imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1],'ax',curax);
 
 if showchan>0 % -> image showchan data
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
@@ -429,13 +433,13 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot topoplot maps at specified timefreqs points
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-wholeax  = sbplot(1,1,1);
+wholeax  = sbplot(1,1,1,'ax',curax);
 topoaxes = zeros(1,tfpoints);
 for n=1:tfpoints
    if n<=plotdim
-      topoaxes(n)=sbplot(plotdim,plotdim,n);
+      topoaxes(n)=sbplot(plotdim,plotdim,n,'ax',curax);
    else
-      topoaxes(n)=sbplot(plotdim,plotdim,plotdim*(n+1-plotdim));
+      topoaxes(n)=sbplot(plotdim,plotdim,plotdim*(n+1-plotdim),'ax',curax);
    end
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
