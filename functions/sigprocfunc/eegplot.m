@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/07/24 01:28:09  arno
+% default spacing -> 3 stds
+%
 % Revision 1.15  2002/07/24 01:25:19  arno
 % default amplitude to standard deviation
 %
@@ -256,8 +259,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	   otherwise disp('Error: ygrid must be either ''on'' or ''off'''); return;
    end;	
    switch lower(g.submean)
-	   case 'on', g.submean  = 1;
-	   case 'off', g.submean = 0;  
+	   case { 'on' 'off' };
 	   otherwise disp('Error: submean must be either ''on'' or ''off'''); return;
    end;	
    
