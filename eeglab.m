@@ -180,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2002/05/01 03:21:10  arno
+% adding channel editor
+%
 % Revision 1.64  2002/04/30 19:07:44  scott
 % *** empty log message ***
 %
@@ -394,8 +397,13 @@ if nargin < 1
 	h('eeglab;');
 else
 	if strcmp(onearg, 'redraw')
-		updatemenu;
-		return;
+		W_MAIN = findobj('tag', 'EEGLAB');
+		if ~isempty(W_MAIN)
+			updatemenu;
+			return;
+		else
+			h('eeglab rebuild;');
+		end;
 	else 
 		h('eeglab rebuild;');
 	end;
