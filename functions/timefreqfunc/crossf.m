@@ -124,12 +124,6 @@
 %           (computation time might be slow; only the 'times' bootstrap can
 %           be used in this mode).
 %
-% Math:
-% if X(t,f) and Y(t,f) are the spectral estimates of X and Y at frequency f
-% and time t (* being the conjugate, || the norm, and n the number of trials)
-%  coher      = sum_over_trials(X(t,f)Y(t,f)*)/sum_over_trials(|X(t,f)Y(t,f)|)
-%  phasecoher = sum_over_trials(X(t,f)Y(t,f)*/|X(t,f)Y(t,f)|)/n
-%
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
@@ -152,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/07/02 21:51:41  scott
+% edited help message -sm
+%
 % Revision 1.27  2002/06/28 17:57:10  arno
 % returning coherence magnitudes
 %
@@ -263,7 +260,7 @@
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
 
-function [R,mbase,times,freqs,Rbootout,Rangle,Rsignif] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
+function [R,mbase,times,freqs,Rbootout,Rangle] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
@@ -686,8 +683,9 @@ else
       
       Boot = bootcomp( Boot, Coher.Rn(t,:), Tfx.tmpalltimes, Tfy.tmpalltimes);
    end % t = trial
-   Boot  = bootcomppost(Boot, Coher.Rn, Tfx.tmpall, Tfy.tmpall);
-   Coher = cohercomppost(Coher, trials);
+   [Boot Rbootout] = bootcomppost(Boot, Coher.Rn, Tfx.tmpall, Tfy.tmpall);
+   % not that the bootstrap thresholding is actually performed in the display subfunction plotall()
+   Coher  = cohercomppost(Coher, trials);
 end;
 
 % if coherence, perform the division
@@ -721,6 +719,7 @@ mbase = mean(abs(Coher.R(:,baseln)'));     % mean baseline coherence magnitude
 plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
 Rangle = angle(Coher.R);
 R = abs(Coher.R);
+Rsignif = Boot.Rsignif;
 
 % ------------------
 % plotting functions
@@ -1214,20 +1213,25 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot) % if bootstrap analysis included . . .
    % 'boottype'='trials',                 size(R)=nb_points*naccu*times
    Boot.Coherboot.R = abs (Boot.Coherboot.R);
    Boot.Coherboot.R = sort(Boot.Coherboot.R,2);
-   Rbootout         = Boot.Coherboot.R;
+
+   % compute bootstrap significance level
+   i = round(Boot.naccu*Boot.alpha);
+   Boot.Rsignif = mean(Boot.Coherboot.R(:,Boot.naccu-i+1:Boot.naccu),2); % significance levels for Rraw
+   Boot.Coherboot.R = squeeze(mean(Boot.Coherboot.R(:,Boot.naccu-i+1:Boot.naccu),2));
+   if size(Boot.Coherboot.R, 2) == 1
+	   Rbootout(:,2) = Boot.Coherboot.R;
+   else
+	   Rbootout(:,:,2) = Boot.Coherboot.R;
+   end;
+   % BEFORE
+   %Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
 elseif ~isnan(Boot.rboot)
-   Boot.Coherboot.R = Boot.rboot;
-   Rbootout         = Boot.rboot;
+	Boot.Coherboot.R = Boot.rboot;
+	Boot.Rsignif     = Boot.rboot
+	Rbootout         = Boot.rboot;
+   else 
+	   Boot.Coherboot.R   = [];
+	   Boot.Rsignif = [];
+   end % NOTE: above, mean ?????
 end;
 
-% compute bootstrap significance level
-if ~isnan(Boot.alpha) % if bootstrap analysis included . . .
-   i = round(Boot.naccu*Boot.alpha);
-   Boot.Rsignif       = mean(Boot.Coherboot.R(:,Boot.naccu-i+1:Boot.naccu),2); % significance levels for Rraw
-   Boot.Coherboot.R   = squeeze(mean(Boot.Coherboot.R(:,Boot.naccu-i+1:Boot.naccu),2));
-   % PROBLEM HERE
-   %Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
-else 
-   Boot.Coherboot.R   = [];
-   Boot.Rsignif = [];
-end % NOTE: above, mean ?????
