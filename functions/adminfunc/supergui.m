@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/08/20 22:33:34  arno
+% debug for Mac
+%
 % Revision 1.30  2002/08/19 19:12:16  arno
 % debugging last
 %
@@ -247,10 +250,16 @@ for row = 1:length(geomx)
 			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
 				factmultx = max(factmultx, curext(3)/curpos(3));
 			end;
-			%if ~strcmp(style, 'pushbutton')
-				factmulty = max(factmulty, curext(4)/curpos(4));
-			%end;
+            factmulty = max(factmulty, curext(4)/curpos(4));
 			set( rowhandle(column), 'units', 'normalized');			
+
+			% Uniformize button text aspect
+            % -----------------------------
+            if strcmp(style, 'pushbutton')
+                tmptext = lower(get(rowhandle(column), 'string'));
+                try, tmptext(1) = upper(tmptext(1)); catch, end;
+                set(rowhandle(column), 'string', tmptext);
+            end;
         else 
 			rowhandle(column) = 0;
 		end;
