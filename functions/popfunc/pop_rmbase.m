@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/17 20:26:22  scott
+% menu and help msg
+%
 % Revision 1.3  2002/08/13 18:19:13  arno
 % strvcat instead of 10
 %
@@ -88,6 +91,7 @@ end;
 fprintf('pop_rmbase(): Removing baseline...\n');
 EEG.data = rmbase( EEG.data(:,:), EEG.pnts, pointrange );
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
+EEG.icaact = [];
 
 if ~isempty(timerange)
 	com = sprintf('%s = pop_rmbase( %s, [%s]);', inputname(1), inputname(1), ...
