@@ -1,7 +1,7 @@
-% tftopo()  - Generates a figure that shows a selected ERSP or ITC image from 
-%             a supplied set of nchans images, plus topoplot()'s of scalp 
-%             distributions at sepcified time / frequency points. 
-%             Inputs may be outputs of timef()
+% tftopo()  - Generates a figure showing a selected image (e.g., an ERSP or ITC) from 
+%             a supplied set of images for every scalp channel, plus topoplot() scalp 
+%             maps at specified (x,y) (e.g., time,frequency) points.  Else, images the 
+%             signed (selected) channel std(). Inputs may be outputs of timef().
 % Usage:
 %        >> tftopo(tfdata,times,freqs,timefreqs,showchan,chanlocs,...
 %                                                  limits,signifs,selchans)
@@ -14,14 +14,15 @@
 %                      Format: size (2,npoints), each row [ms Hz]
 %
 % Optional inputs:
-%   showchan = Channel number of tfdata to image {default 0 -> mean of all chans} 
+%   showchan = Channel number of tfdata to image, or 0
+%               {default=0 -> image the median-signed st. dev. across channels} 
 %   chanlocs = Electrode locations file (for format see >> topoplot example)
 %              {default 'chan.locs'}
 %   limits   = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
-%              Omit or wse nan's to take limits from tfdata. Ex: [nan nan -100 400];
-%   signifs  = Significance level(s) from timef(), for zero'ing non-significant tfdata
-%              {default: none}
-%   selchans = Channels to include in topoplot() scalp maps {default: all}
+%              Omit, or use nan's to use tfdata limits. Ex: [nan nan -100 400];
+%   signifs  = Significance level(s) (e.g., from timef()), for zero'ing non-significant 
+%              tfdata {default: none}
+%   selchans = Channels to include in topoplot() scalp maps (and image std()) {default: all}
 %
 % Authors: Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
@@ -44,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/05/19 13:35:16  scott
+% *** empty log message ***
+%
 % Revision 1.32  2002/05/19 13:34:12  scott
 % showchan==0 -> image signed st dev -sm
 %
@@ -297,9 +301,9 @@ if exist('signifs')
   cc(nullrange,:) = repmat(cc(128,:),length(nullrange),1);
 end
   
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot tfdata image for specified channel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot tfdata image for specified channel or selchans std()
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % figure;
 colormap(cc);
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
@@ -319,7 +323,7 @@ else % showchan==0
             length(times),...
               tftimes,...             
                 tffreqs,...
-                  showchan);
+                  selchans);
 
   tfdat = reshape(tfdat,length(tffreqs),length(tftimes),nchans);
   tfsign = sort(tfdat,3);
@@ -328,7 +332,7 @@ else % showchan==0
   if exist('std')==2
      tfave = tfsign.*std(abs(tfdat),1,3);
   else
-     tfave = tfsign.*mean(abs(tfdat),3);
+     tfave = tfsign.*mean(abs(tfdat),3); % use mean() if std() not in search path
   end
   cmax = max(max(abs(tfave)));
   cmin = -cmax; % make symmetrical
@@ -352,8 +356,10 @@ else
   end
 end
 set(tl,'fontsize',14);
-yl=ylabel(['Frequency (Hz)     Chan ',int2str(showchan)]);
+
+yl=ylabel(['Frequency (Hz)']);
 set(yl,'fontsize',16);
+
 set(gca,'fontsize',14)
 set(gca,'ydir','normal');
 
@@ -386,7 +392,9 @@ for n=1:tfpoints
    axis([0 1 0 1]);
    axis off;
 end
+
 for n=1:tfpoints
+
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    % Plot scalp map using topoplot()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
