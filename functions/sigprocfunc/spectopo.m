@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/07 22:42:17  scott
+% help msg -sm
+%
 % Revision 1.4  2002/07/07 22:38:27  scott
 % adding 'reref','averef' option -sm
 %
@@ -92,6 +95,7 @@ if nargin > 9
      if strcmp(varargin(2),'averef')
         averef_flag = 1;
         varargin(1) = [];
+        varargin(1) = []; % remove the two args from list
      else
         error('only reref choice is averef');
      end
