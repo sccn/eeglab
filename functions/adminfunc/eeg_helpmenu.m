@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/29 17:06:21  arno
+% adding menus
+%
 % Revision 1.6  2002/04/11 03:36:59  arno
 % change load/save sets menus
 %
@@ -63,6 +66,7 @@ commands = { ...
        'pop_loaddat'        ... %       Import .DAT info file (Neuroscan epochs) 
        ''                   ... %    Import event info                           
        'pop_importevent'    ... %       Import Matlab array or ASCII file        
+       'pop_chanevent'      ... %       Import events from channels 
        'pop_importpres'     ... %       Import .LOG event file (Presentation)    
        'pop_loadset'        ... %    Load dataset                                
        'pop_saveset'        ... %    Save dataset                                
@@ -76,6 +80,7 @@ commands = { ...
        'pop_editeventfield' ... %    Edit event fields                           
        'pop_editeventvals'  ... %    Edit event values                           
        'pop_comment'        ... %    About this dataset                          
+       'pop_chanedit'       ... %    Edit channels                      
        'pop_select'         ... %    Select data                                 
        'pop_selectevent'    ... %    Select events                               
        'pop_copyset'        ... %    Copy current dataset                        
@@ -125,6 +130,7 @@ commands = { ...
        'pop_headplot'       ... %       ERP head plots                           
        'pop_compareerps'    ... %    Compare ERPs                                
        'pop_eegplot'        ... %    Scroll component activations                
+       'pop_spectopo'       ... %    Channel spectra and maps with components               
        ''                   ... %    Component scalp plots                       
        'pop_topoplot'       ... %       Component scalp maps                     
        'pop_headplot'       ... %       Component head plots                     
