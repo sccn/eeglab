@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/11/07 01:45:11  arno
+% reading fields automatically
+%
 % Revision 1.6  2003/11/04 01:11:47  arno
 % change default file filter
 %
@@ -74,8 +77,7 @@ if nargin < 2
 	filename = [filepath filename];
 end;
 
-disp('Reading fields from files');
-fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1);
+fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1, 'verbose', 'off');
 
 % finding fields
 % --------------
@@ -83,12 +85,44 @@ indtype = strmatch('event type', lower(fields));
 if isempty(indtype)
     error('Could not detect field ''Event Type'', try importing the file as ASCII (use delimitor=9 (tab))');
 end;
+disp('Replacing field ''Event Type'' by ''type'' for EEGLAB compatibility');
 indlat  = strmatch('time', lower(fields), 'exact');
 if isempty(indlat)
     error('Could not detect field ''Time'', try importing the file as ASCII (use delimitor=9 (tab))');
 end;
+disp('Replacing field ''Time'' by ''latency'' for EEGLAB compatibility');
 fields{indtype} = 'type';
 fields{indlat}  = 'latency';
+
+% regularizing field names
+% ------------------------
+for index = 1:length(fields)
+    indspace = find(fields{index} == ' ');
+    fields{index}(indspace) = '_';
+    indparen = find(fields{index} == ')');
+    if indparen == length(fields{index})
+        % remove text for parenthesis
+        indparen = find(fields{index} == '(');
+        if indparen ~= 1
+            disp([ 'Renaming ''' fields{index} ''' to ''' fields{index}(1:indparen-1) ''' for Matlab compatibility' ]);
+            fields{index} = fields{index}(1:indparen-1);
+        else
+            fields{index}(indspace) = '_';
+        end;
+    else
+        fields{index}(indspace) = '_';
+        indparen = find(fields{index} == '(');
+        fields{index}(indspace) = '_';
+    end;
+end;
+
+% find if uncertainty is duplicated
+% ---------------------------------
+induncert  = strmatch('uncertainty', lower(fields), 'exact');
+if length(induncert) > 1
+    fields{induncert(2)}= 'Uncertainty2';
+    disp('Renaming second ''Uncertainty'' field');
+end;
 
 % import file
 % -----------
