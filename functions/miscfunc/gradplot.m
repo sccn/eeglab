@@ -1,5 +1,5 @@
-% gradplot() - Compute the gradient of EEG scalp distribution(s)
-%              on a square grid
+% gradplot() - Compute the gradient of EEG scalp map(s) on a square grid
+%
 % Usage:
 %            >> [gradX, gradY] = gradplot(maps,eloc_file,draw)
 % Inputs:
@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/01/29 21:16:54  scott
+% more
+%
 % Revision 1.7  2004/01/29 21:04:05  scott
 % more
 %
@@ -81,7 +84,7 @@ if isstr(locs_file) % a locs file
 elseif isstruct(locs_file)  % a locs struct
         [tmpeloc labels Th Rd ind] = readlocs(locs_file);
         if max(abs(Rd))>0.5
-          fprintf('gradplot(): Shrinking radio from max %4.3f to 0.5\n',...
+          fprintf('gradplot(): Shrinking electrode arc_lengths from (max) %4.3f to (max) 0.5\n',...
                           max(abs(Rd)));
           Rd = Rd/(2*max(abs(Rd))); % shrink to max radius = 0.5
         end
@@ -131,15 +134,17 @@ for m=1:size(map,2)
         Zi(mask) = NaN;
         FX(mask) = NaN;
         FY(mask) = NaN;
-width = max(Xi)-min(Xi);
+        width = max(Xi)-min(Xi);
 
-		subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), m);
+        subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), m);
+
 %        surface(1+width*(0.5+Xi-delta/2),...
 %                1+width*(0.5+Yi-delta/2),...
 %                    zeros(size(Zi)),Zi,'EdgeColor','none',...
 %                    'FaceColor','flat'); hold on
-		contour(imresize(Zi,0.5)); hold on
-		quiver(imresize(FX, 0.5), imresize(FY, 0.5)); 
+
+         contour(imresize(Zi,0.5)); hold on
+         quiver(imresize(FX, 0.5), imresize(FY, 0.5)); 
         title(['Map ' int2str(m)]);
 
 
