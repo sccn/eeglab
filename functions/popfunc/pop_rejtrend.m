@@ -7,8 +7,8 @@
 %
 % Inputs:
 %   INEEG      - input dataset
-%   typerej    - type of rejection (1 = independent components; 0 = eeg
-%                data). Default is 0.
+%   typerej    - type of rejection (0 = independent components; 1 = eeg
+%                data). Default is 1.
 %   electrodes - [e1 e2 ...] electrodes (number) to take into 
 %                consideration for rejection
 %   winsize    - integer determining the number of consecutive points
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad
@@ -66,9 +69,9 @@ if nargin < 1
    return;
 end;  
 if nargin < 2
-   icacomp = 0;
+   icacomp = 1;
 end;  
-if icacomp == 1
+if icacomp == 0
 	if isempty( EEG.icasphere )
 	    ButtonName=questdlg( 'Do you want to run ICA now ?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
@@ -95,7 +98,7 @@ if nargin < 3
                		'NO', ...
             		'NO' };
 
-	result       = inputdlg( promptstr, fastif(icacomp, 'Trend rejection in component -- po_rejtrend()', 'Trend rejection -- po_rejtrend()'), 1,  inistr);
+	result       = inputdlg( promptstr, fastif(~icacomp, 'Trend rejection in component -- po_rejtrend()', 'Trend rejection -- po_rejtrend()'), 1,  inistr);
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};
@@ -116,7 +119,7 @@ else
 	calldisp = 0;
 end;
 
-if icacomp == 0
+if icacomp == 1
 	[rej rejE] = rejtrend( EEG.data(elecrange, :, :), winsize, minslope, minstd);
 else
     % test if ICA was computed or if one has to compute on line
@@ -134,14 +137,14 @@ fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials rejected\n', length(find(rej > 0)), EEG.trials);
 
 if calldisp
-    if icacomp == 0 macrorej  = 'EEG.reject.rejconst';
+    if icacomp == 1 macrorej  = 'EEG.reject.rejconst';
         			macrorejE = 'EEG.reject.rejconstE';
     else			macrorej  = 'EEG.reject.icarejconst';
         			macrorejE = 'EEG.reject.icarejconstE';
     end;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
-	if icacomp == 0
+	if icacomp == 1
 		eeg_multieegplot( EEG.data(elecrange,:,:), rej, rejE, oldrej, oldrejE, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 	else
