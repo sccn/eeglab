@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2003/01/02 17:13:01  scott
+% edit header and msgs -sm
+%
 % Revision 1.87  2003/01/02 16:37:33  arno
 % editing message - ad & sm
 %
@@ -560,8 +563,8 @@ end;
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
             if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
-                  if popask( [ 'eeg_checkset() error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ...
-                   ') does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
+                  if popask( [ 'eeg_checkset() error: number of columns in weights array (' int2str(size(EEG.icaweights,2)) 10 ')' ...
+                   'does not match the number of rows in the sphere array (' int2str(size(EEG.icasphere,1)) ')' 10 ...
                    'Should EEGLAB attempt to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                     error('eeg_checkset error: user abort');
                     %res = com;
@@ -582,8 +585,8 @@ end;
             end;
             if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
-                       if popask( [ 'eeg_checkset() error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
-                       ') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
+                       if popask( [ 'eeg_checkset() error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10 ')' ...
+                       'does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
                        'Do you want to want to abort operation ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                         error('eeg_checkset error: user abort');
                         %res = com;
@@ -603,7 +606,7 @@ end;
                     if any(isnan(EEG.data(:)))
                         fprintf('eeg_checkset(): recomputing using NaN indices in first channel ...\n'); 
                         tmpindices = find(~isnan(EEG.data(1,:)));
-                        EEG.icaact    = EEG.data;
+                        EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
                         EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                     else
                         EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
