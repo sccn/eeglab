@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/21 01:57:16  arno
+% nothing
+%
 % Revision 1.16  2002/08/13 00:08:12  arno
 % button problem
 %
@@ -319,7 +322,7 @@ end;
 % ica specific
 % ------------
 if ~isempty(EEG.icasphere)
-   EEG.icaweights = EEG.icaweights(:,g.channel);
+   EEG.icasphere = EEG.icasphere(:,g.channel);
 end;
 if ~isempty(EEG.icawinv)
    EEG.icawinv = EEG.icawinv(g.channel,:);
