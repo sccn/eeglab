@@ -1,5 +1,5 @@
 % pop_chanedit() - Edit channel locations (chanlocs) structure of an EEGLAB dataset.
-%                  For channel location structure and file format, 
+%                  For EEG channel location structure and file formats, 
 %                  see >> help readlocs  % help message of readlocs() 
 %
 % Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
@@ -8,7 +8,7 @@
 %                        'key2', value2, ... ); % edit separate chanlocs struct
 % Graphic interface:
 %   "Channel information ('field name')" - [edit boxes] display channel field 
-%                   content of the current channel. Use 'transform' from the command
+%                   contents for the current channel. Use 'transform' on the command
 %                   line to modify these fields.
 %   "Opt. 3D center" - [button] recenter 3-D channel coordinates. Uses the chancenter()
 %                 function. Command line equivalent is 'convert', { 'chancenter' [xc
@@ -19,7 +19,7 @@
 %   "Transform axis" - [button] perform any operation on channel fields. Command
 %                 line equivalent is 'transform'.
 %   "xyz->polar & sph." - [button] convert 3-D cartesian coordinates to polar and
-%                 3-D spherical coordinates. This is usefull when you edit the 
+%                 3-D spherical coordinates. This is useful when you edit the 
 %                 coordinates manually. Command line equivalent is 'convert', 
 %                 'cart2all'.
 %   "sph.->polar & xyz" - [button] convert 3-D spherical coordinates to polar and
@@ -32,27 +32,27 @@
 %   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
 %   "Insert chan" - [button] insert channel before current channel. Command line 
 %                 equivalent: 'insert'.
-%   "<<" - [button] scroll channel backward (-10).
-%   "<" - [button] scroll channel backward (-1).
-%   ">" - [button] scroll channel forward (+1).
-%   ">>" - [button] scroll channel forward (+10).
-%   "Append chan" - [button] append channel after the current channel. Command line 
-%                 equivalent: 'append'.
-%   "Plot 2D" - [button] plot channel positions in 2-D using topoplot() function.  
-%   "Plot limit (0-1;[]=auto)" - [edit box] enter a value in degree of head limit for plotting
-%                 channels in 2-D polar view. This DOES NOT AFFECT channel locations and
-%                 is only used for visualization. This parameter is attached to the dataset
-%                 and is then used in all 2-D scalp plots. Command line equivalent
-%                 is 'shrink'.
-%   "Shrink to center" - [button] automatically computes the shrinking factor so all
-%                 channels are visible on the 2-D topographical plot.
-%   "Plot 3D" - [button] plot channel positions in 3-D using plotchans3d() function.                 
-%   "Read locations" - [button] read location file using readlocs() function. 
-%                 Command line equivalent is 'load'.
+%   "<<" - [button] scroll channel backward by 10.
+%   "<" - [button] scroll channel backward by 1.
+%   ">" - [button] scroll channel forward by 1.
+%   ">>" - [button] scroll channel forward by 10.
+%   "Append chan" - [button] append channel after the current channel. 
+%                 Command line equivalent: 'append'.
+%   "Plot 2D" - [button] plot channel positions in 2-D using the topoplot() function.  
+%   "Plot radius [value (0.2-1.0), []=auto)" - [edit box] default plotting radius
+%                 in 2-D polar views. This doe NOT affect channel locations and
+%                 is only used for visualization. This parameter is attached to the 
+%                 chanlocs structure and is then used in all 2-D scalp topoplots. 
+%                 Default -> to data limits. Command line equivalent: 'plotrad'.
+%   "Shrink to center" - [button] (deprecated, 'plotrad' above now recommended) shrink 
+%                 channel locations towards the vertex to show all on 2-D topoplots.
+%   "Plot 3D" - [button] plot channel positions in 3-D using the plotchans3d() function.
+%   "Read locations" - [button] read location file using the readlocs() function. 
+%                 Command line equivalent: 'load'.
 %   "Read help" - [button] readlocs() function help.
-%   "Save .ced" - [button] save channel location as ".ced" format which is the native
-%                 EEGLAB format. Command line equivalent is 'save'.
-%   "Save others" - [button] save channel location as other formats using the 
+%   "Save .ced" - [button] save channel locations in ".ced" format which is the native
+%                 EEGLAB format. Command line equivalent: 'save'.
+%   "Save others" - [button] save channel locations in other formats using the 
 %                 pop_writelocs() function (see also readlocs() for channel formats).
 %   "Cancel" - [button] cancel all editing.
 %   "Help" - [button] this help message.
@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2004/03/18 01:41:01  arno
+% msgs
+%
 % Revision 1.92  2004/03/18 01:37:55  arno
 % implemetning plotrad
 %
@@ -600,9 +603,9 @@ if nargin < 2
 		uilist = {  uilist{:},...
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
-					{ 'Style', 'text', 'string', 'Plot limit (0-1;[ ]=auto)'} ...
+					{ 'Style', 'text', 'string', 'Plot radius (0.2-1, []=auto)'} ...
 					{ 'Style', 'edit', 'string', plotrad, 'tag', 'shrinkfactor' } ...
-					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Shrink to center', 'value', shrinkorskirt } ...
+					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Shrink to center', 'value', 0 } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', plot3d } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Read locations', 'callback', guireadlocs }, ...
 					{ 'Style', 'pushbutton', 'string', 'Read help', 'callback', 'pophelp(''readlocs.m'');' }, ...	
@@ -928,11 +931,11 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
 		chans = rmfield(chans, 'plotrad');
         if isstr(plotrad) & ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
 	end;
-	if isfield(chans, 'shrink'), 
+	if isfield(chans, 'shrink') 
 		shrinkorskirt = 1;
-        if ~isstr(chans(1).shrink)
-            plotrad = 0.5 + 0.5*chans(1).shrink; % conversion old values
-        end;
+        % if ~isstr(chans(1).shrink)
+        %    plotrad = 0.5 + 0.5*chans(1).shrink; % convert old values
+        % end;
 		chans = rmfield(chans, 'shrink');
 	end;
     
