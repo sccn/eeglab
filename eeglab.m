@@ -99,6 +99,7 @@
 % pop_spectopo()  - plot all channel spectra and scalp maps (spectopo())
 % pop_plottopo()  - plot a data epoch in a topographic array (plottopo())
 % pop_readedf()   - read .EDF EEG data format (readedf())
+% pop_readbdf()   - read .BDF EEG data format (openbdf() and readbdf())
 % pop_headplot()  - plot a 3-D data scalp map (headplot())
 % pop_averef()    - convert data to average reference (averef())
 % pop_signalstat() - plot signal or component statistic (signalstat())
@@ -176,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.191  2002/11/12 02:12:24  scott
+% edit help msg
+%
 % Revision 1.190  2002/11/12 01:32:35  arno
 % adding read bdf format
 %
