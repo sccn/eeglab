@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/08/31 18:59:49  scott
+% debug same
+%
 % Revision 1.42  2004/08/31 18:57:42  scott
 % added figure(curfig) calls to keep plotting straight in Matlab 7.0.0 -sm
 %
@@ -262,7 +265,12 @@ if nargin < 3
         try, options      = eval( [ '{ ' result{5} ' }' ]);
         catch, error('Invalid scalp map options'); end;
     end;        
-    if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
+    if length(arg2) == 1, 
+      figure; curfig=gcf; 
+      try, icadefs; 
+         set(curfig, 'color', BACKCOLOR); 
+      catch, end; 
+    end;
 else
     if ~isempty(varargin) & isnumeric(varargin{1})
         plotdip = varargin{1};
@@ -315,16 +323,17 @@ end;
 counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
+curfig = gcf;
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
-            if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
-        	figure;
-			pos = get(gcf,'Position');
+            if index> 1, figure(curfig); a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
+        	figure; curfig = gcf;
+			pos = get(curfig,'Position');
 			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
-			set(gcf,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
-			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
+			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
        end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
         set(gca, 'visible', 'off')
@@ -363,32 +372,26 @@ for index = 1:size(arg2(:),1)
     else 
         addopt = { 'verbose', 'off' };
     end;
-    curfig = gcf;
+    fprintf('Printing to figure %d.\n',curfig);
     if ~isnan(arg2(index))
 		if typeplot
-            figure(curfig);
-            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
+            figure(curfig); tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
-                 figure(curfig);
-                 title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
+                 figure(curfig); title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
-                 figure(curfig);
-                 title([int2str(arg2(index)) ' ms']);
+                 figure(curfig); title([int2str(arg2(index)) ' ms']);
 			end;
 		else
             if arg2(index) < 0
-                 figure(curfig);
-                tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 figure(curfig); tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             else
-                 figure(curfig);
-                tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 figure(curfig); tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
 			end;
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
-            figure(curfig);
-            title(texttitle);
+            figure(curfig); title(texttitle);
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
@@ -412,8 +415,7 @@ for index = 1:size(arg2(:),1)
     end;
 end;
 if nbgraph> 1, 
-   figure(curfig);
-   a = textsc(0.5, 0.05, topotitle); 
+   figure(curfig); a = textsc(0.5, 0.05, topotitle); 
    set(a, 'fontweight', 'bold'); 
 end;
 if nbgraph== 1, 
@@ -421,7 +423,8 @@ if nbgraph== 1,
 end;
 set(allobj(1:countobj-1), 'visible', 'on');
 
-axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
+figure(curfig);
+axcopy(curfig, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
 com = [com sprintf('pop_topoplot(%s,%d, %s);', ...
                    inputname(1), typeplot, vararg2str({arg2 topotitle rowcols plotdip outoptions{:} }))];
