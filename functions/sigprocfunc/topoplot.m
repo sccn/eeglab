@@ -56,7 +56,7 @@
 %  
 % Outputs:
 %    h    - axes handle
-%    grip - 64x64 output image 
+%    grip - 67x67 output image 
 %  
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/07/12 01:40:49  arno
+% fixing noplot
+%
 % Revision 1.35  2003/07/12 01:33:58  scott
 % debug noplot
 %
