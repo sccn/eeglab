@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2002/07/11 00:04:57  arno
+% same
+%
 % Revision 1.39  2002/07/11 00:03:09  arno
 % debugging itcmax
 %
@@ -556,7 +559,7 @@ switch g.baseboot
     otherwise, error('baseboot must be 0 or 1');
 end;
 switch g.type
-    case { 'coher', 'phasecoher' },;
+    case { 'coher', 'phasecoher', 'phasecoher2' },;
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 
@@ -573,7 +576,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
-	    case 'coher',
+	    case { 'coher' 'phasecoher2' },
            cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
            cumulXboot = zeros(g.padratio*g.winsize/2,g.naccu);
         case 'phasecoher'
@@ -600,7 +603,7 @@ else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%
     Rn = zeros(1,g.timesout);
     Rbn = 0;
 	switch g.type
-	  case 'coher',
+	  case { 'coher' 'phasecoher2' },
            cumulX = zeros(size(win,2),g.timesout);
            cumulXboot = zeros(size(win,2),g.naccu);
       case 'phasecoher'
@@ -643,8 +646,9 @@ stp = (g.frame-g.winsize)/(g.timesout-1);
 
 fprintf('Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher', fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',      fprintf('  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher',  fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher2', fprintf('  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'coher',       fprintf('  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
 end;
 fprintf('  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
 fprintf('Each trial contains samples from %d ms before to\n',g.tlimits(1));
@@ -723,8 +727,11 @@ for i=1:trials
 		        RR(:,j) = zeros(size(RR(:,j)));
           else
 		      switch g.type
-		        case 'coher',
-		          RR(:,j) = tmpX; % normalized cross-spectral vector
+		        case { 'coher' },
+		          RR(:,j) = tmpX; 
+                  cumulX(:,j) = cumulX(:,j)+abs(tmpX).^2;
+		        case { 'phasecoher2' },
+		          RR(:,j) = tmpX; 
                   cumulX(:,j) = cumulX(:,j)+abs(tmpX);
 		        case 'phasecoher',
 		          RR(:,j) = tmpX ./ abs(tmpX); % normalized cross-spectral vector
@@ -762,7 +769,8 @@ for i=1:trials
 			Pboot(:,j) = Pboot(:,j) + PP(:,i);
 		    Rboot(:,j) = Rboot(:,j) + RR(:,i);
 		    switch g.type
-		        case 'coher', cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
+		        case 'coher',       cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX).^2;
+		        case 'phasecoher2', cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
             end;
             j = j+1;
           end
@@ -782,6 +790,11 @@ end % trial
 % ----------------------------------
 switch g.type
  case 'coher',
+  R = R ./ (trials * sqrt( cumulX ) );
+  if ~isnan(g.alpha)
+	  Rboot = Rboot ./ (trials * sqrt( cumulXboot ) );
+  end;
+ case 'phasecoher2',
   R = R ./ ( cumulX );
   if ~isnan(g.alpha)
 	  Rboot = Rboot ./ cumulXboot;
