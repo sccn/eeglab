@@ -10,8 +10,8 @@
 % Inputs:
 %   rows    - number of rows 
 %   columns - number of columns 
-%   sigmaR  - standart deviation for rows (default: rows/5)
-%   sigmaC  - standart deviation for columns (default: columns/5)
+%   sigmaR  - standard deviation for rows (default: rows/5)
+%   sigmaC  - standard deviation for columns (default: columns/5)
 %   meanR   - mean for rows (default: center of the row)
 %   meanC   - mean for columns (default: center of the column)
 %   cut	    - percentage (0->1) of the maximum value for removing 
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
 function mat = gauss2d( sizeX, sizeY, sigmaX, sigmaY, meanX, meanY, cut);
