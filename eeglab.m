@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.180  2002/10/23 22:28:26  arno
+% releasing the timtopo ploting for continuous data
+%
 % Revision 1.179  2002/10/23 15:44:26  arno
 % disable function warning
 %
@@ -976,8 +979,8 @@ BORDEREXT       = 10;
 FONTNAME        = 'courrier';
 FONTSIZE        = 11;
 
-h = findobj('tag', 'EEGLAB');
-if ~isempty(h)
+hh = findobj('tag', 'EEGLAB');
+if ~isempty(hh)
     disp('EEGLAB warning: there can be only one EEGLAB window, closing old one');
     close(h);
 end;
@@ -1184,8 +1187,8 @@ end;
 % ------------------------------------------
 g = myguihandles(gcf);
 if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
-	h = findobj('parent', gcf, 'userdata', 'fullline');
-	set(h, 'visible', 'off');
+	hh = findobj('parent', gcf, 'userdata', 'fullline');
+	set(hh, 'visible', 'off');
 	
 	if CURRENTSET == 0
 		set( g.win0, 'String', sprintf('Parameters of %s dataset', ...
@@ -1239,8 +1242,8 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	tmp = whos('EEG');
 	set( g.val13, 'String', num2str(round(tmp.bytes/1E6*10)/10));
 else
-	h = findobj('parent', gcf, 'userdata', 'fullline');
-	set(h, 'visible', 'on');
+	hh = findobj('parent', gcf, 'userdata', 'fullline');
+	set(hh, 'visible', 'on');
 	set( g.win0, 'String', 'No current dataset');
 	set( g.mainwin1, 'String', '- Create a new or load an existing dataset:');
 	set( g.mainwin2, 'String', '   Use "File > Import data"           (new)'); 
@@ -1275,9 +1278,9 @@ function num = popask( text )
 
 function g = myguihandles(fig)
 	g = [];
-	h = findobj('parent', gcf);
+	hh = findobj('parent', gcf);
 	for index = 1:length(h)
-		if ~isempty(get(h(index), 'tag'))
-			g = setfield(g, get(h(index), 'tag'), h(index));
+		if ~isempty(get(hh(index), 'tag'))
+			g = setfield(g, get(hh(index), 'tag'), hh(index));
 		end;
 	end;
