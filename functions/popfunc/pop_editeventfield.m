@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/10/29 01:17:52  arno
+% pop field for new field
+%
 % Revision 1.25  2002/10/29 00:35:23  arno
 % update gui
 %
@@ -180,7 +183,7 @@ if nargin<2
                     'clear filename filepath tagtest;' ];
         uilist = { ...
          { 'Style', 'text', 'string', 'Event indices to modify', 'fontweight', 'bold' }, ...
-         { 'Style', 'text', 'string', 'Delete old events (else modify existing events indices) ?', 'fontweight', 'bold' } };
+         { 'Style', 'text', 'string', 'Delete old events (else modify existing event indices) ?', 'fontweight', 'bold' } };
         geometry    = { [ 0.63 1.4 0.2] [ 0.63 0.6 1] };
         uilist = { uilist{:} {} ...
          { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] 'tag' 'eventindices'} ...
