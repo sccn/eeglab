@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/20 00:53:14  arno
+% restorings some outputs options
+%
 % Revision 1.13  2002/04/19 23:20:23  arno
 % changing trial bootstrap, not optimal, waiting for further inputs
 %
@@ -459,15 +462,12 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
 	Rboot = zeros(g.padratio*g.winsize/2,g.naccu); % summed bootstrap coher
 	switch g.type
 	    case 'coher',
-           cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
-           cumulY = zeros(g.padratio*g.winsize/2,g.timesout);
-           cumulXboot = zeros(g.padratio*g.winsize/2,g.naccu);
-           cumulYboot = zeros(g.padratio*g.winsize/2,g.naccu);
+           cumulXY = zeros(g.padratio*g.winsize/2,g.timesout);
+           cumulXYboot = zeros(g.padratio*g.winsize/2,g.naccu);
     end;
     if g.bootsub > 0
 		Rboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub); % summed bootstrap coher
-		cumulXboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub);
-		cumulYboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub);
+		cumulXYboottrial = zeros(g.padratio*g.winsize/2, g.timesout, g.bootsub);
     end;
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -481,15 +481,12 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	Rboot = zeros(size(win,2),g.naccu);  % summed bootstrap coher
 	switch g.type
 	    case 'coher',
-           cumulX = zeros(size(win,2),g.timesout);
-           cumulY = zeros(size(win,2),g.timesout);
-           cumulXboot = zeros(size(win,2),g.naccu);
-           cumulYboot = zeros(size(win,2),g.naccu);
+           cumulXY = zeros(size(win,2),g.timesout);
+           cumulXYboot = zeros(size(win,2),g.naccu);
     end;        
     if g.bootsub > 0
 		Rboottrial = zeros(size(win,2), g.timesout, g.bootsub); % summed bootstrap coher
-		cumulXboottrial = zeros(size(win,2), g.timesout, g.bootsub);
-		cumulYboottrial = zeros(size(win,2), g.timesout, g.bootsub);
+		cumulXYboottrial = zeros(size(win,2), g.timesout, g.bootsub);
     end;            
 end
 
@@ -605,8 +602,7 @@ for t=1:trials,
 		  switch g.type
 		      case 'coher',
 		          R(:,j)      = R(:,j) + tmpX.*conj(tmpY); % complex coher.
-                  cumulX(:,j) = cumulX(:,j)+abs(tmpX);
-                  cumulY(:,j) = cumulY(:,j)+abs(tmpY);
+                  cumulXY(:,j) = cumulXY(:,j)+abs(tmpX).*abs(tmpY);
 		      case 'phasecoher',
 		          R(:,j) = R(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
           end;
@@ -632,8 +628,7 @@ for t=1:trials,
 					   switch g.type
 						case 'coher',
 						 Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
-						 cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-						 cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
+						 cumulXYboot(:,j) = cumulXYboot(:,j)+abs(tmpX).*abs(tmpY);
 						case 'phasecoher',
 						 Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 					   end;
@@ -648,6 +643,8 @@ for t=1:trials,
 	   end;
 	end
 end % t = trial
+abs(R(1:10))
+cumulXY(1:10)
 
 % handle trial bootstrap types
 % ----------------------------
@@ -669,8 +666,7 @@ if g.bootsub > 0
 				switch g.type
 				   case 'coher',
 					Rboottrial(:,:,j) = Rboottrial(:,:,j) + tmpsX.*conj(tmpsY); % complex coher.
-					cumulXboottrial(:,:,j) = cumulXboottrial(:,:,j)+abs(tmpsX);
-					cumulYboottrial(:,:,j) = cumulYboottrial(:,:,j)+abs(tmpsY);
+					cumulXYboottrial(:,:,j) = cumulXYboottrial(:,:,j)+abs(tmpsX).*abs(tmpsY);
 				   case 'phasecoher',
 					Rboottrial(:,:,j) = Rboottrial(:,:,j) + tmpsX.*conj(tmpsY) ./ (abs(tmpsX).*abs(tmpsY)); % complex coher.
 				  end;
@@ -713,8 +709,7 @@ if strcmp(g.boottype, 'timestrials') & isnan(g.rboot)
 					switch g.type
 					 case 'coher',
 					  Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY); % complex coher.
-					  cumulXboot(:,j) = cumulXboot(:,j)+abs(tmpX);
-					  cumulYboot(:,j) = cumulYboot(:,j)+abs(tmpY);
+					  cumulXYboot(:,j) = cumulXYboot(:,j)+abs(tmpX).*abs(tmpY);
 					 case 'phasecoher',
 					  Rboot(:,j) = Rboot(:,j) + tmpX.*conj(tmpY) ./ (abs(tmpX).*abs(tmpY)); % complex coher.
 					end;
@@ -730,12 +725,12 @@ clear alltmpsX alltmpsY;
 % ----------------------------------
 switch g.type
  case 'coher',
-  R = R ./ ( cumulX .* cumulY );
+  R = R ./ cumulXY;
   if ~isnan(g.alpha) & isnan(g.rboot)
-	  Rboot = Rboot ./ ( cumulXboot .* cumulYboot );  
+	  Rboot = Rboot ./ cumulXYboot;  
   end;
   if g.bootsub > 0
-	  Rboottrial = Rboottrial ./ ( cumulXboottrial .* cumulYboottrial );
+	  Rboottrial = Rboottrial ./ cumulXYboottrial;
   end;
  case 'phasecoher',
   Rn = sum(Rn, 1);
