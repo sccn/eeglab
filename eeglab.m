@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.312  2004/05/27 23:14:17  arno
+% allowing to define EEG then call eeglab redraw
+%
 % Revision 1.311  2004/03/25 15:44:08  arno
 % version option
 %
@@ -1246,8 +1249,8 @@ e_histdone_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''Done.'
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newnonempty   = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load          = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_newnonempty   = [e_catch 'EEGTMP = h(LASTCOM, EEGTMP); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_load          = [e_catch 'EEGTMP = h(LASTCOM, EEGTMP); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
 e_newset        = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_store         = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_storeall      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
