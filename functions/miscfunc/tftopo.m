@@ -27,7 +27,7 @@
 %
 % Authors: Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
-% See also: spectopo(), timtopo(), envtopo()
+% See also: spectopo(), timtopo(), envtopo(), changeunits()
 
 % Copyright (C) Scott Makeig & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01
 %
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/05/19 13:57:54  scott
+% *** empty log message ***
+%
 % Revision 1.34  2002/05/19 13:52:24  scott
 % showchans=0 -> image std() of selchans images -sm
 %
@@ -314,14 +317,14 @@ colormap(cc);
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
 imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
 
-if showchan>0
+if showchan>0 % -> image showchan data
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
   axis([limits(1:4)]);
   caxis([limits(5:6)]);
   hold on;
 
-else % showchan==0
+else % showchan==0 -> image std() of selchans
   tftimes = mmidx(1):mmidx(2);
   tffreqs = mmidx(3):mmidx(4);
   tfdat = matsel(tfdata,...
@@ -345,7 +348,6 @@ else % showchan==0
   axis([limits(1:4)]);
   caxis([cmin cmax]);
   hold on;
-  % cbar
 end
 axes(imgax)
 xl=xlabel('Time (ms)');
@@ -385,7 +387,7 @@ for n=1:tfpoints
    end
 
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Plot connecting line using changeunits()
+   % Plot connecting lines using changeunits()
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    from = changeunits([timefreqs(n,:)],imgax,wholeax);
    to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
