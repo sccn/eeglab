@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/07/14 01:58:00  arno
+% same
+%
 % Revision 1.18  2002/07/14 01:47:23  arno
 % testing amps limits
 %
@@ -1659,7 +1662,7 @@ if ~isnan(coherfreq)
    plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
 
    if ~isnan(aligntime)
-     line([aligntime aligntime],[minamp maxamp]*1.1,'Color','k'); 
+     line([aligntime aligntime],[minamp(1) maxamp(1)]*1.1,'Color','k'); 
                                                       % x=median sort value
    end
    set(ax3,'Xtick',xtick);
@@ -1679,15 +1682,15 @@ if ~isnan(coherfreq)
      for vt = vts
       if isnan(aligntime)
        if TIMEX      % overplot vt on amp
-         plot([vt vt],[minamp maxamp],DOTSTYLE,...
+         plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
                   'Linewidth',VERTWIDTH);
        else
-         plot([0 max(outtrials)],[minamp maxamp],DOTSTYLE,...
+         plot([0 max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
                   'Linewidth',VERTWIDTH);
        end
       else
        if TIMEX      % overplot realigned vt on amp
-         plot(repmat(median(aligntime+vt-outsort),1,2),[minamp,maxamp],DOTSTYLE,...
+         plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
                   'LineWidth',VERTWIDTH); 
        else
          plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
@@ -1699,9 +1702,9 @@ if ~isnan(coherfreq)
 
    if Cohsigflag % plot amplitude significance levels
      hold on
-      plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)],'r',...
+      plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
                   'linewidth',SIGNIFWIDTH);
-      plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)],'r',...
+      plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)] - mean(ampsig),'r',...
                   'linewidth',SIGNIFWIDTH);
    end
 
@@ -1723,6 +1726,7 @@ if ~isnan(coherfreq)
         [num2str(baseamp,4) ' dB']);
    set(dbtxt,'fontsize',TICKFONT);
     drawnow;
+	set(ax3, 'xlim', timelimits);
    %
    %%%%%% Make coher axis below amp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    %
