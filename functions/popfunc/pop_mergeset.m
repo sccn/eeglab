@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/05/06 17:42:14  arno
+% add urevent boundary
+%
 % Revision 1.22  2004/03/19 19:15:58  arno
 % merging data differently to save mem
 %
@@ -187,6 +190,32 @@ else
         INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data;
     end;
 	INEEG1.setname	= 'Merge datasets';
+    INEEG1trials = INEEG1.trials;
+    INEEG2trials = INEEG2.trials;
+    INEEG1pnts   = INEEG1.pnts;
+    INEEG2pnts   = INEEG2.pnts;
+	if INEEG1.trials > 1 | INEEG2.trials > 1
+		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
+	else
+		INEEG1.pnts = INEEG1.pnts + INEEG2.pnts;
+	end;
+	
+	if isfield(INEEG1, 'reject')
+		INEEG1 = rmfield(INEEG1, 'reject' );
+	end;
+	INEEG1.specicaact = [];
+	INEEG1.specdata = [];
+	if keepall == 0
+		INEEG1.icaact = [];
+		INEEG1.icawinv = [];
+		INEEG1.icasphere = [];
+		INEEG1.icaweights = [];
+		if isfield(INEEG1, 'stats')
+			INEEG1 = rmfield(INEEG1, 'stats' );
+		end;
+	else
+		INEEG1.icaact = [];
+	end;
 
 	% concatenate events
 	% ------------------
@@ -194,12 +223,12 @@ else
         disp('Concatenating events...');
 		if isfield( INEEG1.event, 'epoch')
 			for index = 1:length(INEEG2.event(:))
-				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1.trials;
+				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1trials;
 			end;    
 		end;
 		if isfield( INEEG1.event, 'latency')
 			for index = 1:length(INEEG2.event(:))
-				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1.trials*INEEG1.pnts;
+				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1trials*INEEG1pnts;
 			end;    
 		end;
 
@@ -231,8 +260,8 @@ else
 
         % add discontinuity event if continuous
         % -------------------------------------
-        if INEEG1.trials  == 1 & INEEG2.trials == 1
-            INEEG1 = eeg_insertbound(INEEG1, INEEG1.pnts+0.5, INEEG1.pnts+0.5, 0, 0);
+        if INEEG1trials  == 1 & INEEG2trials == 1
+            INEEG1 = eeg_insertbound(INEEG1, INEEG1pnts+0.5, INEEG1pnts+0.5, 0, 0);
         end;
  
 	end;
@@ -247,29 +276,6 @@ else
 	%else
 	%	INEEG1.epoch =[];
 	%end;
-
-	if INEEG1.trials > 1 | INEEG2.trials > 1
-		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
-	else
-		INEEG1.pnts = INEEG1.pnts + INEEG2.pnts;
-	end;
-	
-	if isfield(INEEG1, 'reject')
-		INEEG1 = rmfield(INEEG1, 'reject' );
-	end;
-	INEEG1.specicaact = [];
-	INEEG1.specdata = [];
-	if keepall == 0
-		INEEG1.icaact = [];
-		INEEG1.icawinv = [];
-		INEEG1.icasphere = [];
-		INEEG1.icaweights = [];
-		if isfield(INEEG1, 'stats')
-			INEEG1 = rmfield(INEEG1, 'stats' );
-		end;
-	else
-		INEEG1.icaact = [];
-	end;
 
 	if ~isempty(INEEG2.event)
         INEEG1.pnts = size(INEEG1.data,2) / INEEG1.trials;
