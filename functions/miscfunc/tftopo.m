@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/09/11 18:59:34  arno
+% allowing image significance
+%
 % Revision 1.62  2003/08/28 17:41:21  arno
 % debuging the first dimension for significance
 %
@@ -622,12 +625,14 @@ if ~isempty(g.timefreqs)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         axes(topoaxes(n));
         scalpmap = squeeze(tfdataori(tfpidx(n,2),tfpidx(n,1),g.selchans));   
+
         %topoplot(scalpmap,g.chanlocs,'maplimits',[g.limits(5) g.limits(6)],...
-        %            'electrodes','on','shrink','off');
+        %            'electrodes','on');
+
         if ~isempty(varargin)
-            topoplot(scalpmap,g.chanlocs,'electrodes','on','shrink','on', varargin{:}); 
+            topoplot(scalpmap,g.chanlocs,'electrodes','on', varargin{:}); 
         else
-            topoplot(scalpmap,g.chanlocs,'electrodes','on','shrink','on'); 
+            topoplot(scalpmap,g.chanlocs,'electrodes','on'); 
         end;
         % 'interlimits','electrodes')
         axis square;
@@ -652,7 +657,7 @@ end;
 if g.showchan>0 & ~isempty(g.chanlocs)
      sbplot(4,4,1,'ax',imgax);
      topoplot(g.showchan,g.chanlocs,'electrodes','off', ...
-                  'style', 'blank', 'emarkersize1chan', 10, 'shrink', 'on');
+                  'style', 'blank', 'emarkersize1chan', 10 );
      axis('square');
 end
 axcopy;
