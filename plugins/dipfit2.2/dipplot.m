@@ -22,12 +22,12 @@
 %  'rvrange'  - [min max] Only plot dipoles with residual variace within the
 %               given range. Default: plot all dipoles.
 %  'summary'  - Build a summary plot with three views (top, back, side)
-%  'image'    - ['besa'|'mri'] Background image. {Default: 'besa'} 
+%  'image'    - ['besa'|'mri'] Background image. 
 %               'mri' (or 'fullmri') uses mean-MRI brain images from the Montreal 
 %               Neurological Institute. This option can also contain a 3-D MRI
-%               volume (dim 1: left to right; dim 2: anterior-posterior
-%               dim 3: superior-inferior). Use 'coregist' to coregister electrodes
-%               with the MRI.
+%               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
+%               superior-inferior). Use 'coregist' to coregister electrodes
+%               with the MRI. {default: 'mri'} 
 %  'coreg'    - [cx cy cz scale pitch roll yaw] the electrodes coordinates are
 %               rotated in 3-D using pitch (x plane), rool (y plane) and yaw
 %               (z plane). They are then scaled using 'scale' and recentered to
@@ -143,6 +143,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.76  2004/04/29 15:35:32  scott
+%adding cylinders for spheres pointers
+%
 %Revision 1.75  2004/04/14 01:40:32  scott
 %hid 'spheres' option
 %
@@ -400,7 +403,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'sphere'    'real'     [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
                                  'links'    'real'      []                  [];
-                                 'image'     ''         []                 'besa' }, 'dipplot');
+                                 'image'     'string'   []                 'mri' }, 'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
     if strcmpi(g.spheres,'on')
@@ -754,10 +757,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg); 
             [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
 
-            if ~strcmpi(g.spheres,'on')
+            if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
 
-            else % plot dipole cylinders
+            else % plot dipole direction cylinders with end cap patch
               thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
               CYLWIDTH = 1.6; CYLLEN = 24;
               for k=1:length(xx)
@@ -781,10 +784,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if ~strcmpi(g.spheres,'on')
                set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
-             else
+            else
                   set(s1, 'userdata', dipstruct, 'tag', tag,'cdatamapping','direct','facecolor','r' );
                   set(p1, 'userdata', dipstruct, 'tag', tag );
-                end
             end
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or point %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -798,16 +800,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 'direct','tag','img', 'facelighting', 'none' };
                 for q = 1:length(xx)
                    scolor = repmat(33,size(xs,1),size(xs,2));
-                   surf(xs/SPHERE_FAC+xx(q),...
+                   sf=surf(xs/SPHERE_FAC+xx(q),...
                         ys/SPHERE_FAC+yy(q),...
                         zs/SPHERE_FAC+zz(q),...
                         scolor);
-                   shading interp
-                   material shiny
+                   % set(sf,{options});
+                   shading interp;
+                   material shiny;
                 end
-                light
-                lighting phong
-            else
+                light;
+                lighting phong;
+
+            else % plot dipole markers
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
