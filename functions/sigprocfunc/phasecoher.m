@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/03/15 15:50:04  scott
+% header
+%
 % Revision 1.3  2002/08/05 17:46:16  arno
 % putting back revision 1.1
 %
@@ -248,7 +251,7 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
 
  fprintf('Computing %d bootstrap coherence values... ',COHSIG_REPS); 
  for f = 1:COHSIG_REPS %%%%%%%%%%%%%%% Bootstrap replications %%%%%%%%%%%
-  if rem(f,100) == 0
+  if rem(f,50) == 0
     fprintf('%d ',f);
   end
   randoff = floor(rand(1,trials)*(frames-winlength))+1; % random offsets
