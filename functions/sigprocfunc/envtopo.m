@@ -43,7 +43,7 @@
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
 %  'pvaf'      = ['on'|'off'] display percentage of variance accounted for by each 
 %                component over the interval selected by limcontrib. Default is 'on'
-%                pvaf(component) = 1-variance(data-component))/variance(data)
+%                pvaf(component) = 100-100*variance(data-component))/variance(data)
 %
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/03/14 02:50:18  arno
+% help for pvaf
+%
 % Revision 1.17  2003/03/14 02:45:48  arno
 % now printing pvaf
 %
