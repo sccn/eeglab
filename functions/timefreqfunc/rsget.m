@@ -35,15 +35,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/07/08 15:59:44  arno
+% Initial revision
+%
 
 function p = rsget( l, val);
     
     % plot the curve
     % --------------
-    pval = linspace(0,1, 102); pval(1) = []; pval(end) = [];
-    rp   = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
-    fp   = l(2)*1./(l(3).*(pval.^(l(3)-1)) + l(4).*((1-pval).^(l(4)-1)));
-    
+    %pval = linspace(0,1, 102); pval(1) = []; pval(end) = [];
+    %rp   = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
+    %fp   = l(2)*1./(l(3).*(pval.^(l(3)-1)) + l(4).*((1-pval).^(l(4)-1)));
     %figure; plot(pval, rp);
     %figure; plot(rp, fp);
     
