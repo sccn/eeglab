@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/11/03 23:23:37  arno
+% adapting to new history ...
+%
 % Revision 1.18  2003/11/01 03:05:34  arno
 % removing some double brackets
 %
@@ -264,10 +267,11 @@ g = finputcheck( args, { 'fields'    'cell'     []         {};
                          'timeunit'  'real'     [0 Inf]    1;
                          'event'     { 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
-                         'delim'     'string'   []         char([9 32])}, 'pop_importevent');
+                         'delim'     {'integer' 'string'}   []         char([9 32])}, 'pop_importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
-    
+g.delim = char(g.delim);    
+
 % test the presence of variables
 % ------------------------------
 %try, g.fields; 	 	  catch, g.fields = {}; end;
