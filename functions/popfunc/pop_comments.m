@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> newcomments = pop_comments( oldcomments);
-%   >> newcomments = pop_comments( oldcomments, title, newcomments );
+%   >> newcomments = pop_comments( oldcomments, title, newcomments, concat);
 %
 % Inputs:
 %   oldcomments - old comments (string or cell array of strings)
@@ -20,8 +20,9 @@
 %       window pops up.
 %
 % Example
-%  newc = pop_comments( { 'This is the first line' ' ' ...
-%               'this is the third line' }, 'Editing');  
+%  EEG.comments = pop_comments( { 'This is the first line.' ' ' ...
+%               'This is the third line.' }, 'Editing');
+% EEG.comments = pop_comments(EEG.comments,'','This is the fourth line.",1);
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/05/09 22:04:46  arno
+% making the comments incremental
+%
 % Revision 1.10  2003/04/09 23:28:12  arno
 % debuging command line call
 %
