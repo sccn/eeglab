@@ -25,10 +25,12 @@
 %       frames      = Frames per trial                        {750}
 %       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
 %       srate       = data sampling rate (Hz)                 {250}
-%       cycles      = >0 -> Number of cycles in each analysis wavelet 
-%                     =0 -> Use FFTs (with constant window length) {0}
-%                           OR multitaper decomposition (with 'mtaper').
-%                     
+%       cycles      = is 0 -> Use FFTs (with constant window length) {0}
+%                     is >0 -> Number of cycles in each analysis wavelet 
+%                     is [wavcycles fact] -> wavelet cycles increase with frequency 
+%                     starting at wavcyle (0<fact<1, fact=1 no increase, fact=0
+%                     same as running FFT).
+%                     OR multitaper decomposition (with 'mtaper').
 %
 %    Optional Inter-Irial Coherence Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
@@ -124,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/08/09 22:29:44  arno
+% implementing wavelet factor
+%
 % Revision 1.44  2002/07/22 14:28:56  arno
 % debugging input baseline spectrum
 %
@@ -1115,6 +1120,7 @@ switch lower(g.plotitc)
 end; %switch
 
 if g.plot
+    set(gcf, 'color', [1 1 1]);
     if (length(g.title) > 0)
 	    axes('Position',pos,'Visible','Off');               
 	    h(13) = text(-.05,1.01,g.title);

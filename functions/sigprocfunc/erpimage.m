@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/08/09 16:28:07  arno
+% debugging allamps
+%
 % Revision 1.29  2002/08/05 18:04:55  arno
 % performing moving average on allamps amplitude (and not log)
 %
@@ -220,6 +223,7 @@ TIMEX = 1;          % 1 -> plot time on x-axis;
 icadefs;            % read BACKCOLOR for plot from defs file (edit this)
                     % read DEFAULT_SRATE for coher,phase,allamps, etc.
 % BACKCOLOR = [0.8 0.8 0.8]; % grey background
+BACKCOLOR = [1 1 1];
 
 % Fix plotting text and line style parameters
 SORTWIDTH = 2.5;    % Linewidth of plotted sortvar

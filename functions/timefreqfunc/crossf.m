@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2002/08/11 22:28:36  arno
+% updating cycles
+%
 % Revision 1.43  2002/08/09 22:37:32  arno
 % debugging cyclefact
 %
@@ -1123,6 +1126,7 @@ case 'on'
 end
 
 if g.plot
+    set(gcf, 'color', [1 1 1]);
    if (length(g.title) > 0) % plot title
       axes('Position',pos,'Visible','Off');               
       h(13) = text(-.05,1.01,g.title);

@@ -121,5 +121,6 @@ varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, 
 com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent ); %s', outstr);
 
 eval(com)	
+set(gcf, 'color', [1 1 1]);
 
 return;
