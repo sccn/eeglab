@@ -16,8 +16,8 @@
 %                   other fields  : used for graphic interface.
 %
 % Optional input:
-%  'rvrange'  - [min max] Only plot dipoles with residual variace within the
-%               given range. Default: plot all dipoles.
+%  'rvrange'  - [min max] or [max] Only plot dipoles with residual variace
+%               within the given range. Default: plot all dipoles.
 %  'summary'  - Build a summary plot with three views (top, back, side)
 %  'mri'      - Matlab file containing an MRI volume and a 4-D transformation
 %               matrix to go from voxel space to electrode space:
@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.116  2005/03/18 17:57:12  arno
+%disable mesh for MNI coordinate with no mesh data
+%
 %Revision 1.115  2005/03/18 17:52:05  arno
 %fixing summary mode
 %
@@ -660,6 +663,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % remove sources with out of bound Residual variance
     % --------------------------------------------------
     if isfield(sources, 'rv') & ~isempty(g.rvrange)
+        if length(g.rvrange) == 1, g.rvrange = [ 0 g.rvrange ]; end;
         for index = length(sources):-1:1
             if sources(index).rv < g.rvrange(1)/100 | sources(index).rv > g.rvrange(2)/100
                 sources(index) = [];
