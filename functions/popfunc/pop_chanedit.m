@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2002/11/15 02:32:27  arno
+% debug for command line call
+%
 % Revision 1.37  2002/11/15 01:38:14  scott
 % Can not -> cannot
 %
@@ -413,7 +416,6 @@ else
 		   end;
 		   switch method
 			case 'chancenter',
-			 extraargs
 			 if isempty(extraargs)
 				 [X Y Z]=chancenter(cell2mat({chans.X})', cell2mat({chans.Y})', cell2mat({chans.Z})',[]);
 			 else
