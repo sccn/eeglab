@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2004/09/13 19:31:00  arno
+% reverting version 1.49
+%
 % Revision 1.49  2004/09/13 18:21:02  arno
 % debug ploting for Matlab 7
 %
@@ -353,7 +356,7 @@ for index = 1:size(arg2(:),1)
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
        end;    
-		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
+		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1, 'align');
         set(curax, 'visible', 'off')
    end;
 
