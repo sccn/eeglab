@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/15 01:40:45  scott
+% Can not -> cannot
+%
 % Revision 1.15  2002/11/14 23:03:04  arno
 % debugging save from the command line
 %
@@ -192,7 +195,7 @@ if mode == 0  % single datasets
 	disp('Pop_saveset: extended datasets syntax check...');
 	EEG = eeg_checkset(EEG, 'eventconsistency');
 	EEG.filename    = curfilename;
-	EEG.filepath    = curfilepath;
+	EEG.filepath    = '';
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
 	disp('Saving dataset...');
@@ -264,6 +267,7 @@ else
 		for index = 1:length(ALLEEG)
 			tmpdata = ALLEEG(index).data;
 			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
+            ALLEEG(index).filepath = '';
 			try, 
 				floatwrite( tmpdata, [ curfilepath ALLEEG(index).data], 'ieee-le');
 			catch, 
