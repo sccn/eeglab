@@ -4,8 +4,7 @@
 % Usage:
 %     >> [compvarorder,compvars,compframes,comptimes,compsplotted] ...
 %           = envtopo(data,weights,'chan_locs',[limits],[compnums],...
-%                 'title',[plotchans],[voffsets],'colorfile',fill_comp);
-%
+%             'title',[plotchans],[voffsets],'colorfile',fill_comp,[vert]);
 % Inputs:
 %  data       = single data epoch (chans,frames)
 %  weights    = final weight matrix from runica() (=weights*sphere)
@@ -61,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/09 02:13:22  arno
+% make the color file internal
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
