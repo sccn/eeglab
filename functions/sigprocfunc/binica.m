@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 08/07/00 Added warning to update icadefs.m -sm
 % 09/08/00 Added tmpint to script, weights and sphere files to avoid
@@ -66,6 +69,20 @@ icadefs % import ICABINARY and SC
 if ~exist('SC')
   fprintf('binica: You need to update your icadefs file to include ICABINARY and SC.\n')
   return
+end;
+if exist(SC) ~= 2
+  fprintf('binica: ica source file ''%s'' is not matlab path, check\n', SC);
+  return
+else
+	SC = which(SC);
+	fprintf('binica: using source file ''%s''\n',  SC);
+end
+if exist(ICABINARY) ~= 2
+  fprintf('binica: ica binary ''%s'' is not matlab path, check\n', ICABINARY);
+  return
+else
+	ICABINARY = which(ICABINARY);
+	fprintf('binica: using binary ica file ''%s''\n', ICABINARY);
 end
 
 %

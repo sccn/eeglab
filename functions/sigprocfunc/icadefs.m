@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/09 02:17:27  arno
+% adding comments for unused variables
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -43,11 +46,12 @@ TUTDIR = '/home/scott/matlab/tutorial';% toolbox tutorial elsewere. If
                                        % you choose not to install the tutorial
                                        % leave this as is.
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/icatutorial/';
-ICABINARY = '/home/duann/stalone/ica_linux'; % <=INSERT path of ica executable for binica.m
+ICABINARY = 'ica_linux.bin'; % <=INSERT path of ica executable for binica.m
+
 % ------------- END OF PATH DEFINITION ----------------------
 % -----------------------------------------------------------
 
-SC  =  [ICADIR 'binica.sc'];           % master .sc file for binica.m
+SC  =  ['binica.sc'];           % master .sc file for binica.m
 
 %ENVCOLORS  = [ ICADIR 'envproj.col' ]; % default color-order
 ENVCOLORS  = [ 'envproj.col' ]; % default color-order
