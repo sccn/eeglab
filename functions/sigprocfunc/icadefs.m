@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/03/21 15:43:50  scott
+% changing back - EEG not imported from workspace to functions.
+%
 % Revision 1.24  2004/03/21 15:34:57  scott
 % debug same
 %
@@ -115,6 +118,8 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
 ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
                             % If none, use []
+SHRINKWARNING = 1;          % warn user about the shrink factor
+
 % COLORS
 % ------
 
