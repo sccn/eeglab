@@ -36,8 +36,9 @@
 %  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
 %               in making 3-D plots {Default 'off'}
 %  'dipolesize' - Size of the dipole sphere(s) {Default: 30}
-%  'dipolelength' - Length of the dipole bar(s) {Default: 30}
+%  'dipolelength' - Length of the dipole bar(s) {Default: 1}
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
+%  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
 %
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
@@ -115,26 +116,7 @@ function [sources, x, y, z, xo, yo, zo] = dipplot( sources, varargin )
         help dipplot;
         return;
     end;
-    
-    if isfield(sources, 'besathloc')
-        sources = convertbesaoldformat(sources);
-    end;
-    if isfield(sources, 'dip')
-        for index = 1:length(sources)
-            sources(index).posxyz = sources(index).dip.pos/4;
-            tmp = sources(index).posxyz(:,1);
-            sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
-            sources(index).posxyz(:,2) = -tmp;
-            sources(index).momxyz = sources(index).dip.mom'/10000;
-            tmp = sources(index).momxyz(:,1);
-            sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
-            sources(index).momxyz(:,2) = -tmp;
-        end;
-    end;
-    if ~isfield(sources, 'posxyz')
-        sources = computexyzforbesa(sources);
-    end;        
-    
+        
     % reading and testing arguments
     % -----------------------------
     if ~isstruct(sources)
@@ -152,9 +134,41 @@ function [sources, x, y, z, xo, yo, zo] = dipplot( sources, varargin )
                                  'projimg'  'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'   [0 Inf]            30;
-                                 'dipolelength' 'real'   [0 Inf]          30;
+                                 'dipolelength' 'real' [0 Inf]            1;
+                                 'sphere'   'real'     [0 Inf]              1;
                                  'image'    'string'   { 'besa' 'mri' }   'besa' }, 'dipplot');
     if isstr(g), error(g); end;
+    
+    % conversion
+    % ----------
+    if isfield(sources, 'besathloc')
+        sources = convertbesaoldformat(sources);
+    end;
+    if ~isfield(sources, 'posxyz')
+        sources = computexyzforbesa(sources);
+    end;        
+
+    % normalize position to unit sphere
+    % ---------------------------------
+    maxi = 0;
+    for index = 1:length(sources)
+        maxi = max(maxi,max(abs(sources(index).posxyz(:))));
+    end;
+    if maxi > 1.01
+        disp('Non-normalized dipole positions, normalizing by standard head radius 8.4747 cm'); 
+        g.sphere = 8.4747;
+    end;
+    
+    for index = 1:length(sources)
+        sources(index).posxyz = sources(index).posxyz/g.sphere;
+        tmp = sources(index).posxyz(:,1);
+        sources(index).posxyz(:,1) = sources(index).posxyz(:,2);
+        sources(index).posxyz(:,2) = -tmp;
+        sources(index).momxyz = sources(index).momxyz/g.sphere*0.05;
+        tmp = sources(index).momxyz(:,1);
+        sources(index).momxyz(:,1) = sources(index).momxyz(:,2);
+        sources(index).momxyz(:,2) = -tmp;
+    end;
     
     % remove sources with out of bound Residual variance
     % --------------------------------------------------
@@ -614,7 +628,6 @@ function newsrc = convertbesaoldformat(src);
     end; 
 
 function src = computexyzforbesa(src);
-    scaling = 0.0105; % image scaling factor
     
     for index = 1:length( src )
         for index2 = size( src(index).possph, 1 )
@@ -628,10 +641,11 @@ function src = computexyzforbesa(src);
             theta    = postmp(2);    %% %%%%%%%%%%%%%%% USE BESA COORDINATES %%%%%
             phiori   = momtmp(1)+90; %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
             thetaori = momtmp(2);    %% %%%%%%%%%%%% USE BESA COORDINATES %%%%%
-            [x y z]    = sph2cart(theta/180*pi, phi/180*pi, postmp(3)*scaling);
-            [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, momtmp(3)*scaling);
-            src(index).posxyz(index2,:) = [x y z];
-            src(index).momxyz(index2,:) = [xo yo zo];
+            % exentricities are in % of the radius of the head sphere
+            [x y z]    = sph2cart(theta/180*pi, phi/180*pi, postmp(3)/100); 
+            [xo yo zo] = sph2cart(thetaori/180*pi, phiori/180*pi, momtmp(3)*5); % exentricity scaled for compatibility with DIPFIT
+            src(index).posxyz(index2,:) = [-y x z];
+            src(index).momxyz(index2,:) = [-yo xo zo];
                     
         end;
     end;
