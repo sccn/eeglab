@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/07/15 21:12:33  arno
+% added backward compatibility
+%
 % Revision 1.13  2003/07/15 18:49:43  arno
 % debug remaning problems
 %
@@ -271,7 +274,7 @@ for index = 1:length(datadd)
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     else          erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
     end;
-    addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname '(' int2str(TMPEEG.trials) ')' ];
+    addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname ' (n=' int2str(TMPEEG.trials) ')' ];
     clear TMPEEG;
 end;
 
