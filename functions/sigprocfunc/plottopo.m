@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/24 17:53:46  scott
+% added 'vert' vertical line plotting -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -592,7 +595,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
        if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
         ymean = (ymin+ymax)/2; 
         vmin = ymean-2/3*(ymean-ymin);
-        vmin = ymean+2/3*(ymax-ymean);
+        vmax = ymean+2/3*(ymax-ymean);
         for v = vert
           plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
         end
