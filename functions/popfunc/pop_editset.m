@@ -28,10 +28,8 @@
 %                  and an unmixing weight matrix (see above).  To use the sphere 
 %                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
 %                  Command line equivalent: 'icasphere'.
-%   "Averaged referenced data" - [checkbox] Re-reference data to average reference 
-%                  by checking the checkbox. Transform back to common reference 
-%                  by unchecking the checkbox. Command line equivalent: 'averef' 
-%                  See also pop_reref().
+%   "Data reference" - [text] to change data reference, use menu Tools > Re-reference
+%                  calling function pop_reref().
 % Inputs:
 %   EEG          - EEG dataset structure
 %
@@ -52,7 +50,6 @@
 %                  For file formats, see >> help readlocs
 %   'nbchan'     - [int] Number of data channels. 
 %   'xmin'       - [real] Data start time (in seconds).
-%   'averef'     - ['Yes'|'No'] 'Yes' if data are average-reference. 
 %   'pnts'       - [int] Number of data points per epoch (epoched data only)
 %   'srate'      - [real] Data sampling rate in Hz. 
 %   'icaweight'  - [matrix] ICA weight matrix. 
@@ -94,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/05/29 21:45:53  arno
+% allowing to import numerical data array from command line
+%
 % Revision 1.36  2003/05/22 01:48:49  arno
 % debug icaweight/icasphere
 %
@@ -230,6 +230,15 @@ if nargin < 2                 % if several arguments, assign values
                     'clear filename filepath tagtest;' ];
 	editcomments = 'set(gcf, ''userdata'', pop_comments(get(gcbf, ''userdata''), ''Edit comments of current dataset''));';
 		
+    if isstr(EEG.ref)
+        curref = EEG.ref;
+    else
+        if EEG.ref(1) < 0
+            curref = [ int2str(-EEG.ref) ' (absent from data)' ];
+        else
+            curref = [ int2str(-EEG.ref) ' (present in data)' ];
+        end;
+    end;
     uilist = { ...
          { 'Style', 'text', 'string', 'Dataset name (optional):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
 		 { 'Style', 'pushbutton', 'string', 'About', 'callback', editcomments },  ...
@@ -264,8 +273,8 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'edit', 'string', fastif(isempty(EEG.icasphere), '', 'EEG.icasphere'), 'horizontalalignment', 'left', 'tag',  'sphfile' } ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } ...
 	     ...
-		 { 'Style', 'text', 'string', 'Averaged referenced data ?'} { } ...
-		 { 'Style', 'checkbox', 'string', '(set = Yes)', 'value', ~strcmpi(EEG.ref, 'common') }, { 'Style', 'text', 'string', '(EEG.ref)'} ...
+		 { 'Style', 'text', 'string', 'Data reference'} { } ...
+		 { 'Style', 'text', 'string', curref }, { 'Style', 'text', 'string', '(EEG.ref)'} ...
 			 };
 
     if EEG.trials == 1,  uilist(21:24) = []; geometry(6) = []; end;
@@ -285,7 +294,6 @@ if nargin < 2                 % if several arguments, assign values
 	if ~strcmp( results{i  }, fastif(isempty(EEG.chanlocs), '', 'EEG.chanlocs')  ) , args = { args{:}, 'chanlocs' , results{i} }; end;
 	if ~strcmp( results{i+1}, fastif(isempty(EEG.icaweights), '', 'EEG.icaweights') ), args = { args{:}, 'icaweights', results{i+1} }; end;
 	if ~strcmp( results{i+2}, fastif(isempty(EEG.icasphere), '', 'EEG.icasphere') ) , args = { args{:}, 'icasphere', results{i+2} }; end;
-	if strcmpi(EEG.ref, 'averef') ~= results{i+3}, args = { args{:}, 'averef', fastif(results{i+3}, 'yes', 'no') }; end;
 	if ~strcmp(EEG.comments, newcomments), args = { args{:}, 'comments' , newcomments }; end;
 else % no interactive inputs
     args = varargin;
@@ -318,10 +326,7 @@ for curfield = tmpfields'
         case 'setname' , EEGOUT.setname = getfield(g, {1}, curfield{1});
         case 'pnts'    , EEGOUT.pnts = getfield(g, {1}, curfield{1});
         case 'comments', EEGOUT.comments = getfield(g, {1}, curfield{1});
-	    case 'averef'  , reref = getfield(g, {1}, curfield{1});
-	                     if (strcmpi(EEGOUT.ref, 'common') & strcmpi(reref, 'yes')) | (~strcmpi(EEGOUT.ref, 'common') & strcmpi(reref, 'no'))
-							 EEGOUT = pop_reref(EEG, []);
-						 end;
+	    case 'averef'  , disp('The ''averef'' argument is obsolete; use function pop_reref() instead');
         case 'nbchan'  , EEGOUT.nbchan = getfield(g, {1}, curfield{1});
         case 'xmin'    , oldxmin = EEG.xmin;
                          EEGOUT.xmin = getfield(g, {1}, curfield{1});
