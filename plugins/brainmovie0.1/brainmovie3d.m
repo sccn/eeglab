@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/08/06 14:42:19  arno
+% *** empty log message ***
+%
 % Revision 1.4  2003/07/03 16:50:20  arno
 % header typo
 %
@@ -146,7 +149,7 @@
 % Initial revision
 %
 
-function brainmovie3d(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
+function alltimepoints = brainmovie3d(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
     
 if nargin < 6
 	help brainmovie3d;
