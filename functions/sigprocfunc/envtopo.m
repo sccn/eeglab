@@ -4,17 +4,17 @@
 % Usage:
 %     >> envtopo(data,weights);
 %     >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
-%             = envtopo(data, weights, 'key1', val1, 'key2', val2 ...);
+%                                   = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data       = single data epoch (chans,frames)
-%  weights    = final weight matrix from runica() (= weights*sphere)
+%  weights    = ICA weight matrix (= weights*sphere)
 %
 % Optional inputs:
 %  'chanlocs'  = [string] channel location file or EEG.chanlocs structure. 
 %                  See >> topoplot example 
-%  'limits'    = [mins maxs minuV maxuV] times values in sec, potential values in uV
+%  'limits'    = [minms maxms minuV maxuV] times values in ms, potential values in uV
 %                  {def|[] or both t's 0 -> data uV limits}
-%  'limcontrib' = [mins maxs]  time range (in sec) in which to rank component contribution
+%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  {default|[]|[0 0] -> data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if n < 0, the number largest-comp. maps  to plot (component with max
@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2004/04/25 16:20:41  scott
+% clarified that input times are in sec, not ms; cleaned up commandline info -sm
+%
 % Revision 1.55  2004/04/24 17:21:37  scott
 % fixed pvaf computation and printout. Added 'sumenv' mode as default. Deprecated
 % 'colorfile' for 'colors' (backward compatible). Cleaned up printout.
@@ -234,7 +237,6 @@
 % 03-16-02 added all topoplot options -ad
 
 function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin);
-    %chan_locs,limits,compnums,titl,plotchans,voffsets,colorfile,fill_comp_env,vert, varargin)
 
 if nargin < 2
    help envtopo
@@ -253,7 +255,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'fillcomp'      'integer'  []                       0 ;  % no fill
 				  'colorfile'     'string'   []                       '' ; % deprecated usage
 				  'colors'        'string'   []                       '' ; % new usage
-				  'compnums'      'integer'  []                       []; ...
+				  'compnums'      'integer'  []                       -7; ...
 				  'subcomps'      'integer'  []                       []; ...
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
@@ -302,6 +304,13 @@ end;
 if ~isempty(g.colors)
     g.colorfile = g.colors; % retain old usage 'colorfile' for 'colors' -sm 4/04
 end
+
+%
+%%%%%%%%%%%%%%%%% convert limits and limcontrib times to seconds from ms %%%%%%%
+%
+g.limits(1) = g.limits(1)/1000;
+g.limits(2) = g.limits(2)/1000;
+g.limcontrib = g.limcontrib/1000;
 
 uraxes = gca; % the original figure or subplot axes
 pos=get(uraxes,'Position');
@@ -974,7 +983,7 @@ if strcmpi(g.dispmaps, 'on')
             if chid <3,
                 numlabels = 1;
             else
-                fprintf('Will label scalp maps with labels from pwd file %s\n','envtopo.labels');
+                fprintf('Will label scalp maps with labels from file %s\n','envtopo.labels');
                 compnames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
                 compnames = compnames';
                 [r c] = size(compnames);
