@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/09/19 01:42:56  arno
+% documenting stop at 1E-7 for more than 32 channels
+%
 % Revision 1.8  2003/09/18 23:43:50  arno
 % debug 'weight' input (would not sort component by variance and make some function crash
 %
@@ -285,8 +288,8 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          pcaflag = 'on';
          ncomps = Value;
-         if ncomps >= chans | ncomps < 1,
-            fprintf('runica(): pca value must be in range [1,%d]\n',chans-1)
+         if ncomps > chans | ncomps < 1,
+            fprintf('runica(): pca value must be in range [1,%d]\n',chans)
             return
          end
          chans = ncomps;
