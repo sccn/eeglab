@@ -142,6 +142,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.72  2004/03/26 01:39:04  arno
+%only plotting active dipoles
+%
 %Revision 1.71  2004/03/26 01:22:20  arno
 %mricorner with tightview
 %
