@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2004/03/25 22:30:13  arno
+% same thing
+%
 % Revision 1.177  2004/03/25 22:26:45  arno
 % same thing
 %
@@ -1109,17 +1112,37 @@ if headrad > 0                         % if cartoon head to be plotted
   base  = rmax-.004;
   EarX  = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489]; % rmax = 0.5
   EarY  = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
+%
+%%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+ringpts = 201;
+ringwidth = 1.03;  % 3% width
+ringmin = rmax; % rmax/(ringwidth/2); % make head outline be at ring middle
 
-  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
-      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
-  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
+rx = sin(linspace(0,2*pi,ringpts)); rX = rx(end:-1:1);
+ry = cos(linspace(0,2*pi,ringpts)); rY = ry(end:-1:1);
+for i=2:2:ringpts
+  rx(i) = rx(i)*ringwidth;
+  ry(i) = ry(i)*ringwidth;
+end
+f1= fill(ringmin*[rx rX],ringmin*[ry rY],BACKCOLOR,'edgealpha',0); hold on
+f2= fill(ringmin*[rx rX*ringwidth],ringmin*[ry rY*ringwidth],BACKCOLOR,'edgealpha',0);
+
+%  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...
+%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
+%  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
   
-
+%
+%%%%%%%%%%%%%%%%%%% Plot head outline %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
   plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
 
   sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
                                                                  % by this factor
+%
+%%%%%%%%%%%%%%%%%%% Plot ears and nose %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
          'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
