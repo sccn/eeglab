@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/04/19 23:20:23  arno
+% changing trial bootstrap, not optimal, waiting for further inputs
+%
 % Revision 1.12  2002/04/19 19:46:28  arno
 % crossf with new trial coherence bootstrap (minus mean)
 %
@@ -763,6 +766,14 @@ elseif ~isnan(g.rboot)
 	Rbootout = Rboot;
 end;
 
+if ~isnan(g.alpha) % if bootstrap analysis included . . .
+	i = round(g.naccu*g.alpha);
+	Rboot = Rboot';
+	Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
+	Rboot = [mean(Rboot(1:i,:)); mean(Rboot(g.naccu-i+1:g.naccu,:))];
+	%Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
+end % NOTE: above, mean ?????
+
 if g.bootsub < 0
 	meanRboot = mean(Rboot,3);
 	figure
@@ -778,13 +789,14 @@ if g.bootsub < 0
 	end;
 	Rbootout = Rboot;
 else	
-	plotall(R, Rboot, times, freqs, mbase, dispf, g);
+	plotall(R, Rboot, Rsignif, times, freqs, mbase, dispf, g);
+	Rangle = angle(R);
 end;
 
 % ------------------
 % plotting functions
 % ------------------
-function plotall(R, Rboot, times, freqs, mbase, dispf, g) 
+function plotall(R, Rboot, Rsignif, times, freqs, mbase, dispf, g) 
 
 switch lower(g.plotphase)
    case 'on',  
@@ -798,22 +810,6 @@ switch lower(g.plotphase)
           case 'off', g.plot = 0;
        end;     
 end; 
-
-if ~isnan(g.alpha) % if bootstrap analysis included . . .
-    switch g.boottype
-	    case 'trials',
-			i = round(g.naccu*g.alpha);
-			Rsignif = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3); % significance levels for Rraw
-		 	Rbootplus = mean(Rboot(:,:,1:i),3);
-		 	Rbootminus = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3);
-        otherwise
-			i = round(g.naccu*g.alpha);
-			Rboot = Rboot';
-			Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
-			Rboot = [mean(Rboot(1:i,:)); mean(Rboot(g.naccu-i+1:g.naccu,:))];
-		 	%Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
-	end;
-end % NOTE: above, mean ?????
 
 % compute angles
 % --------------
