@@ -19,9 +19,9 @@
 %   help       - optional help command 
 %   title      - optional figure title
 %   userdat    - optional userdata input for the figure
-%   mode       - ['normal'|'return'|fignumber], either wait for user to press
-%                OK or CANCEL ('normal'), return without processing user
-%                input ('return'), or simply scan parameter of an existing 
+%   mode       - ['normal'|'noclose'|fignumber], either wait for user to press
+%                OK or CANCEL ('normal'), return without closing window
+%                input ('noclose'), or process an existing 
 %                window which number is given as input (fignumber). 
 %                Default is 'normal'.
 %
@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/26 23:24:37  arno
+% adding mode
+%
 % Revision 1.2  2002/04/09 03:44:35  arno
 % adding input userdata
 %
@@ -94,16 +97,16 @@ if isstr(mode)
 	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
 	[tmp tmp2 allobj] = supergui( geometry, listui{:} );
 	
-	% create figure and wait for return
-	% ---------------------------------
-	if strcmp(mode, 'normal')
-		waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
-	end;
 else 
-	fig = mode
+	fig = mode;
+	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
 end;
 
-result = {};	
+% create figure and wait for return
+% ---------------------------------
+waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+
+result = {};
 userdat = [];
 try, findobj(fig); % figure still exist ?
 catch, return; end;
@@ -125,4 +128,6 @@ for index=1:length(allobj)
    catch, end;
 end;   
 userdat = get(fig, 'userdata');
-close(fig);
+if isstr(mode) & strcmp('mode', 'normal')
+	close(fig);
+end;
