@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/21 00:52:30  scott
+% edited help -sm
+%
 % Revision 1.2  2002/04/10 01:37:03  arno
 % doubling the quotes in string
 %
@@ -174,20 +177,30 @@ function str = contarray( array )
 	if all(round(array) == array)
 		str = num2str(array(1));
 		skip = 0;
+        indent = array(2) - array(1);
 		for index = 2:length(array)
-			if array(index) ~= array(index-1)+1
+			if array(index) ~= array(index-1)+indent
 				if skip == 0
 					str = [str ' ' num2str(array(index))];
 				else
-					str = [str ':' num2str(array(index-1)) ',' num2str(array(index))];
+                    if indent == 1
+                        str = [str ':' num2str(array(index-1)) ',' num2str(array(index))];
+                    else
+                        str = [str ':' num2str(indent) ':' num2str(array(index-1)) ',' num2str(array(index))];
+                    end;
 				end;
 				skip = 0;
+                indent = array(index) - array(index-1);
 			else
 				skip = skip + 1;
 			end;
 		end;
-		if array(index) == array(index-1)+1
-			str = [str ':' num2str(array(index)) ];
+		if array(index) == array(index-1)+indent
+            if indent == 1
+                str = [str ':' num2str(array(index)) ];
+            else
+                str = [str ':' num2str(indent) ':' num2str(array(index)) ];
+            end;
 		end;
 	else
 		str = num2str(double(array));
