@@ -30,6 +30,7 @@
 %   'maxfreq'  = [float] maximum frequency to plot. Overwrite limits x axis.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                Default is 'off'. 
+%   'boundaries' = data point indices indicating discontinuities in the signal
 %
 % Plot component contributions:
 %   'weights'  = ICA unmixing matrix. 'freq' must contain a single frequency.
@@ -85,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/07/30 18:12:51  arno
+% debugging
+%
 % Revision 1.22  2002/07/29 22:22:27  arno
 % update messages
 %
@@ -183,6 +187,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'freqfac'       'integer'  []                        FREQFAC;
 				  'percent'       'real'     [0 100]                  100 ;
 				  'reref'         'string'   { 'averef' 'no' }         'no' ;
+				  'boundaries'    'integer'  []                       [] ;
 				  'icamode'       'string'   { 'normal' 'sub' }        'normal' ;
 				  'weights'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
@@ -285,9 +290,11 @@ else
 		fprintf('\n');
 	else
 		fprintf('Computing spectra at specified channel: ')
+		g.reref = 'no';
 		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
 		fprintf('\n');
 	end;
+	g.reref = 'no';
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% select channel and spectrum
@@ -645,6 +652,7 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		nchans = size(data,1);		
 	end;
 	fftlength = 2^round(log(srate)/log(2))*g.freqfac;
+	
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
 			if strcmp(g.icamode, 'normal')
@@ -655,18 +663,27 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		else
 			tmpdata = data(c,:); % channel activity
 		end;
+		if strcmp(g.reref, 'averef')
+			tmpdata = averef(tmpdata);
+		end;
 		for e=epoch_subset
-			if strcmp(g.reref, 'averef')
-				[tmpspec,freqs] = psd(averef(matsel(tmpdata,frames,0,1,e)),fftlength,...
-									  srate,fftlength/2,fftlength/8);
-			else
+			if isempty(g.boundaries)
 				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,...
 									  srate,fftlength/2,fftlength/8);
-			end
-			if c==1 & e==epoch_subset(1)
-				eegspec = zeros(nchans,length(freqs));
-			end
-			eegspec(c,:) = eegspec(c,:) + tmpspec';
+				if c==1 & e==epoch_subset(1)
+					eegspec = zeros(nchans,length(freqs));
+				end
+				eegspec(c,:) = eegspec(c,:) + tmpspec';
+			else
+				for n=1:length(boundaries)-1
+					[tmpspec,freqs] =  psd(averef(tmpdata(:,boundaries(n)+1:boundaries(n+1))),...
+										   fftlength, srate,fftlength/2,fftlength/8);
+					if c==1 & e==epoch_subset(1)
+						eegspec = zeros(nchans,length(freqs));
+					end
+					eegspec(c,:) = eegspec(c,:) + tmpspec'/length(g.boundaries-1);
+				end
+			end;
 		end
 		fprintf('.')
 	end
