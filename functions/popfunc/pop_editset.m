@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/12/05 23:24:47  arno
+% command line call problem
+%
 % Revision 1.41  2003/07/30 18:01:24  arno
 % handling empty chanlocs
 %
@@ -222,7 +225,7 @@
 % 04-02-02 recompute event latencies when modifying xmin -ad
 
 function [EEGOUT, com] = pop_editset(EEG, varargin);
-
+   
 com = '';
 if nargin < 1
    help pop_editset;
@@ -309,11 +312,13 @@ if nargin < 2                 % if several arguments, assign values
 	if ~strcmp(EEG.comments, newcomments), args = { args{:}, 'comments' , newcomments }; end;
 else % no interactive inputs
     args = varargin;
-    for index=1:2:length(args)
-        if ~isempty(inputname(index+2)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
-			args{index+1} = inputname(index+2); 
-		end;
-    end;                
+    % Do not copy varargin
+    % --------------------
+    %for index=1:2:length(args)
+    %    if ~isempty(inputname(index+2)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
+	%		args{index+1} = inputname(index+1); 
+	%	end;
+    %end;                
 end;
 
 % create structure
