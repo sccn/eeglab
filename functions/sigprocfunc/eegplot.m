@@ -50,6 +50,8 @@
 %    'children'   - [integer] Figure handle of a dependant eegplot() window. Scrolling
 %                    horizontally in the master window will produce the same effect in the
 %                    dependent window. Allows comparison of two concurrent data types.
+%    'scale'      - ['on'|'off'] display scale { default: 'on'}.
+%
 % Outputs:
 %    TMPREJ       - Matrix with same format as 'winrej' set as a variable in
 %                    the global workspace when the REJECT button is clicked. 
@@ -79,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2002/09/05 15:03:43  arno
+% debug scale
+%
 % Revision 1.47  2002/08/28 00:42:57  arno
 % debugging if no arguments
 %
@@ -322,6 +327,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
    try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
+   try, g.scale; 		    catch, g.scale      = 'on'; end;
 
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -332,12 +338,12 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' },;
+               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' 'butlabel' 'scale' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
 
-	if length(g.srate) > 1
+   if length(g.srate) > 1
    		disp('Error: srate must be a single number'); return;
    end;	
    if length(g.spacing) > 1
@@ -369,6 +375,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    switch lower(g.submean)
 	   case { 'on' 'off' };
 	   otherwise disp('Error: submean must be either ''on'' or ''off'''); return;
+   end;	
+   switch lower(g.scale)
+	   case { 'on' 'off' };
+	   otherwise disp('Error: scale must be either ''on'' or ''off'''); return;
    end;	
    
    switch lower(g.color)
@@ -970,6 +980,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   else set(m(7),'checked','off');
   end 
   eegplot('scaleeye', [], gcf);
+  if strcmp(lower(g.scale), 'off')
+	  eegplot('scaleeye', 'off', gcf);
+  end;
   
   eegplot('drawp', 0);
   eegplot('drawp', 0);
@@ -1336,20 +1349,31 @@ else
     figh = p2;
 	g = get(figh,'UserData');
     % figh = get(obj,'Parent');
-    
+
     if ~isempty(obj)
-		toggle = get(obj,'checked');
 		eyeaxes = findobj('tag','eyeaxes','parent',figh);
 		children = get(eyeaxes,'children');
-		if strcmp(toggle,'on')
-			set(children, 'visible', 'off');
-			set(eyeaxes, 'visible', 'off');
-			set(obj,'checked','off');
-			return;
+		if isstr(obj)
+			if strcmp(obj, 'off')
+				set(children, 'visible', 'off');
+				set(eyeaxes, 'visible', 'off');
+				return;
+			else
+				set(children, 'visible', 'on');
+				set(eyeaxes, 'visible', 'on');
+			end;
 		else
-			set(children, 'visible', 'on');
-			set(eyeaxes, 'visible', 'on');
-			set(obj,'checked','on');
+			toggle = get(obj,'checked');
+			if strcmp(toggle,'on')
+				set(children, 'visible', 'off');
+				set(eyeaxes, 'visible', 'off');
+				set(obj,'checked','off');
+				return;
+			else
+				set(children, 'visible', 'on');
+				set(eyeaxes, 'visible', 'on');
+				set(obj,'checked','on');
+			end;
 		end;
 	end;
 	
@@ -1397,6 +1421,12 @@ else
       obj = findobj(gcf, 'style', 'text'); 
       %objscale = findobj(obj, 'tag', 'thescale');
       %delete(setdiff(obj, objscale));
+	  obj = findobj(gcf, 'tag', 'Eelec');delete(obj);
+	  obj = findobj(gcf, 'tag', 'Etime');delete(obj);
+	  obj = findobj(gcf, 'tag', 'Evalue');delete(obj);
+	  obj = findobj(gcf, 'tag', 'Eelecname');delete(obj);
+	  obj = findobj(gcf, 'tag', 'Etimename');delete(obj);
+	  obj = findobj(gcf, 'tag', 'Evaluename');delete(obj);
  
 	case 'zoom' % if zoom
       fig = varargin{1};
