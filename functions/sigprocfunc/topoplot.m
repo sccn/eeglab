@@ -118,6 +118,7 @@
 
 % Unimplemented future options:
 %              Using option 'plotgrid', the plot can be a rectangular imagesc() grid.
+%
 %   'plotgrid'        - [channels] or {[channels], 'position'} where [channels] is a matrix of grid 
 %                       channel numbers - in which 0's plot 0-values and negative integers, 
 %                       polarity-reversed values - and char 'position' (if either 'l' or 'r') 
@@ -145,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.235  2004/12/26 05:48:57  scott
+% enlarged definition of 'emarker', deprecated 'ecolor','emarkersize'...
+%
 % Revision 1.234  2004/12/24 19:48:23  scott
 % fixed and extended 'emarker2' args; added 'hcolor','none' option; changed 'emarkersize1chan' to
 % 'emarkersizemark' (preserving backwards compatability as well). tested with /home/www/eeglab/test_topoplot.m
@@ -1014,7 +1018,7 @@ end
 %
 if strcmp(plotgrid,'on')
    if abs(max(max(gridchans))) > length(Values)
-        error('''plotgrid'' channel index larger than the number of input channel values');
+        error('''plotgrid'' channel index > the number of input channel values');
    end
    gchans = sort(find(abs(gridchans(:))>0));
    if setdiff(gchans,unique(gchans))
@@ -1257,7 +1261,7 @@ end
 % 
 
 if strcmp(plotgrid,'on')
-     plotchans(gchans) = [];   % remove grid chans from head plotchans   <==== wrong!
+     plotchans(gchans) = [];   % remove grid chans from head plotchans   <==== wrong! ???
 end
 
 allx = x;
@@ -1433,21 +1437,21 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   if strcmp(STYLE,'grid')                     % plot grid only
-    error('''plotgrid'' option not yet implemented.'); % <============
+    % error('''plotgrid'' option not yet implemented.'); % <============
     gridvalues = zeros(size(gridchans));
+gridchans
+size(Values)
     for j=1:size(gridchans,1)
       for k=1:size(gridchans,2)
-         if gridpos(j,k) > 0
-            gridvalues(j,k) = Values(gridpos(j,k));
-         elseif gridpos(j,k) < 0
-            gridvalues(j,k) = -Values(gridpos(j,k));
-         else
-            gridvalues(j,k) = 0;
+         if gridchans(j,k) > 0
+fprintf('%d, %d\n',j,k);
+            gridvalues(j,k) = Values(gridchans(j,k));
+         elseif gridchans(j,k) < 0
+            gridvalues(j,k) = -Values(gridchans(j,k));
          end
       end
     end
-    % meshgrid(); % <==== incomplete
-    % imagesc(gridvalues); % <==== incomplete
+    h=imagesc(gridvalues); % ,'EdgeColor','none','FaceColor',SHADING);                    
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
