@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/11/04 01:11:47  arno
+% change default file filter
+%
 % Revision 1.5  2003/01/24 04:14:46  scott
 % header edit -sm
 %
@@ -71,8 +74,28 @@ if nargin < 2
 	filename = [filepath filename];
 end;
 
-EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, 'delim', 9, 'align', 0, 'fields', ...
-    { 'pres_trial', 'stimulus', 'type', 'latency', 'ttime', 'uncertainty1', 'duration', 'uncertainty2', 'reqtime', 'reqdur' });
+disp('Reading fields from files');
+fields = loadtxt(filename, 'delim', 9, 'skipline', -2, 'nlines', 1);
+
+% finding fields
+% --------------
+indtype = strmatch('event type', lower(fields));
+if isempty(indtype)
+    error('Could not detect field ''Event Type'', try importing the file as ASCII (use delimitor=9 (tab))');
+end;
+indlat  = strmatch('time', lower(fields), 'exact');
+if isempty(indlat)
+    error('Could not detect field ''Time'', try importing the file as ASCII (use delimitor=9 (tab))');
+end;
+fields{indtype} = 'type';
+fields{indlat}  = 'latency';
+
+% import file
+% -----------
+if isempty(EEG.event), align = NaN; 
+else                   align = 0; end;
+EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
+                           'delim', 9, 'align', align, 'fields', fields);
 
 command = sprintf('EEG = pop_importpres(%s, ''%s'');', inputname(1), filename); 
 
