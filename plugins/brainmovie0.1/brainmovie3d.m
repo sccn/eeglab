@@ -70,6 +70,7 @@
 %                      {default: hot(64)}
 % 'scalepower'  - [min max] dB range for power (and disk size) variation {default: [-5 5]}  
 % 'scalecoher'  - [min max] coherence range {default: [0 1]}
+% 'scaleitc'    - [absmax] maximum itc {Default: 1}
 % 'diskscale'   - numeric value that scales the size of disks {default: [1.0]}   
 %
 % Movie coordinates and axis options
@@ -132,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/07/03 16:50:20  arno
+% header typo
+%
 % Revision 1.3  2003/07/03 16:49:44  arno
 % test for nan itc
 %
@@ -188,6 +192,7 @@ try, g.crossfphasespeed;catch, g.crossfphasespeed='on'; end;
 try, g.crossfphaseunit; catch, g.crossfphaseunit='degree'; end;
 try, g.scalepower;      catch, g.scalepower = [-5 5]; end;
 try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
+try, g.scaleitc;        catch, g.scaleitc = 1; end;
 try, g.diskscale;       catch, g.diskscale = 1; end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
@@ -805,17 +810,22 @@ function [tmpsize, tmpcolor, handles] = drawcircle( tmpcoord, tmpersp, tmpitc, g
         if isnan(tmpitc), tmpitc = 0; end;
         
 		switch lower(g.itc)
-			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2+ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
-			case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
-			%case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
-			%case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
+         case 'on', 
+          indexcolor = length(g.colmapcoh)/2+ceil((tmpitc/g.scaleitc)*length(g.colmapcoh)/2);
+          if indexcolor < 1 | indexcolor > length(g.colmapcoh)
+              error([ 'ITC ' num2str(tmpitc) 'out of bound, use ''scaleitc'' to increase maxitc' ] );
+          end;
+          tmpcolor = g.colmapcoh( indexcolor,: );
+         case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
+          %case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
+          %case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
 		end;
 		if tmpersp == 0
 			dashed = 1;
 		else
 			dashed = 0;
 		end;		
-		
+        
         tmpsize = g.diskscale*tmpsize*g.maxc;
 		if tmpsize > 0
             if length(tmpcoord) > 2
@@ -883,7 +893,8 @@ function handles = drawconnections( pos1, pos2, crossfpower, crossfangle, circfa
 		case 'on',  curphase = (crossfangle+180)/360; % phase from 1 to 0
 		case 'off', curphase = 0.5;
 	end;
-	
+    if crossfpower == 0, tmpthick = 0; end;
+    
 	if tmpthick > 0        
         [xc yc zc] = cylinder( g.resmult*tmpthick/300*g.maxc, 10);
         colorarray = repmat(reshape(tmpcolor, 1,1,3), [size(zc,1) size(zc,2) 1]);
