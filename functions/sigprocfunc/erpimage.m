@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2003/07/21 21:19:15  scott
+% debug
+%
 % Revision 1.110  2003/07/21 21:17:52  scott
 % debug
 %
@@ -1920,12 +1923,12 @@ end;
 if strcmpi(noshow, 'no')
     if ~isnan(aligntime) % if trials time-aligned 
         if times(1) <= aligntime & times(frames) >= aligntime
-            plot([aligntime aligntime],[0 ntrials],'k','Linewidth',ZEROWIDTH); 
+            plot([aligntime aligntime],[min(outtrials) max(outtrials)],'k','Linewidth',ZEROWIDTH); 
             % plot vertical line at aligntime
         end
     else % trials not time-aligned 
         if times(1) <= 0 & times(frames) >= 0
-            plot([0 0],[0 ntrials],'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
+            plot([0 0],[min(outtrials) max(outtrials)],'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
         end
     end
 end;
@@ -2012,9 +2015,9 @@ if strcmpi(noshow, 'no')
         end
         hold on; 
         if TIMEX      % overplot aligned sortvar on image
-            plot([aligntime aligntime],[0 ntrials],'k','LineWidth',SORTWIDTH);
+            plot([aligntime aligntime],[min(outtrials) max(outtrials)],'k','LineWidth',SORTWIDTH);
         else
-            plot([[0 ntrials],aligntime aligntime],'k','LineWidth',SORTWIDTH);
+            plot([[min(outtrials) max(outtrials)],aligntime aligntime],'k','LineWidth',SORTWIDTH);
         end
         fprintf('Overplotting realigned times-zero on data.\n');
         hold on; 
@@ -2193,7 +2196,7 @@ if Erpflag == YES & strcmpi(noshow, 'no')
                 if TIMEX      % overplot vt on ERP
                     plot([vt vt],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
                 else
-                    plot([0 max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                    plot([min(outtrials) max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
                 end
             else
                 if TIMEX      % overplot realigned vt on ERP
@@ -2357,7 +2360,7 @@ if ~isnan(coherfreq)
                         plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
                              'Linewidth',VERTWIDTH);
                     else
-                        plot([0 max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
+                        plot([min(outtrials) max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
                              'Linewidth',VERTWIDTH);
                     end
                 else
@@ -2446,7 +2449,7 @@ if ~isnan(coherfreq)
                     if TIMEX      % overplot vt on coher
                         plot([vt vt],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
                     else
-                        plot([0 max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+                        plot([min(outtrials) max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
                     end
                 else
                     if TIMEX      % overplot realigned vt on coher
