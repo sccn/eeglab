@@ -31,6 +31,10 @@
 %               be two input datasets (ALLEEG length must be equal to 2). The movie
 %               is divided in 3 rows, the first row depict the first condition, the
 %               second row the second condition and the third row the difference.
+%               Default is 'off'.
+%  'freqs'      - [real vector] of frequency values in Hz. For each frequency value
+%               the closest value in the frequency decomposition will be found and
+%               a movie will be generated. Default is all frequencies.
 %  'confirm'    - ['on'|'off'] ask for confimartion for time-consuming computation.
 %               Default is 'on'.
 %
@@ -97,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/20 00:50:58  arno
+% testing
+%
 % Revision 1.3  2002/11/20 00:46:44  arno
 % default subitc
 %
@@ -152,7 +159,7 @@ if length(unique(cell2mat({ALLEEG(:).pnts}))) > 1
 end;
 if isempty(g.freqs) & strcmp(g.confirm, 'on')
     disp('********** USER ATTENTION REQUIRED ************');
-    r = input('Are you sure you want to make a movie a each of the output frequencies (y/n)', 's');
+    r = input('Are you sure you want to make a movie a each of the output frequencies (y/n):', 's');
     if r(1) == 'n', disp('Cancelling movie call'); return; end;
 end;
 g.tffolder    = addfinalsep(g.tffolder);
@@ -170,7 +177,7 @@ if isempty(g.freqparams)
                      'subitc', 'on' };
 end;
 g.freqparams = { ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ALLEEG(1).srate, ...
-                 g.freqparams, ...
+                 g.freqparams{:}, ...
                  'plotersp', 'off', ...
                  'plotitc', 'off', ...
                  'plotamp', 'off', ...
@@ -187,7 +194,7 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
     end;
     if strcmp(g.confirm, 'on')
         disp('********** USER ATTENTION REQUIRED ************');
-        r = input('Are you sure you want to compute time-frequency decompositions (y/n)', 's');
+        r = input('Are you sure you want to compute time-frequency decompositions (y/n):', 's');
         if r(1) == 'n', disp('Cancelling movie call'); return; end;
     end;
     
@@ -195,11 +202,11 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
 	% -------------------------------------------
 	if strcmpi(g.diffmovie, 'on')
         [ALLERSP ALLITC ALLCROSSF ALLCROSSFANGLE times freqs] ...
-			= timecrossfdiff( { ALLEEG(1).icaact(g.comps,:) ALLEEG(2).icaact(g.comps,:)} , spectoptions{:});
+			= timecrossf( { ALLEEG(1).icaact(g.comps,:) ALLEEG(2).icaact(g.comps,:)} , g.freqparams{:});
 	else 
         for ind =1:nbconditions
             [ ALLERSP(:,ind), ALLITC(:,ind), ALLCROSSF(:,:,ind), ALLCROSSFANGLE(:,:,ind), times, freqs] ...
-                = timecrossf( ALLEEG(ind).icaact(selected_compo,:), spectoptions{:});
+                = timecrossf( ALLEEG(ind).icaact(selected_compo,:), g.freqparams{:});
         end;
     end;
 	
