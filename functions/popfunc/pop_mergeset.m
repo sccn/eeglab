@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/05/14 22:14:54  arno
+% same
+%
 % Revision 1.26  2004/05/14 22:10:18  arno
 % new eeg_insertbound call
 %
@@ -270,7 +273,7 @@ else
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
-            INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+0.5, INEEG1pnts+0.5, 0);
+            INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+0.5, 0);
         end;
  
 	end;
