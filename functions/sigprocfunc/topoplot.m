@@ -49,15 +49,6 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
-%   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
-%                       channel numbers - in which 0s plot 0-values and negative integers, 
-%                       polarity-reversed values - and char position (if either 'l' or 'r') 
-%                       indicates which side of the head to plot the grid, or if 'o', plot the 
-%                       grid only {the default grid location is to the left of the head}. The 
-%                       channels matrix should show the topographic ordering of the channels. 
-%                       {default: no grid plot} NOTE: Not yet implemented.
-%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
-%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
 % Dipole plotting:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
@@ -106,6 +97,17 @@
 %
 % See also: timtopo(), envtopo()
 
+% future:
+%   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
+%                       channel numbers - in which 0s plot 0-values and negative integers, 
+%                       polarity-reversed values - and char position (if either 'l' or 'r') 
+%                       indicates which side of the head to plot the grid, or if 'o', plot the 
+%                       grid only {the default grid location is to the left of the head}. The 
+%                       channels matrix should show the topographic ordering of the channels. 
+%                       {default: no grid plot} NOTE: Not yet implemented.
+%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
+%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
+
 % Deprecated but still usable;
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
@@ -127,6 +129,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.214  2004/10/27 17:34:35  scott
+% help msg adjust -sm
+%
 % Revision 1.213  2004/10/27 16:39:06  arno
 % remove infinite and NaN values
 %
