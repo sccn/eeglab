@@ -9,9 +9,7 @@
 %
 % Usage:
 %    >> [ allersps, allitcs, allcrossfs, allcrossfphis, times, freqs] ...
-%        = timecrossf(data, frames, tlimits, srate, cycles, ...
-%                 winsize,timesout, padratio,maxfreq, tvec,eloc_file, ...
-%                 alpha,marktimes,powbase,pboot,rboot);
+%        = timecrossf(data, frames, tlimits, srate, cycles, ...);
 %
 % Inputs:
 %   data        - multi-row data (nb_input,frames*nepochs) for the first
@@ -76,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/21 00:37:41  arno
+% debugging bootstrap for real negative values
+%
 % Revision 1.7  2002/11/20 01:34:44  arno
 % nbcompo for difference
 % timef and crossf
