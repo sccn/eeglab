@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2002/08/12 18:53:14  arno
+% errordlg2
+%
 % Revision 1.55  2002/08/12 18:51:58  arno
 % errordlg2
 %
@@ -744,10 +747,12 @@ if ~isempty( varargin)
 		  end;
 		  
 		  % build epoch structure
+		  try,
 		  if EEG.trials > 1 & ~isempty(EEG.event)
 			  maxlen = 0;
 			  EEG.epoch = [];
 			  EEG.epoch(1).event = [];	
+			  EEG.epoch(EEG.trials).event = [];	
 			  for index = 1:length(EEG.event)
 				  currentepoch = EEG.event(index).epoch;
 				  if currentepoch <= length(EEG.epoch)
@@ -766,17 +771,21 @@ if ~isempty( varargin)
 				  eval( ['allfieldvals = { EEG.event.' eventfields{fieldnum} '};'] );
 				  for trial = 1:EEG.trials
 					  valfield = allfieldvals( EEG.epoch(trial).event );
-					  if strcmp(eventfields{fieldnum}, 'latency')
+					  if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
 						  valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 						  valfield = mat2cell(valfield);
 					  end;
-					  if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
-					  else            EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield);
+					  if ~isempty(valfield)
+						  if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
+						  else            EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield);
+						  end;
 					  end;
 				  end;
 			  end;    
 		  end;
-		  
+		  catch, error(['warning: minor problem encountered when generating' 10 ...
+						'epoch information (only usefull for users using command line scripts)']);
+		  end;
 		 otherwise, error('eeg_checkset: unknown option');
 		end;        
     end;
