@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.188  2004/01/24 20:51:57  scott
+% same
+%
 % Revision 1.187  2004/01/24 20:45:11  scott
 % same
 %
@@ -759,7 +762,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % Initialize optional output variables:
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
-auxvar = []; erpsig = []; winloc = [];
+auxvar = []; erpsig = []; winloc = []
 
 YES = 1;  % logical variables
 NO  = 0;
@@ -1532,6 +1535,7 @@ if exist('phargs') == 1 % if phase-sort
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1); 
         tmprange = find(winloc>0 & winloc<=frames);
         winloc = winloc(tmprange); % sorting window times
+  fprintf('winloc phase\n')
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -1622,8 +1626,9 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	winlen = floor(DEFAULT_CYCLES*srate/freq);
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
-    tmprange = find(winloc>0 & winloc<=frames);
-    winloc = winloc(tmprange); % sorting window times
+        tmprange = find(winloc>0 & winloc<=frames);
+        winloc = winloc(tmprange); % sorting window times
+  fprintf('winloc amp\n')
     
 	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
@@ -1726,6 +1731,8 @@ elseif exist('valargs')
     if ~isempty(auxvar)
         auxvar = auxvar(:,sortidx);
     end
+    winloc = [sttime,endtime];
+  fprintf('winloc value\n')
 %
 %%%%%%%%%%%%%%%%%%%%%% Sort trials on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
