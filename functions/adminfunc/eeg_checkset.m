@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2002/09/23 16:08:57  arno
+% check for EEG.data empty
+%
 % Revision 1.68  2002/09/05 00:04:05  arno
 % disp-> error
 %
@@ -370,7 +373,7 @@ if isstr(EEG.data)
 		errordlg2(['Can not open data file ''' EEG.data ''', check directory'], 'error');
 	end;
 	fprintf('Reading float file ''%s''...', EEG.data);
-	EEG.data = fread(fid, [EEG.nchan Inf], 'float32');
+	EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
 end;
 
 % verify the type of the variables
