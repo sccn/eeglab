@@ -28,7 +28,7 @@
 % 'resolution'- ['low' or 'high'], 'high' -> multiply the size of the image by 3 
 %               for subsequent antialiasing and high quality movie generation 
 %               {default: 'low'}
-% 'framesout' - ['eps'|'fig'] Default format for saving frames on disk. Default is '.eps'.
+% 'framesout' - ['eps'|'ppm'|'fig'] Default format for saving frames on disk. Default is '.eps'.
 % 'rt'        - cell array of vector containing reaction times of the subject in 
 %               each conditions (default {} -> ignored)
 % 'rthistloc' - location and size of rt histograms in individual axes. 
@@ -114,6 +114,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/11/21 18:52:21  arno
+% new envvert
+%
 % Revision 1.28  2002/11/21 02:04:50  arno
 % ready for difference
 %
@@ -379,8 +382,8 @@ switch lower(g.caption)
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
 end;
 switch lower(g.framesout)
-	case {'eps', 'fig'} ;  
-	otherwise disp('Error: Framesout must be either ''eps'' or ''fig'''); return;
+	case {'eps', 'fig', 'ppm'} ;  
+	otherwise disp('Error: Framesout must be either ''eps'', ''ppm'' or ''fig'''); return;
 end;	
 if ~isempty(g.envvert),
     if ~iscell(g.envvert) & ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
@@ -774,7 +777,10 @@ for indeximage = alltimepoints
     if strcmpi(g.framesout, 'eps')
         command2 = sprintf('print -depsc -loose image%4.4d.eps', indeximage);
         eval(command2);
-    else
+    elseif 	strcmpi(g.framesout, 'ppm')
+        command2 = sprintf('print -dppm -loose image%4.4d.ppm', indeximage);
+        eval(command2);
+    else % fig format
         hgsave(sprintf('image%4.4d.fig', indeximage));
         if strcmp(g.visible, 'on')
             drawnow;
