@@ -157,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2003/07/20 19:25:10  scott
+% fixed typo
+%
 % Revision 1.84  2003/07/14 23:03:57  arno
 % handling numerical types
 %
@@ -759,7 +762,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
                'clear tmpg;' ], ...
    'value', 0);
 
-% electrodes, postion, value and tag
+% channels, position, value and tag
 
   u(9) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -916,8 +919,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'set(gcbf, ''userdata'', g ); ' ...
       'clear g;'] )
 
-	% set electrodes
-	uimenu('Parent',m(11),'Label','Mark electrodes', 'enable', 'off', 'checked', 'off', 'Callback', ...
+	% set channels
+	uimenu('Parent',m(11),'Label','Mark channels', 'enable', 'off', 'checked', 'off', 'Callback', ...
   	['g = get(gcbf, ''userdata'');' ...
   	 'g.setelectrode = ~g.setelectrode;' ...
   	 'set(gcbf, ''userdata'', g); ' ...
@@ -1025,7 +1028,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     
   %uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
   %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
-  %uimenu('Parent',zm,'Label','Zoom electrodes', 'callback', ...
+  %uimenu('Parent',zm,'Label','Zoom channels', 'callback', ...
   %             [ 'zoom(gcbf, ''yon'');' commandzoom ]);
   uimenu('Parent',zm,'Label','Zoom on', 'callback', ...
                [ 'zoom(gcbf, ''on'');' commandzoom ]);
@@ -1324,7 +1327,7 @@ else
              'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
     end
      
-    % draw selected electrodes
+    % draw selected channels
     % ------------------------
     if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
@@ -1566,11 +1569,11 @@ else
 	eegplot('drawp',0);	
 	return;
     
-  case 'winelec'  % change electrode window size
+  case 'winelec'  % change channel window size
    % get new window length with dialog box
    fig = gcf;
    g = get(gcf,'UserData');
-   result = inputdlg2( { 'Enter number of electrodes to show:' } , 'Change number of electrodes to show', 1,  { num2str(g.dispchans) });
+   result = inputdlg2( { 'Enter number of channels to show:' } , 'Change number of channels to show', 1,  { num2str(g.dispchans) });
    if size(result,1) == 0 return; end;
 
    g.dispchans = eval(result{1});
@@ -1582,8 +1585,8 @@ else
 	eegplot('drawp',0);	
 	return;
    
-  case 'loadelect' % load electrodes
-	[inputname,inputpath] = uigetfile('*','Electrode File');
+  case 'loadelect' % load channels
+	[inputname,inputpath] = uigetfile('*','Channel locations file');
 	if inputname == 0 return; end;
 	if ~exist([ inputpath inputname ])
 		error('no such file');
@@ -1594,7 +1597,7 @@ else
 	return;
   
   case 'setelect'
-    % Set electrodes    
+    % Set channels    
     eloc_file = p1;
     axeshand = p2;
     outvar1 = 1;
