@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/03/10 16:28:12  arno
+% removing help for elc
+%
 % Revision 1.42  2003/03/10 16:26:59  arno
 % adding then removing .elc format
 %
@@ -304,6 +307,12 @@ if isstr(filename) & strcmp(filename, 'getinfos')
    labels = listimportformat;
    theta = listcolformat;
    radius = listskipline;
+   return;
+elseif isstr(filename) & strcmp(filename, 'getinfoswrite')
+   eloc = listtype([4:8,10]);
+   labels = listimportformat([4:8,10]);
+   theta = listcolformat([4:8,10]);
+   radius = listskipline([4:8,10]);
    return;
 end;
 
