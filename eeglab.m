@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.354  2004/11/12 18:36:57  arno
+% same
+%
 % Revision 1.353  2004/11/12 18:35:57  arno
 % same
 %
@@ -1449,9 +1452,9 @@ end;
         combdf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
         comedf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
         combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
-        uimenu( menu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
-        uimenu( menu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
-        uimenu( menu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
+        uimenu( neuromenu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
+        uimenu( neuromenu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
+        uimenu( neuromenu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
     end;
     
     importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
