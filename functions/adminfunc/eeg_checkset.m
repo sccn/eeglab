@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2004/05/24 17:24:08  arno
+% assign 0 to empty durations
+%
 % Revision 1.120  2004/05/14 17:47:15  arno
 % convert history
 %
@@ -1121,6 +1124,10 @@ if ~isempty( varargin)
                       valfield = allfieldvals( EEG.epoch(trial).event );
                       if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
                           valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+                          valfield = mat2cell(valfield);
+                      end;
+                      if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'duration')
+                          valfield = cell2mat(valfield)/EEG.srate*1000;
                           valfield = mat2cell(valfield);
                       end;
                       if ~isempty(valfield)
