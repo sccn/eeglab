@@ -1,59 +1,53 @@
-% makehtml() - function generating all the HTML files for files in specific 
-%              directories 
+% makehtml() - function generating .html function index page and Matlab function help 
+%              pages composed automatically from formatted function help messages
 %
 % Usage: 
-%   >> makehtml( list, outputdir);
-%   >> makehtml( list, outputdir, ...
-%               'key1', val1, 'key2', val2, ...);
+%   >> makehtml(list, outputdir);
+%   >> makehtml(list, outputdir, 'key1', val1, 'key2', val2, ...);
 %
 % Input:
-%    list        - 1) list (cell array) of filenames to convert. Ex:
-%                     { 'filename1' 'filename2' 'filename3' }
-%                  2) cell array of filenames to convert and the text link 
-%                     on the summary page for them. For option 1, as a default
-%                     the filename without the extension is used.
-%                    { { 'filename1' 'link1' } ...
-%                      { 'filename2' 'link2' } }
-%                  3) cell array of 2-3 cell array elements containing
-%                  info to generate directory HTML and matlab page. Ex
-%                  { { 'directory1' 'title1' 'matlabfunc1' } ...
-%                    { 'directory1'''title1' 'matlabfunc2' } }
-%                  'directory' is the directory name
-%                  'title' is the title that will be given the directory on
-%                    the web page.
-%                  'matlabfunc' is the name for a matlab function that will be
-%                    created to sumarized the directory content (note that only
-%                    one web page is created by several matlab files can be created
-%                    It can be left empty.
-%                  To scan several direcotry under the same title use convention
-%                  { { { 'directory1' 'direcotory2 } 'title1' 'matlabfunc1' }
-%                  List can also contains filenames
-%    outputdir   - output HTML directory
+%    list        - 1) List (cell array) of filenames to convert. 
+%                     Ex: {'filename1' 'filename2' 'filename3'} 
+%                     By default, the filename extension .m is understood.
+%                  2) Cell array of filenames to convert and the text link 
+%                     on the summary page for them.
+%                      {{'filename1' 'link1'} {'filename2' 'link2'}} ...
+%                     Ex: ???
+%                  3) Cell array of 2-3 cell array elements containing
+%                     info to generate .html function index and help pages. 
+%                   Ex: { {'directory1' 'heading1' 'matlabfunc1'} ...
+%                         {'directory1' 'heading1' 'matlabfunc2'} }
+%                   - 'directory': Function file directory name
+%                   - 'heading': Index page heading for the directory functions 
+%                   - 'matlabfunc': A Matlab function that will be
+%                       referenced in the index {default: all .m files in directory}
+%                  4) To scan several directories under the same heading, use 
+%                  {{{'directory1' 'directory2'} 'heading1' 'matlabfunc1' ... }
+%    outputdir   - Directory for output .html help files 
 %
 % Optional inputs:
-%   'outputfile' - output file name. Default is 'index.html'.
-%   'header'     - command to insert in the header of all HTML files (i.e. javascript 
-%                  declaration or meta-tags). Default: javascript 'openhelp' function. 
-%   'footer'     - command to insert at the end of all HTML files (i.e. back
-%                  button. Default is a reference back to the index file. 
-%   'refcall'    - syntax format to call references. Default javascript function 
-%                  uses 'javascript:openhelp(''%s.js'')'. Use '%s.html' for
-%                  standard HTML link.     
-%   'font'       - font name (default: 'Helvetica')
-%   'background' - baground tag (with body tag i.e. '<body BACKGROUND="img.jpg">'). 
-%   'outputlink' - command to call the generated HTML page. Default is
-%                  'javascript:openhelp(''%s.js'')'. Use '%s.html' for
-%                  standard HTML link.     
-%   'fontindex'  - font of the HTML index file (default: 'Helvetica')
-%   'backindex'  - background tag for the index file
-%   'mainonly'   - ['on'|'off'] only generate main page. Default is OFF and
-%                  generate all web pages.
+%   'outputfile' - Output file name. {default: 'index.html'}
+%   'header'     - Command to insert in the header of all .html files (i.e. javascript 
+%                  declaration or meta-tags). {default: javascript 'openhelp' function}
+%   'footer'     - Command to insert at the end of all .html files (e.g., back
+%                  button. {default: reference back to the index file}
+%   'refcall'    - Syntax format to call references. {default: 
+%                  'javascript:openhelp(''%s.js'')'} Use '%s.html' for an .html link.     
+%   'font'       - Font name (default: 'Helvetica')
+%   'background' - Background image (Ex: 'img.jpg' -> '<body BACKGROUND="img.jpg">'). 
+%   'outputlink' - Help page calling command for the index page. {default: 
+%                  'javascript:openhelp(''%s.js'')'. 
+%                  Use '%s.html' for a standard .html page link.     
+%   'fontindex'  - Font for the .html index file (default: 'Helvetica')
+%   'backindex'  - Background tag for the index file (c.f. 'background')
+%   'mainonly'   - ['on'|'off'] 'on' -> Generate the index page only.
+%                   {default: 'off' -> generate both the index and help pages}
 %   
 % Author: Arnaud Delorme, CNL / Salk Institute, 2002
 %
-% Example used for generating EEGLAB help menus:
+% Example: Generate EEGLAB help menus at SCCN:
 %  makehtml({ { 'adminfunc' 'Admin functions' 'adminfunc/eeg_helpadmin.m' } ...
-%             { 'popfunc', 'Interactive (pop_) functions' 'adminfunc/eeg_helppop.m' } ...
+%             { 'popfunc', 'Interactive pop_functions' 'adminfunc/eeg_helppop.m' } ...
 %             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
 %            '/home/www/eeglab/allfunctions');          
 %
@@ -76,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/17 20:12:55  arno
+% same
+%
 % Revision 1.6  2002/08/17 20:03:52  arno
 % new background color
 %
@@ -154,7 +151,7 @@ end;
 % ------------------
 rmpath('.');
 
-% write HTML file
+% write .html file
 % ----------------
 fo = fopen([ outputdir g.outputfile], 'w');
 if fo == -1, error(['can not open file ''' [ outputdir g.outputfile] '''']); end;
@@ -294,7 +291,7 @@ function makehelpmatlab( filename, directory, titlewindow);
 	fclose( fo );
 return
 
-% convert spaces for HTML
+% convert spaces for .html
 function strout = space2html(strin, linkb, linke)
 	strout = [];
 	index = 1;

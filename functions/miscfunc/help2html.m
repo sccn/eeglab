@@ -1,5 +1,5 @@
-% help2html() - convert a Matlab m-file help-message header 
-%               into an .html help file 
+% help2html() - Convert a Matlab m-file help-message header into an .html help file 
+%
 % Usage:
 %  >> linktext = help2html( filein, fileout, 'key1', val1, 'key2', val2 ...);
 %
@@ -30,8 +30,8 @@
 %
 % M-file format:
 %   The following lines describe the header format of an m-file function 
-%   to allow html help file generation. Characters '-' and ':' are used
-%   by the function for parsing.
+%   to allow .html help file generation. Characters '-' and ':' are used
+%   explicitly by the function for parsing.
 %                                               
 %%    function_name() - description line 1              
 %%                      description line 2       
@@ -52,18 +52,18 @@
 %    
 % Author:  Arnaud Delorme, Salk Institute 2001
 %
-% Notes: 1) In Title2, the text lines are considered as is (e.g., 
+% Notes: 1) Below Title2, the text lines are considered as is (e.g., 
 %           preserving Matlab carriage returns) unless there is a 
-%           matlab continuation cue ('...'). In this case, lines are 
-%           contcatenated. For Title1 with variable's name, all text lines 
-%           are concatenated by default.
+%           Matlab continuation cue ('...'). In this case, lines are 
+%           contcatenated. For 'Title1' following each variable name 
+%           all text lines are concatenated by default.
 %        2) The pattern 'function()[,]' is detected 
-%           It is printed in bold if it's the function descriptor
-%           It is used as a web link to another function, but only if the html 
+%           It is printed in bold if it is the function descriptor
+%           It is used as a web link to another function, but only if the 
 %           file 'function.html' exists.
-%        3) If a '.jpg' file with the same name as the function exists, it is
-%           inserted into the HTLM file after the function description.
-%        4) Lines beginning by '%%' are not interpreted
+%        3) If a 'function.jpg' image file with the same name as the function exists, 
+%           the image is inserted into the .html file following the function description.
+%        4) Lines beginning by '%%' are not interpreted.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/17 00:52:45  arno
+% [Adebug
+%
 % Revision 1.12  2002/08/17 00:35:56  arno
 % debugging
 %
