@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/08/22 15:36:56  arno
+% decoupling window length and fft length
+%
 % Revision 1.30  2002/08/17 00:13:35  arno
 % same default as in timef for epoched data
 %
@@ -609,7 +612,7 @@ if ~isempty(g.freq)
 		for index = 1:length(g.icamaps)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
-			topoplot(g.icawinv(:,compnum),g.chanlocs,varargin{:}); 
+			topoplot(g.icawinv(:,compnum).^2,g.chanlocs,varargin{:}); 
 			tl=title(int2str(compnum));
 			set(tl,'fontsize',16);
 			axis square;
