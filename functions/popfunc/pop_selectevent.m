@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/05/03 02:29:17  arno
+% allow to select latencies
+%
 % Revision 1.9  2002/04/25 17:17:15  scott
 % editting msg -sm
 %
@@ -141,7 +144,7 @@ if nargin<2
          { }, ...
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
-
+					   
     % add all fields to graphic interface
     % -----------------------------------
     for index = 1:length(allfields)
@@ -160,7 +163,7 @@ if nargin<2
 
 		descrip = { 'string', stringtext, 'callback', ['questdlg(' vararg2str(tmptext) ...
 					',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ] };
-	   ['questdlg(' vararg2str(tmptext) ',''Description of field ''''' allfields{index} ''''''', ''OK'', ''OK'');' ]
+
         % create the gui for this field
         % -----------------------------
         geometry = { geometry{:} [0.65 0.85 1.5 0.25 0.25 0.1] };
@@ -175,7 +178,16 @@ if nargin<2
     uilist   = { uilist{:} ...
         { }, ...
         { 'Style', 'checkbox', 'string', txtdel, 'tag', '10', 'fontweight', 'bold', 'value', 1  } { } };
-    results = inputgui( geometry, uilist, helpfunction, 'Select events -- pop_selectevent()');
+
+	if isfield(EEG.event, 'latency')
+		if EEG.trials > 1
+			uilist{end} = { 'Style', 'text', 'string', 'Note: latency unit is millisecond' };
+		else
+			uilist{end} = { 'Style', 'text', 'string', 'Note: latency unit is second' };	   
+		end;
+	end;
+ 
+	results = inputgui( geometry, uilist, helpfunction, 'Select events -- pop_selectevent()');
     if length(results) == 0, return; end;
    
     % decode inputs
