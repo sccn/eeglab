@@ -1,8 +1,8 @@
 % pop_eventstat() - Computes and plots statistical characteristics of an EEG event,
-%                    including the data histogram, a fitted normal distribution,
-%                    a normal ditribution fitted on trimmed data, a boxplot, and
-%                    the QQ-plot. The estimates value are printed in a panel and
-%                    can be read as output. See SIGNALSTAT.
+%                   including the data histogram, a fitted normal distribution,
+%                   a normal ditribution fitted on trimmed data, a boxplot, and
+%                   the QQ-plot. The estimates value are printed in a panel and
+%                   can be read as output. NaNs are omitted. See SIGNALSTAT.
 %
 % Usage:
 %   >>  OUTEEG = pop_eventstat( EEG ); % pops up
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/19 23:54:15  arno
+% adding latency range
+%
 % Revision 1.1  2002/08/15 16:30:01  arno
 % Initial revision
 %
@@ -92,6 +95,7 @@ end;
 % call function signalstat() either on raw data or ICA data
 % ---------------------------------------------------------
 typevals = eeg_getepochevent(EEG, type, latrange, eventfield);
+typevals=typevals(~isnan(typevals));
 dlabel='Event values';
 dlabel2=['Event' vararg2str(type) ' statistics for ''' eventfield ''' info'];
 
@@ -105,7 +109,7 @@ end;
 
 % return the string command
 % -------------------------
-fprintf('pop_eventstat: computing statistics...\n');
+fprintf('pop_eventstat: extracting events...\n');
 varargout{1} = sprintf('pop_eventstat( %s, %s );', inputname(1), vararg2str({eventfield type latrange percent}));
 com          = sprintf('%s signalstat( typevals, 1, dlabel, percent, dlabel2 ); %s', outstr);
 
