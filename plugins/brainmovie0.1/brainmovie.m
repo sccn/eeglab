@@ -115,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/11/21 01:44:56  arno
+% debugging colors for saving in ppm
+%
 % Revision 1.26  2002/11/21 01:04:55  arno
 % debugging colors
 %
@@ -834,14 +837,15 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
 	% -------------------------------------
 	%g.scalecoher = 2 * g.scalecoher / (g.xlimaxes(2)-g.xlimaxes(1));
 	%g.scalepower = 2 * g.scalepower / (g.xlimaxes(2)-g.xlimaxes(1));
-	switch lower(g.crossfcoh)
-		case 'on', tmpthick   = (crossfpower-g.scalecoher(1))/(g.scalecoher(2)-g.scalecoher(1));	% determine thickness = coherence amplitude
+	crossfpowerabs = abs(crossfpower);
+    switch lower(g.crossfcoh)
+		case 'on', tmpthick   = (crossfpowerabs-g.scalecoher(1))/(g.scalecoher(2)-g.scalecoher(1));	% determine thickness = coherence amplitude
 		case 'off', tmpthick  = 0;
 	end;
 
 	sizec = size( g.colmapcrossf,1 );
 	switch lower(g.crossfphasecolor)
-		case 'on',  tmpcolor  = g.colmapcrossf( sizec/2+ ceil(tmpthick*(sizec/2-1)+1), : );    % determine color = coherence phase
+		case 'on',  tmpcolor  = g.colmapcrossf( sizec/2+ ceil(tmpthick*(sizec/2-1)+1)*sign(crossfpower), : );    % determine color = coherence phase
 		case 'off', tmpcolor  = g.colmapcrossf( sizec/2, : );
 	end;
 	tmpthick = 30 * (tmpthick-0.1); % does not vary with the axis zoom
