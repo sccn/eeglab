@@ -13,8 +13,8 @@
 %   title        - plot title. Default is none.
 %   singletrials - [0|1], 0 plot average, 1 plot individual
 %                  single trials. Default is 0.
-%   others...    - plottopo additional arguments 'axsize', 'color', 'ydir'
-%                  'vert' } (see >> help plottopo)
+%   others...    - additional plottopo arguments {'axsize', 'color', 'ydir'
+%                  'vert'} (see >> help plottopo)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 March 2002
 %
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/29 18:34:29  arno
+% changing default background
+%
 % Revision 1.9  2002/08/14 01:39:30  scott
 % figure name plottopo()
 %
