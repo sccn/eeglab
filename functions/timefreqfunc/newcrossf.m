@@ -177,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/05/01 00:46:33  arno
+% updating outputs
+%
 % Revision 1.43  2003/05/01 00:11:16  arno
 % removing dispf
 %
@@ -894,8 +897,8 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% compute time frequency decompositions
 	% -------------------------------------
     spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
-                        g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
-                        'padratio', g.padratio, 'maxfreq', g.maxfreq };
+                g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
+                'maxfreq', g.maxfreq 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
 
     fprintf('\nProcessing first input\n');
 	X = reshape(X, g.frame, trials);
