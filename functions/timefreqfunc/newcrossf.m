@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2005/01/28 00:47:32  arno
+% fix timesout
+%
 % Revision 1.72  2004/12/07 22:30:41  arno
 % new version with new bootstrap
 %
@@ -742,6 +745,7 @@ try, g.lowmem;     catch, g.lowmem = 'off'; end;
 try, g.plottype;   catch, g.plottype = 'image'; end;
 try, g.plotmean;   catch, g.plotmean = 'on'; end;
 try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
+try, g.chaninfo;   catch, g.chaninfo = []; end;
 
 if isfield(g, 'detret'), g.detrend = g.detret; end;
 if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
@@ -1576,18 +1580,18 @@ if g.plot
       h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
-            'style', 'blank', 'emarkersize1chan', 10);
+            'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
       else
-         topoplot(g.topovec(1,:),g.elocs,'electrodes','off');
+         topoplot(g.topovec(1,:),g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
       end;
       axis('square')
       
       h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(2),g.elocs,'electrodes','off', ...
-            'style', 'blank', 'emarkersize1chan', 10);
+            'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
       else
-         topoplot(g.topovec(2,:),g.elocs,'electrodes','off');
+         topoplot(g.topovec(2,:),g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
       end;
       axis('square')
    end

@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2005/02/23 19:44:10  hilit
+% coerrected the computation of the last output (itc phase)
+%
 % Revision 1.79  2005/01/06 17:47:37  scott
 % nothing
 %
@@ -550,6 +553,7 @@ try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
 try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
+try, g.chaninfo;   catch, g.chaninfo = []; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -1249,9 +1253,9 @@ switch lower(g.plotitc)
 		h(12) = subplot('Position',[-.1 .43 .2 .14].*s+q);
 		if length(g.topovec) == 1
 		  topoplot(g.topovec,g.elocs,'electrodes','off', ...
-			   'style', 'blank', 'emarkersize1chan', 10);
+			   'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
 		else
-		  topoplot(g.topovec,g.elocs,'electrodes','off');
+		  topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
 		end;
 		    axis('square')
 	end

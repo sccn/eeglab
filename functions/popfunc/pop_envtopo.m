@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/03/05 00:13:19  arno
+% adding chaninfo
+%
 % Revision 1.27  2004/11/12 07:17:47  scott
 % changed entopo
 %
@@ -239,6 +242,7 @@ end;
 % plot the data
 % --------------
 options = [ options ', ''verbose'', ''off''' ];
+if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 if any(isnan(sigtmp(:)))
     disp('NaN detected: using nan_mean');
     if length(EEG) == 2

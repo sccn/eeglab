@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2005/01/28 00:52:01  arno
+% same
+%
 % Revision 1.67  2005/01/28 00:47:41  arno
 % fix timesout
 %
@@ -708,6 +711,8 @@ try, g.verbose;    catch, g.verbose = 'on'; end;
 try, g.plottype;   catch, g.plottype = 'image'; end;
 try, g.plotmean;   catch, g.plotmean = 'on'; end;
 try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
+try, g.chaninfo;   catch, g.chaninfo = []; end;
+
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -1616,9 +1621,9 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           h(12) = subplot('Position',[-.1 .43 .2 .14].*s+q);
           if length(g.topovec) == 1
               topoplot(g.topovec,g.elocs,'electrodes','off', ...
-                       'style', 'blank', 'emarkersize1chan', 10);
+                       'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
           else
-              topoplot(g.topovec,g.elocs,'electrodes','off');
+              topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
           end;
           axis('square')
       end
