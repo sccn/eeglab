@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/09 01:43:18  arno
+% [6~[6~same
+%
 % Revision 1.3  2002/08/09 01:42:40  arno
 % debugging filter over smal time period
 %
@@ -64,7 +67,7 @@ if nargin < 3
    				  'Higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
    				  'Filter length in points (default: see >> help pop_eegfilt)' };
 	inistr       = { '0', '0', '' };
-   	result       = inputdlg( promptstr, 'Filter the data -- pop_eegfilt()', 1,  inistr);
+   	result       = inputdlg2( promptstr, 'Filter the data -- pop_eegfilt()', 1,  inistr, 'pop_eegfilt');
 	if size(result, 1) == 0 return; end;
 	locutoff   	 = eval( result{1} );
 	hicutoff 	 = eval( result{2} );

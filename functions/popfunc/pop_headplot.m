@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/12 02:46:45  arno
+% inputdlg2
+%
 % Revision 1.9  2002/08/12 02:44:37  arno
 % inputdlg2
 %
@@ -124,9 +127,11 @@ if nargin < 3
  	% which set to save
 	% -----------------
 	if typeplot
-		txt = sprintf('ERP head plot at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		%txt = sprintf('ERP head plot at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = sprintf('ERP head plot at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
-		txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
+		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
+		txt = ['Component numbers (negate index to invert component polarity):' ];
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...

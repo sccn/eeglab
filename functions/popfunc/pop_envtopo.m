@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 01:32:37  arno
+% color
+%
 % Revision 1.6  2002/08/11 22:09:36  arno
 % color
 %
@@ -95,7 +98,7 @@ if nargin < 3
 	                 '', ...
 	                 ['Largest ERP components' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] ...
 	                 '''electrodes'',''off''' };
-	result       = inputdlg( promptstr, 'Components and ERP envelope -- pop_envtopo()', 1, inistr);
+	result       = inputdlg2( promptstr, 'Components and ERP envelope -- pop_envtopo()', 1, inistr, 'pop_envtopo');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	timerange    = eval( [ '[' result{1} ']' ] );

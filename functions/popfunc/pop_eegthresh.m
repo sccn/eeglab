@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/07 22:40:09  arno
+% same
+%
 % Revision 1.7  2002/08/07 22:26:58  arno
 % editing header
 %
@@ -119,8 +122,8 @@ if nargin < 3
                     'NO', ...
             	    'NO' };
 
-	result       = inputdlg( promptstr, fastif(icacomp == 0, 'Rejection abnormal comp. values -- pop_eegthresh()', ...
-											   'Rejection abnormal elec. values -- pop_eegthresh()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif(icacomp == 0, 'Rejection abnormal comp. values -- pop_eegthresh()', ...
+											   'Rejection abnormal elec. values -- pop_eegthresh()'), 1,  inistr, 'pop_eegthresh');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};

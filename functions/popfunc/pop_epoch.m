@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/08 21:56:30  arno
+% removing epoch creation
+%
 % Revision 1.12  2002/08/08 14:46:30  arno
 % programming boundary events
 %
@@ -128,7 +131,7 @@ if nargin < 3
 					'Out-of-bounds EEG rejection limits, [min max] ([]=none):'  };
 
    inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '"' ]), '' };
-   result       = inputdlg( promptstr, 'Extract epochs -- pop_epochs', 1,  inistr);
+   result       = inputdlg2( promptstr, 'Extract epochs -- pop_epochs', 1,  inistr, 'pop_epoch');
    size_result  = size( result );
    if size_result(1) == 0 return; end;
    

@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/08 01:33:56  arno
+% adding history for continuous rejection
+%
 % Revision 1.12  2002/08/07 22:41:01  arno
 % editing text
 %
@@ -111,8 +114,8 @@ if nargin < 3 & EEG.trials > 1
          	         'Reject labelled trials (yes/no)', ...
 						 };
 	inistr       = { 'yes', 'no' };
-	result       = inputdlg( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
-											   'Manual trials rejection -- pop_eegplot()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif(icacomp==0, 'Manual component rejection -- pop_eegplot()', ...
+								'Manual trials rejection -- pop_eegplot()'), 1,  inistr, 'pop_eegplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    

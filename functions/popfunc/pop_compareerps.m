@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/12 02:15:37  arno
+% colors
+%
 % Revision 1.2  2002/08/11 22:11:41  arno
 % color
 %
@@ -63,7 +66,7 @@ if nargin < 2
 	                 'Enter a subset of channels ([]=all):' ...
 	                 'Plot title ([]=automatically generated):' };
 	inistr       = { '1' '' '' };
-	result       = inputdlg( promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Compare dataset ERPs -- pop_compareerps()', 1,  inistr, 'pop_compareerps');
 	if length(result) == 0 return; end;
 	setlist   	 = eval( [ '[' result{1} ']' ] );
 	chansubset   = eval( [ '[' result{2} ']' ] );

@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/12 01:46:44  arno
+% color
+%
 % Revision 1.3  2002/08/11 22:22:19  arno
 % color
 %
@@ -87,9 +90,11 @@ if nargin < 3
 	% which set to save
 	% -----------------
 	if typeplot
-		txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		%txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
-		txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
+		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
+		txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...
@@ -100,7 +105,7 @@ if nargin < 3
 	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
 	               '' ['''electrodes'', ''off''' ] };
     help topoplot;
-	result       = inputdlg( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr);
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'pop_topoplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
