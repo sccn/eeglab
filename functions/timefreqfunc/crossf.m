@@ -3,18 +3,18 @@
 %        the coherence phase difference between the processes. In this panel: 
 %           -90 degrees (blue)   means x leads y by a quarter cycle.
 %            90 degrees (orange) means y leads x by a quarter cycle.
-%        Click on each subplot to view separately and zoom in/out.
+%        Click on any subplot to view separately and zoom in/out.
 %
 % Function description:
-%        Uses EITHER fixed-window, zero-padded FFTs (faster) OR constant-Q 
-%        0-padded wavelet DFTs (better sensitivity), both Hanning-tapered. 
-%        Output frequency spacing is the lowest frequency ('srate'/'winsize') 
-%        divided by the 'padratio'.
+%        Uses EITHER fixed-window, zero-padded FFTs (fastest) OR constant-Q 
+%        0-padded wavelet DFTs (more even sensitivity across frequencies), 
+%        both Hanning-tapered.  Output frequency spacing is the lowest 
+%        frequency ('srate'/'winsize') divided by the 'padratio'.
 %
 %        If an 'alpha' value is given, then bootstrap statistics are 
-%        computed (from a distribution of 200 ('naccu') surrogate baseline
+%        computed (from a distribution of 'naccu' (200) surrogate baseline
 %        data epochs) for the baseline epoch, and non-significant features 
-%        of the output plots are zeroed (e.g., plotted in green). The baseline
+%        of the output plots are zeroed (and shown in green). The baseline
 %        epoch is all windows with center times < the 'baseline' value or, 
 %        if 'baseboot' is 1, the whole epoch. 
 % Usage: 
@@ -77,8 +77,8 @@
 %                    Be sure that the bootstrap type is identical to
 %                    the one used to obtain bootstrap coherence limits.
 % Optional Scalp Map:
-%       'topovec'  = (2,nchans) matrix, plot scalp topographies (maps) to plot {[]}
-%                    ELSE (chan1,chan2), plot two cartoons showing channel locations.
+%       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {[]}
+%                    ELSE (c1,c2), plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
 %                    File should be ascii in format of  >> topoplot example   
 %
@@ -102,7 +102,7 @@
 %       mcoh        = Vector of mean baseline coherence at each frequency
 %       timesout    = Vector of output times (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
-%       cohboot     = Matrix (nfreqs , 2) of [lower;upper] coh signif. limits
+%       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
 %
@@ -120,8 +120,8 @@
 %           amplitude image, the baseline is displayed as a magenta line
 %           (if no baseline is selected, this curve represents the average
 %           coherence at every given frequency).
-%        6) If a out of memory error occurs, set the 'memory' option to 'low'
-%           (computation time might be slow and only the 'times' bootstrap can
+%        6) If a out-of-memory error occurs, set the 'memory' option to 'low'
+%           (computation time might be slow; only the 'times' bootstrap can
 %           be used in this mode).
 %
 % Math:
@@ -131,7 +131,7 @@
 %  phasecoher = sum_over_trials(X(t,f)Y(t,f)*/|X(t,f)Y(t,f)|)/n
 %
 % Authors: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
-%          SCCN/INC/UCSD, La Jolla, 1998-2002 
+%          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
 % See also: timef()
 
@@ -152,6 +152,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/06/28 17:57:10  arno
+% returning coherence magnitudes
+%
 % Revision 1.26  2002/06/25 22:23:37  arno
 % NEW MODULAR VERSION WITH SUBITC
 %
