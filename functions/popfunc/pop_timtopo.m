@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 02:20:31  arno
+% debug
+%
 % Revision 1.6  2002/08/12 02:17:50  arno
 % inputdlg2
 % /
@@ -112,7 +115,7 @@ if ~isempty(EEG.chanlocs)
 	else
 		com = sprintf('timtopo( mean(SIGTMP(:,posi:posf,:),3), EEG.chanlocs, [timerange(1) timerange(2) 0 0], topotime, '''', 0, 0 %s);', options);
 		eval(com)
-	    com = sprintf('figure; pop_timtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(topotime), options);
+	    com = sprintf('figure; pop_timtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(topotime), plottitle, options);
 	end;		
 else
 	fprintf('Can not plot without channel location\n');
