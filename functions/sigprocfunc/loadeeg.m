@@ -9,16 +9,19 @@
 % Inputs:
 %   filename     - [string] Input Neuroscan .eeg file      
 %   chanlist     - [integer array] Only import selected channels
-%                  Ex: 3,4:10 {Default: import all} 
-%   triallist    - [integer array] Only import selected trials {Default: import all}
+%                  Ex: 3,4:10 {Default: 'all'} 
+%   triallist    - [integer array] Only import selected trials {Default: import 'all'}
 %   typerange    - [integer array] Only import trials of selected type
-%                  {Default: import all}
+%                  {Default: import 'all'}
 %   accepttype   - [integer array] Only import trials with the selected
-%                  'accept' field values {Default: import all}
+%                  'accept' field values {Default: 'all'}
 %   rtrange      - [float array] [min max] (ms) Only import trials with subject
-%                  reaction times in this range {Default: all}
+%                  reaction times in this range {Default: 'all'}
 %   responsetype - [integer array] Only import trials with selected 
-%                  response type values {Default: all}
+%                  response type values {Default: 'all'}
+%   format       - ['short'|'int32'] data format. Neuroscan 4.3 uses 32-bit data
+%                  while older version uses 16-bit. Default is 'short' (16-bit).
+%
 % Outputs:
 %   signal       - output signal of size (trials,  points)	
 %   accept       - [1/0] vector of values for the accept field (one per trial)
@@ -66,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/02/28 19:47:15  arno
+% resolving ???
+%
 % Revision 1.3  2003/02/28 19:20:39  scott
 % header edits - see ??? -sm
 %
@@ -78,7 +84,7 @@
 
 function [signal, accept, typeeeg, rt, response, chan_names, pnts, ....
 	nsweeps, rate, xmin, xmax]=loadeeg( FILENAME, chanlist, ...
-	TrialList, typerange, acceptype, rtrange, responsetype)
+	TrialList, typerange, acceptype, rtrange, responsetype, format)
 if nargin<1 
 	fprintf('Not enought arguments\n'); 
 	help loadeeg 
@@ -90,6 +96,10 @@ if nargin<4 typerange='all'; end;
 if nargin<5 acceptype='all'; end;
 if nargin<6 rtrange  ='all'; end;
 if nargin<7 responsetype='all'; end;
+if nargin<8 format='short'; end;
+format = lower(format);
+
+if ~strcmpi(format, 'short') & ~strcmpi(format, 'int32'), error('loadeeg: format error'); end;
 
 % open file for reading
 % ---------------------
@@ -101,7 +111,8 @@ end;
 
 % read general part of the erp header and set variables
 % -----------------------------------------------------
-erp = fread(fid, 362, 'uchar');	% skip the firsts 368 bytes
+rev = char(fread(fid, 20, 'uchar'))'; % revision number
+erp = fread(fid, 342, 'uchar');	% skip the firsts 368 bytes
 nsweeps = fread(fid, 1, 'ushort');	% number of sweeps
 erp = fread(fid, 4, 'uchar'); 	% skip 4 bytes 
 pnts= fread(fid, 1, 'ushort');	% number of point per waveform
@@ -174,7 +185,7 @@ for sweep = 1:nsweeps
 	s_rt       = fread(fid, 1, 'float32');
 	s_response = fread(fid, 1, 'ushort');
 	s_reserved = fread(fid, 1, 'ushort');
-
+    
 	unreaded_buf = 1;
 
 	% store the sweep or reject the sweep
@@ -191,7 +202,7 @@ for sweep = 1:nsweeps
 				if responsetag
 					if rttag
 
-						buf = fread(fid, [chan pnts], 'short');
+						buf = fread(fid, [chan pnts], format);
 						unreaded_buf = 0;
 
 						% copy information to array
@@ -215,7 +226,11 @@ for sweep = 1:nsweeps
 		end;
 	end;
 
-	if unreaded_buf fseek(fid, buf_size*2, 'cof'); end;				
+	if unreaded_buf 
+        if strcmpi(format, 'short'), fseek(fid, buf_size*2, 'cof'); 
+        else                         fseek(fid, buf_size*4, 'cof'); 
+        end;
+    end;				
 end;
 nsweeps = count_selected-1;
 fclose(fid);

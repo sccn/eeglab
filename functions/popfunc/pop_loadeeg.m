@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/04/10 18:06:18  arno
+% default argument
+%
 % Revision 1.9  2003/04/10 18:02:57  arno
 % change default file name
 %
@@ -88,7 +91,7 @@
 
 % popup loadeeg file
 % ------------------
-function [EEG, command] = pop_loadeeg(filename, filepath, range_chan, range_sweeps, range_typeeeg, range_response); 
+function [EEG, command] = pop_loadeeg(filename, filepath, range_chan, range_sweeps, range_typeeeg, range_response, datformat); 
 
 EEG = [];
 command = '';
@@ -101,33 +104,38 @@ if nargin < 2
 
 	% popup window parameters
 	% -----------------------
-	promptstr    = { 'Enter trialrange subset:', ...
+	promptstr    = { 'Data precision in bits (16 or 32 for Neuroscan v4.3):', ...
+                     'Enter trialrange subset:', ...
 					 'Enter the type range subset:', ...
 					 'Enter electrodes subset:', ...
 					 'Enter response range subset:'};
-	inistr       = { '' '' '' '' };
+	inistr       = { '16' '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadeeg');
 	if size( result,1 ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
-	range_sweeps    = eval( [ '[' result{1} ']' ] );
-	range_typeeeg   = eval( [ '[' result{2}  ']' ] );
-	range_chan      = eval( [ '[' result{3}  ']' ] );
-	range_response  = eval( [ '[' result{4}  ']' ] );
+    precision = eval(result{1});
+    if precision == 16, datformat = 'short'; else datformat = 'int32'; end;
+	range_sweeps    = eval( [ '[' result{2} ']' ] );
+	range_typeeeg   = eval( [ '[' result{3}  ']' ] );
+	range_chan      = eval( [ '[' result{4}  ']' ] );
+	range_response  = eval( [ '[' result{5}  ']' ] );
 end;
 
-if ~exist('range_chan')   | isempty(range_chan)      , range_chan     = 'all'; end;
-if ~exist('range_sweeps') | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
-if ~exist('range_typeeg') | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
-if ~exist('range_response') | isempty(range_response), range_response     = 'all'; end;
+if exist('datformat') ~= 1, datformat = 'short'; end;
+if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end;
+if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
+if exist('range_typeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
+if exist('range_response') ~= 1 | isempty(range_response), range_response     = 'all'; end;
 
 % load datas
 % ----------
 EEG = eeg_emptyset;
 fullFileName = sprintf('%s%s', filepath, filename);
-[EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response);
+[EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = ...
+    loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response, datformat);
 EEG.filename        = filename;
 EEG.filepath        = filepath;
 EEG.setname 		= 'Neuroscan EEG data';
