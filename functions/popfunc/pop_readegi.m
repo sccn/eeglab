@@ -6,6 +6,8 @@
 %
 % Inputs:
 %   filename       - EGI file name
+%   datachunks     - desired frame numbers (see readegi() help)
+%                    option available from the command line only
 % 
 % Outputs:
 %   EEG            - EEGLAB data structure
@@ -33,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/09/22 23:42:19  arno
+% debuging urevent
+%
 % Revision 1.9  2003/07/11 21:44:00  arno
 % removing warning for urevent
 %
@@ -61,7 +66,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_readegi(filename); 
+function [EEG, command] = pop_readegi(filename, datachunks); 
     
 EEG = [];
 command = '';
@@ -76,8 +81,11 @@ end;
 % load datas
 % ----------
 EEG = eeg_emptyset;
-
-[Head EEG.data Eventdata] = readegi( filename );
+if nargin > 1
+    [Head EEG.data Eventdata] = readegi( filename, datachunks);
+else
+    [Head EEG.data Eventdata] = readegi( filename);
+end;
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
