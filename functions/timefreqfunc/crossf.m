@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/01/02 22:40:43  arno
+% updateing linear coherence formulas
+%
 % Revision 1.55  2003/01/02 19:33:55  arno
 % removing reverse angle for wavelet
 %
@@ -743,7 +746,7 @@ if g.shuffle ~= 0
    X = [];
    Y = [];
    for index = 1:g.shuffle
-      XX = shuffle(XX,1);
+      XX = shuffle(XX,3);
       X = [X XX(:,:)];
       Y = [Y YY];
    end;

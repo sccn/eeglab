@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/01/06 17:45:52  arno
+% adding shuffle for conditions
+%
 % Revision 1.36  2003/01/04 02:43:28  arno
 % catch error for fully non-significan image
 %
@@ -802,7 +805,7 @@ if g.shuffle ~= 0
    X = [];
    Y = [];
    for index = 1:g.shuffle
-      XX = shuffle(XX,1);
+      XX = shuffle(XX,3);
       X = [X XX(:,:)];
       Y = [Y YY];
    end;
