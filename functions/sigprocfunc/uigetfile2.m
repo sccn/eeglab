@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/12/01 23:18:14  hilit
+% now changed correctly
+%
 % Revision 1.4  2004/12/01 23:15:31  hilit
 % file can be now read from Matlab6 even if created in Matlab 7
 %
@@ -64,7 +67,8 @@ function varargout = uigetfile2(varargin);
         catch, 
             try,  save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat');
           catch, error('uigetfile2: save error, out of space or file permission problem');
-        end;      
+            end
+        end
         if isunix
             system('chmod 777 eeglab.cfg');
         end
