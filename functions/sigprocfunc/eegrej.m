@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/06/03 21:19:02  arno
+% changing latency of boundevent
+%
 % Revision 1.7  2003/06/11 18:35:45  arno
 % generate specific error
 % for wrong event latencies
@@ -131,7 +134,7 @@ for i=1:size(regions,1)
 		boundevents(index) = boundevents(index) - (regions(i,2)-regions(i,1)+1);
     end;
 end;
-boundevents = boundevents+1.5;
+boundevents = boundevents+0.5;
 
 if isstr(indata)
   disp('Using disk to reject data');
