@@ -1,23 +1,23 @@
-% reref() - convert common reference EEG data to another common reference
+% reref() - convert common reference EEG data to some other common reference
 %           or to average reference
 %
 % Usage:
 %   >> dataout = reref(data);
-%   >> [dataout Chanlocs Wout Sout meandata] = reref(data, ref, 'key', 'val');
+%   >> [dataout Chanlocs Wout Sout meandata] = reref(data, refchan, 'key', 'val');
 %
 % Inputs:
 %   data - 2-D data matrix (chans,frames*epochs) 
-%   ref  - reference channel number -- two possibilities here:
+%   refchan  - reference channel number -- two possibilities here:
 %          1) [] - compute average reference. If the 'withref' method
 %             is set, the function recomputes the common reference potential 
 %             while averaging.
-%          2) 1 <= X <= size(data,1): re-reference to channel X. If the 
+%          2) 1 <= num <= size(data,1): re-reference to channel num. If the 
 %             'withref' method is set, the function computes the previous 
 %             common reference channel.
 % 
 % Optional inputs:
 %   'elocs'     - Electrode location structure (e.g., EEG.chanlocs).
-%   'icaweight' - ICA weight matrix (Note: should be weights*sphere)
+%   'icaweight' - ICA weight matrix (Note: this should be weights*sphere)
 %   'method'    - ['standard'|'withref'] Include reference channel in output. 
 %   'refloc'    - Reference channel location -- a cell array with name and 
 %                 polar coordinates of the channel, { 'label' theta radius }. 
@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/13 15:08:40  scott
+% help msg
+%
 % Revision 1.5  2002/11/12 23:32:59  arno
 % debugging old ref channel potential
 %
