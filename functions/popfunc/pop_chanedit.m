@@ -96,6 +96,8 @@
 %                   optional arguments (such as file format) to the function 
 %                   readlocs() can be specified if the input is a cell array.
 %   'save'        - 'filename' Save text file with channel info.
+%   'lookup'      - [integer array] lookup channel indices standard location. []
+%                   looks up all channels.
 %
 % Outputs:
 %   newchans      - new EEGLAB channel locations structure
@@ -128,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2003/12/17 01:35:58  arno
+% debug plot3d for empty chans
+%
 % Revision 1.76  2003/12/12 01:17:22  arno
 % nothing
 %
@@ -376,7 +381,30 @@ allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_r
 [chans shrinkfact]= checkchans(chans, allfields);
 
 if nargin < 2
+    
 	totaluserdat = {};
+    % lookup channel locations if necessary
+    % -------------------------------------
+    if all(cellfun('isempty', {chans.theta}))
+        standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
+                          'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
+                          'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
+                          'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
+                          'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
+                          'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
+        [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
+        if ~isempty(tmp1)
+            res = questdlg2(strvcat('Only channel labels are currenlty present but some', ...
+                                   'of these labels are standart location. Do you want to look up', ...
+                                   'standard coordinates for these channels?'), 'Look up channel locations?', ...
+                           'No', 'Yes', 'Yes');
+            if strcmpi(res, 'yes')
+                chans = pop_chanedit(chans, 'lookup', []);	
+                totaluserdat = { 'lookup' [] };
+            end;
+        end;
+    end;
+    
 	ingui = 1;
 	guimodif = 0;
 	while ingui
@@ -687,16 +715,20 @@ else
 		   else 
 			   eval(tmpoper);
 		   end;
+           
 		  case 'shrink'
 		   chans(1).shrink = args{ curfield+1 };		   
+           
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
+           
 		  case 'changefield'
 		   tmpargs = args{ curfield+1 };
 		   if length( tmpargs ) < 3
 			   error('pop_chanedit: not enough arguments to change field value');
 		   end;
 		   eval([ 'chans(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' reformat(tmpargs{3} ) ';' ]);
+           
 		  case { 'insert' 'add' }
 		   tmpargs = args{ curfield+1 };
 		   allfields = fieldnames(chans);
@@ -709,6 +741,7 @@ else
 		   for index = 1:length( allfields )
                eval([ 'chans(' int2str(num) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
 		   end;
+           
 		  case 'append'
 		   tmpargs = args{ curfield+1 };
 		   allfields = fieldnames(chans);
@@ -721,6 +754,7 @@ else
 		   for index = 1:length( allfields )
                eval([ 'chans(' int2str(num+1) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
 		   end;
+           
 		  case 'changechan'
 		   tmpargs = args{ curfield+1 };
 		   num = tmpargs{1};
@@ -731,6 +765,7 @@ else
 		   for index = 1:length( allfields )
 			   eval([ 'chans(' int2str(num) ').' allfields{index} '=' reformat(tmpargs{index+1}) ';' ]);
 		   end;
+           
 		  case 'load'
 		   tmpargs = args{ curfield+1 };
 		   if ~isempty(tmpargs), 
@@ -740,10 +775,38 @@ else
                    chans = readlocs(tmpargs{:});
 			   end;
 		   end;
-		  case 'eval'
+           
+		  case 'lookup'
+           tmplocs = readlocs('Standard-10-20-Cap81.ced', 'filetype', 'chanedit');
+           [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
+           if ~isempty(tmp)
+               [ind2 ind3] = sort(ind2);
+               ind1 = ind1(ind3);
+               for index = 1:length(ind2)
+                   chans(ind2(index)).theta      = tmplocs(ind1(index)).theta;
+                   chans(ind2(index)).radius     = tmplocs(ind1(index)).radius;
+                   chans(ind2(index)).X          = tmplocs(ind1(index)).X;
+                   chans(ind2(index)).Y          = tmplocs(ind1(index)).Y;
+                   chans(ind2(index)).Z          = tmplocs(ind1(index)).Z;
+                   chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
+                   chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
+                   chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
+               end;
+               tmpdiff = setdiff([1:length(chans)], ind1);
+               if ~isempty(tmpdiff)
+                   fprintf('Channel lookup: no location for ');
+                   for index = 1:(length(tmpdiff)-1)
+                       fprintf('%s,', chans(tmpdiff(index)).labels);
+                   end;
+                   fprintf('%s\n', chans(tmpdiff(end)).labels);
+               end;
+           end;
+          case 'eval'
 		   tmpargs = args{ curfield+1 };
            eval(tmpargs);
-		  case 'save'
+                tmplocs = readlocs('Standard-10-20-Cap81.ced', 'filetype', 'chanedit');
+		  
+          case 'save'
 		   tmpargs = args{ curfield+1 };
 		   if isempty(tmpargs), return; end;
 		   fid = fopen(tmpargs, 'w');
