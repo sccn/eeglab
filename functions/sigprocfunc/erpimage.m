@@ -88,14 +88,11 @@
 %   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
-%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
-%               traces. To plot N traces, the auxvar matrix should be size (N,frames) 
-%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
-%               e.g. colorstrings = {'r','bo-','k:'} (See also: 'vert')
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified times
-%               ELSE  [times_matrix] Plot vertical dashed time series at times 
-%               specified by the columns of the 'vert' arg matrix. Matrix must  
-%               have ntrials rows (See also: 'auxvar').
+%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
+%               traces. To plot N traces, the auxvar matrix should be size (N,ntrials) 
+%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
+%               Ex: colorstrings = {'r','bo-','k:'} (See also: 'vert')
 %
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
@@ -155,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2003/07/24 23:41:05  arno
+% correcting output
+%
 % Revision 1.121  2003/07/24 18:17:33  scott
 % *** empty log message ***
 %
@@ -1086,7 +1086,7 @@ if ~isempty(auxvar)
 		auxvar = auxvar';               % (assuming N < frames)
 	end
 	if size(auxvar,2) ~= frames
-		fprintf('erpimage(): auxvar size should be (N,nframes), e.g., (N,%d)\n',frames);
+		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',ntrials);
 		return
 	end
 	if exist('auxcolors')==YES % if specified
@@ -2109,7 +2109,6 @@ end;
 %
 if strcmpi(noshow, 'no')
     if ~isempty(auxvar)
-        % here first smooth auxvar and apply sorting!!!
         fprintf('Overplotting auxvar(s) on data.\n');
         hold on; 
         auxtrials = outtrials(:)' ; % make row vector
