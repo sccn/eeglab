@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/01/24 04:13:00  scott
+% header edit -sm
+%
 % Revision 1.2  2003/01/24 01:34:44  arno
 % adding setname
 %
@@ -53,11 +56,10 @@ end;
 % read ERPSS format
 EEG = eeg_emptyset;
 fprintf('pop_read_erpss: importing ERPSS file...\n');
-[EEG.data,events] = read_erpss('KBSTERN1.RDF');
+[EEG.data,events,header] = read_erpss('KBSTERN1.RDF');
 EEG.nbchan = size(EEG.data,1);
-EEG.srate = 1000;
+EEG.srate = header.srate;
 EEG.setname = 'ERPSS data';
-disp('Sampling rate set to 1000 Hz.');
 EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
 EEG = eeg_checkset(EEG);
 

@@ -36,7 +36,7 @@ function [eeg,ev,header] = read_erpss(filename)
         disp('File opened:');
     end
     
-    fseek(fp,6,-1);
+    fseek(fp,8,-1);
     header.nchans = fread(fp,1,'uint16');
     
     cnt = 0;
@@ -71,6 +71,8 @@ function [eeg,ev,header] = read_erpss(filename)
     totalsize = 0;
     fclose(fp);
     fp = fopen(filename,'rb','ieee-le');
+    fseek(fp,552,-1);
+    header.srate  = fread(fp,1,'uint16');
     fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
 
