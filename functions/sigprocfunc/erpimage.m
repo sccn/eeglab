@@ -15,10 +15,10 @@
 %               Formats (1,frames*trials) or (frames,trials)
 %   sortvar  - [vector] Variable to sort epochs on (length(sortvar) = nepochs)
 %              Example: sortvar may by subject response time in each epoch (in ms)
+% Additional ordered inputs (with defaults):
 %   times    - Vector of times (ms) (length(times) = frames) {def|0: [0:frames-1]}
 %               ELSE [startms ntimes srate] Give start time (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz),
-% Additional ordered inputs (with defaults):
 %  'title'   - ['string'] Plot titla {default: none}
 %   avewidth - Number of trials to moving-average (NB: may be non-int) {def|0->1}
 %   decimate - Factor to decimate ntrials out by (NB: may be non-int) {def|0->1}
@@ -125,6 +125,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2002/10/14 16:12:38  scott
+% fprintf ms
+%
 % Revision 1.64  2002/10/14 16:09:53  scott
 % valsort fprintf
 %
