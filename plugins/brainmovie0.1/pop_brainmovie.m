@@ -35,6 +35,10 @@
 %  'freqs'      - [real vector] of frequency values in Hz. For each frequency value
 %               the closest value in the frequency decomposition will be found and
 %               a movie will be generated. Default is all frequencies.
+%  'quality'    - ['ultrafast'|'fast'|'getframe'|'slow'] different output speed and
+%               quality for generating movies. Default is 'ultrafast' where the function
+%               does not call makemovie(). For ['fast'|'getframe'|'slow'], see
+%               makemovie function help.
 %  'confirm'    - ['on'|'off'] ask for confimartion for time-consuming computation.
 %               Default is 'on'.
 %
@@ -101,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/11/21 19:06:22  arno
+% more debugging
+%
 % Revision 1.11  2002/11/21 18:04:38  arno
 % deleting previous tf data
 %
@@ -164,6 +171,7 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'circfactor'  'real'          []                                       [];
                             'freqs'       'real'          []                                       [];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
+                            'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'showcomps'   'integer'       []                                       [];
                             'makemovie'   'cell'          {}                                       {};
                             'eventprob'   ''              []                                       [] });
@@ -394,6 +402,12 @@ if strcmpi(g.diffmovie, 'on')
 end;
 brainmovieoptions = { brainmovieoptions{:} 'envelope' allenv };
 
+% plot polarity
+% -------------
+if strcmpi(g.diffmovie, 'on')
+    brainmovieoptions = { brainmovieoptions{:} 'polarity' 'posneg' };
+end;
+
 % get reaction time
 % -----------------
 if ~isempty(g.eventprob)
@@ -430,7 +444,8 @@ if ~strcmpi(g.mode, 'compute')
         % Run brainmovie
         % --------------
 		brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                    brainmovieoptions{:}, 'framesout', 'fig', 'scalepower', [tmpmin tmpmax] );  
+                    brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'), ...
+                    'scalepower', [tmpmin tmpmax] );  
         if strcmp(g.oneframe, 'on')
             disp('Only one frame generated');
             cd(origdir);
@@ -439,18 +454,22 @@ if ~strcmpi(g.mode, 'compute')
         
         % Run makemovie
         % -------------
-        g.framefolder = pwd;
-        if ~isempty(g.moviefolder)
-            cd(g.moviefolder)
-        else 
-            cd(origdir);
+        if length(g.freqindices) == 1, outname = g.moviename;
+        else                           outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
         end;
-        if length(g.freqindices) > 1, outname = g.moviename;
-        else                          outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
+        if strcmpi(g.quality, 'ultrafast')
+            unix(sprintf('mkavi -file %s.avi image*.ppm', outname));
+        else
+            g.framefolder = pwd;
+            if ~isempty(g.moviefolder)
+                cd(g.moviefolder)
+            else 
+                cd(origdir);
+            end;
+            g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
+            makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
         end;
-        g.makemovie = removedup({ 'mode' 'fast' g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
-        makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
-	end;
+    end;    
 	cd(origdir);
 end;
 

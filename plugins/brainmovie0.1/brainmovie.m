@@ -39,6 +39,8 @@
 % 'size'      - [widthcond height] output image size {default [400,400]}
 %               widthcond is the width of a single condition plot (in pixels)
 % 'head'      - [FILENAME], plot the head background image using .pcx image in FILENAME
+% 'polarity'  - ['pos'|'posneg'] polarity for ITC and crossf. 'pos' = only positive values
+%               'posneg' = positive and negative values.
 % 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
 %
 % Movie ITC, Power and Crossf options:
@@ -114,6 +116,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/11/21 19:44:25  arno
+% rescale image for ppm output
+%
 % Revision 1.30  2002/11/21 19:19:59  arno
 % adding ppm format
 %
@@ -257,6 +262,7 @@ try, g.caption;			catch, g.caption = 'on'; end;
 try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
+try, g.polarity;		catch, g.polarity = 'pos'; end; 
 try, g.framesout;	    catch, g.framesout = 'eps'; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
@@ -383,6 +389,10 @@ end;
 switch lower(g.caption)
 	case {'on', 'off'} ;  
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
+end;
+switch lower(g.polarity)
+	case {'pos', 'posneg'} ;  
+	otherwise disp('Error: Polarity must be either ''pos'' or ''posneg'''); return;
 end;
 switch lower(g.framesout)
 	case {'eps', 'fig', 'ppm'} ;  
@@ -567,7 +577,7 @@ switch lower(g.caption)
   switch g.itc, case 'on',
 	  c(2) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.29 , (1-maxcoordx)/2, 0.14].*s+q, ...
 				  'visible', g.visible );
-      if any(ALLITC{1,end}(:) < 0) % negative ITCs (difference only) ?
+      if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcoh, 'vert', 'circle', g);
           ylabel('ITC', 'fontweight', 'bold');
           set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
@@ -580,7 +590,7 @@ switch lower(g.caption)
   switch g.crossf, case 'on',
       c(3) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.47 , (1-maxcoordx)/4, 0.14].*s+q, ...
                   'visible', g.visible );
-      if any(ALLCROSSF{1,2,end}(:) < 0) % negative ITCs (difference only) ?
+      if strcmpi(g.polarity, 'posneg') % negative ITCs (difference only) ?
           cbar( [-1 1], [-1 1], g.colmapcrossf, 'vert', '', g);
           ylabel('Cross-Coh' , 'fontweight', 'bold');
           set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
