@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2002/07/26 18:06:41  arno
+% add warning
+%
 % Revision 1.41  2002/07/25 17:36:34  arno
 % debugging
 %
@@ -541,10 +544,7 @@ if ~isfield(EEG.reject, 'threshentropy')	EEG.reject.threshentropy = 600; res = c
 if ~isfield(EEG.reject, 'threshkurtact')	EEG.reject.threshkurtact = 600; res = com; end;
 if ~isfield(EEG.reject, 'threshkurtdist')	EEG.reject.threshkurtdist = 600; res = com; end;
 if ~isfield(EEG.reject, 'gcompreject')		EEG.reject.gcompreject = []; res = com; end;
-if length(EEG.reject.gcompreject) ~= size(EEG.icaact,1)
-	EEG.reject.gcompreject = zeros(1, size(EEG.icaact,1));
-end;
-if isempty(EEG.reject.gcompreject)
+if length(EEG.reject.gcompreject) ~= size(EEG.icaweights,1)
 	EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
 end;
 
