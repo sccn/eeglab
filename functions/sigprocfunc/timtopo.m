@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/03/05 03:16:41  scott
+% typo
+%
 % Revision 1.60  2003/03/05 03:16:10  scott
 % topoleft
 %
@@ -390,10 +393,10 @@ end
 halfn = floor(ntopos/2);
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep) + 0.5)*topowidth;
-   topoleft = pos(3)/2 - (ntopos/2+halfn*headsep)*topowidth;
+   topoleft = pos(3)/2 - (ntopos/2+halfn*head_sep)*topowidth;
 else % even number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*(1+head_sep))*topowidth;
-   topoleft = pos(3)/2 - ((halfn)+(halfn-1)*headsep)*topowidth;
+   topoleft = pos(3)/2 - ((halfn)+(halfn-1)*head_sep)*topowidth;
 end
 if 0
 if ntopos==1
