@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/13 23:54:18  arno
+% implmenting nan_mean
+%
 % Revision 1.4  2002/09/05 15:46:04  arno
 % update header
 %
@@ -358,104 +361,106 @@ end
 
     for I=1:chans,        % for each data channel
 
-      index=(2*((rem(I-1,ceil(chans/2))+1)))-1+floor(2*(I-1)/chans); 
-      subplot(ceil(chans/2),2,index); h=gca;    % = 1 3 5 .. 2 4 6 ..
-      hold on;                      % plot down left side of page first
-      set(h,'YLim',[ymin ymax]);    % set default plotting parameters
-      set(h,'XLim',[xmin xmax]);
-
-      axislcolor = get(gca,'Xcolor');   %%CJH
-
-      if P==0 
-        if ~ISSPEC
-         axis('off');
-         plot([0 0],[ymin ymax],'color',axislcolor); % draw vert %%CJH
-                                                     % axis at time 0  
-        else  % ISSPEC
-            axis('off');plot([xmin xmin],[0 ymax],'color',axislcolor); 
-        end  
-                                                
+        index=(2*((rem(I-1,ceil(chans/2))+1)))-1+floor(2*(I-1)/chans); 
+        subplot(ceil(chans/2),2,index); h=gca;    % = 1 3 5 .. 2 4 6 ..
+        hold on;                      % plot down left side of page first
+        set(h,'YLim',[ymin ymax]);    % set default plotting parameters
+        set(h,'XLim',[xmin xmax]);
+        
+        axislcolor = get(gca,'Xcolor');   %%CJH
+        
+        if P==0 
+            if ~ISSPEC
+                axis('off');
+                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert %%CJH
+                                                            % axis at time 0  
+            else  % ISSPEC
+                axis('off');plot([xmin xmin],[0 ymax],'color',axislcolor); 
+            end  
+            
       % secondx = 200;                               % draw second vert axis 
       % axis('off');plot([secondx secondx],[ymin ymax],'color',axislcolor); 
- 
-       axis('off');
-       plot([xmin xmax],[0 0],'color',axislcolor);   % draw horizontal axis 
+      
+      axis('off');
+      plot([xmin xmax],[0 0],'color',axislcolor);   % draw horizontal axis 
 
-       %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
-
-       if ~isempty(channels),                               % print channames
-        if ~ISSPEC
-          if ymin <= 0 & ymax >= 0,
-                yht = 0;
-          else
-                yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
-          end
-          axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
-            set(h,'HorizontalAlignment','right');      % print before traces
-            set(h,'FontSize',FONTSIZE);                % choose font size
-
-        % axis('off'),h=text(xmax+0.10*xdiff,yht,[channames(I,:)]);
-        %    set(h,'HorizontalAlignment','left');      % print after traces
-
-        else % ISSPEC
-          axis('off'),h=text(xmin-0.04*xdiff,ymax/2,[channames(I,:)]); 
-            set(h,'HorizontalAlignment','right');      % print before traces
-            set(h,'FontSize',FONTSIZE);                % choose font size
-
-        % axis('off'),h=text(xmax+0.10*xdiff,ymax/2,[channames(I,:)]);
-        %    set(h,'HorizontalAlignment','left');      % print after traces
-
-        end;
+      %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
+      
+      if ~isempty(channels),                               % print channames
+          if ~ISSPEC
+              if ymin <= 0 & ymax >= 0,
+                  yht = 0;
+              else
+                  yht = nan_mean(SIGN*data(I,1+P*frames:1+P*frames+frames-1));
+              end
+              axis('off'),h=text(xmin-0.04*xdiff,yht,[channames(I,:)]); 
+              set(h,'HorizontalAlignment','right');      % print before traces
+              set(h,'FontSize',FONTSIZE);                % choose font size
+              
+              % axis('off'),h=text(xmax+0.10*xdiff,yht,[channames(I,:)]);
+              %    set(h,'HorizontalAlignment','left');      % print after traces
+              
+          else % ISSPEC
+              axis('off'),h=text(xmin-0.04*xdiff,ymax/2,[channames(I,:)]); 
+              set(h,'HorizontalAlignment','right');      % print before traces
+              set(h,'FontSize',FONTSIZE);                % choose font size
+              
+              % axis('off'),h=text(xmax+0.10*xdiff,ymax/2,[channames(I,:)]);
+              %    set(h,'HorizontalAlignment','left');      % print after traces
+              
+          end;
        end; 
-      end; 
-      %
-      %%%%%%%%%%%%%%%%%%%%% Plot two-sided time-series data %%%%%%%%%%%%%%%%%%%
-      %
-      if ~ISSPEC
-                                                    
-        plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(P+1));   
-
-        if SIGN > 0
-            axis([xmin xmax ymin ymax]);           % set axis bounds (pos up)
-        else
-            axis([xmin xmax -1*ymax -1*ymin]);     % set axis bounds (neg up)
-        end
-                                        
-        if P==datasets-1,            % on last traces
-         if I==floor((chans+1)/2),   % draw +/0 on lowest left plot
-            signx = xmin-0.04*xdiff;
-
-          if SIGN > 0  % pos up
-            axis('off');hl=text(signx,ymin,num2str(ymin,3));        % text ymin
-            axis('off');hi=text(signx,ymax,['+' num2str(ymax,3)]);  % text +ymax
-          else         % neg up
-            axis('off');hl=text(signx,-1*ymin,num2str(ymin,3));        % text ymin
-            axis('off');hi=text(signx,-1*ymax,['+' num2str(ymax,3)]);  % text +ymax
-          end
-          set(hl,'FontSize',TICKFONTSIZE);         % choose font size
-          set(hl,'HorizontalAlignment','right','Clipping','off');
-          set(hi,'FontSize',TICKFONTSIZE);         % choose font size
-          set(hi,'HorizontalAlignment','right','Clipping','off');
-         end
-
-         if I==chans & limitset,    % draw timescale on lowest right plot
-            ytick = -ymax-0.25*ydiff;
-
-            tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
-            set(h,'FontSize',TICKFONTSIZE);         % choose font size
-            set(h,'HorizontalAlignment','center',...
+        end; 
+        %
+        %%%%%%%%%%%%%%%%%%%%% Plot two-sided time-series data %%%%%%%%%%%%%%%%%%%
+        %
+        if ~ISSPEC
+            
+            %ymin = min(data(I,1+P*frames:1+P*frames+frames-1));
+            %ymax = max(data(I,1+P*frames:1+P*frames+frames-1));
+            plot(x,SIGN*data(I,1+P*frames:1+P*frames+frames-1),colors(P+1));   
+            
+            if SIGN > 0
+                axis([xmin xmax ymin ymax]);           % set axis bounds (pos up)
+            else
+                axis([xmin xmax -1*ymax -1*ymin]);     % set axis bounds (neg up)
+            end
+            
+            if P==datasets-1,            % on last traces
+                if I==floor((chans+1)/2),   % draw +/0 on lowest left plot
+                    signx = xmin-0.04*xdiff;
+                    
+                    if SIGN > 0  % pos up
+                        axis('off');hl=text(signx,ymin,num2str(ymin,3));        % text ymin
+                        axis('off');hi=text(signx,ymax,['+' num2str(ymax,3)]);  % text +ymax
+                    else         % neg up
+                        axis('off');hl=text(signx,-1*ymin,num2str(ymin,3));        % text ymin
+                        axis('off');hi=text(signx,-1*ymax,['+' num2str(ymax,3)]);  % text +ymax
+                    end
+                    set(hl,'FontSize',TICKFONTSIZE);         % choose font size
+                    set(hl,'HorizontalAlignment','right','Clipping','off');
+                    set(hi,'FontSize',TICKFONTSIZE);         % choose font size
+                    set(hi,'HorizontalAlignment','right','Clipping','off');
+                end
+                
+                if I==chans & limitset,    % draw timescale on lowest right plot
+                    ytick = -ymax-0.25*ydiff;
+                    
+                    tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
+                    set(h,'FontSize',TICKFONTSIZE);         % choose font size
+                    set(h,'HorizontalAlignment','center',...
+                          'Clipping','off');  % center text
+                    
+                    tick = [xlabel]; h=text(xmin+xdiff/2,ytick,tick);
+                    set(h,'FontSize',TICKFONTSIZE);         % choose font size
+                    set(h,'HorizontalAlignment','center',...
+                          'Clipping','off');  % center text
+                    
+                    tick = [int2str(xmax)]; h=text(xmax,ytick,tick);
+                    set(h,'FontSize',TICKFONTSIZE);         % choose font size
+                    set(h,'HorizontalAlignment','center',...
                       'Clipping','off');  % center text
-
-            tick = [xlabel]; h=text(xmin+xdiff/2,ytick,tick);
-            set(h,'FontSize',TICKFONTSIZE);         % choose font size
-            set(h,'HorizontalAlignment','center',...
-                      'Clipping','off');  % center text
-
-            tick = [int2str(xmax)]; h=text(xmax,ytick,tick);
-            set(h,'FontSize',TICKFONTSIZE);         % choose font size
-            set(h,'HorizontalAlignment','center',...
-                      'Clipping','off');  % center text
-         end;
+                end;
         end;
       %
       %%%%%%%%%%%%%%%%%%%%% Plot positive-up [0,ymax] %%%%%%%%%%%%%%%%%%%%%%%%
