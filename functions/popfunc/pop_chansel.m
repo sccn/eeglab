@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/03/03 19:32:31  arno
+% Initial revision
+%
 
 function chanlist = pop_chansel(chans); 
     
