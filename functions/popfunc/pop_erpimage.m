@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2004/03/02 21:55:00  arno
+% recover version 1.114
+%
 % Revision 1.114  2003/05/10 19:06:21  arno
 % debug last
 %
@@ -647,6 +650,8 @@ if popup
     options = '';
 	if ~typeplot
 		options = [options ',''yerplabel'',''''' ];
+    else
+   		options = [options ',''yerplabel'',''\muV''' ];     
 	end;
 	if isempty(titleplot)
         if typeplot==1
