@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2004/02/25 19:23:18  arno
+% fixing besa problem
+%
 % Revision 1.68  2003/12/20 01:52:29  arno
 % final size
 %
@@ -805,7 +808,7 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
     
     if ~isfield(tmpstruct, 'posxyz') | ~isfield(tmpstruct, 'component')
         fprintf('No 3-D coordinates found, running dipplot ...\n');
-        tmpstruct = dipplot(tmpstruct, 'sphere', spheresize, 'normlen', 'on', image', 'mri');
+        tmpstruct = dipplot(tmpstruct, 'sphere', spheresize, 'normlen', 'on', 'image', 'mri');
         close;
     end;
     
