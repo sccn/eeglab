@@ -85,6 +85,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/03/21 17:21:10  scott
+% refine help message
+% made the default 'datsub' = []
+% return error if alpha given and length(datadd) == 1
+%
 % Revision 1.29  2005/03/21 16:13:25  arno
 % header etc
 %
@@ -327,7 +332,7 @@ for index = union(datadd, datsub)
 end;
     
 if ~isempty(alpha) & length(datadd) == 1
-    error('T-tests require more than one '''datadd''' dataset');
+    error([ 'T-tests require more than one ''' datadd ''' dataset' ]);
 end
 
 % compute ERPs for add
