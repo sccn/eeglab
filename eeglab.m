@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.333  2004/08/31 21:40:52  arno
+% adding new command string
+%
 % Revision 1.332  2004/08/31 18:52:50  arno
 % fix typo
 %
@@ -1349,8 +1352,6 @@ set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data', 'tag', 'import data'); 
 	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'From Biosemi .BDF file','CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readbdf;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From European Data Format .EDF file','CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From EGI .RAW file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Segmented EGI .RAW files', 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readsegegi;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'      , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
