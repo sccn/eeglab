@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/11 19:15:01  arno
+% same as before
+%
 % Revision 1.2  2002/04/11 19:11:57  arno
 % default value for LASTCOM
 %
@@ -50,4 +53,3 @@ global CURRENTSET;	% current set index
 %global EEGMENU;		% main menu
 global ALLCOM;		% all commands (history)
 global LASTCOM;		% last command
-if isempty(LASTCOM), LASTCOM = ''; end;
