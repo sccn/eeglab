@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/06/16 16:35:14  arno
+% debug edgelen...
+%
 % Revision 1.36  2004/06/16 16:09:05  arno
 % new option edge length
 %
@@ -260,30 +263,29 @@ if nargin < 2
 	
 	if length(result) == 0 return; end;
 	chan   = eval( [ '[' result{1} ']' ] );
-	if ~isempty(result{2}), g.oper = result{2}; else g.oper = ''; end;
+    options = {};
+	if ~isempty(result{2}), options = { options{:} 'oper' result{2} }; end;
 	switch result{3},
-		case 1, g.edge = 'leading';
-		case 2, g.edge = 'both';
-		case 3, g.edge = 'trailing';
-	end;
-    g.edgelen = eval( [ '[' result{4} ']' ] );
-    if result{5}, g.duration = 'on'; else g.duration = 'off'; end;
-	if result{6}, g.delchan  = 'on'; else g.delchan  = 'off'; end;
-	if result{7}, g.delevent = 'on'; else g.delevent = 'off'; end;
-	if result{8}, g.nbtype   = 1;    else g.nbtype   = NaN; end;
-    g.typename =  [ 'chan' int2str(chan) ];
-else 
-	listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
-                  'edgelen'   'integer'    [1 Inf]                            1;
-				  'delchan'   'string'     { 'on' 'off' }                     'on';
-				  'oper'      'string'     []                                 '';
-				  'delevent'  'string'     { 'on' 'off' }                     'on';
-				  'duration'  'string'     { 'on' 'off' }                     'off';
-                  'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
-				  'nbtype'    'integer'    [1 NaN]                             NaN };
-	g = finputcheck( varargin, listcheck, 'pop_chanedit');
-	if isstr(g), error(g); end;
+		case 1, options = { options{:} 'oper' 'leading' };
+		case 2, options = { options{:} 'oper' 'both' };
+		case 3, options = { options{:} 'oper' 'trailing' };
+	end; 
+    options = { options{:} 'edgelen' eval( [ '[' result{4} ']' ] ) };
+    if result{5},  options = { options{:} 'duration' 'on' }; end;
+	if ~result{6}, options = { options{:} 'delchan'  'off'}; end;
+	if ~result{7}, options = { options{:} 'delevent' 'off'}; end;
+	if result{8},  options = { options{:} 'nbtype'  1}; end;
 end;
+listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
+              'edgelen'   'integer'    [1 Inf]                            1;
+              'delchan'   'string'     { 'on' 'off' }                     'on';
+              'oper'      'string'     []                                 '';
+              'delevent'  'string'     { 'on' 'off' }                     'on';
+              'duration'  'string'     { 'on' 'off' }                     'off';
+              'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
+              'nbtype'    'integer'    [1 NaN]                             NaN };
+g = finputcheck( varargin, listcheck, 'pop_chanedit');
+if isstr(g), error(g); end;
 
 % check inut consistency
 % ----------------------
@@ -404,6 +406,8 @@ if strcmp(g.delchan, 'on')
 	EEG = pop_select(EEG, 'nochannel', chan);
 end;
 
-command = sprintf('%s = pop_chanevent(%s, %s);', inputname(1), inputname(1), ...
-				  vararg2str({ chan 'edge', g.edge 'nbtype' g.nbtype 'delchan' g.delchan 'delevent' g.delevent})); 
+if nargin < 2
+    command = sprintf('%s = pop_chanevent(%s, %s);', inputname(1), inputname(1), ...
+                      vararg2str({ chan options{:} })); 
+end;
 return;
