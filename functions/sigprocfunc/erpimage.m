@@ -20,7 +20,7 @@
 %              Example: sortvar may by subject response time in each epoch (in ms)
 %              {default|[]: plot in input order}
 %   times    - [vector | []] of latencies (ms) (length(times) = frames) 
-%               ELSE [startms ntimes srate] Give start latency (ms), time points 
+%               Else [startms ntimes srate] Give start latency (ms), time points 
 %               (i.e. frames) per epoch, sampling rate (Hz), {default|[]: 0:nframes-1}
 %  'title'   - ['string'] Plot titla {default: none}
 %   avewidth - Number of trials to smooth with a moving-average (may be non-integer) 
@@ -74,26 +74,27 @@
 %   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
 %               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items 
 %               and omit late items. Use last input, bamp, to fix the baseline amplitude.
+%               {default: from data}
 %   'signif' - [lo_amp, hi_amp, coher_signif_level] Use preassigned significance 
 %               levels to save computation time. {default: none}
-%   'caxis'  - [lo hi] Set color axis limits ELSE [fraction] Set caxis limits at 
+%   'caxis'  - [lo hi] Set color axis limits. Else [fraction] Set caxis limits at 
 %               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
 %
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {default no ERP plotted}
 %   'erpalpha' - [alpha] One-sided significance threshold (range: [.001 0.1]). 
-%              Requires 'erp' {default no +/-alpha significance thresholds plotted}
-%   'erpstd' - Plot ERP +/- stdev. Requires 'erp' {default no +/-stdev plotted}
-%   'rmerp'  - Subtract the average ERP from each trial before processing {default no}
+%              Requires 'erp' {default: no alpha significance thresholds plotted}
+%   'erpstd' - Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
+%   'rmerp'  - Subtract the average ERP from each trial before processing {default: no}
 %
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
-%               ELSE [minfrq maxfrq] = same, but select frequency with max power in 
+%               Else [minfrq maxfrq] = same, but select frequency with max power in 
 %               given range (Note: the 'phasesort' freq (above) overwrites these parameters).
-%               ELSE [minfrq maxfrq alpha] = plot coher. signif. level line at 
-%               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
+%               Else [minfrq maxfrq alpha] = plot coher. signif. level line at 
+%               probability alpha (range: [0,0.1]) {default: no coher, no alpha level}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
-%               implicit in third arg, times) {default: as in icadefs.m}
+%               implicit in third arg, times) {default: as defined in icadefs.m}
 %   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
 % Add other features:
@@ -104,9 +105,9 @@
 %   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
 %   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
-%               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
+%               as separate traces. Else, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
-%               (See also: 'vert' above).
+%               (See also: 'vert' above). {default: none}
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Get uV with '\muV'
@@ -166,6 +167,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.228  2004/11/22 17:57:37  scott
+% read YDIR from icadefs.m to set the direction of the ERP trace axes
+%
 % Revision 1.227  2004/11/15 17:22:46  scott
 % compute spectrum on urdata instead of data, for consistency
 %
