@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
 function [ laplac, sumLaplac2D ] = del2map( map, filename, draw )
@@ -66,9 +69,11 @@ if isstr( filename )
 	[x,y] = pol2cart(Th,Rd);
 else
 	x = real(filename);
-	y = imag(filename);		line( [(x-0.01)' (x+0.01)']', [(y-0.01)' (y+0.01)']');
-		line( [(x+0.01)' (x-0.01)']', [(y-0.01)' (y+0.01)']');
-
+	y = imag(filename);		
+    if exist('draw') == 1 & draw ~= 0
+        line( [(x-0.01)' (x+0.01)']', [(y-0.01)' (y+0.01)']');
+        line( [(x+0.01)' (x-0.01)']', [(y-0.01)' (y+0.01)']');
+    end;
 end;	
 
 % locates nearest position of electrod in the grid 
@@ -93,7 +98,7 @@ for i=1:size(map,2)
 
 	% Draw gradient
 	% -------------
-	if exist('draw');
+	if exist('draw') == 1 & draw ~= 0
 		if size(map,2) > 1
 			subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), i);
 		end;
