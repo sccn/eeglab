@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/03/31 23:40:16  hilit
+% added another option to savemode, saves the data structure without the data
+%
 % Revision 1.45  2005/02/16 19:42:51  hilit
 % in save changing '-V6' to '-v6'
 %
@@ -287,8 +290,14 @@ else
 end;
 
 if mode == 0  % single datasets
-	fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
-	EEG = eeg_checkset(EEG, 'eventconsistency');
+    fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
+    if exist('option_savematlab') == 1
+        if option_savematlab ~= 2
+            EEG = eeg_checkset(EEG, 'eventconsistency');
+        end
+    else
+        EEG = eeg_checkset(EEG, 'eventconsistency');
+    end
 	EEG.filename    = curfilename;
 	EEG.filepath    = curfilepath;
 	tmpica = EEG.icaact;
@@ -363,17 +372,33 @@ else
 	disp('Pop_saveset: extended datasets syntax check...');
 	for index = 1:length(indices)
 		if ~isempty(ALLEEG(indices(index)).data)
-			try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
-			catch
-				if nargin < 2
-					if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
-								  'Do you want to continue ?' ])
-						error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
-					end;	
-				else
-					disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
+            if exist('option_savematlab') == 1
+                if option_savematlab ~= 2
+                    try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
+					catch
+						if nargin < 2
+							if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
+										  'Do you want to continue ?' ])
+								error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
+							end;	
+						else
+							disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
+						end;
+					end;
+                end
+            else
+                try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
+				catch
+					if nargin < 2
+						if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
+									  'Do you want to continue ?' ])
+							error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
+						end;	
+					else
+						disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
+					end;
 				end;
-			end;
+            end
 		else
 			disp(['Pop_saveset warning: dataset ' int2str(indices(index)) ' is empty']);
 		end;
