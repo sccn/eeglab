@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2004/02/15 16:48:44  scott
+% same
+%
 % Revision 1.82  2004/02/15 16:45:42  scott
 % same
 %
@@ -346,6 +349,7 @@ AXHEADFAC = 1.3;        % axes to head scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
+CCOLOR = [0.5 0.5 0.5]; % default contour color
 ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = 'on';      % default 'electrodes': on|off|label
 EMARKER = '.';
@@ -485,6 +489,8 @@ if nargs > 2
 	  shrinkfactor = Value;
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
+	 case {'contourcolor','ccolor'}
+	  CCOLOR = Value;
 	 case {'electcolor','ecolor'}
 	  ECOLOR = Value;
 	 case {'emarkersize','emsize'}
@@ -704,7 +710,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(STYLE,'contour')
-    contour(Xi,Yi,Zi,CONTOURNUM,'k');
+    contour(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
   elseif strcmp(STYLE,'both')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -712,7 +718,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-    contour(Xi,Yi,Zi,CONTOURNUM,'k');
+    contour(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
   elseif strcmp(STYLE,'straight')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -721,7 +727,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         handle = tmph;
     end;
   elseif strcmp(STYLE,'fill')
-    contourf(Xi,Yi,Zi,CONTOURNUM,'k');
+    contourf(Xi,Yi,Zi,CONTOURNUM,CCOLOR);
   else
     error('topoplot(): Invalid style')
   end
@@ -848,7 +854,6 @@ end
 %
 if ~isempty(DIPOLE)
     hold on;
-    color = 'k';
     % invert x and y from dipplot
     tmp = DIPOLE;
     DIPOLE(:,1) = -tmp(:,2);
@@ -887,7 +892,7 @@ hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
   sf = squeezefac;
-  HCOLOR = 'w'; 
+  % HCOLOR = 'w'; 
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
