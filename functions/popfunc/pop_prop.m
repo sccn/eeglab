@@ -38,6 +38,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/15 17:19:32  arno
+% visible on/off
+% /
+%
 % Revision 1.9  2002/10/13 23:49:07  arno
 % use nan_mean instead of mean
 %
@@ -191,15 +195,15 @@ if EEG.trials > 1
 	EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
 	if typecomp == 1
         offset = nan_mean(EEG.data(numcompo,:));
-		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp');   
+		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 2/3, 'cbar','erp');   
 	else
 		if option_computeica  
             offset = nan_mean(EEG.icaact(numcompo,:));
-			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
+			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', 3, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
 		else
 			icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
             offset = nan_mean(icaacttmp);
-			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 1/4, 'cbar','erp', 'yerplabel', '');   
+			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', 3, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
 		end;
 	end;
     axes(hhh);
