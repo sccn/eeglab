@@ -24,10 +24,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-%
-% Revision 1.1  2004/12/03 16:00:00  hilit
+% Revision 1.1  2004/12/08 19:44:56  arno
 % Initial revision
 %
+
 
 function varargout = uiputfile2(varargin);
     
@@ -40,28 +40,38 @@ function varargout = uiputfile2(varargin);
     %% search for the (mat) file which contains the latest used directory 
     % -------------------
     olddir = pwd;
-    if exist(fullfile(getenv('TEMP'),'eeglab.cfg'))
-        load(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat');
-        s = ['cd([''' Path '''])'];
-        if exist(Path) == 7, eval(s); end;
-    end;
+    try,
+        tmp_fld = getenv('TEMP');
+        if isempty(tmp_fld) & isunix
+            if exist('/tmp') == 7
+                tmp_fld = '/tmp';
+            end;
+        end;
+        if exist(fullfile(tmp_fld,'eeglab.cfg'))
+            load(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
+            s = ['cd([''' Path '''])'];
+            if exist(Path) == 7, eval(s); end;
+        end;
+    catch, end;
 
     %% Show the open dialog and save the latest directory to the file
     % ---------------------------------------------------------------
     [varargout{1} varargout{2}] = uiputfile(varargin{:});
-    if varargout{1} ~= 0
-        Path = varargout{2};
-        cd(olddir);
-        try, save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat','-V6'); % Matlab 7
-        catch, 
-            try,  save(fullfile(getenv('TEMP'),'eeglab.cfg'),'Path','-mat');
-          catch, error('uiputfile2: save error, out of space or file permission problem');
+    try,
+        if varargout{1} ~= 0
+            Path = varargout{2};
+            try, save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat','-V6'); % Matlab 7
+            catch, 
+                try,  save(fullfile(tmp_fld,'eeglab.cfg'),'Path','-mat');
+                catch, error('uigetfile2: save error, out of space or file permission problem');
+                end
             end
-        end
-        if isunix
-            system('chmod 777 eeglab.cfg');
-        end
-    else
-       cd(olddir) 
-    end;
-     
+            if isunix
+                system('chmod 777 eeglab.cfg');
+            end
+        end;
+    catch, end;
+    cd(olddir) 
+    
+
+    
