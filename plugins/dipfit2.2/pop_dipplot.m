@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/08/04 18:59:03  arno
+% now plot for scanned dipoles
+%
 % Revision 1.9  2003/06/12 23:51:09  arno
 % put normlen by default
 %
@@ -150,7 +153,7 @@ else
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
     if ~isempty(comps)
         if ~isfield(EEG.dipfit.model, 'component')
-            for index = comps(:)
+            for index = comps(:)'
                 EEG.dipfit.model(index).component = index;
             end;
         end;
