@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2004/06/16 22:21:20  arno
+% debug for numercial types
+%
 % Revision 1.120  2004/05/15 00:33:25  arno
 % same
 %
@@ -663,7 +666,7 @@ if popup
 	end;
 	if isempty(titleplot)
         if typeplot==1
-            if ~isempty(EEG.chanlocs) % if channel plot
+            if isempty(EEG.chanlocs) % if channel plot
                   titleplot = [ EEG.chanlocs(channel).labels ];
             else, titleplot = [ int2str(channel) ];
             end
@@ -679,7 +682,7 @@ if popup
     end;
 	smooth       = eval(res.smooth);
     if res.plotmap
-		if ~isempty(EEG.chanlocs)
+		if isfield(EEG.chanlocs, 'theta')
 			if typeplot == 0
 				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
 			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
