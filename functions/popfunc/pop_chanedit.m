@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/04/10 17:29:47  arno
+% header edit
+%
 % Revision 1.45  2003/03/06 00:36:34  arno
 % further checking
 %
@@ -260,9 +263,11 @@ if nargin < 2
 						['comtmp = {''convert'' {''sph2cart'' ''gui''}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->sph'  , 'callback', ...
 						['comtmp = {''convert'' {''cart2sph'' ''gui''}};' endgui] }, ...
+					  { 'Style', 'pushbutton', 'string', 'Rotate axis'  , 'callback', ...
+						['[ comtmp tmpforce ] = forcelocs(chantmp); comtmp = {''forcelocs'' tmpforce{1} }; clear tmpforce;' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'Transform axes', 'callback', ...
 						['comtmp = {''transform'' ' transform '};' endgui] }, ...
-					  {} { } { } };
+					  { } { } };
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
 			geometry = { geometry{:} [1.5 1 0.2 1] };
@@ -434,6 +439,8 @@ else
 	 % ------------------------
 	 for curfield = 1:2:length(args)
 		 switch lower(args{curfield})
+          case 'forcelocs',
+           chans = forcelocs(chans,args{curfield+1});
 		  case 'convert', 
 		   if iscell(args{curfield+1})
 			   method=args{curfield+1}{1};
