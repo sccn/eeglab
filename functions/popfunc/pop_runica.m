@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2004/02/05 01:24:09  arno
+% updating sobi calls
+%
 % Revision 1.35  2003/12/19 02:49:43  arno
 % debug rank lowering
 %
@@ -441,9 +444,9 @@ switch lower(icatype)
      case 'sobi' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
-             EEG.icawinv = sobi( tmpdata );
+             EEG.icawinv = sobi( EEG.data );
         else    
-            eval(sprintf('EEG.icawinv = sobi( tmpdata %s );', options));
+            eval(sprintf('EEG.icawinv = sobi( EEG.data %s );', options));
         end;
         EEG.icaweight = pinv(EEG.icawinv);
         EEG.icasphere = eye(size(EEG.icaweights,2));
