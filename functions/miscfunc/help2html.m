@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/16 16:43:58  arno
+% debug componly
+%
 % Revision 1.9  2002/08/16 15:09:33  arno
 % programming output only
 %
@@ -286,7 +289,7 @@ while (str(1) == '%')
            		fprintf( fo, [ g.normcol2 g.vartext '</td></tr>\n' ], oldvartext);
        	 	else
        			if ~isempty(oldvartext)
-           			fprintf( fo, [ g.normcol2 g.tabtext '</td></tr>\n' ], oldvartext);	
+           			fprintf( fo, [ g.normcol2 g.text '</td></tr>\n' ], oldvartext);	
        			end;
          	end;	 	
          	newvar = 1;
