@@ -82,6 +82,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/24 18:29:21  arno
+% two inputs for coher and time centering for phase
+%
 % Revision 1.9  2002/04/24 17:35:50  arno
 % rechanged log
 %
@@ -920,7 +923,8 @@ end
 %
 %%%%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if length(coherfreq) == 2 & freq <= 0 % find max frequency in specified band
+if length(coherfreq) == 2 & coherfreq(1) ~= coherfreq(2) & freq <= 0 
+	% find max frequency in specified band
 	[pxx,tmpfreq] = psd(data(:),1024,srate,frames,0);
 
 	pxx = 10*log10(pxx);
@@ -929,7 +933,9 @@ if length(coherfreq) == 2 & freq <= 0 % find max frequency in specified band
 		coherfreq = coherfreq(1);
 	end
 	[dummy maxx] = max(pxx(n));
-	coherfreq = tmpfreq(n(maxx));
+	coherfreq = tmpfreq(n(maxx));	
+else 
+	coherfreq = coherfreq(1);
 end
 
 if ~Allampsflag & ~exist('data2') %%%%%%%%%%%%%%% Plot ERP image %%%%%%%%%%%%%%
