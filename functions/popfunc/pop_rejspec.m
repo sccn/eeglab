@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/30 23:33:47  arno
+% new rejection type
+%
 % Revision 1.6  2002/07/30 15:17:52  arno
 % debug display
 %
@@ -171,14 +174,14 @@ end;
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trials rejected\n', length(Irej), EEG.trials);
-tmprejectelec = zeros( 1, EEG.trials);
-tmprejectelec(Irej) = 1;
+rej = zeros( 1, EEG.trials);
+rej(Irej) = 1;
 if icacomp == 1
-   tmpelecIout = zeros(EEG.nbchan, EEG.trials);
+   rejE = zeros(EEG.nbchan, EEG.trials);
 else
-   tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
+   rejE = zeros(size(EEG.icaweights,1), EEG.trials);
 end;
-tmpelecIout = Erej;
+rejE(elecrange,:) = Erej;
 
 if calldisp
 	nbpnts = fastif( icacomp == 1, size(EEG.specdata,2), size(EEG.specicaact,2));
