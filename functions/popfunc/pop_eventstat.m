@@ -14,6 +14,8 @@
 %   eventfield - event field to process (i.e. latency)
 %   type       - name of the event type(s) to process. Can be a single element or
 %                a cell array.
+%   latrange   - [min max] event latency range within data epochs in milliseconds.
+%   percent    - percentage for trimmed data statistics (see signalstat())
 %    
 % Outputs:
 %   OUTEEG  - output dataset
@@ -39,11 +41,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/15 16:30:01  arno
+% Initial revision
+%
 % Revision 1.8  2002/08/12 20:42:47  luca
 % added Log tag, changed popup title, added title for table
 %
 
-function varargout = pop_eventstat( EEG, eventfield, type, percent );
+function varargout = pop_eventstat( EEG, eventfield, type, latrange, percent );
 
 % the command output is a hidden output that does not have to
 % be described in the header
@@ -69,21 +74,24 @@ end;
 % pop up window
 % -------------
 if nargin < 2
-	promptstr    = { 'Enter event field to process' ...
+	promptstr    = { 'Enter event field to process:' ...
 					 strvcat('Enter event type(s) ([]=all):', ...
 							 'Select "Edit > Event values" to see type values') ...
+					strvcat('Enter event latency range in msec', ...
+							'Default is whole epoch or data') ...
 					'Percent for trimmed statistics:' };
-	inistr       = { 'latency' '' '5' };
+	inistr       = { 'latency' '' '' '5' };
 	result       = inputdlg2( promptstr, 'Plot event statistics -- pop_eventstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	eventfield   = deblank(result{1}); % the brackets allow to process matlab arrays
 	type   	     = parsetxt( result{2} ); % the brackets allow to process matlab arrays
-	percent      = eval( [ '[' result{3} ']' ] );
+	latrange     = eval( [ '[' result{3} ']' ] );
+	percent      = eval( [ '[' result{4} ']' ] );
 end;
 
 % call function signalstat() either on raw data or ICA data
 % ---------------------------------------------------------
-typevals = eeg_getepochevent(EEG, type, [], eventfield);
+typevals = eeg_getepochevent(EEG, type, latrange, eventfield);
 dlabel='Event values';
 dlabel2=['Event' vararg2str(type) ' statistics for ''' eventfield ''' info'];
 
@@ -98,7 +106,7 @@ end;
 % return the string command
 % -------------------------
 fprintf('pop_eventstat: computing statistics...\n');
-varargout{1} = sprintf('pop_eventstat( %s, %s );', inputname(1), vararg2str({eventfield type percent}));
+varargout{1} = sprintf('pop_eventstat( %s, %s );', inputname(1), vararg2str({eventfield type latrange percent}));
 com          = sprintf('%s signalstat( typevals, 1, dlabel, percent, dlabel2 ); %s', outstr);
 
 eval(com)	
