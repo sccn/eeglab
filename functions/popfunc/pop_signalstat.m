@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/12 21:32:41  luca
+% added check for empty EEG.chanlocs array
+%
 % Revision 1.10  2002/08/23 22:20:22  luca
 % changed message
 %
@@ -76,27 +79,27 @@ end;
 % pop up window
 % -------------
 if (nargin < 3 & typeproc==1)
-	promptstr    = { 'Enter EEG channel:'; 'Percent for trimmed statistics:' };
+	promptstr    = { 'Channel number:'; 'Trim percentage (each end):' };
 	inistr       = { '1';'5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
-	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
+	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow processing Matlab arrays
 	percent      = eval( [ '[' result{2} ']' ] );
 elseif (nargin < 3 & typeproc==0)
-	promptstr    = { 'Enter component number:'; 'Percent for trimmed statistics:' };
+	promptstr    = { 'Component number:'; 'Trim percentage (each end):' };
 	inistr       = { '1'; '5' };
 	result       = inputdlg2( promptstr, 'Plot signal statistics -- pop_signalstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
-	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
+	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow processing Matlab arrays
     percent      = eval( [ '[' result{2} ']' ] );
 end;
 
 if length(cnum) ~= 1 | (cnum-floor(cnum)) ~= 0
-	error('pop_signalstat(): Component index must be a single integer');
+	error('pop_signalstat(): Channel/component number must be a single integer');
 end
 
 if cnum < 1 | cnum > EEG.nbchan
-   error('pop_signalstat(): Component index out of range');
+   error('pop_signalstat(): Channel/component number out of range');
 end;   
 
 % call function signalstat() either on raw data or ICA data
