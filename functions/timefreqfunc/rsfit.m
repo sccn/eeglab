@@ -13,7 +13,9 @@
 %   c    - [mean var skewness kurtosis] distribution cumulants
 %   l    - [4x float vector] Ramberg-Schmeiser distribution best fit
 %          parameters.
-%   chi2 - [float] chi2 for goodness of fit (based on 12 bins).
+%   chi2 - [float] chi2 for goodness of fit (based on 12 bins). 
+%          Fit is significantly different from data histogram if 
+%          chi2 > 19 (5%) 
 %
 % Author: Arnaud Delorme, SCCN, 2003
 %
@@ -40,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/07/10 00:00:43  arno
+% compute chi2 goodness of fit
+%
 % Revision 1.2  2003/07/09 16:23:01  arno
 % adding error messages
 %
@@ -116,31 +121,35 @@ function [p, c, l, res] = rsfit(x, val)
         
         % regroup bin with less than 5 values
         % -----------------------------------
+        indices2rm = [];
         for index = 1:length(N)-1
             if N(index) < 5
-                N(index+1) = N(index+1) + N(index)
-                N(index)   = [];
-                X(index+1) = [];
+                N(index+1) = N(index+1) + N(index);
+                indices2rm = [ indices2rm index];
             end;
         end;
+        N(indices2rm)   = [];
+        X(indices2rm+1) = [];
+        indices2rm = [];
         for index = length(N):-1:2
             if N(index) < 5
-                N(index-1) = N(index-1) + N(index)
-                N(index)   = [];
-                X(index) = [];
+                N(index-1) = N(index-1) + N(index);
+                indices2rm = [ indices2rm index];
             end;
         end;
+        N(indices2rm)   = [];
+        X(indices2rm)   = [];
         
         % compute expected values
         % -----------------------
         for index = 1:length(X)-1
             p1 = rsget( l, X(index+1));
             p2 = rsget( l, X(index  ));
-            expect(index) = length(allvals)*(p1-p2);
+            expect(index) = length(x)*(p1-p2);
         end;
         
         % value of X2
         % -----------
-        res = sum(((expect - N).^2)./expect)
+        res = sum(((expect - N).^2)./expect);
     end;
     return
