@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/03/19 18:19:22  arno
+% same
+%
 % Revision 1.8  2004/03/19 18:16:58  arno
 % same
 %
@@ -76,28 +79,45 @@ fid = fopen(filename, 'r');
 if fid == -1
   disp('Cannot open file'); return;
 end;
-for index=1:12	fgetl(fid); end;
+for index=1:8	fgetl(fid); end;
 
 % scan file
 % ---------
 index = 1;
 tmpstr = fgetl(fid);
 noteof = 1;
+countfid  = 1;
+fidlabels = { 'Nz' 'LPA' 'RPA' };
 while noteof
     if ~isempty(deblank(tmpstr))
         if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
-            if (tmpstr(1) == '%') & (tmpstr(2) == 'N')
-                eloc(index).labels =  strtok( tmpstr(3:end) );
-                tmpstr = fgetl(fid);
-                tmp = sscanf(tmpstr, '%f');
-                if isempty(tmpstr)
+            
+            if tmpstr(1) == '%'
+                if tmpstr(2) == 'F' % fiducial
+                    tmp = sscanf(tmpstr(3:end), '%f');
+                    
+                    eloc(index).labels = fidlabels{countfid};
+                    eloc(index).X  = tmp(1); x(index) = tmp(1);
+                    eloc(index).Y  = tmp(2); y(index) = tmp(2);
+                    eloc(index).Z  = tmp(3); z(index) = tmp(3);
+                    index     = index    + 1;
+                    countfid  = countfid + 1;
+                    
+                elseif tmpstr(2) == 'N' % regular channel
+                    
+                    eloc(index).labels =  strtok( tmpstr(3:end) );
                     tmpstr = fgetl(fid);
                     tmp = sscanf(tmpstr, '%f');
+                    if isempty(tmpstr)
+                        tmpstr = fgetl(fid);
+                        tmp = sscanf(tmpstr, '%f');
+                    end;
+                    
+                    eloc(index).X  = tmp(1); x(index) = tmp(1);
+                    eloc(index).Y  = tmp(2); y(index) = tmp(2);
+                    eloc(index).Z  = tmp(3); z(index) = tmp(3);
+                    index = index + 1;
                 end;
-                eloc(index).X  = tmp(1); x(index) = tmp(1);
-                eloc(index).Y  = tmp(2); y(index) = tmp(2);
-                eloc(index).Z  = tmp(3); z(index) = tmp(3);
-                index = index + 1;
             end;
         end;
     end;
