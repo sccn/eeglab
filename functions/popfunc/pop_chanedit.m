@@ -43,7 +43,7 @@
 %                 2-D polar view. This DOES NOT AFFECT channel locations and is only
 %                 used for visualization. This parameter is attached to the dataset
 %                 and is then used in all 2-D scalp plots. Command line equivalent
-%                 is 'shink'.
+%                 is 'shrink'.
 %   "Auto shrink" - [button] automatically computes the shrinking factor so all
 %                 channels are visible on the 2-D topographical plot.
 %   "Plot 3D" - [button] plot channel positions in 3-D using plotchans3d() function.                 
@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2004/02/13 19:13:56  arno
+% nothing
+%
 % Revision 1.88  2004/02/13 02:36:21  arno
 % updating location after chancenter
 %
@@ -591,7 +594,7 @@ if nargin < 2
 		uilist = {  uilist{:},...
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
-					{ 'Style', 'text', 'string', '2D shink factor (-1 to 1)'} ...
+					{ 'Style', 'text', 'string', '2D shrink factor (-1 to 1)'} ...
 					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), ...
 					  'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string''); set(findobj(''tag'', ''shrinkbut''), ''value'', 0);' } ...
 					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), ...
