@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.208  2004/09/29 15:44:46  scott
+% added 'plotchans' option. upgraded 'plotgrid' (still unimplemented) -sm
+%
 % Revision 1.207  2004/09/29 01:04:22  scott
 % created input 'plotgrid' - plotting not yet implemented -sm
 %
@@ -694,7 +697,7 @@ end
 
 if nargs > 2
   if ~(round(nargs/2) == nargs/2)
-    error('Odd number of inputs?')
+    error('Odd number of input arguments??')
   end
   for i = 3:2:nargs
     Param = eval(['p',int2str((i-3)/2 +1)]);
@@ -863,9 +866,9 @@ if nargs > 2
          case 'plotchans'
            plotchans = Value(:);
            if find(plotchans==0) 
-               error('''plotchans'' values must be > 0');
+               error('''plotchans'' values must all be > 0');
            end
-           if max(abs(plotchans))>length(Values)
+           if max(abs(plotchans))>max(Values) | max(abs(plotchans))>length(Values)
                error('''plotchans'' values must be <= max channel index');
            end
 	 otherwise
@@ -889,7 +892,8 @@ if strcmp(plotgrid,'on')
    end
    error('''plotgrid'' option not yet implemented.'); % <============
 end
-if isempty(plotchans)
+
+if isempty(plotchans) & ~isempty(Values)
   plotchans = 1:length(Values);
   if strcmp(plotgrid,'on')
      plotchans(gchans) = [];   % remove grid chans from head plotchans
@@ -957,6 +961,9 @@ end;
 labels = labels(indices); % remove labels for electrodes without locations
 labels = strvcat(labels); % make a label string matrix
 
+if isempty(Values)
+  plotchans = 1:length(Th);
+end
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1075,6 +1082,7 @@ allx = x;
 ally = y;
 
 Values(find(plotchans<0)) = -Values(find(plotchans<0)); % reverse indicated channel polarities
+
 intchans = intersect(intchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
 pltchans = intersect(pltchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
 fprintf('topoplot(): plotting %d channels\n',length(pltchans));
@@ -1109,7 +1117,6 @@ x     = x(pltchans);
 y     = y(pltchans);
 
 labels= labels(pltchans,:);
-
 %
 %%%%%%%%%%%%%%% Squeeze channel locations to <= rmax %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
