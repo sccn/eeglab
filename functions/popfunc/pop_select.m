@@ -35,12 +35,12 @@
 %   INEEG         - input dataset
 %
 % Optional inputs
-%   'time'        - time range to include [min max] in milliseconds. For
+%   'time'        - time range to include [min max] in seconds. For
 %                   data epoch, the range must include either 0 of the max 
 %                   time, as time regions can not be removed from epochs. For
 %                   continuous data, can be [min max] x n to select 
 %                   several regions. Note that the boundary are both included.
-%   'notime'      - time range to exclude [min max] in milliseconds. For
+%   'notime'      - time range to exclude [min max] in seconds. For
 %                   continuous data, can be [min max] x n to select 
 %                   several regions. Note that the boundary are both excluded.
 %   'point'       - data points to include [min max]. For
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/02/28 00:18:49  arno
+% backward compatibility
+%
 % Revision 1.26  2003/02/28 00:16:14  arno
 % reprograming data point selection
 %
@@ -192,7 +195,7 @@ if nargin < 2
          { 'Style', 'text', 'string', 'Select data in:', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Input desired range', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'on->remove these', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Time range [min max] (ms)' }, ...
+         { 'Style', 'text', 'string', 'Time range [min max] (s)' }, ...
          { 'Style', 'edit', 'string', '' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' },{ }, ...
          ...
