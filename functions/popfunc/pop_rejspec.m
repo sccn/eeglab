@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/26 18:09:31  arno
+% debugging
+%
 % Revision 1.3  2002/07/26 18:04:48  arno
 % debugging
 %
@@ -186,7 +189,7 @@ if calldisp
 		eegplot(icaacttmp, 'winlength', 5, 'position', [100 800 800 500], 'limits', [EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
 	eeg_multieegplot( allspec, tmprejectelec, tmpelecIout(elecrange,:), oldrej, oldrejE, 'srate', ...
-		      EEG.srate, 'limits', [1 EEG.srate/2], 'command', command, 'children', gcf); 
+		      EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', command, 'children', gcf); 
 end;
 
 % store variables if necessary
