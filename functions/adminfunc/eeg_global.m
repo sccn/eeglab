@@ -2,7 +2,7 @@
 %           
 % Global variables:
 %  EEG        - structure containing the current dataset
-%  ALLEEG     - array of structures containing all the datasets
+%  ALLEEG     - array of structures containing all the loaded datasets
 %  CURRENTSET - index of the current dataset in the ALLEEG array
 %  LASTCOM    - most recent command run by EEGLAB
 %  ALLCOM     - cell array containing the EEGLAB session command history 
@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/11 23:30:33  arno
+% remove LASTCOM check
+%
 % Revision 1.3  2002/04/11 19:15:01  arno
 % same as before
 %
