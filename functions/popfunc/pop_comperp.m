@@ -32,17 +32,22 @@
 %                tailed). Significan time regions are highlighted in the
 %                data plots.
 %   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
+%   'std'      - ['on'|'off'|'none'] Show standard devitations. 'none' means that
+%                this option does not affect other options {default:'none'}
+%   'addstd'   - ['on'|'off'] Show standard deviation for datadd only {default is
+%                'on' if 'datsub' empty, otherwise 'off'}
+%   'substd'   - ['on'|'off'] Plot standard deviation of datsub only {default:'off'}
+%   'diffstd'  - ['on'|'off'] Show standard dev. of datadd-datsub {default:'on'}
 %   'addavg'   - ['on'|'off'] Show average or RMS for datadd {default: 'on' 
 %                if 'datsub' empty, otherwise 'off'}
-%   'addstd'   - ['on'|'off'] Show standard deviation for datadd {default:'on'
-%                if 'datsub' empty, otherwise 'off'}
 %   'subavg'   - ['on'|'off'] Plot average/RMS of datsub {default:'off'}
-%   'substd'   - ['on'|'off'] Plot standard deviation of datsub {default:'off'}
-%   'addall'   - ['on'|'off'] Plot all ERPs in dataadd {default:'off'}
-%   'suball'   - ['on'|'off'] Plot all ERPs in datasub {default:'off'}
-%   'diffadd'  - ['on'|'off'] Plot average/RMS of datadd-datsub {default:'on'}
-%   'diffstd'  - ['on'|'off'] Show standard dev. of datadd-datsub {default:'on'}
-%   'diffall'  - ['on'|'off'] Show all erps for difference {default:'off'
+%   'allerps'  - ['on'|'off'|'none'] Show ERPs for all conditions. 'none' means that
+%                this option does not affect other options {default:'none'}
+%   'addall'   - ['on'|'off'] Plot all ERPs in dataadd only {default:'off'}
+%   'suball'   - ['on'|'off'] Plot all ERPs in datasub only {default:'off'}
+%   'diffall'  - ['on'|'off'] Show all erps for difference {default:'off'}
+%   'diffonly' - ['on'|'off'|'none'] Show difference only. 'none' means that this
+%                option does not affect other options {default:'none'}
 %   'tplotopt' - [cell array] Pass 'key', val' plotting options for plottopo()
 %
 % Output:
@@ -79,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/03/20 18:24:03  scott
+% help msg - still needs clarification
+%
 % Revision 1.27  2004/02/10 21:40:58  arno
 % return correct outputs
 %
