@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/06/03 14:51:12  arno
+% debug allepochvals
+%
 % Revision 1.13  2004/06/02 18:21:45  arno
 % adding extra output
 %
@@ -213,17 +216,16 @@ end;
 epochval       = zeros(1,EEG.trials); epochval(:) = nan;
 allepochval    = cell(1, EEG.trials);
 if strcmp(fieldname, 'latency')
-    count = 1;
 	for index = 1:length(Ieventtmp)
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
         else                             epoch = EEG.event(Ieventtmp(index)).epoch;
         end;
         allepochval{epoch}(end+1) = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
                                             EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
-		if count == 1
+		if length(allepochval{epoch}) == 1
 			epochval(epoch) = allepochval{epoch}(end);
 		else
-            if count == 2
+            if length(allepochval{epoch}) == 2
                 disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ]); 
                 %, ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
             end;
@@ -236,9 +238,8 @@ else
             if ~isfield(EEG.event, 'epoch'), epoch = 1;
             else                             epoch = EEG.event(Ieventtmp(index)).epoch;
             end;
-            epochval(epoch) = val;
+            epochval(epoch)           = val;
             allepochval{epoch}(end+1) = val;
-            count = count+1;
 		end;
 	end;
 end;    
