@@ -115,6 +115,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.20  2003/04/19 01:15:07  arno
+%debugging 2 besa dipoles
+%
 %Revision 1.19  2003/04/19 00:55:53  arno
 %correct normalized dipole length
 %
@@ -662,6 +665,14 @@ function newsrc = convertbesaoldformat(src);
         
         % copy other fields
         % -----------------
+        if isfield(src, 'stdX')
+            newsrc(count).meanX = src(index).meanX;
+            newsrc(count).meanY = src(index).meanY;
+            newsrc(count).meanZ = src(index).meanZ;
+            newsrc(count).stdX = src(index).stdX;
+            newsrc(count).stdY = src(index).stdY;
+            newsrc(count).stdZ = src(index).stdZ;
+        end;
         if isfield(src, 'rv')
             newsrc(count).rv = src(index).rv;
         end;
