@@ -27,7 +27,8 @@
 %   'freqfac'  = number of time to oversample, vertical frequency resolution {default: 2}
 %   'percent'  = downsampling factor or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
-%                the computation. From 0 to 100 {default: 100}.
+%                the computation. From 0 to 100 {default: 100 from the command line and
+%                20 if using the pop_up window}.
 %   'freqrange' = [min max] frequency range to plot. Overwrite limits x axis.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                Default is 'off'. 
@@ -94,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/11/19 18:55:59  arno
+% spectopo now returning component spectrum
+%
 % Revision 1.45  2002/11/15 01:39:31  scott
 % Can not -> cannot
 %
