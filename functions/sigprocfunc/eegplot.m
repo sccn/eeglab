@@ -38,18 +38,19 @@
 %                    the number of data channels. 
 %    'color'      - ['on'|'off'] Plot channels with different colors {default: 'off'}
 %    'submean'    - ['on'|'off'] Remove mean from each channel in each window {default: 'on'}
-%    'position'   - Position of the figure [lowleftcorner_x corner_y width height]       ???
-%    'trialstag'  - Points to tag (i.e. trial limits {default []}                   ???
-%    'tag'        - Tag to identify the EEGPLOT window.                               ???
-%    'freq'       - Maximum frequencies in case one wants to plot frequencies.     ???
-%    'children'   - Handler of a dependant eegplot() window to call if the 
-%                    current window is affected. Default none {0}.                  ???
+%    'position'   - Position of the figure in pixels [lowleftcorner_x corner_y width height]
+%    'tag'        - Matlab object tag to identify the EEGPLOT window (allow to have several
+%                   EEGPLOT windows active simulatenously)
+%    'freq'       - Maximum frequency when plotting frequencies (instead of activities).
+%                   This number is only used for the scale of the ordinate axis.
+%    'children'   - Window handler of a dependant eegplot() window {0}. The dependant 
+%                   window follows horizontal time scrolls of the master window.
 % Outputs:
-%    TMPREJ       - [integer vector] Indices of rejected epochs (a variable in     ???
-%                    the global workspace). When the user clicks the 'REJECT' button, 
-%                    the 'command'-argument command can use this variable to perform 
-%                    various operations. (Use eegplot2trial() and eegplot2event() 
-%                    to convert between rejected data types).
+%    TMPREJ       - [integer vector] Indices of rejected epochs (given as a variable in
+%                    the global workspace when the EEGPLOT window is closed). When the user 
+%                    clicks the 'REJECT' button, the 'command'-argument command can use this 
+%                    variable to perform  various operations. (Use eegplot2trial() and 
+%                    eegplot2event() to convert between rejected data types).
 %
 % Author: Arnaud Delorme & Colin Humphries, CNL/Salk Institute, SCCN/UCSD , 1998-2001
 %
@@ -74,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/06/26 18:39:33  scott
+% Edited help message -- see ??? for points needing more clarification. -sm
+%
 % Revision 1.7  2002/06/25 01:19:49  arno
 % update tag position
 %
