@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/05/19 02:53:45  scott
+% *** empty log message ***
+%
 % Revision 1.26  2002/05/19 02:50:40  scott
 % *** empty log message ***
 %
@@ -305,6 +308,8 @@ else % showchan==0
   tfsign = sort(tfdat,3);
   tfsign = sign(tfsign(:,:,round(nchans/2)));
 
+min(times(tftimes))
+max(times(tftimes))
   tfave = tfsign.*mean(abs(tfdat),3);
   cmax = max(max(abs(tfave)));
   cmin = -cmax; % make symmetrical
