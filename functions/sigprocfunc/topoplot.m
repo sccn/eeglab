@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.185  2004/03/31 05:06:27  scott
+% implementing 'conv' (undocumented)
+%
 % Revision 1.184  2004/03/31 03:19:02  scott
 % adjust ear lines
 %
@@ -1142,7 +1145,6 @@ if headrad > 0                         % if cartoon head to be plotted
 %%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-circ = linspace(0,2*pi,CIRCGRID);
 
 hwidth = HEADRINGWIDTH;                   % width of head ring 
 hin  = squeezefac*headrad*(1- hwidth/2);  % inner head ring radius
@@ -1153,24 +1155,29 @@ if hin>rin
   rin = hin;                              % dont blank inside the head ring
 end
 
-rx = sin(circ); 
-ry = cos(circ); 
-
-if ~exist('CONVHULL')
-  ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
-  ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
-
-else % plot CONVHULL
+if exist('CONVHULL')
   cnv = convhull(x,y);
+  startang = atan2(x(cnv(1)),y(cnv(1)));
+  circ = linspace(0+startang,2*pi+startang,CIRCGRID);
+  rx = sin(circ); 
+  ry = cos(circ); 
   cnvfac = round(CIRCGRID/length(cnv)); % spline interpolate the convex hull
   if cnvfac < 1, cnvfac=1; end;
+
   xx =spline(linspace(0,1,length(cnv)+1), [x(cnv) x(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
   yy =spline(linspace(0,1,length(cnv)+1), [y(cnv) y(cnv(1))], linspace(0,1,(length(cnv)+1)*cnvfac));;
   ringx = [[ry(:)' ry(1) ]*(rin+rwidth)  [yy]*1.02];
   ringy = [[rx(:)' rx(1) ]*(rin+rwidth)  [xx]*1.02];
+  ringh2= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
 end
 
+circ = linspace(0,2*pi,CIRCGRID);
+rx = sin(circ); 
+ry = cos(circ); 
+ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
+ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
 ringh= fill(ringx,ringy,BACKCOLOR,'edgecolor',BACKCOLOR); hold on
+
 
 %f1= fill(rin*[rx rX],rin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
 %f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
