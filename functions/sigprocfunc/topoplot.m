@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/07/01 23:18:04  julie
+% added 'noplot' arg, undocumented
+%
 % Revision 1.32  2003/07/01 23:11:51  arno
 % adding handle output
 %
@@ -457,11 +460,12 @@ if ~strcmp(STYLE,'blank')
   
   [Xi,Yi,Zi] = griddata(y,x,Vl,yi',xi,'invdist'); % Interpolate data
 
-  if ~noplot
   % Take data within head
   mask = (sqrt(Xi.^2+Yi.^2) <= rmax);
   ii = find(mask == 0);
   Zi(ii) = NaN;
+
+  if noplot==0 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % calculate colormap limits
   m = size(colormap,1);
@@ -638,6 +642,8 @@ axis off
 axis square;
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 
-end % noplot
+else % noplot
+  fprintf('topoplot(): no plot requested.\n')
+end
 
 handle = gca;
