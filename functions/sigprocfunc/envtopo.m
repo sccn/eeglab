@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/03/23 20:07:38  scott
+% making data env overplot bold
+%
 % Revision 1.21  2003/03/23 20:05:59  scott
 % overplot data envelope on filled component projection
 %
@@ -665,7 +668,7 @@ envx = [1;compx+1];
         % plot the n-th component filled 
         %
         if g.fillcomp(1)>0 & find(g.fillcomp==c-1) 
-            fprintf('filling component %d\n',c);
+            fprintf('filling the envelope of component %d\n',c-1);
             mins = matsel(envdata,frames,0,2,envx(c));
             p=fill([x x(frames:-1:1)],...
                    [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
