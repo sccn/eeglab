@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/06/23 17:24:03  arno
+% debug debuging
+%
 % Revision 1.55  2003/06/23 17:19:32  arno
 % nothing
 %
@@ -289,7 +292,7 @@
 % *** empty log message ***
 %
 
-function brainmovie(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
+function alltimepoints = brainmovie(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
     
 if nargin < 6
 	help brainmovie;
