@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/07/31 16:59:04  arno
+% debugging
+%
 % Revision 1.10  2002/07/31 16:38:50  arno
 % debugging
 %
@@ -134,8 +137,12 @@ switch superpose
 			  else
 				  currentname = [ 'EEG.reject.rej' EEG.reject.disprej{index} ];
 			  end;
+			  currentcolor =  [ 'EEG.reject.rej' EEG.reject.disprej{index} 'col' ];
+			  if strcmp(EEG.reject.disprej{index}, 'manual')
+				  currentcolor = [ 'min(' currentcolor '+0.15, [1 1 1])' ];
+			  end; % using this test, manual rejections won't be added to current rej
 			  eval( [ 'rejeegplottmp = trial2eegplot( ' currentname ',' currentname ...
-					  'E, nbpnts, EEG.reject.rej' EEG.reject.disprej{index} 'col);' ]);
+					  'E, nbpnts,' currentcolor ');' ]);
 			  if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
 		  end;
 	  end;
