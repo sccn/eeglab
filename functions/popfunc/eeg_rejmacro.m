@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/12 18:55:29  arno
+% warndlg2
+%
 % Revision 1.16  2002/08/08 00:23:22  arno
 % editing
 %
@@ -166,7 +169,7 @@ switch superpose
   if ~isempty(rejeegplottmp), rejeegplot = [ rejeegplot; rejeegplottmp ]; end;
 end;
 if ~isempty(rejeegplot)
-	rejeegplot = rejeegplot(:,[1:5,elecrange]);
+	rejeegplot = rejeegplot(:,[1:5,elecrange+5]);
 else
 	rejeegplot = [];
 end;
