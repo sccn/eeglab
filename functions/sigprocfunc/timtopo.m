@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/03/05 03:03:43  scott
+% topowidth
+%
 % Revision 1.56  2003/03/05 02:54:49  scott
 % topoargs
 %
@@ -482,7 +485,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   maxdata = max(data(:,plotframes(t))); % max data value at plotframe
 
   axtp = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth ...
+       [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
                        topowidth*(1+head_sep)]); % this will be the topoplot axes
