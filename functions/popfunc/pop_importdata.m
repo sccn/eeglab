@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/09/04 18:30:11  luca
+% same
+%
 % Revision 1.9  2002/09/04 18:28:23  luca
 % 'debug command line big variable passed as text - arno
 %
@@ -168,7 +171,6 @@ end;
 % generate the output command
 % ---------------------------
 com = '';
-args
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
         if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, char(args{i+1}) );
