@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/08 02:48:32  scott
+% worked on spelling, made text msg depend on number of pre-labeled comps -sm
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -77,7 +80,7 @@ if isempty(components)
 	if ~isempty(EEG.reject.gcompreject)
       		components = find(EEG.reject.gcompreject == 0);
    	else
-        	fprintf('Warning: no components pre-labeled, no rejection performed\n');
+        	fprintf('Warning: no components specified, no rejection performed\n');
          	return;
    	end;
 else
