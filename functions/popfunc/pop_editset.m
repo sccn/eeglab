@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/18 02:29:24  arno
+% further checks for matlab file import
+%
 % Revision 1.8  2002/04/11 18:28:58  arno
 % adding average reference input
 %
@@ -250,22 +253,22 @@ for curfield = tmpfields'
                             switch lower(g.dataformat)
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
-							  catch, error(['Pop_editset error: can not read ascii file ''' varname ''' for raw data']); 
+							  catch, error(['Pop_editset error: cannot read ascii file ''' varname ''' ']); 
 							  end;
 							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
-								  if length(x) > 1, error('Pop_editset error: Matlab file must contain a single variable'); end;
+								  if length(x) > 1, error('Pop_editset error: .mat file must contain a single variable'); end;
 								  EEGOUT.data = load(varname, '-mat');
-							  catch, error(['Pop_editset error: can not read matlab file ''' varname ''' for raw data']); 
+							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
 							  end;
 							  if size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'float32', if EEGOUT.nbchan == 0,
-								  error(['Pop_editset error: can not read file float_32 without the number of channel']);
+								  error(['Pop_editset error: cannot read float32 data file without knowing the number of channels']);
 							 end;     
 							 try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf]);
-							 catch, error(['Pop_editset error: can not read float_32 file ''' varname ''' for raw data']); 
+							 catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
 							 end;
 							 otherwise, error('Pop_editset error: unrecognized file format');
                             end;
@@ -275,9 +278,9 @@ for curfield = tmpfields'
 							try 
 							     res = evalin('base', ['exist(''' varname ''') == 1']);
 							catch
-							     error('Pop_editset: cannot evaluate variable, that may be a filename ?');
+							     error('Pop_editset: cannot evaluate variable. Is it a filename ?');
 							end;
-							if ~res, error('Pop_editset: cannot evaluate variable, that may be a filename ?'); end;
+							if ~res, error('Pop_editset: cannot evaluate variable. Is it a filename ?'); end;
 						    testval = evalin('base', ['isglobal(' varname ')']);
 							warning off;
 							if ~testval
@@ -286,7 +289,7 @@ for curfield = tmpfields'
                                 commandrestore = [];
 							end;		  
 							% make global, must make these variable global, if you try to evaluate them direclty in the base
-							% workspace, with large array the computation become incredibly slow.  
+							% workspace, with a large array the computation becomes incredibly slow.  
 							%--------------------------------------------------------------------
 				         	comglobal = sprintf('global %s;', varname);
 				      		evalin('base', comglobal);
