@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/02/23 15:36:16  scott
+% added 'shrink','skirt' to topoplot calls
+%
 % Revision 1.14  2003/04/18 00:51:16  arno
 % nromalizing component spectrum by map RMS
 %
@@ -202,7 +205,7 @@ if typecomp == 1 % plot single channel locations
 	topoplot( numcompo, EEG.chanlocs, ...
              'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10,'shrink','skirt'); axis square;
 else             % plot component map
-	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 
+	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, ...
              'shading', 'interp', 'numcontour', 3,'shrink','skirt'); axis square;
 end;
 title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
