@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/07/30 18:23:55  arno
+% changind default
+%
 % Revision 1.16  2002/07/30 00:21:30  arno
 % implementing history
 %
@@ -259,8 +262,8 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], %d %s);', inputname(1), typeproc, num, ...
-			int2str(tlimits), cycles, options);
+varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
+			int2str(tlimits), num2str(cycles), options);
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
 
