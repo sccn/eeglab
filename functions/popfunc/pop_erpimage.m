@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/18 19:11:09  arno
+% testing version control
+%
 % Revision 1.5  2002/04/18 15:56:33  scott
 % editted msgs -sm
 %
@@ -123,107 +126,201 @@ end;
 if nargin < 2	
 	typeplot = 1; %1=signal; 0=component
 end;
-popup = nargin < 3 | (nargin == 3 & (isstr(channel) | isempty(channel)));
+	lastcom = [];
+if nargin < 3
+	popup = 1;
+else
+	popup = isstr(channel) | isempty(channel);
+	if isstr(channel)
+		lastcom = channel;
+	end;
+end;
 
 if popup
-	% decode last command
+	% get contextual help
 	% -------------------
-	if nargin == 3
-		lastcom = channel;
-		indstr = findstr( lastcom, 'pop_erpimage');
-		if ~isempty( indstr ), defaults = 1;
-		else defaults = 0;
-		end;
-	else defaults = 0;
-	end;
-	if defaults
-			indstr = findstr( lastcom, ',');
-			chan_default   = lastcom(indstr(2)+1:indstr(3)-1);
-			title_default  = ''; %lastcom(indstr(3)+2:indstr(4)-2);
-			smooth_default = lastcom(indstr(4)+1:indstr(5)-1);
-			decim_default  = lastcom(indstr(5)+1:indstr(6)-1);
-			sorttyp_default = lastcom(indstr(6)+2:indstr(7)-2);
-			sortwin_default = lastcom(indstr(7)+2:indstr(8)-2);
-			sortfld_default = lastcom(indstr(8)+2:indstr(9)-2);
-			renorm_default  = lastcom(indstr(9)+2:indstr(10)-2);
-			eloc_default    = 'no';
-			options_default = lastcom(indstr(10)+1:end-2);
-			if ~isempty(findstr(options_default, '''topo'', { '))
-				indexoption = findstr(options_default, '''topo'', { ');
-				indexendoption = findstr(options_default, ' } ');
-				if indexendoption(1) < indexoption, indexendoption = indexendoption(2); end;
-				options_default = [ options_default(1:indexoption-1) options_default(indexendoption+4:end)];
-				eloc_default    = 'yes';
-			else
-				eloc_default    = 'no';
-			end;	
-	else
-		chan_default = '1';
-		title_default = '';
-		smooth_default = int2str(min(max(EEG.trials-5,0), 10));
-		decim_default = '1';
-		sorttyp_default = '';
-		sortwin_default = '';
-		sortfld_default = '';
-		renorm_default = 'no';
-		title_default = '';
-		eloc_default  = 'yes';
-		options_default = ['''erp'', ''cbar'''];
-	end;
-
-	% which set to save
-	% -----------------
-    promptstr = { fastif( typeplot, 'Channel:', 'Component:') ...
-      			'Epoch smoothing-window width (in epochs) (Ex: 10):' ...
-      			'Epoch downsampling factor (1=none) (Ex: 2.5):' ...
-                ['Epoch-sorting event field name (Ex: latency, []=no sorting):' ], ...
-                ['Event type(s) subset ([]=all):' 10 ...
-                '(See ''/Edit/Edit event values'' for event types)'], ...
-                'Sorting event window [start, end] in seconds ([]=whole epoch):', ...
-                ['Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):'], ...
-                'Plot title ([]=default,[space]=none):', ...
-				 fastif(typeplot, 'Plot channel location', 'Plot component scalp map (yes|no):') ...
-				'Other erpimage options (see >> help erpimage):' };
-    inistr       = { ...
-		chan_default, ...
-		smooth_default, ...
-		decim_default, ...
-		sorttyp_default, ...
-		sortwin_default, ...
-		sortfld_default, ...
-		renorm_default, ...
-		title_default, ...
-		eloc_default, ...
-		options_default }
-    
-    help erpimage
-    result       = inputdlg( promptstr, fastif( typeplot, 'Channel ERP image -- pop_erpimage()', ...
-												'Component ERP image -- pop_erpimage()'), 1,  inistr);
+	[txt2 vars2] = gethelpvar('erpimage.m');
+	[txt vars] = gethelpvar('erpimopt.m');
+	txt  = { txt{:} txt2{:}};
+	vars = { vars{:} vars2{:}};
+	
+	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
+				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 1 1.1] [1 1 1 1 1.1] [1] [1 3.1 0.8 0.1 0.1]};
+    uilist = { { 'Style', 'text', 'string', fastif(typeplot, 'Channel', 'Component'), 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom,3,[],'1') } { } ...
+			   { 'Style', 'text', 'string', 'Figure title', 'fontweight', 'bold'  } ...
+			   { 'Style', 'edit', 'string', ''  } ...
+			   ...
+			   { 'Style', 'text', 'string', 'Smoothing', 'fontweight', 'bold', 'tooltipstring', context('avewidth',vars,txt) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 5, [], int2str(min(max(EEG.trials-5,0), 10))) } ...
+			   { 'Style', 'checkbox', 'string', 'Plot ERP', 'tooltipstring', context('erp',vars,txt), 'value', getdef(lastcom, 'erp', 'present', 1) } ...
+			   { 'Style', 'text', 'string', 'ERP limits (uV)'  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits', [3:4])  } ...
+			   { 'Style', 'text', 'string', 'Downsampling', 'fontweight', 'bold', 'tooltipstring', context('decimate',vars,txt) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 6, [], '1') } ...
+			   { 'Style', 'checkbox', 'string', 'Plot colorbar','tooltipstring', context('caxis',vars,txt), 'value', getdef(lastcom, 'cbar', 'present', 1)  } ...
+			   { 'Style', 'text', 'string', 'Color limits','tooltipstring', context('caxis',vars,txt)  } ...
+			   { 'Style', 'edit', 'string',  getdef(lastcom, 'caxis') } ...
+			   {} ...
+			   { 'Style', 'text', 'string', 'Sort/align trials by epoch event values', 'fontweight', 'bold'} ...
+			   { 'Style', 'text', 'string', 'Sorting field', 'tooltipstring', 'Epoch-sorting event field name (Ex: latency, []=no sorting):' } ...
+			   { 'Style', 'text', 'string', 'Event type(s)', 'tooltipstring', ['Event type(s) subset ([]=all):' 10 ...
+                '(See ''/Edit/Edit event values'' for event types)']  } ...
+			   { 'Style', 'text', 'string', 'Time window', 'tooltipstring', 'Sorting event window [start, end] in seconds ([]=whole epoch):' } ...
+			   { 'Style', 'text', 'string', 'Rescale', 'tooltipstring', 'Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):' } ...
+			   { 'Style', 'text', 'string', 'Align', 'tooltipstring',  context('align',vars,txt) } ...
+			   { 'Style', 'checkbox', 'string', 'Don''t sort var.', 'tooltipstring', context('nosort',vars,txt), 'value', getdef(lastcom, 'nosort', 'present', 0)  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 9) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 7) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 8) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 10) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'align') } ...
+			   { 'Style', 'checkbox', 'string', 'Don''t plot var.', 'tooltipstring', context('noplot',vars,txt), 'value', getdef(lastcom, 'noplot', 'present', 0) } ...
+			   {} ...
+			   { 'Style', 'text', 'string', 'Sort trials by phase', 'fontweight', 'bold'} ...
+			   { 'Style', 'text', 'string', 'Freq. range (Hz)', 'tooltipstring', ['sort by phase at max power frequency' 10 ...
+               'in the data within the range [minfrq,maxfrq]' 10 '(overrides frequency specified in ''coher'' flag)']  } ...
+			   { 'Style', 'text', 'string', '% trials to ignore', 'tooltipstring', ['percent of trials to reject for low' ...
+			    'amplitude. Else,' 10 'if prct is in the range [-100,0] -> percent to reject for high amplitude'] } ...
+			   { 'Style', 'text', 'string', 'Ending time (ms)', 'tooltipstring', 'Ending time fo the 3 cycle window'  } ...
+			   { 'Style', 'text', 'string', 'Window cycles', 'tooltipstring', '3 cycles wavelet window'  } {}...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'phase', [1:2]) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'phase', [3]) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'phase', [4]) } ...
+			   { 'Style', 'text', 'string', '         3'  } {}...
+			   {} ...
+			   { 'Style', 'text', 'string', 'Inter-trial coherence options', 'fontweight', 'bold'} ...
+			   { 'Style', 'text', 'string', 'Coher freq.', 'tooltipstring', context('coher',vars,txt)} ...
+			   { 'Style', 'text', 'string', 'Signif. level', 'tooltipstring', 'add coher. signif. level line at alpha (alpha range: (0,0.1])' } ...
+			   { 'Style', 'text', 'string', 'Power limits (dB)'  } ...
+			   { 'Style', 'text', 'string', 'Coher limits (<=1)'  } ...
+			   { 'Style', 'checkbox', 'string', 'Image amps', 'tooltipstring',  context('allamp',vars,txt), 'value', getdef(lastcom, 'allamps', 'present', 0) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'coher', [1])  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'coher', [2])  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',[5:6])  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',[7:8])  } { } ... 
+			   {} ...
+			   { 'Style', 'text', 'string', 'Other options', 'fontweight', 'bold'} ...
+			   { 'Style', 'text', 'string', 'Plot spectrum','tooltipstring',  context('spec',vars,txt)} ...
+			   { 'Style', 'text', 'string', 'Baseline amp.', 'tooltipstring', 'use it to fix baseline amplitude' } ...
+			   { 'Style', 'text', 'string', 'Mark times (ms)','tooltipstring',  context('vert',vars,txt)} ...
+			   { 'Style', 'text', 'string', 'Time limits (ms)', 'tooltipstring',  'select time subset in ms' } ...
+			   { 'Style', 'checkbox', 'string', 'Plot scalp map', 'tooltipstring', 'plot a 2-d head map (vector) at upper left', 'value', getdef(lastcom, 'topo', 'present', 1)  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'spec') } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',9) } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'vert') } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'limits',[1:2]) } {} ...
+			   {} ...
+			   { 'Style', 'text', 'string', 'Etc...(see help)'  } ...
+			   { 'Style', 'edit', 'string', getdef(lastcom, 'auxvar', 'full') } {} {} {} ...
+			};
+		
+    result = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', ...
+							 fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'));
 	if size(result, 1) == 0 return; end;
+
+	% first rows
+	% ---------
+	limits(1:8)  = NaN;
 	channel   	 = eval( result{1} );
-	smooth       = eval( result{2} );
-	decimate     = eval( result{3} );
-	try, sortingeventfield = eval( result{4} ); catch, sortingeventfield = result{4}; end;
-	sortingtype  = parsetxt(result{5});
-	sortingwin   = eval( [ '[' result{6} ']' ] );
-	renorm = result{7};
-	titleplot    = result{8};
+	titleplot    = result{2};
+	options = '';
     if isempty(titleplot)
         titleplot = [ fastif( typeplot, 'Channel ', 'Component ') int2str(channel) ' ERP image'];
     end;
-    if typeplot == 0
-        switch lower(result{9})
-            case 'yes', options = [',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-            otherwise, options = '';
-        end;	
-	else 
-        switch lower(result{9})
-            case 'yes', options = [',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
-            otherwise, options = '';
+	smooth       = eval( result{3} );
+	if result{4}
+		options = [options ',''erp'''];
+	end;
+	if ~isempty(result{5})
+		limits(3:4) = eval( [ '[' result{5} ']' ]); 
+	end;
+	decimate     = eval( result{6} );
+	if result{7}
+		options = [options ',''cbar'''];
+	end;
+	if ~isempty(result{8})
+		options = [options ',''caxis'', ' result{8} ];
+	end;
+	
+	% event rows
+	% ----------
+	if result{9}
+		options = [options ',''nosort'''];
+	end;
+	try, sortingeventfield = eval( result{10} ); catch, sortingeventfield = result{10}; end;
+	sortingtype  = parsetxt(result{11});
+	sortingwin   = eval( [ '[' result{12} ']' ] );
+	renorm = result{13};
+	if ~isempty(result{14})
+		options = [options ',''align'', ' result{14} ];
+	end;
+	if result{15}
+		options = [options ',''noplot'''];
+	end;
+
+	% phase rows
+	% ----------
+	tmpphase = [];
+	if ~isempty(result{16})
+		tmpphase = eval( [ '[ 0 0 ' result{16} ']' ]);
+	end;
+	if ~isempty(result{17})
+		tmpphase(2) = eval( result{17} );
+	end;
+	if ~isempty(result{18})
+		tmpphase(1) = eval( result{18} );
+	end;
+	if ~isempty(tmpphase)
+		options = [ options ',''phase'',[' num2str(tmpphase) ']' ];
+	end;
+	
+	% coher rows
+	% ----------
+	tmpcoher = [];
+	if result{19}
+		options = [options ',''allamps'''];
+	end;
+	if ~isempty(result{20})
+		tmpcoher = eval( result{20} );
+	end;
+	if ~isempty(result{21})
+		tmpcoher(2) = eval( result{21} );
+	end;
+	if ~isempty(tmpcoher)
+		options = [ options ',''coher'',[' num2str(tmpcoher) ']' ];
+	end;
+	if ~isempty(result{22})
+		limits(5:6) = eval( [ '[' result{22} ']' ]);
+	end;
+	if ~isempty(result{23})
+		limits(7:8) = eval( [ '[' result{23} ']' ]);
+	end;
+
+	% options rows
+	% ------------
+    if result{24}
+		if typeplot == 0, options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
+		else              options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
         end;	
 	end;
-	if ~isempty(deblank(result{10}))
-		options      = [ options ',' result{10} ];
+	if ~isempty(result{25})
+		[options ',''spec'', ' result{25} ];
+	end;
+	if ~isempty(result{26})
+		limits(9) = eval( result{26} ); %bamp
+	end;
+	if ~isempty(result{27})
+		[options ',''vert'', [' result{27} ']' ];
+	end;
+	if ~isempty(result{28})
+		limits(1:2) = eval( [ '[' result{28} ']' ]);
+	end;
+	if ~all(isnan(limits))
+		options = [ options ',''limits'',[' num2str(limits) ']' ];
+	end;
+	if ~isempty(result{29})
+		options      = [ options ',' result{29} ];
 	end;
 	figure;
 else
@@ -324,3 +421,72 @@ com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xm
 eval(com)
 
 return;
+
+% get contextual help
+% -------------------
+function txt = context(var, allvars, alltext);
+	loc = strmatch( var, allvars);
+	if ~isempty(loc)
+		txt= alltext{loc(1)};
+	else
+		disp([ 'warning: variable ''' var ''' not found']);
+		txt = '';
+	end;
+
+% get default from command string
+% -------------------------------
+function txt = getdef(lastcom, var, mode, default)
+	if nargin < 4
+		default = '';
+	end;
+	if isempty(lastcom)
+		txt = default; return;
+	end;
+	if nargin < 3
+		mode = [];
+	end;
+	if isstr(mode) & strcmp('mode', 'present')
+		if ~isempty(findstr(var, lastcom))
+			txt = 1; return;
+		else
+			txt = 0; return;
+		end;
+	end;
+	if isnumeric(var)
+		comas = findstr(lastcom, ',');
+		if length(comas) >= vars
+			txt = lastcom(comas(var)+1:comas(var+1)-1);
+			txt = deblank(txt(end:-1:1));
+			txt = deblank(txt(end:-1:1));
+		else
+			txt = default;
+		end;
+		return;
+	else
+		comas  = findstr(lastcom, ',');
+		varloc = findstr(lastcom, var);
+		if ~isempty(varloc)
+			comas = comas(find(comas >varlocs));
+			txt = lastcom(comas(1)+1:comas(2)-1);
+			txt = deblank(txt(end:-1:1));
+			txt = deblank(txt(end:-1:1));
+			if strcmp(mode, 'full')
+				parent = findstr(lastcom, '}');
+				if ~isempty(parent)
+					comas = comas(find(comas >parent(1)));
+					txt = lastcom(comas(1)+1:comas(2)-1);
+				end;
+				txt = [ '''' var ''', ' txt ];	
+			elseif isnumeric(mode)
+				txt = str2num(txt);
+				if length(txt) >= max(mode)
+					txt = int2str(txt(mode));	
+				else 
+					txt = default;
+				end;
+			end;
+		else
+			txt = default;
+		end;
+	end;
+			
