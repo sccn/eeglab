@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2004/02/15 16:26:54  scott
+% same
+%
 % Revision 1.76  2004/02/15 16:25:25  scott
 % same
 %
@@ -865,6 +868,7 @@ plot(cos(circ).*rmax,sin(circ).*rmax,...
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
   sf = 0.8;
+  HCOLOR = 'w'; 
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head 
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
