@@ -8,8 +8,56 @@
 %                        'key2', value2, ... ); % edit separate chanlocs struct
 % Graphic interface:
 %   "Channel information ('field name')" - [edit boxes] display channel field 
-%                   content the current channel. Use 'transform' from the command
+%                   content of the current channel. Use 'transform' from the command
 %                   line to modify these fields.
+%   "3d center" - [button] recenter 3-D channel coordinates. Uses the chancenter()
+%                 function. Command line equivalent is 'convert', { 'chancenter' [xc
+%                 yc zc] }, [xc yc zc] being the center of the sphere (use empty to
+%                 find the center so that electrodes best match a sphere).
+%   "rotate axis" - [button] force one electrode to one position and rotate other
+%                 electrodes accordingly. Command line equivalent is 'forcelocs'.
+%   "Transform axis" - [button] perform any operation on channel fields. Command
+%                 line equivalent is 'transform'.
+%   "xyz->polar & sph." - [button] convert 3-D cartesian coordinates to polar and
+%                 3-D spherical coordinates. This is usefull when you edit the 
+%                 coordinates manually. Command line equivalent is 'convert', 
+%                 'cart2all'.
+%   "sph.->polar & xyz" - [button] convert 3-D spherical coordinates to polar and
+%                 3-D cartesian coordinates. Command line equivalent is 'convert', 
+%                 'sph2all'.
+%   "polar->sph & xyz" - [button] convert 2-D polar coordinates to 3-D spherical and
+%                 3-D cartesian coordinates. Command line equivalent is 'convert', 
+%                 'topo2all'. Note that if spherical radii are absent, they are forced
+%                 to 1.
+%   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
+%   "Insert chan" - [button] insert channel before current channel. Command line 
+%                 equivalent: 'insert'.
+%   "<<" - [button] scroll channel backward (-10).
+%   "<" - [button] scroll channel backward (-1).
+%   ">" - [button] scroll channel forward (+1).
+%   ">>" - [button] scroll channel forward (+10).
+%   "Append chan" - [button] append channel after the current channel. Command line 
+%                 equivalent: 'append'.
+%   "Plot 2d" - [button] plot channel positions in 2-D using topoplot() function.  
+%   "2-D shrink factor" - [edit box] enter a value to shrink channel location in the
+%                 2-D polar view. This DOES NOT AFFECT channel locations and is only
+%                 used for visualization. This parameter is attached to the dataset
+%                 and is then used in all 2-D scalp plots. Command line equivalent
+%                 is 'shink'.
+%   "Auto shrink" - [button] automatically computes the shrinking factor so all
+%                 channels are visible on the 2-D topographical plot.
+%   "Plot 3d" - [button] plot channel positions in 3-D using plotchans3d() function.                 
+%   "Read locations" - [button] read location file using readlocs() function. 
+%                 Command line equivalent is 'load'.
+%   "Read help" - [button] readlocs() function help.
+%   "Save .ced" - [button] save channel location as ".ced" format which is the native
+%                 EEGLAB format. Command line equivalent is 'save'.
+%   "Save others" - [button] save channel location as other formats using the 
+%                 pop_writelocs() function (see also readlocs() for channel formats).
+%   "Cancel" - [button] cancel all editing.
+%   "Help" - [button] this help message.
+%   "OK" - [button] save editing and propagate to parent.
+% 
 % Input:
 %   EEG      - EEG dataset
 %   chanlocs - EEG.chanlocs structure
@@ -18,7 +66,8 @@
 %   'convert'     - {conversion_type [args]} Conversion type may be: 'cart2topo'
 %                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', or 'chancenter'. 
 %                   See help messages for these functions. Args are only relevant 
-%                   for 'chancenter'.
+%                   for 'chancenter'. See also graphical interface button for more
+%                   info.
 %   'transform'   - String command for manipulating arrays. 'chan' is full channel 
 %                   info. Fields that can be manipulated are 'labels', 'theta'
 %                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 
@@ -39,6 +88,9 @@
 %                   same as 'insert' but add the the new channel after the current
 %                   channel.
 %   'delete'      - [int_vector] Vector of channel numbers to delete.
+%   'forcelocs'   - [cell] call forcelocs() function to force a particular channel
+%                   to be at a particular location on the sphere (and rotate other
+%                   channels accordingly).
 %   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
 %   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
 %                   optional arguments (such as file format) to the function 
@@ -76,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2003/12/05 23:41:34  arno
+% debug convert2all
+%
 % Revision 1.73  2003/12/05 23:39:09  arno
 % coordinate conversion debug
 %
