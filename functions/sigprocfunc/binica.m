@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/10/07 18:55:03  arno
+% undo changes
+%
 % Revision 1.6  2003/10/07 18:54:30  arno
 % testing
 %
@@ -289,7 +292,7 @@ end
 % if created by binica(), rm temporary data file
 %
 if ~isempty(tmpdata)
-  eval(['!rm ' datafile]);
+    eval(['!rm -f ' datafile]);
 end
 
 %
