@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/11 22:46:44  arno
+% backcolor
+%
 % Revision 1.6  2002/08/11 19:26:11  arno
 % editing
 %
@@ -74,7 +77,10 @@ SC  =  ['binica.sc'];           % Master .sc script file for binica.m
                                 % in its path of script directories.
                                 % Copy to pwd to alter ica defaults
 
-BACKCOLOR  = [.66 .76 1];     % grey background color for eeglab
+BACKCOLOR  =  [.846 .892 .956];     
+BACKEEGLABCOLOR  = [.66 .76 1];    
+GUIBUTTONCOLOR   = [.66 .76 1];    
+GUITEXTCOLOR     = [0 0 0.4];
 
 MAXENVPLOTCHANS   = 256;  % maximum number of channels to plot in envproj.m
 MAXPLOTDATACHANS  = 256;  % maximum number of channels to plot in dataplot.m
