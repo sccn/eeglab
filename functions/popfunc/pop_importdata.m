@@ -27,30 +27,32 @@
 %                  ICA weights from other decompositions (for instance: same
 %                  data, different conditions). To use the ICA weights from
 %                  another loaded dataset (n) enter "ALLEEG(n).icaweights"
-%                  in this edit box. Command line equivalent: 'icaweight'
-%                                               ??? Should be 'icaweights' ???
+%                  in this edit box. Command line equivalent: 'icaweights'
 %   "ICA sphere array or text file" - [edit box] Import an ICA sphering matrix. 
 %                  For computational reasons, an ICA decomposition may be defined 
 %                  by a sphere matrix and an unmixing (weight) matrix (above).
 %                  To use the ICA weights from another loaded dataset (n)
 %                  enter "ALLEEG(n).icasphere". If no sphering matrix, enter 
 %                  "eye(EEG.nbchan)". Command line equivalent: 'icasphere'.
-%                    ??? above ???
 % Optional inputs:
 %   'setname'    - ['string'] Name of the new EEGLAB dataset
 %   'data'       - ['varname'|'filename'] Data variable or file name to import.
-%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data file format.
-%                  The data file is transposed if the number of rows is greater
-%                  than the number of columns. NOTE: for types 'float32le' and
-%                  'float32be' (little endian and big endian byte ordering), data
-%                  must be organised in the format (channels, times,  epochs).
+%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
+%                  'array' is a Matlab array in the global workspace.
+%                  'matlab' is a Matlab file (which must contain a single variable).
+%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bits
+%                  float data files (little endian or big endian byte ordering).
+%                  Data must be organised as (channels, timepoints) i.e. 
+%                  channels = rows and timepoints = columns or (channels, timepoints, 
+%                  epochs). For convenience, The data file is transposed if the number
+%                  of rows is larger than the number of columns.
 %   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode 
 %                  locations (see >> help readlocs for file format).
 %   'nbchan'     - Number of data channels. 
 %   'xmin'       - Starting time in seconds.
 %   'pnts'       - Number of data frames (time points) per data epoch (epoched data only).
 %   'srate'      - Data sampling rate in Hz.
-%   'icaweight'  - ICA weight matrix. 
+%   'icaweights' - ICA weight matrix. 
 %   'icasphere'  - ICA sphering matrix (if [], eye(nchans)).
 % 
 % Outputs:
@@ -81,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/02/22 16:58:02  scott
+% header edits, with ??? -sm
+%
 % Revision 1.15  2003/02/21 22:55:11  arno
 % adding gui info
 %

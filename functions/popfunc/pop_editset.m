@@ -6,20 +6,23 @@
 %
 % Graphic interface:
 %   "EEGLAB dataset name" - [Edit box] Name for the new dataset. 
-%                  The last column indicates which field of the EEG structure 
-%                  this paramter is corresponding to. ??? 
+%                  In the last column of the graphic interface, the "EEG.setname"
+%                  text indicates which field of the EEG structure this parameter
+%                  is corresponding to (in this case 'setname').
 %                  Command line equivalent: 'setname'. 
 %   "Time points per epoch" - [Edit box] Number of data frames (points) per epoch.
 %                  Command line equivalent: 'pnts'
 %   "Data sampling rate" - [Edit box] In Hz. Command line equivalent: 'srate'
-%   "Optional epoch start time" - [Edit box] In ms. ??? Command line equivalent: 'xmin'
+%   "Optional epoch start time" - [Edit box]  This edit box is only present for 
+%                  data epoch and specify the epochs start time in ms. Epoch upper
+%                  time limit is automatically calculated. 
+%                  Command line equivalent: 'xmin'
 %   "Channel locations file or array" - [Edit box] For channel data formats, see 
 %                  >> readlocs help    Command line equivalent: 'chanlocs'
 %   "ICA weights array or text file" - [edit box] Import ICA weights from other 
 %                  decompositions (e.g., same data, different conditions). 
 %                  To use the ICA weights from another loaded dataset (n) enter 
-%                  "ALLEEG(n).icaweights" Command line equivalent: 'icaweight'
-%                                                              ??? icaweights ???
+%                  "ALLEEG(n).icaweights" Command line equivalent: 'icaweights'
 %   "ICA sphere array or text file" - [edit box] Import ICA sphere matrix. 
 %                  Infomax ICA decompositions may be defined by a sphere matrix 
 %                  and an unmixing weight matrix (see above).  To use the sphere 
@@ -37,10 +40,14 @@
 %   'data'       - ['varname'|'filename'] Import data from a Matlab variable or file
 %                  into an EEG data structure 
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
-%                  The data file is transposed if the number of rows is larger
-%                  than the number of columns ???. Note: for types 'float32le' and
-%                  'float32be' (little endian or big endian byte ordering), data
-%                  must be organised as (channels, timepoints, epochs).
+%                  'array' is a Matlab array in the global workspace.
+%                  'matlab' is a Matlab file (which must contain a single variable).
+%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bits
+%                  float data files (little endian or big endian byte ordering).
+%                  Data must be organised as (channels, timepoints) i.e. 
+%                  channels = rows and timepoints = columns or (channels, timepoints, 
+%                  epochs). For convenience, The data file is transposed if the number
+%                  of rows is larger than the number of columns.
 %   'chanlocs'   - ['varname'|'filename'] Import a channel location file.
 %                  For file formats, see >> help readlocs
 %   'nbchan'     - [int] Number of data channels. 
@@ -87,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/02/22 17:11:31  scott
+% header edit -sm
+%
 % Revision 1.31  2003/02/21 22:55:09  arno
 % adding gui info
 %
