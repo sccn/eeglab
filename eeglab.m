@@ -1,4 +1,6 @@
-% eeglab() - EEGLAB (Version 3.0) - Graphic user interface environment for 
+% eeglab() - EEGLAB (Version 4.0)
+%
+% - Graphic user interface environment for 
 %   electrophysiological data analtsis using the ICA EEG toolbox (Makeig et al., 
 %   CNL / The Salk Institute, 1997-2001), now the EEGLAB toolbox. Currently,
 %   EEGLAB is hosted (2002-) by the Swartz Center for Computational Neuroscience, 
@@ -182,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2002/08/09 17:59:38  arno
+% adding signal statistics
+%
 % Revision 1.100  2002/08/01 00:35:15  arno
 % debugging history for erpimage
 %
