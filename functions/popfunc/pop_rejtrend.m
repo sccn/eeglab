@@ -1,53 +1,49 @@
-% pop_rejtrend() - Detect linear trends in EEG activity and reject the  
-%                  epoched trials based on the accuracy of the linear
-%                  fit.
+% pop_rejtrend() - Measure linear trends in EEG data; reject data epochs 
+%                  containing strong trends.
 % Usage:
-%   >> pop_rejtrend( INEEG, typerej); % pop up interactive window
+%   >> pop_rejtrend( INEEG, typerej); % pop up an interactive window
 %   >> OUTEEG = pop_rejtrend( INEEG, typerej, elec_comp, ...
 %                winsize, maxslope, minR, superpose, reject);
 %
-% Graphical interface:
-%   "Electrode" - [edit box] electrodes or components (number) to take into 
-%                 consideration for rejection. Same as the 'elec_comp'
-%                 parameter from the command line.
-%   "Consecutive alike values" - [edit box] integer determining the
-%                 number of consecutive points for the detection of linear
-%                 patterns. Same as the 'winsize' parameter from the
-%                 command line.
-%   "Maximal slope" - [edit box] maximal absolute slope of the linear 
-%                trend of the activity for rejection. Same as the 'maxslope'
-%                 parameter from the command line.
-%   "R square limit" -[edit box] minimal R^2 (0 to 1). Same as 'minR'
-%                 parameter from the command line.
-%   "Display with previous rejection" - [edit box] can be either YES or 
-%                 NO. This edit box corresponds to the command line input 
-%                 option 'superpose'.
-%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
-%                 box corresponds to the command line input option 'reject'.
-%
-% Inputs:
-%   INEEG      - input dataset
-%   typerej    - type of rejection (0 = independent components; 1 = eeg
-%                data). Default is 1.
-%   elec_comp  - [e1 e2 ...] electrodes or components (number) to take into 
-%                consideration for rejection
-%   winsize    - integer determining the number of consecutive points
-%                for the detection of linear patterns
-%   maxslope   - maximal absolute slope of the linear trend of the 
-%                activity for rejection
-%   minR       - minimal R^2 (coefficient of determination between
-%                0 and 1)
-%   superpose  - 0=do not superpose pre-labelling with previous
-%                pre-labelling (stored in the dataset). 1=consider both
-%                pre-labelling (using different colors). Default is 0.
-%   reject     - 0=do not reject labelled trials (but still store the 
-%                labels. 1=reject labelled trials. Default is 1.
+% Pop-up window interface:
+%   "Electrode|Component number(s)" - [edit box] electrode or component number(s) 
+%                 to take into consideration during rejection. Sets the 'elec_comp'
+%                 parameter in the command line call (see below).
+%   "Slope window width" - [edit box] integer number of consecutive data
+%                 points to use in detecting linear trends. Sets the 'winsize' 
+%                 parameter in the command line call.
+%   "Maximum slope to allow" - [edit box] maximal absolute slope of the 
+%                 linear trend to allow in the data. If electrode data, uV/epoch;
+%                 if component data, std. dev./epoch. Sets the 'maxslope'
+%                 parameter in the command line call.
+%   "R-square limit" -[edit box] maximal regression R-square (0 to 1) value
+%                 to allow.  Sets the 'minR' parameter in the command line call.
+%   "Display previous rejection marks?" - [edit box] either YES or NO. 
+%                 Sets the command line input option 'superpose'.
+%   "Reject marked trials?" - [edit box] either YES or NO. 
+%                 Sets the command line input option 'reject'.
+% Command line inputs:
+%   INEEG      - input EEG dataset
+%   typerej    - [1|0] data to reject on: 0 = component activations; 
+%                1 = electrode data. {Default: 1}.
+%   elec_comp  - [e1 e2 ...] electrode|component number(s) to take into 
+%                consideration during rejection
+%   winsize    - (integer) number of consecutive points
+%                to use in detecing linear trends
+%   maxslope   - maximal absolute slope of the linear trend to allow in the data
+%   minR       - minimal linear regression R-square value to allow in the data
+%                (= coefficient of determination, between 0 and 1)
+%   superpose  - [0|1] 0 = Do not superpose marks on previous marks
+%                stored in the dataset; 1 = Show both types of marks using 
+%                different colors. {Default: 0}
+%   reject     - [1|0] 0 = Do not reject marked trials but store the 
+%                labels; 1 = Reject marked trials. {Default: 1}
 %
 % Outputs:
-%   OUTEEG     - output dataset with labeled rejected sweeps
-%     when eegplot is called, modifications are applied to the current 
-%     dataset at the end of the call of eegplot (when the user press the 
-%     button 'reject').
+%   OUTEEG     - output dataset with rejected trials marked for rejection
+%     Note: When eegplot() is called, modifications are applied to the current 
+%     dataset at the end of the call to eegplot() (e.g., when the user presses 
+%     the 'Reject' button).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -72,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/12/17 18:15:25  arno
+% default reject
+%
 % Revision 1.14  2003/12/04 23:27:06  arno
 % reject trials
 %
@@ -148,12 +147,15 @@ if nargin < 3
 
 	% which set to save
 	% -----------------
-	promptstr   = { fastif(icacomp==0, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
-	                'Consecutive alike values (in data points)', ... 
-					'Maximal slope (trend) of the activity (unit/epoch):', ...
-					'R square limit (0 to 1, ex: 0.8):', ...
-               		'Display with previous rejection', ...
-         			'Reject marked trial(s) (YES or NO)' };
+	promptstr   = { fastif(icacomp==0, 'Component number(s), Ex: 2 4 5):', ...
+                                           'Electrode number(s), Ex: 2 4 5):'), ...
+	                'Slope window width (in points)', ... 
+			     fastif(icacomp==0, ...
+                                'Maximum slope to allow (uV/epoch)', ...
+                                'Maximum slope to allow (std. dev./epoch)'), ...
+				'R-square limit to allow (0 to 1, Ex: 0.8):', ...
+               		'Display previous rejection marks? (YES or NO)', ...
+         			'Reject marked trial(s)? (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
 					int2str(EEG.pnts),  ...
 					'0.5', ...
@@ -161,8 +163,8 @@ if nargin < 3
                		'NO', ...
             		'NO' };
 
-	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trend rejection in component -- po_rejtrend()', ...
-											   'Trend rejection -- po_rejtrend()'), 1,  inistr, 'pop_rejtrend');
+	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trend rejection in component(s) -- pop_rejtrend()', ...
+											   'Data trend rejection -- pop_rejtrend()'), 1,  inistr, 'pop_rejtrend');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};
@@ -207,8 +209,8 @@ else
     rejE = zeros(size(icaacttmp,1), length(rej));
     rejE(elecrange,:) = tmprejE;
 end;
-fprintf('%d channel selected\n', size(elecrange(:), 1));
-fprintf('%d/%d trials marked for rejection\n', length(find(rej > 0)), EEG.trials);
+fprintf('%d channel(s) selected\n', size(elecrange(:), 1));
+fprintf('%d/%d trial(s) marked for rejection\n', length(find(rej > 0)), EEG.trials);
 
 if calldisp
     if icacomp == 1 macrorej  = 'EEG.reject.rejconst';
