@@ -26,6 +26,8 @@
 %                       'blank'    - plot electrode locations only {default: 'both'}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'
 %                       {default: 'on', marks electrode location points}
+%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{var}
+%                       electrode marking details and their {defaults}. 
 %   'numcontour'      - number of contour lines {default: 6}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
@@ -46,21 +48,18 @@
 %   'ccolor'          - color of the contours {default: blue}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
-%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{}
-%                        electrode marking details {defaults}
 %   'shrink'          - ['on'|'off'|'force'|factor] 'on' -> If max channel arc_length > 0.5, 
 %                       shrink electrode coordinates towards vertex to plot all channels
 %                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
 %                       so the channel max is 0.5. factor -> Apply a specified shrink
 %                       factor (range (0,1) = shrink fraction). {default: 'off'}
-%                       % ??? Ex: 'shrinkfactor',0.15 -> shrink elecrode arc_lengths by 15%
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
 %                       model has radius 1). If several rows, plot one dipole per row.
-%                       Coordinates returned by dipplot() may be used. Can accepts
+%                       Coordinates returned by dipplot() may be used. Can accept
 %                       an EEG.dipfit.model structure (See >> help dipplot).
-%                       Ex: 'dipole',EEG.dipfit.model(17) % Use dipole(s) for comp. 17.
+%                       Ex: 'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
 %   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'off'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
 %   'diplen'          - [real] scale dipole length {default: 1}.
@@ -100,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.164  2004/03/21 16:52:37  scott
+% debugged plotrad, headrad plot size setting
+%
 % Revision 1.163  2004/03/20 18:20:14  scott
 % created 'headrad' (removed 'forcehead'). Now uses only 'plotrad' and 'headrad'
 % to set plotting scales. 'shrink' mode disabled temporarily
@@ -1101,42 +1103,54 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot dipole(s) on the scalp map  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isempty(DIPOLE)  % Note: invert x and y from dipplot usage
+if ~isempty(DIPOLE)  
     hold on;
     tmp = DIPOLE;
     if isstruct(DIPOLE)
         if ~isfield(tmp,'posxyz')
            error('dipole structure is not an EEG.dipfit.model')
         end
-        DIPOLE = [];
+        DIPOLE = [];  % Note: invert x and y from dipplot usage
         DIPOLE(:,1) = -tmp.posxyz(:,2)/DIPSPHERE; % -y -> x
         DIPOLE(:,2) =  tmp.posxyz(:,1)/DIPSPHERE; %  x -> y
         DIPOLE(:,3) = -tmp.momxyz(:,2);
         DIPOLE(:,4) =  tmp.momxyz(:,1);
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;       % scale radius from 1 -> rmax
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if shrink or rmax > 0.5
-        DIPOLE(:,3:end) = DIPOLE(:,3:end)/500;      % ???
     else
         DIPOLE(:,1) = -tmp(:,2);                    % same for vector input
         DIPOLE(:,2) =  tmp(:,1);
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; 
-        DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
     end;
+    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax^2/plotrad; % scale radius from 1 -> rmax 
+    DIPOLE(:,3:end) = (DIPOLE(:,3:end)/10000)*rmax^2/plotrad; % NB: 10000 was 500 !?!?
     if strcmpi(DIPNORM, 'on')
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
         end;
     end;
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
-    for index = 1:size(DIPOLE,1)
+
+    PLOT_DIPOLE=1;
+    if sum(DIPOLE(1,3:4).^2) <= 0.0001  
+      if strcmpi(VERBOSE,'on')
+        fprintf('Note: dipole is length 0 - not plotted\n')
+      end
+      PLOT_DIPOLE = 0;
+    end
+    if sum(DIPOLE(1,1:2).^2) > plotrad
+      if strcmpi(VERBOSE,'on')
+        fprintf('Note: dipole is outside plotting area - not plotted\n')
+      end
+      PLOT_DIPOLE = 0;
+    end
+    if PLOT_DIPOLE
+      for index = 1:size(DIPOLE,1)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
         set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
         hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
                    [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
         set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
+      end;
     end;
 end;
 
