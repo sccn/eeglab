@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/03/15 17:23:57  scott
+% print msg
+%
 % Revision 1.4  2003/03/15 15:50:04  scott
 % header
 %
@@ -138,7 +141,7 @@ if floor(trials) ~= trials
    return
 end
 
-fprintf('Analyzing %d data trials of %d frames ',trials,frames);
+fprintf('phasecoher(): Analyzing %d data trials of %d frames ',trials,frames);
 if trials < 10
   fprintf(...
   'Low number of trials (%d) may not give accurate coherences.\n',trials)
