@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/07/24 19:29:10  arno
+% removing renorm
+%
 % Revision 1.32  2002/07/24 19:27:16  arno
 % adding back renorm into text output
 %
@@ -214,6 +217,7 @@ else
 end;
 
 if popup
+	lastcom
 	% get contextual help
 	% -------------------
 	[txt2 vars2] = gethelpvar('erpimage.m');
@@ -272,7 +276,9 @@ if popup
 				 'tooltipstring', 'Epoch-sorting event field name (Ex: latency, []=no sorting):' } ...
 			   { 'Style', 'pushbutton', 'string', 'Event type(s)', 'callback', commandtype, 'tooltipstring', ['Event type(s) subset ([]=all):' 10 ...
                 '(See ''/Edit/Edit event values'' for event types)']  } ...
-			   { 'Style', 'text', 'string', 'Time window', 'tooltipstring', 'Sorting event window [start, end] in seconds ([]=whole epoch):' } ...
+			   { 'Style', 'text', 'string', 'Time window', 'tooltipstring', [ 'Sorting event window [start, end] in milliseconds ([]=whole epoch):' 10 ...
+												  'events are only selected within this time window (can be usefull if several' 10 ...
+												  'events of the same type are in the same epoch, or for selecting trials with given response time)']} ...
 			   { 'Style', 'text', 'string', 'Rescale', 'tooltipstring', 'Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):' } ...
 			   { 'Style', 'text', 'string', 'Align', 'tooltipstring',  context('align',vars,txt) } ...
 			   { 'Style', 'checkbox', 'string', 'Don''t sort var.', 'tooltipstring', context('nosort',vars,txt), 'value', getdef(lastcom, 'nosort', 'present', 0)  } ...
@@ -539,7 +545,7 @@ disp(' '); disp(com); disp(' ');
 eval(com)
 
 if popup
-	varargout{1} = [popcom 10 '% Call: ' com];
+	varargout{1} = popcom; % [10 '% Call: ' com];
 end;
 
 return;
