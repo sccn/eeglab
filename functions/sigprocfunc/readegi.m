@@ -2,7 +2,7 @@
 %	      Return header info, EEG data, and any event data.
 %
 % Usage:
-%   >> [head, TrialData, EventData] = readegi(filename, dataChunks)
+%   >> [head, TrialData, EventData, CatIndex] = readegi(filename, dataChunks)
 %
 % Required Input:
 %   filename = EGI data filename
@@ -17,6 +17,7 @@
 %   head = struct containing header info (see readegihdr() )
 %   TrialData = EEG channel data
 %   EventData = event codes
+%   CatIndex  = segment category indices
 %
 % Author: Cooper Roddey, SCCN, 13 Nov 2002
 %
@@ -44,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/06/11 07:39:35  cooper
+% Added 'dataChunks' input argument.
+%
 % Revision 1.12  2002/12/07 00:32:13  arno
 % converting event codes to char
 %
@@ -81,7 +85,7 @@
 % header ...
 %
 
-function  [head, TrialData, EventData] = readegi(filename, dataChunks)
+function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks)
 
 if nargin <1 | nargin >2,
     help readegi;
