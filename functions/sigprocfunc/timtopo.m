@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/03/05 03:16:10  scott
+% topoleft
+%
 % Revision 1.59  2003/03/05 03:06:37  scott
 % cleanup
 %
@@ -395,7 +398,7 @@ end
 if 0
 if ntopos==1
    topoleft = pos(3)/2 - topowidth/2;
-elseif ntopos = 2
+elseif ntopos == 2
    topoleft = pos(3)/2 - (1+0.5*head_sep)*topowidth;
 elseif ntopos==3
    topoleft = pos(3)/2 - (3/2*topowidth+1*head_sep);
