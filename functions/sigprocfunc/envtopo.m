@@ -64,7 +64,7 @@
 %
 % Notes:
 %  To label maps with other than component numbers, put four-char strings into
-%  file 'envtopo.labels' (. = space) in time-order of their projection maxima
+%  a local pwd file named 'envtopo.labels' (. = space) in time-order of their projection maxima
 %
 % Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2004/11/12 18:38:35  scott
+% help msg details
+%
 % Revision 1.73  2004/11/12 18:35:34  scott
 % reformed the limit setting code. Adjusted component label text, [ymin,ymax].
 % Added xunitframes and ylimset variables.
@@ -827,7 +830,7 @@ end
 if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
  FILLCOLOR = [.66 .76 1];
  sumenv = envelope(sumproj(g.plotchans,:), g.envmode);
- if ~ylimset & min(sumenv) > ymax, ymax = max(curenv); end
+ if ~ylimset & max(sumenv) > ymax, ymax = max(curenv); end
  if ~ylimset & min(sumenv) < ymin, ymin = min(curenv); end
  if strcmpi(g.sumenv,'fill')  
     %
@@ -921,14 +924,18 @@ end
             end
         end
         if c==1 & ~isempty(g.vert)
-            for v=g.vert
-                vl=plot([v v], [-1e10 1e10],'k--'); % plot specified vertical lines
-                set(vl,'linewidth',2.5);           % if any
+            for v=1:length(g.vert)
+                vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--'); % plot specified vertical lines
+                if ~any(g.limcontrib ~= 0)        % if any 
+                    set(vl,'linewidth',2.5);
+                elseif v>= length(g.vert)-1;
+                    set(vl,'linewidth',1.2);
+                end
             end
         end
-        if g.limits(1) <= 0 & g.limits(2) >= 0
-                vl=plot([0 0], [-1e10 1e10],'k'); % plot specified vertical lines
-                set(vl,'linewidth',2);           % if any
+        if g.limits(1) <= 0 & g.limits(2) >= 0    % plot vertical line at time zero
+                vl=plot([0 0], [-1e10 1e10],'k');
+                    set(vl,'linewidth',2);
         end
  
         %
@@ -948,16 +955,21 @@ end
             p=plot(times,matsel(envdata,frames,0,2,envx(1)),colors(mapcolors(1),1));% plot the min
             set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
         end
-    end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
-%%%%%%%%%%%%%%%%%%%%%%% Extend y limits by 5% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% Extend y limits by 5% %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-datarange = ymax-ymin;
-ymin = ymin-0.05*datarange;
-ymax = ymax+0.05*datarange;
+if ~ylimset
+  datarange = ymax-ymin;
+  ymin = ymin-0.05*datarange;
+  ymax = ymax+0.05*datarange;
+end
 axis([xmin xmax ymin ymax]);
 
+%
+%%%%%%%%%%%%%%%%%%%%%% Label axes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 set(axe,'Color',axcolor);
 if ~xunitframes
    l= xlabel('Time (s)');
@@ -972,7 +984,7 @@ else
 end;    
 set(l,'FontSize',14,'FontWeight','Bold');
 %
-%%%%%%%%%%%%%%%%%%%%%% Draw oblique/vertical lines %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Draw oblique/vertical lines %%%%%%%%%%%%%%%%%%%%%
 %
 % axall = axes('Units','Normalized','Position',pos,...
 axall = axes('Position',pos,...
@@ -984,13 +996,16 @@ axis([0 1 0 1])
 width  = xmax-xmin;
 height = ymax-ymin;
 
-if strcmpi(g.dispmaps, 'on')
+%
+%%%%%%%%%%%%%%%%%%%%%% draw component maps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%% draw vertical lines and labels %%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-for t=1:ntopos % draw oblique lines from max env vals (or plot top)
-               % to map bases, in left to right order
+if strcmpi(g.dispmaps, 'on')
+    for t=1:ntopos % draw oblique lines from max env vals (or plot top)
+                 % to map bases, in left to right order
+        %
+        %%%%%%%%%%%%%%%%% draw vertical lines and labels %%%%%%%%%%%%%%%%%%%%%%%%
+        %
         if BOLD_COLORS==1
             linestyles = 1:ntopos;
         else
@@ -1053,8 +1068,8 @@ for t=1:ntopos % draw oblique lines from max env vals (or plot top)
         end
         set(gca,'Visible','off');
         axis([0 1 0 1]);
-    end
-end;
+    end % t
+end; % if g.dispmaps == on
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
