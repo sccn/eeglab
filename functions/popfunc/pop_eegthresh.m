@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/07/26 17:56:04  arno
+% still debugging
+%
 % Revision 1.3  2002/07/26 17:52:24  arno
 % debugging
 %
@@ -170,14 +173,16 @@ if calldisp
     else			macrorej  = 'EEG.reject.icarejthresh';
         			macrorejE = 'EEG.reject.icarejthreshE';
     end;
+	
+	colrej = EEG.reject.rejthreshcol;
+	rej  = tmprejectelec;
+	rejE = tmpelecIout;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 	     
     if icacomp == 1
-        eeg_multieegplot( EEG.data(elecrange,:,:), tmprejectelec, tmpelecIout(elecrange,:), oldrej, oldrejE, 'srate', ...
-		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
+        eegplot( EEG.data(elecrange,:,:), 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     else
-        eeg_multieegplot( icaacttmp, tmprejectelec, tmpelecIout(elecrange,:), oldrej, oldrejE, 'srate', ...
-		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
+        eegplot( icaacttmp, 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     end;	
 end;
 
