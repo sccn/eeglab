@@ -161,6 +161,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.209  2004/06/05 01:33:07  arno
+% spetial option to preserve backward compatibility
+%
 % Revision 1.208  2004/05/07 04:47:17  scott
 % made sotvar = [] work
 %
@@ -1084,12 +1087,7 @@ if nargin > 6
 		  noshow = Arg;
 		  Noshowflag = NO;
 	  elseif Alignflag == YES
-		  if length(Arg) ~= 1 
-			  help erpimage
-			  fprintf('\nerpimage(): align arg must be a scalar msec.\n');
-			  return
-		  end
-		  aligntime = Arg(1);
+		  aligntime = Arg;
 		  Alignflag = NO;
 	  elseif Limitflag == YES
 		  %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
@@ -1449,7 +1447,7 @@ end
 if isnan(timelimits)
    timelimits = [min(times) max(times)];
 end
-if ~isnan(aligntime)
+if ~isstr(aligntime) & ~isnan(aligntime)
 	if ~isinf(aligntime) ...
 			& (aligntime < timelimits(1) | aligntime > timelimits(2))
 		help erpimage
@@ -1533,39 +1531,45 @@ end;
 %
 %%%%%%%%%%%%%%%%%%% Align data to sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isnan(aligntime)
-    if isinf(aligntime)
+
+if isstr(aligntime) | ~isnan(aligntime)
+    if ~isstr(aligntime) & isinf(aligntime)
         aligntime= median(sortvar);
         fprintf('Aligning data to median sortvar.\n'); 
         % Alternative below: trimmed median - ignore top/bottom 5%
         %   ssv = sort(sortvar); % ssv = 'sorted sortvar'
         %   aligntime= median(ssv(ceil(ntrials/20)):floor(19*ntrials/20)); 
     end
-    fprintf('Realigned sortvar plotted at %g ms.\n',aligntime);
     
-    aligndata=zeros(frames,ntrials); % begin with matrix of zeros()
-    shifts = zeros(1,ntrials);
-    for t=1:ntrials, %%%%%%%%% foreach trial %%%%%%%%%
-        shft = round((aligntime-sortvar(t))*srate/1000);
-        shifts(t) = shft;
-        if shft>0, % shift right
-            if frames-shft > 0
-                aligndata(shft+1:frames,t)=data(1:frames-shft,t);
-            else
-                fprintf('No aligned data for epoch %d - shift (%d frames) too large.\n',t,shft);
-            end
-        elseif shft < 0 % shift left
-            if frames+shft > 0
-                aligndata(1:frames+shft,t)=data(1-shft:frames,t);
-            else
-                fprintf('No aligned data for epoch %d - shift (%d frames) too large.\n',t,shft);
-            end
-        else % shft == 0
-            aligndata(:,t) = data(:,t);
-        end 
-    end % end trial
-    fprintf('Shifted epochs by %d to %d frames.\n',min(shifts),max(shifts));
-    data = aligndata;                       % now data is aligned to sortvar
+    if ~isstr(aligntime)
+        fprintf('Realigned sortvar plotted at %g ms.\n',aligntime);
+        aligndata=zeros(frames,ntrials); % begin with matrix of zeros()
+        shifts = zeros(1,ntrials);
+        for t=1:ntrials, %%%%%%%%% foreach trial %%%%%%%%%
+            shft = round((aligntime-sortvar(t))*srate/1000);
+            shifts(t) = shft;
+            if shft>0, % shift right
+                if frames-shft > 0
+                    aligndata(shft+1:frames,t)=data(1:frames-shft,t);
+                else
+                    fprintf('No aligned data for epoch %d - shift (%d frames) too large.\n',t,shft);
+                end
+            elseif shft < 0 % shift left
+                if frames+shft > 0
+                    aligndata(1:frames+shft,t)=data(1-shft:frames,t);
+                else
+                    fprintf('No aligned data for epoch %d - shift (%d frames) too large.\n',t,shft);
+                end
+            else % shft == 0
+                aligndata(:,t) = data(:,t);
+            end 
+        end % end trial
+        fprintf('Shifted epochs by %d to %d frames.\n',min(shifts),max(shifts));
+        data = aligndata;                       % now data is aligned to sortvar
+    else
+        aligntime = str2num(aligntime);
+        if isinf(aligntime),  aligntime= median(sortvar); end;
+    end;
 end 
 
 %
