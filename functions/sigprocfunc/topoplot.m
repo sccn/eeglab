@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/13 17:44:37  arno
+% remove color setting
+%
 % Revision 1.10  2002/08/12 01:34:53  arno
 % color
 %
@@ -488,3 +491,5 @@ plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)
 
 hold off
 axis off
+axis square;
+try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
