@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/23 15:04:29  scott
+% help msg
+%
 % Revision 1.6  2002/08/19 21:53:40  arno
 % same
 %
@@ -96,7 +99,12 @@ if nargin < 2
 	if length(result) == 0 return; end;
 	icatype      = result{1};
 	options      = [ ',' result{2} ];
+    fig = figure;
+    supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
+                        {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
+    drawnow;
 else
+    fig = [];
 	options = [];
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
@@ -149,6 +157,7 @@ switch lower(icatype)
         end;
      otherwise, error('Pop_runica: unrecognized algorithm');
 end;
+if ~isempty(fig), try, close(fig); catch, end; end;
 EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
 
 eeg_options; 

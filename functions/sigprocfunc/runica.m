@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Edit history %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -747,9 +750,13 @@ end
   blockno = 1;  % running block counter for kurtosis interrupts
 
   while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    permute=randperm(datalength); % shuffle data order at each step
+      permute=randperm(datalength); % shuffle data order at each step
 
     for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+      pause(0);
+      if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+          close; error('USER ABORD');
+      end;
       if biasflag                                                   
        u=weights*data(:,permute(t:t+block-1)) + bias*onesrow;      
       else                                                             
