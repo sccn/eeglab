@@ -105,6 +105,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/26 18:42:50  arno
+% moviefolder now functionnal
+%
 % Revision 1.16  2002/11/26 16:16:51  arno
 % always including frequency in movie name
 % ,
@@ -445,21 +448,23 @@ if ~strcmpi(g.mode, 'compute')
         
 		% Compute the MIN/MAX power 
 		%--------------------------
-		tmpmin = 1000;
-		tmpmax = -1000;
-		for numcompo=1:length( g.comps ) 
-			for condition=1:nbconditions 
-				tmpersp = ALLERSP{ numcompo, condition };
-				tmpmin  = min( tmpmin, min(	tmpersp(freqindex,:) ));
-				tmpmax  = max( tmpmax, max(	tmpersp(freqindex,:) ));
-			end;
-		end;
-		
+        if ~strmatch('scalepower', brainmovieoptions(1:2:end)) % test if scalepower is defined
+            tmpmin = 1000;
+            tmpmax = -1000;
+            for numcompo=1:length( g.comps ) 
+                for condition=1:nbconditions 
+                    tmpersp = ALLERSP{ numcompo, condition };
+                    tmpmin  = min( tmpmin, min(	tmpersp(freqindex,:) ));
+                    tmpmax  = max( tmpmax, max(	tmpersp(freqindex,:) ));
+                end;
+            end;
+            brainmovieoptions = { brainmovieoptions{:} 'scalepower' [tmpmin tmpmax] };
+        end;
+        
         % Run brainmovie
         % --------------
-		brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                    brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'), ...
-                    'scalepower', [tmpmin tmpmax] );  
+        brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
+                    brainmovieoptions{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         if strcmp(g.oneframe, 'on')
             disp('Only one frame generated');
             cd(origdir);
