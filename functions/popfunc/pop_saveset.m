@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/07/30 17:03:23  arno
+% same
+%
 % Revision 1.31  2004/07/30 17:02:17  arno
 % debug last
 %
@@ -253,12 +256,12 @@ if mode == 0  % single datasets
             try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
             catch, 
                 try, save([ curfilepath curfilename ], '-mat', 'EEG');
-                catch, error('Pop_saveset: save error, check permissions on file or directory');
+                catch, error('Pop_saveset: save error, out of space or file permission problem');
                 end;
             end;
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
-			error('Pop_saveset: save error, check permissions on file or directory');
+			error('Pop_saveset: save error, out of space or file permission problem');
 		end;
 		EEG.data = tmpdata; 
 		EEG.icaact = tmpica;
@@ -275,19 +278,16 @@ if mode == 0  % single datasets
                 if strcmpi(but, 'yes'), del =1; end;
             end;
         end;
-        try, 
-            EEG.data = single(EEG.data);
-            fprintf('Saving dataset...\n');
-            try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
-            catch, 
-                try, save([ curfilepath curfilename ], '-mat', 'EEG');
-                catch, error('Pop_saveset: save error, check permissions on file or directory');
-                end;
+        EEG.data = single(EEG.data);
+        fprintf('Saving dataset...\n');
+        asdf
+        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+        catch, 
+            try, save([ curfilepath curfilename ], '-mat', 'EEG');
+            catch, error('Pop_saveset: save error, out of space or file permission problem');
             end;
-            EEG.data = double(EEG.data);
-		catch, 
-			error('Pop_saveset: Save error, check permissions on file or directory');
-		end;
+        end;
+        EEG.data = double(EEG.data);
         if del,
             try,
                 tmpfilename = which(tmpfilename);
@@ -347,7 +347,7 @@ else
 			try, 
 				floatwrite( tmpdata, [ curfilepath ALLEEG(index).data], 'ieee-le');
 			catch, 
-				error('Pop_saveset: saving error, check permission on file or directory');
+				error('Pop_saveset: saving error, out of space or file permission problem');
 			end;
 		end;
 	else % standard file saving
@@ -370,7 +370,7 @@ else
 	try, save([ curfilepath curfilename ], '-V6', '-mat', 'ALLEEG');
 	catch, 
         try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
-        catch, error('Pop_saveset: save error, check permissions on file or directory');
+        catch, error('Pop_saveset: save error, out of space or file permission problem');
         end;
 	end;
     
