@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/05/15 21:30:32  arno
+% adding properties
+%
 % Revision 1.4  2003/04/30 22:57:40  arno
 % debug scale
 %
@@ -78,7 +81,7 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
   border  = mean(newfreqs(2:end)-newfreqs(1:end-1))/2; % automatically added to the borders in imagesc
   newfreqs = linspace(realborders(1)+border, realborders(2)-border, length(freqs));
   
-  if nargin == 4 & isempty(clim)
+  if nargin == 4 & ~isempty(clim)
       imagesc(times,newfreqs,data,clim);
   else 
       imagesc(times,newfreqs,data);
@@ -100,4 +103,8 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
   
   % additional properties
   % ---------------------
-  set(gca, varargin{:}, 'xaxislocation', 'bottom', 'box', 'off', 'ticklength', [0.03 0.01]);
+  set(gca, 'yminortick', 'off', 'xaxislocation', 'bottom', 'box', 'off', 'ticklength', [0.03 0], 'tickdir','out', 'color', 'none');  
+  if ~isempty(varargin)
+      set(gca, varargin{:});
+  end;
+  
