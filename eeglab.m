@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2002/08/14 23:54:36  arno
+% new format for dataset parameter ui
+%
 % Revision 1.134  2002/08/14 21:43:05  arno
 % besa menu toggle
 %
@@ -1069,18 +1072,18 @@ else
 	set(h, 'visible', 'on');
 	set( g.win0, 'String', 'No current dataset');
 	set( g.mainwin1, 'String', '- Create a new or load an existing dataset:');
-	set( g.mainwin2, 'String', '   Use "/File/Import data"           (new)'); 
-	set( g.mainwin3, 'String', '   Or  "/File/Load existing dataset" (old)');
+	set( g.mainwin2, 'String', '   Use "File > Import data"           (new)'); 
+	set( g.mainwin3, 'String', '   Or  "File > Load existing dataset" (old)');
 	set( g.mainwin4, 'String', '- If new,');
-	set( g.mainwin5, 'String', '  "/File/Import epoch info" (data epochs), else');
-	set( g.mainwin6, 'String', '  "/File/Import event info" (continuous data)');
-	set( g.mainwin7, 'String',  '  "/Edit/Dataset info" (add/edit dataset info)');
-	set( g.mainwin8, 'String', '  "/File/Save dataset" (save dataset)');
-	set( g.mainwin9, 'String', '- Prune data: "/Edit/Select data"');
-	set( g.mainwin10,'String', '- Reject data: "/Tools/Reject continuous data"');
-	set( g.mainwin11,'String', '- Epoch data: "/Tools/Extract epochs"');
-	set( g.mainwin12,'String', '- Remove baseline: "/Tools/Remove baseline"');
-	set( g.mainwin13,'String', '- Run ICA:    "/Tools/Run ICA"');
+	set( g.mainwin5, 'String', '  "File > Import epoch info" (data epochs) else');
+	set( g.mainwin6, 'String', '  "File > Import event info" (continuous data)');
+	set( g.mainwin7, 'String',  '  "Edit > Dataset info" (add/edit dataset info)');
+	set( g.mainwin8, 'String', '  "File > Save dataset" (save dataset)');
+	set( g.mainwin9, 'String', '- Prune data: "Edit > Select data"');
+	set( g.mainwin10,'String', '- Reject data: "Tools > Reject continuous data"');
+	set( g.mainwin11,'String', '- Epoch data: "Tools > Extract epochs"');
+	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
+	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
 end;
 
 % adjust title extent
