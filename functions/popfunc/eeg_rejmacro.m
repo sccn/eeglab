@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/26 21:27:36  arno
+% updating call to eeg_store
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -58,7 +61,7 @@ if reject
 	if ~exist('icacomp'), icacomp = typerej; end;
     com2 = [com2 sprintf(['%s = pop_rejepoch(%s, tmprej, 1);' ...
 		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);' ...
-	       'eeglab(''redraw''); end;'], inputname(1), inputname(1)); ] ;
+	       'eeglab(''redraw''); end;'], 'EEG', 'EEG'); ] ;
 else
 	com2 = [com2 '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
 end; 
