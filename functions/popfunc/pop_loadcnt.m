@@ -11,6 +11,12 @@
 %                   (though it is probably there). Values known to 
 %                   work are 1 and 40. If 1 does not work (the data does
 %                   not look like EEG), you should try 40. 
+%   "Time interval in seconds" - [edit box] specify time interval [min max]
+%                   to import portion of data. Command line equivalent
+%                   in loadcnt: 't1' and 'lddur'
+%   "Import keystrokes" - [edit box] set this option to 'yes' to import
+%                   keystrokes events in dataset. Command line equivalent
+%                   'keystroke'.
 %   "loadcnt() 'key', 'val' params" - [edit box] Enter optional loadcnt()
 %                   parameters.
 %
@@ -18,6 +24,8 @@
 %   filename       - file name
 %
 % Optional inputs:
+%   'keystroke'    - ['on'|'off'] set the option to 'on' to import 
+%                    keystroke events. Default is off.
 %   Same as loadcnt() function.
 % 
 % Outputs:
@@ -52,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/05/20 00:46:11  arno
+% debug if no events
+%
 % Revision 1.11  2003/05/14 17:16:27  arno
 % putting time range in gui
 %
@@ -103,8 +114,9 @@ if nargin < 1
 	% -----------------------
     promptstr    = { 'Enter block size for CNT file (1 or 40):' ...
                      'Time interval in seconds (i.e. [0 100]; default all):' ...
+                     'Import keystrokes (off|on -> import as type 0):' ...
                      'loadcnt() ''key'', ''val'' params' };
-	inistr       = { '1'  '' '' };
+	inistr       = { '1'  '' 'off' '' };
 	pop_title    = sprintf('Load a CNT dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
@@ -117,16 +129,10 @@ if nargin < 1
         timer =  eval( [ '[' result{2} ']' ]);
         options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
     end;   
-    if ~isempty(result{3}), options = [ options ',' result{3} ]; end;
+    if ~strcmpi(result{3}, 'off'), options = [ options ', ''keystroke'', ''' result{3} '''' ]; end;
+    if ~isempty(result{4}), options = [ options ',' result{4} ]; end;
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
-		end;
-	end;	
+	options = vararg2str(varargin);
 end;
 
 % load datas
@@ -151,7 +157,11 @@ EEG.data            = r.dat;
 EEG.filename        = filename;
 EEG.setname 		= 'CNT file';
 EEG.nbchan          = r.nchannels; 
-I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
+if isempty(findstr('keystroke', lower(options)))
+    I = find( ( r.event.stimtype ~= 0 ) & ( r.event.stimtype ~= 255 ) );
+else
+    I = 1:length(r.event.stimtype);
+end;
 
 if ~isempty(I)
     EEG.event(1:length(I),1) = r.event.stimtype(I);
