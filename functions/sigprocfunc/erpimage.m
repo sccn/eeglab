@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2003/05/06 17:31:29  arno
+% debug Rmerp
+%
 % Revision 1.102  2003/05/06 15:58:51  scott
 % header edits
 %
@@ -1886,7 +1889,7 @@ end
 if strcmpi(noshow, 'no')
     if TIMEX
         if Nosort == YES
-            l=ylabel('Trial Number');
+            l=ylabel('Trials');
         else
             if exist('phargs')
                 l=ylabel('Phase-sorted Trials');
@@ -1900,7 +1903,7 @@ if strcmpi(noshow, 'no')
         end
     else % if switch x<->y axes
         if Nosort == YES & NoTimeflag==NO
-            l=xlabel('Trial Number');
+            l=xlabel('Trials');
         else
             if exist('phargs')
                 l=ylabel('Phase-sorted Trials');
