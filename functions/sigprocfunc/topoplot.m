@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2003/12/17 01:25:37  arno
+% debug plot electrode subset
+%
 % Revision 1.68  2003/12/17 00:57:17  arno
 % subset of electrodes
 %
@@ -512,7 +515,7 @@ if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common 
     Rd(end) = [];
 end;
 
-if length(Vl) > 0
+if length(Vl) > 1
     Vl     = Vl(ind);
 end;
 labels = labels(ind);
