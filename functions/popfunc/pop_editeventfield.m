@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/07/23 18:37:41  arno
+% removing debug message
+%
 % Revision 1.6  2002/05/03 22:11:07  arno
 % debugging rename
 %
@@ -188,7 +191,7 @@ if nargin<2
 	                else                                args = { args{:}, allfields{index}, results{index*2+1} }; end;
 				end;
 				try, 
-					if ~isempty( userdat{index} ) & ~strcmp( userdat{index}, EEG.eventdescription{index})
+					if ~strcmp( userdat{index}, EEG.eventdescription{index})
 						args = { args{:}, [ allfields{index} 'info' ], userdat{index} }; 
 					end;
 				catch, end;
@@ -287,7 +290,10 @@ for curfield = tmpfields'
                         disp(['Set warning: Field ''' curfield{1} ''' not found for deletion, ignoring']);
                      else
 	                    EEG.event = rmfield(EEG.event, curfield{1}); 
-	                    allfields = { allfields{1:indexmatch-1} allfields{indexmatch+1:end}};
+	                    allfields(indexmatch) = [];
+						try,
+							EEG.eventdescription(indexmatch) = [];
+						catch, end;
 	                 end;    
 	            else % interpret
 		            switch g.append 
