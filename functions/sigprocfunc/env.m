@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 2001 - extrapolation -ad
 % 01-25-02 reformated help & license -ad 
@@ -53,10 +56,12 @@ if nargin > 2
 	Xi = [timearray];
 	Yi = ones(1,size(timearray,2));
 
+    warning off;
 	[tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'invdist');   % interpolate data
 	maxdata = Zi;
 	[tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'invdist');   % interpolate data
 	mindata = Zi;
+    warning on;
 end;	
 
 envdata = [maxdata;mindata];
