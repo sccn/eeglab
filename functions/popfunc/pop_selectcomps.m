@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/26 23:57:37  arno
+% same
+%
 % Revision 1.5  2002/07/26 23:56:27  arno
 % window location
 %
@@ -96,7 +99,7 @@ end;
 % set up the figure
 % -----------------
 if ~exist('fig')
-	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off');
+	figure('name', 'Reject components by map - pop_selectcomps()', 'numbertitle', 'off', 'color', [1 1 1]);
 	set(gcf,'MenuBar', 'none');
 	pos = get(gcf,'Position');
 	set(gcf,'Position', [pos(1) 20 800 800]);
