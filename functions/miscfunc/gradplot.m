@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/01/29 02:15:56  scott
+% update locs_file reading from topoplot.m
+%
 % Revision 1.4  2004/01/28 21:52:52  scott
 % same
 %
@@ -52,7 +55,7 @@
 
 % 01-25-02 reformated help & license, added links -ad 
 
-function [gradx, grady] = gradplot( map, locs_file, draw ) 
+function [gradx, grady] = gradplot( map, loc_file, draw ) 
 
 if nargin < 2
 	help gradplot;
