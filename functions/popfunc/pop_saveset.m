@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2004/08/18 21:30:16  arno
+% debug last
+%
 % Revision 1.34  2004/08/18 21:26:47  hilit
 % removed asdf bug
 %
@@ -184,7 +187,8 @@ if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
 				indices = [indices index];
 			end;
 		end;
-		result = inputdlg2( {'Indices of the datasets to save'}, 'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
+		result = inputdlg2( {'Indices of the datasets to save'}, ...
+                             'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
         drawnow;
 		if length(result) == 0 return; end;
 		indices = eval( [ '[' result{1} ']' ] );
@@ -285,14 +289,18 @@ if mode == 0  % single datasets
             end;
         end;
         EEG.data = single(EEG.data);
+        EEGDATA  = EEG.data;
+        EEG.data = 'EEGDATA';
         fprintf('Saving dataset...\n');
-        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG');
+        try, save([ curfilepath curfilename ], '-V6', '-mat', 'EEG', 'EEGDATA'); % Matlab 7
         catch, 
-            try, save([ curfilepath curfilename ], '-mat', 'EEG');
+            try, save([ curfilepath curfilename ], '-mat', 'EEG', 'EEGDATA');
             catch, error('Pop_saveset: save error, out of space or file permission problem');
             end;
-            EEG.data = double(EEG.data);
+            EEGDATA= double(EEGDATA); 
         end;
+        EEG.data = EEGDATA;
+        clear EEGDATA;
         if del,
             try,
                 tmpfilename = which(tmpfilename);
