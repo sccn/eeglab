@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/07/26 16:14:03  arno
+% removing trials with Nan values for sortvar, debugging 'vert'
+%
 % Revision 1.25  2002/07/15 02:00:48  arno
 % same
 %
@@ -757,7 +760,7 @@ end
 %
 if any(isnan(sortvar))
 	nanlocs = find(isnan(sortvar));
-	fprintf('Removing %d trials with NaN values for sorting variable', length(nanlocs));
+	fprintf('Removing %d trials having NaN values for sorting variable', length(nanlocs));
 	data(:,nanlocs) = [];
 	sortvar(nanlocs) = [];
 	if exist('data2') == 1
@@ -771,7 +774,7 @@ if any(isnan(sortvar))
 			verttimes(nanlocs,:) = [];
 		end;
 	end;
-	ntrials = size(data,2)
+	ntrials = size(data,2);
 end;
 
 %
