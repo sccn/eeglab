@@ -21,6 +21,9 @@
 % Outputs:
 %   struct    - checked structure
 %
+% Note: in case of error, a string is returned with the error message
+%       instead of a structure.
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 July 2002
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -42,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/10 02:17:27  arno
+% debugging error message passing
+%
 % Revision 1.1  2002/07/10 01:03:19  arno
 % Initial revision
 %
