@@ -50,6 +50,9 @@
 %                 function for computing more accurate limits or exact p-value
 %                 ('vals' option). Statistical toolbox required.
 %                 Option currently only implemented for 1-D data.
+%   'correctp'    - [phat pci zerofreq] parameters for correcting biased
+%                 probability distribution (only works with 'distfit'). See help
+%                 of correctfit().
 %
 % Outputs: 
 %    rsignif    - significance arrays. 2 values (low high) for each points (use
@@ -80,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/07/08 16:36:25  arno
+% no plot
+%
 % Revision 1.13  2003/07/08 15:37:02  arno
 % *** empty log message ***
 %
@@ -157,6 +163,7 @@ g = finputcheck(varargin, ...
 				  'alpha'         'real'     [0 1]                    0.05; ...
 				  'vals'          'real'     [0 Inf]                    []; ...
 				  'distfit'       'string'   {'on' 'off' }            'off'; ...
+				  'correctp'      'real'     []                       []; ...
 				  'accarray'      'integer'  []                       NaN	});
 if isstr(g)
 	error(g);
@@ -379,6 +386,13 @@ if strcmpi(g.distfit, 'on')
     % fitting with Ramber-Schmeiser distribution
     % ------------------------------------------
     accarrayout = 1 - rsfit(abs(Rbootout(:)), g.vals);
+    if ~isempty(g.correctp)
+        if length(g.correctp) == 2
+            accarrayout = correctfit(accarrayout, 'gamparams', [g.correctp 0]); % no correction for p=0
+        else
+            accarrayout = correctfit(accarrayout, 'gamparams', g.correctp);
+        end;
+    end;
     return;
     
     % fitting with normal distribution (deprecated)
