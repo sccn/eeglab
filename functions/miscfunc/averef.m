@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/21 00:21:51  arno
+% debugging
+%
 % Revision 1.3  2002/04/11 18:37:33  scott
 % revised help msg
 %
@@ -71,13 +74,15 @@ data = data - ones(chans,1)*sum(data)/chans;
 
 % treat optional ica parameters
 if nargin == 2
-	winv = pinv(W);
-	avematrix = eye(chans)-ones(chans)*1/chans;
+	winv  = pinv(W);
+    size1 = size(winv,1);
+	avematrix = eye(size1)-ones(size1)*1/size1;
 	W = pinv(avematrix*winv);
 end;
 if nargin == 3
 	winv = pinv(W*S);
-	S = eye(size(W,1), size(W,1));
-	avematrix = eye(chans)-ones(chans)*1/chans;
+    size1 = size(winv,1);
+	avematrix = eye(size1)-ones(size1)*1/size1;
 	W = pinv(avematrix*winv);
+	S = eye(chans);
 end;
