@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2003/08/07 15:54:49  scott
+% debug last
+%
 % Revision 1.53  2003/08/07 15:51:05  scott
 % added 'noplot' option to return interpolated channel value
 %
@@ -540,6 +543,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
           error('designated ''noplot'' channel out of bounds')
       else
         chanval = Zi(chancoords);
+        chancoords
+        chanval
       end
   end
   %
