@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/08/09 01:15:36  arno
+% updating boundaries
+%
 % Revision 1.23  2002/07/30 18:12:51  arno
 % debugging
 %
@@ -675,8 +678,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 				end
 				eegspec(c,:) = eegspec(c,:) + tmpspec';
 			else
-				for n=1:length(boundaries)-1
-					[tmpspec,freqs] =  psd(averef(tmpdata(:,boundaries(n)+1:boundaries(n+1))),...
+				for n=1:length(g.boundaries)-1
+					[tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
 										   fftlength, srate,fftlength/2,fftlength/8);
 					if c==1 & e==epoch_subset(1)
 						eegspec = zeros(nchans,length(freqs));

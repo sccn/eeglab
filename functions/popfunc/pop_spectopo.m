@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/08/09 01:13:15  arno
+% debugging boundaries
+%
 % Revision 1.16  2002/08/09 00:54:35  arno
 % adding boundaries for cont. data
 %
@@ -188,15 +191,6 @@ if ~isempty(EEG.chanlocs)
 else
 	spectopooptions = options;
 end;
-
-% add boundaries if continuous data
-% ----------------------------------
-if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
-	boundaries = strmatch({EEG.event.type}, 'boundary');
-	if ~isempty(boundaries)
-		spectopooptions = { spectopooptions{:} 'boundaries' cell2mat({EEG.event(boundaries).latency}) }; 
-	end;	
-end;
 	
 % The programming here is a bit redundant but it tries to optimize 
 % memory usage.
@@ -206,13 +200,31 @@ if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
 	posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
 	pointrange = posi:posf;
 	if posi == posf, error('pop_spectopo: empty time range'); end;
-	fprintf('pop_spectopo: slecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
+	fprintf('pop_spectopo: selecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
 			timerange(1), timerange(2), posi, posf);
 end;
 if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
 else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
 end;
 SIGTMP = reshape(SIGTMP, size(SIGTMP,1), size(SIGTMP,2)*size(SIGTMP,3));
+
+% add boundaries if continuous data
+% ----------------------------------
+if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+	boundaries = strmatch('boundary', {EEG.event.type});
+	if ~isempty(boundaries)
+		if exist('pointrange')
+			boundaries = cell2mat({EEG.event(boundaries).latency})-0.5-pointrange(1)+1;
+			boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
+			boundaries(find(boundaries<1)) = [];
+			boundaries = [0 boundaries pointrange(end)-pointrange(1)];
+		else
+			boundaries = [0 cell2mat({EEG.event(boundaries).latency})-0.5 EEG.pnts];
+		end;
+		spectopooptions = [ spectopooptions ',''boundaries'',[' int2str(round(boundaries)) ']']; 
+	end;		
+	fprintf('Pop_spectopo: finding continuous data discontinuities\n');
+end;
 
 % outputs
 % -------
