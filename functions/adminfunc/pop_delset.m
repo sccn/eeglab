@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 18:40:54  arno
+% inputdlg2
+%
 % Revision 1.5  2002/08/11 19:31:34  arno
 % editing text
 %
@@ -59,6 +62,7 @@ if nargin < 1
 	return;
 end;
 if isempty( ALLSET )
+	error('Can not delete dataset. Restart eeglab to clear all dataset information');
     return;
 end;    
 

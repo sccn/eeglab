@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 02:37:13  arno
+% inputdlg2
+%
 % Revision 1.7  2002/06/25 02:20:29  arno
 % preserving epoch information
 %
@@ -74,7 +77,7 @@ if nargin < 1
 	return;
 end;
 if isempty(INEEG1)
-	error('Pop_merge: cannot merge empty dataset');
+	error('Pop_merge: need at least 2 datasets');
 end;
 if nargin < 2 & length(INEEG1) == 1
 	error('Pop_merge: need at least 2 datasets');
