@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/06/08 17:32:12  arno
+% update new call to eeg_insertbound
+%
 % Revision 1.27  2004/05/14 22:14:54  arno
 % same
 %
@@ -244,6 +247,33 @@ else
 			end;    
 		end;
 
+        % concatenate urevents
+        % --------------------
+        if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
+            
+            % insert boundary event
+            % ---------------------
+            INEEG1.urevent(end+1).type    = 'boundary';
+            INEEG1.urevent(end  ).latency = INEEG1.pnts+0.5;
+            
+            % update urevent indices for second dataset
+            % -----------------------------------------
+            orilen    = length(INEEG1.urevent);
+            for e=1:length(INEEG2.event)
+                INEEG2.event(e).urevent = INEEG2.event(e).urevent + orilen;
+            end;
+            
+            disp('Concatenating urevents...');
+            allfields = fieldnames(INEEG2.urevent);
+            for i=1:length( allfields )
+                for e=1:length(INEEG2.urevent)
+                    tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
+                    INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+                end;
+            end;
+           
+        end;
+
         % concatenate events
         % ------------------
         orilen = length(INEEG1.event);
@@ -255,20 +285,6 @@ else
             end;
 		end;
         INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
-
-        % concatenate urevents
-        % --------------------
-        if isfield(INEEG2, 'urevent') & ~isempty(INEEG2.urevent)
-            disp('Concatenating urevents...');
-            orilen = length(INEEG1.urevent);
-            allfields = fieldnames(INEEG2.urevent);
-            for i=1:length( allfields )
-                for e=1:length(INEEG2.urevent)
-                    tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
-                    INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
-                end;
-            end;
-        end;
 
         % add discontinuity event if continuous
         % -------------------------------------
