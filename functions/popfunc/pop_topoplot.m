@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/12/11 16:16:42  arno
+% debug history generation
+%
 % Revision 1.35  2003/11/06 02:12:57  arno
 % put RV to title
 %
@@ -336,9 +339,14 @@ for index = 1:size(arg2(:),1)
     
 	% plot scalp map
     % --------------
+    if index == 1
+        addopt = { 'verbose', 'on' };
+    else 
+        addopt = { 'verbose', 'off' };
+    end;
     if ~isnan(arg2(index))
 		if typeplot
-            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, 'verbose', 'off', options{:});
+            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
@@ -346,9 +354,9 @@ for index = 1:size(arg2(:),1)
 			end;
 		else
             if arg2(index) < 0
-                tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, options{:} );
+                tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             else
-                tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
+                tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
