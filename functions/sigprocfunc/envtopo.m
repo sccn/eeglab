@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/01/26 01:11:06  scott
+% same
+%
 % Revision 1.32  2004/01/26 01:08:13  scott
 % same
 %
@@ -522,8 +525,8 @@ if strcmpi(g.pvaf, 'on')
     [sortpvaf spx] = sort(pvaf);
     sortpvaf = pvaf(spx);
     pvafcomps = pvafcomps(spx);
-    pvafcomps = pvafcomps(end:-1:1);
-    sortpvaf  = sortpvaf(end:-1:1);
+    %pvafcomps = pvafcomps(end:-1:1);
+    %sortpvaf  = sortpvaf(end:-1:1);
     k = 1;
     for index =1:ncomps-ntopos
         fprintf('   IC%d pvaf: %6.2f%%      ', pvafcomps(index),sortpvaf(index));
