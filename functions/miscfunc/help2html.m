@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/17 02:25:10  arno
+% documenting new features
+%
 % Revision 1.16  2003/02/17 02:19:14  arno
 % including gif images now. Also new format
 %
@@ -344,18 +347,23 @@ while (str(1) == '%')
                fprintf( fo, [g.normcol2 g.description '</td></tr>\n'], [ upper(oldvartext(1)) oldvartext(2:end) ]);
 
                % INSERT IMAGE IF PRESENT
-               imagename = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.jpg' ];
-			   if exist( imagename ) % do not make link if the file does not exist 
-					fprintf(fo, [ g.normrow g.doublecol ...
-								'<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
-								' width=400></A></CENTER></td></tr>' ]);
-		       else
-                   imagename = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.gif' ];
-                   if exist( imagename ) % do not make link if the file does not exist 
+               imagename = [];
+               imagename1 = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.jpg' ];
+               imagename2 = [ htmlfile( 1:findstr( htmlfile, functioname )-1) functioname '.gif' ];
+			   if exist( imagename2 ), imagename = imagename2; end; 
+			   if exist( imagename1 ), imagename = imagename1; end; 
+               if ~isempty(imagename) % do not make link if the file does not exist 
+                   imageinfo = imfinfo(imagename);
+                   if imageinfo.Width < 400
                        fprintf(fo, [ g.normrow g.doublecol ...
                                      '<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
-                                     ' width=600></A></CENTER></td></tr>' ]);
+                                     '></A></CENTER></td></tr>' ]);
+                   else
+                       fprintf(fo, [ g.normrow g.doublecol ...
+                                     '<CENTER><BR><A HREF="' imagename '" target="_blank"><img SRC=' imagename ...
+                                     ' width=400></A></CENTER></td></tr>' ]);
                    end;
+                   
                end;
             end;             
    		elseif ~isempty(oldvarname)
