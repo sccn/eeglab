@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/23 17:03:41  scott
+% added alternate functions nan_mean() and nan_sum() -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -296,7 +299,7 @@ function out = nan_mean(in)
 %
 % nan_sum() - take the column sums of a matrix, ignoring NaN values
 %
-function out = nan_mean(in)
+function out = nan_sum(in)
 
    nans = find(isnan(in));
    in(nans) = 0;
