@@ -4,7 +4,7 @@
 % Usage:
 %   >>  eloc = readlocs( filename );
 %   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
-%   >>  [eloc, labels, theta, radius] = readlocs( filename, 'key', 'val', ... );
+%   >>  [eloc, labels, theta, radius, indices] = readlocs( filename, 'key', 'val', ... );
 %
 % Inputs:
 %   filename   - Name of the file containing the electrode locations
@@ -73,6 +73,7 @@
 %   labels    - cell array of strings giving the  names of the electrodes
 %   theta     - vector of polar angles for the electrodes (in degrees).
 %   radius    - vector of polar coordinate radius values for the electrodes
+%   indices   - indices of channel having non-empty coordinates
 %
 % File formats:
 %   The extension of the file determines its type if 'filetype' is unspecified:
@@ -176,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/12/05 18:37:56  arno
+% debug polhemus x and y fixed
+%
 % Revision 1.55  2003/12/02 03:21:39  arno
 % neuroscan format
 %
@@ -283,7 +287,7 @@
 %
 
 
-function [eloc, labels, theta, radius] = readlocs( filename, varargin ); 
+function [eloc, labels, theta, radius, indices] = readlocs( filename, varargin ); 
 
 if nargin < 1
 	help readlocs;
@@ -565,10 +569,13 @@ if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
 if nargout > 2
-    theta = cell2mat({ eloc.theta });
+    tmptheta = { eloc.theta };
+    indices = find(~cellfun('isempty', tmptheta));
+    theta = cell2mat(tmp_theta(indices));
 end;
 if nargout > 3
-    radius  = cell2mat({ eloc.radius });
+    tmprad = { eloc.radius };
+    radius  = cell2mat(tmprad(indices));
 end;
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
 %disp('Converting channel labels to string');
