@@ -24,7 +24,7 @@
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> data limits}
+%                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> plotting limits}
 %  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv', 
 %                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative 
 %                  variance. Here:                                      
@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2005/04/01 22:13:44  scott
+% same
+%
 % Revision 1.89  2005/04/01 22:06:55  scott
 % made default ymax,ymin from plotted data, not whole data
 %
@@ -452,14 +455,33 @@ else % dprecated - old style input args
     g.dispmaps = 'on';
 end;
 
-if ~isempty(g.colors)
-    g.colorfile = g.colors; % retain old usage 'colorfile' for 'colors' -sm 4/04
-end
-
+%
+% Check input flags and arguments
+% 
 if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
 [chans,frames] = size(data);
+
+if isempty(g.chanlocs)
+        error('requires ''chanlocs'' flag and argument');
+end
+if isstr(g.chanlocs)
+        if exist(g.chanlocs) ~= 2  % if no such file
+            fprintf('envtopo(): named channel location file ''%s'' not found.\n',g.chanlocs);
+            return
+        end
+        eloc = readlocs(g.chanlocs);  % read channel locations information
+        if length(eloc) ~= chans
+            fprintf(...
+              'envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
+            return
+        end
+end
+
+if ~isempty(g.colors)
+    g.colorfile = g.colors; % retain old usage 'colorfile' for 'colors' -sm 4/04
+end
 
 if ~isempty(g.vert)
    g.vert = g.vert/1000; % convert from ms to s
@@ -519,20 +541,6 @@ pmax = g.limits(2);
 
 dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
-
-%
-%%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
-%
-ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(data(g.plotchans,:))); % begin by setting limits from data
-ymax = max(max(data(g.plotchans,:)));
-if length(g.limits) == 4 
-     if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
-	 ymin = g.limits(3);
-	 ymax = g.limits(4);
-         ylimset = 1;
-     end
-end
 
 %
 %%%%%%%%%%%%%%% Find limits of the component selection window %%%%%%%%%
@@ -702,12 +710,29 @@ envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode);
 
 fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
 fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
-fprintf('Comparing projection sizes for components:  ');
+fprintf('Comparing maximum projections for components:  ');
         if ncomps>32
            fprintf('\n');
         end
 compvars = zeros(1,ncomps);
 mapsigns = zeros(1,ncomps);
+
+%
+% Compute frames to plot
+%
+sampint  = (xmax-xmin)/(frames-1);     % sampling interval in sec
+times    = xmin:sampint:xmax;          % make vector of data time values
+
+[v minf] = min(abs(times-pmin));
+[v maxf] = min(abs(times-pmax));
+pframes  = minf:maxf;         % frames to plot
+ptimes   = times(pframes);    % times to plot
+if limframe1 < minf
+   limframe1 = minf;
+end
+if limframe2 > maxf
+   limframe2 = maxf;
+end
 
 %
 %%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
@@ -762,7 +787,7 @@ fprintf('\n');
 
 % compute pvaf
 if ~xunitframes
-  fprintf('  from the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
+  fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
 vardat = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
 
@@ -789,14 +814,6 @@ npercol = ceil(ncomps/3);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-sampint  = (xmax-xmin)/(frames-1);     % sampling interval in sec
-times    = xmin:sampint:xmax;          % make vector of data time values
-
-[v minf] = min(abs(times-pmin));
-[v maxf] = max(abs(times-pmax));
-pframes  = minf:maxf;         % frames to plot
-ptimes   = times(pframes);    % times to plot
-
 if strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
     [compvars,compx] = sort(compvars');  % sort compnums on max variance
 else % if 'pvaf' is 'pvaf' or 'rv'
@@ -920,6 +937,20 @@ axes(axe)
 set(axe,'Color',axcolor);
 
 % fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax,ymin,ymax);
+
+%
+%%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
+%
+ylimset = 0; % flag whether hard limits have been set by the user
+ymin = min(min(data(g.plotchans,pframes))); % begin by setting limits from plotted data
+ymax = max(max(data(g.plotchans,pframes)));
+if length(g.limits) == 4 
+     if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
+	 ymin = g.limits(3);
+	 ymax = g.limits(4);
+         ylimset = 1;
+     end
+end
 
 %
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
@@ -1187,18 +1218,6 @@ if strcmpi(g.dispmaps, 'on')
     
     [tmp tmpsort] = sort(maporder);
     [tmp tmpsort] = sort(tmpsort);
-    if isstr(g.chanlocs)
-        if exist(g.chanlocs) ~= 2  % if no such file
-            fprintf('envtopo(): named channel location file ''%s'' not found.\n',g.chanlocs);
-            return
-        end
-        eloc = readlocs(g.chanlocs);
-        if length(eloc) ~= chans
-            fprintf(...
-              'envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
-            return
-        end
-    end
     chanlocs = g.chanlocs(g.plotchans); % topoplot based on g.plotchans only! -sm 11/04
 
     for t=1:ntopos % left to right order  (maporder)
