@@ -1,13 +1,13 @@
 % eeg_helphelp() - how to use EEGLAB help.
 %
-% Menus:  =============================================================
+% Menus: 
 % Each EEGLAB menu calls a Matlab function from the commandline. If this 
 % function pops up a graphic interface window, the figure title usually 
 % contains the name of the function that the window will call. EEGLAB help 
 % files are thus simply the collection of all the help files of the called 
 % functions. 
 %
-% Convention for function calls: ======================================
+% Convention for function calls:
 % When the menu calls a function, it uses the EEG dataset as  an
 % argument, sometimes with additional parameters. The function then
 % pops-up an interactive window asking for additional parameter values.
@@ -18,7 +18,7 @@
 % build their own EEGLAB macros by copying and pasting commands from the 
 % EEGLAB history (from h()) into their own Matlab script files.
 %
-% Understanding EEGLAB help windows: ===================================
+% Understanding EEGLAB help windows:
 % From the EEGLAB menu, it is possible to call up the help message of any 
 % function that is called from the menu by opening the '/Help/EEGLAB' menu window.
 % The help message of each function that is called is then displayed.
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/01 03:35:25  arno
+% editing header
+%
 % Revision 1.2  2002/04/21 01:04:56  scott
 % edited help msg -sm
 %
