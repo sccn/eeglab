@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2005/01/31 23:21:55  arno
+% header
+%
 % Revision 1.103  2005/01/24 01:15:39  arno
 % fixing zoom for Matlab 7
 %
@@ -894,7 +897,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
                     'if g.children, delete(g.children); end;' ...
                     'delete(gcbf);' ...
 		  				  tmpcom ...
-                    'clear g;']; % quitting expression
+                    '; clear g;']; % quitting expression
   if ~isempty(g.command)
 	  u(12) = uicontrol('Parent',figh, ...
 						'Units', 'normalized', ...
