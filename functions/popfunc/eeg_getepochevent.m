@@ -8,7 +8,8 @@
 %   EEG       - Input dataset
 %
 % Optional inputs:
-%   types     - Cell array of a subset of event types; 
+%   types     - String containing an event type. Cell array of string
+%               may be used to select several event types; 
 %               {} is all types of events. Note: Requires that 
 %               a field named 'type' is defined in 'EEG.event'.
 %   timewin   - Event time window [start, end] in milliseconds
@@ -37,10 +38,15 @@
 %        recomputes the latency of each event relative to the epoch time
 %        limits.
 %
-% Example: >> latencies = eeg_getepochevent(EEG, {'target','rare'}, [0 0.3]);
-%          % Return the latencies (by default) of 'target' or 'rare' type
-%          % events occurring between 0 and 0.3 sec of each epoch.
-%          % Returns NaN for epochs with no such events. (See Notes above).
+% Example: 
+%  >> latencies = eeg_getepochevent(EEG, 'rt');
+%  % Return the latencies (by default) in milliseconds of events having 
+%  % type 'rt' (reaction time)
+%
+%  >> latencies = eeg_getepochevent(EEG, {'target','rare'}, [0 0.3], 'position');
+%  % Return the position (field 'position') of 'target' or 'rare' type
+%  % events occurring between 0 and 0.3 sec of each epoch.
+%  % Returns NaN for epochs with no such events. (See Notes above).
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 15 Feb 2002
 %
@@ -65,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/01/03 20:46:38  scott
+% header edits -sm
+%
 % Revision 1.9  2002/08/15 16:29:35  arno
 % update message
 %
