@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/07/17 23:20:16  scott
+% formatting
+%
 % Revision 1.26  2003/07/03 16:55:07  arno
 % header
 %
@@ -201,6 +204,7 @@ else
 		end;
 	end;	
 end;
+options = [ options ', ''masksurf'', ''on''' ];
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')  
@@ -237,6 +241,8 @@ end;
 % plot the graphs
 % ---------------
 counter = 1;
+countobj = 1;
+allobj = zeros(1,1000);
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
@@ -249,15 +255,16 @@ for index = 1:size(arg2(:),1)
 			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
        end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
+        set(gca, 'visible', 'off')
 	end;
 
 	if ~isnan(arg2(index))
 		if typeplot
 			if length( options ) < 2
-				topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, ...
+				tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, ...
                           'verbose', 'off');
 			else	
-				eval([ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
+				eval([ 'tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits, ''verbose'', ''off''' options ');' ] );
 			end;
 			if nbgraph == 1, 
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
@@ -267,21 +274,23 @@ for index = 1:size(arg2(:),1)
 		else
 			if length( options ) < 2
 			    if arg2(index) < 0
-	    			topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs );
+	    			tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs );
 	    		else
-	    			topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs );
+	    			tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs );
 	            end;    			
 			else	
 			    if arg2(index) < 0
-				    eval( [ 'topoplot(  -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
+				    eval( [ 'tmpobj = topoplot(  -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
 	            else
-	    			eval( [ 'topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
+	    			eval( [ 'tmpobj = topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs, ''verbose'', ''off''' options ');' ]);
 	            end;    			
 			end;
 			if nbgraph == 1, title( [ 'IC ' int2str(arg2(index)) ' from ' topotitle] );
 			else title(['' int2str(arg2(index))]);
 			end;
 		end;
+        allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
+        countobj = countobj+length(tmpobj);
 		drawnow;
 		axis square; 
 		if index == size(arg2(:),1)
@@ -303,6 +312,8 @@ end;
 if nbgraph== 1, 
    com = 'figure;'; 
 end;
+set(allobj(1:countobj-1), 'visible', 'on');
+
 axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); clear postmp;');
 
 if length( options ) < 2

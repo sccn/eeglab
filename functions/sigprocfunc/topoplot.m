@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/08/07 16:02:35  scott
+% typo
+%
 % Revision 1.56  2003/08/07 16:01:49  scott
 % debug
 %
@@ -273,6 +276,7 @@ SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
 DIPOLE = [];
 VERBOSE = 'on';
+MASKSURF = 'off';
 
 %
 %%%%%%%%%%%%%%%%%%%%%%% Handle arguments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -352,6 +356,8 @@ if nargs > 2
 	  VERBOSE = Value;
 	 case 'maplimits'
 	  MAPLIMITS = Value;
+	 case 'masksurf'
+	  MASKSURF = Value;
 	 case 'gridscale'
 	  GRID_SCALE = Value;
 	 case 'style'
@@ -592,12 +598,20 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   if strcmp(STYLE,'contour')
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
   elseif strcmp(STYLE,'both')
-    surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
+    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
+    if strcmpi(MASKSURF, 'on')
+        set(tmph, 'visible', 'off');
+        handle = tmph;
+    end;
     contour(Xi,Yi,Zi,CONTOURNUM,'k');
   elseif strcmp(STYLE,'straight')
-    surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
+    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
+    if strcmpi(MASKSURF, 'on')
+        set(tmph, 'visible', 'off');
+        handle = tmph;
+    end;
   elseif strcmp(STYLE,'fill')
     contourf(Xi,Yi,Zi,CONTOURNUM,'k');
   else
@@ -642,7 +656,9 @@ else % if style 'blank'
   end;
 end
 
-handle = gca;
+if exist('handle') ~= 1
+    handle = gca;
+end;
 
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%% Draw head %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
