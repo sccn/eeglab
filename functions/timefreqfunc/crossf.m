@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/05/23 23:33:35  scott
+% remove subtraction of mean coherence -sm
+%
 % Revision 1.23  2002/04/25 02:54:07  arno
 % debugging topovec
 %
@@ -414,7 +417,7 @@ if isempty(g.topovec)
 elseif min(size(g.topovec))==1
 	g.topovec = g.topovec(:);
 end;
-if size(g.topovec,1)~=2
+if ~isempty(g.topovec) & size(g.topovec,1)~=2
 	error('topovec must be a row or column vector.');
 end
 
