@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2004/10/07 17:28:26  hilit
+% cosmetic GUI changes
+%
 % Revision 1.106  2004/10/07 16:28:02  hilit
 % disabled the call to orderfields
 %
@@ -1023,5 +1026,7 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
             chans = setfield(chans, {1}, fields{index}, []);
         end;
     end;
-    %chans = orderfields(chans, fields);
+    if exist('orderfields') == 2
+        chans = orderfields(chans, fields);
+    end;
     
