@@ -105,6 +105,10 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/11/26 16:16:51  arno
+% always including frequency in movie name
+% ,
+%
 % Revision 1.15  2002/11/22 02:10:10  arno
 % still commenting the revertangle function
 %
@@ -464,16 +468,13 @@ if ~strcmpi(g.mode, 'compute')
         
         % Run makemovie
         % -------------
-        outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
+        if ~isempty(g.moviefolder)
+             outname = sprintf('%s/%s%3.2f', g.moviefolder, g.moviename, freqs(freqindex));
+        else outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
+        end;
         if strcmpi(g.quality, 'ultrafast')
             unix(sprintf('mkavi -file %s.avi image*.ppm', outname));
         else
-            g.framefolder = pwd;
-            if ~isempty(g.moviefolder)
-                cd(g.moviefolder)
-            else 
-                cd(origdir);
-            end;
             g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
             makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
         end;
