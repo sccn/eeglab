@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/11/13 01:21:24  arno
+% typo in header
+%
 % Revision 1.14  2002/11/12 23:48:59  luca
 % noew saving output
 %
@@ -174,8 +177,10 @@ end;
 
 sizewin = 2^nextpow2(EEG.pnts);
 if icacomp == 1
-    [allspec, Irej, rejE, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
+    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
 							elecrange, EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    rejE = zeros(EEG.nbchan, EEG.trials);
+    rejE(elecrange,Irej) = tmprejE;
 else
     % test if ICA was computed
     % ------------------------
@@ -187,8 +192,10 @@ else
 												  EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, size(icaacttmp,1), EEG.pnts, EEG.trials);
     end;
-    [allspec, Irej, rejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
-								EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
+                                                      EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    rejE = zeros(EEG.nbchan, size(icaacttmp,1));
+    rejE(elecrange,Irej) = tmprejE;
 end;
 
 fprintf('%d channel selected\n', size(elecrange(:), 1));
@@ -254,7 +261,6 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	[tmp freqs] = pmtm( data(1,:,1) ); % just to get the frequencies 	
     freqs = [freqs(1) freqs(end)]*srate;	
     
-    Irej    = [];
 	fprintf('Computing spectrum (using slepian tapers; done only once):\n');
 	if isempty(specdata)
 		for index = 1:size(data,1)
@@ -271,11 +277,7 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	
 	% perform the rejection
 	% ---------------------	
-	[I1 Itmprej NS Etmprej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
+	[I1 Irej NS Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
 										 freqs, startfreq, max(max(freqs), endfreq));
-	Irej = union(Irej, Itmprej);
-    Erej    = zeros(size(data,1), length(Itmprej));
-
-	Erej(elecrange,Itmprej) = Etmprej;
 	fprintf('\n');    
 	
