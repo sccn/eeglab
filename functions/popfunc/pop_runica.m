@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/12/11 16:28:01  arno
+% remove debug mesg
+%
 % Revision 1.32  2003/11/07 02:22:18  arno
 % fixing history problem
 %
@@ -490,7 +493,7 @@ if nargin < 2
     if length(options) < 2
         com = sprintf('%s = pop_runica(%s, ''%s'');', inputname(1), inputname(1), icatype);
     else
-        com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1), icatype, options);
+        com = sprintf('%s = pop_runica(%s, ''%s'' %s);', inputname(1),inputname(1), icatype, options);
     end;
 end;
 
