@@ -1,16 +1,14 @@
-% spectopo() - Plot the mean log spectrum of a set of data epochs at
-%              all channels as a bundle of traces. At specified frequencies,
-%              plot the relative topographic distribution of power.
-%              Uses pwelch() from the Matlab signal processing toolbox or
-%              EEGLAB spec() function.
+% spectopo() - Plot the mean log spectrum of a set of data epochs at all channels 
+%              as a bundle of traces. At specified frequencies, plot the relative 
+%              topographic distribution of power. If available, uses pwelch() from 
+%              the Matlab signal processing toolbox, else the EEGLAB spec() function.
 % Usage:
-%        >> spectopo(data, frames, srate);
-%        >> [spectra,freqs,speccomp,contrib,specstd] = ...
+%              >> spectopo(data, frames, srate);
+%              >> [spectra,freqs,speccomp,contrib,specstd] = ...
 %                     spectopo(data, frames, srate, 'key1', 'val1', 'key2', 'val2' ...);
-%
 % Inputs:
 %       data   = If 2-D (nchans,frames*epochs); % can be single-epoch
-%                 else, 3-D (nchans,frames,epochs)
+%                else, 3-D (nchans,frames,epochs)
 %       frames = frames per epoch {0 -> data length}
 %       srate  = sampling rate per channel (Hz)
 %
@@ -29,22 +27,20 @@
 %   'nfft'     = [integer] value to zero pad data to. Overwrites 'freqfac' above.
 %   'winsize'  = [integer] window size in data points {default: from data}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
-%   'percent'  = downsampling factor, or approximate percent of the data to
-%                keep while computing spectra. Downsampling can be used to speed up
-%                the computation. From 0 to 100 {defaults: 100 from the command line, 
-%                or 20 from the pop_up window}.
-%   'freqrange'  = [min max] frequency range to plot. Changes x-axis limits. 
-%   'reref'      = ['averef'|'off'] convert input data to average reference 
-%                  {default: 'off'}
-%   'mapnorm'    = [float vector] if 'data' contain the activity of an independant 
+%   'percent'  = [float 0 to 100] percent of the data to sample in computing the 
+%                spectra. Can be used to speed up the computation. {default: 100}.
+%   'freqrange' = [min max] frequency range to plot. Changes x-axis limits. 
+%   'reref'    = ['averef'|'off'] convert input data to average reference 
+%                {default: 'off'}
+%   'mapnorm'  = [float vector] if 'data' contain the activity of an independant 
 %                component, this parameter should contain its scalp map. In this case
 %                the spectrum amplitude will be scaled by component RMS scalp power.
 %                Useful for comparing component strengths.
 %   'boundaries' = data point indices of discontinuities in the signal
-%   'plot'       = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
+%   'plot'     = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
 %
-% Plot component contributions:
-%   'weights'  = ICA unmixing matrix. 'freq' must contain a single frequency.
+% Optionally plot component contributions:
+%   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
 %                ICA maps of the N (='nicamaps') components that account for the most
 %                power at the selected frequency ('freq') are plotted along with
 %                the spectra of the selected channel ('plotchan') and components
@@ -53,17 +49,17 @@
 %                contributions at the selected frequency ('freq'). {[]=channel with
 %                higest power at 'freq'). If 0, plot RMS power at all channels. 
 %   'nicamaps' = [integer] number of ICA component maps to plot (default: 4).
-%   'icacomps' = [integer array] indices of ICA component spectra to plot ([]=all).
+%   'icacomps' = [integer array] indices of ICA component spectra to plot ([] -> all).
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectrum of
 %                individual ICA components, the function computes the spectrum of
 %                the data minus their contributions {default: 'normal'}
 %   'icamaps'  = [integer array] force plotting of selected ICA compoment maps ([]=the
 %                'nicamaps' largest).
-%   'icawinv'  = [float array] inverse weigth matrix. By default computed by inverting
-%                the weight matrix (but if some components have been removed, then
+%   'icawinv'  = [float array] inverse weight matrix. By default computed by inverting
+%                the weight matrix. However, if some components have been removed, then
 %                weight's pseudo-inverse matrix does not represent component's maps. 
-%   'memory'   = ['low'|'high'] setting to low will use less memory for ICA component 
-%                computing, but will be longer.
+%   'memory'   = ['low'|'high'] setting to low will use less memory for component 
+%                computing, but computing time will be longer.
 %
 % Topoplot options:
 %    opther 'key','val' options are propagated to topoplot() for map display
@@ -80,9 +76,7 @@
 %                   variance, if 'icamode' is 'sub', percent variance accounted for)
 %        specstd  = spectrum standard deviation in dB
 %
-% Notes: The old function call is still functional for backward compatibility
-%        >> [spectra,freqs] = spectopo(data, frames, srate, headfreqs, ...
-%                               chanlocs, limits, titl, freqfac, percent);
+% Notes: The original input format is still functional for backward compatibility.
 %        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
@@ -108,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2004/02/12 02:14:09  arno
+% message for spec()
+%
 % Revision 1.83  2004/02/06 17:19:51  arno
 % select at least one epoch
 %
@@ -379,7 +376,7 @@
 
 % Uses: MATLAB pwelch(), changeunits(), topoplot(), textsc()
 
-function [eegspecdB,freqs,compeegspecdB,resvar,specstd]=spectopo(data,frames,srate,varargin) 
+function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,srate,varargin) 
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
@@ -420,10 +417,20 @@ if nargin <= 3 | isstr(varargin{1})
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2
             if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
-			error('spectopo: for computing component contribution, one must specify a (single) frequency');
+			error('spectopo(): for computing component contribution, one must specify a (single) frequency');
 		end;
 	end;
 else
+        if ~isnumeric(data)
+           error('spectopo(): Incorrect call format (see >> help spectopo).')
+        end
+        if ~isnumeric(frames) | round(frames) ~= frames
+           error('spectopo(): Incorrect call format (see >> help spectopo).')
+        end
+        if ~isnumeric(srate)  % 3rd arg must be the sampling rate in Hz
+           error('spectopo(): Incorrect call format (see >> help spectopo).')
+        end
+
 	if nargin > 3,    g.freq = varargin{1};
 	else              g.freq = [];
 	end;
@@ -488,7 +495,7 @@ compeegspecdB = [];
 resvar = NaN;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute channel spectra using pwelch()
+% compute channel spectra using pwelch()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 epoch_subset = 1:epochs;
 if g.percent ~= 1 & epochs > 1
@@ -577,9 +584,9 @@ else
 	fprintf('\n');
     
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% rescaling spectra with respect to projection (rms = root mean square)
-    % all channel: component_i power = rms(inverseweigths(component_i)^2) * power(activation_component_i);
-    % one channel: component_i power = inverseweigths(channel_j,component_i)^2) * power(activation_component_i);
+	% rescale spectra with respect to projection (rms = root mean square)
+    % all channel: component_i power = rms(inverseweigths(component_i)^2)*power(activation_component_i);
+    % one channel: component_i power = inverseweigths(channel_j,component_i)^2)*power(activation_component_i);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if strcmpi(g.icamode, 'normal')
         for index = 1:size(compeegspecdB,1) 
@@ -612,7 +619,7 @@ else
 end;
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute axis and caxis g.limits
+% compute axis and caxis g.limits
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if length(g.limits)<1 | isnan(g.limits(1))
    g.limits(1) = LOPLOTHZ;
@@ -670,7 +677,7 @@ if isnan(g.limits(5))+isnan(g.limits(6)) == 1
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Plot spectrum of each channel
+% plot spectrum of each channel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if strcmpi(g.plot, 'on')
     mainfig = gca; axis off;
@@ -765,7 +772,7 @@ end;
 
 if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot vertical lines through channel trace bundle at each headfreq
+	% plot vertical lines through channel trace bundle at each headfreq
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.weights)
 		for f=1:length(g.freq)
@@ -776,7 +783,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		end;
 	else
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		% Plot vertical line at comp analysis freq
+		% plot vertical line at comp analysis freq
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		mincompdB = min([min(eegspecdB(:,freqidx(1))) min(compeegspecdB(:,freqidx(1)))]);
 		maxcompdB = max([max(eegspecdB(:,freqidx(1))) max(compeegspecdB(:,freqidx(1)))]);
@@ -818,7 +825,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	end;
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot connecting lines using changeunits()
+	% plot connecting lines using changeunits()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	for f=1:length(g.freq)+length(g.icamaps)
 		if ~isempty(g.weights)
@@ -845,7 +852,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	end;
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot heads using topoplot()
+	% plot heads using topoplot()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Plotting scalp distributions: ')
 	for f=1:length(g.freq)
@@ -888,7 +895,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	fprintf('\n');
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Plot independant components
+	% plot independant components
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if ~isempty(g.weights)
 		if realpos(1) == max(realpos), plotcolbar(g); end;
@@ -925,8 +932,9 @@ if ~isempty(g.title) & strcmpi(g.plot, 'on')
 	set(tl,'fontsize',15)
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % return component spectrum
-% -------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 if ~isempty(g.weights) & nargout >= 3
     tmp = compeegspecdB;
     compeegspecdB = zeros(ncompsori, size(tmp,2));
@@ -996,7 +1004,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     if ~usepwelch
         fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using spec() function\n');
         disp('Note: spec() emulates psd() not pwelch() so results scale will differ if SPT present');
-        disp('THIS FUNCTION (SPEC()) RETURNS INNACURATE POWER OVER FILTERED REGIONS');
+        disp('NOTE: FUNCTION (SPEC()) RETURNS INACCURATE RESULTS IN FILTERED REGIONS');
     end;
     fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         
@@ -1057,8 +1065,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     
     n = length(epoch_subset);
 	eegspecdB = eegspec/n; % normalize by the number of sections
-    if n>1
-        specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % normalize standard deviation by the number of sections
+    if n>1  % normalize standard deviation by the number of sections
+        specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); 
     else specstd   = [];
     end;
 	return;
