@@ -29,9 +29,12 @@
 %                keep while computing spectra. Downsampling can be used to speed up
 %                the computation. From 0 to 100 {default: 100 from the command line and
 %                20 if using the pop_up window}.
-%   'freqrange' = [min max] frequency range to plot. Overwrite limits x axis.
-%   'reref'    = ['averef'|'off'] convert input data to average reference 
-%                Default is 'off'. 
+%   'freqrange'  = [min max] frequency range to plot. Overwrite limits x axis.
+%   'reref'      = ['averef'|'off'] convert input data to average reference 
+%                  Default is 'off'.
+%   'mapnorm'    = [float vector] in case 'data' contain the activity of an independant 
+%                component, this parameter can contain its map, so the spectrum amplitude 
+%                will be scaled by the component RMS power.
 %   'boundaries' = data point indices indicating discontinuities in the signal
 %
 % Plot component contributions:
@@ -97,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2003/04/17 00:41:06  arno
+% computing pvaf at all channels
+%
 % Revision 1.54  2003/04/09 23:32:49  arno
 % fixing lines
 %
@@ -295,6 +301,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'boundaries'    'integer'  []                       [] ;
 				  'icamode'       'string'   { 'normal' 'sub' }        'normal' ;
 				  'weights'       'real'     []                       [] ;
+				  'mapnorm'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
@@ -395,6 +402,10 @@ if isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing spectra')
 	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
+    if ~isempty(g.mapnorm) % normalize by component map RMS power (if data contain 1 component
+        disp('Scaling spectrum by component RMS of scalp map power');
+        eegspecdB       = sqrt(mean(g.mapnorm.^4)) * eegspecdB;
+    end;
 	eegspecdB = 10*log10(eegspecdB);
     fprintf('\n');
 else
