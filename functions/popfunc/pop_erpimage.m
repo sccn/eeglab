@@ -171,6 +171,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2004/09/21 17:46:42  hilit
+% changed the if statement from if isempty(EEG.chanlocs) -> if ~
+%
+% isempty(EEG.chanlocs)
+%
 % Revision 1.122  2004/06/16 22:24:33  arno
 % no scalp map if only channel labels
 %
@@ -686,9 +691,10 @@ if popup
 	smooth       = eval(res.smooth);
     if res.plotmap
 		if isfield(EEG.chanlocs, 'theta')
+            if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 			if typeplot == 0
-				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
-			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
+				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs EEG.chaninfo } '];
+			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs EEG.chaninfo } '];
 			end;	
 		end;
 	end;
