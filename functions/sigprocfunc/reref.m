@@ -1,44 +1,44 @@
-% reref() - convert common-reference EEG data to average reference
+% reref() - convert common reference EEG data to another common reference
+%           or to average reference
 %
 % Usage:
-%   >> data = reref(data);
-%   >> [dataout Elocs Wout Sout meandata] = reref(data, ref, 'key', 'val');
+%   >> dataout = reref(data);
+%   >> [dataout Chanlocs Wout Sout meandata] = reref(data, ref, 'key', 'val');
 %
 % Inputs:
-%   data - 2D data matrix (chans,frames*epochs) 
-%   ref  - reference channel number: 2 possibilities
+%   data - 2-D data matrix (chans,frames*epochs) 
+%   ref  - reference channel number -- two possibilities here:
 %          1) [] - compute average reference. If the 'withref' method
 %             is set, the function recomputes the common reference potential 
 %             while averaging.
-%          2) 1<= X <= size(data,1): re-reference to channel X. If the 
-%             'withref' method is set, the function compute the potential of
-%             of the old common reference.
+%          2) 1 <= X <= size(data,1): re-reference to channel X. If the 
+%             'withref' method is set, the function computes the previous 
+%             common reference channel.
 % 
 % Optional inputs:
-%   'elocs'     - Electrode location structure.
-%   'icaweight' - ICA weight matrix (or weight * sphere)
-%   'method'    - ['standard'|'withref'] include reference in the output
-%                 data.
-%   'refloc'    - reference channel location
-%                 Cell array with name and polar coordinates of the channel
-%                 { 'label' theta radius }. For 3-D location, include 
-%                 the reference as the last channel in the 'elocs' structure.
+%   'elocs'     - Electrode location structure (e.g., EEG.chanlocs).
+%   'icaweight' - ICA weight matrix (Note: should be weights*sphere)
+%   'method'    - ['standard'|'withref'] Include reference channel in output. 
+%   'refloc'    - Reference channel location -- a cell array with name and 
+%                 polar coordinates of the channel, { 'label' theta radius }. 
+%                 For 3-D location, include the reference as the last channel 
+%                 in the 'chanlocs' structure.
 %
 % Outputs:
-%   dataout  - Input data converted to average reference
-%   Elocs    - Updated location structure
-%   Wout     - ICA weight matrix converted to average reference
-%   Sout     - ICA sphere matrix converted to eye()
-%   meandata - (1,dataframes) mean removed from each data frame (point)
+%   dataout     - Input data converted to average reference
+%   Chanlocs    - Updated location structure
+%   Wout        - ICA weight matrix converted to average reference
+%   Sout        - ICA sphere matrix converted to eye()
+%   meandata    - (1,dataframes) mean removed from each data frame (point)
 %
-% Notes: 1) Average reference calculation implement two methods 
-%        from www.egi.com/Technotes/AverageReference.pdf
-%        standard: V'i = (Vi - Vref) - sum(Vi-Vref)/number_of_electrode
-%        withref:  V'i = (Vi - Vref) - sum(Vi-Vref)/(number_of_electrode+1)
-%        The last method also allow to compute the potential of the common
-%        reference. Note that the common reference can also be included
-%        when re-referencing data.
-%        2) If 'icaweight' converts the weight matrix W to average reference:
+% Notes: 1) The average reference calculation implements two methods 
+%           (from www.egi.com/Technotes/AverageReference.pdf)
+%           (a) standard: V'i = (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
+%           (b) withref:  V'i = (Vi-Vref) - sum(Vi-Vref)/(number_of_electrodes+1)
+%           Method (b) also allows computing the potential of the common
+%           reference. Note that the common reference can also be included
+%           when re-referencing data.
+%        2) 'icaweight' conversion of the weight matrix W to average reference:
 %        If ica_act = W*data, then data = inv(W)*ica_act; 
 %        If R*data is the average-referenced data, 
 %        R*data = (R*inv(W))*ica_act and Wout = inv(R*inv(W));
@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/12 23:32:59  arno
+% debugging old ref channel potential
+%
 % Revision 1.4  2002/11/12 23:22:47  arno
 % header typo
 %
