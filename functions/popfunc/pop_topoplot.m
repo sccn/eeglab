@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2005/03/10 17:48:40  arno
+% converting MNI coordinates back to spherical
+%
 % Revision 1.60  2005/03/05 00:05:52  arno
 % same
 %
@@ -389,7 +392,7 @@ for index = 1:size(arg2(:),1)
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
-                if strcmpi(EEG.dipfit.coordtype, 'MNI') % from MNI to sperical coordinates
+                if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
                     transform = pinv( sph2spm );                    
                     tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3)/85;
                     tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
