@@ -162,6 +162,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.217  2004/08/30 17:08:49  scott
+% debug last
+%
 % Revision 1.216  2004/08/30 17:05:17  scott
 % reshape verttimes if necessary
 %
@@ -850,6 +853,8 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = []; 
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
 auxvar = []; erpsig = []; winloc = [];
+curfig = gcf;   % note current figure - to avoid v7.0.0 bug that draws
+                % some elements on the EEGLAB window -sm 8-30-04
 
 YES = 1;  % logical variables
 NO  = 0;
@@ -2320,33 +2325,33 @@ if ~isempty(verttimes)
          if isnan(aligntime) % if nor re-aligned data
              if TIMEX          % overplot vt on image
                  if length(vt)==1
-                     plot([vt vt],[0 max(outtrials)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                     figure(curfig);plot([vt vt],[0 max(outtrials)],DOTSTYLE,'Linewidth',VERTWIDTH);
                  elseif length(vt)==ntrials
                      [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-                     plot(outvt,outtrials,DOTSTYLE,'Linewidth',VERTWIDTH);
+                     figure(curfig);plot(outvt,outtrials,DOTSTYLE,'Linewidth',VERTWIDTH);
                  end
              else
                  if length(vt)==1
-                     plot([0 max(outtrials)],[vt vt],DOTSTYLE,'Linewidth',VERTWIDTH);
+                     figure(curfig);plot([0 max(outtrials)],[vt vt],DOTSTYLE,'Linewidth',VERTWIDTH);
                  elseif length(vt)==ntrials
                      [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-                     plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
+                     figure(curfig);plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
                  end
              end
          else                % re-aligned data
              if TIMEX          % overplot vt on image
                  if length(vt)==ntrials
                      [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-                     plot(aligntime+outvt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                     figure(curfig);plot(aligntime+outvt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
                  elseif length(vt)==1
-                     plot(aligntime+vt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                     figure(curfig);plot(aligntime+vt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH); 
                  end
              else
                  if length(vt)==ntrials
                      [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
-                     plot(outtrials,aligntime+outvt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                     figure(curfig);plot(outtrials,aligntime+outvt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
                  elseif length(vt)==1
-                     plot(outtrials,aligntime+vt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
+                     figure(curfig);plot(outtrials,aligntime+vt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH); 
                  end
              end
          end
@@ -2369,9 +2374,9 @@ if ~isempty(horzepochs)
      for he = horzepochs % for each horizontal line
          fprintf('%g ',he);
              if TIMEX          % overplot he on image
-                 plot([timelimits(1) timelimits(2)],[he he],LINESTYLE,'Linewidth',HORZWIDTH);
+                 figure(curfig);plot([timelimits(1) timelimits(2)],[he he],LINESTYLE,'Linewidth',HORZWIDTH);
              else
-                 plot([he he], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
+                 figure(curfig);plot([he he], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
              end
      end
      %end
@@ -2388,13 +2393,13 @@ end;
 if strcmpi(noshow, 'no')
     if ~isnan(aligntime) % if trials time-aligned 
         if times(1) <= aligntime & times(frames) >= aligntime
-            plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
+            figure(curfig);plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
                                'k','Linewidth',ZEROWIDTH); % plot vertical line at time 0
             % plot vertical line at aligntime
         end
     else % trials not time-aligned 
         if times(1) <= 0 & times(frames) >= 0
-            plot([0 0],[min(outtrials) max(outtrials)],...
+            figure(curfig);plot([0 0],[min(outtrials) max(outtrials)],...
                                'k','Linewidth',ZEROWIDTH); % plot smoothed sortwvar
         end
     end
@@ -2414,27 +2419,24 @@ end
 if strcmpi(noshow, 'no')
     if TIMEX
         if Nosort == YES
-            l=ylabel('Trials');
+            figure(curfig);l=ylabel('Trials');
         else
             if exist('phargs')
-                l=ylabel('Phase-sorted Trials');
-                l=ylabel('Trials');
+                figure(curfig);l=ylabel('Phase-sorted Trials');
             elseif exist('ampargs')
-                l=ylabel('Amplitude-sorted Trials');
-                l=ylabel('Trials');
+                figure(curfig);l=ylabel('Amplitude-sorted Trials');
             else
                 l=ylabel('Sorted Trials');
             end
         end
     else % if switch x<->y axes
         if Nosort == YES & NoTimeflag==NO
-            l=xlabel('Trials');
+            figure(curfig);l=xlabel('Trials');
         else
             if exist('phargs')
-                l=ylabel('Phase-sorted Trials');
-                l=ylabel('Trials');
+                figure(curfig);l=ylabel('Phase-sorted Trials');
             elseif NoTimeflag == NO
-                l=xlabel('Sorted Trials');
+                figure(curfig);l=xlabel('Sorted Trials');
             end
         end
     end
@@ -2448,9 +2450,9 @@ if strcmpi(noshow, 'no')
     set(gca,'color',BACKCOLOR);
     if Erpflag == NO & NoTimeflag == NO
         if exist('NoTimesPassed')~=1
-            l=xlabel('Time (ms)');
+            figure(curfig);l=xlabel('Time (ms)');
         else
-            l=xlabel('Frames');
+            figure(curfig);l=xlabel('Frames');
         end
         set(l,'Fontsize',LABELFONT);
     end
@@ -2471,9 +2473,9 @@ if strcmpi(noshow, 'no')
         end
         hold on; 
         if TIMEX      % overplot sortvar
-            plot(outsort,outtrials,'k','LineWidth',SORTWIDTH); 
+            figure(curfig);plot(outsort,outtrials,'k','LineWidth',SORTWIDTH); 
         else
-            plot(outtrials,outsort,'k','LineWidth',SORTWIDTH);
+            figure(curfig);plot(outtrials,outsort,'k','LineWidth',SORTWIDTH);
         end                                                 
         drawnow
     else % plot re-aligned zeros on sortvar-aligned data
@@ -2482,19 +2484,19 @@ if strcmpi(noshow, 'no')
         end
         hold on; 
         if TIMEX      % overplot re-aligned 0 time on image
-            plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
+            figure(curfig);plot([aligntime aligntime],[min(outtrials) max(outtrials)],...
                                             'k','LineWidth',SORTWIDTH);
         else
-            plot([[min(outtrials) max(outtrials)],aligntime aligntime],...
+            figure(curfig);plot([[min(outtrials) max(outtrials)],aligntime aligntime],...
                                             'k','LineWidth',SORTWIDTH);
         end
         fprintf('Overplotting realigned times-zero on data.\n');
         hold on; 
         
         if TIMEX      % overplot realigned sortvar on image
-            plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
+            figure(curfig);plot(0+aligntime-outsort,outtrials,'k','LineWidth',ZEROWIDTH); 
         else
-            plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
+            figure(curfig);plot(0+outtrials,aligntime-outsort,'k','LineWidth',ZEROWIDTH); 
         end                                                 
         drawnow
     end
@@ -2519,17 +2521,17 @@ if strcmpi(noshow, 'no')
             if isnan(aligntime) % plot auxvar on un-aligned data
                 auxcolor = auxcolors{c};
                 if TIMEX      % overplot auxvar
-                    plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH); 
+                    figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH); 
                 else
-                    plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
+                    figure(curfig);plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
                 end                                                 
                 drawnow
             else % plot re-aligned zeros on sortvar-aligned data
                 auxcolor = auxcolors{c};
                 if TIMEX      % overplot realigned 0-time on image
-                    plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
+                    figure(curfig);plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
                 else
-                    plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH); 
+                    figure(curfig);plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH); 
                 end                                                 
                 drawnow
             end % aligntime
@@ -2545,7 +2547,7 @@ if strcmpi(noshow, 'no')
         axcb=axes('Position',...
                   [pos(1)+pos(3)+0.02 pos(2) ...
                    0.03 pos(4)]);
-        cbar(axcb,0,[mindat,maxdat]); % plot colorbar to right of image
+        figure(curfig);cbar(axcb,0,[mindat,maxdat]); % plot colorbar to right of image
         set(axcb,'fontsize',TICKFONT);
         % drawnow
         axes(ax1); % reset current axes to the erpimage
@@ -2663,16 +2665,16 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     if isnan(coherfreq)            % if no amp and coher plots below . . .
         if TIMEX & NoTimeflag == NO
             if exist('NoTimesPassed')~=1
-                l=xlabel('Time (ms)');
+                figure(curfig);l=xlabel('Time (ms)');
             else
-                l=xlabel('Frames');
+                figure(curfig);l=xlabel('Frames');
             end
             set(l,'FontSize',LABELFONT);
         else
             if exist('NoTimesPassed')~=1
-                l=ylabel('Time (ms)');
+                figure(curfig);l=ylabel('Time (ms)');
             else
-                l=ylabel('Frames');
+                figure(curfig);l=ylabel('Frames');
             end
             set(l,'FontSize',LABELFONT);
         end
@@ -2688,16 +2690,16 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         for vt = vts
             if isnan(aligntime)
                 if TIMEX      % overplot vt on ERP
-                    plot([vt vt],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                    figure(curfig);plot([vt vt],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
                 else
-                    plot([min(outtrials) max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
+                    figure(curfig);plot([min(outtrials) max(outtrials)],[limit(3:4)],DOTSTYLE,'Linewidth',VERTWIDTH);
                 end
             else
                 if TIMEX      % overplot realigned vt on ERP
-                    plot(repmat(median(aligntime+vt-outsort),1,2),[limit(3),limit(4)],...
+                    figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),[limit(3),limit(4)],...
                          DOTSTYLE,'LineWidth',VERTWIDTH); 
                 else
-                    plot([limit(3),limit(4)],repmat(median(aligntime+vt-outsort),1,2),...
+                    figure(curfig);plot([limit(3),limit(4)],repmat(median(aligntime+vt-outsort),1,2),...
                          DOTSTYLE,'LineWidth',VERTWIDTH); 
                 end                                                 
             end
@@ -2859,18 +2861,18 @@ if ~isnan(coherfreq)
             for vt = vts
                 if isnan(aligntime)
                     if TIMEX      % overplot vt on amp
-                        plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
+                        figure(curfig);plot([vt vt],[minamp(1) maxamp(1)],DOTSTYLE,...
                              'Linewidth',VERTWIDTH);
                     else
-                        plot([min(outtrials) max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
+                        figure(curfig);plot([min(outtrials) max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
                              'Linewidth',VERTWIDTH);
                     end
                 else
                     if TIMEX      % overplot realigned vt on amp
-                        plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
+                        figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
                              'LineWidth',VERTWIDTH); 
                     else
-                        plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
+                        figure(curfig);plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
                              'LineWidth',VERTWIDTH); 
                     end                                                 
                 end
@@ -2879,9 +2881,9 @@ if ~isnan(coherfreq)
         
         if 0 % Cohsigflag % plot amplitude significance levels
             hold on
-            plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
+            figure(curfig);plot([timelimits(1) timelimits(2)],[ampsig(1) ampsig(1)] - mean(ampsig),'r',...
                  'linewidth',SIGNIFWIDTH);
-            plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)] - mean(ampsig),'r',...
+            figure(curfig);plot([timelimits(1) timelimits(2)],[ampsig(2) ampsig(2)] - mean(ampsig),'r',...
                  'linewidth',SIGNIFWIDTH);
         end
         
@@ -2956,15 +2958,15 @@ if ~isnan(coherfreq)
             for vt = vts
                 if isnan(aligntime)
                     if TIMEX      % overplot vt on coher
-                        plot([vt vt],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+                        figure(curfig);plot([vt vt],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
                     else
-                        plot([min(outtrials) max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+                        figure(curfig);plot([min(outtrials) max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
                     end
                 else
                     if TIMEX      % overplot realigned vt on coher
-                        plot(repmat(median(aligntime+vt-outsort),1,2),[mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH); 
+                        figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),[mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH); 
                     else
-                        plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,'LineWidth',VERTWIDTH); 
+                        figure(curfig);plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,'LineWidth',VERTWIDTH); 
                     end                                                 
                 end
             end
@@ -2990,9 +2992,9 @@ if ~isnan(coherfreq)
         set(ax4,'Fontsize',TICKFONT);
         if NoTimeflag==NO
             if exist('NoTimesPassed')~=1
-                l=xlabel('Time (ms)');
+                figure(curfig);l=xlabel('Time (ms)');
             else
-                l=xlabel('Frames');
+                figure(curfig);l=xlabel('Frames');
             end
             set(l,'Fontsize',LABELFONT);
         end
@@ -3064,7 +3066,7 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
         [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
                            512,srate,winlength,0);
     end;
-    plot(F,10*log10(Pxx));
+    figure(curfig);plot(F,10*log10(Pxx));
     goodfs = find(F>= lospecHz & F <= hispecHz);
     maxgfs = max(10*log10(Pxx(goodfs)));
     mingfs = min(10*log10(Pxx(goodfs)));
@@ -3072,10 +3074,10 @@ if (~isempty(lospecHz)) & strcmpi(noshow, 'no')
     axis([lospecHz hispecHz mingfs-1 maxgfs+1]);
     set(h(13),'Box','off','color',BACKCOLOR);
     set(h(13),'Fontsize',SPECFONT);
-    l=ylabel('dB');
+    figure(curfig);l=ylabel('dB');
     set(l,'Fontsize',SPECFONT);
     if ~isnan(coherfreq)
-        hold on; plot([coherfreq,coherfreq],[mingfs maxgfs],'r');
+        hold on; figure(curfig);plot([coherfreq,coherfreq],[mingfs maxgfs],'r');
     end
     axhndls = [axhndls h(13)];
 end 
@@ -3119,6 +3121,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
   WINFILLCOLOR    = [.88 .92 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
+  axes(ax);
   if ~isempty(winloc)
     fillwinx = [winloc winloc(end:-1:1)];
     hannwin = makehanning(length(winloc));
