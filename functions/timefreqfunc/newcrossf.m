@@ -18,9 +18,9 @@
 %        epoch is all windows with center times < the given 'baseline' value 
 %        or, if 'baseboot' is 1, the whole epoch. 
 % Usage: 
-%        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
-%                       = crossf(x,y,frames,tlimits,srate,cycles, ...
-%                                        'key1', 'val1', 'key2', val2' ...);
+%        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles,...
+%                  allcoher,alltfX,alltfY] = crossf(x,y,frames,tlimits,srate, ...
+%                                        cycles, 'key1', 'val1', 'key2', val2' ...);
 %
 % Required inputs:
 %       x       = first single-channel data set (1,frames*nepochs)      
@@ -60,20 +60,31 @@
 %       'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
 %
 %    Optional FFT/DFT:
-%       'winsize'  = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                    if cycles >0: *longest* window length to use. This
-%                    determines the lowest output frequency  {~frames/8}
-%       'timesout' = Number of output times (int<frames-winsize) {def: 200}
-%       'padratio' = FFTlength/winsize (2^k)                     {def: 2}
-%                    Multiplies the number of output frequencies by
-%                    dividing their spacing. When cycles==0, frequency
-%                    spacing is (low_frequency/padratio).
-%       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
-%                    If cycles==0, all FFT frequencies are output.{def: 50}
-%       'baseline' = Coherence baseline end time (ms). This parameter
-%                    affect the 'mcoh' output and the bootstrap estimation. 
-%                    Use NaN for full epoch. {0}
-%       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
+%       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
+%                     if cycles >0: *longest* window length to use. This
+%                     determines the lowest output frequency  {~frames/8}
+%       'timesout'  = Number of output times (int<frames-winsize) {def: 200}
+%       'padratio'  = FFTlength/winsize (2^k)                     {def: 2}
+%                     Multiplies the number of output frequencies by
+%                     dividing their spacing. When cycles==0, frequency
+%                     spacing is (low_frequency/padratio).
+%       'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
+%                     If cycles==0, all FFT frequencies are output.{def: 50}
+%                     DEPRECATED, use 'freqs' instead,
+%       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
+%                     minfreq being determined by the number of data points, 
+%                     cycles and sampling frequency.
+%       'nfreqs'    = number of output frequencies. For FFT, closest computed
+%                     frequency will be returned. Overwrite 'padratio' effects
+%                     for wavelets. Default: use 'padratio'.
+%       'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                     Note that for obtaining 'log' spaced freqs using FFT, 
+%                     closest correspondant frequencies in the 'linear' space 
+%                     are returned.
+%       'baseline'  = Coherence baseline end time (ms). This parameter
+%                     affect the 'mcoh' output and the bootstrap estimation. 
+%                     Use NaN for full epoch. {0}
+%       'powbase'   = Baseline spectrum to log-subtract.  {default: from data}
 %
 %    Optional Bootstrap:
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
@@ -124,6 +135,9 @@
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles 
+%       allcoher    = single trial coherence
+%       alltfX      = single trial spectral decomposition of X
+%       alltfY      = single trial spectral decomposition of Y
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
@@ -163,6 +177,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/05/01 00:11:16  arno
+% removing dispf
+%
 % Revision 1.42  2003/04/17 21:21:35  arno
 % fixing newfig
 %
@@ -582,6 +599,9 @@ try, g.detret;     catch, g.detret = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
+try, g.freqs;      catch, g.freqs = [0 50]; end;
+try, g.nfreqs;     catch, g.nfreqs = []; end;
+try, g.freqscale;  catch, g.freqscale = 'linear'; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
 try, g.type;       catch, g.type = 'phasecoher'; end; 
@@ -599,7 +619,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' ...
-		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' };
+		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
@@ -877,10 +897,10 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
                         g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
                         'padratio', g.padratio, 'maxfreq', g.maxfreq };
 
-    fprintf('\nProcessing trial for first input (of %d):',trials);
+    fprintf('\nProcessing first input\n');
 	X = reshape(X, g.frame, trials);
 	[alltfX freqs times] = timefreq(X, g.srate, spectraloptions{:});
-    fprintf('\nProcessing trial for second input (of %d):',trials);
+    fprintf('\nProcessing second input\n');
 	Y = reshape(Y, g.frame, trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
     
@@ -1048,8 +1068,13 @@ case 'on'
    map(151,:) = map(151,:)*0.9; % tone down the (0=) green!
    colormap(map);
    
-   try, imagesc(times,freqs,RR,max(max(RR))*[-1 1]); % plot the coherence image
-   catch, imagesc(times,freqs,RR,[-1 1]); end;
+   if ~strcmpi(g.freqscale, 'log')
+       try, imagesc(times,freqs,RR,max(max(RR))*[-1 1]); % plot the coherence image
+       catch, imagesc(times,freqs,RR,[-1 1]); end;
+   else 
+       try, imagesclogy(times,freqs,RR,max(max(RR))*[-1 1]); % plot the coherence image
+       catch, imagesclogy(times,freqs,RR,[-1 1]); end;
+   end;
    
    if ~isempty(g.maxamp)
 	   caxis([-g.maxamp g.maxamp]);
@@ -1110,16 +1135,34 @@ case 'on'
    
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
    E = abs(mbase); % baseline mean coherence at each frequency
-   plot(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
-   
+   if ~strcmpi(g.freqscale, 'log')
+       plot(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
+   else
+       semilogy(freqs,E,'m','LineWidth',g.linewidth); % plot mbase
+       set(h(5),'View',[90 90])
+       divs = linspace(log(freqs(1)), log(freqs(end)), 10);
+       set(gca, 'xtickmode', 'manual');
+       divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+                                                    % out-of border label with within border ticks
+       set(gca, 'xtick', divs);       
+   end;       
    if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
        hold on
-       switch dims(Rboot)
-        case 1, plot(freqs,Rboot(:),'g','LineWidth',g.linewidth);
-        case 2, plot(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
-        case 3, plot(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
-                plot(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
-       end;  
+       if ~strcmpi(g.freqscale, 'log')
+           switch dims(Rboot)
+            case 1, plot(freqs,Rboot(:),'g','LineWidth',g.linewidth);
+            case 2, plot(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
+            case 3, plot(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
+             plot(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
+           end;  
+       else
+           switch dims(Rboot)
+            case 1, semilogy(freqs,Rboot(:),'g','LineWidth',g.linewidth);
+            case 2, semilogy(freqs,mean(Rboot(:,:),2),'g','LineWidth',g.linewidth);
+            case 3, semilogy(freqs,mean(Rboot(:,:,1),2),'g','LineWidth',g.linewidth);
+                    semilogy(freqs,mean(Rboot(:,:,2),2),'g','LineWidth',g.linewidth);
+           end;  
+       end;           
        if ~isnan(max(E))
            axis([freqs(1) freqs(end) 0 max([E Rboot(:)'])*1.2]);
        end;
@@ -1152,8 +1195,12 @@ case 'on'
        end
        Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
        
-       imagesc(times,freqs,Rangle,[-maxangle maxangle]); % plot the 
-       hold on                                             % coherence phase angles
+       if ~strcmpi(g.freqscale, 'log')
+           imagesc(times,freqs,Rangle,[-maxangle maxangle]); % plot the coherence phase angles
+       else
+           imagesclogy(times,freqs,Rangle,[-maxangle maxangle]); % plot the coherence phase angles
+       end;           
+       hold on                                             
        plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth); % zero-time line
        for i=1:length(g.marktimes)
            plot([g.marktimes(i) g.marktimes(i)],[0 freqs(end)],'--m','LineWidth',g.linewidth);
