@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/08/13 00:20:22  arno
+% update position
+%
 % Revision 1.14  2002/08/12 21:42:59  arno
 % ignore pushbutton extent
 %
@@ -195,7 +198,7 @@ end;
 %scale and replace the figure in the screen
 pos = get(gcf, 'position');
 if factmulty > 1
-	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty)
+	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = pos(3)*factmultx;
