@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/04/15 01:44:47  arno
+% refining distfit for 1-D data
+%
 % Revision 1.21  2004/04/14 20:36:14  scott
 % edited help message
 %
@@ -240,11 +243,13 @@ if (size(oriarg1,1) == 1 | size(oriarg1,2) == 1) & size(oriarg1,3) == 1
     else 
         Rbootout = g.accarray;
     end;
-    tmpsort = sort(Rbootout);
-    i = round(g.alpha*g.naccu);
-    sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
-    if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
-    accarrayout = sigval;
+    if strcmpi(g.distfit, 'off')
+        tmpsort = sort(Rbootout);
+        i = round(g.alpha*g.naccu);
+        sigval = [mean(tmpsort(1:i)) mean(tmpsort(g.naccu-i+1:g.naccu))];
+        if strcmpi(g.bootside, 'upper'), sigval = sigval(2); end;
+        accarrayout = sigval;
+    end;
 else
 
     % array of 2 or 3 dimensions
