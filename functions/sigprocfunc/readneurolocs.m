@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/08/05 18:24:04  arno
+% header
+%
 % Revision 1.5  2003/07/29 21:25:20  arno
 % debug C3-C4
 %
@@ -160,12 +163,14 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
     % shrink coordinates
     % ------------------
     if ~isempty(indexfz)
-        y = y/y(indexfz)*0.25556;
+        yy = y/y(indexfz)*45;
+        y  = y/y(indexfz)*0.25556;
         disp('Readneurolocs: electrode location scaled along the y axis for standard Fz location');
         if isempty(indexc3), indexc3 = indexfz; end;
     end;
     if ~isempty(indexc3)
-        x = x/x(indexc3)*0.25556;
+        xx = x/x(indexc3)*45;
+        x  = x/x(indexc3)*0.25556;
         disp('Readneurolocs: electrode location scaled along the x axis for standard C3 location');
     end;
 
@@ -180,4 +185,18 @@ function chanlocs = readneurolocs( filename, plottag, indexcz, indexfz)
         chanlocs(index).theta  = theta(index)/pi*180-90;
         chanlocs(index).radius = r(index);
     end;
-        
+    % return;
+   
+    % second solution using angle
+    % ---------------------------
+    [phi,theta] = cart2pol(-xx, yy);
+    phi = phi/pi*180;
+    
+    % convert to other types of coordinates
+    % -------------------------------------
+    labels = names';
+    chanlocs = struct('labels', labels, 'sph_theta_besa', mat2cell(theta)', 'sph_phi_besa', mat2cell(phi)');
+    chanlocs = convertlocs( chanlocs, 'sphbesa2all');
+    for index = 1:length(chanlocs)
+        chanlocs(index).labels = num2str(chanlocs(index).labels);
+    end;
