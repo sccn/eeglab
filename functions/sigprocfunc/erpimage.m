@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/04/25 17:51:50  arno
+% including renorm inside function
+%
 % Revision 1.12  2002/04/25 17:08:03  arno
 % correcting error message
 %
@@ -716,7 +719,6 @@ end
 %
 %%%%%%%%%%%%%%%%%%% Renormalize sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-renorm
 switch lower(renorm)
  case 'yes',
   disp('erpimage warning: *** sorting variable renormalized ***');
