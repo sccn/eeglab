@@ -49,6 +49,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/03/13 03:05:29  arno
+% add output
+%
 % Revision 1.8  2004/03/13 02:40:58  arno
 % only adding history once
 %
@@ -80,11 +83,11 @@ mode = 1; % mode = 1, full print, mode = 0, truncated print
 
 global ALLCOM;
 
-if nargin == 2
-    fprintf('2: %s\n', command);
-elseif nargin == 1
-    fprintf('1: %s\n', command);
-end;
+%if nargin == 2
+%    fprintf('2: %s\n', command);
+%elseif nargin == 1
+%    fprintf('1: %s\n', command);
+%end;
 
 if nargin < 1
 	if isempty(ALLCOM)
