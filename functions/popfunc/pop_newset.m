@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/12/05 20:01:05  arno
+% eeg_hist for history
+%
 % Revision 1.19  2003/12/05 00:48:28  arno
 % saving setname
 %
@@ -179,7 +182,7 @@ for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
-	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1;
+	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1; com = ''; return;
 	 case 'save'      , if isunix | strcmp(computer, 'MAC'), 
                              dirindices = sort(union(findstr(args{ind+1}, ':'), findstr(args{ind+1}, '/')));
                         else dirindices = find(args{ind+1} == '\');
