@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2004/02/15 20:03:40  scott
+% same
+%
 % Revision 1.108  2004/02/15 20:02:02  scott
 % same
 %
@@ -699,8 +702,7 @@ end
 if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
    fprintf('max Th: %g\n',max(Th)); % DEBUG
    [Th' Rd'] % DEBUG
-   Th = skirt_Th(2*pi*Th/360,Rd);  % rotate the angles of the electrodes in the 'skirt'
-   Th = 180*Th/pi; % convert back to degrees
+   Th = skirt_Th(Th,Rd);  % rotate the angles of the electrodes in the 'skirt'
    fprintf('max Th: %g\n',max(Th)); % DEBUG
 end
 %
