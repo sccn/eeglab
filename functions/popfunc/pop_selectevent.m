@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2002/11/09 17:32:59  scott
+% "Rename..." legend edit
+%
 % Revision 1.42  2002/10/29 23:26:30  arno
 % optimize size
 %
@@ -246,9 +249,10 @@ if nargin<2
 
     geometry = { geometry{:} [1] [1.3 2] };
     uilist   = { uilist{:} ...
-        { }, ...
-        { 'Style', 'checkbox', 'string','Select all events NOT selected above',} { } ...
-        };
+                 { }, ...
+                 { 'Style', 'checkbox', 'string','Select all events NOT selected above',} ...
+                 { 'Style', 'text', 'string','Set this button (to left) and "all BUT" buttons (above) for logical OR' } ...
+               };
 
     geometry = { geometry{:} [1] [2 1 1] [2 1 1] [2 1] };
     uilist = { uilist{:} { } ...
