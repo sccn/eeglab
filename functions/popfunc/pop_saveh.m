@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 03-29-02 added update menu -ad 
@@ -59,7 +62,7 @@ fprintf(fid, '%% ------------------------------------------------\n');
 for index = length(allcoms):-1:1
     fprintf(fid, '%s\n', allcoms{index});
 end;
-fprintf(fid, 'eeg_updatemenu;\n');
+fprintf(fid, 'eeglab redraw;\n');
 fclose(fid);
     
 com = sprintf('pop_saveset( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
