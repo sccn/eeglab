@@ -1,17 +1,17 @@
-% pop_read_erpss() - import an uncompressed ERPSS-format EEG file 
-%                    (.RAW or .RDF)
+% pop_read_erpss() - interactively import an uncompressed ERPSS-format 
+%                    data file (.RAW or .RDF) using read_erpss()
 % Usage:
 %   >> OUTEEG = pop_read_erpss( filename, srate );
 %
 % Inputs:
-%   filename       - file name
+%   filename       - file name (with extension)
 %
 % Outputs:
 %   OUTEEG         - EEGLAB data structure
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 January 2003
 %
-% See also: eeglab()
+% See also: eeglab(), read_erpss()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/01/24 01:34:44  arno
+% adding setname
+%
 % Revision 1.1  2003/01/24 01:29:57  arno
 % Initial revision
 %

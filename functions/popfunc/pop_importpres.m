@@ -1,4 +1,4 @@
-% pop_importpres() - append presentation file events into eeglab()
+% pop_importpres() - append Presentation event file information into eeglab()
 %
 % Usage:
 %   >> EEGOUT = pop_importpres( EEGIN, filename );
@@ -10,11 +10,11 @@
 % Outputs:
 %   EEGOUT         - data structure
 %
-% Note: 1) if they are pre-existing events in the input dataset,
-%       this function will recalculate the latency of the events
-%       in the presentation file, so that they match the one
-%       of the pre-existing events.
-%       2) this function call pop_importevent()
+% Note: 1) If they are pre-existing events in the input dataset,
+%          this function will recalculate the latency of the events
+%          in the Presentation file, so that they match the one
+%          of the pre-existing events.
+%       2) This function calls pop_importevent()
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2002
 %
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/01/24 02:14:16  arno
+% changing delimiter to 9
+%
 % Revision 1.3  2002/10/15 17:05:02  arno
 % drawnow
 %
@@ -59,7 +62,7 @@ end;
 
 if nargin < 2 
 	% ask user
-	[filename, filepath] = uigetfile('*', 'Choose a file from Presentation -- pop_importpres()'); 
+	[filename, filepath] = uigetfile('*', 'Choose a Presentation file -- pop_importpres()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
