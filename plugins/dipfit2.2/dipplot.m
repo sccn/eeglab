@@ -112,6 +112,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.13  2003/03/14 02:11:33  arno
+%automatic scaling for dipfit
+%
 %Revision 1.12  2003/03/11 23:33:27  arno
 %typo
 %
@@ -167,7 +170,11 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % conversion
     % ----------
     if strcmpi(g.normlen, 'on')
-        try, EEG.sources = rmfield(EEG.sources, 'besaextori'); catch, end;
+        try, sources = rmfield(sources, 'besaextori'); catch, end;
+    end;
+    if ~isfield(sources, 'besathloc') & strcmpi(g.image, 'besa')
+        error(['For copyright reasons, it is not possible to use the BESA ' ...
+               'head model to plot non-BESA dipoles']);
     end;
     
     if isfield(sources, 'besathloc')
