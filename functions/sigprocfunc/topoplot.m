@@ -42,6 +42,11 @@
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area (square or disk, see
 %                       'intsquare' below). Interpolate electrodes in this area {default: channel max}
+%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
+%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
+%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
+%                       so the channel max is 0.5. factor -> Apply a specified shrink
+%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
 %                       values from electrodes shown in the plotting disk only. {default: 'on'}
@@ -109,11 +114,6 @@
 % Deprecated but still usable;
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes'-> interpolate the electrode grid; 
 %                       'head'-> interpolate the whole disk {default: 'head'}.
-%   'shrink'          - ['on'|'off'|'force'|factor] Deprecated. 'on' -> If max channel arc_length 
-%                       > 0.5, shrink electrode coordinates towards vertex to plot all channels
-%                       by making max arc_length 0.5. 'force' -> Normalize arc_length 
-%                       so the channel max is 0.5. factor -> Apply a specified shrink
-%                       factor (range (0,1) = shrink fraction). {default: 'off'}
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.219  2004/11/22 05:02:51  scott
+% fixing topoplot([],EEG.chanlocs,'emarker','o')
+%
 % Revision 1.218  2004/11/22 04:58:21  scott
 % fixed topoplot(32,EEG.chanlocs) and topoplot([],EEG.chanlocs,'emarker','o')
 % to plot marked channel 32 in red disk
@@ -1022,7 +1025,7 @@ end;
 labels = labels(indices); % remove labels for electrodes without locations
 labels = strvcat(labels); % make a label string matrix
 
-if isempty(Values)
+if ~isempty(Values)
   plotchans = 1:length(Th);
 end
 %
