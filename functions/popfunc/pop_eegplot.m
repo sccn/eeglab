@@ -12,7 +12,7 @@
 % Graphical interface:
 %   "Add to previously marked rejections" - [edit box] can be either YES or NO. This
 %                    edit box corresponds to the command line input option 'superpose'.
-%"  "Reject marked trials" - [edit box] can be either YES or NO. This edit box 
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit box 
 %                    corresponds to the command line input option 'reject'.
 %
 % Inputs:
@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/02/18 22:08:54  arno
+% update header for GUI
+%
 % Revision 1.20  2003/02/03 18:36:53  scott
 % header msg clarified -sm
 %
