@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2005/04/01 23:16:11  scott
+% adjusted default limcontrib timerange and limits
+%
 % Revision 1.90  2005/04/01 22:13:44  scott
 % same
 %
@@ -513,7 +516,6 @@ if length(g.limits) == 3 | length(g.limits) > 4 % if g.limits wrong length
    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
 end
 
-
 xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
 if ~isempty(g.timerange)   % if 'timerange' given
     if g.limits(1)==0 & g.limits(2)==0
@@ -536,8 +538,15 @@ else
   xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
   xmax = g.timerange(2);
 end
+
 pmin = g.limits(1); % plot min and max sec
+if pmin < xmin
+   pmin = xmin;     % don't allow plotting beyond the data limits
+end
 pmax = g.limits(2);
+if pmax > xmax
+   pmax = xmax;
+end
 
 dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
