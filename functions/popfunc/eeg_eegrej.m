@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/06/02 17:21:54  arno
+% typo
+%
 % Revision 1.15  2004/06/02 17:18:00  arno
 % insert bound before removing events
 %
@@ -120,20 +123,22 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 % add boundary events
 % -------------------
 if ~isempty(boundevents)
-    EEG.event = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
-    EEG       = eeg_checkset(EEG, 'eventconsistency');
+    [ EEG.event indold ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
+    EEG                        = eeg_checkset(EEG, 'eventconsistency');
+else
+    indold = 1:length(EEG.event);
 end;
 
 % change event latencies
 % ----------------------
 if ~isempty(tmpalllatencies)
 	tmpnanloc = find(~isnan(tmpalllatencies));
-	EEG.event = EEG.event(tmpnanloc);
+	EEG.event = EEG.event(indold(tmpnanloc));
 	fprintf('eeg_eegrej(): event latencies recomputed and %d (of %d) events removed.\n', ...
 			length(tmpalllatencies)-length(EEG.event), length(tmpalllatencies));
 	tmpalllatencies = tmpalllatencies(tmpnanloc);
 	for tmpindex = 1:length(EEG.event)
-		EEG.event = setfield(EEG.event, { tmpindex }, 'latency', tmpalllatencies(tmpindex));
+		EEG.event = setfield(EEG.event, { indold(tmpindex) }, 'latency', tmpalllatencies(tmpindex));
 	end;
 end;
 EEG.icaact = [];
