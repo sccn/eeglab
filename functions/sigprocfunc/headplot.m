@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/25 18:24:08  arno
+% debugging
+%
 % Revision 1.2  2002/04/17 20:56:14  arno
 % changing XYZ coordinate transformation for eloc structure
 %
@@ -95,7 +98,7 @@ end
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
 % mesh_file  = [ICADIR '/newupper.mat']; % whole head model file (183K)
-mesh_file  = [ICADIR '/mhead.mat'];      % upper head model file (987K)
+mesh_file  = ['mhead.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
