@@ -119,7 +119,9 @@
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
-%     outvar  = (1,epochsout) actual values trials are sorted on (after smoothing)
+%     outvar  = (1,epochsout) actual values trials are sorted on (after smoothing).
+%               if 'sortvarpercent' is used, this variable contains a cell array with
+%               { sorted_values { sorted_percent1 ... sorted_percentN } }
 %   outtrials = (1,epochsout)  smoothed trial numbers
 %     limits  = (1,10) array, 1-9 as in 'limits' above, then analysis frequency (Hz) 
 %    axhndls  = vector of 1-7 plot axes handles (img,cbar,erp,amp,coh,topo,spec)
@@ -172,6 +174,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.243  2005/03/10 16:47:52  arno
+% chaning variable name
+%
 % Revision 1.242  2005/03/10 02:33:38  arno
 % implementing percentile
 %
@@ -3319,6 +3324,12 @@ if strcmpi(noshow, 'no')
     axcopy(gcf);
     % eegstr = 'img=get(gca,''''children''''); if (strcmp(img(end),''''type''''),''''image''''), img=get(img(end),''''CData''''); times=get(img(end),''''Xdata''''); clf; args = [''''limits'''' '''','''' times(1) '''','''' times(end)]; if exist(''''EEG'''')==1, args = [args '''','''' ''''srate'''' '''','''' EEG.srate]; end eegplot(img,args); end';
     % axcopy(gcf,eegstr);
+end;
+
+
+% returning outsort
+if exist('outpercent')
+    outsort = { outsort outpercent };
 end;
 
 fprintf('Done.\n');
