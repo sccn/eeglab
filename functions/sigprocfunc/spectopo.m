@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/07/25 20:44:32  luca
+% *** empty log message ***
+%
 % Revision 1.17  2002/07/25 00:36:32  arno
 % debugging
 %
@@ -610,10 +613,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		end
 		fprintf('.')
 	end
-	length(epoch_subset)
 	epochs = round(size(data,2)/frames);
-    length(epochs)
-	eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
+	eegspecdB = 10*log10(eegspec/length(epoch_subset)); % convert power to dB
 	%eegspecdB = 10*eegspec/epochs; % convert power to dB
 	return;
 % Before the linear summation was used 
