@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/08/18 21:22:28  scott
+% made option 'pvaf,'on' the default
+%
 % Revision 1.19  2003/05/12 23:47:44  arno
 % removing extra blanks
 %
@@ -137,7 +140,7 @@ if nargin < 3
 	                 '', ...
                      '', ...
 	                 ['Largest ERP components' fastif(isempty(EEG(end).setname), '',[' of ' EEG(end).setname])] ...
-	                 '''electrodes'',''off''' };
+	                 '''electrodes'',''off'', ''pvaf'', ''on''' };
     if length(EEG) > 1
         promptstr = { 'Dataset indices to subtracts (''1 2''=1-2)' promptstr{:} };
         inistr    = { '2 1' inistr{:} };
@@ -201,7 +204,7 @@ end;
 
 % plot the datas
 % --------------
-options = [ options ', ''verbose'', ''off'',''pvaf'',''on''' ];
+options = [ options ', ''verbose'', ''off''' ];
 if any(isnan(sigtmp(:)))
     disp('NaN detected: using nan_mean');
     if length(EEG) == 2
