@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.68  2004/02/23 19:17:00  arno
+%remove debug msg
+%
 %Revision 1.67  2004/02/23 19:16:16  arno
 %fixing 2 dipole problem
 %
