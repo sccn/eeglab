@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/12/04 17:49:06  arno
+% same
+%
 % Revision 1.23  2003/12/04 17:47:26  arno
 % eegfiltfft
 %
@@ -332,7 +335,7 @@ if length(datsub) > 0 % dataset to subtract
                       erp2ind(:,:,index)  = mean(tmpica,3);
                       erp2ind(:,:,index)  = mean(TMPEEG.icaact,3);
         end;
-        subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(' int2str(TMPEEG.trials) ')' ];
+        subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(n=' int2str(TMPEEG.trials) ')' ];
         clear TMPEEG
     end;
     
