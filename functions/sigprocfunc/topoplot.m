@@ -146,6 +146,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.237  2005/01/03 02:10:33  scott
+% added 'gridplot' option
+%
 % Revision 1.236  2005/01/02 18:42:25  scott
 % implementing 'plotgrid'
 %
@@ -1448,10 +1451,14 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Plot grid only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   if strcmpi(STYLE,'grid')                     % plot grid only
-    g1 = size(gridchans,1); Xi = linspace(-rmax,rmax,g1+1);
+    g1 = size(gridchans,1); 
+    g2 = size(gridchans,2); 
+    gmax = max([g1 g2]);
+
+    Xi = linspace(-rmax*g2/gmax,rmax*g2/gmax,g1+1);
     Xi = Xi+rmax/g1; Xi = Xi(1:end-1);
 
-    g2 = size(gridchans,2); Yi = linspace(-rmax,rmax,g2+1);
+    Yi = linspace(-rmax*g1/gmax,rmax*g1/gmax,g2+1);
     Yi = Yi+rmax/g2; Yi = Yi(1:end-1); Yi = Yi(end:-1:1); % by trial and error!
 
     gridvalues = zeros(size(gridchans));
@@ -1464,6 +1471,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          end
       end
     end
+
     handle=imagesc(Xi,Yi,gridvalues); % plot grid
     axis square
 
