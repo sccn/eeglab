@@ -80,10 +80,13 @@
 %       labels - labels for curves 
 % plotwin : rej1 - rejection array (with all electrodes x trials)
 %           rej2 - global rejection array (size trials)
-%           thr1 - threshold local (electrodes)
+%           thr1 - threshold (electrodes)
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/05 23:43:05  arno
+% update text
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -199,8 +202,8 @@ if ~isstr( signal )
 
 	% Entropy component text and threshold
 	% ------------------------------------
-    makebutton( 'Local', 'Plotwin'  ,  [3 -6 27 6].*s+q, [30 -6 15 6].*s+q, 3, g.threshold); 
-    makebutton( 'Global', 'Plotwin'     ,  [50 -6  27 6].*s+q, [77 -6  15 6].*s+q, 4, g.thresholdg); 
+    makebutton( 'Single-channel', 'Plotwin'  ,  [3 -6 27 6].*s+q, [30 -6 15 6].*s+q, 3, g.threshold); 
+    makebutton( 'All-channel', 'Plotwin'     ,  [50 -6  27 6].*s+q, [77 -6  15 6].*s+q, 4, g.thresholdg); 
 
 	% EEGPLOT button
 	% --------------
@@ -334,7 +337,7 @@ else %if signal is a string draw everything
 		n2 = sum(rej2(:));
 		rej = rej | rej2(:)';
 	end;
-	fprintf('%d trials rejected ( local:%d, global:%d)\n', sum(rej(:)), n1, n2);
+	fprintf('%d trials rejected (single:%d, all:%d)\n', sum(rej(:)), n1, n2);
 	gcfdata {3} = rej;
 	gcfdata {4} = rejelec;
 	set(gcf, 'userdata', gcfdata);
