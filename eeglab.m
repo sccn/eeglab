@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.300  2003/12/11 17:29:19  arno
+% fixing lastcom for pop_chaneditset and pop_copyset
+%
 % Revision 1.299  2003/12/05 18:06:39  arno
 % debug adding path
 %
@@ -1281,7 +1284,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''         data channels (otherwise channel locations are ignored)'');' ...
                         'disp(''TIP: To edit channel info only, ">> chanlocs = pop_chanedit([]);" on the command line'');' ...
                         '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize'');' ...
-                        'clear TMPCHAN; h(LASTCOM); H(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
+                        'clear TMPCHAN; h(LASTCOM); h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
