@@ -9,9 +9,10 @@
 %   chanstruct     - channel structure. See readlocs()
 %
 % Optional input:
-%   'withindex'    - add index to each entry
-%   'select'       - selection of channel. Can take as input all the
-%                    outputs of this function.
+%   'withindex'      - add index to each entry
+%   'select'         - selection of channel. Can take as input all the
+%                      outputs of this function.
+%   'selectionmode' - selection mode 'multiple' or 'single'. See listdlg2().
 %
 % Output:
 %   chanlist  - indices of selected channels
@@ -39,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/11/10 17:27:07  arno
+% debug last
+%
 % Revision 1.13  2004/11/10 16:48:02  arno
 % NEW CHANNEL SELECTOR
 %
@@ -91,8 +95,9 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'   'string'  {'on' 'off'}   'off';
-                                'select'      { 'cell' 'string' 'integer' } [] [] });
+    g = finputcheck(varargin, { 'withindex'     'string'  {'on' 'off'}   'off';
+                                'select'        { 'cell' 'string' 'integer' } [] [];
+                                'selectionmode' 'string' { 'single' 'multiple' } 'multiple'});
     if isstr(g), error(g); end;
     
     % convert selection to integer
@@ -136,7 +141,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         end;
     end;
     [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift/Ctrl to', 'select several)'), ...
-                                          'ListString', tmpfieldnames, 'initialvalue', g.select);       
+                'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);       
     allchanstr = chans(chanlist);
     
     % get concatenated string (if index)
