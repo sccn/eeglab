@@ -18,7 +18,7 @@
 %                contributions at a single channel ('plotchan').
 %   'chanlocs' = electrode locations file (format: >> topoplot example)
 %   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax]
-%                To use data limtis, omit final values or use nan's
+%                To use data limits, omit final values or use nan's
 %                i.e. [-100 900 nan nan -10 10], [-100 900]
 %                Note that default color limits are symmetric around 0 and are
 %                different for each head {defaults: all nans}
@@ -27,6 +27,7 @@
 %   'percent'  = downsampling factor or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
 %                the computation. From 0 to 100 {default: 100}.
+%   'maxfreq'  = [float] maximum frequency to plot. Overwrite limits x axis.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                Default is 'off'. 
 %
@@ -81,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/07/20 19:21:21  arno
+% debugging
+%
 % Revision 1.13  2002/07/20 01:55:54  arno
 % add ignore extras
 %
@@ -144,7 +148,8 @@ end
 if nargin <= 3 | isstr(varargin{1})
 	% 'key' 'val' sequency
 	fieldlist = { 'freq'          'real'     []                        [] ;
-				  'chanlocs'      ''         []                       [] ;
+				  'chanlocs'      ''         []                        [] ;
+				  'maxfreq'       'real'     [1 srate/2]               [] ;
 				  'memory'        'string'   {'low' 'high'}           'high' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
@@ -159,6 +164,7 @@ if nargin <= 3 | isstr(varargin{1})
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
+	if ~isempty(g.maxfreq), g.limits(2) = g.maxfreq; end;
 else
 	if nargin > 3,    g.freq = varargin{1};
 	else              g.freq = [];
@@ -270,7 +276,7 @@ else
 	if strcmp(g.memory, 'high')
 		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g);
 	else % in case out of memory error, multiply conmponent sequencially
-		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g, newweights);
+		[compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
 	end;
 	fprintf('\n');
 	
@@ -386,12 +392,29 @@ if ~isempty(g.freq)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Plot connecting lines using changeunits()
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	tmpmainpos = get(gca, 'position');
 	headax = zeros(1,length(g.freq));
 	for f=1:length(g.freq)+length(g.icamaps)
 		headax(f) = sbplot(3,length(g.freq)+length(g.icamaps),f);
 		axis([-1 1 -1 1]);
+		
+		%axis x coords and use
+		tmppos = get(headax(f), 'position');
+		allaxcoords(f) = tmppos(1);
+		allaxuse(f)    = 0;
 	end
 	large = sbplot(1,1,1);
+	
+	% relative positions on plot
+	if  ~isempty(g.weights)
+		freqnormpos = tmpmainpos(1) + tmpmainpos(3)*(freqs(freqidx(1))-g.limits(1))/(g.limits(2)-g.limits(1));
+		for index = 1:length(g.icamaps)+1
+			[realpos(index) allaxuse] = closestplot( freqnormpos, allaxcoords, allaxuse );
+		end;
+	else 
+		realpos = 1:length(g.freq);
+	end;
+	
 	for f=1:length(g.freq)+length(g.icamaps)
 		if f>length(g.freq) % special case of ica components
 			from = changeunits([freqs(freqidx(1)),g.icafreqsval(f-1)],specaxes,large);
@@ -399,10 +422,10 @@ if ~isempty(g.freq)
 		else 
 			from = changeunits([freqs(freqidx(f)),max(eegspecdB(:,freqidx(f)))],specaxes,large);
 		end;
-		pos = get(headax(f),'position');
-		to = changeunits([0,0],headax(f),large)+[0 -min(pos(3:4))/1.7];
+		pos = get(headax(realpos(f)),'position');
+		to = changeunits([0,0],headax(realpos(f)),large)+[0 -min(pos(3:4))/1.7];
 		hold on;
-		li(f) = plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
+		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],'k','LineWidth',2);
 		axis([0 1 0 1]);
 		axis off;
 	end;
@@ -412,7 +435,7 @@ if ~isempty(g.freq)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Plotting scalp distributions: ')
 	for f=1:length(g.freq)
-		axes(headax(f));
+		axes(headax(realpos(f)));
 		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
 		if isnan(g.limits(5)),     maplimits = 'absmax';
 		else                       maplimits = [g.limits(5) g.limits(6)];
@@ -453,33 +476,23 @@ if ~isempty(g.freq)
 	% Plot independant components
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if ~isempty(g.weights)
+		if realpos(1) == max(realpos), plotcolbar(g); end;
 		% use headaxe from 2 to end (reserved earlier)
-		set(li(1), 'linewidth', 3); % make the line with the scalp topoplot thicker than others
+		set(li(realpos(1)), 'linewidth', 3); % make the line with the scalp topoplot thicker than others
 		for index = 1:length(g.icamaps)
-			axes(headax(index+1));
+			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
 			topoplot(g.icawinv(:,compnum),g.chanlocs,varargin{:}); 
 			tl=title(int2str(compnum));
 			set(tl,'fontsize',16);
 			axis square;
 			drawnow
+			if realpos(index+1) == max(realpos), plotcolbar(g); end;
 		end;
+	else 
+		plotcolbar(g);
 	end;
 
-	%%%%%%%%%%%%%%%%
-	% Plot color bar
-	%%%%%%%%%%%%%%%%
-	cb=cbar;
-	pos = get(cb,'position');
-	set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
-	set(cb,'fontsize',12);
-	if isnan(g.limits(5))
-		ticks = get(cb,'ytick');
-		[tmp zi] = find(ticks == 0);
-		ticks = [ticks(1) ticks(zi) ticks(end)];
-		set(cb,'ytick',ticks);
-		set(cb,'yticklabel',{'-','0','+'});
-	end
 end;
 
 %%%%%%%%%%%%%%%%
@@ -494,6 +507,33 @@ end
 % Turn on axcopy
 %%%%%%%%%%%%%%%%
 axcopy
+
+%%%%%%%%%%%%%%%%
+% Plot color bar
+%%%%%%%%%%%%%%%%
+function plotcolbar(g)
+	cb=cbar;
+	pos = get(cb,'position');
+	set(cb,'position',[pos(1) pos(2) 0.03 pos(4)]);
+	set(cb,'fontsize',12);
+	if isnan(g.limits(5))
+		ticks = get(cb,'ytick');
+		[tmp zi] = find(ticks == 0);
+		ticks = [ticks(1) ticks(zi) ticks(end)];
+		set(cb,'ytick',ticks);
+		set(cb,'yticklabel',{'-','0','+'});
+	end
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% function closest plot
+%%%%%%%%%%%%%%%%%%%%%%%
+function [index, usedplots] = closestplot(xpos, xcentercoords, usedplots);
+	notused = find(usedplots == 0);
+	xcentercoords = xcentercoords(notused);
+	[tmp index] = min(abs(xcentercoords-xpos));
+	index = notused(index);
+	usedplots(index) = 1;
+	return;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function computing spectrum
