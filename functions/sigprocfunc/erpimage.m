@@ -160,6 +160,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.202  2004/01/24 21:58:33  scott
+% same
+%
 % Revision 1.201  2004/01/24 21:53:38  scott
 % same
 %
@@ -3046,7 +3049,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
 %                           If winloc not [], plot grey back image in sort window
 %                                       winloc(1)-> winloc(end) (ms)
   FILLCOLOR    = [.66 .76 1];
-  WINFILLCOLOR    = [.83 .88 1];
+  WINFILLCOLOR    = [.88 .92 1];
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   if ~isempty(winloc)
@@ -3059,7 +3062,7 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
        fillwiny = [hannwin*axlimits(3) hannwin*axlimits(4)];
     else
        % fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
-       fillwiny = [hannwin*1.1*min(erp) hannwin*1.1*max(erp)];
+       fillwiny = [hannwin*2*min(erp) hannwin*2*max(erp)];
     end
     fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
     set(fillwh,'edgecolor',WINFILLCOLOR-[.00 .00 0]); % make edges NOT highlighted
