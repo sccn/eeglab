@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2003/12/02 03:21:26  arno
+% better gui for readlocs
+%
 % Revision 1.59  2003/10/16 23:39:45  arno
 % eeglabsources
 % OA
@@ -419,7 +422,7 @@ if nargin < 2
 			[results userdat returnmode] = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', 'Edit channel info -- pop_chanedit()', {}, currentfig );
 		else 
 			[results userdat returnmode] = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', 'Edit channel info -- pop_chanedit()', {}, 'noclose' );
-			currentfig = gcf;
+			if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
 		end; 
 		if length(results) == 0, return; end;
 		
@@ -458,7 +461,7 @@ if nargin < 2
 			guimodif = 1;
 		end;
 	end;
-	
+    
 	% not in the loop, returning
 	% --------------------------
 	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
