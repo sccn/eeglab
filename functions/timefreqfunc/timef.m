@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/04/29 14:29:53  scott
+% debugging cumulX/PA -sm
+%
 % Revision 1.24  2002/04/29 14:24:13  scott
 % debugging -sm
 %
@@ -689,7 +692,7 @@ disp 'phsamp1'
 disp 'phsamp2'
           PA(:,:,j) = PA(:,:,j) ...
               + repmat((tmpX ./ abs(tmpX)),1,size(PP,1))   ...
-                   .* repmat(sqrt(PP(:,j))',size(PP,1),1)    ...
+                   .* repmat(sqrt(PP(:,j))',size(PP,1),1);
                                            % x-product: unit phase column
                                            % times amplitude row
         end
