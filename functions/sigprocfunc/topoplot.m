@@ -2,6 +2,8 @@
 %              (looking down at the top of the head) using interpolation on a fine 
 %              cartesian grid. Can also show specified channnel location(s), or return 
 %              an interpolated value at an arbitrary scalp location (see 'noplot').
+%              Using option 'gridplot', the plot can be a rectangular imagesc() grid
+%              or can add such a grid plot to the left or right of the head image.
 %              By default, channel locations below head center (arc_length 0.5) are 
 %              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
 %              options below). Nose is at top of plot; left is left; right is right.
@@ -24,6 +26,9 @@
 %                       'both'     -> plot both colored map and contour lines
 %                       'fill'     -> plot constant color between contour lines
 %                       'blank'    -> plot electrode locations only {default: 'both'}
+%   'plotchans'       - vector of channel indices to interpolate in the head plot. Negative
+%                       integers reverse the data polarity. Grid chans, if any, are not included 
+%                       in plotchans (see 'gridplot' below). {default: [] -> plot all chans}
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
 %                       options below. {default: 'off' -> mark electrode locations with points}. 
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
@@ -31,7 +36,7 @@
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
 %                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5)}. 
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
-%                       NOTE: only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
+%                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
 %   'conv'            - ['on'|'off'] Show map interpolation only out to the convext hull of
 %                       the electrode locations to minimize extrapolation.  {default: 'off'}
@@ -39,12 +44,15 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
-%   'plotgrid'        - {channels,values} or {channels, values, position} where channels is 
-%                       a list of grid channel numbers, values is a list of channel values, 
-%                       and position (if either 'l' or 'r') indicates which side of the head 
-%                       to plot the grid, or if 'o', plot the grid only. {default location is
-%                       to the left of the head}. The channels vector should be in topographic 
-%                       order from top-left rightward. {default: no grid plot}
+%   'plotgrid'        - [channels] or {[channels], position} where channels is a matrix of grid 
+%                       channel numbers - in which 0s plot 0-values and negative integers, 
+%                       polarity-reversed values - and char position (if either 'l' or 'r') 
+%                       indicates which side of the head to plot the grid, or if 'o', plot the 
+%                       grid only {the default grid location is to the left of the head}. The 
+%                       channels matrix should show the topographic ordering of the channels. 
+%                       {default: no grid plot} NOTE: Not yet implemented.
+%                       Ex: >> topoplot(values,'chanlocs','plotgrid',{[11 12 0; 13 14 15],'o'});
+%                       % Plot a 2x3 grid (only) of channels 11-15 data values plus one 0 value.
 % Dipole plotting:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
 %                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
@@ -65,7 +73,7 @@
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius plotrad) plotting disk. 'off' -> Interpolate
 %                       values from electrodes shown in the plotting disk only. {default: 'on'}
-%   'electcolor'{'k'}|'emarker'{'.'}|'emarkersize'{14}|'emarkersize1chan'{40}|'efontsize'{var}
+%   'electcolor' {'k'}|'emarker' {'.'}|'emarkersize' {14}|'emarkersize1chan' {40}|'efontsize' {var}
 %                       electrode marking details and their {defaults}. 
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
@@ -118,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.207  2004/09/29 01:04:22  scott
+% created input 'plotgrid' - plotting not yet implemented -sm
+%
 % Revision 1.206  2004/09/10 00:53:08  hilit
 % converted input arguments to text() to double
 %
@@ -578,6 +589,7 @@ if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
    BACKCOLOR = [.93 .96 1];  % EEGLAB standard
 end
 plotgrid = 'off';
+plotchans = [];
 gridpos = 'l';          % default grid position left of head
 noplot  = 'off';
 handle = [];
@@ -740,8 +752,15 @@ if nargs > 2
          end
          if strcmpi(ELECTRODES,'pointnumbers') | strcmpi(ELECTRODES,'ptsnumbers') ...
               | strcmpi(ELECTRODES,'numberspts') | strcmpi(ELECTRODES,'ptnumbers') ...
-              | strcmpi(ELECTRODES,'numberpts') 
+              | strcmpi(ELECTRODES,'numberpts')  | strcmpi(ELECTRODES,'ptsnums')  ...
+              | strcmpi(ELECTRODES,'numspts') 
              ELECTRODES = 'numpoint'; % backwards compatability
+         end
+         if strcmpi(ELECTRODES,'nums') 
+             ELECTRODES = 'numbers'; % backwards compatability
+         end
+         if strcmpi(ELECTRODES,'pts') 
+             ELECTRODES = 'on'; % backwards compatability
          end
          if ~strcmpi(ELECTRODES,'labelpoint') ...
             & ~strcmpi(ELECTRODES,'numpoint') ...
@@ -825,31 +844,61 @@ if nargs > 2
          case 'gridscale'
           GRID_SCALE = Value;
           if isstr(GRID_SCALE) | GRID_SCALE ~= round(GRID_SCALE) | GRID_SCALE < 32
-               error('''gridscale'' value must be integer > 32.\n');
+               error('''gridscale'' value must be integer > 32.');
           end
-         case 'plotgrid'
-           if ~iscell(Value)
-               error('''plotgrid'' value must be a cell array\n');
+         case {'plotgrid','gridplot'}
+           plotgrid = 'on';
+           if iscell(Value)
+               if length(Value) > 2
+                 error('''plotgrid'' value must be a matrix or cell array of length 2');
+               end
+               gridchans = Value{1};
+               gridpos   = Value{2};
+               if ~ismember(gridpos,'lro')
+                 error('''plotgrid'' position must be ''l'', ''r'', or ''o''');
+               end
+           else
+               gridchans = Value;
            end
-           if length(a)<2
-               error('''plotgrid'' value must be a cell array of length 2 or 3\n');
+         case 'plotchans'
+           plotchans = Value(:);
+           if find(plotchans==0) 
+               error('''plotchans'' values must be > 0');
            end
-           gridchans = Value{1};
-           gridvals  = Value{2};
-           if length(a)>2
-               gridpos   = Value{3};
+           if max(abs(plotchans))>length(Values)
+               error('''plotchans'' values must be <= max channel index');
            end
-           error('''plotgrid'' option not yet implemented.\n');
 	 otherwise
 	  error(['Unknown input parameter ''' Param ''' ???'])
     end
   end
 end
 
+if strcmp(plotgrid,'on')
+   if abs(max(max(gridchans))) > length(Values)
+        error('''plotgrid'' channel index larger than the number of input channel values');
+   end
+   gchans = sort(find(abs(gridchans(:))>0));
+   if setdiff(gchans,unique(gchans))
+        fprintf('topoplot() warning: ''plotgrid'' channel matrix has duplicate channels\n');
+   end
+   if plotchans
+     if intersect(gchans,abs(plotchans))
+        fprintf('topoplot() warning: ''plotgrid'' and ''plotchans'' have channels in common\n');
+     end
+   end
+   error('''plotgrid'' option not yet implemented.'); % <============
+end
+if isempty(plotchans)
+  plotchans = 1:length(Values);
+  if strcmp(plotgrid,'on')
+     plotchans(gchans) = [];   % remove grid chans from head plotchans
+  end
+end
 if isempty(ELECTRODES)                     % if electrode labeling not specified
   if length(Values) > MAXDEFAULTSHOWLOCS   % if more channels than default max
     ELECTRODES = 'off';                    % don't show electrodes
-  else                                     % else if fewer chans
+  else                                     % else if fewer chans,
     ELECTRODES = 'on';                     % do
   end
 end
@@ -1007,7 +1056,7 @@ end
 % 
 pltchans = find(Rd <= plotrad); % plot channels inside plotting circle
 
-[x,y] = pol2cart(Th,Rd);  % transform from polar to cartesian coordinates
+[x,y] = pol2cart(Th,Rd);  % transform electrode locations from polar to cartesian coordinates
 
 if strcmpi(INTSQUARE,'on') &  ~strcmpi(STYLE,'blank') % interpolate channels in the radius intrad square
   intchans = find(x <= intrad & y <= intrad); % interpolate and plot channels inside interpolation square
@@ -1022,6 +1071,13 @@ end;
 %
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
+allx = x;
+ally = y;
+
+Values(find(plotchans<0)) = -Values(find(plotchans<0)); % reverse indicated channel polarities
+intchans = intersect(intchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
+pltchans = intersect(pltchans,abs(plotchans)); % head plot only indicated 'plotchans' channels
+fprintf('topoplot(): plotting %d channels\n',length(pltchans));
 
 if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
@@ -1049,8 +1105,6 @@ inty  = y(intchans);
 
 Th    = Th(pltchans);              % eliminate channels outside the plotting area
 Rd    = Rd(pltchans);
-allx = x;
-ally = y;
 x     = x(pltchans);
 y     = y(pltchans);
 
@@ -1434,13 +1488,15 @@ end
 ELECTRODE_HEIGHT = 2.1;  % z value for plotting electrode information (above the surf)
 
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
-  hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+  hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
     for i = 1:size(labels,1)
-    text(double(y(i)),double(x(i)),ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','center',...
+    text(double(y(i)),double(x(i)),...
+        ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
@@ -1448,9 +1504,11 @@ elseif strcmp(ELECTRODES,'labels')  % print electrode names (labels)
 %%%%%%%%%%%%%%%%%%%%%%%% Mark electrode locations plus labels %%%%%%%%%%%%%%%%%%%
 %
 elseif strcmp(ELECTRODES,'labelpoint') 
-  hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
+  hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(double(y(i)+0.01),double(x(i)),ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','left',...
+    hh(i) = text(double(y(i)+0.01),double(x(i)),...
+        ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(pltchans(i)), ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -1463,7 +1521,8 @@ elseif strcmp(ELECTRODES,'labelpoint')
 elseif strcmp(ELECTRODES,'numpoint') 
   hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
   for i = 1:size(labels,1)
-    hh(i) = text(double(y(i)+0.01),double(x(i)),ELECTRODE_HEIGHT,num2str(pltchans(i)),'HorizontalAlignment','left',...
+    hh(i) = text(double(y(i)+0.01),double(x(i)),...
+        ELECTRODE_HEIGHT,num2str(pltchans(i)),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -1475,7 +1534,8 @@ elseif strcmp(ELECTRODES,'numpoint')
 %
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
-    text(double(y(i)),double(x(i)),ELECTRODE_HEIGHT,int2str(pltchans(i)),'HorizontalAlignment','center',...
+    text(double(y(i)),double(x(i)),...
+        ELECTRODE_HEIGHT,int2str(pltchans(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
