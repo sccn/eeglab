@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/11 21:35:54  arno
+% debugging function call
+%
 % Revision 1.5  2002/10/11 01:13:25  arno
 % confirm->0 by default
 %
@@ -69,7 +72,13 @@ if nargin < 3
    confirm = 1;
 end;
    
-fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
+if isequal(sort(unique(tmprej)), [0 1])
+    format0_1 = 1;
+    fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
+else 
+    format0_1 = 0;
+    fprintf('%d/%d trials rejected\n', length(tmprej), EEG.trials);
+end;
 
 if confirm ~= 0
     ButtonName=questdlg2('Are you sure, you want to reject the labeled trials ?', ...
@@ -86,8 +95,12 @@ end;
 
 % create a new set if set_out is non nul 
 % --------------------------------------
-EEG = pop_select( EEG, 'notrial', find(tmprej > 0));
+if format0_1
+    EEG = pop_select( EEG, 'notrial', find(tmprej > 0));
+else
+    EEG = pop_select( EEG, 'notrial', tmprej);
+end;
 
-com = sprintf( '%s = pop_rejepoch( %s, [%s], 0);', inputname(1), ...
-			inputname(1), int2str( tmprej ));		
+com = sprintf( '%s = pop_rejepoch( %s, %s);', inputname(1), ...
+			inputname(1), vararg2str({ find(tmprej>0) 0}));		
 return;
