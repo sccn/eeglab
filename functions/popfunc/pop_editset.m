@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/18 14:43:02  scott
+% edited error msgs -sm
+%
 % Revision 1.11  2002/04/18 02:52:05  scott
 % [same] -sm
 %
@@ -150,7 +153,7 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } ...
 	     ...
 		 { 'Style', 'text', 'string', 'Averaged referenced data ?'} { } ...
-		 { 'Style', 'checkbox', 'string', '(set = yes)', 'value', strcmp(EEG.averef, 'yes') }, { 'Style', 'text', 'string', '(EEG.averef)'} ...
+		 { 'Style', 'checkbox', 'string', '(set = Yes)', 'value', strcmp(EEG.averef, 'Yes') }, { 'Style', 'text', 'string', '(EEG.averef)'} ...
 			 };
 
     if EEG.trials == 1,  uilist(21:24) = []; geometry(6) = []; end;
