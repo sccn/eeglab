@@ -145,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.99  2004/06/11 00:16:12  arno
+%change light
+%
 %Revision 1.98  2004/06/09 21:15:01  arno
 %debug projcol
 %
@@ -837,7 +840,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
             tag = [ 'dipole' num2str(index) ];
-            [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg);             [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
+            [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg);             
+            [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
