@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/01/21 17:19:32  arno
+% adding strvcat to the y-label
+%
 % Revision 1.47  2003/01/03 01:42:31  arno
 % more details on default percentage
 %
@@ -757,7 +760,7 @@ function plotcolbar(g)
 			[tmp zi] = find(ticks == 0);
 			ticks = [ticks(1) ticks(zi) ticks(end)];
 			set(cb,'ytick',ticks);
-			set(cb,'yticklabel',strvcat({'-','','+'}));
+			set(cb,'yticklabel',strvcat('-',' ','+'));
 		end
 	catch, end; % in a single channel is plotted
 
