@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/31 16:16:31  arno
+% no change
+%
 % Revision 1.7  2002/07/31 01:01:57  arno
 % debugging for frequencies
 %
@@ -79,10 +82,12 @@ com2 = [ 'if ~isempty(TMPREJ), [tmprej tmprejE] = eegplot2trial(TMPREJ,' ...
          macrorej '= tmprej;' macrorejE '= tmprejE2;' ];
 if reject
     com2 = [com2 sprintf(['%s = pop_rejepoch(%s, tmprej, 1);' ...
-		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);' ...
+		   '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET);' ...
+		   'disp(''warning: manual modification were not saved in the history'');' ...
 	       'eeglab(''redraw''); end;'], 'EEG', 'EEG'); ] ;
 else
 	com2 = [com2 ...
+		    'disp(''warning: manual modification were not saved in the history'');' ...
 			' warndlg(strvcat(''Epoched labelled for rejection have been stored'',' ...
 			'''To actually reject these epochs'', ''/Tools/Reject data epochs/Reject labelled epochs''));' ...
 			'[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab(''redraw''); end;' ];
@@ -94,9 +99,14 @@ end;
 % the first part is used to convert the eegplot output
 command = [  com2 topcommand 'clear tmprej tmprejE tmprejE2 TMPREJ;' ];
 
-oldrej  = eval(macrorej);
-oldrejE = eval(macrorejE);
-	
+if all(colrej == EEG.reject.rejmanualcol)
+	oldrej = [];  % for manual rejection, old rejection are
+	oldrejE = []; % the current rejection
+else
+	oldrej  = eval(macrorej);
+	oldrejE = eval(macrorejE);
+end;
+
 % mix all type of rejections
 % --------------------------
 switch superpose
@@ -137,5 +147,5 @@ if ~isempty(EEG.chanlocs)
 	eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
 end;
 if ~reject
-	eegplotoptions = { eegplotoptions{:}  'butlabel', 'KEEP LABELS' };
+	eegplotoptions = { eegplotoptions{:}  'butlabel', 'UPDATE MARKS' };
 end;
