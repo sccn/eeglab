@@ -153,6 +153,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2003/08/24 04:37:47  scott
+% debug last
+%
 % Revision 1.137  2003/08/24 04:36:29  scott
 % fprintf
 %
@@ -2220,7 +2223,7 @@ erp = [];
 if Erpflag == YES 
   if exist('erpalpha')
     [erp erpalphaout] = nan_mean(urdata',erpalpha);   
-    fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n',erpalpha,mean(erpalpha));
+    fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n',erpalpha,mean(erpalphaout));
   else
     [erp] = nan_mean(urdata');   % compute erp average, ignoring nan's
   end
