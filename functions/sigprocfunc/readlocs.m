@@ -1,6 +1,7 @@
-% readlocs() - read electrode location information from a file. Several standard file
-%              formats are supported. Users may also specify a custom column format.
-%              Examples of the defined formats are given below (File Formats).
+% readlocs() - read electrode location coordinates and other information from a file. 
+%              Several standard file formats are supported. Users may also specify 
+%              a custom column format. Defined format examples are given below 
+%              (see File Formats).
 % Usage:
 %   >>  eloc = readlocs( filename );
 %   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
@@ -16,33 +17,35 @@
 %                 using the file extension (see below under File Formats):
 %                  'loc' - an EEGLAB 2-D polar coordinates channel locations file 
 %                          Coordinates are theta and radius (see definitions below).
-%                  'sph' - a Matlab spherical coordinates file (Note: spherical
+%                  'sph' - Matlab spherical coordinates (Note: spherical
 %                          coordinates used by Matlab functions are different 
-%                          from spherical coordinates used in BESA - see below).
-%                  'sfp' - EGI cartesian coordinates (not Matlab cartesian - see below).
-%                  'xyz' - MATLAB/EEGLAB cartesian coordinates (Not EGI cartesian; 
-%                          z is toward nose; y is toward left ear; z is toward vertex).
-%                  'asc' - Neuroscan polar coordinate file.
-%                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded with 
-%                          'X' on sensor pointing to subject (see below and readelp()).
+%                          from spherical coordinates used by BESA - see below).
+%                  'sfp' - EGI Cartesian coordinates (NOT Matlab Cartesian - see below).
+%                  'xyz' - Matlab/EEGLAB Cartesian coordinates (NOT EGI Cartesian).
+%                          z is toward nose; y is toward left ear; z is toward vertex
+%                  'asc' - Neuroscan polar coordinates.
+%                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded 
+%                          with 'X' on sensor pointing to subject (see below and readelp()).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
 %                          'Y' on sensor pointing to subject (see below and readelp()).
-%                  'besa' - BESA-'.elp' spherical coordinate file. (Not MATLAB spherical
-%                           - see below).
-%                  'chanedit' - EEGLAB channel location files created by pop_chanedit().
-%                  'custom' - Ascii files with columns in user-defined 'format' (see below).
+%                  'besa' - BESA-'.elp' spherical coordinates. (Not MATLAB spherical -
+%                           see below).
+%                  'chanedit' - EEGLAB channel location file created by pop_chanedit().
+%                  'custom' - Ascii file with columns in user-defined 'format' (see below).
 %   'format'    - [cell array] Format of a 'custom' channel location file (see above).
-%                          Default if no file type is defined. The cell array contains
+%                          Default, if no file type is defined. The cell array contains
 %                          labels defining the meaning of each column of the input file:
 %                           'channum'   [positive integer] channel number 
 %                           'labels'    [string] channel name (no spaces)
 %                           'theta'     [real degrees] 2-D angle in polar coordinates; 
 %                                       positive = rotating from nose (0) toward left ear 
-%                           'radius'    [real] radius in 2-D polar coords (0.5 is disk limits)
-%                           'X'         [real] Matlab-cartesian X coordinate (to nose)
-%                           'Y'         [real] Matlab-cartesian Y coordinate (to left ear)
-%                           'Z'         [real] Matlab-cartesian Z coordinate (to vertex)
-%                           '-X','-Y','-Z' Matlab-cartesian coordinates pointing away from above
+%                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head 
+%                                       disk radius and limit for topoplot() plotting)
+%                           'X'         [real] Matlab-Cartesian X coordinate (to nose)
+%                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear)
+%                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex)
+%                           '-X','-Y','-Z' Matlab-Cartesian coordinates pointing opposite
+%                                       to the above.
 %                           'sph_theta' [real degrees] Matlab spherical horizontal angle; 
 %                                       positive = rotating from nose (0) toward left ear.
 %                           'sph_phi'   [real degrees] Matlab spherical elevation angle;
@@ -58,29 +61,29 @@
 %                           'calib'     [real near 1.0] channel calibration value.
 %                           'gain'      [real > 1] channel gain. 
 %                           'custom1'   custom field #1.
-%                           'custom2', 'custom3', 'custom4' more custom fields.
+%                           'custom2', 'custom3', 'custom4', etc.    more custom fields
 %   'skiplines' - [integer] Number of header lines to skip (in 'custom' file types only).
-%                 All characters following '%' will be treated as comments and ignored.
+%                 Note: Characters on a line following '%' will be treated as comments.
 %   'readchans' - [integer array] indices of electrodes to read. Default is all.
-%   'center'    - [(1,3) real array or 'auto'] of xyz coordinates for conversion to 
-%                 spherical or polar, Specify the center of the sphere here, or 
-%                'auto'. This uses the center of the sphere that best fits all 
-%                 the electrode locations read. Default is [0 0 0].
+%   'center'    - [(1,3) real array or 'auto'] center of xyz coordinates for conversion 
+%                 to spherical or polar, Specify the center of the sphere here, or 'auto'. 
+%                 This uses the center of the sphere that best fits all the electrode 
+%                 locations read. Default is [0 0 0].
 % Outputs:
-%   eloc      - structure containing the channel names and locations.
-%               It has three fields: 'labels', 'theta' and 'radius', identical
-%               to the EEGLAB struct EEG.chanlocs.
-%   labels    - cell array of strings giving the  names of the electrodes
-%   theta     - vector of polar angles for the electrodes (in degrees).
-%   radius    - vector of polar coordinate radius values for the electrodes
-%   indices   - indices of channel having non-empty coordinates
+%   eloc        - structure containing the channel names and locations.
+%                 It has three fields: 'labels', 'theta' and 'radius' 
+%                 Identical to the EEGLAB struct EEG.chanlocs.
+%   labels      - cell array of strings giving the  names of the electrodes
+%   theta       - vector of polar angles for the electrodes (in degrees).
+%   radius      - vector of polar coordinate radius values for the electrodes
+%   indices     - indices of channels with non-empty coordinates
 %
 % File formats:
-%   The extension of the file determines its type if 'filetype' is unspecified:
+%   If 'filetype' is unspecified, the file extension determines its type.
 %
 %   '.loc' or '.locs': 
-%               polar coordinates. Notes: angle in degrees: right ear is 90, 
-%               left ear -90; head disk radius is 0.5. 
+%               polar coordinates. Notes: angles in degrees: 
+%               right ear is 90; left ear -90; head disk radius is 0.5. 
 %               Fields:   N    angle  radius    label
 %               Sample:   1    -18    .511       Fp1   
 %                         2     18    .511       Fp2  
@@ -88,11 +91,11 @@
 %                         4     90    .256       C4
 %                           ...
 %               Note: In previous releases, channel labels had to contain exactly 
-%               four characters (spaces replaced by '.'). This format still works 
-%               but dots are no longer required.
+%               four characters (spaces replaced by '.'). This format still works, 
+%               though dots are no longer required.
 %   '.sph':
 %               Matlab spherical coordinates. Notes: theta is the azimuthal/horizontal angle
-%               in deg.: 0 is toward nose, 90 rotated to left ear. Following this, perform
+%               in deg.: 0 is toward nose, 90 rotated to left ear. Following this, performs
 %               the elevation (phi). Angles in degrees.
 %               Fields:   N    theta    phi    label
 %               Sample:   1      18     -2      Fp1
@@ -104,7 +107,7 @@
 %               Cartesian 3-D electrode coordinates scanned using the EETrak software. 
 %               See readeetraklocs().
 %   '.elp':     
-%               Polhemus-.'elp' cartesian coordinates. By default, an .elp extension is read
+%               Polhemus-.'elp' Cartesian coordinates. By default, an .elp extension is read
 %               as PolhemusX-elp in which 'X' on the Polhemus sensor is pointed toward the 
 %               subject. Polhemus files are not in columnar format (see readelp()).
 %   '.elp':
@@ -121,7 +124,7 @@
 %                         C4          46    0 
 %                           ...
 %   '.xyz': 
-%               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose, 
+%               Matlab/EEGLAB Cartesian coordinates. Here. x is towards the nose, 
 %               y is towards the left ear, and z towards the vertex.
 %               Fields:   channum   x           y         z     label
 %               Sample:   1       .950        .308     -.035     Fp1
@@ -130,11 +133,11 @@
 %                         4        0          -.719      .695    C4
 %                           ...
 %   '.asc', '.dat':     
-%               Neuroscan-.'asc' or '.dat' cartesian polar coordinates text file.
+%               Neuroscan-.'asc' or '.dat' Cartesian polar coordinates text file.
 %   '.sfp': 
-%               BESA/EGI-xyz cartesian coordinates. Notes: For EGI, x is toward right ear, 
+%               BESA/EGI-xyz Cartesian coordinates. Notes: For EGI, x is toward right ear, 
 %               y is toward the nose, z is toward the vertex. EEGLAB converts EGI 
-%               cartesian coordinates to Matlab/EEGLAB xyz coordinates. 
+%               Cartesian coordinates to Matlab/EEGLAB xyz coordinates. 
 %               Fields:   label   x           y          z
 %               Sample:   Fp1    -.308        .950      -.035    
 %                         Fp2     .308        .950      -.035  
@@ -143,17 +146,17 @@
 %                           ...
 %   '.ced':   
 %               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
-%               Carthesian coordinates are the same as the ones for the 'xyz' format.
+%               Cartesian coordinates are as in the 'xyz' format (above).
 %               Fields:   channum  label  theta  radius   x      y      z    sph_theta   sph_phi  ...
 %               Sample:   1        Fp1     -18    .511   .950   .308  -.035   18         -2       ...
 %                         2        Fp2      18    .511   .950  -.308  -.035  -18         -2       ...
 %                         3        C3      -90    .256   0      .719   .695   90         44       ...
 %                         4        C4       90    .256   0     -.719   .695  -90         44       ...
 %                           ...
-%               The last columns of the file may contain any other defined field (gain,
+%               The last columns of the file may contain any other defined fields (gain,
 %               calib, type, custom).
 %
-% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002 (expanded from the ICA 
+% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002 (expanded from the previous EEG/ICA 
 %         toolbox function)
 %
 % See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
@@ -177,6 +180,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2004/01/01 18:57:26  scott
+% edit text outputs
+%
 % Revision 1.59  2004/01/01 01:47:34  scott
 % franglais -> anglais
 %
