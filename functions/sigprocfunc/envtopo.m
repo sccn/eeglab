@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/03/23 20:14:50  scott
+% fill msg edit
+%
 % Revision 1.22  2003/03/23 20:07:38  scott
 % making data env overplot bold
 %
@@ -251,7 +254,7 @@ all_bold = 0;
 BOLD_COLORS = 1;  % 1 = use solid lines for first 5 components plotted
                   % 0 = use std lines according to component rank only
 FILL_COMP_ENV = 0;  % default no fill
-MAXTOPOS = 7;  % max topoplots to plot
+MAXTOPOS = 20;  % max topoplots to plot
 
 if ndims(data) == 3
     data = mean(data,3);
@@ -523,7 +526,7 @@ topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
 if topowidth*head_sep + pos(3) > 0.90    % adjust for maximum height
   topowidth = (0.90-0.68)/head_sep;
 end
-topowidth = 0.10;
+%topowidth = 0.10;
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep + 0.5)*topowidth;
 else % even number of topos
