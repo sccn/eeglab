@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/18 15:56:33  scott
+% editted msgs -sm
+%
 % Revision 1.4  2002/04/11 20:02:42  arno
 % adding last command history
 %
@@ -103,7 +106,7 @@
 
 function varargout = pop_erpimage( EEG, typeplot, channel, titleplot, smooth, decimate, sortingtype, ...
             sortingwin, sortingeventfield, renorm, varargin)
-
+ 
 varargout{1} = '';
 if nargin < 1
    help pop_erpimage;
