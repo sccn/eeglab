@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/06 02:00:08  arno
+% correcting char size for times font
+%
 % Revision 1.3  2002/04/06 01:19:26  arno
 % changing lines increments between title-text
 %
@@ -80,11 +83,11 @@ if nargin >2
 else
     g = [];
 end;
-try g.title;    catch g.title = ''; end;    
-try g.fontname; catch g.fontname = 'courier'; end;    
-try g.fontsize; catch g.fontsize = 12; end;    
-try g.fontweight; catch g.fontweight = 'normal'; end;    
-try g.linesperpage; catch g.linesperpage = 20; end;    
+try, g.title;    catch g.title = ''; end;    
+try, g.fontname; catch g.fontname = 'courier'; end;    
+try, g.fontsize; catch g.fontsize = 12; end;    
+try, g.fontweight; catch g.fontweight = 'normal'; end;    
+try, g.linesperpage; catch g.linesperpage = 20; end;    
 
 if isempty( helparray )
 	helparray = cell(1,200);
