@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/12 14:40:25  arno
+% color
+%
 % Revision 1.10  2002/08/12 14:36:02  arno
 % color
 %
@@ -93,7 +96,8 @@ BACKEEGLABCOLOR  = [.66 .76 1];
 GUIBUTTONCOLOR   = [.66 .76 1];    
 GUITEXTCOLOR     = [0 0 0.4];
 
-GUIBUTTONCOLOR  =  [.93 .96 1];     
+GUIBUTTONCOLOR  =     [.66 .76 1]; 
+GUIPOPBUTTONCOLOR  =  [.93 .96 1];     
 GUIBACKCOLOR   = [.66 .76 1];    
 GUITEXTCOLOR     = [0 0 0.4];
 
