@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/02/05 01:29:59  arno
+% debug sobi call
+%
 % Revision 1.36  2004/02/05 01:24:09  arno
 % updating sobi calls
 %
@@ -443,12 +446,13 @@ switch lower(icatype)
         close(fig);
      case 'sobi' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
+        disp('Running sobi...');
         if length(options) < 2
              EEG.icawinv = sobi( EEG.data );
         else    
             eval(sprintf('EEG.icawinv = sobi( EEG.data %s );', options));
         end;
-        EEG.icaweight = pinv(EEG.icawinv);
+        EEG.icaweights = pinv(EEG.icawinv);
         EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'ng_ol' 
@@ -468,8 +472,8 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icawinv = acsobiro( tmpdata %s );', options));
         end;
-        EEG.icaweight = pinv(EEG.icawinv);
-        EEG.icasphere = eye(size(EEG.icaweights,2));
+        EEG.icaweights = pinv(EEG.icawinv);
+        EEG.icasphere  = eye(size(EEG.icaweights,2));
         close(fig);
      case 'acrsobibpf' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -478,8 +482,8 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icawinv = acrsobibpf( tmpdata %s );', options));
         end;
-        EEG.icaweight = pinv(EEG.icawinv);
-        EEG.icasphere = eye(size(EEG.icaweights,2));
+        EEG.icaweights = pinv(EEG.icawinv);
+        EEG.icasphere  = eye(size(EEG.icaweights,2));
         close(fig);
      case 'fastica'
         if ~exist('fastica', 'file') & ~exist('fastica', 'dir')
