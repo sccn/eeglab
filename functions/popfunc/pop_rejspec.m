@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/11/15 01:37:17  arno
+% header typo
+%
 % Revision 1.16  2002/11/13 02:06:52  arno
 % debugging command line call
 %
@@ -216,10 +219,10 @@ if calldisp
 	colrej = EEG.reject.rejfreqcol;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 	if icacomp == 1
-		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], ...
+		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], ...
 				'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
 	else
-		eegplot(icaacttmp(elecrange,:,:), 'winlength', 5, 'position', [100 800 800 500], 'limits', ...
+		eegplot(icaacttmp(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
 				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
 	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
