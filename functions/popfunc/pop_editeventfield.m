@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/05/28 19:09:45  arno
+% do not do anything when press OK
+%
 % Revision 1.30  2004/05/27 02:00:14  arno
 % dealing with urevents
 %
@@ -425,8 +428,11 @@ for curfield = tmpfields'
                                   disp('pop-editeventfield: updating urevent structure');
                                   try
                                       for indtmp = g.indices(:)'
-                                          tmpval      = getfield (EEG.event, {indtmp}, curfield{1});
-                                          EEG.urevent = setfield (EEG.urevent, {EEG.event(indtmp).urevent}, curfield{1}, tmpval);
+                                          if ~isempty(EEG.event(indtmp).urevent)
+                                              tmpval      = getfield (EEG.event, {indtmp}, curfield{1});
+                                              EEG.urevent = setfield (EEG.urevent, {EEG.event(indtmp).urevent}, ...
+                                                                                   curfield{1}, tmpval);
+                                          end;
                                       end;
                                   catch,
                                       disp('Warning: problem while updating urevent structure');
