@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/29 17:24:22  arno
+% header
+%
 % Revision 1.7  2002/07/20 19:10:41  arno
 % debugging output
 %
@@ -139,7 +142,8 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 		  else 
 			  if strcmp(fieldlist{index, TYPE}, 'integer')
 				  if ~isempty(fieldlist{index, VALS})
-					  if ~ismember(tmpval, fieldlist{index, VALS})
+					  if (isnan(tmpval) & ~any(isnan(fieldlist{index, VALS}))) ...
+					     & (~ismember(tmpval, fieldlist{index, VALS}))
 						  g = [ callfunc 'error: wrong value for argument ''' fieldlist{index, NAME} '''' ]; return;
 					  end;
 				  end;
