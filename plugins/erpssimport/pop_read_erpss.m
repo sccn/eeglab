@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/06/19 16:16:16  arno
+% make ur
+%
 % Revision 1.11  2003/06/18 00:22:56  arno
 % debug if no events
 %
@@ -67,7 +70,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_read_erpss(filename); 
+function [EEG, command] = pop_read_erpss(filename, srate); 
 EEG = [];
 command = '';
 
@@ -84,7 +87,19 @@ EEG = eeg_emptyset;
 fprintf('pop_read_erpss: importing ERPSS file...\n');
 [EEG.data,events,header] = read_erpss(filename);
 EEG.nbchan = size(EEG.data,1);
-EEG.srate = header.srate;
+if nargin < 1 & round(header.srate) == 0
+    promptstr    = { 'Sampling rate' };
+    inistr       = { '256' };
+    result       = inputdlg2( promptstr, 'Import BCI2000 data -- pop_loadbci()', 1,  inistr, 'pop_loadbci');
+    if length(result) == 0 return; end;
+    srate   = eval( result{1} );
+elseif round(header.srate) ~= 0 
+    srate = header.srate
+elseif nargin ~= 2
+    disp('WARNING: Unknown sampling rate.Use menu "Edit > Dataset info" to enter it.');
+    srate = NaN;
+end;
+EEG.srate = srate;
 EEG.setname = 'ERPSS data';
 if exist('filepath') == 1
     EEG.filepath = filepath;
@@ -98,5 +113,5 @@ end;
 EEG = eeg_checkset(EEG, 'eventconsistency');
 EEG = eeg_checkset(EEG, 'makeur');
 
-command = sprintf('EEG = pop_read_erpss(''%s'');',filename); 
+command = sprintf('EEG = pop_read_erpss(''%s'', %f);',filename, srate); 
 return;
