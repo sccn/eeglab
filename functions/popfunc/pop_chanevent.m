@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/04/16 15:40:39  arno
+% nothing
+%
 % Revision 1.32  2004/03/05 23:25:54  arno
 % debug gui order
 %
@@ -214,7 +217,7 @@ if nargin < 2
 	
 	if length(result) == 0 return; end;
 	chan   = eval( [ '[' result{1} ']' ] );
-	if ~isempty(result{2}), g.oper = result{3}; else g.oper = ''; end;
+	if ~isempty(result{2}), g.oper = result{2}; else g.oper = ''; end;
 	switch result{3},
 		case 1, g.edge = 'both';
 		case 2, g.edge = 'leading';
