@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2003/11/29 23:34:00  scott
+% help msg
+%
 % Revision 1.66  2003/11/06 16:31:18  arno
 % changing dipnorm
 %
@@ -495,15 +498,19 @@ end
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if isstr(loc_file)
-	[tmpeloc labels Th Rd] = readlocs(loc_file,'filetype','loc');
+	[tmpeloc labels Th Rd ind] = readlocs(loc_file,'filetype','loc');
 else % a locs struct
-	[tmpeloc labels Th Rd] = readlocs(loc_file);
+	[tmpeloc labels Th Rd ind] = readlocs(loc_file);
 end
 if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common reference channel)
     tmpeloc(end) = [];
     labels(end) = [];
     Th(end) = [];
     Rd(end) = [];
+end;
+if length(ind) < length(Vl)
+    Vl     = Vl(ind);
+    labels = labels(ind);
 end;
 if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
