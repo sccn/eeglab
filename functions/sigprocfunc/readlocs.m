@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2004/03/23 00:37:56  scott
+% clarifying help msg re meaning of 'indices' output
+%
 % Revision 1.63  2004/03/23 00:22:51  scott
 % clarified meaning of output 'indices'
 %
@@ -416,8 +419,8 @@ if isstr(filename)
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';
-            disp( [ 'WARNING: Polhemus Cartesian coord. file extension (".elp") detected.\n' ... 
-                    '         If importing BESA spherical coords, force type "besa" instead'] );
+            fprintf( [ 'WARNING: Polhemus Cartesian coord. file extension (".elp") detected.\n' ... 
+                    '         If importing BESA spherical coords, force type "besa" instead.\n'] );
         case 'asc', g.filetype = 'asc';
         case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
