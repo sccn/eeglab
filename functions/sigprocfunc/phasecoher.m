@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/03/16 18:46:48  scott
+% printout edit
+%
 % Revision 1.6  2003/03/16 18:12:11  scott
 % message edit
 %
@@ -340,7 +343,8 @@ if PLOT_IT %%%%%%%%%%%%%% make two-panel plot of results %%%%%%%%
   axis([ax(1) ax(2) 0 1]);
      set(gca,'fontSize',TICKFONT);
      set(gca,'FontWeight','bold');
-  if alpha ~= nan                      % plot coher significance
+     alpha
+  if ~isnan(alpha)                      % plot coher significance
     plot([wintimes(1) wintimes(end)],[cohsig cohsig],'r'); 
        % was [times(1) times(winframes)] !??
   end                                  
