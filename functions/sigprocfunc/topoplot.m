@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.212  2004/10/09 22:26:18  scott
+% iv interp. value output, then output grid too -sm
+%
 % Revision 1.211  2004/10/08 21:34:25  scott
 % same -sm
 %
@@ -954,6 +957,17 @@ if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary
     end
 end;
 Th = pi/180*Th;                              % convert degrees to radians
+
+% ------------------------------
+% remove infinite and NaN values
+% ------------------------------
+if length(Values) > 1
+    inds = union(find(isnan(Values)), find(isinf(Values)));
+    indices = setdiff(indices, inds);
+    tmpeloc(inds) = [];
+    Th(inds) = [];
+    Rd(inds) = [];
+end;
 
 if length(Values) > 1
    if max(indices)>length(Values)
