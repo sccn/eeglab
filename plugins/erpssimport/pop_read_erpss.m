@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/06/11 21:21:48  arno
+% adding a check for event consistency
+%
 % Revision 1.9  2003/04/10 18:04:50  arno
 % default argument
 %
@@ -86,7 +89,9 @@ if exist('filepath') == 1
 else
     EEG.filename = filename;
 end;
-EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
+if ~isempty(events)
+    EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
+end;
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 command = sprintf('EEG = pop_read_erpss(''%s'');',filename); 
