@@ -1,72 +1,70 @@
-% bootstat() - accumulate surrogate data to assess significance
-%
+% bootstat() - accumulate surrogate data to assess significance by bootstrap of 
+%              some measure of two input variables. Fits the psd with a 4th-order 
+%              polynomial using the distribution kurtosis. Reference: Ramberg, J.S., 
+%              Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. "A probability 
+%              distribution and its uses in fitting data." Technimetrics, 1979, 
+%              21:201-214.
 % Usage:
-%     >> [rsignif,accarray] = bootstat(arg1, arg2, formula, varargin ...);
-%
+%            >> [rsignif,accarray] = bootstat(arg1, arg2, formula, varargin ...);
 % Inputs:
 %    arg1    - [array] 1-D, 2-D or 3-D array of values
 %    arg2    - [array] 1-D, 2-D or 3-D array of values
 %    formula - [string] formula to compute the given measure. Takes arguments
-%              'arg1', 'arg2' as inputs and 'res' (result, by default) as 
-%              output. The formula has to iterative for more than 1-D arrays so
-%              shuffling can occur at each step while scanning the last dimension
-%              of the arrays. 
-%              For 1-D arrays: 'res = mean( arg1 .* arg2)'
-%              For 2-D or 3-D arrays: 'res = res + arg1 .* conj(arg2)'
-%
+%                   'arg1', 'arg2' as inputs and 'res' (result, by default) as output.
+%                   For data arrays of more than 1 dimension, the formula must be iterative 
+%                   so that shuffling can occur at each step while scanning the last 
+%                   array dimension.  Examples:
+%                   'res = arg1 - arg2'              % difference of two 1-D data arrays
+%                   'res = mean( arg1 .* arg2)'      % mean projection of two 1-D data arrays
+%                   'res = res + arg1 .* conj(arg2)' % iterative, for use with 2|3-D arrays
 % Optional inputs:
-%   'boottype '   - ['first'|'second'|'both'|'both2'] 
-%                 'first'=  accumulate in the first dimension only (shuffling 
-%                           the first dimension (e.g., trials)). 
-%                 'second'= shuffle the second dimension (e.g., times), 
-%                           keeping the first (e.g., trials) constant. 
-%                 'both'=   shuffle both dimensions repetivelly during accumulation.
-%                 'both2'=  same as 'both' but shuffle dimension 2 only once per 
-%                           accumulation. In the context of EEG coherence, this 
-%                           option allows to detect significant changes with respect
-%                           to baseline synchronization (using option 'both' 
-%                           synchronizations during baseline are ignored since time
-%                           is shuffled during accumulation.
-%                 Default is 'both'.
-%   'alpha'       - [real] significance level (between 0 and 1). Default is 0.05.
-%   'naccu'       - [integer] number of exemplars to accumulate. Default is 200.
+%   'boottype '   - ['first'|'second'|'both'|'both2']   {default: 'both'}
+%                   'first' = accumulate surrogate data by shuffling the first dimension 
+%                             only. Ex: for (trials,times) data, shuffle trials.
+%                   'second'= shuffle the second dimension (Ex: times), keeping 
+%                             the first dimension (Ex: trials) constant. 
+%                   'both'  = shuffle both dimensions repetetively during accumulation.
+%                   'both2' = same as 'both', but shuffle the second dimension only once 
+%                             per cycle through the data.  
+%   'alpha'       - [real] significance level (between 0 and 1) {default 0.05}.
+%   'naccu'       - [integer] number of exemplars to accumulate {default 200}.
 %   'bootside'    - ['both'|'upper'] side of the surrogate distribution to
-%                 consider for significance. This parameter affects the size
-%                 of the last dimension of the accumulation array 'accres' (size
-%                 is 2 for 'both' and 1 for 'upper'). Default is 'both'.
-%   'basevect'    - [integer vector] time vector indices for baseline. Default 
-%                 is all time points.
-%   'accarray'    - accumulation array (from a previous call). Allows computing
-%                 the 'rsignif' output faster.
-%   'formulainit' - [string] for initializing variable. i.e. 'res = zeros(10,40);'
-%                 Default is initializing  'res = (size(arg1,3) x naccu)'
-%   'formulapost' - [string] after the accumulation. i.e. 'res = res /10;'
-%                 default is none.
-%   'formulaout'  - [string] name of the computed variable. Default is 'res'.
-%   'vals'        - [float array] value for significance. 'alpha' is ignored and 
-%                 rsignif returns the p-value. Have to be used with 'distfit'.
-%                 Option currently only implemented for 1-D data.
-%   'distfit'     - ['on'|'off'] fit distribution with known
-%                 function for computing more accurate limits or exact p-value
-%                 ('vals' option). Statistical toolbox required.
-%                 Option currently only implemented for 1-D data.
-%   'correctp'    - [phat pci zerofreq] parameters for correcting biased
-%                 probability distribution (only works with 'distfit'). See help
-%                 of correctfit().
-%
+%                   consider for significance. This parameter affects the size
+%                   of the last dimension of the accumulation array ('accres') 
+%                   (size is 2 for 'both' and 1 for 'upper') {default: 'both'}.
+%   'basevect'    - [integer vector] time vector indices for baseline
+%                   {default: all time points}.
+%   'accarray'    - accumulation array (from a previous call). Allows faster 
+%                   computation of the 'rsignif' output {default: none}.
+%   'formulainit' - [string] for initializing the output variable. Ex: 'res=zeros(10,40);'
+%                   {default: 'res = (size(arg1,3) x naccu)'}
+%   'formulapost' - [string] transformation to apply after accumulation. 
+%                   Ex: 'res = res /10;' {default: none}.
+%   'formulaout'  - [string] name of the computed variable {default: 'res'}.
+%   'distfit'     - ['on'|'off'] fit distribution with known function to compute more accurate 
+%                   limits or exact p-value (see 'vals' option). the MATLAB statistical toolbox 
+%                   is required. This option is currently implemented only for 1-D data.
+%   'vals'        - [float array] significance values. 'alpha' is ignored and 
+%                   rsignif returns the p-values. Requires 'distfit' (see above).
+%                   This option currently implemented only for 1-D data.
+%   'correctp'    - [phat pci zerofreq] parameters for correcting for a biased probability 
+%                   distribution (requires 'distfit' above). See help of correctfit().
 % Outputs: 
-%    rsignif    - significance arrays. 2 values (low high) for each points (use
-%                 'alpha' to change these limits).
-%    accarray   - result for accumulated values.
+%    rsignif      - significance arrays. 2 values (low high) for each point (use
+%                   'alpha' to change these limits).
+%    accarray     - accumulated surrogate data values.
 %
-% Authors: Arnaud Delorme, Lars & Scott Makeig
-%          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
+% Authors: Arnaud Delorme, Lars Kai Hansen & Scott Makeig
+%          SCCN/INC, UCSD, La Jolla, 2002-
 %
 % See also: timef()
 
 % NOTE: There is one hidden parameter 'savecoher', 0 or 1
+% HELP TEXT REMOVED:          (Ex: Using option 'both', 
+%                             coherence during baseline would be ignored since times
+%                             are shuffled during each accumulation.
 
-% Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
+% Copyright (C) 9/2002  Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -83,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/12/09 22:29:07  arno
+% typo in text
+%
 % Revision 1.19  2003/11/04 18:39:11  arno
 % header
 %
@@ -147,11 +148,10 @@
 % -------------------------------------
 
 % *************************************
-% fitting of the psd with as 4th order
-% polynomial using the kurtosis of the distribution
-% See: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. 
-% A probability distribution and its uses in fitting data. Technimetrics, 
-% 1979, 21: 201-214, probably avalaible at the Script Librairy
+% To fit the psd with as 4th order polynomial using the distribution kurtosis,
+% Reference: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. 
+% "A probability distribution and its uses in fitting data." 
+% Technimetrics, 1979, 21: 201-214.
 % *************************************
 
 function [accarrayout, Rbootout] = bootstat(oriarg1, oriarg2, formula, varargin)
@@ -416,28 +416,29 @@ if strcmpi(g.distfit, 'on')
     accarrayout = 1 - normcdf(g.vals, mu, sigma); % cumulative density distribution
                                         % formula of normal distribution
                                         % y = 1/sqrt(2) * exp( -(x-mu).^2/(sigma*sigma*2) ) / (sqrt(pi)*sigma);
-
-    %figure;
-    %hist(abs(Rbootout)); tmpax = axis;
-    %hold on; 
-    %valcomp = linspace(min(abs(Rbootout(:))), max(abs(Rbootout(:))), 100);
-    %normy = normpdf(valcomp, mu, sigma);
-    %plot(valcomp, normy/max(normy)*tmpax(4), 'r');
-    %return;
+    % plot results 
+    % -------------------------------------
+    % figure;
+    % hist(abs(Rbootout)); tmpax = axis;
+    % hold on; 
+    % valcomp = linspace(min(abs(Rbootout(:))), max(abs(Rbootout(:))), 100);
+    % normy = normpdf(valcomp, mu, sigma);
+    % plot(valcomp, normy/max(normy)*tmpax(4), 'r');
+    % return;
 end;
     
     
 return;
 
-% Gamma and Beta fits
-%elseif strcmpi(g.distfit, 'gamma')
-%[phatgam pcigam] = gamfit(abs(Rbootout(:)));
-%gamy = gampdf(valcomp, phatgam(1), pcigam(2))
-%p = 1 - gamcdf(g.vals, phatgam(1), pcigam(2)); % cumulative density distribution
-%elseif strcmpi(g.distfit, 'beta')
-%[phatbeta pcibeta] = betafit(abs(Rbootout(:)));
-%betay = betapdf(valcomp, phatbeta(1), pcibeta(1));
-%p = 1 - betacdf(g.vals, phatbeta(1), pcibeta(1)); % cumulative density distribution
-%end
+% % Gamma and Beta fits:
+% elseif strcmpi(g.distfit, 'gamma')
+%  [phatgam pcigam] = gamfit(abs(Rbootout(:)));
+%  gamy = gampdf(valcomp, phatgam(1), pcigam(2))
+%  p = 1 - gamcdf(g.vals, phatgam(1), pcigam(2)); % cumulative density distribution
+% elseif strcmpi(g.distfit, 'beta')
+%  [phatbeta pcibeta] = betafit(abs(Rbootout(:)));
+%  betay = betapdf(valcomp, phatbeta(1), pcibeta(1));
+%  p = 1 - betacdf(g.vals, phatbeta(1), pcibeta(1)); % cumulative density distribution
+% end
 
 
