@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/22 00:44:59  arno
+% compatibility with previous eeglab version
+%
 % Revision 1.10  2002/08/22 00:04:44  arno
 % old format compatibility
 %
@@ -202,7 +205,7 @@ function EEG = checkoldformat(EEG)
 	if ~isfield(EEG, 'icaact'), EEG.icaact = []; end;
 	if ~isfield(EEG, 'chanlocs'), EEG.chanlocs = []; end;
 	
-	if isfield(EEG, 'events')
+	if isfield(EEG, 'events') & ~isfield(EEG, 'event')
 		try, 
 			if EEG.trials > 1
 				EEG.events  = [ EEG.rt(:) ];
