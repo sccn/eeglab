@@ -8,7 +8,7 @@
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
 %                        if a single channel number, show location of that 
-%                        channel 	 
+%                        channel (use with 'style', 'blank' only)
 %   		chan_locs  - name of an EEG electrode position file (See
 %                             >> topoplot example for format). Can also be a
 %                        structure (see >> help pop_editset)
@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/05/12 22:27:44  arno
+% debug verbose
+%
 % Revision 1.26  2003/05/12 22:23:38  arno
 % adding verbose option
 %
