@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/04/25 16:28:09  scott
+% edit help message
+%
 % Revision 1.22  2004/03/03 19:29:49  arno
 % remove pvaf on since it is the default
 %
@@ -187,7 +190,8 @@ if length(EEG) == 2
     sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
 end;
 posi = round( (timerange(1)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
-posf = min(round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1, EEG.pnts);
+
+posf = min(round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1, EEG(1).pnts);
 
 % outputs
 % -------
