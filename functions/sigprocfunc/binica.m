@@ -44,6 +44,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/03/13 19:03:45  scott
+% trying to read flag,arg pairs - FAILS!!!
+% Arno/Hilit - PLEASE CHECK LINE 219 and etc. ! -Scott
+%
 % Revision 1.11  2005/03/13 17:14:40  peter
 % comments
 %
@@ -200,8 +204,6 @@ while isempty(s) | s ~= -1
   end
 end 
 
-flags % DEBUG
-
 %
 % substitute the flags/args pairs in the .sc file
 %
@@ -216,23 +218,23 @@ else
  end
  while arg <= nargin
 
-  eval(['FLAG = var' int2str(arg) ';']); % WHY DOES THIS MAKE FLAG (64,3) ?????
+  eval(['OPTIONFLAG = var' int2str(arg) ';']); % WHY DOES THIS MAKE FLAG (64,3) ?????  
   fprintf('WARNING: binica() did NOT read the specified flag, arg pair!!!!\n');
 
   if arg == nargin
-    fprintf('\nbinica(): Flag %s needs an argument.\n',FLAG)
+    fprintf('\nbinica(): Flag %s needs an argument.\n',OPTIONFLAG)
     return
   end
   eval(['Arg = var' int2str(arg+1) ';']);
 
-  if strcmpi(FLAG,'pca')
+  if strcmpi(OPTIONFLAG,'pca')
         ncomps = Arg; % get number of components out for reading wts.
   end
   arg = arg+2;
 
   nflags = f;
   for f=1:length(flags)   % replace arg with Arg
-    if strcmp(FLAG,flags{f})
+    if strcmp(OPTIONFLAG,flags{f})
        args{f} = num2str(Arg);
        fprintf('setting %s, %s.\n',flags{f},args{f});
     end
