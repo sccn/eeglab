@@ -1803,7 +1803,8 @@ axcopy; % turn on popup zoom windows
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   
-axes(ax1);  % switch focus to main image to allow title()ing -sm
+axes('position',gcapos);
+axis off
 return
 %
 %%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
