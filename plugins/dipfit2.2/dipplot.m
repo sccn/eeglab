@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.102  2004/11/11 02:11:16  arno
+%dipname -> dipnames
+%
 %Revision 1.101  2004/11/11 01:40:39  arno
 %new dipnames option
 %
@@ -888,7 +891,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
                                            sources(index).rv*100);
             else
-                dipstruct.rv     = sprintf('C %d (%3.2f)',g.dipnames{index}, sources(index).rv*100);
+                dipstruct.rv     = sprintf('%s (%3.2f)',g.dipnames{index}, sources(index).rv*100);
             end;
             if ~strcmpi(g.spheres,'on') % plot disk markers
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
