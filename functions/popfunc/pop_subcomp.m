@@ -4,11 +4,11 @@
 %   >> OUTEEG = pop_subcomp( INEEG, components, confirm);
 %
 % Inputs:
-%   INEEG      - input dataset.
-%   components - array of components to subtract. If empty, use the 
-%                pre-labelled components in the dataset 
+%   INEEG      - Input dataset.
+%   components - Array of components to subtract. If empty, use the 
+%                 pre-labeled components in the dataset 
 %                (INEEG.reject.gcompreject).
-%   confirm    - display the difference between original and processed
+%   confirm    - Display the difference between original and processed
 %                dataset. 1=ask for confirmation. 0=do not ask. 
 %                Default 0.
 %
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 propagate ica weight matrix -ad sm jorn 
@@ -58,10 +61,11 @@ if nargin < 2
 	if ~isempty(EEG.reject.gcompreject)
       components = find(EEG.reject.gcompreject == 1);
       components = components(:)';
+   	  promptstr    = { ['Components to subtract from data' 10 '(default: pre-labeled components to reject):'] };
    else
       components = [];
+      promptstr    = { ['Components to subtract from data:'] };
    end;
-   promptstr    = { ['Components to subtract from data' 10 '(default are pre-labelled components):'] };
 	inistr       = { int2str(components) };
 	result       = inputdlg( promptstr, 'Subtract components from data -- pop_subcomp()', 1,  inistr);
 	size_result  = size( result );
@@ -73,7 +77,7 @@ if isempty(components)
 	if ~isempty(EEG.reject.gcompreject)
       		components = find(EEG.reject.gcompreject == 0);
    	else
-        	fprintf('Warning: no component pre-labelled, no rejection performed\n');
+        	fprintf('Warning: no components pre-labeled, no rejection performed\n');
          	return;
    	end;
 else
@@ -83,7 +87,7 @@ else
 end;
 
 fprintf('Computing projection ....\n');
-eeg_options; % changed from eeglaboptions 3/30/02 -sm
+eeg_options; 
 if option_computeica  
     [ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:EEG.nbchan, components));
 else
