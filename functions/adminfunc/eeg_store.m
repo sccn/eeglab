@@ -37,6 +37,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 add the eeglab options -ad
 
@@ -94,5 +97,5 @@ else
  	end;	
 end;	
 CURRENTSET = storeSetIndex;
-
+fprintf('Done.\n');
 return;
