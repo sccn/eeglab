@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.271  2003/11/25 22:58:23  arno
+% same
+%
 % Revision 1.270  2003/11/25 22:57:21  arno
 % pluginmenucolor
 %
@@ -1282,12 +1285,14 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     % changing plugin menu color
     % --------------------------
     fourthsub_m = findobj('parent', fourth_m);
+    plotsub_m   = findobj('parent', third_m);
     importsub_m = findobj('parent', neuromenu);
     epochsub_m  = findobj('parent', importepoch);
     eventsub_m  = findobj('parent', importevent);
     exportsub_m = findobj('parent', exportm);
     icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(importsub_m) > 10, set(importsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
