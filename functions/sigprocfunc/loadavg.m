@@ -50,6 +50,9 @@
 % average (i.e., channel[j]->n).
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/12/17 02:46:00  arno
+% divide by number of accepted sweeps
+%
 % Revision 1.2  2002/11/04 02:31:51  arno
 % adding sweeps
 %
@@ -128,7 +131,8 @@ for elec = 1:chan
 	sensitivity(elec) = fread(fid, 1, 'float32');
 	erp = fread(fid, 8, 'uchar');
 	calib(elec) = fread(fid, 1, 'float32');
-	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', chan_names(elec,1:4), baseline(elec), sensitivity(elec), calib(elec));
+	fprintf('%s: baseline: %d\tsensitivity: %f\tcalibration: %f\n', ...
+            char(chan_names(elec,1:4)), baseline(elec), sensitivity(elec), calib(elec));
 	factor(elec) = calib(elec) * sensitivity(elec) / 204.8;
 end;
 
@@ -148,7 +152,7 @@ for elec = 1:chan
 	% skip sweeps header and read data	
 	% --------------------------------
 	fseek(fid, 5, 'cof');
-	signal(:, elec) = fread(fid, pnts, 'float32') * calib(elec) / nsweeps;
+	signal(:, elec) = fread(fid, pnts, 'float32') * factor(elec) / nsweeps;
 end;
 
 if variance_flag
