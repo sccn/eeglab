@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/03/17 18:07:28  arno
+% beginning to remove BESA
+%
 % Revision 1.25  2005/03/17 16:39:12  arno
 % using coordformat instead of sph2spm
 %
@@ -193,7 +196,7 @@ if nargin < 2
     if result{ind+7} == 1, options = { options{:} 'normlen'   'on' }; end;
     if ~isempty( result{ind+8} ), tmpopt = eval( [ '{' result{ind+8} '}' ] ); options = { options{:} tmpopt{:} }; end;
 else 
-    if isstr(comp)
+    if isstr(comps)
         options = { comp varargin{:} };
         comp = typedip;
         typedip = 'dipfit';
