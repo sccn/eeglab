@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.110  2004/02/15 20:04:20  scott
+% same
+%
 % Revision 1.109  2004/02/15 20:03:40  scott
 % same
 %
@@ -1040,21 +1043,27 @@ function [newTh] = skirt_Th(Th,Rd)
    q2 = find(Th>=pi/2 & Th<pi);
    if ~isempty(q2)
      Th(q2) = Th(q2)-pi/2; % rotate to q1
-     Th = rot_Th(Th,Rd,q1);
+     dr = Rd(q1)-0.5;
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
+     Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
      Th(q2) = Th(q2)+pi/2; % rotate back
    end
   fprintf('rotated %d q2 angles\n',length(q2)); % DEBUG
    q3 = find(Th<-pi/2 & Th>=-pi);
    if ~isempty(q3)
      Th(q3) = Th(q3)+pi; % rotate to q1
-     Th = rot_Th(Th,Rd,q1);
+     dr = Rd(q1)-0.5;
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
+     Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
      Th(q3) = Th(q3)-pi; % rotate back
    end
   fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
    q4 = find(Th<0 & Th>=-pi/2);
    if ~isempty(q4)
      Th(q4) = Th(q4)+pi/2; % rotate to q1
-     Th = rot_Th(Th,Rd,q1);
+     dr = Rd(q1)-0.5;
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
+     Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
      Th(q4) = Th(q4)-pi/2; % rotate back
    end
   fprintf('rotated %d q4 angles\n',length(q4)); % DEBUG
