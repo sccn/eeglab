@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/01/28 16:49:09  arno
+% debugging read error
+%
 % Revision 1.4  2003/01/24 17:49:39  arno
 % now reading sampling rate
 %
@@ -50,10 +53,10 @@ command = '';
 
 if nargin < 1
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a ERPSS file -- pop_read_erpss'); 
+	[filenametmp, filepath] = uigetfile('*.*', 'Choose a ERPSS file -- pop_read_erpss'); 
     drawnow;
-	if filename == 0 return; end;
-	filename = [filepath '/' filename];
+	if filenametmp == 0 return; end;
+	filename = [filepath '/' filenametmp];
 end;
 
 % read ERPSS format
@@ -63,6 +66,12 @@ fprintf('pop_read_erpss: importing ERPSS file...\n');
 EEG.nbchan = size(EEG.data,1);
 EEG.srate = header.srate;
 EEG.setname = 'ERPSS data';
+if exist('filepath') == 1
+    EEG.filepath = filepath;
+    EEG.filename = filenametmp;
+else
+    EEG.filename = filename;
+end;
 EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
 EEG = eeg_checkset(EEG);
 
