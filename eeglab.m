@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.338  2004/08/31 22:05:32  arno
+% add comment
+%
 % Revision 1.337  2004/08/31 22:04:55  arno
 % isequal compare data array
 %
@@ -1534,9 +1537,26 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                 addpath([ p 'plugins' delimiter dircontent{index} ]);
                 tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
                 for tmpind = 1:length(tmpdir)
+                    % find plugin function in subfolder
+                    % ---------------------------------
                     if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
                         funcname = tmpdir(tmpind).name(1:end-2);
                         tmpind = length(tmpdir);
+                    end;
+                    
+                    % spetial case of eeglab subfolder (for BIOSIG)
+                    % --------------------------------
+                    if strcmpi(tmpdir(tmpind).name, 'eeglab')
+                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
+                        tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
+                        for tmpind2 = 1:length(tmpdir2)
+                            if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ..
+                                    && tmpdir2(tmpind2).name(end) == 'm'
+                                funcname = tmpdir2(tmpind2).name(1:end-2);
+                                tmpind2  = length(tmpdir2);
+                                tmpind   = length(tmpdir);
+                            end;
+                        end;
                     end;
                 end;
             end;
