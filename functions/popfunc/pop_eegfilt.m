@@ -35,19 +35,22 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
 function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder);
 
 com = '';
-if isempty(EEG.data)
-    disp('Pop_eegfilt() error: cannot filter empty dataset'); return;
-end;    
 if nargin < 1
 	help pop_eegfilt;
 	return;
 end;	
+if isempty(EEG.data)
+    disp('Pop_eegfilt() error: cannot filter empty dataset'); return;
+end;    
 if nargin < 3
 	% which set to save
 	% -----------------
@@ -67,19 +70,34 @@ if nargin < 3
 	end;
 elseif nargin < 4
 	filtorder = [];
-end;	
-
-if EEG.trials == 1
-	epochframe = 0;
-else
-	epochframe = EEG.pnts;
-end;	
-
-if isempty( filtorder )
-	EEG.data = eegfilt( EEG.data(:,:), EEG.srate, locutoff, hicutoff, epochframe);
-else
-	EEG.data = eegfilt( EEG.data(:,:), EEG.srate, locutoff, hicutoff, epochframe, filtorder);
 end;
+ 
+options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
+if ~isempty( filtorder )
+	options = { options{:} filtorder };
+end;
+
+if EEG.trials == 1 
+	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
+		boundaries = strmatch({EEG.event.type}, 'boundary');
+		if isempty(boundaries)
+			EEG.data = eegfilt( EEG.data, options{:}); 
+		else
+			disp('Pop_eegfilt:finding continuous data boundaries');
+			boundaries = [0 round(boundaries-0.5) EEG.pnts];
+			for n=1:length(boundaries)-1
+				EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+					eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+			end
+		end
+	else
+		EEG.data = eegfilt( EEG.data, options{:});
+	end;
+else
+	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
+	EEG.data = eegfilt( EEG.data, options{:});
+	% note: reshape does not reserv new memory while EEG.data(:,:) does
+end;	
 
 com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s]);', inputname(1), inputname(1), ...
 			num2str( locutoff), num2str( hicutoff), num2str( filtorder ) );
