@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2003/01/24 19:32:02  arno
+% debugging ICA for NaN
+%
 % Revision 1.88  2003/01/02 17:13:01  scott
 % edit header and msgs -sm
 %
@@ -397,7 +400,10 @@ if length(EEG) > 1
     end;
     return;
 end;
-if isempty(EEG.data), return; end;
+if isempty(EEG.data)
+    errordlg2(strvcat('Error: no data'), 'Error');
+    error('eeg_checkset() error: no data'); return;
+end;              
 
 if ~isempty( varargin)
     if isempty(EEG.data)
@@ -759,7 +765,7 @@ if ~isempty( varargin)
     for index = 1:length( varargin )
         switch varargin{ index }
          case 'data',; % already done at the top 
-         case 'contdata',; % already done at the top 
+         case 'contdata',;
           if EEG.trials > 1
               errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
               error('eeg_checkset() error: data is not continuous'); return;
