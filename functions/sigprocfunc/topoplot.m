@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2004/02/15 19:47:27  scott
+% same
+%
 % Revision 1.99  2004/02/15 19:45:27  scott
 % same
 %
@@ -670,7 +673,8 @@ else
    fprintf('shrinkfactor: %g\n',shrinkfactor);
 end
 if (isstr('shrinkfactor') & strcmp('shrinkfactor','skirt')) | ~isstr('stringfactor')
-   Th = skirt_Th(Th,Rd);  % rotate the angles of the electrodes in the 'skirt'
+   Th = skirt_Th(2*pi*Th/360,Rd);  % rotate the angles of the electrodes in the 'skirt'
+   Th = 180*Th/pi; % convert back to degrees
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
