@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2002/11/15 01:37:42  scott
+% Can not -> Cannot
+%
 % Revision 1.82  2002/11/13 19:57:40  arno
 % checkin shrink factor
 %
@@ -364,7 +367,6 @@ end;
 % checking multiple datasets
 if isempty(EEG), return; end;
 if ~isfield(EEG, 'data'), return; end;
-if isempty(EEG.data), return; end;
 if length(EEG) > 1
 	for index = 1:length(EEG)
 		if ~isempty(EEG(index))
@@ -378,6 +380,7 @@ if length(EEG) > 1
 	end;
 	return;
 end;
+if isempty(EEG.data), return; end;
 
 if ~isempty( varargin)
     if isempty(EEG.data)
