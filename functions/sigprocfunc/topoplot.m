@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2004/02/15 19:59:04  scott
+% same
+%
 % Revision 1.104  2004/02/15 19:56:43  scott
 % same
 %
@@ -1016,7 +1019,9 @@ axis square; % keep head round!
 function [newTh] = skirt_Th(Th,Rd)
    q1 = find(Th>=0 & Th<pi/2);
    if ~isempty(q1)
-     Th = rot_Th(Th,Rd,q1);
+     dr = Rd(q1)-0.5;
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi)));
+     Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
    end
   fprintf('rotated %d q1 angles\n',length(q1));
    q2 = find(Th>=pi/2 & Th<pi);
