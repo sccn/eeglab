@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/07/15 17:11:22  arno
+% allowing empty g.chans & header typo
+%
 % Revision 1.20  2003/05/09 23:26:06  arno
 % debuging regions
 %
@@ -642,12 +645,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         else                         tmpcolor = g.colors{P+1};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
-            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), tmpcolor{:});   
+            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
             ymn = min(g.ydir*[ymax ymin]);
             ymx = max(g.ydir*[ymax ymin]);
             axis([xmin xmax ymn ymx]);          % set axis bounds
         else % ISSPEC
-            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), tmpcolor{:});   
+            plot(x,g.ydir*data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color',  tmpcolor{:});   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
                 ymaxm = ymaxm/2.;
