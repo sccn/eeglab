@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/23 18:39:52  arno
+% debug
+%
 % Revision 1.5  2002/08/15 16:37:01  arno
 % update colo
 %
@@ -125,5 +128,6 @@ if ~isempty(elocname)
 end;
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
+axis equal;
 rotate3d on
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
