@@ -63,6 +63,9 @@
 %       'boottype'  = ['trials'|'times'|'both'] Bootstrap type: Either shuffle
 %                      trials but not windows ('trials'), windows but not trials
 %                      ('times') or both ('both')                  {'times' }
+%       'rboot'     = Bootstrap coherence limits (e.g., from crossf()) {from data}
+%                     be sure that the bootstrap type is identical to
+%                     the one used to obtain bootstrap coherence limits.
 %    Optional Scalp Map:
 %       'topovec'   = Scalp topography (map) to plot              {[]}
 %       'elocs'     = Electrode location file for scalp map       {none}
@@ -76,8 +79,6 @@
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
 %       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
-%       'pboot'     = Bootstrap power limits (e.g., from timef()) {from data}
-%       'rboot'     = Bootstrap coherence limits (e.g., from timef()) {from data}
 %       'axesfont'  = Axes font size                               {10}
 %       'titlefont' = Title font size                              {8}
 %
@@ -113,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/09 18:59:06  arno
+% corrected typo in header that made the function to crash
+%
 % Revision 1.2  2002/04/07 02:24:36  scott
 % worked on hlpe message, changed some defaults -sm
 %
@@ -138,7 +142,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-03-02 added new options for bootstrap -ad 
 
-function [R,mbase,times,freqs,Rboot,Rangle,Rsignif] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
+function [R,mbase,times,freqs,Rbootout,Rangle,Rsignif] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
@@ -235,7 +239,6 @@ try, g.elocs;      catch, g.elocs = ''; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
 try, g.marktimes;  catch, g.marktimes = []; end; % default no vertical lines
 try, g.powbase;    catch, g.powbase = nan; end;
-try, g.pboot;      catch, g.pboot = nan; end;
 try, g.rboot;      catch, g.rboot = nan; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
 try, g.plotphase;  catch, g.plotphase  = 'on'; end;
@@ -471,7 +474,7 @@ for t=1:trials,
 			tmpY = win' * tmpY(:);
 		  end
 
-          if ~isnan(g.alpha)
+          if ~isnan(g.alpha) & isnan(g.rboot)
            if firstboot==1
              tmpsX = repmat(nan,length(tmpX),g.timesout);
              tmpsY = repmat(nan,length(tmpY),g.timesout);
@@ -493,7 +496,7 @@ for t=1:trials,
         end % ~any(isnan())
 	end % time window
 	
-	if ~isnan(g.alpha) 
+	if ~isnan(g.alpha) & isnan(g.rboot)
 	   if strcmp(g.boottype, 'times') % get g.naccu bootstrap estimates for each trial
         j=1;
 		while j<=g.naccu
@@ -522,7 +525,7 @@ end % t = trial
 
 % handle specific bootstrap types
 % -------------------------------
-if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times')
+if ~isnan(g.alpha) & ~strcmp(g.boottype, 'times') & isnan(g.rboot)
     fprintf('\nProcessing bootstrap (of %d):',trials);
     for allt=1:trials
 		if (rem(allt,10) == 0)
@@ -576,7 +579,7 @@ end;
 switch g.type
    case 'coher',
         R = R ./ ( cumulX .* cumulY );
-	    if ~isnan(g.alpha)
+	    if ~isnan(g.alpha) & isnan(g.rboot)
             Rboot = Rboot ./ ( cumulXboot .* cumulYboot );
 	    end;   
 end;        
@@ -607,20 +610,37 @@ Rraw = R;						% raw coherence values
 mbase = mean(R(:,baseln)');     % mean baseline coherence magnitude
 % R = R - repmat(mbase',[1 g.timesout]);% remove baseline mean
 
-if ~isnan(g.alpha) % if bootstrap analysis included . . .
+% compute bootstrap significance level
+% ------------------------------------
+if ~isnan(g.alpha) & isnan(g.rboot) % if bootstrap analysis included . . .
     switch g.boottype
 	    case 'trials',
 			i = round(g.naccu*g.alpha);
 			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
 			Rboot = sort(Rboot,3);  
+			Rbootout = Rboot;
+        otherwise
+			i = round(g.naccu*g.alpha);
+			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
+			Rboot = sort(Rboot');
+			Rboot = Rboot';
+			Rbootout = Rboot;
+	end;
+elseif ~isnan(g.rboot)
+	Rboot = g.rboot;
+	Rbootout = Rboot;
+end;
+if ~isnan(g.alpha) % if bootstrap analysis included . . .
+    switch g.boottype
+	    case 'trials',
+			i = round(g.naccu*g.alpha);
 			Rsignif = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3); % significance levels for Rraw
 		%	Rboot = [mean(Rboot(1:i,:))-mbase ; mean(Rboot(g.naccu-i+1:g.naccu,:))-mbase];
 		 	Rbootplus = mean(Rboot(:,:,1:i),3);
 		 	Rbootminus = mean(Rboot(:,:,g.naccu-i+1:g.naccu),3);
         otherwise
 			i = round(g.naccu*g.alpha);
-			Rboot = abs(Rboot) / trials; % normalize bootstrap magnitude to [0,1]
-			Rboot = sort(Rboot');  
+			Rboot = Rboot';
 			Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
 		%	Rboot = [mean(Rboot(1:i,:))-mbase ; mean(Rboot(g.naccu-i+1:g.naccu,:))-mbase];
 		 	Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
