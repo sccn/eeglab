@@ -8,7 +8,7 @@
 % Usage:
 %   >> [ outparam ] = inputgui( geometry, listui );
 %   >> [ outparam userdat strhalt] = ...
-%             inputgui( geometry, listui, help, title, userdat, mode );
+%             inputgui( geometry, listui, help, title, userdat, mode, geomvert );
 % 
 % Inputs:
 %   geometry   - see supergui()
@@ -24,6 +24,8 @@
 %                input ('noclose'), or process an existing 
 %                window which number is given as input (fignumber). 
 %                Default is 'normal'.
+%   geomvert   - vertical geometry argument, this argument is passed on to
+%                supergui()
 %
 % Output:
 %   outparam   - list of outputs. The function scan all lines and
@@ -61,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/13 17:29:07  arno
+% new supergui call
+%
 % Revision 1.9  2002/08/12 18:24:39  arno
 % empty help
 %
@@ -91,7 +96,7 @@
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat, strhalt] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode);
+function [result, userdat, strhalt] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode, geomvert);
 
 if nargin < 2
    help inputgui;
@@ -116,7 +121,11 @@ if isstr(mode)
 		listui = { listui{:}, {} };
 	end;   
 	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-	[tmp tmp2 allobj] = supergui( geometry, [], listui{:} );
+	if exist('geomvert') ~= 1
+		[tmp tmp2 allobj] = supergui( geometry, [], listui{:} );
+	else
+		[tmp tmp2 allobj] = supergui( geometry, [geomvert(:)' 1 1], listui{:} );
+	end;
 else 
 	fig = mode;
 	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
