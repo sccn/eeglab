@@ -63,13 +63,14 @@
 %  'dipolelength' - Length of the dipole bar(s) {Default: 1}
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
 %  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
+%  'spheres'  - ['on'|'off'] {default: 'off'} plot dipole markers as 3-D spheres. 
+%               Does not yet interact with gui buttons, produces non-gui mode.
 %  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
 %  'std'      - [cell array] plot standard deviation of dipoles. i.e.
 %               { [1:6] [7:12] } plot two elipsoids that best fit all the dipoles
 %               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
 %               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
 %               first elipsoid is 2 standard-dev and the lines are thicker.
-%
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
 %   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
@@ -111,11 +112,7 @@
 %  % To make a summary plot
 %  dipplot( sources, 'summary', 'on', 'dipolesize', 15, 'mesh', 'off');
 %
-% See also: eeglab()
-
-% Undocumented option: 'spheres', 'on'|'off'   {default: 'off'} - plots
-%                     dipole markers as 3-D spheres. Does not yet interact
-%                     with gui buttons.
+% See also: eeglab(), dipfit()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -146,6 +143,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.75  2004/04/14 01:40:32  scott
+%hid 'spheres' option
+%
 %Revision 1.74  2004/04/13 18:24:58  scott
 %nothing
 %
@@ -378,31 +378,34 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
    end;
     
     %                             key        type       range             default
-    g = finputcheck( varargin, { 'color'     ''         []                 [];
+    g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
-                                 'coreg'     'real'     []                 [];
+                                 'coreg'     'real'     []                  [];
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on' 'off' }     'off';
                                  'view'      'real'     []                 [0 0 1];
-                                 'rvrange'   'real'     [0 Inf]            [];
+                                 'rvrange'   'real'     [0 Inf]             [];
                                  'normlen'   'string'   { 'on' 'off' }     'off';
                                  'num'       'string'   { 'on' 'off' }     'off';
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
-                                 'std'       'cell'     []                 {};
+                                 'std'       'cell'     []                  {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
-                                 'projcol'   { 'string' 'real' }   []      [];
+                                 'projcol'   { 'string' 'real' }   []       [];
                                  'projlines' 'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
-                                 'dipolesize' 'real'   [0 Inf]             30;
-                                 'dipolelength' 'real' [0 Inf]             1;
-                                 'sphere'    'real'     [0 Inf]            1;
+                                 'dipolesize' 'real'    [0 Inf]             30;
+                                 'dipolelength' 'real'  [0 Inf]             1;
+                                 'sphere'    'real'     [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
+                                 'links'    'real'      []                  [];
                                  'image'     ''         []                 'besa' }, 'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
-    
+    if strcmpi(g.spheres,'on')
+       g.gui = 'off';
+    end 
     % axis image and limits
     % ---------------------
     dat.mode       = g.image;
@@ -622,11 +625,13 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             for index = 1:length(sources)
                 if index~=1 
                     if sources(index).component ~= sources(index-1).component
-                        textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                        textforgui(colorcount) = { sprintf(...
+             'Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
                         colorcount = colorcount+1;
                     end;
                 else 
-                    textforgui(colorcount) = { sprintf('Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
+                    textforgui(colorcount) = { sprintf(...
+             'Component %d (R.V. %3.2f)', sources(index).component, 100*sources(index).rv) };
                     colorcount = colorcount+1;
                 end;
             end;
@@ -742,19 +747,48 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             end
             x = -x; xo1 = -xo1; 
             y = -y; yo1 = -yo1; 
-            
+            %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
             tag = [ 'dipole' num2str(index) ];
             [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg); 
             [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
-            h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
+
+            if ~strcmpi(g.spheres,'on')
+               h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]' );
+
+            else % plot dipole cylinders
+              thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
+              CYLWIDTH = 1.6; CYLLEN = 24;
+              for k=1:length(xx)
+                [cx cy cz] = cylinder([1 1 1],20);
+                % rotate(h1,[yy(k)-yyo1(k) xxo1(k)-xx(k) 0],thetas(k));
+                cx = cx*CYLWIDTH + xx(k);
+                cy = cy*CYLWIDTH + yy(k);
+                cz = cz*CYLLEN + zz(k);
+                caxis([0 33])
+                cax =caxis;
+                s1 = surf(cx,cy,cz); % makes red
+                set(s1,'cdatamapping','direct','FaceColor','r');
+                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); % c = 'r'
+              end
+            end
+
             dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
             dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
             dipstruct.rv     = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
-            set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
-            if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
-            
-            % draw point
+
+            if ~strcmpi(g.spheres,'on')
+               set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+               if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
+             else
+                  set(s1, 'userdata', dipstruct, 'tag', tag,'cdatamapping','direct','facecolor','r' );
+                  set(p1, 'userdata', dipstruct, 'tag', tag );
+                end
+            end
+            %
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or point %%%%%%%%%%%%%%%%%%%%%%%%%
+            %
             hold on;
             if strcmp(g.spheres,'on')
                 spherecolors = g.color{index};
@@ -763,7 +797,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
                 'direct','tag','img', 'facelighting', 'none' };
                 for q = 1:length(xx)
-                   scolor = repmat(33,size(xs,1),size(xs,2))
+                   scolor = repmat(33,size(xs,1),size(xs,2));
                    surf(xs/SPHERE_FAC+xx(q),...
                         ys/SPHERE_FAC+yy(q),...
                         zs/SPHERE_FAC+zz(q),...
@@ -772,14 +806,15 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                    material shiny
                 end
                 light
+                lighting phong
             else
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
             end
-            
-            % project onto images
-            % -------------------
+            %
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto images %%%%%%%%%%%%%%%%%%%%%%%%%
+            %
             if strcmpi(g.projimg, 'on')
                 if isstr(g.color{index})
                     switch g.color{index}
@@ -829,8 +864,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
 
-            % line projections
-            % -------------------
+            %
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% project onto axes %%%%%%%%%%%%%%%%%%%%%%%%%
+            %
             if strcmpi(g.projlines, 'on')
                 if isstr(g.color{index})
                     switch g.color{index}
@@ -849,24 +885,27 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
                 h(1) = line( [xx xx]', [yy yy]', [zz -dat.maxcoord(1)]');
-                set(h(1), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                set(h(1), 'userdata', 'proj', 'linestyle', '--', ...
+                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 h(2) = line( [xx xx]', [yy dat.maxcoord(2)]', [zz zz]');
-                set(h(2), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                set(h(2), 'userdata', 'proj', 'linestyle', '--', ...
+                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 h(3) = line( [xx -dat.maxcoord(3)]', [yy yy]', [zz zz]');
-                set(h(3), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                set(h(3), 'userdata', 'proj', 'linestyle', '--', ...
+                             'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
                 if ~isempty(g.projcol)
                     set(h, 'color', g.projcol);
                 end;
             end;
-                        
+            %           
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw text  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            %
             if isfield(sources, 'component')
                 if strcmp(g.num, 'on')
                     h = text(xx,  yy,  zz, [ '  ' int2str(sources(index).component)]);
