@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.146  2002/08/17 18:51:06  scott
+% Reject using ICA -> Reject epochs using ICA
+%
 % Revision 1.145  2002/08/17 02:08:21  arno
 % debugging error catch
 %
@@ -735,7 +738,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	fourth_sub1 = uimenu( fourth_m, 'Label', 'Reject data epochs');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
-	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject epochs using ICA');
+	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject data using ICA');
 
 if besamenu
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Localize dipoles using BESA');
