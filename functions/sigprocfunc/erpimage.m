@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.164  2003/11/13 02:14:16  scott
+% same
+%
 % Revision 1.163  2003/11/13 01:58:10  scott
 % same
 %
@@ -721,6 +724,7 @@ alpha     = 0;      % default alpha level for coherence significance
 
 MIN_ERPALPHA = 0.001; % significance bounds for ERP 
 MAX_ERPALPHA = 0.1; 
+FILLCOLOR    = [1 .7 .7];
 
 Noshow    = NO;     % show sortvar by default
 Nosort    = NO;     % sort on sortvar by default
@@ -2613,7 +2617,13 @@ if ~isnan(coherfreq)
         
         fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
         fprintf('     relative to baseamp: %g dB\n',baseamp);
-        plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
+        if Cohsigflag
+                ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times); ...
+                              repmat(-ampsig(2)+mean(ampsig),1,length(times)]);
+        	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims); % plot AMP
+        else
+        	plot1erp(ax3,times,amps,[timelimits minamp(1) maxamp(1)]); % plot AMP
+        end
         
         if ~isnan(aligntime)
             line([aligntime aligntime],[minamp(1) maxamp(1)]*1.1,'Color','k'); 
@@ -2880,11 +2890,10 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,signif,stdev)
   ERPZEROWIDTH = 2;
   if exist('signif') == 1 
     if ~isnan(signif);
-      fillcolor = [1 .7 .7];
       filltimes = [times times(end:-1:1)];
       fillsignif = [signif -1*signif(end:-1:1)];
-      fillh = fill(filltimes,fillsignif, fillcolor); hold on    % plot 0+alpha
-      set(fillh,'edgecolor',fillcolor);
+      fillh = fill(filltimes,fillsignif, FILLCOLOR); hold on    % plot 0+alpha
+      set(fillh,'edgecolor',FILLCOLOR);
       % [plot_handle] = plot(times,signif, 'r','LineWidth',1); hold on    % plot 0+alpha
       % [plot_handle] = plot(times,-1*signif, 'r','LineWidth',1); hold on % plot 0-alpha
     end
