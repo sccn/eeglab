@@ -135,6 +135,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/12/27 17:47:32  arno
+% compatible with more BESA formats
+%
 % Revision 1.22  2002/12/26 16:41:23  arno
 % new release
 %
@@ -163,7 +166,7 @@ end;
 % you do not have to edit these functions.
 
 listtype = { ...
-   		'polhemus' ...
+   		 'polhemus' ...
          'polhemusX' ...
          'polhemusY' ...
          'besa' ...
@@ -178,7 +181,7 @@ listimportformat = { ...
       { } ... % polhemus (specific non-columnar implementation)
       { } ... % polhemus (specific non-columnar implementation)
       { 'labels' 'sph_theta_besa' 'sph_phi_besa' } ... % BESA/EGI format
-      { 'channum' 'X' 'Y' 'Z' } ... % xyz format
+      { 'labels' '-Y' 'X' 'Z' } ... % xyz format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
       { 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
@@ -221,22 +224,22 @@ if isstr(filename)
 	% ---------------------
    periods = find(filename == '.');
    fileextension = filename(periods(end)+1:end);
-	if isempty(g.filetype)
-		switch lower(fileextension),
-		 case {'loc' 'locs' }, g.filetype = 'loc';
-		 case 'xyz', g.filetype = 'xyz';
-		 case 'sph', g.filetype = 'sph';
-		 case 'txt', g.filetype = 'chanedit';
-		 case 'elp', g.filetype = 'polhemus';
-		 case 'eps', g.filetype = 'besa';
-		 otherwise, g.filetype =  ''; 
-      end;
-      fprintf('Readlocs: ''%s'' format detected from file extension\n', g.filetype); 
-	end;
+   if isempty(g.filetype)
+       switch lower(fileextension),
+        case {'loc' 'locs' }, g.filetype = 'loc';
+        case 'xyz', g.filetype = 'xyz';
+        case 'sph', g.filetype = 'sph';
+        case 'txt', g.filetype = 'chanedit';
+        case 'elp', g.filetype = 'polhemus';
+        case 'eps', g.filetype = 'besa';
+        otherwise, g.filetype =  ''; 
+       end;
+       fprintf('Readlocs: ''%s'' format detected from file extension\n', g.filetype); 
+   end;
    
    % assign format from filetype
    % ---------------------------
-   if isempty(g.format) & ~isempty(g.filetype)
+   if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') 
       indexformat = strmatch(lower(g.filetype), listtype, 'exact');
       g.format = listimportformat{indexformat};
       if isempty(g.skipline)
@@ -252,25 +255,15 @@ if isstr(filename)
    % -----------
    if strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
            strcmp(lower(g.filetype), 'polhemus')
-       [eloctmp labels X Y Z]= readelp( filename );
+       [eloc labels X Y Z]= readelp( filename );
        if strcmp(lower(g.filetype), 'polhemusy')
-           tmp = X; X = Y; Y = Z;
+           tmp = X; X = Y; Y = TMP;
        end;
-       for index = 1:length( eloctmp )
-           eloc(index).labels = labels{index};
-           eloc(index).theta  = theta(index);
-           eloc(index).radius = radius(index);
-           if strcmp(lower(g.filetype), 'polhemusy')
-               eloc(index).X = Y(index);
-               eloc(index).Y = X(index);	
-               eloc(index).Z = Z(index);	
-           else
-               eloc(index).X = X(index);
-               eloc(index).Y = Y(index);	
-               eloc(index).Z = Z(index);	
-           end;
+       for index = 1:length( eloc )
+           eloc(index).X = X(index);
+           eloc(index).Y = Y(index);	
+           eloc(index).Z = Z(index);	
        end;
-       elocs = convertlocs(elocs, 'cart2all');
    else      
        % importing file
        % --------------
@@ -316,7 +309,6 @@ if isstr(filename)
    % handling BESA coordinates
    % -------------------------
    if isfield(eloc, 'sph_theta_besa')
-       %eloc = convertlocs(eloc, 'sphbesa2all');
        if isnumeric(eloc(1).labels)
            disp('Alternate BESA format detected ( Theta | Phi )');
            for index = 1:length(eloc)
@@ -325,16 +317,17 @@ if isstr(filename)
            end;
            eloc = rmfield(eloc, 'labels');
        end;
+       eloc = convertlocs(eloc, 'sphbesa2all');
        fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
        fprintf('          to avoid confusion (these field can be exported though)\n');   
-       %eloc = rmfield(eloc, 'sph_phi_besa');
-       %eloc = rmfield(eloc, 'sph_theta_besa');  
+       eloc = rmfield(eloc, 'sph_phi_besa');
+       eloc = rmfield(eloc, 'sph_theta_besa');
 
        % converting XYZ coordinates to polar
        % -----------------------------------
    elseif isfield(eloc, 'X')
        eloc = convertlocs(eloc, 'cart2all');  
-   elseif isfield(eloc, 'X')
+   elseif isfield(eloc, 'sph_theta')
        eloc = convertlocs(eloc, 'sph2all');  
    else 
        eloc = convertlocs(eloc, 'topo2all');  
@@ -373,8 +366,8 @@ end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
-%theta = cell2mat({ eloc.theta });
-%radius  = cell2mat({ eloc.radius });
+theta = cell2mat({ eloc.theta });
+radius  = cell2mat({ eloc.radius });
 if isnumeric(eloc(1).labels)
     for index = 1:length(eloc)
         eloc(index).labels = int2str(eloc(index).labels);
