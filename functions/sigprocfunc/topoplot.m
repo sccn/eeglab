@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/07/18 01:33:19  scott
+% text placement
+%
 % Revision 1.50  2003/07/18 01:31:49  scott
 % debug
 %
@@ -578,7 +581,7 @@ else % if style 'blank'
   if strcmp(ELECTRODES,'labelpoint') |  strcmp(ELECTRODES,'numpoint')
     text(-0.6,-0.6, ...
     [ int2str(length(Rd)) ' of ' int2str(length(tmpeloc)) ' electrode locations shown']);
-    text(-0.6,-0.68, ...
+    text(-0.6,-0.7, ...
     [ 'Click on electrodes to toggle name/number']);
     % a = textsc('Channel locations', 'title');
     a = title('Channel locations');
