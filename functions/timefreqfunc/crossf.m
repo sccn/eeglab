@@ -24,11 +24,7 @@
 %
 % Required inputs:
 %       x       = first single-channel data set (1,frames*nepochs)      
-%                 Else, cell array of two single-channel data for estimating
-%                 coherence differences between two conditions.
 %       y       = second single-channel data set (1,frames*nepochs)     
-%                 Else, cell array of two single-channel data sets for 
-%                 estimating coherence differences between two conditions.
 %       frames  = frames per epoch                                   {750}
 %       tlimits = [mintime maxtime] (ms) epoch time limits  {[-1000 2000]}
 %       srate   = data sampling rate (Hz)                            {250}
@@ -97,9 +93,7 @@
 %       'maxamp'    = [real] Set the maximum for the amp. scale    {auto}
 %       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
 %       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
-%       'title'     = Optional figure title. If two conditions are given
-%                     as input, title can be a cell array with 2 string
-%                     elements {none}
+%       'title'     = Optional figure title {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
 %       'cmax'      = Maximum amplitude for color scale  { use data limits }
@@ -156,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/09/12 03:22:44  scott
+% help msg -sm
+%
 % Revision 1.48  2002/08/14 21:06:33  arno
 % hanning debug
 %
