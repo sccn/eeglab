@@ -4,7 +4,7 @@
 %
 % Usage:
 %   >> EEGOUT = pop_importepoch( EEG, filename, fieldlist, latencyfieldlist, ...
-%                                  timeunit, headerlines, insertepoch, cleanevents);
+%                                  timeunit, headerlines, cleanevents);
 %
 % Inputs:
 %   EEG              - input dataset
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/18 18:25:02  arno
+% typo can not2
+%
 % Revision 1.4  2002/04/18 18:24:41  arno
 % typo can not
 %
@@ -244,7 +247,7 @@ com = sprintf('%s = pop_importepoch( %s, ''%s'', { ', inputname(1), inputname(1)
 for i=1:length(fieldlist)
     com = sprintf('%s ''%s'',', com, fieldlist{i} );
 end;    
-com = [ com(1:end-1) '} , {' ];
+com = [ com(1:end-1) '} , { ' ];
 for i=1:length(latencyfieldlist)
     com = sprintf('%s ''%s'',', com, latencyfieldlist{i} );
 end;    
