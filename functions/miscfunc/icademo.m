@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/09/05 17:28:13  arno
+% debugging
+%
 % Revision 1.2  2002/09/05 15:38:39  arno
 % debug for new functions
 %
@@ -181,25 +184,29 @@ fprintf('Try using the on-screen and menu control elements...\n')
 
 %  >> eegplot(data,srate,spacing,eloc_file,windowlength,title)
 
-     eegplotold(data,srate,0,chan_locs,1,'Two data epochs using eegplot()')
-     set(gcf,'Position',pos+2*off); % #3 - eegplot() makes its own figure
+     %eegplotold(data,srate,0,chan_locs,1,'Two data epochs using eegplot()')
+     eegplot(data,'srate',srate, 'spacing', 0,'eloc_file',chan_locs, ...
+				'winlength',1,'title','Two data epochs using eegplot()')
+     %set(gcf,'Position',pos+2*off); % #3 - eegplot() makes its own figure
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 fprintf(...
-'Plotting the same data as two consecutive 1-sec epochs using eegplot()...\n');
-fprintf('Thus, eegplot() can be used to embed plots in larger figures.\n')
+'Plotting the same data as two consecutive 1-sec epochs using eegplotold()...\n');
+fprintf('Thus, eegplotold() can be used to embed plots in larger figures.\n')
 %
 % >> eegplot('noui',data,srate,spacing,eloc_file,startsec,color)
 %
 figure('Position',pos+2.5*off); 
 subplot(1,2,1)
-  eegplotold('noui',data(:,1:312),srate,0,chan_locs,0,'r');
+  %eegplot('noui',data(:,1:312),'srate',srate,'spacing', 0,'eloc_file', chan_locs, 'color', {{'b'}} );
+  eegplotold('noui',data(:,1:312),srate,0,chan_locs,0,'b');
   title('Lapses')
 subplot(1,2,2)
-  eegplotold('noui',data(:,313:624),srate,0,chan_locs,0,'b');
+  %eegplot('noui',data(:,1:313:624),'srate',srate,'spacing', 0,'eloc_file', chan_locs, 'color', {{'b'}} );
+  eegplotold('noui',data(:,313:624),srate,0,chan_locs,0,'r');
   title('Hits')
 
 fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
