@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/10 19:34:39  arno
+% futher debuging
+%
 % Revision 1.2  2002/04/10 19:31:12  arno
 % debugging (variable name error)
 %
@@ -60,7 +63,7 @@ if nargin < 4
 end;   
 
 sig = reshape(sig, size(sig,1), size(sig,2)*size(sig,3));
-squaresig  = sum(sum(abs(sig)));
+squaresig  = sum(sum(sig.^2));
 
 if ~iscell(act)
     compproj   = winv(:,compos)*act(compos,:)-sig;
@@ -71,7 +74,7 @@ else
     compproj   = winv(:,compos)*acttmp-sig;
 end;
 
-squarecomp = sum(sum(abs(compproj)));
+squarecomp = sum(sum(compproj.^2));
 varegg     = 1- squarecomp/squaresig;
 compproj   = compproj+sig;
 
@@ -79,6 +82,8 @@ compproj   = compproj+sig;
 
 return;
 
+% old version
+% -----------
 for s = compos
     % compute projection
     % ------------------
