@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2003/09/04 23:42:01  arno
+% DO NOT KNOW LAST MODIF, REVERT PREVIOUS VERSION IF PROBLEM
+%
 % Revision 1.57  2003/06/23 17:47:58  arno
 % adding threshold and continuity options
 %
@@ -742,38 +745,48 @@ function cella = removedup(cella)
 % get dipoles location
 % --------------------
 function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
-    if ~isfield(ALLEEG, 'sources')
-        error('Field ''sources'' containing dipole location does not exist');
+    if ~isfield(ALLEEG, 'sources') & ~isfield(ALLEEG, 'dipfit')
+        error('Field ''sources'' or ''dipfit'' containing dipole location does not exist');
     end;
     
     % searching sources
     % -----------------
-    indexeeg = find(~cellfun('isempty', { ALLEEG.sources }));
-    try,
-        indexeeg = indexeeg(1);
-    catch,
-        error('Field ''sources'' containing dipole location does not exist');
+    if isfield(ALLEEG, 'sources')
+        indexeeg  = find(~cellfun('isempty', { ALLEEG.sources }));
+        if isempty(indexeeg)
+            error('Field ''sources''containing dipole location is empty');
+        end;
+        tmpstruct  = ALLEEG(indexeeg).sources;
+        spheresize = 1;
+    else
+        indexeeg = find(~cellfun('isempty', { ALLEEG.dipfit }));
+        if isempty(indexeeg)
+            error('Field ''dipfit'' containing dipole location is empty');
+        end;
+        tmpstruct  = ALLEEG(indexeeg).dipfit.model;
+        spheresize = max(ALLEEG(indexeeg).dipfit.vol.r);
     end;
     fprintf('Found besa sources in dataset number %d\n', indexeeg);
     
-    if ~isfield(ALLEEG(indexeeg).sources, 'posxyz')
+    if ~isfield(tmpstruct, 'posxyz') | ~isfield(tmpstruct, 'component')
         fprintf('No 3-D coordinates found, running besaplot ...\n');
-        ALLEEG(indexeeg).sources = besaplot(ALLEEG(indexeeg).sources);
+        tmpstruct = besaplot(tmpstruct, 'sphere', spheresize);
         close;
-    end;        
+    end;
     
     % scanning components
     % -------------------
     for index = 1:length(comps)
-        indexcomp = find(cell2mat({ALLEEG(indexeeg).sources.component}) == comps(index));
+        indexcomp = find(cell2mat({tmpstruct.component}) == comps(index));
         if isempty(indexcomp)
             error(['Component ' int2str( comps(index) ) ' not found in the besa equivalent dipole strcuture']);
         end;
         if length(indexcomp) > 1
-            error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
+            error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ...
+                   ': only considering the first one']);
         end;            
-        coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,2);
-        coordinates(index,2) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,1);
-        coordinates(index,3) = -ALLEEG(indexeeg).sources(indexcomp(1)).posxyz(1,3);
-        compdipoles(index)   = ALLEEG(indexeeg).sources(indexcomp(1));
+        coordinates(index,1) =  tmpstruct(indexcomp(1)).posxyz(1,2);
+        coordinates(index,2) = -tmpstruct(indexcomp(1)).posxyz(1,1);
+        coordinates(index,3) = -tmpstruct(indexcomp(1)).posxyz(1,3);
+        compdipoles(index)   =  tmpstruct(indexcomp(1));
     end;
