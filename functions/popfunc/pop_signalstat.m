@@ -117,6 +117,7 @@ end;
 
 % return the string command
 % -------------------------
+fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
 com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent ); %s', outstr);
 
