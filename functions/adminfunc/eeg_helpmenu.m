@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/11 03:36:59  arno
+% change load/save sets menus
+%
 % Revision 1.5  2002/04/06 01:57:38  arno
 % title editing
 %
@@ -50,7 +53,9 @@ commands = { ...
        ''                   ... % File                                           
        ''                   ... %    Import data                                 
        'pop_editset'        ... %       Import Matlab data array                 
+       'pop_loadbci'        ... %       Read .BCI datafile (Snapmaster)          
        'pop_snapread'       ... %       Read .SMA datafile (Snapmaster)          
+       'pop_loadelp'        ... %       Read .ELP datafile (Neuroscan continuous)
        'pop_loadcnt'        ... %       Read .CNT datafile (Neuroscan continuous)
        'pop_loadeeg'        ... %       Read .EEG datafile (Neuroscan epochs)    
        ''                   ... %    Import epoch info                           
