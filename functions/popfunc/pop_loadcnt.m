@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/05/20 01:49:01  arno
+% allowing to import keystrokes
+%
 % Revision 1.12  2003/05/20 00:46:11  arno
 % debug if no events
 %
@@ -170,7 +173,8 @@ if ~isempty(I)
 end;
 
 EEG.srate           = r.rate;
-EEG = eeg_checkset(EEG);
+EEG = eeg_checkset(EEG, 'eventconsistency');
+EEG = eeg_checkset(EEG, 'makeur');
 
 if length(options) > 2
     command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
