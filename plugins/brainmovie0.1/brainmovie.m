@@ -46,7 +46,8 @@
 % Movie ITC, Power and Crossf options:
 % 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
 %                                                           {default: on}
-% 'itc'       - ['on'|'off'] vary component disk colors according to coherence {default: on}
+% 'itc'       - ['on'|'off'] vary component disk colors according to inter-trial coherence 
+%							    {default: on}
 % 'crossf'    - ['on'|'off'] plot | do not plot coherence   {default: on}
 % 'crossfcoh' - ['on'|'off'] vary the width of the connecting arc 
 %                               according to cross-coherence magnitude {def: on}
@@ -58,7 +59,8 @@
 % 'colmapcoh'   - colormap array for disks (according to inter-trial coherence) 
 %                      {default: hot(64)}
 % 'scalepower'  - [min max] dB range for power (and disk size) variation {default: [-5 5]}  
-% 'scalecoher'  - [min max] coherence range {default: [0 1]}  
+% 'scalecoher'  - [min max] coherence range {default: [0 1]}
+% 'diskscale'   - numeric value that scales the size of disks {default: [1.0]}   
 %
 % Movie coordinates and axis options
 % 'xlimaxes'    - x-axis limits axis for the component locations {default: [-1 1]}
@@ -116,6 +118,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2002/11/26 18:48:28  arno
+% do not draw line if two circle are too close to each other
+%
 % Revision 1.32  2002/11/21 20:29:40  arno
 % positive and neg scale
 %
@@ -260,6 +265,7 @@ try, g.crossfphasespeed;catch, g.crossfphasespeed='on'; end;
 try, g.crossfphaseunit; catch, g.crossfphaseunit='degree'; end;
 try, g.scalepower;      catch, g.scalepower = [-5 5]; end;
 try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
+try, g.diskscale;  catch, g.diskscale = 1; end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.frames;			catch, g.frames = []; end; 
@@ -415,6 +421,9 @@ end;
 if length(g.scalecoher) ~= 2
 	disp('Error: Scalecoher must be a 2-element array'); return;
 end;
+if (length(g.diskscale) ~= 1 | g.diskscale < 0)
+        disp('Error: Diskscale must be a scalar value >= 0.'); return;
+end
 if size(g.colmapcoh,2) ~= 3
 	disp('Error: Colmapcoh must be a colormap (3 columns)'); return;
 end;
@@ -839,6 +848,7 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 			dashed = 0;
 		end;		
 		
+                tmpsize = g.diskscale*tmpsize;
 		if tmpsize > 0
 			circle( tmpcoord(1), tmpcoord(2), tmpsize, tmpcolor, 'k', 0, 360, dashed);
 		end;
@@ -848,7 +858,7 @@ return;
 % --------------------------
 function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circfact, g);
 % pos1, pos2		position of the points
-% crossfpower       coherence power for with of the line
+% crossfpower       coherence power for width of the line
 % crossfangle       coherence angle for color and speed of the line
 % cirfact           curvature of the line
 % g                 preference
