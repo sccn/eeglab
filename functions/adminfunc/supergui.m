@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/08/13 23:04:51  arno
+% debug pop_merge
+%
 % Revision 1.23  2002/08/13 18:59:49  arno
 % update automatic INSETY
 %
@@ -222,9 +225,9 @@ for row = 1:length(geomx)
 			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
 				factmultx = max(factmultx, curext(3)/curpos(3));
 			end;
-			if ~strcmp(style, 'pushbutton')
+			%if ~strcmp(style, 'pushbutton')
 				factmulty = max(factmulty, curext(4)/curpos(4));
-			end;
+			%end;
 			set( rowhandle(column), 'units', 'normalized');			
         else 
 			rowhandle(column) = 0;
