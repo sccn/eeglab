@@ -2,9 +2,28 @@
 %                  epoched trials based on the accuracy of the linear
 %                  fit.
 % Usage:
-%   >> pop_rejtrend( INEEG, typerej); % pop up
+%   >> pop_rejtrend( INEEG, typerej); % pop up interactive window
 %   >> OUTEEG = pop_rejtrend( INEEG, typerej, electrodes, ...
-%                winsize, minslope, minR, superpose, reject);
+%                winsize, maxslope, minR, superpose, reject);
+%
+% Graphical interface:
+%   "Electrode" - [edit box] electrodes (number) to take into 
+%                 consideration for rejection. Same as the 'electrodes'
+%                 parameter from the command line.
+%   "Consecutive alike values" - [edit box] integer determining the
+%                 number of consecutive points for the detection of linear
+%                 patterns. Same as the 'winsize' parameter from the
+%                 command line.
+%   "Maximal slope" - [edit box] maximal absolute slope of the linear 
+%                trend of the activity for rejection. Same as the 'maxslope'
+%                 parameter from the command line.
+%   "R square limit" -[edit box] minimal R^2 (0 to 1). Same as 'minR'
+%                 parameter from the command line.
+%   "Display with previous rejection" - [edit box] can be either YES or 
+%                 NO. This edit box corresponds to the command line input 
+%                 option 'superpose'.
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
+%                 box corresponds to the command line input option 'reject'.
 %
 % Inputs:
 %   INEEG      - input dataset
@@ -14,7 +33,7 @@
 %                consideration for rejection
 %   winsize    - integer determining the number of consecutive points
 %                for the detection of linear patterns
-%   minslope   - minimal absolute slope of the linear trend of the 
+%   maxslope   - maximal absolute slope of the linear trend of the 
 %                activity for rejection
 %   minR       - minimal R^2 (coefficient of determination between
 %                0 and 1)
@@ -53,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/13 01:19:42  arno
+% debug for command line call
+%
 % Revision 1.10  2002/11/12 23:56:52  luca
 % now saving outputs -ad
 %
@@ -118,7 +140,7 @@ if nargin < 3
 					'Maximal slope (trend) of the activity (unit/epoch):', ...
 					'R square limit (0 to 1, ex: 0.8):', ...
                		'Display with previous rejection', ...
-         			'Actually reject marked trial(s) (YES or NO)' };
+         			'Reject marked trial(s) (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
 					int2str(EEG.pnts),  ...
 					'0.5', ...
