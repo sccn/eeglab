@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.187  2004/03/31 18:06:53  scott
+% adding 'conv' mode for plotting convex hull; corrected shrink in 'interp' mode
+%
 % Revision 1.186  2004/03/31 05:15:05  scott
 % *** empty log message ***
 %
@@ -1195,15 +1198,23 @@ if strcmp(CONVHULL,'on') %%%%%%%%% mask outside the convex hull of the electrode
                                       linspace(0,1,3*length(cnv)*cnvfac));
   yy =spline(linspace(0,1,3*length(cnv)), [y(cnv) y(cnv) y(cnv)], ...
                                       linspace(0,1,3*length(cnv)*cnvfac));
+  yy = yy(CIRCGRID+1:2*CIRCGRID);
+  xx = xx(CIRCGRID+1:2*CIRCGRID);
 
   xx = xx*1.02; yy = yy*1.02;           % extend spline outside electrode marks
+
   splrad = sqrt(xx.^2+yy.^2);           % arc radius of spline points (yy,xx)
   oob = find(splrad >= rin);            %  enforce an upper bound on xx,yy
   xx(oob) = rin*xx(oob)./splrad(oob);   % max radius = rin
   yy(oob) = rin*yy(oob)./splrad(oob);   % max radius = rin
 
-  ringy = [[ry(:)' ry(1) ]*(rin+rwidth) yy(CIRCGRID+1:2*CIRCGRID) yy(CIRCGRID+1)];
-  ringx = [[rx(:)' rx(1) ]*(rin+rwidth) xx(CIRCGRID+1:2*CIRCGRID) xx(CIRCGRID+1)];
+  splrad = sqrt(xx.^2+yy.^2);           % arc radius of spline points (yy,xx)
+  oob = find(splrad < hin);             %  enforce a lower bound on xx,yy
+  xx(oob) = hin*xx(oob)./splrad(oob);   % min radius = hin
+  yy(oob) = hin*yy(oob)./splrad(oob);   % min radius = hin
+
+  ringy = [[ry(:)' ry(1) ]*(rin+rwidth) yy yy(1)];
+  ringx = [[rx(:)' rx(1) ]*(rin+rwidth) xx xx(1)];
 
   ringh2= patch(ringy,ringx,ones(size(ringy)),BACKCOLOR,'edgecolor','none'); hold on
 
@@ -1217,7 +1228,7 @@ else %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% mask the jagged border around rmax %%%%%%%%
   ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
   ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
 
-  ringh= patch(ringx,ringy,ones(size(ringx)),BACKCOLOR,'edgecolor','none'); hold on
+  ringh= patch(ringx,ringy,0.01*ones(size(ringx)),BACKCOLOR,'edgecolor','none'); hold on
   % plot(ry*rmax,rx*rmax,'b') % debugging line
 end
 
@@ -1267,10 +1278,11 @@ ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR); hol
   EarY  = [q+.0555 q+.0775 q+.0783 q+.0746 q+.0555 -.0055 -.0932 -.1313 -.1384 -.1199];
   sf    = headrad/plotrad;                                          % squeeze the model ears and nose 
                                                                     % by this factor
-  plot([basex;tiphw;0;-tiphw;-basex]*sf,[base;tip-tipr;tip;tip-tipr;base]*sf,...
+  plot3([basex;tiphw;0;-tiphw;-basex]*sf,[base;tip-tipr;tip;tip-tipr;base]*sf,...
+         2*ones(size([basex;tiphw;0;-tiphw;-basex])),...
          'Color',HEADCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
-  plot(EarX*sf,EarY*sf,'color',HEADCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
-  plot(-EarX*sf,EarY*sf,'color',HEADCOLOR,'LineWidth',HLINEWIDTH)   % plot right ear
+  plot3(EarX*sf,EarY*sf,2*ones(size(EarX)),'color',HEADCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
+  plot3(-EarX*sf,EarY*sf,2*ones(size(EarY)),'color',HEADCOLOR,'LineWidth',HLINEWIDTH)   % plot right ear
 end
 
 %
