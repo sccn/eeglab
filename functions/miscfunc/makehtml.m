@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/12/04 17:40:36  arno
+% mainheader option and tags for titles
+%
 % Revision 1.13  2002/11/21 23:06:37  arno
 % indexfunc -> index
 %
@@ -263,7 +266,10 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 			end;
 			fprintf('Processing %s:%s\n', filename, filelink );
 			if ~isempty(filename)				
-				cd(DEST); help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
+				cd(DEST); 
+                try, delete([ DEST filename ]);
+                catch, end;
+                help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
 				
 				if strcmp(mainonly,'off')
 					inputfile = which( filename);
