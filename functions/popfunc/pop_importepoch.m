@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/05/21 22:25:14  arno
+% header
+%
 % Revision 1.29  2004/05/21 22:24:55  arno
 % adding duration field
 %
@@ -335,6 +338,11 @@ if ~iscell(fieldlist)
 end;
 otherfieldlist = setdiff( fieldlist, g.latencyfields);
 otherfieldlist = setdiff( otherfieldlist, g.typefield);
+for index = 1:length(g.durationfields)
+    if isstr(g.durationfields{index})
+        otherfieldlist = setdiff( otherfieldlist, g.durationfields{index});
+    end;
+end;
 if size(values,1) ~= EEG.trials
     error( [ 'Pop_importepoch() error: the number of rows in the input file/array does' 10 ... 
              'not match the number of trials. Maybe you forgot to specify the file header length?' ]);
@@ -495,7 +503,7 @@ function array = load_file_or_array( varname, skipline );
             linenb = linenb +1;
         end;        
                 
-		fclose(fid); 
+		fclose(fid);
 
     else % variable in the global workspace
          % --------------------------
