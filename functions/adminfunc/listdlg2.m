@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/15 16:56:45  arno
+% drawnow for windows
+%
 % Revision 1.2  2002/08/21 18:13:37  arno
 % debug for one element only
 %
@@ -93,7 +96,6 @@ okornot = 0;
 strval = '';
 vals = [];
 waitfor( fig, 'userdata');
-drawnow;
 try,
 	vals = get(h, 'value');
 	strval = '';
@@ -107,4 +109,5 @@ try,
 		okornot = 1;
 	end;
 	close(fig);
+    drawnow;
 end;
