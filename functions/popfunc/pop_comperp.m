@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/29 19:01:50  arno
+% handle empty ICA matrices
+%
 % Revision 1.17  2003/07/16 18:54:47  arno
 % changing default
 %
@@ -282,7 +285,9 @@ for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)));
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     elseif isempty(TMPEEG.icaact)
-    else          erp1ind(:,:,index)  = mean((TMPEEG.icaweights*EEG.icasphere)*TMPEEG.data,3);
+    else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+                                                 size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
+                  erp1ind(:,:,index)  = mean(tmpica,3);
                   erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
     end;
     addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname ' (n=' int2str(TMPEEG.trials) ')' ];
@@ -303,7 +308,9 @@ if length(datsub) > 0 % dataset to subtract
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)));
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         elseif isempty(TMPEEG.icaact)
-        else          erp2ind(:,:,index)  = mean((TMPEEG.icaweights*EEG.icasphere)*TMPEEG.data,3);
+        else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+                                                     size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
+                      erp2ind(:,:,index)  = mean(tmpica,3);
                       erp2ind(:,:,index)  = mean(TMPEEG.icaact,3);
         end;
         subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(' int2str(TMPEEG.trials) ')' ];
