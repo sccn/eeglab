@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/22 23:53:23  arno
+% fopen ieee-le for Mac
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -132,10 +135,13 @@ r.event.type=fread(f, 1, 'char');
 event.size=fread(f, 1, 'long');
 %event.offset=fread(f, 1, 'long')
 
+tmp = r.event.type
 if r.event.type==1
-   event.bytes=8;
+    event.bytes=8;
 elseif r.event.type==2
-   event.bytes=19;
+    event.bytes=19;
+else
+    error('File format error');
 end
 
 r.nevent=event.size/event.bytes;
