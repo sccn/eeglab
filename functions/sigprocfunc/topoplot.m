@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2004/03/18 16:22:12  arno
+% debug shrink
+%
 % Revision 1.152  2004/03/18 01:47:24  scott
 % debug
 %
@@ -402,8 +405,8 @@ EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
 HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 SHADING = 'flat';       % default 'shading': flat|interp
-shrinkfactor = 'off';
-skirtfactor  = 'off';
+shrinkfactor = 'off';   % shrinking mode
+plotrad      = [];      % plotting radius( [] = aurto )
 DIPOLE  = [];           % dipole defaults
 DIPNORM   = 'off';
 DIPSPHERE = 85;
@@ -536,7 +539,7 @@ if nargs > 2
 	 case 'shrink'
 	  shrinkfactor = Value;
 	 case 'plotrad'
-	  skirtfactor = Value;
+	  plotrad = Value;
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
 	 case {'contourcolor','ccolor'}
@@ -614,8 +617,8 @@ end;
 if ~isstr(shrinkfactor)
     shrinkfactor = 0.5+0.5*shrinkfactor; 
 end;
-if strcmpi(skirtfactor, 'off') & isfield(tmpeloc, 'skirt'), 
-   skirtfactor = tmpeloc(1).skirt; 
+if isempty(plotrad) & isfield(tmpeloc, 'plotrad'), 
+   plotrad = tmpeloc(1).plotrad; 
 end;
 
 labels = strvcat(labels);
@@ -628,6 +631,10 @@ Th = pi/180*Th;                              % convert degrees to radians
 
 % shrink mode
 % -----------
+if isstr(shrinkfactor) & ~strcmpi(shrinkfactor, 'off') & ~isempty(plotrad)
+    shrinkfactor = plotrad;
+    plotrad      = rmax; % head limit
+end;
 if isstr(shrinkfactor) % if shrink arg is a string option
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >rmax) ...
                    | strcmp(lower(shrinkfactor),'force') 
@@ -635,14 +642,14 @@ if isstr(shrinkfactor) % if shrink arg is a string option
         if shrinkfactor > 1
             shrinkfactor = 1;
         elseif strcmpi(VERBOSE, 'on')
-            fprintf('topoplot(): electrode radii shrunk towards vertex by (radius %2.3g) to plot all\n', ...
+            fprintf('topoplot(): electrode radii shrunk towards vertex by (head radius %2.3g) to plot all\n', ...
                 shrinkfactor);
         end;
 		Rd = Rd*shrinkfactor; % squeeze electrodes by (squeezefac*100)%
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
-        fprintf('topoplot(): electrode radii shrunk towards vertex (radius %2.3g) to plot all\n', ...
+        fprintf('topoplot(): electrode radii shrunk towards vertex (head radius %2.3g)\n', ...
                                                                       shrinkfactor);
 	end;
     Rd = Rd/shrinkfactor*rmax; % squeeze electrodes by (squeezefac*100)% 
@@ -651,20 +658,10 @@ end;
 
 % skirt mode
 % ----------
-squeezefac=1;
-if ~isstr(skirtfactor) & strcmpi(skirtfactor, 'off') 
-    squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
-    if squeezefac > 1
-        squeezefac = 1;
-    elseif strcmpi(VERBOSE, 'on')
-        fprintf(...
-            'topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
-            1-squeezefac);
-    end;
-    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
-end;	                        % to plot all inside the head cartoon
-
-enum = find(Rd <= rmax);                     % interpolate on-head channels only
+if isempty(plotrad)
+    plotrad = max(Rd);
+end;
+enum = find(Rd <= plotrad);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
     if strcmpi(VERBOSE, 'on')
         fprintf('topoplot(): %d/%d electrodes not shown (radius>0.5)\n', ...
@@ -683,7 +680,7 @@ if ~isempty(Vl)
                     if strcmpi(VERBOSE, 'on')
                         disp( [ ...
     'topoplot() Warning: one or more channels are not visible (use "Edit' ...
-    ' > Channel locations" to modify the montage shrink factor).' ] );
+    ' > Channel locations" to modify the montage plotting limits).' ] );
                     end;
                 else
                     tmpVl(cc) = tmpind;
@@ -697,6 +694,17 @@ end;
 Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
+
+% squeeze all to 0.5
+% ------------------
+squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
+squeezefac = rmax/max(Rd);   % was (2*max(r)-1)/(2*rmax);
+if squeezefac > 1
+    squeezefac = 1;
+else 
+    Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
+end;	                % to plot all inside the head cartoon
+
 
 if exist('QUAD_SKIRT') % not ready yet!!!
   if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
@@ -809,7 +817,7 @@ end % exist
   hold on
   h = gca; % uses current axes
 
-  if ~isstr(skirtfactor) & squeezefac<0.92
+  if ~isstr(plotrad) & squeezefac<0.92
     AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
                       % shrunk enough by the 'skirt' option
   end
@@ -859,7 +867,7 @@ else % if style 'blank'
 
    cla
    hold on
-  if ~isstr('skirtfactor')
+  if ~isstr('plotrad')
     AXHEADFAC = 1.01; % do not leave room for external ears if head cartoon
                       % shrunk by the 'skirt' option
   end
@@ -980,7 +988,7 @@ EarX = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489];
 EarY = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 
 
-if isstr('skirtfactor') % if 'skirt' mode
+if isstr('plotrad') % if 'skirt' mode
   sf = squeezefac;
   if sf < 0.99
    hd=plot(1.01*cos(circ).*rmax,1.01*sin(circ).*rmax,...
@@ -1020,7 +1028,7 @@ if ~isempty(DIPOLE)
         DIPOLE(:,3) = -tmp.momxyz(:,2);
         DIPOLE(:,4) =  tmp.momxyz(:,1);
         DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        if ~isstr('skirtfactor')
+        if ~isstr('plotrad')
            DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
         end                                            % plot dipole(s) inside head
         DIPOLE(:,3:end) = DIPOLE(:,3:end)/500; % ???
@@ -1030,7 +1038,7 @@ if ~isempty(DIPOLE)
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
         DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax;
-        if ~isstr('skirtfactor')
+        if ~isstr('plotrad')
            DIPOLE(:,1:4)   = DIPOLE(:,1:4)*squeezefac; % if 'skirt' mode, 
         end                                            % plot dipole(s) inside head
         DIPOLE(:,3:end)   = DIPOLE(:,3:end)/500;
