@@ -82,6 +82,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/04/24 19:04:45  arno
+% further check for coherfreq
+%
 % Revision 1.10  2002/04/24 18:29:21  arno
 % two inputs for coher and time centering for phase
 %
@@ -369,9 +372,9 @@ if nargin > 6
 		  end
 		  Caxflag = NO;
 	  elseif Coherflag == YES
-		  if size(Arg,1) ~= 1 | ( size(Arg,2) ~= 1 & size(Arg,2) ~= 2)
+		  if length(Arg) > 3 | length(Arg) < 1
 			  help erpimage
-			  fprintf('\nerpimage(): coher arg must be size (1,1) or (1,2).\n');
+			  fprintf('\nerpimage(): coher arg must be size <= 3.\n');
 			  return
 		  end
 		  coherfreq = Arg(1);
