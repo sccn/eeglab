@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/09 02:06:27  arno
+% updating transition
+%
 % Revision 1.2  2002/08/09 02:04:34  arno
 % debugging
 %
@@ -72,7 +75,7 @@ MINFREQ = 0;
 
 minfac         = 3;    % this many (lo)cutoff-freq cycles in filter 
 min_filtorder  = 15;   % minimum filter length
-trans          = 0.05; % fractional width of transition zones
+trans          = 0.15; % fractional width of transition zones
 
 if locutoff>0 & hicutoff > 0 & locutoff > hicutoff,
     help eegfilt
