@@ -16,8 +16,6 @@
 %
 % Output:
 %   wavelet - cell array of wavelet filter to apply onto the data
-%             (if 1 frequency only, directelly return the wavelet not
-%             a cell array).
 %
 % Note: The size of the window is automatically computed from the 
 %       number of cycles ans is always odd.
@@ -41,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/04/28 22:46:49  arno
+% Initial revision
+%
 
 function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
 
@@ -78,28 +79,24 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc);
         wavelet{index} = win .* hanning(length(winval))';
         
     end;
-
-    if length(freqs) == 1
-        wavelet  = wavelet{1};
-    end;
     
     return;
     
     % testing
     % -------
-    wav1 = dftfilt2(5, 5, 256);
+    wav1 = dftfilt2(5, 5, 256); wav1 = wav1{1};
     abs1 = linspace(-floor(length(wav1)),floor(length(wav1)), length(wav1));
     figure; plot(abs1, real(wav1), 'b');
     
-    wav2 = dftfilt2(5, 3, 256);
+    wav2 = dftfilt2(5, 3, 256); wav2 = wav2{1};
     abs2 = linspace(-floor(length(wav2)),floor(length(wav2)), length(wav2)); 
     hold on; plot(abs2, real(wav2), 'r');
     
-    wav3 = dftfilt2(5, 1.4895990, 256);
+    wav3 = dftfilt2(5, 1.4895990, 256); wav3 = wav3{1};
     abs3 = linspace(-floor(length(wav3)),floor(length(wav3)), length(wav3)); 
     hold on; plot(abs3, real(wav3), 'g');
 
-    wav4 = dftfilt2(5, 8.73, 256);
+    wav4 = dftfilt2(5, 8.73, 256); wav4 = wav4{1};
     abs4 = linspace(-floor(length(wav4)),floor(length(wav4)), length(wav4)); 
     hold on; plot(abs4, real(wav4), 'm');
     
