@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/08/21 23:11:15  arno
+% optimize size
+%
 % Revision 1.19  2002/08/21 23:03:48  arno
 % shorten message
 %
@@ -160,7 +163,7 @@ if nargin<2
                     'clear filename filepath tagtest;' ];
         uilist = { ...
          { 'Style', 'text', 'string', 'Event indices to replace', 'fontweight', 'bold' }, ...
-         { 'Style', 'text', 'string', 'Append events?', 'fontweight', 'bold' } };
+         { 'Style', 'text', 'string', 'Append/modify events?', 'fontweight', 'bold' } };
         geometry    = { [ 1 1.1 0.2 1 0.2] [ 1.2 1 1.7 0.3] };
         uilist = { uilist{:} {} {} {} ...
          { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] } ...
