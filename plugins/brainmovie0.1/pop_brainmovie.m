@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/11/20 19:22:10  arno
+% more besa and allenv debugging
+%
 % Revision 1.8  2002/11/20 19:08:52  arno
 % searching for besa dipole locations
 %
@@ -159,13 +162,25 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'makemovie'   'cell'          {}                                       {};
                             'eventprob'   ''              []                                       [] });
 if isstr(g), error(g); end;
-                    
+clear functions;
+
 % checking parameters
 % -------------------
 if strcmpi(g.diffmovie, 'on') &	length(ALLEEG) ~= 2
     error('For difference movies: nedd exactly to process 2 datasets');
 end;
+
+% cfunding components to show
+% ---------------------------
 if isempty(g.showcomps), g.showcomps = g.comps; end;
+for index = 1:length(g.showcomps)
+    tmpshow(index) = find(g.showcomps(index) ==  g.comps);
+    if isempty(tmpshow(index))
+        error('showcomps error: component not found');
+    end;
+end;
+g.showcomps = tmpshow;
+
 if length(unique(cell2mat({ALLEEG(:).pnts}))) > 1
     error('All datasets must have the same number of points');
 end;
@@ -277,19 +292,18 @@ else
     for index = 1:length(g.freqs)
         [tmpfreq minfreq] = min(abs(freqs - g.freqs(index)));
         g.freqindices = [ g.freqindices minfreq];
-        fprintf('Found closest frequency for %3.2f Hz: %3.2f Hz\n', g.freqs(index), tmpfreq);
+        fprintf('Found closest frequency for %3.2f Hz: %3.2f Hz\n', g.freqs(index), freqs(g.freqindices));
     end;
 end;
         
 % movie title defaults
 % --------------------
 for index = 1:nbconditions
-    alltittles{index} = sprintf('Condition %d', index);
+    alltitles{index} = sprintf('Condition %d', index);
 end;
 if strcmpi(g.diffmovie, 'on')
     alltitles{3} = 'Cond1 - Cond2';
 end
-alltitles = strvcat(alltitles{:});
 
 % pern10 movie parameters
 % -----------------------
@@ -307,18 +321,18 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     brainmovieoptions = { 'resolution', 'low', ...
                         'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
-                        'xlimaxes', [-1.1 1.1], ...
-                        'ylimaxes', [-1.1 1.1], ...
+                        'xlimaxes', [-1.15 1.15], ...
+                        'ylimaxes', [-0.8 1.5], ...
                         'title', '', ...
                         'rthistloc', [9 9 1.3 1], ...
                         'envylabel', 'uV', ...
                         'visible', 'on', ...
                         'crossfphasespeed', 'off', ...
-                        'head', 'mrirot.pcx', ...
+                        'head', 'mriside.pcx', ...
                         'crossfphaseunit', 'radian', ...
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
-                        'condtitle', alltittles };
+                        'condtitle', alltitles };
 elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     
     % ------------------
@@ -345,19 +359,22 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
                         'size', [350 400], ...
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
-                        'condtitle', alltittles };
+                        'condtitle', alltitles };
 elseif isstr(g.movparams)
     error('Movparams template can only be ''mritop'' and ''mriside''');
 else
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'condtitle' alltittles 'coordinates', g.coordinates, ...
+    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
+if strcmp(g.oneframe, 'on')
+   brainmovieoptions = { brainmovieoptions{:} 'frames' [1] };
+end;
 if ~isempty(g.addmovparams)
-    brainmovieoptions = { brainmovieoptions{:} g.addmovparams };
+    brainmovieoptions = { brainmovieoptions{:} g.addmovparams{:} };
 end;
 
 % data enveloppe
@@ -380,9 +397,6 @@ if ~isempty(g.eventprob)
 	eventcellarray{nbconditions+1} = [];
     brainmovieoptions = { brainmovieoptions{:} 'rt' eventcellarray };
 end;
-%if strcmp(g.oneframe, 'on')
-%   brainmovieoptions = { brainmovieoptions{:} 'frames' [1 2] };
-%end;
 
 % BRAINMOVIE 
 % ----------
@@ -410,10 +424,11 @@ if ~strcmpi(g.mode, 'compute')
         % --------------
 		brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
                     brainmovieoptions{:}, 'framesout', 'fig', 'scalepower', [tmpmin tmpmax] );  
-        %if strcmp(g.oneframe, 'on')
-        %    disp('Only one frame generated');
-        %    return
-        %end;
+        if strcmp(g.oneframe, 'on')
+            disp('Only one frame generated');
+            cd(origdir);
+            return
+        end;
         
         % Run makemovie
         % -------------
@@ -424,7 +439,7 @@ if ~strcmpi(g.mode, 'compute')
             cd(origdir);
         end;
         if length(g.freqindices) > 1, outname = g.moviename;
-        else                          outname = sprintf('%s%3.2f', g.moviename, freqs(g.freqindices(freqindex)));
+        else                          outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
         end;
         g.makemovie = removedup({ 'mode' 'fast' g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
         makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
