@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/12/06 03:07:19  arno
+% debuging channel import
+%
 % Revision 1.5  2002/12/06 02:50:05  arno
 % use leading edge
 %
@@ -81,9 +84,11 @@ EEG.xmin            = 0;
 % importing the events
 % --------------------
 if ~isempty(Eventdata)
-    for index = 1:size(Eventdata,1)
-        EEG = pop_chanevent( EEG, EEG.nbchan-size(Eventdata,1)+1, 'edge', 'leading', ...
-                             'delevent', 'off', 'typename', Head.eventcode(index,:) ,'nbtype', 1, 'delchan', 'on');
+    orinbchans = EEG.nbchan;
+    for index = size(Eventdata,1):-1:1
+        EEG = pop_chanevent( EEG, orinbchans-size(Eventdata,1)+index, 'edge', 'leading', ...
+                             'delevent', 'off', 'typename', Head.eventcode(index,:), ...
+                             'nbtype', 1, 'delchan', 'on');
     end;
 end;
 EEG = eeg_checkset(EEG);
