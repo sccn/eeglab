@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/12 16:28:13  arno
+% inputdlg2
+%
 % Revision 1.13  2002/08/08 21:56:30  arno
 % removing epoch creation
 %
@@ -124,8 +127,8 @@ OLDEEG = EEG;
 if nargin < 3
 	% popup window parameters
 	% -----------------------
-   promptstr    = { [ 'Enter time-locking event type(s) ([]=all):' 10 ...
-                    '(use ''/Edit/Event values'' to scan type values)'], ...
+   promptstr    = { strvcat('Enter time-locking event type(s) ([]=all):', ...
+                    '(use ''/Edit/Event values'' to scan type values)'), ...
                     'Epoch [start, end] in seconds (e.g. [-1 2]):', ... 
                     'Name of the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits, [min max] ([]=none):'  };
