@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.222  2003/02/24 19:35:58  arno
+% adding plugin functionality
+%
 % Revision 1.221  2003/02/21 22:25:52  arno
 % small problem with 2 import menus
 %
@@ -1102,9 +1105,8 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
         if ~isempty(findstr(dircontent.m{index}, 'eegplugin'))
             funcname = dircontent.m{index}(1:end-2);
             disp(['eeglab: executing plugin "' funcname '"' ]);
-            eval( [ funcname '(fourth_m, trystrs, catchstrs)' ]  );
-            %eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
-            %     ['disp(''eeglab: error while executing plugin "' funcname '"'')']  );
+            eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
+                 ['disp(''eeglab: error while executing plugin "' funcname '"''); disp(lasterr);']  );
         end;
     end;
 
