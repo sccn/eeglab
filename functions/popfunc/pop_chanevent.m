@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/22 21:13:36  arno
+% debug
+%
 % Revision 1.3  2002/08/06 21:39:11  arno
 % spelling
 %
@@ -57,14 +60,14 @@ function [EEG, command] = pop_chanevent(EEG, chans, varargin);
 command = '';
 
 if nargin < 2
-	geometry = { [1 1.05] [1.5 1 0.5] [1.5 0.18 1.32] [1.5 0.18 1.32] [1.5 0.18 1.32] };
+	geometry = { [1.465 2.05] [1.5 1 1] [1.5 0.21 1] [1.5 0.21 1] [1.5 0.21 1] };
 	strgui = { { 'style' 'text' 'string' 'Event channel(s)' 'tooltipstring' 'indexes of event channels' } ...
 			   { 'style' 'edit' 'string' '' } ...
 			   { 'style' 'text' 'string' 'Edge type to extract' 'tooltipstring' ...
 				 [ 'extract events when values if the event channel go up' 10 ...
 				   '(''leading''), down (''trailing'') or both (''both'').' 10 ...
 				   'AFTER SCROLLING, CLICK TO SELECT ON UNIX' ] } ...
-			   { 'style' 'listbox' 'string' 'both|leading|trailing' 'value' 1 } { } ...
+			   { 'style' 'listbox' 'string' 'both|leading|trailing' 'value' 1 } { 'style' 'text' 'string' '(click to select)'} ...
 			   { 'style' 'text' 'string' 'Delete event channel(s)' } ...
 			   { 'style' 'checkbox' 'value' 1 } { } ...
 			   { 'style' 'text' 'string' 'Delete old events if any' } ...
@@ -82,9 +85,9 @@ if nargin < 2
 		case 2, g.edge = 'leading';
 		case 3, g.edge = 'trailing';
 	end;
-	if result{3}, g.delchan = 'yes'; else g.delchan = 'no'; end;
-	if result{4}, g.delevent= 'yes'; else g.event   = 'no'; end;
-	if result{5}, g.nbtype  = 1;     else g.nbtype  = NaN; end;
+	if result{3}, g.delchan = 'yes'; else g.delchan  = 'no'; end;
+	if result{4}, g.delevent= 'yes'; else g.delevent = 'no'; end;
+	if result{5}, g.nbtype  = 1;     else g.nbtype   = NaN; end;
 else 
 	listcheck = { 'edge'     'string'     { 'both' 'leading' 'trailing'}     'both';
 				  'delchan'  'string'     { 'yes' 'no' }                     'yes';
@@ -92,6 +95,9 @@ else
 				  'nbtype'   'integer'    [1 NaN]                            NaN };
 	g = finputcheck( varargin, listcheck, 'pop_chanedit');
 	if isstr(g), error(g); end;
+end;
+if length(chans) ~= 1
+	error('One (single) channel must be selected');
 end;
 
 % process events
@@ -102,9 +108,9 @@ events(10000).latency = 0;
 for index = chans
 	counttrial = 1;
 	switch g.edge
-		case 'both   ',  tmpevent = find( diff(EEG.data(index, :)) ~= 0);
+		case 'both'    , tmpevent = find( diff(EEG.data(index, :)) ~= 0);
 		case 'trailing', tmpevent = find( diff(EEG.data(index, :)) < 0);
-		case 'leading',  tmpevent = find( diff(EEG.data(index, :)) > 0);
+		case 'leading' , tmpevent = find( diff(EEG.data(index, :)) > 0);
 	end;
 	tmpevent = tmpevent+1;
 	for tmpi = tmpevent
@@ -124,9 +130,13 @@ events = events(1:counte-1);
 if strcmp(g.delevent, 'yes')
 	EEG.event = events;
 else
-	EEG.event(end+1:end+length(events)) = events;
+	for index = 1:length(events)
+		EEG.event(end+1).type  = events(index).type;
+		EEG.event(end).latency = events(index).latency;
+	end;
+	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
+	EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
-EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
 
 % delete channels
 % ---------------
