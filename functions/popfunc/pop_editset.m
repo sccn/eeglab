@@ -24,6 +24,7 @@
 %   'icaweight'  - ICA weight matrix. By default, the sphering matrix is set to
 %                   the identity matrix if it is empty.
 %   'icasphere'  - ICA sphering matrix
+%   'comments'   - command string for the current dataset
 % 
 % Outputs:
 %   EEGOUT       - modified dataset structure
@@ -57,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/04/18 16:19:38  scott
+% EEG.averef -sm
+%
 % Revision 1.13  2002/04/18 16:13:20  scott
 % working on EEG.averef -sm
 %
@@ -115,16 +119,19 @@ EEGOUT = EEG;
 if nargin < 2                 % if several arguments, assign values 
    % popup window parameters	
    % -----------------------
-    geometry    = { [2 0.1 1 0.7] [1.1 1 1 0.7]   [2 0.1 1 0.7] [2 0.1 1 0.7] [2 0.1 1 0.7] ...
+    geometry    = { [1.5 0.6 1 0.7] [1.1 1 1 0.7]   [2 0.1 1 0.7] [2 0.1 1 0.7] [2 0.1 1 0.7] ...
 					[2 0.1 1 0.7] [1.5 0.6 1 0.7] [2 0.1 1 0.7] [2 0.1 1 0.7] [2 0.1 1 0.7] };
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
                     'if filename ~=0,' ...
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];
+	editcomments = 'set(gcf, ''userdata'', pop_comments(get(gcbf, ''userdata''), ''Edit comments of current dataset''));';
+		
     uilist = { ...
          { 'Style', 'text', 'string', 'Dataset name (optional):', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
-		 { },  { 'Style', 'edit', 'string', EEG.setname }, { 'Style', 'text', 'string', '(EEG.setname)' }...
+		 { 'Style', 'pushbutton', 'string', 'About', 'callback', editcomments },  ...
+		 { 'Style', 'edit', 'string', EEG.setname }, { 'Style', 'text', 'string', '(EEG.setname)' }...
          ...
          { 'Style', 'text', 'string', 'Data file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { }, { }, { 'Style', 'text', 'string', '(EEG.data)' }, ...
@@ -160,8 +167,8 @@ if nargin < 2                 % if several arguments, assign values
 			 };
 
     if EEG.trials == 1,  uilist(21:24) = []; geometry(6) = []; end;
-    results = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', ...
-						fastif(isempty(EEG.data), 'Import dataset info -- pop_editset()', 'Edit dataset info -- pop_editset()'));
+    [results newcomments] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', ...
+						fastif(isempty(EEG.data), 'Import dataset info -- pop_editset()', 'Edit dataset info -- pop_editset()'), EEG.comments);
     if length(results) == 0, return; end;
 
 	args = {};
@@ -178,6 +185,7 @@ if nargin < 2                 % if several arguments, assign values
 	if ~strcmp( results{i+2}, fastif(isempty(EEG.icasphere), '', 'EEG.icasphere') ) , args = { args{:}, 'icasphere', results{i+2} }; end;
 	results{i+3} = fastif(results{i+3}, 'yes', 'no');
 	if ~strcmp( EEG.averef, results{i+3} ), args = { args{:}, 'averef', results{i+3} }; end;
+	if ~strcmp(EEG.comments, newcomments), args = { args{:}, 'comments' , newcomments }; end;
 else % no interactive inputs
     args = varargin;
     for index=1:2:length(args)
@@ -206,6 +214,7 @@ for curfield = tmpfields'
         case {'dataformat' }, ; % do nothing now
         case 'setname' , EEGOUT.setname = getfield(g, {1}, curfield{1});
         case 'pnts'    , EEGOUT.pnts = getfield(g, {1}, curfield{1});
+        case 'comments', EEGOUT.comments = getfield(g, {1}, curfield{1});
         case 'averef'  , EEGOUT.averef = getfield(g, {1}, curfield{1});
         case 'nbchan'  , EEGOUT.nbchan = getfield(g, {1}, curfield{1});
         case 'xmin'    , oldxmin = EEG.xmin;
@@ -323,7 +332,7 @@ end;
 com = sprintf( '%s = pop_editset(%s', inputname(1), inputname(1) );
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
-        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', ''%s''', com, args{i}, args{i+1} );
+        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, vararg2str(args{i+1}) );
         else                  com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
         end;
     else
