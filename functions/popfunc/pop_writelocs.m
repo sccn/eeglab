@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/12/24 01:25:18  arno
+% Initial revision
+%
 % Revision 1.2  2002/11/14 23:35:36  arno
 % header
 %
@@ -49,7 +52,7 @@ end;
 
 % get infos from readlocs
 % -----------------------
-[listtype formatinfo listcolformat formatskip] = readlocs('getinfos');
+[listtype formatinfo listcolformat formatskip] = readlocs('getinfoswrite');
 formatskip = [ formatskip 0];
 
 if nargin < 2
