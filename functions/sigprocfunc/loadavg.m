@@ -50,6 +50,9 @@
 % average (i.e., channel[j]->n).
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg( FILENAME)
 
@@ -107,6 +110,7 @@ fprintf('number of points per trial : %d\n', pnts);
 fprintf('sampling rate (Hz)         : %f\n', rate);
 fprintf('xmin (s)                   : %f\n', xmin);
 fprintf('xmax (s)                   : %f\n', xmax);
+fprintf('number of trials (s)       : %d\n', nsweeps);
 
 % read electrode configuration
 % ----------------------------
