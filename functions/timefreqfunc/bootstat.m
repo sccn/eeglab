@@ -11,12 +11,19 @@
 %              output. i.e.    'res = res + arg1 .* conj(arg2)'
 %
 % Optional inputs:
-%   'boottype '   - ['first'|'second'|'both'] 
-%                 'first' = accumulate in the first dimension only (shuffling 
+%   'boottype '   - ['first'|'second'|'both'|'both2'] 
+%                 'first'=  accumulate in the first dimension only (shuffling 
 %                           the first dimension (e.g., trials)). 
-%                 'second' = shuffle the second dimension (e.g., times), 
-%                            keeping the first (e.g., trials) constant. 
-%                 'both' = shuffle both dimensions. Default is 'both'.
+%                 'second'= shuffle the second dimension (e.g., times), 
+%                           keeping the first (e.g., trials) constant. 
+%                 'both'=   shuffle both dimensions repetivelly during accumulation.
+%                 'both2'=  same as 'both' but shuffle dimension 2 only once per 
+%                           accumulation. In the context of EEG coherence, this 
+%                           option allows to detect significant changes with respect
+%                           to baseline synchronization (using option 'both' 
+%                           synchronizations during baseline are ignored since time
+%                           is shuffled during accumulation.
+%                 Default is 'both'.
 %   'alpha'       - [real] significance level (between 0 and 1). Default is 0.05.
 %   'naccu'       - [integer] number of exemplars to accumulate. Default is 200.
 %   'bootside'    - ['both'|'upper'] side of the surrogate distribution to
@@ -62,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/12/31 04:37:19  scott
+% header edits
+%
 % Revision 1.3  2002/12/07 02:54:27  arno
 % adding message for how to implement new statistics
 %
@@ -105,7 +115,7 @@ Boot = finputcheck(varargin, ...
                   'formulapost'   'string'   []                       ''; ...
                   'formulainit'   'string'   []                       'res = zeros(nb_points,Boot.naccu);'; ...
                   'formulaout'    {'cell' 'string'} []                       'res'; ...
-				  'boottype'      'string'  {'first' 'second' 'both' 'times' 'trials' 'timestrials'} 'both'; ...
+				  'boottype'      'string'  {'first' 'second' 'both' 'times' 'trials' 'timestrials' 'timestrials2' 'both2'} 'both'; ...
 				  'alpha'         'real'     [0 1]                    0.05; ...
 				  'accarray'      'integer'  []                       NaN	});
 if isstr(Boot)
@@ -114,9 +124,10 @@ end;
 bootname = Boot.boottype;
 unitname = '';
 switch Boot.boottype
- case 'times',  Boot.boottype = 'first'; unitname = 'trial '; bootname = 'times';
- case 'trials', Boot.boottype = 'second'; unitname = 'time '; bootname = 'trials';
- case 'timestrials',  Boot.boottype = 'both'; unitname = 'trial '; bootname = 'timestrials';
+ case 'times',  Boot.boottype = 'first'; unitname = 'trials'; bootname = 'times';
+ case 'trials', Boot.boottype = 'second'; unitname = 'times'; bootname = 'trials';
+ case 'timestrials',  Boot.boottype = 'both'; unitname = 'trials'; bootname = 'timestrials';
+ case 'timestrials2', Boot.boottype = 'both2'; unitname = 'trials'; bootname = 'timestrials';
 end;
 if ~iscell(Boot.formulaout)
     Boot.formulaout = { Boot.formulaout };
@@ -149,10 +160,13 @@ if isempty(Boot.basevect)
 	Boot.basevect = 1:times;
 end;
 
+fprintf('Bootstrap baseline length is %d (out of %d) points\n', length(Boot.basevect));
+
 if isnan(Boot.accarray)
 	eval( Boot.formulainit );
-	if strcmpi( Boot.boottype, 'second') % get g.naccu bootstrap estimates for each trial
-		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu, unitname, times(end));
+	if strcmpi( Boot.boottype, 'second') % get g.naccu bootstrap estimates for each time window
+        fprintf('Bootstrap type is 2-D (best but slowliest)\n');
+		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu, unitname, times(end));
 		
 		arg2 = zeros(nb_points, Boot.naccu);
 		arg1 = zeros(nb_points, Boot.naccu);
@@ -184,7 +198,8 @@ if isnan(Boot.accarray)
             end;
 		end;
 	elseif strcmpi(Boot.boottype, 'both') % handle timestrials bootstrap
-		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu,unitname,trials);
+        fprintf('Bootstrap type is 1-D with full shuffling along dimension 2\n');
+		fprintf('Processing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
         arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
 		for allt=1:trials
@@ -195,10 +210,8 @@ if isnan(Boot.accarray)
 			while j<=Boot.naccu
 				t = ceil(rand([1 2])*trials); % random ints [1,trials]
 				
-				goodbasewins = Boot.basevect; 
-				ngdbasewins = length(goodbasewins);
-				s = ceil(rand([1 2])*ngdbasewins); % random ints [1,times]
-				s=goodbasewins(s);
+				s = ceil(rand([1 2])* length(Boot.basevect)); % random ints [1,times]
+				s = Boot.basevect(s);
 					
 				arg1(:,j) = oriarg1(:,s(1),t(1));
 				arg2(:,j) = oriarg2(:,s(2),t(2));
@@ -212,8 +225,36 @@ if isnan(Boot.accarray)
         for index= 1:length(Boot.formulaout) 
             eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
         end;
+	elseif strcmpi(Boot.boottype, 'both2') % handle timestrials bootstrap, shuffle time only once
+        fprintf('Bootstrap type is 1-D with shuffling along dimension 2 (once per bootstrap)\n');
+		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s %d):\n',bootname, Boot.naccu,unitname,trials);
+        arg1 = zeros(nb_points, Boot.naccu);
+		arg2 = zeros(nb_points, Boot.naccu );	
+        
+        s = ceil(rand([1 2])* length(Boot.basevect)); % random ints [1,times]
+        s = Boot.basevect(s);
+        
+        for allt=1:trials
+			if rem(allt,10) == 0,  fprintf(' %d',allt); end
+			if rem(allt,120) == 0, fprintf('\n'); end
+			
+            j=1;
+			while j<=Boot.naccu
+				t = ceil(rand([1 2])*trials); % random ints [1,trials]
+				arg1(:,j) = oriarg1(:,s(1),t(1));
+				arg2(:,j) = oriarg2(:,s(2),t(2));
+				j = j+1;
+			end
+			eval([ formula ';' ]);
+		end
+		if ~isempty(Boot.formulapost)
+			eval([ Boot.formulapost ';' ]);
+		end;
+        for index= 1:length(Boot.formulaout) 
+            eval([ 'accarray' int2str(index) ' = ' Boot.formulaout{index} ';' ]);
+        end;
 	elseif strcmpi(Boot.boottype, 'first') % boottype is 'times'
-		fprintf('\nProcessing %s (naccu=%d) bootstrap (of %s%d):',bootname, Boot.naccu,unitname,trials);
+		fprintf('\nProcessing %s (naccu=%d) 1-D bootstrap (of %s%d):\n',bootname, Boot.naccu,unitname,trials);
 		arg1 = zeros(nb_points, Boot.naccu);
 		arg2 = zeros(nb_points, Boot.naccu );
 		for allt=1:trials
