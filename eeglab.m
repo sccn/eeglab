@@ -64,7 +64,6 @@
 % mat2cell()      - matrix to cell (local)
 % pophelp()       - format the help header  !!!
 % realproba()     - compute observed probability (used by entropy)
-% rejepoch()      - reject trials based on a given statistical measure
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
 % slider()        - graphic slider function
@@ -177,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2002/08/17 00:35:17  arno
+% editing header for internet
+%
 % Revision 1.141  2002/08/15 22:15:43  arno
 % EDF
 %
