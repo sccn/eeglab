@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2002/04/29 15:06:51  scott
+% same -sm
+%
 % Revision 1.30  2002/04/29 15:03:31  scott
 % same -sm
 %
@@ -755,12 +758,9 @@ end;
 
 switch g.phsamp
  case 'on'
-size(PA)
-size(cumulX)
+  tmpcx(1,:,:) = cumulX; % allow ./ below
   for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
-j
-disp phsamp4
-    PA(j,:,:) = PA(j,:,:) ./ cumulX;
+    PA(j,:,:) = PA(j,:,:) ./ tmpcx;
   end
 end
 
