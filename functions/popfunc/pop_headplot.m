@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/05/10 02:16:41  arno
+% debug autoscale
+%
 % Revision 1.17  2003/03/12 06:34:46  scott
 % header edits
 %
@@ -309,8 +312,8 @@ end;
 if nbgraph== 1, com = 'figure;'; rotate3d(gcf); end;
 
 if length( options ) < 2
-	com = [com sprintf('pop_headplot(%s,%d,[%s], ''%s'', [%s]);', inputname(1), typeplot, sprintf('%d ',arg2), topotitle, int2str(rowcols) )];
+	com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s]);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols) )];
 else
-	com = [com sprintf('pop_headplot(%s,%d,[%s], ''%s'', [%s] %s);', inputname(1), typeplot, sprintf('%d ',arg2), topotitle, int2str(rowcols), options )];
+	com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols), options )];
 end;
 return;
