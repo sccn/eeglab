@@ -144,6 +144,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.86  2004/05/13 18:57:48  arno
+%plot middle of two dipoles
+%
 %Revision 1.85  2004/05/10 14:37:59  arno
 %image type
 %
@@ -812,10 +815,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
             dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
                                                              sources(index).rv*100);
-            if ~strcmpi(g.spheres,'on')
+            if ~strcmpi(g.spheres,'on') % plot disk markers
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
-            else % 'spheres','on'
+            else % 'spheres','on' -> plot dipole spheres
                  if exist('s1'), 
                    set(s1,'userdata',dipstruct,'tag',tag,'cdatamapping','direct','facecolor','r');
                  end
@@ -824,28 +827,27 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                  end
             end
             %
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or point %%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or disk marker %%%%%%%%%%%%%%%%%%%%%%%%%
             %
             hold on;
-            if strcmp(g.spheres,'on') % plot spheres
+            if strcmpi(g.spheres,'on') % plot spheres
                 spherecolor = g.color{index};
                 [xs,ys,zs] = sphere;
                 for q = 1:length(xx)
                    sf=surf(xs*g.spheresize+xx(q),...
                         ys*g.spheresize+yy(q),...
-                        zs*g.spheresize+zz(q),...
-                   'cdatamapping','direct',...
-                   'facecolor',spherecolor); % draw the 3-D sphere - last arg pairs NOT SET ????
+                             zs*g.spheresize+zz(q),...
+                                   'cdatamapping','direct',...
+                                    'facecolor',spherecolor); 
+                       % draws the 3-D sphere -> BUT last arg pairs are NOT set. Why not ????
 
-                  options = {'FaceColor','texturemap', 'EdgeColor','none', ...
-                              'CDataMapping','direct','tag','img', 'facelighting','none' };
+                   options = {'FaceColor','texturemap', 'EdgeColor','none', ...
+                              'CDataMapping','direct','tag','img', 'facelighting','none'};
 
                    % set(sf,{options}); <==== this says 'invalid key pair' but which pair ????
-
                    set(sf,'cdatamapping','direct');
                    set(sf,'facecolor','g');  % <========= this has no effect !?!?! Why not ????
-                   % set(sf) % <========== doesnt show the set() changes made above ????
-
+                   % set(sf) % <========== doesnt show the set() changes made above. Why not ????
                    shading interp;
                    material shiny;
                 end
