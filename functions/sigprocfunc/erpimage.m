@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2003/08/24 04:23:40  scott
+% debug
+%
 % Revision 1.132  2003/08/24 04:20:26  scott
 % same
 %
@@ -2719,8 +2722,8 @@ function [plot_handle] = plot1erp(ax,times,erp,axlimits,stdev)
   ERPZEROWIDTH = 2;
   [plot_handle] = plot(times,erp,'LineWidth',ERPDATAWIDTH); hold on
   if exist('stdev') == 1
-      [plot_handle] = plot(times,stdev, 'r--','LineWidth',1); hold on    % plot +alpha
-      [plot_handle] = plot(times,-1*stdev, 'r--','LineWidth',1); hold on % plot -alpha
+      [plot_handle] = plot(times,stdev, 'r','LineWidth',1); hold on    % plot +alpha
+      [plot_handle] = plot(times,-1*stdev, 'r','LineWidth',1); hold on % plot -alpha
 
       % [plot_handle] = plot(times,erp+stdev, 'r--','LineWidth',1); hold on
       % [plot_handle] = plot(times,erp-stdev, 'r--','LineWidth',1); hold on
