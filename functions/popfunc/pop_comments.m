@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/06 02:58:37  arno
+% returning [] when no modification
+%
 % Revision 1.2  2002/04/06 02:49:39  arno
 % reprogrammed the whole function
 %
@@ -117,8 +120,6 @@ end;
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
-comments
-newcomments
 if ~strcmp( comments, newcomments)
   com =sprintf('EEG.comments = pop_comments('''', '''', %s);', str2str(newcomments));
 end;
