@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/07/27 01:25:45  arno
+% debugging vert
+%
 % Revision 1.27  2002/07/26 16:18:32  arno
 % removing debugging messages
 %
@@ -1086,14 +1089,13 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                           times(1),times(base(end)));
  end
  amps = 20*log10(amps); % convert to dB
- allamps = 20*log10(allamps);
 
  if isnan(baseamp) % if not specified in 'limits'
     [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
- 	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+ 	allamps = allamps - 10.^(baseamp/20); % divide by (non-log) baseline amplitude
 else
     amps = amps-baseamp; % use specified (log) baseamp
-	allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
+	allamps = allamps - 10.^(baseamp/20); % divide by (non-log) baseline amplitude
  end
  if isnan(signifs);
     ampsig = ampsig-baseamp;
@@ -1135,6 +1137,7 @@ else
   outtrials = 1:ntrials;
   outsort = sortvar;
  end
+ allamps = 20*log10(allamps);
 
  %
  %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
