@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/24 16:37:04  arno
+% debugging/reprogramming
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -57,7 +60,7 @@ if nargin < 2
 	if filename == 0 return; end;
 	result       = inputdlg( {strvcat('Code for absence of reaction time/event in a trial', ...
 									 '(none=all latencies are imported)')}, ...
-									 'Load Neruoscan DATA file -- pop_loaddat()', 1,  {'1000'});
+									 'Load Neuroscan DATA file -- pop_loaddat()', 1,  {'1000'});
 	if length(result) == 0 return; end;
 	no_rt = eval( result{1} );
 end;
