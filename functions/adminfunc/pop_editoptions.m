@@ -14,24 +14,29 @@
 %   "Retain parent dataset" - [checkbox] if checked, EEGLAB can retain 
 %                   several datasets in memory. Command line 
 %                   equivalent: option_keepdataset.
-%   "option_savematlab" - [checkbox] if checked, datasets are saved as
-%                   standard Matlab files (this requires disk space). When
-%                   unchecked, datasets' raw data are saved in a separate
-%                   file to save disk space. Command line 
-%                   equivalent: option_savematlab.
-%
+%   "Store data in the .set file" - [checkbox] if checked, datasets are saved as
+%                   standard Matlab files (this requires disk space). When this option
+%                   is UNchecked, the raw data for a dataset is saved as a stream of 32-bit 
+%                   floats in a separate binary file to save disk space. As of Matlab 4.51, 
+%                   the order of the data in the binary file is as in the transpose of the 
+%                   data (i.e., as in EEG.data', frames by channels). This allows quick 
+%                   reading of single channels from the data, e.g. when working with clusters 
+%                   of components across datasets. The stored files have the extension 
+%                   .dat instead of the previous, non-transposed .fdt. Both file types 
+%                   are read by the dataset load function. Command line equivalent: 
+%                   option_savematlab.
 % Optional inputs:
 %   'option_computeica' - [0|1] If 1, compute the ICA component activitations and
 %                   store them in a new variable. If 0, compute ICA activations
-%                   only when needed (& only partially, if possible) and do not 
-%                   store the results). 
+%                   only when needed (& only partially, if possible) and do not
+%                   store the results).
 %   'option_keepdataset' - [0|1] If 1, keep datasets in memory so that the user 
 %                   can undo any EEGLAB operation by returning to the parent
 %                   dataset.  The user may work on several datasets at a time.
 %                   If 0, only one dataset is stored in memory, any changes 
 %                   overwriting the current (EEG) dataset. 
 %   'option_savematlab' - [0|1] If 1, datasets are saved as Matlab files. If 0,
-%                   raw data is saved in a separate file to save disk space.
+%                   raw data is saved in a separate 32-bit float file to save disk space.
 %            
 %   NOTE: Turn OFF these options to work with very large datasets or on computers
 %                   with limited memory.
@@ -68,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/07/31 22:28:41  arno
+% *** empty log message ***
+%
 % Revision 1.18  2003/04/10 17:31:03  arno
 % header edit
 %
