@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2005/03/04 23:20:41  arno
+% new structure chaninfo etc...
+%
 % Revision 1.111  2004/11/19 02:07:38  arno
 % display warning when deleting channels
 %
@@ -518,8 +521,8 @@ end;
 
 % dealing with additional parameters
 % ----------------------------------
-if nargin > 2 & ~isstr(params), % nothing
- elseif nargin > 1
+if nargin > 1 & ~isstr(params), % nothing
+elseif nargin > 1
     varargin = { params varargin{:} };
     clear params;
     params.shrink        = shrinkorskirt;
@@ -534,7 +537,7 @@ if ~isfield(params, 'nosedir')
 end;
 oldparams = params;
 
-if nargin < 2
+if nargin < 3
     
 	totaluserdat = {};
     % lookup channel locations if necessary
