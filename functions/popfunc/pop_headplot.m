@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/19 23:59:09  arno
+% reducing message
+%
 % Revision 1.11  2002/08/12 16:32:22  arno
 % inputdlg2
 %
@@ -148,6 +151,10 @@ if nargin < 3
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
+	if length(arg2) > EEG.nbchan
+		tmpbut = questdlg2(['This involve drawing ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
+		if strcmp(tmpbut, 'Cancel'), return; end;
+	end;
 	topotitle    = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
 	options      = [ ',' result{4} ];
