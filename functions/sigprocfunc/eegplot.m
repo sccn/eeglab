@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2003/02/20 20:56:38  scott
+% header edit -sm
+%
 % Revision 1.73  2003/02/20 20:11:33  arno
 % replaing ???
 % /
@@ -993,7 +996,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
      'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
      'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
      'clear tmpg;' ]);
-   
+  uimenu('Parent',figh,'Label', 'help', 'callback', 'pophelp(''eegplot'');');
+  
   % %%%%%%%%%%%%%%%%%
   % Set up autoselect
   % %%%%%%%%%%%%%%%%%
