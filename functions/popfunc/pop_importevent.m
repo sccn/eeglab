@@ -1,5 +1,5 @@
-% pop_importevent() - Import events in a dataset. If the EEG dataset
-%              is the only inputs, a window pops up to ask for the relevant 
+% pop_importevent() - Import events into an EEG dataset. If the EEG dataset
+%              is the only input, a window pops up to ask for the relevant 
 %              parameter values.
 %
 % Usage: >> [EEG,eventnumbers] = pop_importevent( EEG, 'key1', 'value1', ...);
@@ -8,39 +8,37 @@
 %   EEG      - input dataset
 %
 % Optional input
-%  'append'   - ['yes'|'no'] 'yes' = Append to the current events of the
-%               EEG dataset {default}: 'no' = Erase the previous events.
-%  'event'    - [ 'filename'|array ] filename of a text file or
-%               Matlab array of the global workspace containing an
+%  'append'   - ['yes'|'no'] 'yes' = Append events to the current events in 
+%               the EEG dataset {default}: 'no' = Erase the previous events.
+%  'event'    - [ 'filename'|array ] Filename of a text file, or name of s
+%               Matlab array in the global workspace containing an
 %               array of events in the folowing format: The first column
-%               is the type of the event, the second the latency and
-%               the other ones are user defined fields. This function
-%               can handle text entries in ascii files.
-%  'fields'   - cell array of name for each user-defined column, 
+%               is the type of the event, the second the latency. 
+%               The others are user-defined. The function can read 
+%               either numeric or text entries in ascii files.
+%  'fields'   - Cell array containing the name of each user-defined column, 
 %               optionally followed by a description. Ex: { 'type', 'latency' }
-%  'skipline' - number of rows to skip for text files 
-%  'indices'  - vector indicating the indices of the events to modify 
-%  'timeunit' - [ latency unit in second ]. Default unit is 1 second. 
-%  'delim'    - delimiting characters in file. Default is tab and space.
-%  'align'    - [num] align the first event latency to existing 
-%               event latency (number num) and check latency
-%               consistency. Negative values can also be used and then
-%               event number -num is aligned with the first pre-existing
-%               event. Default is 0. (NaN-> no alignment)
-%
+%  'skipline' - Number of header rows to skip in the text file 
+%  'indices'  - Vector indicating the indices of the events to modify 
+%  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
+%  'delim'    - Delimiting characters in the input file. Default is tab|space.
+%  'align'    - [num] Align the first event latency to the latency of existing 
+%               event number num, and check latency consistency. Negative values 
+%               can also be used; then event number -num is aligned with the 
+%               first pre-existing event. Default is 0. (NaN-> no alignment)
 % Outputs:
-%   EEG          - dataset with updated event field
-%   eventnumbers - indexes of the appended events
+%   EEG          - EEG dataset with updated event fields
+%   eventnumbers - Indexes of the appended events
 %
-% Example: [EEG, eventnumbers] = pop_importevent(EEG, 'event', ...
+% Example: >> [EEG, eventnumbers] = pop_importevent(EEG, 'event', ...
 %         'event_values.txt', 'fields', {'type', 'latency','condition' }, ...
 %         'append', 'no', 'align', 0, 'timeunit', 1E-3 );
 %
 %         This loads the ascii file 'event_values.txt' containing 3 columns 
-%         (event type, latency and condition). Latencies in the file are
-%         in ms. The first event latency is re-aligned with the first 
-%         pre-existing latencies in the dataset ('align', 0) and old
-%         events are erased ('append' no).
+%         (event_type, latency, and condition). Latencies in the file are
+%         in ms (1E-3). The first event latency is re-aligned with the 
+%         beginning of the dataset ('align', 0). Any previous events 
+%         are erased ('append', 'no').
 %
 % Author: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 9 Feb 2002
 %
@@ -65,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/01/03 01:40:58  arno
+% changing exemple
+%
 % Revision 1.10  2002/11/18 18:18:01  arno
 % removing debugging message
 %
