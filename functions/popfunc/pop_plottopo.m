@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 01:39:10  arno
+% color
+%
 % Revision 1.4  2002/08/11 22:18:23  arno
 % color
 %
@@ -73,11 +76,11 @@ end;
 if nargin < 2
 	promptstr    = { 'Channels to plot:' ...
 					 'Plot title:' ...
-					 'Plot single trials instead of average (yes|no)' 'Vertical lines (ms)' };
+					 'Plot single trials (yes|no)' 'Vertical lines (ms)' };
 	inistr       = { [ '1:' num2str( EEG.nbchan ) ] ...
 					 ['ERP in scalp order' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] ...
 					 'no' ''};
-	result       = inputdlg( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr);
+	result       = inputdlg( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr, 'plottopo');
 	if size(result,1) == 0 return; end;
 	channels     = eval( [ '[' result{1} ']' ] );
 	plottitle    = result{2};

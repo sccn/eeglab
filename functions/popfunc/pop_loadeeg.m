@@ -37,6 +37,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/05/02 19:39:43  arno
+% updating function for new event structure
+% ,
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -65,7 +69,7 @@ if nargin < 2
 					 'Enter response range subset:'};
 	inistr       = { '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
-	result       = inputdlg( promptstr, pop_title, 1,  inistr);
+	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadeeg');
 	if size( result,1 ) == 0 return; end;
 
 	% decode parameters
