@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/11/06 18:28:54  arno
+% Initial revision
+%
 
 function [dipoles, model] = dipfit_erpeeg(DATA, chanlocs, varargin);
     
@@ -78,9 +81,15 @@ function [dipoles, model] = dipfit_erpeeg(DATA, chanlocs, varargin);
     % process outputs
     % ---------------
     dipoles = EEG.dipfit.model;
-    dipoles = rmfield(dipoles, 'active');
-    dipoles = rmfield(dipoles, 'select');
+    if isfield(dipoles, 'active')
+        dipoles = rmfield(dipoles, 'active');
+    end;
+    if isfield(dipoles, 'select')
+        dipoles = rmfield(dipoles, 'select');
+    end;
     model   = EEG.dipfit;
-    model   = rmfield(model, 'model');
+    if isfield(model, 'model')
+        model   = rmfield(model, 'model');
+    end;
     return;
     
