@@ -36,7 +36,7 @@
 %                        if any. else 'off'}
 %   'colormap'        -  (n,3) any size colormap
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
-%                        map from coordinate XI,YI to coordinates XE, YE, ZE (head 
+%                        map from coordinate (XI,YI) to coordinates (XE,YE,ZE) (head 
 %                        model has radius 1). If several rows, plot one dipole per row.
 %   'dipnorm'         - ['on'|'off'] normalize deipole length {default = 'off'}.
 %   'diporient'       - [-1|1] invert dipole orientation {default = 1}.
@@ -46,18 +46,15 @@
 %                        The dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
 %                        Coordinates returned by dipplot() may be used.
-%   'headcolor'       - color of head cartoon {default black}
 %   'verbose'         - ['on'|'off'] default is 'on'.
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                        If [rad theta] are coordinates of a (possibly missing) channel, 
 %                        returns interpolated value for channel location. For location 
 %                        conventions, see >> topoplot 'example'
 %   'gridscale'       - [int >> 1] - interpolated data matrix size (rows) (default: 67)
-%   'efontsize'       - detail
-%   'electcolor'      - detail
-%   'emarker'         - detail
-%   'emarkersize'     - detail
-%   'emarkersize1chan' - detail
+%   'ccolor'          - color of the contours {default: blue}
+%   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
+%   'efontsize'|'electcolor'|'emarker'|'emarkersize'|'emarkersize1chan' - electrode details
 %  
 % Outputs:
 %         h           - axes handle
@@ -96,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2004/02/15 17:35:49  scott
+% added 'style','skirt'
+%
 % Revision 1.94  2004/02/15 17:29:25  scott
 % same
 %
@@ -606,7 +606,7 @@ if isstr(shrinkfactor)
                    'topoplot(): electrode radii shrunk towards vertex by %2.3g to plot all\n', ...
                                                                       1-squeezefac);
                end;
-		Rd = Rd*squeezefac; % squeeze electrodes by squeezefac*100% 
+		Rd = Rd*squeezefac; % squeeze electrodes by (squeezefac*100)%
 	end;	                        % to plot all inside the head cartoon
 else  % if numeric shrinkfactor given
     if strcmpi(VERBOSE, 'on')
@@ -651,6 +651,10 @@ Th = Th(enum);
 Rd = Rd(enum);
 labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
+
+if (isstr('shrinkfactor') & strcmp('shrinkfactor','skirt')) | ~isstr('stringfactor')
+   Th = skirt_Th(Th,Rd,q1);  % rotate the angles of the electrodes in the 'skirt'
+end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -695,7 +699,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%% return designated channel value %%%%%%%%%%%%%%%%
   %
-  if exist('chanrad')
+  if exist('chanrad') % 'noplot' (first argument)
       chantheta = (chantheta/360)*2*pi;
       chancoords = round(ceil(GRID_SCALE/2)+GRID_SCALE/2*2*chanrad*[cos(-chantheta),-sin(-chantheta)]);
       if chancoords(1)<1 | chancoords(1) > GRID_SCALE | chancoords(2)<1 | chancoords(2)>GRID_SCALE
@@ -731,6 +735,18 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
     amax = MAPLIMITS(2);
   end
   delta = xi(2)-xi(1); % length of grid entry
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
+%
+if (isstr('shrinkfactor') & strcmp('shrinkfactor','skirt')) | ~isstr('stringfactor')
+  [Thi,Phi,Rdi] = cart2sph(Xi-rmax*sf,Yi,Zi);
+  [tmp,Thi,Rdi] = sph2topo(1:length(X1),Thi,Phi);
+  skirt_mask = (sqrt(Xi.^2+Yi.^2)> rmax*sf & ...
+         abs(Thi)<pi/2);
+  ii = find(mask == 0);
+  Zi(ii) = NaN;
+end
   
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Draw interpolated scalp map %%%%%%%%%%%%%%%%%
@@ -743,18 +759,20 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   % pos = get(gca,'position');
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
-  if strcmp(STYLE,'contour')
+  if strcmp(STYLE,'contour')                     % plot surface contours only
     [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
-     for h=chs, set(h,'color',CCOLOR); end
-  elseif strcmp(STYLE,'both')
-    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
-	'FaceColor',SHADING);
+    for h=chs, set(h,'color',CCOLOR); end
+
+  elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
+    tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
+               'EdgeColor','none','FaceColor',SHADING);                    
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k');
+    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
     for h=chs, set(h,'color',CCOLOR); end
+
   elseif strcmp(STYLE,'straight')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -762,14 +780,15 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
+
   elseif strcmp(STYLE,'fill')
     [cls chs] = contourf(Xi,Yi,Zi,CONTOURNUM,'k');
     for h=chs, set(h,'color',CCOLOR); end
+
   else
     error('topoplot(): Invalid style')
   end
   caxis([amin amax]) % set coloraxis
-
 else % if style 'blank'
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%% Draw blank head %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -936,11 +955,9 @@ if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
   set(hd,'color','w','linewidth',HLINEWIDTH+5);
-  %hd2=plot(cos(circ).*rmax,sin(circ).*rmax,...
-  %     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
-else
+else % no 'skirt'
   plot([basex;0;-basex],[base;tip;base],...
-    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
+    'Color',HCOLOR,'LineWidth',HLINEWIDTH);                   % plot nose
   plot(EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)       % plot left ear
   plot(-EarX,EarY,'color',HCOLOR,'LineWidth',HLINEWIDTH)      % plot right ear
 end
@@ -957,3 +974,36 @@ end;
 hold off
 axis off
 axis square; % keep head round!
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%% Warp electrode angles in the 'skirt' %%%%%%%%%%%
+%
+function [newTh] = skirt_Th(Th,Rd,q)
+   q1 = find(Th>=0 & Th<pi/2);
+   if ~isempty(q1)
+     Th = rot_Th(Th,Rd,q1);
+   end
+   q2 = find(Th>=pi/2 & Th<pi);
+   if ~isempty(q2)
+     Th(q2) = Th(q2)-pi/2; % rotate to q1
+     Th = rot_Th(Th,Rd,q1);
+     Th(q2) = Th(q2)+pi/2; % rotate back
+   end
+   q3 = find(Th<-pi/2 & Th>=-pi);
+   if ~isempty(q3)
+     Th(q3) = Th(q3)+pi; % rotate to q1
+     Th = rot_Th(Th,Rd,q1);
+     Th(q3) = Th(q3)-pi; % rotate back
+   end
+   q4 = find(Th<0 & Th>=-pi/2);
+   if ~isempty(q4)
+     Th(q4) = Th(q4)+pi/2; % rotate to q1
+     Th = rot_Th(Th,Rd,q1);
+     Th(q4) = Th(q4)-pi/2; % rotate back
+   end
+
+function [newTh] = rot_Th(Th,Rd,q)
+     dr = Rd(q)-0.5;
+     x = asin(sin(3/8*pi).*dr/(0.25+dr.^2-dr.*cos(3/8*pi));
+     Th(q) = x+(pi/2)*Th(q)/(pi/2-2*x);
+return
