@@ -70,8 +70,8 @@
 %           the function description. If the .jpg file is absent, the function
 %           checks for the presence of a .gif file.
 %        4) Lines beginning by '%%' are not interpreted and will be printed as is.
-%        5) if [type] is present in a "descriptor2  - [type] text line 1" line
-%           "type is bolded.
+%        5) if [type] is present in a "descriptor2  - [type] text line 1"
+%           type is bolded.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/02/17 02:51:36  arno
+% max image size set to 600 instead of 400
+%
 % Revision 1.19  2003/02/17 02:39:57  arno
 % debug feature and document
 %
