@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2003/06/30 15:00:43  arno
+% fixing inputcheck problem
+%
 % Revision 1.47  2003/05/13 23:31:25  arno
 % number of lines to skip in chanedit format
 %
@@ -329,7 +332,7 @@ elseif isstr(filename) & strcmp(filename, 'getinfoswrite')
 end;
 
 g = finputcheck( varargin, ...
-   { 'filetype'	'string' { listtype{:} '' } '';
+   { 'filetype'	'string' { listtype{:} '' 'locs' } '';
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'    'integer' [1 Inf]				[];
      'format'		'cell'	 []					{} }, 'readlocs');
@@ -356,6 +359,8 @@ if isstr(filename)
         otherwise, g.filetype =  ''; 
        end;
        fprintf('Readlocs: ''%s'' format detected from file extension\n', g.filetype); 
+   else 
+       if strcmpi(g.filetype, 'locs'),  g.filetype = 'loc'; end;
    end;
    
    % assign format from filetype
