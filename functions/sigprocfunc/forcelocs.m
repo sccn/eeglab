@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/04/16 01:56:47  arno
+% adding hidden output
+%
 % Revision 1.1  2003/04/16 01:48:32  arno
 % Initial revision
 %
@@ -52,6 +55,7 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
     NENTRY = 1; % number of lines in GUI
     FIELDS = { 'X' 'Y' };
     
+    options = [];
     if nargin < 1
         help forcelocs;
         return;
