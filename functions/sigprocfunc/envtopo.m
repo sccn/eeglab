@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2004/01/29 16:55:29  scott
+% same
+%
 % Revision 1.47  2004/01/29 16:54:41  scott
 % same
 %
@@ -560,7 +563,7 @@ fprintf('\n');
 % ---------------------------------------
 % compute pvaf
 if strcmpi(g.pvaf, 'on')
-    fprintf('In the interval %4.0f to %4.0f ms:\n',x(frame1),x(frame2));
+    fprintf('In the interval %.0f to %.0f ms:\n',x(frame1),x(frame2));
     vardat = mean(mean((data(:,frame1:frame2).^2))); % find data variance in interval
     pvaf = 100-100*pvaf/vardat;
     [sortpvaf spx] = sort(pvaf);
