@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2003/12/03 02:32:41  arno
+% verbose option
+%
 % Revision 1.64  2003/10/22 17:37:03  arno
 % slight imprecision on frequency for FFT when padratio > 1
 %
@@ -368,7 +371,7 @@ function [P,R,mbase,times,freqs,Pboot,Rboot,PA] = timef( X, frame, tlimits, Fs, 
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
 % ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is coherence.
-%        But here, we consider    Phase(PPy) = 0 and |Pyy| = 1 -> Pxy = Pxx
+%        But here, we consider    Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
 %        Giving, R = |Sum(Pxx)|/Sum(|Pxx|), the inter-trial coherence (ITC)
 %        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
 

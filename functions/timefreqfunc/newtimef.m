@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/12/09 23:23:31  arno
+% nothing
+%
 % Revision 1.51  2003/12/09 23:13:03  arno
 % fixing plotimef baseline problem
 %
@@ -497,7 +500,7 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tli
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
 % ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is coherence.
-%        But here, we consider    Phase(PPy) = 0 and |Pyy| = 1 -> Pxy = Pxx
+%        But here, we consider    Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
 %        Giving, R = |Sum(Pxx)|/Sum(|Pxx|), the inter-trial coherence (ITC)
 %        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
 
