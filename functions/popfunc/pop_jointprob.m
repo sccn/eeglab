@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/26 17:21:03  arno
+% return command if 2 outputs
+%
 % Revision 1.2  2002/07/26 16:40:54  arno
 % switching icacomp
 %
@@ -212,9 +215,8 @@ if ~isempty(rej)
 end;
 nrej = sum(rej);
 
-com = [ com sprintf('Indexes = pop_jointprop( %s, %d, [%s], [%s], [%s], %d, %d);', ...
-   inputname(1), icacomp, num2str(elecrange),  num2str(locthresh), ...
-   num2str(globthresh), superpose, reject ) ]; 
+com = [ com sprintf('%s = pop_jointprob(%s,%s);', inputname(1), ...
+		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ]; 
 if nargin < 3 & nargout == 2
 	locthresh = com;
 end;
