@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/10 18:01:59  arno
+% Initial revision
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT, com] = pop_dipfit_gridsearch(EEG, select, xgrid, ygrid, zgrid, reject );
@@ -125,3 +128,4 @@ if nargin < 2
   EEGOUT = dipfit_gridsearch(EEG, 'component', select, 'xgrid', xgrid, 'ygrid', ygrid, 'zgrid', zgrid, options{:});
 
   % FIXME reject is not being used at the moment
+  disp('Done');
