@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2004/02/15 17:06:44  scott
+% same
+%
 % Revision 1.90  2004/02/15 17:05:34  scott
 % same
 %
@@ -731,11 +734,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
   % fprintf('Current axes size %g,%g\n',pos(3),pos(4));
 
   if strcmp(STYLE,'contour')
-    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM); % ,{'LineSpec',CCOLOR});
-    set(chs(1))
-      for h=chs
-          set(h,'color',CCOLOR);
-      end
+    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
+     for h=chs, set(h,'color',CCOLOR); end
   elseif strcmp(STYLE,'both')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -743,7 +743,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-    contour(Xi,Yi,Zi,CONTOURNUM,'LINESPEC',CCOLOR);
+    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k');
+    for h=chs, set(h,'color',CCOLOR); end
   elseif strcmp(STYLE,'straight')
     tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
 	'FaceColor',SHADING);
@@ -752,7 +753,8 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
         handle = tmph;
     end;
   elseif strcmp(STYLE,'fill')
-    contourf(Xi,Yi,Zi,CONTOURNUM,'LINESPEC',CCOLOR);
+    [cls chs] = contourf(Xi,Yi,Zi,CONTOURNUM,'k');
+    for h=chs, set(h,'color',CCOLOR); end
   else
     error('topoplot(): Invalid style')
   end
