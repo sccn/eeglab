@@ -1,3 +1,5 @@
+% This function is obsolete. See pop_reref() instead.
+%
 % pop_averef() - Convert an EEG dataset to average reference.
 %
 % Usage:
@@ -33,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/12 19:02:37  arno
+% debugging command line call
+%
 % Revision 1.10  2002/09/05 00:31:12  scott
 % added EEG.rmave to output dataset - to allow re-referencing -sm
 %
