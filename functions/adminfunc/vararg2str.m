@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/05/28 19:21:05  arno
+% fixing history for 2 elements
+%
 % Revision 1.12  2003/12/09 21:57:13  arno
 % now can process logical values
 %
@@ -179,7 +182,7 @@ function str = struct2str( structure )
 	allfields = fieldnames( structure );
 	for index = 1:length( allfields )
 		strtmp = '';
-		allcontent = eval( [ '{ structure.' allfields{index} '};' ] );
+		allcontent = { getfield( structure, allfields{index}) };
 		str = [ str, '''' allfields{index} ''',{' vararg2str( allcontent ) '},' ];
 	end;
 	str = [ 'struct(' str(1:end-1) ')' ];
