@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 6/6/97 added movieframes arg -sm
 % 6/12/97 removed old 'startframes' var., fixed vertical line frame selection -sm
@@ -111,8 +114,11 @@ Movie    = moviein(mframes,gcf);
 axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);
 
 % >> eegplotold('noui',data,srate,spacing,eloc_file,startsec,color)
-eegplotold('noui',-data,srate,0,eloc_locs,startsec,'r'); 
-
+if isstruct(eloc_locs)
+    eegplotold('noui',-data,srate,0,[],startsec,'r');
+else
+    eegplotold('noui',-data,srate,0,eloc_locs,startsec,'r');
+end;    
 % set(axeegplot,'XTick',[])                %%CJH
                                          % plot negative up
 limits = get(axeegplot,'Ylim');          % list channel numbers only
