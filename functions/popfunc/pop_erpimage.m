@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2002/10/16 16:24:37  arno
+% debug command line call
+%
 % Revision 1.82  2002/10/15 16:56:44  scott
 % debug
 %
@@ -454,9 +457,6 @@ if popup
 	% ---------
 	limits(1:8)  = NaN;
 	channel   	 = eval( [ '[' res.chan ']' ]);
-        if typeplot == 1 % if channel plot
-          chanlabels = {EEG.chanlocs.labels};
-        end
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), projchan = str2num(res.projchan); else, projchan = []; end;
 	if typeplot
@@ -465,10 +465,13 @@ if popup
 		options = [options ',''yerplabel'',''''' ];
 	end;
 	if isempty(titleplot)
-         if typeplot==1
-            titleplot = [ 'ERP Image (', chanlabels{channel}, ')'];
-         else
-            titleplot = [ 'ERP Image (Comp. ', int2str(channel), ')'];
+        if typeplot==1
+            if ~isempty(EEG.chanlocs) % if channel plot
+                  titleplot = [ 'ERP Image (' EEG.chanlocs(index).labels ')'];
+            else, titleplot = [ 'ERP Image (' int2str(channel) ')'];
+            end
+        else
+            titleplot = [ 'ERP Image (Comp. ' int2str(channel) ')'];
         end
     end;
 	smooth       = eval(res.smooth);
