@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2002/04/26 02:48:32  scott
+% editing message
+%
 % Revision 1.40  2002/04/25 19:10:26  arno
 % debugged typp
 %
@@ -341,9 +344,11 @@ checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc'');
 checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
 
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
-storenewcall = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');';
+storeload    = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');';
+storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);';
 
 e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG), EEG = EEGTMP; clear EEGTMP;' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_load            = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG), EEG = EEGTMP; clear EEGTMP;' storeload 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist            = [e_catch 'h(LASTCOM); eeglab(''redraw'');'];
@@ -367,7 +372,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( importevent, 'Label', 'Import Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
 	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_newnonempty]); 
+	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_load]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_store]);
 	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG); eeg_retrieve(CURRENTSET);' e_hist 'h(''eeg_retrieve(CURRENTSET);'');' ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist ]);
