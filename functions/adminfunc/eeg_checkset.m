@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2002/11/15 02:11:04  arno
+% debugging for single dataset
+%
 % Revision 1.83  2002/11/15 01:37:42  scott
 % Can not -> Cannot
 %
@@ -648,6 +651,8 @@ if ~isempty( EEG.chanlocs )
 	        EEG.chanlocs = [];
 	        res = com;
 	    end;
+    end;
+    if isstruct( EEG.chanlocs)
         if ~isstr(EEG.chanlocs(1).labels)
             for index = 1:length(EEG.chanlocs)
                 if ~isstr(EEG.chanlocs(index).labels)
