@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2003/03/06 00:34:28  arno
+% handling numeric shrink factors
+%
 % Revision 1.42  2003/02/23 08:23:08  scott
 % header edit -sm
 %
@@ -390,8 +393,6 @@ if nargin < 2
 		if evalin('base', 'exist(''tmpshrink'')') == 1
 			tmpshrink = evalin('base', 'tmpshrink');
 			evalin('base', 'clear tmpshrink');
-            tmpshrink
-            shrinkfact
             if ~strcmp(tmpshrink, 'off')
 				if  isstr(tmpshrink)  chans(1).shrink = num2str(tmpshrink);
 				else                  chans(1).shrink = tmpshrink;
