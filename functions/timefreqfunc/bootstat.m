@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/07/09 00:34:19  arno
+% implementing correctp
+%
 % Revision 1.14  2003/07/08 16:36:25  arno
 % no plot
 %
@@ -383,8 +386,8 @@ if strcmpi(g.distfit, 'on')
         error('For fitting, vals must contain exactly one value');
     end;
     
-    % fitting with Ramber-Schmeiser distribution
-    % ------------------------------------------
+    % fitting with Ramberg-Schmeiser distribution
+    % -------------------------------------------
     accarrayout = 1 - rsfit(abs(Rbootout(:)), g.vals);
     if ~isempty(g.correctp)
         if length(g.correctp) == 2
