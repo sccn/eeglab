@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.27  2003/05/14 21:36:36  arno
+%nothing
+%
 %Revision 1.26  2003/04/30 18:42:07  arno
 %calibrating roughtly the slice selection
 %
@@ -322,7 +325,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % -----------------------
     if strcmp(g.summary, 'on')
         figure;
-        options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength,'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image };
+        options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength, ...
+                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image };
         axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off;
         axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off;
         axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off;
