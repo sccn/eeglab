@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/05/02 01:38:10  arno
+% same
+%
 % Revision 1.13  2002/05/02 01:36:46  arno
 % debuging returned values
 %
@@ -161,7 +164,7 @@ else
 	if g.optim == 1
 		[x y z newcenter] = chancenter(x, y, z, []);
 	else
-		[x y z newcenter] = chancenter(x, y, z, center);
+		[x y z newcenter] = chancenter(x, y, z, g.center);
 	end;
 end;
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
