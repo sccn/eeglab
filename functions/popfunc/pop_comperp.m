@@ -34,6 +34,7 @@
 %                or ('off') do plot the ERP grand averages.
 %   'allerps'  - ['on'|'off'] Show all erps. {default: 'off'}
 %   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
+%   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
 %   'tplotopt' - [cell array] 'key', val' plotting options for topoplot
 %
 % Output:
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/04/15 00:26:15  arno
+% debug alpha
+%
 % Revision 1.6  2003/04/15 00:15:32  arno
 % axis off
 %
@@ -107,7 +111,7 @@ allcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b
 erp1 = '';
 if nargin < 3
     checkboxgeom = [1.6 0.15 0.5];
-    uigeom = { [ 2 1] [2 1] [2 1] [2 1] checkboxgeom checkboxgeom checkboxgeom checkboxgeom [1.2 0.5 1] };
+    uigeom = { [ 2 1] [2 1] [2 1] [2 1] checkboxgeom checkboxgeom checkboxgeom checkboxgeom [2 1] [0.9 0.4 1] };
     commulcomp= ['if get(gcbo, ''value''),' ...
                  '    set(findobj(gcbf, ''tag'', ''multcomp''), ''enable'', ''on'');' ...
                  'else,' ...
@@ -130,6 +134,8 @@ if nargin < 3
                { 'style' 'checkbox' 'string' '' } { } ...
 	           { 'style' 'text' 'string' 'Check checkbox to use RMS instead of average:' } ...
                { 'style' 'checkbox' 'string' '' } { } ...
+	           { 'style' 'text' 'string' 'Low pass (Hz) (for display only)' } ...
+               { 'style' 'edit' 'string' '' } ...
                { 'style' 'text' 'string' 'Topoplot options (''key'', ''val''):' } ...
                { 'style' 'pushbutton' 'string' 'Help' 'callback', 'pophelp(''plottopo'')' } ...
                { 'style' 'edit' 'string' '' }};
@@ -148,7 +154,8 @@ if nargin < 3
     if result{6}, options = { options{:} 'allerps' 'on' }; end;
     if result{7}, options = { options{:} 'diffonly' 'on' }; end;
     if result{8}, options = { options{:} 'mode' 'rms' }; end;
-    if ~isempty(result{9}), options = { options{:} 'tplotopt' eval([ '{ ' result{9} ' }' ]) }; end; 
+    if ~isempty(result{9}) , options = { options{:} 'lowpass' str2num(result{9}) }; end;
+    if ~isempty(result{10}), options = { options{:} 'tplotopt' eval([ '{ ' result{10} ' }' ]) }; end; 
 else 
     options = varargin;
 end;
@@ -164,6 +171,7 @@ g = finputcheck( options, ...
                    'std'      'string'  {'on' 'off'}     'off';
                    'diffonly' 'string'  {'on' 'off'}     'off';
                    'allerps'  'string'  {'on' 'off'}     'off';
+                   'lowpass'  'float'    [0 Inf]         [];
                    'tplotopt' 'cell'     []              {};
                    'mode'     'string'  {'ave' 'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
@@ -178,9 +186,10 @@ if length(datsub) > 0 & length(datadd) ~= length(datsub)
     error('The number of component to subtract must be the same as the number of components to add');
 end;
 regions = {};
-pnts = ALLEEG(datadd(1)).pnts;
-xmin = ALLEEG(datadd(1)).xmin;
-xmax = ALLEEG(datadd(1)).xmax;
+pnts   = ALLEEG(datadd(1)).pnts;
+srate  = ALLEEG(datadd(1)).srate;
+xmin   = ALLEEG(datadd(1)).xmin;
+xmax   = ALLEEG(datadd(1)).xmax;
 nbchan = ALLEEG(datadd(1)).nbchan;
 chanlocs = ALLEEG(datadd(1)).chanlocs;
 for index = union(datadd, datsub)
@@ -302,6 +311,9 @@ else
 
 end;
     
+if ~isempty(g.lowpass)
+    erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
+end;
 if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
 
 plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
