@@ -24,6 +24,8 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+% $Log: not supported by cvs2svn $
+
 function h = circpatch( X, Y, circfactor, color, thickness, segments, offset, middle );
 
 PADSTRIPE  = 0.8; % percentage

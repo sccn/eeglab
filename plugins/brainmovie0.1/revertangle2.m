@@ -32,6 +32,8 @@
 % ALLCROSSFANGLE
 % ALLCROSSF
 
+% $Log: not supported by cvs2svn $
+
 function [ALLCROSSFANGLE, inversion] = revertangle( ALLCROSSFANGLE, ALLCROSSF );
 
 nbcompo = size(ALLCROSSFANGLE,2);
