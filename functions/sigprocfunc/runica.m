@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/05/09 22:49:45  scott
+% made wchange printout hold enough decimal places when 'stop' is small
+%
 % Revision 1.15  2004/05/09 18:18:36  scott
 % added printout of frames per weight -sm
 %
@@ -990,7 +993,9 @@ end
          ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
                      step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
       end % step > 2
-      fprintf(ps,change);
+      fprintf(step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n',
+                       step,      lrate,     degconst*angledelta);
+      % fprintf(ps,change);  % <---- BUG !!!!
      end; % if verbose
   %
   %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
