@@ -1,11 +1,15 @@
 % pop_chansel() - select channel graphical interface
 %
 % Usage:
-%   >> chanlist = pop_chansel(chanstruct); % a window pops up
+%   >> [chanlist channames] = pop_chansel(chanstruct); % a window pops up
 %
 % Inputs:
 %   chanstruct     - channel structure. See readlocs()
-% 
+%
+% Output:
+%   chanlist  - indices of selected channels
+%   channames - names of selected channels
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 3 March 2003
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -27,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/05 18:53:32  arno
+% handle empty entries
+%
 % Revision 1.5  2003/03/05 18:46:49  arno
 % debug for numerical channels
 %
@@ -43,7 +50,7 @@
 % Initial revision
 %
 
-function chanlist = pop_chansel(chans); 
+function [chanlist,chanliststr] = pop_chansel(chans); 
     
     if nargin < 1
         help pop_chansel;
@@ -98,4 +105,5 @@ function chanlist = pop_chansel(chans);
        i = strmatch (chanliststr{index}, channelnames, 'exact');
        chanlist  = [chanlist i];
    end;
-   chanlist = sort(chanlist);
+   [chanlist indices] = sort(chanlist);
+   chanliststr = chanliststr(indices);
