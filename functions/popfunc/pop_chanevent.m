@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2004/07/27 22:47:54  arno
+% debug history
+%
 % Revision 1.37  2004/06/16 16:35:14  arno
 % debug edgelen...
 %
@@ -266,9 +269,9 @@ if nargin < 2
     options = {};
 	if ~isempty(result{2}), options = { options{:} 'oper' result{2} }; end;
 	switch result{3},
-		case 1, options = { options{:} 'oper' 'leading' };
-		case 2, options = { options{:} 'oper' 'both' };
-		case 3, options = { options{:} 'oper' 'trailing' };
+		case 1, options = { options{:} 'edge' 'leading' };
+		case 2, options = { options{:} 'edge' 'both' };
+		case 3, options = { options{:} 'edge' 'trailing' };
 	end; 
     options = { options{:} 'edgelen' eval( [ '[' result{4} ']' ] ) };
     if result{5},  options = { options{:} 'duration' 'on' }; end;
