@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/09/23 23:06:25  arno
+% debugging limits
+%
 % Revision 1.4  2002/09/06 23:04:23  luca
 % debugging latencies when epoch suppressed
 %
@@ -127,6 +130,8 @@ g.allevents =  g.allevents(:)';
 datawidth  = size(data,2)*size(data,3);
 dataframes = size(data,2);
 indexes = zeros(length(events),1);
+alleventout = {};
+alllatencyout = {};
 for index = 1:length(events)
 	pos0 = round(events(index)*g.srate); % offset of time locking event
 	posinit = pos0+reallim(1); % compute offset
@@ -159,8 +164,10 @@ newtime(2) = reallim(2)/g.srate;
 
 indexes = find(indexes == 1);
 epochdat = epochdat(:,:,indexes);
-alleventout = alleventout(indexes);
-alllatencyout= alllatencyout(indexes);
+if ~isempty(alleventout)
+    alleventout = alleventout(indexes);
+    alllatencyout= alllatencyout(indexes);
+end;
 reallim = reallim*g.srate;
 return;
 
