@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/30 21:24:48  scott
+% *** empty log message ***
+%
 % Revision 1.18  2002/04/30 21:23:58  scott
 % *** empty log message ***
 %
@@ -57,7 +60,7 @@
 % *** empty log message ***
 %
 % Revision 1.14  2002/04/30 21:19:05  scott
-% debugging sign feature for chowchans==0 -sm
+% debugging sign feature for showchans==0 -sm
 %
 % Revision 1.13  2002/04/30 21:17:59  scott
 % fg
@@ -262,10 +265,12 @@ end
 colormap(cc);
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
 imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
+
 if showchan>0
   imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
-else
+
+else % showchan==0
   tftimes = mmidx(1):mmidx(2);
   tffreqs = mmidx(3):mmidx(4);
   tfdat = matsel(tfdata,...
@@ -279,7 +284,13 @@ else
   tfsign = sign(tfsign(:,:,round(nchans/2)));
 
   tfave = tfsign.*mean(abs(tfdat),3);
+  cmax = max(max(abs(ftave)));
+  cmin = -cmax; % make symmetrical
   imagesc(times(tftimes),freqs(tffreqs),tfave);
+  caxis([cmin cmax]);
+  cbarh=sbplot(plotdim,plotdim*2,plotdim*2*plotdim-1);
+  cbar
+  axis off
 end
 hold on;
 axis([limits(1:4)]);
