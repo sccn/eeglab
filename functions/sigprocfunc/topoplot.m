@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.165  2004/03/21 17:25:39  scott
+% corrected dipole plotting
+%
 % Revision 1.164  2004/03/21 16:52:37  scott
 % debugged plotrad, headrad plot size setting
 %
@@ -721,9 +724,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%% Set radius of head cartoon %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if isempty(headrad)  % never set -> defaults
-  if plotrad >= 0.5
-     headrad = 0.5;  % (anatomically correct)
-  else % if plotrad < 0.5
+  if plotrad >= rmax
+     headrad = rmax;  % (anatomically correct)
+  else % if plotrad < rmax
      headrad = 0;    % don't plot head
      if strcmpi(VERBOSE, 'on')
        fprintf('topoplot(): not plotting cartoon head since plotrad (%5.4g) < 0.5\n',...
