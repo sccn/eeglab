@@ -106,7 +106,7 @@
 %   spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent timef() from 
 %   removing the baseline. The lower panel presents the data ITC (Inter-Trial Coherence). 
 %   Click on any plot axes to pop up a new window (using 'axcopy()')
-%   -- Upper left marginal panel presents the mean spectrm during the baseline period
+%   -- Upper left marginal panel presents the mean spectrum during the baseline period
 %      (blue), and when significance is set, the significance threshold at each frequency
 %      (dotted green-black trace).
 %   -- The marginal panel under the ERSP image shows the maximum (green) and minimum 
@@ -144,6 +144,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2003/08/25 21:58:50  arno
+% header typo
+%
 % Revision 1.61  2003/08/05 22:01:52  scott
 % header msg edits
 %
