@@ -1,4 +1,4 @@
-% readbdf() -  Loads selected Records of an EDF File 
+% readbdf() -  Loads selected Records of an EDF or BDF File 
 %              (European Data Format for Biosignals) into MATLAB
 %
 % Usage: [DAT,signal] = readedf(EDF_Struct,Records)
