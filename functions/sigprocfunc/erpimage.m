@@ -70,14 +70,15 @@
 %
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {default no}
-%   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {default no}
-%   'rmerp'  - Subtract the mean ERP from each trial before processing {default no}
+%   'erpalpha' - [alpha] One-sided significance threshold (range: [.001 0.1]). 
+%              Requires 'erp' option. {default no +/-alpha thresholds shown}
+%   'rmerp'  - Subtract the average ERP from each trial before processing {default no}
 %
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] = same, but select frequency with max power in 
 %               given range (NB: 'phasesort' freq (above) overwrites these parameters).
-%               ELSE [minfrq maxfrq alpha] = use coher. signif. level line at 
+%               ELSE [minfrq maxfrq alpha] = plot coher. signif. level line at 
 %               probability alpha (range: [0,0.1]) {default: no coher, no probabilities}
 %   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not 
 %               implicit in third arg times) {default: as in icadefs.m}
@@ -152,6 +153,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2003/08/24 04:27:41  scott
+% fprintf adjust
+%
 % Revision 1.134  2003/08/24 04:25:05  scott
 % adjust erpalpha line type
 %
@@ -2820,7 +2824,7 @@ function [out, outalpha]  = nan_mean(in,alpha)
          booterps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
      end
      booterps = sort(abs(booterps));
-     alpha = 1+floor(alpha*NBOOT);
+     alpha = 1+floor(2*alpha*NBOOT); % one-sided probability threshold
      outalpha = booterps(end+1-alpha,:);
    end
    out(nononnans) = NaN;
