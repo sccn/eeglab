@@ -26,6 +26,8 @@
 % Required inputs:     Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
 %                     2-D array (frames,trials) or 3-D array (1,frames,trials)
+%                     To compare conditions 1 (data1) and condition 2 (data2)
+%                     in place of data enter { data1 data2 }
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
 %       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
 %       srate       = data sampling rate (Hz)                 {250}
@@ -85,8 +87,8 @@
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                      level. Show non-signif. output values as green.   {0}
 %       'naccu'     = Number of bootstrap replications to accumulate     {200}
-%       'baseboot'  = Bootstrap baseline subtract (0 -> use 'baseline';
-%                                                  1 -> use whole trial) {0}
+%       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
+%                                                  0 -> use whole trial) {0}
 %       'boottype'  = ['times'|'timestrials'] shuffle time only or time and
 %                     trials for computing bootstrap. Both options should
 %                     return identical results {'times'}.
@@ -166,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2004/02/27 18:59:22  arno
+% reshape data
+%
 % Revision 1.54  2004/02/14 23:24:05  arno
 % implement erspmax
 %
