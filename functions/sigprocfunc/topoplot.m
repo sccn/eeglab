@@ -23,9 +23,14 @@
 %   'interplimits'    - 'electrodes' to furthest electrode; 'head' to edge of
 %                        head {default 'head'}
 %   'gridscale'       -  scaling grid size {default 67}
-%   'dipole'          -  [XI YI XE YE L S C] plot dipole on the top of the scalp
-%                        map from coordinate XI,YI to coordinates XE, YE. The
-%                        dipole bar is scaled by length L. Dipole size (scaling) 
+%   'dipole'          -  [XI YI XE YE] plot dipole on the top of the scalp
+%                        map from coordinate XI,YI to coordinates XE, YE (head is radius one).
+%                        If several rows, plot one dipole per row.
+%   'dipnorm'         - ['on'|'off'] normlaize deipole length. { default = 'off'}.
+%   'diplen'          - [real] scale dipole lenght. { default = 1 }.
+%   'dipscale'        - [real] scale dipole size. { default = 1 }.
+%   'dipcolor'        - [color] change dipole color. { default = 'k' (black) }.
+%                        The dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
 %                        Coordinates returned by dipplot can be used.
 %   'maplimits'       - 'absmax' +/- the absolute-max 
@@ -91,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2003/11/05 19:44:32  arno
+% header text
+%
 % Revision 1.60  2003/08/08 17:36:12  arno
 % shrink factor overwrite problem fixed
 %
@@ -271,8 +279,7 @@ MAPLIMITS = 'absmax';   % absmax, maxmin, [values]
 GRID_SCALE = 67;
 CONTOURNUM = 6;
 STYLE = 'both';       % both,straight,fill,contour,blank
-HCOLOR = [0 0 0];
-ECOLOR = [0 0 0];
+HCOLOR = [0 0 0];ECOLOR = [0 0 0];
 CONTCOLOR = [0 0 0];
 ELECTRODES = 'on';      % ON OFF LABEL
 EMARKER = '.';
@@ -281,7 +288,11 @@ EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
-DIPOLE = [];
+DIPOLE  = [];
+DIPNORM   = 'off';
+DIPLEN    = 1;
+DIPSCALE  = 1;
+DIPCOLOR  = [0 0 0];
 VERBOSE = 'on';
 MASKSURF = 'off';
 
@@ -390,6 +401,14 @@ if nargs > 2
          end
 	 case 'dipole'
 	  DIPOLE = Value;
+	 case 'dipnorm'
+	  DIPNORM = Value;
+	 case 'diplen'
+	  DIPLEN = Value;
+	 case 'dipscale'
+	  DIPSCALE = Value;
+	 case 'dipcolor'
+	  DIPCOLOR = Value;
 	 case 'emarker'
 	  EMARKER = Value;
 	 case 'shrink'
@@ -757,20 +776,21 @@ end
 if ~isempty(DIPOLE)
     hold on;
     color = 'k';
-    DIPOLE(:,1:4)   = DIPOLE(:,1:4)/2;
+    DIPOLE(:,1:4)   = DIPOLE(:,1:4)*0.5;
     DIPOLE(:,[2,4]) = - DIPOLE(:,[2,4]);
+    DIPOLE(:,3:4)   = DIPOLE(:,3:4)/200;
+    if strcmpi(DIPNORM, 'on')
+        for index = size(DIPOLE,1)
+            DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:4))*0.05;
+        end;
+    end; 
+    DIPOLE(:, 3:4) =  DIPOLE(:, 3:4)*DIPLEN;
     for index = 1:size(DIPOLE,1)
-        if size(DIPOLE,2) >=9, tmpcolor  = DIPOLE(index, 7:9); else, tmpcolor = 'k'; end;
-        if size(DIPOLE,2) >=6, tmpscale  = DIPOLE(index, 6); else, tmpscale = 1; end;
-        if size(DIPOLE,2) >=5, tmplength = DIPOLE(index, 5); else, tmplength = 1; end;
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
-        set(hh, 'color', tmpcolor, 'markersize', tmpscale*30);
-        if tmplength ~= 1
-            DIPOLE(index, 3) = DIPOLE(index,1) + (DIPOLE(index,3)-DIPOLE(index,1))*tmplength;
-            DIPOLE(index, 4) = DIPOLE(index,2) + (DIPOLE(index,4)-DIPOLE(index,2))*tmplength;
-		end;
-        hh = line( [DIPOLE(index, 1) DIPOLE(index, 3)]', [DIPOLE(index, 2) DIPOLE(index, 4)]');
-        set(hh, 'color', tmpcolor, 'linewidth', tmpscale*30/10);
+        set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
+        hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
+                   [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
+        set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
     end;
 end;
 
