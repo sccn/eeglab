@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/11/13 23:04:41  arno
+% removing extra electrode in average ref
+%
 % Revision 1.9  2002/11/13 22:28:57  arno
 % removing the average reference with original common reference
 %
@@ -132,7 +135,7 @@ g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'method'     'string'  { 'standard' 'withref' }  '';
                             'refstate'   'string'  { 'common' 'averef' }   'common';
                             'refloc'     'cell'    []          {};
-                            'elocs'      'struct'  []          [] });
+                            'elocs'      {'integer' 'struct'}  []          [] });
 if isstr(g), error(g); end;
 
 chans = size(data,1);
