@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/11/12 16:25:13  scott
+% warning command edit
+%
 % Revision 1.13  2002/10/17 02:35:46  arno
 % handles nan now
 %
@@ -89,10 +92,10 @@ if nargin < 1
 	help pop_envtopo;
 	return;
 end;	
-if isempty( EEG.icasphere )
+if length(EEG) == 1 & isempty( EEG.icasphere )
 	disp('Error: cannot plot without ICA weights. Select Tools > Run ICA.'); return;
 end;
-if isempty(EEG.chanlocs)
+if length(EEG) == 1 & isempty(EEG.chanlocs)
 	fprintf('Cannot plot without channel locations. Select Edit > Dataset info.\n');
 	return;
 end;
@@ -110,16 +113,26 @@ if nargin < 3
                      'Indices of component to subtract from data before plotting' ...
 					 'Plot title:' ...
 			         'Additional spectopo() and topoplot() options:' };
-	inistr       = { [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
-	                 [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)], ...
+	inistr       = { [num2str( EEG(end).xmin*1000) ' ' num2str(EEG(end).xmax*1000)], ...
+	                 [num2str( EEG(end).xmin*1000) ' ' num2str(EEG(end).xmax*1000)], ...
                      '7', ...
 	                 '', ...
                      '', ...
-	                 ['Largest ERP components' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] ...
+	                 ['Largest ERP components' fastif(isempty(EEG(end).setname), '',[' of ' EEG(end).setname])] ...
 	                 '''electrodes'',''off''' };
+    if length(EEG) > 1
+        promptstr = { 'Dataset indices to subtracts (''1 2''=1-2)' promptstr{:} };
+        inistr    = { '2 1' inistr{:} };
+    end;
 	result       = inputdlg2( promptstr, 'Components and ERP envelope -- pop_envtopo()', 1, inistr, 'pop_envtopo');
 	if length(result) == 0 return; end;
 
+    if length(EEG) > 1
+        subindices = eval( [ '[' result{1} ']' ] );
+        result(1) = [];
+        EEG = EEG(subindices(1:2));
+        fprintf('Pop_envtopo: subtracting dataset %d from dataset %d\n', subindices(2), subindices(1));
+    end;
     timerange    = eval( [ '[' result{1} ']' ] );
     options = ',';
 	if ~isempty( result{2} ), options = [ options '''limcontrib'',  [' result{2} '],' ]; end;
@@ -135,9 +148,19 @@ else
 	options = [',' vararg2str( varargin ) ];
 end;
     
-sigtmp = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
-posi = round( (timerange(1)/1000-EEG.xmin) * EEG.srate) + 1;
-posf = round( (timerange(2)/1000-EEG.xmin) * EEG.srate) + 1;
+if length(EEG) > 2
+    error('Can not process more than 2 datasets');
+end;
+
+sigtmp = reshape(EEG(1).data, EEG(1).nbchan, EEG(1).pnts, EEG(1).trials);
+if length(EEG) == 2
+    if ~all(EEG(1).icaweights(:) == EEG(2).icaweights(:))
+        error('The ICA decomposition must be the same for the 2 datasets');
+    end;
+    sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
+end;
+posi = round( (timerange(1)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
+posf = round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
 
 % outputs
 % -------
@@ -147,19 +170,42 @@ if nargin >= 4
     if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
 end;
 
-% plot the datas and generate output command
-% --------------------------------------------
+% generate output command
+% ------------------------
 if length( options ) < 2, options = ''; end;
-varargout{1} = sprintf('figure; pop_envtopo(%s, [%s] %s);', inputname(1), num2str(timerange), ...
-                       options);
+if length(EEG) == 1
+    varargout{1} = sprintf('figure; pop_envtopo(%s, [%s] %s);', inputname(1), num2str(timerange), options);
+else
+    if exist('subindices')
+        varargout{1} = sprintf('figure; pop_envtopo(%s([%s]), [%s] %s);', inputname(1), int2str(subindices), num2str(timerange), options);
+    end;
+end;
+
+% plot the datas
+% --------------
 if any(isnan(sigtmp(:)))
-    com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
-                    '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
-                    '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    disp('NaN detected: using nan_mean');
+    if length(EEG) == 2
+        com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3)-nan_mean(sigtmp2(:,posi:posf,:),3),' ...
+                        'EEG(1).icaweights*EEG(1).icasphere, ' ...
+                        '''chanlocs'', EEG(1).chanlocs, ''icawinv'', EEG(1).icawinv, ''limits'',' ...
+                        '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    else
+        com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
+                        '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
+                        '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    end;
 else    
-    com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
-                    '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
-                    '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    if length(EEG) == 2
+        com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3)-mean(sigtmp2(:,posi:posf,:),3),' ...
+                        ' EEG(1).icaweights*EEG(1).icasphere, ' ...
+                        '''chanlocs'', EEG(1).chanlocs, ''icawinv'', EEG(1).icawinv, ''limits'',' ...
+                        '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    else
+        com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
+                        '''chanlocs'', EEG.chanlocs, ''icawinv'', EEG.icawinv, ''limits'',' ...
+                        '[timerange(1) timerange(2) 0 0] %s);' ] , outstr, options);
+    end;    
 end;
 eval(com);
 
