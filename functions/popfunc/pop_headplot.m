@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/27 00:38:22  arno
+% more optimal auto location
+%
 % Revision 1.13  2002/08/20 00:05:59  arno
 % adding test for plotting a large number of components
 %
@@ -112,12 +115,14 @@ if nargin < 3
 		 switch lower(ButtonName),
 		      case 'cancel', return;
 		      case 'load file', 
-				    [filename, filepath] = uigetfile('*.spl', 'Load a spline file');
+				    [filename, filepath] = uigetfile('*.spl', 'Load a spline file'); 
+                    drawnow;
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
 		            options = [ ', ''load'',' EEG.splinefile ',' ]; 
 		      case 'yes',
 				    [filename, filepath] = uiputfile('*.spl', 'Save spline file with .spl extension');
+                    drawnow;
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
 		            headplot('setup', EEG.chanlocs, EEG.splinefile);

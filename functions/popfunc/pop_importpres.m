@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/07 17:40:24  arno
+% header
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -54,6 +57,7 @@ end;
 if nargin < 2 
 	% ask user
 	[filename, filepath] = uigetfile('*', 'Choose a file from Presentation -- pop_importpres()'); 
+    drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
 end;

@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/13 16:40:23  scott
+% help msg and text edits
+%
 % Revision 1.2  2002/04/23 23:33:14  arno
 % changing last call
 %
@@ -51,6 +54,7 @@ end;
 	
 if nargin < 3
 	[curfilename, curfilepath] = uiputfile('eeglabhist.m', 'Save the EEGLAB session command history with .m extension -- pop_saveh()');
+    drawnow;
 	if curfilename == 0 return; end;
 end;
 
