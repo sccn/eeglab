@@ -10,35 +10,39 @@
 %                        if a single channel number, show location of that 
 %                        channel 	 
 %   		chan_locs  - name of an EEG electrode position file (See
-%                             >> topoplot example   for format.
+%                             >> topoplot example for format). Can also be a
+%                        structure (see >> help pop_editset)
+%
 % Optional Parameters:
 %   'shrink'           - ['on'|'off'|'force'|factor] normalize electrode polar
 %                        coordinates if maximum radius > 0.5 ('on') so that
 %                        maximu radius is 0.5. 'force' normalize radius so 
 %                        that the maximum is 0.5. factor apply a normalizing
-%                        factor (percentage of the maximum). {default = 'on'}.
-%   'colormap'         -  any sized colormap
-%   'interplimits'     - 'electrodes' to furthest electrode 'head' to edge of
-%                         head {default 'head'}
-%   'gridscale'        -  scaling grid size {default 67}
-%   'maplimits'        - 'absmax' +/- the absolute-max 
-%                        'maxmin' scale to data range
-%                         [clim1,clim2] user-definined lo/hi
-%                         {default = 'absmax'}
-%   'style'            - 'straight' colormap only
-%                        'contour' contour lines only
-%                        'both' - both colormap and contour lines
-%                        'fill' - constant color between lines
-%                        'blank' - just plot electrode locations
-%                        {default = 'both'}
-%   'numcontour'       - number of contour lines {default = 6}
-%   'shading'          - 'flat','interp'  {default = 'flat'}
-%   'headcolor'        - Color of head cartoon {default black}
-%   'electrodes'       - 'on','off','labels','numbers','labelpoint','numpoint'
-%   'efontsize'        - detail
-%   'electcolor'       - detail
-%   'emarker'          - detail
-%   'emarkersize'      - detail
+%                        factor (percentage of the maximum). {default = 'off'}.
+%                        Note that the chan_locs structure may have an optional
+%                        shrink field (same format as this parameter).
+%   'colormap'        -  any sized colormap
+%   'interplimits'    - 'electrodes' to furthest electrode 'head' to edge of
+%                        head {default 'head'}
+%   'gridscale'       -  scaling grid size {default 67}
+%   'maplimits'       - 'absmax' +/- the absolute-max 
+%                       'maxmin' scale to data range
+%                        [clim1,clim2] user-definined lo/hi
+%                        {default = 'absmax'}
+%   'style'           - 'straight' colormap only
+%                       'contour' contour lines only
+%                       'both' - both colormap and contour lines
+%                       'fill' - constant color between lines
+%                       'blank' - just plot electrode locations
+%                       {default = 'both'}
+%   'numcontour'      - number of contour lines {default = 6}
+%   'shading'         - 'flat','interp'  {default = 'flat'}
+%   'headcolor'       - Color of head cartoon {default black}
+%   'electrodes'      - 'on','off','labels','numbers','labelpoint','numpoint'
+%   'efontsize'       - detail
+%   'electcolor'      - detail
+%   'emarker'         - detail
+%   'emarkersize'     - detail
 %   'emarkersize1chan' - detail
 %  
 % Eloc_file format:
@@ -73,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/05/01 02:40:10  arno
+% typo
+%
 % Revision 1.6  2002/04/24 17:30:47  arno
 % auto shrink
 %
@@ -134,7 +141,7 @@ EMARKERSIZE = [];     % DEFAULTS SET IN CODE
 EFSIZE = get(0,'DefaultAxesFontSize');
 HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
-shrinkfactor = 'on';
+shrinkfactor = 'off';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -268,6 +275,7 @@ end
 % read the channel location file
 % ------------------------------
 [tmpeloc labels Th Rd] = readlocs(loc_file);
+if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
     
