@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/15 17:05:02  arno
+% drawnow
+%
 % Revision 1.2  2002/08/07 17:40:24  arno
 % header
 %
@@ -62,7 +65,7 @@ if nargin < 2
 	filename = [filepath filename];
 end;
 
-EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, 'align', 0, 'fields', ...
+EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, 'delim', 9, 'align', 0, 'fields', ...
     { 'pres_trial', 'stimulus', 'type', 'latency', 'ttime', 'uncertainty1', 'duration', 'uncertainty2', 'reqtime', 'reqdur' });
 
 command = sprintf('EEG = pop_importpres(%s, ''%s'');', inputname(1), filename); 
