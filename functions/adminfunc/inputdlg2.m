@@ -13,7 +13,7 @@
 %   Same as inputdlg
 %
 % Note: The advantage of this function is that the color of the window
-%       can be changed and that it display an help button. Edit 
+%       can be changed and that it displays an help button. Edit 
 %       supergui to change window options. Also the parameter LineNo
 %       can only be one.
 %
@@ -40,6 +40,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/19 22:21:25  arno
+% new windows
+% size
+%
 % Revision 1.8  2002/08/13 21:42:48  arno
 % undo debug
 %
