@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/06/14 21:38:31  arno
+% handling insert urevent after boundary
+%
 % Revision 1.29  2004/06/14 16:11:16  arno
 % moving check somewhere else
 %
@@ -507,7 +510,6 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           set(gcf, 'userdata', userdata);
           pop_editeventvals('goto', 0);
           
-          
           % update history
           % --------------
           oldcom = { oldcom{:} 'sort' { field1 dir1 field2 dir2 } };
@@ -517,6 +519,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           warndlg2('Sorting done');
       else 
           eventtmp = EEG.event;
+          noeventcheck  = 1; % otherwise infinite recursion with eeg_checkset
       end;
       
     end; % end switch
@@ -531,7 +534,9 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         set(gcf, 'userdata', userdata);
     else
         EEG.event = eventtmp;
-        EEG = eeg_checkset(EEG, 'eventconsistency');
+        if ~exist('noeventcheck')
+            EEG = eeg_checkset(EEG, 'eventconsistency');
+        end;
     end;
     return;
 end;
