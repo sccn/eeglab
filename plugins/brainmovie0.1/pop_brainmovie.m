@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/20 19:08:52  arno
+% searching for besa dipole locations
+%
 % Revision 1.7  2002/11/20 15:33:24  arno
 % more correction, some thanks to cooper
 %
@@ -278,23 +281,25 @@ else
     end;
 end;
         
+% movie title defaults
+% --------------------
+for index = 1:nbconditions
+    alltittles{index} = sprintf('Condition %d', index);
+end;
+if strcmpi(g.diffmovie, 'on')
+    alltitles{3} = 'Cond1 - Cond2';
+end
+alltitles = strvcat(alltitles{:});
+
 % pern10 movie parameters
 % -----------------------
-if isstr(g.movparams) & strcmpi(g.movparams, 'mriside')
-    
+if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
+        
     % -------------------
     % movie from the side
     % -------------------
-    for index = 1:nbconditions
-        alltittles{index} = sprintf('Condition %d', index);
-    end;
-    if strcmpi(g.diffmovie, 'on')
-        alltitles{3} = 'Cond1 - Cond2';
-    end
-    alltitles = strvcat(alltitles{:});
-    alltittles = strvcat(alltitles{:});
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, comps)
+        coordinates = founddipoles(ALLEEG, g.comps);
         coordinates = coordinates(:, [2 3]); % remove X
     else
         coordinates = g.coordinates;
@@ -306,7 +311,6 @@ if isstr(g.movparams) & strcmpi(g.movparams, 'mriside')
                         'ylimaxes', [-1.1 1.1], ...
                         'title', '', ...
                         'rthistloc', [9 9 1.3 1], ...
-                        'envelope', allenv, ...
                         'envylabel', 'uV', ...
                         'visible', 'on', ...
                         'crossfphasespeed', 'off', ...
@@ -320,16 +324,8 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     % ------------------
     % movie from the top
     % ------------------
-    for index = 1:nbconditions
-        alltittles{index} = sprintf('Condition %d', index);
-    end;
-    alltittles = strvcat(alltitles{:});
-    if strcmpi(g.diffmovie, 'on')
-        alltitles{3} = 'Cond1 - Cond2';
-    end
-    
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, comps)
+        coordinates = founddipoles(ALLEEG, g.comps);
         coordinates = coordinates(:, [1 2]); % remove Z
     else
         coordinates = g.coordinates;
@@ -340,7 +336,6 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
                         'ylimaxes', [-1.1 1.1], ...
-                        'envelope', allenv, ...
                         'envylabel', 'uV', ...
                         'rthistloc', [9 9 1.3 1], ...
                         'visible', 'on', ...
@@ -351,17 +346,20 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
                         'condtitleformat', { 'fontsize', 14, 'fontweight', 'bold'}, ...
                         'square', 'off', ...
                         'condtitle', alltittles };
-else 
+elseif isstr(g.movparams)
+    error('Movparams template can only be ''mritop'' and ''mriside''');
+else
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'coordinates', g.coordinates, ...
+    brainmovieoptions = { 'condtitle' alltittles 'coordinates', g.coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
 if ~isempty(g.addmovparams)
     brainmovieoptions = { brainmovieoptions{:} g.addmovparams };
 end;
+
 % data enveloppe
 % --------------
 for index = 1:nbconditions
@@ -460,15 +458,30 @@ function coordinates = founddipoles(ALLEEG, comps)
     if ~isfield(ALLEEG, 'sources')
         error('Field ''sources'' containing dipole location does not exist');
     end;
+    
+    % searching sources
+    % -----------------
+    indexeeg = find(~cellfun('isempty', { ALLEEG.sources }));
+    indexeeg = indexeeg(1);
+    fprintf('Found besa sources in dataset number %d\n', indexeeg);
+    
+    if ~isfield(ALLEEG(indexeeg).sources, 'X')
+        fprintf('No 3-D coordinates found, running besaplot ...\n');
+        ALLEEG(indexeeg).sources = besaplot(ALLEEG(indexeeg).sources);
+        close;
+    end;        
+    
+    % scanning components
+    % -------------------
     for index = 1:length(comps)
-        indexcomp = find(cell2mat({ALLEEG(1).sources.component}) == comps(index))
-        if isempty(indexomp)
+        indexcomp = find(cell2mat({ALLEEG(indexeeg).sources.component}) == comps(index));
+        if isempty(indexcomp)
             error(['Component ' int2str( comps(index) ) ' not found in the besa equivalent dipole strcuture']);
         end;
-        if length(indexomp) > 1
+        if length(indexcomp) > 1
             error(['Warning: 2 equivalent dipoles found for component ' int2str( comps(index) ) ': only considering the first one']);
         end;            
-        coordinates(index,1) = EEG.sources(indexcomp(1)).X;
-        coordinates(index,2) = EEG.sources(indexcomp(1)).Y;
-        coordinates(index,3) = EEG.sources(indexcomp(1)).Z;
+        coordinates(index,1) = ALLEEG(indexeeg).sources(indexcomp(1)).X;
+        coordinates(index,2) = ALLEEG(indexeeg).sources(indexcomp(1)).Y;
+        coordinates(index,3) = ALLEEG(indexeeg).sources(indexcomp(1)).Z;
     end;
