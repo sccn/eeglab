@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.172  2004/03/23 15:20:39  scott
+% made only 2 outputs
+%
 % Revision 1.171  2004/03/23 00:40:06  scott
 % clarifying handling of un-located channels
 %
@@ -538,6 +541,7 @@ if nargs == 1
                'head center and are plotted outside the head cartoon.\n'....
                'Option plotrad controls how much of this lower-head "skirt" is shown.\n',...
                'Option headrad controls if and where the cartoon head will be drawn.\n',...
+               'Option intrad controls how many channels will be included in the interpolation.\n',...
                ])
       return
     end
@@ -701,7 +705,7 @@ elseif r==1 & c==1
   STYLE = 'blank'; % plot channels only, marking the indicated channel number
 end
 
-if intrad<plotrad
+if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
    error('intrad must be >= plotrad');
 end
 
@@ -763,6 +767,7 @@ if isempty(plotrad) & isfield(tmpeloc, 'plotrad'),
 end;
 if isempty(plotrad) 
   plotrad = min(1.0,max(Rd)*1.02);            % default: just outside the outermost electrode location
+  plotrad = max(plotrad,0.5);                 % default: plot out to the 0.5 head boundary
 end                                           % don't plot channels with Rd > 1 (below head)
 if isempty(intrad) 
   intrad = min(1.0,max(Rd)*1.02);             % default: just outside the outermost electrode location
