@@ -56,8 +56,8 @@
 %                 { default 0: no shuffling }.
 %
 %    Optional Detrend:
-%       'detret' = ['on'|'off'], Linearly detrend data within epochs. {'off'}
-%       'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
+%       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
+%       'rmerp'     = ['on'|'off'], Remove epoch mean from data epochs {'off'}
 %
 %    Optional FFT/DFT:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/05/21 02:06:34  arno
+% debug for conditions
+%
 % Revision 1.50  2003/05/20 22:29:03  arno
 % lowmem for 2condition debug
 %
@@ -616,8 +619,8 @@ try, g.rboot;      catch, g.rboot = []; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
 try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
-try, g.detrep;     catch, g.detrep = 'off'; end;
-try, g.detret;     catch, g.detret = 'off'; end;
+try, g.detrend;    catch, g.detrend = 'off'; end;
+try, g.rmerp;      catch, g.rmerp = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
@@ -637,11 +640,14 @@ try, g.savecoher;  catch, g.savecoher = 0; end;
 try, g.noinput;    catch, g.noinput = 'no'; end;
 try, g.lowmem;     catch, g.lowmem = 'off'; end;
 
+if isfield(g, 'detret'), g.detrend = g.detret; end;
+if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
+
 allfields = fieldnames(g);
 for index = 1:length(allfields)
 	switch allfields{index}
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
-		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
+		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' ...
 		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
@@ -655,8 +661,8 @@ g.srate   = Fs;
 g.cycles  = varwin;
 g.type       = lower(g.type);
 g.boottype   = lower(g.boottype);
-g.detrep     = lower(g.detrep);
-g.detret     = lower(g.detret);
+g.rmerp     = lower(g.rmerp);
+g.detrend     = lower(g.detrend);
 g.plotphase  = lower(g.plotphase);
 g.plotbootsub = lower(g.plotbootsub);
 g.subitc     = lower(g.subitc);
@@ -945,7 +951,7 @@ end;
 
 % detrend over epochs (trials) if requested
 % -----------------------------------------
-switch g.detrep
+switch g.rmerp
 case 'on'
    X = reshape(X, g.frame, length(X)/g.frame);
    X = X - mean(X,2)*ones(1, length(X(:))/g.frame);
@@ -981,7 +987,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% compute time frequency decompositions
 	% -------------------------------------
     spectraloptions = { 'timesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
-                g.detret, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
+                g.detrend, 'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
                 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
 
     fprintf('\nProcessing first input\n');

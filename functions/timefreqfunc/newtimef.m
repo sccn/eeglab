@@ -39,8 +39,8 @@
 %                      as the phase coupling factor           {'phasecoher'}.
 %
 %    Optional Detrending:
-%       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across trialsk {'off'}
+%       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
+%       'rmerp'     = ['on'|'off'], Remove epoch mean from data epochs {'off'}
 %
 %    Optional FFT/DFT Parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/05/21 02:26:16  arno
+% debug condition
+%
 % Revision 1.30  2003/05/20 22:29:05  arno
 % lowmem for 2condition debug
 %
@@ -540,8 +543,8 @@ try, g.pboot;      catch, g.pboot = NaN; end;
 try, g.rboot;      catch, g.rboot = NaN; end;
 try, g.plotersp;   catch, g.plotersp = 'on'; end;
 try, g.plotitc;    catch, g.plotitc  = 'on'; end;
-try, g.detrep;     catch, g.detrep = 'off'; end;
-try, g.detret;     catch, g.detret = 'off'; end;
+try, g.detrend;    catch, g.detrend = 'off'; end;
+try, g.rmerp;      catch, g.rmerp = 'off'; end;
 try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
@@ -563,6 +566,9 @@ g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;        
+
+if isfield(g, 'detret'), g.detrend = g.detret; end;
+if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -703,13 +709,13 @@ switch lower(g.plotitc)
     case { 'on', 'off' }, ;
     otherwise error('plotitc must be either on or off');
 end;
-switch lower(g.detrep)
+switch lower(g.rmerp)
     case { 'on', 'off' }, ;
-    otherwise error('detrep must be either on or off');
+    otherwise error('rmerp must be either on or off');
 end;
-switch lower(g.detret)
+switch lower(g.detrend)
     case { 'on', 'off' }, ;
-    otherwise error('detret must be either on or off');
+    otherwise error('detrend must be either on or off');
 end;
 switch lower(g.phsamp)
     case { 'on', 'off' }, ;
@@ -952,7 +958,7 @@ end
 % -----------------------------------------
 % detrend over epochs (trials) if requested
 % -----------------------------------------
-if strcmpi(g.detrep, 'on')
+if strcmpi(g.rmerp, 'on')
     X = X - mean(X,2)*ones(1, length(X(:))/g.frame);
 end;        
 
@@ -961,7 +967,7 @@ end;
 % ----------------------------------------------------
 g.subitc = 'off';
 [alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
-                                'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
+                                'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                 g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                       'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, 'nfreqs', g.nfreqs); 
 P  = mean(alltfX.*conj(alltfX), 3); % power
