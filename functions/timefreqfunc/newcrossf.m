@@ -49,7 +49,9 @@
 %                 {default: 'phasecoher'}. Note that for amplitude correlation,
 %                 the significance threshold is computed using the corrcoef
 %                 function, so can be set arbitrary low without increase in
-%                 computation load.
+%                 computation load. An additional type is 'crossspec' to compute
+%                 cross-spectrum between 2 processes (single-trial). This type
+%                 is automatically selected if user enter continuous data.
 %       'amplag' = [integer vector] allow to compute non 0 amplitude correlation 
 %                 (using option 'amp' above). The vector given as parameter 
 %                 indicates the point lags ([-4 -2 0 2 4] would compute the 
@@ -99,11 +101,6 @@
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
-%       'baseline'  = Coherence baseline end latency (ms). {0} This parameter
-%                     affects the 'mcoh' output and the bootstrap estimation. 
-%                     Use NaN to include the full epoch in the baseline. 
-%       'powbase'   = Baseline spectrum to log-subtract. {Default: mean 
-%                     spectrum of the baseline data}
 %       'lowmem'    = ['on'|'off'] {'off'} Compute frequency by frequency to 
 %                     save memory. 
 %
@@ -117,9 +114,12 @@
 %                    ('trials'). Option 'times' is not recommended but requires 
 %                    less memory and provide similar results to other options.
 %                    {default: 'timestrials'}
-%       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
-%                    If no baseline is given (NaN), extent of bootstrap shuffling 
-%                    is the whole epoch  {default: 0}
+%       'baseboot'  = Coherence baseline bootstrap end latency (ms). {0} This 
+%                     parameter affects the 'mcoh' output and the bootstrap estimation. 
+%                     Use NaN to include the full epoch in the baseline. A range
+%                     [min max] may also be entered. You may finally enter 
+%                     one row per region for baseline e.g. [0 100; 300 400] 
+%                     considers the window 0 to 100 ms and 300 to 400 ms. 
 %       'condboot' = ['abs'|'angle'|'complex'] In comparing two conditions,
 %                    either subtract complex spectral values' absolute vales 
 %                    ('abs'), angles ('angles') or the complex values themselves
@@ -152,6 +152,7 @@
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
 %       mcoh        = Vector of mean baseline coherence at each frequency
+%                     see 'baseboot' parameter.
 %       timesout    = Vector of output latencies (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
@@ -200,6 +201,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2004/04/29 17:43:57  arno
+% debug scaling for amp
+%
 % Revision 1.66  2004/04/29 16:55:26  arno
 % implementing amplitude correlation
 %
@@ -597,8 +601,8 @@ DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= 'Event-Related Coherence';			% Figure title
 DEFAULT_ALPHA   = NaN;			% Default two-sided significance probability threshold
 
-disp('WARNING: this function is not part of the EEGLAB toolbox and should not be distributed');
-disp('         you must contact Arnaud Delorme (arno@salk.edu) for terms of use');
+%disp('WARNING: this function is not part of the EEGLAB toolbox and should not be distributed');
+%disp('         you must contact Arnaud Delorme (arno@salk.edu) for terms of use');
 
 if (nargin < 2)
    help newcrossf
@@ -683,14 +687,12 @@ try, g.elocs;      catch, g.elocs = ''; end;
 try, g.alpha;      catch, g.alpha = DEFAULT_ALPHA; end;  
 try, g.marktimes;  catch, g.marktimes = []; end; % default no vertical lines
 try, g.marktimes = g.vert;       catch, g.vert = []; end; % default no vertical lines
-try, g.powbase;    catch, g.powbase = nan; end;
 try, g.rboot;      catch, g.rboot = []; end;
 try, g.plotamp;    catch, g.plotamp = 'on'; end;
 try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
 try, g.detrend;    catch, g.detrend = 'off'; end;
 try, g.rmerp;      catch, g.rmerp = 'off'; end;
-try, g.baseline;   catch, g.baseline = 0; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
@@ -717,7 +719,7 @@ allfields = fieldnames(g);
 for index = 1:length(allfields)
 	switch allfields{index}
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
-		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
+		  'marktimes' 'vert' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'rmerp' 'detret' 'detrend' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' 'lowmem' ...
 		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' 'newfig' 'freqs' 'nfreqs' 'freqscale' 'amplag' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
@@ -727,6 +729,9 @@ end;
 
 g.tlimits = tlimits;
 g.frame   = frame;
+if ~iscell(X) g.trials = prod(size(X))/g.frame;
+else          g.trials = prod(size(X{1}))/g.frame;
+end;
 g.srate   = Fs;
 g.cycles  = varwin;
 g.type       = lower(g.type);
@@ -741,7 +746,14 @@ g.compute    = lower(g.compute);
 g.AXES_FONT  = 10;
 g.TITLE_FONT = 14;
 
+% change type if necessary
+if g.trials == 1 & ~strcmpi(g.type, 'crossspec')
+    disp('Continuous data: switching to crossspectrum');
+    g.type = 'crossspec';
+end;
+
 % reshape 3D inputs
+% -----------------
 if ndims(X) == 3
     X = reshape(X, size(X,1), size(X,2)*size(X,3));
     Y = reshape(Y, size(Y,1), size(Y,2)*size(Y,3));
@@ -755,6 +767,7 @@ if strcmpi(g.title, DEFAULT_TITLE)
      case 'phasecoher',  g.title	= 'Event-Related Phase Coherence';		
      case 'phasecoher2', g.title	= 'Event-Related Phase Coherence 2';			
      case 'amp'  ,       g.title	= 'Event-Related Amplitude Correlation';		
+     case 'crossspec',   g.title	= 'Event-Related Amplitude Correlation';		
     end;
 end;
 
@@ -787,13 +800,6 @@ end
 if g.alpha>0.5 | g.alpha<=0
    error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
-if ~isnan(g.alpha)
-   if g.baseboot > 0
-      fprintf('Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
-   else
-      fprintf('Bootstrap analysis will use data in all subwindows.\n')
-   end
-end
 switch lower(g.newfig)
     case { 'on', 'off' }, ;
     otherwise error('newfig must be either on or off');
@@ -803,8 +809,8 @@ case { 'ms', 'deg' },;
 otherwise error('Angleunit must be either ''deg'' or ''ms''');
 end;    
 switch g.type
-case { 'coher', 'phasecoher' 'phasecoher2' 'amp' },;
-otherwise error('Type must be either ''coher'', ''phasecoher'', or ''amp''');
+case { 'coher', 'phasecoher' 'phasecoher2' 'amp' 'crossspec' },;
+otherwise error('Type must be either ''coher'', ''phasecoher'', ''crossspec'', or ''amp''');
 end;    
 switch g.boottype
 case { 'times' 'timestrials' 'timestrials2' 'trials'},;
@@ -967,6 +973,9 @@ if iscell(X)
           
          case 'amp' % amplitude correlation
 		  error('Cannot compute difference of amplitude correlation images yet');
+         
+         case 'crossspec' % amplitude correlation
+		  error('Cannot compute difference of cross-spectral decomposition');
           
          case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
@@ -1051,12 +1060,13 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%
 % display text to user
 %%%%%%%%%%%%%%%%%%%%%%
-trials    = length(X)/g.frame;
 fprintf('\nComputing the Event-Related \n');
 switch g.type
-    case 'phasecoher',  fprintf('Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',       fprintf('Linear Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher',  fprintf('Phase Coherence (ITC) images based on %d trials\n',g.trials);
+    case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images based on %d trials\n',g.trials);
+    case 'coher',       fprintf('Linear Coherence (ITC) images based on %d trials\n',g.trials);
+    case 'amp',         fprintf('Amplitude correlation images based on %d trials\n',g.trials);
+    case 'crossspec',   fprintf('Cross-spectral images based on %d trials\n',g.trials);
 end;
 if ~isnan(g.alpha)
    fprintf('Bootstrap confidence limits will be computed based on alpha = %g\n', g.alpha);
@@ -1078,15 +1088,15 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
     spectraloptions = { 'ntimesout', g.timesout, 'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', ...
                 g.detrend, 'subitc', g.subitc, 'wavelet', g.cycles, 'padratio', g.padratio, ...
                 'freqs' g.freqs 'freqscale' g.freqscale 'nfreqs' g.nfreqs };
-    if ~strcmpi(g.type, 'amp')
+    if ~strcmpi(g.type, 'amp') & ~strcmpi(g.type, 'crossspec')
         spectraloptions = { spectraloptions{:} 'itctype' g.type };
     end;
 
     fprintf('\nProcessing first input\n');
-	X = reshape(X, g.frame, trials);
+	X = reshape(X, g.frame, g.trials);
 	[alltfX freqs timesout] = timefreq(X, g.srate, spectraloptions{:});
     fprintf('\nProcessing second input\n');
-	Y = reshape(Y, g.frame, trials);
+	Y = reshape(Y, g.frame, g.trials);
 	[alltfY] = timefreq(Y, g.srate, spectraloptions{:});
     
 	% ------------------
@@ -1094,6 +1104,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% ------------------
 	tmpprod = alltfX .* conj(alltfY);
 	switch g.type
+	 case 'crossspec',
+	  coherres = alltfX .* conj(alltfY); % no normalization
+      
 	 case 'coher',
 	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(alltfX .* conj(alltfY), 3) ./ sqrt( sum(abs(alltfX).^2,3) .* sum(abs(alltfY).^2,3) );
@@ -1111,7 +1124,7 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	 
      case 'phasecoher',
 	  coherresout = alltfX .* conj(alltfY);
-	  coherres = sum( coherresout ./ abs(coherresout), 3) / trials;
+	  coherres = sum( coherresout ./ abs(coherresout), 3) / g.trials;
 	end;
 	
 	% -----------------
@@ -1122,6 +1135,10 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	else
 		formulaout = 'coher';
 		switch g.type
+		 case 'crossspec',
+		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
+		  formula =     [ 'coher  = coher  + arg1.*conj(arg2);' ];
+		  formulapost =   ''; 
 		 case 'coher',
 		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
 						  'cumulX = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ...
@@ -1149,15 +1166,38 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		 case 'phasecoher',
 		  formulainit = [ 'coher  = zeros(' int2str(length(freqs)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'tmpprod = arg1.*conj(arg2); coher = coher + tmpprod ./ abs(tmpprod)';
-		  formulapost = [ 'coher = coher /' int2str(trials) ];
+		  formulapost = [ 'coher = coher /' int2str(g.trials) ];
 		end;
 		
 		if ~isnan(g.alpha)
-            if g.baseboot == 0
-                baselnboot = find(timesout < g.baseline);
-            else
+            % finding baseline for bootstrap
+            % ------------------------------
+            if size(g.baseboot,2) == 2
                 baselnboot = [];
+                for index = 1:size(g.baseboot,1)
+                    tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                    baselnboot = union(baselnboot, tmptime);
+                end;
+                if length(baselnboot)==0
+                    error('No point found in baseline');
+                end;
+            else
+                if ~isempty(find(timesout < g.baseboot))
+                    baselnboot = find(timesout < g.baseboot); % subtract means of pre-0 (centered) windows
+                else
+                    baselnboot = 1:length(timesout); % use all times as baseboot
+                    fprintf('   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
+                    g.baseboot = timesout(end);
+                end
             end;
+            if length(g.baseboot) == 2
+                fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', ...
+                         g.baseboot(1),  g.baseboot(2));
+            elseif g.baseboot
+                fprintf('   %d bootstrap windows in baseline (times<%g).\n',...
+                         length(baseln), g.baseboot)
+            end;        
+
             options = { formula, 'boottype', g.boottype, ...
                         'formulapost', formulapost, 'formulainit', formulainit, ...
                         'formulaout', formulaout, 'bootside', 'upper', ...
@@ -1174,24 +1214,24 @@ end;
 %%%%%%%%%%
 % baseline
 %%%%%%%%%%
-if ~isnan(g.baseline)
-   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-   if isempty(baseln)
-      baseln = 1:length(timesout); % use all times as baseline
-      disp('Bootstrap baseline empty, using the whole epoch');
-   end;
-   baselength = length(baseln);
-else
-   baseln = 1:length(timesout); % use all times as baseline
-   baselength = length(timesout); % used for bootstrap
-end;
-if ~isnan(g.baseline)
-   if length(baseln) == length(timesout), fprintf('\nUsing full time range as baseline\n');
-   else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
-   end;
-else fprintf('\nNo baseline time range specified.\n');	
-end;
-mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
+%if ~isnan(g.baseline)
+%   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+%   if isempty(baseln)
+%      baseln = 1:length(timesout); % use all times as baseline
+%      disp('Bootstrap baseline empty, using the whole epoch');
+%   end;
+%   baselength = length(baseln);
+%else
+%   baseln = 1:length(timesout); % use all times as baseline
+%   baselength = length(timesout); % used for bootstrap
+%end;
+%if ~isnan(g.baseline)
+%   if length(baseln) == length(timesout), fprintf('\nUsing full time range as baseline\n');
+%   else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
+%   end;
+%else fprintf('\nNo baseline time range specified.\n');	
+%end;
+mbase = mean(abs(coherres(:,:)'));     % mean baseline coherence magnitude
 
 % plot everything
 % ---------------
