@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 02/15/02 modified function according to new event structure -ad
 
@@ -104,47 +107,59 @@ end;
 if ~isfield( EEG.event, fieldname)
     disp(['Getepochevent: no ''' fieldname ''' field in events, abord']); return;
 end;
-EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % deal with empty types
 % ---------------------
-if isempty(type)
-    type = unique( { EEG.event.type } );
+if ~isempty(type) & ~iscell(type)
+	type = { type };
 end;
 
 % convert types
 % -------------
 for indextype=1:length(type)
-     if isstr(type{indextype})
-         if ~isempty(str2num(type{indextype}))   type{indextype} = str2num(type{indextype}); end;
-     end;
- end;
+     if isstr(type{indextype}) & isnumeric(EEG.event(1).type)
+         if ~isempty(str2num(type{indextype}))   
+			 type{indextype} = str2num(type{indextype}); 
+		 else
+			 error('eeg_getepochevent: string type can not be found in numeric event type array');
+		 end;		 
+	 elseif isnumeric(type{indextype}) & isstr(EEG.event(1).type)
+		  type{indextype} = num2str(type{indextype});
+	 end;
+end;
 
 % select epochs
 % -------------
-epochval = zeros(1,EEG.trials); epochval(:) = nan;
-for index = 1:length(EEG.event)
-    epoch = EEG.event(index).epoch;
-
-    for indextype=1:length(type)
-        typeval = type{indextype};
-        test = 0;
-        if isstr(typeval) & isstr(EEG.event(index).type)
-            if ~isempty(strmatch(typeval, EEG.event(index).type)), test = 1; end;
-        elseif isnumeric(typeval) & isnumeric(EEG.event(index).type)
-	        if typeval == EEG.event(index).type,  test = 1; end;
-	    end;
-	    if test           
-            if isnan(epochval(epoch))
-                switch fieldname,
-                     case 'latency', 
-                        epochval(epoch) = (mod(EEG.event(index).latency-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000;
-                     otherwise, eval( ['epochval(epoch) = EEG.event(index).' fieldname ';']);
-                end;    
-             else
-                disp(['Getepochevent warning: more than one event selected in epoch ' int2str(epoch) ' -- only the field value for the first event returned']);
-            end;
-        end;    
-    end;
+if ~isempty(type)
+	Ieventtmp = [];
+	for indextype=1:length(type)
+		typeval = type{indextype};
+		test = 0;
+		if isstr(typeval)
+			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type })' ];
+		else
+			Ieventtmp = [Ieventtmp find(typeval == cell2mat({ EEG.event.type })) ];
+		end;
+	end;
+else
+	Ieventtmp = [1:length(EEG.event)];
 end;
-           
+
+epochval = zeros(1,EEG.trials); epochval(:) = nan;
+if strcmp(fieldname, 'latency')
+	for index = 1:length(Ieventtmp)
+		epoch = EEG.event(Ieventtmp(index)).epoch;
+		if isnan(epochval(epoch))
+			epochval(epoch) = (mod(EEG.event(Ieventtmp(index)).latency-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000;
+		else
+			disp(['Getepochevent warning: more than one event selected in epoch ' int2str(epoch) ' -- only the field value for the first event returned']);
+		end;
+	end;
+else
+	for index = 1:length(Ieventtmp)
+		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+		if ~isempty(val)
+			epochval(EEG.event(Ieventtmp(index)).epoch) = val;
+		end;
+	end;
+end;    
