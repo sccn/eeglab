@@ -1,6 +1,6 @@
-% convertelocs() - Convert between frames for electrode locations
+% convertlocs() - Convert between frames for electrode locations
 %
-% Usage: >> newchans = convertelocs( EEG, 'command');
+% Usage: >> newchans = convertlocs( EEG, 'command');
 %
 % Input:
 %   chanlocs  - EEGLAB dataset or EEG.chanlocs structure
@@ -22,7 +22,7 @@
 % Outputs:
 %   newchans      - new EEGLAB channel locations structure
 %
-% Ex:  CHANSTRUCT = convertelocs( CHANSTRUCT, 'cart2topo'
+% Ex:  CHANSTRUCT = convertlocs( CHANSTRUCT, 'cart2topo'
 %        % Convert Cathesian coordinates to topographical ones
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002
@@ -48,11 +48,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/12/24 01:24:30  arno
+% Initial revision
+%
 
-function chans = convertelocs(chans, command);
+function chans = convertlocs(chans, command);
 
 if nargin < 1
-   help convertelocs;
+   help convertlocs;
    return;
 end;
 
@@ -93,16 +96,16 @@ case 'topo2sph',
       chans(index).sph_radius = 1;
    end;
 case 'topo2sphbesa',
-   chans = convertelocs(chans, 'topo2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
 case 'topo2cart'
-   chans = convertelocs(chans, 'topo2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
    disp('Warning: spherical coordinates automatically updated');
-   chans = convertelocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
 case 'topo2all',
-   chans = convertelocs(chans, 'topo2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2sphbesa'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
 case 'sph2cart',
    [x y z] = sph2cart(cell2mat({chans.sph_theta})'/180*pi, cell2mat({chans.sph_phi})'/180*pi, cell2mat({chans.sph_radius})');
    for index = 1:length(chans)
@@ -127,9 +130,9 @@ case 'sph2sphbesa',
       chans(index).sph_phibesa    = sph_phibesa  (index);
    end;   
 case 'sph2all',
-   chans = convertelocs(chans, 'sph2topo'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2sphbesa'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
 case 'sphbesa2sph',
    % using polar coordinates
    [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 1);
@@ -139,20 +142,20 @@ case 'sphbesa2sph',
       chans(index).sph_phi    = sph_phi  (index);
    end;
 case 'sphbesa2topo',
-   chans = convertelocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2topo'); % search for spherical coords
+   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
 case 'sphbesa2cart',
-   chans = convertelocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2cart'); % search for spherical coords   
+   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords   
 case 'sphbesa2all',
-   chans = convertelocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2all'); % search for spherical coords
+   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2all'); % search for spherical coords
 case 'cart2topo',
-   chans = convertelocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2topo'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
 case 'cart2sphbesa',
-   chans = convertelocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
 case 'cart2sph',
 	[th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
 	for index = 1:length(chans)
@@ -161,6 +164,6 @@ case 'cart2sph',
 		 chans(index).sph_radius    = radius(index);
 	end;
 case 'cart2all',
-   chans = convertelocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertelocs(chans, 'sph2all'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2all'); % search for spherical coords
 end;

@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/12/24 01:25:27  arno
+% Initial revision
+%
 
 function writelocs( chans, filename, varargin ); 
 
@@ -95,7 +98,7 @@ if nargin < 2
 	return;
 end;
 
-chans = convertelocs(chans, 'auto');
+chans = convertlocs(chans, 'auto');
 
 % get infos from readlocs
 % -----------------------
