@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/10/17 01:49:49  arno
+% title check
+%
 % Revision 1.11  2002/10/15 23:02:28  arno
 % time limits warning
 %
@@ -816,11 +819,11 @@ end;
 g.subitc = 'off';
 fprintf('\nProcessing trial (of %d):',trials);
 [alltfX freqs times R] = timefreq(X, g.srate, 'timesout', g.timesout, 'winsize', g.winsize, ...
-                                'tlimits', g.tlimits, 'detrend', g.detret, 'itctype', ...
+                                'tlimits', g.tlimits, 'maxfreq', g.maxfreq, 'detrend', g.detret, 'itctype', ...
                                 g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], 'padratio', g.padratio); 
-nb_points = size(alltfX,1);
 dispf     = find(freqs <= g.maxfreq);
 freqs = freqs(dispf);
+if size(alltfX,1) ~=length(dispf), alltfX = alltfX(dispf,:,:); R = R(dispf,:); end;
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
 % ----------------
@@ -882,22 +885,22 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 		formulaout = { 'power' 'itc' };
 		switch g.type
 		 case 'coher',
-		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'power   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'cumul   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + arg2.*conj(arg2);';
 		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
 						  'itc     = itc ./ sqrt(cumul) /' int2str(trials) ];
 		 case 'phasecoher',
-		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'power   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2;';
 		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
 						  'itc     = itc /' int2str(trials) ];
 		 case 'phasecoher2',
-		  formulainit = [ 'power   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'itc     = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ...
-						  'cumul   = zeros(' int2str(nb_points) ',' int2str(g.naccu) ');' ];
+		  formulainit = [ 'power   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'itc     = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ...
+						  'cumul   = zeros(' int2str(length(dispf)) ',' int2str(g.naccu) ');' ];
 		  formula     =   'power   = power + arg1.*conj(arg1); itc   = itc + arg2; cumul = cumul + sqrt(arg2.*conj(arg2));';
 		  formulapost = [ 'power   = power /' int2str(trials) ';' ...
 						  'itc     = itc ./ cumul;' ];
