@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/08/22 17:01:14  arno
+% debugging for 1 plot
+%
 % Revision 1.15  2002/08/20 00:05:38  arno
 % adding test for plotting a large number of components
 %
@@ -214,7 +217,7 @@ for index = 1:size(arg2(:),1)
 			else	
 				eval( [ 'topoplot( SIGTMPAVG(:,index), EEG.chanlocs, ''maplimits'', maplimits' options ');' ] );
 			end;
-			if nbgraph == 1, title( topotitle );
+			if nbgraph == 1, title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else title([int2str(arg2(index)) ' ms']);
 			end;
 		else
@@ -231,7 +234,7 @@ for index = 1:size(arg2(:),1)
 	    			eval( [ 'topoplot(  EEG.icawinv(:, arg2(index)), EEG.chanlocs' options ');' ]);
 	            end;    			
 			end;
-			if nbgraph == 1, title( topotitle );
+			if nbgraph == 1, title( [ 'IC ' int2str(arg2(index)) ' from ' topotitle] );
 			else title(['' int2str(arg2(index))]);
 			end;
 		end;
