@@ -24,6 +24,8 @@
 %                opposite for lower bound. Given values are also consider
 %                outlier (if equal the trial is rejected). Default: none.
 %   'verbose'    - ['yes'|'no']. Default is 'yes'.
+%   'newname'    - 'string'. Default is (if parent dataset name not empty)
+%                "Epoched from "[old dataset name]" dataset" 
 %   'eventindices' - [indices], use event indices to epoch data
 %   'epochinfo'  - ['yes'|'no']. Propagate all events information into the
 %                the epoch structure. Default is 'yes'.
@@ -55,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/10 02:42:22  arno
+% debuging event selection
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -89,9 +94,10 @@ if nargin < 3
    promptstr    = { [ 'Enter time-locking event type(s) ([]=all):' 10 ...
                     '(use ''/Edit/Edit event values'' to scan type values)'], ...
                     'Epoch [start, end] in seconds (e.g. [-1 2]):', ... 
+                    'Name of the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits, [min max] ([]=none):'  };
 
-   inistr       = { '', '[-1 2]', '', 'yes' };
+   inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '" dataset' ]), '' };
    result       = inputdlg( promptstr, 'Extract epochs -- pop_epochs', 1,  inistr);
    size_result  = size( result );
    if size_result(1) == 0 return; end;
@@ -100,7 +106,8 @@ if nargin < 3
    lim = eval( [ '[' result{2} ']' ] );
 
    args = {};
-   if ~isempty( result{3} ),  args = { args{:}, 'valuelim', eval( [ '[' result{3} ']' ] ) }; end;
+   if ~isempty( result{3} ),  args = { args{:}, 'newname', result{3} }; end;
+   if ~isempty( result{4} ),  args = { args{:}, 'valuelim', eval( [ '[' result{4} ']' ] ) }; end;
    args = { args{:}, 'epochinfo', 'yes' };
  
 else % no interactive inputs
@@ -121,6 +128,7 @@ end;
 try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end;
 try, g.verbose; 	      catch, g.verbose = 'on'; end;
+try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '" dataset' ]); end;
 try, g.eventindices;      catch, g.eventindices = []; end;
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end;
 try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [-Inf Inf]; end;
@@ -182,6 +190,13 @@ EEG.xmax = lim(2)-1/EEG.srate;
 EEG.pnts = size(EEG.data,2);
 EEG.trials = size(EEG.data,3);
 EEG.icaact = [];
+if ~isempty(EEG.setname)
+	if ~isempty(EEG.comments)
+		EEG.comments = strvcat(['Comment of parent dataset ' EEG.setname ': ----------'], EEG.comments);
+	end;
+	EEG.comments = strvcat(['Parent dataset: ' EEG.setname ], ' ', EEG.comments);
+end;
+EEG.setname = g.newname;
 
 % modify the event structure accordingly (latencies and add epoch field)
 % ----------------------------------------------------------------------
