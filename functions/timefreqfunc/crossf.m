@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2002/08/09 22:29:42  arno
+% implementing wavelet factor
+%
 % Revision 1.41  2002/07/26 00:27:56  arno
 % significance for all plots
 %
@@ -748,8 +751,8 @@ tmpsaveall = (~isnan(g.alpha) & isnan(g.rboot) & strcmp(g.memory, 'high')) ...
                  | (strcmp(g.subitc, 'on') & strcmp(g.memory, 'high'));
 trials = length(X)/g.frame;
 if ~strcmp(lower(g.compute), 'c')
-   Tfx = tfinit(X, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, tmpsaveall);
-   Tfy = tfinit(Y, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, tmpsaveall);
+   Tfx = tfinit(X, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
+   Tfy = tfinit(Y, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
    Coher     = coherinit(Tfx.nb_points, trials, g.timesout, g.type);
    Coherboot = coherinit(Tfx.nb_points, trials, g.naccu   , g.type);
    Boot      = bootinit( Coherboot, Tfx.nb_points, g.timesout, g.naccu, baselength, g.baseboot, g.boottype, g.alpha, g.rboot);
@@ -1152,7 +1155,7 @@ end;
 % function for time freq initialisation
 % -------------------------------------
 function Tf = tfinit(X, timesout, winsize, ...
-   cycles, frame, padratio, detret, srate, maxfreq, subitc, type, saveall);
+   cycles, frame, padratio, detret, srate, maxfreq, subitc, type, cyclesfact, saveall);
 Tf.X         = X(:)'; % make X column vectors
 Tf.winsize   = winsize;
 Tf.cycles    = cycles;
@@ -1169,7 +1172,7 @@ if (Tf.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
    Tf.nb_points = padratio*winsize/2;   
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
    Tf.freqs = srate*cycles/winsize*[2:2/padratio:winsize]/2;
-   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,g.cyclesfact);
+   Tf.win = dftfilt(winsize,maxfreq/srate,cycles,padratio,cyclesfact);
    Tf.nb_points = size(Tf.win,2);
 end;
 Tf.tmpalltimes = zeros(Tf.nb_points, timesout);
