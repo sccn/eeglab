@@ -1,6 +1,5 @@
 % pop_mergeset() - Merge two datasets. If only one argument is given,
 %                  a window pops up to ask for other arguments.
-%
 % Usage:
 %   >> OUTEEG = pop_mergeset( INEEG1, INEEG2, keepall);
 %   >> OUTEEG = pop_mergeset( ALLEEG ); % pop_up window
@@ -41,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/01/24 19:43:50  arno
+% same
+%
 % Revision 1.12  2003/01/24 19:41:35  arno
 % debugging ?
 % /
@@ -97,7 +99,7 @@ if nargin < 2 & length(INEEG1) == 1
 end;
 
 if nargin == 1
-	promptstr    = { 'Enter dataset numbers to merge', ...
+	promptstr    = { 'Dataset indices to merge', ...
 					 'Preserve ICA of the first dataset ?' };
 	inistr       = { '1', 'no' };
 	result       = inputdlg2( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr, 'pop_mergeset');
@@ -119,7 +121,7 @@ fprintf('Merging datasets...\n');
 if ~isstruct(INEEG2)
 	indices = INEEG2;
 	if length(indices) < 2
-		error('Pop_merge: need at least 2 datasets');
+		error('Pop_merge: needs at least two datasets');
 	end;
 	%NEWEEG = eeg_retrieve(INEEG1, indices(1));
 	NEWEEG = INEEG1(indices(1));
@@ -176,7 +178,7 @@ else
                 INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
             end;
 		end;
-        INEEG1.epoch = []; % epoch info regenrated at the end by 'eventconsistency'
+        INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
 	end;
     
 	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
