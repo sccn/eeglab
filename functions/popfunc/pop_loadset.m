@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/11/05 19:27:05  arno
+% uigetfile -> uigetfile2
+%
 % Revision 1.27  2004/09/21 16:48:37  hilit
 % changed from && -> &
 %
@@ -179,14 +182,14 @@ if isfield(TMPVAR, 'EEG') %individual dataset
         if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
             VAROUT.filepath = inputpath; 
             if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
-                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
                 VAROUT.data     = [ inputname(1:end-3) 'fdt' ];
             end;
         else 
             VAROUT.filepath = '';
             tmpinputname = [ inputpath inputname ];
             if length(tmpinputname) > 3 & ~strcmp(tmpinputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(tmpinputname(end-2:end), 'set')
-                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
                 VAROUT.data     = [ tmpinputname(1:end-3) 'fdt' ];
             end;
         end;
@@ -206,7 +209,7 @@ elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
         if isstr(VAROUT(index).data), 
             VAROUT(index).filepath = inputpath; 
             if length(inputname) > 4 & ~strcmp(inputname(1:end-4), VAROUT(index).data(1:end-4)) & strcmpi(inputname(end-3:end), 'sets')
-                disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
+                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
                 VAROUT(index).data = [ inputname(1:end-4) 'fdt' int2str(index) ];
             end;
         end;
