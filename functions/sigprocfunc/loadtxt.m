@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/11/19 19:28:16  arno
+% now reading empty tabs
+%
 % Revision 1.4  2003/11/07 01:45:32  arno
 % adding nline argument
 %
@@ -117,7 +120,8 @@ while isempty(inputline) | inputline~=-1
 	        case 'on',
 			     while ~isempty(deblank(inputline))
 			         [tmp inputline] = mystrtok(inputline, g.delim);
-			         tmp2 = str2num( tmp );
+			         if ~isempty(tmp) & tmp(1) > 43 & tmp(1) < 59, tmp2 = str2num(tmp);
+                     else tmp2 = []; end;
 			         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
 			         else                  array{linenb, colnb} = tmp2;
 			         end;
