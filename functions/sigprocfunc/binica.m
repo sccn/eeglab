@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/10/07 18:54:30  arno
+% testing
+%
 % Revision 1.5  2002/11/15 01:44:18  arno
 % header for web
 %
@@ -122,7 +125,7 @@ if ~isstr(data) % data variable name given
   nchans = size(data,1);
   nframes = size(data,2);
   tmpdata = ['binica' tmpint '.fdt'];
-  floatwrite(data,tmpdata, 'ieee-be');
+  floatwrite(data,tmpdata);
   datafile = tmpdata;
   firstarg = 2;
 else % data filename given
