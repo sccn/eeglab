@@ -1,25 +1,26 @@
-% timecrossfdiff() - compute the time frequency content of an array rows and 
-%                    cross-coherence between the rows for two sets of data and
-%                    the difference between these two sets. If the rows depict 
-%                    different components activation, these results can then 
-%                    be used to analyse time relation between these
-%                    components  (using the brainmovie function). You may 
-%                    also input electrode activities into this function to 
-%                    analyse the synchronisation and phase relashionship 
-%                    between the electrodes.  
+% timecrossf() - compute the time frequency content of an array rows and 
+%                cross-coherence between the rows for. If the rows depict 
+%                different components activation, these results can then 
+%                be used to analyse time relation between these
+%                components  (using the brainmovie function). You may 
+%                also input electrode activities into this function to 
+%                analyse the synchronisation and phase relashionship 
+%                between the electrodes.  
 %
 % Usage:
 %    >> [ allersps, allitcs, allcrossfs, allcrossfphis, times, freqs] ...
-%        = timecrossfdiff(data1, data2, frames, tlimits, srate, cycles, ...
+%        = timecrossf(data, frames, tlimits, srate, cycles, ...
 %                 winsize,timesout, padratio,maxfreq, tvec,eloc_file, ...
 %                 alpha,marktimes,powbase,pboot,rboot);
 %
 % Inputs:
-%   data1       - multi-row data (nb_input,frames*nepochs) for the first
+%   data        - multi-row data (nb_input,frames*nepochs) for the first
 %                 condition. Each row is a different input. The function 
 %                 will conpute the time frequency content of each row and  
-%                 the cross-coherence between the rows.
-%   data2       - same as data1 for the second condition.
+%                 the cross-coherence between the rows. If data is a cell
+%                 array { data1 data2 }, the function will compute the 
+%                 time-frequency decomposition for these 2 arrays and the 
+%                 difference between them.
 %   frames      - frames per epoch                        {768}
 %   tlimits     - epoch time limits (ms) [mintime maxtime]{[-1000 2000]}
 %   srate       - data sampling rate (Hz)                 {256}
@@ -64,9 +65,6 @@
 %   brainmovie( allersps, allitcs, allcrossfs, allcrossfphis, times, ...
 %                [1:2] )     
 %
-% Note: in constrast to timecrossf(), timecrossfdiff() uses
-% the new version of timef and crossf.
-% 
 % See also timef(), crossf(), brainmovie()
 
 % arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2001
@@ -78,33 +76,47 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/11/18 00:43:32  arno
+% Initial revision
+%
 % Revision 1.1  2002/11/18 00:33:30  arno
 % Initial revision
 %
 
-function [ ALLERSP, ALLITC, ALLCROSSF, ALLCROSSFANGLE, times, freqs ] = timecrossfdiff(data1, data2, frames, tlimits, srate, cycle, varargin);
+function [ ALLERSP, ALLITC, ALLCROSSF, ALLCROSSFANGLE, times, freqs ] = timecrossf(data, frames, tlimits, srate, cycle, varargin);
 
 if nargin < 3
-	help timecrossfdiff;
+	help timecrossf;
 	return;
 end;
 
 SAVE    = 0;	% save graphs in jpeg format
 %XDISP   = 'cole:0.0';
 nbcompo = size( data, 1);
+if iscell(data)
+    data1 = data{1};
+    data2 = data{2};
+end;
 
 % compute all time frequency maps
 % -------------------------------
 compter = 1;
 for numcompo = 1:nbcompo
-	[ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
+	if iscell(data)
+        [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
                                                       frames, tlimits, srate, cycle, varargin{:});   
-    ALLERSP1     = applyboot( ersp{1}, erspboot{1});
-    ALLERSP2     = applyboot( ersp{2}, erspboot{2});
-    ALLERSPDIFF  = applyboot( ersp{3}, erspboot{3});
-    ALLITC1      = applyboot( itc{1} , itcboot{1});
-    ALLITC2      = applyboot( itc{2} , itcboot{2});
-    ALLITCDIFF   = applyboot( itc{3} , itcboot{3});
+        ALLERSP1{numcompo,1}     = applyboot( ersp{1}, erspboot{1});
+        ALLERSP2{numcompo,1}     = applyboot( ersp{2}, erspboot{2});
+        ALLERSPDIFF{numcompo,1}  = applyboot( ersp{3}, erspboot{3});
+        ALLITC1{numcompo,1}      = applyboot( itc{1} , itcboot{1});
+        ALLITC2{numcompo,1}      = applyboot( itc{2} , itcboot{2});
+        ALLITCDIFF{numcompo,1}   = applyboot( itc{3} , itcboot{3});
+    else
+        [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
+                                                      frames, tlimits, srate, cycle, varargin{:});   
+        ALLERSP{numcompo,1}    = applyboot( ersp, erspboot);
+        ALLITC{numcompo,1}     = applyboot( itc,  itcboot);
+    end;
 	if SAVE
 		%command = sprintf('print -djpeg timef%2.2d', numcompo); eval(command); close;
 		command = sprintf('hgsave(''timef%2.2d'');', numcompo); eval(command); close;
@@ -119,25 +131,35 @@ ALLCROSSFANGLE = cell(nbcompo, nbcompo);
 for index1 = 1:nbcompo
 	for index2 = 1:nbcompo
 		if index2 > index1
-			[coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data1(index2,:)}, ...
-                        { data1(index2,:) data2(index2,:)}, frames,  tlimits, srate, cycle, varargin{:});    
-			ALLCROSSF1     { index1, index2 } = applyboot(coh{1}, cohboot{1});
-			ALLCROSSF2     { index1, index2 } = applyboot(coh{2}, cohboot{2});
-			ALLCROSSFDIFF  { index1, index2 } = applyboot(coh{3}, cohboot{3});
-			ALLCROSSFANGLE1{ index1, index2 } = cohangles{1};
-			ALLCROSSFANGLE2{ index1, index2 } = cohangles{2};
-			ALLCROSSFANGLEDIFF{ index1, index2 } = cohangles{3};
-			if SAVE
-				%command = sprintf('print -djpeg crossf%2.2d-%2.2d%', index1, index2); eval(command); close;
-				command = sprintf('hgsave(''crossf%2.2d-%2.2d%'');', index1, index2); eval(command); close;
-			end;
+            if iscell(data)
+                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
+                                                                  { data1(index2,:) data2(index2,:)}, frames,  ...
+                                                                  tlimits, srate, cycle, varargin{:});    
+                ALLCROSSF1     { index1, index2 } = applyboot(coh{1}, cohboot{1});
+                ALLCROSSF2     { index1, index2 } = applyboot(coh{2}, cohboot{2});
+                ALLCROSSFDIFF  { index1, index2 } = applyboot(coh{3}, cohboot{3});
+                ALLCROSSFANGLE1{ index1, index2 } = cohangles{1};
+                ALLCROSSFANGLE2{ index1, index2 } = cohangles{2};
+                ALLCROSSFANGLEDIFF{ index1, index2 } = cohangles{3};
+            else
+                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), frames,  ...
+                                                                  tlimits, srate, cycle, varargin{:});    
+                ALLCROSSF      { index1, index2 } = applyboot(coh, cohboot);
+                ALLCROSSFANGLE { index1, index2 } = cohangles;
+                if SAVE
+                    %command = sprintf('print -djpeg crossf%2.2d-%2.2d%', index1, index2); eval(command); close;
+                    command = sprintf('hgsave(''crossf%2.2d-%2.2d%'');', index1, index2); eval(command); close;
+                end;
+            end;
 		end;
 	end;
-end;		
-ALLERSP    = { ALLERSP1    ALLERSP2    ALLERSPDIFF };
-ALLITC     = { ALLITC1     ALLITC2     ALLITCDIFF  };
-ALLCROSSF  = { ALLCROSSF1  ALLCROSSF2  ALLCROSSFDIFF  };
-ALLCROSSFANGLE  = { ALLCROSSFANGLE1  ALLCROSSFANGLE2  ALLCROSSFANGLEDIFF  };
+end;
+if iscell(data)
+    ALLERSP    = { ALLERSP1    ALLERSP2    ALLERSPDIFF };
+    ALLITC     = { ALLITC1     ALLITC2     ALLITCDIFF  };
+    ALLCROSSF  = { ALLCROSSF1  ALLCROSSF2  ALLCROSSFDIFF  };
+    ALLCROSSFANGLE  = { ALLCROSSFANGLE1  ALLCROSSFANGLE2  ALLCROSSFANGLEDIFF  };
+end;
 
 return;
 
