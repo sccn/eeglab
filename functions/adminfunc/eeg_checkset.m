@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2002/08/22 21:21:00  arno
+% typo
+%
 % Revision 1.64  2002/08/21 17:56:20  arno
 % debug checks
 %
@@ -326,7 +329,7 @@ end;
 if ~isempty( varargin)
     if isempty(EEG.data)
         errordlg2('Empty dataset -> File / Import data or File / Load existing dataset', 'Error');
-        error('eeg_checkset: empty dataset');
+        disp('eeg_checkset error: empty dataset'); return;
     end;    
 end;
 
@@ -338,7 +341,7 @@ res = [];
 if isstr(EEG.data)
 	fid = fopen(EEG.data, 'r', 'ieee-le');
 	if fid == -1
-		error(['Can not open data file ''' EEG.data ''', check directory']);
+		errordlg2(['Can not open data file ''' EEG.data ''', check directory'], 'error');
 	end;
 	fprintf('Reading float file ''%s''...', EEG.data);
 	EEG.data = fread(fid, [EEG.nchan Inf], 'float32');
@@ -635,12 +638,12 @@ if ~isempty( varargin)
 		 case 'contdata',; % already done at the top 
 		  if EEG.trials > 1
 			  errordlg2(strvcat('Error: function only works on continuous data'), 'Error');
-			  error('eeg_checkset: data is not continuous');
+			  disp('eeg_checkset error: data is not continuous'); return;
 		  end;
 		 case 'ica', 
 		  if isempty(EEG.icaweights)
 			  if ~popask(strvcat('No ICA weights. Compute now?', '(then go back to the function you just called)'))
-				  error('eeg_checkset: ICA components must be derived before running that function'); 
+				  errordlg2('eeg_checkset: ICA components must be derived before running that function'); return; 
 			  end;
 			  [EEG res] = pop_runica(EEG);
 			  res = [ inputname(1) ' = eeg_checkset('  inputname(1) '); ' res ];
@@ -648,19 +651,19 @@ if ~isempty( varargin)
 		 case 'epoch', 
 		  if EEG.trials == 1
 			  errordlg2(strvcat('Epochs must be extracted before running that function', 'Use /Tools/Extract epochs'), 'Error');
-			  error('eeg_checkset: epochs must be extracted before running that function');
+			  disp('eeg_checkset error: epochs must be extracted before running that function'); return
 		  end;
 		 case 'event', 
 		  if isempty(EEG.event)
 			  errordlg2(strvcat('Cannot process if no events. First add events.', 'Use /File/Import event info or /Import epoch info'), 'Error');
-			  error('eeg_checkset: no events');
+			  disp('eeg_checkset: no events'); return;
 		  end;
 		 case 'chanloc', 
 		  if isempty(EEG.chanlocs)
 			  errordlg2( strvcat('Cannot process without channel location file.', ...
 						 'Enter the name of the file via "/Edit/Edit dataset info".', ...
 						 'For the file format, enter ''>> help totoplot'' from the command line.'), 'Error');
-			  error('eeg_checkset: cannot process without channel location file.');
+			  disp('eeg_checkset: cannot process without channel location file.'); return;
 		  end;
 		 case 'eventconsistency',		  
 		  if isempty(EEG.event), return; end;
@@ -803,8 +806,8 @@ if ~isempty( varargin)
 				  end;
 			  end;    
 		  end;
-		  catch, error(['warning: minor problem encountered when generating' 10 ...
-						'epoch information (only usefull for users using command line scripts)']);
+		  catch, errordlg2(['warning: minor problem encountered when generating' 10 ...
+						'epoch information (only usefull for users using command line scripts)']); return;
 		  end;
 		 otherwise, error('eeg_checkset: unknown option');
 		end;        
