@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2004/09/10 17:35:07  hilit
+% added the current axes setting to try and fix the plotting bug in Matlab 7
+%
 % Revision 1.44  2004/08/31 19:32:16  scott
 % still trying - but plot 2 is drawn on plot 1 (Matlab7) ?? -sm
 %
@@ -341,7 +344,7 @@ for index = 1:size(arg2(:),1)
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
         curax = gca;
         set(curax, 'visible', 'off')
-	end;
+   end;
 
 	% add dipole location if present
     % ------------------------------
@@ -379,27 +382,28 @@ for index = 1:size(arg2(:),1)
     fprintf('Printing to figure %d.\n',curfig);
     if ~isnan(arg2(index))
 		if typeplot
-            figure(curfig); subplot(curax);
+            figure(curfig); if nbgraph > 1, subplot(curax); end;
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
-                 figure(curfig); subplot(curax);
+                 figure(curfig); if nbgraph > 1, subplot(curax); end;
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
 			else 
-                 figure(curfig); subplot(curax); title([int2str(arg2(index)) ' ms']);
+                 figure(curfig); if nbgraph > 1, subplot(curax); end; 
+                 title([int2str(arg2(index)) ' ms']);
 			end;
 		else
             if arg2(index) < 0
-                 figure(curfig); subplot(curax);
+                 figure(curfig);  if nbgraph > 1, subplot(curax); end;
                  tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             else
-                 figure(curfig); subplot(curax);
+                 figure(curfig);  if nbgraph > 1, subplot(curax); end;
                  tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
 			end;
             if dipoleplotted, texttitle = [ texttitle ' (' num2str(EEG.dipfit.model(arg2(index)).rv*100,2) '%)']; end;
-            figure(curfig); subplot(curax); title(texttitle);
+            figure(curfig);  if nbgraph > 1, subplot(curax); end; title(texttitle);
 		end;
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
