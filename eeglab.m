@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.272  2003/11/26 01:23:15  arno
+% color for plugin in plot menu
+%
 % Revision 1.271  2003/11/25 22:58:23  arno
 % same
 %
@@ -1014,6 +1017,16 @@
 % 3/19/02 Help msg edited by sm 
 
 function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
+
+% add the paths
+% -------------
+p = which('eeglab.m');
+p = p(1:findstr(p,'eeglab.m')-1);
+addpath([p 'dipfit']);
+addpath([p 'sigprocfunc']);
+addpath([p 'popfunc']);
+addpath([p 'adminfunc']);
+    
 eeg_options; 
 eeg_global;
 
