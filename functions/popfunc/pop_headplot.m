@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/08/20 00:05:59  arno
+% adding test for plotting a large number of components
+%
 % Revision 1.12  2002/08/19 23:59:09  arno
 % reducing message
 %
@@ -223,7 +226,10 @@ for index = 1:size(arg2(:),1)
             if index> 1, a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
         	figure;
         	pos = get(gcf,'Position');
-	        set(gcf,'Position', [pos(1) pos(2) SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
+			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
+			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
+			set(gcf,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
+			try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
         end;    
 		subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
 	end;
