@@ -184,6 +184,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.198  2002/11/14 18:08:47  arno
+% adding readegi
+%
 % Revision 1.197  2002/11/13 17:03:06  arno
 % averef -> reref
 %
@@ -1298,7 +1301,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	end;
 	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
 	%set( g.val9, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
-	set( g.val10, 'String', EEG.averef);
+	set( g.val10, 'String', fastif(strcmpi(EEG.ref, 'common'), 'No', 'Yes'));
 	set( g.val11, 'String', fastif(isempty(EEG.chanlocs), 'No', 'Yes'));
 	set( g.val12, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
 	tmp = whos('EEG');
