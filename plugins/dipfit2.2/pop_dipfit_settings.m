@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/03/17 17:33:41  arno
+% warning if dipole info already present
+%
 % Revision 1.7  2005/03/16 02:32:39  arno
 % detect channels with no coordinates
 %
@@ -215,7 +218,7 @@ if nargin < 2
     
     userdata    = [];
     
-    geomvert = [1 1 1 1 1 1 1 1 1 1];
+    geomvert = [2 1 1 1 1 1 1 1 1 1];
     
     geomhorz = {
         [1 2] 
@@ -259,7 +262,7 @@ if nargin < 2
                  'set(findobj(gcbf, ''tag'', ''meg''), ''string'', tmpdat{tmpval}{4});' ];
         
     elements  = { ...
-        { 'style' 'text'        'string'  'Model (clik to select)' } ...
+        { 'style' 'text'        'string'  [ 'Model (clik to select)' 10 '' ] } ...
         { 'style' 'listbox'     'string'  'Spherical 4 shell (BESA)|Boundary Element Model|Custom' ... 
                                 'callback' setmodel } { } ...
         { 'style' 'text'        'string' 'Model file' } ...
