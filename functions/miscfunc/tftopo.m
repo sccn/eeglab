@@ -13,7 +13,7 @@
 %                      Format: size (2,npoints), each row [ms Hz]
 %
 % Optional inputs:
-%   showchan = Channel number of tfdata to image {default 1} 
+%   showchan = Channel number of tfdata to image {default 0 -> mean of all chans} 
 %   chanlocs = Electrode locations file (for format see >> topoplot example)
 %              {default 'chan.locs'}
 %   limits   = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/27 01:37:19  scott
+% same -sm
+%
 % Revision 1.7  2002/04/27 01:26:40  scott
 % updated topoplot call -sm
 %
@@ -90,7 +93,10 @@ if nargin<6
   chanlocs = 'chan.locs';  % default channel locations file
 end
 if nargin<5
-  showchan = 1; % default tfdata image to show
+  showchan = 0; % default tfdata image to show
+end
+if isempty(showchan)
+  showchan=0;
 end
 
 if length(size(tfdata))==2
@@ -107,7 +113,7 @@ if nchans*length(times) ~= size(tfdata,2)
                  length(times));
    return
 end
-if showchan> nchans | showchan < 1
+if showchan> nchans | showchan < 0
    fprintf('tftopo(): showchan (%d) must be <= nchans (%d)\n',showchan,nchans);
    return
 end
@@ -225,8 +231,13 @@ figure;
 colormap(cc);
 plotdim = 1+floor(tfpoints/2); % number of topoplots on top of image
 imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1]);
-imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
+if showchan>0
+  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
     matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan));
+else
+  imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
+    blockave(abs(matsel(tfdata,length(times),mmidx(1):mmidx(2),mmidx(3):mmidx(4),showchan),length(times))));
+end
 hold on;
 axis([limits(1:4)]);
 caxis([limits(5:6)]);
