@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/08/12 21:51:17  arno
+% same
+%
 % Revision 1.13  2002/08/12 21:50:49  arno
 % text
 %
@@ -173,8 +176,13 @@ end;
 % -----------------------------
 if icacomp == 1
 	fprintf('Computing joint probability for channels...\n');
-	[ EEG.stats.jpE rejE ] = jointprob( EEG.data, locthresh, EEG.stats.jpE, 1); 
-
+    if isempty(EEG.stats.jpE)
+		[ EEG.stats.jpE rejE ] = jointprob( EEG.data, locthresh, EEG.stats.jpE, 1); 
+	end;
+	[ tmp rejEtmp ] = jointprob( EEG.data(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
+    rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
+	rejE(elecrange,:) = rejEtmp;
+	
 	fprintf('Computing all-channel probability...\n');
 	tmpdata = permute(EEG.data, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
@@ -188,7 +196,12 @@ else
         tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, EEG.trials);
     end;
 	fprintf('Computing joint probability for components...\n');
-    [ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
+    if isempty(EEG.stats.icajpE)
+		[ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
+	end;
+	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:), locthresh, EEG.stats.icajpE(elecrange,:), 1); 
+    rejE    = zeros(size(tmpdata,1), size(rejEtmp,2));
+	rejE(elecrange,:) = rejEtmp;
 
 	fprintf('Computing global joint probability...\n');
 	tmpdata2 = permute(tmpdata, [3 1 2]);
@@ -219,11 +232,11 @@ if calldisp
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( EEG.data, EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
+				rejstatepoch( EEG.data(elecrange,:), EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off'  );
 		else 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( tmpdata, EEG.stats.icajpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icajp, ...
+				rejstatepoch( tmpdata(elecrange,:), EEG.stats.icajpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.icajp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off' );
 		end;		
 		nrej = n;

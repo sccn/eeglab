@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/12 21:52:30  arno
+% same
+%
 % Revision 1.10  2002/08/12 21:52:02  arno
 % text
 %
@@ -162,8 +165,13 @@ end;
 % -----------------------------
 if icacomp == 1
 	fprintf('Computing kurtosis for channels...\n');
-	[ EEG.stats.kurtE rejE ] = rejkurt( EEG.data, locthresh, EEG.stats.kurtE, 1); 
-
+    if isempty(EEG.stats.kurtE )
+		[ EEG.stats.kurtE rejE ] = rejkurt( EEG.data, locthresh, EEG.stats.kurtE, 1); 
+	end;
+	[ tmp rejEtmp ] = rejkurt( EEG.data(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
+    rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
+	rejE(elecrange,:) = rejEtmp;
+	
 	fprintf('Computing all-channel kurtosis...\n');
 	tmpdata = permute(EEG.data, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
@@ -174,13 +182,18 @@ else
     % ------------------------
     eeg_options; % changed from eeglaboptions 3/30/02 -sm
  	if option_computeica  
-    	icaacttmp = EEG.icaact(elecrange, :, :);
+    	icaacttmp = EEG.icaact;
 	else
-        icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-        icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
+        icaacttmp = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+        icaacttmp = reshape( icaacttmp, size(icaacttmp,1), EEG.pnts, EEG.trials);
     end;
-	[ EEG.stats.icakurtE rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
-
+    if isempty(EEG.stats.icakurtE )
+		[ EEG.stats.icakurtE rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
+	end;
+	[ tmp rejEtmp ] = rejkurt( icaacttmp(elecrange, :,:), locthresh, EEG.stats.icakurtE(elecrange, :), 1); 
+	rejE    = zeros(size(icaacttmp,1), size(rejEtmp,2));
+	rejE(elecrange,:) = rejEtmp;
+	
 	fprintf('Computing global joint probability...\n');
 	tmpdata = permute(icaacttmp, [3 1 2]);
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
@@ -236,6 +249,7 @@ if ~isempty(rej)
 	end;
 end;
 nrej = sum(rej);
+elecrange
 
 com = [ com sprintf('%s = pop_rejkurt(%s,%s);', inputname(1), ...
 		inputname(1), vararg2str({icacomp,elecrange,locthresh,globthresh,superpose,reject})) ]; 
