@@ -142,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2003/04/23 01:18:08  arno
+% typo
+%
 % Revision 1.87  2003/04/23 01:15:51  arno
 % debuging cycles
 %
@@ -973,7 +976,7 @@ if exist('phargs')
 	if phargs(3) > srate/2
 		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
 	end
-    DEFAULT_CYCLES = 18*phargs(3)/(phargs(3)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
+    DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
 		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				phargs(3),DEFAULT_CYCLES);
@@ -991,7 +994,7 @@ if exist('ampargs')
 	if ampargs(3) > srate/2
 		fprintf('erpimage(): amplitude-sorting frequency must be less than Nyquist rate.');
 	end
-    DEFAULT_CYCLES = 18*ampargs(3)/(ampargs(3)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
+    DEFAULT_CYCLES = 9*ampargs(3)/(ampargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/ampargs(3)
 		fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
 				ampargs(3),DEFAULT_CYCLES);
@@ -1011,7 +1014,7 @@ if ~any(isnan(coherfreq))
 		fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
 		return
 	end
-    DEFAULT_CYCLES = 18*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 2 Hz, 15 at 50 Hz
+    DEFAULT_CYCLES = 9*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/coherfreq(1)
 		fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
 				coherfreq(1),DEFAULT_CYCLES);
