@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/03/14 16:18:37  arno
+% plot pvaf in topoplot
+%
 % Revision 1.19  2003/03/14 15:23:29  arno
 % pvaf -> * 100
 %
@@ -664,6 +667,11 @@ envx = [1;compx+1];
             p=fill([x x(frames:-1:1)],...
                    [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
                    colors(mapcolors(c),1));
+            %
+            % Overplot the data envlope again so it is not covered by the fill()'d component
+            %
+            p=plot(x,matsel(envdata,frames,0,1,envx(1)),colors(mapcolors(1),1));% plot the max
+            p=plot(x,matsel(envdata,frames,0,2,envx(1)),colors(mapcolors(1),1));% plot the min
         end
         axis([xmin xmax ymin ymax]);
     end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
