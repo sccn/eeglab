@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/06 21:49:46  arno
+% spelling
+%
 % Revision 1.5  2002/06/28 02:27:32  arno
 % adding ori fields
 %
@@ -103,9 +106,9 @@ I = [];
 % warning if data epochs
 % ----------------------
 if nargin<2 & EEG.trials > 1
-		questdlg(['Though epoch information is defined in terms of event,' 10 ...
-				  'this function is usually used to import events into continuous data.' 10 ...
-				  'For data epochs you may better use menu /File/Import epoch info/'], ...
+		questdlg2(strvcat('Though epoch information is defined in terms of event,', ...
+				  'this function is usually used to import events into continuous data.', ...
+				  'For data epochs you may better use menu /File/Import epoch info/'), ...
 				'pop_importevent warning', 'OK', 'OK');
 end;
 	

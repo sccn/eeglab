@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/08/12 16:43:01  arno
+% debug inputdlg2
+%
 % Revision 1.19  2002/08/12 16:37:24  arno
 % inputdlg2
 %
@@ -343,8 +346,8 @@ else
 			   extraargs = {''};
 		   end;
 		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
-			   tmpButtonName=questdlg2( ['This will modify fields in the channel structure' 10 ...
-					'Are you sure, you want to apply that function ?'], 'Confirmation', 'Cancel', 'Yes','Yes');
+			   tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
+					'Are you sure, you want to apply that function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
 			   if ~strcmp(tmpButtonName, 'Yes'), return; end;
 		   end;
 		   switch method
@@ -505,7 +508,7 @@ function txt = inserttxt( txt, tokins, tokfind);
 		txt = [txt(1:locfind(index)-1) tokins txt(locfind(index):end)];
 	end;
 function num = popask( text )
-	 ButtonName=questdlg( text, ...
+	 ButtonName=questdlg2( text, ...
 	        'Confirmation', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', num = 0;
