@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2003/02/26 02:18:55  arno
+% debugging if file has changed of location
+%
 % Revision 1.90  2003/02/03 20:07:45  arno
 % error if no data
 %
@@ -500,8 +503,7 @@ end;
 
     % parameters coherence -------------------------
     if     round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts          
-       fprintf( 'eeg_checkset() warning: inconsistency (xmax-xmin)*rate+1 (=%f) must be equal to the number of frames (=%d); xmax corrected\n', ...
-          EEG.srate*(EEG.xmax-EEG.xmin)+1, EEG.pnts); 
+       fprintf( 'eeg_checkset() note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames'); 
        if EEG.srate == 0
           EEG.srate = 1;
        end;
