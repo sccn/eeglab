@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2003/12/17 00:57:17  arno
+% subset of electrodes
+%
 % Revision 1.67  2003/11/29 23:34:00  scott
 % help msg
 %
@@ -508,10 +511,11 @@ if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common 
     Th(end) = [];
     Rd(end) = [];
 end;
-if length(ind) < length(Vl)
+
+if length(Vl) > 0
     Vl     = Vl(ind);
-    labels = labels(ind);
 end;
+labels = labels(ind);
 if strcmpi(shrinkfactor, 'off') & isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
 Th = pi/180*Th;                              % convert degrees to radians
@@ -739,7 +743,7 @@ if strcmp(ELECTRODES,'on')
   end
   hp2 = plot(y,x,EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE);
 elseif strcmp(ELECTRODES,'labels')
-  for i = 1:size(labels,1)
+    for i = 1:size(labels,1)
     text(y(i),x(i),labels(i,:),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
