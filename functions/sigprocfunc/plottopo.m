@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/04/06 17:21:38  arno
+% draw full vertical lines
+%
 % Revision 1.32  2004/02/10 16:56:27  arno
 % error msg
 %
@@ -205,6 +208,7 @@ gcapos = get(gca,'Position');
 PLOT_WIDTH    = gcapos(3)*PLOT_WIDTH; % width and height of gca plot array on gca
 PLOT_HEIGHT   = gcapos(4)*PLOT_HEIGHT;
 MAXCHANS      = 256;     % can be increased
+curfig = gcf;            % learn the current graphic figure number
 %
 %%%%%%%%%%%%%%%%%%%% Default settings - use commandline to override %%%%%%%%%%%
 %
@@ -506,7 +510,7 @@ chans = length(channelnos);
   % clf;   % clear the current figure
 
   % print plottitle over (left) subplot 1
-  h=gca;title(g.title,'FontSize',TITLEFONTSIZE); % title plot and
+  figure(curfig); h=gca;title(g.title,'FontSize',TITLEFONTSIZE); % title plot 
   hold on
   msg = ['Plotting %d traces of %d frames with colors: '];
 
@@ -540,7 +544,7 @@ if isempty(g.chanlocs) % plot in a rectangular grid
     ht = g.geom(1);
     wd = g.geom(2);
     if chans > ht*wd
-        fprintf('topoplot(): (%d) channels to be plotted > grid size [%d %d]\n',...
+        fprintf('plottopo(): (%d) channels to be plotted > grid size [%d %d]\n',...
                 chans,ht,wd);
         return
     end
@@ -662,7 +666,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             if ~isempty(g.regions)
                 for index=1:size(g.regions{c},2)
                     tmpreg = g.regions{c}(:,index);
-                    tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                    figure(curfig); tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
                                  [-100 -100 100 100], [1 1 0.9]); hold on;
                     set(tmph, 'edgecolor', [1 1 0.9]);
                 end;
@@ -676,7 +680,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             NAME_OFFSET = -1;
             NAME_OFFSETY = -0.5;
             if ISSPEC
-                axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
+                figure(curfig);axis('off'),h=text(xmin-NAME_OFFSET*xdiff,ymax/2,[channames(c,:)]); 
                 set(h,'HorizontalAlignment','right');    % print before traces
                 set(h,'FontSize',CHANFONTSIZE);              % choose font size
             else % ~ISSPEC
@@ -686,12 +690,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     yht = mean(data(c,1+P*g.frames:1+P*g.frames+g.frames-1));
                 end
                 if ~ISRECT    % print before traces
-                    axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
+                    figure(curfig);axis('off'),h=text(xmin-NAME_OFFSET*xdiff,yht-NAME_OFFSETY*ydiff,[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
                     set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
                     xmn = xdiff/2+xmin;
-                    axis('off'),h=text(xmn,ymax+0.05*ymax,[channames(c,:)]); 
+                    figure(curfig);axis('off'),h=text(xmn,ymax+0.05*ymax,[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
                     set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
@@ -707,7 +711,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         else                          tmpcolor = g.colors{Pind};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
-            plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
+            figure(curfig);plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), ...
+                      'color', tmpcolor{:});   
             ymn = min([ymax ymin]);
             ymx = max([ymax ymin]);
             if g.ydir == -1
@@ -715,7 +720,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             end;
             axis([xmin xmax ymn ymx]);          % set axis bounds
         else % ISSPEC
-            plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color',  tmpcolor{:});   
+            figure(curfig); plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), ...
+                      'color',  tmpcolor{:});   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
                 ymaxm = ymaxm/2.;
@@ -730,12 +736,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         %
         if P == datasets-1
             if ISSPEC
-                plot([xmin xmin],[0 ymax],'color',axislcolor); 
+                figure(curfig);plot([xmin xmin],[0 ymax],'color',axislcolor); 
             else
-                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
+                figure(curfig);plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
             end  
             axis('off');
-            plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
+            figure(curfig);plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
         end;
         %
         %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
@@ -746,11 +752,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 vmin = ymean-0.5*(ymean-ymin);
                 vmax = ymean+0.5*(ymax-ymean);
                 for v = g.vert
-                    plot([v v],[ymin ymax],'color',vertcolor); % draw vertical lines 
+                    figure(curfig);plot([v v],[ymin ymax],'color',vertcolor); % draw vertical lines 
                 end
             else
                 for v = g.vert
-                    plot([v v],[0 ymax],'color',vertcolor); 
+                    figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
                 end
             end
         end
@@ -772,9 +778,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   axis('off');
   if ~ISSPEC,
     if xmin <=0
-      p=plot([0 0],[ymn ymx],'color','k'); % draw vert axis at zero
+      figure(curfig);p=plot([0 0],[ymn ymx],'color','k'); % draw vert axis at zero
     else
-      p=plot([xmin xmin],[ymn ymx],'color','k'); % draw vert axis at zero
+      figure(curfig);p=plot([xmin xmin],[ymn ymx],'color','k'); % draw vert axis at zero
     end
     if g.ydir == -1
         set(gca, 'ydir', 'reverse');
@@ -784,10 +790,10 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
     %set(p, 'Clipping','off');        % center text
   elseif ISSPEC
     ylo=0;
-    plot([xmin xmin],[0 ymax],'color',axislcolor); 
+    figure(curfig);plot([xmin xmin],[0 ymax],'color',axislcolor); 
     axis([xmin xmax ylo ymaxm]);      % set axis values
   end  
-  p=plot([xmin xmax],[0 0],'color',axislcolor); % draw horizontal axis 
+  figure(curfig);p=plot([xmin xmax],[0 0],'color',axislcolor); % draw horizontal axis 
   axis([xmin xmax ymin ymax]);        % set axis values
   %
   %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
@@ -795,11 +801,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~isnan(g.vert)
    if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
     for v = g.vert
-      plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+      figure(curfig);plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
     end
    else
     for v = g.vert
-      plot([v v],[0 ymax],'color',vertcolor); 
+      figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
     end
    end
   end
@@ -812,26 +818,26 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   if ~ISSPEC % not spectral data
                                                     
     signx = xmin-0.15*xdiff;
-    axis('off');h=text(signx, ymin,num2str(ymin,3)); % text ymin
+    figure(curfig);axis('off');h=text(signx, ymin,num2str(ymin,3)); % text ymin
     set(h,'FontSize',TICKFONTSIZE);               % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
-    axis('off');h=text(signx, ymax,['+' num2str(ymax,3)]);  % text +ymax
+    figure(curfig);axis('off');h=text(signx, ymax,['+' num2str(ymax,3)]);  % text +ymax
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','right','Clipping','off');
 
     ytick = g.ydir*(-ymax-0.3*ydiff);
-    tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
+    figure(curfig);tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
 
-    tick = [xlabel]; h=text(xmin+xdiff/2,ytick-0.5*g.ydir*ydiff,tick);
+    tick = [xlabel]; figure(curfig);h=text(xmin+xdiff/2,ytick-0.5*g.ydir*ydiff,tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
 
-    tick = [int2str(xmax)]; h=text(xmax,ytick,tick);
+    tick = [int2str(xmax)]; figure(curfig);h=text(xmax,ytick,tick);
     set(h,'FontSize',TICKFONTSIZE);         % choose font size
     set(h,'HorizontalAlignment','center',...
                         'Clipping','off');  % center text
@@ -842,27 +848,27 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
       ymin=0;
       signx = xmin-0.15*xdiff;
 
-      axis('on');h=text(signx,-1*ymin,num2str(ymin,3));% text ymin
+      figure(curfig);axis('on');h=text(signx,-1*ymin,num2str(ymin,3));% text ymin
       set(h,'FontSize',TICKFONTSIZE);           % choose font size
       set(h,'HorizontalAlignment','right','Clipping','off');
 
-      axis('on');h=text(signx,-1*ymax,['+' num2str(ymax,3)]); % text +ymax
+      figure(curfig);axis('on');h=text(signx,-1*ymax,['+' num2str(ymax,3)]); % text +ymax
       set(h,'FontSize',TICKFONTSIZE);           % choose font size
       set(h,'HorizontalAlignment','right','Clipping','off');
 
       ytick = -ymax-0.25*ydiff;
 
-      tick = [int2str(xmin)]; h=text(xmin,ytick,tick);
+      tick = [int2str(xmin)]; figure(curfig);h=text(xmin,ytick,tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
 
-      tick = [xlabel]; h=text(xmin+xdiff/2,ytick,tick);
+      tick = [xlabel]; figure(curfig);h=text(xmin+xdiff/2,ytick,tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
 
-      tick = [int2str(xmax)]; h=text(xmax,ytick,tick);
+      tick = [int2str(xmax)]; figure(curfig);h=text(xmax,ytick,tick);
       set(h,'FontSize',TICKFONTSIZE);         % choose font size
       set(h,'HorizontalAlignment','center',...
                           'Clipping','off');  % center text
