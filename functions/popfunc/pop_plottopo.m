@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 22:27:52  arno
+% change title
+%
 % Revision 1.7  2002/08/12 16:34:05  arno
 % same
 %
@@ -115,7 +118,7 @@ if singletrials
 else
     plottopo( mean(EEG.data,3), options{:} );
 end;
-set(gcf, 'color', [1 1 1], 'name', 'ERP in scalp order -- pop_plottopo()');
+set(gcf, 'color', [1 1 1], 'name', ' plottopo()');
 
 if ~isempty(options(6:end))
 	com = sprintf('figure; pop_plottopo(%s, [%s], ''%s'', %d %s);', ...
