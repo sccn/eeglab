@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.188  2004/03/31 18:23:15  scott
+% debug 'conv' mode - plot ears and nose above map surface to avoid masking by 'conv'
+%
 % Revision 1.187  2004/03/31 18:06:53  scott
 % adding 'conv' mode for plotting convex hull; corrected shrink in 'interp' mode
 %
@@ -967,6 +970,8 @@ inty  = y(intchans);
 
 Th    = Th(pltchans);              % eliminate channels outside the plotting area
 Rd    = Rd(pltchans);
+allx = x;
+ally = y;
 x     = x(pltchans);
 y     = y(pltchans);
 
@@ -984,6 +989,8 @@ intx = intx*squeezefac;
 inty = inty*squeezefac;  
 x    = x*squeezefac;    
 y    = y*squeezefac;   
+allx    = allx*squeezefac;    
+ally    = ally*squeezefac;   
 
 % Note: Now outermost channel will be plotted just inside rmax
 
@@ -1182,25 +1189,31 @@ if hin>rin
 end
 
 if strcmp(CONVHULL,'on') %%%%%%%%% mask outside the convex hull of the electrodes %%%%%%%%%
-  cnv = convhull(x,y);
+  cnv = convhull(allx,ally);
   cnvfac = round(CIRCGRID/length(cnv)); % spline interpolate the convex hull
   if cnvfac < 1, cnvfac=1; end;
   CIRCGRID = cnvfac*length(cnv);
 
-  startangle = atan2(x(cnv(1)),y(cnv(1)));
+  startangle = atan2(allx(cnv(1)),ally(cnv(1)));
   circ = linspace(0+startangle,2*pi+startangle,CIRCGRID);
   rx = sin(circ); 
   ry = cos(circ); 
 
-  x = x(:)';  % make x a row vector
-  y = y(:)';  % make y a row vector
-  xx =spline(linspace(0,1,3*length(cnv)), [x(cnv) x(cnv) x(cnv)], ...
+  allx = allx(:)';  % make x (elec locations; + to nose) a row vector
+  ally = ally(:)';  % make y (elec locations, + to r? ear) a row vector
+  erad = sqrt(allx(cnv).^2+ally(cnv).^2);  % convert to polar coordinates
+  eang = atan2(allx(cnv),ally(cnv));
+  eang = unwrap(eang);
+  eradi =spline(linspace(0,1,3*length(cnv)), [erad erad erad], ...
                                       linspace(0,1,3*length(cnv)*cnvfac));
-  yy =spline(linspace(0,1,3*length(cnv)), [y(cnv) y(cnv) y(cnv)], ...
+  eangi =spline(linspace(0,1,3*length(cnv)), [eang+2*pi eang eang-2*pi], ...
                                       linspace(0,1,3*length(cnv)*cnvfac));
+  xx = eradi.*sin(eangi);           % convert back to rect coordinates
+  yy = eradi.*cos(eangi);
   yy = yy(CIRCGRID+1:2*CIRCGRID);
   xx = xx(CIRCGRID+1:2*CIRCGRID);
-
+  eangi = eangi(CIRCGRID+1:2*CIRCGRID);
+  eradi = eradi(CIRCGRID+1:2*CIRCGRID);
   xx = xx*1.02; yy = yy*1.02;           % extend spline outside electrode marks
 
   splrad = sqrt(xx.^2+yy.^2);           % arc radius of spline points (yy,xx)
@@ -1209,7 +1222,7 @@ if strcmp(CONVHULL,'on') %%%%%%%%% mask outside the convex hull of the electrode
   yy(oob) = rin*yy(oob)./splrad(oob);   % max radius = rin
 
   splrad = sqrt(xx.^2+yy.^2);           % arc radius of spline points (yy,xx)
-  oob = find(splrad < hin);             %  enforce a lower bound on xx,yy
+  oob = find(splrad < hin);             % don't let splrad be inside the head cartoon
   xx(oob) = hin*xx(oob)./splrad(oob);   % min radius = hin
   yy(oob) = hin*yy(oob)./splrad(oob);   % min radius = hin
 
