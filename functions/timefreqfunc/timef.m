@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/04/27 21:17:27  scott
+% debugging PC -sm
+%
 % Revision 1.14  2002/04/27 21:13:57  scott
 % added undocumented arg 'phasecouple',{'on'|'off'} -sm
 %
@@ -639,8 +642,8 @@ for i=1:trials
 
         if g.phasecouple
           PC(:,:,j) = PC(:,:,j) ...
-              + repmat(sqrt(PP(:,j)),1,nfreqs) ...
-                   .* repmat((tmpX ./ abs(tmpX)),nfreqs,1); 
+              + repmat(sqrt(PP(:,j)),1,size(PP,1)) ...
+                   .* repmat((tmpX ./ abs(tmpX)),size(PP,1),1); 
                                                    % normalized spectral vector
                                                    % dot-times amplitude vector
         end
