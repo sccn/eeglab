@@ -1,4 +1,4 @@
-% pop_plotdata() - Plot average of EEG channels or independent components in
+g% pop_plotdata() - Plot average of EEG channels or independent components in
 %                  a rectangular array. Else, (over)plot single trials.
 %
 % Usage:
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/08/09 15:41:18  arno
+% header modified
+%
 % Revision 1.14  2003/05/10 02:33:10  arno
 % output command simplification
 %
@@ -108,7 +111,6 @@ if exist('plottitle') ~= 1
 end;
 
 if nargin <3
-    uilist = 
 	if typeplot
 		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Plot ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname),'',[ EEG.setname ' ERP'])] 'no'}, 'pop_plotdata' );
 	else
