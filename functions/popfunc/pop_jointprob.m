@@ -41,7 +41,7 @@
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
 %   reject     - 0=do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 0.
+%              labels. 1=reject labelled trials. Default is 1.
 %   vistype    - visualization type. 0 is rejepoch() and 1 is eegplot()
 %              default is 0.  
 %
@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/12/04 23:18:26  arno
+% adding code to reject trials
+%
 % Revision 1.17  2003/02/18 22:41:48  arno
 % updating header for GUI
 %
@@ -153,6 +156,9 @@ if icacomp == 0
     	end % switch
 	end;
 end;	
+if exist('reject') ~= 1
+    reject = 1;
+end;
 
 if nargin < 3
 
