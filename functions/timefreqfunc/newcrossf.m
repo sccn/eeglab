@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/10/15 20:53:32  arno
+% title diff
+%
 % Revision 1.7  2002/10/15 19:16:23  arno
 % debugging wavelets ...
 %
@@ -639,17 +642,17 @@ if iscell(X)
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X).*conj(arg2(:,:,X),3) ./ sqrt(sum(arg1(:,:,X))) ./ sqrt(sum(arg2(:,:,X)))';
 		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
-						'upper', g.condboot, { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
+						'both', g.condboot, { savedcoher1 savedcoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
 		 case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
-		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
 														   { savecoher1 savecoher2 });
 		 case 'phasecoher2',
 		  formula = 'sum(arg1(:,:,X),3) ./ sum(sqrt(arg1(:,:,X).*conj(arg1(:,:,X)))),3)'; 
 		  % sqrt(a.*conj(a)) is about twice faster than abs()
-		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'upper', g.condboot, ...
+		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
 														   { savecoher1 savecoher2 });
 		end;
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
@@ -885,6 +888,8 @@ if g.cycles(1) ~= 0
 end
 if ~isreal(R)
     R = abs(R);
+    if size(Rboot,1) == 2, Rboot(1,:,:) = 0;
+    end;
     Rraw =R; % raw coherence values
     setylim = 1;
     % if ~isnan(g.baseline)
@@ -913,13 +918,21 @@ case 'on'
    %
    RR = R;
    if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
-      if all(size(RR) == size(Rboot))
-		  RR  (find(RR < Rboot)) = 0;
-		  Rraw(find(RR < Rboot)) = 0;
-	  else
-		  RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
-		  Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
-	  end; 
+       if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
+           PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
+           Pboot = squeeze(mean(Pboot,2));
+       else
+           PP(find((PP > repmat(Pboot(:,1),[1 g.timesout])) ...
+                   & (PP < repmat(Pboot(:,2),[1 g.timesout])))) = 0;
+       end;
+       end
+       if all(size(RR) == size(Rboot))
+           RR  (find((RR < Rboot(1,:,:)) & (RR < Rboot(2,:,:)))) = 0;
+           Rraw(find((RR < Rboot(1,:,:)) & (RR < Rboot(2,:,:)))) = 0;
+       else
+           RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+           Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+       end; 
    end
    
    if g.cmax == 0
