@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/12 02:17:13  arno
+% same
+%
 % Revision 1.5  2002/08/12 02:15:03  arno
 % changing gui
 %
@@ -138,12 +141,12 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 % ----
 sigtmp = reshape( sigtmp, size(sigtmp,1),  size(sigtmp,2)*size(sigtmp,3));
 if ~isempty(EEG.chanlocs) & typeplot
-	plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, EEG.chanlocs); %'tmp.nam');
+	plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, EEG.chanlocs(indices)); %'tmp.nam');
 else
 	plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, indices);
 end;
 if typeplot == 1
-	set(gcf, 'name', 'ERP in channel array -- pop_plotdata()');
+	set(gcf, 'name', 'ERP in rect. array -- pop_plotdata()');
 else
 	set(gcf, 'name', 'component ERPs  -- pop_plotdata()');
 end;
