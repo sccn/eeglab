@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2005/03/05 00:04:42  arno
+% adding chaninfo
+%
 % Revision 1.58  2005/02/07 18:01:47  scott
 % adjust pop window text
 %
@@ -409,7 +412,7 @@ for index = 1:size(arg2(:),1)
         addopt = { 'verbose', 'off' };
     end;
     %fprintf('Printing to figure %d.\n',curfig);
-    if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' chaninfo }; end;
+    if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end;
     if ~isnan(arg2(index))
 		if typeplot
             if nbgraph > 1, axes(curax); end;
