@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/19 17:58:11  arno
+% returning non-matched 'key' 'val' arguments
+%
 % Revision 1.5  2002/07/19 17:46:53  arno
 % g empty if no varargin
 %
@@ -75,7 +78,7 @@
 % Initial revision
 %
 
-function [g, newvararg] = finputcheck( vararg, fieldlist, callfunc, mode )
+function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 
 	if nargin < 2
 		help finputcheck;
@@ -93,7 +96,7 @@ function [g, newvararg] = finputcheck( vararg, fieldlist, callfunc, mode )
 	DEF  = 4;
 	SIZE = 5;
 	
-	newvararg = {};
+	varargnew = {};
 	% create structure
 	% ----------------
 	if ~isempty(vararg)
@@ -182,8 +185,8 @@ function [g, newvararg] = finputcheck( vararg, fieldlist, callfunc, mode )
 		if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
 			if ~strcmp(mode, 'ignore')
 				g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
-				varargnew{end+1} = allfields{index};
-				varargnew{end+1} = getfield(g, {1}, allfields{index});
 			end;
+			varargnew{end+1} = allfields{index};
+			varargnew{end+1} = getfield(g, {1}, allfields{index});
 		end;
 	end;
