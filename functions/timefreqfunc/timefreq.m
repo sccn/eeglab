@@ -35,12 +35,12 @@
 %                   length (fastest, 2^n<frames);
 %                   if cycles >0: *longest* window length to use. This
 %                   determines the lowest output frequency  {~frames/8}
-%      'timesout' = Number of output times (int<frames-winsize). Enter a 
+%      'ntimesout' = Number of output times (int<frames-winsize). Enter a 
 %                   negative value [-S] to subsample original time by S.
-%                   Enter an array to obtain spectral decomposition at 
+%      'timesout' = Enter an array to obtain spectral decomposition at 
 %                   specific time values (note: algorithm find closest time 
 %                   point in data and this might result in an unevenly spaced
-%                   time array. {def: 200}
+%                   time array). Overwrite 'ntimesout'. {def: automatic}
 %      'freqs'    = [min max] frequency limits. Default [minfreq srate/2], 
 %                   minfreq being determined by the number of data points, 
 %                   cycles and sampling frequency. Enter a single value
@@ -49,16 +49,16 @@
 %                   For wavelet, reducing the max frequency reduce
 %                   the computation load.
 %      'padratio' = FFTlength/winsize (2^k)                     {def: 2}
-%                    Multiplies the number of output frequencies by
-%                    dividing their spacing. When cycles==0, frequency
-%                    spacing is (low_frequency/padratio).
+%                   Multiplies the number of output frequencies by
+%                   dividing their spacing. When cycles==0, frequency
+%                   spacing is (low_frequency/padratio).
 %      'nfreqs'   = number of output frequencies. For FFT, closest computed
 %                   frequency will be returned. Overwrite 'padratio' effects
 %                   for wavelets. Default: use 'padratio'.
 %      'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
-%                     Note that for obtaining 'log' spaced freqs using FFT, 
-%                     closest correspondant frequencies in the 'linear' space 
-%                     are returned.
+%                    Note that for obtaining 'log' spaced freqs using FFT, 
+%                    closest correspondant frequencies in the 'linear' space 
+%                    are returned.
 %
 % Outputs: 
 %       tf      - time frequency array for all trials (freqs, times, trials)
@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/06/27 15:29:45  arno
+% removing deprecated arguments
+%
 % Revision 1.26  2003/06/27 01:00:26  arno
 % updating timeout help
 %
@@ -193,7 +196,8 @@ end;
 
 [frame trials]= size(data);
 g = finputcheck(varargin, ...
-                { 'timesout'      'real'     []                       200; ...
+                { 'ntimesout'     'integer'  []                       200; ...
+				  'timesout'      'real'     []                       []; ...
 				  'winsize'       'integer'  [0 Inf]                  max(pow2(nextpow2(frame)-3),4); ...
                   'tlimits'       'real'     []                       [0 frame/srate]; ...
                   'detrend'       'string'   {'on' 'off'}              'off'; ...
@@ -275,7 +279,7 @@ end;
 
 % compute time vector
 % -------------------
-[ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize);
+[ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout);
 tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
 % -------------------------------
@@ -410,29 +414,29 @@ end
 
 % get time points
 % ---------------
-function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize);
+function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize, ntimevar);
     timevect = linspace(tlimits(1), tlimits(2), frames);
     srate    = 1000*(frames-1)/(tlimits(2)-tlimits(1));
     
-    if length(timevar) == 1 
-        if timevar(1) > 0
+    if isempty(timevar) % no pre-defined time points 
+        if ntimevar(1) > 0
             % generate linearly space vector
             % ------------------------------
-            if (timevar > frames-winsize)
-                timevar = frames-winsize;
-                if timevar < 0
+            if (ntimevar > frames-winsize)
+                ntimevar = frames-winsize;
+                if ntimevar < 0
                     error('Not enough data points, reduce the window size or lowest frequency');
                 end;
-                disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(timevar) ]);
+                disp(['Value of ''timesout'' must be <= frame-winsize, ''timesout'' adjusted to ' int2str(ntimevar) ]);
             end
-            npoints = timevar(1);
+            npoints = ntimevar(1);
             wintime = 500*winsize/srate;
             timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
             fprintf('Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
         else            
             % subsample data
             % --------------
-            nsub     = -timevar(1);
+            nsub     = -ntimevar(1);
             timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
             timevals    = timevect( timeindices );
             fprintf('Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
