@@ -2,9 +2,27 @@
 %               (i.e. standard) method.
 %
 % Usage:
-%   >> pop_eegthresh( INEEG, typerej); % pops-up
-%   >> [EEG Indexes] = pop_eegthresh( INEEG, typerej, elec_comp, negthresh, ...
-%                posthresh, starttime, endtime, superpose, reject);
+%   >> pop_eegthresh( INEEG, typerej); % pop-up interactive window
+%   >> [EEG Indexes] = pop_eegthresh( INEEG, typerej, elec_comp, lowthresh, ...
+%                upthresh, starttime, endtime, superpose, reject);
+%
+% Graphical interface:
+%   "Electrode" - [edit box] electrodes or components (number) to take into
+%                 consideration for rejection. Same as the 'elec_comp'
+%                 parameter from the command line.
+%   "Lower limit(s) - [edit box] lower threshold limit in microV. Same as
+%                 the command line parameter 'lowthresh'.
+%   "Upper limit(s) - [edit box] upper threshold limit in microV. Same as
+%                 the command line parameter 'upthresh'.
+%   "Start time(s)" - [edit box] starting time limit in second. Same as
+%                 the command line parameter 'starttime'.
+%   "End time(s)" - [edit box] ending time limit in second. Same as
+%                 the command line parameter 'endtime'.
+%   "Display with previous rejection" - [edit box] can be either YES or
+%                 NO. This edit box corresponds to the command line input
+%                 option 'superpose'.
+%   "Reject marked trials" - [edit box] can be either YES or NO. This edit
+%                 box corresponds to the command line input option 'reject'.
 %
 % Inputs:
 %   INEEG      - input dataset
@@ -13,14 +31,14 @@
 %              thresholding, the activity is normalized.
 %   elec_comp  - [e1 e2 ...] electrodes (number) or components to take 
 %              into consideration for rejection
-%   negthresh  - negative threshold limit in mV (can be an array if 
+%   lowthresh  - lower threshold limit in microV (can be an array if 
 %              several electrodes; if less numbe  of values than number 
 %              of electrodes the last value is used for the remaining 
 %              electrodes). For independent component, this threshold is
 %              expressed in term of standard deviation. 
-%   posthresh  - positive threshold limit in mV (same syntax as negthresh)
-%   starttime  - starting time limit in second (same syntax as negthresh)
-%   endtime    - ending time limit in second (same syntax as negthresh)
+%   upthresh   - upper threshold limit in microV (same syntax as lowthresh)
+%   starttime  - starting time limit in second (same syntax as lowthresh)
+%   endtime    - ending time limit in second (same syntax as lowthresh)
 %   superpose  - 0=do not superpose pre-labelling with previous
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
@@ -56,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/12 21:50:24  arno
+% text
+%
 % Revision 1.9  2002/08/12 16:26:55  arno
 % inputdlg2
 %
@@ -116,7 +137,7 @@ if nargin < 3
 					'Start time(s) (s;ex -0.1 0.3):', ...
 					'End time(s) (s;ex 0.2):', ...
                     'Display with previous rejection', ...
-         		    'Actually reject marked trial(s) (YES or NO)' };
+         		    'Reject marked trial(s) (YES or NO)' };
 	inistr      = { fastif(icacomp==1, ['1:' int2str(EEG.nbchan)], '1:5'), ...
 					fastif(icacomp==1, '-10', '-20'),  ...
 					fastif(icacomp==1, '10', '20'), ...
