@@ -5,16 +5,16 @@
 %   >> newcomments = pop_comments( oldcomments, title, newcomments );
 %
 % Inputs:
-%   oldcomments - old comments, string or cell array of strings
-%   title       - optional title window
-%   newcomments - new comments, string or cell array of strings
-%                 to assign (command line calls only)
+%   oldcomments - old comments (string or cell array of strings)
+%   title       - optional window title (string)
+%   newcomments - new comments (string or cell array of strings)
+%                 to assign (during commandline calls only)
 %
 % Outputs:
 %   newcomments - new comments, string
 %
-% note: if new comments are given as input, there are simply
-%       converted and returned by the function, otherwise a
+% Note: if new comments are given as input, there are simply
+%       converted and returned by the function; otherwise a
 %       window pops up.
 %
 % Example
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 01:23:16  arno
+% update colors
+%
 % Revision 1.7  2002/08/12 01:22:20  arno
 % updating colors
 %
@@ -83,7 +86,7 @@ if nargin < 3
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
 	end;
 	figure('menubar', 'none', 'color', BACKCOLOR, ...
-		   'numbertitle', 'off', 'name', 'About this dataset -- pop_comment()');
+		   'numbertitle', 'off', 'name', 'Read/Enter comments -- pop_comments()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
@@ -91,7 +94,7 @@ if nargin < 3
 	if exist('plottitle') ~=1, plottitle = ''; end;
 	
 	h = title(plottitle);
-	set(h, 'fontweight', 'bold', 'interpreter', 'none');
+	set(h, 'fontname','Helvetica','fontweight', 'bold', 'interpreter', 'none');
 	
 	axis off;
 
@@ -108,7 +111,7 @@ if nargin < 3
   	'Units','Normalized', ...
 	'Position', [80 0 20 10].*s+q, ...
 	'backgroundcolor', GUIBUTTONCOLOR, ...
-	'string','OK', 'callback', ...
+	'string','SAVE', 'callback', ...
 		[ 'set(gcbf, ''userdata'', ' ...
 		'get(findobj(''parent'', gcbf, ''tag'', ''edit''), ''string''));' ]);
 
