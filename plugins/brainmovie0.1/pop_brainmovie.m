@@ -97,6 +97,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/11/18 23:16:04  arno
+% Initial revision
+%
 % Revision 1.2  2002/11/07 21:55:28  arno
 % new default for timesout
 %
@@ -112,14 +115,14 @@ if nargin < 2
 end;
 g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'computemovie' 'auto' }     'auto';
                             'comps'       'integer'       [1 Inf]                                  1:size(ALLEEG(1).icaact,1);
-							'freqsparam'  'cell'          {}                                       {};
+							'freqparams'  'cell'          {}                                       {};
 							'diffmovie'   'string'        { 'on' 'off' }                           'off';
 							'confirm'     'string'        { 'on' 'off' }                           'on';
 							'moviename'   'string'		  {}									   'movie';
 							'moviefolder' 'string'        {}                                       '';
 							'tfname'      'string'		  {}									   'tfparams';
 							'tffolder'    'string'        {}                                       '';
-							'framefolder' 'string'        {}                                       [ pwd 'movieframes'];
+							'framefolder' 'string'        {}                                       [ addfinalsep(pwd) 'movieframes'];
 							'movparams'   {'string' 'cell'}       []							   'mriside';
                             'addmovparams'  'cell'          {}							           {};
 							'showcomps'   'integer'       []									   [];
@@ -141,14 +144,14 @@ if isempty(g.showcomps), g.showcomps = g.comps; end;
 if length(unique(cell2mat({ALLEEG(:).pnts}))) > 1
     error('All datasets must have the same number of points');
 end;
-if isempty(freqs) & strcmp(g.confirm, 'on')
+if isempty(g.freqs) & strcmp(g.confirm, 'on')
     disp('********** USER ATTENTION REQUIRED ************');
     r = input('Are you sure you want to make a movie a each of the output frequencies (y/n)');
     if r(1) == 'n', disp('Cancelling movie call'); return; end;
 end;
-tffolder    = addfinalsep(tffolder);
-moviefolder = addfinalsep(moviefolder);
-framefolder = addfinalsep(framefolder);
+g.tffolder    = addfinalsep(g.tffolder);
+g.moviefolder = addfinalsep(g.moviefolder);
+g.framefolder = addfinalsep(g.framefolder);
 
 % spectral options
 % ----------------
@@ -170,10 +173,10 @@ g.freqparams = { ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ALLEEG(1)
 % -------------------
 nbconditions = length(ALLEEG);
 
-if strcmpi(mode, 'compute') | strcmpi(mode, 'computemovie') | ...
-        ( strcmpi(mode, 'auto') & ~exist([tffolder tfname '_freqs']))
-    if strcmpi(mode, 'auto')
-        fprintf('Auto mode: %s file does not exist, running time-freq. decomposition\n', [tffolder tfname '_freqs']);
+if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
+        ( strcmpi(g.mode, 'auto') & ~exist([g.tffolder g.tfname '_freqs']))
+    if strcmpi(g.mode, 'auto')
+        fprintf('Auto mode: %s file does not exist, running time-freq. decomposition\n', [g.tffolder g.tfname '_freqs']);
     end;
     if strcmp(g.confirm, 'on')
         disp('********** USER ATTENTION REQUIRED ************');
@@ -193,44 +196,44 @@ if strcmpi(mode, 'compute') | strcmpi(mode, 'computemovie') | ...
         end;
     end;
 	
-	eval(['save ' tffolder tfname '_freqs freqs']);
-	eval(['save ' tffolder tfname '_ALLERSP ALLERSP']);
-	eval(['save ' tffolder tfname '_ALLITC ALLITC']);
-	eval(['save ' tffolder tfname '_ALLCROSSF ALLCROSSF']);
-	eval(['save ' tffolder tfname '_ALLCROSSFANGLE ALLCROSSFANGLE']);
-	eval(['save ' tffolder tfname '_times times']);
-	eval(['save ' tffolder tfname '_freqs freqs']);
+	eval(['save ' g.tffolder g.tfname '_freqs freqs']);
+	eval(['save ' g.tffolder g.tfname '_ALLERSP ALLERSP']);
+	eval(['save ' g.tffolder g.tfname '_ALLITC ALLITC']);
+	eval(['save ' g.tffolder g.tfname '_ALLCROSSF ALLCROSSF']);
+	eval(['save ' g.tffolder g.tfname '_ALLCROSSFANGLE ALLCROSSFANGLE']);
+	eval(['save ' g.tffolder g.tfname '_times times']);
+	eval(['save ' g.tffolder g.tfname '_freqs freqs']);
 	disp('**************** Computation terminated and saved');
 else
-    if strcmpi(mode, 'auto')
+    if strcmpi(g.mode, 'auto')
         fprintf('Auto mode: found existing files\n');
     end;
 	disp('Loading files');
-	eval(['load ' tffolder tfname '_ALLERSP' ]); 
-	eval(['load ' tffolder tfname '_ALLITC' ]); 
-	eval(['load ' tffolder tfname '_ALLCROSSF' ]); 
-	eval(['load ' tffolder tfname '_ALLCROSSFANGLE' ]); 
-	eval(['load ' tffolder tfname '_times' ]); 
-	eval(['load ' tffolder tfname '_freqs' ]); 
+	eval(['load ' g.tffolder g.tfname '_ALLERSP' ]); 
+	eval(['load ' g.tffolder g.tfname '_ALLITC' ]); 
+	eval(['load ' g.tffolder g.tfname '_ALLCROSSF' ]); 
+	eval(['load ' g.tffolder g.tfname '_ALLCROSSFANGLE' ]); 
+	eval(['load ' g.tffolder g.tfname '_times' ]); 
+	eval(['load ' g.tffolder g.tfname '_freqs' ]); 
 end;
 
 % threshold activities (so that lines do not flash)
 % -------------------------------------------------
 try, 
-	eval(['load ' tffolder tfname '_newERSP' ]);
-	eval(['load ' tffolder tfname '_newITC' ]);
-	eval(['load ' tffolder tfname '_newCROSSF' ]);
-	eval(['load ' tffolder tfname '_newANGLE' ]);
+	eval(['load ' g.tffolder g.tfname '_newERSP' ]);
+	eval(['load ' g.tffolder g.tfname '_newITC' ]);
+	eval(['load ' g.tffolder g.tfname '_newCROSSF' ]);
+	eval(['load ' g.tffolder g.tfname '_newANGLE' ]);
 catch,
 	newERSP   = moviethresh( ALLERSP, 0.2, 4, 2);
 	newITC    = moviethresh( ALLITC , 0.2, 4, 2);
 	newCROSSF = moviethresh( ALLCROSSF, 0.2, 4, 2);
 	newANGLE  = revertangle2( ALLCROSSFANGLE, newCROSSF); % max angle
 	
-	eval(['save ' tffolder tfname '_newERSP   newERSP' ]);
-	eval(['save ' tffolder tfname '_newITC    newITC' ]);
-	eval(['save ' tffolder tfname '_newCROSSF newCROSSF' ]);
-	eval(['save ' tffolder tfname '_newANGLE  newANGLE' ]);
+	eval(['save ' g.tffolder g.tfname '_newERSP   newERSP' ]);
+	eval(['save ' g.tffolder g.tfname '_newITC    newITC' ]);
+	eval(['save ' g.tffolder g.tfname '_newCROSSF newCROSSF' ]);
+	eval(['save ' g.tffolder g.tfname '_newANGLE  newANGLE' ]);
 
 	% this second call is innefective (but it is usefull for you to check that changes have been applied)
 	%newERSP   = moviethresh( newERSP, 0.1, 4, 2);
@@ -248,7 +251,7 @@ else
     for index = 1:length(g.freqs)
         [tmpfreq minfreq] = min(abs(freqs - g.freqs(index)));
         g.freqindices = [ g.freqindices minfreq];
-        fprintf('Found closest freqeuncy for %3.2f Hz: %3.2f Hz\n', g.freqs(index), tmpfreq);
+        fprintf('Found closest frequency for %3.2f Hz: %3.2f Hz\n', g.freqs(index), tmpfreq);
     end;
 end;
         
@@ -276,7 +279,7 @@ if strcmpi(g.mode, 'mriside')
     end;
     brainmovieoptions = { 'resolution', 'low', ...
                         'coordinates', coordinates, ...
-                        'circfactor', circfactor, ...
+                        'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
                         'ylimaxes', [-1.1 1.1], ...
                         'title', '', ...
@@ -314,7 +317,7 @@ elseif strcmpi(g.mode, 'mritop')
     
     brainmovieoptions = { 'resolution', 'low', ...
                         'coordinates', coordinates, ...
-                        'circfactor', circfactor, ...
+                        'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
                         'ylimaxes', [-1.1 1.1], ...
                         'envelope', allenv, ...
@@ -332,8 +335,8 @@ else
     % ------------
     % custom movie
     % ------------
-    brainmovieoptions = { 'coordinates', coordinates, ...
-                        'circfactor', circfactor, ...
+    brainmovieoptions = { 'coordinates', g.coordinates, ...
+                        'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
 if ~isempty(g.addmovparams)
@@ -347,6 +350,7 @@ end;
 if strcmpi(g.diffmovie, 'on')
 	allenv(:,:,3) = env(mean(ALLEEG(1).data,3)-mean(ALLEEG(2).data,3), [min(times) max(times)], times);
 end;
+brainmovieoptions = { brainmovieoptions{:} 'envelope' allenv };
 
 % get reaction time
 % -----------------
@@ -357,17 +361,20 @@ if ~isempty(g.eventprob)
     end;
 	eventcellarray{nbconditions+1} = [];
     brainmovieoptions = { brainmovieoptions{:} 'rt' eventcellarray };
-end;    
+end;
+%if strcmp(g.oneframe, 'on')
+%   brainmovieoptions = { 'frames' [1 2] };
+%end;
 
 % BRAINMOVIE 
 % ----------
 brainmovieoptions  =removedup(brainmovieoptions);
-if ~strcmpi(mode, 'compute')
+if ~strcmpi(g.mode, 'compute')
 	origdir = pwd;
     
 	for freqindex = g.freqindices
-        [tmp1 tmp2] = mkdir( g.framefolder );
-		cd(g.framefolder);
+        [tmp1 tmp2] = mkdir('/', g.framefolder(2:end) );
+        cd(g.framefolder);
         
 		% Compute the MIN/MAX power 
 		%--------------------------
@@ -384,16 +391,25 @@ if ~strcmpi(mode, 'compute')
         % Run brainmovie
         % --------------
 		brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                    brainmovieoptions{:}, 'scalepower', [tmpmin tmpmax] );  
+                    brainmovieoptions{:}, 'framesout', 'fig', 'scalepower', [tmpmin tmpmax] );  
+        %if strcmp(g.oneframe, 'on')
+        %    disp('Only one frame generated');
+        %    return
+        %end;
         
         % Run makemovie
         % -------------
         g.framefolder = pwd;
-        cd(g.moviefolder)
+        if ~isempty(g.moviefolder)
+            cd(g.moviefolder)
+        else 
+            cd(origdir);
+        end;
         if length(g.freqindices) > 1, outname = g.moviename;
         else                          outname = sprintf('%s3.2f', g.moviename, freqs(g.freqindices(freqindex)));
         end;
-        makemovie( { 'image' 1 length(times) 4 }, 'dir', g.framefolder, 'outname', outname);
+        g.makemovie = removedup({ 'mode' 'fast' g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
+        makemovie( { 'image' 1 length(times) 4 }, g.makemovie{:});
 	end;
 	cd(origdir);
 end;
@@ -403,9 +419,10 @@ return
 % add a folder separator
 % ----------------------
 function str = addfinalsep(str)
-    if strcmpi(COMPUTER, 'pcwin')
+    if isempty(str), return; end;
+    if strcmpi(computer, 'PCWIN')
         if str(end) ~= '\', str(end+1) = '\'; end;
-    elseif strcmpi(COMPUTER, 'mac')
+    elseif strcmpi(computer, 'MAC')
         if str(end) ~= ':', str(end+1) = ':'; end;
     else
         if str(end) ~= '/', str(end+1) = '/'; end;
