@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/12/05 03:12:06  arno
+% fixing fig problem
+%
 % Revision 1.13  2002/11/15 18:01:06  arno
 % adding more warning messages
 %
@@ -186,7 +189,7 @@ EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as i
 eeg_options; 
 if option_computeica
     EEG.icaact    = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-    EEG.icaact    = reshape( EEG.icaact, EEG.nbchan, EEG.pnts, EEG.trials);
+    EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
 end;
 if nargin < 2
     if length(options < 2)
