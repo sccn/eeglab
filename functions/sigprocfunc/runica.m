@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/10/06 20:39:20  scott
+% fixed block size to integer -sm
+%
 % Revision 1.20  2004/06/29 16:44:09  scott
 % randomize data shuffling by clock state
 %
@@ -220,7 +223,7 @@ DEFAULT_LRATE        = 0.00065/log(chans);
                                   % heuristic default - may need adjustment
                                   %   for large or tiny data sets!
 % DEFAULT_BLOCK        = floor(sqrt(frames/4));  % heuristic default 
-DEFAULT_BLOCK          = ceil(min(5*log(frames)),0.3*frames)); % heuristic 
+DEFAULT_BLOCK          = ceil(min(5*log(frames),0.3*frames)); % heuristic 
                                   % - may need adjustment!
 % Extended-ICA option:
 DEFAULT_EXTENDED     = 0;         % default off
