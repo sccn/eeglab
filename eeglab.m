@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2002/08/19 19:50:23  arno
+% hiding statistic menu if no ksstat func
+%
 % Revision 1.151  2002/08/17 22:23:23  scott
 % As 2-D scalp series -> In 2-D
 % As 3-D head plots -> In 3-D
@@ -1009,7 +1012,8 @@ clear functions;
 eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
-		if popask( ['Remove all datasets except the present one ?' 10 'Otherwise go back to the memory menu to unset dataset overwrite'])
+		if popask( strvcat('Remove all datasets except the present one ?', ...
+						   'Otherwise go back to the memory menu to unset dataset overwrite'))
 			ALLEEG = []; CURRENTSET = 0;
 			h('ALLEEG = []; CURRENTSET = 0;');
 		else 
