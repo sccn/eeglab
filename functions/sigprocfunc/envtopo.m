@@ -3,7 +3,7 @@
 %             separately (with zoom feature).
 % Usage:
 %     >> envtopo(data,weights);
-%     >> [compvarorder,compvars,compframes,comptimes,compsplotted] ...
+%     >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
 %           = envtopo(data, weights, 'key1', val1, 'key2', val2 ...);
 %
 % Inputs:
@@ -51,6 +51,7 @@
 %  compframes    = frames of max variance
 %  comptimes     = times of max variance
 %  compsplotted  = components plotted
+%  pvaf          = percentage variance accounted for
 %
 % Notes:
 %  To label maps with other than component numbers, put 4-char strings into
@@ -77,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/03/14 15:23:29  arno
+% pvaf -> * 100
+%
 % Revision 1.18  2003/03/14 02:50:18  arno
 % help for pvaf
 %
@@ -164,7 +168,7 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-16-02 added all topoplot options -ad
 
-function [compvarorder,compvars,compframes,comptimes,compsplotted] = envtopo(data,weights,varargin);
+function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin);
     %chan_locs,limits,compnums,titl,plotchans,voffsets,colorfile,fill_comp_env,vert, varargin)
 
 if nargin < 2
@@ -232,6 +236,7 @@ uraxes = gca; % the original figure or subplot axes
 pos=get(uraxes,'Position');
 axcolor = get(uraxes,'Color');
 delete(gca)
+pvaf = [];
 
 all_bold = 0;
 BOLD_COLORS = 1;  % 1 = use solid lines for first 5 components plotted
@@ -470,9 +475,9 @@ fprintf('\n');
 % ---------------------------------------
 if strcmpi(g.pvaf, 'on')
     vardat = mean(mean((data(:,frame1:frame2).^2)));
-    pvaf = pvaf / vardat;
+    pvaf = 100-100*pvaf / vardat;
     for index =1:ncomps
-        fprintf('Component %d percentage variance accounted for: %6.2f\n', index, 100-100*pvaf(index));
+        fprintf('Component %d percentage variance accounted for: %6.2f\n', index, pvaf(index));
     end;
 end;
 %
@@ -783,6 +788,9 @@ if strcmpi(g.dispmaps, 'on')
             else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
             end
             axis square
+            if strcmpi(g.pvaf, 'on')
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''PVAF: ' sprintf('%6.2f', pvaf(maporder(t))) ''');'] );
+            end;
         else axis off;
         end;
         %ELSE headplot(g.icawinv(:,t),chan_spline);% make a 3-d headplot
@@ -837,8 +845,7 @@ if strcmpi(g.dispmaps, 'on')
     set(axall,'layer','top'); % bring component lines to top
     
 end;
-axcopy(gcf);
-
+axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
