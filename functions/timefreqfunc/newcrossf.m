@@ -46,7 +46,8 @@
 %       'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
 %                 from x and y. This computes the  'intrinsic' coherence
 %                 x and y not arising from common synchronization to 
-%                 experimental events. See notes. {default: 'off'}
+%                 experimental events. For cell array input, one may provide
+%                 a cell array ({'on','off'} for example). {default: 'off'}
 %       'shuffle' = integer indicating the number of estimates to compute
 %                 bootstrap coherence based on shuffled trials. This estimates
 %                 the coherence arising only from time locking of x and y
@@ -155,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/01/02 21:24:02  cooper
+% more fixes to lin coher formula.
+%
 % Revision 1.33  2003/01/02 19:59:33  arno
 % remove phase inversion for wavelets
 %
@@ -666,10 +670,13 @@ if iscell(X)
     % ----------------
 	for index = 1:2:length(vararginori)
 		if index<=length(vararginori) % needed: if elemenets are deleted
-			if strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
-			end;
+			if strcmp(vararginori{index}, 'title') , vararginori(index:index+1) = []; end;
+			if strcmp(vararginori{index}, 'subitc'), vararginori(index:index+1) = []; end;
 		end;
 	end;
+    if ~iscell(g.subitc)
+        g.subitc = { g.subitc g.subitc };
+    end;
 	if iscell(g.title) 
 		if length(g.title) <= 2,
 			g.title{3} = 'Condition 1 - condition 2';
@@ -689,10 +696,10 @@ if iscell(X)
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = newcrossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, vararginori{:});
+				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, 'subitc', g.subitc{1}, vararginori{:});
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = newcrossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', g.title{1},  vararginori{:});
+				frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', g.title{1}, 'subitc', g.subitc{1},  vararginori{:});
 	end;
 	
 	R1 = R1.*exp(j*Rangle1/180*pi);
@@ -703,10 +710,10 @@ if iscell(X)
 	end;
     if ~strcmp(g.type, 'coher') & nargout < 9
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = newcrossf(X{2}, Y{2}, ...
-								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, vararginori{:});
+				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, 'subitc', g.subitc{2}, vararginori{:});
 	else
 		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = newcrossf(X{2}, Y{2}, ...
-								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, vararginori{:});
+				frame, tlimits, Fs, varwin,'savecoher', 1, 'title', g.title{2}, 'subitc', g.subitc{2}, vararginori{:});
 	end;
 	R2 = R2.*exp(j*Rangle2/180*pi);
 
