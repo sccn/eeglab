@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/06/07 18:39:18  arno
+% replace indold by indnew
+%
 % Revision 1.19  2004/06/04 01:30:59  arno
 % better msg
 %
@@ -133,10 +136,10 @@ EEG.xmax = EEG.xmax+EEG.xmin;
 % -------------------
 if ~isempty(boundevents)
     [ EEG.event indnew ] = eeg_insertbound(EEG.event, EEG.pnts, boundevents, regions);
-    EEG                  = eeg_checkset(EEG, 'eventconsistency');
 else
     indnew = 1:length(EEG.event);
 end;
+
 
 % change event latencies
 % ----------------------
@@ -155,6 +158,7 @@ if ~isempty(tmpalllatencies)
         fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', ...
                 length(tmpnanloc));
     end;
+    EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
 EEG.icaact = [];
  
