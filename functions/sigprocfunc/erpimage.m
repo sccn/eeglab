@@ -169,6 +169,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.233  2005/02/10 02:38:50  arno
+% auxvar re-alignement
+%
 % Revision 1.232  2005/01/21 16:45:27  scott
 % help msg
 %
@@ -2678,7 +2681,7 @@ if strcmpi(noshow, 'no')
             else % plot re-aligned zeros on sortvar-aligned data
                 auxcolor = auxcolors{c};
                 if TIMEX      % overplot realigned 0-time on image
-                    figure(curfig);plot(0+aligntime-auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
+                    figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH); 
                 else
                     figure(curfig);plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH); 
                 end                                                 
