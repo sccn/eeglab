@@ -84,6 +84,9 @@
 %           thr2 - threshold global
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/12 22:19:15  arno
+% update button and color
+%
 % Revision 1.4  2002/08/11 22:17:09  arno
 % color
 %
@@ -171,7 +174,7 @@ if ~isstr( signal )
 			g.labels(index,:) = sprintf('%3d', index);
 		end;
 		if ~isempty(g.rejglob)
-			g.labels(index+2,:) = 'g..';
+			g.labels(index+2,:) = 'g.';
 		end;
 	end;		
 			
