@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/01/08 23:32:04  arno
+% typo in linear coherence formula
+%
 % Revision 1.13  2003/01/06 17:52:38  arno
 % nothing
 %
@@ -228,7 +231,7 @@ if strcmpi(g.subitc, 'on')
     %a = gcf; figure; imagesc(abs(itcvals)); cbar; figure(a);
 	tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
 end;
-%figure; imagesc(abs(sum(tmpall,3))); cbar;
+%figure; imagesc(abs(sum(itcvals,3))); cbar;
 return;
 
 
