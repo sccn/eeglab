@@ -1,7 +1,6 @@
-% eegfilt() - (high|low|band)pass filter EEG data using two-way least-squares 
+% eegfilt() - (high|low|band)-pass filter EEG data using two-way least-squares 
 %              FIR filtering. Multiple data channels and epochs supported.
-%              (Requires the Signal Processing Toolbox)
-%
+%              (Requires the MATLAB Signal Processing Toolbox)
 % Usage:
 %  >> [smoothdata] = eegfilt(data,srate,locutoff,hicutoff);
 %  >> [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff, ...
@@ -38,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/01/24 00:23:33  arno
+% print information about transition bands
+%
 % Revision 1.7  2003/01/23 23:53:25  arno
 % change text
 %
