@@ -143,6 +143,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.78  2004/05/04 05:37:26  scott
+%turn off 'spheres' cylinder plotting if g.dipolelenth == 0
+%
 %Revision 1.77  2004/04/30 18:48:53  scott
 %made default image 'mri' - debugged sphers/cylinders
 %
@@ -782,14 +785,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
             dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
             dipstruct.posxyz = sources(index).posxyz; % value used for other purposes
-            dipstruct.rv     = sprintf('C %d (%3.2f)', sources(index).component, sources(index).rv*100);
-
+            dipstruct.rv     = sprintf('C %d (%3.2f)',sources(index).component,...
+                                                             sources(index).rv*100);
             if ~strcmpi(g.spheres,'on')
-               set(h1, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+               set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
             else
-                  set(s1, 'userdata', dipstruct, 'tag', tag,'cdatamapping','direct','facecolor','r' );
-                  set(p1, 'userdata', dipstruct, 'tag', tag );
+                 if exist(s1), 
+                   set(s1,'userdata',dipstruct,'tag',tag,'cdatamapping','direct','facecolor','r');
+                 end
+                 if exist(p1), 
+                   set(p1, 'userdata', dipstruct, 'tag', tag );
+                 end
             end
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or point %%%%%%%%%%%%%%%%%%%%%%%%%
