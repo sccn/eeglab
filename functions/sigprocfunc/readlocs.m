@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2003/05/13 22:07:07  arno
+% removing labels in sfp format
+%
 % Revision 1.44  2003/05/13 21:14:11  arno
 % only write a subset of file format
 %
@@ -282,7 +285,7 @@ listimportformat = { ...
       { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
       { 'labels' '-Y' 'X' 'Z' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
-      { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
+      { 'channum' 'sph_theta' 'sph_phi' 'labels' } ... % sph format
       { } ... % ascii Neuroscan format
       { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
 
