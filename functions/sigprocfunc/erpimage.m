@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.148  2003/09/09 23:26:48  arno
+% change && to &
+%
 % Revision 1.147  2003/09/07 00:41:51  arno
 % fixing stdev, do not know why it crashed
 %
@@ -1624,7 +1627,6 @@ end
 % 
 %%%%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-
 urdata = data; % save data to compute amp, coher on unsmoothed data
 if ~Allampsflag & ~exist('data2') % if imaging potential,
     if avewidth > 1 | decfactor > 1
@@ -1828,9 +1830,9 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
     fprintf('Subtracting the mean baseline log amplitude \n');
+
     %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
     % allamps = allamps./baseall;
-    
     % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
     
     if avewidth > 1 | decfactor > 1
@@ -1839,13 +1841,14 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
             fprintf(...
                 'Smoothing the amplitude epochs using a window width of %g epochs ',...
                 avewidth);
-        else
+        else % sort trials
             fprintf(...
                 'Smoothing the sorted amplitude epochs with a %g-epoch moving window.',...
                 avewidth);
         end
         fprintf('\n');
         fprintf('  and a decimation factor of %g\n',decfactor);
+
         %fprintf('4 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
         if exist('phargs') % if phase-sorted trials, use circular/wrap-around smoothing
@@ -1856,29 +1859,34 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                                       allamps,...
                                       allamps(:,[1:fronthalf])],...
                                       [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
-            					% Note: sort using square window
+            				% Note: sort using square window
             [outsort,outtrials] = movav([sortvar((end-backhalf+1):end),...
-                                        sortvar,...
-                                        sortvar(1:fronthalf)],...
-                                        1:(ntrials+backhalf+fronthalf),avewidth,decfactor); 
-            % outtrials = 1:ntrials;
+                                      sortvar,...
+                                      sortvar(1:fronthalf)],...
+                                      1:(ntrials+backhalf+fronthalf),avewidth,decfactor); 
+                                        % outtrials = 1:ntrials;
+            [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
+                                      auxvar,...
+                                      auxvar(:,[1:fronthalf])],...
+                                      [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor); 
            else % avewidth==2
             [allamps,outtrials] = movav([allamps(:,end),allamps],...
-                                       [1:(ntrials+1)],avewidth,decfactor); 
-            					% Note: sort using square window
+                                      [1:(ntrials+1)],avewidth,decfactor); 
+            				% Note: sort using square window
             [outsort,outtrials] = movav([sortvar(end) sortvar],...
-                                        1:(ntrials+1),avewidth,decfactor); 
-            % outtrials = 1:ntrials;
+                                      1:(ntrials+1),avewidth,decfactor); 
+                                        % outtrials = 1:ntrials;
+            [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor); 
            end
         else % if trials not phase sorted, no wrap-around
-
             [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor); 
-                                 % Note: using square window
+                                        % Note: using square window
             %fprintf('5 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
             [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor); 
+            [auxvar,tmp] = movav([auxvar,1:ntrials,avewidth,decfactor); 
         end
         fprintf('Output allamps data will be %d frames by %d smoothed trials.\n',...
-                frames,length(outtrials));
+                                      frames,length(outtrials));
 
     else % if no smoothing
         outtrials = 1:ntrials;
@@ -1886,7 +1894,6 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     end
 
     allamps = 20*log10(allamps);
-    
     if isnan(baseamp) % if not specified in 'limits'
         [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
         allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
@@ -2036,7 +2043,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
         hold on
     end;
     
-end %%%%%%%%%%%%%%%%%%%%%%%%%%% End image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end %%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~isempty(verttimes)
  if size(verttimes,1) ~= 1 & size(verttimes,1) ~= ntrials
@@ -2248,7 +2255,6 @@ if strcmpi(noshow, 'no')
         end % c
     end % auxvar
 end;
-
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Plot colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
