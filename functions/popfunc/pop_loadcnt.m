@@ -11,8 +11,8 @@
 %   "Time interval in seconds" - [edit box] specify time interval [min max]
 %                   to import portion of data. Command line equivalent
 %                   in loadcnt: 't1' and 'lddur'
-%   "Import keystrokes" - [checkbox] set this option to import
-%                   keystrokes events in dataset. Command line equivalent
+%   "Import keystrokes" - [checkbox] set this option to import keystroke
+%                   event types in dataset. Command line equivalent
 %                   'keystroke'.
 %   "loadcnt() 'key', 'val' params" - [edit box] Enter optional loadcnt()
 %                   parameters.
@@ -22,7 +22,7 @@
 %
 % Optional inputs:
 %   'keystroke'    - ['on'|'off'] set the option to 'on' to import 
-%                    keystroke events. Default is off.
+%                    keystroke event types. Default is off.
 %   Same as loadcnt() function.
 % 
 % Outputs:
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/12/17 23:20:49  arno
+% debug last
+%
 % Revision 1.21  2003/12/17 23:19:51  arno
 % importing channel labels
 %
@@ -146,7 +149,7 @@ if nargin < 1
                      { 'style' 'checkbox' 'tag' '32' 'string' '32-bits' 'value' 0 'callback' callback32 } ...
                      { 'style' 'text' 'string' 'Time interval in seconds (i.e. [0 100]; default all):' } ...
                      { 'style' 'edit' 'string' '' } ...
-                     { 'style' 'text' 'string' 'Check to Import keystrokes (import as type 0):' } ...
+                     { 'style' 'text' 'string' 'Check to Import keystrokes:' } ...
                      { 'style' 'checkbox' 'string' '' } { } ...
                      { 'style' 'text' 'string' 'loadcnt() ''key'', ''val'' params' } ...
                      { 'style' 'edit' 'string' '' } };
@@ -197,16 +200,27 @@ EEG.nbchan          = r.header.nchannels;
 
 % inport events
 % -------------
-if ~isempty(findstr('keystroke', lower(options)))
-    tmpe = cell2mat( { r.event.stimtype } );
-    I = find( ( tmpe ~= 0 ) & ( tmpe ~= 255 ) );
-else
-    I = 1:length(r.event);
-end;
+I = 1:length(r.event);
 if ~isempty(I)
     EEG.event(1:length(I),1) = cell2mat( { r.event(I).stimtype } );
     EEG.event(1:length(I),2) = cell2mat( { r.event(I).offset   } );
     EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
+end;
+
+% process keyboard entries
+% ------------------------
+if ~isempty(findstr('keystroke', lower(options)))
+    tmpkbd  = cell2mat( { r.event(I).keyboard } );
+    tmpkbd2 = cell2mat( { r.event(I).keypad_accept } );
+    for index = 1:length(EEG.event)
+        if EEG.event(index).type == 0
+            if r.event(index).keypad_accept,
+                EEG.event(index).type = [ 'keypad' num2str(r.event(index).keypad_accept) ];
+            else
+                EEG.event(index).type = [ 'keyboard' num2str(r.event(index).keyboard) ];
+            end;
+        end;
+    end;
 end;
 
 % import channel locations (Neuroscan coordinates are not wrong)
