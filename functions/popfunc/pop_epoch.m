@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/08 14:46:30  arno
+% programming boundary events
+%
 % Revision 1.11  2002/08/06 21:35:13  arno
 % spelling
 %
@@ -250,35 +253,6 @@ for index=1:EEG.trials
 end;
 EEG.event = newevent;
 EEG = eeg_checkset(EEG, 'eventconsistency');
-
-% include the event latencies into EEG.epoch
-% ------------------------------------------
-maxlen = 0;
-EEG.epoch = [];
-EEG.epoch(1).event = [];	
-for index = 1:length(EEG.event)
-    currentepoch = EEG.event(index).epoch;
-    if currentepoch <= length(EEG.epoch)
-        EEG.epoch(currentepoch).event = [ EEG.epoch(currentepoch).event index ];
-    else
-        EEG.epoch(currentepoch).event = [ index ];
-    end;
-    maxlen = max(length(EEG.epoch(currentepoch).event), maxlen);
-end;
-
-% copy event information into the epoch array
-% -------------------------------------------
-switch lower(g.epochinfo)
- case 'yes', eventfields = fieldnames(EEG.event);
-  for fieldnum = 1:length(eventfields)
-	  for trial = 1:EEG.trials
-		  %['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]
-		  if maxlen == 1, eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} ';' ]);
-		  else            eval(['EEG.epoch(trial).event' eventfields{fieldnum} '= { EEG.event(EEG.epoch(trial).event).' eventfields{fieldnum} '};' ]);
-		  end;
-	  end;
-  end;    
-end;
 
 % check for boundary events
 % -------------------------
