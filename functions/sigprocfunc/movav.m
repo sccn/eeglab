@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/05/23 17:18:21  scott
+% adjust default 'xvals' -sm
+%
 % Revision 1.3  2002/05/23 17:06:00  scott
 % *** empty log message ***
 %
@@ -220,6 +223,7 @@ end
     elseif length(xwin)==1,
       if fastave
         if nanexist
+lox,hix
          outdata(:,f) = nanmean(data(:,round(lox):round(hix))')'; % Else average ignoring NaNs
         else
          outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
