@@ -5,6 +5,7 @@
 %
 % Inputs:
 %   eventin    - EEGLAB event structure
+%   pnts       - data points in EEG dataset
 %   latency    - relative latency (in the event structure) of boundary 
 %                event(s)
 %   abslatency - absolute latency of regions in original dataset. Can
@@ -43,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/05/14 21:29:06  arno
+% only event not urevents
+%
 % Revision 1.11  2004/05/06 21:53:28  arno
 % same
 %
