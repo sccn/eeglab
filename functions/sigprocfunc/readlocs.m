@@ -131,7 +131,7 @@
 %                         C3     -.719        0          .695  
 %                         C4      .719        0          .695  
 %                           ...
-%   '.txt':   
+%   '.ced':   
 %               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
 %               Fields:   label  theta  radius   x      y      z    sph_theta   sph_phi  ...
 %               Sample:   Fp1     -18    .511   .950   .308  -.035   18         -2       ...
@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/12/29 22:35:35  arno
+% adding coords. info for file format in header, programming .sph, ...
+%
 % Revision 1.29  2002/12/29 22:00:10  arno
 % skipline -> skiplines
 %
@@ -276,7 +279,7 @@ if isstr(filename)
         case {'loc' 'locs' }, g.filetype = 'loc';
         case 'xyz', g.filetype = 'xyz';
         case 'sph', g.filetype = 'sph';
-        case 'txt', g.filetype = 'chanedit';
+        case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';
         case 'eps', g.filetype = 'besa';
         otherwise, g.filetype =  ''; 
