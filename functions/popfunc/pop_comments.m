@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/10 19:21:28  arno
+% debuging cancel button
+%
 % Revision 1.5  2002/04/10 19:17:12  arno
 % setting title propertie to no interpreter
 %
@@ -71,7 +74,13 @@ elseif iscell(comments), comments = strvcat(comments{:});
 end;
 newcomments = comments;
 if nargin < 3
-	figure('menubar', 'none', 'numbertitle', 'off', 'name', 'About this dataset -- pop_comment()');
+	try, icadefs;
+	catch,
+		BACKCOLOR  =  [.8 .8 .8];     
+		GUIBUTTONCOLOR   = [.8 .8 .8];    
+	end;
+	figure('menubar', 'none', 'color', BACKCOLOR, ...
+		   'numbertitle', 'off', 'name', 'About this dataset -- pop_comment()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
@@ -88,12 +97,14 @@ if nargin < 3
   	uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
 	'Position', [0 0 20 10].*s+q, ...
+	'backgroundcolor', GUIBUTTONCOLOR, ...
 	'string','CANCEL', 'callback', ...
 		[ 'set(gcbf, ''userdata'', -1);' ]);
 		
   	uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
 	'Position', [85 0 20 10].*s+q, ...
+	'backgroundcolor', GUIBUTTONCOLOR, ...
 	'string','OK', 'callback', ...
 		[ 'set(gcbf, ''userdata'', ' ...
 		'get(findobj(''parent'', gcbf, ''tag'', ''edit''), ''string''));' ]);
