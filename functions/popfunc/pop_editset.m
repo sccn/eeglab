@@ -18,11 +18,11 @@
 %                  time limit is automatically calculated. 
 %                  Command line equivalent: 'xmin'
 %   "Channel locations file or array" - [Edit box] For channel data formats, see 
-%                  >> readlocs help    Command line equivalent: 'chanlocs'
+%                  >> readlocs help     Command line equivalent: 'chanlocs'
 %   "ICA weights array or text file" - [edit box] Import ICA weights from other 
 %                  decompositions (e.g., same data, different conditions). 
-%                  To use the ICA weights from another loaded dataset (n) enter 
-%                  "ALLEEG(n).icaweights" Command line equivalent: 'icaweights'
+%                  To use the ICA weights from another loaded dataset (n), enter 
+%                  "ALLEEG(n).icaweights". Command line equivalent: 'icaweights'
 %   "ICA sphere array or text file" - [edit box] Import ICA sphere matrix. 
 %                  Infomax ICA decompositions may be defined by a sphere matrix 
 %                  and an unmixing weight matrix (see above).  To use the sphere 
@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/02/24 16:26:38  arno
+% resolving ???
+%
 % Revision 1.32  2003/02/22 17:11:31  scott
 % header edit -sm
 %
