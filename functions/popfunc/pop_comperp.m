@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/12/04 15:34:27  arno
+% fixing erp add
+%
 % Revision 1.21  2003/11/18 16:35:40  scott
 % Enter ... -> ...
 %
@@ -373,7 +376,11 @@ end;
 % lowpass data
 % ------------
 if ~isempty(g.lowpass)
-    erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
+    if exist('eegfilt') == 2
+        erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
+    else
+        erptoplot = eegfiltfft(erptoplot, srate, 0, g.lowpass);
+    end;
 end;
 if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
 
