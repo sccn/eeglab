@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/07/09 00:48:28  arno
+% going to lower tolerance
+%
 % Revision 1.2  2003/07/08 16:37:06  arno
 % *** empty log message ***
 %
@@ -54,4 +57,4 @@ function p = rsget( l, val);
     
     % find p value for a given val
     % ----------------------------
-    p = fminbnd('rspfunc', 0, 1, optimset('TolX',1e-300), l, val);
+    p = fminbnd('rspfunc', 0, 1, optimset('TolX',1e-300, 'MaxFunEvals', 10000), l, val);
