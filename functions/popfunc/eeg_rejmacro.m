@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/11/15 19:01:25  arno
+% debugging for ICA
+%
 % Revision 1.20  2002/11/15 01:47:47  scott
 % can not -> cannot
 %
@@ -214,7 +217,7 @@ if ~isempty(rejeegplot)
 else
 	rejeegplot = [];
 end;
-eegplotoptions = { 'winlength', 5, 'position', [100 300 800 500], 'winrej', ...
+eegplotoptions = { 'winlength', 5, 'position', [100 50 800 500], 'winrej', ...
 				   rejeegplot, 'xgrid', 'off', 'wincolor', EEG.reject.rejmanualcol, ...
 				   'colmodif', { { EEG.reject.rejmanualcol EEG.reject.rejthreshcol EEG.reject.rejconstcol ...
                                    EEG.reject.rejjpcol     EEG.reject.rejkurtcol   EEG.reject.rejfreqcol } } };
