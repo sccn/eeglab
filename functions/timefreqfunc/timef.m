@@ -104,6 +104,9 @@
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
+% Know problems:
+%   Significant mask fails for linear coherence.
+%
 % See also: crossf()
  
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -126,6 +129,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2002/11/15 03:04:07  arno
+% header for web
+%
 % Revision 1.50  2002/10/18 16:49:53  arno
 % win' -> transpose(win)
 %
