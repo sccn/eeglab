@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2004/07/09 16:26:38  arno
+% debug duration selection
+%
 % Revision 1.51  2004/05/26 23:29:47  arno
 % implementing duration
 %
@@ -313,6 +316,7 @@ if nargin<2
         tmpres = results{2*index+1};
         if isempty(findstr(tmpres, '<=')), 
             try, tmpres = eval( [ '[' tmpres ']' ] );
+                 if ~isnumeric(tmpres), tmpres = parsetxt( results{2*index+1} ); end;
             catch, tmpres = parsetxt( tmpres ); end;
         end;
         if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
@@ -333,9 +337,6 @@ if nargin<2
     end;
 else % no interactive inputs
     args = varargin;
-    for i=1:length(varargin)
-        if iscell(args{i}), args{i} = { args{i} }; end; % double nested 
-    end;    
 end;
 
 % setting default for the structure
@@ -401,7 +402,11 @@ for index = 1:length(allfields)
             eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                Ieventtmp = unique( [ Ieventtmp; strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
+                tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
+                if isempty( tmpindex ),
+                    fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
+                end;
+                Ieventtmp = unique( [ Ieventtmp; tmpindex ]);
             end;
             Ievent = intersect( Ievent, Ieventtmp );
         elseif isstr( tmpvar ) % real range
@@ -456,7 +461,11 @@ for index = 1:length(allfields)
             eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                Ieventtmp = unique( [ Ieventtmp; strmatch( tmpvar{index2}, tmpvarvalue, 'exact') ]);
+                tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
+                if isempty( tmpindex ),
+                    fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
+                end;
+                Ieventtmp = unique( [ Ieventtmp; tmpindex ]);
             end;
             Ieventrem = union( Ieventrem, Ieventtmp );
          elseif isstr( tmpvar )
