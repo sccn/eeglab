@@ -108,7 +108,7 @@
 % pop_chanevent()      - import events stored in data channel(s)
 % pop_comments()       - edit dataset comment ('about') text
 % pop_compareerps()    - compare two dataset ERPs using plottopo()
-% pop_compprop()       - plot component properties (erpimage(), spectra, map)
+% pop_prop()           - plot channel or component properties (erpimage, spectra, map)
 % pop_copyset()        - copy dataset
 % pop_dispcomp()       - display component scalp maps with reject buttons
 % pop_editeventfield() - edit event fields
@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2002/09/03 16:32:47  arno
+% same, debug
+%
 % Revision 1.159  2002/09/03 16:31:55  arno
 % dataset size
 %
@@ -830,7 +833,8 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
     uimenu( third_m, 'Label', 'Channel data (scroll)'        , 'CallBack', [ check          'LASTCOM = pop_eegplot(EEG, 1, 0, 0);' e_hist], 'Separator', 'on');
 	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ checkplot      'LASTCOM = pop_spectopo(EEG, 1);' e_hist], 'enable', fastif(exist('resample'), 'on', 'off'));
-	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch     'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
+	uimenu( third_m, 'Label', 'Channel ERP image'        , 'CallBack', [ checkepoch  'LASTCOM = pop_erpimage(EEG, 1, h(''find'',''pop_erpimage(EEG,1''));' e_hist]);
+	uimenu( third_m, 'Label', 'Chennel properties'       , 'CallBack', [ checkplot   'LASTCOM = pop_prop(EEG,1);' e_hist]);
 	ERP_m = uimenu( third_m, 'Label', 'Averaged ERP');
 		uimenu( ERP_m, 'Label', 'Plus scalp maps'     , 'CallBack', [ checkepochplot 'LASTCOM = pop_timtopo(EEG);' e_hist]);
 		uimenu( ERP_m, 'Label', 'In scalp array'     , 'CallBack', [ checkplot      'LASTCOM = pop_plottopo(EEG);' e_hist]);
@@ -845,7 +849,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	topoica_m = uimenu( third_m, 'Label', 'Component maps');
 		uimenu( topoica_m, 'Label', 'In 2-D', 'CallBack', [ checkicaplot   'LASTCOM = pop_topoplot(EEG, 0);' e_hist]);
 		uimenu( topoica_m, 'Label', 'In 3-D', 'CallBack', [ checkicaplot   '[EEG LASTCOM] = pop_headplot(EEG, 0);' e_store]);
-	uimenu( third_m, 'Label', 'Component properties'     , 'CallBack', [ checkicaplot   'LASTCOM = pop_compprop(EEG);' e_hist]);
+	uimenu( third_m, 'Label', 'Component properties'     , 'CallBack', [ checkicaplot   'LASTCOM = pop_prop(EEG,0);' e_hist]);
 	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
 	   uimenu( ERPC_m, 'Label', 'On same axis (with maps)', 'CallBack', [ checkepochicaplot 'LASTCOM = pop_envtopo(EEG);' e_hist]);
