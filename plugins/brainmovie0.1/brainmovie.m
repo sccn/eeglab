@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/05/31 18:31:10  arno
+% undo last change
+%
 % Revision 1.52  2003/05/31 18:20:15  arno
 % printing frequency in title
 %
@@ -918,12 +921,14 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 		end;	
 		tmpsize = 0.05 *  tmpsize * (g.xlimaxes(2)-g.xlimaxes(1))+0.1;
 
-		switch lower(g.itc)
-			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2+ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
-			case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
-			%case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
-			%case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
-		end;
+        try
+            switch lower(g.itc)
+             case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2+ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
+             case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
+              %case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
+              %case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
+            end;
+        catch,  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: ); end;
 		if tmpersp == 0
 			dashed = 1;
 		else
