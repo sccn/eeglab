@@ -4,7 +4,6 @@
 % Usage:
 %        >>  topoplot(datavector, chan_locs);
 %        >>  [h zi] = topoplot(datavector, chan_locs, 'Param1','Value1', ...)
-%
 % Inputs:
 %    		datavector - vector of values at the corresponding locations.
 %                        if a single channel number, show location of that 
@@ -12,7 +11,6 @@
 %   		chan_locs  - name of an EEG electrode position file (See
 %                             >> topoplot example for format). Can also be a
 %                        structure (see >> help pop_editset)
-%
 % Optional Parameters:
 %   'shrink'           - ['on'|'off'|'force'|factor] normalize electrode polar
 %                        coordinates if maximum radius > 0.5 ('on') so that
@@ -57,7 +55,7 @@
 %  
 % Outputs:
 %         h           - axes handle
-%         grid        - (67,67) interpolated data image (off-head points = NaN).
+%         grid        - interpolated data image (gridscale,gridscale) (off-head points = NaN).
 %
 % Eloc_file format:
 %    chan_number degrees radius reject_level amp_gain channel_name
@@ -65,9 +63,9 @@
 %    For a sample eloc file: >> topoplot example
 %
 % Note: 1) topoplot only works when map limits are >= the max and min 
-%                                     interpolated data values.
+%          interpolated data values.
 %       2) topoplot will ignore any electrode with a position outside 
-%       the head (radius > 0.5). To make the head round, >> axis square
+%          the head (radius > 0.5). To make the head round, >> axis square
 %
 % Authors: Andy Spydell, Colin Humphries & Arnaud Delorme 
 %          CNL / Salk Institute, Aug, 1996
@@ -91,8 +89,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2003/07/17 23:13:03  scott
+% rm debug message
+%
 % Revision 1.43  2003/07/16 16:29:46  arno
-% replacing with topoplottest
+% replacing with topoplottest - added image output, gridscale arg
 %
 % Revision 1.41  2003/07/15 23:55:40  arno
 % retreiving version 1.28
@@ -183,7 +184,7 @@
 %
 
 % Topoplot Version 2.1
-
+% Original development history:
 % Begun by Andy Spydell and Scott Makeig, NHRC,  7-23-96
 % 8-96 Revised by Colin Humphries, CNL / Salk Institute, La Jolla CA
 %   -changed surf command to imagesc (faster)
@@ -204,7 +205,6 @@
 % 01-25-02 reformated help & license, added link -ad 
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-25-02 added 'labelpoint' options and allow Vl=[] -ad &sm
-
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 function [handle,Zi] = topoplot2(Vl,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
@@ -371,7 +371,7 @@ end
 if r>1 & c>1,
   error('topoplot(): input data must be a single vector');
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %fid = fopen(loc_file);
 %if fid<1,
 %  fprintf('topoplot(): cannot open chan_locs file (%s).\n',loc_file);
@@ -379,14 +379,13 @@ end
 %end
 %A = fscanf(fid,'%d %f %f %s',[7 MAXTOPOPLOTCHANS]);
 %fclose(fid);
-
 %A = A';
 %labels = setstr(A(:,4:7));
 %idx = find(labels == '.');                       % some labels have dots
 %labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
-
 %Th = pi/180*A(:,2);                              % convert degrees to radians
 %Rd = A(:,3);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % read the channel location file
 % ------------------------------
