@@ -51,9 +51,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.52  2004/09/13 19:27:54  arno
-% reverting version 1.49
-%
 % Revision 1.49  2004/09/13 18:21:02  arno
 % debug ploting for Matlab 7
 %
@@ -287,7 +284,7 @@ if nargin < 3
         catch, error('Invalid scalp map options'); end;
     end;        
     if length(arg2) == 1, 
-      curfig = figure;
+      figure; curfig=gcf; 
       try, icadefs; 
          set(curfig, 'color', BACKCOLOR); 
       catch, end; 
