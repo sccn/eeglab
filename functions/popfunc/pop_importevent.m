@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/10 21:18:09  arno
+% remove text message
+%
 % Revision 1.8  2002/09/04 17:53:45  luca
 % added ;
 %
@@ -179,7 +182,6 @@ if nargin<2
 	    % handle alignment 
 	    % ----------------     
 	    if ~isempty(eval(results{end})), if eval(results{end}) ~= 0,  args = { args{:}, 'align', eval(results{end}) }; end; end;
-        args
 else % no interactive inputs
     args = varargin;
     % scan args to modify array/file format
