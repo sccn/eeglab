@@ -6,8 +6,8 @@
 %      >> [delays,targets,urtargs,urprevs] = eeg_time2prev(EEG,{target},{previous});
 % Inputs:
 %  EEG      - structure containing an EEGLAB dataset
-%  target   - cell array of strings naming event type(s) of the specified target events 
-%  previous - cell array of strings naming event type(s) of the specified previous events 
+% {target}  - cell array of strings naming event type(s) of the specified target events 
+%{previous} - cell array of strings naming event type(s) of the specified previous events 
 %
 % Outputs:
 %  delays    - vector giving, for each event of a type listed in "target", the delay (in ms) 
