@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/08/20 18:43:07  arno
+% remove MAC error for Osx
+%
 % Revision 1.42  2004/08/20 18:11:11  arno
 % no eval for binica
 %
@@ -257,18 +260,18 @@ switch lower(icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
-        tmprank = rank(tmpdata(:,1:floor(size(tmpdata,2)/2)));
-        if rank(tmpdata) < size(EEG.data,1), 
+        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        if tmprank < size(EEG.data,1), 
             disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
         end;
         if length(options) < 2
-            if rank(tmpdata) == size(EEG.data,1), 
+            if tmprank == size(EEG.data,1), 
                 [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001 );
             else 
                 [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
         else % if there are defined 'options'   
-            if rank(tmpdata) == size(EEG.data,1) | ~isempty(findstr('pca', options))
+            if tmprank == size(EEG.data,1) | ~isempty(findstr('pca', options))
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
             else
                 eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s, ''pca'', %d );', options, tmprank));
@@ -281,19 +284,19 @@ switch lower(icatype)
         if exist(ICABINARY) ~= 2
             error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
-        tmprank = rank(tmpdata(:,1:floor(size(tmpdata,2)/2)));
-        if rank(tmpdata) < size(EEG.data,1), 
+        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        if tmprank < size(EEG.data,1), 
             disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
         end;
         if length(options) < 2
-            if rank(tmpdata) == size(EEG.data,1), 
+            if tmprank == size(EEG.data,1), 
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001 );
             else 
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
             end;
         else % if defined 'options'
             tmpoptions = eval( [ '{' options '}' ]);
-            if rank(tmpdata) == size(EEG.data,1) | ~isempty(findstr('pca', options))
+            if tmprank == size(EEG.data,1) | ~isempty(findstr('pca', options))
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, tmpoptions{:}  );
             else
                 [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'pca', tmprank, tmpoptions{:}  );
