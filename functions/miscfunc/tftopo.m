@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/05/19 03:04:46  scott
+% *** empty log message ***
+%
 % Revision 1.29  2002/05/19 02:57:24  scott
 % *** empty log message ***
 %
@@ -329,6 +332,12 @@ axes(imgax)
 xl=xlabel('Time (ms)');
 set(xl,'fontsize',16);
 set(gca,'yaxislocation','left')
+if showchan>0
+   tl=title(['Channel ',int2str(showchan)]);
+else
+   tl=title(['All-channel Mean          ']);
+end
+set(tl,'fontsize',14);
 yl=ylabel(['Frequency (Hz)     Chan ',int2str(showchan)]);
 set(yl,'fontsize',16);
 set(gca,'fontsize',14)
