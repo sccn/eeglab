@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/03/17 02:24:49  arno
+% same
+%
 % Revision 1.5  2005/03/17 02:24:04  arno
 % show history
 %
@@ -170,7 +173,6 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     check_dipfit = ['if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end;'  ...
                  trystrs.no_check ];
     check_dipfitnocheck = ['if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end; ' ...
-                 'h(''% no history for manual DIPFIT dipole localization'');'  ...
                  trystrs.no_check ];
     check_chans = [ '[EEG tmpres] = eeg_checkset(EEG, ''chanlocs_homogeneous'');' ...
                        'if ~isempty(tmpres), h(tmpres), end; clear tmpres;' ];
