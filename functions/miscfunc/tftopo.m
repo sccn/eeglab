@@ -42,6 +42,8 @@
 %                each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string).
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
+%  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
+%                    using the left mouse button {default: 'on'}.. 
 %
 % Notes:
 %  1) Additional topoplot() optional arguments can be used.
@@ -76,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2005/01/31 19:15:45  hilit
+% added input option 'verbose'
+%
 % Revision 1.68  2004/11/05 17:56:21  arno
 % add title
 %
@@ -317,6 +322,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'mode'          'string'   { 'ave' 'rms' }           'rms';
               'title'         'string'   []                        '';
               'verbose'    'string'  {'on' 'off' }             'on';
+              'axcopy'    'string'  {'on' 'off' }             'on';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
               'showchan'      'integer'  [0 nchans]                0 ;
@@ -693,7 +699,9 @@ if g.showchan>0 & ~isempty(g.chanlocs)
                   'style', 'blank', 'emarkersize1chan', 10 );
      axis('square');
 end
-axcopy;
+if strcmpi(g.axcopy, 'on')
+    axcopy
+end
 
 
 function tfdat = avedata(tfdat, dim, thresh, mode)
@@ -1117,8 +1125,9 @@ if g.showchan>0 & ~isempty(g.chanlocs)
                   'style', 'blank', 'emarkersize1chan', 10 );
      axis('square');
 end
-axcopy;
-
+if strcmpi(g.axcopy, 'on')
+    axcopy
+end
 
 function tfdat = avedata(tfdat, dim, thresh, mode)
     tfsign  = sign(mean(tfdat,dim));
