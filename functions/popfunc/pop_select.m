@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/01/14 00:28:21  arno
+% implementing new time selection (using the epoch function)
+%
 % Revision 1.20  2002/12/06 03:21:56  arno
 % correcting typos
 %
@@ -235,14 +238,22 @@ if ~isempty( g.nopoint )
     g.notime(2) = eeg_point2lat(g.nopoint(end), 1, EEG.srate, [EEG.xmin EEG.xmax]);
 end;
 if ~isempty( g.notime )
+    if size(g.notime,2) ~= 2
+        error('Time must contain 2 columns exactly');
+    end;
     if g.notime(2) == EEG.xmax
         g.time = [EEG.xmin g.notime(1)];
     else
         if g.notime(1) == EEG.xmin
             g.time = [g.notime(2) EEG.xmax];
-        else 
-            error('Wrong notime range. Remember that it is not possible to remove a slice of time.');
+        elseif EEG.trials > 1
+            error('Wrong notime range. Remember that it is not possible to remove a slice of time for data epochs.');
         end;
+    end;
+end;
+if ~isempty(g.time)
+    if size(g.time,2) ~= 2
+        error('Time must contain 2 columns exactly');
     end;
 end;
 
@@ -304,42 +315,62 @@ end;
 
 % performing removal
 % ------------------
-if ~isempty(g.time)
-    % select new time window
-    % ----------------------    
-    try,   tmpeventlatency = cell2mat({EEG.event.latency});
-    catch, tmpeventlatency = [];
-    end;
-    alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
-    alllatencies = linspace( alllatencies, EEG.pnts*(EEG.trials-1)+alllatencies, EEG.trials);
-    [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
-               [g.time(1) g.time(2)]*EEG.srate, 'allevents', tmpeventlatency);
-    tmptime = tmptime/EEG.srate;
-    if g.time(1) ~= tmptime(1) & g.time(2)-1/EEG.srate ~= tmptime(2)
-        fprintf('pop_select(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
-    end;
-    EEG.xmin = tmptime(1);
-    EEG.xmax = tmptime(2);
-    EEG.pnts = size(EEG.data,2);
-    alllatencies = alllatencies(indices);
-
-    % modify the event structure accordingly (latencies and add epoch field)
-    % ----------------------------------------------------------------------
-    allevents = [];
-    newevent = [];
-    count = 1;
-    if ~isempty(epochevent)
-        for index=1:EEG.trials
-            for indexevent = epochevent{index}
-                newevent(count)         = EEG.event(indexevent);
-                newevent(count).epoch   = index;
-                newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
-                count = count + 1;
+if ~isempty(g.time) | ~isempty(g.notime)
+    if EEG.trials > 1
+        % select new time window
+        % ----------------------    
+        try,   tmpeventlatency = cell2mat({EEG.event.latency});
+        catch, tmpeventlatency = [];
+        end;
+        alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
+        alllatencies = linspace( alllatencies, EEG.pnts*(EEG.trials-1)+alllatencies, EEG.trials);
+        [EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, ...
+                                                     [g.time(1) g.time(2)]*EEG.srate, 'allevents', tmpeventlatency);
+        tmptime = tmptime/EEG.srate;
+        if g.time(1) ~= tmptime(1) & g.time(2)-1/EEG.srate ~= tmptime(2)
+            fprintf('pop_select(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
+        end;
+        EEG.xmin = tmptime(1);
+        EEG.xmax = tmptime(2);
+        EEG.pnts = size(EEG.data,2);
+        alllatencies = alllatencies(indices);
+        
+        % modify the event structure accordingly (latencies and add epoch field)
+        % ----------------------------------------------------------------------
+        allevents = [];
+        newevent = [];
+        count = 1;
+        if ~isempty(epochevent)
+            newevent = EEG.event(1);
+            for index=1:EEG.trials
+                for indexevent = epochevent{index}
+                    newevent(count)         = EEG.event(indexevent);
+                    newevent(count).epoch   = index;
+                    newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
+                    count = count + 1;
+                end;
             end;
         end;
-    end;
-    EEG.event = newevent;
-    EEG.epoch = [];
+        EEG.event = newevent;
+        EEG.epoch = [];
+    else
+        if isempty(g.notime)
+            g.time = g.time';
+            if g.time(1) ~= 0, g.notime = [0 g.time(1:end)];
+            else               g.notime = [g.time(2:end)];
+            end;
+            if g.time(end) == EEG.xmax, g.notime(end) = [];
+            else                        g.notime(end+1) = EEG.xmax;
+            end;
+            g.notime = reshape(g.notime, 2, length(g.notime)/2)';
+        end;   
+        
+        nbtimes = length(g.notime(:));
+        points = eeg_lat2point(g.notime(:)', ones(1,nbtimes), EEG.srate, [EEG.xmin EEG.xmax]);
+        points = reshape(points, size(g.notime));
+        points
+        EEG = eeg_eegrej(EEG, points);
+    end
 end;
 
 % performing removal
