@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/06 02:22:10  arno
+% handle spetial case
+%
 % Revision 1.5  2003/01/28 19:00:47  arno
 % making ouput nicer for arrays
 %
@@ -96,8 +99,6 @@ for index = 1:length(allargs)
 	tmpvar = allargs{index};
 	if ~isempty(inputnam{index})
 		strout = [ strout ',' inputnam{index} ];
-	elseif ~isnan(inputnum(index))
-		strout = [ strout ',varargin{' num2str(inputnum(index)) '}' ];
 	else
 		if isstr( tmpvar )
 			if int2str(index)
@@ -139,7 +140,7 @@ return;
 % convert array to string
 % -----------------------
 function str = array2str( array )
-	if isempty( array), str = '[]'; return; end;
+    if isempty( array), str = '[]'; return; end;
 	if prod(size(array)) == 1, str = num2str(array); return; end;
 	if size(array,1) == 1, str = [ '[' contarray(array) '] ' ]; return; end;
 	if size(array,2) == 1, str = [ '[' contarray(array') ']'' ' ]; return; end;
@@ -180,12 +181,13 @@ return;
 % test continuous arrays
 % ----------------------
 function str = contarray( array )
-	if all(round(array) == array)
+	tmpind = find( round(array) ~= array );
+    if isempty(tmpind) | all(isnan(array(tmpind)))
 		str = num2str(array(1));
 		skip = 0;
         indent = array(2) - array(1);
 		for index = 2:length(array)
-			if array(index) ~= array(index-1)+indent
+            if array(index) ~= array(index-1)+indent
 				if skip <= 1
 					if skip == 0
                         str = [str ',' num2str(array(index))];
