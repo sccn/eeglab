@@ -23,7 +23,7 @@
 %                Note that default color limits are symmetric around 0 and are
 %                different for each head {defaults: all nans}
 %   'title'    = [quoted string] plot title {default: none}
-%   'freqfac'  = [int power of 2] approximate frequencies/Hz to compute {default: 4}
+%   'freqfac'  = number of time to oversample, vertical frequency resolution {default: 2}
 %   'percent'  = downsampling factor or approximate percentage of the data to
 %                keep while computing spectra. Downsampling can be used to speed up
 %                the computation. From 0 to 100 {default: 100}.
@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2002/08/17 00:13:35  arno
+% same default as in timef for epoched data
+%
 % Revision 1.29  2002/08/12 22:46:19  arno
 % maxfreq->freqrange
 %
@@ -188,7 +191,7 @@ function [eegspecdB,freqs]=spectopo(data,frames,srate,varargin)
 	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
-FREQFAC  = 4;  % approximate frequencies/Hz (default)
+FREQFAC  = 2;  % approximate frequencies/Hz (default)
 
 if nargin<3
    help spectopo
@@ -671,12 +674,11 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 	else 
 		nchans = size(data,1);		
 	end;
-	if length(epoch_subset) == 1
-		fftlength = 2^round(log(srate)/log(2))*g.freqfac;
-	else 
-		fftlength = 2*max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
-	end;
-	fprintf(' (window length %d):', fftlength);
+	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
+	winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
+	winlength = min(winlength, 512);
+	fftlength = 2^(nextpow2(winlength))*g.freqfac;
+	fprintf(' (window length %d; fft length: %d; overlap 1/2):\n', winlength, fftlength);
 	
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
@@ -693,8 +695,8 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		end;
 		for e=epoch_subset
 			if isempty(g.boundaries)
-				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),fftlength,...
-									  srate,fftlength/2,fftlength/8);
+				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),...
+									  fftlength,srate,winlength,winlength/2);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 				end
@@ -702,7 +704,7 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 			else
 				for n=1:length(g.boundaries)-1
 					[tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-										   fftlength, srate,fftlength/2,fftlength/8);
+										   fftlength,srate,winlength,winlength/2);
 					if c==1 & e==epoch_subset(1)
 						eegspec = zeros(nchans,length(freqs));
 					end
