@@ -11,7 +11,7 @@
 %              pre-labelling (stored in the dataset). 1=consider both
 %              pre-labelling (using different colors). Default is 0.
 %   reject     - 0 = do not reject labelled trials (but still store the 
-%              labels. 1=reject labelled trials. Default is 0.
+%              them. 1=reject labelled trials). Default is 0.
 %
 % Outputs:
 %   Modifications are applied to the current dataset at the end of the
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/07/26 16:53:22  arno
+% switching icacomp
+%
 % Revision 1.5  2002/07/08 22:03:02  arno
 % nothing
 %
