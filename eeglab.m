@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.251  2003/07/31 22:39:22  arno
+% debug last
+%
 % Revision 1.250  2003/07/31 22:32:35  arno
 % same
 %
@@ -987,6 +990,8 @@ if nargin == 1
 	else
         h('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 	end;
+else 
+    onearg = 'rebuild';
 end;
 ALLCOM = ALLCOM;
 colordef white
@@ -1038,7 +1043,7 @@ catchstrs.new_and_hist           = e_newset;
 
 % menu definition
 % --------------- 
-eeg_mainfig;
+eeg_mainfig(onearg);
 W_MAIN = findobj('tag', 'EEGLAB');
 EEGUSERDAT = get(W_MAIN, 'userdata');
 set(W_MAIN, 'MenuBar', 'none');
@@ -1224,7 +1229,7 @@ end;
 % --------------------
 % draw the main figure
 % --------------------
-function eeg_mainfig;
+function eeg_mainfig(onearg);
 
 icadefs;
 COLOR = BACKEEGLABCOLOR;
@@ -1243,6 +1248,16 @@ hh = findobj('tag', 'EEGLAB');
 if ~isempty(hh)
     disp('EEGLAB warning: there can be only one EEGLAB window, closing old one');
     close(hh);
+end;
+if strcmpi(onearg, 'remote')
+    figure(	'name', 'EEGLAB v4.0', ... 
+	'numbertitle', 'off', ...
+	'resize', 'off', ...
+	'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) 30 ], ...
+	'color', COLOR, ...
+	'Tag','EEGLAB', ...
+	'Userdata', {[] []});
+    return;
 end;
 
 W_MAIN = figure('Units','points', ...
@@ -1445,6 +1460,9 @@ end;
 % print some informations on the main figure
 % ------------------------------------------
 g = myguihandles(gcf);
+if ~isfield(g, 'win0') % no display
+    return;
+end;
 if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
 	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
