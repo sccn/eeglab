@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/03/22 22:15:39  arno
+% pca option for binica
+%
 % Revision 1.39  2004/02/05 01:50:52  arno
 % call for acsobiro
 %
@@ -496,10 +499,11 @@ switch lower(icatype)
             error('Pop_runica: to use fastica, you must first download the toolbox (see >> help pop_runica)');
         end;     
         if length(options) < 2
-            eval([ '[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' );' ]);
+            eval([ '[ ICAcomp, EEG.icaweights, EEG.icawinv] = fastica( tmpdata, ''displayMode'', ''off'' );' ]);
         else    
-            eval(sprintf('[ ICAcomp, EEG.icaweights,EEG.icasphere] = fastica( tmpdata, ''displayMode'', ''off'' %s );', options));
+            eval(sprintf('[ ICAcomp, EEG.icaweights, EEG.icawinv] = fastica( tmpdata, ''displayMode'', ''off'' %s );', options));
         end;
+        EEG.icasphere  = eye(size(EEG.icaweights,2));
      otherwise, error('Pop_runica: unrecognized algorithm');
 end;
 if ~isempty(fig), try, close(fig); catch, end; end;
