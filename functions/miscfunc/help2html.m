@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/16 15:09:33  arno
+% programming output only
+%
 % Revision 1.8  2002/08/15 22:23:25  arno
 % add outputonly param
 %
@@ -166,14 +169,16 @@ fid = fopen( filename, 'r');
 if fid == -1
 	error('Input file not found');
 end;
-fo = fopen(htmlfile, 'w');
-if fo == -1
-	error('Cannot open output file');
+if ~strcmp(g.outputonly, 'on')
+	fo = fopen(htmlfile, 'w');
+	if fo == -1
+		error('Cannot open output file');
+	end;
+	% write header
+	% ------------
+	fprintf(fo, '<HTML><HEAD>%s</HEAD><BODY>\n%s\n<table WIDTH="100%%" NOSAVE>\n', g.header, g.background);
 end;
 
-% write header
-% ------------
-fprintf(fo, '<HTML><HEAD>%s</HEAD><BODY>\n%s\n<table WIDTH="100%%" NOSAVE>\n', g.header, g.background);
 	
 cont = 1;
 % scan file
