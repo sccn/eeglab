@@ -1,18 +1,33 @@
 % pop_loadeeg() - load a neuroscan EEG file (pop out window if no arguments).
 %
 % Usage:
-%   >> [dat] = pop_loadeeg( filename, filepath, range_chan, range_sweeps, range_typeeeg, range_response);
+%   >> EEG = pop_loadeeg; % pop-up window mode
+%   >> EEG = pop_loadeeg( filename, filepath, range_chan, range_trials, ...
+%                  range_typeeeg, range_response);
+%
+% Graphical interface:
+%   "Enter trial range subset" - [edit box] integer array. Command line
+%                equivalent: 'range_trials'
+%   "Enter type range subset" - [edit box] integer array. Command line
+%                equivalent: 'range_typeeeg'
+%   "Enter electrode subset" - [edit box] integer array. Command line
+%                equivalent: 'range_chan'
+%   "Enter response range subset" - [edit box] integer array. Command line
+%                equivalent: 'range_response'
 %
 % Inputs:
 %   filename       - file name
 %   filepath       - file path
-%   range_chan     - matlab index array for the electrodes to load (ex: 3,4:10; default all) 
-%   range_sweeps   - matlab index array for the sweeps'index to load (default all)
-%   range_typeeeg  - matlab index array for the type to load (default all)
-%   range_response - matlab index array for the responses to load (default all)
+%   range_chan     - [integer array] only import selected electrodes
+%                    (ex: 3,4:10; default all)
+%   range_trials   - [integer array] only import selected trials (default all)
+%   range_typeeeg  - [integer array] only import trials with selected type
+%                    (default all)
+%   range_response - [integer array] only import trials with selected responses
+%                    values (default all)
 % 
 % Outputs:
-%   dat            - data structure
+%   EEG            - eeglab() data structure
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/01/14 00:30:23  arno
+% handling the case where all rts are 0
+%
 % Revision 1.3  2002/08/12 02:38:13  arno
 % [6~[6~inputdlg2
 %
