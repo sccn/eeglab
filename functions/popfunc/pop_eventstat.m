@@ -2,7 +2,7 @@
 %                   including the data histogram, a fitted normal distribution,
 %                   a normal ditribution fitted on trimmed data, a boxplot, and
 %                   the QQ-plot. The estimates value are printed in a panel and
-%                   can be read as output. NaNs are omitted. See SIGNALSTAT.
+%                   can be read as output. NaNs are omitted. See signalstat().
 %
 % Usage:
 %   >>  OUTEEG = pop_eventstat( EEG ); % pops up
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2003/11/18 16:28:25  scott
+% Enter ... -> ...
+%
 % Revision 1.4  2002/11/12 16:35:51  arno
 % add error message
 %

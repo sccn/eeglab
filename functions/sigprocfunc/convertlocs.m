@@ -5,14 +5,11 @@
 %
 % Input:
 %   chanlocs  - EEGLAB EEG dataset OR EEG.chanlocs channel locations structure
-%   'command' - ['cart2topo'|'sph2topo'|'sphbesa2topo'|
-%               'sph2cart'|'topo2cart'|'sphbesa2cart'|
-%               'cart2sph'|'sphbesa2sph'|'topo2sph'|
-%               'cart2sphbesa'|'sph2sphbesa'|'topo2sphbesa'|
+%   'command' - ['cart2topo'|'sph2topo'|'sphbesa2topo'| 'sph2cart'|'topo2cart'|'sphbesa2cart'|
+%               'cart2sph'|'sphbesa2sph'|'topo2sph'| 'cart2sphbesa'|'sph2sphbesa'|'topo2sphbesa'|
 %               'cart2all'|'sph2all'|'sphbesa2all'|'topo2all']
-%                 These command modes convert between four coordinate frames:
-%                    3-D cartesian (cart), Matlab spherical (sph),
-%                    Besa spherical (sphbesa), and 2-D polar (topo)
+%                These command modes convert between four coordinate frames: 3-D cartesian 
+%                (cart), Matlab spherical (sph), Besa spherical (sphbesa), and 2-D polar (topo)
 %               'auto' -- Here, the function finds the most complex coordinate frame 
 %                 and constrains all the others to this one. It searches first for cartesian 
 %                 coordinates, then for spherical and finally for polar. Default is 'auto'.
@@ -49,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/12/02 17:53:16  arno
+% updating help messages
+%
 % Revision 1.11  2003/05/13 23:48:59  arno
 % debug convert to besa
 %

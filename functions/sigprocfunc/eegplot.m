@@ -33,8 +33,8 @@
 %                  Command line equivalents: 'xgrid' / 'ygrid' 
 %     "Display > Show scale" - [menu] Show (or hide if shown) the scale on the bottom 
 %                  right corner of the activity window. Command line equivalent: 'scale' 
-%     "Display > Title" - [menu] Change the title of the figure. Command line equivalent:
-%                  'title'
+%     "Display > Title" - [menu] Change the title of the figure. The command line
+%                   equivalent is 'title'
 %     "Settings > Time range to display"  - [menu] For continuous EEG data, this item 
 %                  pops up a query window for entering the number of seconds to display
 %                  in the activity window. For epoched data, the query window asks
@@ -106,7 +106,7 @@
 %                   if this parameter is not empty.
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
-%                    for rejection, each row indicating a different period: 
+%                    for rejection, each row indicating a different period
 %                      [start end] = period limits (in frames from beginning of data); 
 %                      [R G B] = specifies the marking color; 
 %                      [e1 e2 e3 ...] = a (1,nchans) logical [0|1] vector giving 
@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2003/11/18 16:24:36  scott
+% Enter new channel -> New channel
+%
 % Revision 1.89  2003/07/29 17:28:14  arno
 % debuging integer types
 %
