@@ -132,6 +132,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.67  2004/02/23 19:16:16  arno
+%fixing 2 dipole problem
+%
 %Revision 1.66  2004/02/23 19:09:05  arno
 %*** empty log message ***
 %
@@ -649,7 +652,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             xo = sources(index).momxyz(dip,1)*g.dipolelength;
             yo = sources(index).momxyz(dip,2)*g.dipolelength;
             zo = sources(index).momxyz(dip,3)*g.dipolelength;
-            dsaf
             
             % copy for output
             % ---------------
