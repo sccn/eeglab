@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.266  2003/11/25 19:30:01  arno
+% removing ant menus
+%
 % Revision 1.265  2003/11/25 19:10:11  arno
 % smart plugin
 %
@@ -1109,17 +1112,6 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
-    if exist('sload') == 2  & exist('daqread') == 2 % detect BIOSIG
-        disp('BIOSIG detected; Additional import menu inserted');
-        pathsload   = which('sload');   pathsload   = pathsload(1:end-7);
-        pathloadeeg = which('loadeeg'); pathloadeeg = pathloadeeg(1:end-9);
-        if strcmpi(pathsload, pathloadeeg)
-            disp('Warning: BIOSIG function ''loadeeg'' is in conflict with EEGLAB ''loadeeg'' function (Neuroscan)');
-            disp('         Note: the ''loadeeg'' BIOSIG function is redundant with the BIOSIG ''sload'' function');
-            disp( [ '         We advise that you remove ' which('loadeeg') ]);
-        end;
-        uimenu( neuromenu, 'Label', 'From other formats using BIOSIG',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_biosig;' e_newnonempty ], 'Separator', 'on'); 
-    end;
         
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
