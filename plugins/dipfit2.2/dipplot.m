@@ -37,6 +37,8 @@
 %  'summary'  - Build a summary plot with three views (top, back, side)
 %  'image'    - ['besa'|'mri'] Background image. {Default: 'besa'} 'mri' uses
 %               mean-MRI brain images from the Montreal Neurological Institute.
+%  'cornermri' - ['on'|'off'] force MRI images to the corner of the MRI volume
+%               (usefull when background is not black).
 %  'rvrange'  - [min max] Only plot dipoles with residual variace within the
 %               given range. Default: plot all dipoles.
 %  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
@@ -122,6 +124,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.53  2003/09/11 00:51:19  arno
+%adding new param cornermri
+%
 %Revision 1.52  2003/08/13 00:46:07  arno
 %*** empty log message ***
 %
