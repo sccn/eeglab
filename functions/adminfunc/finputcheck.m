@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/07/29 18:00:53  arno
+% debugging for NaN
+%
 % Revision 1.8  2002/07/29 17:24:22  arno
 % header
 %
@@ -95,7 +98,9 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	else 
 		callfunc = [callfunc ' ' ];
 	end;
-
+    if nargin < 4
+        mode = 'do not ignore';
+    end;
 	NAME = 1;
 	TYPE = 2;
 	VALS = 3;
@@ -190,7 +195,7 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	allfields = fieldnames(g);
 	for index=1:length(allfields)
 		if isempty(strmatch(allfields{index}, fieldlist(:, 1)'))
-			if ~strcmp(mode, 'ignore')
+			if ~strcmpi(mode, 'ignore')
 				g = [ callfunc 'error: undefined argument ''' allfields{index} '''']; return;
 			end;
 			varargnew{end+1} = allfields{index};
