@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/07/28 21:00:36  arno
+% debugging
+%
 % Revision 1.8  2002/07/26 01:59:53  arno
 % debugging
 %
@@ -115,10 +118,12 @@ if ~isempty(EEG.chanlocs)
     % memory use.
     % ----------------------------------------------------------------
     if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
-	   posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
-	   posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
-	   pointrange = posi:posf;
-	   if posi == posf, error('pop_spectopo: empty time range'); end;
+		posi = round( (timerange(1)/1000-EEG.xmin)*EEG.srate )+1;
+		posf = round( (timerange(2)/1000-EEG.xmin)*EEG.srate )+1;
+		pointrange = posi:posf;
+		if posi == posf, error('pop_spectopo: empty time range'); end;
+		fprintf('pop_spectopo: slecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
+				timerange(1), timerange(2), posi, posf);
 	end;
     if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
     else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
