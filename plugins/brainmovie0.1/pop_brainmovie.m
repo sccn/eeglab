@@ -1,5 +1,5 @@
-% pop_brainmovie() - function to make movie from an EEGLAB dataset
-% 
+% pop_brainmovie() - function to make an ICA time/frequency movie from one or two EEGLAB dataset(s).
+%                    Calls functions brainmovie(), makemovie().
 % Usage:
 %  pop_brainmovie(ALLEEG, 'key', 'val', ...);
 %
@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2003/05/30 02:05:38  arno
+% changing thresholds
+%
 % Revision 1.49  2003/05/29 23:57:24  arno
 % allowing reading single time-freq file
 %
