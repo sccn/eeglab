@@ -144,6 +144,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2003/04/23 23:59:48  arno
+% remove debug msg
+%
 % Revision 1.92  2003/04/23 23:58:02  arno
 % debuging phasedet in erpimage
 %
@@ -1118,7 +1121,7 @@ switch lower(renorm)
 		   0.5 * (max(times) - min(times)) + min(times) + 0.4*(max(times) - min(times));
  case 'no',;
  otherwise,
-  locx = findstr('x', lower(renorm))
+  locx = findstr('x', lower(renorm));
   if length(locx) ~= 1, error('erpimage: unrecognized renormalizing formula'); end;
   eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
 end;
