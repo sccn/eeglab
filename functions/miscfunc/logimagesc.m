@@ -7,6 +7,8 @@
 %   freqs = vector of y-axis values
 %   data  = matrix of size (freqs,times)
 %
+% Note: Entering text() onto the image requires specifying (x,log(y)).
+
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 4/2000 
 
 % Copyright (C) 4/2000 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
@@ -26,6 +28,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 08-07-00 made ydir normal -sm
 % 01-25-02 reformated help & license -ad 
