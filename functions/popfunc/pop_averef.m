@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/11 17:58:20  arno
+% computing average reference of components
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -52,7 +55,7 @@ if nargin < 2 | confirm == 1
     % which set to save
 	% -----------------
 	 ButtonName=questdlg( ...
-['Convert the data to average reference?' 10 'Note: ICA activations will be converted if they exist...'], ...
+['Convert the data to average reference?' 10 'Note: ICA activations will also be converted if they exist...'], ...
 	        'Average reference confirmation -- pop_averef()', 'Cancel', 'Yes','Yes');
 	 switch lower(ButtonName),
 	      case 'cancel', return;
@@ -62,13 +65,13 @@ end;
 
 EEG.data = reshape(EEG.data, EEG. nbchan, EEG.pnts*EEG.trials);
 if ~isempty(EEG.icaweights)
-	disp('Pop_averef: average referencing ICA weight matrix (see >> help averef)');
+	disp('Pop_averef: converting ICA weight matrix to average reference (see >> help averef)');
 	[EEG.data EEG.icaweights EEG.icasphere] = averef(EEG.data,EEG.icaweights,EEG.icasphere);
 else
 	EEG.data = averef(EEG.data);
 end;	
 EEG.data = reshape(EEG.data, EEG. nbchan, EEG.pnts, EEG.trials);
-EEG.averef = 'yes';
+EEG.averef = 'Yes';
 EEG.icaact = [];
 EEG = eeg_checkset(EEG);
 
