@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/05/13 23:48:59  arno
+% debug convert to besa
+%
 % Revision 1.10  2003/05/13 23:40:39  arno
 % messages
 %
@@ -131,6 +134,9 @@ end;
 switch command
 case 'topo2sph',
    [sph_phi sph_theta] = topo2sph( [cell2mat({chans.theta})' cell2mat({chans.radius})'] );
+   if verbose
+       disp('Warning: electrodes forced to lie on a sphere for polar to 3-D conversion');
+   end;
    for index = 1:length(chans)
       chans(index).sph_theta  = sph_theta(index);
       chans(index).sph_phi    = sph_phi  (index);
@@ -161,7 +167,7 @@ case 'sph2cart',
    end;
 case 'sph2topo',
  if verbose
-     disp('Warning: all radii constrained to one for spherical to topo transformation');
+     % disp('Warning: all radii constrained to one for spherical to topo transformation');
  end;
  try, [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_phi})' cell2mat({chans.sph_theta})'], 1, 2); % using method 2
    catch, error('Cannot process empty values'); end;
