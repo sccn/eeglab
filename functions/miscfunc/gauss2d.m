@@ -1,24 +1,23 @@
-% gauss2d() - generate a 2 dimensional gaussian matrice
+% gauss2d() - generate a 2-dimensional gaussian matrix
 %
 % Usage:
 %   >> [ gaussmatrix ] = gauss2d( rows, columns, ...
-%                              sigmaR, sigmaC, meanR, meanC, cut)
+%                              sigmaR, sigmaC, peakR, peakC, mask)
 %
 % Example:
-%   >> gauss2d( 5, 5)
+%   >> imagesc(gauss2d(50, 50)); % image a size (50,50) 2-D gaussian matrix
 %
 % Inputs:
-%   rows    - number of rows 
-%   columns - number of columns 
-%   sigmaR  - standard deviation for rows (default: rows/5)
-%   sigmaC  - standard deviation for columns (default: columns/5)
-%   meanR   - mean for rows (default: center of the row)
-%   meanC   - mean for columns (default: center of the column)
-%   cut	    - percentage (0->1) of the maximum value for removing 
-%             values in the matrix (default: 0)
+%   rows    - number of rows in matrix
+%   columns - number of columns in matrix
+%   sigmaR  - width of standard deviation in rows (default: rows/5)
+%   sigmaC  - width of standard deviation in columns (default: columns/5)
+%   peakR   - location of the peak in each row (default: rows/2)
+%   peakC   - location of the peak in each column (default: columns/2)
+%   mask    - (0->1) portion of the matrix to mask with zeros (default: 0)
 %
 % Ouput:
-%   gaussmatrix - gaussian matrix
+%   gaussmatrix - 2-D gaussian matrix
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 
@@ -41,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/02/07 00:35:36  arno
+% header typo
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
