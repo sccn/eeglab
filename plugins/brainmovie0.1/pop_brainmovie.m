@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/11/20 01:10:48  arno
+% header update
+%
 % Revision 1.4  2002/11/20 00:50:58  arno
 % testing
 %
@@ -206,7 +209,7 @@ if strcmpi(g.mode, 'compute') | strcmpi(g.mode, 'computemovie') | ...
 	else 
         for ind =1:nbconditions
             [ ALLERSP(:,ind), ALLITC(:,ind), ALLCROSSF(:,:,ind), ALLCROSSFANGLE(:,:,ind), times, freqs] ...
-                = timecrossf( ALLEEG(ind).icaact(selected_compo,:), g.freqparams{:});
+                = timecrossf( ALLEEG(ind).icaact(g.comps,:), g.freqparams{:});
         end;
     end;
 	
