@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/12 21:53:22  arno
+% text
+%
 % Revision 1.8  2002/08/12 02:31:36  arno
 % inputdlg2
 %
@@ -131,6 +134,11 @@ if nargin < 3
 	switch lower(result{5}), case 'yes', superpose=1; otherwise, superpose=0; end;
 	switch lower(result{6}), case 'yes', reject=1; otherwise, reject=0; end;
 end;
+if nargin < 7
+    superpose = 0;
+    reject = 0;
+    topcommand = '';
+end;
 
 if isstr(elecrange) % convert arguments if they are in text format 
 	calldisp = 1;
@@ -176,6 +184,15 @@ if calldisp
 		eegplot( icaacttmp, 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	end;	
+end;
+if ~isempty(rej)
+	if icacomp	== 1
+		EEG.reject.rejconst = rej;
+		EEG.reject.rejconstE = rejE;
+	else
+		EEG.reject.icarejconst = rej;
+		EEG.reject.icarejconstE = rejE;
+	end;
 end;
 
 %com = sprintf('Indexes = pop_rejtrend( %s, %d, [%s], %s, %s, %s, %d, %d);', ...
