@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2002/10/29 17:27:17  arno
+% change location of time unit message
+%
 % Revision 1.26  2002/10/29 17:07:07  arno
 % text editing
 %
@@ -193,7 +196,7 @@ if nargin<2
          { 'Style', 'text', 'string', '  Field', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'To edit: Edit/Event info'  }, ...
          { 'Style', 'text', 'string', 'Ex: 2:4,5  OR  ''COND1''  OR  4.5 <= 13'  }, ...
-         { 'Style', 'text', 'string', '          non-range', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', 'select all but these', 'fontweight', 'bold'  }, ...
          ...
          { 'Style', 'text', 'string', 'Event indices' }, ...
          { }, ...
@@ -229,7 +232,7 @@ if nargin<2
          { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
         if strcmpi(allfields{index}, 'latency')
             if EEG.trials > 1
-                uilist{end-2} = { 'Style', 'text', 'string', '(ms)' };
+                uilist{end-2} = { 'Style', 'text', 'string', '(ms)     ' };
             else
                 uilist{end-2} = { 'Style', 'text', 'string', '(s)' };	   
             end;
