@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/10/29 01:20:21  arno
+% more error checking
+%
 % Revision 1.32  2003/10/29 00:13:57  arno
 % processing a single frequency
 %
@@ -306,7 +309,6 @@ end;
 
 % compute time vector
 % -------------------
-g
 [ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout);
 tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
