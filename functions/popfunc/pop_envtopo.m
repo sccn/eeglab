@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/04/15 16:55:43  arno
+% allowing to plot 20 components
+%
 % Revision 1.16  2003/03/14 03:22:03  arno
 % documenting dataset subtraction
 %
@@ -169,7 +172,7 @@ if length(EEG) == 2
     sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
 end;
 posi = round( (timerange(1)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
-posf = round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
+posf = min(round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1, EEG.pnts);
 
 % outputs
 % -------
@@ -192,6 +195,7 @@ end;
 
 % plot the datas
 % --------------
+options = [ options ', ''verbose'', ''off''' ];
 if any(isnan(sigtmp(:)))
     disp('NaN detected: using nan_mean');
     if length(EEG) == 2
