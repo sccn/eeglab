@@ -10,10 +10,11 @@
 %   'setname'    - Name of the dataset
 %   'data'       - ['varname'|'filename'] Import a file or variable
 %                   into the EEG structure of EEGLAB.
-%   'dataformat' - ['array|matlab|ascii|float32'] Format of the input data file. The
-%                   data file is transposed if the number of rows is larger than
-%                   the number of columns. Note that for 'float32', data must
-%                   be organised in the format channels x times.
+%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
+%                  The ata file is transposed if the number of rows is greater
+%                  than the number of columns. Note: for type 'float32le' and
+%                  'float32be' (little endian and big endian byte ordering), data
+%                  must be organised in the format (channels x timepoints x epochs).
 %   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode locations 
 %                  (See >> help readlocs for file format).
 %   'nbchan'     - Number of channels in data
@@ -58,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/09/04 18:28:25  luca
+% debug command line big variable passed as text - arno
+%
 % Revision 1.23  2002/08/29 23:17:01  arno
 % debugging icaweights and sphere
 %
@@ -340,12 +344,12 @@ for curfield = tmpfields'
 							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
 							  end;
 							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
-							 case {'float32le' 'floatbe'}, 
+							 case {'float32le' 'float32be'}, 
 							  if EEGOUT.nbchan == 0,
 								  error(['Pop_editset error: to read float32 data you must first specify the number of channels']);
 							  end;     
 							  try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf], ...
-														   fastif(strcmp(g.dataformat, 'floatle'), 'ieee-le', 'ieee-be'));
+														   fastif(strcmpi(g.dataformat, 'float32le'), 'ieee-le', 'ieee-be'));
 							  catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
 							  end;
 							 otherwise, error('Pop_editset error: unrecognized file format');

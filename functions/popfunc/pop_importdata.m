@@ -7,10 +7,11 @@
 %   'setname'    - name of the existing .set EEGLAB dataset
 %   'data'       - ['varname'|'filename'] Data file or variable to import
 %                  into EEGLAB.
-%   'dataformat' - ['array|matlab|ascii|float32'] input data file format. The
-%                  data file is transposed if the number of rows is greater than
-%                  the number of columns. Note: for type 'float32', data must
-%                  be organised in the format (channels x timepoints x epochs).
+%   'dataformat' - ['array|matlab|ascii|float32le|float32be'] input data file format.
+%                  The ata file is transposed if the number of rows is greater
+%                  than the number of columns. Note: for type 'float32le' and
+%                  'float32be' (little endian and big endian byte ordering), data
+%                  must be organised in the format (channels x timepoints x epochs).
 %   'chanlocs'   - ['varname'|'filename'] Import a file containing
 %                  electrode locations (see >> help readlocs for file format).
 %   'nbchan'     - Number of data channels 
@@ -48,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/09/04 18:30:31  luca
+% same
+%
 % Revision 1.10  2002/09/04 18:30:11  luca
 % same
 %
