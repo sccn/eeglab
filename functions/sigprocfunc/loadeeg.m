@@ -1,42 +1,42 @@
-% loadeeg() - load binary ".EEG" file in neuroscan format.
+% loadeeg() - load a binary data file in Neuroscan .eeg file format.
 %
 % Usage:
-% >> signal = loadeeg( filename );
+% >> signal = loadeeg(filename);
 % >> [signal, accept, typeeeg, rt, response, chan_names, pnts, ...
-%    ntrials, srate, xmin, xmax] = loadeeg( filename, chanlist, ...
-%      triallist, typerange, accepttype, rtrange, responsetype)
+%      ntrials, srate, xmin, xmax] = loadeeg( filename, chanlist, ...
+%        triallist, typerange, accepttype, rtrange, responsetype);
 %
 % Inputs:
-%   filename     - [string] input Neuroscan .eeg file      
-%   chanlist     - [integer array] only import selected electrodes
-%                  (ex: 3,4:10; default all) 
-%   triallist    - [integer array] only import selected trials (default all)
-%   typerange    - [integer array] only import trials with selected type
-%                  (default all)
-%   accepttype   - [integer array] only import trials with the selected
-%                  accept field values (default all)
-%   rtrange      - [float array] range [min max] for reaction time (default all)
-%   responsetype - [integer array] only import trials with selected responses
-%                  values (default all)
-%
+%   filename     - [string] Input Neuroscan .eeg file      
+%   chanlist     - [integer array] Only import selected channels
+%                  Ex: 3,4:10 {Default: import all} 
+%   triallist    - [integer array] Only import selected trials {Default: import all}
+%   typerange    - [integer array] Only import trials of selected type
+%                  {Default: import all}
+%   accepttype   - [integer array] Only import trials with the selected
+%                  'accept' field values {Default: import all}
+%   rtrange      - [float array] [min max] (ms) Only import trials with subject
+%                  reaction times in this range {Default: all}
+%   responsetype - [integer array] Only import trials with selected 
+%                  response type values {Default: all}
 % Outputs:
-%   signal     - output signal (size trials x points)	
-%   accept     - values for the accept field (size trials) 
-%   typeeeg    - values for the accept type (size trials) 
-%   rt         - values for the accept rt (size trials) 
-%   response   - values for the accept response (size trials) 
-%   chan_names - string array with channel names of the electrodes
-%   pnts       - number of points per trial
-%   ntrials    - number of trials
-%   srate      - sampling rate
-%   xmin       - trial's starting time in ms
-%   xmax       - trial's ending time in ms
+%   signal       - output signal of size (trials,  points)	
+%   accept       - [1/0] vector of values for the accept field (one per trial)
+%   typeeeg      - [???] values for the accept type (size trials) 
+%   rt           - [???] values for the accept rt (size trials) 
+%   response     - [???] values for the accept response (size trials) 
+%   chan_names   - ['string' array] containing channel names 
+%   pnts         - Number of points per trial
+%   ntrials      - Number of trials
+%   srate        - Sampling rate (Hz)
+%   xmin         - Trial start time (ms)
+%   xmax         - Trial end time (ms)
 %
 % Example:
-%   % load data into the array named 'signal' 
-%   [signal]=loadeeg( 'test.eeg' ); 
-%   %plot the signal for the first electrode of the first sweep
-%   plot( signal(1,:) );	  		
+%   % Load .eeg data into an array named 'signal' 
+%   >> [signal]=loadeeg( 'test.eeg' ); 
+%   % Plot the signal in the first channel, first trial
+%   >> plot( signal(1,:) );	  		
 %
 % Author: Arnaud Delorme, CNL, Salk Institute, 2001
 %
@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/02/21 17:26:20  arno
+% updating header
+%
 % Revision 1.1  2002/04/05 17:39:45  arno
 % Initial revision
 %
