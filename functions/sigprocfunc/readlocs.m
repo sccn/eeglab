@@ -168,6 +168,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/12/29 23:04:00  scott
+% header
+%
 % Revision 1.31  2002/12/29 22:37:15  arno
 % txt -> ced
 %
@@ -282,7 +285,7 @@ if isstr(filename)
    if isempty(g.filetype)
        switch lower(fileextension),
         case {'loc' 'locs' }, g.filetype = 'loc';
-        case 'xyz', g.filetype = 'xyz';
+        case 'xyz', g.filetype = 'xyz'; disp('Warning: Matlab carthesian coords "xyz" file extension detected; if importing EGI cartesian coords. use type "sfp" instead');
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = 'polhemus';
