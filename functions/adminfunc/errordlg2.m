@@ -23,6 +23,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/08/12 18:48:22  arno
+% Initial revision
+%
 % Revision 1.3  2002/08/12 18:24:29  arno
 % debug
 %
@@ -35,7 +38,7 @@
 
 function errordlg2(Prompt, Title);
 
-beep;
+disp(char(7));
 if nargin <2
 	Title = 'Error';
 end;
