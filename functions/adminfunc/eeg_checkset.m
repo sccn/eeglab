@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/09 01:52:57  arno
+% adding check of event latencies
+%
 % Revision 1.4  2002/04/08 21:52:51  arno
 % checking event description consistency
 %
@@ -461,20 +464,22 @@ if ~isempty( varargin)
 				        end;
 				    end;
 				    EEG.event(removeevent) = [];
-				        
-				    difffield = setdiff( fieldnames(EEG.event), { 'latency' 'type' 'epoch' });
-  			        for index = 1:length(difffield)
-                        % get the field content
-                        % ---------------------
-				        for indexevent = 1:length(EEG.event)
-				            if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
-				                arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
-				            end;    
-				        end;
+					
+					% uniformize fields content for the different epochs
+					% --------------------------------------------------
+					difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' });
+					for index = 1:length(difffield)
+						% get the field content
+						% ---------------------
+						for indexevent = 1:length(EEG.event)
+							if ~isempty( getfield( EEG.event, {indexevent}, difffield{index}) )
+								arraytmpinfo{EEG.event(indexevent).epoch, index} = getfield( EEG.event, {indexevent}, difffield{index});
+							end;    
+						end;
                         % uniformize content for all epochs
                         % ---------------------------------
 				        for indexevent = 1:length(EEG.event)
-			                setfield( EEG.event, { EEG.event(indexevent).epoch }, difffield{index}, arraytmpinfo{EEG.event(indexevent).epoch, index});
+			                setfield( EEG.event, { indexevent }, difffield{index}, arraytmpinfo{EEG.event(indexevent).epoch, index});
 				        end;
 				    end;
 				end;
