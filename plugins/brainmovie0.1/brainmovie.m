@@ -121,6 +121,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2003/05/30 02:05:13  arno
+% removing warning
+%
 % Revision 1.50  2003/05/06 22:13:38  arno
 % do not make ovals for components
 %
@@ -769,8 +772,8 @@ for indeximage = alltimepoints
 			%x = (g.xlimaxes(2)-g.xlimaxes(1))*0.2 + g.xlimaxes(1);
 			%y = (g.ylimaxes(2)-g.ylimaxes(1))*(-0.06) + g.ylimaxes(1);
 			%text(x, y, g.title, 'fontsize', 14, 'fontweight', 'bold' );
-                        t = textsc(g.title,'title');
-                        set(t,'VerticalAlignment','top', 'fontsize', 15);
+            t = textsc([ g.title ' ' num2str(FREQS) ' Hz' ],'title');
+            set(t,'VerticalAlignment','top', 'fontsize', 15);
 		end;  
 	end;
 
