@@ -147,6 +147,10 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.118  2005/03/31 18:32:57  arno
+%test for strings
+%.,
+%
 %Revision 1.117  2005/03/22 19:03:35  arno
 %rvrange
 %
@@ -707,16 +711,16 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         colorcount = 1;
         if isfield(newsources, 'component')
             for index = 1:length(newsources)
-                if isempty(g.dipnames), tmpname = sprintf( 'Component %d', newsources(index).component);
+                if isempty(g.dipnames), tmpname = sprintf( 'Comp. %d', newsources(index).component);
                 else                    tmpname = g.dipnames{index};
                 end;
                 talpos = newsources(index).talcoord;
                 if size(talpos,1) == 1
-                    textforgui(colorcount) = { sprintf( 'Comp. %d (RV:%3.2f%%; Tal:%d,%d,%d)', ...
+                    textforgui(colorcount) = { sprintf( '%s (RV:%3.2f%%; Tal:%d,%d,%d)', tmpname, ...
                                                         sources(index).component, 100*newsources(index).rv, ...
                                                         round(talpos(1,1)), round(talpos(1,2)), round(talpos(1,3))) };
                 else
-                    textforgui(colorcount) = { sprintf( 'Comp. %d (RV:%3.2f%%; Tal:%d,%d,%d & %d,%d,%d)', ...
+                    textforgui(colorcount) = { sprintf( '%s (RV:%3.2f%%; Tal:%d,%d,%d & %d,%d,%d)', tmpname, ...
                                                         sources(index).component, 100*newsources(index).rv, ...
                                                         round(talpos(1,1)), round(talpos(1,2)), round(talpos(1,3)), ...
                                                         round(talpos(2,1)), round(talpos(2,2)), round(talpos(2,3))) };
