@@ -74,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/23 02:04:28  arno
+% updating header
+%
 % Revision 1.8  2002/11/21 00:37:41  arno
 % debugging bootstrap for real negative values
 %
@@ -164,7 +167,7 @@ for index1 = 1:nbcompo
                 ALLCROSSFANGLE { index1, index2, 2 } = cohangles{2};
                 ALLCROSSFANGLE { index1, index2, 3 } = cohangles{3};
             else
-                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), frames,  ...
+                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), data(index2,:), frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
                 ALLCROSSF      { index1, index2 } = applyboot(coh, cohboot);
                 ALLCROSSFANGLE { index1, index2 } = cohangles;
