@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/08/14 16:32:37  arno
+% yfact takes into account button now
+%
 % Revision 1.24  2002/08/13 23:04:51  arno
 % debug pop_merge
 %
@@ -296,8 +299,13 @@ hh =findobj(allhandlers, 'parent', gcf, 'style', 'pushbutton');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'checkbox');
-set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
-set(hh, 'foregroundcolor', GUITEXTCOLOR);
+if isunix
+	set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
+	set(hh, 'foregroundcolor', GUITEXTCOLOR);	
+else 
+	set(hh, 'backgroundcolor', GUIBACKCOLOR);
+	set(hh, 'foregroundcolor', GUITEXTCOLOR);
+end;
 hh =findobj(allhandlers, 'parent', gcf, 'style', 'listbox');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
