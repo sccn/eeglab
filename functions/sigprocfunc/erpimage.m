@@ -159,6 +159,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.185  2004/01/24 20:40:23  scott
+% plotting sorting window
+%
 % Revision 1.184  2003/12/17 21:42:13  scott
 % adjust same
 %
@@ -2988,9 +2991,9 @@ function [plot_handle] = plot1trace(ax,times,erp,axlimits,signif,stdev,winloc)
       if ~isempty(winloc)
          fillwinx = [winloc(1,:) winloc(2,end:-1:1)];
          if ~isempty(axlimits) & sum(isnan(axlimits))==0
-           fillwiny = [repmat(axlimits(3),1,length(winloc) repmat(axlimits(4),1,length(winloc))];
+           fillwiny = [repmat(axlimits(3),1,length(winloc)) repmat(axlimits(4),1,length(winloc))];
          else
-           fillwiny = [repmat(min(erp)*1.1,1,length(winloc) repmat(max(erp)*1.1,1,length(winloc))];
+           fillwiny = [repmat(min(erp)*1.1,1,length(winloc)) repmat(max(erp)*1.1,1,length(winloc))];
          end
          fillwh = fill(fillwinx,fillwiny, WINFILLCOLOR); hold on    % plot 0+alpha
       end
