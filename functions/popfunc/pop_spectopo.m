@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2005/03/05 00:11:28  arno
+% add chaninfo
+%
 % Revision 1.42  2005/01/24 00:33:24  arno
 % debug plotting with no channel location
 %
@@ -369,6 +372,7 @@ if EEG.trials == 1 & ~strcmp(processflag,'EEG')
 end;
 
 if ~isempty(EEG.chanlocs)
+    if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 	spectopooptions = [ options ', ''verbose'', ''off'', ''chanlocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
 	if dataflag == 0 % i.e. components
 		spectopooptions = [ spectopooptions ', ''weights'', EEG.icaweights*EEG.icasphere' ];
