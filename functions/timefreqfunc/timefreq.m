@@ -47,13 +47,13 @@
 %                    Multiplies the number of output frequencies by
 %                    dividing their spacing. When cycles==0, frequency
 %                    spacing is (low_frequency/padratio).
-%      'nfreqs'   = number of output frequencies. Cannot be used with FFT.
-%                   Overwrite previous option for wavelets.
+%      'nfreqs'   = number of output frequencies. For FFT, closest computed
+%                   frequency will be returned. Overwrite 'padratio' effects
+%                   for wavelets. Default: use 'padratio'.
 %      'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
-%                    Note that for FFT, computation is always performed in 
-%                    the linear space. For obtaining 'log' spaced freqs, 
-%                    closest frequencies in the 'linear' space are computed and
-%                    returned.
+%                     Note that for obtaining 'log' spaced freqs using FFT, 
+%                     closest correspondant frequencies in the 'linear' space 
+%                     are returned.
 %      'maxfreq'   = Maximum frequency (Hz) to plot (& output if cycles>0) 
 %                    If wavelet==0, all FFT frequencies are output.
 %                    For wavelet, reducing the max frequency reduce
@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/04/29 01:08:44  arno
+% new version which can generate wavelets at any frequencies
+%
 % Revision 1.15  2003/01/10 01:26:59  arno
 % nothing
 %
@@ -257,6 +260,10 @@ tmpall      = repmat(nan,[length(freqs) g.timesout trials]);
 % -------------------------------
 % compute time freq decomposition
 % -------------------------------
+fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
+        fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
+
+fprintf('Processing trial (of %d):',trials);
 if g.cycles(1) == 0
     for trial = 1:trials
         if rem(trial,10) == 0,  fprintf(' %d',trial); end
@@ -281,7 +288,6 @@ else % wavelet
     for index = 1:length(g.win)
         g.win{index} = transpose(repmat(g.win{index}, [trials 1]));
     end;
-    size(tmpall)
     
     % apply filters
     % -------------
@@ -305,9 +311,9 @@ else % wavelet
             tmpall( freqind, index, :) = tmpX;            
         end;
     end;
-    size(tmpall)
 end;    
-    
+fprintf('\n');
+
 % compute and subtract ITC
 % ------------------------
 if nargout > 3 | strcmpi(g.subitc, 'on')
@@ -414,7 +420,7 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize)
     if all(oldtimevals == timevals)
         disp('Debug msg: Time value unchanged by finding closest in data');        
     else 
-        disp('Debug msg: Time value updated by finding closest points in data');
+        %disp('Debug msg: Time value updated by finding closest points in data');
     end;    
 
 % DEPRECATED, FOR C INTERFACE
