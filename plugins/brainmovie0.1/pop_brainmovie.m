@@ -101,6 +101,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/11/21 18:04:38  arno
+% deleting previous tf data
+%
 % Revision 1.10  2002/11/21 02:08:18  arno
 % more debugging of freqs ...
 %
@@ -296,7 +299,7 @@ else
     for index = 1:length(g.freqs)
         [tmpfreq minfreq] = min(abs(freqs - g.freqs(index)));
         g.freqindices = [ g.freqindices minfreq];
-        fprintf('Found closest frequency for %3.2f Hz: %3.2f Hz\n', g.freqs(index), freqs(g.freqindices));
+        fprintf('Found closest frequency for %3.2f Hz: %3.2f Hz\n', g.freqs(index), freqs(g.freqindices(index)));
     end;
 end;
         
