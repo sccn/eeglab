@@ -1,64 +1,62 @@
-% pop_comperp() - Compute the grand average ERP waveforms of multiple datasets,
-%                 with optional ERP subtraction.
+% pop_comperp() - Compute the grand average ERP waveforms of multiple datasets
+%                 currently loaded into EEGLAB, with optional ERP difference-wave 
+%                 plotting and t-tests.
 % Usage:
-%       >> pop_comperp( ALLEEG, flag );      % pop-up window mode
+%       >> pop_comperp( ALLEEG, flag );  % pop-up window, interactive mode
 %       >> [erp1 erp2 erpsub time sig] = pop_comperp( ALLEEG, flag, ...
-%                                   datadd, datsub, 'key', 'val', ...);
+%                                         datadd, datsub, 'key', 'val', ...);
 % Inputs:
 %   ALLEEG  - Array of EEG datasets
-%   flag    - [0|1] (1) Use raw data or (0) ICA components. {default: 1}
-%   datadd  - [integer array] List of datasets to sum to make an ERP 
-%             grand average.
-%   datsub  - [integer array] List of datasets to subtract to make an ERP
-%             grand average. This option is to be used to compare
-%             sub-conditions; each array must have the same number of 
-%             elements as the respective 'datadd' datasets. 
-%             e.g., The first 'datsub' dataset is subtracted from first 
+%   flag    - [0|1] 0 -> Use ICA components; 1 -> use data channels {default: 1}
+%   datadd  - [integer array] List of ALLEEG dataset indices to average to make 
+%             an ERP grand average.
+%   datsub  - [integer array] List of ALLEEG dataset indices to average and then 
+%             subtract from the 'datadd' result to make an ERP grand mean difference. 
+%             This option is to be used to compare sub-conditions; each array 
+%             must have the same number of elements as the respective 'datadd' 
+%             datasets. e.g., The first 'datsub' dataset is subtracted from first 
 %             'datadd' dataset. The two datasets may normally contain data 
 %             from the same subject under different experiemtal conditions.
 %
 % Optional inputs:
-%   'chans'    - [integer array] Vector of channel or component indices. 
-%                {default: all}.
-%   'title'    - [string] Plot title. {default: none}
-%   'tlim'     - [min max] sub-time window in ms to plot data. Default: whole 
-%                time range.
-%   'ylim'     - [min max] y-axis limits. Default: auto.
+%   'chans'    - [integer array] Vector of chans. or comps. to use {default: all}
+%   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
+%                or as a rectangular array (plotdata()). Note: Only channels
+%                (see 'chans' above) can be plotted in a 'scalp' array.
+%   'tlim'     - [min max] Time window (ms) to plot data {default: whole time range}
+%   'title'    - [string] Plot title {default: none}
+%   'ylim'     - [min max] y-axis limits. {default: auto}
 %   'alpha'    - [float] Apply t-test for p=alpha (0<alpha<1). Use paired if
 %                t-test datasub is not empty (two-tailed). If data is empty,
 %                use t-test against a 0 mean dataset with same variance (two-
 %                tailed). Significan time regions are highlighted in the
 %                data plots.
-%   'geom'     - ['scalp'|'array'] Plot erps in a scalp array (plottopo())
-%                or as a rectangular array (plotdata()). Note: Components
-%                cannot be plotted in a 'scalp' array.
 %   'mode'     - ['ave'|'rms'] Plot grand average or RMS (root mean square)
-%   'addavg'   - ['on'|'off'] Show average/RMS for datadd. Default: 'on' if
-%                datsub empty, otherwise 'off'.
-%   'addstd'   - ['on'|'off'] Show standard deviation for datadd. Default: 'on'
-%                if datsub empty, otherwise 'off'.
-%   'addall'   - ['on'|'off'] Show all erps for dataadd. Default: 'off'.
-%   'subavg'   - ['on'|'off'] Show average/RMS for datsub. Default: 'off'.
-%   'substd'   - ['on'|'off'] Show standard deviation for datsub. Default: 'off'.
-%   'suball'   - ['on'|'off'] Show all erps for datasub. Default: 'off'.
-%   'diffadd'  - ['on'|'off'] Show average/RMS for difference. Default: 'on'.
-%   'diffstd'  - ['on'|'off'] Show standard deviation for difference.
-%                Default is 'on'.
-%   'diffall'  - ['on'|'off'] Show all erps for difference. Default: 'off'.
-%   'tplotopt' - [cell array] 'key', val' plotting options for plottopo
+%   'addavg'   - ['on'|'off'] Show average or RMS for datadd {default: 'on' 
+%                if 'datsub' empty, otherwise 'off'}
+%   'addstd'   - ['on'|'off'] Show standard deviation for datadd {default:'on'
+%                if 'datsub' empty, otherwise 'off'}
+%   'subavg'   - ['on'|'off'] Plot average/RMS of datsub {default:'off'}
+%   'substd'   - ['on'|'off'] Plot standard deviation of datsub {default:'off'}
+%   'addall'   - ['on'|'off'] Plot all ERPs in dataadd {default:'off'}
+%   'suball'   - ['on'|'off'] Plot all ERPs in datasub {default:'off'}
+%   'diffadd'  - ['on'|'off'] Plot average/RMS of datadd-datsub {default:'on'}
+%   'diffstd'  - ['on'|'off'] Show standard dev. of datadd-datsub {default:'on'}
+%   'diffall'  - ['on'|'off'] Show all erps for difference {default:'off'
+%   'tplotopt' - [cell array] Pass 'key', val' plotting options for plottopo()
 %
 % Output:
-%   erp1   - Grand average (or rms) of 'datadd' datasets
-%   erp2   - Grand average (or rms) of 'datsub' datasets
+%   erp1   - Grand average (or rms) of the 'datadd' datasets
+%   erp2   - Grand average (or rms) of the 'datsub' datasets
 %   erpsub - Grand average (or rms) 'datadd' minus 'datsub' difference
-%   times  - Array of epoch time indices
-%   sig    - P significance values (chans,times). 
+%   times  - Vector of epoch time indices
+%   sig    - t-test significance values (chans,times). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2003
 %
-% Note: t-test functions were adapted for matric preocessing from 
-%       functions of C. Goutte. See description inside the code of this
-%       function for more info.
+% Note: t-test functions were adapted for matrix preprocessing from C
+%       functions Press et al. See the description in the code of this
+%       function for more information.
 %
 % See also: eeglab(), plottopo()
 
@@ -81,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/02/10 21:40:58  arno
+% return correct outputs
+%
 % Revision 1.26  2004/02/10 17:26:14  arno
 % adding tlim and ylim option
 %
