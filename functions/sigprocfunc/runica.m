@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/05/23 15:31:53  arno
+% adding more details for extended option of runica
+%
 % Revision 1.3  2003/01/15 22:08:21  arno
 % typo
 %
@@ -482,6 +485,14 @@ wts_passed = 0;                      % flag weights passed as argument
          return
       end
    end
+% 
+% adjust lrate if necessary
+%
+if lrate ~= DEFAULT_LRATE & size(data,1) > 32
+    lrate = 1E-7;
+    disp('More than 32 channels: default lrate 1E-7');
+end;
+   
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize weights, etc. %%%%%%%%%%%%%%%%%%%%%%%%
 %
