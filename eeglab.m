@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.298  2003/12/05 00:49:20  arno
+% no local history when changing comments
+%
 % Revision 1.297  2003/12/05 00:17:03  arno
 % history in datasets
 %
@@ -1115,7 +1118,7 @@ elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ]
 else
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions');    
     funcpath = which('readeetraklocs.m');
-    funcpath = eeglabpath(1:end-length('readeetraklocs.m'));
+    funcpath = funcpath(1:end-length('readeetraklocs.m'));
     myaddpath( funcpath , 'eeglab1020.ced', 'resources');    
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
