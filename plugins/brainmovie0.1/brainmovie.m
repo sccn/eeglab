@@ -110,6 +110,11 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/09 01:22:49  cooper
+% Changed 'envvert' option to be a cell array of vectors.
+% The vectors can either be numeric (vert. line times in ms),
+%  or structures with fields: time, color, and style.
+%
 % Revision 1.17  2002/11/05 00:20:30  cooper
 % Made top space for fig title and adjusted flash coordinates.
 %
@@ -326,8 +331,10 @@ switch lower(g.caption)
 	case {'on', 'off'} ;  
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
 end;
-if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
+if ~isempty(g.envvert),
+   if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
         disp('Error: Invalid type for Envvert.'); return;
+   end
 end
 if ~isempty(g.latency) & ~isnumeric(g.latency)
 	disp('Error: Latency must be a vector'); return;
