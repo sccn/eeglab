@@ -26,8 +26,6 @@
 %                It is either a string or an integer.
 %   sortingwin - Sorting event window [start, end] in seconds ([]=whole epoch)
 %   sortingeventfield - Sorting field name. Default is none. 
-%   renorm      - ['yes'|'no'|'a*x+b'] renormalize sorting variable.
-%                Default is 'no'. Ex: '3*x+2'. 
 %   options    - erpimage() options. Default is none. Separate the options
 %                by commas. Example 'erp', 'cbar'. See erpimage() help 
 %                and >> erpimage moreargs for further details. 
@@ -80,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/25 16:05:57  scott
+% adding blank line above history entry -sm
+%
 % Revision 1.18  2002/04/25 16:03:12  scott
 % trying to output com into history as well as popcom -sm
 %
@@ -320,7 +321,9 @@ if popup
 	try, sortingeventfield = eval( result{10} ); catch, sortingeventfield = result{10}; end;
 	sortingtype  = parsetxt(result{11});
 	sortingwin   = eval( [ '[' result{12} ']' ] );
-	renorm = result{13};
+	if ~isempty(result{13}) & ~strcmp(result{13}, 'no')
+		options = [options ',''renorm'', ''' result{13} '''' ];
+	end;
 	if ~isempty(result{14})
 		options = [options ',''align'', ' result{14} ];
 	end;
@@ -432,8 +435,9 @@ end;
 % ---------------------
 typetxt = '';
 if ~isempty(sortingeventfield)
-    events = eeg_getepochevent( EEG, sortingtype, sortingwin, sortingeventfield);
-
+    %events = eeg_getepochevent( EEG, sortingtype, sortingwin, sortingeventfield);
+	events = sprintf('eeg_getepochevent( EEG, %s)', vararg2str({sortingtype, sortingwin, sortingeventfield}));
+	
     % generate text for the command
     % -----------------------------
     for index = 1:length(sortingtype)
@@ -443,34 +447,36 @@ if ~isempty(sortingeventfield)
             typetxt = [typetxt ' ' num2str(sortingtype{index}) ];
         end;
     end;    
-	% renormalize latencies if necessary
-	% ----------------------------------
-	switch lower(renorm)
-	    case 'yes',
-	         disp('Pop_erpimage warning: *** sorting variable renormalized ***');
-	         events = (events-min(events)) / (max(events) - min(events)) * ...
-	                        0.5 * (EEG.xmax*1000 - EEG.xmin*1000) + EEG.xmin*1000 + 0.4*(EEG.xmax*1000 - EEG.xmin*1000);
-	    case 'no',;
-	    otherwise,
-	        locx = findstr('x', lower(renorm))
-	        if length(locx) ~= 1, error('Pop_erpimage error: unrecognize renormalazing formula'); end;
-	        eval( [ 'events =' renorm(1:locx-1) 'events' renorm(locx+1:end) ';'] );
-	end;
+% $$$ 	% renormalize latencies if necessary
+% $$$ 	% ----------------------------------
+% $$$ 	switch lower(renorm)
+% $$$ 	    case 'yes',
+% $$$ 	         disp('Pop_erpimage warning: *** sorting variable renormalized ***');
+% $$$ 	         events = (events-min(events)) / (max(events) - min(events)) * ...
+% $$$ 	                        0.5 * (EEG.xmax*1000 - EEG.xmin*1000) + EEG.xmin*1000 + 0.4*(EEG.xmax*1000 - EEG.xmin*1000);
+% $$$ 	    case 'no',;
+% $$$ 	    otherwise,
+% $$$ 	        locx = findstr('x', lower(renorm))
+% $$$ 	        if length(locx) ~= 1, error('Pop_erpimage error: unrecognize renormalazing formula'); end;
+% $$$ 	        eval( [ 'events =' renorm(1:locx-1) 'events' renorm(locx+1:end) ';'] );
+% $$$ 	end;
 else
-    events = ones(1, EEG.trials)*EEG.xmax*1000;
+	events = 'ones(1, EEG.trials)*EEG.xmax*1000';
+    %events = ones(1, EEG.trials)*EEG.xmax*1000;
     sortingeventfield = '';
 end;           
 
 if typeplot == 1
-	tmpsig = EEG.data(channel, :);
+	tmpsig = ['EEG.data(' int2str(channel) ', :)'];
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
     eeg_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
-    	tmpsig = EEG.icaact(channel, :);
+		tmpsig = ['EEG.icacat(' int2str(channel) ', :)'];
 	else
-        tmpsig = EEG.icaweights(channel,:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+		tmpsig = ['EEG.icacat(' int2str(channel) ', :)'];
+        tmpsig = ['EEG.icaweights(' int2str(channel) ',:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
     end;
 end;
 
@@ -489,9 +495,9 @@ if length( options ) < 2
 end;
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
-popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
-com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], titleplot, smooth, decimate %s);', outstr, options);
+com = sprintf('%s erpimage( %s, %s, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options)
 eval(com)
 
 varargout{1} = [10 popcom 10 '% ' com];
