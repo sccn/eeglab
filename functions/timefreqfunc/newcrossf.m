@@ -101,6 +101,12 @@
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
+%       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
+%                      baseline is used. A range [min max] may also be entered
+%                     You may also enter one row per region for baseline
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
+%                     300 to 400 ms. This is only valid for the coherence amplitude
+%                     not for the coherence phase. { default NaN }
 %       'lowmem'    = ['on'|'off'] {'off'} Compute frequency by frequency to 
 %                     save memory. 
 %
@@ -114,12 +120,14 @@
 %                    ('trials'). Option 'times' is not recommended but requires 
 %                    less memory and provide similar results to other options.
 %                    {default: 'timestrials'}
-%       'baseboot'  = Coherence baseline bootstrap end latency (ms). {0} This 
-%                     parameter affects the 'mcoh' output and the bootstrap estimation. 
-%                     Use NaN to include the full epoch in the baseline. A range
-%                     [min max] may also be entered. You may finally enter 
-%                     one row per region for baseline e.g. [0 100; 300 400] 
-%                     considers the window 0 to 100 ms and 300 to 400 ms. 
+%       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
+%                                                  0 -> use whole trial
+%                                                  [min max] -> use time range)
+%                     Default is to use the baseline unless no baseline is
+%                     specified (then the function uses all sample up to time 0)
+%                     You may also enter one row per region for baseline
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
+%                     300 to 400 ms.
 %       'condboot' = ['abs'|'angle'|'complex'] In comparing two conditions,
 %                    either subtract complex spectral values' absolute vales 
 %                    ('abs'), angles ('angles') or the complex values themselves
@@ -152,7 +160,7 @@
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
 %       mcoh        = Vector of mean baseline coherence at each frequency
-%                     see 'baseboot' parameter.
+%                     see 'baseline' parameter.
 %       timesout    = Vector of output latencies (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
@@ -201,6 +209,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2004/06/02 18:25:07  arno
+% implementing crossspec option
+%
 % Revision 1.67  2004/04/29 17:43:57  arno
 % debug scaling for amp
 %
@@ -693,6 +704,7 @@ try, g.plotphase;  catch, g.plotphase  = 'on'; end;
 try, g.plotbootsub;  catch, g.plotbootsub  = 'on'; end;
 try, g.detrend;    catch, g.detrend = 'off'; end;
 try, g.rmerp;      catch, g.rmerp = 'off'; end;
+try, g.baseline;   catch, g.baseline = NaN; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
@@ -1172,36 +1184,31 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 		if ~isnan(g.alpha)
             % finding baseline for bootstrap
             % ------------------------------
-            if size(g.baseboot,2) == 2
-                baselnboot = [];
-                for index = 1:size(g.baseboot,1)
-                    tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
-                    baselnboot = union(baselnboot, tmptime);
-                end;
-                if length(baselnboot)==0
-                    error('No point found in baseline');
+            if size(g.baseboot,2) == 1
+                if g.baseboot == 0, baselntmp = [];
+                elseif ~isnan(g.baseline(1))
+                    baselntmp = baseln; 
+                else baselntmp = find(timesout <= 0); % if it is empty use whole epoch
                 end;
             else
-                if ~isempty(find(timesout < g.baseboot))
-                    baselnboot = find(timesout < g.baseboot); % subtract means of pre-0 (centered) windows
-                else
-                    baselnboot = 1:length(timesout); % use all times as baseboot
-                    fprintf('   No bootstrap windows in baseline (times<%g); using whole epoch.\n');
-                    g.baseboot = timesout(end);
-                end
+                baselntmp = [];
+                for index = 1:size(g.baseboot,1)
+                    tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                    baselntmp = union(baselntmp, tmptime);
+                end;
             end;
-            if length(g.baseboot) == 2
-                fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', ...
-                         g.baseboot(1),  g.baseboot(2));
+            if prod(size(g.baseboot)) > 2
+                fprintf('Bootstrap analysis will use data in multiple selected windows.\n');
+            elseif size(g.baseboot,2) == 2
+                fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
             elseif g.baseboot
-                fprintf('   %d bootstrap windows in baseline (times<%g).\n',...
-                         length(baseln), g.baseboot)
+                fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
             end;        
 
             options = { formula, 'boottype', g.boottype, ...
                         'formulapost', formulapost, 'formulainit', formulainit, ...
                         'formulaout', formulaout, 'bootside', 'upper', ...
-                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselnboot };
+                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselntmp };
             Rbootout = bootstat(alltfX, alltfY, options{:});               
             % NOTE: it is not necessary to implement lowmem for this function (automatic)
         else Rbootout = [];
@@ -1214,24 +1221,31 @@ end;
 %%%%%%%%%%
 % baseline
 %%%%%%%%%%
-%if ~isnan(g.baseline)
-%   baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-%   if isempty(baseln)
-%      baseln = 1:length(timesout); % use all times as baseline
-%      disp('Bootstrap baseline empty, using the whole epoch');
-%   end;
-%   baselength = length(baseln);
-%else
-%   baseln = 1:length(timesout); % use all times as baseline
-%   baselength = length(timesout); % used for bootstrap
-%end;
-%if ~isnan(g.baseline)
-%   if length(baseln) == length(timesout), fprintf('\nUsing full time range as baseline\n');
-%   else, fprintf('\nUsing times in under %d ms for baseline\n', g.baseline);
-%   end;
-%else fprintf('\nNo baseline time range specified.\n');	
-%end;
-mbase = mean(abs(coherres(:,:)'));     % mean baseline coherence magnitude
+if size(g.baseline,2) == 2
+    baseln = [];
+    for index = 1:size(g.baseline,1)
+        tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
+        baseln = union(baseln, tmptime);
+    end;
+    if length(baseln)==0
+        error('No point found in baseline');
+    end;
+else
+    if ~isempty(find(timesout < g.baseline))
+        baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+    else
+        baseln = 1:length(timesout); % use all times as baseline
+    end
+end;
+if ~isnan(g.alpha) & length(baseln)==0
+    fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
+    return
+end
+if ~isnan(g.baseline)
+    mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
+else
+    mbase = [];
+end;
 
 % plot everything
 % ---------------
@@ -1322,9 +1336,9 @@ if ~isreal(R)
     R = abs(R);
     Rraw =R; % raw coherence values
     setylim = 1;
-    % if ~isnan(g.baseline)
-    % 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
-    % end;
+    if ~isnan(g.baseline)
+     	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
+    end;
 else
     Rraw = R;
     setylim = 0;
