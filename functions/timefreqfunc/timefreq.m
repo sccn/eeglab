@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/10/18 14:43:35  arno
+% header
+%
 % Revision 1.9  2002/10/16 01:21:16  arno
 % removing debug plots
 %
@@ -196,7 +199,7 @@ for trial = 1:trials
 			tmpX = fft(tmpX,g.padratio*g.winsize);
 			tmpX = tmpX(2:g.padratio*g.winsize/2+1);
 		else 
-			tmpX = g.win' * tmpX(:);
+			tmpX = transpose(g.win) * tmpX(:);
 		end
 		tmpall(:,index, trial) = tmpX(:);
 
