@@ -2,21 +2,16 @@
 %
 % Usage:
 %   >> CHANLOCS = readneurolocs( filename );
-%   >> CHANLOCS = readneurolocs( filename, 'key1', val1, 'key2', val2, ...);
+%   >> CHANLOCS = readneurolocs( filename, 'key1', val1, ...);
 %
 % Inputs:
 %   filename       - file name or matlab cell array { names x_coord y_coord }
 %
 % Optional inputs:
-%   'hcalib'       - [cell array] name and phi angle of two electrodes with 
-%                    left/right simetry. Ex: { 'c3' 44 'c4' 44 }.
-%   'vcalib'       - [cell array] name and phi angle of two electrodes with 
-%                    bottom/up simetry. Ex: { 'fz' 44 'pz' 44 }.
-%   'autocalib'    - ['on'|'off'] attempt to automatically detect 'c3, 'c4'
-%                    'fz', 'pz' to calibrate the coordinates. Default is 'on'
-%                    for '.asc' files and 'off' for '.dat' files.
-%   'plot'         - ['on'|'off'] if 'on', plot the electrode locations. 
-%                    Default 'off'.
+%   same as caliblocs()
+%   note that if no optional input are provided, re-centering will be
+%   performed automatically and re-scaling of coordinates will be
+%   performed for '.asc' files (not '.dat' files).
 %
 % Outputs:
 %   CHANLOCS       - EEGLAB channel location data structure. See
@@ -45,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/12/01 17:10:17  arno
+% automatic calibration
+%
 % Revision 1.7  2003/12/01 02:31:01  arno
 % correct slight innacuracy when reading file
 %
@@ -77,14 +75,6 @@ function chanlocs = readneurolocs( filename, varargin)
         plottag = 0;
     end;
     
-    % check input parameters
-    % ----------------------
-    g = finputcheck( varargin, { 'hcalib'    'cell'  []   {};
-                                 'vcalib'    'cell'  []   {};
-                                 'autocalib' 'string'  { 'on' 'off' 'auto' }   'auto';
-                                 'plot'      'string'  { 'on' 'off' }   'off' });
-    if isstr(g), error(g); end;
-    
     % read location file
     % ------------------
     if isstr( filename )
@@ -115,10 +105,7 @@ function chanlocs = readneurolocs( filename, varargin)
                 end;
             end;
             x = chans(:,3);
-            y = chans(:,4);
-            if strcmpi(g.autocalib, 'auto')
-                g.autocalib = 'on';
-            end;
+            y = -chans(:,4);
         else
             [tmp2 tmpind] = sort(cell2mat(locs(:,1))');
             locs = locs(tmpind,:);
@@ -127,86 +114,16 @@ function chanlocs = readneurolocs( filename, varargin)
             x      = x/513.1617*44;
             y      = y/513.1617*44;
             names = locs(:,end-2);
-            if strcmpi(g.autocalib, 'auto')
-                g.autocalib = 'off';
-            end;
         end;
     else
         names = filename{1};
         x     = filename{2};
         y     = filename{3};
-        if strcmpi(g.autocalib, 'auto')
-            g.autocalib = 'on';
-        end;
     end;
     
-    % auto calibration
-    % ----------------
-    if strcmpi(g.autocalib, 'on')
-        indexc3 = strmatch( 'c3', lower(names'), 'exact' );
-        indexc4 = strmatch( 'c4', lower(names'), 'exact' );
-        if ~isempty(indexc3) & ~isempty(indexc4)
-            g.hcalib = { 'c3' 45 'c4' 45 };
-        end;
-        indexfz = strmatch( 'fz', lower(names'), 'exact' );
-        indexpz = strmatch( 'pz', lower(names'), 'exact' );
-        if ~isempty(indexfz) & ~isempty(indexpz)
-            g.vcalib = { 'fz' 45 'pz' 45 };
-        end;
-        if isempty(g.vcalib) & isempty(g.hcalib)
-            disp('No electrodes found for position re-calibration')
-        else
-            disp('Landmark electrodes found for position re-calibration')
-        end;
-    end;
-    
-    % calibrate
-    % ---------
-    if ~isempty(g.hcalib)
-        index1 = strmatch(lower( g.hcalib{1}), lower(names'), 'exact' );
-        index2 = strmatch( lower(g.hcalib{3}), lower(names'), 'exact' );
-        if isempty(index1) | isempty(index2)
-            error('Electrode not found for horizontal calibration');
-        end;
-        disp([ 'Readneurolocs: electrode location re-calibrated along x axis using ''' ...
-               g.hcalib{1} ''' and '''  g.hcalib{3} '''']);
-        centerx = (x(index1)+x(index2))/2;
-        centery = (y(index1)+y(index2))/2;
-        x = - x + centerx;
-        y = - y + centery;
-        x = x/x(index1)*g.hcalib{2};
-    end;
-    if ~isempty(g.vcalib)
-        index1 = strmatch( lower(g.vcalib{1}), lower(names'), 'exact' );
-        index2 = strmatch( lower(g.vcalib{3}), lower(names'), 'exact' );
-        if isempty(index1) | isempty(index2)
-            error('Electrode not found for horizontal calibration');
-        end;
-        disp([ 'Readneurolocs: electrode location re-calibrated along y axis using ''' ...
-               g.vcalib{1} ''' and '''  g.vcalib{3} '''']);
-        if isempty(g.hcalib)
-            centerx = (x(index1)+x(index2))/2;
-            centery = (y(index1)+y(index2))/2;
-            x = - x + centerx;
-            y = - y + centery;
-        end;
-        y = y/y(index1)*g.vcalib{2};
-    end;
-    
-    % plot all channels
-    % -----------------
-    if strcmpi(g.plot, 'on')
-        figure;
-        for index = 1:length(x)
-            plot( x(index), y(index), '+');
-            hold on; % do not erase
-            text( x(index)+0.01, y(index), int2str(index));
-        end;
-    end;
-       
     % second solution using angle
     % ---------------------------
-    [phi,theta] = cart2pol(-x, y);
+    [phi,theta] = cart2pol(x, y);
     phi = phi/pi*180;
     
     % convert to other types of coordinates
@@ -217,3 +134,7 @@ function chanlocs = readneurolocs( filename, varargin)
     for index = 1:length(chanlocs)
         chanlocs(index).labels = num2str(chanlocs(index).labels);
     end;
+    
+    % re-calibration
+    % --------------
+    chanlocs = adjustlocs(chanlocs, 'autoscale', 'on');
