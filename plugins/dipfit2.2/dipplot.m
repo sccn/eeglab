@@ -111,6 +111,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.8  2003/03/06 17:01:10  arno
+%textgui -> textforgui
+%
 %Revision 1.7  2003/03/06 16:50:08  arno
 %adding log message
 %
@@ -239,6 +242,10 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
             if colorcount >= 15, set(h, 'fontsize', 8);end;
             if colorcount >= 20, set(h, 'fontsize', 6);end;
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', 'w'); end;
+        else 
+            for index = 1:length(sources)
+                textforgui(index) = { '' };
+            end;
         end;
         axis off;
         return;
