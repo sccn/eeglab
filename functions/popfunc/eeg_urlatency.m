@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/06/11 22:50:24  arno
+% debug duration field
+%
 % Revision 1.4  2004/05/06 21:54:10  arno
 % debug last
 %
@@ -57,17 +60,17 @@ function latout = eeg_urlatency( events, latin );
     end;
     
     boundevents = { events.type };
-    latout = latin;
+    latout      = latin;
     if ~isempty(boundevents) & isstr(boundevents{1})
         indbound = strmatch('boundary', boundevents);
         
-        if isfield(events, 'duration')
+        if isfield(events, 'duration') & ~isempty(indbound)
             for index = indbound'
                 if events(index).latency < latin
                     latout = latout + events(index).duration;
                 end;
             end;
-        else
+        elseif ~isempty(indbound) % boundaries but with no associated duration
             latout = NaN;
         end;
     end;
