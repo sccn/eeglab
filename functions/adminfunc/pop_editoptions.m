@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/25 16:56:13  arno
+% copying file if read only
+%
 % Revision 1.3  2002/04/21 01:07:59  scott
 % edited help msg -sm
 %
@@ -175,6 +178,7 @@ for index = 1:2:length(args)
     com = sprintf( '%s ''%s'', %d,', com, args{index}, args{index+1});
 end;
 com = [com(1:end-1) ');'];   
+clear functions
 
 % ---------------------------
 function  chopedtext = choptext( tmptext )
