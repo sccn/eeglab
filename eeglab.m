@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.361  2005/03/04 23:42:06  arno
+% make function compatible with channel info
+%
 % Revision 1.360  2005/02/03 18:46:36  arno
 % fixing link to license
 %
@@ -1564,7 +1567,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
    
 third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
-       uimenu( loc_m, 'Label', 'By name'   , 'CallBack'  , [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''');'']; eval(LASTCOM);' e_hist]);
+       uimenu( loc_m, 'Label', 'By name'   , 'CallBack'  , [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''', ''''chaninfo'''', EEG.chaninfo);'']; eval(LASTCOM);' e_hist]);
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
     uimenu( third_m, 'Label', 'Channel data (scroll)'        , 'CallBack', [ check          'LASTCOM = pop_eegplot(EEG, 1, 1, 1);' e_hist], 'Separator', 'on');
 	uimenu( third_m, 'Label', 'Channel spectra and maps' , 'CallBack', [ check      'LASTCOM = pop_spectopo(EEG, 1);' e_hist]);
