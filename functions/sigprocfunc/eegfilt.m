@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2004/02/12 22:51:30  scott
+% text output edits
+%
 % Revision 1.13  2003/07/28 17:38:53  arno
 % updating error messages
 %
@@ -155,13 +158,9 @@ if epochs*epochframes ~= frames,
     error('epochframes does not divide frames.\n');
 end
 
-fprintf('eegfilt(): IF a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
-fprintf('           then Matlab has failed to design a good filter. As a workaround, \n');
-fprintf('           for band-pass filtering, first highpass the data, then lowpass it.\n');
-
 if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
     fprintf('eegfilt(): filter order is %d. ',filtorder);
-    error('epochframes must be 3 times the filtorder.');
+    error('epochframes must be at least 3 times the filtorder.');
 end
 if (1+trans)*hicutoff/nyq > 1
 	error('high cutoff frequency to close to Nyquist frequency');
@@ -170,8 +169,13 @@ end;
 if locutoff > 0 & hicutoff > 0,    % bandpass filter
     if revfilt
          fprintf('eegfilt() - performing %d-point notch filtering.\n',filtorder);
-    else fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
+    else 
+         fprintf('eegfilt() - performing %d-point bandpass filtering.\n',filtorder);
     end; 
+    fprintf('eegfilt() - IF a message, ''Matrix is close to singular or badly scaled,'' appears,\n');
+    fprintf('            then Matlab has failed to design a good filter. As a workaround, \n');
+    fprintf('            for band-pass filtering, first highpass the data, then lowpass it.\n');
+
     f=[MINFREQ (1-trans)*locutoff/nyq locutoff/nyq hicutoff/nyq (1+trans)*hicutoff/nyq 1]; 
     fprintf('eegfilt() - low transition band width is %1.1g Hz; high trans. band width, %1.1g Hz.\n',(f(3)-f(2))*srate, (f(5)-f(4))*srate/2);
     m=[0       0                      1            1            0                      0]; 
