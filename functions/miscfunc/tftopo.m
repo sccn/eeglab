@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/04/30 21:17:01  scott
+% adding sign -sm
+%
 % Revision 1.11  2002/04/30 20:53:35  scott
 % debugging showchans==0 option -sm
 %
@@ -256,7 +259,7 @@ else
   tfdat = reshape(tfdat,length(tffreqs),length(tftimes),nchans);
   tfsign = sort(tfdata,3);
   tfsign = sign(tfsign,:,:,round(nchans/2));
-  tfave = blockave(abs(tfdata,length(tftimes))
+  tfave = tfsign.*blockave(abs(tfdata,length(tftimes)));
   imagesc(times(tftimes),freqs(tffreqs),tfave);
 end
 hold on;
