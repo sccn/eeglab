@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2004/01/29 16:44:56  scott
+% rm pvaf printout for now
+%
 % Revision 1.43  2004/01/29 16:39:45  scott
 % test for chanlocs file location and size
 %
@@ -508,7 +511,7 @@ plotframes = ones(ncomps);
 maxproj = zeros(chans,ncomps);
 envdata = zeros(2,frames*(ncomps+1));
 envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); % first, plot the data envelope
-fprintf('Comparing projection sizes for components: ');
+fprintf('Comparing projection sizes for components:\n');
 compvars = zeros(1,ncomps);
     
 for c = 1:ncomps %%% find max variances and their frame indices %%%%%
