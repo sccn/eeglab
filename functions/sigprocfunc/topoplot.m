@@ -26,15 +26,16 @@
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
 %                       'head', to edge of head {default 'head'}.
-%   'plotrad'         - [float] plotting radius. Default is data limits.
-%   'shrink'          - ['on'|'off'|'force'|'skirt'|factor] 'on': If max radius > 0.5, 
+%   'plotrad'         - [float] plotting radius. (See >> topoplot example). If 
+%                       plotrad > 0.5, plot electrodes in lower head in a circular 
+%                       'skirt' outside the cartoon head outline. {default: max of 0.5 
+%                       and outermost channel radius)}. 
+%   'shrink'          - ['on'|'off'|'force'|factor] 'on': If max channel radius > 0.5, 
 %                        normalize electrode polar coordinates to make the maximum
 %                        radius 0.5 (to plot all locations). 'force': Normalize radius 
-%                        so the maximum is 0.5. 'factor': Apply a normalizing
-%                        factor (percentage of the maximum) 'skirt': Plot cartoon head
-%                        at the usual 0.5 radius and show lower positions as a 'skirt' 
-%                        outside the head boundary. {default = chan_locs structure 'shrink' 
-%                        value, if any, else 'off'}
+%                        so the channel max is 0.5. 'factor': Apply a specified shrink
+%                        factor (range (0,1), fraction of the maximum).
+%                        {default = chan_locs 'shrink' value, if any, else 'off'}
 %   'colormap'        -  (n,3) any size colormap
 %   'verbose'         - ['on'|'off'] default is 'on'.
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
@@ -100,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.150  2004/03/18 01:26:33  arno
+% plotrad
+%
 % Revision 1.149  2004/03/18 00:29:07  arno
 % debug skirt option
 %
@@ -525,7 +529,7 @@ if nargs > 2
 	  EMARKER = Value;
 	 case 'shrink'
 	  shrinkfactor = Value;
-	 case 'skirt'
+	 case 'plotrad'
 	  skirtfactor = Value;
 	 case {'headcolor','hcolor'}
 	  HCOLOR = Value;
