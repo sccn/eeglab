@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/01/30 15:59:23  arno
+% topoplot msg displayed only for 1st plot
+%
 % Revision 1.36  2003/12/11 16:16:42  arno
 % debug history generation
 %
@@ -331,8 +334,9 @@ for index = 1:size(arg2(:),1)
                     end;
                 end;
                 if nbgraph ~= 1
-                    options = { 'dipscale' 0.6 options{:} };
+                    options = {  options{:} 'dipscale' 0.6 };
                 end;
+                options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
             end;
         end;
     end;
