@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2003/05/24 19:10:57  arno
+% debug lowmem
+%
 % Revision 1.53  2003/05/23 17:15:35  arno
 % lowmem for 2 conditions debug
 %
@@ -676,6 +679,12 @@ g.plotamp    = lower(g.plotamp);
 g.compute    = lower(g.compute);
 g.AXES_FONT  = 10;
 g.TITLE_FONT = 14;
+
+% reshape 3D inputs
+if ndims(X) == 3
+    X = reshape(X, size(X,1), size(X,2)*size(X,3));
+    Y = reshape(Y, size(Y,1), size(Y,2)*size(Y,3));
+end;
 
 % testing arguments consistency
 % -----------------------------
