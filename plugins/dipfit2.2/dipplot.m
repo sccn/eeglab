@@ -147,6 +147,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.119  2005/03/31 18:38:17  arno
+%fixing dipole name for summary mode
+%
 %Revision 1.118  2005/03/31 18:32:57  arno
 %test for strings
 %.,
@@ -712,7 +715,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         if isfield(newsources, 'component')
             for index = 1:length(newsources)
                 if isempty(g.dipnames), tmpname = sprintf( 'Comp. %d', newsources(index).component);
-                else                    tmpname = g.dipnames{index};
+                else                    tmpname = char(g.dipnames{index});
                 end;
                 talpos = newsources(index).talcoord;
                 if size(talpos,1) == 1
