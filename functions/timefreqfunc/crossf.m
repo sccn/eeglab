@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/04/12 01:08:13  arno
+% change plotamps to plotamp in help message
+%
 % Revision 1.7  2002/04/12 00:41:37  arno
 % programming baseboot
 %
@@ -681,13 +684,15 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 	end;
 end % NOTE: above, mean ?????
 
-set(gcf,'DefaultAxesFontSize',AXES_FONT)
-colormap(jet(256));
-
-pos = get(gca,'position'); % plot relative to current axes
-q = [pos(1) pos(2) 0 0];
-s = [pos(3) pos(4) pos(3) pos(4)];
-axis('off')
+if g.plot
+	set(gcf,'DefaultAxesFontSize',AXES_FONT)
+	colormap(jet(256));
+	
+	pos = get(gca,'position'); % plot relative to current axes
+	q = [pos(1) pos(2) 0 0];
+	s = [pos(3) pos(4) pos(3) pos(4)];
+	axis('off')
+end;
 
 switch lower(g.plotamp)
  case 'on' 
