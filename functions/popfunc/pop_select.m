@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/10/11 01:22:37  arno
+% debugging min time when time select
+%
 % Revision 1.18  2002/08/21 01:57:57  arno
 % undo changes
 %
@@ -261,13 +264,13 @@ if ~isempty(g.trialcond)
 end;
 
 if isempty(g.trial)
-   error('Empty dataset, no trials');
+   error('Empty dataset, no trial');
 end;
 if length(g.trial) ~= EEG.trials
-	fprintf('Removing %d trials...\n', EEG.trials - length(g.trial));
+	fprintf('Removing %d trial(s)...\n', EEG.trials - length(g.trial));
 end;
 if length(g.channel) ~= EEG.nbchan
-	fprintf('Removing %d channels...\n', EEG.nbchan - length(g.channel));
+	fprintf('Removing %d channel(s)...\n', EEG.nbchan - length(g.channel));
 end;
 if length(g.point) ~= EEG.pnts
 	fprintf('Selecting data points...\n');
