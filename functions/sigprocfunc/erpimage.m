@@ -61,6 +61,7 @@
 %               (+/-)fraction*max(abs(data)) {Default: data bounds}
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {Default no}
+%   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {Default no}
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
@@ -140,6 +141,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2003/01/02 16:55:02  scott
+% allowed sortvars to be negative -sm
+%
 % Revision 1.69  2002/11/19 23:27:55  arno
 % debugging spectrum for very long epochs
 %
@@ -430,6 +434,7 @@ Allcohersflag=NO;   % don't image the coherence amplitudes by default
 Topoflag  = NO;     % don't plot a topoplot in upper left
 Specflag  = NO;     % don't plot a spectrum in upper right
 Erpflag   = NO;     % don't show erp average by default
+Erpstdflag= NO; 
 Alignflag = NO;     % don't align data to sortvar by default
 Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
@@ -831,6 +836,8 @@ if nargin > 6
 		  Specflag = YES;
 	  elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
 		  Erpflag = YES;
+	  elseif strcmpi(Arg,'erpstd')
+		  Erpstdflag = YES;
 	  elseif strcmp(Arg,'align')
 		  Alignflag = YES;
 	  elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
@@ -1859,6 +1866,9 @@ if Erpflag == YES
  end;
  xticklabel = strvcat(xticklabel);
  erp=nan_mean(urdata');           % compute erp average, ignoring nan's
+ if Erpstdflag == YES
+     stdev = nan_std(urdata');
+ end;
  %
  %%%%%% Plot ERP time series below image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %
@@ -1869,6 +1879,10 @@ if Erpflag == YES
    maxerp = round(fac*YEXPAND*max(erp))/fac; % minimal decimal places
    fac = 10*fac;
   end
+  if Erpstdflag == YES
+      fac = fac/10;
+      maxerp = max(maxerp, round(fac*YEXPAND*max(erp+stdev))/fac);
+  end;
  end
  if isnan(minerp)
   fac = 1;
@@ -1877,6 +1891,10 @@ if Erpflag == YES
     minerp = round(fac*YEXPAND*min(erp))/fac; % minimal decimal places
     fac = 10*fac;
   end
+  if Erpstdflag == YES
+      fac = fac/10;
+      minerp = min(minerp, round(fac*YEXPAND*min(erp-stdev))/fac);
+  end;
  end
  limit = [timelimits(1:2) -max(abs([minerp maxerp])) max(abs([minerp maxerp]))];
           
@@ -1890,7 +1908,10 @@ if Erpflag == YES
      [gcapos(1) gcapos(2) ...
       gcapos(3) image_loy*gcapos(4)]);
  end
- plot1erp(ax2,times,erp,limit); % plot ERP
+ if Erpstdflag == YES
+      plot1erp(ax2,times,erp,limit, stdev); % plot ERP
+ else plot1erp(ax2,times,erp,limit); % plot ERP
+ end;
  if ~isnan(aligntime)
    line([aligntime aligntime],[limit(3:4)*1.1],'Color','k'); % x=median sort value
  end
@@ -2247,7 +2268,7 @@ end
 %   
 if (~isempty(topomap)) 
     h(12)=axes('Position',...
-    [gcapos(1)+0.10*gcapos(3) gcapos(2)+0.86*gcapos(4),...
+    [gcapos(1)+0.10*gcapos(3) gcapos(2)+0.92*gcapos(4),...
         0.20*gcapos(3) 0.14*gcapos(4)]);
     % h(12) = subplot('Position',[.10 .86 .20 .14]); 
     fprintf('Plotting a topo map in upper left.\n');
@@ -2321,11 +2342,15 @@ return
 %
 %%%%%%%%%%%%%%%%%%% function plot1erp() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1erp(ax,Time,erp,axlimits)
+function [plot_handle] = plot1erp(ax,Time,erp,axlimits,stdev)
 
   ERPDATAWIDTH = 2;
   ERPZEROWIDTH = 2;
   [plot_handle] = plot(Time,erp,'LineWidth',ERPDATAWIDTH); hold on
+  if exist('stdev') == 1
+      [plot_handle] = plot(Time,erp+stdev, 'r--','LineWidth',1); hold on
+      [plot_handle] = plot(Time,erp-stdev, 'r--','LineWidth',1); hold on
+  end;
   if sum(isnan(axlimits))==0
     if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
       axis([axlimits(1:2) 1.1*axlimits(3:4)])
@@ -2390,7 +2415,6 @@ prctl = interp1(pt,sortdata,pc);
 % nan_mean() - take the column means of a matrix, ignoring NaN values
 % 
 function out = nan_mean(in)
-
    nans = find(isnan(in));
    in(nans) = 0;
    sums = sum(in);
@@ -2401,3 +2425,17 @@ function out = nan_mean(in)
    nonnans(nononnans) = 1;
    out = sum(in)./nonnans;
    out(nononnans) = NaN;
+
+function out = nan_std(in)
+    
+    nans = find(isnan(in));
+    in(nans) = 0;
+   
+    nonnans = ones(size(in));
+    nonnans(nans) = 0;
+    nonnans = sum(nonnans);
+    nononnans = find(nonnans==0);
+    nonnans(nononnans) = 1;
+   
+    out = sqrt((sum(in.^2)-sum(in).^2./nonnans)./(nonnans-1));
+    out(nononnans) = NaN;
