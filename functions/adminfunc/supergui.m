@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/18 17:07:40  arno
+% no modif
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -157,5 +160,5 @@ hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
 pos = get(gcf, 'position');
-set(gcf, 'position', [pos(1) pos(2)+(pos(4)-outheight) outwidth*1.2, outheight*1.5]);
+set(gcf, 'position', [pos(1) pos(2)+(pos(4)-outheight*1.5) outwidth*1.2, outheight*1.5]);
 return;
