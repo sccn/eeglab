@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/05/06 17:13:32  arno
+% debuging passing parameters
+%
 % Revision 1.6  2003/03/14 22:40:24  arno
 % error fif besa head used for dipfit
 %
@@ -127,7 +130,6 @@ if nargin < 3
 else 
     options = varargin;
 end;
-options
 
 if strcmpi(typedip, 'besa')
     if ~isfield(EEG, 'sources'), error('No BESA dipole information in dataset');end;
@@ -141,8 +143,21 @@ if strcmpi(typedip, 'besa')
 else 
     if ~isfield(EEG, 'dipfit'), error('No DIPFIT dipole information in dataset');end;
     if ~isempty(comps)
+        if ~isfield(EEG.dipfit.model, 'component')
+            for index = comps(:)
+                EEG.dipfit.model(index).component = index;
+            end;
+        end;
         dipplot(EEG.dipfit.model(comps), options{:});
     else
+        % find localized dipoles
+        comps = [];
+        for index2 = 1:length(EEG.dipfit.model)
+            if EEG.dipfit.model(index2).posxyz(1) ~= 0
+                comps = [ comps index2 ];
+                EEG.dipfit.model(index2).component = index2;
+            end;
+        end;        
         dipplot(EEG.dipfit.model, options{:});
     end;
 end;
