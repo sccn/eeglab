@@ -1,0 +1,118 @@
+% transformcoords() - Select nazion and inion in anatomical MRI images.
+%
+% Usage:
+%   mewcoords = transformcoords(coords, rotate, scale, center, reverse);
+%
+% Inputs:
+%   coords    - array of 3-D coordinates (N by 3)
+%   rotate    - [pitch roll yaw] rotate in 3-D using pitch (x plane), 
+%               roll (y plane) and yaw (z plane). An empty array does
+%               not perform any rotation.
+%   scale     - [scalex scaley scalez] scale axis. A single numeric
+%               input scale all the dimentions the same. Default 1
+%               does not scale.
+%   center    - [cx cy cz] after rotating and scaling, move the
+%               coordinate center to [cx cy cz]. Default [0 0 0]
+%               does not move the center.
+%   reverse   - [0|1] when set to 1 perform the reverse transformation,
+%               first moving to the old center, unscaling, and unrotating.
+%               Default is 0.
+%
+% Output:
+%   newcoords - coordinates after rotating, scaling and recentering
+%
+% Author: Arnaud Delorme, Salk, SCCN, UCSD, CA, March 23, 2004
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) 2004 Arnaud Delorme
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function mewcoords = transformcoords(coords, rotate, scale, center, reverse);
+    
+    if naring < 2
+        help transformcoords;
+        return;
+    end;
+    if nargin < 3
+        scale =1;
+    end;
+    if nargin < 4
+        center = [0 0 0];
+    end;
+    if nargin < 5
+        reverse = 0;
+    end;
+    if size(coords, 2) ~= 3
+        error('Number of columns must be 3 for the coordinate input');
+    end;
+    if length(rotate) > 0 & length(rotate) ~= 0
+        error('rotate parameter must have 3 values');
+    end;
+    
+    % decode parameters
+    % -----------------
+    cx = center(1);
+    cy = center(2);
+    cz = center(3);
+    if length(scale) == 1
+        scale = [scale scale scale];
+    end;
+    scalex = scale(1);
+    scaley = scale(2);
+    scalez = scale(3);
+    if length(rotate) < 3
+        rotate = [0 0 0]
+    end;
+    pitch = rotate(1);
+    roll  = rotate(2);
+    yaw   = rotate(3);
+    
+    
+    if ~reverse
+        % pitch roll yaw rotation
+        % -----------------------
+        cp = cos(pitch); sp = sin(pitch);
+        cr = cos(roll);  sr = sin(roll);
+        cy = cos(yaw);   sy = sin(yaw);
+        rot3d = [ cy*cr+sy*sp*sr    sy*cr-cy*sp*sr     cp*sr  ;
+                  -sy*cp            cy*cp               sp     ;
+                  sy*sp*cr-cy*sr    -cy*sp*cr-sy*sr     cp*cr  ];
+        coords = rot3d*coords;
+        
+        % scaling and centering
+        % ---------------------
+        coords(1,:) = coords(1,:)*scalex-cx;
+        coords(2,:) = coords(2,:)*scaley-cy;
+        coords(3,:) = coords(3,:)*scalez-cz;
+    else
+        % unscaling and uncentering
+        % -------------------------
+        coords(1,:) = (coords(1,:)+cx)/scalex;
+        coords(2,:) = (coords(2,:)+cy)/scaley;
+        coords(3,:) = (coords(3,:)+cz)/scalez;
+        
+        % pitch roll yaw rotation
+        % -----------------------
+        cp = cos(-pitch); sp = sin(-pitch);
+        cr = cos(-roll);  sr = sin(-roll);
+        cy = cos(-yaw);   sy = sin(-yaw);
+        rot3d = [ cy*cr+sy*sp*sr    sy*cr-cy*sp*sr     cp*sr  ;
+                  -sy*cp            cy*cp               sp     ;
+                  sy*sp*cr-cy*sr    -cy*sp*cr-sy*sr     cp*cr  ];
+        coords = rot3d*coords;
+    end;
+    
