@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/02/21 16:49:22  arno
+% nothing
+%
 % Revision 1.20  2002/12/24 01:26:19  arno
 % adding 'plot' option
 %
@@ -151,7 +154,13 @@ if isstr(mode)
 	% ---------------------
 	listui = { listui{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
 	if exist('helpcom') == 1 & ~isempty(helpcom)
-		listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
+        if ~iscell(helpcom)
+            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
+        else
+            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom{1} } };
+            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help GUI', 'callback', helpcom{2} } };
+            geometry{end} = [1 1 1 1];
+        end;
 	else
 		listui = { listui{:}, {} };
 	end;   
