@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2004/02/15 19:53:36  scott
+% same
+%
 % Revision 1.102  2004/02/15 19:53:06  scott
 % same
 %
@@ -673,16 +676,16 @@ Rd = Rd(enum);
 labels = labels(enum,:);
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
 
-if isstr('shrinkfactor')
+if isstr('shrinkfactor') % DEBUG
    fprintf('shrinkfactor: %s\n',shrinkfactor);
 else
    fprintf('shrinkfactor: %g\n',shrinkfactor);
 end
-if (isstr('shrinkfactor') & strcmp('shrinkfactor','skirt')) | ~isstr('stringfactor')
-   fprintf('max Th: %g\n',max(Th));
+if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
+   fprintf('max Th: %g\n',max(Th)); % DEBUG
    Th = skirt_Th(2*pi*Th/360,Rd);  % rotate the angles of the electrodes in the 'skirt'
    Th = 180*Th/pi; % convert back to degrees
-   fprintf('max Th: %g\n',max(Th));
+   fprintf('max Th: %g\n',max(Th)); % DEBUG
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -768,7 +771,7 @@ if ~strcmpi(STYLE,'blank') % if draw scalp map
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Remove 4 wedges in skirt %%%%%%%%%%%%%%%%%
 %
-if (isstr('shrinkfactor') & strcmp('shrinkfactor','skirt')) | ~isstr('stringfactor')
+if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrinkfactor')
   [Thi,Phi,Rdi] = cart2sph(Xi-rmax*sf,Yi,Zi);
   [tmp,Thi,Rdi] = sph2topo(1:length(X1),Thi,Phi);
   skirt_mask = (sqrt(Xi.^2+Yi.^2)> rmax*sf & ...
