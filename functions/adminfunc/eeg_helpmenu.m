@@ -25,6 +25,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/09/09 02:00:02  arno
+% menu has changed
+%
 % Revision 1.11  2002/09/05 01:34:13  arno
 % menu editing
 %
@@ -71,6 +74,7 @@ allmenus = { ...
 '      From BCI2000 ASCII file' 'pop_loadbci'        ... %       Read .BCI datafile (Snapmaster)      
 '      From Snapmaster .SMA file' 'pop_snapread'       ... %       Read .SMA datafile (Snapmaster)      
 '      From Biosemi .EDF file' 'pop_readedf'        ... %       Read .ELP datafile (Neuroscan continuous)      
+'      From Biosemi .BDF file' 'pop_readbdf'        ... %       Read .ELP datafile (Neuroscan continuous)      
 '      From Neuroscan .CNT file' 'pop_loadcnt'        ... %       Read .CNT datafile (Neuroscan continuous)      
 '      From Neuroscan .EEG file' 'pop_loadeeg'        ... %       Read .EEG datafile (Neuroscan epochs)      
 '   Import epoch info' ''      ...
