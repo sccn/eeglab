@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.195  2004/05/05 20:21:02  scott
+% *** empty log message ***
+%
 % Revision 1.194  2004/04/29 18:58:48  scott
 % removed new axes - scaling problem. Toggling pts|numbers doesnt work inside head cartoon.
 %
@@ -1430,8 +1433,13 @@ if ~isempty(DIPOLE)
         DIPOLE(:,3) = -tmp(:,4);
         DIPOLE(:,4) =  tmp(:,3);
     end;
+    for index = 1:size(DIPOLE,1)
+        if ~any(DIPOLE(index,:))
+             DIPOLE(index,:) = [];
+        end
+    end;
     DIPOLE(:,1:4)   = DIPOLE(:,1:4)*rmax*(rmax/plotrad); % scale radius from 1 -> rmax (0.5)
-    DIPOLE(:,3:end) = (DIPOLE(:,3:end))*rmax*(rmax/plotrad); 
+    DIPOLE(:,3:end) = (DIPOLE(:,3:end))*rmax/100000*(rmax/plotrad); 
     if strcmpi(DIPNORM, 'on')
         for index = 1:size(DIPOLE,1)
             DIPOLE(index,3:4) = DIPOLE(index,3:4)/norm(DIPOLE(index,3:end))*0.2;
@@ -1440,7 +1448,7 @@ if ~isempty(DIPOLE)
     DIPOLE(:, 3:4) =  DIPORIENT*DIPOLE(:, 3:4)*DIPLEN;
 
     PLOT_DIPOLE=1;
-    if sum(DIPOLE(1,3:4).^2) <= 0.0001  
+    if sum(DIPOLE(1,3:4).^2) <= 0.00001  
       if strcmpi(VERBOSE,'on')
         fprintf('Note: dipole is length 0 - not plotted\n')
       end
