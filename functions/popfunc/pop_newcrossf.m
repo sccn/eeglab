@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/24 22:08:58  arno
+% adding tabs
+%
 % Revision 1.9  2002/04/24 21:53:09  scott
 % [same] -sm
 %
@@ -129,6 +132,15 @@ if nargin < 3
    if ~isempty( result{7} )
 	   options = [ options ',' result{7} ];
    end;
+   % add topoplot
+   % ------------
+   if ~isempty(EEG.chanlocs)
+	   if typeproc == 1
+		   options = [options ', ''topovec'', [' int2str([num1 num2]) '], ''elocs'', EEG.chanlocs' ];
+	   else % typeproc == 0
+		   options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) '])'', ''elocs'', EEG.chanlocs' ];
+	   end;
+   end;
 
    figure;
 else
@@ -176,17 +188,6 @@ else
 end;	 
 tmpsig1 = reshape( tmpsig1, 1, size(tmpsig1,2)*size(tmpsig1,3));
 tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
-
-% add topoplot
-% ------------
-%
-if ~isempty(EEG.chanlocs)
-  if typeproc == 1
-      options = [options ', ''topovec'', ' int2str([num1 num2]) ', ''elocs'', EEG.chanlocs' ];
-  else % typeproc == 0
-      options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) ']), ''elocs'', EEG.chanlocs' ];
-  end;
-end;
 
 %
 % outputs

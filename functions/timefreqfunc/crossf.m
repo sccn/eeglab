@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/04/25 02:38:12  arno
+% change significance (only one sided
+%
 % Revision 1.21  2002/04/25 02:18:19  arno
 % debugging topovec
 %
@@ -405,11 +408,11 @@ end
 
 if isempty(g.topovec)
 	g.topovec = [];
-elseif size(g.topovec,2)~=2
-	error('tvec must be two column vectors.');
-	if isempty(g.elocs)
-		error('Channel location file must be specified.');
-	end;
+elseif min(size(g.topovec))==1
+	g.topovec = g.topovec(:);
+end;
+if size(g.topovec,1)~=2
+	error('topovec must be a row or column vector.');
 end
 
 if isempty(g.elocs)
@@ -791,6 +794,8 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 	Rsignif = mean(Rboot(g.naccu-i+1:g.naccu,:)); % significance levels for Rraw
 	Rboot = mean(Rboot(g.naccu-i+1:g.naccu,:));
 	%Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
+else 
+	Rsignif = [];
 end % NOTE: above, mean ?????
 
 if g.bootsub < 0
@@ -997,13 +1002,21 @@ if g.plot
    %
    if (~isempty(g.topovec))
          h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
-         topoplot(g.topovec(:,1),g.elocs,'electrodes','off', ...
-                    'style', 'blank', 'emarkersize1chan', 10);
+		 if size(g.topovec,2) == 1
+			 topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
+					  'style', 'blank', 'emarkersize1chan', 10);
+		 else
+			 topoplot(g.topovec(1,:),g.elocs,'electrodes','off');
+		 end;
 		 axis('square')
 
          h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
-         topoplot(g.topovec(:,2),g.elocs,'electrodes','off', ...
-                    'style', 'blank', 'emarkersize1chan', 10);
+		 if size(g.topovec,2) == 1
+			 topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
+					  'style', 'blank', 'emarkersize1chan', 10);
+		 else
+			 topoplot(g.topovec(2,:),g.elocs,'electrodes','off');
+		 end;
         axis('square')
    end
 
