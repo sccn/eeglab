@@ -8,9 +8,11 @@
 %   >> headplot('setup',['elocs'],['splinefile'],['comment'],['type'])
 %
 % Inputs: 
-%   'elocs'       - file of electrode locations in cartesian coords
-%                   or channel location structure.
-%                   cf. functions: readlocs(), convertlocs()
+%   'elocs'       - file of electrode locations (compatible with readlocs())
+%                   or channel location structure. If the channel file extension
+%                   is not standard, use readlocs() to load the data file, e.g.
+%                   >> headplot('setup', readlocs('myfile', 'filetype', 'besa'), ...
+%                      'splinefile');
 %   'splinefile'  - name of spline file to save splining info into
 %   'comment'     - optional string vector containing info for spline file
 %   'type'        - type is obsolete, it must be cartesian.
@@ -68,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/02/24 16:08:41  arno
+% removing spherical coords
+%
 % Revision 1.28  2004/02/24 15:39:03  arno
 % header msg
 %
@@ -229,53 +234,10 @@ if isstr(values)
     % Open electrode file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstr(eloc_file)
-	    fid = fopen(eloc_file);
-	    if fid == -1
-	      error(['headplot(): Error opening file: ',eloc_file])
-	    end
-        A = fscanf(fid,'%d %f %f %f %s',[8 MAX_ELECTRODES]);  
-	    fclose(fid);
-	    fprintf(['Electrode file ',eloc_file,' opened.\n'])
-	    A = A';
-	    fprintf('Location data for %d electrodes read.\n',size(A,1));
-        
-	    %%%%%%%%%%%%%%%%%%%%%%%%%%%
-	    % Record ElectrodeNames
-	    %%%%%%%%%%%%%%%%%%%%%%%%%%%
-	    ElectrodeNames = zeros(size(A,1),4);
-	    for r = 1:size(ElectrodeNames,1)
-            ElectrodeNames(r,:) = sprintf('%s',A(r,5:8));
-	      for c=1:4
-	        if ElectrodeNames(r,c) == '.'
-	          ElectrodeNames(r,c) = ' ';
-	        end
-	      end
-	      if ElectrodeNames(r,3)== ' ' & ElectrodeNames(r,4)== ' '
-	            ElectrodeNames(r,[2 3]) = ElectrodeNames(r,[1 2]);
-	            ElectrodeNames(r,1) = ' '; % move 1|2-letter label to center
-	      end
-	    end
-    
-	    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	    % Convert from spherical coords to Cartesian
-	    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        Xe = A(:,2);
-        Ye = A(:,3);
-        Ze = A(:,4);
-        dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-        Xe = Xe./dists;
-        Ye = Ye./dists;
-        Ze = Ze./dists;
-		Xetmp = Xe;
-		Xe = -Ye;
-		Ye = Xetmp;
-    else
 	    %%%%%%%%%%%%%%%%%%%%%
 	    % Electrode structure
 	    %%%%%%%%%%%%%%%%%%%%%
-	    if ~isfield(eloc_file, 'X') | isempty(eloc_file(1).X) % no X Y Z coordinates
-			[tmp labels Th Rd ind] = readlocs(eloc_file);
-        end;
+        [eloc_file labels Th Rd ind] = readlocs(eloc_file);
         fprintf('Headplot: using existing XYZ coordinates\n');
         tmpX = { eloc_file.X };
         tmpY = { eloc_file.Y };
