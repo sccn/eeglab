@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/06 01:57:38  arno
+% title editing
+%
 % Revision 1.4  2002/04/06 01:20:04  arno
 % more editing, title mainly
 %
@@ -57,10 +60,9 @@ commands = { ...
        'pop_importevent'    ... %       Import Matlab array or ASCII file        
        'pop_importpres'     ... %       Import .LOG event file (Presentation)    
        'pop_loadset'        ... %    Load dataset                                
-       'pop_loadwks'        ... %    Load workspace                              
+       'pop_saveset'        ... %    Save dataset                                
        'pop_saveset'        ... %    Save dataset                                
        'pop_delset'         ... %    Clear dataset(s)                            
-       'pop_savewks'        ... %    Save workspace                              
        'pop_editoptions'    ... %    Maximize memory                             
        'pop_saveh'          ... %    Save history                                
        ''                   ... %    Quit                                        
