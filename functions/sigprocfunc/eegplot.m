@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2002/10/19 23:10:16  arno
+% debug last
+%
 % Revision 1.56  2002/10/19 23:07:24  arno
 % implement more exact limits at very low freq.
 %
@@ -1080,27 +1083,28 @@ else
     set(EPosition,'string',num2str(g.time+1)); 
     set(figh, 'userdata', g);
 
+    lowlim = round(g.time*multiplier+1);
+    highlim = round(min((g.time+g.winlength)*multiplier+2,g.frames));
+    
     % Plot data and update axes
     switch lower(g.submean) % subtract the mean ?
-     case 'on', meandata = mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');  
-     case 'nan',meandata = nan_mean(data(:,round(g.time*multiplier+1):round(min((g.time+g.winlength)*multiplier,g.frames)))');
+     case 'on', meandata = mean(data(:,lowlim:highlim)');  
+     case 'nan',meandata = nan_mean(data(:,lowlim:highlim)');
      otherwise, meandata = zeros(1,g.chans);
     end;
     axes(ax1)
     cla
      
-	 % plot data
-     axes(ax1)
-	 hold on
-	 lowlim = round(g.time*multiplier+1);
-	 highlim = round(min((g.time+g.winlength)*multiplier+2,g.frames));
- 	 for i = 1:g.chans
-         plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
-              'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
-     end
-
-     % draw selected electrodes
-     if ~isempty(g.winrej)
+    % plot data
+    axes(ax1)
+    hold on
+    for i = 1:g.chans
+        plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+             'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
+    end
+     
+    % draw selected electrodes
+    if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
 				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)
