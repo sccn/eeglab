@@ -76,6 +76,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/11/20 01:27:54  arno
+% redebugging bootstrap
+%
 % Revision 1.5  2002/11/20 01:21:05  arno
 % erspboot -> array
 %
@@ -108,6 +111,7 @@ nbcompo = size( data, 1);
 if iscell(data)
     data1 = data{1};
     data2 = data{2};
+    nbcompo = size( data1, 1);    
 end;
 
 % compute all time frequency maps
