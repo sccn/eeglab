@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2004/08/25 00:22:02  arno
+% same
+%
 % Revision 1.33  2004/08/25 00:18:09  arno
 % allow values
 %
@@ -505,7 +508,7 @@ function array = load_file_or_array( varname, skipline, delim );
             end;   
         end;
     else
-        array = varname;
+        array = { varname };
     end;     
 return;
 
