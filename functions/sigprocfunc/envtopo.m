@@ -33,8 +33,8 @@
 %  'icawinv'   = [float array] inverse weigth matrix. By default computed by inverting
 %                the weight matrix (but if some components have been removed, then
 %                weight's pseudo-inverse matrix does not represent component's maps. 
-%  'envmode'   = ['avg'|'rms'] compute the average enveloppe or the root mean square
-%                enveloppe { Default -> 'avg' }
+%  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
+%                envelope { Default -> 'avg' }
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
 %                plotting.
 %
@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/25 18:47:33  luca
+% sign of comparison typo - ad
+%
 % Revision 1.8  2002/10/09 21:57:25  arno
 % documenting limcontrib
 %
