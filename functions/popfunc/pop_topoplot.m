@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2003/11/05 20:35:54  arno
+% plot dipoles
+%
 % Revision 1.32  2003/10/29 01:06:08  arno
 % remove debuging message
 %
@@ -194,14 +197,18 @@ if nargin < 3
                { 'style'   'text'     'string'    'Plot associated dipole(s) (if present)' } ...
                { 'style'   'checkbox' 'string'    '' } { } ...
                { } ...
-               { 'style'   'text'     'string'    '-> Additional scalp map (and dipole) plotting options (see help)' } ...
+               { 'style'   'text'     'string'    [ '-> Additional scalp map' fastif(typeplot,'',' (and dipole)') ...
+                                                  ' plotting options (see help)' ] } ...
                { 'style'   'edit'     'string'    '''electrodes'', ''off''' } };
     uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
-    uivert = [ 1   1       1    1       1       1             1   1   1   ];
+    if typeplot
+        uilist(9:11) = [];
+        uigeom(6) = [];
+    end;
     guititle = fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', ...
                        'Component scalp map(s) -- pop_topoplot()');
     
-    result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal', uivert);
+    result = inputgui( uigeom, uilist, 'pophelp(''pop_topoplot'')', guititle, [], 'normal');
 	if length(result) == 0 return; end;
 	
     % reading first param
@@ -219,11 +226,16 @@ if nargin < 3
     % --------------------
 	topotitle   = result{2};
 	rowcols     = eval( [ '[' result{3} ']' ] );
-	plotdip     = result{4};
-    try, options      = eval( [ '{ ' result{5} ' }' ]);
-    catch, error('Invalid scalp map options'); 
-    end;
-	if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
+    if typeplot
+        plotdip = 0;
+        try, options      = eval( [ '{ ' result{4} ' }' ]);
+        catch, error('Invalid scalp map options'); end;
+    else
+        plotdip     = result{4};
+        try, options      = eval( [ '{ ' result{5} ' }' ]);
+        catch, error('Invalid scalp map options'); end;
+    end;        
+    if length(arg2) == 1, figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; end;
 else
     if ~isempty(varargin) & isnumeric(varargin{1})
         plotdip = varargin{1};
@@ -297,18 +309,23 @@ for index = 1:size(arg2(:),1)
     if plotdip & typeplot == 0
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
             if length(EEG.dipfit.model) >= index
-                curpos = EEG.dipfit.model(index).posxyz/EEG.dipfit.vol.r(end);
-                curmom = EEG.dipfit.model(index).momxyz;
+                curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
+                curmom = EEG.dipfit.model(arg2(index)).momxyz;
                 if size(curpos,1) > 1 & any(curpos(2,:) ~= 0)
                 else
                     if  any(curpos(1,:) ~= 0)
-                        options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:2) ] };
+                        options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                        if nbgraph ~= 1
+                            options = { 'dipscale' 0.6 options{:} };
+                        end;
                     end;
                 end;
             end;
         end;
     end;
     
+	% plot scalp map
+    % --------------
     if ~isnan(arg2(index))
 		if typeplot
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, 'verbose', 'off', options{:});
