@@ -22,6 +22,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/15 17:57:33  arno
+% update example tutorials
+% URLs
+%
 % Revision 1.17  2002/11/15 15:52:57  arno
 % more help for local tutorial copies
 %
@@ -96,12 +100,21 @@ ICABINARY = 'ica_linux2.4'; % <=INSERT name of ica executable for binica.m
 % COLORS
 % ------
 
-BACKCOLOR           = [.93 .96 1];    % Background figure color 
-BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
-GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
-GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
-GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
-GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
+if get(0, 'screendepth') <=8
+    BACKCOLOR           = [1 1 1];    % Background figure color 
+    BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
+    GUIBUTTONCOLOR      = [1 1 1];    % Buttons colors in figures
+    GUIPOPBUTTONCOLOR   = [1 1 1];    % Buttons colors in GUI windows
+    GUIBACKCOLOR        = [1 1 1];    % GUI background color
+    GUITEXTCOLOR        = [0 0 0];      % GUI foreground color for text    
+else
+    BACKCOLOR           = [.93 .96 1];    % Background figure color 
+    BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
+    GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
+    GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
+    GUIBACKCOLOR        = [.66 .76 1];    % GUI background color
+    GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
+end;
 
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
 % -------------------------------------------------------------
