@@ -43,8 +43,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/04/16 01:48:32  arno
+% Initial revision
+%
 
-function chanlocs = forcelocs( chanlocs, varargin)
+function [chanlocs,options] = forcelocs( chanlocs, varargin)
     
     NENTRY = 1; % number of lines in GUI
     FIELDS = { 'X' 'Y' };
