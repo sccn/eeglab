@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/14 00:12:52  arno
+% new error message
+%
 % Revision 1.6  2002/08/14 00:11:28  arno
 % update header
 %
@@ -126,7 +129,7 @@ if mode == 0  % single datasets
 	tmpica = EEG.icaact;
 	EEG.icaact      = [];
 	disp('Saving dataset...');
-	command = sprintf('save -MAT %s EEG', [ curfilepath curfilename ]);
+	command = sprintf('save(''%s'',''-MAT'',''EEG'');', [ curfilepath curfilename ]);
 	try, eval(command);
 	catch, error('Pop_saveset: saving error, check permission on file or directory');
 	end;
