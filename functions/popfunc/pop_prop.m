@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/09/04 23:13:59  arno
+% Initial revision
+%
 % Revision 1.17  2002/09/04 23:12:51  arno
 % channel property
 %
@@ -289,9 +292,9 @@ if exist('winhandle')
 		set(hval, 'enable', 'off');
 	end;
 	
-	com = sprintf('pop_prop( %s, %d, 0);', inputname(1), numcompo );
+	com = sprintf('pop_prop( %s, %d, %d, 0);', inputname(1), typecomp, numcompo );
 else
-	com = sprintf('pop_prop( %s, %d);', inputname(1), numcompo);
+	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), typecomp, numcompo);
 end;
 
 return;
