@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/12/27 22:46:45  scott
+% edit header msg -sm
+%
 % Revision 1.4  2002/12/27 22:20:07  arno
 % same
 %
@@ -175,6 +178,7 @@ case 'cart2sphbesa',
    chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
 case 'cart2sph',
+    disp('WARNING: XYZ center not optimized, optimize center, then recompute coords');
 	[th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
 	for index = 1:length(chans)
 		 chans(index).sph_theta     = th(index)/pi*180;
