@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/11/15 22:36:52  arno
+% latency of urevent boundary
+%
 % Revision 1.29  2004/11/09 23:51:00  arno
 % boundary in urevent
 %
@@ -257,7 +260,7 @@ else
             % insert boundary event
             % ---------------------
             INEEG1.urevent(end+1).type    = 'boundary';
-            INEEG1.urevent(end  ).latency = max(INEEG1.pnts, INEEG1.urevent(end-1).latency)+0.5;
+            INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
             
             % update urevent indices for second dataset
             % -----------------------------------------
