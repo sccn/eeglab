@@ -5,4 +5,4 @@
 
 option_computeica = 1 ; % Precompute ICA activations (uses RAM) 
 option_keepdataset = 1 ; % Retain parent datasets (uses RAM)
-option_savematlab = 1 ; % Store data in the .set file (inactivate for clustering)
+option_savematlab = 1 ; % Store data in the .set file (recommended for future clustering option)
