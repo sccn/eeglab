@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/05/20 23:30:57  arno
+% still debuging october 2002 problem
+%
 % Revision 1.18  2003/04/10 17:57:44  arno
 % filter for file read
 %
@@ -116,17 +119,18 @@ if isfield(TMPVAR, 'EEG') %individual dataset
             VAROUT.filepath = inputpath; 
             if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
                 disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
-                VAROUT.data = [ inputname(1:end-3) 'fdt' ];
+                VAROUT.data     = [ inputname(1:end-3) 'fdt' ];
             end;
         else 
             VAROUT.filepath = '';
             tmpinputname = [ inputpath inputname ];
             if length(tmpinputname) > 3 & ~strcmp(tmpinputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(tmpinputname(end-2:end), 'set')
                 disp('Warning: the name of the dataset has changed on disk, updating .fdt data file to the new name');
-                VAROUT.data = [ tmpinputname(1:end-3) 'fdt' ];
+                VAROUT.data     = [ tmpinputname(1:end-3) 'fdt' ];
             end;
         end;
     end;
+    VAROUT.filename = [ inputname(1:end-3) 'set' ];
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
