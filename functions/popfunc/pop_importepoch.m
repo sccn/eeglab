@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/10/29 22:57:03  scott
+% text
+%
 % Revision 1.18  2002/10/29 22:55:49  scott
 % text
 %
@@ -276,11 +279,15 @@ if ~isempty(EEG.event)
     end;
 end;
 if strcmpi(g.clearevents, 'on')
+    fprintf('Pop_importepoch: deleting old events if any\n');
     EEG.event = [];
+else 
+    fprintf('Pop_importepoch: appending new events to the existing event array\n');
 end;
            
 % add time locking event fields
 % -----------------------------
+fprintf('Pop_importepoch: adding automatically Time Locking Event (TLE) events\n');
 if ~isempty(g.typefield)
     if isempty(strmatch( g.typefield, epochfield )) 
          error(['Pop_importepoch: type field ''' g.typefield ''' not found']);
@@ -293,7 +300,7 @@ for trial = 1:EEG.trials
     else 
         EEG.event(end).type = 'TLE';
     end;
-    eval( ['EEG.event(end).latency = EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
+    eval( ['EEG.event(end).latency = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;' ] );
 end;
 
 % add latency fields
