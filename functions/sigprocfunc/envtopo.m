@@ -1,24 +1,24 @@
 % envtopo() - Plot the envelope of a data epoch plus envelopes and scalp maps of specified 
-%             or largest contributing components. If a 3-D input matrix, operating on the
-%             epoch mean. Click on individual topoplots to examine them in detail (by axcopy()).
+%             or largest-contributing components. If a 3-D input matrix, operates on the
+%             mean of the data epochs. Click on individual axes to examine them in detail. 
 % Usage:
-%            >> envtopo(data,weights);
-%            >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
+%             >> envtopo(data,weights,'chanlocs',file_or_struct);
+%             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
 %                    = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
-%  data         = single data epoch (chans,frames) or a 3-D data matrix 
+%  data        = single data epoch (chans,frames) or a 3-D data matrix 
 %                 (chans,frames,epochs). If data are 3-D, process the mean data epoch.
-%  weights      = ICA weight matrix (e.g., icaweights*icasphere)
-%
+%  weights     = linear decomposition (unmixing) weight matrix (e.g., icaweights*icasphere)
+% Required keyword:
+%  'chanlocs'  = [string] channel location filename or EEG.chanlocs structure. 
+%                For more information, see >> topoplot example 
 % Optional inputs:
-%  'chanlocs'  = [string] channel location file or EEG.chanlocs structure. 
-%                  See >> topoplot example 
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if int < 0, the number of largest contributing components to plot 
 %                  {default|[] -> 7}
 %  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
-%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plotting
-%                  limits (in ms) and min/max data limits (in uV). If 0, or if both
+%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
+%                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
@@ -43,7 +43,7 @@
 %  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
 %                  the weight matrix (but if some components have been removed, then
 %                  weight's pseudo-inverse matrix does not represent component's maps).
-%  'icaact'     = [float array] ICA component activations. By default these are computed 
+%  'icaact'     = [float array] component activations. By default these are computed 
 %                  from the input weight matrix.
 %  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2004/11/30 18:15:06  scott
+% debugging same
+%
 % Revision 1.84  2004/11/30 17:12:21  scott
 % debugging use of g.plotchans only in plotting and computations
 %
