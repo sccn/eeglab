@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2003/11/27 00:25:51  arno
+% automatically detecting elc files
+%
 % Revision 1.51  2003/11/05 17:20:23  arno
 % first convert spherical instead of carthesian
 %
@@ -379,7 +382,8 @@ if isstr(filename)
    
    % assign format from filetype
    % ---------------------------
-   if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') 
+   if ~isempty(g.filetype) & ~strcmpi(g.filetype, 'custom') ...
+           & ~strcmpi(g.filetype, 'asc') & ~strcmpi(g.filetype, 'elc') 
       indexformat = strmatch(lower(g.filetype), listtype, 'exact');
       g.format = listimportformat{indexformat};
       if isempty(g.skiplines)
