@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/03/16 02:43:50  arno
+% allowing to show legend
+%
 % Revision 1.13  2003/03/16 01:49:09  arno
 % debug
 % last
@@ -210,7 +213,7 @@ else
 end
 
 nolegend = 0;
-if isempty(legend), nolegend = 1; end;
+if isempty(g.legend), nolegend = 1; end;
 
 limitset = 0;
 if length(g.limits)>1
