@@ -1,14 +1,39 @@
-% pop_multiica() - Run an several ICA decomposition on an EEG dataset 
+% pop_runica() - Run an ICA decomposition on an EEG dataset 
 %                using runica(),binica(), or other ICA algorithm.
 % Usage:
 %   >> OUT_EEG = pop_runica( IN_EEG ); % pops-up a data entry window
-%   >> OUT_EEG = pop_runica( IN_EEG, 'key', 'val', ... ); % no pop_up
+%   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options ); % no pop_up
 %
+% Graphic interface:
+%   "ICA algorithm to use" - [edit box] The type of ICA algorithm 
+%                 to use for the ICA decomposition. 
+%                 equivalent: 'rhe ica_type'
+%   "Commandline options" - [edit box] Command line options to forward
+%                 to the ICA algorithm. Command line eqivalent: 'options' 
 % Inputs:
 %   IN_EEG      - input EEG dataset
+%   ica_type    - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
+%                 to use for the ICA decomposition. The nature of any 
+%                 differences in the results of these algorithms have 
+%                 not been well characterized. Default is binica(), if
+%                 found, else runica().
+%   options     - ICA algorithm options (see ICA routine help messages).
 % 
-% Optional inuts:
-%   same as multiica()
+% Note:
+% 1) Infomax is the ICA algorithm we use most. It is based on Tony Bell's
+%    algorithm implemented for automated use by Scott Makeig using the 
+%    natural gradient of Amari et al.. It can also extract sub-Gaussian 
+%    sources using the 'extended' ICA option of Lee and Girolami. Function
+%    runica() is the all-Matlab version; binica() calls the (1.5x faster) 
+%    binary version (separate download) translated to C by Sigurd Enghoff.
+% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
+%    It is included in the EEGLAB toolbox by his permission. 
+%    See >> help jader
+% 3) To run fastica(), download the fastICA toolbox from
+%    http://www.cis.hut.fi/projects/ica/fastica/ and make it available 
+%    in your Matlab path. According to the authors, default parameters
+%    are not optimal: Try 'approach', 'sym' to estimate components in
+%    parallel.
 %
 % Outputs:
 %   OUT_EEG = Input EEGLAB dataset with new .weights and .sphere field values.
