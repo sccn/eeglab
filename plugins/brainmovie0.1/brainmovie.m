@@ -63,6 +63,7 @@
 % 'envylabel'   - ordinate label for envelope. Default 'Potential \muV'
 % 'envvert'     - vector of time indices to insert vertical lines. A cell array
 %                 of vector (1 per condition) can also be given.
+% 'flashes'     - vector of time indices at witch the background is set to black.
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (nrows = num. of conditions)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
@@ -90,6 +91,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/20 00:40:01  arno
+% adding verts selective to conditions
+%
 % Revision 1.3  2002/04/18 23:28:32  arno
 % lots of modification (2 days of programing)
 %
@@ -147,6 +151,7 @@ try, g.colmapcoh;       catch, g.colmapcoh = hot(64); end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.envvert;			catch, g.envvert = []; end; 
+try, g.flashes;			catch, g.flashes = []; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
@@ -365,6 +370,31 @@ pos = get(gca,'position');
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)];
 
+% compute selected latency point
+% ------------------------------
+if ~isempty(g.latency)
+	alltimepoints = [];
+	for index = 1:length(g.latency)
+		[tmp tmptimepoint] = min(abs(g.latency(index)-times));
+		alltimepoints = [ alltimepoints tmptimepoint];
+	end;	
+else 
+	alltimepoints = 1:nwin;
+end;
+
+% compute flashes latency
+% -----------------------
+if ~isempty(g.flashes)
+	allflashes = [];
+	for index = 1:length(g.flashes)
+		[tmp tmptimepoint] = min(abs(g.flashes(index)-times));
+		allflashes = [ allflashes tmptimepoint];
+	end;
+	allflashes = [allflashes allflashes+1];
+	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', []); set (gcf, 'visible', g.visible);
+	hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch, 'facecolor', 'w');
+end;	
+
 % draw captions if necessary
 % --------------------------
 ordinate = 0.2;
@@ -436,24 +466,23 @@ end;
 %hhimg2 = axes('position', [0.5, 0.7, 0.2, 0.3].*s+q, 'visible', g.visible, 'color', 'none'); 
 %hhmouse = axes('position', [0.3, 0.6, 0.2, 0.4].*s+q, 'visible', g.visible, 'color', 'none'); 
 
-% compute selected latency point
-% ------------------------------
-if ~isempty(g.latency)
-	alltimepoints = [];
-	for index = 1:length(g.latency)
-		[tmp tmptimepoint] = min(abs(g.latency(index)-times));
-		alltimepoints = [ alltimepoints tmptimepoint];
-	end;	
-else 
-	alltimepoints = 1:nwin;
-end;
-
 % scan time windows
 % -----------------
 for indeximage = alltimepoints
 %indeximage = 123;
 	fprintf('Processing image %d\n', indeximage);
 
+	% invert background if necessary
+	% ------------------------------
+	if ~isempty(g.flashes)
+		%axes(hback); set (gcf, 'visible', g.visible);
+		if ~isempty(find(indeximage == allflashes))
+			set(hpatch, 'facecolor', [0.5 0.5 0.5]);
+		else 
+			set(hpatch, 'facecolor', 'w');
+		end;
+	end;
+	
 	% clean images
 	% ------------
 	for i=1:nbconditions
@@ -572,7 +601,7 @@ for indeximage = alltimepoints
 			end;
 		end;
 	end;		   
-		
+			
 	% save the file for a movie
 	% -------------------------
 	command2 = sprintf('print -depsc -loose image%4.4d.eps', indeximage);
