@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/11/15 19:07:24  arno
+% updating default position (eegplot)
+%
 % Revision 1.17  2002/11/15 01:37:17  arno
 % header typo
 %
@@ -226,7 +229,7 @@ if calldisp
 				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
 	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
-			 command, 'children', gcf, eegplotoptions{:}); 
+			 command, 'children', gcf, 'position', [100 50 800 500], eegplotoptions{:}); 
 end;
 if ~isempty(rej)
 	if icacomp	== 1
