@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/06/29 23:31:19  arno
+% recompute size
+%
 % Revision 1.14  2004/04/13 18:08:43  arno
 % dipole projections
 %
@@ -476,6 +479,16 @@ figure( 'position', [100, 100, ceil(nbconditions*g.size(1)/4)*4, ceil(g.size(2)/
         'PaperPositionMode', 'auto', 'papertype', 'A1', 'visible',g.visible); %'paperorientation', 'landscape' );
 
 axis off
+if 	strcmpi(g.framesout, 'ppm')
+    r = 0.8465;
+    pos = get(gcf,'position');
+    if floor(pos(3)/r)> 1280
+        fact = 1280/(pos(3)/r);
+        set(gcf, 'position', [ 0 0 1280  floor(pos(4)/r*fact) ]);
+    else
+        set(gcf, 'position', [ 0 0 floor(pos(3)/r), floor(pos(4)/r) ]);
+    end;
+end;
 pos = get(gca,'position');
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)];
@@ -835,9 +848,6 @@ for indeximage = alltimepoints
         command2 = sprintf('print -depsc -loose %s/image%4.4d.eps', g.framefolder, indeximage);
         eval(command2);
     elseif 	strcmpi(g.framesout, 'ppm')
-        r = 0.8465;
-        pos = get(gcf,'position');
-        set(gcf, 'position', [ 0 0 floor(pos(3)/r), floor(pos(4)/r) ]);
         command2 = sprintf('print -dppm -loose %s/image%4.4d.ppm', g.framefolder, indeximage);
         eval(command2);
     else % fig format
