@@ -173,6 +173,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/04/23 02:03:17  arno
+% updating menus for old and new pop_erpimage.m
+%
 % Revision 1.25  2002/04/22 23:34:40  arno
 % correcting typo
 %
@@ -298,17 +301,17 @@ set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
 	uimenu( neuromenu, 'Label', 'Read ascii/float data file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'Read .SMA data file (Snapmaster)'       ,     'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'Read .CNT data file (Neuroscan continuous)',  'CallBack', [ nocheck 'eeg_global; [EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'Read .SMA data file (Snapmaster)'       ,     'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'Read .CNT data file (Neuroscan continuous)',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'Read .EEG data file (Neuroscan epochs)'  ,    'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	importepoch = uimenu( first_m, 'Label', 'Import epoch info'); 
     uimenu( importepoch, 'Label', 'Import Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
-	uimenu( importepoch, 'Label', 'Import .DAT info file (Neuroscan epochs)', 'CallBack', [ check   'eeg_global; [EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
+	uimenu( importepoch, 'Label', 'Import .DAT info file (Neuroscan epochs)', 'CallBack', [ check   '[EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
 	importevent = uimenu( first_m, 'Label', 'Import event info'); 
 	uimenu( importevent, 'Label', 'Import Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
-	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check   'eeg_global; [EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
+	uimenu( importevent, 'Label', 'Import .LOG event file (Presentation)'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck 'eeg_global; [TMPVAR LASTCOM]= pop_loadset; clear TMPVAR;' e_hist]); 
+	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_newnonempty]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   'LASTCOM = pop_saveset(EEG);' e_hist]);
 	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   'LASTCOM = pop_saveset;' e_hist ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck 'LASTCOM = pop_delset;' e_hist ]);
