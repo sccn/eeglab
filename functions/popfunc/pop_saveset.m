@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2004/08/18 21:26:47  hilit
+% removed asdf bug
+%
 % Revision 1.33  2004/08/18 21:21:17  arno
 % message
 %
@@ -288,8 +291,8 @@ if mode == 0  % single datasets
             try, save([ curfilepath curfilename ], '-mat', 'EEG');
             catch, error('Pop_saveset: save error, out of space or file permission problem');
             end;
+            EEG.data = double(EEG.data);
         end;
-        EEG.data = double(EEG.data);
         if del,
             try,
                 tmpfilename = which(tmpfilename);
