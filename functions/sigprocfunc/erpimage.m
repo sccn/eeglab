@@ -144,6 +144,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2003/04/25 22:32:26  arno
+% doing the same for ampsort
+%
 % Revision 1.96  2003/04/25 22:30:40  arno
 % interpolating phase value
 %
@@ -1290,11 +1293,11 @@ elseif exist('ampargs') == 1 % if amplitude-sort
     if length(tmprange) ~=  winlen+1
         filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
         timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
-        phaseangles = phaseangles + 2*pi*(timecenter-phargs(1))*freq;
+        phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq;
         fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
         fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
                 filtersize, 1000/freq*filtersize, timecenter);
-        fprintf('    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', length(winloc), phargs(1));
+        fprintf('    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', length(winloc), ampargs(1));
     else
         fprintf('Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
