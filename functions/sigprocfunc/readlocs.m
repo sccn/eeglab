@@ -74,7 +74,7 @@
 %   '.sph':
 %               Matlab spherical coordinates. Notes: theta is the azimuthal/horizontal
 %               angle: 0 is toward nose, 90 toward left ear. Following this, perform
-%               the elevation angle (phi). Angles in degrees.
+%               the elevation (phi). Angles in degrees.
 %     Fields:   N    theta    phi    label
 %     Sample:   1      18     -2      Fp1
 %               2     -18     -2      Fp2
@@ -154,6 +154,9 @@ x               Matlab/EEGLAB cartesian coordinates. Here. x is towards the nose
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/12/28 01:32:41  scott
+% worked on header information - axis details etcetc. -sm & ad
+%
 % Revision 1.25  2002/12/27 23:23:35  scott
 % edit header msg - NEEDS MORE DETAILS -sm
 %
