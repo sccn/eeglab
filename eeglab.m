@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.281  2003/11/29 23:36:34  scott
+% 4.0 -> 4.3
+%
 % Revision 1.280  2003/11/27 20:18:39  arno
 % adding path datafile
 %
@@ -1370,7 +1373,7 @@ if ~isempty(hh)
     close(hh);
 end;
 if strcmpi(onearg, 'remote')
-    figure(	'name', 'EEGLAB v4.3', ... 
+    figure(	'name', 'EEGLAB v4.0', ... 
 	'numbertitle', 'off', ...
 	'resize', 'off', ...
 	'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) 30 ], ...
