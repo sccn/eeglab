@@ -34,10 +34,10 @@
 % Author: Arnaud Delorme, CNL / Salk Institute, 2002
 %
 % Example: 
-%  makehtml({ 'eeglab', 'pop_functions', { 'release6', 'finished' }}, ...
-%   '/home/arno/public_html/eeglab/auto', ...
+%  makehtml({ 'adminfunc', 'popfunc', { 'toolbox', 'toolbox2' }}, ...
+%   '/home/www/eeglab/eeglab/allfunctions', ...
 %   { 'Admin functions', 'Interactive (pop_) functions', 'Signal processing functions' }, ...
-%   { 'eeglab/eeg_helpadmin.m', 'eeglab/eeg_helppop.m', 'eeglab/eeg_helpsigproc.m' });          
+%   { 'adminfunc/eeg_helpadmin.m', 'adminfunc/eeg_helppop.m', 'adminfunc/eeg_helpsigproc.m' });          
 %
 % See also: help2html()
 
@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
 function makehtml( directorylist, outputdir, titlelist, matlabhelp, varargin );
 
@@ -122,8 +125,7 @@ end;
 
 % write HTML file
 % ----------------
-cd(outputdir);
-fo = fopen('indexfunc.html', 'w');
+fo = fopen([ outputdir 'indexfunc.html'], 'w');
 fprintf(fo, '<HTML><HEAD>%s</HEAD>%s<FONT FACE="%s">\n', OPENWIN, g.backindex, g.fontindex);
 
 for index = 1:length( direct )
@@ -136,8 +138,6 @@ if isunix
     chmodcom = sprintf('!chmod 777 %s*', outputdir);
     eval(chmodcom);
 end;
-
-cd(ORIGIN);
 
 % ------------------------------
 % Generate help files for EEGLAB
@@ -162,7 +162,7 @@ function filelist = scandir( dirlist )
     else
         if dirlist(end) ~= '/', dirlist(end+1) = '/'; end;
         if exist(dirlist) ~= 7
-            error([ dir ' is not a directory']);
+            error([ dirlist ' is not a directory']);
         end;    
         tmpdir  =  dir([dirlist '*.m']); 
         filelist = { tmpdir(:).name }; 
@@ -171,12 +171,13 @@ function filelist = scandir( dirlist )
 return;
 
 % ------------------------------ Function to generate help for a bunch of files -
-function makehelphtml( files, fo, title, STYLEHEADER, DEST, options );
+function makehelphtml( files, fo, title, STYLEHEADER, DEST, options);
+        tmpdir = pwd;
 	fprintf(fo, STYLEHEADER, title );
 	fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
 	for index = 1:length(files)
 		fprintf('Processing %s\n', files{index});
-		com = help2html( files{index}, [], options{:});
+		cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
 		fprintf( fo, '%s', com);
 		inputfile = which( files{index});
 		try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
@@ -200,7 +201,9 @@ function makehelpmatlab( filename, directory, titlewindow);
 		fprintf(fo, '''%s'' ...\n', directory{index});
 	end;	
 	fprintf(fo, '};\n');
-	fprintf(fo, 'textgui( text, command, ''title'', ''%s'', ''fontname'', ''helvetica'', ''linesperpage'', 15 );\n', titlewindow);
+	fprintf(fo, ['textgui( text, command,' ...
+	'''fontsize'', 15, ''fontname'', ''times'', ''linesperpage'', 18, ', ...
+	'''title'',strvcat( ''%s'', ''(Click on blue text for help)''));\n'], titlewindow);
 	fprintf(fo, 'return;\n');
 	fclose( fo );
 return
