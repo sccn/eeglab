@@ -1,15 +1,22 @@
 % pop_erpimage() - simple erpimage of EEG channels or an independent
 %                  components with a pop-up window if only
-%                  two arguments.
+%                  two (or three in specific condition) arguments.
 %
 % Usage:
+%   >> pop_erpimage(EEG, typeplot); % pop_up window
+%   >> pop_erpimage(EEG, typeplot, lastcom); % pop_up window
+%   >> pop_erpimage(EEG, typeplot, channel); % do not pop-up
 %   >> pop_erpimage(EEG, typeplot, channel, title, smooth, decimate, ...
 %                 sortingtype, sortingwin, sortingeventfield, renorm, ...
 %                 options...);
 %
 % Inputs:
 %   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component (default:1)
+%   typeplot   - 1=channel, 0=component 
+%   lastcom    - string containing last command (from LASTCOM) or from
+%                the function output.
+%
+% Commandline options:
 %   channel    - channel or component to plot
 %   title      - plot title
 %   smooth     - smoothing parameter (in terms of trial). Default is 5.
@@ -25,8 +32,14 @@
 %                using comma. Example 'erp', 'cbar'. See erpimage() help 
 %                for further details. 
 %
-% Outputs: same as erpimage(), no outputs are returned when a
-%          window pops-up to ask for additional arguments
+% Outputs from pop-up: 
+%   string containing the command used to evaluate this plotting function
+%   (saved by eeglab() as LASTCOM) put it into 'lastcom' for restoring
+%   last input parameters as defaults in the pop-up window
+%
+% Outputs from command line:
+%   same as erpimage(), no outputs are returned when a
+%   window pops-up to ask for additional arguments
 %   
 % Notes:
 %   1) A new figure is created only when the pop_up window is called, 
@@ -67,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/05 23:05:50  arno
+% Correct typo
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -99,7 +115,49 @@ if nargin < 2
 	typeplot = 1; %1=signal; 0=component
 end;
 
-if nargin < 3
+if nargin < 3 | (nargin == 3 & isstr(channel))
+
+	% decode last command
+	% -------------------
+	if nargin == 3 & isstr(channel)
+		lastcom = channel;
+		indstr = findstr( lastcom, 'pop_erpimage');
+		if ~isempty( indstr )
+			indstr = findstr( lastcom, ',');
+			chan_default   = lastcom(indstr(2)+1:indstr(3)-1);
+			title_default  = ''; %lastcom(indstr(3)+2:indstr(4)-2);
+			smooth_default = lastcom(indstr(4)+1:indstr(5)-1);
+			decim_default  = lastcom(indstr(5)+1:indstr(6)-1);
+			sorttyp_default = lastcom(indstr(6)+2:indstr(7)-2);
+			sortwin_default = lastcom(indstr(7)+2:indstr(8)-2);
+			sortfld_default = lastcom(indstr(8)+2:indstr(9)-2);
+			renorm_default  = lastcom(indstr(9)+2:indstr(10)-2);
+			eloc_default    = 'no';
+			options_default = lastcom(indstr(10)+1:end-2);
+			if ~isempty(findstr(options_default, '''topo'', { '))
+				indexoption = findstr(options_default, '''topo'', { ');
+				indexendoption = findstr(options_default, ' } ');
+				if indexendoption(1) < indexoption, indexendoption = indexendoption(2); end;
+				options_default = [ options_default(1:indexoption-1) options_default(indexendoption+4:end)];
+				eloc_default    = 'yes';
+			else
+				eloc_default    = 'no';
+			end;	
+		end;
+	else
+		chan_default = '1';
+		title_default = '';
+		smooth_default = int2str(min(max(EEG.trials-5,0), 10));
+		decim_default = '1';
+		sorttyp_default = '';
+		sortwin_default = '';
+		sortfld_default = '';
+		renorm_default = 'no';
+		title_default = '';
+		eloc_default  = 'yes';
+		options_default = ['''erp'', ''cbar'''];
+	end;
+
 	% which set to save
 	% -----------------
     promptstr = { fastif( typeplot, 'Channel:', 'Component:') ...
@@ -110,18 +168,24 @@ if nargin < 3
                 '(See ''/Edit/Edit event values'' for event types)'], ...
                 'Sorting event window [start, end] in seconds ([]=whole epoch):', ...
                 ['Rescale sorting variable to plot window (yes|no|a*x+b)(Ex:3*x+2):'], ...
-                'Plot title ([]=default,[space]=none):' };
-    inistr       = { '1', int2str(min(max(EEG.trials-5,0), 10)), '1', '', '', '', 'no', '' };
-    if typeplot == 0
-        promptstr = { promptstr{:} 'Plot component scalp map (yes|no):' };
-        inistr    = { inistr{:} 'yes' };
-    end;
-   
-    promptstr = { promptstr{:} 'Other erpimage options (see >> help erpimage):' };
-    inistr    = { inistr{:} ['''erp'', ''cbar'''] };
+                'Plot title ([]=default,[space]=none):', ...
+				 fastif(typeplot, 'Plot channel location', 'Plot component scalp map (yes|no):') ...
+				'Other erpimage options (see >> help erpimage):' };
+    inistr       = { ...
+		chan_default, ...
+		smooth_default, ...
+		decim_default, ...
+		sorttyp_default, ...
+		sortwin_default, ...
+		sortfld_default, ...
+		renorm_default, ...
+		title_default, ...
+		eloc_default, ...
+		options_default };
     
     help erpimage
-    result       = inputdlg( promptstr, fastif( typeplot, 'Channel ERP image -- pop_erpimage()', 'Component ERP image -- pop_erpimage()'), 1,  inistr);
+    result       = inputdlg( promptstr, fastif( typeplot, 'Channel ERP image -- pop_erpimage()', ...
+												'Component ERP image -- pop_erpimage()'), 1,  inistr);
 	if size(result, 1) == 0 return; end;
 	channel   	 = eval( result{1} );
 	smooth       = eval( result{2} );
@@ -136,13 +200,18 @@ if nargin < 3
     end;
     if typeplot == 0
         switch lower(result{9})
-            case 'yes', options = [', ''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
+            case 'yes', options = [',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs } '];
             otherwise, options = '';
-        end;
-	    options      = [ options ',' result{10} ];
-    else        
-	   options      = [ ',' result{9} ];
-	end;   
+        end;	
+	else 
+        switch lower(result{9})
+            case 'yes', options = [',''topo'', { ' int2str(channel) ' EEG.chanlocs } '];
+            otherwise, options = '';
+        end;	
+	end;
+	if ~isempty(deblank(result{10}))
+		options      = [ options ',' result{10} ];
+	end;
 	figure;
 else
 	options = '';
@@ -226,7 +295,7 @@ end;
 % outputs
 % -------
 outstr = '';
-if nargin >= 3
+if nargin >= 4 | (nargin == 3 & isstr(channel))
     for io = 1:nargout, outstr = [outstr 'varargout{' int2str(io) '},' ]; end;
     if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
 end;
@@ -236,8 +305,8 @@ end;
 if length( options ) < 2
     options = '';
 end;
-    
-varargout{1} = sprintf('figure; pop_erpimage( %s, %d, %d, ''%s'', %d, %d, {%s}, [%s], ''%s'', ''%s'' %s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
+    options
+varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
 com = sprintf('%s erpimage( tmpsig, events, [EEG.xmin*1000:1000*(EEG.xmax-EEG.xmin)/(EEG.pnts-1):EEG.xmax*1000], titleplot, smooth, decimate %s);', outstr, options);
 eval(com)
 
