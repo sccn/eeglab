@@ -41,6 +41,8 @@
 %  'subcomps'  = [integer vector] indices of components to remove from data before 
 %                plotting.
 %  'dispmaps'  = ['on'|'off'] display component number and scalp maps. Default is 'on'.
+%  'actscale'  = ['on'|'off'] scale component scalp map by component activity at the
+%                designated point in time. Default 'off'.
 %  'pvaf'      = ['on'|'off'] display percentage of variance accounted for by each 
 %                component over the interval selected by limcontrib. Default is 'on'
 %                pvaf(component) = 100-100*variance(data-component))/variance(data)
@@ -78,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/04/15 16:55:10  arno
+% allowing to plot up to 20 components
+%
 % Revision 1.23  2003/03/23 20:14:50  scott
 % fill msg edit
 %
@@ -204,6 +209,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; ...
 				  'pvaf'          'string'   {'on' 'off'}             'on'; ...
+				  'actscale'      'string'   {'on' 'off'}             'off'; ...
 				  'limcontrib'    'real'     []                       0 };
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
@@ -523,25 +529,14 @@ end
 
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
-if topowidth*head_sep + pos(3) > 0.90    % adjust for maximum height
-  topowidth = (0.90-0.68)/head_sep;
+if topowidth > 0.20    % adjust for maximum height
+    topowidth = 0.2;
 end
-%topowidth = 0.10;
+
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep + 0.5)*topowidth;
 else % even number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep)*topowidth;
-end
-if 0
- if ntopos == 3
-  topoleft = 0.22;
- elseif ntopos == 2
-  topoleft = 0.36;
- elseif ntopos == 1
-  topoleft = 0.5; % center single topomap
- else
-  topoleft = 0;
- end
 end
 
 %
@@ -794,6 +789,16 @@ end;
 %
 
 if strcmpi(g.dispmaps, 'on')
+    
+    % common scale for colors
+    % -----------------------
+    if strcmpi(g.actscale, 'on')
+        maxvolt = 0;
+        for t=1:ntopos
+            maxvolt = max(max(abs(maxproj(:,t))), maxvolt);
+        end;
+    end;
+    
     for t=1:ntopos % left to right order 
                    % axt = axes('Units','Normalized','Position',...
         axt = axes('Units','Normalized','Position',...
@@ -812,8 +817,13 @@ if strcmpi(g.dispmaps, 'on')
             end;
         else axis off;
         end;
-        %ELSE headplot(g.icawinv(:,t),chan_spline);% make a 3-d headplot
-        % if available
+
+        % scale colors
+        % ------------
+        if strcmpi(g.actscale, 'on')
+            caxis([-maxvolt maxvolt]);
+        end;
+        
         if t==1
             chid = fopen('envtopo.labels','r');
             if chid <3,
@@ -850,16 +860,19 @@ if strcmpi(g.dispmaps, 'on')
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
     %
     % axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
-    axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
-    h=cbar(axt);                        % colorbar axes
-    set(h,'Ytick',[]);
-    
-    axes(axall)
-    set(axall,'Color',axcolor);
-    text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
-    text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
-    text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
-    
+    axt = axes('Position',[pos(1)+pos(3)*1.02 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+    if strcmpi(g.actscale, 'on')
+        h=cbar(axt, [1:64],[-maxvolt maxvolt],3);
+    else
+        h=cbar(axt);                        % colorbar axes
+        set(h,'Ytick',[]);
+        
+        axes(axall)
+        set(axall,'Color',axcolor);
+        text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+        text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
+        text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
+    end;
     axes(axall)
     set(axall,'layer','top'); % bring component lines to top
     
