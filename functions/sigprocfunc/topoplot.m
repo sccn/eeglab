@@ -31,7 +31,7 @@
 %                        radius 0.5 (to plot all locations). 'force': Normalize radius 
 %                        so the maximum is 0.5. 'factor': Apply a normalizing
 %                        factor (percentage of the maximum) 'skirt': Plot cartoon head
-%                        at the usual 0.5 radius and show lower locations as a 'skirt' 
+%                        at the usual 0.5 radius and show lower positions as a 'skirt' 
 %                        outside the head boundary. {default = chan_locs structure 'shrink' 
 %                        value, if any, else 'off'}
 %   'colormap'        -  (n,3) any size colormap
@@ -71,9 +71,10 @@
 %    (Angle-0 =Cz-to-Fz; C3-angle =-90; Radius at edge of image = 0.5)
 %    For a sample eloc file: >> topoplot 'example'
 %
-% Note: 1) topoplot only works when map limits are >= the max and min 
-%          interpolated data values.
-%       2) topoplot will ignore any electrode with a position outside 
+% Note: 1) topoplot() only works when map limits are >= the max and <= min of the 
+%          interpolated data values, respectively.
+%       2) Unless, 'shrink' is set to 'on' or 'skirt' (or EEG.shrink == 'on'|'skirt'), 
+%          topoplot will ignore any electrode with a position outside 
 %          the head (radius > 0.5). To make the head round, >> axis square
 %
 % Authors: Andy Spydell, Colin Humphries & Arnaud Delorme 
@@ -98,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2004/02/18 01:02:58  scott
+% 'dipole' help message. Adaptive AXHEADFAC.
+%
 % Revision 1.139  2004/02/17 22:44:54  arno
 % now processing DIPFIT structure and fixed normalization bug
 %
