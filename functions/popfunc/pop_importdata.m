@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/09/04 18:24:09  luca
+% debug for command line - arno
+%
 % Revision 1.7  2002/07/31 18:02:26  arno
 % adding more options
 %
@@ -153,7 +156,9 @@ if nargin < 1                 % if several arguments, assign values
 else % no interactive inputs
     args = varargin;
     for index=1:2:length(args)
-        if ~iscell(args{index+1}) , args{index+1} = { inputname(index+1) }; end;
+        if ~isempty(inputname(index+2)) & ~isstr(args{index+1}) & length(args{index+1})>1, 
+			args{index+1} = inputname(index+2); 
+		end;
     end;                
 end;
 
