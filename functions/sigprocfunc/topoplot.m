@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2004/02/15 17:17:30  scott
+% same
+%
 % Revision 1.91  2004/02/15 17:06:44  scott
 % same
 %
@@ -373,7 +376,7 @@ AXHEADFAC = 1.3;        % axes to head scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
 HCOLOR = [0 0 0];       % default head color
-CCOLOR = [0.5 0.5 0.5]; % default contour color
+CCOLOR = [0.65 0.65 1.0]; % default contour color
 ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = 'on';      % default 'electrodes': on|off|label
 EMARKER = '.';
@@ -919,14 +922,15 @@ hd=plot(cos(circ).*rmax,sin(circ).*rmax,...
 if isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')
   fprintf('%s, %3.2g,%3.2g\n',shrinkfactor,max(Rd),Rd(2));
   sf = squeezefac;
-  % HCOLOR = 'w'; 
   plot(cos(circ).*sf*rmax,sin(circ).*sf*rmax,...
     'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head *inside* circle
   plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
   plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)     % plot left ear
   plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot right ear
-  set(hd,'color',HCOLOR,'linewidth',HLINEWIDTH+5);
+  set(hd,'color','w','linewidth',HLINEWIDTH+5);
+  hd2=plot(cos(circ).*rmax,sin(circ).*rmax,...
+       'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH); % plot head
 else
   plot([basex;0;-basex],[base;tip;base],...
     'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
