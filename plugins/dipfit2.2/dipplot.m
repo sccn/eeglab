@@ -115,6 +115,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.17  2003/04/19 00:37:43  arno
+%changing dipole size for BESA
+%
 %Revision 1.16  2003/04/11 17:26:45  arno
 %accurate plotting in fullMRI
 %
@@ -425,8 +428,10 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 
                 % project onto z axis
                 tag = [ 'dipole' num2str(index) ];
-                h = line( [x xo]', [y yo]', [-1 -1]');
-                set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                if ~strcmpi(g.image, 'besa')
+                    h = line( [x xo]', [y yo]', [-1 -1]');
+                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(x,  y,  -1); 
                 set(h, 'userdata', dipstruct, 'tag', tag, ...
@@ -434,10 +439,23 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
-                h = line( [x xo]', [-1 -1]', [z zo]');
-                set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                if ~strcmpi(g.image, 'besa')
+                    h = line( [x xo]', [1 1]', [z zo]');
+                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
-                h = plot3(x,  -1,  z); 
+                h = plot3(x,  1,  z); 
+                set(h, 'userdata', dipstruct, 'tag', tag, ...
+                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                
+                % project onto y axis
+                tag = [ 'dipole' num2str(index) ];
+                if ~strcmpi(g.image, 'besa')
+                    h = line( [-1 -1]', [y yo]', [z zo]');
+                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                end;
+                if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
+                h = plot3(-1,  y,  z); 
                 set(h, 'userdata', dipstruct, 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
