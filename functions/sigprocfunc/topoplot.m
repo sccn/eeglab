@@ -7,9 +7,9 @@
 %              options below). Nose is at top of plot; left is left; right is right.
 %              Using option 'plotgrid', the plot may be one or more rectangular grids.
 % Usage:
-%        >>  topoplot(datavector, EEG.chanlocs);   % plot using an EEG chanlocs structure
-%        >>  topoplot(datavector, 'my_chan.locs'); % plot by reading a channel locations file
-%        >>  topoplot('example');                  % type an example of an electrode location file
+%        >>  topoplot(datavector, EEG.chanlocs);   % plot a map using an EEG chanlocs structure
+%        >>  topoplot(datavector, 'my_chan.locs'); % read a channel locations file and plot a map
+%        >>  topoplot('example');                  % give an example of an electrode location file
 %        >>  [h grid_or_val plotrad_or_grid, xmesh, ymesh]= ...
 %                           topoplot(datavector, chan_locs, 'Input1','Value1', ...);
 % Required Inputs:
@@ -151,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.243  2005/01/10 20:26:34  scott
+% adjust color limits for 'gridplot'
+%
 % Revision 1.242  2005/01/10 19:46:47  scott
 % added (undoc) arg 'whitebk'
 %
@@ -1368,7 +1371,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   if default_intrad % if no specified intrad
-   if strcmpi(INTERPLIMITS,'head')
+   if strcmpi(INTERPLIMITS,'head') % intrad is 'head'
     xmin = min(-rmax,min(intx)); xmax = max(rmax,max(intx));
     ymin = min(-rmax,min(inty)); ymax = max(rmax,max(inty));
 
@@ -1376,7 +1379,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     xmin = max(-rmax,min(intx)); xmax = min(rmax,max(intx));
     ymin = max(-rmax,min(inty)); ymax = min(rmax,max(inty));
    end
-  else % intrad specified
+  else % some other intrad specified
     xmin = -intrad*squeezefac; xmax = intrad*squeezefac;   % use the specified intrad value 
     ymin = -intrad*squeezefac; ymax = intrad*squeezefac;
   end
@@ -1426,8 +1429,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   if isstr(MAPLIMITS)
     if strcmp(MAPLIMITS,'absmax')
-      amin = -max(max(abs(Zi)));
       amax = max(max(abs(Zi)));
+      amin = -amax;
     elseif strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
       amin = min(min(Zi));
       amax = max(max(Zi));
