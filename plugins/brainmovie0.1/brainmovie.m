@@ -63,7 +63,10 @@
 % 'envylabel'   - ordinate label for envelope. Default 'Potential \muV'
 % 'envvert'     - vector of time indices to insert vertical lines. A cell array
 %                 of vector (1 per condition) can also be given.
-% 'flashes'     - vector of time indices at witch the background is set to black.
+% 'flashes'     - vector of time indices at witch the background is set to black. One can 
+%                 specify the color of the flash if a cell array of cell array doublet is
+%                 given as input. Ex. { { 1500 'r' } { 200 'y' }} will generate two 
+%                 flashes, one red at 1500 ms and one yellow at 200 ms.
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (nrows = num. of conditions)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
@@ -91,6 +94,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/07/10 18:29:55  arno
+% adding flash arguement
+%
 % Revision 1.4  2002/04/20 00:40:01  arno
 % adding verts selective to conditions
 %
@@ -385,14 +391,25 @@ end;
 % compute flashes latency
 % -----------------------
 if ~isempty(g.flashes)
+	if iscell(g.flashes)
+		for index = 1:length(g.flashes)
+			flasheslat(index) = g.flashes{index}{1};
+			flashescol{index} = g.flashes{index}{2};
+		end;
+	else
+		flasheslat = g.flashes;
+		for index = 1:length(g.flashes)
+			flashescol{index} = [0.5 0.5 0.5];
+		end;
+	end;
 	allflashes = [];
 	for index = 1:length(g.flashes)
-		[tmp tmptimepoint] = min(abs(g.flashes(index)-times));
+		[tmp tmptimepoint] = min(abs(flasheslat(index)-times));
 		allflashes = [ allflashes tmptimepoint];
 	end;
-	allflashes = [allflashes allflashes+1];
 	hback = axes('position', [0 0 1 1], 'xtick', [], 'ytick', []); set (gcf, 'visible', g.visible);
 	hpatch = patch([ 0 1 1 0], [0 0 1 1], [0.5 0.5 0.5]); set(hpatch, 'facecolor', 'w');
+	posf = 0; % used as a counter to preserve color
 end;	
 
 % draw captions if necessary
@@ -477,9 +494,12 @@ for indeximage = alltimepoints
 	if ~isempty(g.flashes)
 		%axes(hback); set (gcf, 'visible', g.visible);
 		if ~isempty(find(indeximage == allflashes))
-			set(hpatch, 'facecolor', [0.5 0.5 0.5]);
-		else 
+			posf = find(allflashes == find(indeximage == allflashes));
+			set(hpatch, 'facecolor', flashescol{posf});
+		elseif posf == 0 % allow the color to stay 2 images
 			set(hpatch, 'facecolor', 'w');
+		else
+			posf = 0;
 		end;
 	end;
 	
