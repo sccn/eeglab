@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.137  2004/11/09 02:02:38  arno
+% debug events for Matlab 7
+%
 % Revision 1.136  2004/09/22 16:50:23  hilit
 % changed || -> |
 %
@@ -1168,7 +1171,7 @@ if ~isempty( varargin)
               if isnumeric(tmpval) & ~isa(tmpval, 'double')
                   for indexevent = 1:length(EEG.event)
                       tmpval  =   getfield(EEG.event, { indexevent }, allf{index} );
-                      EEG.event = setfield(EEG.event, { indexevent }, allf{index});
+                      EEG.event = setfield(EEG.event, { indexevent }, allf{index}, double(tmpval));
                   end;
               end;
           end;
