@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/09/23 20:34:03  arno
+% DEBUGGED VERSION 1.9
+%
 % Revision 1.13  2003/09/23 20:31:39  arno
 % revert version 1.9
 % /
@@ -74,7 +77,7 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose a BCI file -- pop_loadbci'); 
     drawnow;
 	if filename == 0 return; end;
-	filename = [filepath '/' filename];
+	filename = [filepath filename];
 	promptstr    = { 'Sampling rate' };
 	inistr       = { '256' };
 	result       = inputdlg2( promptstr, 'Import BCI2000 data -- pop_loadbci()', 1,  inistr, 'pop_loadbci');
