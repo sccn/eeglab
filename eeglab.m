@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/04/18 20:01:13  arno
+% retrIeve
+%
 % Revision 1.16  2002/04/18 03:10:14  scott
 % changed Edit menu item names -sm
 %
@@ -256,9 +259,9 @@ checkplot         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM)
 checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
-e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), EEG = EEGTMP; clear EEGTMP; eeg_store; end; eeg_updatemenu;'];
-e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeg_updatemenu;'];
-e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end; eeg_updatemenu;'];
+e_newnonempty     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), EEG = EEGTMP; clear EEGTMP; eeg_store; fprintf(''Done.''); end; eeg_updatemenu;'];
+e_newset          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store; fprintf(''Done.''); end; eeg_updatemenu;'];
+e_store           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); fprintf(''Done.''); end; eeg_updatemenu;'];
 e_hist            = [e_catch 'h(LASTCOM); eeg_updatemenu;'];
 
 % menu definition
