@@ -132,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.224  2004/11/22 21:55:46  hilit
+% undo some of the changes
+%
 % Revision 1.223  2004/11/22 21:47:14  hilit
 % debugging 'style' 'blank' problems
 %
@@ -1006,9 +1009,6 @@ if length(Values) < length(tmpeloc)
         fprintf('            Marking the locations of the %d indicated channels.\n', ...
                                     length(Values));
     end
-    if isempty(Values)
-      Values = 1:length(tmpeloc);
-    end
     plotchans = Values;
     STYLE = 'blank'; % plot channels only, marking the indicated channel number
     if strcmpi(ELECTRODES,'off')
@@ -1043,6 +1043,10 @@ labels = strvcat(labels); % make a label string matrix
 if ~isempty(Values) & ~strcmpi( STYLE, 'blank')
   plotchans = 1:length(Th);
 end
+if isempty(plotchans) & strcmpi( STYLE, 'blank')
+  plotchans = 1:length(Th);
+end
+
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
