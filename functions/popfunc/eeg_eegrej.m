@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/08 01:20:13  arno
+% same
+%
 % Revision 1.2  2002/08/08 01:18:33  arno
 % empty regions ?
 %
@@ -86,7 +89,7 @@ end;
 % -------------------
 if ~isempty(boundevents)
 	fprintf('eeg_eegrej(): boundary events added.\n');
-	for tmpindex = 1:length(EEG.event)
+	for tmpindex = 1:length(boundevents)
 		EEG.event(end+1).type  = 'boundary';
 		EEG.event(end).latency = boundevents(tmpindex);
 	end;
