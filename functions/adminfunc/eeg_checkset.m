@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2002/08/09 00:39:18  arno
+% debugging epoch
+%
 % Revision 1.48  2002/08/08 21:55:59  arno
 % adding epoch creation
 %
@@ -714,7 +717,7 @@ if ~isempty( varargin)
 				  end;
 			  end;
 			  if strcmp(format, 'str')
-				  fprintf('eeg_checkset: uniformize value type of event field ''%s''\n', allfields{index});
+				  fprintf('eeg_checkset: uniformize value format of event field ''%s''\n', allfields{index});
 				  % get the field content
 				  % ---------------------
 				  for indexevent = 1:length(EEG.event)
