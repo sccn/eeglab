@@ -111,6 +111,9 @@
 %     being modified
 
 %$Log: not supported by cvs2svn $
+%Revision 1.9  2003/03/07 00:32:53  arno
+%debugging textforgui
+%
 %Revision 1.8  2003/03/06 17:01:10  arno
 %textgui -> textforgui
 %
@@ -118,7 +121,7 @@
 %adding log message
 %
 
-function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
+function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     DEFAULTVIEW = [0 0 1];
         
@@ -129,6 +132,7 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
         
     % reading and testing arguments
     % -----------------------------
+    sources = sourcesori;
     if ~isstruct(sources)
         error('dipplot: ''sources'' must be a strcuture');
     end;
@@ -214,9 +218,9 @@ function [sources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sources, varargin )
     if strcmp(g.summary, 'on')
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize,'dipolelength', g.dipolelength,'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image };
-        axes('position', [0 0 0.5 0.5]);  dipplot(sources, 'view', [1 0 0] , options{:}); axis off;
-        axes('position', [0 0.5 0.5 .5]); dipplot(sources, 'view', [0 0 1] , options{:}); axis off;
-        axes('position', [.5 .5 0.5 .5]); dipplot(sources, 'view', [0 -1 0], options{:}); axis off;
+        axes('position', [0 0 0.5 0.5]);  dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off;
+        axes('position', [0 0.5 0.5 .5]); dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off;
+        axes('position', [.5 .5 0.5 .5]); dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off;
         axes('position', [0.5 0 0.5 0.5]); 
         %p = get(gcf, 'position');
         %p(2) = p(2)+p(4)-800;
@@ -626,7 +630,7 @@ function newsrc = convertbesaoldformat(src);
         
         % convert format
         % --------------
-        if isempty(src(index).besaextori), src(index).besaextori = 20; end; % 20 mm
+        if isempty(src(index).besaextori), src(index).besaextori = 1; end; % 20 mm
         newsrc(index).possph(countdip,:) = [ src(index).besathloc src(index).besaphloc src(index).besaexent];
         newsrc(index).momsph(countdip,:) = [ src(index).besathori src(index).besaphori src(index).besaextori];
         
