@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2004/08/31 18:57:42  scott
+% added figure(curfig) calls to keep plotting straight in Matlab 7.0.0 -sm
+%
 % Revision 1.41  2004/03/18 00:32:19  arno
 % remove skirt
 %
@@ -183,7 +186,6 @@
 function com = pop_topoplot( EEG, typeplot, arg2, topotitle, rowcols, varargin);
 
 com = '';
-curfig = gcf;
 if nargin < 1
    help pop_topoplot;
    return;
@@ -361,6 +363,7 @@ for index = 1:size(arg2(:),1)
     else 
         addopt = { 'verbose', 'off' };
     end;
+    curfig = gcf;
     if ~isnan(arg2(index))
 		if typeplot
             figure(curfig);
