@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2004/07/07 22:21:13  arno
+% debug shrinkorskirt
+%
 % Revision 1.99  2004/06/09 17:44:55  arno
 % lookup coordinate
 %
@@ -453,6 +456,17 @@ end;
 
 nbchan = length(chans);
 allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' };
+
+if isfield(chans, 'shrink')
+    icadefs;
+    if SHRINKWARNING
+        warndlg2( [ 'You are currently shrinking channel locations for display.' 10 ...
+                    'A new option (more anatomically correct) is to plot channels' 10 ...
+                    'outside head limits: to do so try disabling the shrink option' 10 ...
+                    'by unclicking the ''shrink'' button. (Edit the icadefs file to' 10 ...
+                    'disable this message)' ], 'Shrink factor warning');
+    end;
+end;
 [chans shrinkorskirt plotrad]= checkchans(chans, allfields);
 
 if nargin < 2
