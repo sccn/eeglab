@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/04/29 14:02:34  scott
+% made sure cumulX is computed -sm
+%
 % Revision 1.18  2002/04/29 13:57:49  scott
 % modified PC->PA, 'phasecouple'->'phsamp', made output format (phs,amp,time) -sm
 %
@@ -531,7 +534,7 @@ end
 
 if g.phsamp
     PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
-end                                                     phs   amp
+end                                             %       phs   amp
 
 wintime = 1000/g.srate*(g.winsize/2); % (1000/g.srate)*(g.winsize/2);
 times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
