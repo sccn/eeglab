@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/12 18:50:22  arno
+% errordlg2
+%
 % Revision 1.21  2002/08/12 18:30:05  arno
 % quesdlg2
 %
@@ -350,7 +353,7 @@ else
 		   end;
 		   if isstr(extraargs{1}) & strcmp(extraargs{1}, 'gui') & ~strcmp(method, 'chancenter')
 			   tmpButtonName=questdlg2( strvcat('This will modify fields in the channel structure', ...
-					'Are you sure, you want to apply that function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
+					'Are you sure you want to apply this function ?'), 'Confirmation', 'Cancel', 'Yes','Yes');
 			   if ~strcmp(tmpButtonName, 'Yes'), return; end;
 		   end;
 		   switch method
