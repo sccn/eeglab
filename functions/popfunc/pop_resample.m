@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/06/13 15:07:00  arno
+% adding urevent compatiblity
+%
 % Revision 1.3  2003/02/16 22:59:40  arno
 % adding text for GUI in header
 %
@@ -84,16 +87,21 @@ end;
 % ------------
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
 oldpnts   = EEG.pnts;
-EEG.pnts  = ceil( EEG.pnts / (EEG.srate/freq) );
 fprintf('resampling data %3.0f Hz\n', freq);
 
 % resample for multiple channels
 % -------------------------
-tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
 for index1 = 1:size(EEG.data,1)
    fprintf('%d ', index1);	
    sigtmp = squeeze (EEG.data(index1,:, :));
-	tmpeeglab(index1,:, :) = resample( sigtmp, p, q ); 
+   tmpres = resample( sigtmp, p, q );
+   if index1 == 1
+       if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
+       else                    EEG.pnts  = size(tmpres,1);
+       end;
+       tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+   end;
+   tmpeeglab(index1,:, :) = tmpres;
 end;
 fprintf('\n');	
 EEG.data = tmpeeglab;
@@ -116,7 +124,7 @@ end;
 EEG.icaact = [];
 
 % store dataset
-EEG.srate   = freq;
+EEG.srate   = EEG.srate*p/q;
 fprintf('resampling finished\n');
 
 EEG.setname = [EEG.setname ' resampled'];
