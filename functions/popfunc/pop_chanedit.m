@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2003/12/05 18:20:21  arno
+% same thing
+%
 % Revision 1.68  2003/12/05 18:18:52  arno
 % checkchans problem
 %
@@ -365,7 +368,7 @@ if nargin < 2
 		% add buttons
 		% -----------
 		geometry =  { geometry{:} [1] [1.15 0.5 0.6 1.9 0.4 0.4 1.15] [1.15 0.7 0.7 1 0.7 0.7 1.15] };
-		callpart1 = [ 'valnum   = str2num(get(findobj(''tag'', ''chaneditnumval''), ''string''));' ];
+		callpart1 = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ];
 		callpart2 = [ 'set(findobj(''tag'', ''chaneditnumval''), ''string'', num2str(valnum));' ];
 		for index = 1:length(allfields)
 			callpart2 = [ callpart2  'set(findobj(''tag'', ''chanedit' allfields{index} ...
