@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/12/17 23:02:42  scott
+% remove output
+%
 % Revision 1.22  2003/12/17 23:00:24  scott
 % return Wout
 %
@@ -156,8 +159,8 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-% mesh_file  = [ICADIR '/newupper.mat']; % whole head model file (183K)
-mesh_file  = ['mhead.mat'];      % upper head model file (987K)
+mesh_file  = [ICADIR '/newupper.mat']; % whole head model file (183K)
+% mesh_file  = ['mhead.mat'];      % upper head model file (987K)
 
 Lighting   = 'on';
 Maplimits  = 'absmax';
@@ -356,9 +359,9 @@ if isstr(values)
       npoints = I(1:3);
       diffe = newPOS(npoints,:)-spherePOS(npoints,:);
       newElect(i,:) = elect+mean(diffe)*ElectDFac;
-      if Ze(i) < -1 % WAS 0 !!!! % HeadCenter(3) ????
-        newElect(i,:) = [0 0 0]; % mark as electrode position not to be plotted
-      end
+      %if Ze(i) < -1 % Was 0, to plot superior electrodes only 
+      %  newElect(i,:) = [0 0 0]; % mark as electrode position not to be plotted
+      %end
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
