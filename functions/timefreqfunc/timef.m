@@ -83,7 +83,8 @@
 %       'rboot'     = Bootstrap ITC limits (e.g., from timef())     {from data}
 %       'axesfont'  = Axes text font size                                {10}
 %       'titlefont' = Title text font size                               {8}
-%
+%       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
+%                     
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
@@ -118,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/08 19:57:19  arno
+% Editing, maxfreq-> Niquist
+%
 % Revision 1.4  2002/04/07 02:49:35  scott
 % clarified hlpe message, changed default srate and winsize -sm
 %
@@ -274,6 +278,7 @@ try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
+try, g.vert;       catch, g.vert = []; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
 
 % testing arguments consistency
@@ -348,6 +353,13 @@ if ~isnan(g.alpha)
      fprintf('Bootstrap analysis will use data in all subwindows.\n')
    end
 end
+if ~isnumeric(g.vert)
+    error('vertical line(s) option must be a vector');
+else
+	if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
+        error('vertical line(s) time out-of-bound');
+	end;
+end;
 
 if ~isnan (g.rboot)
   if size(g.rboot) == [1,1]
@@ -734,6 +746,11 @@ switch lower(g.plotersp)
 	hold off
 	set(h(1),'YTickLabel',[],'YTick',[])
 	set(h(1),'XTickLabel',[],'XTick',[])
+	if ~isempty(g.vert)
+		for index = 1:length(g.vert)
+			line([g.vert(index), g.vert(index)], [min(freqs(dispf)) max(freqs(dispf))], 'linewidth', 1, 'color', 'm');
+		end;
+	end;
 
 	h(2) = gca;
 	h(3) = cbar('vert'); % ERSP colorbar axes
@@ -811,6 +828,11 @@ switch lower(g.plotitc)
 	hold off
 	set(h(6),'YTickLabel',[],'YTick',[])
 	set(h(6),'XTickLabel',[],'XTick',[])
+	if ~isempty(g.vert)
+		for index = 1:length(g.vert)
+			line([g.vert(index), g.vert(index)], [min(freqs(dispf)) max(freqs(dispf))], 'linewidth', 1, 'color', 'm');
+		end;
+	end;
 
 	h(7) = gca;
 	h(8) = cbar('vert');
