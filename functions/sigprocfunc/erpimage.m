@@ -144,6 +144,10 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2003/04/23 23:41:19  arno
+% restoring cycles to a default of 3, adding cycle paramete
+% r
+%
 % Revision 1.90  2003/04/23 22:09:21  arno
 % adding cycles to the phasedet script
 %
@@ -1179,10 +1183,10 @@ if exist('phargs') == 1 % if phase-sort
 	[dummy minx] = min(abs(times-phargs(1)));
 	winlen = floor(DEFAULT_CYCLES*srate/freq);
 	%winloc = minx-[winlen:-1:0]; % ending time version
-	winloc = minx-linspace(floor(winlen), floor(-winlen), winlen+1);
+	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
     winloc = winloc(find(winloc>0 & winloc<=frames));
     
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq, DEFAULT_CYCLES);
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
 	fprintf(...
 'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%4.0f ms) window centered at %4.0f ms.\n',...  
@@ -1251,12 +1255,13 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	end
 	
 	[dummy minx] = min(abs(times-ampargs(1)));
-	winlen = floor(3*srate/freq);
+	winlen = floor(DEFAULT_CYCLES*srate/freq);
 	%winloc = minx-[winlen:-1:0]; % ending time version
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
 	winloc = winloc(find(winloc>0 & winloc<=frames));
-	
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq,DEFAULT_CYCLES);
+	winlen
+    
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
 	
 	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %1.1f-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
@@ -2502,6 +2507,7 @@ data = reshape(data,[frames prod(size(data))/frames]);
 %       this has to be fixed
 win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
 win = win .* repmat(hanning(length(nwin))',length(freq),1);
+%tmp =gcf; figure; plot(real(win)); figure(tmp);
 resp = win * data(nwin,:);
 ang = angle(resp);
 amp = abs(resp);
