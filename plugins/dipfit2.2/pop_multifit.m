@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/03/17 17:45:33  arno
+% reject dipoles
+%
 % Revision 1.6  2005/03/17 17:43:17  arno
 % nothing
 %
@@ -271,9 +274,9 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
             warning backtrace off;
             try,
                 if g.dipoles == 2,
-                    EEG.dipfit.model(i) = dipfit_nonlinear(EEG, 'component', i, 'symetry', defaultconstraint);
+                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symetry', defaultconstraint);
                 else
-                    EEG.dipfit.model(i) = dipfit_nonlinear(EEG, 'component', i, 'symetry', []);
+                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symetry', []);
                 end;
             catch, EEG.dipfit.model(i).rv = NaN; disp('Maximum number of iterations reached. Fitting failed');
             end;
