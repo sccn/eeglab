@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.129  2004/02/15 20:48:15  scott
+% same
+%
 % Revision 1.128  2004/02/15 20:44:51  scott
 % same
 %
@@ -845,8 +848,8 @@ if (isstr('shrinkfactor') & strcmp(lower(shrinkfactor),'skirt')) | ~isstr('shrin
 %  size(Thi(:)) % DEBUG
 %  size(Phi(:)) % DEBUG
   [tmp,Thi,Rdi] = sph2topo([[1:GRID_SCALE^2]',Thi(:),Phi(:)]);
-  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2)> rmax*squeezefac & ...
-         abs(Thi)<pi/2);
+  skirt_mask = (sqrt(Xi(:).^2+Yi(:).^2)> GRID_SCALE*rmax*squeezefac & ...
+         abs(Thi)<pi/4);
   ii = find(mask == 0);
   Zi(ii) = NaN;
 end
@@ -1090,11 +1093,11 @@ function [newTh] = skirt_Th(Th,Rd,maxr)
 
    if ~isempty(q1)
      dr = Rd(q1)-0.5;
-     x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-x % DEBUG
+     x = abs(asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi))));
+180*x/pi % DEBUG
 oldTh = Th; % DEBUG
-     Th(q1) = x+(pi/2)*Th(q1)/(pi/2-2*x);
-[oldTh(:) Th(:)] % DEBUG
+     Th(q1) = x+(pi/2)/(pi/2-2*x)*Th(q1);
+[q1' oldTh(q1)' Th(q1)'] % DEBUG
    end
 %  fprintf('rotated %d q1 angles\n',length(q1)); % DEBUG
 
