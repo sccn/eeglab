@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/12/03 02:11:04  arno
+% Initial revision
+%
 
 function [power, freqs] = spec(X, nfft, fs, win, overlap);
 
@@ -73,15 +76,17 @@ timesout = floor(length(X)/(win-overlap));
 
 [ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs, fs, ...
                                         0, 'padratio', padratio, 'timesout', timesout, 'winsize', win, 'maxfreq', fs/2, ...
-                                        'plotersp', 'off', 'plotitc', 'off', 'baseline', NaN);
+                                        'plotersp', 'off', 'plotitc', 'off', 'baseline', NaN, 'verbose', 'off');
 
 ersp = 10.^(ersp/10); % back to amplitude
 spec = mean(ersp,2)*2.7/win; % this formula is a best approximation (I couldn't find the actual one)
                              % in practice the difference with psd is less than 0.1 dB
 spec = 10*log10(spec);
-hold on;
-h = plot(freqs, spec);
-set(h, 'linewidth', 2);
+if nargout < 1
+    hold on;
+    h = plot(freqs, spec);
+    set(h, 'linewidth', 2);
+end;
 return;
 
 %figure;
