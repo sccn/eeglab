@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2003/05/02 21:47:07  arno
+% implementing lowmem option
+%
 % Revision 1.45  2003/05/01 22:03:17  arno
 % debuging frequencies
 %
@@ -848,19 +851,43 @@ if iscell(X)
 		  Tfx1 = Tfx1.*conj(Tfx1); Tfx2 = Tfx2.*conj(Tfx2);
 		  Tfy1 = Tfy1.*conj(Tfy1); Tfy2 = Tfy2.*conj(Tfy2);
 		  formula = 'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X),3)) ./ sqrt(sum(arg3(:,:,X),3))';
-		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
-						'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
-		 case 'phasecoher', % normalize first to speed up
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) }, ...
+                     { Tfx1(ind:ind+1,:,:) Tfx2(ind:ind+1,:,:) }, { Tfy1(ind:ind+1,:,:) Tfy2(ind:ind+1,:,:) });
+              end;     
+          else
+              [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, ...
+                 'both', g.condboot, { savecoher1 savecoher2 }, { Tfx1 Tfx2 }, { Tfy1 Tfy2 });
+          end; 
+         case 'phasecoher', % normalize first to speed up
 		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
 		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ length(X)';
-		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) } );
+              end;     
+          else
+              [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
 														   { savecoher1 savecoher2 });
+          end;
 		 case 'phasecoher2',
+		  savecoher1 = savecoher1 ./ sqrt(savecoher1.*conj(savecoher1));
+		  savecoher2 = savecoher2 ./ sqrt(savecoher2.*conj(savecoher2)); % twice faster than abs()
 		  formula = 'sum(arg1(:,:,X),3) ./ sum(sqrt(arg1(:,:,X).*conj(arg1(:,:,X)))),3)'; 
 		  % sqrt(a.*conj(a)) is about twice faster than abs()
-		  [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
+          if strcmpi(g.lowmem, 'on')
+              for ind = 1:2:size(savecoher1,1)
+                  [Rdiff(ind:ind+1,:,:) coherimages(ind:ind+1,:,:) coher1(ind:ind+1,:,:) coher2(ind:ind+1,:,:)] = condstat(formula, g.naccu, g.alpha, ...
+                      'both', g.condboot, { savecoher1(ind:ind+1,:,:) savecoher2(ind:ind+1,:,:) } );
+              end;     
+          else
+              [Rdiff coherimages coher1 coher2] = condstat(formula, g.naccu, g.alpha, 'both', g.condboot, ...
 														   { savecoher1 savecoher2 });
+          end;
 		end;
 		%Boot = bootinit( [], size(savecoher1,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
 		%Boot.Coherboot.R = coherimages;
@@ -998,10 +1025,17 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
             else
                 baselnboot = [];
             end;
-            Rbootout = bootstat(alltfX, alltfY, formula, 'boottype', g.boottype, ...
-							'formulapost', formulapost, 'formulainit', formulainit, ...
-							'formulaout', formulaout, 'bootside', 'upper', ...
-                            'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselnboot);
+            options = { formula, 'boottype', g.boottype, ...
+                        'formulapost', formulapost, 'formulainit', formulainit, ...
+                        'formulaout', formulaout, 'bootside', 'upper', ...
+                        'naccu', g.naccu, 'alpha', g.alpha, 'basevect', baselnboot };
+            if strcmpi(g.lowmem, 'on')
+                for ind = 1:2:size(alltfX,1) % scan frequencies
+                    Rbootout(ind:ind+1,:,:) = bootstat(alltfX(ind:ind+1,:,:), alltfY(ind:ind+1,:,:), options{:});
+                end;
+            else
+                Rbootout = bootstat(alltfX, alltfY, options{:});               
+            end;
 		else Rbootout = [];
         end;
         % note that the bootstrap thresholding is actually performed in the display subfunction plotall()
