@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 18:36:35  arno
+% questdlg2
+%
 % Revision 1.6  2002/08/12 02:22:53  arno
 % inpudlg2
 %
@@ -104,9 +107,9 @@ end;
 fprintf('Computing projection ....\n');
 eeg_options; 
 if option_computeica  
-    [ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:EEG.nbchan, components));
+    [ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 else
-    [ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:EEG.nbchan, components));
+    [ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 end;    
 compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
 
@@ -134,8 +137,8 @@ end;
 EEG.data  = compproj;
 EEG.setname = 'ICA filtered';
 EEG.icaact = [];
-EEG.icaweights = EEG.icaweights(setdiff(1:EEG.nbchan, components),:);
-EEG.icawinv = EEG.icawinv(:,setdiff(1:EEG.nbchan, components));
+EEG.icaweights = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
+EEG.icawinv = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
 
 com = sprintf('%s = pop_subcomp( %s, [%s], %d);', inputname(1), inputname(1), ...
    int2str(components), plotag);
