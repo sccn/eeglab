@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2002/10/15 16:58:47  arno
+% drawnow for windows
+%
 % Revision 1.14  2002/10/14 23:04:02  arno
 % default output
 %
@@ -99,7 +102,13 @@ if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
 	VAROUT = checkoldformat(TMPVAR.EEG);
-    if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
+    if isstr(VAROUT.data), 
+        if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
+            VAROUT.filepath = inputpath; 
+        else 
+            VAROUT.filepath = '';
+        end;
+    end;
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
