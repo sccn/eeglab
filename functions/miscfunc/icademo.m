@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/09/16 23:34:21  arno
+% debug channel location
+%
 % Revision 1.5  2002/11/13 18:15:36  arno
 % debugging for new function format
 %
@@ -117,8 +120,9 @@ t=text(0,-3.5,'for more details.');
 set(t,'FontSize',14,'HorizontalAlignment','center');
 axis('off')
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Load an ascii ERP data matrix 
@@ -146,7 +150,9 @@ else                                    % filter each epoch similarly
 end
 pos = get(gcf,'Position'); % record figure position to use as a base for later figures
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -160,9 +166,11 @@ fprintf('        of %d chans by %d frames using plotdata()...\n\n', ...
                                size(data,1),size(data,2));
 figure('Position',pos+off/2); % #2a
 
-  plotdata(data,frames,[0 995 -10 10],'ERP Data', chan_locs2 ,0,'(2 conditions)');
+plotdata(data,frames,[0 995 -10 10],'ERP Data', chan_locs2 ,0,'(2 conditions)');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -174,9 +182,11 @@ figure('Position',pos+off); % #2b
 
 % plotttopo(data,chan_locs,frames,limits,title,axsize,colors) 
 
-  plottopo(data,chan_locs,frames,[0 995 -10 10],'ERP Data');
+plottopo(data,chan_locs,frames,[0 995 -10 10],'ERP Data');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')  
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -189,7 +199,9 @@ figure('Position',pos+off*3/2); % #2c
 
 timtopo(data(:,1:frames),chan_locs,[0 995 -10 10],[250 320 390 500],'Target Hits');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -206,7 +218,9 @@ fprintf('Try using the on-screen and menu control elements...\n')
 				'winlength',1,'title','Two data epochs using eegplot()')
      %set(gcf,'Position',pos+2*off); % #3 - eegplot() makes its own figure
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -226,7 +240,9 @@ subplot(1,2,2)
   eegplotold('noui',data(:,313:624),srate,0,chan_locs,0,'r');
   title('Hits')
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -240,13 +256,17 @@ fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
 %
 fprintf('Now decompose both epochs at once using the ICA algorithm, runica() ...\n\n');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
-  [weights,sphere,activations,bias,signs,lrates] = runica(data);
+[weights,sphere,activations,bias,signs,lrates] = runica(data);
 
 fprintf('\nDone!\n');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -275,8 +295,9 @@ fprintf('Note: runica() orders components by size - comport() not commonly neede
 
 fprintf('\nDone!\n');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the activation waveforms of all the components 
@@ -291,8 +312,9 @@ figure('Position',pos+3*off);
                  'ICA Component Activations', ...
                           windex,0,'(2 conditions)');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the contributions to the first epoch of data by the first reordered 
@@ -307,8 +329,9 @@ figure('Position',pos+4*off);
  [projdata] = plotproj(data(:,1:frames),weights*sphere,windex(1:10), ...
                'First epoch (comps. 1-10)',limits,[1:10], chan_locs2 );
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the contributions to the first epoch of data by the 5 largest
@@ -324,8 +347,9 @@ figure('Position',pos+4*off);
  [projdata] = projtopo(data(:,1:frames),weights*sphere,1:5,chan_locs,...
                'First epoch',limits);
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the envelopes of the data epoch 1 and the first 10 components
@@ -340,8 +364,9 @@ figure('Position',pos+5*off);
                   'Envelopes of data and largest 6 components (cond. 1)',...
                      [0 995*0.6 0 0]);
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 fprintf('Now plotting envelopes PLUS scalp maps using envtopo().\n');
@@ -353,8 +378,9 @@ figure('Position',pos+5.5*off);
   envtopo(data(:,1:floor(0.6*frames)),weights*sphere,'chanlocs',chan_locs,...
                             'limits', [0 995*0.6 0 0],'compnums',[2 3 4 6],'title', 'Largest Components');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot a close-up of the decomposition of epoch 2, channel 2.
@@ -373,8 +399,9 @@ figure('Position',pos+6*off);
                                  [0 995 0 0],'Epoch 1, channel Fz',0);
 fprintf('\n Note that two components make up most of the response peak.\n');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Plot the scalp maps of the first four reordered components 
@@ -387,8 +414,9 @@ figure('Position',pos+7*off);
   compmap(maxmap,chan_locs,1:4,'Maps of 1st 4 ICA Components',...
                                                    [2 2],windex(1:4));
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Display the projected epoch-1 data for reordered ICA component windex(7) 
@@ -405,8 +433,9 @@ figure('Position',pos+8*off);
 
   compplot(projp3,frame,chan_locs,0,srate,'ICA Button Press Component');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Make and display a brief movie of a small segment of the first data epoch
@@ -423,8 +452,9 @@ figure('Position',pos+9*off);
 %
   seemovie(Movie,-5,Colormap); 
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
-
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Run testica script using optimum parameters 
@@ -438,18 +468,22 @@ fprintf('Perfect separation would produce an identity matrix.\n');
 fprintf('This is not possible here, since 14 sources are mixed into only 6 channels.\n');
 fprintf('The figure will show that the 6 largest sources are still recovered clearly ...\n');
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+    testica(chans,epochs*frames,14,-0.05,1.4);
+else 
+    [testresult] = testica(chans,epochs*frames,14,-0.05,1.4);
+end;
 
-%  [testresult] = testica(chans,frames,sources,exppow,shape);
-
-                  testica(chans,epochs*frames,14,-0.05,1.4);
-                  % model 14 sources with a wide range of sizes & positive kurtosis
+% model 14 sources with a wide range of sizes & positive kurtosis
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 set(gcf,'Position',pos+10*off); 
 
-fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%
+if ~exist('icademoauto')
+    fprintf('\n****> Hit any key to continue: '); pause; fprintf('\n\n'); %%%    
+end; 
 fprintf('\n *************************************************************\n');
 fprintf(' *               For a tutorial on the toolbox:                *\n');
 fprintf(' *                                                             *\n');
