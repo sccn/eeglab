@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/09/23 16:43:48  arno
+% [Aimplementing saving as float
+%
 % Revision 1.8  2002/08/19 22:09:28  arno
 % debugging save for MAC
 %
@@ -166,7 +169,7 @@ if mode == 0  % single datasets
 	eeg_options;
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		tmpdata = EEG.data;
-		EEG.data = [ curfilepath noextcurfilename '.fdt' ];
+		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
 			eval(command);
 			floatwrite( tmpdata, EEG.data, 'ieee-le');
@@ -227,7 +230,7 @@ else
 	if exist('option_savematlab') == 1 & option_savematlab == 0
 		for index = 1:length(ALLEEG)
 			tmpdata = ALLEEG(index).data;
-			ALLEEG(index).data = [ curfilepath noextcurfilename '.fdt' int2str(index) ];
+			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
 			try, 
 				floatwrite( tmpdata, ALLEEG(index).data, 'ieee-le');
 			catch, 
