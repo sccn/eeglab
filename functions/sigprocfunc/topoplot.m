@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.137  2004/02/17 18:11:36  scott
+% fixed 'skirt'&'fill' problem. Also, made heads bigger
+%
 % Revision 1.136  2004/02/17 16:58:24  scott
 % change color of outer 'shrink' mode ring to almost white, to avoid print bug
 %
@@ -980,7 +983,9 @@ if strcmp(ELECTRODES,'on')
     EMARKERSIZE = 6;
    elseif length(y)>=100
     EMARKERSIZE = 3;
-   elseif length(y)>=200
+   elseif length(y)>=128
+    EMARKERSIZE = 2;
+   elseif length(y)>=180
     EMARKERSIZE = 1;
    end
   end
