@@ -28,6 +28,7 @@
 % 'resolution'- ['low' or 'high'], 'high' -> multiply the size of the image by 3 
 %               for subsequent antialiasing and high quality movie generation 
 %               {default: 'low'}
+% 'framesout' - ['eps'|'fig'] Default format for saving frames on disk. Default is '.eps'.
 % 'rt'        - cell array of vector containing reaction times of the subject in 
 %               each conditions (default {} -> ignored)
 % 'rthistloc' - location and size of rt histograms in individual axes. 
@@ -39,6 +40,8 @@
 %               widthcond is the width of a single condition plot (in pixels)
 % 'head'      - [FILENAME], plot the head background image using .pcx image in FILENAME
 % 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
+%
+% Movie ITC, Power and Crossf options:
 % 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
 %                                                           {default: on}
 % 'itc'       - ['on'|'off'] vary component disk colors according to coherence {default: on}
@@ -54,6 +57,8 @@
 %                      {default: hot(64)}
 % 'scalepower'  - [min max] dB range for power (and disk size) variation {default: [-5 5]}  
 % 'scalecoher'  - [min max] coherence range {default: [0 1]}  
+%
+% Movie coordinates and axis options
 % 'xlimaxes'    - x-axis limits axis for the component locations {default: [-1 1]}
 % 'ylimaxes'    - y-axis limits axis for the component locations {default: [-1 to 1]}
 % 'coordinates' - 2-column array of [x y] coordinates of the selected components 
@@ -110,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/11/18 23:17:17  arno
+% test if circfactor is empty
+%
 % Revision 1.19  2002/11/12 20:06:01  cooper
 % Fixed empty envvert bug.
 %
@@ -219,6 +227,7 @@ try, g.caption;			catch, g.caption = 'on'; end;
 try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
+try, g.framesout;	    catch, g.framesout = []; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
@@ -335,10 +344,15 @@ switch lower(g.caption)
 	case {'on', 'off'} ;  
 	otherwise disp('Error: Caption must be either ''on'' or ''off'''); return;
 end;
+switch lower(g.framesout)
+	case {'esp', 'fig'} ;  
+	otherwise disp('Error: Framesout must be either ''eps'' or ''fig'''); return;
+end;	
 if ~isempty(g.envvert),
-   if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
-        disp('Error: Invalid type for Envvert.'); return;
-   end
+   %if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
+   %     disp('Error: Invalid type for Envvert.'); return;
+   %end
+   % check did not work for my data -ad 
 end
 if ~isempty(g.latency) & ~isnumeric(g.latency)
 	disp('Error: Latency must be a vector'); return;
@@ -725,9 +739,12 @@ for indeximage = alltimepoints
 			
 	% save the file for a movie
 	% -------------------------
-	command2 = sprintf('print -depsc -loose image%4.4d.eps', indeximage);
-	eval(command2);
-	
+    if strcmpi(g.framesout, 'eps')
+        command2 = sprintf('print -depsc -loose image%4.4d.eps', indeximage);
+        eval(command2);
+    else
+        hgsave(sprintf('image%4.4d.fig', indeximage));
+    end;
 end;		 
 return;
 
