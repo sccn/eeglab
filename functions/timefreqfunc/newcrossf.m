@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/10/24 22:15:13  cooper
+% Fixed timesout ~= size(RR,2) bug in plotall().
+%
 % Revision 1.22  2002/10/24 15:09:18  arno
 % topoplot channel
 %
@@ -480,8 +483,10 @@ for index=1:length(varargin)
 	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
 end;
 if ~isempty(varargin)
-   try, g = struct(varargin{:}); 
-   catch, error('Argument error in the {''param'', value} sequence'); end; 
+    [tmp indices] = unique(varargin(1:2:end));
+    varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 line remove duplicate arguments    
+    try, g = struct(varargin{:}); 
+    catch, error('Argument error in the {''param'', value} sequence'); end; 
 else 
 	g = [];
 end;
