@@ -153,6 +153,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2003/05/23 15:12:11  arno
+% same
+%
 % Revision 1.77  2003/05/23 15:11:13  arno
 % allowing cell array of color as input
 %
@@ -462,7 +465,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try
        options = varargin;
        for index = 1:length(options)
-           if iscell(options{index}), options{index} = { options{index} }; end;
+           if iscell(options{index}) & ~iscell(options{index}{1}), options{index} = { options{index} }; end;
        end;
        if ~isempty( varargin ), g=struct(options{:}); 
        else g= []; end;
