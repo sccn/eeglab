@@ -42,6 +42,15 @@
 %               event to the number num pre-existing event. A negative value 
 %               can also be used; then event number -num is aligned with the 
 %               first pre-existing event. Default is 0. (NaN-> no alignment).
+%               Command line equivalent is 'align'.
+%  "Auto adjust event sampling rate" - [checkbox] when checked the function
+%               automatically adjust the sampling rate of the new events so
+%               they best align with the closest old event. This may account
+%               for small differences in sampling rate that could lead to 
+%               big differences at the end of the experiement (e.g., 0.01%
+%               clock difference during half an hour would lead to 360 ms 
+%               difference after one hour if not corrected). Command line
+%               line equivalent is 'optimalim'.
 % Input:
 %   EEG      - input dataset
 %
@@ -65,6 +74,9 @@
 %  'align'    - [num] Align the first event latency to the latency of existing 
 %               event number num, and check latency consistency. See also GUI
 %               help above.
+%  'optimalign' - ['on'|'off'] optimize sampling rate for new events so they
+%               best align with old events. Default is 'on'.
+%
 % Outputs:
 %   EEG          - EEG dataset with updated event fields
 %   eventindices - Indexes of the appended events
@@ -102,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/11/19 19:28:46  arno
+% nothing
+%
 % Revision 1.24  2003/11/07 02:14:26  arno
 % more detailed message
 %
@@ -219,7 +234,7 @@ if nargin<2
         uilist = { ...
          { 'Style', 'text', 'string', 'Event indices', 'fontweight', 'bold' }, ...
          { 'Style', 'text', 'string', 'Append events?', 'fontweight', 'bold' } };
-        geometry    = { [ 1 1.1 1.1 1] [ 1 1 2] [1 1 2] [ 2 1 1] };
+        geometry    = { [ 1 1.1 1.1 1] [ 1 1 2] [1 1 2] [ 1.2 1 1] };
         uilist = { uilist{:}, ...     
          { 'Style', 'text', 'string', 'Event file or array', 'horizontalalignment', 'right', 'fontweight', 'bold' }, ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''globfile'';' commandload ] }, ...
@@ -229,14 +244,16 @@ if nargin<2
          { }, { 'Style', 'text', 'string', 'NB: No = overwrite', 'value', 0 }, { }, ...
          { 'Style', 'text', 'string', 'Input field (column) names       ', 'fontweight', 'bold', 'tooltipstring', helpfields } ...
          { 'Style', 'edit', 'string', '' } { 'Style', 'text', 'string', 'Ex: latency type position', 'tooltipstring', helpfields } };
-         geometry = { geometry{:} [2 1 1] [2 1 1] [2 1 1] };
+         geometry = { geometry{:} [1.2 1 1] [1.2 1 1] [1.2 1 1] [1.2 0.2 1.8] };
          uilist   = { uilist{:}, ...
                 { 'Style', 'text', 'string', 'Number of file header lines', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '0' }, ...
-					  { 'Style', 'text', 'string', 'Note: latency required', 'tooltipstring', helpfields },...
+					  { 'Style', 'text', 'string', '     Note: latency required', 'tooltipstring', helpfields },...
                 { 'Style', 'text', 'string', 'Latency time unit (sec)', 'horizontalalignment', 'left' }, { 'Style', 'edit', 'string', '1' } ...
 					  { 'Style', 'text', 'string', 'Ex: If ms, 1E-3' },...
                 { 'Style', 'text', 'string', 'Align event latencies to data events', 'horizontalalignment', 'left' }, ...
 					  { 'Style', 'edit', 'string', fastif(isempty(EEG.event),'NaN','0') } { 'Style', 'text', 'string', 'See Help' },...
+                { 'Style', 'text', 'string', 'Auto adjust new events sampling rate', 'horizontalalignment', 'left' }, ...
+					  { 'Style', 'checkbox', 'value' 1 } { },...
                };
         results = inputgui( geometry, uilist, 'pophelp(''pop_importevent'');', 'Import event info -- pop_importevent()' );
         if length(results) == 0, return; end;
@@ -248,17 +265,20 @@ if nargin<2
 	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
 	    if ~isempty( results{3} ), args = { args{:}, 'event', results{3} }; end; 
 	    if ~isempty( results{4} ), args = { args{:}, 'fields', parsetxt(results{4}) }; end;
+        
 	    % handle skipline 
 	    % ---------------     
-	    if ~isempty(eval(results{end-2})), if eval(results{end-2}) ~= 0,  args = { args{:}, 'skipline', eval(results{end-2}) }; end; end;
+	    if ~isempty(eval(results{end-3})), if eval(results{end-3}) ~= 0,  args = { args{:}, 'skipline', eval(results{end-3}) }; end; end;
 
 	    % handle timeunit 
 	    % -------------     
-	    if ~isempty(eval(results{end-1})), if eval(results{end-1}) ~= 0,  args = { args{:}, 'timeunit', eval(results{end-1}) }; end; end;
+	    if ~isempty(eval(results{end-2})), if eval(results{end-2}) ~= 0,  args = { args{:}, 'timeunit', eval(results{end-2}) }; end; end;
 
 	    % handle alignment 
 	    % ----------------     
-	    if ~isempty(eval(results{end})), if eval(results{end}) ~= 0,  args = { args{:}, 'align', eval(results{end}) }; end; end;
+	    if ~isempty(eval(results{end-1})), if eval(results{end-1}) ~= 0,  args = { args{:}, 'align', eval(results{end-1}) }; end; end;
+	    if ~results{end} ~= 0,  args = { args{:}, 'optimalign', 'off' }; end;
+        
 else % no interactive inputs
     args = varargin;
     % scan args to modify array/file format
@@ -282,6 +302,7 @@ g = finputcheck( args, { 'fields'    'cell'     []         {};
                          'timeunit'  'real'     [0 Inf]    1;
                          'event'     { 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
+                         'optimalign' 'string'  { 'on' 'off' }         'on';
                          'delim'     {'integer' 'string'}   []         char([9 32])}, 'pop_importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
@@ -316,7 +337,11 @@ if ~isnan(g.align.val)
         g.align.event = EEG.event(g.align.val+1).latency;
     end
     g.align.nbevent = length(EEG.event);
-    g.align.txt = sprintf('Check alignment between pre-existing (old) and loaded event latencies:\nOld event latencies (10 first): %s ...\n', int2str(cell2mat({ EEG.event(1:min(10, length(EEG.event))).latency })));
+    g.oldevents = EEG.event;
+    g.align.txt = sprintf('Check alignment between pre-existing (old) and loaded event latencies:\nOld event latencies (10 first): %s ...\n', ...
+                          int2str(cell2mat({ EEG.event(1:min(10, length(EEG.event))).latency })));
+else
+    g.oldevents = [];
 end;
 
 tmpfields = fieldnames(g);
@@ -329,7 +354,7 @@ for curfield = tmpfields'
         case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
         case 'event', % load an ascii file
             switch g.append 
-                case { '''no''' 'no' } % for backward compatibility
+                case { '''no''' 'no' } % ''no'' for backward compatibility
                       EEG.event = load_file_or_array( g.event, g.skipline, g.delim );
                       allfields = g.fields(1:min(length(g.fields), size(EEG.event,2)));
                       EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
@@ -339,7 +364,7 @@ for curfield = tmpfields'
 						  EEG.event(index).init_index = index;
 						  EEG.event(index).init_time  = EEG.event(index).latency*g.timeunit;
 					  end;
-					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
+					  EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align, g.oldevents, g.optimalign);
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
@@ -365,7 +390,7 @@ for curfield = tmpfields'
 						  EEG.event(index+offset).init_index = index;
 						  EEG.event(index+offset).init_time  = EEG.event(index+offset).latency*g.timeunit;
 					  end;
-                      EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
+                      EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align, g.oldevents, g.optimalign);
             end;
       end;
 end;
@@ -426,10 +451,10 @@ return;
 
 % update latency values
 % ---------------------
-function event = recomputelatency( event, indices, srate, timeunit, align);
+function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign);
     if ~isfield(event, 'latency'), return; end;
     for index = indices
-        event(index).latency = round(event(index).latency*srate*timeunit);
+        event(index).latency = event(index).latency*srate*timeunit;
     end;
     if ~isnan( align.val )
         if align.val >= 0, alignlatency = event(1).latency;
@@ -443,8 +468,43 @@ function event = recomputelatency( event, indices, srate, timeunit, align);
                    'number of event that were read, so their latencies may have been wrongly re-aligned' ]);
         end;           
         fprintf(align.txt);
-        fprintf('New event latencies (10 first): %s ...\n', int2str(cell2mat({ event(1:min(10, length(event))).latency })));
+        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
     end;
+    if strcmpi(optimalign, 'on')
+       newlat = cell2mat({ event.latency     });
+       oldlat = cell2mat({ oldevents.latency });
+       
+       newlat = repmat(newlat, [length(oldlat) 1]);
+       oldlat = repmat(oldlat', [1 size(newlat,2)]);
+       newlat = newlat-newlat(1);
+       oldlat = oldlat-oldlat(1);
+       
+       newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
+       fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
+       if newfactor > 1.01 | newfactor < 0.99
+           disp('Difference is more than 1%, something is wrong; ignoring ratio');
+           newfactor = 1;
+       end;
+       
+       %diffarray = abs(newfactor*newlat-oldlat)';
+       %[allmins poss] = min(diffarray);
+       %figure; hist(allmins);
+    else
+        newfactor = 1;
+    end;
+    if ~isnan( align.val )
+        latfirstevent = event(1).latency;
+        for index = setdiff(indices, 1)
+            event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
+        end;
+        fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
+        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(oldevents))).latency }))));
+    else
+        for index = indices
+            event(index).latency = round(event(index).latency*newfactor);
+        end;
+    end;        
+
          
 % create new field names
 % ----------------------
