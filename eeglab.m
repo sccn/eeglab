@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.256  2003/10/29 18:29:11  arno
+% same
+%
 % Revision 1.255  2003/10/29 18:28:35  arno
 % debug last
 %
@@ -1076,9 +1079,9 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
         pathsload   = which('sload');   pathsload   = pathsload(1:end-7);
         pathloadeeg = which('loadeeg'); pathloadeeg = pathloadeeg(1:end-9);
         if strcmpi(pathsload, pathloadeeg)
-            disp('Warning: BIOSIG function ''loadeeg'' is in conflict with EEGLAB ''loadeeg'' function');
-            disp('         Note: ''loadeeg'' in BIOSIG is redundant with BIOSIG ''sload'' function');
-            disp( [ '        We advise that you remove ' which('loadeeg') ]);
+            disp('Warning: BIOSIG function ''loadeeg'' is in conflict with EEGLAB ''loadeeg'' function (Neuroscan)');
+            disp('         Note: the ''loadeeg'' BIOSIG function is redundant with the BIOSIG ''sload'' function');
+            disp( [ '         We advise that you remove ' which('loadeeg') ]);
         end;
         uimenu( neuromenu, 'Label', 'From other formats using BIOSIG',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_biosig;' e_newnonempty ], 'Separator', 'on'); 
     end;
