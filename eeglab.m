@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2002/08/14 20:43:46  arno
+% disable menus if function not available
+%
 % Revision 1.132  2002/08/14 00:15:32  arno
 % debug unique dataset
 %
@@ -590,13 +593,16 @@ function eeglab( onearg )
 eeg_options; 
 eeg_global;
 
-if nargin < 1
+if nargin < 1 | exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
 	eeg_global;
 	EEG = eeg_emptyset;
 	evalin('base', 'eeg_global;');
 	h('eeglab;');
-else
+end;
+
+besamenu = 0;
+if nargin == 1
 	if strcmp(onearg, 'redraw')
 		W_MAIN = findobj('tag', 'EEGLAB');
 		if ~isempty(W_MAIN)
@@ -605,11 +611,14 @@ else
 		else
 			h('eeglab rebuild;');
 		end;
-	else 
+	elseif strcmp(onearg, 'besa');
+		besamenu = 1;
+		disp('Besa menu activated');
+	else
 		h('eeglab rebuild;');
 	end;
 end;
-  
+
 colordef white
 
 % checking strings
@@ -694,12 +703,15 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
 	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject using ICA');
+
+if besamenu
 	fourth_sub3 = uimenu( fourth_m, 'Label', 'Localize dipoles using BESA');
 	uimenu( fourth_sub3, 'Label', 'Export dipoles'   , 'CallBack', [ 'besaexport(EEG);']);
 	uimenu( fourth_sub3, 'Label', 'Import dipoles'   , 'CallBack', [ check 'EEG = besaimport(EEG);' e_store]);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles'   , 'CallBack', [ 'besaplot(EEG.sources);']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles2'  , 'CallBack', [ 'besaplot(EEG.sources, ''sideview'', ''on'');']);
 	uimenu( fourth_sub3, 'Label', 'Plot dipoles summary', 'CallBack', [ 'besaplot(EEG.sources, ''summary'', ''on'', ''dipolesize'', 15, ''mesh'', ''off''); set(gcf, ''color'', ''w'');']);
+end;
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
 	uimenu( fourth_sub1, 'Label', 'Reject by inspection'     , 'CallBack', [ check      '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
