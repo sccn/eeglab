@@ -38,6 +38,7 @@
 %               exemple { 'b' 'g' [1 0 0] } gives blue, green and red. 
 %               Dipole colors will rotate through the given colors if
 %               the number given is less than the number of dipoles to plot.
+%               A single number will be used as color index in the jet colormap.
 %  'view'     - 3-D viewing angle in cartesian coords.,
 %               [0 0 1] gives a sagittal view, [0 -1 0] a view from the rear;
 %               [1 0 0] gives a view from the side of the head.
@@ -144,6 +145,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.90  2004/06/01 16:53:35  scott
+%spherecolor now works (undocumented) but gives weird color palette ??
+%
 %Revision 1.89  2004/06/01 15:48:50  scott
 %sphere colors
 %
@@ -443,16 +447,15 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'dipolelength' 'real'  [0 Inf]             1;
                                  'sphere'      'real'   [0 Inf]             1;
                                  'spheres'    'string'  {'on' 'off'}       'off';
-                                 'spheresize'  'real'   [0 Inf]             5;
-                                 'spherecolor' 'cell'   [1 64]             64;
                                  'links'       'real'   []                  [];
                                  'image'       { 'string' 'real'} []                 'mri' }, ...
                                                                                     'dipplot');
     if isstr(g), error(g); end;
     g.zoom = 1500;
-    if strcmpi(g.spheres,'on')
-       g.gui = 'off';
-    end 
+    %if strcmpi(g.spheres,'on')
+    %   g.gui = 'off';
+    %end 
+    
     % axis image and limits
     % ---------------------
     dat.mode       = g.image;
@@ -804,26 +807,26 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
             tag = [ 'dipole' num2str(index) ];
-            [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg); 
-            [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
+            [xx   yy   zz]   = transcoords(x,   y,   z,    dat.tcparams, dat.coreg);             [xxo1 yyo1 zzo1] = transcoords(xo1, yo1, zo1,  dat.tcparams, dat.coreg); 
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
 
             elseif g.dipolelength>0 % plot dipole direction cylinders with end cap patch
-              thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
-              for k=1:length(xx)
-                [cx cy cz] = cylinder([1 1 1],SPHEREGRAIN);
-                % rotate(h1,[yy(k)-yyo1(k) xxo1(k)-xx(k) 0],thetas(k));
-                cx = cx*g.spheresize/3 + xx(k);
-                cy = cy*g.spheresize/3 + yy(k);
-                cz = cz*g.dipolelength + zz(k);
-                caxis([0 33])
-                cax =caxis;
-                s1 = surf(cx,cy,cz);  % draw the 3-D cylinder
-                set(s1,'cdatamapping','direct','FaceColor','r'); % tries to make cylinder red - doesnt work!?!
-                p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); 
-              end
+              disp('Cannot plot bar with sphere');
+              %thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
+              %for k=1:length(xx)
+              %  [cx cy cz] = cylinder([1 1 1],SPHEREGRAIN);
+              %  % rotate(h1,[yy(k)-yyo1(k) xxo1(k)-xx(k) 0],thetas(k));
+              %  cx = cx*g.spheresize/3 + xx(k);
+              %  cy = cy*g.spheresize/3 + yy(k);
+              %  cz = cz*g.dipolelength + zz(k);
+              %  caxis([0 33])
+              %  cax =caxis;
+              %  s1 = surf(cx,cy,cz);  % draw the 3-D cylinder
+              %  set(s1,'cdatamapping','direct','FaceColor','r'); % tries to make cylinder red - doesnt work!?!
+              %  p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); 
+              %end
             end
 
             dipstruct.pos3d  = [xx yy zz];            % value used for fitting MRI
@@ -833,53 +836,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if ~strcmpi(g.spheres,'on') % plot disk markers
                set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
-            else % 'spheres','on' -> plot dipole spheres
-                 if exist('s1'), 
-                   set(s1,'userdata',dipstruct,'tag',tag,'cdatamapping','direct','facecolor','r');
-                 end
-                 if exist('p1'), 
-                   set(p1, 'userdata', dipstruct, 'tag', tag );
-                 end
             end
+            
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw sphere or disk marker %%%%%%%%%%%%%%%%%%%%%%%%%
             %
             hold on;
             if strcmpi(g.spheres,'on') % plot spheres
-                spherecolor = g.spherecolor{1+rem(index-1,length(g.spherecolor))};
-                [xs,ys,zs] = sphere;
-                for q = 1:length(xx)
-                     if q==0 % DEBUG
-                         size(zs*g.spheresize+zz(q))
-                         size(spherecolor)
-                     end
-                   sf=surf(xs*g.spheresize+xx(q),...
-                       ys*g.spheresize+yy(q),...
-                         zs*g.spheresize+zz(q),...
-                          repmat(spherecolor,size(zs)),...
-                            'edgecolor','none',...
-                              'backfacelighting', 'lit', ...
-                               'facelighting', 'phong', ...
-                                 'facecolor', 'interp', ...
-                                   'ambientstrength', 0.3);
-                       % draws the 3-D sphere -> BUT last arg pairs are NOT set. Why not ????
-% [0 0 1]', ... 
-% repmat([1 0 0]',length(xx(q)),1)
-% handles = surf(xs, ys, zs, colorarray, 'tag', 'tmpmov', 'EdgeColor','none', 'VertexNormals', normals, ...
-
-                   options = {'FaceColor','texturemap', 'EdgeColor','none', ...
-                              'CDataMapping','direct','tag','img', 'facelighting','none'};
-
-                   % set(sf,{options}); <==== this says 'invalid key pair' but which pair ????
-                   set(sf,'cdatamapping','direct');
-                   set(sf,'facecolor','g');  % <========= this has no effect !?!?! Why not ????
-                   % set(sf) % <========== doesnt show the set() changes made above. Why not ????
-                   shading interp;
-                   material shiny;
-                end
-                light;
+                h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
+                set(h, 'userdata', dipstruct, 'tag', tag);
                 lighting phong;
-
+                material shiny;
+                camlight left;
             else % plot dipole markers
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
