@@ -1,12 +1,12 @@
-% pop_timef() - Returns estimates and plots of event-related (log) spectral
+% pop_newtimef() - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           timelocked to a set of input events in one data channel. 
 %
 % Usage:
-%   >> pop_timef(EEG, typeplot); % pop_up window
-%   >> pop_timef(EEG, typeplot, lastcom); % pop_up window
-%   >> pop_timef(EEG, typeplot, channel); % do not pop-up
-%   >> pop_timef(EEG, typeproc, num, tlimits,cycles,
+%   >> pop_newtimef(EEG, typeplot); % pop_up window
+%   >> pop_newtimef(EEG, typeplot, lastcom); % pop_up window
+%   >> pop_newtimef(EEG, typeplot, channel); % do not pop-up
+%   >> pop_newtimef(EEG, typeproc, num, tlimits,cycles,
 %                        'key1',value1,'key2',value2, ... );   
 %     
 % Inputs:            
@@ -19,14 +19,14 @@
 %               0 -> Use FFTs (with constant window length)
 %
 % Optional inputs:
-%    See the timef() function.
+%    See the newtimef() function.
 %    
-% Outputs: same as timef(), no outputs are returned when a
+% Outputs: same as newtimef(), no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: timef(), eeglab() 
+% See also: newtimef(), eeglab() 
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/01/22 21:54:28  scott
+% rm same
+%
 % Revision 1.30  2004/01/22 21:49:32  scott
 % same
 %
@@ -146,13 +149,13 @@
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
 
-function varargout = pop_timef(EEG, typeproc, num, tlimits, cycles, varargin );
+function varargout = pop_newtimef(EEG, typeproc, num, tlimits, cycles, varargin );
 
 varargout{1} = '';
 % display help if not enough arguments
 % ------------------------------------
 if nargin < 2
-	help pop_timef;
+	help pop_newtimef;
 	return;
 end;	
 lastcom = [];
@@ -168,7 +171,7 @@ end;
 % pop up window
 % -------------
 if popup
-	[txt vars] = gethelpvar('timef.m');
+	[txt vars] = gethelpvar('newtimef.m');
 	
 	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.1 0.78] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
     uilist = { ...
@@ -177,7 +180,7 @@ if popup
 			   { 'Style', 'text', 'string', 'Epoch time range [min max] (msec)', 'fontweight', 'bold', ...
 				 'tooltipstring', 'Sub epoch time limits' } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,4,[],[ int2str(EEG.xmin*1000) ' ' int2str(EEG.xmax*1000) ]) } {} ...
-			   { 'Style', 'text', 'string', 'Wavelet cycles (0->FFT, see >> help timef)', 'fontweight', 'bold', ...
+			   { 'Style', 'text', 'string', 'Wavelet cycles (0->FFT, see >> help newtimef)', 'fontweight', 'bold', ...
 				 'tooltipstring', context('cycles',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,5,[],'3 0.5') } {} ...
 			   { 'Style', 'text', 'string',  '[set]->Linear coher / [unset]->Phase coher', 'fontweight', 'bold', ...
@@ -187,10 +190,10 @@ if popup
 			   { 'Style', 'text', 'string', 'Bootstrap significance level (Ex: 0.01 -> 1%)', 'fontweight', 'bold', ...
 				 'tooltipstring', context('alpha',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,'alpha') } {} ...
-			   { 'Style', 'text', 'string', 'Optional timef() arguments (see Help)', 'fontweight', 'bold', ...
-				 'tooltipstring', 'See timef() help via the Help button on the right...' } ...
+			   { 'Style', 'text', 'string', 'Optional newtimef() arguments (see Help)', 'fontweight', 'bold', ...
+				 'tooltipstring', 'See newtimef() help via the Help button on the right...' } ...
 			   { 'Style', 'edit', 'string', '''padratio'', 4, ''plotphase'',''off''' } ...
-			   { 'Style', 'pushbutton', 'string', 'Help', 'callback',  'pophelp(''timef'');' } ...
+			   { 'Style', 'pushbutton', 'string', 'Help', 'callback',  'pophelp(''newtimef'');' } ...
 			   {} ...
 			   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotersp','present',0), 'string', ...
 				 'Plot Event Related Spectral Power', 'tooltipstring', ...
@@ -205,9 +208,9 @@ if popup
 			%		'as red (+) or blue (-)'] } ...
 			%   { 'Style', 'checkbox', 'value', ~getkeyval(lastcom,'plotphase','present',1) } { } ...
 
-	result = inputgui( geometry, uilist, 'pophelp(''pop_timef'');', ...
-					   fastif(typeproc, 'Plot channel time frequency -- pop_timef()', ...
-							  'Plot component time frequency -- pop_timef()'));
+	result = inputgui( geometry, uilist, 'pophelp(''pop_newtimef'');', ...
+					   fastif(typeproc, 'Plot channel time frequency -- pop_newtimef()', ...
+							  'Plot component time frequency -- pop_newtimef()'));
 	if length( result ) == 0 return; end;
 
 	num	     = eval( [ '[' result{1} ']' ] ); 
@@ -313,13 +316,9 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
+varargout{1} = sprintf('figure; pop_newtimef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
 			int2str(tlimits), num2str(cycles), options);
-%if is_sccn
-%    com = sprintf('%s newtimef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-%else
-    com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-%end;
+com = sprintf('%s newtimef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
 
 return;
