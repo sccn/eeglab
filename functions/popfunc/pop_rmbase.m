@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/02/17 02:56:16  arno
+% reformating text for new functionality in help2html
+%
 % Revision 1.8  2003/02/16 23:53:12  arno
 % typo last
 %
@@ -93,7 +96,7 @@ if nargin < 2 & EEG.trials > 1
 	% popup window parameters
 	% -----------------------
     promptstr    = {'Baseline time range (min_ms max_ms):',...
-         		   strvcat('Baseline points vector (ex:1:56):', '(Overwritten by time limits).') };
+         		   strvcat('Baseline points vector (ex:1:56):', '(Overwrite time limits).') };
 	inistr       = { [num2str(EEG.xmin*1000) ' 0'], '' };
 	result       = inputdlg2( promptstr, 'Epoch baseline removal -- pop_rmbase()', 1,  inistr, 'pop_rmbase');
 	size_result  = size( result );
@@ -114,13 +117,12 @@ elseif nargin < 2 & EEG.trials == 1
     pointrange = [1:EEG.pnts];
 end;
 
-if ~isempty(timerange)
+if isempty(pointrange)
+    if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
+        error('pop_rembase(): Bad time range');
+    end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
 end;	
-
-if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
-   error('pop_rembase(): Bad time range');
-end;
 if (min(pointrange) < 1) | (max( pointrange ) > EEG.pnts)  
    error('Wrong point range');
 end;
