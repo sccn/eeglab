@@ -13,7 +13,7 @@
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, Mai 14, 2003
 %
-% See also: eeglab(), readegi(), readegihdr()
+% See also: pop_export()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/05/14 15:28:19  arno
+% sphere matrixc
+%
 % Revision 1.1  2003/05/14 15:10:20  arno
 % Initial revision
 %
