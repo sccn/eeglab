@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/11/18 17:15:18  arno
+% adding float arg (=real)
+%
 % Revision 1.12  2002/11/15 02:16:50  arno
 % header for web
 %
@@ -120,6 +123,7 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	% create structure
 	% ----------------
 	if ~isempty(vararg)
+        vararg = removedup(vararg);
 		for index=1:length(vararg)
 			if iscell(vararg{index})
 				vararg{index} = {vararg{index}};
@@ -235,3 +239,12 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
      case '';
      otherwise, error([ 'finputcheck error: unrecognized type ''' fieldname '''' ]);
     end;
+
+% remove duplicates in the list of parameters
+% -------------------------------------------
+function cella = removedup(cella)
+    [tmp indices] = unique(cella(1:2:end));
+    if length(tmp) ~= length(cella)/2
+        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)');
+    end;
+    cella = cella(sort(union(indices*2-1, indices*2)));
