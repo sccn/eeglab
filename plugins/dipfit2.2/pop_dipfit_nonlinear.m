@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/03/17 02:21:56  arno
+% com not supported
+%
 % Revision 1.3  2005/03/10 18:14:52  arno
 % warning backtrace
 %
@@ -257,7 +260,7 @@ elseif nargin>=3
       current = get(findobj(parent, 'tag', 'component'), 'string');
       EEG.dipfit.current = str2num(current);
       if ~isempty( EEG.dipfit.current )
-        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on', 'image', 'mri');
+        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on');
       end;
       
     case 'dialog_checkinput'
