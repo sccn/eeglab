@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2003/03/05 15:38:15  arno
+% fixing '.' bug
+%
 % Revision 1.39  2003/03/04 20:04:44  arno
 % adding neuroscan .asc format
 %
@@ -262,7 +265,7 @@ listimportformat = { ...
    	{ } ... % polhemus (specific non-columnar implementation)	
       { } ... % polhemus (specific non-columnar implementation)
       { } ... % polhemus (specific non-columnar implementation)
-      { 'labels' 'sph_theta_besa' 'sph_phi_besa' } ... % BESA/EGI format
+      { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' } ... % BESA/EGI format
       { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
       { 'labels' '-Y' 'X' 'Z' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
@@ -347,7 +350,9 @@ if isstr(filename)
        eloc = readneurolocs( filename );
    elseif strcmp(lower(g.filetype(1:end-1)), 'polhemus') | ...
            strcmp(lower(g.filetype), 'polhemus')
-       [eloc labels X Y Z]= readelp( filename );
+       try, 
+           [eloc labels X Y Z]= readelp( filename );
+       catch, error('Error while reading Polhemus (for BESA .elp file force file type to BESA)'); end;
        if strcmp(lower(g.filetype), 'polhemusy')
            tmp = X; X = Y; Y = TMP;
        end;
@@ -408,8 +413,17 @@ if isstr(filename)
                eloc(index).sph_theta_besa = eloc(index).labels;
            end;
            eloc = rmfield(eloc, 'labels');
+       elseif isstr(eloc(1).sph_theta_besa)
+           disp('Alternate BESA format detected ( E_type| Elec | Theta | Phi )');
+           for index = 1:length(eloc)
+               eloc(index).labels         = eloc(index).sph_theta_besa;
+               eloc(index).sph_theta_besa = eloc(index).sph_phi_besa;
+               eloc(index).sph_phi_besa   = eloc(index).sph_radius;
+               eloc(index).radius         = 1;
+           end;           
        end;
        eloc = convertlocs(eloc, 'sphbesa2all');
+       eloc = convertlocs(eloc, 'topo2all'); % problem with some EGI files (not BESA files)
        fprintf('Readlocs: BESA spherical coords. converted, now deleting BESA fields\n');   
        fprintf('          to avoid confusion (these field can be exported though)\n');   
        eloc = rmfield(eloc, 'sph_phi_besa');
