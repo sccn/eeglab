@@ -142,6 +142,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2003/04/23 01:24:15  arno
+% chaning default to 3 cycles at 5 Hz
+%
 % Revision 1.88  2003/04/23 01:18:08  arno
 % typo
 %
@@ -1168,7 +1171,7 @@ if exist('phargs') == 1 % if phase-sort
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
 	winloc = winloc(find(winloc>0 & winloc<=frames));
 	
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq, DEFAULT_CYCLES);
 	
 	fprintf(...
 'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%4.0f ms) window centered at %4.0f ms.\n',...  
@@ -1242,7 +1245,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
 	winloc = winloc(find(winloc>0 & winloc<=frames));
 	
-	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq,DEFAULT_CYCLES);
 	
 	fprintf('Sorting data epochs by amplitude at %3.1f Hz in %1.1f-cycle (%4.0f-ms) window centered at %4.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,DEFAULT_CYCLES*1000/freq,ampargs(1));
@@ -2474,7 +2477,7 @@ function [plot_handle] = plot1erp(ax,Time,erp,axlimits,stdev)
 %              Constructs a complex filter at frequency freq
 %
 
-function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq)
+function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq,cycles)
 % Typical values:
 %   frames = 768;
 %   srate = 256;
@@ -2482,14 +2485,12 @@ function [ang,amp,win] = phasedet(data,frames,srate,nwin,freq)
 %   freq = 10;
 
 data = reshape(data,[frames prod(size(data))/frames]);
-win = exp(2i*pi*freq(:)*[1:length(nwin)]/srate);
+win = exp(cycles*2i*pi*freq(:)*[1:length(nwin)]/srate);
 win = win .* repmat(hanning(length(nwin))',length(freq),1);
 resp = win * data(nwin,:);
 ang = angle(resp);
 amp = abs(resp);
-if ~exist('allamps')
-   allamps = [];
-end
+
 %
 %%%%%%%%%%%%%% function prctle() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
