@@ -1,4 +1,4 @@
-% timtopo() - plot a data epoch and map its scalp topography at given times
+% timtopo() - plot a data epoch and map its scalp map(s) at given time(s)
 %
 % Usage:
 %  >> timtopo(data,'chan_locs')
@@ -7,16 +7,16 @@
 %
 % Inputs:
 %  data       = EEG/ERP data epoch (chans,frames)
-%  chan_locs  = channel location file, See ">> topoplot example" for format
+%  chan_locs  = channel location file, See  >> topoplot example 
 %
 % Optional inputs:
 %  [limits]   = [xmin xmax ymin ymax]  (x's in ms) {def|0 or both y's 0 -> data limits}
 %  plottimes  = vector of times to topoplot {default|nan -> frame of max(var())}
 % 'title'     = plot title {default|0 -> none}
 %  plotchans  = data channel(s) to plot {default|0 -> all}
-%  voffsets   = vertical lines extend above the data this much (plot units){def -> 0}
-%  'key','val' = optional topoplot() arguments (see topoplot())
-%
+%  voffsets   = vertical lines extend above the data this much (plot units){default -> 0}
+% 'key','val' = optional topoplot() arguments. See >> help topoplot 
+
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
 %
 % See also: envtopo(), topoplot()
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/03/04 17:41:55  scott
+% debug last -sm
+%
 % Revision 1.12  2003/03/04 17:40:51  scott
 % debug head size for sbplots -sm
 %
@@ -348,8 +351,10 @@ maxenv = max(matsel(data,frames,plotframes(t))); % max env val
       data_y = pos(2)+0.6*pos(4);
   end
   l1 = plot([(plottimes(t)-xmin)/width  ...
-               topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+                 pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth], ...
                  [data_y 0.70]); % 0.70 is bottom of topo maps
+               % topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+
 
 %  l1 = plot(...
 %     [0.12+0.76*(plottimes(t)-xmin)/width  ...
