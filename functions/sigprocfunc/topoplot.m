@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2004/02/15 21:01:27  scott
+% same
+%
 % Revision 1.130  2004/02/15 20:57:04  scott
 % same
 %
@@ -1117,7 +1120,7 @@ oldTh = Th; % DEBUG
      Th(q3) = Th(q3)+pi; % rotate to q1
      dr = Rd(q3)-0.5;
      x = asin(sin(3/4*pi).*dr/(0.25+dr.^2-dr.*cos(3/4*pi)));
-     Th(q3) = x+*Th(q3)*(pi2-2*x)/pi2;
+     Th(q3) = x+Th(q3)*(pi2-2*x)/pi2;
      Th(q3) = Th(q3)-pi; % rotate back
    end
 %  fprintf('rotated %d q3 angles\n',length(q3)); % DEBUG
