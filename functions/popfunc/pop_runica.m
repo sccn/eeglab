@@ -1,32 +1,29 @@
-% pop_runica() - Run ICA decomposition on an EEG dataset using runica(),
-%                binica(), or other ICA algorithm.
-%
+% pop_runica() - Run an ICA decomposition on an EEG dataset 
+%                using runica(),binica(), or other ICA algorithm.
 % Usage:
-%   >> OUT_EEG = pop_runica( IN_EEG ); % pop-p widow mode
-%   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options );
+%   >> OUT_EEG = pop_runica( IN_EEG ); % pops-up a data entry window
+%   >> OUT_EEG = pop_runica( IN_EEG, ica_type, options ); % no pop_up
 %
-% Graphical interface:
+% Graphic interface:
 %   "ICA algorithm to use" - [edit box] The type of ICA algorithm 
-%                 to use for the ICA decomposition. Same as 'rhe ica_type'
-%                 parameter from the command line.
+%                 to use for the ICA decomposition. 
+%                 equivalent: 'rhe ica_type'
 %   "Commandline options" - [edit box] Command line options to forward
-%                 to the ICA algorithm. Same as the 'options' parameter
-%                 from the command line.
-%
+%                 to the ICA algorithm. Command line eqivalent: 'options' 
 % Inputs:
-%   IN_EEG      - input dataset
-%   ica_type    - ['runica'|'binica'|'jader'|'fastica'] The ICA algorithm 
+%   IN_EEG      - input EEG dataset
+%   ica_type    - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
 %                 to use for the ICA decomposition. The nature of any 
 %                 differences in the results of these algorithms have 
-%                 not been well characterized. Default is binica() if
-%                 it exists on the system, else runica().
+%                 not been well characterized. Default is binica(), if
+%                 found, else runica().
 %   options     - ICA algorithm options (see ICA routine help messages).
 % 
 % Note:
 % 1) Infomax is the ICA algorithm we use most. It is based on Tony Bell's
 %    algorithm implemented for automated use by Scott Makeig using the 
 %    natural gradient of Amari et al.. It can also extract sub-Gaussian 
-%    sources using the 'extended' ICA option of Lee and Girolami. 
+%    sources using the 'extended' ICA option of Lee and Girolami. Function
 %    runica() is the all-Matlab version; binica() calls the (1.5x faster) 
 %    binary version (separate download) translated to C by Sigurd Enghoff.
 % 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
@@ -35,11 +32,11 @@
 % 3) To run fastica(), download the fastICA toolbox from
 %    http://www.cis.hut.fi/projects/ica/fastica/ and make it available 
 %    in your Matlab path. According to the authors, default parameters
-%    are not optimal: try 'approach', 'sym' to estimate components in
+%    are not optimal: Try 'approach', 'sym' to estimate components in
 %    parallel.
 %
 % Outputs:
-%   OUT_EEG = Input EEGLAB dataset with new (OUT_EEG.weights, OUT_EEG.sphere). 
+%   OUT_EEG = Input EEGLAB dataset with new .weights and .sphere field values.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -64,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2003/02/19 19:22:40  arno
+% updating header for GUI
+%
 % Revision 1.16  2003/01/15 22:07:59  arno
 % typo
 %
