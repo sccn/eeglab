@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/03/04 17:49:36  scott
+% debug oblique lines -sm
+%
 % Revision 1.13  2003/03/04 17:41:55  scott
 % debug last -sm
 %
@@ -287,16 +290,16 @@ fprintf('\n');
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % site the plot at bottom of the figure
-axe = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
-set(axe,'Color',BACKCOLOR);
+axdata = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',16);
+set(axdata,'Color',BACKCOLOR);
 
-limits = get(axe,'Ylim');
-set(axe,'GridLineStyle',':')
-set(axe,'Xgrid','off')
-set(axe,'Ygrid','on')
-axes(axe)
+limits = get(axdata,'Ylim');
+set(axdata,'GridLineStyle',':')
+set(axdata,'Xgrid','off')
+set(axdata,'Ygrid','on')
+axes(axdata)
 axcolor = get(gcf,'Color');
-set(axe,'Color',BACKCOLOR);
+set(axdata,'Color',BACKCOLOR);
 pl=plot(x,data(plotchans,:));    % plot the data
 if length(plotchans)==1
   set(pl,'color','k');
@@ -345,16 +348,42 @@ for t=1:ntopos % draw oblique lines through to the topoplots
   axis([0 1 0 1]);
   set(gca,'Visible','off');
 
-maxenv = max(matsel(data,frames,plotframes(t))); % max env val
-  data_y = 0.6*(voffsets(t)+maxenv-ymin)/height;
-  if (data_y > pos(2)+0.6*pos(4))
-      data_y = pos(2)+0.6*pos(4);
-  end
-  l1 = plot([(plottimes(t)-xmin)/width  ...
-                 pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth], ...
-                 [data_y 0.70]); % 0.70 is bottom of topo maps
-               % topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+%   >> large = sbplot(1,1,1);   % normal whole figure axes
+%   >> % Now draw line from point [0.3 0.4] in small1 axes
+%   >> %                 to point [0.6 0.7] in small2 axes
+%   >> from = changeunits([0.3 0.4],small1,large); % point in small1 axes
+%   >> to   = changeunits([0.6 0.7],small2,large); % point in small2 axes
+%   >> plot([from(1) to(1)],[from(2) to(2)])
+%   >> axis([0 1 0 1]); % set large axes limits
+%   >> axis off % finally, hide large axes
 
+  maxdata = max(matsel(data,frames,plotframes(t))); % max data value at plotframe
+  from = changeunits([plotframes(t),maxdata],axdata,axall);
+
+  head_sep = 1.2;
+  axtp = axes('Units','Normalized','Position',...
+       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth ...
+              pos(2)+0.66*pos(4) ...
+                  topowidth ...
+                       topowidth*head_sep]); % this will be the topoplot axes
+  postp = axis(axtp);
+  axis([-1 1 -1 1];
+
+  to   = changeunits([0,-1],axtp,axall);
+  l1 = plot([from(1) from(2)],[to(1) to(2)]);
+
+  % data_y = 0.6*(voffsets(t)+maxdata-ymin)/height;
+  % if (data_y > pos(2)+0.6*pos(4))
+      % data_y = pos(2)+0.6*pos(4);
+  % end
+  % l1 = plot([(plottimes(t)-xmin)/width  ...
+                 % pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth], ...
+                 % [data_y 0.70]); % 0.70 is bottom of topo maps
+% 
+% % x_to was topoleft+1/pos(3)*(t-1)*6*topowidth/5+topowidth*0.6],...
+
+  axes(axtp)                             % topoplot axes
+  cla
 
 %  l1 = plot(...
 %     [0.12+0.76*(plottimes(t)-xmin)/width  ...
@@ -370,15 +399,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-head_sep = 1.2;
 for t=1:ntopos
-%  axt = axes('Units','Normalized','Position',...
+%  axtp = axes('Units','Normalized','Position',...
 %                 [topoleft+(t-1)*6*topowidth/5 0.68 topowidth topowidth*1.2]);
 
-  axt = axes('Units','Normalized','Position',...
-       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
-        topowidth topowidth*head_sep]);
-  axes(axt)                             % topoplot axes
+  axtp = axes('Units','Normalized','Position',...
+       [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth ...
+              pos(2)+0.66*pos(4) ...
+                  topowidth ...
+                       topowidth*head_sep]);
+  axes(axtp)                             % topoplot axes
   cla
 
   % topoplot(data(:,plotframes(t)),chan_locs,'style','both'); % make a topoplot
@@ -403,8 +433,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axt = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
-h=cbar(axt);                        % colorbar axes
+axcb = axes('Position',[pos(1)+pos(3)*0.99 pos(2)+0.6*pos(4) pos(3)*.02 pos(4)*0.09]);
+h=cbar(axcb);                        % colorbar axes
 set(h,'Ytick',[]);
 
 axes(axall)
@@ -416,8 +446,8 @@ text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
 axes(axall)
 set(axall,'layer','top'); % bring component lines to top
 
-%  axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]); % colorbar axes
-%  h=cbar(axt);  
+%  axcb = axes('Units','Normalized','Position',[.88 .58 .03 .10]); % colorbar axes
+%  h=cbar(axcb);  
 %  set(h,'Ytick',[]);
 %
 %  axes(axall)
