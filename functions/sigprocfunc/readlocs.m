@@ -136,8 +136,19 @@
 %                         C3     -.719        0          .695  
 %                         C4      .719        0          .695  
 %                           ...
+%   '.elc': 
+%               Dipfit cartesian coordinates. Notes: x is toward right ear, y is toward
+%               the back of the head, z is toward the vertex. EEGLAB converts Dipfit 
+%               cartesian coordinates to Matlab/EEGLAB xyz coordinates. 
+%               Fields:   label   x           y          z
+%               Sample:   Fp1    -.308        -.950     -.035    
+%                         Fp2     .308        -.950     -.035  
+%                         C3     -.719        0          .695  
+%                         C4      .719        0          .695  
+%                           ...
 %   '.ced':   
 %               ASCII file saved by pop_chanedit(). Contains multiple MATLAB/EEGLAB formats.
+%               Carthesian coordinates are the same as the ones for the 'xyz' format.
 %               Fields:   channum  label  theta  radius   x      y      z    sph_theta   sph_phi  ...
 %               Sample:   1        Fp1     -18    .511   .950   .308  -.035   18         -2       ...
 %                         2        Fp2      18    .511   .950  -.308  -.035  -18         -2       ...
@@ -171,6 +182,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/03/08 17:36:13  arno
+% import spherical EGI files correctly
+%
 % Revision 1.40  2003/03/05 15:38:15  arno
 % fixing '.' bug
 %
@@ -267,10 +281,10 @@ listimportformat = { ...
       { } ... % polhemus (specific non-columnar implementation)
       { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' } ... % BESA/EGI format
       { 'channum' 'X' 'Y' 'Z' 'labels' } ... % xyz format
-      { 'labels' '-Y' 'X' 'Z' } ... % sfp format
+      { 'labels' '-Y' 'X' 'Z' 'labels' } ... % sfp format
       { 'channum' 'theta' 'radius' 'labels' } ... % loc format
-      { } ... % ascii Neuroscan format
       { 'channum' 'sph_theta' 'sph_radius' 'labels' } ... % sph format
+      { } ... % ascii Neuroscan format
       { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' } }; %chanedit format
 
 listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
