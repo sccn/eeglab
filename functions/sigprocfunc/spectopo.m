@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2002/10/23 02:35:02  arno
+% closing figure when error (selective)
+%
 % Revision 1.41  2002/10/23 02:28:54  arno
 % RMS for channel and better implementation for global channel power
 %
@@ -750,8 +753,10 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
 	winlength = min(winlength, 512);
+	winlength = max(winlength, 256);
+	winlength = min(winlength, frames);    
 	fftlength = 2^(nextpow2(winlength))*g.freqfac;
-	fprintf(' (window length %d; fft length: %d; overlap 1/2):\n', winlength, fftlength);
+	fprintf(' (window length %d; fft length: %d; overlap 0):\n', winlength, fftlength);
 	
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
@@ -769,7 +774,7 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		for e=epoch_subset
 			if isempty(g.boundaries)
 				[tmpspec,freqs] = psd(matsel(tmpdata,frames,0,1,e),...
-									  fftlength,srate,winlength,winlength/2);
+									  fftlength,srate,winlength);
 				if c==1 & e==epoch_subset(1)
 					eegspec = zeros(nchans,length(freqs));
 				end
@@ -777,7 +782,7 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 			else
 				for n=1:length(g.boundaries)-1
 					[tmpspec,freqs] =  psd(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-										   fftlength,srate,winlength,winlength/2);
+										   fftlength,srate,winlength);
 					if c==1 & e==epoch_subset(1)
 						eegspec = zeros(nchans,length(freqs));
 					end
