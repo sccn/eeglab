@@ -83,8 +83,9 @@
 %       'rboot'    = Bootstrap coherence limits (e.g., from crossf()) {from data}
 %                    Be sure that the bootstrap type is identical to
 %                    the one used to obtain bootstrap coherence limits.
-%    Optional Scalp Map:
-%       'topovec'  = Scalp topography (map) to plot              {[]}
+nel%    Optional Scalp Map:
+%       'topovec'  = (2,nchans) matrix, plot scalp topographies (maps) to plot {[]}
+%                    ELSE (chan1,chan2), plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
 %                    File should be ascii in format of  >> topoplot example   
 %
@@ -153,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/04/24 21:02:28  scott
+% added topoplots of two heads -sm
+%
 % Revision 1.15  2002/04/24 02:43:18  arno
 % debugging amplitude coherence
 %
@@ -386,7 +390,7 @@ end
 
 if isempty(g.topovec)
 	g.topovec = [];
-elseif (size(g.topovec,1))~=2)
+elseif (size(g.topovec,2))~=2)
 	error('tvec must be two column vectors.');
 end
 
@@ -991,7 +995,7 @@ if g.plot
          topoplot(g.topovec(:,1),g.elocs,'electrodes','off', ...
                     'style', 'blank', 'emarkersize1chan', 10);
 
-         h(15) = subplot('Position',[.9 .43 .2 .14].*s+q);
+         h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
          topoplot(g.topovec(:,2),g.elocs,'electrodes','off', ...
                     'style', 'blank', 'emarkersize1chan', 10);
         axis('square')
