@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/02/23 08:23:08  scott
+% header edit -sm
+%
 % Revision 1.41  2003/01/03 22:43:35  arno
 % removing error message
 % ,
@@ -387,9 +390,11 @@ if nargin < 2
 		if evalin('base', 'exist(''tmpshrink'')') == 1
 			tmpshrink = evalin('base', 'tmpshrink');
 			evalin('base', 'clear tmpshrink');
-			if ~strcmp(num2str(tmpshrink), num2str(shrinkfact))
-				if ~isempty(str2num(tmpshrink))  chans(1).shrink = str2num(tmpshrink);
-				else                             chans(1).shrink = tmpshrink;
+            tmpshrink
+            shrinkfact
+            if ~strcmp(tmpshrink, 'off')
+				if  isstr(tmpshrink)  chans(1).shrink = num2str(tmpshrink);
+				else                  chans(1).shrink = tmpshrink;
 				end;
 				totaluserdat{end+1} = 'shrink';
 				totaluserdat{end+1} = chans(1).shrink;
@@ -403,7 +408,7 @@ if nargin < 2
             com = sprintf('%s=pop_chanedit(%s, %s);', varname, varname, vararg2str(totaluserdat));
 		end;
 	end;
-	evalin('base', 'clear global tmpchan; clear tmpchan;');
+	evalin('base', 'clear global chantmp; clear chantmp;');
 else 
 	 args = varargin;
 	 % no interactive inputs
@@ -593,6 +598,7 @@ function [chans, shrinkfact]= checkchans(chans);
 	if isfield(chans, 'shrink'), 
 		shrinkfact = chans(1).shrink; 
 		chans = rmfield(chans, 'shrink');
+        if ~isempty(str2num(shrinkfact)), shrinkfact = str2num(shrinkfact); end;
 	end;
     try, allfields = fieldnames(chans); catch, allfields = []; end;
 	newstruct{1}  = 'labels';
