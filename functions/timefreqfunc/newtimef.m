@@ -161,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2003/08/01 21:05:12  arno
+% commenting h(9)
+%
 % Revision 1.40  2003/07/09 21:33:17  arno
 % timesout - > ntimesout for timefreq call
 %
@@ -1355,29 +1358,11 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       ERPmin = ERPmin - 0.1*(ERPmax-ERPmin);
       h(10) = subplot('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
 
-      if ~isnan(g.alpha)
-
-          % plot(times,E,[times(1) times(length(times))],...
-          %       mean(Rboot)*[1 1],[0 0],...
-          %    [min(E)-max(E)/3 max(E)+max(E)/3],'--m','LineWidth',g.linewidth)
-          % axis([min(times) max(times) min(E)-max(E)/3 ...
-          %       max([E mean(Rboot)])+max(E)/3]);
-
-          plot(ERPtimes,ERP,...
-               [times(1) times(length(times))],[0 0],...
-               [0 0],[ERPmin ERPmin],'--m','LineWidth',g.linewidth);
-          axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
-      else
-
-          % plot(times,E,[0 0],[min(E)-max(E)/3 max(E)+max(E)/3],'--m',...
-          %      'LineWidth',g.linewidth)
-          % axis([min(times) max(times) min(E)-max(E)/3 max(E)+max(E)/3]);
-
-          plot(ERPtimes,ERP,...
-               [times(1) times(length(times))],[0 0],...
-               [0 0],[ERPmin ERPmax],'--m','LineWidth',g.linewidth);
-          axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
-      end
+      plot(ERPtimes,ERP,...
+           [0 0],[ERPmin ERPmin],'--m','LineWidth',g.linewidth);
+      hold on;
+      plot([times(1) times(length(times))],[0 0], 'k');
+      axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
 
       tick = get(h(10),'YTick');
       set(h(10),'YTick',[tick(1) ; tick(end)])
