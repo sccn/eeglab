@@ -19,8 +19,13 @@
 %                        spherical coordinates).
 %                  'xyz' contain carhtesian coordinates of the electrodes
 %                  'polhemus' polhemus file (see readelp() )
-%                  'besa' besa coordinate file (contact author when
-%                         encountering problem to read such files)
+%                  'besa' besa '.elp' coordinate file (contact author for
+%                         reading other Besa files). '.elp' Besa files
+%                         have only 3 columns of 'theta' angle, 'phi' angle
+%                         and 'weight' (which is ignored). Also note that 
+%                         'theta' and 'phi' meaning is also the inverse
+%                         as the one they have in Matlab (in Besa 'theta' =
+%                         azimut and 'phi' = horiz).
 %                  'chanedit' files created by pop_chanedit()
 %   'skipline'  - [integer] number of lines to skip 
 %   'elecind'   - [integer array] indices of electrode to read 
@@ -51,7 +56,6 @@
 %                 more lines ...
 %   '.txt' - read ascii files saved using pop_chanedit()
 %   '.elp' - Polhemus coordinate file (uses readelp())
-%   '.eps' - Besa coordinate file
 %
 % Outputs:
 %   eloc      - structure containing the channel names and locations.
@@ -88,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/07/02 00:26:28  arno
+% updating for reading besa .elp files
+%
 % Revision 1.11  2002/05/19 13:40:07  scott
 % turned off loadtxt 'verbose' -sm
 %
