@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/02/02 01:21:40  arno
+% remove old ICA information
+%
 % Revision 1.45  2005/02/01 23:09:42  arno
 % call to icaML and icaMS
 %
@@ -320,14 +323,12 @@ switch lower(icatype)
         else    
             eval(sprintf('[EEG.icaweights] = jader( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'matlabshibbsr' 
         if length(options) < 2
             [EEG.icaweights] = MatlabshibbsR( tmpdata );
         else    
             eval(sprintf('[EEG.icaweights] = MatlabshibbsR( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'pearson_ica' 
         if length(options) < 2
             [tmp EEG.icaweights] = pearson_ica( tmpdata, 'maxNumIterations', 1000,'epsilon',0.0005);
@@ -335,7 +336,6 @@ switch lower(icatype)
             eval(sprintf('[tmp EEG.icaweights] = pearson_ica( tmpdata %s );', options));
         end;
         clear tmp;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'egld_ica' 
         disp('Warning: this algorithm is very slow');
         if length(options) < 2
@@ -344,14 +344,12 @@ switch lower(icatype)
             eval(sprintf('[tmp EEG.icaweights] = egld_ica( tmpdata %s );', options));
         end;
         clear tmp;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'eea' 
         if length(options) < 2
             [EEG.icaweights] = eeA( tmpdata );
         else    
             eval(sprintf('[EEG.icaweights] = eeA( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'icaml' 
         if length(options) < 2
             [tmp EEG.icawinv] = icaML( tmpdata );
@@ -359,7 +357,6 @@ switch lower(icatype)
             eval(sprintf('[tmp EEG.icawinv] = icaML( tmpdata %s );', options));
         end;
         clear tmp;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'icams' 
         if length(options) < 2
             [tmp EEG.icawinv] = icaMS( tmpdata );
@@ -367,14 +364,12 @@ switch lower(icatype)
             eval(sprintf('[tmp EEG.icawinv] = icaMS( tmpdata %s );', options));
         end;
         clear tmp;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'tfbss' 
         if length(options) < 2
              [tmp EEG.icaweights] = tfbss( tmpdata, size(tmpdata,1), 8, 512 );
         else    
             eval(sprintf('[tmp EEG.icaweights] = tfbss( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         clear tmp;
      case 'tica' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -383,7 +378,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = tica( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'erica' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -392,7 +386,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = erica( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'simbec' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -401,7 +394,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = simbec( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'unica' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -410,7 +402,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = unica( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'amuse' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -419,17 +410,15 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = amuse( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'fobi' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
              [tmp EEG.icaweights] = fobi( tmpdata, size(tmpdata,1) );
         else    
-            eval(sprintf('EEG.icaweights = fobi( tmpdata %s );', options));
+            eval(sprintf('[tmp EEG.icaweights] = fobi( tmpdata %s );', options));
         end;
         clear tmp;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'evd' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -438,7 +427,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = evd( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'sons' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -447,7 +435,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = sons( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'jadeop' 
         if length(options) < 2
@@ -455,14 +442,12 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = jadeop( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'jade_td_p' 
         if length(options) < 2
              EEG.icaweights = jade_td_p( tmpdata, size(tmpdata,1) );
         else    
             eval(sprintf('EEG.icaweights = jade_td_p( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
      case 'evd24' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         if length(options) < 2
@@ -470,7 +455,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icaweights = evd24( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'sobi' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -480,8 +464,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icawinv = sobi( EEG.data %s );', options));
         end;
-        EEG.icaweights = pinv(EEG.icawinv);
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         close(fig);
      case 'ng_ol' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -490,7 +472,6 @@ switch lower(icatype)
         else    
             eval(sprintf('[ EEG.icaweights tmp ] = ng_ol( tmpdata %s );', options));
         end;
-        EEG.icasphere = eye(size(EEG.icaweights,2));
         clear tmp;
         close(fig);
      case 'acsobiro' 
@@ -500,8 +481,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icawinv = acsobiro( EEG.data %s );', options));
         end;
-        EEG.icaweights = pinv(EEG.icawinv);
-        EEG.icasphere  = eye(size(EEG.icaweights,2));
         close(fig);
      case 'acrsobibpf' 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
@@ -510,8 +489,6 @@ switch lower(icatype)
         else    
             eval(sprintf('EEG.icawinv = acrsobibpf( tmpdata %s );', options));
         end;
-        EEG.icaweights = pinv(EEG.icawinv);
-        EEG.icasphere  = eye(size(EEG.icaweights,2));
         close(fig);
      case 'fastica'
         if ~exist('fastica', 'file') & ~exist('fastica', 'dir')
@@ -522,11 +499,18 @@ switch lower(icatype)
         else    
             eval(sprintf('[ ICAcomp, EEG.icaweights, EEG.icawinv] = fastica( tmpdata, ''displayMode'', ''off'' %s );', options));
         end;
-        EEG.icasphere  = eye(size(EEG.icaweights,2));
      otherwise, error('Pop_runica: unrecognized algorithm');
 end;
 if ~isempty(fig), try, close(fig); catch, end; end;
-EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
+if isempty(EEG.icasphere)
+    EEG.icasphere  = eye(size(EEG.icaweights,2));
+end;
+if isempty(EEG.icaweights)
+    EEG.icaweights = pinv(EEG.icawinv);
+end;
+if isempty(EEG.icawinv)
+    EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
+end;
 
 eeg_options; 
 if option_computeica
