@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 15:17:25  scott
+% editted help msg -sm
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -122,10 +125,10 @@ if isstr(filename)
             [eloc labels X Y Z]= readelp( filename );
             if exist('elpmaindir') ~= 1, elpmaindir = 'X'; end;
  			if strcmp(lower(elpmaindir), 'x')
-                [theta radius] = cart2topo( -X', -Y', Z',[],-1);  
+                [theta radius] = cart2topo( -X', -Y', Z',[]);  
             else
-                [theta radius] = cart2topo( -Y', -X', Z',[],-1);  
-            end;                   
+                [theta radius] = cart2topo( -Y', -X', Z',[]);  
+            end;
 			for index = 1:length( eloc )
 			  eloc(index).theta  = theta(index);
 			  eloc(index).radius = radius(index);
