@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2004/09/10 21:02:15  hilit
+% corrected a problem with the current axes
+%
 % Revision 1.45  2004/09/10 17:35:07  hilit
 % added the current axes setting to try and fix the plotting bug in Matlab 7
 %
@@ -411,8 +414,8 @@ for index = 1:size(arg2(:),1)
 		axis square; 
 		if index == size(arg2(:),1)
 	        if nbgraph == 1
-                clim = get(curax, 'clim');
-                pos = get(curax,'position');
+                clim = get(gca, 'clim');
+                pos = get(gca,'position');
                 q = [pos(1) pos(2) 0 0];
                 s = [pos(3) pos(4) pos(3) pos(4)];
                 col = colormap;
