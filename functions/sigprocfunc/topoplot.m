@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/08/13 17:45:58  arno
+% undo last change
+%
 % Revision 1.11  2002/08/13 17:44:37  arno
 % remove color setting
 %
@@ -311,11 +314,24 @@ enum = find(Rd <= 0.5);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
 	fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', length(enum)-length(Rd),length(Rd));
 end;	
+if ~isempty(Vl)
+	if length(Vl) == length(Th)
+		Vl = Vl(enum);
+	else
+		if strcmp(STYLE,'blank')
+			tmpind = find(enum == Vl);
+			if isempty(tmpind)
+				disp('Topoplot warning: channel out of head limits');
+				Vl = [];
+			else
+				Vl = tmpind;
+			end;
+		end;
+	end;	
+end;
 Th = Th(enum);
 Rd = Rd(enum);
-if ~strcmp(STYLE,'blank')
-    Vl = Vl(enum);
-end;
+
 labels = labels(enum,:);
 
 [x,y] = pol2cart(Th,Rd);      % transform from polar to cartesian coordinates
