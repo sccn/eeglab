@@ -45,6 +45,10 @@
 %               given range. Default: plot all dipoles.
 %  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
 %               in making 3-D plots {Default 'off'}
+%  'projlines' - ['on'|'off'] Plot lines connecting dipole with 2-D projection.
+%                Color is dashed black for BESA head and dashed black for the
+%                MNI brain {Default 'off'}
+%  'projcol'   - [color] color for the projected line {Default is same as dipole}
 %  'dipolesize' - Size of the dipole sphere(s) {Default: 30}
 %  'dipolelength' - Length of the dipole bar(s) {Default: 1}
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
@@ -126,6 +130,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.58  2003/10/29 23:44:38  arno
+%don't know
+%
 %Revision 1.57  2003/10/27 18:50:06  arno
 %adding edges
 %
@@ -320,6 +327,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
                                  'std'       'cell'     []                 {};
                                  'projimg'   'string'   { 'on' 'off' }     'off';
+                                 'projcol'   { 'string' 'real' }   []      [];
+                                 'projlines' 'string'   { 'on' 'off' }     'off';
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'   [0 Inf]            30;
                                  'dipolelength' 'real' [0 Inf]            1;
@@ -638,6 +647,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                    'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
             
             % project onto images
+            % -------------------
             if strcmpi(g.projimg, 'on')
                 if isstr(g.color{index})
                     switch g.color{index}
@@ -685,6 +695,42 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 h = plot3(-dat.maxcoord(3),  yy,  zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+            end;
+
+            % line projections
+            % -------------------
+            if strcmpi(g.projlines, 'on')
+                if isstr(g.color{index})
+                    switch g.color{index}
+                     case 'y', g.color{index} = [1 1 0]; % yellow
+                     case 'm', g.color{index} = [1 0 1];
+                     case 'c', g.color{index} = [0 1 1];
+                     case 'r', g.color{index} = [1 0 0];
+                     case 'g', g.color{index} = [0 1 0];
+                     case 'b', g.color{index} = [0 0 1];
+                     case 'w', g.color{index} = [1 1 1];
+                     case 'k', g.color{index} = [0 0 0];
+                    end;
+                end;
+                tmpcolor = g.color{index};
+                
+                % project onto z axis
+                tag = [ 'dipole' num2str(index) ];
+                h(1) = line( [xx xx]', [yy yy]', [zz -dat.maxcoord(1)]');
+                set(h(1), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                
+                % project onto x axis
+                tag = [ 'dipole' num2str(index) ];
+                h(2) = line( [xx xx]', [yy dat.maxcoord(2)]', [zz zz]');
+                set(h(2), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                
+                % project onto y axis
+                tag = [ 'dipole' num2str(index) ];
+                h(3) = line( [xx -dat.maxcoord(3)]', [yy yy]', [zz zz]');
+                set(h(3), 'userdata', 'proj', 'linestyle', '--', 'tag', tag, 'color', tmpcolor, 'linewidth', g.dipolesize/7.5/5);
+                if ~isempty(g.projcol)
+                    set(h, 'color', g.projcol);
+                end;
             end;
                         
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw text  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
