@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.357  2004/11/12 18:43:42  arno
+% add other path for biosig
+%
 % Revision 1.356  2004/11/12 18:40:23  arno
 % same
 %
@@ -1454,7 +1457,6 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
 	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Brain Vis. Anal. Matlab file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbva;' e_newnonempty ], 'Separator', 'on'); 
     
     % BIOSIG MENUS
     % ------------
@@ -1687,7 +1689,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
-    if length(importsub_m) > 9,  set(importsub_m(1:end-9) , 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(importsub_m) > 8,  set(importsub_m(1:end-8) , 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
