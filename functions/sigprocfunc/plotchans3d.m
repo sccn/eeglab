@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/27 02:40:13  arno
+% editing header
+%
 % Revision 1.1  2002/04/27 02:37:38  arno
 % Initial revision
 %
@@ -106,4 +109,5 @@ for i = 1:length(zs)
 end
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
+axis off
 rotate3d on
