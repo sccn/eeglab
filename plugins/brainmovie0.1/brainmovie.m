@@ -115,6 +115,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/11/19 01:01:59  arno
+% nothing
+%
 % Revision 1.23  2002/11/19 00:42:57  arno
 % debug last
 %
@@ -231,7 +234,6 @@ try, g.crossfphasespeed;catch, g.crossfphasespeed='on'; end;
 try, g.crossfphaseunit; catch, g.crossfphaseunit='degree'; end;
 try, g.scalepower;      catch, g.scalepower = [-5 5]; end;
 try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
-try, g.colmapcoh;       catch, g.colmapcoh = hot(64); end; 
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.frames;			catch, g.frames = []; end; 
@@ -242,12 +244,22 @@ try, g.condtitle;		catch, g.condtitle = []; end;
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
+try, g.colmapcoh;       catch, 
+    colormtmp = hot(64);
+    g.colmapcoh = colormtmp;
+    g.colmapcoh(:,1) =  colormtmp(:,2);
+    g.colmapcoh(:,2) =  colormtmp(:,3);
+    g.colmapcoh(:,3) =  colormtmp(:,1);
+    g.colmapcoh = [ hot; g.colmapcoh(end:-1:1,:) ];
+end; 
 try, g.colmapcrossf; catch,
-	g.colmapcrossf = hsv(64); 
-	g.colmapcrossf = [ g.colmapcrossf(55:end,:); 
-	g.colmapcrossf(1:54,:)]; g.colmapcrossf = g.colmapcrossf(linspace(64, 1, 64),:); % reorganize the colormap
-	g.colmapcrossf = hsv(64);
-	g.colmapcrossf = [g.colmapcrossf(16:end,:); g.colmapcrossf(1:5,:)];
+    g.colmapcrossf = jet(64);
+    g.colmapcrossf = g.colmapcrossf([end:-1:1],:);
+	%g.colmapcrossf = hsv(64); 
+	%g.colmapcrossf = [ g.colmapcrossf(55:end,:); 
+	%g.colmapcrossf(1:54,:)]; g.colmapcrossf = g.colmapcrossf(linspace(64, 1, 64),:); % reorganize the colormap
+	%g.colmapcrossf = hsv(64);
+	%g.colmapcrossf = [g.colmapcrossf(16:end,:); g.colmapcrossf(1:5,:)];
 end;
 try, g.xlimaxes; 		catch, g.xlimaxes = [-1 1]; end;  
 try, g.ylimaxes; 		catch, g.ylimaxes = [-1 1]; end;  
@@ -396,6 +408,7 @@ if ~isempty(g.envelope)
 	end;
 end;
 if ~isempty(g.condtitle)
+    if iscell(g.condtitle), g.condtitle = strvcat(g.condtitle{:}); end;
 	if size( g.condtitle,1 ) ~= nbconditions
 		fprintf('Error: The number of rows in the title array(%d) must match the number of conditions (%d)\n', size(g.condtitle,1), nbconditions); return;
 	end;
@@ -520,17 +533,29 @@ switch lower(g.caption)
   xlimnorm = (1-maxcoordx)/(maxcoordx/nbconditions) * g.xlimaxes;
   ylimnorm = 0.45/(1-ordinate) * g.ylimaxes;
   switch g.power, case 'on',
-	  c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
-				  'ylim', ylimnorm,'visible', g.visible );
-	  scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
-	  axis off;
+      if any(ALLCROSSF{1,2,end}(:) < 0) % negative ITCs (difference only) ?
+          c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
+                      'ylim', ylimnorm,'visible', g.visible );
+          scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
+      else
+          c(1) = axes('position', [maxcoordx, -0.1,    (1-maxcoordx), 0.45].*s+q, 'xlim', xlimnorm, ...
+                      'ylim', ylimnorm,'visible', g.visible );
+          scalepower(mean(xlimnorm), min(ylimnorm)+0.2, g); % see function at the end
+      end;
+      axis off;
   end;
   switch g.itc, case 'on',
 	  c(2) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.29 , (1-maxcoordx)/2, 0.14].*s+q, ...
 				  'visible', g.visible );
-	  cbar( [0 1], [0 1], g.colmapcoh(end:-1:1,:), 'vert', 'circle', g);
-	  ylabel('ITC', 'fontweight', 'bold');
-	  set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
+      if any(ALLITC{1,end}(:) < 0) % negative ITCs (difference only) ?
+          cbar( [-1 1], [-1 1], g.colmapcoh, 'vert', 'circle', g);
+          ylabel('ITC', 'fontweight', 'bold');
+          set(gca, 'ytick', [-1 0 1], 'yticklabel', [-1 0 1], 'xticklabel', []);
+	  else 
+          cbar( [0 1], [0 1], g.colmapcoh(length(g.colmapcoh)/2:end,:), 'vert', 'circle', g);
+          ylabel('ITC', 'fontweight', 'bold');
+          set(gca, 'ytick', [0 1], 'yticklabel', [0 1], 'xticklabel', []);
+      end; 
   end;
   switch g.crossf, case 'on',
 	  c(3) = axes('position', [maxcoordx+(1-maxcoordx)/2, 0.47 , (1-maxcoordx)/4, 0.14].*s+q, ...
@@ -626,6 +651,7 @@ for indeximage = alltimepoints
                         set(t,'VerticalAlignment','top', 'fontsize', 15);
 		end;  
 	end;
+    return;
 
 	% draw the images if necessary
 	% ----------------------------
@@ -772,8 +798,10 @@ function [tmpsize, tmpcolor] = drawcircle( tmpcoord, tmpersp, tmpitc, g);
 		tmpsize = 0.05 *  tmpsize * (g.xlimaxes(2)-g.xlimaxes(1))+0.1;
 
 		switch lower(g.itc)
-			case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
-			case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
+			case 'on',  tmpcolor = g.colmapcoh( length(g.colmapcoh)/2-ceil((tmpitc+0.01)*length(g.colmapcoh)/2),: );
+			case 'off', tmpcolor = g.colmapcoh( length(g.colmapcoh)/2,: );
+			%case 'on',  tmpcolor = g.colmapcoh( 64-ceil((tmpitc+0.01)*63),: );
+			%case 'off', tmpcolor = g.colmapcoh( 64-ceil((0+0.01)*63),: );
 		end;
 		if tmpersp == 0
 			dashed = 1;
@@ -806,8 +834,8 @@ function newphase = drawconnections( pos1, pos2, crossfpower, crossfangle, circf
 
 	sizec = size( g.colmapcrossf,1 );
 	switch lower(g.crossfphasecolor)
-		case 'on',  tmpcolor  = g.colmapcrossf( ceil(tmpthick*(sizec-1))+1, : );    % determine color = coherence phase
-		case 'off', tmpcolor  = g.colmapcrossf( 1, : );             
+		case 'on',  tmpcolor  = g.colmapcrossf( sizec/2+ ceil(tmpthick*(sizec/2-1)+1), : );    % determine color = coherence phase
+		case 'off', tmpcolor  = g.colmapcrossf( sizec/2, : );
 	end;
 	tmpthick = 30 * (tmpthick-0.1); % does not vary with the axis zoom
 	
