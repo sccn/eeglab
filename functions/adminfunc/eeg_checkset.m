@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2002/10/16 22:44:04  arno
+% ica recompute for NaNs
+%
 % Revision 1.73  2002/10/09 00:14:13  arno
 % typo last
 %
@@ -543,7 +546,7 @@ end;
                     res = com;
                     if any(isnan(EEG.data(:)))
                         fprintf('eeg_checkset: recomputing using nan indices in first channel ...\n'); 
-                        tmpindices = find(~isnan(EEG.data(index,:)));
+                        tmpindices = find(~isnan(EEG.data(1,:)));
                         EEG.icaact    = EEG.data;
                         EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                     else
