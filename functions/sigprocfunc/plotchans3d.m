@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/08/15 16:37:01  arno
+% update colo
+%
 % Revision 1.4  2002/05/02 23:24:34  scott
 % removed 'axis off' -sm
 %
@@ -72,7 +75,11 @@ else
     X = elpfile(:,1)';
     Y = elpfile(:,2)';
     Z = elpfile(:,3)';
-    elocname = arg2;
+    if nargin > 1
+        elocname = arg2;
+    else 
+        elocname = [];
+    end;
     if nargin > 2
         zs = arg3;
     end;
@@ -90,8 +97,9 @@ eps=lim/20;
 plot3(X,Y,Z,'ro')
 hold on
 
-elocname(zs);
-plot3(X(zs),Y(zs),Z(zs),'b*')
+if ~isempty(elocname)
+    plot3(X(zs),Y(zs),Z(zs),'b*')
+end;
 
 plot3([0.08 0.12],[0 0],[0 0],'r','LineWidth',4) % nose
 plot3([0 lim],[0 0],[0 0],'b--')                 % axis
@@ -108,11 +116,13 @@ text(0,0,lim+eps,'Z','HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',[0 0 0],...
 	'FontSize',10)
 box on
-for i = 1:length(zs)
-    text(X(zs(i)),Y(zs(i)),Z(zs(i))+eps,elocname(zs(i)),'HorizontalAlignment','center',...
-	'VerticalAlignment','middle','Color',[0 0 0],...
-	'FontSize',10)
-end
+if ~isempty(elocname)
+    for i = 1:length(zs)
+        text(X(zs(i)),Y(zs(i)),Z(zs(i))+eps,elocname(zs(i)),'HorizontalAlignment','center',...
+             'VerticalAlignment','middle','Color',[0 0 0],...
+             'FontSize',10)
+    end
+end;
 %axis(repmat([-lim lim],1,3))
 axis([-lim lim -lim lim -lim*0.5 lim])
 rotate3d on
