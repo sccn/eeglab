@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/07/28 15:22:03  arno
+% averef -> ref
+%
 % Revision 1.5  2002/09/25 23:52:41  arno
 % average referece
 %
@@ -67,7 +70,7 @@ EEG.event     = [];
 EEG.epoch  = [];
 EEG.chanlocs    = '';
 EEG.comments    = '';
-EEG.ref         = 'common';
+EEG.ref         = []; % unspecified
 
 %EEG.reject.threshold  = [1 0.8 0.85];
 %EEG.reject.icareject  = [];
