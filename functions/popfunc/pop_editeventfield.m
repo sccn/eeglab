@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2004/05/27 02:00:14  arno
+% dealing with urevents
+%
 % Revision 1.29  2004/05/26 23:47:03  arno
 % updating the urevent structure
 %
@@ -299,6 +302,7 @@ if nargin<2
         % handle rename 
         % -------------
         if results{end-1} ~= 1, args = { args{:}, 'rename', [ allfields{results{end-1}-1} '->' results{end} ] }; end;  
+        if length(args) < 3, return; end;
 else % no interactive inputs
     args = varargin;
     % scan args to modify array/file format
