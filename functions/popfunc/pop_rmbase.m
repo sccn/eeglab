@@ -6,11 +6,11 @@
 %   >> OUTEEG = pop_rmbase( EEG, timerange, pointrange);
 %
 % Graphical interface:
-%    1st edit box: Baseline time range ([min_ms max_ms]). Same as
-%                  the 'timerange' command line input.
-%    2nd edit box: Baseline points vector (ex:1:56). Overwritten by 
-%                  the time limits option above. Same as the 
-%                  'pointrange' command line input.
+%    "Baseline time range" - [edit box] Same as the 'timerange' command
+%                line input.
+%    "Baseline points vector" - [edit box] Overwritten by the time 
+%                limits option above. Same as the 'pointrange' command 
+%                line input.
 %
 % Inputs:
 %   EEG        - Input dataset
@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/02/16 23:53:12  arno
+% typo last
+%
 % Revision 1.7  2003/02/16 23:52:49  arno
 % adding gui info
 %

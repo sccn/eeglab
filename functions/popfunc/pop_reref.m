@@ -6,27 +6,27 @@
 %       >> EEGOUT = pop_reref( EEG, ref, 'key', 'val' ...);
 %
 % Graphical interface:
-%   1st checkbox: Compute average reference. Checking this box is the same 
+%   "Compute average reference" - [edit box] Checking this box is the same 
 %                 as giving an empty value to the 'ref' command line parameter.
-%   2nd checkbox: Re-reference data to channel number(s). Checking this option
+%   "Re-reference data to channel number" - [checkbox] Checking this option
 %                 automatically uncheck the first checkbox and allow to enter a
 %                 value in the edit box on the right of the checkbox. It does not
 %                 correspond to any command line input.
-%   1st edit box: on the right of the previous checkbox. Enter the index of the 
+%   "Re-reference data to channel number" - [edit box] Enter the index of the 
 %                 electrode for re-referencing in this box. Same as using the 
 %                 'ref' command line input.
-%   3rd checkbox: Include old reference channel. When re-referencing the data,
+%   "Include old reference channel" - [checkbox] When re-referencing the data,
 %                 checking this checkbox allow to generate data for the old 
 %                 reference channel. The location for this channel might not
 %                 have been defined and can be specified using the following 
 %                 textbox. Using this option is the same as setting the 'method'
 %                 option to 'withref'.
-%   other edit boxes: use these edit boex to specify the old reference channel
-%                 location. Same as using the 'refloc' optional input. 
-%                 (note that if the channel location structure contains
-%                 one more channel that the data, the last channel is considered
-%                 to be the reference and the location for this channel does not
-%                 have to be specified here). 
+%   "Include old reference channel" - [edit boxes] use these edit boxes to specify 
+%                 the old reference channel location. Same as using the 'refloc' 
+%                 optional input.  (note that if the channel location structure 
+%                 contains one more channel that the data, the last channel is 
+%                 considered to be the reference and the location for this channel
+%                 does not have to be specified here). 
 %
 % Inputs:
 %   EEG         - input dataset
@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/02/16 23:30:20  arno
+% adding GUI info
+%
 % Revision 1.6  2002/11/13 23:13:51  arno
 % gui mutual exclusion problem
 %
