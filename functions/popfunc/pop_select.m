@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2003/02/27 20:14:10  arno
+% debugging last
+%
 % Revision 1.23  2003/02/27 03:35:41  arno
 % graphic interface help
 %
@@ -478,21 +481,21 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate command
 % ----------------
-com = sprintf('EEG = pop_select( %s', inputname(1));
-for i=1:2:length(args);
-    if iscell(args{i+1})
-        com = sprintf('%s, ''%s'', { {', com, args{i} );
-        tmpcell = args{i+1};
-        tmpcell = tmpcell{1};
-        for j=1:2:length(tmpcell);
-            com = sprintf('%s ''%s'', [%s],', com, tmpcell{j}, num2str(tmpcell{j+1}) );
-        end;
-        com = sprintf('%s } } ', com(1:end-1));     
-    else
-        com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-    end;       
-end;
-com = [com ');'];
+com = sprintf('EEG = pop_select( %s,%s);', inputname(1), vararg2str(args));
+%for i=1:2:length(args);
+%    if iscell(args{i+1})
+%        com = sprintf('%s, ''%s'', { {', com, args{i} );
+%        tmpcell = args{i+1};
+%        tmpcell = tmpcell{1};
+%        for j=1:2:length(tmpcell);
+%            com = sprintf('%s ''%s'', [%s],', com, tmpcell{j}, num2str(tmpcell{j+1}) );
+%        end;
+%        com = sprintf('%s } } ', com(1:end-1));     
+%    else
+%        com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+%    end;       
+%end;
+%com = [com ');'];
 
 return;
 
