@@ -48,6 +48,9 @@
 %                the data minus their contribution { default: 'normal' }
 %   'icamaps'  = [integer array] force plotting of selected ica compoment maps ([]=the
 %                'nicamaps' largest).
+%   'icawinv'  = [float array] inverse weigth matrix. By default computed by inverting
+%                the weight matrix (but if some components have been removed, then
+%                weight's pseudo-inverse matrix does not represent component's maps. 
 %   'memory'   = ['low'|'high'] setting to low will use less memory for ICA component 
 %                computing, but will be longer.
 %
@@ -86,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/09/05 00:07:40  arno
+% raising channel plot when plotting components
+%
 % Revision 1.33  2002/08/30 17:37:07  arno
 % debugging for channel 0
 %
@@ -222,6 +228,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'weights'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
+				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
 				  'icamaps'       'integer'  []                       [] };
 	
@@ -279,7 +286,9 @@ if frames*epochs ~= size(data,2)
    error('Spectopo: non-integer number of epochs');
 end
 if ~isempty(g.weights)
-	g.icawinv = pinv(g.weights); % maps
+    if isempty(g.icawinv)
+        g.icawinv = pinv(g.weights); % maps
+    end;
 	if ~isempty(g.icacomps)
 		g.weights = g.weights(g.icacomps, :);
 		g.icawinv = g.icawinv(:,g.icacomps);
