@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/07/23 16:26:01  arno
+% debugging slidder and X axis
+%
 % Revision 1.13  2002/07/22 23:14:40  arno
 % adding one to the epoch number
 %
@@ -268,8 +271,15 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    g.frames = g.frames*tmpnb;
   
   if g.spacing == 0
-    maxindex = min(10000, g.frames);  
-    g.spacing = max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
+    maxindex = min(1000, g.frames);  
+	stds = std(data(:,1:maxindex),[],2);
+	stds = sort(stds);
+	if length(stds) > 2
+		stds = mean(stds(2:end-1));
+	else
+		stds = mean(stds);
+	end;	
+    g.spacing = stds*2;  % Set g.spacingto max/min data
     if g.spacing > 10
       g.spacing = round(g.spacing);
     end
