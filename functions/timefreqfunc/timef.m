@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2004/11/06 02:43:53  scott
+% nothing
+%
 % Revision 1.77  2004/11/06 02:15:17  scott
 % added 7th output itcphase (internally, Rphase) -sm
 %
@@ -1178,7 +1181,9 @@ switch lower(g.plotitc)
 	set(h(6),'XTickLabel',[],'XTick',[])
 	if ~isempty(g.vert)
 		for index = 1:length(g.vert)
-			line([g.vert(index), g.vert(index)], [min(freqs(dispf)) max(freqs(dispf))], 'linewidth', 1, 'color', 'm');
+			line([g.vert(index), g.vert(index)], ...
+                  [min(freqs(dispf)) max(freqs(dispf))], ...
+                  'linewidth', 1, 'color', 'm');
 		end;
 	end;
 
