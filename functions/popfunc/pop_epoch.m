@@ -40,7 +40,7 @@
 %   OUTEEG     - output dataset
 %   indices    - indices of accepted events
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Authors: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, 2001
 %
 % See also: eeglab(), epoch() 
 
@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/06/18 20:10:25  arno
+% default epoch range
+%
 % Revision 1.40  2004/06/16 22:21:03  arno
 % new GUI
 %
@@ -346,9 +349,11 @@ fprintf('pop_epoch():%d epochs selected\n', length(alllatencies));
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
- case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [lim(1) lim(2)]*EEG.srate, 'valuelim', g.valuelim, 'allevents', tmpeventlatency);
+ case 'points',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, [lim(1) lim(2)]*EEG.srate, ...
+                                                    'valuelim', g.valuelim, 'allevents', tmpeventlatency);
   tmptime = tmptime/EEG.srate;
- case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, 'srate', EEG.srate, 'allevents', tmpeventlatency);
+ case 'seconds',	[EEG.data tmptime indices epochevent]= epoch(EEG.data, alllatencies, lim, 'valuelim', g.valuelim, ...
+                                                    'srate', EEG.srate, 'allevents', tmpeventlatency);
 	otherwise, disp('pop_epoch(): invalid event time format'); beep; return;
 end;
 alllatencies = alllatencies(indices);
