@@ -82,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/07/25 00:36:32  arno
+% debugging
+%
 % Revision 1.16  2002/07/25 00:18:23  scott
 % plot diag comp map lines in same colors as comp spec traces. -sm & ad
 %
@@ -607,7 +610,9 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		end
 		fprintf('.')
 	end
+	length(epoch_subset)
 	epochs = round(size(data,2)/frames);
+    length(epochs)
 	eegspecdB = 10*log10(eegspec/epochs); % convert power to dB
 	%eegspecdB = 10*eegspec/epochs; % convert power to dB
 	return;
