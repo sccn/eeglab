@@ -2,19 +2,20 @@
 %
 % Usage:
 %   >> data = averef(data);
-%   >> [data W] = averef(data, W);
-%   >> [data W S] = averef(data, W, S);
+%   >> [data_out W_out] = averef(data,W);
 %
-% Inputs & outputs:
-%   data - 2D data (chans,frames*epochs) matrices of EEG or MEG data
-%   W    - ICA weigth matrix
-%   S    - ICA sphere matrix
+% Inputs:
+%   data - 2D data matrix (chans,frames*epochs) 
+%   W    - ICA weight matrix
+% Outputs:
+%   data_out - Input data converted to average reference.
+%   W_out    - ICA weight matrix converted to average reference
 %
-% Note: the weight martix returned by ICA also have to be average
-%       referenced:
-%       because ICAACT = W*DATA, DATA = INV(W)*ICAACT 
-%       as R=averef matrix, average reference data is R*DATA
-%       so R*DATA = (R*INV(W))*ICA and NEW_W = INV(R*INV(W))
+% Note: If 2 args, also converts the weight matrix W to average reference:
+%         If ica_act = W*data, then data = inv(W)*ica_act; 
+%         If R*data is the average-referenced data, 
+%         R*data = (R*inv(W))*ica_act and W_out = inv(R*inv(W));
+%       The average-reference ICA maps are the columns of inv(W_out).
 %
 % Authors: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 1999 
 
@@ -37,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/11 18:02:03  arno
+% computing average reference of components
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
