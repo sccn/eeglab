@@ -1,5 +1,5 @@
 % sdfread() -  Reads selected seconds of an EDF File (European Data Format for Biosignals)
-%              The EFG data and header format is specified in [1].
+%              The EDF data and header format is specified in [1].
 % Usage:
 %   [S,EDF] = sdfread(EDF [,SecRead [,StartSec]] )
 %
@@ -8,26 +8,25 @@
 %   SecRead  = Number of seconds to read. Inf reads the whole file. Default is 1 (sec). 
 %   StartSec = Starting position in seconds. If not provided, the data is read
 %              continously from the EDF file. No file pointer repositioning is performed.
-%
 % Example:
 %          >> EDF     = sdfopen(Filename,'r',CHAN,ReRefMx,TSR,OFCHK); % see sdfopen() 
 % % then
-%          >> [S,EDF] = sdfread(EDF, SecRead, StartSec) % Read SecRead secs. of data 
+%          >> [S,EDF] = sdfread(EDF, SecRead, StartSec) % Read SecRead seconds of data 
 %                                                       % beginning at StartSec, else
-%          >> [S,EDF] = sdfread(EDF, Inf);              % Read the whole file data, or
-%          >> [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur); % equivalent.
+%          >> [S,EDF] = sdfread(EDF, Inf);              % read the whole file data, or
+%          >> [S,EDF] = sdfread(EDF, EDF.NRec*EDF.Dur); % equivalent...
 %
 % Note:
-% 1) Ver > 0.75 requests SecRead and StartSec in seconds. 
-%    Previously (Ver <0.76) the units were Records. 
-% 2) In this version, modified for eeglab(), sdfseek, sdftell, 
-%    sdfeof and dt have been included in the code of the function.
+% 1) Versions>0.75 request SecRead and StartSec in seconds. 
+%    Previously, Versions<0.76, the units were Records. 
+% 2) In this version, modified for eeglab(), functions sdfseek(), sdftell(), 
+%    sdfeof() and dt() have been included in the code of sdfread(). -AD
 %
 % Author: (C) 1997-2002 by Alois Schloegl, 15 Jun 2002 #0.85, (Header reworked for 
 %         EEGLAB format and subfunctions inserted in the code, Arnaud Delorme and 
 %         Scott Makeig, 27 Dec 2002)
 %
-% See also: fread, SDFREAD, SDFWRITE, SDFCLOSE, SDFSEEK, SDFREWIND, SDFTELL, SDFEOF
+% See also: fread, SDFOPEN, SDFWRITE, SDFCLOSE, SDFREWIND, [SDFSEEK, SDFTELL, SDFEOF]
 
 %	Copyright (c) 1997-2002 by Alois Schloegl
 %	a.schloegl@ieee.org	
@@ -618,7 +617,7 @@ function [EDF]=sdftell(EDF)
 % returns the location of the EDF_file position indicator in the specified file.  
 % Position is indicated in Blocks from the beginning of the file.  If -1 is returned, 
 % it indicates that the query was unsuccessful; 
-% EDF_Struct is a struct obtained by sdfopen.
+% EDF_Struct is a struct obtained from sdfopen().
 %
 % EDF.FILE.POS contains the position of the EDF-Identifier in Blocks
 
@@ -721,8 +720,9 @@ EDF = sdftell(EDF); % not really needed, only for double check of algorithms
 
 % Initialization of Bufferblock for random access (without EDF-blocklimits) of data 
 if ~EDF.SIE.RAW & EDF.SIE.TimeUnits_Seconds
-        EDF.Block.number=[0 0 0 0]; %Actual Blocknumber, start and end time of loaded block, diff(EDF.Block.number(1:2))==0 denotes no block is loaded;
-        % EDF.Blcok.number(3:4) indicate start and end of the returned data, [units]=samples.
+        EDF.Block.number=[0 0 0 0]; % Actual Blocknumber, start and end time of loaded block, %
+                                    % diff(EDF.Block.number(1:2))==0 denotes no block is loaded;
+        % EDF.Block.number(3:4) indicate start and end of the returned data, [units]=samples.
         EDF.Block.data=[];
         EDF.Block.dataOFCHK=[];
 end;
