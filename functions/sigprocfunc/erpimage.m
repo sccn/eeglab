@@ -63,7 +63,7 @@
 % Add epoch-mean ERP to plot:
 %   'erp'    - Plot ERP time average of the trials below the image {default no}
 %   'erpstd' - Plot ERP standard deviation. Needs 'erp' option present {default no}
-%   'rmerp'  - remove the erp from the data {default no}
+%   'rmerp'  - Subtract the mean ERP from each trial before processing {default no}
 % Add time/frequency information:
 %  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               ELSE [minfrq maxfrq] Same, but select frequency with max power in 
@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2003/05/06 00:49:52  arno
+% debug last
+%
 % Revision 1.99  2003/05/06 00:45:43  arno
 % implementing new option rmerp
 %
@@ -1186,7 +1189,7 @@ if ~isnan(aligntime)
 end 
 
 %
-%%%%%%%%%%%%%%% Remove the ERP %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Remove the ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if strcmpi(Rmerp, 'yes')
     data = data - repmat(nan_mean(data')', [1 size(data,2)]);
