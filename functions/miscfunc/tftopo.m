@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/05/19 02:15:13  scott
+% adding separate scale for showchan==0 -sm
+%
 % Revision 1.19  2002/04/30 21:24:48  scott
 % *** empty log message ***
 %
@@ -284,7 +287,7 @@ else % showchan==0
   tfsign = sign(tfsign(:,:,round(nchans/2)));
 
   tfave = tfsign.*mean(abs(tfdat),3);
-  cmax = max(max(abs(ftave)));
+  cmax = max(max(abs(tfave)));
   cmin = -cmax; % make symmetrical
   imagesc(times(tftimes),freqs(tffreqs),tfave);
   caxis([cmin cmax]);
