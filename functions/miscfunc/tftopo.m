@@ -4,8 +4,7 @@
 %             signed (selected) channel std(). Inputs may be outputs of timef(); else,
 %             e.g., can be used to image a set of smoothed erpimage() images.
 % Usage:
-%        >> tftopo(tfdata,times,freqs,timefreqs,showchan,chanlocs,...
-%                                                  limits,signifs,selchans)
+%        >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
 %   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef() (or any other
 %               time/freq matrix), one for each channel. Size (time,freq,chans) or
@@ -70,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/03/04 18:12:07  arno
+% color limits debug
+%
 % Revision 1.56  2002/10/09 18:20:21  arno
 % line thickness
 %
