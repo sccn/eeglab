@@ -157,6 +157,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2003/07/12 01:23:46  arno
+% now handling events
+%
 % Revision 1.81  2003/06/28 02:07:18  arno
 % update header
 %
@@ -1180,8 +1183,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       
       [g.eventtypes tmpind indexcolor] = unique({g.event.type});
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
-      g.eventtypecolors = g.eventcolors(mod(tmpind-1,length(g.eventcolors))+1);
-      g.eventcolors     = g.eventcolors(mod(indexcolor-1,length(g.eventcolors))+1);
+      g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};  
+      g.eventtypecolors = g.eventcolors(mod([1:length(g.eventtypes)]-1 ,length(g.eventcolors))+1);
+      g.eventcolors     = g.eventcolors(mod(indexcolor-1               ,length(g.eventcolors))+1);
+      g.eventtypestyle  = g.eventstyle (mod([1:length(g.eventtypes)]-1 ,length(g.eventstyle))+1);
+      g.eventstyle      = g.eventstyle (mod(indexcolor-1               ,length(g.eventstyle))+1);
       g.eventlatencies  = cell2mat({g.event.latency});
       g.plotevent       = 'on';
   end;
@@ -1418,7 +1424,8 @@ else
         event2plot = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
         for index = 1:length(event2plot)
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
-            tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) } );
+            tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) }, ...
+                     'linestyle', g.eventstyle{ event2plot(index) } );
             %if g.trials == 1
             %    set(tmph, 'userdata', sprintf('Type: %s; Lat: %.4f s');
             %else
@@ -1770,13 +1777,14 @@ else
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
-          set(fig2, 'position', [ pos(1) pos(2) 100 10*nleg+20]);
+          set(fig2, 'position', [ pos(1) pos(2) 130 10*nleg+20]);
           
           for index = 1:nleg
-              plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}); hold on;
+              plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
+                          g.eventtypestyle{ index }); hold on;
               text(35, (index-0.5)*10, g.eventtypes{index});
           end;
-          xlim([0 100]);
+          xlim([0 130]);
           ylim([0 nleg*10]);
           axis off;
           set(fig2, 'visible', 'on');
