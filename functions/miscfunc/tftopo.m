@@ -9,26 +9,38 @@
 % Inputs:
 %   tfdata    = Set of nchans time/freq ERSPs or ITCs from timef() (or any other
 %               time/freq matrix), one for each channel. Size (time,freq,chans) or
-%               (time,freq,chans,subject).
+%               (time,freq,chans,subjects) for grand RMS.
 %   times     = Vector of times in msec from timef()
 %   freqs     = Vector of frequencies in Hz from timef() 
-%   timefreqs = Vector of time/frequency points to show topoplot() maps for
-%                      Format: size (nrows,2), each row [ms Hz]
 %
 % Optional inputs:
-%   showchan = Channel number of tfdata to image, or 0
-%               {default=0 -> image the median-signed st. dev. across channels} 
-%   chanlocs = Electrode locations file (for format see >> topoplot example)
-%              {default 'chan.locs'}
-%   limits   = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
-%              Omit, or use nan's to use tfdata limits. Ex: [nan nan -100 400];
-%   signifs  = Significance level(s) (e.g., from timef()), for zero'ing non-significant 
-%              tfdata {default: none}
-%   selchans = Channels to include in topoplot() scalp maps (and image std()) {default: all}
+%  'timefreqs' = Array of time/frequency points to show topoplot() maps for
+%                Format: size (nrows,2), each row [ms Hz]
+%  'showchan'  = [integer] Channel number of tfdata to image, or 0
+%                {default=0 -> image the median-signed st. dev. across channels} 
+%  'chanlocs'  = ['string'|structure] Electrode locations file (for format see 
+%                >> topoplot example) or structure             {default none}
+%  'limits'    = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
+%                Omit, or use nan's to use tfdata limits. Ex: [nan nan -100 400];
+%  'signifs'   = Significance level(s) (e.g., from timef()), for zero'ing non-significant 
+%                tfdata. Size must be (1 or 2,freq, chans, subjects). If first dimension is
+%                of size 1, tfdata is assumed to contain positive values   {default: none}
+%  'sigthresh' = [integer], i.e. [K L] after masking time-frequency decomposition using 
+%                'signifs' array, concatenate time/freq values only if more than K electrodes
+%                have non-0 (significant) values. If several subject, the second value L
+%                is used to concatenate subject in the same fashion. Default is [1 1].
+%  'selchans'  = Channels to include in topoplot() scalp maps (and image std()) {default: all}
+%
+% Note:
+%  1) Additional topoplot() options can be used.
+%  2) For topoplot maps, the average power (not masked by significance is used (instead
+%     of the root-mean-square (RMS) for averaging electrode activity).
+%  3) If several subjects (4-D tfdata input) RMS is first computed across electrodes
+%     then across subjects.
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, La Jolla, 3/01 
 %
-% See also: spectopo(), timtopo(), envtopo(), changeunits()
+% See also: timef(), topoplot(), spectopo(), timtopo(), envtopo(), changeunits()
 
 % Copyright (C) Scott Makeig, Arnaud Delorme & Marissa Westerfield, SCCN/INC/UCSD, 
 % La Jolla, 3/01
@@ -48,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2002/10/07 18:51:11  arno
+% all data -> 3D, significance, RMS, subject RMS, ...
+%
 % Revision 1.51  2002/10/07 15:44:48  arno
 % updating header and axis off
 %
@@ -204,35 +219,20 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function tftopo(tfdata,times,freqs,timefreqs,showchan,chanlocs,limits,signifs,selchans)
+function tfave = tftopo(tfdata,times,freqs,varargin);
+    %timefreqs,showchan,chanlocs,limits,signifs,selchans)
 
 LINECOLOR= 'k';
 LINEWIDTH = 2.5;
 ZEROLINEWIDTH = 2.8;
 
-if nargin<4
+if nargin<3
    help tftopo
    return
 end
-if nargin<9
-  selchans = 0;
-end
 
-% default: don't define nargin(8), selchans 
-
-if nargin<7
-  limits = [nan nan nan nan nan nan];
-end
-if nargin<6
-  chanlocs = 'chan.locs';  % default channel locations file
-end
-if nargin<5
-  showchan = 0; % default tfdata image to show
-end
-if isempty(showchan)
-  showchan=0;
-end
-
+% reshape tfdata
+% --------------
 if length(size(tfdata))==2
    nchans = round(size(tfdata,2)/length(times));
    tfdata = reshape(tfdata, size(tfdata,1), length(times), nchans); 
@@ -244,117 +244,170 @@ else
 end
 tfdataori = mean(tfdata,4); % for topoplot
 
+% test inputs
+% -----------
+if nargin <= 3 | isstr(varargin{1})
+	% 'key' 'val' sequence
+	fieldlist = { 'timefreqs'     'real'     []                        [] ;
+				  'chanlocs'      { 'string' 'struct' }       []       '' ;
+				  'showchan'      'integer'  [0 nchans]                0 ;
+				  'limits'        'real'     []                        [nan nan nan nan nan nan];
+				  'signifs'       'real'     []                        [];
+				  'sigthresh'     'integer'  [1 Inf]                   [1 1];
+				  'selchans'      'integer'  [1 nchans]                [1:nchans] };
+	
+	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
+	if isstr(g), error(g); end;
+else
+	if nargin > 3,    g.freq = varargin{1};
+	else              g.freq = [];
+	end;
+	if nargin > 4,	  g.chanlocs = varargin{2};
+	else              g.chanlocs = [];
+	end;
+	if nargin > 5,    g.limits = varargin{3};
+	else              g.limits = [nan nan nan nan nan nan];
+	end;
+	if nargin > 6,    g.title = varargin{4};
+	else              g.title = '';
+	end;
+	if nargin > 7,    g.freqfac = varargin{5};
+	else              g.freqfac = FREQFAC;
+	end;
+	if nargin > 8,    g.percent = varargin{6};
+	else              g.percent = 100;
+	end;
+	if nargin > 10,    g.reref = 'averef';
+	else               g.reref = 'no';
+	end;
+end;
+
+% setting more defaults
+% ---------------------
 if length(times) ~= size(tfdata,2)
    fprintf('tftopo(): tfdata columns must be a multiple of the length of times (%d)\n',...
                  length(times));
    return
 end
-if length(showchan) > 1
+if length(g.showchan) > 1
     error('tftopo(): showchan must be a single number');
 end;
-if showchan> nchans | showchan < 0
-   fprintf('tftopo(): showchan (%d) must be <= nchans (%d)\n',showchan,nchans);
-   return
+if length(g.limits)<1 | isnan(g.limits(1))
+  g.limits(1) = times(1);
 end
-if selchans==0
-  selchans = 1:nchans;
+if length(g.limits)<2 | isnan(g.limits(2))
+  g.limits(2) = times(end);
 end
-
-if length(limits)<1 | isnan(limits(1))
-  limits(1) = times(1);
+if length(g.limits)<3 | isnan(g.limits(3))
+  g.limits(3) = freqs(1);
 end
-if length(limits)<2 | isnan(limits(2))
-  limits(2) = times(end);
+if length(g.limits)<4 | isnan(g.limits(4))
+  g.limits(4) = freqs(end);
 end
-if length(limits)<3 | isnan(limits(3))
-  limits(3) = freqs(1);
+if length(g.limits)<5 | isnan(g.limits(5)) % default caxis plotting limits
+  g.limits(5) = -max(abs(tfdata(:)));
+  mincax = g.limits(5); 
 end
-if length(limits)<4 | isnan(limits(4))
-  limits(4) = freqs(end);
-end
-if length(limits)<5 | isnan(limits(5)) % default caxis plotting limits
-  limits(5) = -max(abs(tfdata(:)));
-  mincax = limits(5); 
-end
-if length(limits)<6 | isnan(limits(6))
+if length(g.limits)<6 | isnan(g.limits(6))
   if exist('mincax')
-    limits(6) = -mincax; % avoid recalculation
+    g.limits(6) = -mincax; % avoid recalculation
   else
-    limits(6) = max(abs(tfdata(:)));
+    g.limits(6) = max(abs(tfdata(:)));
   end
 end
+if length(g.sigthresh) == 1
+    g.sigthresh(2) = 1;
+end;
+if g.sigthresh(1) > nchans
+    error('tftopo(): ''sigthresh'' first number must be lower or equal to the number of channels');
+end;
+if g.sigthresh(2) > size(tfdata,4)
+    error('tftopo(): ''sigthresh'' second number must be lower or equal to the number of subjects');
+end;
+if ~isempty(g.signifs)
+    if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
+            size(g.signifs,3) ~= size(tfdata,3)| size(g.signifs,3) ~= size(tfdata,3)
+        fprintf('tftopo(): error in ''signifs'' array size not compatible with data size.\n');
+        return
+    end
+end;
+if ~isempty(g.timefreqs)
+    if isempty(g.chanlocs)
+        error('tftopo(): ''chanlocs'' must be defined to plot time/freq points');
+    end;
+    if min(g.timefreqs(:,2))<min(freqs) 
+        fprintf('tftopo(): selected plotting frequency %g out of range.\n',min(g.timefreqs(:,2)));
+        return
+    end
+    if max(g.timefreqs(:,2))>max(freqs) 
+        fprintf('tftopo(): selected plotting frequency %g out of range.\n',max(g.timefreqs(:,2)));
+        return
+    end
+    if min(g.timefreqs(:,1))<min(times) 
+        fprintf('tftopo(): selected plotting time %g out of range.\n',min(g.timefreqs(:,1)));
+        return
+    end
+    if max(g.timefreqs(:,1))>max(times) 
+        fprintf('tftopo(): selected plotting time %g out of range.\n',max(g.timefreqs(:,1)));
+        return
+    end
 
-if exist('signifs') & length(signifs) == 1 % should be ITC
-   signifs = [0 signifs];
-end
-  
-if min(timefreqs(:,2))<min(freqs) 
-   fprintf('tftopo(): selected plotting frequency %g out of range.\n',min(timefreqs(:,2)));
-   return
-end
-if max(timefreqs(:,2))>max(freqs) 
-   fprintf('tftopo(): selected plotting frequency %g out of range.\n',max(timefreqs(:,2)));
-   return
-end
-if min(timefreqs(:,1))<min(times) 
-   fprintf('tftopo(): selected plotting time %g out of range.\n',min(timefreqs(:,1)));
-   return
-end
-if max(timefreqs(:,1))>max(times) 
-   fprintf('tftopo(): selected plotting time %g out of range.\n',max(timefreqs(:,1)));
-   return
-end
-
-if 0 % USE USER-SUPPLIED SCALP MAP ORDER. A GOOD ALGORITHM FOR SELECTING
-     % timefreqs POINT ORDER GIVING MAX UNCROSSED LINES IS DIFFICULT!
-  [tmp tfi] = sort(timefreqs(:,1)); % sort on times
-  tmp = timefreqs;
-  for t=1:size(timefreqs,1)
-      timefreqs(t,:) = tmp(tfi(t),:);
-  end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compute timefreqs point indices
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tfpoints = size(timefreqs,1);
-freqidx = zeros(1,tfpoints);
-for f=1:tfpoints
-   [tmp fi] = min(abs(freqs-timefreqs(f,2)));
-   freqidx(f)=fi;
-end
-timeidx = zeros(1,tfpoints);
-for f=1:tfpoints
-   [tmp fi] = min(abs(times-timefreqs(f,1)));
-   timeidx(f)=fi;
-end
-tfpidx = [timeidx' freqidx'];
+    if 0 % USE USER-SUPPLIED SCALP MAP ORDER. A GOOD ALGORITHM FOR SELECTING
+         % g.timefreqs POINT ORDER GIVING MAX UNCROSSED LINES IS DIFFICULT!
+        [tmp tfi] = sort(g.timefreqs(:,1)); % sort on times
+        tmp = g.timefreqs;
+        for t=1:size(g.timefreqs,1)
+            g.timefreqs(t,:) = tmp(tfi(t),:);
+        end
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Compute timefreqs point indices
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    tfpoints = size(g.timefreqs,1);
+    freqidx = zeros(1,tfpoints);
+    for f=1:tfpoints
+        [tmp fi] = min(abs(freqs-g.timefreqs(f,2)));
+        freqidx(f)=fi;
+    end
+    timeidx = zeros(1,tfpoints);
+    for f=1:tfpoints
+        [tmp fi] = min(abs(times-g.timefreqs(f,1)));
+        timeidx(f)=fi;
+    end
+    tfpidx = [timeidx' freqidx'];
+else 
+    tfpoints = 0;
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Adjust plotting limits
 %%%%%%%%%%%%%%%%%%%%%%%%%
-[tmp minfreqidx] = min(abs(limits(3)-freqs)); % adjust min frequency
- limits(3) = freqs(minfreqidx);
-[tmp maxfreqidx] = min(abs(limits(4)-freqs)); % adjust max frequency
- limits(4) = freqs(maxfreqidx);
+[tmp minfreqidx] = min(abs(g.limits(3)-freqs)); % adjust min frequency
+ g.limits(3) = freqs(minfreqidx);
+[tmp maxfreqidx] = min(abs(g.limits(4)-freqs)); % adjust max frequency
+ g.limits(4) = freqs(maxfreqidx);
 
-[tmp mintimeidx] = min(abs(limits(1)-times)); % adjust min time
- limits(1) = times(mintimeidx);
-[tmp maxtimeidx] = min(abs(limits(2)-times)); % adjust max time
- limits(2) = times(maxtimeidx);
+[tmp mintimeidx] = min(abs(g.limits(1)-times)); % adjust min time
+ g.limits(1) = times(mintimeidx);
+[tmp maxtimeidx] = min(abs(g.limits(2)-times)); % adjust max time
+ g.limits(2) = times(maxtimeidx);
 
 mmidx = [mintimeidx maxtimeidx minfreqidx maxfreqidx];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Zero out non-significant image features ?????????????
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-range = limits(6)-limits(5);
+range = g.limits(6)-g.limits(5);
 cc = jet(256);
-for subject = 1:size(tfdata,4)
-    for elec = 1:size(tfdata,3)
-        tmpfilt = (tfdata(:,:,elec,subject) >= repmat(signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
-                   (tfdata(:,:,elec,subject) <= repmat(signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
-        tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
+if ~isempty(g.signifs)
+    fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
+    for subject = 1:size(tfdata,4)
+        for elec = 1:size(tfdata,3)
+            tmpfilt = (tfdata(:,:,elec,subject) >= repmat(g.signifs(2,:,elec, subject)', [1 size(tfdata,2)])) | ...
+                      (tfdata(:,:,elec,subject) <= repmat(g.signifs(1,:,elec, subject)', [1 size(tfdata,2)]));
+            tfdata(:,:,elec,subject) = tfdata(:,:,elec,subject) .* tmpfilt;
+        end;
     end;
 end;
 %colormap('jet');
@@ -370,12 +423,12 @@ end;
 %cc(find(cc<0))=0;
 %cc(find(cc>1))=1;
 
-%if exist('signifs')
-%  minnull = round(256*(signifs(1)-limits(5))/range);
+%if exist('g.signif')
+%  minnull = round(256*(g.signif(1)-g.limits(5))/range);
 %  if minnull<1
 %    minnull = 1;
 %  end
-%  maxnull = round(256*(signifs(2)-limits(5))/range);
+%  maxnull = round(256*(g.signif(2)-g.limits(5))/range);
 %  if maxnull>256
 %    maxnull = 256;
 %  end
@@ -390,38 +443,39 @@ end;
 axis off;
 colormap(cc);
 curax = gca; % current plot axes to plot into
-plotdim = max(1+floor(tfpoints/2),4); % number of topoplots on top of image
-imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1],'ax',curax);
-
-if showchan>0 % -> image showchan data
-    imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),...
-          tfdata(mmidx(3):mmidx(4),mmidx(1):mmidx(2),showchan));
-    axis([limits(1:4)]);
-    caxis([limits(5:6)]);
+if tfpoints ~= 0
+    plotdim = max(1+floor(tfpoints/2),4); % number of topoplots on top of image
+    imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1],'ax',curax);
+else
+    imgax = sbplot(1,1,1,'ax',curax);
+end;
+if g.showchan>0 % -> image showchan data
+    tfave = tfdata(mmidx(3):mmidx(4),mmidx(1):mmidx(2),g.showchan);
+    imagesc(times(mmidx(1):mmidx(2)),freqs(mmidx(3):mmidx(4)),tfave);
+    axis([g.limits(1:4)]);
+    caxis([g.limits(5:6)]);
     hold on;
 
-else % showchan==0 -> image std() of selchans
+else % g.showchan==0 -> image std() of selchans
     tftimes = mmidx(1):mmidx(2);
     tffreqs = mmidx(3):mmidx(4);
-    tfdat   = tfdata(tffreqs,tftimes,selchans,:);
+    tfdat   = tfdata(tffreqs,tftimes,g.selchans,:);
+
+    % average across electrodes
+    fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+    tfdat = rmslocal(tfdat, 3, g.sigthresh(1));
 
     % if several subject, first (RMS) averaging across subjects
     if size(tfdata,4) > 1
-        tfsign = sort(tfdat,4);
-        tfsign = sign(tfsign(:,:,:,round(size(tfdat,4)/2)));
-        tfdat  = tfsign.*sqrt(mean(tfdat.*tfdat,4));
-        %tfdat  = tfsign.*std(abs(tfdat),1,4);
+        fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+        tfdat = rmslocal(tfdat, 4, g.sigthresh(2));
     end;
-    
-    tfsign = sort(tfdat,3);
-    tfsign = sign(tfsign(:,:,round(nchans/2)));
-    tfave  = tfsign.*sqrt(mean(tfdat.*tfdat,3)); % std of all channels
-    %tfave  = tfsign.*std(abs(tfdat),1,3); % std of all channels
+    tfave = tfdat;
     
     cmax = max(max(abs(tfave)));
     cmin = -cmax; % make symmetrical
     imagesc(times(tftimes),freqs(tffreqs),tfave);
-    axis([limits(1:4)]);
+    axis([g.limits(1:4)]);
     caxis([cmin cmax]);
     hold on;
 end
@@ -429,8 +483,8 @@ axes(imgax)
 xl=xlabel('Time (ms)');
 set(xl,'fontsize',16);
 set(gca,'yaxislocation','left')
-if showchan>0
-   % tl=title(['Channel ',int2str(showchan)]);
+if g.showchan>0
+   % tl=title(['Channel ',int2str(g.showchan)]);
    % set(tl,'fontsize',14);
 else
    tl=title(['Signed channel rms']);
@@ -450,65 +504,74 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot topoplot maps at specified timefreqs points
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-wholeax  = sbplot(1,1,1,'ax',curax);
-topoaxes = zeros(1,tfpoints);
-for n=1:tfpoints
-   if n<=plotdim
-      topoaxes(n)=sbplot(plotdim,plotdim,n,'ax',curax);
-   else
-      topoaxes(n)=sbplot(plotdim,plotdim,plotdim*(n+1-plotdim),'ax',curax);
-   end
-
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Plot connecting lines using changeunits()
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   from = changeunits([timefreqs(n,:)],imgax,wholeax);
-   to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
-   axes(wholeax);
-   plot([from(1) to(1)],[from(2) to(2)],LINECOLOR,'linewidth',LINEWIDTH);
-   hold on
-   mk=plot(from(1),from(2),[LINECOLOR 'o'],'markersize',9);
-   set(mk,'markerfacecolor',LINECOLOR);
-   axis([0 1 0 1]);
-   axis off;
-end
-
-endcaxis = 0;
-for n=1:tfpoints
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   % Plot scalp map using topoplot()
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   axes(topoaxes(n));
-   scalpmap = squeeze(tfdataori(tfpidx(n,2),tfpidx(n,1),selchans));   
-   %topoplot(scalpmap,chanlocs,'maplimits',[limits(5) limits(6)],...
-   %            'electrodes','on','shrink','off');
-   topoplot(scalpmap,chanlocs,'electrodes','on','shrink','on');
-               % 'interlimits','electrodes')
-   axis square;
-   hold on
-   tl=title([int2str(timefreqs(n,1)),' ms, ',int2str(timefreqs(n,2)),' Hz']);
-   set(tl,'fontsize',13);
-   endcaxis = max(endcaxis,max(abs(caxis)));
-   %caxis([limits(5:6)]);
-end;
-for n=1:tfpoints
-    axes(topoaxes(n));
-    caxis([-endcaxis endcaxis]);
-    if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
-        cb=cbar;
-        pos = get(cb,'position');
-        set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+if ~isempty(g.timefreqs)
+    wholeax  = sbplot(1,1,1,'ax',curax);
+    topoaxes = zeros(1,tfpoints);
+    for n=1:tfpoints
+        if n<=plotdim
+            topoaxes(n)=sbplot(plotdim,plotdim,n,'ax',curax);
+        else
+            topoaxes(n)=sbplot(plotdim,plotdim,plotdim*(n+1-plotdim),'ax',curax);
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Plot connecting lines using changeunits()
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        from = changeunits([g.timefreqs(n,:)],imgax,wholeax);
+        to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
+        axes(wholeax);
+        plot([from(1) to(1)],[from(2) to(2)],LINECOLOR,'linewidth',LINEWIDTH);
+        hold on
+        mk=plot(from(1),from(2),[LINECOLOR 'o'],'markersize',9);
+        set(mk,'markerfacecolor',LINECOLOR);
+        axis([0 1 0 1]);
+        axis off;
     end
-    drawnow
-end
+    
+    endcaxis = 0;
+    for n=1:tfpoints
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Plot scalp map using topoplot()
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        axes(topoaxes(n));
+        scalpmap = squeeze(tfdataori(tfpidx(n,2),tfpidx(n,1),g.selchans));   
+        %topoplot(scalpmap,g.chanlocs,'maplimits',[g.limits(5) g.limits(6)],...
+        %            'electrodes','on','shrink','off');
+        if ~isempty(varargin)
+            topoplot(scalpmap,g.chanlocs,'electrodes','on','shrink','on', varargin{:}); 
+        else
+            topoplot(scalpmap,g.chanlocs,'electrodes','on','shrink','on'); 
+        end;
+        % 'interlimits','electrodes')
+        axis square;
+        hold on
+        tl=title([int2str(g.timefreqs(n,1)),' ms, ',int2str(g.timefreqs(n,2)),' Hz']);
+        set(tl,'fontsize',13);
+        endcaxis = max(endcaxis,max(abs(caxis)));
+        %caxis([g.limits(5:6)]);
+    end;
+    for n=1:tfpoints
+        axes(topoaxes(n));
+        caxis([-endcaxis endcaxis]);
+        if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
+            cb=cbar;
+            pos = get(cb,'position');
+            set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+        end
+        drawnow
+    end
+end;
 
-if showchan>0
+if g.showchan>0 & ~isempty(g.chanlocs)
      sbplot(4,4,1,'ax',imgax);
-     topoplot(showchan,chanlocs,'electrodes','off', ...
-                  'style', 'blank', 'emarkersize1chan', 10)
+     topoplot(g.showchan,g.chanlocs,'electrodes','off', ...
+                  'style', 'blank', 'emarkersize1chan', 10, 'shrink', 'on')
      axis('square')
 end
 axcopy;
 
-% end % topoplot loop
 
+function tfdat = rmslocal(tfdat, dim, thresh)
+    tfsign  = sign(mean(tfdat,dim));
+    tfmask  = sum(tfdat ~= 0,dim) >= thresh;
+    tfdat   = tfmask.*tfsign.*sqrt(mean(tfdat.*tfdat,dim)); % std of all channels
