@@ -261,7 +261,7 @@ h.autocorrectflag   = fread(fid,1,'char');
 h.dcthreshold       = fread(fid,1,'uchar');
 
 for n = 1:h.nchannels
-    e(n).lab            = fread(fid,10,'char');
+    e(n).lab            = deblank(char(fread(fid,10,'char')'));
     e(n).reference      = fread(fid,1,'char');
     e(n).skip           = fread(fid,1,'char');
     e(n).reject         = fread(fid,1,'char');
