@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/14 17:17:24  arno
+% handle NaN
+%
 % Revision 1.8  2002/08/17 21:54:36  scott
 % pop labels and help msg
 %
@@ -148,11 +151,7 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 % ----
 sigtmp = reshape( sigtmp, size(sigtmp,1),  size(sigtmp,2)*size(sigtmp,3));
 if ~isempty(EEG.chanlocs) & typeplot
-    if any(isnan(sigtmp(1:10000)))
-        plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 -1 1], plottitle, EEG.chanlocs(indices)); %'tmp.nam');
-    else
-        plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, EEG.chanlocs(indices)); %'tmp.nam');
-    end;    
+    plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, EEG.chanlocs(indices)); %'tmp.nam');
 else
 	plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], plottitle, indices);
 end;
