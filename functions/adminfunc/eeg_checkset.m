@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2002/07/23 21:29:07  arno
+% empty icaact
+%
 % Revision 1.34  2002/07/23 00:13:29  arno
 % adding read float feature
 %
@@ -339,6 +342,7 @@ end;
 
 	% check ica
 	% ---------
+	eeg_options; % changed from eeglaboptions 3/30/02 -sm
 	if ~isempty(EEG.icasphere)
 		if ~isempty(EEG.icaweights)
 			if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
@@ -360,7 +364,6 @@ end;
                 res = com;
 			end;
 			if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
-                eeg_options; % changed from eeglaboptions 3/30/02 -sm
                 if size(EEG.data,1) ~= size(EEG.icasphere,2)
 	 	  			if popask( [ 'eeg_checkset error: number of columns in sphere array (' int2str(size(EEG.icasphere,2)) 10
 	 	  			') does not match the number of rows in data(' int2str(size(EEG.data,1)) ')' 10 ...
@@ -390,10 +393,12 @@ end;
             res = com;
  	  		EEG.icasphere = [];
 		end;
-		if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
- 	  		disp( [ 'eeg_checkset note: number of dimensions in independent component array increased to 3' ]); 
-            res = com;
-			EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);		
+		if option_computeica
+			if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
+				disp( [ 'eeg_checkset note: number of dimensions in independent component array increased to 3' ]); 
+				res = com;
+				EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);		
+			end;
 		end;
 	else
         if ~isempty( EEG.icaweights ), EEG.icaweights = []; res = com; end;
