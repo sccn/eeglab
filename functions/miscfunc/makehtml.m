@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/16 15:12:21  arno
+% after crash
+%
 % Revision 1.2  2002/04/06 01:58:16  arno
 % debugging destination of html files
 %
@@ -198,10 +201,9 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
 % fo = output file
 % title = title of the page or section	
 	tmpdir = pwd;
-	fprintf(fo, STYLEHEADER, title );
-	fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
-	for index = 1:length(files)
-		if strcmp(mode, 'files') % processing subtitle and File
+	if strcmp(mode, 'files') % processing subtitle and File
+		fprintf(fo, '<UL>' );
+		for index = 1:length(files)
 			if iscell(files{index})
 				filename = files{index}{1};
 			    filelink = files{index}{2};
@@ -213,16 +215,30 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
 			if ~isempty(filename)
 				try, if exist([ DEST filename]) == 2, delete([ DEST filename]); end; catch, end;
 
-				cd(DEST); com = help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
-
+				cd(DEST); help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
 				inputfile = which( filename);
 				try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
 				catch, fprintf('Cannot copy file %s\n', inputfile); end;
+
+				indexdot = find(filename == '.');
+				if isempty(filelink)
+					com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
+								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
+				else
+					com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
+								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
+				end;
 			else 
-				com = [ '<H3>' filelink '</H3><BR>' ];
+				com = space2html(filelink, '<B>', '</B><BR>');
 			end;
 			fprintf( fo, '%s', com);
-		else % Processing file only
+		end;
+		fprintf(fo, '</UL>' );
+	else 
+		fprintf(fo, STYLEHEADER, title );
+		fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
+		for index = 1:length(files)
+	        % Processing file only
  			fprintf('Processing %s\n', files{index});
 			cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
 			fprintf( fo, '%s', com);
@@ -230,8 +246,8 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options);
 			try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
 			catch, fprintf('Cannot copy file %s\n', inputfile); end;
 		end;
+		fprintf(fo, '</table>' );
 	end;	
-	fprintf(fo, '</table>' );
 return;
 
 % ------------------------------ Function to pop-out a Matlab help window --------
@@ -259,3 +275,17 @@ function makehelpmatlab( filename, directory, titlewindow);
 	fclose( fo );
 return
 
+% convert spaces for HTML
+function strout = space2html(strin, linkb, linke)
+	strout = [];
+	index = 1;
+	while strin(index) == ' '
+		strout = [ strout '&nbsp; '];
+		index = index+1;
+	end;
+	if nargin == 3
+		strout = [strout linkb strin(index:end) linke];
+	else
+		strout = [strout strin(index:end)];
+	end;
+				   
