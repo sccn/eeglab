@@ -1,5 +1,5 @@
 % dipplot() - Visualize EEG equivalent-dipole locations and orientations 
-%             in the MNI average MRI head or in the BESA spherical head model. 
+%             in the MNI average MRI brain or in the BESA spherical head model. 
 % Usage:
 %   >> dipplot( sources, 'key', 'val', ...);
 %   >> [sources X Y Z XE YE ZE] = dipplot( sources, 'key', 'val', ...);
@@ -18,70 +18,71 @@
 %                     component: component number
 %                     rv:        residual variance
 % Optional input:
-%  'rvrange'  - [min max] Only plot dipoles with residual variace within the
-%               given range. Default: plot all dipoles.
-%  'summary'  - Build a summary plot with three views (top, back, side)
-%  'image'    - ['besa'|'mri'] Background image. 
-%               'mri' (or 'fullmri') uses mean-MRI brain images from the Montreal 
-%               Neurological Institute. This option can also contain a 3-D MRI
-%               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
-%               superior-inferior). Use 'coregist' to coregister electrodes
-%               with the MRI. {default: 'mri'} 
-%  'coreg'    - [cx cy cz scale pitch roll yaw] the electrodes coordinates are
-%               rotated in 3-D using pitch (x plane), rool (y plane) and yaw
-%               (z plane). They are then scaled using 'scale' and recentered to
-%               3-D coordinates [cx cy cz].
-%
+%  'rvrange'  - [min max] Only plot dipoles with residual variace in the
+%               given range {default: plot all dipoles}
+%  'summary'  - ['on'|'off'] Build a summary plot with three lateral 
+%               brain slice views (top, back, side) {default: 'off'}
+%  'image'    - ['besa'|'mri'] Background image: 'mri' (or 'fullmri') uses 
+%               mean-MRI brain image from the Montreal Neurological Institute. 
+%               This option may also contain a 3-D MRI volume (dim 1: left to right; 
+%               dim 2: anterior-posterior; dim 3: superior-inferior). Use 'coreg' 
+%               (below) to coregister electrodes with the MR image {default: 'mri'} 
+%  'coreg'    - [cx cy cz scale pitch roll yaw] Rotate the electrode coordinates 
+%               in 3-D using pitch (x plane), roll (y plane) and yaw (z plane). 
+%               Then scale (using 'scale') and re-center to 3-D coordinates 
+%               [cx cy cz] {default: none}
 % Plotting options:
-%  'color'    - [cell array of color strings or (1,3) color arrays]. For
-%               exemple { 'b' 'g' [1 0 0] } gives blue, green and red. 
-%               Dipole colors will rotate through the given colors if
-%               the number given is less than the number of dipoles to plot.
-%               A single number will be used as color index in the jet colormap.
-%  'view'     - 3-D viewing angle in cartesian coordinates: [0 0 1] gives a axial 
+%  'color'    - [cell array of color strings or (1,3) color arrays]. Dipole colors.
+%               Matlab color name (ex. 'r'), RGB formula (ex. [1 0 0]) or integer.
+%               A single integer will be interpreted as a color index (1:64) in 
+%               the 'jet' colormap.  For example, { 'b' 32 [1 0 0] } gives blue, 
+$               green and then red.  If the number of colors given is less than 
+%               the number of dipoles to plot, dipole colors will rotate through 
+%               the given colors. {default: ['g' 'b' 'r' 'm' 'c' 'y']}
+%  'view'     - 3-D viewing angle in Cartesian coordinates: [0 0 1] gives a axial 
 %               (top) view; [0 -1 0] gives a coronal (rear) view; [1 0 0] gives 
-%               a sagittal (side) view of the head. {default:[0 0 1],top|axial}
-%  'mesh'     - ['on'|'off'] Display spherical mesh. {Default is 'on'}
-%  'axistight' - ['on'|'off'] For MRI only, display the closest MRI
-%               slide. {Default is 'off'}
-%  'gui'      - ['on'|'off'] Display controls. {Default is 'on'} If gui 'off', 
-%               a new figure is not created. Useful for incomporating a dipplot 
-%               into a complex figure.
-%  'num'      - ['on'|'off'] Display component number. Take into account
-%               dipole size. {Default: 'off'}
-%  'cornermri' - ['on'|'off'] force MRI images to the corner of the MRI volume
-%               (usefull when background is not black). Default: 'off'.
-%  'drawedges' - ['on'|'off'] draw edges of the 3-D MRI (black in axistight,
-%                white otherwise.) Default is 'off'.
-%  'projimg'  - ['on'|'off'] Project dipole(s) onto the 2-D images, for use
-%               in making 3-D plots {Default 'off'}
-%  'projlines' - ['on'|'off'] Plot lines connecting dipole with 2-D projection.
-%                Color is dashed black for BESA head and dashed black for the
-%                MNI brain {Default 'off'}
-%  'projcol'   - [color] color for the projected line {Default is same as dipole}
-%  'dipolesize' - Size of the dipole sphere(s) {Default: 30}
-%  'dipolelength' - Length of the dipole bar(s) {Default: 1}
-%  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
-%  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
-%  'spheres'  - ['on'|'off'] {default: 'off'} plot dipole markers as 3-D spheres. 
+%               a sagittal (side) view of the head. {default: [0 0 1]=top|axial}
+%  'mesh'     - ['on'|'off'] Display spherical mesh {default: 'off'}
+%  'axistight' - ['on'|'off'] For MRI only, display the closest MRI slice 
+%               {default: 'off'}
+%  'gui'      - ['on'|'off'] Display controls. If gui 'off', a new figure is not 
+%               created. This is sseful for presentation or for incomporating a 
+%               dipplot into a complex figure. {default: 'on'}
+%  'num'      - ['on'|'off'] Display component numbers, taking into account
+%               dipole size. {default: 'off'}
+%  'cornermri' - ['on'|'off'] Force MRI images to the corner of the MRI volume
+%                (useful when background is not black) {default: 'off'}
+%  'drawedges' - ['on'|'off'] Draw edges of the 3-D MRI (black in 'axistight',
+%                white otherwise) {default: 'off'}
+%  'projimg'  -  ['on'|'off'] Plot dipole locations on three cardinal slice images 
+%                in 3-D plots {default 'off'}
+%  'projlines' - ['on'|'off'] Plot thin lines connecting dipoles to their 
+%                locations in the three cardinal slice images {default: 'off'}
+%  'projcol'   - [color] color for the projected line {default: same as dipole}
+%  'dipolesize' - Size of the dipole spheres {default: 30}
+%  'dipolelength' - Length of the dipole pointers {default: 1}
+%  'pointout' - ['on'|'off'] Point the dipoles outward. {default: 'off'}
+%  'sphere'   - [float] radius of sphere corresponding to the skin {default: 1}
+%  'spheres'  - ['on'|'off'] {default: 'off'} Plot dipole markers as 3-D spheres. 
 %               Does not yet interact with gui buttons, produces non-gui mode.
-%  'spheresize' - [real>0] size of spheres (if 'on'). {default: 5}
-%  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {Default: 'off'}
-%  'std'      - [cell array] plot standard deviation of dipoles. i.e.
-%               { [1:6] [7:12] } plot two elipsoids that best fit all the dipoles
+%  'spheresize' - [real>0] Size of spheres (if 'spheres','on'). {default: 5}
+%  'normlen'  - ['on'|'off'] Normalize length of all dipoles. {default: 'off'}
+%  'std'      - [cell array] Plot standard deviation of dipoles. i.e.
+%               { [1:6] [7:12] } Plot two elipsoids that best fit all the dipoles
 %               from 1 to 6 and 7 to 12 with radius 1 standard deviation.
 %               { { [1:6] 2 'linewidth' 2 } [7:12] } do the same but now the
 %               first elipsoid is 2 standard-dev and the lines are thicker.
-%  'dipnames' - [cell array] cell array of string with a name for each dipole (or
-%               pair of dipole).
+%               {default: none}
+%  'dipnames' - [cell array] Cell array of strings with a name for each dipole 
+%               (or dipole pair) {default: none}
 % Outputs:
 %   sources   - EEG.source structure with updated 'X', 'Y' and 'Z' fields
 %   X,Y,Z     - Locations of dipole heads (Cartesian coordinates). If there is
 %               more than one dipole per components, the last dipole is returned.
-%   XE,YE,ZE  - Locations of dipole ends (Cartesian coordinates). The same
-%               remark as above applies.
+%   XE,YE,ZE  - Locations of dipole tips (Cartesian coordinates). If there is
+%               more than one dipole per components, the last dipole is returned.
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 1st July 2002
+% Author: Arnaud Delorme, SCCN / INC / UCSD, 1st July 2002
 %
 % Notes: Visualized locations are not exactly the same as in BESA (because of
 % manual tuning of the size of the head textures).  Because of a bug in the 
@@ -119,6 +120,9 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
+%                Color is dashed black for BESA head and dashed black for the
+%                MNI brain 
+
 % Copyright (C) 2002 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
@@ -146,6 +150,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.105  2005/01/10 19:21:56  scott
+%clarified view plane definitions in help. Specified name of MNI image in error msg
+%
 %Revision 1.104  2004/11/20 02:32:43  scott
 %help msg edits:   carthesian -> Cartesian
 %
