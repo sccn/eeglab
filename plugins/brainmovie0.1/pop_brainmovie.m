@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2003/04/24 01:42:38  arno
+% fliping
+%
 % Revision 1.36  2003/04/24 01:36:48  arno
 % coordinates
 %
@@ -398,13 +401,18 @@ end
 
 % pern10 movie parameters
 % -----------------------
+if ~isempty(g.circfactor)
+    g.circfactor = g.circfactor(g.showcomps, g.showcomps);
+else
+    g.circfactor = zeros(length(g.showcomps));
+end;
 if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         
     % -------------------
     % movie from the side
     % -------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps);
+        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
         [tmp plotorder] = sort( coordinates(:,1) );
         coordinates = coordinates(:, [2 3]); % remove X   
     else
@@ -412,10 +420,12 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
         coordinates = g.coordinates;
     end;
     coordinates(:,1) = -coordinates(:,1);   
-
-    brainmovieoptions = { 'plotorder', plotorder(g.showcomps), ... 
+    size(coordinates')
+    size(g.circfactor)
+    
+    brainmovieoptions = { 'plotorder', plotorder, ... 
                          'resolution', 'low', ...
-                        'coordinates', coordinates, ...
+                        'coordinates', coordinates', ...
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.15 1.15], ...
                         'ylimaxes', [-0.8 1.5], ...
@@ -435,7 +445,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     % movie from the top
     % ------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps);
+        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
         [tmp plotorder] = sort( coordinates(:,3) );
         coordinates = coordinates(:, [1 2]); % remove Z
     else
@@ -445,9 +455,9 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     coordinates(:,2) = -coordinates(:,2);   
     coordinates(:,1) = -coordinates(:,1);   
     
-    brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
+    brainmovieoptions = {  'plotorder',  plotorder, ...
                          'resolution', 'low', ...
-                        'coordinates', coordinates, ...
+                        'coordinates', coordinates', ...
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
                         'ylimaxes', [-1.1 1.1], ...
@@ -467,7 +477,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
     % movie from the rear
     % ------------------
     if isempty(g.coordinates)
-        coordinates = founddipoles(ALLEEG, g.comps);
+        coordinates = founddipoles(ALLEEG, g.comps(g.showcomps));
         [tmp plotorder] = sort( coordinates(:,2) );
         coordinates = coordinates(:, [1 3]); % remove Z
     else
@@ -475,9 +485,9 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
         coordinates = g.coordinates;
     end;
     
-    brainmovieoptions = {  'plotorder',  plotorder(g.showcomps), ...
+    brainmovieoptions = {  'plotorder',  plotorder, ...
                          'resolution', 'low', ...
-                        'coordinates', coordinates, ...
+                        'coordinates', coordinates', ...
                         'circfactor', g.circfactor, ...
                         'xlimaxes', [-1.1 1.1], ...
                         'ylimaxes', [-1.1 1.1], ...
@@ -500,7 +510,7 @@ else
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
+    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates(g.showcomps), ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
