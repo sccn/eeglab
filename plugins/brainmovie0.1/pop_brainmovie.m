@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2003/04/28 22:28:51  arno
+% changing  coords for side view
+%
 % Revision 1.41  2003/04/24 15:19:49  arno
 % debuging plotorder
 %
@@ -291,7 +294,7 @@ end;
 if isempty(g.freqs) & strcmp(g.confirm, 'on')
     disp('********** USER ATTENTION REQUIRED ************');
     r = input('Are you sure you want to make a movie a each of the output frequencies (y/n):', 's');
-    if r(1) == 'n', disp('Cancelling movie call'); return; end;
+    if isempty(r) | r(1) == 'n', disp('Cancelling movie call'); return; end;
 end;
 g.tffolder    = addfinalsep(g.tffolder);
 g.moviefolder = addfinalsep(g.moviefolder);
