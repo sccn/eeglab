@@ -68,11 +68,10 @@
 % 'envelope'    - (2,points,conditions) envelopes of the average data (ERP) in each condition
 %                 (envelope =  min and max traces of each ERP across all channels and times)
 % 'envylabel'   - ordinate label for envelope. {Default 'Potential \muV'}
-% 'envvert'     - cell array of vector(s) of time indices at which to draw vertical lines. 
-%                 In multiple vector case, use 1 vector per condition. Also can be a cell array
-%                 of structure vector(s). Structure fields: time:  line time in ms
-%                                                           color: line color  (e.g. 'b')
-%                                                           style: line style (e.g. '--'). 
+% 'envvert'     - cell array of time indices at which to draw vertical lines.
+%                 Can also be a cell array of cell to specify line aspect. For instance
+%                 { { 0 'color' 'b' 'linewidth' 2 } {1000 'color' 'r' }} would draw two
+%                 lines, one blue thick line at latency 0 and one thin red line at latency 1000.
 % 'flashes'     - vector of time indices at which the background flashes.  Specify the color 
 %                 of the flash with a cell array of [1,2] cell arrays. 
 %                 Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
@@ -115,6 +114,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2002/11/21 02:04:50  arno
+% ready for difference
+%
 % Revision 1.27  2002/11/21 01:44:56  arno
 % debugging colors for saving in ppm
 %
@@ -381,7 +383,7 @@ switch lower(g.framesout)
 	otherwise disp('Error: Framesout must be either ''eps'' or ''fig'''); return;
 end;	
 if ~isempty(g.envvert),
-    if ~iscell(g.envvert) | ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
+    if ~iscell(g.envvert) & ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
         disp('Error: Invalid type for Envvert.'); return;
     end
 end
@@ -761,21 +763,9 @@ for indeximage = alltimepoints
 
             % draw vertical lines if needed
             % -----------------------------
-			if ~isempty(g.envvert)
-				if length(g.envvert) > 1,
-                    verts = g.envvert{ tmpcond };
-                else   verts = g.envvert{1};
-                end
-				
-				for v=verts,
-                    if isstruct(v), ev = v;
-                    else,           ev.time = v;  ev.color = 'k'; ev.style = '-';
-                    end
-                    
-					phandle = plot([ev.time ev.time], [minordinate maxordinate], ev.style, 'linewidth', g.resmult);
-                    set(phandle,'color',ev.color);
-				end;
-			end;
+            if ~isempty(g.envvert)
+                drawvert(g.envvert, tmpcond,  [minordinate maxordinate]);
+            end;
 		end;
 	end;		   
 			
@@ -955,6 +945,43 @@ function cbar( X, Y, colors, orientation, style, g );
 	if strcmp(style, 'circle'), axis square; end;
 return;
 
+% draw vertical lines
+% -------------------
+function drawvert(tmpev, tmpcond, coords);
+    
+    if isstruct(tmpev) | isstruct(tmpev{1})
+        
+        % cooper envert
+        %--------------
+        if length(tmpev) > 1,
+            verts = tmpev{ tmpcond };
+        else   verts = tmpev{1};
+        end
+        
+        for v=verts,
+            if isstruct(v), ev = v;
+            else,           ev.time = v;  ev.color = 'k'; ev.style = '-';
+            end
+            
+            phandle = plot([ev.time ev.time], coords, ev.style, 'linewidth', 1);
+            set(phandle,'color',ev.color);
+        end;
+    else
+        % standard envvert
+        % ----------------
+        for index = 1:length(tmpev)
+            if ~iscell(tmpev{index}), 
+                plot([tmpev{index} tmpev{index}], coords, 'k');
+            else
+                phandle = plot([tmpev{index}{1} tmpev{index}{1}], coords, 'k');
+                if length(tmpev{index}) > 2
+                    set(phandle,tmpev{index}{2:end});
+                end;
+            end;
+        end;
+    end;
+    return;
+    
 % check the flux 
 % --------------
 for indeximage = 1:nwin-7
