@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2002/05/19 14:21:52  scott
+% *** empty log message ***
+%
 % Revision 1.46  2002/05/19 14:20:34  scott
 % *** empty log message ***
 %
@@ -266,8 +269,20 @@ if exist('signifs') & length(signifs) == 1 % should be ITC
    signifs = [0 signifs];
 end
   
-if min(timefreqs(:,2))<0
-   fprintf('tftopo(): timefreqs frequencies must be >=0 Hz\n');
+if min(timefreqs(:,2))<min(freqs) 
+   fprintf('tftopo(): selected plotting frequency %3.1g out of range.\n',min(timefreqs(:,2)));
+   return
+end
+if max(timefreqs(:,2))>max(freqs) 
+   fprintf('tftopo(): selected plotting frequency %3.1g out of range.\n',max(timefreqs(:,2)));
+   return
+end
+if min(timefreqs(:,1))<min(times) 
+   fprintf('tftopo(): selected plotting time %4.1g out of range.\n',min(timefreqs(:,1)));
+   return
+end
+if max(timefreqs(:,1))>max(times) 
+   fprintf('tftopo(): selected plotting time %4.1g out of range.\n',max(timefreqs(:,1)));
    return
 end
 nchans = size(tfdata,2)/length(times);
