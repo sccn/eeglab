@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2002/09/23 23:36:04  arno
+% same
+%
 % Revision 1.25  2002/09/23 23:35:29  arno
 % debug lat
 %
@@ -200,7 +203,7 @@ try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end;
 try, g.verbose; 	      catch, g.verbose = 'on'; end;
 try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', [EEG.setname ' epochs' ]); end;
-try, g.eventindices;      catch, g.eventindices = []; end;
+try, g.eventindices;      catch, g.eventindices = 1:length(EEG); end;
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end;
 try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [-Inf Inf]; end;
 
@@ -209,7 +212,7 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 tmpeventlatency = cell2mat( { EEG.event(:).latency } );
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort in ascending time 
-Ievent = 1:length(EEG.event);
+Ievent = g.eventindices;
 
 if ~isempty( events )
     % select the events for epoching
