@@ -8,8 +8,9 @@
 %   >> headplot('setup',['eloc_angles'],['splinefile'],['comment'],['type'])
 %
 % Inputs: 
-%   'eloc_angles' - file of electrode locations in spherical (or cartesian) coords.
-%                    cf. functions: cart2topo() and topo2sph()
+%   'eloc_angles' - file of electrode locations in spherical (or cartesian) coords
+%                   or channel location structure.
+%                   cf. functions: readlocs(), convertlocs() and topo2sph()
 %   'splinefile'  - name of spline file to save splining info into
 %   'comment'     - optional string vector containing info for spline file
 %   'type'        - type of electrode location file ('cartesian' or default
@@ -46,7 +47,7 @@
 %
 % Note: if an error is generated, headplot may close the current figure
 %
-% Authors: Colin Humphries & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
+% Authors: Colin Humphries, Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, La Jolla, 1998 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) Colin Humphries and Scott Makeig, CNL / Salk Institute, Feb. 1998
@@ -68,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/02/09 19:39:53  scott
+% returning to part-head view
+%
 % Revision 1.26  2004/02/08 16:32:46  scott
 % same
 %
