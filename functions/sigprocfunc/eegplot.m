@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/07/24 01:37:20  arno
+% debugging submean
+%
 % Revision 1.16  2002/07/24 01:28:09  arno
 % default spacing -> 3 stds
 %
@@ -945,7 +948,7 @@ else
       		'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
     end
 
-	 % draw selected electrodes
+    % draw selected electrodes
     if ~isempty(g.winrej)
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
@@ -1035,26 +1038,32 @@ else
      	set(ax0,'XTickLabel', tagnum,'YTickLabel', [],...
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',alltag-lowlim+g.trialstag/2, 'YTick',[], 'tag','backeeg');
+		
 		axes(ax1);
-
 		tagpos  = [];
 		tagtext = [];
-		alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
+		alltag = [alltag alltag(end)+g.trialstag];
+		%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
 
 		nbdiv = 20/g.winlength; % approximative number of divisions
 		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5]]; % possible increments
 		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
 
 		incrementtime  = divpossible(indexdiv);
-		incrementpoint = divpossible(indexdiv)/1000*g.srate+0.01;
+		incrementpoint = divpossible(indexdiv)/1000*g.srate;
+		tagzerooffset  = -g.limits(1)/1000*g.srate
 
 		for i=1:length(alltag)-1
-			if ~isempty(tagpos) & tagpos(end)-alltag(i)<incrementpoint
+			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
 				tagpos  = tagpos(1:end-1);
 				tagtext  = tagtext(1:end-1);
 			end;
-			tagpos  = [ tagpos [alltag(i):incrementpoint:alltag(i+1)]];
-			tagtext = [ tagtext [g.limits(1):incrementtime:g.limits(2)] ];
+			%tagpos  = [ tagpos [alltag(i):incrementpoint:(alltag(i+1)-1)]];
+			%tagtext = [ tagtext [g.limits(1):incrementtime:g.limits(2)] ];
+			tmptagpos = [alltag(i)+tagzerooffset:-incrementpoint:alltag(i)];
+			tagpos  = [ tagpos [tmptagpos(end:-1:2) alltag(i)+tagzerooffset:incrementpoint:(alltag(i+1)-1)]];
+			tmptagtext = [0:-incrementtime:g.limits(1)];
+			tagtext = [ tagtext [tmptagtext(end:-1:2) 0:incrementtime:g.limits(2)] ];
 		end;
      	set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
 			
