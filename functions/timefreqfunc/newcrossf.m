@@ -209,6 +209,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2004/06/02 23:23:52  arno
+% default for baseboot is baseline
+%
 % Revision 1.69  2004/06/02 23:17:47  arno
 % subtracting baseline, baseboot ...
 %
@@ -1244,11 +1247,7 @@ if ~isnan(g.alpha) & length(baseln)==0
     fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
 end
-if ~isnan(g.baseline)
-    mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
-else
-    mbase = [];
-end;
+mbase = mean(abs(coherres(:,baseln)'));     % mean baseline coherence magnitude
 
 % plot everything
 % ---------------
