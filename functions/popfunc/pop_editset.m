@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/09/25 23:49:58  arno
+% correcting float-le problem
+%
 % Revision 1.24  2002/09/04 18:28:25  luca
 % debug command line big variable passed as text - arno
 %
@@ -354,34 +357,36 @@ for curfield = tmpfields'
 							  end;
 							 otherwise, error('Pop_editset error: unrecognized file format');
                             end;
-                         else
-							% restoration command
-							%--------------------
-							try 
-							     res = evalin('base', ['exist(''' varname ''') == 1']);
-							catch
-							     error('Pop_editset: cannot find specified variable!');
-							end;
-							if ~res, 
-           error('Pop_editset: cannot find specified variable.'); 
-       end;
-						    testval = evalin('base', ['isglobal(' varname ')']);
-							warning off;
-							if ~testval
-								commandrestore = [ ' tmpp = '  varname '; clear global ' varname ';'   varname '=tmpp;clear tmpp;' ]; 
-							else
-                                commandrestore = [];
-							end;		  
-							% make global, must make these variable global, if you try to evaluate them direclty in the base
-							% workspace, with a large array the computation becomes incredibly slow.  
-							%--------------------------------------------------------------------
-				         	comglobal = sprintf('global %s;', varname);
-				      		evalin('base', comglobal);
-				      		eval(comglobal);
-				      		eval( ['EEGOUT.data = ' varname ';' ]);
-				      		try, evalin('base', commandrestore); catch, end;
-				      		warning on;
-                            if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
+                         elseif isstr(varname)
+                             % restoration command
+                             %--------------------
+                             try 
+                                 res = evalin('base', ['exist(''' varname ''') == 1']);
+                             catch
+                                 disp('Pop_editset warning: cannot find specified variable in global workspace!');
+                             end;
+                             if ~res, 
+                                 error('Pop_editset: cannot find specified variable.'); 
+                             end;
+                             testval = evalin('base', ['isglobal(' varname ')']);
+                             warning off;
+                             if ~testval
+                                 commandrestore = [ ' tmpp = '  varname '; clear global ' varname ';'   varname '=tmpp;clear tmpp;' ]; 
+                             else
+                                 commandrestore = [];
+                             end;		  
+                             % make global, must make these variable global, if you try to evaluate them direclty in the base
+                             % workspace, with a large array the computation becomes incredibly slow.  
+                             %--------------------------------------------------------------------
+                             comglobal = sprintf('global %s;', varname);
+                             evalin('base', comglobal);
+                             eval(comglobal);
+                             eval( ['EEGOUT.data = ' varname ';' ]);
+                             try, evalin('base', commandrestore); catch, end;
+                             warning on;
+                         else 
+                             EEGOUT.data = varname;
+                             if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
                          end;
          otherwise, error(['Pop_editset error: unrecognized field ''' curfield{1} '''']); 
     end;
