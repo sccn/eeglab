@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/10/29 00:13:57  arno
+% processing a single frequency
+%
 % Revision 1.31  2003/10/22 18:07:37  arno
 % if only 1 input for g.freqs
 %
@@ -231,6 +234,9 @@ if length(g.wavelet) >= 2
 else 
 	g.cyclesfact = 1; % default is 1 (no decrease)
 end;
+if g.cyclesfact < 0 | g.cyclesfact > 1
+    error('Wavelet cycle factor must be comprise between 0 and 1');
+end;
 if (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
    error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > frame)
@@ -300,13 +306,13 @@ end;
 
 % compute time vector
 % -------------------
+g
 [ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout);
 tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
 % -------------------------------
 % compute time freq decomposition
 % -------------------------------
-g
 fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 1000/srate*g.winsize);
 fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
         fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
