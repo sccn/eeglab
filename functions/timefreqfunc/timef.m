@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/11 19:56:12  arno
+% debuging baseboot -ad & lf
+%
 % Revision 1.8  2002/04/11 02:10:27  arno
 % correcting typo
 %
@@ -639,11 +642,13 @@ end % trial
 % if coherence, perform the division
 % ----------------------------------
 switch g.type
-   case 'coher',
-        R = R ./ ( cumulX );
-	    if ~isnan(g.alpha)
-            Rboot = Rboot ./ cumulXboot;
-	    end;   
+ case 'coher',
+  R = R ./ ( cumulX );
+  if ~isnan(g.alpha)
+	  Rboot = Rboot ./ cumulXboot;
+  end;   
+ case 'phasecoher',
+  R = R ./ (ones(size(R,1),1)*Rn);
 end;        
 
 if min(Rn) < 1
@@ -668,7 +673,7 @@ else
 end;
 
 Rsign = sign(imag(R));
-R = abs(R) ./ (ones(size(R,1),1)*Rn); % convert coherence vector to magnitude
+R = abs(R); % convert coherence vector to magnitude
 
 if ~isnan(g.alpha) % if bootstrap analysis included . . .
     if Rbn>0
