@@ -29,8 +29,8 @@
 %                     pvaf(component) = 100-100*variance(data-component))/variance(data)
 %                     rv(component)   = 100*variance(component)/variance(data) 
 %  'title'      = [string] plot title {default|[] -> none}
-%  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes 
-%                  {default|[] -> all}
+%  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
+%                  and also for making scalp topo plots {default|[] -> all}
 %  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
 %                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
 %  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2004/11/17 18:06:33  scott
+% debug 'vert' (specify latencies in ms, documented), limcontrib and vert line styles, 'pvaf'
+%
 % Revision 1.78  2004/11/17 02:27:10  scott
 % made xmin xmax in 'limits' arg control the times plotted
 % changed key 'pvaf' to 'sortvar' ('pvaf' retained for backwards compatiability)
@@ -1151,11 +1154,12 @@ if strcmpi(g.dispmaps, 'on')
         axes(axt)                             % topoplot axes
         cla
         
+        chanlocs = g.chanlocs(g.plotchans);
         if ~isempty(g.chanlocs)
             if ~isempty(varargin) 
-                figure(myfig);topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+                figure(myfig);topoplot(maxproj(g.plotchans,t),chanlocs, varargin{:}); 
             else 
-                figure(myfig);topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+                figure(myfig);topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
