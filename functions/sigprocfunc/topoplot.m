@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2002/10/14 00:40:44  arno
+% *** empty log message ***
+%
 % Revision 1.13  2002/09/23 18:09:11  arno
 % fixing single channel plotting
 %
@@ -261,7 +264,7 @@ if nargs > 2
 	 case 'shading'
 	  SHADING = lower(Value);
 	  if ~any(strcmp(SHADING,{'flat','interp'}))
-		  error('Invalid Shading Parameter')
+		  error('Invalid shading parameter')
 	  end
 	 otherwise
 	  error(['topoplot(): Unknown input parameter ''' Param ''' ???'])
@@ -271,7 +274,7 @@ end
 
 [r,c] = size(Vl);
 if r>1 & c>1,
-  error('topoplot(): data should be a single vector\n');
+  error('topoplot(): input data must be a single vector');
 end
 
 %fid = fopen(loc_file);
