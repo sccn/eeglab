@@ -29,7 +29,10 @@
 %   'overlap'  = [integer] window overlap in data points {default: 0}
 %   'percent'  = [float 0 to 100] percent of the data to sample in computing the 
 %                spectra. Can be used to speed up the computation. {default: 100}.
-%   'freqrange' = [min max] frequency range to plot. Changes x-axis limits. 
+%   'freqrange' = [min max] frequency range to plot. Changes x-axis limits. Default is
+%                1 Hz for the min and niquist (srate/2) for the max (if some scalp
+%                maps are plotted, the scalp map at the highest frequency specifies
+%                the maximum).
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                {default: 'off'}
 %   'mapnorm'  = [float vector] if 'data' contain the activity of an independant 
@@ -102,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2004/04/29 16:27:30  scott
+% removed license() call - expanded license function has disappeared from the matlab path!?
+%
 % Revision 1.86  2004/04/28 14:46:54  scott
 % added license() call to test for pwelch availability -sm
 %
@@ -649,7 +655,7 @@ if ~isempty(g.freq)
 	end
 else
     if isnan(g.limits(2))
-        g.limits(2) = 50;
+        g.limits(2) = srate/2;
     end;
 end;
 
