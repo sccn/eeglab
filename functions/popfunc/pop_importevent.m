@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/01/03 02:20:47  scott
+% header edits -sm
+%
 % Revision 1.11  2003/01/03 01:40:58  arno
 % changing exemple
 %
@@ -335,14 +338,18 @@ function array = load_file_or_array( varname, skipline, delim );
     if varname(1) == '''', % mean that it is a filename
                           % --------------------------
         varname = eval(varname);
-        array = loadtxt( varname, 'skipline', skipline );
+        array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
         
     else % variable in the global workspace
          % --------------------------
-         array = evalin('base', varname);
-         if ~iscell(array)
-             array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
-         end;    
+         if isstr(varname)
+             array = evalin('base', varname);
+             if ~iscell(array)
+                 array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
+             end;    
+         else
+             array = varname;
+         end;
     end;     
 return;
 
