@@ -41,7 +41,7 @@
 %%    Title1:                                     
 %%      descriptor1  - text line 1                 
 %%                     text line 2                 
-%%      descriptor2  - text line 1                 
+%%      descriptor2  - [type] text line 1                 
 %%      "descriptor 3" - text line 1 (see notes)                 
 %%                       etc.                        
 %%                                              
@@ -70,6 +70,8 @@
 %           the function description. If the .jpg file is absent, the function
 %           checks for the presence of a .gif file.
 %        4) Lines beginning by '%%' are not interpreted and will be printed as is.
+%        5) if [type] is present in a "descriptor2  - [type] text line 1" line
+%           "type is bolded.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -90,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/02/17 02:36:15  arno
+% do not force image size to 400 if less than 400
+%
 % Revision 1.17  2003/02/17 02:25:10  arno
 % documenting new features
 %
@@ -422,13 +427,12 @@ function strout = formatstr( str, refcall );
 return;	
 
 % final formating
-function str = finalformat(str); % bold text in bracket
+function str = finalformat(str); % bold text in bracket if just in the beginning
     tmploc = sort(union(find(str == '['), find(str == ']')));
-    if ~isempty(tmploc)
+    if ~isempty(tmploc) & str(1) == '['
         if mod(length(tmploc),2) ~= 0, str, error('Opening but no closing bracket'); end;
-        for index = length(tmploc):-2:1
-            str = [ str(1:tmploc(index-1)) '<b>' str(tmploc(index-1)+1:tmploc(index)-1) '</b>' str(tmploc(index):end) ];
-        end;
+        tmploc = tmploc(1:2);
+        str = [ str(1:tmploc(1)) '<b>' str(tmploc(1)+1:tmploc(2)-1) '</b>' str(tmploc(2):end) ];
     end;
 
     %tmploc = find(str == '"');
