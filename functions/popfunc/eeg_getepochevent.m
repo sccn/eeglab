@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/22 21:51:49  arno
+% removing error message for latency
+%
 % Revision 1.3  2002/04/18 18:22:27  arno
 % typo can not
 %
@@ -149,6 +152,21 @@ else
 	Ieventtmp = [1:length(EEG.event)];
 end;
 
+% select latencies
+% ----------------
+if isfield(EEG.event, 'latency') & (timelim(1) ~= -Inf | timelim(2) ~= Inf)
+	selected = ones(size(Ieventtmp));
+	for index=1:length(Ieventtmp)
+		reallat = (mod(EEG.event(Ieventtmp(index)).latency-1, EEG.pnts)/EEG.srate+EEG.xmin)*1000;
+		if reallat < timelim(1) | reallat > timelim(2)
+			selected(index) = 0;
+		end;
+	end;
+	Ieventtmp = Ieventtmp( find(selected == 1) );
+end;
+
+% select events
+% -------------
 epochval = zeros(1,EEG.trials); epochval(:) = nan;
 if strcmp(fieldname, 'latency')
 	for index = 1:length(Ieventtmp)
