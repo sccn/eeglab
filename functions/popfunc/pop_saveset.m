@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2003/10/31 01:12:57  scott
+% same
+%
 % Revision 1.26  2003/10/31 01:11:40  scott
 % message text
 %
@@ -235,7 +238,7 @@ if mode == 0  % single datasets
 		tmpdata = EEG.data;
 		EEG.data = [ noextcurfilename '.fdt' ];
 		try, 
-            fprintf('                Saving dataset...\n');
+            fprintf('Saving dataset...\n');
 			eval(command);
 			floatwrite( tmpdata, [curfilepath EEG.data], 'ieee-le');
 		catch, 
