@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2002/05/19 02:18:36  scott
+% *** empty log message ***
+%
 % Revision 1.20  2002/05/19 02:15:13  scott
 % adding separate scale for showchan==0 -sm
 %
@@ -291,6 +294,7 @@ else % showchan==0
   cmin = -cmax; % make symmetrical
   imagesc(times(tftimes),freqs(tffreqs),tfave);
   caxis([cmin cmax]);
+  cbar
   cbarh=sbplot(plotdim,plotdim*2,plotdim*2*plotdim-1);
   cbar
   axis off
