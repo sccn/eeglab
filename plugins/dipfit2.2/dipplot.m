@@ -122,6 +122,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.37  2003/07/01 23:49:21  arno
+%try to implement contextual menu: does not work in 3-D
+%
 %Revision 1.36  2003/07/01 22:10:14  arno
 %debuging for 2 dipoles/component
 %
@@ -350,7 +353,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     for index = 1:length(sources)
         maxi = max(maxi,max(abs(sources(index).posxyz(:))));
     end;
-    if maxi > 1.01
+    if maxi > 1.01 & g.sphere == 1
         disp('Non-normalized dipole positions, normalizing by standard head radius 84.747 mm'); 
         g.sphere = 84.747;
         fact = 0.1;
