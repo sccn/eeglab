@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/05/29 18:54:59  arno
+% debug command line call
+%
 % Revision 1.20  2003/03/05 19:47:15  arno
 % adding done message
 %
@@ -227,7 +230,9 @@ if mode == 0  % single datasets
 		EEG.icaact = tmpica;
 	else % saving data as a single Matlab file 
 		try, 
+            EEG.data = single(EEG.data);
 			eval(command);
+            EEG.data = double(EEG.data);
 		catch, 
 			error('Pop_saveset: saving error, check permission on file or directory');
 		end;
@@ -285,7 +290,11 @@ else
 				error('Pop_saveset: saving error, check permission on file or directory');
 			end;
 		end;
-	end;
+	else % standard file saving
+		for index = 1:length(ALLEEG)
+			ALLEEG(index).data = single(ALLEEG(index).data);
+		end;        
+    end;
 	try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
 	catch, error('Pop_saveset: saving error, check permission on file or directory');
 	end;
