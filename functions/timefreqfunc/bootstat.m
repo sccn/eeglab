@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/02 00:36:04  arno
+% update condstat, debug
+%
 % Revision 1.1  2002/10/01 16:07:33  arno
 % Initial revision
 %
@@ -69,6 +72,14 @@
 %
 % function for bootstrap initialisation
 % -------------------------------------
+
+% *************************************
+% to do: implement the fitting of the psd with as 4th order
+% polynomial using the kurtosis of the distribution
+% See: Ramberg, J.S., Tadikamalla, P.R., Dudewicz E.J., Mykkytka, E.F. 
+% A probability distribution and its uses in fitting data. Technimetrics, 
+% 1979, 21: 201-214, probably avalaible at the Script Librairy
+% *************************************
 
 function [accarrayout, Rbootout] = bootstat(oriarg1, oriarg2, formula, varargin)
 %	nb_points, timesout, naccu, baselength, baseboot, boottype, alpha, rboot);
