@@ -16,10 +16,10 @@
 %   'save'        - 'filename' save the dataset
 %   'retrieve'    - dataset number, retrieve a dataset
 %
-% Note: 1) this function take into account the content of eeg_options
-%       for dataset overwritting. If the dataset overwritting
-%       feature is set, the 'overwrite' arguement is ignored.
-%       2) this function calls eeg_store() which may modify the 
+% Note: 1) This function takes into account the content of eeg_options
+%       for dataset overwriting. If the dataset overwriting
+%       feature is set, then the 'overwrite' arguement is ignored.
+%       2) This function calls eeg_store() which may modify the 
 %       variable ALLEEG containing all the dataset information.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 Arpil 2002
@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/12/04 19:11:35  arno
+% macOSX directory compatibility
+%
 % Revision 1.11  2002/11/14 17:40:55  arno
 % comment -> description
 %
