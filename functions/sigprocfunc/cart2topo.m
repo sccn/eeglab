@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/05/02 01:23:29  arno
+% using chancenter
+%
 % Revision 1.9  2002/05/02 00:33:14  arno
 % introduce minus
 %
@@ -151,6 +154,7 @@ else
 		[x y z newcenter] = chancenter(x, y, z, center);
 	end;
 end;
+radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
 
 x = x./radius; % make radius 1
 y = y./radius;
