@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/12/04 17:47:26  arno
+% eegfiltfft
+%
 % Revision 1.22  2003/12/04 15:34:27  arno
 % fixing erp add
 %
@@ -376,7 +379,7 @@ end;
 % lowpass data
 % ------------
 if ~isempty(g.lowpass)
-    if exist('eegfilt') == 2
+    if exist('filtfilt') == 2
         erptoplot = eegfilt(erptoplot, srate, 0, g.lowpass);
     else
         erptoplot = eegfiltfft(erptoplot, srate, 0, g.lowpass);
