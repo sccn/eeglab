@@ -112,6 +112,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.189  2004/04/01 17:10:46  scott
+% converted 'conv' interpolation to polar
+%
 % Revision 1.188  2004/03/31 18:23:15  scott
 % debug 'conv' mode - plot ears and nose above map surface to avoid masking by 'conv'
 %
@@ -1241,7 +1244,9 @@ else %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% mask the jagged border around rmax %%%%%%%%
   ringx = [[rx(:)' rx(1) ]*(rin+rwidth)  [rx(:)' rx(1)]*rin];
   ringy = [[ry(:)' ry(1) ]*(rin+rwidth)  [ry(:)' ry(1)]*rin];
 
-  ringh= patch(ringx,ringy,0.01*ones(size(ringx)),BACKCOLOR,'edgecolor','none'); hold on
+  if ~strcmpi(STYLE,'blank')
+    ringh= patch(ringx,ringy,0.01*ones(size(ringx)),BACKCOLOR,'edgecolor','none'); hold on
+  end
   % plot(ry*rmax,rx*rmax,'b') % debugging line
 end
 
