@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/03/20 01:44:27  arno
+% removing bother message of removed events
+%
 % Revision 1.7  2003/02/27 03:06:47  arno
 % debug, handle regions from eegplot
 %
@@ -112,7 +115,7 @@ end;
 if ~isempty(boundevents)
 	fprintf('eeg_eegrej(): boundary events added.\n');
 	for tmpindex = 1:length(boundevents)
-        if boundevents(tmpindex) => 1 & boundevents(tmpindex) <= EEG.pnts
+        if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= EEG.pnts
             EEG.event(end+1).type  = 'boundary';
             EEG.event(end).latency = boundevents(tmpindex);
         end;
