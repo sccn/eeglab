@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/13 21:42:48  arno
+% undo debug
+%
 % Revision 1.7  2002/08/13 21:42:34  arno
 % debug
 %
@@ -93,7 +96,7 @@ for index = 1:length(Prompt)
 	if ~isempty(geomvert) % vertical
 		geometry = { geometry{:} [ 1] [1 ]};
 	else
-		geometry = { geometry{:} [ 1 1 ]};
+		geometry = { geometry{:} [ 1 0.6 ]};
 	end;
 	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
 				{ 'Style', 'edit', 'string', DefAns{index} } };
