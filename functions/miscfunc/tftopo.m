@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/04/30 21:23:58  scott
+% *** empty log message ***
+%
 % Revision 1.17  2002/04/30 21:22:46  scott
 % *** empty log message ***
 %
@@ -274,9 +277,8 @@ else
   tfdat = reshape(tfdat,length(tffreqs),length(tftimes),nchans);
   tfsign = sort(tfdat,3);
   tfsign = sign(tfsign(:,:,round(nchans/2)));
-  size(tfsign)
-  size(mean(abs(tfdat)))
-  tfave = tfsign.*mean(abs(tfdat));
+
+  tfave = tfsign.*mean(abs(tfdat),3);
   imagesc(times(tftimes),freqs(tffreqs),tfave);
 end
 hold on;
