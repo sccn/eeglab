@@ -162,6 +162,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2003/11/26 18:18:52  scott
+% help msg
+%
 % Revision 1.62  2003/08/05 22:06:49  scott
 % header edits
 %
@@ -499,6 +502,7 @@ try, g.compute;    catch, g.compute = 'matlab'; end;
 try, g.maxamp;     catch, g.maxamp = []; end;
 try, g.savecoher;  catch, g.savecoher = 0; end;
 try, g.noinput;    catch, g.noinput = 'no'; end;
+try, g.chaninfo;   catch, g.chaninfo = []; end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
@@ -1187,18 +1191,18 @@ if g.plot
       h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
-            'style', 'blank', 'emarkersize1chan', 10);
+            'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
       else
-         topoplot(g.topovec(1,:),g.elocs,'electrodes','off');
+         topoplot(g.topovec(1,:),g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
       end;
       axis('square')
       
       h(16) = subplot('Position',[.9 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(2),g.elocs,'electrodes','off', ...
-            'style', 'blank', 'emarkersize1chan', 10);
+            'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
       else
-         topoplot(g.topovec(2,:),g.elocs,'electrodes','off');
+         topoplot(g.topovec(2,:),g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
       end;
       axis('square')
    end
