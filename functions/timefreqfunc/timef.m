@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2002/04/27 21:26:24  scott
+% debugging PC -sm
+%
 % Revision 1.16  2002/04/27 21:19:02  scott
 % debugging PC -sm
 %
@@ -192,7 +195,9 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,times,freqs,Pboot,Rboot,PC] = timef( X, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,times,freqs,Pboot,Rboot,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
+
+% Note: PA is output of 'phsamp','on' 
 
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
@@ -314,7 +319,7 @@ try, g.naccu;      catch, g.naccu = 200; end;
 try, g.mtaper;     catch, g.mtaper = []; end;
 try, g.vert;       catch, g.vert = []; end;
 try, g.type;       catch, g.type = 'phasecoher'; end;
-try, g.phasecouple;   catch, g.phasecouple = 'off'; end;
+try, g.phsamp;   catch, g.phsamp = 'off'; end;
 
 % testing arguments consistency
 % -----------------------------
@@ -459,9 +464,9 @@ switch lower(g.detret)
     case { 'on', 'off' }, ;
     otherwise error('detret must be either on or off');
 end;
-switch lower(g.phasecouple)
+switch lower(g.phsamp)
     case { 'on', 'off' }, ;
-    otherwise error('phasecouple must be either on or off');
+    otherwise error('phsamp must be either on or off');
 end;
 if ~isnumeric(g.linewidth)
     error('linewidth must be numeric');
@@ -521,9 +526,9 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end;        
 end
 
-if g.phasecouple
-    PC = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
-end
+if g.phsamp
+    PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
+end                                                     phs   amp
 
 wintime = 1000/g.srate*(g.winsize/2); % (1000/g.srate)*(g.winsize/2);
 times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
@@ -642,12 +647,12 @@ for i=1:trials
           Wn(j) = 1;
         end
 
-        if g.phasecouple
-          PC(:,:,j) = PC(:,:,j) ...
-              + repmat(sqrt(PP(:,j)),1,size(PP,1)) ...
-                   .* repmat((tmpX ./ abs(tmpX))',size(PP,1),1); 
-                                                   % normalized spectral vector
-                                                   % dot-times amplitude vector
+        if g.phsamp
+          PA(:,:,j) = PA(:,:,j) ...
+              + repmat((tmpX ./ abs(tmpX)),1,size(PP,1))   ...
+                   .* repmat(sqrt(PP(:,j))',size(PP,1),1)    ...
+                                           % x-product: unit phase column
+                                           % times amplitude row
         end
 	end % window
 
@@ -693,9 +698,9 @@ switch g.type
   R = R ./ (ones(size(R,1),1)*Rn);
 end;        
 
-if g.phasecouple
- for j=1:size(PP,1)    % can use Matlab to avoid loop here??
-    PC(j,:,:) = PC(j,:,:) ./ cumulX;
+if g.phsamp
+ for j=1:size(PP,1)    % can we use Matlab to avoid loop here??
+    PA(j,:,:) = PA(j,:,:) ./ cumulX;
  end
 end
 
