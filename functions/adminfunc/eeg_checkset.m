@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2002/04/30 15:21:44  scott
+% editted help msg -sm
+%
 % Revision 1.19  2002/04/20 18:45:02  arno
 % editing error message
 %
@@ -320,7 +323,7 @@ res = [];
  	    			fprintf('eeg_checkset: recomputing ica activation matrix ...\n'); 
                     res = com;
                     EEG.icaact     = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
-                    EEG.icaact    = reshape( EEG.icaact, EEG.nbchan, EEG.pnts, EEG.trials);
+                    EEG.icaact    = reshape( EEG.icaact, size(EEG.icadata,1), EEG.pnts, EEG.trials);
                 end;
  			end;
             if isempty(EEG.icawinv)
