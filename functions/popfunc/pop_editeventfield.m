@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/07/25 01:08:15  arno
+% debugging
+%
 % Revision 1.7  2002/07/23 18:37:41  arno
 % removing debug message
 %
@@ -129,7 +132,7 @@ if nargin<2
         uilist = { uilist{:} {} {} {} ...
          { 'Style', 'edit', 'string', ['1:' int2str(length(EEG.event))] } ...
          { 'Style', 'checkbox', 'string', 'Yes/No', 'value', 1 }, ...
-         { 'Style', 'text', 'string', 'NB: No = overwrite events' }, { }, { }, ...   
+         { 'Style', 'text', 'string', 'NB: No (unchecked) -> overwrite events' }, { }, { }, ...   
          { 'Style', 'text', 'string', 'Edit fields:', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Field description', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Values file|array', 'fontweight', 'bold'  }, ...
@@ -258,8 +261,8 @@ for curfield = tmpfields'
        case {'append', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
        case 'rename',
             if isempty( findstr('->',g.rename) ), disp('Set warning: bad syntax for rename'); end;
-            oldname = g.rename(1:findstr('->',g.rename)-1)
-            newname = g.rename(findstr('->',g.rename)+2:end)
+            oldname = g.rename(1:findstr('->',g.rename)-1);
+            newname = g.rename(findstr('->',g.rename)+2:end);
             indexmatch = strmatch(oldname, allfields);
             if isempty(indexmatch), disp('Set warning: name not found for rename'); 
             else
