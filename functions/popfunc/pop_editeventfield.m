@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/04/09 01:41:49  arno
+% debuging array passage, change default
+%
 % Revision 1.2  2002/04/08 21:55:09  arno
 % not edited
 %
@@ -131,7 +134,11 @@ if nargin<2
 	        catch, end;
 	        uilist   = { uilist{:}, ...
 	         { 'Style', 'text', 'string', allfields{index} }, ...
-	         { 'Style', 'edit', 'string', description }, ...
+	         { 'Style', 'pushbutton', 'string', description, 'callback', ...
+			 [ 'tmpuserdata = get(gcf, ''userdata'');' ...
+			   'tmpuserdata{' int2str(index) '} = pop_comments(tmpuserdata{' int2str(index) '}, ''editing ' allfields{index} ' info'');' ...
+			   'set(gcbo, ''string'', tmpuserdata{' int2str(index) '});' ...
+			   'set(gcf, ''userdata'', tmpuserdata); clear tmpuserdata;' ] }, ...
 	         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  allfields{index} }, ...
 	         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''' allfields{index} ''';' commandload ] }, ...
 	         { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
@@ -152,24 +159,30 @@ if nargin<2
                 { 'Style', 'edit', 'string', '' } ...
                 fastif(isunix,{ 'Style', 'text', 'string', 'NB: click on field!' },{ })};
 
-        results = inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', 'Edit event field(s) -- pop_editeventfield()' );
+        [results userdat ]= inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', ...
+									  'Edit event field(s) -- pop_editeventfield()', EEG.eventdescription );
         if length(results) == 0, return; end;
 
 	    % decode top inputs
 	    % -----------------
 	    args = {};
-	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
+	    if ~isempty( results{1} ), args = { args{:}, 'indices', results{1} }; end;
 	    if results{2} == 0       , args = { args{:}, 'append', 'no' }; end;
 	    
 	    % dealing with existing fields
 	    %-----------------------------
 	    for index = 1:length(allfields) 
-	        if results{2+index*3} == 1, args = { args{:}, allfields{index}, [] };
-	        else if ~isempty( results{1+index*3} )
-	                if exist(results{1+index*3}) == 2,  args = { args{:}, allfields{index}, [ results{1+index*3} ] }; % file
-	                else                              args = { args{:}, allfields{index}, results{1+index*3} }; end;
-	             end;
-     	         if ~isempty( results{index*3} ), args = { args{:}, [ allfields{index} 'info' ], [ results{index*3} ] }; end;
+	        if results{index*2+2} == 1, args = { args{:}, allfields{index}, [] };
+	        else 
+				if ~isempty( results{index*2+1} )
+	                if exist(results{index*2+1}) == 2,  args = { args{:}, allfields{index}, [ results{index*2+1} ] }; % file
+	                else                                args = { args{:}, allfields{index}, results{index*2+1} }; end;
+				end;
+				try, 
+					if ~isempty( userdat{index} ) & ~strcmp( userdat{index}, EEG.eventdescription{index})
+						args = { args{:}, [ allfields{index} 'info' ], userdat{index} }; 
+					end;
+				catch, end;
 	        end;     
 	    end;
 	    
@@ -223,6 +236,7 @@ try, g.timeunit; 	  catch, g.timeunit = 1; end;
 try, g.align; 	      catch, g.align = NaN; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
 g.align.val = g.align;
+if isstr(g.indices), g.indices = eval([ '[' g.indices ']' ]); end;
 
 tmpfields = fieldnames(g);
 % scan all the fields of g
@@ -304,19 +318,34 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 com = sprintf('%s = pop_editeventfield( %s', inputname(1), inputname(1));
 for i=1:2:length(args)
     if ~isempty( args{i+1} )
-        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, args{i+1} );
-        else    if ~iscell( args{i+1} ) com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
-                else 
-                    com = sprintf('%s, ''%s'', { ', com, args{i});
-                    for index = 1:length( args{i+1}{1} ), com = sprintf('%s ''%s'' ', com, args{i+1}{1}{index}); end;
-                    com = sprintf('%s }', com);
-                end;                    
+        if isstr( args{i+1} ) com = sprintf('%s, ''%s'', %s', com, args{i}, str2str(args{i+1}) );
+        else    
+			if ~iscell( args{i+1} ) com = sprintf('%s, ''%s'', [%s]', com, args{i}, num2str(args{i+1}) );
+			else 
+				com = sprintf('%s, ''%s'', { ', com, args{i});
+				for index = 1:length( args{i+1}{1} ), com = sprintf('%s ''%s'' ', com, args{i+1}{1}{index}); end;
+				com = sprintf('%s }', com);
+			end;                    
         end;
     else
         com = sprintf('%s, ''%s'', []', com, args{i} );
     end;
 end;
 com = [com ');'];
+
+% interpret the variable name
+% ---------------------------
+function str = str2str( array )
+	str = '';
+	for index = 1:size(array,1)
+		str = [ str ', ''' array(index,:) '''' ];
+	end;
+	if size(array,1) > 1
+		str = [ 'strvcat(' str(2:end) ')'];
+	else
+		str = str(2:end);
+	end;	
+return;
 
 % interpret the variable name
 % ---------------------------
