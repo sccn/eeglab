@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2004/08/20 01:45:55  hilit
+% added 'rmdc' - remove DC input option
+%
 % Revision 1.88  2004/04/30 17:40:19  arno
 % max niquest by default
 %
@@ -482,9 +485,9 @@ end;
 
 if strcmpi(g.rmdc, 'on')
     data = data - repmat(mean(data,2), [ 1 size(data,2) 1]);
-else
-    data = reshape(data, size(data,1), size(data,2)*size(data,3));
 end
+data = reshape(data, size(data,1), size(data,2)*size(data,3));
+
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
