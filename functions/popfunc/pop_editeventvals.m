@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/04/19 20:38:55  arno
+% debuging sorting for integer arrays
+%
 % Revision 1.6  2002/04/18 18:23:39  arno
 % typo can not
 %
@@ -220,7 +223,7 @@ for curfield = 1:2:length(args)
 	            if length(tmparg) < 4, dir2 = 0;
 	            else                   dir2 = tmparg{4}; 
 	            end;
-	            try, eval(['tmparray = cell2mat( { [ EEG.event.' tmparg{3} '] } );']);
+	            try, eval(['tmparray = cell2mat( { EEG.event.' tmparg{3} ' } );']);
 	            catch, eval(['tmparray = { EEG.event.' tmparg{3} ' };']);
 	            end;
 	            [X I] = sort( tmparray );
@@ -230,7 +233,7 @@ for curfield = 1:2:length(args)
 	            events = EEG.event;
 	        end;       
             try, eval(['tmparray = cell2mat( { EEG.event.' tmparg{1} ' } );']);
-            catch, eval(['tmparray = { [ EEG.event.' tmparg{1} '] };']);
+            catch, eval(['tmparray = { EEG.event.' tmparg{1} ' };']);
 	        end;
 	        [X I] = sort( tmparray );
 	        if dir1 == 1, I = I(end:-1:1); end;
