@@ -67,7 +67,7 @@
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'numcontour'      - number of contour lines {default: 6}
-%   'ccolor'          - color of the contours {default: blue}
+%   'ccolor'          - color of the contours {default: dark grey}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
 %   'gridscale'       - [int > 32] size (nrows) of interpolated data matrix (default: 67)
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {101}
@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.182  2004/03/31 02:08:07  scott
+% *** empty log message ***
+%
 % Revision 1.181  2004/03/30 18:48:21  scott
 % same
 %
@@ -500,8 +503,8 @@ CIRCGRID   = 201;       % number of angles to use in drawing circles
 AXHEADFAC = 1.3;        % head to axes scaling factor
 CONTOURNUM = 6;         % number of contour levels to plot
 STYLE = 'both';         % default 'style': both,straight,fill,contour,blank
-HCOLOR = [0 0 0];       % default head color
-CCOLOR = [0 0 1];       % default contour color
+HEADCOLOR = [0 0 0];    % default head color (black)
+CCOLOR = [0.2 0.2 0.2]; % default contour color
 ECOLOR = [0 0 0];       % default electrode color
 ELECTRODES = [];        % default 'electrodes': on|off|label - set below
 MAXDEFAULTSHOWLOCS = 64;% if more channels than this, don't show electrode locations by default
@@ -692,7 +695,7 @@ if nargs > 2
 	    error('bad value for headrad');
 	  end
 	 case {'headcolor','hcolor'}
-	  HCOLOR = Value;
+	  HEADCOLOR = Value;
 	 case {'contourcolor','ccolor'}
 	  CCOLOR = Value;
 	 case {'electcolor','ecolor'}
@@ -1126,11 +1129,6 @@ end;
 %%%%%%%%%%%%%%%%%%%% Plot cartoon head, ears, nose %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if headrad > 0                         % if cartoon head to be plotted
-  basex = 0.18*rmax;                   % nose width
-  tip   = rmax*1.15; 
-  base  = rmax-.004;
-  EarX  = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489]; % rmax = 0.5
-  EarY  = [.0555 .0775 .0783 .0746 .0555 -.0055 -.0932 -.1313 -.1384 -.1199];
 %
 %%%%%%%%%%%%%%%%%%% Plot filled ring %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1156,7 +1154,7 @@ f2= fill(rin*[rx rX*(1+rwidth)],rin*[ry rY*(1+rwidth)],BACKCOLOR,'edgecolor',BAC
 
 % Former line-style border smoothing - width did not scale with plot
 %  brdr=plot(1.015*cos(circ).*rmax,1.015*sin(circ).*rmax,...      % old line-based method
-%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
+%      'color',HEADCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot skirt outline
 %  set(brdr,'color',BACKCOLOR,'linewidth',HLINEWIDTH + 4);        % hide the disk edge jaggies 
 
 %
@@ -1168,22 +1166,30 @@ for k=2:2:CIRCGRID
   rx(k) = rx(k)*(1+hwidth);
   ry(k) = ry(k)*(1+hwidth);
 end
-f3= fill(hin*[rx rX],hin*[ry rY],BACKCOLOR,'edgecolor',BACKCOLOR); hold on
-f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],BACKCOLOR,'edgecolor',BACKCOLOR);
+f3= fill(hin*[rx rX],hin*[ry rY],HEADCOLOR,'edgecolor',HEADCOLOR); hold on
+f4= fill(hin*[rx rX*(1+hwidth)],hin*[ry rY*(1+hwidth)],HEADCOLOR,'edgecolor',HEADCOLOR);
 
 % Former line-style head
 %  plot(cos(circ).*squeezefac*headrad,sin(circ).*squeezefac*headrad,...
-%      'color',HCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
+%      'color',HEADCOLOR,'Linestyle','-','LineWidth',HLINEWIDTH);    % plot head outline
 
 %
 %%%%%%%%%%%%%%%%%%% Plot ears and nose %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  sf    = headrad/plotrad;                                       % squeeze the model ears and nose 
-                                                                 % by this factor
-  plot([basex;0;-basex]*sf,[base;tip;base]*sf,...
-         'Color',HCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
-  plot(EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
-  plot(-EarX*sf,EarY*sf,'color',HCOLOR,'LineWidth',HLINEWIDTH)   % plot right ear
+  base  = rmax-.004;
+  basex = 0.18*rmax;                   % nose width
+  tip   = 1.15*rmax; 
+  tiphw = .04*rmax;                    % nose tip half width
+  tipr  = .01*rmax;                    % nose tip rounding
+  q = .04; % ear lengthening
+  EarX  = [.497  .510  .518  .5299 .5419  .54    .547   .532   .510   .489-.01]; % rmax = 0.5
+  EarY  = [q+.0555 q+.0775 q+.0783 q+.0746 q+.0555 -.0055 -.0932 -.1313 -.1384 -.1199];
+  sf    = headrad/plotrad;                                          % squeeze the model ears and nose 
+                                                                    % by this factor
+  plot([basex;tiphw;0;-tiphw;-basex]*sf,[base;tip-tipr;tip;tip-tipr;base]*sf,...
+         'Color',HEADCOLOR,'LineWidth',HLINEWIDTH);                 % plot nose
+  plot(EarX*sf,EarY*sf,'color',HEADCOLOR,'LineWidth',HLINEWIDTH)    % plot left ear
+  plot(-EarX*sf,EarY*sf,'color',HEADCOLOR,'LineWidth',HLINEWIDTH)   % plot right ear
 end
 
 %
