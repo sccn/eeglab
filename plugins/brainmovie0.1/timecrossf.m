@@ -74,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2003/08/04 21:43:40  arno
+% change applyboot
+%
 % Revision 1.11  2003/06/18 17:21:04  arno
 % allowing to read file on disk
 %
@@ -131,15 +134,12 @@ end;
 % compute all time frequency maps
 % -------------------------------
 compter = 1;
+asdffdsaf
 for numcompo = 1:nbcompo
 	if iscell(data)
-        filename = sprintf('timef%d.mat', numcompo);
-        if exist(filename) ~= 1
-            [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
-                                                      frames, tlimits, srate, cycle, varargin{:});   
-        else
-            load('-mat', filename);
-        end;
+        [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef({ data1(numcompo,:) data2(numcompo,:) }, ...
+                                                          frames, tlimits, srate, cycle, varargin{:});
+        size(ersp{1})
         ALLERSP{numcompo,1}     = applyboot( ersp{1}, erspboot{1});
         ALLERSP{numcompo,2}     = applyboot( ersp{2}, erspboot{2});
         ALLERSP{numcompo,3}     = applyboot( ersp{3}, erspboot{3});
@@ -148,13 +148,8 @@ for numcompo = 1:nbcompo
         if ~isreal(itc{3}), itc{3} = abs(itc{3}); end;
         ALLITC {numcompo,3}     = applyboot( itc{3}, itcboot{3});
     else
-        filename = sprintf('timef%d.mat', numcompo);
-        if exist(filename) ~= 1
-            [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
-                                                      frames, tlimits, srate, cycle, varargin{:});   
-        else
-            load('-mat', filename);
-        end;
+        [ersp,itc,powbase,times,freqs,erspboot,itcboot] = newtimef( data(numcompo,:), ...
+                                                          frames, tlimits, srate, cycle, varargin{:});   
         ALLERSP{numcompo,1}    = applyboot( ersp, erspboot);
         ALLITC{numcompo,1}     = applyboot( itc,  itcboot);
     end;
@@ -173,14 +168,10 @@ for index1 = 1:nbcompo
 	for index2 = 1:nbcompo
 		if index2 > index1
             if iscell(data)
-                filename = sprintf('crossf%d-%d.mat', index1, index2);
-                if exist(filename) ~= 1
-                    [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
+                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf({ data1(index1,:) data2(index1,:)}, ...
                                                                   { data1(index2,:) data2(index2,:)}, frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
-                else 
-                    load('-mat', filename);
-                end;
+                size(coh{1})
                 ALLCROSSF      { index1, index2, 1 } = applyboot(coh{1}, cohboot{1});
                 ALLCROSSF      { index1, index2, 2 } = applyboot(coh{2}, cohboot{2});
                 ALLCROSSF      { index1, index2, 3 } = applyboot(coh{3}, cohboot{3});
@@ -188,13 +179,8 @@ for index1 = 1:nbcompo
                 ALLCROSSFANGLE { index1, index2, 2 } = cohangles{2};
                 ALLCROSSFANGLE { index1, index2, 3 } = cohangles{3};
             else
-                filename = sprintf('crossf%d-%d.mat', index1, index2);
-                if exist(filename) ~= 1
-                    [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), data(index2,:), frames,  ...
+                [coh,mcoh,timesout,freqsout,cohboot,cohangles] = newcrossf(data(index1,:), data(index2,:), frames,  ...
                                                                   tlimits, srate, cycle, varargin{:});    
-                else 
-                    load('-mat', filename);
-                end;
                 ALLCROSSF      { index1, index2 } = applyboot(coh, cohboot);
                 ALLCROSSFANGLE { index1, index2 } = cohangles;
                 if SAVE
