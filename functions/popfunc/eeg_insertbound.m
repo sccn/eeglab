@@ -1,26 +1,23 @@
-% eeg_insertbound() - insert boundary event in event structure.
+% eeg_insertbound() - insert boundary event in EEGLAB event structure.
 %
 % Usage:
-%   >> EEGOUT = eeg_insertbound( EEG, latency, abslatency, lengths, checkevent);
+%   >> eventout = eeg_insertbound( eventin, pnts, latency, abslatency, duration);
 %
 % Inputs:
-%   EEG        - EEG dataset
+%   eventin    - EEGLAB event structure
 %   latency    - relative latency (in the event structure) of boundary 
 %                event(s)
 %   abslatency - absolute latency of regions in original dataset. Can
 %                also be an array of [beg end] latency with one row
 %                per region removed. Then 'lengths' is ignored.
-%   lengths    - length of removed regions
-%   checkevent - [0|1] check event consistency (1). Default is 1.
+%   duration   - length of removed regions
 %
 % Outputs:
-%   EEG        - output EEG dataset with 'event' and 'urevent' fields
-%                updated
+%   eventout   - EEGLAB event output structure with added boundaries
 %
 % Notes:
 %   1) This function performs the following: add boundary events to the 
-%   'event' and 'urevent' structures. Update urevent indices in the
-%   'event' structure. Add a length field to the 'urevent' boundaries.
+%   'event' structures; remove nested boundaries.
 %   2) all latencies are given in data point unit.
 % 
 % Author: Arnaud Delorme, SCCN, INC, UCSD, April, 19, 2004
@@ -46,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/05/06 21:53:28  arno
+% same
+%
 % Revision 1.10  2004/05/06 21:52:43  arno
 % debuging for mergeset
 %
@@ -81,14 +81,11 @@
 % Initial revision
 %
 
-function EEG = eeg_insertbound( EEG, boundevents, regions, lengths, checkevent );
+function eventout = eeg_insertbound( eventin, pnts, boundevents, regions, lengths);
     
     if nargin < 2
         help eeg_insertbound;
         return;
-    end;
-    if nargin < 5
-        checkevent = 1;
     end;
     if size(regions,2) ~= 1 & exist('lengths') ~= 1
         lengths = regions(:,2)-regions(:,1)+1;
@@ -98,20 +95,18 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths, checkevent )
         lengths = zeros(size(regions));
     end;
     
-    if isfield(EEG, 'urevent')
-        newur = EEG.urevent;
-    end;
+    eventout = eventin;
     rmnested = [];
 	for tmpindex = 1:length(boundevents)
-        if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= EEG.pnts
+        if boundevents(tmpindex) >= 1 & boundevents(tmpindex) <= pnts
             
             % insert event at the correct location in the urevent structure
             % -------------------------------------------------------------
-            if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
+            if isfield(eventin, 'latency')
+                
                 % find event succeding boundary
                 % ------------------------------
-                urlatency = eeg_urlatency(EEG.urevent, regions(tmpindex)-0.5);
-                alllats   = cell2mat( { newur.latency } ) - urlatency;
+                alllats   = cell2mat( { eventout.latency } ) - regions(tmpindex)-0.5;
                 tmpind    = find( alllats > 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
                 tmpind2        = tmpind(tmpind2);
@@ -119,65 +114,56 @@ function EEG = eeg_insertbound( EEG, boundevents, regions, lengths, checkevent )
                 % insert event at tmpind2
                 % -----------------------
                 if ~isempty(tmpind2)
-                    newur(tmpind2+1:end+1) = newur(tmpind2:end);
-                    newur(tmpind2).type  = 'boundary';
+                    eventout(tmpind2+1:end+1) = eventout(tmpind2:end);
                 else
-                    newur(end+1).type  = 'boundary';
-                    tmpind2 = length(newur);
+                    tmpind2 = length(eventout)+1;
                 end;
-                newur(tmpind2).latency = urlatency;
-                newur(tmpind2).length  = lengths(tmpindex);
-                rmnested = [ rmnested findnestedur(newur, tmpind2) ];
-                
-                % update indices in event structure
-                % ---------------------------------
-                for index = 1:length(EEG.event)
-                    if EEG.event(index).urevent >= tmpind2
-                        EEG.event(index).urevent = EEG.event(index).urevent+1;
-                    end;
+                eventout(tmpind2).type     = 'boundary';
+                eventout(tmpind2).latency  = regions(tmpindex)-0.5;
+                eventout(tmpind2).duration = 0; % just to create field
+                [ tmpnest addlength ] = findnested(eventout, tmpind2);
+                if addlength == -1
+                    eventout(tmpind2) = rmfield(eventout, 'duration');
+                    disp('Warning: old boundary event type present in dataset');
+                    disp('         The new boundary events have to be compatible with the old ones');
+                    disp('         and will not contain the duration of the removed region');
+                else
+                    eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
                 end;
+                rmnested = [ rmnested tmpnest ];
             end; 
-            
-            % update event structure
-            % ----------------------
-            EEG.event(end+1).type  = 'boundary';
-            EEG.event(end).latency = boundevents(tmpindex);
-            if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
-                EEG.event(end).urevent = tmpind2;              
-            end;
+        
         end; 
 	end;
     
-    % sort urevents by latency
-    % ------------------------
-    if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
-        [EEG.event EEG.urevent] = removenested(EEG.event, newur, rmnested);
-    end;
-    
-	EEG = pop_editeventvals( EEG, 'sort', { 'latency', [0] } );
-    if checkevent
-        EEG = eeg_checkset(EEG, 'eventconsistency');
-    end;
+    % remove nested events
+    % ---------------------
+    eventout(rmnested) = [];
 
-% look for nested ur events
+% look for nested events
 % retrun indices of nested events and
 % their total length
 % -----------------------------------
-function [ indnested, addlen ] = findnestedur(newur, ind);
+function [ indnested, addlen ] = findnested(event, ind);
     indnested = [];
     addlen = 0;
     tmpind = ind+1;
-    
-    while tmpind < length(newur) & ...
-        newur(tmpind).latency < newur(ind).latency+newur(ind).length
-        if strcmpi(newur(tmpind).type, 'boundary')
+
+    while tmpind < length(event) & ...
+        event(tmpind).latency < event(ind).latency+event(ind).duration
+        if strcmpi(event(tmpind).type, 'boundary')
             indnested = [ indnested tmpind ];
-            addlen    = addlen + newur(tmpind).length;
+            if ~isempty( event(tmpind).duration )
+                addlen    = addlen + event(tmpind).duration;
+            else
+                addlen = -1; % error
+            end;
         end;
         tmpind = tmpind+1;
     end;
     
 % remove urevent and recompute indices
+% THIS FUNCTION IS DEPRECATED
 % ------------------------------------
 function [event, urevent] = removenested(event, urevent, nestind);
     
