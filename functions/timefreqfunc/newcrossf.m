@@ -155,6 +155,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/01/02 09:08:41  cooper
+% fixed bug in formula for linear
+% coherence passed to condstat.
+%
 % Revision 1.31  2003/01/02 07:35:10  cooper
 % fixed coherresout = [] bug in
 % linear coher case.
@@ -970,9 +974,6 @@ end;
 % compute angles
 % --------------
 Rangle = angle(R);
-if g.cycles(1) ~= 0
-   Rangle = -Rangle; % make lead/lag the same for FFT and wavelet analysis
-end
 if ~isreal(R)
     R = abs(R);
     Rraw =R; % raw coherence values
