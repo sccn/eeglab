@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/07/24 23:27:24  arno
+% debuging ng_ol
+%
 % Revision 1.24  2003/07/24 00:21:29  arno
 % buttons ...
 %
@@ -203,10 +206,22 @@ switch lower(icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
+        tmprank = rank(tmpdata(:,1:100));
+        if rank(tmpdata) < size(EEG.data,1), 
+            disp(['Warning: data rank lower than number of channel, number of component reduced to' int2str(tmprank) ]);
+        end;
         if length(options) < 2
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001 );
+            if rank(tmpdata) == size(EEG.data,1), 
+                [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001 );
+            else 
+                [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
+            end;
         else    
-            eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
+            if rank(tmpdata) == size(EEG.data,1), 
+                eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s );', options));
+            else
+                eval(sprintf('[EEG.icaweights,EEG.icasphere] = runica( tmpdata %s, ''pca'', %d );', options, tmprank));
+            end;
         end;
      case 'binica'
         if ~isunix | strcmp(computer, 'MAC')
@@ -218,10 +233,22 @@ switch lower(icatype)
         if exist(ICABINARY) ~= 2
             error('Pop_runica: binary ica program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
+        tmprank = rank(tmpdata(:,1:100));
+        if rank(tmpdata) < size(EEG.data,1), 
+            disp(['Warning: data rank lower than number of channel, number of component reduced to' int2str(tmprank) ]);
+        end;
         if length(options) < 2
-            [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001 );
+            if rank(tmpdata) == size(EEG.data,1), 
+                [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001 );
+            else 
+                [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank );
+            end;
         else    
-            eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica(tmpdata %s );', options));
+            if rank(tmpdata) == size(EEG.data,1), 
+                eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s );', options));
+            else
+                eval(sprintf('[EEG.icaweights,EEG.icasphere] = binica( tmpdata %s, ''pca'', %d );', options, tmprank));
+            end;
         end;
      case 'jader' 
         if length(options) < 2
