@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/07/21 17:17:15  arno
+% debugging extract epochs from epochs
+%
 % Revision 1.9  2002/06/28 02:15:37  arno
 % considering events in different epochs
 %
@@ -113,12 +116,12 @@ if nargin < 3
 	% popup window parameters
 	% -----------------------
    promptstr    = { [ 'Enter time-locking event type(s) ([]=all):' 10 ...
-                    '(use ''/Edit/Edit event values'' to scan type values)'], ...
+                    '(use ''/Edit/Event values'' to scan type values)'], ...
                     'Epoch [start, end] in seconds (e.g. [-1 2]):', ... 
                     'Name of the new dataset:', ... 
 					'Out-of-bounds EEG rejection limits, [min max] ([]=none):'  };
 
-   inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '" dataset' ]), '' };
+   inistr       = { '', '[-1 2]', fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '"' ]), '' };
    result       = inputdlg( promptstr, 'Extract epochs -- pop_epochs', 1,  inistr);
    size_result  = size( result );
    if size_result(1) == 0 return; end;
@@ -149,7 +152,7 @@ end;
 try, g.epochfield; 	 	  catch, g.epochfield = 'type'; end; % obsolete
 try, g.timeunit; 	 	  catch, g.timeunit = 'points'; end;
 try, g.verbose; 	      catch, g.verbose = 'on'; end;
-try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '" dataset' ]); end;
+try, g.newname; 	      catch, g.newname = fastif(isempty(EEG.setname), '', ['Epoched from "' EEG.setname '"' ]); end;
 try, g.eventindices;      catch, g.eventindices = []; end;
 try, g.epochinfo;         catch, g.epochinfo = 'yes'; end;
 try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [-Inf Inf]; end;
