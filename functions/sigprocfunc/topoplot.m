@@ -12,6 +12,20 @@
 %                        >> topoplot 'example' for format). May also be an
 %                        EEG.chanlocs structure (see >> help pop_editset)
 % Optional Parameters:
+%   'maplimits'       - 'absmax' scale to +/- the absolute-max; 'maxmin', scale to 
+%                        the data range; [clim1,clim2], user-definined lo/hi limits
+%                        {default = 'absmax'}
+%   'style'           - 'straight' - plot colored map only
+%                       'contour'  - plot contour lines only
+%                       'both'     - plot both colored map and contour lines
+%                       'fill'     - plot constant color between contour lines
+%                       'blank'    - plot electrode locations only
+%                                    {default = 'both'}
+%   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
+%   'numcontour'      - number of contour lines {default = 6}
+%   'shading'         - 'flat','interp'  {default = 'flat'}
+%   'interplimits'    - ['electrodes'|'head'] 'electrodes', to furthest electrode; 
+%                       'head', to edge of head {default 'head'}.
 %   'shrink'           - ['on'|'off'|'force'|factor] 'on': normalize electrode 
 %                        polar coordinates if maximum radius > 0.5 so that
 %                        maximu radius is 0.5. 'force': normalize radius so 
@@ -20,8 +34,6 @@
 %                        Note that the chan_locs structure may have an optional
 %                        shrink field (same format as this parameter).
 %   'colormap'        -  (n,3) any sized colormap
-%   'interplimits'    - ['electrodes'|'head'] 'electrodes': to furthest electrode; 
-%                       'head' to edge of head {default 'head'}.
 %   'dipole'          -  [XI YI XE YE ZE] plot dipole on the top of the scalp
 %                        map from coordinate XI,YI to coordinates XE, YE, ZE (head 
 %                        model has radius 1). If several rows, plot one dipole per row.
@@ -33,21 +45,8 @@
 %                        The dipole bar is scaled by length L. Dipole size (scaling) 
 %                        is S and its color is C (3 real numbers between 0 and 1).
 %                        Coordinates returned by dipplot() may be used.
-%   'maplimits'       - 'absmax' +/- the absolute-max 
-%                       'maxmin' scale to data range
-%                        [clim1,clim2] user-definined lo/hi
-%                        {default = 'absmax'}
-%   'style'           - 'straight' - colormap only
-%                       'contour'  - contour lines only
-%                       'both'     - both colormap and contour lines
-%                       'fill'     - constant color between lines
-%                       'blank'    - only plot electrode locations
-%                       {default = 'both'}
-%   'numcontour'      - number of contour lines {default = 6}
-%   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'headcolor'       - color of head cartoon {default black}
 %   'verbose'         - ['on'|'off'] default is 'on'.
-%   'electrodes'      - 'on','off','labels','numbers','pointlabels','pointnumbers'
 %   'noplot'          - ['on'|'off'|[rad theta]] do not plot (but return interpolated data).
 %                        If [rad theta] are coordinates of a (possibly missing) channel, 
 %                        returns interpolated value for channel location. For location 
@@ -96,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2003/12/17 15:49:45  arno
+% debug chan with no coordinates
+%
 % Revision 1.69  2003/12/17 01:25:37  arno
 % debug plot electrode subset
 %
