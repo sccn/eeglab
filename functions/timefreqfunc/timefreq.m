@@ -1,34 +1,58 @@
 % timefreq() - compute time/frequency decomposition of data trials.
 %
 % Usage:
-%     >> [tf, freqs, times, itcvals] = timefreq(arg1, arg2, formula, varargin ...);
+%     >> [tf, freqs, times] = timefreq(data, srate);
+%     >> [tf, freqs, times, itcvals] = timefreq(data, srate, 'key1', 'val1', ...
+%                                      'key2', 'val2' ...)
 %
 % Inputs:
-%    arg1    - [array] 2-D or 3-D array of value
-%    arg2    - [array] 2-D or 3-D array of value
-%    formula - [string] formula to compute a given measure. Takes arguments
-%              'arg1', 'arg2' as inputs and 'res' (by default) as output. i.e.
-%              'res = res + arg1 .* conj(arg2)'
+%       data    = [float array] 2-D data array of size (times,trials)
+%       srate   = sampling rate
 %
 % Optional inputs:
-%   'boottype '   - ['first'|'second'|'both'] 'fist' accumulate in the first 
-%                 dimension only (shuffling the first dimension). 'second'
-%                 shuffle the second dimension but keep the fist constant. 
-%                 'both' shuffle the two dimension. Default is 'both'.
-%   'alpha'       - [real] significance (between 0 and 1). Default is 0.05.
-%   'naccu'       - [integer] number of exemplar to accumulate. Default is 200.
-%   'basevect'    - [integer vector] time vector indices for baseline. Default 
-%                 is all time points.
-%   'accarray'    - accumulation array (from previous calls). Allow to compute
-%                 only the 'rsignif' output.
-%   'formulainit' - [string] for initializing variable. i.e. 'res = zeros(10,40);'
-%                 Default is initialization of the res variable to
-%                 (size(arg1,3) x naccu)
-%   'formulapost' - [string] after the accumulation. i.e. 'res = res /10;'
-%                 default is none.
-%   'formulaout'  - [string] name of the computed variable. Default is 'res'.
+%       wavelet = 0  -> Use FFTs (with constant window length) { Default } 
+%               = >0 -> Number of cycles in each analysis wavelet 
+%               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
+%                 of wavelet cycles expands with frequency from cycles
+%                 If expfactor = 1, no expansion; if = 0, constant
+%                 window length (as in FFT)            {default wavelet: 0}
+%
+%    Optional Coherence Type for ITC:
+%      'type'   = ['coher'|'phasecoher'] Compute either linear coherence
+%                 ('coher') or phase coherence ('phasecoher') also known
+%                 as phase coupling factor' {default: 'phasecoher'}.
+%      'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
+%                 (ITC) from x and y. This computes the  'intrinsic' coherence
+%                 x and y not arising from common synchronization to 
+%                 experimental events. See notes. {default: 'off'}
+%
+%    Optional Detrend:
+%      'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
+%
+%    Optional FFT/DFT:
+%      'winsize'  = If cycles==0 (FFT, see 'wavelet' input): data subwindow 
+%                   length (fastest, 2^n<frames);
+%                   if cycles >0: *longest* window length to use. This
+%                   determines the lowest output frequency  {~frames/8}
+%      'timesout' = Number of output times (int<frames-winsize) {def: 200}
+%      'padratio' = FFTlength/winsize (2^k)                     {def: 2}
+%                    Multiplies the number of output frequencies by
+%                    dividing their spacing. When cycles==0, frequency
+%                    spacing is (low_frequency/padratio).
+%      'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
+%                    If wavelet==0, all FFT frequencies are output.
+%                    For wavelet, reducing the max frequency reduce
+%                    the computation load {def: 50}
 %
 % Outputs: 
+%       tf      - time frequency array for all trials (freqs, times, trials)
+%       freqs   - vector of computed frequencies (Hz)
+%       times   - vector of computed time points (ms)
+%       itcvals - time frequency "average" for all trials (freqs, times).
+%                 In the coherence case, it is the real mean of the time
+%                 frequency decomposition, but in the phase coherence case
+%                 (see 'type' input'), this is the mean of the normalized
+%                 spectral estimate.
 %
 % Authors: Arnaud Delorme, Lars & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
@@ -52,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/10/16 01:21:16  arno
+% removing debug plots
+%
 % Revision 1.8  2002/10/16 00:18:34  arno
 % debuging with cooper
 %
@@ -106,6 +133,8 @@ g = finputcheck(varargin, ...
 				  'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher'; ...
 				  'subitc'        'string'   {'on' 'off'}              'off'	});
 
+% checkin parameters
+% ------------------
 g.cycles = g.wavelet(1);
 if length(g.wavelet) >= 2
 	g.cyclesfact = g.wavelet(2);
