@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2003/08/02 21:29:50  arno
+% text
+%
 % Revision 1.19  2003/07/28 17:39:07  arno
 % nothing
 %
@@ -166,7 +169,6 @@ end;
 if revfilt ~= 0
 	options = { options{:} revfilt };
 end;
-options
 
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
