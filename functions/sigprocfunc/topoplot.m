@@ -45,6 +45,7 @@
 %   'numcontour'      - number of contour lines {default = 6}
 %   'shading'         - 'flat','interp'  {default = 'flat'}
 %   'headcolor'       - Color of head cartoon {default black}
+%   'verbose'         - ['on'|'off'] default is 'on'.
 %   'electrodes'      - 'on','off','labels','numbers','labelpoint','numpoint'
 %   'efontsize'       - detail
 %   'electcolor'      - detail
@@ -84,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2002/11/27 01:23:53  arno
+% change warning message
+%
 % Revision 1.24  2002/11/12 23:06:48  arno
 % still debugging last insert
 %
@@ -201,6 +205,7 @@ HLINEWIDTH = 2;
 SHADING = 'flat';     % flat or interp
 shrinkfactor = 'off';
 DIPOLE = [];
+VERBOSE = 'off';
 
 %%%%%%%%%%%%%%%%%%%%%%%
 if nargin< 1
@@ -275,6 +280,8 @@ if nargs > 2
           error('topoplot(): Incorrect value for interplimits')
 	  end
 	  INTERPLIMITS = Value;
+	 case 'verbose'
+	  VERBOSE = Value;
 	 case 'maplimits'
 	  MAPLIMITS = Value;
 	 case 'gridscale'
@@ -358,7 +365,9 @@ Th = pi/180*Th;                              % convert degrees to radians
 if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
 		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
-		fprintf('topoplot(): electrode radius shrunk by %2.3g to show all\n', squeeze);
+		if strcmpi(VERBOSE, 'on')
+            fprintf('topoplot(): electrode radius shrunk by %2.3g to show all\n', squeeze);
+        end;
 		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
 	end;	
 else 
@@ -368,7 +377,9 @@ end;
 	  
 enum = find(Rd <= 0.5);                     % interpolate on-head channels only
 if length(enum) > length(Rd)
-	fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', length(enum)-length(Rd),length(Rd));
+    if strcmpi(VERBOSE, 'on')
+        fprintf('topoplot(): %d/%d electrode not shown (radius>0.5)\n', length(enum)-length(Rd),length(Rd));    
+    end; 
 end;	
 if ~isempty(Vl)
 	if length(Vl) == length(Th)
@@ -380,7 +391,10 @@ if ~isempty(Vl)
             for kk=1:length(Vl)
                 tmpind = find(enum == Vl(kk));
                 if isempty(tmpind)
-                    disp('Topoplot warning: some channel are not visible (use the "Edit > Channel locations" to modify the shrink factor).');
+                    if strcmpi(VERBOSE, 'on')
+                        disp( [ 'Topoplot warning: some channel are not visible (use the "Edit' ...
+                                ' > Channel locations" to modify the shrink factor).' ] );
+                    end;
                 else
                     tmpVl(cc) = tmpind;
                     cc=cc+1;
