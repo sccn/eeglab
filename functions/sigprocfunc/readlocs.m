@@ -181,6 +181,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2005/01/13 22:55:50  arno
+% do not select string in theta
+%
 % Revision 1.65  2004/10/27 01:01:05  arno
 % msg format
 %
@@ -600,12 +603,19 @@ else
         disp('readlocs(): input variable must be a string or a structure');
     end;        
 end;
+
+% remove string in theta
+% ----------------------
+tmpinds = find(cellfun('length',{ eloc.theta}) > 1);
+for ind = tmpinds
+    eloc(tmpinds).theta = [];
+end;
 if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
 if nargout > 2
     tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
-    indices = intersect(find(cellfun('length', tmptheta) == 1), find(~cellfun('isempty', tmptheta)));
+    indices = find(~cellfun('isempty', tmptheta));
     theta = cell2mat(tmptheta(indices));
 end;
 if nargout > 3
