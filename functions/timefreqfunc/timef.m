@@ -92,8 +92,9 @@
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%          powbase  = Baseline power spectrum (removed for each window to compute the ersp)
-%            times  = Vector of output times (subwindow centers) (in ms).
+%          powbase  = Baseline power spectrum (subtracted from each window to compute 
+%                     the ERSP).
+%            times  = Vector of output times (sub-window centers) (in ms).
 %            freqs  = Vector of frequency bin centers (in Hz).
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
@@ -101,8 +102,8 @@
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
-% Know problems:
-%   Significance masking fails for linear coherence.
+% Known problems:
+%   Significance masking currently fails for linear coherence.
 %
 % See also: crossf()
  
@@ -126,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2003/05/12 23:41:54  arno
+% text typo
+%
 % Revision 1.55  2003/05/05 16:27:11  arno
 % debug FFT scale
 %
