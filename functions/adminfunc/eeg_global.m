@@ -1,4 +1,6 @@
-% eeg_global() - declare global EEGLAB variables 
+% eeg_global() - declare global EEGLAB variables. These variables are
+%                used only as global by the main function eeglab(),
+%                the function pop_rejmenu() and the history h() function.
 %           
 % Global variables:
 %  EEG        - structure containing the current dataset
@@ -31,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/21 01:02:22  scott
+% edit help msg -sm
+%
 % Revision 1.4  2002/04/11 23:30:33  arno
 % remove LASTCOM check
 %
