@@ -85,6 +85,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2002/10/13 23:23:32  scott
+% added ampsort, valsort args -sm
+%
 % Revision 1.44  2002/09/03 21:35:27  arno
 % removing oridata completelly
 %
@@ -722,9 +725,9 @@ if nargin > 6
 		  Limitflag = YES;
 	  elseif (strcmp(Arg,'phase') | strcmp(Arg,'phasesort'))
 		  Phaseflag = YES;
-	  elseif (strcmp(Arg,'ampsort') 
+	  elseif strcmp(Arg,'ampsort') 
 		  Ampflag = YES;
-	  elseif (strcmp(Arg,'valsort') 
+	  elseif strcmp(Arg,'valsort')
 		  Valflag = YES;
 	  elseif strcmp(Arg,'auxvar')
 		  Auxvarflag = YES;
