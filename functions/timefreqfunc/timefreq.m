@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/10/09 00:03:20  arno
+% debugging
+%
 % Revision 1.2  2002/10/02 00:36:08  arno
 % update condstat, debug
 %
@@ -104,7 +107,7 @@ elseif (g.winsize > frame)
    error('Value of winsize must be less than frame length.');
 end 
 if (g.timesout > frame-g.winsize)
-   g.timesout = g.frame-g.winsize;
+   g.timesout = frame-g.winsize;
    disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
 end
 if (pow2(nextpow2(g.padratio)) ~= g.padratio)
