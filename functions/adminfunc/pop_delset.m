@@ -1,9 +1,10 @@
 % pop_delset() - Delete a dataset into the global variable containing
 %                all datasets.
 %
-% Usage: >> pop_delset(indexes);
+% Usage: >> ALLEEG = pop_delset(ALLEEG, indexes);
 %
 % Inputs:
+%   ALLEEG   - array of EEG datasets
 %   indexes  - Indexes of datasets to delete. If no index is given,
 %              a pop_up window asks the user to choose.
 %
@@ -32,20 +33,25 @@
 % uses the global variable ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
 % load a set and store it in the current set
 % ------------------------------------------
-function command = pop_delset( set_in);
-eeg_global;
-eeg_consts;
+function [ALLSET, command] = pop_delset(ALLSET, set_in);
 
 command = '';
-if isempty( ALLEEG )
+if nargin < 1
+	help pop_delset;
+	return;
+end;
+if isempty( ALLSET )
     return;
 end;    
-if nargin < 1
 
+if nargin < 2
 	% which set to delete
 	% -----------------
 	promptstr    = { 'Enter the dataset(s) to delete:' };
@@ -60,13 +66,13 @@ if isempty(set_in)
 	return;
 end;	
 
-A = fieldnames( ALLEEG );
+A = fieldnames( ALLSET );
 A(:,2) = cell(size(A));
 A = A';
 for i = set_in
    try
-   		ALLEEG(i) = struct(A{:});
-		%ALLEEG = setfield(ALLEEG, {set_in}, A{:}, cell(size(A)));
+   		ALLSET(i) = struct(A{:});
+		%ALLSET = setfield(ALLSET, {set_in}, A{:}, cell(size(A)));
 	catch
 		error('Error: no such dataset');
 		return;
@@ -79,8 +85,8 @@ if ismember(CURRENTSET, set_in)
 	CURRENTSET = 0;
 	index = 1;
 	while( index <= MAX_SET)
-		try, ALLEEG(index).data;
-			if ~isempty( ALLEEG(index).data)
+		try, ALLSET(index).data;
+			if ~isempty( ALLSET(index).data)
 				CURRENTSET = index;
 				break;
 			end;	
@@ -88,9 +94,6 @@ if ismember(CURRENTSET, set_in)
  		index = index+1;
 	end;
 end;
-if CURRENTSET == 0
-    EEG = eeg_emptyset;
-end;
     
-command = sprintf('pop_delset( [%s] );', int2str(set_in));
+command = sprintf('%s = pop_delset( %s, [%s] );', inputname(1), int2str(set_in));
 return;
