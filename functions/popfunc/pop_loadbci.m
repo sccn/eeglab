@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/11/13 17:09:12  scott
+% help msg
+%
 % Revision 1.7  2002/10/15 17:00:49  arno
 % drawnow
 %
@@ -56,6 +59,7 @@
 %
 
 function [EEG, command] = pop_loadbci(filename, srate); 
+EEG = [];
 command = '';
 
 if nargin < 1

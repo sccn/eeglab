@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/10 18:03:54  arno
+% default filters
+%
 % Revision 1.7  2003/04/10 18:00:15  arno
 % file file
 % file filter
@@ -56,6 +59,7 @@
 %
 
 function [EEG, command] = pop_read_erpss(filename); 
+EEG = [];
 command = '';
 
 if nargin < 1

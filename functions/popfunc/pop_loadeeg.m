@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/10 18:02:57  arno
+% change default file name
+%
 % Revision 1.8  2003/04/10 18:01:51  arno
 % file filter
 %
@@ -87,6 +90,7 @@
 % ------------------
 function [EEG, command] = pop_loadeeg(filename, filepath, range_chan, range_sweeps, range_typeeeg, range_response); 
 
+EEG = [];
 command = '';
 
 if nargin < 2
