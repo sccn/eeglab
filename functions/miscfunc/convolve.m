@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/07/29 22:29:25  arno
+% put bug
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -42,7 +45,6 @@
 function R = convolve( A, B )
 
 % size of B must be odd
-my modif
 
 % convolve A and B (normalize by the sum of convolved elements)
 % -------------------------------------------------------------
