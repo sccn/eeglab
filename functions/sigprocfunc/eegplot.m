@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2003/01/10 01:01:29  arno
+% updating plotting position
+%
 % Revision 1.65  2002/11/15 01:11:59  arno
 % debugging incallback
 %
@@ -341,7 +344,7 @@ SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
 DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.788095];
                                   % dimensions of main EEG axes
-ORIGINAL_POSITION = [100 200 800 500];
+ORIGINAL_POSITION = [50 50 800 500];
                                   
 if nargin < 1
    help eegplot
@@ -499,9 +502,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
-      'MenuBar','none','tag', g.tag ,'Position',g.position, 'numbertitle', 'off');
+      'MenuBar','none','tag', g.tag ,'Position',g.position, 'numbertitle', 'off', 'visible', 'off');
 
-  pos = get(gcf,'position'); % plot relative to current axes
+  pos = get(figh,'position'); % plot relative to current axes
   q = [pos(1) pos(2) 0 0];
   s = [pos(3) pos(4) pos(3) pos(4)]./100;
   clf;
@@ -1025,14 +1028,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
           'eegplot(''drawp'', 0);' ...
           'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
 
-  set(gcf, 'windowbuttondownfcn', commandpush);
-  set(gcf, 'windowbuttonmotionfcn', commandmove);
-  set(gcf, 'windowbuttonupfcn', commandrelease);
-  set(gcf, 'interruptible', 'off');
-  set(gcf, 'busyaction', 'cancel');
+  set(figh, 'windowbuttondownfcn', commandpush);
+  set(figh, 'windowbuttonmotionfcn', commandmove);
+  set(figh, 'windowbuttonupfcn', commandrelease);
+  set(figh, 'interruptible', 'off');
+  set(figh, 'busyaction', 'cancel');
   
   g.commandselect = { commandpush commandmove commandrelease };           
-  set(gcf, 'userdata', g);
+  set(figh, 'userdata', g);
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Plot EEG Data
@@ -1065,7 +1068,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   set(h, 'backgroundcolor', BUTTON_COLOR);
   h = findobj(gcf, 'tag', 'eegslider');
   set(h, 'backgroundcolor', BUTTON_COLOR);
-
+  set(figh, 'visible', 'on');
+  
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
