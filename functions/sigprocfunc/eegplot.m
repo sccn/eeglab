@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2002/08/27 23:34:00  arno
+% debugging xgrid
+%
 % Revision 1.45  2002/08/19 19:47:19  arno
 % debugging last
 %
@@ -310,7 +313,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.color;		    catch, g.color		= 'off'; end;
    try, g.submean;			catch, g.submean	= 'on'; end;
    try, g.children;			catch, g.children	= 0; end;
-   try, g.limits;		    catch, g.limits	    = [0 1]; end;
+   try, g.limits;		    catch, g.limits	    = [0 size(data,2)/g.srate]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans  = min(32, size(data,1)); end;
    try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
