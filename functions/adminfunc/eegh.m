@@ -14,10 +14,13 @@
 %   - arg is 0         : clear stack
 %   - arg1 is 'find' and arg2 is a string, try to find the closest command
 %     in the stack containing the string
+%   - arg1 is a string and arg2 is a structure, also add the history to
+%     the structure in filed 'history'.
 %
 % Global variables used:
 %   LASTCOM   - last command
 %   ALLCOM    - all the commands   
+%   EEG       - EEG structure
 %
 % See also:
 %  eeglab() (a graphical interface for eeg plotting, space frequency
@@ -45,6 +48,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/08/11 19:23:34  arno
+% remove eeg_const
+%
 % Revision 1.2  2002/07/27 00:42:10  arno
 % implementing findstr
 %
@@ -58,6 +64,7 @@ mode = 1; % mode = 1, full print, mode = 0, truncated print
 
 global LASTCOM;
 global ALLCOM;
+global EEG;
 
 if nargin < 1
 	if isempty(ALLCOM)
@@ -82,7 +89,7 @@ elseif nargin == 1
 		if isempty(ALLCOM)
 			ALLCOM = { command };
 		else	
-			ALLCOM          = { command ALLCOM{:}};
+			ALLCOM = { command ALLCOM{:}};
 		end;	
 		LASTCOM         = command;
 	else	
@@ -104,13 +111,21 @@ elseif nargin == 1
 		end;	
 	end;		
 else % nargin == 2
-	if strcmp(command, 'find')
-      for index = 1:length(ALLCOM)
-		  if ~isempty(findstr(ALLCOM{index}, str))
-			  str = ALLCOM{index};  
-			  return;
-		  end;
-	  end;
-	  str = [];
-	end;
+    if ~isstruct(str)
+        if strcmp(command, 'find')
+            for index = 1:length(ALLCOM)
+                if ~isempty(findstr(ALLCOM{index}, str))
+                    str = ALLCOM{index};  
+                    return;
+                end;
+            end;
+            str = [];
+        end;
+    else
+        h(command); % add to history
+        if ~isfield(EEG, 'history')
+            EEG.history = '';
+        end;
+        EEG.history = strvcat(EEG.history, command);
+    end;
 end;
