@@ -59,7 +59,7 @@
 %   "OK" - [button] save editing and propagate to parent.
 % 
 % Input:
-%   EEG      - EEG dataset
+%   EEG      - EEG dataset 
 %   chanlocs - EEG.chanlocs structure
 %
 % Optional inputs:
@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2004/03/19 19:45:49  arno
+% plotrad as number
+%
 % Revision 1.95  2004/03/19 19:45:16  arno
 % conversion
 %
@@ -431,7 +434,13 @@ com ='';
 if nargin < 1
    help pop_editeventvals;
    return;
-end;	
+end;
+
+% in case an EEG structure was given as input
+% -------------------------------------------
+if isstruct(chans) & isfield(chans, 'chanlocs')
+    chans = chans.chanlocs;
+end;
 
 nbchan = length(chans);
 allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' };
