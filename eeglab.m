@@ -179,6 +179,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2002/08/14 00:03:13  arno
+% *** empty log message ***
+%
 % Revision 1.130  2002/08/13 23:51:33  arno
 % debug CURRENSET (T missing)
 %
@@ -658,7 +661,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadset;' e_load]); 
 	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_store]);
-	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG); EEG = eeg_retrieve(ALLEEG, CURRENTSET);' e_hist 'h(''EEG = eeg_retrieve(ALLEEG, CURRENTSET);'');' ]);
+	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG);' e_hist ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall]);
 	uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_saveh(ALLCOM);' e_hist]);
@@ -1033,6 +1036,9 @@ if ~option_keepdataset
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'off');
 	CURRENTSET = 0;
 else
+	if isempty(ALLEEG)
+		ALLEEG = EEG;
+	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
 
