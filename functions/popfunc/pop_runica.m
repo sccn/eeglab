@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/02/01 23:09:42  arno
+% call to icaML and icaMS
+%
 % Revision 1.44  2004/09/09 00:13:31  arno
 % fixing rank problem
 %
@@ -249,6 +252,12 @@ else
 		end;
 	end;	
 end;
+
+% remove old ICA weights etc...
+% -----------------------------
+EEG.icaweights = [];
+EEG.icasphere  = [];
+EEG.icaact     = [];
 
 %------------------------------
 % compute ICA on a definite set
