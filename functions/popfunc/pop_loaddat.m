@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/10 17:36:06  arno
+% header
+%
 % Revision 1.8  2002/10/15 17:01:35  arno
 % *** empty log message ***
 %
@@ -105,7 +108,7 @@ disp('Loading dat file...');
 [typeeeg, rt, response, n] = loaddat( fullFileName );
 
 if n ~= EEG.trials
-	error('pop_loaddat, number of trials in input dataset and DAT file different, abording');
+	error('pop_loaddat, number of trials in input dataset and DAT file different, aborting');
 end;	  
 
 for index = 1:length(EEG.event)
