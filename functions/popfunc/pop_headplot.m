@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2003/05/10 02:36:02  arno
+% compress output command
+%
 % Revision 1.18  2003/05/10 02:16:41  arno
 % debug autoscale
 %
@@ -130,6 +133,7 @@ if nargin < 3
 				    if filename == 0 return; end;
 		            EEG.splinefile = [ filepath filename ];
 		            options = [ ', ''load'',' EEG.splinefile ',' ]; 
+                    com = 'EEG = ';
 		      case 'yes',
 				    [filename, filepath] = uiputfile('*.spl', 'Save spline file with .spl extension');
                     drawnow;
@@ -137,6 +141,7 @@ if nargin < 3
 		            EEG.splinefile = [ filepath filename ];
 		            headplot('setup', EEG.chanlocs, EEG.splinefile);
 		            options = [ ', ''setup'',' EEG.splinefile ',' ]; 
+                    com = 'EEG = ';
 		 end;
 		 return;
     else
@@ -309,7 +314,7 @@ if nbgraph> 1,
     set(a, 'fontweight', 'bold');
     axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;');
 end;
-if nbgraph== 1, com = 'figure;'; rotate3d(gcf); end;
+if nbgraph== 1, com = [ 'figure;' com ]; rotate3d(gcf); end;
 
 if length( options ) < 2
 	com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s]);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols) )];
