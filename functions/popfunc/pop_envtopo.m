@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 16:27:38  arno
+% inputdlg2
+%
 % Revision 1.7  2002/08/12 01:32:37  arno
 % color
 %
@@ -139,7 +142,7 @@ if ~isempty(EEG.chanlocs)
 	end;
 	varargout{1} = sprintf('figure; pop_envtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(compnums), envtitle, options);
 	popcom = sprintf('figure; pop_envtopo(%s, [%s], [%s], ''%s'' %s);', inputname(1), num2str(timerange), num2str(compnums), envtitle, options);
-	com =  sprintf('%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, EEG.chanlocs, [timerange(1) timerange(2) 0 0], compnums, envtitle, [], [], [], [], [] %s);', outstr, options);
+	com =  sprintf('%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, EEG.chanlocs, [timerange(1) timerange(2) 0 0], compnums, envtitle, [], [], [], 0, [] %s);', outstr, options)
 	eval(com)
         varargout{1} = [ 10 popcom 10 '% ' com];
 else
