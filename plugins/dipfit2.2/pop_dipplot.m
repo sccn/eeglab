@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/03/13 19:51:07  arno
+% updated for release
+%
 % Revision 1.3  2003/03/11 23:35:27  arno
 % typo
 %
@@ -104,7 +107,7 @@ if nargin < 3
     options = {};
     if ~isempty(result{1}), comps = eval( [ '[' result{1} ']' ] ); else comps = []; end;
     if length(varstr) >= 7,
-        if result{2} == 2, typedip = 'DIPFIT';
+        if result{2} == 1, typedip = 'DIPFIT';
         else               typedip = 'BESA';
         end;
         ind = 3;
