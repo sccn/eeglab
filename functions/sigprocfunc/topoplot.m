@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/24 17:30:47  arno
+% auto shrink
+%
 % Revision 1.5  2002/04/24 17:07:28  arno
 % debugging error message problem
 %
@@ -276,7 +279,7 @@ end
 if isstr(shrinkfactor)
 	if (strcmp(lower(shrinkfactor), 'on') & max(Rd) >0.5) | strcmp(lower(shrinkfactor), 'force')
 		squeeze = 1 - 0.5/max(Rd); %(2*max(r)-1)/(2*rmax);
-		fprintf('topoplot(): electrode radius shrinked by %2.3g to show all\n', squeeze);
+		fprintf('topoplot(): electrode radius shrunk by %2.3g to show all\n', squeeze);
 		Rd = Rd-squeeze*Rd; % squeeze electrodes in squeeze*100% to have all inside
 	end;	
 else 
