@@ -13,9 +13,10 @@
 %   EEG        - input EEG dataset
 %   eventfield - event field to process (i.e. latency)
 %   type       - name of the event type(s) to process. Can be a single element or
-%                a cell array.
+%                a cell array. Default is all types.
 %   latrange   - [min max] event latency range within data epochs in milliseconds.
-%   percent    - percentage for trimmed data statistics (see signalstat())
+%                Default is whole epoch.
+%   percent    - percentage for trimmed data statistics. Default is 5%. (see signalstat())
 %    
 % Outputs:
 %   OUTEEG  - output dataset
@@ -41,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2003/12/06 02:09:03  arno
+% same
+%
 % Revision 1.6  2003/12/06 02:08:39  arno
 % header
 %
@@ -102,6 +106,16 @@ if nargin < 2
 	type   	     = parsetxt( result{2} ); % the brackets allow to process matlab arrays
 	latrange     = eval( [ '[' result{3} ']' ] );
 	percent      = eval( [ '[' result{4} ']' ] );
+else
+    if nargin < 3
+        type = [];
+    end;
+    if nargin < 4
+        latrange = [];
+    end;
+    if nargin < 5
+        percent = 5;
+    end;
 end;
 
 % call function signalstat() either on raw data or ICA data
@@ -112,7 +126,7 @@ if isempty(typevals)
     error('No such events found. See Edit > Event values to confirm event type.');
 end;
 dlabel='Event values';
-dlabel2=['Event' vararg2str(type) ' statistics for ''' eventfield ''' info'];
+dlabel2=['Event' num2str(type) ' statistics for ''' eventfield ''' info'];
 
 % outputs
 % -------
