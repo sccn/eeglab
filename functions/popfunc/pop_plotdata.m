@@ -1,21 +1,22 @@
-% pop_plotdata() - plot average of EEG channels or an independent components.
+% pop_plotdata() - Plot average of EEG channels or independent components in
+%                  a rectangular array. Else, (over)plot single trials.
 %
 % Usage:
 %   >> avg = pop_plotdata(EEG, typeplot, indices, trials, title, singletrials);
 %
 % Inputs:
-%   EEG        - dataset structure
-%   typeplot   - 1=channel, 0=component (default:1)
-%   indices    - array of channels or components index to plot 
-%               (default: all)
-%   trials     - array of trial indexes. only take specific trials into 
-%                the average (default: all)
-%   title      - plot title. Default is none.
-%   singletrials - [0|1], 0 plot average, 1 plot individual
-%                  single trials, Default is 0.
+%   EEG        - Input dataset 
+%   typeplot   - Type data to plot (1=channels, 0=components) {Default:1}
+%   indices    - Array of channels (or component) indices to plot 
+%                     {Default: all}
+%   trials     - Array of trial indices. sum specific trials in the average 
+%                     {Default: all}
+%   title      - Plot title. {Default: []}.
+%   singletrials - [0|1], Plot average or overplot single trials 
+%                      0 plot average, 1 plot single trials {Default: 0}
 %
 % Outputs:
-%   avg        - average matrix
+%   avg        - [matrix] Data average
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -40,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/12 21:14:46  arno
+% text
+%
 % Revision 1.6  2002/08/12 02:17:13  arno
 % same
 %
@@ -82,9 +86,9 @@ end;
 
 if nargin <3
 	if typeplot
-		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP in channel array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] ['ERP in channel array' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'plotdata' );
+		result = inputdlg2( {'Channel number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Plot ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname),'',[ EEG.setname ' ERP'])] 'no'}, 'plotdata' );
 	else
-		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'ERP component array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] ['Component ERPs' fastif(isempty(EEG.setname), '',[' of ' EEG.setname])] 'no'}, 'plotdata' );
+		result = inputdlg2( {'Component number(s):' 'Plot title:' 'Plot single trials instead of average (yes|no)'}, 'Component ERP in rect. array -- pop_plotdata()', 1, {['1:' int2str(size(EEG.icaweights,1))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] 'no'}, 'plotdata' );
 	end;		
 	if length(result) == 0 return; end;
 	indices   	 = eval( [ '[' result{1} ']' ] );
