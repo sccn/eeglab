@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2003/04/23 16:44:07  arno
+% more flipping
+%
 % Revision 1.30  2003/04/23 16:41:14  arno
 % flipping back y and x
 %
@@ -388,7 +391,7 @@ if isstr(g.movparams)& strcmpi(g.movparams, 'mriside')
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,1) );
-        coordinates = coordinates(:, [2 3]); % remove X
+        coordinates = coordinates(:, [2 3]); % remove X        
     else
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
@@ -418,7 +421,7 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mritop')
     if isempty(g.coordinates)
         coordinates = founddipoles(ALLEEG, g.comps);
         [tmp plotorder] = sort( coordinates(:,3) );
-        coordinates = coordinates(:, [1 2]); % remove Z
+        coordinates = -coordinates(:, [1 2]); % remove Z
     else
         plotorder   = g.showcomps;
         coordinates = g.coordinates;
