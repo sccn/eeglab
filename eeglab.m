@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.309  2004/03/04 18:48:28  arno
+% debug last
+%
 % Revision 1.308  2004/03/04 18:46:39  arno
 % update text for channel location
 %
@@ -1230,13 +1233,13 @@ e_histdone_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''Done.'
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newnonempty   = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load          = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_newset        = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store         = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall      = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_hist          = [e_catch 'h(LASTCOM, EEG);'];
-e_histdone      = [e_catch 'h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
+e_newnonempty   = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_load          = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_newset        = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store         = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_hist          = [e_catch 'EEG = h(LASTCOM, EEG);'];
+e_histdone      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
 % build structures for plugins
 % ----------------------------
@@ -1311,7 +1314,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''TIP: call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                         'disp(''     to convert between channel location file formats'');' ...
                         '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; eeg_checkset(EEG, ''chanlocsize'');' ...
-                        'clear TMPCHAN; h(LASTCOM); h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
+                        'clear TMPCHAN; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
