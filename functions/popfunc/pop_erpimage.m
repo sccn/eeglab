@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/07/24 19:20:58  arno
+% same
+%
 % Revision 1.28  2002/07/24 19:19:34  arno
 % debugging
 %
@@ -529,9 +532,8 @@ disp('Command executed by pop_erpimage:');
 disp(' '); disp(com); disp(' ');
 eval(com)
 
-if ~popup
-	varargout = [popcom 10 '% Call: ' com];
-	varargout
+if popup
+	varargout{1} = [popcom 10 '% Call: ' com];
 end;
 
 return;
