@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.250  2003/07/31 22:32:35  arno
+% same
+%
 % Revision 1.249  2003/07/31 22:30:23  arno
 % debug storeallcall
 %
@@ -1391,7 +1394,7 @@ if ~option_keepdataset
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'off');
 	CURRENTSET = 0;
 else
-	if isempty(ALLEEG)
+	if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
 		ALLEEG = EEG;
 	end;
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
