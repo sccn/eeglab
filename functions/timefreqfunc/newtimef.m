@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2005/01/28 00:47:41  arno
+% fix timesout
+%
 % Revision 1.66  2004/12/10 23:07:00  arno
 % add text message
 %
@@ -1125,7 +1128,7 @@ g.subitc = 'off';
 if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
 else                       tmioutopt = { 'ntimesout', g.timesout };
 end;
-[alltfX freqs timesout R] = timefreq(X, g.srate, timoutopt{:}, 'winsize', g.winsize, ...
+[alltfX freqs timesout R] = timefreq(X, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
                                      'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                      g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
