@@ -108,6 +108,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2003/12/03 02:15:40  arno
+% use spec if pwelch absent
+%
 % Revision 1.76  2003/11/26 17:14:29  arno
 % 10*lochanging log label
 %
@@ -1011,7 +1014,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
                                                       winlength,g.overlap,fftlength,srate);
                         else
                             [tmpspec,freqs] =  spec(tmpdata(e,g.boundaries(n)+1:g.boundaries(n+1)),...
-                                                      fftlength,srate,winlength,g.overlap);
+                                                    fftlength,srate,winlength,g.overlap);
                         end;
                         if exist('eegspec') ~= 1
                             eegspec = zeros(nchans,length(freqs));
@@ -1031,7 +1034,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     n = length(epoch_subset);
 	eegspecdB = eegspec/n; % normalize by the number of sections
     if n>1
-         specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % normalize standard deviation by the number of sections
+        specstd   = sqrt( (specstd +  eegspec.^2/n)/(n-1) ); % normalize standard deviation by the number of sections
     else specstd   = [];
     end;
 	return;
