@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/05/13 23:27:05  arno
+% debuging verbose
+%
 % Revision 1.8  2003/05/13 23:19:48  arno
 % debug last
 %
@@ -162,6 +165,9 @@ case 'sph2topo',
    for index = 1:length(chans)
       chans(index).theta  = angle(index);
       chans(index).radius = radius(index);
+      if ~isfield(chans, 'sph_radius') | isempty(chans(index).sph_radius)
+          chans(index).sph_radius = 1;
+      end;
    end;
 case 'sph2sphbesa',
    % using polar coordinates
@@ -208,7 +214,7 @@ case 'cart2sphbesa',
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
 case 'cart2sph',
     if verbose
-        disp('WARNING: XYZ center not optimized, optimize center, then recompute coords');
+        disp('WARNING: XYZ center not optimized, optimize center');
 	end;
     [th phi radius] = cart2sph(cell2mat({chans.X}), cell2mat({chans.Y}), cell2mat({chans.Z}));
 	for index = 1:length(chans)
