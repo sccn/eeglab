@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-31-00 added o-time line and possibility of plotting 1 channel -sm & mw
 % 11-02-99 added maplimits arg -sm
@@ -55,7 +58,7 @@ end
 [chans,frames] = size(data);
 icadefs;   
 
-if nargin < 7
+if nargin < 7 | voffsets == 0
   voffsets = zeros(1,32);
 end
 
@@ -324,8 +327,10 @@ axcopy(gcf);
   text(0.50,0.96,titl,'FontSize',16,'HorizontalAlignment','Center');
   text(0.86,0.67,'+','FontSize',16,'HorizontalAlignment','Center');
   if ~isempty(varargin)
-    if ~isempty( strmatch( 'absmax', varargin))
-        text(0.86,0.624,'0','FontSize',16,'HorizontalAlignment','Center');
-    end;
+    try,
+		if ~isempty( strmatch( 'absmax', varargin))
+			text(0.86,0.624,'0','FontSize',16,'HorizontalAlignment','Center');
+		end;
+	catch, end;
   end
   text(0.86,0.59,'-','FontSize',16,'HorizontalAlignment','Center');
