@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2003/06/11 21:18:04  arno
+% new limits for latencies
+%
 % Revision 1.95  2003/02/28 17:05:23  arno
 % eeg_checkset() -> eeg_checkset in warnings
 %
@@ -825,6 +828,17 @@ if ~isempty( varargin)
                          'Enter the name of the file via "Edit > Edit dataset info".', ...
                          'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
               error('eeg_checkset: cannot process dataset without channel location file.'); return;
+          end;
+         case 'chanlocs_homogenous', 
+          if isempty(EEG.chanlocs)
+              errordlg2( strvcat('Cannot process without channel location file.', ...
+                         'Enter the name of the file via "Edit > Edit dataset info".', ...
+                         'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
+              error('eeg_checkset: cannot process dataset without channel location file.'); return;
+          end;
+          if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(1).X)
+              EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
+              res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogenous'' ); ' ];
           end;
          case 'chanlocsize', 
           if ~isempty(EEG.chanlocs)
