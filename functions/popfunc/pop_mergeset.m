@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/03/17 23:10:16  arno
+% fixing urevents
+%
 % Revision 1.20  2004/02/21 03:14:53  arno
 % same
 %
@@ -173,7 +176,11 @@ else
 		end;
 	end;	
 
-	INEEG1.data    = [ INEEG1.data(:,:) INEEG2.data(:,:) ];
+    if INEEG1.trials > 1 |  INEEG2.trials > 1
+        INEEG1.data(:,:,end+1:end+size(INEEG2.data,3)) = INEEG2.data;
+    else
+        INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data;
+    end;
 	INEEG1.setname	= 'Merge datasets';
 
 	% concatenate events
