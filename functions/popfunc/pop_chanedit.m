@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2004/11/19 02:07:38  arno
+% display warning when deleting channels
+%
 % Revision 1.110  2004/11/12 21:37:30  arno
 % nothing
 %
@@ -1039,6 +1042,8 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
             chans = setfield(chans, {1}, fields{index}, []);
         end;
     end;
+    if isfield(chans, 'sph_theta_besa'), chans = rmfield( chans, 'sph_theta_besa'); end;
+    if isfield(chans, 'sph_phi_besa'  ), chans = rmfield( chans, 'sph_phi_besa');   end;
     if exist('orderfields') == 2
         chans = orderfields(chans, fields);
     end;
