@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/11/05 18:50:22  arno
+% fixing normlen problem
+%
 % Revision 1.17  2003/10/31 19:00:41  arno
 % adding more options
 %
@@ -207,5 +210,7 @@ else
     end;
 end;
     
-com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ typedip comps options{:}}));
+if naring < 3
+    com = sprintf('pop_dipplot( %s,%s);', inputname(1), vararg2str({ typedip comps options{:}}));
+end;
 return;
