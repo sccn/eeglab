@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/01/26 02:06:55  scott
+% same
+%
 % Revision 1.39  2004/01/26 02:05:23  scott
 % same
 %
@@ -542,8 +545,8 @@ if strcmpi(g.pvaf, 'on')
     k = 1;
     for index =1:ncomps
         fprintf('   IC%d ',spx(index));
-        if index<100, fprintf(' '); end
-        if index<10, fprintf(' '); end
+        if spx(index)<100, fprintf(' '); end
+        if spx(index)<10, fprintf(' '); end
         fprintf('pvaf: %6.2f%%   ', sortpvaf(index));
         if rem(k,3)==0, fprintf('\n'); end;
         k = k+1;
@@ -616,7 +619,7 @@ for t=1:ntopos
 end
 fprintf('\n');
 if strcmp(g.pvaf,'on')
-  fprintf('                          pvaf: ');
+  fprintf('                          pvaf:  ');
   for t=1:ntopos
     fprintf('%4.2f ',pvaf(maporder(t)));
   end
