@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2003/07/22 17:36:44  arno
+% subtract DC for small portion of data
+%
 % Revision 1.17  2003/07/20 19:19:10  scott
 % clarify processing message
 %
@@ -160,6 +163,7 @@ end;
 if revfilt ~= 0
 	options = { options{:} revfilt };
 end;
+options
 
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
@@ -199,6 +203,7 @@ else
 	EEG.data = eegfilt( EEG.data, options{:});
 	% Note: reshape does not reserve new memory while EEG.data(:,:) does
 end;	
+
 
 com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
 			num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ) );
