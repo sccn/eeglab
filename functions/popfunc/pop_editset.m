@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2002/08/26 22:03:01  arno
+% average reference more message
+%
 % Revision 1.21  2002/08/12 18:31:31  arno
 % questdlg2
 %
@@ -281,14 +284,16 @@ for curfield = tmpfields'
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if exist( varname ) == 2
                             fprintf('Pop_editset: filename ''%s'' found for ICA weight matrix\n', varname); 
-                            try, EEGOUT.icaweights = load(varname, '-ascii');
-                            catch, fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+							try, EEGOUT.icaweights = load(varname, '-ascii');
+								EEGOUT.icawinv = [];
+                            catch, fprintf('Pop_editset warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
                             end;
                          else
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
 							 else
 								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icawinv = [];
 							 end;
 						 end;
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
@@ -298,6 +303,7 @@ for curfield = tmpfields'
                          if exist( varname ) == 2
                             fprintf('Pop_editset: filename ''%s'' found for ICA sphere matrix\n', varname); 
                             try, EEGOUT.icasphere = load(varname, '-ascii');
+								EEGOUT.icawinv = [];
                             catch, fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
                             end;
                          else
@@ -305,6 +311,7 @@ for curfield = tmpfields'
 								 EEGOUT.icasphere = [];
 							 else
 								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable name ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icawinv = [];
 							 end;
                          end;
 	    case 'data'    , varname = getfield(g, {1}, curfield{1});
