@@ -19,11 +19,11 @@
 %   help       - optional help command 
 %   title      - optional figure title
 %   userdat    - optional userdata input for the figure
-%   mode       - ['normal'|'noclose'|fignumber]. Either wait for user to press
-%                OK or CANCEL ('normal'), return without closing window
-%                input ('noclose'), or process an existing 
-%                window which number is given as input (fignumber). 
-%                Default is 'normal'.
+%   mode       - ['normal'|'noclose'|'plot' fignumber]. Either wait for
+%                user to press OK or CANCEL ('normal'), return without
+%                closing window input ('noclose'), only draw the gui ('plot')
+%                or process an existing window which number is given as 
+%                input (fignumber). Default is 'normal'.
 %   geomvert   - vertical geometry argument, this argument is passed on to
 %                supergui()
 %
@@ -66,6 +66,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/11/13 17:06:44  scott
+% hj
+% help msg
+%
 % Revision 1.18  2002/11/13 00:53:43  arno
 % replace gcf by fig
 %
@@ -163,7 +167,11 @@ end;
 
 % create figure and wait for return
 % ---------------------------------
-waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+if isstr(mode) & strcmpi(mode, 'plot')
+   return; % only plot and returns
+else 
+	waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+end;
 
 result = {};
 userdat = [];
