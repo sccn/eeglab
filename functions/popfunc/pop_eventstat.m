@@ -22,7 +22,7 @@
 %
 % Author: Arnaud Delorme & Luca Finelli, CNL / Salk Institute - SCCN, 15 August 2002
 %
-% See also: signalstat(), eeg_get_epochevent(), eeglab()
+% See also: signalstat(), eeg_getepochevent(), eeglab()
 
 % Copyright (C) 2002 Arnaud Delorme & Luca Finelli, Salk/SCCN, La Jolla, CA
 %
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/12/06 02:08:39  arno
+% header
+%
 % Revision 1.5  2003/11/18 16:28:25  scott
 % Enter ... -> ...
 %
