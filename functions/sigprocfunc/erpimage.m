@@ -93,7 +93,7 @@
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified times
 %   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
 %               traces. To plot N traces, the auxvar matrix should be size (N,ntrials) 
-%               ELSE, 'auxvar',{[matrix],{colorstrings}} specifies the N trace colors. 
+%               ELSE, 'auxvar',{[that_matrix],{colorstrings}} to specify N trace colors. 
 %               Ex: colorstrings = {'r','bo-','k:'} (See also: 'vert')
 %
 % Miscellaneous options:
@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2003/08/24 04:49:01  scott
+% help msg
+%
 % Revision 1.139  2003/08/24 04:38:18  scott
 % same
 %
@@ -1145,23 +1148,30 @@ if ~exist('srate') | srate <= 0
 end
 if ~isempty(auxvar)
 	whos auxvar
-	if size(auxvar,1)>size(auxvar,2)  % make (N,frames)
-		auxvar = auxvar';               % (assuming N < frames)
+    if size(auxvar,1) ~= ntrials && size(auxvar,2) ~= ntrials
+		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
+                           ntrials);
+        return
+    end
+	if size(auxvar,1) == ntrials && size(auxvar,2) ~= ntrials  % make (N,frames)
+		auxvar = auxvar';               
 	end
 	if size(auxvar,2) ~= ntrials
-		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',ntrials);
+		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
+                           ntrials);
 		return
 	end
 	if exist('auxcolors')==YES % if specified
 		if isa(auxcolors,'cell')==NO
-			fprintf('erpimage(): auxcolors argument to auxvar flag must be a cell array. See help.\n');
+			fprintf(...
+   'erpimage(): auxcolors argument to auxvar flag must be a cell array. See help.\n');
 			return
 		end
 	end
 end
 if exist('phargs')
 	if phargs(3) > srate/2
-		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
+	     fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
 	end
     % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
