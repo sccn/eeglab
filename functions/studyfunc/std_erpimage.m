@@ -58,8 +58,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.1  2005/02/03 00:10:48  arno
+%Initial revision
+%
 
 function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = subjerpimage( subjind, data, sortvar, times, titleim, movewin, decim, varargin );
+    
+    plot_indiv = 0; % 0 or 1
     
     if nargin < 7
         help subjerpimage
@@ -97,21 +102,24 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = subjer
     values = unique(sortind);
     nsubj = length(values);
     realdecim = decim(1);
+    if ~plot_indiv, extra_args = { 'noshow', 'yes' };
+    else            extra_args = { };
+    end;
     for ival = 1:nsubj
         idxsubj = find(subjind == values(ival));
         p(ival) = length(idxsubj);
         
-        %figure; 
+        if plot_indiv, figure; end;
         if movewin(1) >= 0
             if isempty(erparg1)
                 [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
                   amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                              times, titleim, movewin(1), -decim(1), varargin{:}, 'noshow', 'yes');
+                                                              times, titleim, movewin(1), -decim(1), varargin{:}, extra_args{:});
                 %{ times, titleim, movewin(1), -decim(1), varargin{:} }
             else
                 [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
                   amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                              times, titleim, movewin(1), -decim(1), erparg1{3:end}, 'noshow', 'yes');
+                                                              times, titleim, movewin(1), -decim(1), erparg1{3:end}, extra_args{:});
                 %{  times, titleim, movewin(1), -decim(1), erparg1{3:end} }
             end;
         else
@@ -120,13 +128,13 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = subjer
             if isempty(erparg1)
                 [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
                   amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, -movewin(1), -decim(1), varargin{:}, 'noshow', 'yes');
+                                                                  times, titleim, -movewin(1), -decim(1), varargin{:}, extra_args{:});
                 [ tmpdata2 tmpvar2 ] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
                                                                   times, titleim, 1, 0, varargin{:}, 'noshow', 'yes');
             else
                 [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
                   amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, -movewin(1), -decim(1), erparg1{3:end}, 'noshow', 'yes');
+                                                                  times, titleim, -movewin(1), -decim(1), erparg1{3:end}, extra_args{:});
                 [ tmpdata2 tmpvar2 ] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
                                                                   times, titleim, 1, 0, erparg1{3:end}, 'noshow', 'yes');
             end;
