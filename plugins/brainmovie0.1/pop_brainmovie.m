@@ -107,6 +107,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2003/04/23 16:26:46  arno
+% debug
+%
 % Revision 1.24  2003/01/01 02:19:01  arno
 % debugging axes orientation
 %
@@ -455,10 +458,20 @@ elseif isstr(g.movparams) & strcmpi(g.movparams, 'mrirear')
 elseif isstr(g.movparams)
     error('Movparams template can only be ''mritop'' and ''mriside''');
 else
+    if isempty(g.coordinates)
+        coordinates = founddipoles(ALLEEG, g.comps);
+        [tmp plotorder] = sort( coordinates(:,2) );
+        coordinates = coordinates(:, [1 3]); % remove Z
+    else
+        plotorder   = g.showcomps;
+        coordinates = g.coordinates;
+    end;
+
     % ----------------------------------------------------------------
     % custom movie -> g.movparams contains cell array of movie options
     % ----------------------------------------------------------------
-    brainmovieoptions = { 'condtitle' alltitles 'coordinates', g.coordinates, ...
+    brainmovieoptions = { 'plotorder',  plotorder(g.showcomps),
+                          'condtitle' alltitles 'coordinates', coordinates, ...
                         'circfactor', g.circfactor, ...
                         g.movparams{:}};
 end;
@@ -468,9 +481,6 @@ end;
 if ~isempty(g.addmovparams)
     brainmovieoptions = { brainmovieoptions{:} g.addmovparams{:} };
 end;
-coordinates
-size(coordinates)
-size(g.circfactor)
 
 % data enveloppe
 % --------------
