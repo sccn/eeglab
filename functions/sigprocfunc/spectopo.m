@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2002/08/12 22:46:19  arno
+% maxfreq->freqrange
+%
 % Revision 1.28  2002/08/11 18:44:56  arno
 % [A[Amoving main title
 %
@@ -294,17 +297,17 @@ if isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% compute data spectrum
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	fprintf('Computing spectra: ')
+	fprintf('Computing spectra')
 	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
 	fprintf('\n');
 else
 	% compute data spectrum
 	if isempty(g.plotchan) | g.plotchan == 0
-		fprintf('Computing spectra: ')
+		fprintf('Computing spectra')
 		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
 		fprintf('\n');
 	else
-		fprintf('Computing spectra at specified channel: ')
+		fprintf('Computing spectra at specified channel')
 		g.reref = 'no';
 		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
 		fprintf('\n');
@@ -668,7 +671,12 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 	else 
 		nchans = size(data,1);		
 	end;
-	fftlength = 2^round(log(srate)/log(2))*g.freqfac;
+	if length(epoch_subset) == 1
+		fftlength = 2^round(log(srate)/log(2))*g.freqfac;
+	else 
+		fftlength = 2*max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
+	end;
+	fprintf(' (window length %d):', fftlength);
 	
 	for c=1:nchans % scan channels or components
 		if exist('newweights') == 1
