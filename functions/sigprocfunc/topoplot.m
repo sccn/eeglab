@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2002/11/12 22:19:01  arno
+% typo
+%
 % Revision 1.22  2002/11/12 21:43:51  scott
 % tmpelocs -> tmpeloc
 %
@@ -336,6 +339,9 @@ else % a locs struct
 end
 if length(tmpeloc) == length(Vl) + 1 % remove last channel if necessary (common reference channel)
     tmpeloc(end) = [];
+    labels(end) = [];
+    Th(end) = [];
+    Rd(end) = [];
 end;
 if isfield(tmpeloc, 'shrink'), shrinkfactor = tmpeloc(1).shrink; end;
 labels = strvcat(labels);
