@@ -82,6 +82,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/04/24 17:35:50  arno
+% rechanged log
+%
 % 3/5/98 added nosort option -sm
 % 3/22/98 added colorbar ylabel, sym. range finding -sm
 % 5/08/98 added noplot option -sm
@@ -349,229 +352,234 @@ if nargin > 6
 
   for a=7:nargin % for each remaining Arg
 
-    Arg = eval(['arg' int2str(a-6)]);
-    if Caxflag == YES
-      if size(Arg,1) ~= 1 | size(Arg,2) > 2
-        help erpimage
-        fprintf('\nerpimage(): caxis arg must be a scalar or (1,2) vector.\n');
-        return
-      end
-      if size(Arg,2) == 2
-         Caxis = Arg;
-      else
-         caxfraction = Arg;
-      end
-      Caxflag = NO;
-    elseif Coherflag == YES
-       if size(Arg,1) ~= 1 | ( size(Arg,2) ~= 1 & size(Arg,2) ~= 2)
-        help erpimage
-        fprintf('\nerpimage(): coher arg must be size (1,1) or (1,2).\n');
-        return
-       end
-       coherfreq = Arg(1);
-       if size(Arg,2) == 2
-         Cohsigflag = YES;
-         alpha  = Arg(2);
-         if alpha < 0 | alpha > 0.1
-           fprintf('erpimage(): alpha value %g out of bounds.\n',alpha); 
-           return
-         end
-       end
-       Coherflag = NO;
-       Erpflag = YES;  % plot amp, coher below erp time series
-    elseif Topoflag == YES;
-       if length(Arg) ~= 2
-        help erpimage
-        fprintf('\nerpimage(): topo arg must be a list of length 2.\n');
-        return
-       end
-       topomap = Arg{1};
-       eloc_file = Arg{2};
-       Topoflag = NO;
-    elseif Specflag == YES;
-       if length(Arg) ~= 2
-        help erpimage
-        fprintf('\nerpimage(): spec arg must be a list of length 2.\n');
-        return
-       end
-       lospecHz = Arg(1);
-       hispecHz = Arg(2);
-       Specflag = NO;
-    elseif Alignflag == YES
-       if length(Arg) ~= 1 
-        help erpimage
-        fprintf('\nerpimage(): align arg must be a scalar msec.\n');
-        return
-       end
-       aligntime = Arg(1);
-       Alignflag = NO;
-    elseif Limitflag == YES
-      %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
-      if size(Arg,1) ~= 1 | size(Arg,2) < 2 ...
-          | size(Arg,2) > 9 ...
-        help erpimage
-        fprintf('\nerpimage(): limits arg must be a vector sized (1,2<->9).\n');
-        return
-      end
-      if  ~isnan(Arg(1)) & (Arg(2) <= Arg(1))
-        help erpimage
-        fprintf('\nerpimage(): time limits out of order or out of range.\n');
-        return
-      end
-      if Arg(1) < min(times)
-          Arg(1) = min(times);
-          fprintf('Adjusting mintime limit to first data value %g\n',min(times));
-      end
-      if Arg(2) > max(times)
-          Arg(2) = max(times);
-          fprintf('Adjusting maxtime limit to last data value %g\n',max(times));
-      end
-      timelimits = Arg(1:2);
-      if length(Arg)> 2
-        minerp = Arg(3);
-      end
-      if length(Arg)> 3
-        maxerp = Arg(4);
-      end
-      if ~isnan(maxerp) & maxerp <= minerp
-        help erpimage
-        fprintf('\nerpimage(): erp limits args out of order.\n');
-        return
-      end
-      if length(Arg)> 4
-        minamp = Arg(5);
-      end
-      if length(Arg)> 5
-        maxamp = Arg(6);
-      end
-      if maxamp <= minamp
-        help erpimage
-        fprintf('\nerpimage(): amp limits args out of order.\n');
-        return
-      end
-      if length(Arg)> 6
-        mincoh = Arg(7);
-      end
-      if length(Arg)> 7
-        maxcoh = Arg(8);
-      end
-      if maxcoh <= mincoh
-        help erpimage
-        fprintf('\nerpimage(): coh limits args out of order.\n');
-        return
-      end
-      if length(Arg)>8
-        baseamp = Arg(9);    % for 'allamps'
-      end
-      Limitflag = NO;
-
-     elseif Srateflag == YES
+	  Arg = eval(['arg' int2str(a-6)]);
+	  if Caxflag == YES
+		  if size(Arg,1) ~= 1 | size(Arg,2) > 2
+			  help erpimage
+			  fprintf('\nerpimage(): caxis arg must be a scalar or (1,2) vector.\n');
+			  return
+		  end
+		  if size(Arg,2) == 2
+			  Caxis = Arg;
+		  else
+			  caxfraction = Arg;
+		  end
+		  Caxflag = NO;
+	  elseif Coherflag == YES
+		  if size(Arg,1) ~= 1 | ( size(Arg,2) ~= 1 & size(Arg,2) ~= 2)
+			  help erpimage
+			  fprintf('\nerpimage(): coher arg must be size (1,1) or (1,2).\n');
+			  return
+		  end
+		  coherfreq = Arg(1);
+		  if size(Arg,2) == 1
+			  coherfreq = Arg(1);
+		  else
+			  coherfreq = Arg(1:2);
+		  end;
+		  if size(Arg,2) == 3
+			  Cohsigflag = YES;
+			  alpha  = Arg(3);
+			  if alpha < 0 | alpha > 0.1
+				  fprintf('erpimage(): alpha value %g out of bounds.\n',alpha); 
+				  return
+			  end
+		  end
+		  Coherflag = NO;
+		  Erpflag = YES;  % plot amp, coher below erp time series
+	  elseif Topoflag == YES;
+		  if length(Arg) ~= 2
+			  help erpimage
+			  fprintf('\nerpimage(): topo arg must be a list of length 2.\n');
+			  return
+		  end
+		  topomap = Arg{1};
+		  eloc_file = Arg{2};
+		  Topoflag = NO;
+	  elseif Specflag == YES;
+		  if length(Arg) ~= 2
+			  help erpimage
+			  fprintf('\nerpimage(): spec arg must be a list of length 2.\n');
+			  return
+		  end
+		  lospecHz = Arg(1);
+		  hispecHz = Arg(2);
+		  Specflag = NO;
+	  elseif Alignflag == YES
+		  if length(Arg) ~= 1 
+			  help erpimage
+			  fprintf('\nerpimage(): align arg must be a scalar msec.\n');
+			  return
+		  end
+		  aligntime = Arg(1);
+		  Alignflag = NO;
+	  elseif Limitflag == YES
+		  %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
+		  if size(Arg,1) ~= 1 | size(Arg,2) < 2 ...
+				  | size(Arg,2) > 9 ...
+				  help erpimage
+			  fprintf('\nerpimage(): limits arg must be a vector sized (1,2<->9).\n');
+			  return
+		  end
+		  if  ~isnan(Arg(1)) & (Arg(2) <= Arg(1))
+			  help erpimage
+			  fprintf('\nerpimage(): time limits out of order or out of range.\n');
+			  return
+		  end
+		  if Arg(1) < min(times)
+			  Arg(1) = min(times);
+			  fprintf('Adjusting mintime limit to first data value %g\n',min(times));
+		  end
+		  if Arg(2) > max(times)
+			  Arg(2) = max(times);
+			  fprintf('Adjusting maxtime limit to last data value %g\n',max(times));
+		  end
+		  timelimits = Arg(1:2);
+		  if length(Arg)> 2
+			  minerp = Arg(3);
+		  end
+		  if length(Arg)> 3
+			  maxerp = Arg(4);
+		  end
+		  if ~isnan(maxerp) & maxerp <= minerp
+			  help erpimage
+			  fprintf('\nerpimage(): erp limits args out of order.\n');
+			  return
+		  end
+		  if length(Arg)> 4
+			  minamp = Arg(5);
+		  end
+		  if length(Arg)> 5
+			  maxamp = Arg(6);
+		  end
+		  if maxamp <= minamp
+			  help erpimage
+			  fprintf('\nerpimage(): amp limits args out of order.\n');
+			  return
+		  end
+		  if length(Arg)> 6
+			  mincoh = Arg(7);
+		  end
+		  if length(Arg)> 7
+			  maxcoh = Arg(8);
+		  end
+		  if maxcoh <= mincoh
+			  help erpimage
+			  fprintf('\nerpimage(): coh limits args out of order.\n');
+			  return
+		  end
+		  if length(Arg)>8
+			  baseamp = Arg(9);    % for 'allamps'
+		  end
+		  Limitflag = NO;
+		  
+	  elseif Srateflag == YES
           srate = Arg(1);
           Srateflag = NO;
-     elseif Auxvarflag == YES;
+	  elseif Auxvarflag == YES;
           if isa(Arg,'cell')==YES & length(Arg)==2
-             auxvar = Arg{1};
-             auxcolors = Arg{2};
+			  auxvar = Arg{1};
+			  auxcolors = Arg{2};
           elseif isa(Arg,'cell')==YES
-             fprintf('erpimage(): auxvars argument must be a matrix or length-2 cell array.\n');
-             return
+			  fprintf('erpimage(): auxvars argument must be a matrix or length-2 cell array.\n');
+			  return
           else
-            auxvar = Arg; % no auxcolors specified
+			  auxvar = Arg; % no auxcolors specified
           end
           Auxvarflag = NO;
-     elseif Vertflag == YES
+	  elseif Vertflag == YES
           verttimes = Arg;
           Vertflag = NO;
-     elseif Signifflag == YES
-      signifs = Arg; % [low_amp hi_amp coher]
-      if length(signifs) ~= 3
-         fprintf('\nerpimage(): signif arg [%g] must have 3 values\n',Arg);
-         return
-      end
-      Signifflag = NO;
-     elseif Allcohersflag == YES
+	  elseif Signifflag == YES
+		  signifs = Arg; % [low_amp hi_amp coher]
+		  if length(signifs) ~= 3
+			  fprintf('\nerpimage(): signif arg [%g] must have 3 values\n',Arg);
+			  return
+		  end
+		  Signifflag = NO;
+	  elseif Allcohersflag == YES
           data2=Arg;
           if size(data2) ~= size(data)
-fprintf('erpimage(): allcohers data matrix must be the same size as data.\n');
+			  fprintf('erpimage(): allcohers data matrix must be the same size as data.\n');
               return
           end
           Allcohersflag = NO;
-     elseif Phaseflag == YES
+	  elseif Phaseflag == YES
           n = length(Arg);
           if n > 5
-            error('erpimage(): Too many arguments for keyword ''phase''');
+			  error('erpimage(): Too many arguments for keyword ''phase''');
           end
           phargs = Arg;
-
+		  
           if phargs(3) < 0
               error('erpimage(): Invalid negative argument for keyword ''phase''');
           end
           if n>=4
-            if phargs(4) < 0
-              error('erpimage(): Invalid negative argument for keyword ''phase''');
-            end
+			  if phargs(4) < 0
+				  error('erpimage(): Invalid negative argument for keyword ''phase''');
+			  end
           end
           
           if min(phargs(1)) < times(1) | max(phargs(1)) > times(end)
-            error('erpimage(): End time for phase sorting filter out of bound.');
+			  error('erpimage(): time for phase sorting filter out of bound.');
           end
 
           if phargs(2) >= 100 | phargs(2) < -100
-            error('%-argument for keyword ''phase'' must be (-100;100)');
+			  error('%-argument for keyword ''phase'' must be (-100;100)');
           end
           
           if length(phargs) >= 4 & phargs(3) > phargs(4)
-            error('erpimage(): Phase sorting frequency range must be increasing.');
+			  error('erpimage(): Phase sorting frequency range must be increasing.');
           end
           if length(phargs) == 5
-            topphase = phargs(5);
+			  topphase = phargs(5);
           end
           Phaseflag = NO;
-    elseif strcmp(Arg,'nosort')
-      Nosort = YES;
-    elseif strcmp(Arg,'noplot')|strcmp(Arg,'noshow')
-      Noshow = YES;
-    elseif strcmp(Arg,'caxis')
-      Caxflag = YES;
-    elseif strcmp(Arg,'coher')
-      Coherflag = YES;
-    elseif strcmp(Arg,'allamps')
-      Allampsflag = YES;
-    elseif strcmp(Arg,'allcohers')
-      Allcohersflag = YES;
-    elseif strcmp(Arg,'topo') | strcmp(Arg,'topoplot')
-      Topoflag = YES;
-    elseif strcmp(Arg,'spec') | strcmp(Arg,'spectrum')
-      Specflag = YES;
-    elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
-      Erpflag = YES;
-    elseif strcmp(Arg,'align')
-      Alignflag = YES;
-    elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
-      Colorbar = YES;
-    elseif strcmp(Arg,'limits')
-      Limitflag = YES;
-    elseif strcmp(Arg,'phase')
-      Phaseflag = YES;
-    elseif strcmp(Arg,'auxvar')
-      Auxvarflag = YES;
-    elseif strcmp(Arg,'srate')
-      Srateflag = YES;
-    elseif strcmp(Arg,'vert') |  strcmp(Arg,'verttimes')
-      Vertflag = YES;
-    elseif strcmp(Arg,'signif')|strcmp(Arg,'signifs')|strcmp(Arg,'sig')|strcmp(Arg,'sigs')
-      Signifflag = YES;
-    elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
-      NoTimeflag = YES;
-    else
-      help erpimage
-      if isstr(Arg)
-         fprintf('\nerpimage(): unknown arg %s\n',Arg);
-      else
-         fprintf('\nerpimage(): unknown arg %d, size(%d,%d)\n',a,size(Arg,1),size(Arg,2));
-      end
-      return
-    end
+	  elseif strcmp(Arg,'nosort')
+		  Nosort = YES;
+	  elseif strcmp(Arg,'noplot')|strcmp(Arg,'noshow')
+		  Noshow = YES;
+	  elseif strcmp(Arg,'caxis')
+		  Caxflag = YES;
+	  elseif strcmp(Arg,'coher')
+		  Coherflag = YES;
+	  elseif strcmp(Arg,'allamps')
+		  Allampsflag = YES;
+	  elseif strcmp(Arg,'allcohers')
+		  Allcohersflag = YES;
+	  elseif strcmp(Arg,'topo') | strcmp(Arg,'topoplot')
+		  Topoflag = YES;
+	  elseif strcmp(Arg,'spec') | strcmp(Arg,'spectrum')
+		  Specflag = YES;
+	  elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
+		  Erpflag = YES;
+	  elseif strcmp(Arg,'align')
+		  Alignflag = YES;
+	  elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
+		  Colorbar = YES;
+	  elseif strcmp(Arg,'limits')
+		  Limitflag = YES;
+	  elseif strcmp(Arg,'phase')
+		  Phaseflag = YES;
+	  elseif strcmp(Arg,'auxvar')
+		  Auxvarflag = YES;
+	  elseif strcmp(Arg,'srate')
+		  Srateflag = YES;
+	  elseif strcmp(Arg,'vert') |  strcmp(Arg,'verttimes')
+		  Vertflag = YES;
+	  elseif strcmp(Arg,'signif')|strcmp(Arg,'signifs')|strcmp(Arg,'sig')|strcmp(Arg,'sigs')
+		  Signifflag = YES;
+	  elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
+		  NoTimeflag = YES;
+	  else
+		  help erpimage
+		  if isstr(Arg)
+			  fprintf('\nerpimage(): unknown arg %s\n',Arg);
+		  else
+			  fprintf('\nerpimage(): unknown arg %d, size(%d,%d)\n',a,size(Arg,1),size(Arg,2));
+		  end
+		  return
+	  end
   end % Arg
 end
 
@@ -583,73 +591,77 @@ if   Caxflag == YES ...
     fprintf('\nerpimage(): missing option arg.\n')
     return
 end
-if (Allampsflag | exist('data2')) & ( isnan(coherfreq) | ~Cohsigflag )
- fprintf('\nerpimage(): allamps and allcohers flags require coher freq, srate, and cohsig.\n');
- return
+if (Allampsflag | exist('data2')) & ( any(isnan(coherfreq)) | ~Cohsigflag )
+	fprintf('\nerpimage(): allamps and allcohers flags require coher freq, srate, and cohsig.\n');
+	return
 end
 if Allampsflag & exist('data2')
- fprintf('\nerpimage(): cannot image both allamps and allcohers.\n');
- return
+	fprintf('\nerpimage(): cannot image both allamps and allcohers.\n');
+	return
 end
 if ~exist('srate') | srate <= 0 
-  fprintf('\nerpimage(): Data srate must be specified and > 0.\n');
-  return
+	fprintf('\nerpimage(): Data srate must be specified and > 0.\n');
+	return
 end
 if ~isempty(auxvar)
-whos auxvar
-  if size(auxvar,1)>size(auxvar,2)  % make (N,frames)
-    auxvar = auxvar';               % (assuming N < frames)
-  end
-  if size(auxvar,2) ~= frames
-     fprintf('erpimage(): auxvar size should be (N,nframes), e.g., (N,%d)\n',frames);
-     return
-  end
-  if exist('auxcolors')==YES % if specified
-    if isa(auxcolors,'cell')==NO
-      fprintf('erpimage(): auxcolors argument to auxvar flag must be a cell array. See help.\n');
-      return
-    end
-  end
+	whos auxvar
+	if size(auxvar,1)>size(auxvar,2)  % make (N,frames)
+		auxvar = auxvar';               % (assuming N < frames)
+	end
+	if size(auxvar,2) ~= frames
+		fprintf('erpimage(): auxvar size should be (N,nframes), e.g., (N,%d)\n',frames);
+		return
+	end
+	if exist('auxcolors')==YES % if specified
+		if isa(auxcolors,'cell')==NO
+			fprintf('erpimage(): auxcolors argument to auxvar flag must be a cell array. See help.\n');
+			return
+		end
+	end
 end
 if exist('phargs')
- if phargs(3) > srate/2
-  fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
- end
- if frames < DEFAULT_CYCLES*srate/phargs(3)
-  fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
-            phargs(3),DEFAULT_CYCLES);
-  return
- end
- if length(phargs)==4 & phargs(4) > srate/2
-    phargs(4) = srate/2;
- end
- if length(phargs)==5 & (phargs(5)>180 | phargs(5) < -180)
-  fprintf('\nerpimage(): coher topphase (%g) out of range.\n',topphase);
-  return
- end
+	if phargs(3) > srate/2
+		fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
+	end
+	if frames < DEFAULT_CYCLES*srate/phargs(3)
+		fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
+				phargs(3),DEFAULT_CYCLES);
+		return
+	end
+	if length(phargs)==4 & phargs(4) > srate/2
+		phargs(4) = srate/2;
+	end
+	if length(phargs)==5 & (phargs(5)>180 | phargs(5) < -180)
+		fprintf('\nerpimage(): coher topphase (%g) out of range.\n',topphase);
+		return
+	end
 end
-if ~isnan(coherfreq)
- if coherfreq <= 0 | coherfreq > srate/2 | srate <= 0
-  fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq);
-  return
- end
- if frames < DEFAULT_CYCLES*srate/coherfreq
-  fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
-            coherfreq,DEFAULT_CYCLES);
-  return
- end
+if ~any(isnan(coherfreq))
+	if coherfreq(1) <= 0 | srate <= 0
+		fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(1));
+		return
+	end
+	if coherfreq(end) > srate/2 | srate <= 0
+		fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
+		return
+	end
+	if frames < DEFAULT_CYCLES*srate/coherfreq(1)
+		fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
+				coherfreq(1),DEFAULT_CYCLES);
+		return
+	end
 end
           
 if isnan(timelimits)
    timelimits = [min(times) max(times)];
 end
 if ~isnan(aligntime)
- if ~isinf(aligntime) ...
-      & (aligntime < timelimits(1) | aligntime > timelimits(2))
-  help erpimage
-  fprintf('\nerpimage(): requested align time outside of time limits.\n');
-  return
- end
+	if ~isinf(aligntime) ...
+			& (aligntime < timelimits(1) | aligntime > timelimits(2))
+		help erpimage
+		fprintf('\nerpimage(): requested align time outside of time limits.\n');
+		return
+	end
 end
 % 
 %%%%%%%%%%%%%%%%  Replace nan's with 0s %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -723,84 +735,81 @@ end
 %%%%%%%%%%%%%%% Sort the data on sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if exist('phargs') == 1 % if phase-sort
-        % fprintf('     length(phargs) = %d\n',length(phargs))
-        if length(phargs) >= 4 % find max frequency in specified band
-                [pxx,freqs] = psd(data(:),1024,srate,frames,0);
-
-           %gf = gcf;
-           % figure;plot(freqs,pxx);
-           %xx=axis;
-           %axis([phargs(3) phargs(4) xx(3) xx(4)]);
-           %figure(gf);
-
-           pxx = 10*log10(pxx);
-           n = find(freqs >= phargs(3) & freqs <= phargs(4));
-           if ~length(n)
-                freq = phargs(3);
-           end
-           [dummy maxx] = max(pxx(n));
-           freq = freqs(n(maxx));
-        else
-           freq = phargs(3); % else use specified frequency
-        end
-
-        [dummy minx] = min(abs(times-phargs(1)));
-        winlen = floor(3*srate/freq);
-        winloc = minx-[winlen:-1:0];
-        winloc = winloc(find(winloc>0 & winloc<=frames));
-
-        [phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
-
-        fprintf(...
-  'Sorting data epochs by phase at %.2f Hz, window ending at %f3. ms.\n',...  
-             freq,phargs(1));
-        fprintf('Phase is computed using a filter of length %d frames.\n',...
-             length(winloc));
-        %
-        % Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        phargs(2) = phargs(2)/100; % convert rejection rate from % to fraction
-        [tmp n] = sort(phsamp); % sort amplitudes
-        if phargs(2)>=0
-          n = n(ceil(phargs(2)*length(n))+1:end); % if rej 0, select all trials
-          fprintf(...
-    'Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
-                      length(n),100*(1-phargs(2)));
-
-        else % phargs(2) < 0
-          phargs(2) = 1+phargs(2); % subtract from end
-          n = n(1:floor(phargs(2)*length(n)));
-          fprintf(...
-    'Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
+	if length(phargs) >= 4 % find max frequency in specified band
+		[pxx,freqs] = psd(data(:),1024,srate,frames,0);
+		
+		%gf = gcf;
+		% figure;plot(freqs,pxx);
+		%xx=axis;
+		%axis([phargs(3) phargs(4) xx(3) xx(4)]);
+		%figure(gf);
+		
+		pxx = 10*log10(pxx);
+		n = find(freqs >= phargs(3) & freqs <= phargs(4));
+		if ~length(n)
+			freq = phargs(3);
+		end
+		[dummy maxx] = max(pxx(n));
+		freq = freqs(n(maxx));
+	else
+		freq = phargs(3); % else use specified frequency
+	end
+	
+	[dummy minx] = min(abs(times-phargs(1)));
+	winlen = floor(3*srate/freq);
+	%winloc = minx-[winlen:-1:0]; % ending time version
+	winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
+	winloc = winloc(find(winloc>0 & winloc<=frames));
+	
+	[phaseangles phsamp] = phasedet(data,frames,srate,winloc,freq);
+	
+	fprintf('Sorting data epochs by phase at %.2f Hz, window centered at %f3. ms.\n',...  
+			freq,phargs(1));
+	fprintf('Phase is computed using a filter of length %d frames.\n',...
+			length(winloc));
+	%
+	% Reject small (or large) phsamp trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	phargs(2) = phargs(2)/100; % convert rejection rate from % to fraction
+	[tmp n] = sort(phsamp); % sort amplitudes
+	if phargs(2)>=0
+		n = n(ceil(phargs(2)*length(n))+1:end); % if rej 0, select all trials
+		fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
+			length(n),100*(1-phargs(2)));
+		
+	else % phargs(2) < 0
+		phargs(2) = 1+phargs(2); % subtract from end
+		n = n(1:floor(phargs(2)*length(n)));
+		fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
                       length(n),phargs(2)*100);
-        end
-        %
-        % Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        data = data(:,n); % amp-sort the data, removing rejected-amp trials
-        phsamp = phsamp(n);           % amp-sort the amps
-        phaseangles = phaseangles(n); % amp-sort the phaseangles
-        sortvar = sortvar(n);         % amp-sort the trial indices
-        ntrials = length(n);          % number of trials retained
-        %
-        % Sort remaining data by phase angle %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        topphase = topphase/360*2*pi; % convert from degrees to radians
-        phaseangles = -phaseangles;
-        ip = find(phaseangles>topphase);
-        phaseangles(ip) = phaseangles(ip)-2*pi; % rotate so topphase at top of plot
-
-        [phaseangles sortidx] = sort(phaseangles); % sort trials on (rotated) phase
-        data    =  data(:,sortidx);                % sort data by phase
-        phsamp  =  phsamp(sortidx);                % sort amps by phase
-        sortvar = sortvar(sortidx);                % sort input sortvar by phase
-        phaseangles = -phaseangles; % Note: phsangles now descend from pi 
-
-        fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
-        sortidx = n(sortidx); % return original trial indices in final sorted order
-        if ~isempty(auxvar)
-          auxvar = auxvar(:,sortidx);
-        end
+	end
+	%
+	% Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	data = data(:,n); % amp-sort the data, removing rejected-amp trials
+	phsamp = phsamp(n);           % amp-sort the amps
+	phaseangles = phaseangles(n); % amp-sort the phaseangles
+	sortvar = sortvar(n);         % amp-sort the trial indices
+	ntrials = length(n);          % number of trials retained
+	%
+	% Sort remaining data by phase angle %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	topphase = topphase/360*2*pi; % convert from degrees to radians
+	phaseangles = -phaseangles;
+	ip = find(phaseangles>topphase);
+	phaseangles(ip) = phaseangles(ip)-2*pi; % rotate so topphase at top of plot
+	
+	[phaseangles sortidx] = sort(phaseangles); % sort trials on (rotated) phase
+	data    =  data(:,sortidx);                % sort data by phase
+	phsamp  =  phsamp(sortidx);                % sort amps by phase
+	sortvar = sortvar(sortidx);                % sort input sortvar by phase
+	phaseangles = -phaseangles; % Note: phsangles now descend from pi 
+	
+	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
+	sortidx = n(sortidx); % return original trial indices in final sorted order
+	if ~isempty(auxvar)
+		auxvar = auxvar(:,sortidx);
+	end
 
 elseif Nosort == YES
   fprintf('Not sorting data on input sortvar.\n');
@@ -884,7 +893,7 @@ fprintf('Data will be plotted between %g and %g ms.\n',timelimits(1),timelimits(
 %
 %%%%%%%%%%%%% Image the aligned/sorted/smoothed data %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isnan(coherfreq)       % if plot three time axes
+if ~any(isnan(coherfreq))       % if plot three time axes
      image_loy = 3*PLOT_HEIGHT;
 elseif Erpflag == YES   % elseif if plot only one time axes
      image_loy = 1*PLOT_HEIGHT;
@@ -906,6 +915,21 @@ ind = isnan(data);    % find nan's in data
 [i j]=find(ind==1);
 if ~isempty(i)
   data(i,j) = 0;      % plot shifted nan data as 0 (=green)
+end
+
+%
+%%%%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if length(coherfreq) == 2 & freq <= 0 % find max frequency in specified band
+	[pxx,tmpfreq] = psd(data(:),1024,srate,frames,0);
+
+	pxx = 10*log10(pxx);
+	n = find(tmpfreq >= coherfreq(1) & tmpfreq <= coherfreq(2));
+	if ~length(n)
+		coherfreq = coherfreq(1);
+	end
+	[dummy maxx] = max(pxx(n));
+	coherfreq = tmpfreq(n(maxx));
 end
 
 if ~Allampsflag & ~exist('data2') %%%%%%%%%%%%%%% Plot ERP image %%%%%%%%%%%%%%
