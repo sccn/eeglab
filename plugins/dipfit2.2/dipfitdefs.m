@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/10 18:55:49  arno
+% add template files
+%
 % Revision 1.1  2005/03/10 18:10:27  arno
 % Initial revision
 %
@@ -105,7 +108,7 @@ template_models = { ...
     { [ folder 'standard_BESA' delim 'standard_BESA.mat' ] ... % model hdmfile for BESA
       'spherical' ...                                          % coordinate 'spherical' or 'MNI'
       [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...      % MRI MNI normalized file
-      [ folder 'standard_BESA' delim 'Standard-10-5-Cap385.sfp' ] } ... % channel location file
+      [ folder 'standard_BESA' delim 'standard-10-5-cap385.sfp' ] } ... % channel location file
                                                                         % associated with model
     { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...   % same as above for BEM model
       'MNI' ...
