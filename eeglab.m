@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2002/08/21 17:56:21  arno
+% add menu to export rejections
+%
 % Revision 1.154  2002/08/21 02:22:00  arno
 % add continuous data check for rejection continuous data menu
 %
@@ -675,6 +678,11 @@ if nargin == 1
 		end;
 	elseif strcmp(onearg, 'besa');
 		besamenu = 1;
+		clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
+		eeg_global;
+		EEG = eeg_emptyset;
+		evalin('base', 'eeg_global;');
+		h('eeglab besa;');
 		disp('Besa menu activated');
 	else
 		h('eeglab rebuild;');
