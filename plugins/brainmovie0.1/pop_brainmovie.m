@@ -109,6 +109,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2003/06/10 18:29:59  arno
+% chaning plot order 3D movies
+%
 % Revision 1.52  2003/05/31 18:15:10  arno
 % implement type
 %
@@ -658,7 +661,7 @@ if ~strcmpi(g.mode, 'compute')
             end;
             brainmovieoptions = { brainmovieoptions{:} 'scalepower' [tmpmin tmpmax] };
         end;
-        
+                
         % Run brainmovie
         % --------------
         if strcmpi(g.type, '3d')
