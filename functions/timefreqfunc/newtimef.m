@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2004/06/01 23:21:59  arno
+% implementing baseboot and baseline windows
+%
 % Revision 1.58  2004/03/09 17:35:04  arno
 % msg
 %
@@ -1126,14 +1129,6 @@ end;
 if ~isnan(g.alpha) & length(baseln)==0
     myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
-elseif ~isnan(g.alpha) 
-    if length(g.baseboot) == 2
-        myprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', ...
-                 g.baseboot(1),  g.baseboot(2));
-    elseif g.baseboot
-        myprintf(g.verbose, '   %d bootstrap windows in baseline (times<%g).\n',...
-                 length(baseln), g.baseline)
-    end;        
 end
 if isnan(g.powbase)
   myprintf(g.verbose, 'Computing the mean baseline spectrum\n');
