@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/08/12 18:58:58  arno
+% inputdlg2
+%
 % Revision 1.38  2002/08/12 01:18:40  arno
 % debug last
 %
@@ -952,6 +955,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   h = findobj(gcf, 'style', 'pushbutton');
   set(h, 'backgroundcolor', BUTTON_COLOR);
+  h = findobj(gcf, 'tag', 'eegslider');
+  set(h, 'backgroundcolor', BUTTON_COLOR);
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
@@ -1348,6 +1353,8 @@ else
         text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
 			 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
 	end
+	text(.5,YLim(2)/10+Yl(1),'Scale',...
+		 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
     
   case 'noui'
       eegplot( varargin{:} );
