@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/04/23 18:28:02  arno
+% correcting coher computation
+%
 % Revision 1.9  2002/04/11 19:56:12  arno
 % debuging baseboot -ad & lf
 %
@@ -661,12 +664,12 @@ P = P ./ (ones(size(P,1),1) * Rn);
 
 if isnan(g.powbase)
   fprintf('Computing the mean baseline spectrum\n');
-  mbase = mean(P(:,baseln)');
+  mbase = mean(P(:,baseln),2)';
 else
   fprintf('Using the input baseline spectrum\n');
   mbase = g.powbase;
 end
-if ~isnan( g.baseline ) 
+if ~isnan( g.baseline ) & ~isnan( mbase )
     P = 10 * (log10(P) - repmat(log10(mbase)',[1 g.timesout])); % convert to (10log10) dB
 else
     P = 10 * log10(P);
