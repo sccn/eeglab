@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/08/07 22:38:42  arno
+% editing header
+%
 % Revision 1.9  2002/07/31 01:02:13  arno
 % debugging
 %
@@ -133,8 +136,8 @@ if nargin < 3
                		'NO', ...
             		'NO' };
 
-	result       = inputdlg( promptstr, fastif(~icacomp, 'Reject by component spectra -- pop_rejspec()', ...
-											   'Reject by data spectra -- pop_rejspec()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif(~icacomp, 'Reject by component spectra -- pop_rejspec()', ...
+											   'Reject by data spectra -- pop_rejspec()'), 1,  inistr, 'pop_rejspec');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};

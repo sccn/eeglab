@@ -65,14 +65,14 @@ end;
 if (nargin < 3 & typeproc==1)
 	promptstr    = { 'Enter EEG channel:'; 'Percent for trimmed statistics:' };
 	inistr       = { '1';'5' };
-	result       = inputdlg( promptstr, 'EEG channel selection', 1,  inistr);
+	result       = inputdlg2( promptstr, 'EEG channel selection', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	cnum   	     = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
 	percent      = eval( [ '[' result{2} ']' ] );
 elseif (nargin < 3 & typeproc==0)
 	promptstr    = { 'Enter component number:'; 'Percent for trimmed statistics:' };
 	inistr       = { '1'; '5' };
-	result       = inputdlg( promptstr, 'Component selection', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Component selection', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	cnum    	 = eval( [ '[' result{1} ']' ] ); % the brackets allow to process matlab arrays
     percent      = eval( [ '[' result{2} ']' ] );

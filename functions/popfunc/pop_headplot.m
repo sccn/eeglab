@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/12 01:37:37  arno
+% color
+%
 % Revision 1.7  2002/08/11 22:15:06  arno
 % color
 %
@@ -87,7 +90,7 @@ end;
 
 if nargin < 3
     if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
-		 ButtonName=questdlg( ['3D head plot need to generate a spline file' 10 ...
+		 ButtonName=questdlg2( ['3D head plot need to generate a spline file' 10 ...
 		                      'the first time it is called (and for every new channel' 10 ...
 		                      'location file. Do you want to generate this file now ?'], ...
 		              'Spline file', 'Cancel', 'Load an existing file', 'Yes','Yes');
@@ -131,7 +134,7 @@ if nargin < 3
 	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
 	               '' '' };
     help headplot;
-	result       = inputdlg( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', 'Component head plot(s) -- pop_headplot()'), 1,  inistr);
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', 'Component head plot(s) -- pop_headplot()'), 1,  inistr, 'headplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );

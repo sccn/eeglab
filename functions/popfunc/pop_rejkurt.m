@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/07 23:19:15  arno
+% editing
+%
 % Revision 1.7  2002/08/07 22:39:14  arno
 % same
 %
@@ -121,7 +124,7 @@ if nargin < 3
             		'NO', ...
             		'REJECTRIALS' };
 
-	result       = inputdlg( promptstr, fastif(~icacomp, 'Trial rejection using comp. kurtosis -- pop_rejkurt()', 'Trial rejection using data kurtosis -- pop_rejkurt()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trial rejection using comp. kurtosis -- pop_rejkurt()', 'Trial rejection using data kurtosis -- pop_rejkurt()'), 1,  inistr, 'pop_rejkurt');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};

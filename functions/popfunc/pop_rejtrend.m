@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/08/07 22:39:38  arno
+% same
+%
 % Revision 1.6  2002/08/07 22:28:38  arno
 % editing
 %
@@ -102,7 +105,7 @@ if nargin < 3
 	% which set to save
 	% -----------------
 	promptstr   = { fastif(icacomp==0, 'Component (number; ex: 2 4 5):', 'Electrode (number; ex: 2 4 5):'), ...
-	                'Size of the window of consecutive alike values (in data points)', ... 
+	                'Consecutive alike values (in data points)', ... 
 					'Maximal slope (trend) of the activity (unit/epoch):', ...
 					'R square limit (0 to 1, ex: 0.8):', ...
                		'Display with previous rejection', ...
@@ -114,8 +117,8 @@ if nargin < 3
                		'NO', ...
             		'NO' };
 
-	result       = inputdlg( promptstr, fastif(~icacomp, 'Trend rejection in component -- po_rejtrend()', ...
-											   'Trend rejection -- po_rejtrend()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif(~icacomp, 'Trend rejection in component -- po_rejtrend()', ...
+											   'Trend rejection -- po_rejtrend()'), 1,  inistr, 'pop_rejtrend');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};

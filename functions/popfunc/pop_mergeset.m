@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/06/25 02:20:29  arno
+% preserving epoch information
+%
 % Revision 1.6  2002/06/25 00:52:27  arno
 % debuging ICA info copy
 %
@@ -81,7 +84,7 @@ if nargin == 1
 	promptstr    = { 'Enter dataset numbers to merge', ...
 					 'Preserve ICA of the first dataset ?' };
 	inistr       = { '1', 'no' };
-	result       = inputdlg( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr, 'pop_mergeset');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
    

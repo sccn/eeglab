@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/06 21:37:28  arno
+% spelling
+%
 % Revision 1.3  2002/07/31 17:25:34  arno
 % typo
 %
@@ -61,9 +64,9 @@ if nargin < 2
 	% ask user
 	[filename, filepath] = uigetfile('*.DAT', 'Choose a DAT file -- pop_loaddat'); 
 	if filename == 0 return; end;
-	result       = inputdlg( {strvcat('Code signifying no reaction time (or other) event in a trial', ...
-									 '(none=all latencies are imported)')}, ...
-									 'Load Neuroscan DATA file -- pop_loaddat()', 1,  {'1000'});
+	result       = inputdlg2( {strvcat('Code signifying no event in a trial ([]=none)', ...
+									 'Load Neuroscan DATA file -- pop_loaddat()', 1,  {'1000'}, 'pop_loaddat');
+%									 '(none=all latencies are imported)')}, ...
 	if length(result) == 0 return; end;
 	no_rt = eval( result{1} );
 end;

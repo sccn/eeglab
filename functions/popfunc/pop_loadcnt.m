@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/06 21:33:30  arno
+% spelling
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
@@ -55,10 +58,10 @@ if nargin < 1
 	% popup window parameters
 	% -----------------------
 	promptstr    = { 'Average reference ?' ...
-					 'Enter block size in CNT file (if 1 does not work, try 40):' };
+					 'Enter block size in CNT file (1 or 40):' };
 	inistr       = { 'YES', '40'  };
 	pop_title    = sprintf('Load a CNT dataset');
-	result       = inputdlg( promptstr, pop_title, 1,  inistr);
+	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadcnt');
 	if length( result ) == 0 return; end;
 
 	% decode parameters

@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/08/07 23:19:43  arno
+% text
+%
 % Revision 1.10  2002/08/07 22:39:54  arno
 % same
 %
@@ -132,7 +135,7 @@ if nargin < 3
             		'NO', ...
             		'REJECTRIALS' };
 
-	result       = inputdlg( promptstr, fastif( ~icacomp, 'Reject. improbable comp. -- pop_jointprob()', 'Reject improbable data -- pop_jointprob()'), 1,  inistr);
+	result       = inputdlg2( promptstr, fastif( ~icacomp, 'Reject. improbable comp. -- pop_jointprob()', 'Reject improbable data -- pop_jointprob()'), 1,  inistr, 'pop_jointprob');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	elecrange    = result{1};

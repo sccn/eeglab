@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:32:13  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license -ad 
 
@@ -54,7 +57,7 @@ if nargin < 2
    promptstr    = {'Enter time limits (in ms) for baseline:',...
          		   ['Enter point range for baseline (ex:1:frames):' 10 '(overwrite previous option)'] };
 	inistr       = { [num2str(EEG.xmin*1000) ' 0'], '' };
-	result       = inputdlg( promptstr, 'Baseline removal -- pop_rmbase()', 1,  inistr);
+	result       = inputdlg2( promptstr, 'Baseline removal -- pop_rmbase()', 1,  inistr, 'pop_rmbase');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 

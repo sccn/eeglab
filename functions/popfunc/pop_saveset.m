@@ -44,6 +44,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 21:45:48  arno
+% making the function standalone
+% ,
+%
 % Revision 1.1  2002/04/18 19:57:34  arno
 % Initial revision
 %
@@ -81,7 +85,7 @@ if nargin < 2
 				indices = [indices index];
 			end;
 		end;
-		result = inputdlg( {'Indices of the datasets to save'}, 'Save several datasets -- pop_saveset()', 1, {int2str(indices)});
+		result = inputdlg2( {'Indices of the datasets to save'}, 'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
 		if length(result) == 0 return; end;
 		indices = eval( [ '[' result{1} ']' ] );
 		[curfilename, curfilepath] = uiputfile('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
