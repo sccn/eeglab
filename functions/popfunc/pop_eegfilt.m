@@ -28,7 +28,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eegfilt(), eeglab()
+% See also: eegfilt(), eegfiltfft(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2003/09/01 18:14:17  arno
+% fixing nargin problem -thanks Petr Janata
+%
 % Revision 1.21  2003/08/06 00:22:05  arno
 % removing debug message
 %
@@ -173,11 +176,22 @@ if revfilt ~= 0
 	options = { options{:} revfilt };
 end;
 
+% warning
+% -------
+if exist('filtfilt') ~= 2
+    disp('Warning: cannot find the signal processing toolbox');
+    disp('         a simple fft/inverse fft filter will be used');
+end;
+
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
 		boundaries = strmatch('boundary', {EEG.event.type});
 		if isempty(boundaries)
-			EEG.data = eegfilt( EEG.data, options{:}); 
+            if exist('filtfilt') == 2
+                EEG.data = eegfilt( EEG.data, options{:}); 
+            else
+                EEG.data = eegfiltfft( EEG.data, options{:}); 
+            end;
 		else
 			options{4} = 0;
 			disp('Pop_eegfilt:finding continuous data boundaries');
@@ -189,8 +203,13 @@ if EEG.trials == 1
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
-					EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
-						eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+                    if exist('filtfilt') == 2
+                        EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+                            eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+                    else
+                        EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+                            eegfiltfft(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+                    end;
 				catch
 					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
                     if locutoff ~= 0 & hicutoff == 0
@@ -204,11 +223,19 @@ if EEG.trials == 1
             catch, end;
 		end
 	else
-		EEG.data = eegfilt( EEG.data, options{:});
+        if exist('filtfilt') == 2
+            EEG.data = eegfilt( EEG.data, options{:});
+        else
+            EEG.data = eegfiltfft( EEG.data, options{:});
+        end;
 	end;
 else
-	EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
-	EEG.data = eegfilt( EEG.data, options{:});
+    EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
+    if exist('filtfilt') == 2
+        EEG.data = eegfilt( EEG.data, options{:});
+    else
+        EEG.data = eegfiltfft( EEG.data, options{:});
+    end;
 	% Note: reshape does not reserve new memory while EEG.data(:,:) does
 end;	
 
