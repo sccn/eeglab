@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.175  2004/03/24 16:35:25  scott
+% added 'cricgrid' plotting detail argument
+%
 % Revision 1.174  2004/03/23 19:19:34  scott
 % made 'electrodes' default 'off'
 %
@@ -820,7 +823,11 @@ if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'),
     if strcmpi(VERBOSE,'on')
        fprintf('Use of EEG.shrink deprecated: see new topoplot() options plotrad and headrad.\n')
     end
-    shrinkfactor = tmpeloc.shrink;
+    if isfield(tmpeloc, 'shrink')
+        shrinkfactor = tmpeloc.shrink;
+    else
+        shrinkfactor = 0;
+    end;
 end;
 
 if isstr(shrinkfactor)
