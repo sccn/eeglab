@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2002/11/13 18:30:04  scott
+% same
+%
 % Revision 1.89  2002/11/13 18:28:16  scott
 % freq range text
 %
@@ -385,7 +388,7 @@ if popup
 				   'clear tmps tmpv tmpstr tmpfieldnames;' ];
 	
 	geometry = { [1 1 0.1 0.8 2.1] [1 1 1 1 1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 0.8 0.8 1.2] [1 1 1 0.8 0.8 1.2] [1] [1] ...
-				 [1.1 1.4 1.2 1 .5] [1.1 1.4 1.2 1 .5] [1] [1] [1 1 1 1 1] [1 1 1 1 1] [1] [1] [1 1 1 2.2] [1 1 1 2.2]};
+				 [1.6 1.7 1.2 1 .5] [1.6 1.7 1.2 1 .5] [1] [1] [1.5 1 1 1 1] [1.5 1 1 1 1] [1] [1] [1.5 1 1 2.2] [1.5 1 1 2.2]};
     uilist = { { 'Style', 'text', 'string', fastif(typeplot, 'Channel', 'Component(s)'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1'), 'tag', 'chan' } { } ...
 			   { 'Style', 'text', 'string', 'Figure title', 'fontweight', 'bold'  } ...
