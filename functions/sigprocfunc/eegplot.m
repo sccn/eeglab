@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2002/11/14 17:03:41  arno
+% debugging multiple window selection
+%
 % Revision 1.63  2002/11/13 00:47:45  arno
 % debug multiple color display
 %
@@ -903,7 +906,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   commandpush = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
   			 'g = get(gcbf,''UserData'');' ... % get data of backgroung image {g.trialstag g.winrej incallback}
-             'if tmpcallback ~= 1' ... % interception of nestest calls
+             'if g.incallback ~= 1' ... % interception of nestest calls
  			 '   if g.trialstag ~= -1,' ...
 			 '   	lowlim = round(g.time*g.trialstag+1);' ...
  			 '   else,' ...
