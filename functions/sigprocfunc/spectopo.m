@@ -89,6 +89,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2002/10/10 16:00:22  arno
+% cle[A
+% move title a little bit
+%
 % Revision 1.38  2002/10/09 00:21:44  arno
 % remove previous modif
 %
@@ -332,18 +336,21 @@ if isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing spectra')
 	[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
-	fprintf('\n');
+	eegspecdB = 10*log10(eegspecdB);
+    fprintf('\n');
 else
 	% compute data spectrum
 	if isempty(g.plotchan) | g.plotchan == 0
 		fprintf('Computing spectra')
-		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);
-		fprintf('\n');
+		[eegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g);	
+        eegspecdB = 10*log10(eegspecdB);
+        fprintf('\n');
 	else
 		fprintf('Computing spectra at specified channel')
 		g.reref = 'no';
 		[eegspecdB freqs] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
-		fprintf('\n');
+        eegspecdB = 10*log10(eegspecdB);
+        fprintf('\n');
 	end;
 	g.reref = 'no';
 	
@@ -366,18 +373,27 @@ else
 	% compute component spectra
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing component spectra: ')
-	if g.plotchan ~= 0
-		newweights = diag(g.icawinv(g.plotchan,:)) * g.weights;
-	else
-		newweights = diag(sum(g.icawinv,1)) * g.weights;
-	end;
+    newweights = g.weights;
 	if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
 		[compeegspecdB freqs] = spectcomp( newweights*data, frames, srate, epoch_subset, g);
 	else % in case out of memory error, multiply conmponent sequencially
 		[compeegspecdB freqs] = spectcomp( data, frames, srate, epoch_subset, g, newweights);
 	end;
 	fprintf('\n');
-
+    
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% rescaling spectra with respect to projection
+    % all channel: component_i power = sum(inverseweigths(component_i)^2) * power(activation_component_i);
+    % one channel: component_i power = inverseweigths(channel_j,component_i)^2) * power(activation_component_i);
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for index = 1:size(compeegspecdB,1) 
+        if g.plotchan == 0
+            compeegspecdB(index,:) = 10*log10( sum(g.icawinv(:,g.icacomps(index)).^2) * compeegspecdB(index,:) );
+        else 
+            compeegspecdB(index,:) = 10*log10( g.icawinv(g.plotchan,g.icacomps(index))^2 * compeegspecdB(index,:) );
+        end;
+    end;
+        
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% select components to plot
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -757,5 +773,5 @@ function [eegspecdB, freqs] = spectcomp( data, frames, srate, epoch_subset, g, n
 		end
 		fprintf('.')
 	end
-	eegspecdB = 10*log10(eegspec/length(epoch_subset)); % convert power to dB
+	eegspecdB = eegspec/length(epoch_subset); % convert power to dB
 	return;
