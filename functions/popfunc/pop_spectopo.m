@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2004/03/25 16:54:21  arno
+% changing edit box text
+%
 % Revision 1.40  2003/08/11 17:27:59  arno
 % command line problem fixed
 %
@@ -240,15 +243,23 @@ if nargin < 3
 	processflag = 'EEG';
 end;
 
+chanlocs_present = 0;
+if ~isempty(EEG.chanlocs)
+    if isfield(EEG.chanlocs, 'theta')
+        chanlocs_present = 1;
+    end;
+end;
+
 if nargin < 3
 	if dataflag
 		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1]};
+        scalp_freq = fastif(chanlocs_present, { '6 10 22' }, { '' 'enable' 'off' });
 		promptstr    = { { 'style' 'text' 'string' 'Epoch time range to analyze [min_ms max_ms]:' }, ...
 						 { 'style' 'edit' 'string' [num2str( EEG.xmin*1000) ' ' num2str(EEG.xmax*1000)] }, ...
 						 { 'style' 'text' 'string' 'Percent data to sample (1 to 100):'}, ...
 						 { 'style' 'edit' 'string' '15' }, ...
 						 { 'style' 'text' 'string' 'Frequencies to plot as scalp maps (Hz):'}, ...
-						 { 'style' 'edit' 'string' '6 10 22' }, ...
+						 { 'style' 'edit' 'string'  scalp_freq{:} }, ...
 						 { 'style' 'text' 'string' 'Apply to EEG|ERP|BOTH:'}, ...
 						 { 'style' 'edit' 'string' 'EEG' }, ...
 						 { 'style' 'text' 'string' 'Plotting frequency range [lo_Hz hi_Hz]:'}, ...
@@ -279,7 +290,7 @@ if nargin < 3
 			if ~isempty(result{5}),    options = [ options ',' result{5} ]; end;
 		end;
 	else
-		if isempty(EEG.chanlocs)
+		if ~chanlocs_present
 			error('pop_spectopo(): cannot plot component contributions without channel locations');
 		end;
 		geometry = { [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 1] [2 0.18 0.78] [2 1] [2 1] };
