@@ -185,6 +185,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.229  2003/03/13 19:35:57  arno
+% removing besa option
+%
 % Revision 1.228  2003/03/03 17:09:38  arno
 % debug last
 %
@@ -1084,6 +1087,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
 	uimenu( third_m, 'Label', 'Component ERP image'      , 'CallBack', [ checkepochica  'LASTCOM = pop_erpimage(EEG, 0, h(''find'',''pop_erpimage(EEG,0''));' e_hist]);
 	ERPC_m = uimenu( third_m, 'Label', 'Component ERPs');
 	   uimenu( ERPC_m, 'Label', 'With component maps', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(EEG);' e_hist]);
+	   uimenu( ERPC_m, 'Label', 'With comp. maps (compare)', 'CallBack', [ checkica 'LASTCOM = pop_envtopo(ALLEEG);' e_hist]);
 	   uimenu( ERPC_m, 'Label', 'In rectangular array'      , 'CallBack', [ checkepochica     '[tmpeeg LASTCOM] = pop_plotdata(EEG, 0); clear tmpeeg;' e_hist]);
 
 	stat_m = uimenu( third_m, 'Label', 'Data statistics', 'Separator', 'on', 'enable', fastif(exist('kstest'), 'on', 'off'));
