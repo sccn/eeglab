@@ -37,6 +37,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2002/04/23 17:57:52  arno
+% allowing store of multiple datasets
+%
 % Revision 1.4  2002/04/20 17:18:33  arno
 % removing "Done."
 %
@@ -62,7 +65,7 @@ eeg_global;
 if length(EEG) > 1
 	TMPEEG = EEG;
 	for index=1:length(TMPEEG)
-		EEG = TMPEEG(1);
+		EEG = TMPEEG(index);
 		eeg_store;
 	end;
 	return;
