@@ -3,12 +3,13 @@
 % Usage:
 %   >>  newdata = setfont( handle, 'key', 'val');
 %   >>  [newdata chlab] = setfont( handle, 'key' , 'val', ... );
-%   >>  [newdata chlab] = setfont( handle, 'labels', 'key' , 'val', ... );
+%   >>  [newdata chlab] = setfont( handle, 'labels', type, 'key' , 'val', ... );
 %
 % Inputs:
 %   handle     - [gcf,gca] figure or plot handle
-%   'labels'   - if the keyword label is present, the formating is only
-%                applied to x and y labels and titles.
+%   'labels'   - ['xlabels'|'ylabels'|'titles'|'axis'|'strings'] only apply
+%                formating to selected category. Note that this has to be the 
+%                first optional input.
 %   properties - 'key', 'val' properties for the figure
 %
 % Exemple:
@@ -33,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/04/16 17:21:17  arno
+% Initial revision
+%
 
 function setfont(fig, varargin);
     
@@ -42,36 +46,61 @@ function setfont(fig, varargin);
     end;
     
     if strcmpi(varargin{1}, 'labels')
-        varargin = varargin(2:end);
-        label = 1;
+        varargin = varargin(3:end);
+        label = varargin{1};
     else
-        label = 0;
+        label = '';
     end;
-    h = findallobjects(fig, label);
+    [hx, hy, hti, hgca, hstr] = findallobjects(fig);
     
+    % select a specified category
+    % ---------------------------
+    if isempty(label)
+        h = [hx, hy, hti, hgca, hstr];
+    else
+        switch lower(label),
+         case 'xlabels', h =hx;
+         case 'ylabels', h =hy;
+         case 'titles',  h =hti;
+         case 'axis',    h =hgca;
+         case 'strings', h =hstr;
+         otherwise, error('Unrecognized ''labels'''); 
+        end;
+    end;
+    
+    % apply formating
+    % ---------------
     for index = 1:length(h)
-        try, 
+        isaxis = 0;
+        try, get(h(index), 'xtick');  isaxis = 1; catch, end;
+        if isaxis 
             set(h(index), 'XTickLabelMode', 'manual', 'XTickMode', 'manual');
             set(h(index), 'YTickLabelMode', 'manual', 'YTickMode', 'manual');
-        catch, end;
-        try, 
-            set(h(index), varargin{:});
-        catch, end;
+        end;
+        for tmpprop = 1:2:length(varargin)
+            if strcmpi(varargin{tmpprop}, 'color') & isaxis
+                set(h(index), 'xcolor', varargin{tmpprop+1}, ...
+                              'ycolor', varargin{tmpprop+1}, ...
+                              'zcolor', varargin{tmpprop+1});                
+            else
+                try, 
+                    set(h(index), varargin{tmpprop}, varargin{tmpprop+1});
+                catch, end;
+            end;
+        end;
     end;
     
-function handles = findallobjects(fig, label);
+function [hx, hy, hti, hgca, hstr] = findallobjects(fig);
     handles = findobj(fig)';
-    lhandles = [];
+    hx   = [];
+    hy   = [];
+    hti  = [];
+    hgca = [];
+    hstr = [];
     for index = 1:length(handles)
-        try, 
-            lhandles = [ lhandles get(handles(index), 'xlabel')  ];
-            lhandles = [ lhandles get(handles(index), 'ylabel')  ];
-            lhandles = [ lhandles get(handles(index), 'title')  ];
-        catch, 
-        end;
+        try, hx   = [ hx    get(handles(index), 'xlabel')  ]; catch, end;
+        try, hy   = [ hy    get(handles(index), 'ylabel')  ]; catch, end;
+        try, hti  = [ hti   get(handles(index), 'title')   ]; catch, end;
+        try, get(handles(index), 'xtick');  hgca = [ hgca  handles(index) ]; catch, end;
+        try, get(handles(index), 'string'); hstr = [ hstr  handles(index) ]; catch, end;
     end;    
-    if nargin < 2 | label == 1
-        handles = lhandles;
-    else 
-        handles = [ handles lhandles ];
-    end;
