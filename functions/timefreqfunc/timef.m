@@ -120,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2002/04/29 14:24:13  scott
+% debugging -sm
+%
 % Revision 1.23  2002/04/29 14:21:23  scott
 % same -sm
 %
@@ -527,7 +530,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
            end
     end;        
 
-else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+else % %%%%%%%%%%%%%%%%%% cycles>0, Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%
 
    	freqs = g.srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
     dispf = find(freqs <= g.maxfreq);
@@ -549,7 +552,7 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
       case 'phasecoher'
            switch g.phsamp
              case 'on'
-               cumulX = zeros(g.padratio*g.winsize/2,g.timesout);
+               cumulX = zeros(size(win,2),g.timesout);
            end
    end;        
 end
