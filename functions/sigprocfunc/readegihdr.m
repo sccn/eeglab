@@ -38,8 +38,8 @@ end;
     
 head.version = fread(fid,1,'integer*4');
 
-if ~(head.version == 2 | head.version == 3),
-        error('EGI Simple Binary Version 2 and 3 supported only.');
+if ~(head.version == 2 | head.version == 3 | head.version == 5),
+        error('EGI Simple Binary Version 2, 3, and 5 supported only.');
 end;
 
 year = fread(fid,1,'integer*2');
