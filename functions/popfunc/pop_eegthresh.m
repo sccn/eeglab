@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/07/26 17:52:24  arno
+% debugging
+%
 % Revision 1.2  2002/07/26 16:48:32  arno
 % switching icacomp
 %
@@ -66,10 +69,10 @@
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad
 
-function [EEG, I1, com] = pop_eegthresh( EEG, icacomp, elecrange, negthresh, posthresh, ...
+function [EEG, Irej, com] = pop_eegthresh( EEG, icacomp, elecrange, negthresh, posthresh, ...
    						starttime, endtime, superpose, reject, topcommand);
 
-I1 = [];
+Irej = [];
 com = '';
 if nargin < 1
    help pop_eegthresh;
@@ -138,7 +141,7 @@ if any(endtime   > EEG.xmax)
 end;
 
 if icacomp == 1
-	[I1 Irej NS Erejtmp] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+	[Itmp Irej NS Erejtmp] = eegthresh( EEG.data, EEG.pnts, elecrange, negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
     tmpelecIout = zeros(EEG.nbchan, EEG.trials);
     tmpelecIout(elecrange,Irej) = Erejtmp;
 else
@@ -151,7 +154,7 @@ else
         icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
-	[I1 Irej NS Erejtmp] = eegthresh( icaacttmp, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
+	[Itmp Irej NS Erejtmp] = eegthresh( icaacttmp, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);
     tmpelecIout = zeros(size(EEG.icaweights,1), EEG.trials);
     tmpelecIout(elecrange,Irej) = Erejtmp;
 end;
@@ -184,7 +187,7 @@ end;
 com = [ com sprintf('%s = pop_eegthresh(%s,%s);', inputname(1), ...
 		inputname(1), vararg2str({icacomp,elecrange,negthresh,posthresh,starttime,endtime,superpose,reject})) ]; 
 if nargin < 3
-	I1 = com;
+	Irej = com;
 end;
 
 return;
