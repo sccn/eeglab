@@ -1,8 +1,10 @@
-% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
-%        between two input data time series. A lower panel (optionally) shows 
-%        the coherence phase difference between the processes. In this panel:
-%           -90 degrees (blue)   means x leads y by a quarter cycle.
-%            90 degrees (orange) means y leads x by a quarter cycle.
+{% crossf() - Returns estimates and plots event-related coherence (ERCOH) 
+%        between two input data time series (X,Y). A lower panel (optionally) 
+%        shows the coherence phase difference between the processes. 
+%        In this panel:
+%           -90 degrees (blue)   means X leads Y by a quarter cycle.
+%            90 degrees (orange) means Y leads X by a quarter cycle.
+%        Coherence phase units may be radians, degrees, or msec.
 %        Click on any subplot to view separately and zoom in/out.
 %
 % Function description:
@@ -12,93 +14,94 @@
 %        frequency ('srate'/'winsize') divided by the 'padratio'.
 %
 %        If an 'alpha' value is given, then bootstrap statistics are 
-%        computed (from a distribution of 'naccu' (200) surrogate baseline
+%        computed (from a distribution of 'naccu' {200} surrogate baseline
 %        data epochs) for the baseline epoch, and non-significant features 
 %        of the output plots are zeroed (and shown in green). The baseline
-%        epoch is all windows with center latencies < the given 'baseline' value 
-%        or, if 'baseboot' is 1, the whole epoch. 
+%        epoch is all windows with center latencies < the given 'baseline' 
+%        value, or if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles] ...
-%                       = crossf(x,y,frames,tlimits,srate,cycles, ...
+%                       = crossf(X,Y,frames,tlimits,srate,cycles, ...
 %                                        'key1', 'val1', 'key2', val2' ...);
-%
 % Required inputs:
-%       x       = first single-channel data set (1,frames*nepochs)      
-%       y       = second single-channel data set (1,frames*nepochs)     
-%       frames  = frames per epoch                                   {750}
-%       tlimits = [mintime maxtime] (ms) epoch latency limits  {[-1000 2000]}
-%       srate   = data sampling rate (Hz)                            {250}
+%       X       = first single-channel data set (1,frames*nepochs)      
+%       Y       = second single-channel data set (1,frames*nepochs)     
+%       frames  = frames per epoch                                 {default: 750}
+%       tlimits = [mintime maxtime] (ms) epoch latency limits {def: [-1000 2000]}
+%       srate   = data sampling rate (Hz)                          {default: 250}
 %       cycles  = 0  -> Use FFTs (with constant window length) 
 %               = >0 -> Number of cycles in each analysis wavelet 
 %               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
 %                 of wavelet cycles expands with frequency from cycles
 %                 If expfactor = 1, no expansion; if = 0, constant
-%                 window length (as in FFT)            {default cycles: 0}
-%
-%    Optional Coherence Type:
+%                 window length (as in FFT)                          {default: 0}
+% Optional Coherence Type:
 %       'type'  = ['coher'|'phasecoher'] Compute either linear coherence
 %                 ('coher') or phase coherence ('phasecoher') also known
 %                 as phase coupling factor' {default: 'phasecoher'}.
 %       'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
-%                 from x and y. This computes the  'intrinsic' coherence
-%                 x and y not arising from common synchronization to 
+%                 from X and Y. This computes the  'intrinsic' coherence
+%                 X and Y not arising from common synchronization to 
 %                 experimental events. See notes. {default: 'off'}
 %       'shuffle' = integer indicating the number of estimates to compute
 %                 bootstrap coherence based on shuffled trials. This estimates
-%                 the coherence arising only from time locking of x and y
-%                 to experimental events (opposite of 'subitc'). {default: 0}. 
+%                 the coherence arising only from time locking of X and Y
+%                 to experimental events (opposite of 'subitc')      {default: 0}
+% Optional Detrend:
+%       'detret' = ['on'|'off'], Linearly detrend data within epochs {def: 'off'}
+%       'detrep' = ['on'|'off'], Linearly detrend data across trials {def: 'off'}
 %
-%    Optional Detrend:
-%       'detret' = ['on'|'off'], Linearly detrend data within epochs. {'off'}
-%       'detrep' = ['on'|'off'], Linearly detrend data across trials  {'off'}
-%
-%    Optional FFT/DFT:
+% Optional FFT/DFT:
 %       'winsize'  = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                    if cycles >0: *longest* window length to use. This
-%                    determines the lowest output frequency  {~frames/8}
-%       'timesout' = Number of output latencies (int<frames-winsize) {def: 200}
-%       'padratio' = FFTlength/winsize (2^k)                     {def: 2}
+%                    determines the lowest output frequency  {default: ~frames/8}
+%       'timesout' = Number of output latencies (int<frames-winsize)   {def: 200}
+%       'padratio' = FFTlength/winsize (2^k)                         {default: 2}
 %                    Multiplies the number of output frequencies by
 %                    dividing their spacing. When cycles==0, frequency
 %                    spacing is (low_frequency/padratio).
 %       'maxfreq'  = Maximum frequency (Hz) to plot (& output if cycles>0) 
-%                    If cycles==0, all FFT frequencies are output.{def: 50}
-%       'baseline' = Coherence baseline end latency (ms). NaN=no baseline  {NaN}
-%       'powbase'  = Baseline spectrum to log-subtract.  {default: from data}
+%                    If cycles==0, all FFT frequencies are output  {default: 50}
+%       'baseline' = Coherence baseline end latency (ms). NaN -> No baseline  
+%                      {default:NaN}
+%       'powbase'  = Baseline spectrum to log-subtract      {default: from data}
 %
-%    Optional Bootstrap:
+% Optional Bootstrap:
 %       'alpha'    = If non-0, compute two-tailed bootstrap significance prob.
-%                    level. Show non-signif output values as green. {0}
-%       'naccu'    = Number of bootstrap replications to compute {200}
+%                    level. Show non-signif output values as green. {def: 0}
+%       'naccu'    = Number of bootstrap replications to compute {def: 200}
 %       'boottype' = ['times'|'timestrials'] Bootstrap type: Either shuffle
 %                    windows ('times') or windows and trials ('timestrials')
-%                    Option 'timestrials' requires more memory {default 'times'}
+%                    Option 'timestrials' requires more memory  {default: 'times'}
 %       'memory'   = ['low'|'high'] 'low' -> decrease memory use {default: 'high'}
-%       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch). 
+%       'baseboot' = Extent of bootstrap shuffling (0=to 'baseline'; 1=whole epoch) 
 %                    If no baseline is given (NaN), extent of bootstrap shuffling 
 %                    is the whole epoch                         {default: 0}
 %       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
 % Optional Scalp Map:
-%       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {[]}
+%       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {default: []}
 %                    ELSE (c1,c2), plot two cartoons showing channel locations.
-%       'elocs'    = Electrode location file for scalp map       {none}
+%       'elocs'    = Electrode location file for scalp map  {default: none}
 %                    File should be ascii in format of >> topoplot example   
 %
 % Optional Plot and Compute Features:
-%       'compute'   = ['matlab'|'C'] Use C sub-routine to speed up the
-%                     computation                      {default 'matlab'}
-%       'plotamp'   = ['on'|'off'], Plot coherence magnitude       {'on'}
-%       'maxamp'    = [real] Set the maximum for the amp. scale    {auto}
-%       'plotphase' = ['on'|'off'], Plot coherence phase angle     {'on'}
-%       'angleunit' = Phase units: 'ms' for msec or 'deg' for degrees {'deg'}
-%       'title'     = Optional figure title {none}
-%       'vert'      = Latencies to mark with a dotted vertical line   {none}
-%       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'cmax'      = Maximum amplitude for color scale  { use data limits }
-%       'axesfont'  = Axes font size                               {10}
-%       'titlefont' = Title font size                              {8}
+%       'compute'   = ['matlab'|'c'] Use C subroutines to speed up the
+%                     computation (currently unimplemented) {def: 'matlab'}
+%       'plotamp'   = ['on'|'off'], Plot coherence magnitude    {def: 'on'}
+%       'maxamp'    = [real] Set the maximum for the amp. scale {def: auto}
+%       'plotphase' = ['on'|'off'], Plot coherence phase angle  {def: 'on'}
+%       'angleunit' = Phase units: 'ms' -> msec, 'deg' -> degrees,
+%                     or 'rad' -> radians                  {default: 'deg'}
+%       'title'     = Optional figure title                {default:  none}
+%       'vert'      = Latencies to mark with a dotted vertical line 
+%                                                           {default: none}
+%       'linewidth' = Line width for marktimes traces (thick=2, thin=1) 
+%                                                              {default: 2}
+%       'cmax'      = Maximum amplitude for color scale  {def: data limits}
+%       'axesfont'  = Axes font size                          {default: 10}
+%       'titlefont' = Title font size                          {default: 8}
 %
 % Outputs: 
 %       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
@@ -107,7 +110,7 @@
 %       freqsout    = Vector of frequency bin centers (Hz).
 %       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
 %                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
-%       cohangle    = (nfreqs,timesout) matrix of coherence angles 
+%       cohangle    = (nfreqs,timesout) matrix of coherence angles (in radians)
 %
 % Plot description:
 %   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
@@ -122,7 +125,7 @@
 %      significance threshold (dotted black-green).
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
-%        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
+%        2) As noted above: 'blue' coherence angle -> X leads Y; 'red' -> Y leads X
 %        3) The 'boottype' should be ideally 'timesframes', but this creates high 
 %           memory demands, so the 'times' method must be used in many cases.
 %        4) If 'boottype' is 'trials', the average of the complex bootstrap
@@ -162,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2005/03/07 21:24:02  arno
+% adding chninfo
+%
 % Revision 1.63  2003/11/26 18:18:52  scott
 % help msg
 %
@@ -385,17 +391,21 @@ function [R,mbase,times,freqs,Rbootout,Rangle, trialcoher, Tfx, Tfy] = crossf(X,
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
+%
 % Commandline arg defaults:
-DEFAULT_ANGLEUNITS = 'deg';     % angle plotting units - 'ms' or 'deg'
+%
+DEFAULT_ANGLEUNIT = 'deg'; % angle plotting units - 'rad', 'ms', or 'deg'
 DEFAULT_EPOCH	= 750;			% Frames per epoch
 DEFAULT_TIMELIM = [-1000 2000];	% Time range of epochs (ms)
 DEFAULT_FS		= 250;			% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;			% Fixed window length or base on cycles.
+
 % =0: fix window length to nwin
 % >0: set window length equal varwin cycles
 %     bounded above by winsize, also determines
 %     the min. freq. to be computed.
+
 DEFAULT_OVERSMP	= 2;			% Number of times to oversample = vertical resolution
 DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= 'Event-Related Coherence';			% Figure title
@@ -408,13 +418,13 @@ end
 
 if ~iscell(X)
 	if (min(size(X))~=1 | length(X)<2)
-		fprintf('crossf(): x must be a row or column vector.\n');
+		fprintf('crossf(): X must be a row or column vector.\n');
 		return
 	elseif (min(size(Y))~=1 | length(Y)<2)
-		fprintf('crossf(): y must be a row or column vector.\n');
+		fprintf('crossf(): Y must be a row or column vector.\n');
 		return
 	elseif (length(X) ~= length(Y))
-		fprintf('crossf(): x and y must have same length.\n');
+		fprintf('crossf(): X and Y must have same length.\n');
 		return
 	end
 end;
@@ -492,7 +502,7 @@ try, g.baseline;   catch, g.baseline = NaN; end;
 try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
-try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
+try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNIT; end;
 try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.boottype;   catch, g.boottype = 'times'; end; 
@@ -613,8 +623,8 @@ if ~isnan(g.alpha)
    end
 end
 switch g.angleunit
-case { 'ms', 'deg' },;
-otherwise error('Angleunit must be either ''deg'' or ''ms''');
+case { 'rad', 'ms', 'deg' },;
+otherwise error('Angleunit must be either ''rad'', ''deg'', or ''ms''');
 end;    
 switch g.type
 case { 'coher', 'phasecoher' 'phasecoher2' },;
@@ -634,13 +644,14 @@ end;
 if strcmp(g.memory, 'low') & ~strcmp(g.boottype, 'times')
    error(['Bootstrap type ''' g.boottype ''' cannot be used in low memory mode']);
 end;
+
 switch g.compute
 case { 'matlab', 'c' },;
 otherwise error('compute must be either ''matlab'' or ''c''');
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% compare 2 conditions part
+% Compare 2 conditions 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 if iscell(X)
 	if length(X) ~= 2 | length(Y) ~= 2
@@ -667,44 +678,47 @@ if iscell(X)
 	fprintf('Running crossf on condition 1 *********************\n');
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
-	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
+	fprintf('      (the ''coher'' option takes 3 times more memory than other options)\n');
 	figure; 
 	subplot(1,3,1); title(g.title{1});
 	if ~strcmp(g.type, 'coher')
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1] = crossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ', vararginori{:});
+								frame, tlimits, Fs, varwin, 'savecoher', 1, 'title', ' ',vararginori{:});
 	else
 		[R1,mbase,times,freqs,Rbootout1,Rangle1, savecoher1, Tfx1, Tfy1] = crossf(X{1}, Y{1}, ...
-								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', ' ',  vararginori{:});
+								frame, tlimits, Fs, varwin, 'savecoher', 1,'title', ' ',vararginori{:});
 	end;
-	R1 = R1.*exp(j*Rangle1/180*pi);
+	R1 = R1.*exp(j*Rangle1); % output Rangle is in radians
 	
-	% asking user for memory limitations
-	%if ~strcmp(g.noinput, 'yes')
-	%	tmp = whos('Tfx1');
-	%	fprintf('This function will require an additional %d bytes, do you wish\n', tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
-	%	res = input('to continue (y/n) (use ''noinput'' option to disable message):', 's');
-	%	if res == 'n', return; end;
-	%end;
+	% Asking user for memory limitations
+	% if ~strcmp(g.noinput, 'yes')
+	%	  tmp = whos('Tfx1');
+	%	  fprintf('This function will require an additional %d bytes, do you wish\n', ...
+  %       tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
+	%	  res = input('to continue (y/n) (use ''noinput'' option to disable message):', 's');
+	%  	if res == 'n', return; end;
+	% end;
 
 	fprintf('\nRunning crossf on condition 2 *********************\n');
 	subplot(1,3,2); title(g.title{2});
 	if ~strcmp(g.type, 'coher')
-		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = crossf(X{2}, Y{2}, ...
+		  [R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2] = crossf(X{2}, Y{2}, ...
 								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
 	else
-		[R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = crossf(X{2}, Y{2}, ...
+		  [R2,mbase,times,freqs,Rbootout2,Rangle2, savecoher2, Tfx2, Tfy2] = crossf(X{2}, Y{2}, ...
 								frame, tlimits, Fs, varwin,'savecoher', 1, 'title', ' ',vararginori{:});
 	end;
-	R2 = R2.*exp(j*Rangle2/180*pi);
+	R2 = R2.*exp(j*Rangle2); % output Rangle is in radians
 
 	subplot(1,3,3); title(g.title{3});
 	if isnan(g.alpha)
 		plotall(R2-R1, [], [], times, freqs, mbase,  find(freqs <= g.maxfreq), g);
 	else 
-		% accumulate coherence images (all arrays [nb_points x timesout x trials])
+		% accumulate coherence images (all arrays [nb_points * timesout * trials])
 		% ---------------------------
-		allsavedcoher = zeros(size(savecoher1,1), size(savecoher1,2), size(savecoher1,3)+size(savecoher2,3));
+		allsavedcoher = zeros(size(savecoher1,1), ...
+                          size(savecoher1,2), ...
+                          size(savecoher1,3)+size(savecoher2,3));
 		allsavedcoher(:,:,1:size(savecoher1,3))     = savecoher1;
 		allsavedcoher(:,:,size(savecoher1,3)+1:end) = savecoher2;
 		clear savecoher1 savecoher2;
@@ -1002,17 +1016,30 @@ mbase = mean(abs(Coher.R(:,baseln)'));     % mean baseline coherence magnitude
 % plot everything
 % ---------------
 plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
-Rangle = angle(Coher.R);
+
+%
+% Convert output Rangle to degrees or ms - Disabled to keep original default: radians output
+%
+% Rangle = angle(Coher.R); % returns radians
+% if strcmp(g.angleunit,'ms')  % convert to ms
+%    Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
+% elseif strcmp(g.angleunit,'deg')  % convert to deg
+%    Rangle = Rangle*180/pi; % convert to degrees
+% else % angleunit is 'rad'
+%    % Rangle = Rangle;
+% end
+% Rangle(find(Rraw==0)) = 0; % mask for significance - set angle at non-signif coher points to 0
+
 R = abs(Coher.R);
 Rsignif = Boot.Rsignif;
 Tfx = permute(Tfx.tmpall, [3 2 1]); % from [trials timesout nb_points] -> [nb_points timesout trials]
 Tfy = permute(Tfy.tmpall, [3 2 1]);
 
-return; % ***********************************************************************
+return; % end crossf() *************************************************
 
-% ------------------
-% plotting functions
-% ------------------
+%
+% crossf() plotting functions
+% ----------------------------------------------------------------------
 function plotall(R, Rboot, Rsignif, times, freqs, mbase, dispf, g) 
 
 switch lower(g.plotphase)
@@ -1028,14 +1055,32 @@ case 'off', ordinate1 = 0.1; height = 0.9;
    end;     
 end; 
 
-% compute angles
-% --------------
-Rangle = angle(R);
+%
+% Compute cross-spectral angles
+% -----------------------------
+Rangle = angle(R); % returns radians
+
+%
+% Optionally convert Rangle to degrees or ms
+% ------------------------------------------
+if strcmp(g.angleunit,'ms')  % convert to ms
+   Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
+   maxangle = max(max(abs(Rangle)));
+elseif strcmp(g.angleunit,'deg')  % convert to degrees
+   Rangle = Rangle*180/pi; % convert to degrees
+   maxangle = 180; % use full-cycle plotting 
+else
+   maxangle = pi;  % radians
+end
+Rangle(find(Rraw==0)) = 0; % when plotting, mask for significance 
+                           % = set angle at non-signif coher points to 0
 R = abs(R);
+
 % if ~isnan(g.baseline)
 % 	R = R - repmat(mbase',[1 g.timesout]); % remove baseline mean
 % end;
-Rraw =R; % raw coherence values
+
+Rraw = R; % raw coherence (e.g., coherency) magnitude values output
 
 if g.plot
    fprintf('\nNow plotting...\n');
@@ -1121,7 +1166,6 @@ case 'on'
    %
    % Plot mean baseline coherence at each freq on left side of image
    %
-   
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
    E = abs(mbase(dispf)); % baseline mean coherence at each frequency
    plot(freqs(dispf),E,'LineWidth',g.linewidth); % plot mbase
@@ -1150,14 +1194,6 @@ case 'on'
    % Plot coherence phase lags in bottom panel
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
-   if strcmp(g.angleunit,'ms')  % convert to ms
-      Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
-      maxangle = max(max(abs(Rangle)));
-   else
-      Rangle = Rangle*180/pi; % convert to degrees
-      maxangle = 180; % use full-cycle plotting 
-   end
-   Rangle(find(Rraw==0)) = 0; % set angle at non-signif coher points to 0
    
    imagesc(times,freqs(dispf),Rangle(dispf,:),[-maxangle maxangle]); % plot the 
    hold on                                             % coherence phase angles
