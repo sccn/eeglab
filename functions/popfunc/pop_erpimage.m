@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2002/10/15 16:56:07  scott
+% debug
+%
 % Revision 1.80  2002/10/15 16:52:31  scott
 % debug
 %
@@ -462,7 +465,7 @@ if popup
          if typeplot==1
             titleplot = [ 'ERP Image (', chanlabels{channel}, ')'];
          else
-            titleplot = [ 'ERP Image (Comp. ', int2str(channel)) ')'];
+            titleplot = [ 'ERP Image (Comp. ', int2str(channel), ')'];
         end
     end;
 	smooth       = eval(res.smooth);
