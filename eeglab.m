@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.165  2002/09/08 00:45:03  scott
+% pop_envtopo() menu label -scott
+%
 % Revision 1.164  2002/09/05 00:04:29  scott
 % Plus -> With in menu -scott
 %
@@ -705,9 +708,11 @@ if nargin == 1
 		end;
 	elseif strcmp(onearg, 'besa');
 		besamenu = 1;
-		clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
+		if exist('ALLEEG') == 0
+			clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM;
+			EEG = eeg_emptyset;
+		end;
 		eeg_global;
-		EEG = eeg_emptyset;
 		h('eeglab besa;');
 		disp('Besa menu activated');
 	else
