@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 2-28-97 added source, shape and exppow parameters, kurtosis -sm
 % 4-03-97 shortened name to testica() -sm
@@ -180,7 +183,7 @@ if nargout == 0
 end
 
  fprintf('Decomposing the resulting simulated data using runica() ...\n');
- [weights,sphere,activations,bias,sign,lrates] ...
+ [weights,sphere,activations] ...
               = runica(data, ...
                      'block',block, ...
                      'lrate',lrate, ...
