@@ -105,7 +105,6 @@
 %                     elements {none}
 %       'vert'      = Times to mark with a dotted vertical line   {none}
 %       'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
-%       'cmax'      = Maximum amplitude for color scale  { use data limits }
 %       'axesfont'  = Axes font size                               {10}
 %       'titlefont' = Title font size                              {8}
 %
@@ -120,7 +119,7 @@
 %
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
-%        3) The 'boottype' should be ideally 'timesframes', but this creates high 
+%        3) The 'boottype' should be ideally 'timestrials', but this creates high 
 %           memory demands, so the 'times' method must be used in many cases.
 %        4) If 'boottype' is 'trials', the average of the complex bootstrap
 %           is subtracted from the coherence to compensate for phase differences 
@@ -156,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/10/16 01:29:49  arno
+% display -> ms
+%
 % Revision 1.15  2002/10/15 23:30:04  arno
 % debugging tlimits
 %
@@ -491,7 +493,6 @@ try, g.baseboot;   catch, g.baseboot = 0; end;
 try, g.linewidth;  catch, g.linewidth = 2; end;
 try, g.naccu;      catch, g.naccu = 200; end;
 try, g.angleunit;  catch, g.angleunit = DEFAULT_ANGLEUNITS; end;
-try, g.cmax;       catch, g.cmax = 0; end; % 0=use data limits
 try, g.type;       catch, g.type = 'phasecoher'; end; 
 try, g.boottype;   catch, g.boottype = 'times'; end; 
 try, g.subitc;     catch, g.subitc = 'off'; end;
@@ -505,7 +506,7 @@ for index = 1:length(allfields)
 	switch allfields{index}
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
-		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
+		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'type' 'boottype' 'subitc' ...
 		  'compute' 'maxamp' 'savecoher' 'noinput' 'condboot' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
@@ -531,8 +532,8 @@ g.TITLE_FONT = 14;
 
 % testing arguments consistency
 % -----------------------------
-if (~ischar(g.title))
-   error('Title must be a string.');
+if ~ischar(g.title) & ~iscell(g.title) 
+   error('Title must be a string or a cell array.');
 end
 
 if isempty(g.topovec)
@@ -951,13 +952,7 @@ case 'on'
            Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
        end; 
    end
-   
-   if g.cmax == 0
-      coh_caxis = max(max(R(dispf,:)))*[-1 1];
-   else
-      coh_caxis = g.cmax*[-1 1];
-   end
-   
+    
    h(6) = axes('Units','Normalized', 'Position',[.1 ordinate1 .8 height].*s+q);
    
    map=hsv(300); % install circular color map - green=0, yellow, orng, red, violet = max
@@ -966,7 +961,7 @@ case 'on'
    map(151,:) = map(151,:)*0.9; % tone down the (0=) green!
    colormap(map);
    
-   imagesc(times,freqs(dispf),RR(dispf,:),coh_caxis); % plot the coherence image
+   imagesc(times,freqs(dispf),RR(dispf,:),max(max(RR(dispf,:)))*[-1 1]); % plot the coherence image
    if ~isempty(g.maxamp)
 	   caxis([-g.maxamp g.maxamp]);
    end;
