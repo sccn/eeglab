@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:46:04  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
 % global variables
@@ -43,4 +46,5 @@ global CURRENTSET;	% current set index
 %global H_MAIN;		% main window
 %global EEGMENU;		% main menu
 global ALLCOM;		% all commands (history)
+if exist('LASTCOM') ~= 1, LASTCOM = ''; end;
 global LASTCOM;		% last command
