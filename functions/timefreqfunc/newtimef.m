@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2002/10/24 02:16:28  arno
+% output of the right size
+%
 % Revision 1.12  2002/10/17 01:49:49  arno
 % title check
 %
@@ -441,6 +444,7 @@ end
 % consider structure for these arguments
 % --------------------------------------
 if ~isempty(varargin)
+    varargin
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
 end;
