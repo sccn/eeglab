@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/04/15 23:38:35  arno
+% debuging last
+%
 % Revision 1.8  2003/04/15 17:10:14  arno
 % adding low pass filtering capabilities
 %
@@ -325,8 +328,8 @@ plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
 times = linspace(xmin, xmax, pnts);
 
 if nargin < 3 & nargout == 1
-    erp1 = sprintf('pop_comperp( %s, %d, [%s], [%s] %s);', inputname(1), ...
-                  flag, num2str(datadd), num2str(datsub), vararg2str(options) );
+    erp1 = sprintf('pop_comperp( %s, %d, %s);', inputname(1), ...
+                  flag, vararg2str({ datadd datsub options{:} }) );
 end;
 return;
 
