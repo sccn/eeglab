@@ -14,6 +14,8 @@
 %  'chanlocs'  = [string] channel location file or structure. See >> topoplot example 
 %  'limits'    = [xmin xmax ymin ymax]  x values in ms 
 %                {def|[] or both y's 0 -> y data limits}
+%  'limcontrib' = [xmin xmax]  x values in ms for time range for component contribution 
+%                {def|[] or both y's 0 -> y data limits}
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                ELSE n<0, the number largest-comp. maps to plot {default|[] -> 7}
 %  'title'     = [string] plot title {default|[] -> none}
@@ -68,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/10/09 21:32:18  arno
+% documenting option subcomp
+%
 % Revision 1.6  2002/10/05 01:52:20  arno
 % debug envmode
 %
