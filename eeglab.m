@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.264  2003/11/25 19:00:18  arno
+% same
+%
 % Revision 1.263  2003/11/25 18:59:31  arno
 % typo last
 %
@@ -1092,7 +1095,7 @@ W_MAIN = findobj('tag', 'EEGLAB');
 EEGUSERDAT = get(W_MAIN, 'userdata');
 set(W_MAIN, 'MenuBar', 'none');
 first_m = uimenu( W_MAIN, 'Label', 'File');
-	neuromenu = uimenu( first_m, 'Label', 'Import data'); 
+	neuromenu = uimenu( first_m, 'Label', 'Import data', 'tag', 'import data'); 
 	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
 	uimenu( neuromenu, 'Label', 'From Biosemi .BDF file','CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readbdf;' e_newnonempty ], 'Separator', 'on'); 
 	uimenu( neuromenu, 'Label', 'From European Data Format .EDF file','CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readedf;' e_newnonempty ]); 
@@ -1117,14 +1120,14 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
         uimenu( neuromenu, 'Label', 'From other formats using BIOSIG',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_biosig;' e_newnonempty ], 'Separator', 'on'); 
     end;
         
-	importepoch = uimenu( first_m, 'Label', 'Import epoch info'); 
+	importepoch = uimenu( first_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
 	uimenu( importepoch, 'Label', 'From Neuroscan .DAT file', 'CallBack', [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
-	importevent = uimenu( first_m, 'Label', 'Import event info'); 
+	importevent = uimenu( first_m, 'Label', 'Import event info', 'tag', 'import event'); 
 	uimenu( importevent, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
 	uimenu( importevent, 'Label', 'From data channel'          , 'CallBack', [ check   '[EEG LASTCOM]= pop_chanevent(EEG);' e_store]); 
 	uimenu( importevent, 'Label', 'From Presentation .LOG file'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
-	exportm = uimenu( first_m, 'Label', 'Export'); 
+	exportm = uimenu( first_m, 'Label', 'Export', 'tag', 'export'); 
 	uimenu( exportm, 'Label', 'Data and ICA activity to text file', 'CallBack', [ check   'LASTCOM = pop_export(EEG);' e_histdone ]);
 	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
@@ -1154,7 +1157,7 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Append datasets', 'CallBack', [ check      '[EEGTMP LASTCOM] = pop_mergeset(ALLEEG);' e_newnonempty]);
 	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist 'eeglab redraw;' ]);
 		
-fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
+fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
 	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset], 'enable', fastif(exist('resample'), 'on', 'off'));
 	uimenu( fourth_m, 'Label', 'Re-reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_reref(EEG);' e_store]);
@@ -1195,7 +1198,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools');
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); h(LASTCOM);' ...
 	     '[EEG LASTCOM] = pop_rejepoch(EEG, EEG.reject.rejglobal,1);' e_newset ]);
    
-third_m = uimenu( W_MAIN, 'Label', 'Plot');
+third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 	loc_m = uimenu( third_m, 'Label', 'Channel locations'   );
        uimenu( loc_m, 'Label', 'By name'   , 'CallBack'  , [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''labelpoint'''');'']; eval(LASTCOM);' e_hist]);
 	   uimenu( loc_m, 'Label', 'By number'   , 'CallBack', [ checkplot 'LASTCOM = [''figure; topoplot([],EEG.chanlocs, ''''style'''', ''''blank'''', ''''electrodes'''', ''''numpoint'''');'']; eval(LASTCOM);' e_hist]);
@@ -1266,7 +1269,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot');
                 funcname = dircontent.m{index}(1:end-2);
                 disp(['eeglab: adding plugin "' funcname '"' ]);    
             end;
-            eval( [ funcname '(fourth_m, trystrs, catchstrs)' ], ...
+            eval( [ funcname '(gcf, trystrs, catchstrs)' ], ...
                  ['disp(''eeglab: error while adding plugin "' funcname '"''); disp([ '''    ''' lasterr] );']  );
         end;
     end;
