@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/01/02 16:40:40  arno
+% erpimage 1/4 -> 2/3 caxis  - sm
+%
 % Revision 1.10  2002/10/15 17:19:32  arno
 % visible on/off
 % /
@@ -145,10 +148,19 @@ if nargin == 2
 	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') };
 	inistr       = { '1' };
 	result       = inputdlg2( promptstr, 'Component properties -- pop_prop()', 1,  inistr, 'pop_prop');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+	if size( result, 1 ) == 0 return; end;
    
-	numcompo   = eval( result{1} );
+	numcompo   = eval( [ '[' result{1} ']' ] );
+end;
+
+% plotting several component properties
+% -------------------------------------
+if length(numcompo) > 1
+    for index = numcompo
+        pop_prop(EEG, typecomp, index);
+    end;
+	com = sprintf('pop_prop( %s, %d, [%s]);', inputname(1), typecomp, int2str(numcompo));
+    return;
 end;
 
 if numcompo < 1 | numcompo > EEG.nbchan
@@ -329,7 +341,7 @@ if exist('winhandle')
 	
 	com = sprintf('pop_prop( %s, %d, %d, 0);', inputname(1), typecomp, numcompo );
 else
-	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), typecomp, numcompo);
+	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), typecomp, numcompo );
 end;
 
 return;
