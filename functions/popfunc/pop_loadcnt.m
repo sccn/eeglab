@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/04/10 17:35:29  arno
+% header and history
+%
 % Revision 1.7  2003/03/05 19:48:42  arno
 % removing matlab warning
 %
@@ -83,7 +86,7 @@ EEG = [];
 if nargin < 1 
 
 	% ask user
-	[filename, filepath] = uigetfile('*.CNT', 'Choose a CNT file -- pop_loadcnt()'); 
+	[filename, filepath] = uigetfile('*.CNT;*.cnt', 'Choose a CNT file -- pop_loadcnt()'); 
     drawnow;
 	if filename == 0 return; end;
 
@@ -98,9 +101,9 @@ if nargin < 1
 
 	% decode parameters
 	% -----------------
-    avgref = result{1};
-    blockread = eval( result{2} );
-    options = [ ', ''blockread'', ' int2str(blockread) ', ''avgref'', ''' avgref ''''];
+    blockread = eval( result{1} );
+    options = [ ', ''blockread'', ' int2str(blockread) ];
+    if ~isempty(result{2}), options = [ options ',' result{2} ]; end;
 else
 	options = [];
 	for i=1:length( varargin )
@@ -127,7 +130,7 @@ if nargin > 0
 		r = loadcnt( fullFileName);
 	end;	
 else
-	r = loadcnt( fullFileName, 'blockread', blockread, 'avgref', avgref);
+	eval( [ 'r = loadcnt( fullFileName ' options ');' ]);
 end;
 
 EEG.data            = r.dat;
@@ -144,6 +147,9 @@ EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 EEG.srate           = r.rate;
 EEG = eeg_checkset(EEG);
 
-command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
-
+if length(options) > 2
+    command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
+else
+    command = sprintf('EEG = pop_loadcnt(''%s'');',fullFileName); 
+end;
 return;
