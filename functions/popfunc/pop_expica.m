@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2003/05/14 15:10:20  arno
+% Initial revision
+%
 
 function com = pop_expica(EEG, whichica, filename); 
     
@@ -65,7 +68,7 @@ end;
 if strcmpi(whichica, 'inv')
     tmpmat = EEG.icawinv;
 else
-    tmpmat = EEG.icaweights;
+    tmpmat = EEG.icaweights*EEG.icasphere;
 end;
 save(filename, '-ascii', 'tmpmat');
 
