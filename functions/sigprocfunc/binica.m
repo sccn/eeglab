@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/08/19 19:10:41  arno
+% did not change anything
+%
 % Revision 1.9  2004/02/28 00:00:22  arthur
 % edit commandline output text
 %
@@ -137,6 +140,7 @@ if ~isstr(data) % data variable name given
   floatwrite(data,tmpdata);
   datafile = tmpdata;
   firstarg = 2;
+
 else % data filename given
   if ~exist(data)
     fprintf('\nbinica(): File data not found.\n')
@@ -295,8 +299,8 @@ else
 end
 
 %
-% if created by binica(), rm temporary data file
-%
+% If created by binica(), rm temporary data file
+% Note: doesn't remove the .sc .wts and .fdt files
 if ~isempty(tmpdata)
     eval(['!rm -f ' datafile]);
 end
