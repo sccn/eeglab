@@ -145,6 +145,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2003/05/06 00:45:43  arno
+% implementing new option rmerp
+%
 % Revision 1.98  2003/04/26 01:06:38  arno
 % debuging ampsort for phase sorting
 %
@@ -1186,7 +1189,7 @@ end
 %%%%%%%%%%%%%%% Remove the ERP %%%%%%%%%%%%%%%
 %
 if strcmpi(Rmerp, 'yes')
-    data = data - repmat(nan_mean(data,2), [1 size(data,2)]);
+    data = data - repmat(nan_mean(data')', [1 size(data,2)]);
 end;
 
 %
