@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/23 00:22:13  arno
+% adding carraige return in text
+%
 % Revision 1.1  2002/04/22 23:17:05  arno
 % Initial revision
 %
@@ -139,7 +142,7 @@ while (str(1) == '%')
                if ~isempty(varname) 
                	    vartext = [ vartext 10 str]; % espace if in array
                else 
-               		if all(vartext(	end-2:end) == '.')
+               		if length(vartext)>3 & all(vartext(	end-2:end) == '.')
                			vartext = [ deblank2(vartext(1:end-3)) 10 str]; % espace if '...'
                		else
                     	vartext = [ vartext 10 str];    % CR otherwise
