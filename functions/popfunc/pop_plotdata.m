@@ -1,4 +1,4 @@
-g% pop_plotdata() - Plot average of EEG channels or independent components in
+% pop_plotdata() - Plot average of EEG channels or independent components in
 %                  a rectangular array. Else, (over)plot single trials.
 %
 % Usage:
@@ -43,6 +43,9 @@ g% pop_plotdata() - Plot average of EEG channels or independent components in
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/08/23 15:03:20  arno
+% remove dbug msg
+%
 % Revision 1.15  2004/08/09 15:41:18  arno
 % header modified
 %
