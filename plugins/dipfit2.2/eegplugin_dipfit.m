@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/03/17 02:37:05  arno
+% comment
+%
 % Revision 1.8  2005/03/17 02:36:21  arno
 % debug storing dataset
 %
@@ -149,7 +152,7 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     
     % add dipfit folder to path
     % -----------------------
-    if ~exist('pop_dipfit_settings')
+    if ~exist('pop_dipfit_gridsearch')
         p = which('eegplugin_dipfit2_0');
         p = p(1:findstr(p,'eegplugin_dipfit2_0.m')-1);
         addpath([ p 'dipfit2.0' ] );
