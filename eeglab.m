@@ -172,6 +172,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/04/08 22:59:17  arno
+% changing rmbase dataset saving status
+%
 % Revision 1.3  2002/04/06 02:54:10  arno
 % change comments call
 %
@@ -202,7 +205,7 @@ if nargin < 1
 else
 	h('eeglab redraw;');
 end;
-
+  
 % checking strings
 % ----------------
 check         = '[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);';
