@@ -1,5 +1,5 @@
-% pop_loadeeg() - load a Neuroscan .EEG file (via a pop-up window if no arguments).
-%                 Calls loadeeg().
+% pop_loadeeg() - load a Neuroscan .EEG file (via a pop-up window if no
+%                  arguments). Calls loadeeg().
 %
 % Usage:
 %   >> EEG = pop_loadeeg; % pop-up data entry window
@@ -21,11 +21,12 @@
 %   filepath       - ['string'] file path
 %   range_chan     - [integer array] Import only selected electrodes
 %                    Ex: 3,4:10; {Default: import all}
-%   range_trials   - [integer array] Import only selected trials {Default: import all}
+%   range_trials   - [integer array] Import only selected trials {Default: 
+%                    import all}
 %   range_typeeeg  - [integer array] Import only trials of selected type
 %                    {Default: import all}
-%   range_response - [integer array] Import only trials with selected response values 
-%                    {Default: import all}
+%   range_response - [integer array] Import only trials with selected 
+%                    response values {Default: import all}
 % Outputs:
 %   EEG            - eeglab() data structure
 %
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/02/23 08:33:04  scott
+% header edits -sm
+%
 % Revision 1.5  2003/02/21 17:31:45  arno
 % update header for GUI
 %
@@ -113,7 +117,7 @@ if ~exist('range_response') | isempty(range_response), range_response     = 'all
 % ----------
 EEG = eeg_emptyset;
 fullFileName = sprintf('%s%s', filepath, filename);
-[EEG.data, accept, eegtype, rt, eegresp, EEG.namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response);
+[EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response);
 EEG.filename        = filename;
 EEG.filepath        = filepath;
 EEG.setname 		= 'rawdatas';
