@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/10/21 15:22:17  arno
+% update.m
+%
 % Revision 1.1  2002/10/21 14:53:04  arno
 % Initial revision
 %
@@ -79,8 +82,12 @@ if ~isempty(g.average)
         array = interpolate( array, timevect, newtimevect, g.method);
         timevect = newtimevect;
     end;
+    oldavg = g.average;
     g.average = round(g.average/(timevect(2)-timevect(1)));
-    fprintf('Moving average updated to %d\n', g.average);
+    if oldavg ~= g.average
+        fprintf('Moving average updated from %3.2f to %3.2f (=%d points)\n', ...
+                oldavg, g.average*(timevect(2)-timevect(1)), g.average);
+    end;
     %array = convolve(array, ones(1, g.average));
     array = conv2(array, ones(1, g.average)/g.average, 'same');
 end;
