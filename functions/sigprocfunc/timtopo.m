@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2003/03/04 21:17:52  scott
+% axfont -sm
+%
 % Revision 1.35  2003/03/04 21:10:50  scott
 % titlefont -sm
 %
@@ -308,10 +311,10 @@ end
 
 head_sep = 1.2;
 topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
-if topowidth*head_sep + pos(3) > 0.90    % adjust for maximum height
-  topowidth = (0.90-0.68)/head_sep;
+if topowidth>0.30 % dont make too high
+  topowidth = 0.30;
 end
-topowidth = 0.10;
+% topowidth = 0.10;
 if rem(ntopos,2) == 1  % odd number of topos
    topoleft = pos(3)/2 - (floor(ntopos/2)*head_sep + 0.5)*topowidth;
 else % even number of topos
@@ -328,18 +331,6 @@ if 0
   topoleft = 0;
  end
 end
-
-% topowidth = 0.76/(ntopos+(ntopos-1)/5); % width of each topoplot
-% if topowidth*1.2 + 0.68 > 0.90    % adjust for maximum height
-    % topowidth = (0.90-0.68)/1.2;
-% end
-% if ntopos == 2
-   % topoleft = 0.32;
-% elseif ntopos == 1
-   % topoleft = (1-(0.94-0.68)/1.2)/2; % center single topomap
-% else
-   % topoleft = 0.12;
-% end
 
 if max(plotframes) > frames
     fprintf('Plot frame %d is > frames in data (%d)\n',max(plotframes),frames);
