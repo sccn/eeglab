@@ -152,6 +152,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.134  2003/08/24 04:25:05  scott
+% adjust erpalpha line type
+%
 % Revision 1.133  2003/08/24 04:23:40  scott
 % debug
 %
@@ -2207,7 +2210,7 @@ erp = [];
 if Erpflag == YES 
   if exist('erpalpha')
     [erp erpalpha] = nan_mean(urdata',erpalpha);   
-    fprintf('   Mean erpalpha: %g\n',mean(erpalpha));
+    fprintf('   Mean erp significance threshold: +/-%g\n',mean(erpalpha));
   else
     [erp] = nan_mean(urdata');   % compute erp average, ignoring nan's
   end
