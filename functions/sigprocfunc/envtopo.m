@@ -33,6 +33,8 @@
 %                weight's pseudo-inverse matrix does not represent component's maps. 
 %  'envmode'   = ['avg'|'rms'] compute the average enveloppe or the root mean square
 %                enveloppe { Default -> 'avg' }
+%  'subcomps'  = [integer vector] indices of components to remove from data before 
+%                plotting.
 %
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
@@ -66,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/05 01:52:20  arno
+% debug envmode
+%
 % Revision 1.5  2002/10/05 01:50:34  arno
 % new function with 'key', 'val' args, extra params: envmode, limcontrib, icawinv...
 %
