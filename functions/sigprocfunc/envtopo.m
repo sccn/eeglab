@@ -2,31 +2,37 @@
 %             specified components. Click on individual plots to examine
 %             separately (with zoom feature).
 % Usage:
+%     >> envtopo(data,weights);
 %     >> [compvarorder,compvars,compframes,comptimes,compsplotted] ...
-%           = envtopo(data,weights,'chan_locs',[limits],[compnums],...
-%             'title',[plotchans],[voffsets],'colorfile',fill_comp,[vert]);
+%           = envtopo(data, weights, 'key1', val1, 'key2', val2 ...);
+%
 % Inputs:
 %  data       = single data epoch (chans,frames)
 %  weights    = final weight matrix from runica() (=weights*sphere)
 %
 % Optional inputs:
-%  'chan_locs' = channel location file. See >> topoplot example {def|[]->see icadefs)
-%  limits      = [xmin xmax ymin ymax]  x values in ms 
+%  'chanlocs'  = [string] channel location file or structure. See >> topoplot example 
+%  'limits'    = [xmin xmax ymin ymax]  x values in ms 
 %                {def|[] or both y's 0 -> y data limits}
-%  compnums    = vector of component numbers to plot {default|0 -> all}
+%  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                ELSE n<0, the number largest-comp. maps to plot {default|[] -> 7}
-%  'title'     = plot title {default|[] -> none}
-%  plotchans   = data channels to use in computing envelopes {default|[] -> all}
-%                (Can specify >= 1 data channels).
-%  voffsets    = vert. line extentions above the data max to disentangle plot
-%                lines (left->right heads, values in y-axis units) {def|[] -> none}
-% 'colorfile'  = filename of file containing colors for envelopes, 3 chars
+%  'title'     = [string] plot title {default|[] -> none}
+%  'plotchans' = [integer array] data channels to use in computing envelopes 
+%                {default|[] -> all}
+%  'voffsets'  = [float array] vert. line extentions above the data max to disentangle
+%                plot lines (left->right heads, values in y-axis units) {def|[] -> none}
+%  'colorfile' = [string] filename of file containing colors for envelopes, 3 chars
 %                per line, (. = blank). First color should be "w.." (white)
 %                Colorfile argument 'bold' uses default colors, all thick lines.
 %                {default|[] -> standard color order}
-%  fill_comp   = int_vector>0 -> fill the numbered component envelope(s) with 
+%  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
 %                solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
-%  vert        = vector of times to plot vertical lines {default|[] -> none}
+%  'vert'      = vector of times to plot vertical lines {default|[] -> none}
+%  'icawinv'   = [float array] inverse weigth matrix. By default computed by inverting
+%                the weight matrix (but if some components have been removed, then
+%                weight's pseudo-inverse matrix does not represent component's maps. 
+%  'envmode'   = ['avg'|'rms'] compute the average enveloppe or the root mean square
+%                enveloppe { Default -> 'avg' }
 %
 % Outputs:
 %  compvarorder  = component numbers in decreasing order of max variance in data
@@ -39,7 +45,7 @@
 %  To label maps with other than component numbers, put 4-char strings into
 %  file 'envtopo.labels' (. = space) in time-order of their projection maxima
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 3/1998 
+% Author: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
 % See also: timtopo()
 
@@ -60,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/09/05 00:57:22  arno
+% colorbar->cbar for removing menu bug
+%
 % Revision 1.3  2002/04/25 17:22:33  scott
 % editted help msg -sm
 %
@@ -102,12 +111,65 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-16-02 added all topoplot options -ad
 
-function [compvarorder,compvars,compframes,comptimes,compsplotted] = envtopo(data,weights,chan_locs,limits,compnums,titl,plotchans,voffsets,colorfile,fill_comp_env,vert, varargin)
+function [compvarorder,compvars,compframes,comptimes,compsplotted] = envtopo(data,weights,varargin);
+    %chan_locs,limits,compnums,titl,plotchans,voffsets,colorfile,fill_comp_env,vert, varargin)
 
 if nargin < 2
    help envtopo
    return
 end
+if nargin <= 2 | isstr(varargin{1})
+	% 'key' 'val' sequency
+	fieldlist = { 'chanlocs'      ''         []                       [] ;
+				  'title'         'string'   []                       '';
+				  'limits'        'real'     []                       0;
+				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
+				  'icawinv'       'real'     []                       pinv(weights) ;
+				  'voffsets'      'real'     []                       [] ;
+				  'vert'          'real'     []                       [] ;
+				  'fillcomp'      'integer'  []                       0 ; %no fill
+				  'colorfile'     'string'   []                       '' ;
+				  'compnums'      'integer'  []                       []; ...
+				  'subcomps'      'integer'  []                       []; ...
+				  'envmode'       'string'   {'avg' 'rms'}            'avg'; ...
+				  'limcontrib'    'real'     []                       0 };
+	
+	[g varargin] = finputcheck( varargin, fieldlist, 'envtopo', 'ignore');
+	if isstr(g), error(g); end;
+else
+	if nargin > 3,    g.chanlocs = varargin{1};
+	else              g.chanlocs = [];
+	end;
+	if nargin > 4,	  g.limits = varargin{2};
+	else              g.limits = [];
+	end;
+	if nargin > 5,    g.compnums = varargin{3};
+	else              g.compnums = [];
+	end;
+	if nargin > 6,    g.title = varargin{4};
+	else              g.title = '';
+	end;
+	if nargin > 7,    g.plotchans = varargin{5};
+	else              g.plotchans = [];
+	end;
+	if nargin > 8,    g.voffsets = varargin{6};
+	else              g.voffsets = [];
+	end;
+	if nargin > 9,    g.colorfile = varargin{7};
+	else              g.colorfile = '';
+	end;
+	if nargin > 10,   g.fillcomp = varargin{8};
+	else              g.fillcom = 0;
+	end;
+	if nargin > 11,   g.vert = varargin{9};
+	else              g.vert = [];
+	end;
+    g.limcontrib = 0;
+    g.icawinv = pinv(weights);
+    g.subcomps = [];
+    g.evnmode = 'avg';
+    if nargin > 12, varargin =varargin(10:end); end;
+end;
 
 uraxes = gca; % the original figure or subplot axes
 pos=get(gca,'Position');
@@ -120,107 +182,90 @@ BOLD_COLORS = 1;  % 1 = use solid lines for first 5 components plotted
 FILL_COMP_ENV = 0;  % default no fill
 MAXTOPOS = 7;  % max topoplots to plot
 
+if ndims(data) == 3
+    data = mean(data,3);
+end;
 [chans,frames] = size(data);
+
+% computing sublimits
+% -------------------
+if any(g.limcontrib ~= 0) & any(g.limits ~= 0)
+    sratems = (size(data,2)-1)/(g.limits(2)-g.limits(1));
+    frame1  = round((g.limcontrib(1)-g.limits(1))*sratems)+1;
+    frame2  = round((g.limcontrib(2)-g.limits(1))*sratems)+1;
+    g.vert(end+1) =  g.limcontrib(1);
+    g.vert(end+1) =  g.limcontrib(2);
+else
+    frame1 = 1;
+    frame2 = frames;
+end;
+
+% subtracting components
+% ----------------------
+if ~isempty(g.subcomps)
+    fprintf('envtopo: subtracting components from data\n');
+    proj = icaproj(data,weights,g.subcomps); % updated arg list 12/00 -sm
+    data = data -proj;
+end;
+    
 [wtcomps,wchans] = size(weights);
 if wchans ~= chans
    fprintf('envtopo(): sizes of weights and data do not agree.\n');
    return
 end
 
-icadefs;    % read toolbox defaults
+%icadefs;    % read toolbox defaults
 ENVCOLORS = strvcat('w..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..');
 
-if nargin < 11
-    vert = [];
+if isempty(g.colorfile)
+    g.colorfile = ENVCOLORS; % filename read from icadefs
 end
-if nargin <10
-    fill_comp_env = [];
+if isempty(g.voffsets) | ( size(g.voffsets) == [1,1] & g.voffsets(1) == 0 )
+  g.voffsets = zeros(1,MAXTOPOS); 
 end
-if isempty(fill_comp_env) | fill_comp_env(1) == 0
-    fill_comp_env = FILL_COMP_ENV; % default
+if isempty(g.plotchans) | g.plotchans(1)==0 
+   g.plotchans = 1:chans;
 end
-if nargin < 9
-    colorfile = [];
+if max(g.plotchans) > chans | min(g.plotchans) < 1
+   error('invalid ''plotchan'' index');
 end
-if isempty(colorfile) | colorfile(1) == 0
-    colorfile = ENVCOLORS; % filename read from icadefs
+if isempty(g.compnums) | g.compnums(1) == 0
+    g.compnums = 1:wtcomps; % by default, all components
 end
-
-if nargin < 8
-  voffsets = [];
-end
-if isempty(voffsets) | ( size(voffsets) == [1,1] & voffsets(1) == 0 )
-  voffsets = zeros(1,MAXTOPOS); 
-end
-if nargin < 7
-   plotchans=[];
-end
-if isempty(plotchans) | plotchans(1)==0 
-   plotchans = 1:chans;
-end
-if max(plotchans) > chans | min(plotchans) < 1
-   help envtopo
-   return
-end
-
-if nargin < 6,
-   titl = [];
-end
-if isempty(titl) | titl(1) == 0
-   titl = '';     % DEFAULT TITLE
-end
-
-if nargin < 5
-    compnums = [];
-end
-if isempty(compnums) | compnums(1) == 0
-    compnums = 1:wtcomps; % by default, all components
-end
-if min(compnums) < 0
-  if length(compnums) > 1
+if min(g.compnums) < 0
+  if length(g.compnums) > 1
      fprintf('envtopo(): negative compnums must be a single integer.\n');
      return
   end
-  if -compnums > MAXTOPOS
+  if -g.compnums > MAXTOPOS
     fprintf('Can only plot a maximum of %d components.\n',MAXTOPOS);
     return
   else
-    MAXTOPOS = -compnums;
-    compnums = 1:wtcomps;
+    MAXTOPOS = -g.compnums;
+    g.compnums = 1:wtcomps;
   end
 end
-ncomps = length(compnums);
+ncomps = length(g.compnums);
 for i=1:ncomps-1
   for j=i+1:ncomps
-    if compnums(i)==compnums(j)
-       fprintf('Cannot repeat component number (%d) in compnums.\n',compnums(i));
+    if g.compnums(i)==g.compnums(j)
+       fprintf('Cannot repeat component number (%d) in compnums.\n',g.compnums(i));
        return
     end
   end
 end
-
 limitset = 0;
-if nargin < 4,
-  limits = 0;
-elseif length(limits)>1
+if isempty(g.limits)
+  g.limits = 0;
+end
+if length(g.limits)>1
   limitset = 1;
-end
-if isempty(limits)
-  limits = 0;
-end
-
-if nargin< 3
-  chan_locs = [];
-end
-if isempty(chan_locs) | (isnumeric(chan_locs) & (chan_locs(1) == 0))
-  chan_locs = DEFAULT_ELOC;
-% chan_spline = [];  % for headplot() alternative (commented out below)
 end
 
 %
 %%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if limits==0,      % == 0 or [0 0 0 0]
+if g.limits==0,      % == 0 or [0 0 0 0]
   xmin=0;
   xmax=frames-1;
   ymin=min(min(data));
@@ -229,14 +274,14 @@ if limits==0,      % == 0 or [0 0 0 0]
   ymin = ymin-0.05*datarange;
   ymax = ymax+0.05*datarange;
 else
-  if length(limits)~=4,
+  if length(g.limits)~=4,
     fprintf('envtopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
     return
   end;
-  xmin = limits(1);
-  xmax = limits(2);
-  ymin = limits(3);
-  ymax = limits(4);
+  xmin = g.limits(1);
+  xmax = g.limits(2);
+  ymin = g.limits(3);
+  ymax = g.limits(4);
 end;
 
 if xmax == 0 & xmin == 0,
@@ -252,9 +297,10 @@ if xmax<=xmin,
   return
 end
 
+dataenvelope = envelope(data, g.envmode);
 if ymax == 0 & ymin == 0,
-  ymax=max(max(data));
-  ymin=min(min(data));
+  ymax=max(max(dataenvelope));
+  ymin=min(min(dataenvelope));
   datarange = ymax-ymin;
   ymin = ymin-0.05*datarange;
   ymax = ymax+0.05*datarange;
@@ -266,25 +312,25 @@ end
 %
 %%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~isstr(colorfile)
+if ~isstr(g.colorfile)
   fprintf('envproj(): color file name must be a string.\n');
   return
 end
-if length(colorfile)== 4 & colorfile == 'bold'
+if length(g.colorfile)== 4 & g.colorfile == 'bold'
    all_bold = 1;
-   colorfile = ENVCOLORS; % filename read from icadefs
+   g.colorfile = ENVCOLORS; % filename read from icadefs
 end
-if length(colorfile(:)) < 50
-	cid = fopen(colorfile,'r');
+if length(g.colorfile(:)) < 50
+	cid = fopen(g.colorfile,'r');
 	if cid <3,
-		fprintf('envproj(): cannot open file %s.\n',colorfile);
+		fprintf('envproj(): cannot open file %s.\n',g.colorfile);
 		return
 	else
 		colors = fscanf(cid,'%s',[3 MAXENVPLOTCHANS]);
 		colors = colors';
 	end;
 else
-	colors = colorfile;
+	colors = g.colorfile;
 end;
 [r c] = size(colors);
 for i=1:r
@@ -310,50 +356,46 @@ colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
 %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
 %
 
-ntopos = length(compnums);
+ntopos = length(g.compnums);
 if ntopos > MAXTOPOS
   ntopos = MAXTOPOS; % limit the number of topoplots to display
 end
 
-if max(compnums) > wtcomps | min(compnums)< 1
+if max(g.compnums) > wtcomps | min(g.compnums)< 1
   fprintf(...
 'envtopo(): one or more compnums out of range (1,%d).\n',wtcomps);
   return
 end
 
-if size(weights,1) == size(weights,2)
-  winv = inv(weights);
-else
-  fprintf('Using pseudo inverse pinv().\n');
-  winv = pinv(weights);
-end
 plotframes = ones(ncomps);
 maxproj = zeros(chans,ncomps);
 envdata = zeros(2,frames*(ncomps+1));
-envdata(:,1:frames) = envelope(data(plotchans,:)); % first, plot the data envelope
+envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); % first, plot the data envelope
 fprintf('Comparing projection sizes for components: ');
 compvars = zeros(1,ncomps);
 
 for c = 1:ncomps %%% find max variances and their frame indices %%%%%
 
-  fprintf('%d ',compnums(c)); % c is index into compnums
+  fprintf('%d ',g.compnums(c)); % c is index into compnums
   if rem(c,31)==15
     fprintf('\n');
   end
-  proj = icaproj(data,weights,compnums(c)); % updated arg list 12/00 -sm
-  envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(plotchans,:));
+  %proj = icaproj(data,weights,g.compnums(c)); % updated arg list 12/00 -sm
+  proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -ad 10/2002
+  envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode);
 
-  [val,i] = max(sum(proj.*proj)); % find max variance
+  [val,i] = max(sum(proj(:,frame1:frame2).*proj(:,frame1:frame2))); % find max variance
   compvars(c)   = val;
+  i = i+frame1-1;
 
   if envdata(1,c*frames+i) > ymax % if envelop max at max variance clipped
-    ix = find(envdata(1,c*frames+1:(c+1)*frames) <= ymax);
-    [val,ix] = max(envdata(1,c*frames+ix));
-    plotframes(c) = ix; % draw line from max non-clipped env maximum
-    maxproj(:,c)  = proj(:,ix);
+      ix = find(envdata(1,c*frames+1:(c+1)*frames) <= ymax);
+      [val,ix] = max(envdata(1,c*frames+ix));
+      plotframes(c) = ix; % draw line from max non-clipped env maximum
+      maxproj(:,c)  = proj(:,ix);
   else  % draw line from max envelope value at max projection time point
-    plotframes(c) = i;
-    maxproj(:,c)  = proj(:,i);
+      plotframes(c) = i;
+      maxproj(:,c)  = proj(:,i);
   end
 end 
 fprintf('\n');
@@ -365,7 +407,7 @@ x = xmin:sampint:xmax;                % make vector of x-values
 
 [compvars,compx] = sort(compvars');   % sort compnums on max variance
 compx        = compx(ncomps:-1:1);    % reverse order of sort
-compvarorder = compnums(compx);       % actual component numbers (output var)
+compvarorder = g.compnums(compx);       % actual component numbers (output var)
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames 
 compframes   = plotframes';           % frame of max variance in each comp (output var)
@@ -377,12 +419,12 @@ compsplotted = compvarorder(1:ntopos);% (output var)
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
 plottimes  = x(plotframes);           % convert to times in ms
 compx      = compx(ifx);              % indices into compnums, in plotting order
-maporder   = compnums(compx);         % comp. numbers, in plotting order (l->r)
+maporder   = g.compnums(compx);         % comp. numbers, in plotting order (l->r)
 maxproj    = maxproj(:,compx);        % maps in plotting order 
 
-vlen = length(voffsets); % extend voffsets if necessary
+vlen = length(g.voffsets); % extend voffsets if necessary
 while vlen< ntopos
-  voffsets = [voffsets voffsets(vlen)]; % repeat last offset given
+  g.voffsets = [g.voffsets g.voffsets(vlen)]; % repeat last offset given
   vlen=vlen+1;
 end
 
@@ -415,9 +457,9 @@ end
 
 fprintf('\n');
 fprintf('Plotting envelopes of %d component projections.\n',ntopos);
-if length(plotchans) ~= chans
+if length(g.plotchans) ~= chans
   fprintf('Envelopes computed from %d specified data channels.\n',...
-      length(plotchans));
+      length(g.plotchans));
 end
 fprintf('Topo maps will show components: ');
 for t=1:ntopos
@@ -452,7 +494,7 @@ delete(newaxes) %XXX
 axe = axes('Position',...
                [pos(1) pos(2) pos(3) 0.6*pos(4)],...
                'FontSize',16,'FontWeight','Bold');
-limits = get(axe,'Ylim');
+g.limits = get(axe,'Ylim');
 set(axe,'GridLineStyle',':')
 set(axe,'Xgrid','off')
 set(axe,'Ygrid','on')
@@ -526,8 +568,8 @@ for c = 1:ntopos+1   % plot the computed component envelopes %%%%%%%%%%%%%%%%%%
         set(l1,'LineWidth',2);  % embolden dotted env lines
       end
   end
-  if c==1 & ~isempty(vert)
-   for v=vert
+  if c==1 & ~isempty(g.vert)
+   for v=g.vert
       vl=plot([v v], [ymin ymax],'k--'); % plot specified vertical lines
       set(vl,'linewidth',2.5);           % if any
    end
@@ -535,7 +577,7 @@ for c = 1:ntopos+1   % plot the computed component envelopes %%%%%%%%%%%%%%%%%%
   %
   % plot the n-th component filled 
   %
-  if fill_comp_env(1)>0 & find(fill_comp_env==c-1) 
+  if g.fillcomp(1)>0 & find(g.fillcomp==c-1) 
     fprintf('filling component %d\n',c);
      mins = matsel(envdata,frames,0,2,envx(c));
      p=fill([x x(frames:-1:1)],...
@@ -549,7 +591,11 @@ set(axe,'Color',axcolor);
 l= xlabel('time (ms)');
 % l= xlabel('Time (ms)');
 set(l,'FontSize',14,'FontWeight','Bold');
-l=ylabel('potential (uV)');
+if strcmpi(g.envmode, 'avg')
+    l=ylabel('potential (uV)');
+else 
+    l=ylabel('RMS of uV');
+end;    
 % l=ylabel('Potential (uV)');
 set(l,'FontSize',14,'FontWeight','Bold');
 %
@@ -577,7 +623,7 @@ for t=1:ntopos % draw oblique lines from max env vals (or plot top)
   set(axall,'Visible','off');
   maxenv = matsel(envdata,frames,plotframes(t),1,compx(t)+1); 
                                         % max env val
-  data_y = 0.6*(voffsets(t)+maxenv-ymin)/height;
+  data_y = 0.6*(g.voffsets(t)+maxenv-ymin)/height;
   if (data_y > pos(2)+0.6*pos(4)) 
       data_y = pos(2)+0.6*pos(4);
   end
@@ -608,11 +654,11 @@ for t=1:ntopos % draw oblique lines from max env vals (or plot top)
   end
   hold on
 
-  if voffsets(t) > 0                    % if needed add vertical lines
+  if g.voffsets(t) > 0                    % if needed add vertical lines
     l2 = plot([(plottimes(t)-xmin)/width  ...
                (plottimes(t)-xmin)/width],...
               [0.6*(maxenv-ymin)/height ...
-               0.6*(voffsets(t)+maxenv-ymin)/height],...
+               0.6*(g.voffsets(t)+maxenv-ymin)/height],...
                colors(linestyles(t)+1));
     if linestyles(t)>15                      % thin/dot 11th-> comp. envs.
       set(l2,'LineStyle',':','LineWidth',1);
@@ -652,14 +698,15 @@ for t=1:ntopos % left to right order
   axes(axt)                             % topoplot axes
   cla
 
-  if ~isempty(varargin)
-     topoplot(maxproj(:,t),chan_locs, varargin{:}); 
-  else
-     topoplot(maxproj(:,t),chan_locs,'style','both','emarkersize',3);
-  end
-  %ELSE headplot(winv(:,t),chan_spline);% make a 3-d headplot
+  if ~isempty(g.chanlocs)
+      if ~isempty(varargin) topoplot(maxproj(:,t),g.chanlocs, varargin{:}); 
+      else topoplot(maxproj(:,t),g.chanlocs,'style','both','emarkersize',3);
+      end
+      axis square
+  else axis off;
+  end;
+  %ELSE headplot(g.icawinv(:,t),chan_spline);% make a 3-d headplot
                                           % if available
-  axis square
   if t==1
     chid = fopen('envtopo.labels','r');
     if chid <3,
@@ -704,7 +751,7 @@ set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.50,1.01,titl,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+text(0.50,1.01,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
 text(0.98,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
 text(0.98,0.62,'-','FontSize',16,'HorizontalAlignment','Center');
 
@@ -713,15 +760,30 @@ set(axall,'layer','top'); % bring component lines to top
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function envdata = envelope(data)  % also in release as env()
-  if size(data,1)>1
-    maxdata = max(data); % max at each time point
-    mindata = min(data); % min at each time point
-    envdata = [maxdata;mindata];
-  else
-    maxdata = max([data;data]); % max at each time point
-    mindata = min([data;data]); % min at each time point
-    envdata = [maxdata;mindata];
-  end
-
+function envdata = envelope(data, envmode)  % also in release as env()
+  if nargin < 2
+      envmode = 'avg';
+  end;
+  if strcmpi(envmode, 'rms');
+      warning off;
+      negflag = (data < 0);
+      dataneg = negflag.* data;
+      dataneg = -sqrt(sum(dataneg.*dataneg,1) ./ sum(negflag,1));
+      posflag = (data > 0);
+      datapos = posflag.* data;
+      datapos = sqrt(sum(datapos.*datapos,1) ./ sum(posflag,1)); 
+      envdata = [datapos;dataneg];
+      warning on;
+  else    
+      if size(data,1)>1
+          maxdata = max(data); % max at each time point
+          mindata = min(data); % min at each time point
+          envdata = [maxdata;mindata];
+      else
+          maxdata = max([data;data]); % max at each time point
+          mindata = min([data;data]); % min at each time point
+          envdata = [maxdata;mindata];
+      end
+  end;
+  
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
