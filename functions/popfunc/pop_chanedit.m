@@ -133,6 +133,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2004/11/05 18:06:31  arno
+% putting back orderfields with test
+%
 % Revision 1.107  2004/10/07 17:28:26  hilit
 % cosmetic GUI changes
 %
@@ -821,7 +824,7 @@ else
            end;
            if ~isstr(tmptype), tmptype = num2str(tmptype); end;
            for index = 1:length(tmpchans)
-               if tmpchans(index) > 1 & tmpchans(index) <= length(chans)
+               if tmpchans(index) > 0 & tmpchans(index) <= length(chans)
                    chans( tmpchans(index) ).type = tmptype;
                end;
            end;
