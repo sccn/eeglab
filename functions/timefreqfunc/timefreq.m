@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/01/06 17:52:38  arno
+% nothing
+%
 % Revision 1.12  2003/01/05 18:55:12  arno
 % testing
 %
@@ -235,7 +238,7 @@ function [itcvals] = tfitc(tfdecomp, itctype);
 % first dimension are trials
 switch itctype
    case 'coher',
-      itcvals = sum(tfdecomp,3) ./ sqrt(sum(tfdecomp .* conj(tfdecomp),3)) / size(tfdecomp,3);
+      itcvals = sum(tfdecomp,3) ./ sqrt(sum(tfdecomp .* conj(tfdecomp),3) * size(tfdecomp,3));
 	  %g.ITC(:,times)      = g.ITC(:,times) + g.tmpalltimes; % complex coher.
       %g.ITCcumul(:,times) = g.ITCcumul(:,times)+abs(g.tmpalltimes).^2;
       %case 'coher',       g.ITC = g.ITC ./ sqrt(trials * g.ITCcumul);
