@@ -44,6 +44,9 @@
 %               [0 0 1] gives a sagittal view, [0 -1 0] a view from the rear;
 %               [1 0 0] gives a view from the side of the head.
 %  'mesh'     - ['on'|'off'] Display spherical mesh. {Default is 'on'}
+%  'meshdata' - [cell array|'file_name'] Mesh data in a cell array { 'vertices'
+%               data 'faces' data } or a boundary element model filename (the 
+%               function will plot the 3rd mesh in the 'bnd' sub-structure).
 %  'axistight' - ['on'|'off'] For MRI only, display the closest MRI
 %               slide. {Default is 'off'}
 %  'gui'      - ['on'|'off'] Display controls. {Default is 'on'} If gui 'off', 
@@ -151,6 +154,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.108  2005/03/04 23:18:55  arno
+%use MNI coordinates, completelly remodeled function
+%
 %Revision 1.104  2004/11/20 02:32:43  scott
 %help msg edits:   carthesian -> Cartesian
 %
@@ -477,7 +483,6 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
-                                 'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on' 'off' }     'off';
                                  'view'      'real'     []                 [0 0 1];
@@ -494,12 +499,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'pointout'  'string'   { 'on' 'off' }     'off';
                                  'dipolesize' 'real'    [0 Inf]             30;
                                  'dipolelength' 'real'  [0 Inf]             1;
-                                 'sphere'      'real'   [0 Inf]             1;
-                                 'spheres'    'string'  {'on' 'off'}       'off';
-                                 'links'       'real'   []                  [];
-                                 'image'       { 'string' 'real'} []                 'mri' }, ...
-                                                                                    'dipplot');
-    %                             'std'       'cell'     []                  {};
+                                 'sphere'    'real'   [0 Inf]               1;
+                                 'spheres'   'string'  {'on' 'off'}         'off';
+                                 'links'     'real'   []                    [];
+                                 'image'     { 'string' 'real' } []         'mri';
+                                 'meshdata'  { 'string' 'cell' } []         '' }, 'dipplot');
+    %                             'std'       'cell'     []                  {}; 
     %                             'coreg'     'real'     []                  [];
 
     if isstr(g), error(g); end;
@@ -814,18 +819,26 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         
     % plot sphere mesh and nose
     % -------------------------
-    SPHEREGRAIN = 20; % 20 is Matlab default
-    [x y z] = sphere(SPHEREGRAIN);
-    hold on; 
-    [xx yy zz] = sph2spm(x*0.085, y*0.085, z*0.085, dat.sph2spm);
-    [xx yy zz] = sph2spm(x*85   , y*85   , z*85   , dat.sph2spm);
-    %xx = x*100;
-    %yy = y*100;
-    %zz = z*100;
-    if strcmpi(COLORMESH, 'w')
-        hh = mesh(xx, yy, zz, 'cdata', ones(21,21,3), 'tag', 'mesh'); hidden off;
+    if isempty(g.meshdata)
+        SPHEREGRAIN = 20; % 20 is also Matlab default
+        [x y z] = sphere(SPHEREGRAIN);
+        hold on; 
+        [xx yy zz] = sph2spm(x*0.085, y*0.085, z*0.085, dat.sph2spm);
+        [xx yy zz] = sph2spm(x*85   , y*85   , z*85   , dat.sph2spm);
+        %xx = x*100;
+        %yy = y*100;
+        %zz = z*100;
+        if strcmpi(COLORMESH, 'w')
+            hh = mesh(xx, yy, zz, 'cdata', ones(21,21,3), 'tag', 'mesh'); hidden off;
+        else
+            hh = mesh(xx, yy, zz, 'cdata', zeros(21,21,3), 'tag', 'mesh'); hidden off;
+        end;
     else
-        hh = mesh(xx, yy, zz, 'cdata', zeros(21,21,3), 'tag', 'mesh'); hidden off;
+        if isstr(g.meshdata)
+            tmp = load('-mat', g.meshdata)
+            g.meshdata = { 'vertices' tmp.vol.bnd(3).pnt 'faces' vol.bnd(3).tri };
+        end;
+        p1 = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH);
     end;
     
     %x = x*100*scaling; y = y*100*scaling; z=z*100*scaling;
