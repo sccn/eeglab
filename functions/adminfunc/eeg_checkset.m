@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2003/12/02 03:39:06  arno
+% urchanlocs
+%
 % Revision 1.108  2003/11/18 16:42:30  scott
 % text labels
 %
@@ -766,7 +769,7 @@ if ~isempty( EEG.chanlocs )
     end;
 end;
 if ~isfield(EEG, 'urchanlocs')
-    EEG.urchanlocs = EEG.chanlocs
+    EEG.urchanlocs = EEG.chanlocs;
     %for index = 1:length(EEG.chanlocs)
     %    EEG.chanlocs(index).urchan = index;
     %end;
