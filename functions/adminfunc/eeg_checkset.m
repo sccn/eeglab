@@ -78,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2002/07/23 00:13:29  arno
+% adding read float feature
+%
 % Revision 1.33  2002/06/25 13:40:00  arno
 % adding EEG.times
 %
@@ -397,7 +400,10 @@ end;
         if ~isempty( EEG.icawinv ),    EEG.icawinv = []; res = com; end;
         if ~isempty( EEG.icaact ),     EEG.icaact = []; res = com; end;
 	end;
-
+	if isempty(EEG.icaact)
+		EEG.icaact = [];
+	end;
+	
 % check chanlocs
 % -------------
 if ~isempty( EEG.chanlocs )
