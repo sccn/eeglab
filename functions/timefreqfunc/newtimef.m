@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/15 18:27:08  arno
+% missing argument
+%
 % Revision 1.5  2002/10/15 00:11:39  arno
 % title diff bug
 %
@@ -882,7 +885,8 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
 		end;
 		resboot = bootstat(alltfX, alltfX./sqrt(alltfX.*conj(alltfX)), formula, 'boottype', g.boottype, ...
 						   'formulapost', formulapost, 'formulainit', formulainit, ...
-						   'formulaout', formulaout, 'bootside', {'both' 'upper'}, 'naccu', g.naccu, 'basevect', baselntmp );
+						   'formulaout', formulaout, 'bootside', {'both' 'upper'}, 'naccu', g.naccu, ...
+                           'basevect', baselntmp, 'alpha', g.alpha );
 		Pboot = resboot{1};
 		Rboot = resboot{2};
 		
