@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/07/31 17:10:05  arno
+% conversion to 3-D for the last channel
+%
 % Revision 1.22  2003/07/31 17:03:31  arno
 % empty last channel
 %
@@ -294,7 +297,7 @@ optionscall = options;
 % -------------
 withref = 0;
 keepref = 0;
-restate = NaN;
+refstate = NaN;
 for index = 1:length(options)
     if isstr(options{index}) & strcmpi(options{index}, 'withref');
         withref = 1;
