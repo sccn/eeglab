@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2002/05/02 23:35:15  scott
+% formula -> transform -sm & ad
+%
 % Revision 1.11  2002/05/02 23:29:56  scott
 % Num -> number -sm
 %
@@ -128,8 +131,8 @@ if nargin < 2
 		tmpstr = sprintf('Channel information (variable_name):');
 		uilist = { { 'Style', 'text', 'string', tmpstr, 'fontweight', 'bold'  } };
 		endgui = 'set(findobj(''parent'', gcbf, ''tag'', ''ok''), ''userdata'', ''stop'');';
-		transform = ['inputdlg({strvcat(''Enter transform (Help on chanedit window)''' ...
-					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2)'')}, ''Transform'', 1, { '''' });'];
+		transform = ['inputdlg({strvcat(''Enter transform:''' ...
+					 ',''(Ex: TMP=X; X=-Y; Y=TMP or Y(3) = X(2), etc. See Help in chanedit window.)'')}, ''Transform'', 1, { '''' });'];
 		uiconvert = { { 'Style', 'pushbutton', 'string', '3D center', 'callback', ...
 						['comtmp = {''convert'' {''chancenter'' [] 1}};' endgui] }, ...
 					  { 'Style', 'pushbutton', 'string', 'xyz->polar', 'callback', ...
