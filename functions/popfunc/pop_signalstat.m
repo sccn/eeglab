@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/08/23 21:42:50  luca
+% call to signalstat() includes topographic information
+%
 % Revision 1.8  2002/08/12 20:42:47  luca
 % added Log tag, changed popup title, added title for table
 %
@@ -128,7 +131,7 @@ end;
 
 % return the string command
 % -------------------------
-fprintf('Pop_signalstat: computing statistics...\n');
+%fprintf('Pop_signalstat: computing statistics...\n');
 varargout{1} = sprintf('pop_signalstat( %s, %d, %d );', inputname(1), typeproc, cnum);
 com          = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs ); %s', outstr);
 
