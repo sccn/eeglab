@@ -1,4 +1,4 @@
-% pop_copyset() - Copy the current dataset into another dataset.
+% pop_copyset() - Copy the current EEG dataset into another dataset.
 %
 % Usage:
 %   >> ALLEEG = pop_copyset(ALLEEG, index1); % pop-up
@@ -10,7 +10,7 @@
 %   index2  - index of dataset to copy into
 %
 % Inputs:
-%   ALLEEG - array of dataset structure
+%   ALLEEG - array of dataset structures
 %
 % Note: this function performs ALLEEG(index2) = ALLEEG(index1);
 %       with dataset checks
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/08/13 23:57:45  arno
+% update error message
+%
 % Revision 1.5  2002/08/13 17:22:39  arno
 % text
 %
@@ -65,7 +68,7 @@ if nargin < 2
 	return;
 end;
 if isempty(ALLEEG)
-	error(['Pop_copyset error: can not copy' 10 'dataset in single dataset mode']);
+	error(['Pop_copyset error: cannot copy' 10 'dataset in single dataset mode']);
 end;	
 if isempty(ALLEEG(set_in).data)
     error('Pop_copyset error: cannot copy empty dataset'); return;
