@@ -154,6 +154,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2003/05/29 15:07:03  arno
+% debugging lowmem
+%
 % Revision 1.33  2003/05/24 19:09:16  arno
 % debug lowmem
 %
@@ -992,8 +995,8 @@ if strcmpi(g.phsamp, 'on')
     % times amplitude row
 
     tmpcx(1,:,:) = cumulX; % allow ./ below
-    for j=1:g.timesout
-        PA(:,:,j) = PA(:,:,j) ./ repmat(PP(:,j)', [size(PP,1) 1]);
+    for jj=1:g.timesout
+        PA(:,:,jj) = PA(:,:,jj) ./ repmat(PP(:,jj)', [size(PP,1) 1]);
     end
 end
 
