@@ -28,6 +28,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/09/27 17:24:22  scott
+% help msg -sm
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -58,7 +61,8 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data)
   lfreqs = lfreqs(:);
   [mesht meshf] = meshgrid(times,lfreqs);
   datout = griddata(mesht,meshf,data,times,lgfreqs);
-
+  datout(find(isnan(datout(:)))) = 0;
+  
   imagesc(times,freqs,data);
   nt = ceil(min(freqs)); % new tick - round up min freq to int-hz
   yt=get(gca,'ytick');
