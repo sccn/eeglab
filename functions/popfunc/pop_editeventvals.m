@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2004/07/10 00:50:09  arno
+% 5 decimals
+%
 % Revision 1.37  2004/06/28 19:03:31  arno
 % switching button locations
 %
@@ -352,6 +355,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       
      case 'delete', % **********************************************************
       
+      if ~gui
+          valnum = tmparg;
+      end
+                
       EEG.event(valnum) = []; 
       
       if gui, 
