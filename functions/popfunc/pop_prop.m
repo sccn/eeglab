@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/09/04 23:18:35  arno
+% addding typecomp for output command
+%
 % Revision 1.1  2002/09/04 23:13:59  arno
 % Initial revision
 %
@@ -110,7 +113,7 @@ end;
 if nargin == 1
 	typecomp ==1;
 end;
-if isempty(EEG.icaweights)
+if typecomp == 0 & isempty(EEG.icaweights)
    error('No ICA weights recorded for this set, first run ICA');
 end;   
 if nargin == 2
