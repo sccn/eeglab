@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/07/28 16:44:26  arno
+% allowing to include current ref channel
+%
 % Revision 1.20  2003/07/27 00:59:49  arno
 % debuging re-referencing
 %
@@ -236,12 +239,15 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
         end;
     end;
 else
+    'pick me'
     avematrix = eye(nbchans);
 end;
 
 % new reference electrode
 % -----------------------
-chans = size(avematrix,1);
+if strcmpi(g.method, 'withref')
+    chans = chans+1;
+end;
 refmatrix = eye(chans);
 if ~isempty(ref)
     
@@ -249,9 +255,9 @@ if ~isempty(ref)
     for index = 1:length(ref)
         refmatrix(:,ref(index)) = refmatrix(:,ref(index))-1/length(ref);
     end;
-    fprintf('Warning: reference channels have been removed\n');
     if length(ref) > 1 
         if strcmpi(g.keepref, 'off')
+            fprintf('Warning: reference channels have been removed\n');
             refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
             refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
             rerefchansout = setdiff(rerefchansout, ref);
@@ -264,6 +270,9 @@ if ~isempty(ref)
             refmatrix(:,g.exclude) = []; % supress non EEG channels
         end;
     else
+        if strcmpi(g.keepref, 'on')
+            fprintf('Warning: ''keepref'' can only be used with multiple references (ignored)\n');
+        end;
         refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
         refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
         rerefchansout = setdiff(rerefchansout, ref);
