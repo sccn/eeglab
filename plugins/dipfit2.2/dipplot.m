@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.23  2003/04/30 01:31:53  arno
+%infant option
+%
 %Revision 1.22  2003/04/23 18:35:11  arno
 %allow to plot elipses
 %
@@ -211,18 +214,16 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmpi(g.image, 'besa')
         IMAGESLOC   = { { 'besatop.pcx' } { 'besarear.pcx' } { 'besaside.pcx' } };
         IMAGESAXIS  = { -1  1 -1 };
-        IMAGESOFFSET  = { [0.0  0.07 NaN ]  [0    NaN -0.01]  [ NaN -0.01   -0.025 ] };
-        IMAGESMULT    = { [1.23 1.20 NaN ]  [1.28 NaN  1.13]  [ NaN 1.15   1.15 ] };
-        %IMAGESOFFSET = { [0 -0.07]   [0 -0.03]  [ -0.12 -0.02 ] };
-        %IMAGESMULT   = { [1.22 1.22] [1.28 1.3] [ 1.325 1.02 ] };
+        IMAGESOFFSET  = { [0.0  0.08 NaN ]  [0.01    NaN -0.01]  [ NaN -0.01   -0.025 ] };
+        IMAGESMULT    = { 1.01 1.06 0.96 };
         COLORMESH = [.5 .5 .5];
         BACKCOLOR = 'w';
         AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
     elseif strcmpi(g.image, 'mri')
         IMAGESLOC   = { { 'mritop.pcx' } { 'mrirear.pcx' } { 'mriside.pcx' } };
         IMAGESAXIS  = { -1  1 -1 };
-        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
-        IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;%[ 1.4 1.15 ] };
+        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.04 0.30] } ;% [ -0.12 0] };
+        IMAGESMULT   = { 0.8 0.8 1 };
         COLORMESH = 'w';
         BACKCOLOR = 'k';
         %AXISLIM   = [-1.2 1.2 -1.2 1.2 -1.2 1.2];
@@ -231,7 +232,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         IMAGESLOC   = { { 'transv_infant.pcx' } { 'cor_infant.pcx' } { 'sag_infant.pcx' } };
         IMAGESAXIS  = { -1  1 -1 };
         IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;
-        IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;
+        IMAGESMULT   = { 0.8 0.8 1 } ;
         COLORMESH = 'w';
         BACKCOLOR = 'k';
         AXISLIM   = [-1.4 1.4 -1.1 1.1 -1.2 1.2];
@@ -239,7 +240,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
        [IMAGESLOC IMAGESAXIS] = getmriimgs;
        addpath('/data/common/matlab/MRIimages');
        IMAGESOFFSET = { [-0.01 0.005  NaN]   [-0.02 NaN 0.11]  [NaN 0.05 0.31] } ;% [ -0.12 0] };
-       IMAGESMULT   = { [1.14  1.08   NaN]   [1.13  NaN 1.04]  [NaN 1.13  0.88]} ;%[ 1.4 1.15 ] };
+       IMAGESMULT   = { 0.8 0.8 1 } ;%[ 1.4 1.15 ] };
        %IMAGESOFFSET = { [0 0  NaN]   [0 NaN 0]  [NaN 0 0] } ;% [ -0.12 0] };
        %IMAGESMULT   = { [1 1  NaN]   [1 NaN 1]  [NaN 1 1]} ;%[ 1.4 1.15 ] };
        COLORMESH = 'w';
@@ -365,7 +366,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmp(g.gui, 'on')
         figure;
     end;
-	 plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, [1 1 1]);
+	 plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, [1 1 1]);
     set(gca, 'color', BACKCOLOR);
     %warning off; a = imread('besaside.pcx'); warning on;
     % BECAUSE OF A BUG IN THE WARP FUNCTION, THIS DOES NOT WORK (11/02)
@@ -597,7 +598,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.95 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', '   ' );
     set(gcf, 'userdata', findobj('parent', gca, 'tag', 'dipole1'));
-    set(gca, 'userdata', { IMAGESLOC IMAGESOFFSET, IMAGESMULT IMAGESAXIS } );
+    set(gca, 'userdata', { IMAGESLOC IMAGESOFFSET, IMAGESMULT IMAGESAXIS AXISLIM } );
     set(gcf, 'color', BACKCOLOR);
     
     if strcmp(g.gui, 'off')
@@ -794,6 +795,7 @@ function updatedipplot(fig, nbsources)
    imgoffset = imginfos{2};
    imgmult   = imginfos{3};
    imgaxis   = imginfos{4};
+   axislim   = imginfos{5};
    if length(imginfos{1}) > 1 % several images
       delete(findobj('parent', gca, 'tag', 'img'));
       
@@ -803,19 +805,20 @@ function updatedipplot(fig, nbsources)
       indz = minpos(imgaxis{3} - userdat.pos3d(1) + 4/84.747);
       tmp = userdat.pos3d*84.747
       [ imgaxis{3}(indx) imgaxis{2}(indy) imgaxis{1}(indz)]*84.747
-      plotimgs( imglocs, imgoffset, imgmult, imgaxis, [indx indy indz]);
+      plotimgs( imglocs, imgoffset, imgmult, imgaxis, [indx indy indz], axislim);
    end;
    	
 % plot images
 % -----------
-function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, index);
+function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, index);
    
     try,
         fprintf('Reading img: %s\n', IMAGESLOC{1}{index(1)} );
         warning off;  a = double(imread(IMAGESLOC{1}{index(1)}))/255; warning on;
         if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = ([-1 1; -1 1]+IMAGESOFFSET{1}(1))*IMAGESMULT{1}(1);
-        wy = ([-1 -1; 1 1]+IMAGESOFFSET{1}(2))*IMAGESMULT{1}(2);
+        aspect_ratio   = size(a,1)/size(a,2);
+        wx = ([-1 1; -1 1])*IMAGESMULT{1}*AXISLIM(2)+IMAGESOFFSET{1}(1);
+        wy = ([-1 -1; 1 1])*IMAGESMULT{1}*AXISLIM(4)*aspect_ratio+IMAGESOFFSET{1}(2);
         wz = [ 1 1; 1 1]*IMAGESAXIS{1}(index(1))*1.07;
         % DISPLAY IF REAL RATIO OF IMAGE CORRESPOND TO RATIO SHOWN ON SCREEN
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
@@ -828,9 +831,10 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, index);
         fprintf('Reading img: %s\n', IMAGESLOC{2}{index(2)} );
         warning off; a = double(imread(IMAGESLOC{2}{index(2)}))/255;  warning on;
         if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = ([-1 1; -1 1]+IMAGESOFFSET{2}(1))*IMAGESMULT{2}(1);
+        aspect_ratio   = size(a,1)/size(a,2);
+        wx = ([-1 1; -1 1])*IMAGESMULT{2}*AXISLIM(2)+IMAGESOFFSET{2}(1);
+        wz = ([1 1; -1 -1])*IMAGESMULT{2}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{2}(3);
         wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2))*1.07;
-        wz = ([1 1; -1 -1]+IMAGESOFFSET{2}(3))*IMAGESMULT{2}(3);
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
            'EdgeColor','none', 'CDataMapping','direct','tag','img');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
@@ -841,9 +845,10 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, index);
         fprintf('Reading img: %s\n', IMAGESLOC{3}{index(3)} );
         warning off; a = double(imread(IMAGESLOC{3}{index(3)}))/255;  warning on;
         if ndims(a) == 2, a(:,:,2) = a; a(:,:,3) = a(:,:,1); end;
-        wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3))*1.07
-        wy = ([-1 1; -1 1]+IMAGESOFFSET{3}(2))*IMAGESMULT{3}(2);
-        wz = ([1 1; -1 -1]+IMAGESOFFSET{3}(3))*IMAGESMULT{3}(3);
+        aspect_ratio   = size(a,1)/size(a,2);
+        wx = [ 1  1;  1 1]*IMAGESAXIS{3}(index(3))*1.07;
+        wy = ([-1 1; -1 1])*IMAGESMULT{3}*AXISLIM(4)+IMAGESOFFSET{3}(2);
+        wz = ([1 1; -1 -1])*IMAGESMULT{3}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{3}(3);
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
            'EdgeColor','none', 'CDataMapping','direct','tag','img');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1), ...
