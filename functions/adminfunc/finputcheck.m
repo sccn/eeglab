@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2002/09/30 00:42:08  arno
+% debug input arguments
+%
 % Revision 1.9  2002/07/29 18:00:53  arno
 % debugging for NaN
 %
@@ -135,62 +138,23 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 		
 		% check type
 		% ----------
-		switch fieldlist{index, TYPE}
-		 case { 'integer' 'real' 'boolean' }, 
-		  if ~isnumeric(tmpval)
-			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be numeric' ]; return;
-		  end;
-		  if strcmp(fieldlist{index, TYPE}, 'boolean')
-			  if tmpval ~=0 & tmpval ~= 1
-				  g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be 0 or 1' ]; return;
-			  end;  
-		  else 
-			  if strcmp(fieldlist{index, TYPE}, 'integer')
-				  if ~isempty(fieldlist{index, VALS})
-					  if (isnan(tmpval) & ~any(isnan(fieldlist{index, VALS}))) ...
-					     & (~ismember(tmpval, fieldlist{index, VALS}))
-						  g = [ callfunc 'error: wrong value for argument ''' fieldlist{index, NAME} '''' ]; return;
-					  end;
-				  end;
-			  else % real
-				  if ~isempty(fieldlist{index, VALS})
-					  if tmpval < fieldlist{index, VALS}(1) | tmpval > fieldlist{index, VALS}(2)
-						  g = [ callfunc 'error: value out of range for argument ''' fieldlist{index, NAME} '''' ]; return;
-					  end;
-				  end;
-			  end;
-		  end;  
-			
-		  
-		 case 'string'
-		  if ~isstr(tmpval)
-			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a string' ]; return;
-		  end;
-		  if ~isempty(fieldlist{index, VALS})
-			  if isempty(strmatch(lower(tmpval), fieldlist{index, VALS}))
-				  g = [ callfunc 'error: wrong value for argument''' fieldlist{index, NAME} '''' ]; return;
-			  end;
-		  end;
-
-		  
-		 case 'cell'
-		  if ~isstr(tmpval)
-			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a cell array' ]; return;
-		  end;
-		  
-		  
-		 case 'struct'
-		  if ~isstr(tmpval)
-			g = [ callfunc 'error: argument ''' fieldlist{index, NAME} ''' must be a structure' ]; return;
-		  end;
-		  
-		  
-		 case '';
-		 otherwise, error([ 'finputcheck error: unrecognized type ''' fieldlist{index, NAME} '''' ]);
-		end;
+        if ~iscell( fieldlist{index, TYPE} )
+            res = fieldtest( fieldlist{index, NAME},  fieldlist{index, TYPE}, ...
+                           fieldlist{index, VALS}, tmpval, callfunc );
+            if isstr(res), g = res; return; end;
+        else 
+            testres = 0;
+            tmplist = fieldlist;
+            for it = 1:length( fieldlist{index, TYPE} )
+                res{it} = fieldtest(  fieldlist{index, NAME},  fieldlist{index, TYPE}{it}, ...
+                           fieldlist{index, VALS}, tmpval, callfunc );
+                if ~isstr(res{it}), testres = 1; end;
+            end;
+            if testres == 0, g = strvcat(res{:}); return; end;
+        end;
 	end;
-	
-	% check if fields are defined
+    
+    % check if fields are defined
 	% ---------------------------
 	allfields = fieldnames(g);
 	for index=1:length(allfields)
@@ -202,3 +166,66 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 			varargnew{end+1} = getfield(g, {1}, allfields{index});
 		end;
 	end;
+
+
+function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
+	NAME = 1;
+	TYPE = 2;
+	VALS = 3;
+	DEF  = 4;
+	SIZE = 5;
+    g = [];
+    
+    switch fieldtype
+     case { 'integer' 'real' 'boolean' }, 
+      if ~isnumeric(tmpval)
+          g = [ callfunc 'error: argument ''' fieldname ''' must be numeric' ]; return;
+      end;
+      if strcmp(fieldtype, 'boolean')
+          if tmpval ~=0 & tmpval ~= 1
+              g = [ callfunc 'error: argument ''' fieldname ''' must be 0 or 1' ]; return;
+          end;  
+      else 
+          if strcmp(fieldtype, 'integer')
+              if ~isempty(fieldval)
+                  if (isnan(tmpval) & ~any(isnan(fieldval))) ...
+                          & (~ismember(tmpval, fieldval))
+                      g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
+                  end;
+              end;
+          else % real
+              if ~isempty(fieldval)
+                  if tmpval < fieldval(1) | tmpval > fieldval(2)
+                      g = [ callfunc 'error: value out of range for argument ''' fieldname '''' ]; return;
+                  end;
+              end;
+          end;
+      end;  
+      
+      
+     case 'string'
+      if ~isstr(tmpval)
+          g = [ callfunc 'error: argument ''' fieldname ''' must be a string' ]; return;
+      end;
+      if ~isempty(fieldval)
+          if isempty(strmatch(lower(tmpval), fieldval))
+              g = [ callfunc 'error: wrong value for argument''' fieldname '''' ]; return;
+          end;
+      end;
+
+      
+     case 'cell'
+      if ~iscell(tmpval)
+          g = [ callfunc 'error: argument ''' fieldname ''' must be a cell array' ]; return;
+      end;
+      
+      
+     case 'struct'
+      if ~isstruct(tmpval)
+          g = [ callfunc 'error: argument ''' fieldname ''' must be a structure' ]; return;
+      end;
+      
+      
+     case '';
+     otherwise, error([ 'finputcheck error: unrecognized type ''' fieldname '''' ]);
+    end;
