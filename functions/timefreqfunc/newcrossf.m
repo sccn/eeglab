@@ -155,6 +155,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2002/10/18 20:53:46  arno
+% checking rcs
+%
 % Revision 1.17  2002/10/17 01:45:02  arno
 % editing thanks to cooper
 %
@@ -917,8 +920,6 @@ if g.cycles(1) ~= 0
 end
 if ~isreal(R)
     R = abs(R);
-    if size(Rboot,1) == 2, Rboot(1,:,:) = 0;
-    end;
     Rraw =R; % raw coherence values
     setylim = 1;
     % if ~isnan(g.baseline)
@@ -947,12 +948,13 @@ case 'on'
    %
    RR = R;
    if ~isnan(g.alpha) % zero out (and 'green out') nonsignif. R values
-       if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
-           RR  (find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
-           Rraw(find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
-       else
-           RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
-           Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+       switch dims(Rboot)
+           case 3, RR  (find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
+                   Rraw(find(RR > Rboot(:,:,1) & (RR < Rboot(:,:,2)))) = 0;
+           case 2, RR  (find(RR < Rboot)) = 0;
+                   Rraw(find(RR < Rboot)) = 0;
+           case 1, RR  (find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
+                   Rraw(find(RR < repmat(Rboot(:),[1 g.timesout]))) = 0;
        end; 
    end
     
@@ -978,44 +980,40 @@ case 'on'
    hold off
    set(h(6),'YTickLabel',[],'YTick',[])
    set(h(6),'XTickLabel',[],'XTick',[])
-   %title('Event-Related Coherence')
    
    h(8) = axes('Position',[.95 ordinate1 .05 height].*s+q);
    if setylim 
-       cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
-   else
-       cbar(h(8),1:300, [-tmpscale(2) tmpscale(2)]); % use only positive colors (gyorv) 
+        cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
+   else cbar(h(8),1:300  , [-tmpscale(2) tmpscale(2)]); % use only positive colors (gyorv) 
    end;
    
    %
    % Plot delta-mean min and max coherence at each time point on bottom of image
    %
+   
    h(10) = axes('Units','Normalized','Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal means below
    Emax = max(R(dispf,:)); % mean coherence at each time point
    Emin = min(R(dispf,:)); % mean coherence at each time point
-   if ~isnan(g.alpha) & strcmp(g.boottype, 'trials') 
+   hold on;
+   plot(times,Emax,'b');
+   plot(times,Emin,'b');
+   plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
+   plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
+   for i=1:length(g.marktimes)
+       plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
+   end;
+   if ~isnan(g.alpha) & dims(Rboot) > 1
       % plot bootstrap significance limits (base mean +/-)
-      plot(times,mean(Rboot(dispf,:,1)),'k:','LineWidth',g.linewidth); hold on;
-      plot(times,mean(Rboot(dispf,:,2)),'k:','LineWidth',g.linewidth);
-      plot(times,Emax,'b');
-      plot(times,Emin,'b');
-      plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
-      plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
-      for i=1:length(g.marktimes)
-         plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
+      switch dims(Rboot)
+       case 2, plot(times,mean(Rboot(dispf,:),1),'g','LineWidth',g.linewidth);
+       case 3, plot(times,mean(Rboot(dispf,:,1),1),'g','LineWidth',g.linewidth);
+               plot(times,mean(Rboot(dispf,:,2),1),'g','LineWidth',g.linewidth);
       end;
       axis([min(times) max(times) 0 max([Emax(:)' Rboot(:)'])*1.2])
    else
-      plot(times,Emax,'b');
-      hold on
-      plot(times,Emin,'b');
-      plot([times(1) times(length(times))],[0 0],'LineWidth',0.7);
-      plot([0 0],[-500 500],'--m','LineWidth',g.linewidth);
-      for i=1:length(g.marktimes)
-         plot([g.marktimes(i) g.marktimes(i)],[-500 500],'--m','LineWidth',g.linewidth);
-      end;
       axis([min(times) max(times) 0 max(Emax)*1.2])
    end;
+   
    tick = get(h(10),'YTick');
    set(h(10),'YTick',[tick(1) ; tick(length(tick))])
    set(h(10),'YAxisLocation','right')
@@ -1024,22 +1022,26 @@ case 'on'
    
    %
    % Plot mean baseline coherence at each freq on left side of image
-   %
+   %   
    
    h(11) = axes('Units','Normalized','Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
    E = abs(mbase(dispf)); % baseline mean coherence at each frequency
+   plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
+   
    if ~isnan(g.alpha) % plot bootstrap significance limits (base mean +/-)
-      plot(freqs(dispf),E,'m','LineWidth',g.linewidth); % plot mbase
-      hold on
-      % plot(freqs(dispf),Rboot(:,dispf)+[E;E],'g','LineWidth',g.linewidth);
-      plot(freqs(dispf),mean(Rboot(dispf,:),2),'g','LineWidth',g.linewidth);
-      plot(freqs(dispf),mean(Rboot(dispf,:),2),'k:','LineWidth',g.linewidth);
-      axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(:)'])*1.2]);
+       hold on
+       switch dims(Rboot)
+        case 1, plot(freqs(dispf),Rboot(dispf),'g','LineWidth',g.linewidth);
+        case 2, plot(freqs(dispf),mean(Rboot(dispf,:),2),'g','LineWidth',g.linewidth);
+        case 3, plot(freqs(dispf),mean(Rboot(dispf,:,1),2),'g','LineWidth',g.linewidth);
+                plot(freqs(dispf),mean(Rboot(dispf,:,2),2),'g','LineWidth',g.linewidth);
+       end;  
+       if ~isnan(max(E))
+           axis([freqs(1) freqs(max(dispf)) 0 max([E Rboot(:)'])*1.2]);
+       end;
    else             % plot marginal mean coherence only
-      plot(freqs(dispf),E,'LineWidth',g.linewidth);
-      % axis([freqs(1) freqs(max(dispf)) min(E)-max(E)/3 max(E)+max(E)/3]);
       if ~isnan(max(E))
-         axis([freqs(1) freqs(max(dispf)) 0 max(E)*1.2]);
+          axis([freqs(1) freqs(max(dispf)) 0 max(E)*1.2]);
       end;
    end
    
@@ -1203,3 +1205,6 @@ else
    w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
    w = [w; w(end-1:-1:1)];
 end
+
+function res = dims(array)
+    res = min(ndims(array), max(size(array,2),size(array,3)));
