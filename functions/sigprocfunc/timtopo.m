@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2003/03/04 18:44:58  scott
+% title text debug -sm
+%
 % Revision 1.31  2003/03/04 18:43:45  scott
 % title text -sm
 %
@@ -357,9 +360,9 @@ if length(plotchans)==1
   set(pl,'linewidth',2);
 end
 l= xlabel('Time (ms)');
-set(l,'FontSize',14);
+set(l,'FontSize',16);
 l=ylabel('Potential (uV)');
-set(l,'FontSize',14);
+set(l,'FontSize',16);
 axis([xmin xmax ymin ymax]);
 hold on
 
