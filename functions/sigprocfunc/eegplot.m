@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2002/10/04 17:57:12  arno
+% Y grid text
+%
 % Revision 1.51  2002/09/06 19:49:03  arno
 % custum colors for channels
 %
@@ -318,7 +321,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    end;	
 		 
    try, g.srate; 		    catch, g.srate		= 256; 	end;
-   try, g.spacing; 			catch, g.spacing	= 0; 	end;
+   try, g.spacing; 			catch, g.spacing	= 1; 	end;
    try, g.eloc_file; 		catch, g.eloc_file	= 0; 	end; % 0 mean numbered
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= [100 200 800 500]; 	end;
