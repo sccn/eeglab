@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2004/02/20 23:53:25  arno
+% urevent merging
+%
 % Revision 1.16  2003/12/19 00:53:17  arno
 % adding dicontinuity dataset
 %
@@ -179,6 +182,14 @@ else
 			end;    
 		end;
 		
+        % updating urevent field if present
+        % ---------------------------------
+        if isfield(INEEG2.event, 'urevent') & isfield(INEEG1, 'urevent')
+ 			for index = 1:length(INEEG2.event(:))
+                INEEG2.event(index).urevent = INEEG2.event(index).urevent + length(INEEG1.urevent);
+            end;
+        end;    
+        
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1.trials  == 1 & INEEG2.trials == 1
@@ -201,17 +212,7 @@ else
 	% ------------------
 	if ~isempty(INEEG2.urevent)
         disp('Concatenating urevents...');
-		if isfield( INEEG1.urevent, 'epoch')
-			for index = 1:length(INEEG2.urevent(:))
-				INEEG2.urevent(index).epoch = INEEG2.urevent(index).epoch + INEEG1.trials;
-			end;    
-		end;
-		if isfield( INEEG1.urevent, 'latency')
-			for index = 1:length(INEEG2.urevent(:))
-				INEEG2.urevent(index).latency = INEEG2.urevent(index).latency + INEEG1.trials*INEEG1.pnts;
-			end;    
-		end;
-		
+        
         % add discontinuity urevent if continuous
         % -------------------------------------
         if INEEG1.trials  == 1 & INEEG2.trials == 1
