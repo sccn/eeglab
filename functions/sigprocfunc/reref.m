@@ -7,11 +7,11 @@
 % Inputs:
 %   data - 2D data matrix (chans,frames*epochs) 
 %   ref  - reference channel number: 2 possibilities
-%          1) [] - compute average reference. If the 'withref' mode
+%          1) [] - compute average reference. If the 'withref' method
 %             is set, the function recomputes the common reference potential 
 %             while averaging.
 %          2) 1<= X <= size(data,1): re-reference to channel X. If the 
-%             'withref' mode is set, the function compute the potential of
+%             'withref' method is set, the function compute the potential of
 %             of the old common reference.
 % 
 % Optional inputs:
@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/11/12 19:08:02  arno
+% debugging
+%
 % Revision 1.2  2002/11/12 18:43:31  arno
 % debug
 %
