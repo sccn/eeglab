@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/15 22:58:59  arno
+% nothing
+%
 % Revision 1.5  2002/10/15 18:29:46  arno
 % changing default wavelet factor
 %
@@ -174,10 +177,7 @@ if nargout > 3 | strcmpi(g.subitc, 'on')
 	itcvals = tfitc(tmpall, g.itctype);
 end;
 if strcmpi(g.subitc, 'on')
-	%itcvals = transpose(itcvals); % do not use ' otherwise conjugate
-	
-	itcvalsub = repmat(shiftdim(itcvals, -1), [trials 1 1]);
-	tmpall = (tmpall - abs(tmpall) .* itcvalsub) ./ abs(tmpall);
+	tmpall = (tmpall - abs(tmpall) .* repmat(itcvals, [1 1 trials])) ./ abs(tmpall);
 end;
 return;
 
