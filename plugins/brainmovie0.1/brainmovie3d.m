@@ -25,7 +25,7 @@
 % 'latency'   - plot only a subset of latencies. The time point closest to the 
 %               latency given are plotted. Default = empty, all latencies.
 % 'frames'    - vector of frame indices to compute
-% 'resolution'- ['low' or 'high'], 'high' -> multiply the size of the image by 3 
+% 'resolution' - ['low' or 'high'], 'high' -> multiply the size of the image by 3 
 %               for subsequent antialiasing and high quality movie generation 
 %               {default: 'low'}
 % 'framesout' - ['eps'|'ppm'|'fig'] Default format for saving frames on disk. Default is '.eps'.
@@ -132,6 +132,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/07/03 16:49:44  arno
+% test for nan itc
+%
 % Revision 1.2  2003/07/03 16:07:22  arno
 % disable axis redrawing
 %
