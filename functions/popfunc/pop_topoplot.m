@@ -47,6 +47,9 @@ $   called or when more than one page of maps are plotted. Thus, this
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2002/08/17 22:16:19  scott
+% editing help msg
+%
 % Revision 1.7  2002/08/17 22:15:51  scott
 % *** empty log message ***
 %
@@ -95,19 +98,18 @@ if nargin < 3
 	% which set to save
 	% -----------------
 	if typeplot
-		%txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
-		txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = sprintf('Plot ERP scalp maps at these latencies:' 10 ' (range: %d to %d ms, NaN -> empty):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
 		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
-		txt = sprintf('ERP scalp map at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
+		txt = sprintf('Plotting scalp maps at these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	end;	
 	txt = { txt ...
 	        'Plot title:' ...
 	        ['Plot geometry (rows,columns):' ...
-	        '(Default [] = near square)'] ...
-	        '-> Scalp map plotting options  (See >> help topoplot):' };
+	        '(Default [] -> near square)'] ...
+	        '-> Scalp map plotting options (see >> help topoplot):' };
 	inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
-	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
+	               [fastif(~isempty(EEG.setname), [EEG.setname ' ERP'], '') ] ...
 	               '' ['''electrodes'', ''off''' ] };
 	result       = inputdlg2( txt, fastif( typeplot, 'ERP scalp map(s) -- pop_topoplot()', 'Component scalp map(s) -- pop_topoplot()'), 1,  inistr, 'topoplot');
 	size_result  = size( result );
