@@ -120,6 +120,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.30  2003/05/30 17:16:22  arno
+%nothing
+%
 %Revision 1.29  2003/05/30 17:09:00  arno
 %for index = 1:size(x, 2);
 %    dipstruct(index).posxyz = [x(index) y(index) z(index)];
@@ -495,33 +498,33 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [x xo]', [y yo]', [-1 -1]');
-                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(x,  y,  -1); 
-                set(h, 'userdata', dipstruct, 'tag', tag, ...
+                set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [x xo]', [1 1]', [z zo]');
-                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(x,  1,  z); 
-                set(h, 'userdata', dipstruct, 'tag', tag, ...
+                set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [-1 -1]', [y yo]', [z zo]');
-                    set(h, 'userdata', dipstruct, 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(-1,  y,  z); 
-                set(h, 'userdata', dipstruct, 'tag', tag, ...
+                set(h, 'userdata', 'proj', 'tag', tag, ...
                        'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
             end;
                         
@@ -827,7 +830,7 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
         %       IMAGESMULT{1}(1)/ IMAGESMULT{1}(2) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(4)-AXISLIM(3)) );
         surface(wx, wy, wz, a(end:-1:1,:,:), 'FaceColor','texturemap', ...
-           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+           'EdgeColor','none', 'CDataMapping','direct','tag','img', 'facelighting', 'none');
         hold on; %%fill3([-2 -2 2 2], [-2 2 2 -2], wz(:)-1, BACKCOLOR);
     %catch, error(lasterr); end;
     try,
@@ -839,7 +842,7 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         wz = ([1 1; -1 -1])*IMAGESMULT{2}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{2}(3);
         wy = [1 1; 1 1]*IMAGESAXIS{2}(index(2))*1.07;
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
-           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+           'EdgeColor','none', 'CDataMapping','direct','tag','img', 'facelighting', 'none');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1),  ...
         %        IMAGESMULT{2}(1)/ IMAGESMULT{2}(3) / (AXISLIM(2)-AXISLIM(1)) * (AXISLIM(6)-AXISLIM(5)));
         %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
@@ -853,7 +856,7 @@ function plotimgs(IMAGESLOC, IMAGESOFFSET, IMAGESMULT, IMAGESAXIS, AXISLIM, inde
         wy = ([-1 1; -1 1])*IMAGESMULT{3}*AXISLIM(4)+IMAGESOFFSET{3}(2);
         wz = ([1 1; -1 -1])*IMAGESMULT{3}*AXISLIM(6)*aspect_ratio+IMAGESOFFSET{3}(3);
         hold on; surface(wx, wy, wz, a, 'FaceColor','texturemap', ...
-           'EdgeColor','none', 'CDataMapping','direct','tag','img');
+           'EdgeColor','none', 'CDataMapping','direct','tag','img', 'facelighting', 'none');
         %fprintf('Image ratio %3.2f\tCoord ratio:%3.2f\n', size(a,2)/size(a,1), ...
         %        IMAGESMULT{3}(2)/ IMAGESMULT{3}(3) / (AXISLIM(4)-AXISLIM(3)) * (AXISLIM(6)-AXISLIM(5)));
         %%fill3([-2 -2 2 2], wy(:)-1, [-2 2 2 -2], BACKCOLOR);
