@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2003/01/06 18:12:15  arno
+% shuffle along the 3rd dimension
+%
 % Revision 1.56  2003/01/02 22:40:43  arno
 % updateing linear coherence formulas
 %
@@ -1152,13 +1155,15 @@ end
 
 if g.plot
 	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
-   if (length(g.title) > 0) % plot title
-      axes('Position',pos,'Visible','Off');               
-      h(13) = text(-.05,1.01,g.title);
-      set(h(13),'VerticalAlignment','bottom')
-      set(h(13),'HorizontalAlignment','left')
-      set(h(13),'FontSize',g.TITLE_FONT)
-   end
+    if (length(g.title) > 0) % plot title
+        if h(6) ~= 0, axes(h(6)); else axes(h(13)); end;
+        %h = subplot('Position',[0 0  1 1].*s+q, 'Visible','Off');               
+        %h(13) = text(-.05,1.01,g.title);
+        h(13) = title(g.title);
+        %set(h(13),'VerticalAlignment','bottom')
+        %set(h(13),'HorizontalAlignment','left')
+        set(h(13),'FontSize',g.TITLE_FONT);
+    end
    %
    %%%%%%%%%%%%%%% plot topoplot() %%%%%%%%%%%%%%%%%%%%%%%
    %
