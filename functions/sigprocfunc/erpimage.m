@@ -90,10 +90,10 @@
 %               See '>> topoplot example' for electrode location file structure.
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified times
-%   'auxvar' - [matrix] Plot auxiliary variable(s) for each trial as separate
-%               traces. To plot N traces, the auxvar matrix should be size (N,ntrials) 
-%               ELSE, 'auxvar',{[that_matrix],{colorstrings}} to specify N trace colors. 
-%               Ex: colorstrings = {'r','bo-','k:'} (See also: 'vert')
+%   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
+%               as separate traces. ELSE, 'auxvar',{[that_matrix],{colorstrings}} 
+%               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
+%               (See also: 'vert' aobve).
 %
 % Miscellaneous options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
@@ -153,6 +153,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2003/08/27 17:45:07  scott
+% header
+%
 % Revision 1.141  2003/08/25 22:38:25  scott
 % auxvars adjust tests -sm
 %
@@ -1149,7 +1152,7 @@ if ~exist('srate') | srate <= 0
 	return
 end
 if ~isempty(auxvar)
-	whos auxvar
+	% whos auxvar
     if size(auxvar,1) ~= ntrials && size(auxvar,2) ~= ntrials
 		fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
                            ntrials);
@@ -1164,16 +1167,18 @@ if ~isempty(auxvar)
 		return
 	end
 	if exist('auxcolors')==YES % if specified
-		if isa(auxcolors,'cell')==NO
+		if isa(auxcolors,'cell')==NO % if auxcolors is not a cell array
 			fprintf(...
-   'erpimage(): auxcolors argument to auxvar flag must be a cell array. See help.\n');
+                 'erpimage(): auxcolors argument to auxvar flag must be a cell array.\n');
 			return
 		end
 	end
 end
 if exist('phargs')
 	if phargs(3) > srate/2
-	     fprintf('erpimage(): Phase-sorting frequency must be less than Nyquist rate.');
+	   fprintf(...
+            'erpimage(): Phase-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
+                phargs(3),srate/2);
 	end
     % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/phargs(3)
@@ -1191,7 +1196,9 @@ if exist('phargs')
 end
 if exist('ampargs')
 	if ampargs(3) > srate/2
-		fprintf('erpimage(): amplitude-sorting frequency must be less than Nyquist rate.');
+    	  fprintf(...
+           'erpimage(): amplitude-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
+              ampargs(3),srate/2);
 	end
     %DEFAULT_CYCLES = 9*ampargs(3)/(ampargs(3)+10); % 3 cycles at 5 Hz
 	if frames < DEFAULT_CYCLES*srate/ampargs(3)
@@ -1201,7 +1208,7 @@ if exist('ampargs')
 	end
 	if length(ampargs)==4 & ampargs(4) > srate/2
 		ampargs(4) = srate/2;
-  fprintf('> Reducing max ''ampsort'' frequency to Nyquist (%g Hz)\n',srate/2)
+  fprintf('> Reducing max ''ampsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
 	end
 end
 if ~any(isnan(coherfreq))
@@ -1352,11 +1359,7 @@ if exist('phargs') == 1 % if phase-sort
 	if length(phargs) >= 4 % find max frequency in specified band
 		[pxx,freqs] = psd(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
 		
-		%gf = gcf;
-		% figure;plot(freqs,pxx);
-		%xx=axis;
-		%axis([phargs(3) phargs(4) xx(3) xx(4)]);
-		%figure(gf);
+	%gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
 		
 		pxx = 10*log10(pxx);
 		n = find(freqs >= phargs(3) & freqs <= phargs(4));
@@ -1385,9 +1388,12 @@ if exist('phargs') == 1 % if phase-sort
         fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
         fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
                 filtersize, 1000/freq*filtersize, timecenter);
-        fprintf('    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', length(winloc), phargs(1));
+        fprintf(...
+  '    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
+                        length(winloc), phargs(1));
     else
-        fprintf('Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
+        fprintf(...
+  'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
         fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
     end;
@@ -1397,14 +1403,13 @@ if exist('phargs') == 1 % if phase-sort
 	phargs(2) = phargs(2)/100; % convert rejection rate from % to fraction
 	[tmp n] = sort(phsamp); % sort amplitudes
 	if phargs(2)>=0
-		n = n(ceil(phargs(2)*length(n))+1:end); % if rej 0, select all trials
-		fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
-			length(n),100*(1-phargs(2)));
-		
+	  n = n(ceil(phargs(2)*length(n))+1:end); % if rej 0, select all trials
+	  fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
+	     length(n),100*(1-phargs(2)));
 	else % phargs(2) < 0
-		phargs(2) = 1+phargs(2); % subtract from end
-		n = n(1:floor(phargs(2)*length(n)));
-		fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
+	   phargs(2) = 1+phargs(2); % subtract from end
+	   n = n(1:floor(phargs(2)*length(n)));
+	   fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
                       length(n),phargs(2)*100);
 	end
 	%
@@ -1415,6 +1420,9 @@ if exist('phargs') == 1 % if phase-sort
 	phaseangles = phaseangles(n); % amp-sort the phaseangles
 	sortvar = sortvar(n);         % amp-sort the trial indices
 	ntrials = length(n);          % number of trials retained
+	if ~isempty(auxvar)
+	   auxvar = auxvar(:,n);
+        end
 	%
 	% Sort remaining data by phase angle %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
@@ -1432,7 +1440,7 @@ if exist('phargs') == 1 % if phase-sort
 	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
 	sortidx = n(sortidx); % return original trial indices in final sorted order
 	if ~isempty(auxvar)
-		auxvar = auxvar(:,sortidx);
+	   auxvar = auxvar(:,sortidx);
 	end
 %
 % %%%%%%%%%%%%%%% Sort data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1466,11 +1474,15 @@ elseif exist('ampargs') == 1 % if amplitude-sort
         timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
         phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq;
         fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
-        fprintf('    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
+        fprintf(...
+'    Data time limits reached -> now uses a %1.1f cycles (%1.0f ms) window centered at %1.0f ms\n', ...
                 filtersize, 1000/freq*filtersize, timecenter);
-        fprintf('    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', length(winloc), ampargs(1));
+        fprintf(...
+'    Filter length is %d; Phase has been linearly interpolated to latency et %1.0f ms.\n', ...
+           length(winloc), ampargs(1));
     else
-        fprintf('Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
+        fprintf(...
+'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...  
 			freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
         fprintf('Phase is computed using a filter of length %d frames.\n',length(winloc));
     end;
@@ -1481,15 +1493,15 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	ampargs(2) = ampargs(2)/100; % convert rejection rate from % to fraction
 	[tmp n] = sort(phsamp); % sort amplitudes
 	if ampargs(2)>=0
-		n = n(ceil(ampargs(2)*length(n))+1:end); % if rej 0, select all trials
-		fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
-			length(n),100*(1-ampargs(2)));
-		
+	   n = n(ceil(ampargs(2)*length(n))+1:end); % if rej 0, select all trials
+	   fprintf('Retaining %d epochs (%g percent) with largest power at the analysis frequency,\n',...
+	      length(n),100*(1-ampargs(2)));
 	else % ampargs(2) < 0
 		ampargs(2) = 1+ampargs(2); % subtract from end
 		n = n(1:floor(ampargs(2)*length(n)));
-		fprintf('Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
-                      length(n),ampargs(2)*100);
+		fprintf(...
+            'Retaining %d epochs (%g percent) with smallest power at the analysis frequency,\n',...
+                   length(n),ampargs(2)*100);
 	end
 	%
 	% Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1499,6 +1511,9 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	phaseangles = phaseangles(n); % amp-sort the phaseangles
 	sortvar = sortvar(n);         % amp-sort the trial indices
 	ntrials = length(n);          % number of trials retained
+	if ~isempty(auxvar)
+           auxvar = auxvar(:,n);
+        end
 	%
 	% Sort remaining data by amplitude %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%
@@ -1506,12 +1521,12 @@ elseif exist('ampargs') == 1 % if amplitude-sort
 	data    =  data(:,sortidx);                % sort data by amp
 	phaseangles  =  phaseangles(sortidx);      % sort angles by amp
 	sortvar = sortvar(sortidx);                % sort input sortvar by amp
-	
-	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
-	sortidx = n(sortidx); % return original trial indices in final sorted order
 	if ~isempty(auxvar)
-		auxvar = auxvar(:,sortidx);
+	   auxvar = auxvar(:,sortidx);
 	end
+	fprintf('Size of data = [%d,%d]\n',size(data,1),size(data,2));
+
+	sortidx = n(sortidx); % return original trial indices in final sorted order
 %
 %%%%%%%%%%%%%%%%%%%%%% Don't Sort trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
