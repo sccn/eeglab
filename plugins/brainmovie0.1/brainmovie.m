@@ -110,6 +110,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2002/11/12 20:06:01  cooper
+% Fixed empty envvert bug.
+%
 % Revision 1.18  2002/11/09 01:22:49  cooper
 % Changed 'envvert' option to be a cell array of vectors.
 % The vectors can either be numeric (vert. line times in ms),
@@ -247,7 +250,8 @@ try, g.coordinates; catch,
     end;
 end;
 try, g.circfactor; catch, g.circfactor = zeros( nbcomponents, nbcomponents ); end;
-
+if isempty(g.circfactor), g.circfactor = zeros( nbcomponents, nbcomponents ); end;
+    
 % check size of inputs
 % --------------------
 try
