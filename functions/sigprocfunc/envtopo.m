@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/03/03 22:28:03  arno
+% update text header
+%
 % Revision 1.10  2003/02/27 02:52:24  arno
 % typo
 %
@@ -195,8 +198,8 @@ else
 end;
 
 uraxes = gca; % the original figure or subplot axes
-pos=get(gca,'Position');
-axcolor = get(gca,'Color');
+pos=get(uraxes,'Position');
+axcolor = get(uraxes,'Color');
 delete(gca)
 
 all_bold = 0;
