@@ -23,7 +23,7 @@
 %                  Use this parameter to re-reference data to a given channel if data
 %                  is already average referenced (by setting it to 'averef').
 %                  Integer designates channel reference indices.
-%                  Default is 'common'. 
+%                  Default is 'common' or 0 (0 is the same as common).
 %   'refloc'     - Reference channel location -- a cell array with name and 
 %                  polar coordinates of the channel, { 'label' theta radius }. 
 %                  For 3-D location, include the reference as the last channel 
@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/07/29 18:39:59  arno
+% debuging empty channel location structure
+%
 % Revision 1.22  2003/07/29 16:58:18  arno
 % debuging exclude
 %
