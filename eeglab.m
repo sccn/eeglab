@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.176  2002/10/15 17:18:46  arno
+% visible off and on
+%
 % Revision 1.175  2002/10/15 16:15:52  arno
 % message
 %
@@ -817,7 +820,11 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
 	uimenu( second_m, 'Label', 'Event fields'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventfield(EEG);' e_store]);
 	uimenu( second_m, 'Label', 'Event values'     , 'CallBack', [ checkevent '[EEG LASTCOM] = pop_editeventvals(EEG);' e_store]);
 	uimenu( second_m, 'Label', 'About this dataset', 'CallBack', [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store]);
-	uimenu( second_m, 'Label', 'Channel locations'   , 'CallBack', [ '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
+	uimenu( second_m, 'Label', 'Channel locations'   , 'CallBack', [ 'disp(''IMPORTANT: Close the channel editing window to import channels'');' ...
+                        'disp(''WARNING: the number of channel information must match the number of'');' ... 
+                        'disp(''         data channels (otherwise channel''s info is ignored)'');' ...
+                        'disp(''TIP: to edit channel info only type "chanlocs = pop_chanedit([]);" from the command line'');' ...
+    '[TMPCHAN LASTCOM] =pop_chanedit(EEG.chanlocs); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; clear TMPCHAN; h(LASTCOM);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); h(LASTCOM); eeglab(''redraw'');' e_hist], 'Separator', 'on');
