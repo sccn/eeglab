@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2002/08/12 00:27:16  arno
+% color
+%
 % Revision 1.35  2002/08/11 23:10:04  arno
 % text edit
 %
@@ -228,11 +231,12 @@ function [outvar1] = eegplot(data, varargin); % p1,p2,p3,p4,p5,p6,p7,p8,p9)
 % Defaults (can be re-defined):
 
 DEFAULT_PLOT_COLOR = { [0 0 1], [0.7 0.7 0.7]};         % EEG line color
-DEFAULT_AXIS_BGCOLOR = [.8 .8 .8];% EEG Axes Background Color
 try, icadefs;
 	DEFAULT_FIG_COLOR = BACKCOLOR;
-catch, 
-	DEFAULT_FIG_COLOR = [.66 .76 1];   % Figure Background Color
+	BUTTON_COLOR = GUIBUTTONCOLOR;
+else 
+	DEFAULT_FIG_COLOR = [1 1 1];
+	BUTTON_COLOR =[0.8 0.8 0.8];
 end;
 DEFAULT_AXIS_COLOR = 'k';         % X-axis, Y-axis Color, text Color
 DEFAULT_GRID_SPACING = 1;         % Grid lines every n seconds
@@ -925,46 +929,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Plot Spacing I
   % %%%%%%%%%%%%%%%%%%%%%%%%%%
-  if strcmp(SPACING_EYE,'on')
-    
-    YLim = get(ax1,'Ylim');
-    A = DEFAULT_AXES_POSITION;
-    axes('Position',[A(1)+A(3) A(2) 1-A(1)-A(3) A(4)],...
-	'Visible','off','Ylim',YLim,'tag','eyeaxes')
-    axis manual
-    Xl = [.3 .6 .45 .45 .3 .6];
-    Yl = [g.spacing*2 g.spacing*2 g.spacing*2 g.spacing*1 g.spacing*1 g.spacing*1];
-    line(Xl,Yl,'color',DEFAULT_AXIS_COLOR,'clipping','off',...
- 	'tag','eyeline')
-    text(.5,YLim(2)/23+Yl(1),num2str(g.spacing,4),...
-	'HorizontalAlignment','center','FontSize',10,...
-	'tag','thescale')
-    if strcmp(YAXIS_NEG,'off')
-      text(Xl(2)+.1,Yl(1),'+','HorizontalAlignment','left',...
-	  'verticalalignment','middle')
-      text(Xl(2)+.1,Yl(4),'-','HorizontalAlignment','left',...
-	  'verticalalignment','middle')
-    else
-      text(Xl(2)+.1,Yl(4),'+','HorizontalAlignment','left',...
-	  'verticalalignment','middle')
-      text(Xl(2)+.1,Yl(1),'-','HorizontalAlignment','left',...
-	  'verticalalignment','middle')
-    end
-    if ~isempty(SPACING_UNITS_STRING)
-      text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
-	  'HorizontalAlignment','center','FontSize',10)
-    end
-    set(m(7),'checked','on')
-  
-  elseif strcmp(SPACING_EYE,'off')
-    YLim = get(ax1,'Ylim');
-    A = DEFAULT_AXES_POSITION;
-    axes('Position',[A(1)+A(3) A(2) 1-A(1)-A(3) A(4)],...
-	'Visible','off','Ylim',YLim,'tag','eyeaxes')
-    axis manual
-    set(m(7),'checked','off')
-    
+  YLim = get(ax1,'Ylim');
+  A = DEFAULT_AXES_POSITION;
+  axes('Position',[A(1)+A(3) A(2) 1-A(1)-A(3) A(4)],'Visible','off','Ylim',YLim,'tag','eyeaxes')
+  axis manual
+  if strcmp(SPACING_EYE,'on'),  set(m(7),'checked','on')
+  else set(m(7),'checked','off');
   end 
+  eegplot('scaleeye', [], gcf);
   
   eegplot('drawp', 0);
   eegplot('drawp', 0);
@@ -973,7 +945,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   end;  
   
   h = findobj(gcf, 'style', 'pushbutton');
-  set(h, 'backgroundcolor', [1 1 1]);
+  set(h, 'backgroundcolor', BUTTON_COLOR);
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Main Function
@@ -1150,7 +1122,7 @@ else
     	alltag = [];
        	for tmptag = lowlim:highlim
     		if mod(tmptag-1, g.trialstag) == 0
-				plot([tmptag-lowlim-1 tmptag-lowlim-1], [0 1], 'b--');
+				plot([tmptag-lowlim tmptag-lowlim], [0 1], 'b--');
 				alltag = [ alltag tmptag ];
    			end;	
     	end;
@@ -1162,10 +1134,10 @@ else
 		axes(ax1);
 		tagpos  = [];
 		tagtext = [];
-		if isempty(alltag)
+		if ~isempty(alltag)
 			alltag = [alltag(1)-g.trialstag alltag alltag(end)+g.trialstag];
 		else
-			alltag = mod(lowlim, g.trialstag);
+			alltag = (lowlim-mod(lowlim, g.trialstag))/g.trialstag+1;
 			%alltag = 
 		end;
 			%alltag = [ alltag(1)-g.trialstag alltag alltag(end)+g.trialstag ];
@@ -1325,46 +1297,51 @@ else
     % Turn scale I on/off
     obj = p1;
     figh = p2;
+	g = get(figh,'UserData');
     % figh = get(obj,'Parent');
-    toggle = get(obj,'checked');
     
-    if strcmp(toggle,'on')
-      eyeaxes = findobj('tag','eyeaxes','parent',figh);
-      children = get(eyeaxes,'children');
-      delete(children)
-      set(obj,'checked','off')
-    elseif strcmp(toggle,'off')
-      eyeaxes = findobj('tag','eyeaxes','parent',figh);
-      
-      ESpacing = findobj('tag','ESpacing','parent',figh);
-      g.spacing= str2num(get(ESpacing,'string'));
-      
-      axes(eyeaxes)
-      YLim = get(eyeaxes,'Ylim');
-      Xl = [.35 .65 .5 .5 .35 .65];
-      Yl = [g.spacing*2 g.spacing*2 g.spacing*2 g.spacing*1 g.spacing*1 g.spacing*1];
-      line(Xl,Yl,'color',DEFAULT_AXIS_COLOR,'clipping','off',...
- 	'tag','eyeline')
-      text(.5,YLim(2)/23+Yl(1),num2str(g.spacing,4),...
-	'HorizontalAlignment','center','FontSize',10,...
-	'tag','thescale')
-      if strcmp(YAXIS_NEG,'off')
+    if ~isempty(obj)
+		toggle = get(obj,'checked');
+		if strcmp(toggle,'on')
+			eyeaxes = findobj('tag','eyeaxes','parent',figh);
+			children = get(eyeaxes,'children');
+			delete(children)
+			set(obj,'checked','off');
+			return;
+		else
+			set(obj,'checked','on');
+		end;
+	end;
+	
+	eyeaxes = findobj('tag','eyeaxes','parent',figh);
+	
+	ESpacing = findobj('tag','ESpacing','parent',figh);
+	g.spacing= str2num(get(ESpacing,'string'));
+	
+	axes(eyeaxes); cla;
+	YLim = get(eyeaxes,'Ylim');
+	Xl = [.35 .65 .5 .5 .35 .65];
+	Yl = [ [g.spacing g.spacing g.spacing]*g.chans/g.dispchans 0 0 0] + 0.2;
+	line(Xl,Yl,'color',DEFAULT_AXIS_COLOR,'clipping','off',...
+		 'tag','eyeline')
+	text(.5,YLim(2)/23+Yl(1),num2str(g.spacing,4),...
+		 'HorizontalAlignment','center','FontSize',10,...
+		 'tag','thescale')
+	if strcmp(YAXIS_NEG,'off')
         text(Xl(2)+.1,Yl(1),'+','HorizontalAlignment','left',...
-	    'verticalalignment','middle', 'tag', 'thescale')
+			 'verticalalignment','middle', 'tag', 'thescale')
         text(Xl(2)+.1,Yl(4),'-','HorizontalAlignment','left',...
-	    'verticalalignment','middle', 'tag', 'thescale')
-      else
+			 'verticalalignment','middle', 'tag', 'thescale')
+	else
         text(Xl(2)+.1,Yl(4),'+','HorizontalAlignment','left',...
-	    'verticalalignment','middle', 'tag', 'thescale')
+			 'verticalalignment','middle', 'tag', 'thescale')
         text(Xl(2)+.1,Yl(1),'-','HorizontalAlignment','left',...
-	    'verticalalignment','middle', 'tag', 'thescale')
-      end
-      if ~isempty(SPACING_UNITS_STRING)
+			 'verticalalignment','middle', 'tag', 'thescale')
+	end
+	if ~isempty(SPACING_UNITS_STRING)
         text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
-	    'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
-      end
-      set(obj,'checked','on')
-    end
+			 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
+	end
     
   case 'noui'
       eegplot( varargin{:} );
@@ -1435,6 +1412,7 @@ else
          g.elecoffset = g.chans-g.dispchans;
       end;
       set(fig,'UserData', g);
+	  eegplot('scaleeye', [], fig);
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
   end  
