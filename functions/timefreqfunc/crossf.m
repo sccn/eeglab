@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2002/07/11 18:16:00  arno
+% implmenting maxamp
+%
 % Revision 1.31  2002/07/11 17:01:30  arno
 % implementing phase coherence 2, speeding up 'coher' and 'phasecoher'
 %
@@ -388,7 +391,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
-		  'memory' 'compute' };
+		  'memory' 'compute' 'maxamp' };
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
 end;
