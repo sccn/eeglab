@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2003/05/13 23:19:48  arno
+% debug last
+%
 % Revision 1.7  2003/05/13 23:18:00  arno
 % adding verbose option
 %
@@ -128,18 +131,18 @@ case 'topo2sph',
       chans(index).sph_radius = 1;
    end;
 case 'topo2sphbesa',
-   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
 case 'topo2cart'
-   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
    if verbose
        disp('Warning: spherical coordinates automatically updated');
    end;
-   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
 case 'topo2all',
-   chans = convertlocs(chans, 'topo2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
 case 'sph2cart',
    if ~isfield(chans, 'sph_radius'), sph_radius = ones(length(chans),1);
    else                              sph_radius = cell2mat({chans.sph_radius})';
@@ -169,9 +172,9 @@ case 'sph2sphbesa',
       chans(index).sph_phi_besa    = sph_phi_besa(index);
    end;   
 case 'sph2all',
-   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords
 case 'sphbesa2sph',
    % using polar coordinates
    [chan_num,angle,radius] = sph2topo([ones(length(chans),1)  cell2mat({chans.sph_theta_besa})' ...
@@ -189,20 +192,20 @@ case 'sphbesa2sph',
       chans(index).sph_phi    = sph_phi  (index);      
    end;
 case 'sphbesa2topo',
-   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
+   chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
 case 'sphbesa2cart',
-   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2cart'); % search for spherical coords   
+   chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2cart', varargin{:}); % search for spherical coords   
 case 'sphbesa2all',
-   chans = convertlocs(chans, 'sphbesa2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2all'); % search for spherical coords
+   chans = convertlocs(chans, 'sphbesa2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2all', varargin{:}); % search for spherical coords
 case 'cart2topo',
-   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2topo'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2topo', varargin{:}); % search for spherical coords
 case 'cart2sphbesa',
-   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2sphbesa'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
 case 'cart2sph',
     if verbose
         disp('WARNING: XYZ center not optimized, optimize center, then recompute coords');
@@ -214,6 +217,6 @@ case 'cart2sph',
 		 chans(index).sph_radius    = radius(index);
 	end;
 case 'cart2all',
-   chans = convertlocs(chans, 'cart2sph'); % search for spherical coords
-   chans = convertlocs(chans, 'sph2all'); % search for spherical coords
+   chans = convertlocs(chans, 'cart2sph', varargin{:}); % search for spherical coords
+   chans = convertlocs(chans, 'sph2all', varargin{:}); % search for spherical coords
 end;
