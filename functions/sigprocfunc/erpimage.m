@@ -154,6 +154,9 @@
 %                   and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.176  2003/11/14 16:58:02  scott
+% debug last
+%
 % Revision 1.175  2003/11/14 16:56:16  scott
 % refining erpsig, sig fills
 %
@@ -3035,7 +3038,7 @@ function [out, outalpha]  = nan_mean(in,alpha)
      if NBOOT < round(3/alpha)
         NBOOT = round(3/alpha);
      end
-     fprintf('Erp bootstrap: ');
+     fprintf('Computing %d bootstrap ERP values... ',NBOOT);
      booterps = zeros(NBOOT,inframes);
      for n=1:NBOOT
          signs = sign(randn(1,intrials)'-0.5);
