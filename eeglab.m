@@ -176,6 +176,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2002/08/22 17:18:21  arno
+% more checks
+%
 % Revision 1.156  2002/08/22 17:13:48  arno
 % debug eeglab besa
 %
@@ -740,7 +743,7 @@ first_m = uimenu( W_MAIN, 'Label', 'File');
     uimenu( importepoch, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importepoch(EEG);' e_store ]);
 	uimenu( importepoch, 'Label', 'From Neuroscan .DAT file', 'CallBack', [ check   '[EEG LASTCOM]= pop_loaddat(EEG);' e_store]); 
 	importevent = uimenu( first_m, 'Label', 'Import event info'); 
-	uimenu( importevent, 'Label', 'From  Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
+	uimenu( importevent, 'Label', 'From Matlab array or ASCII file',        'CallBack', [ check   '[EEG LASTCOM] = pop_importevent(EEG);' e_store]);
 	uimenu( importevent, 'Label', 'From data channel'          , 'CallBack', [ check   '[EEG LASTCOM]= pop_chanevent(EEG);' e_store]); 
 	uimenu( importevent, 'Label', 'From Presentation .LOG file'   , 'CallBack', [ check   '[EEG LASTCOM]= pop_importpres(EEG);' e_store]); 
 
