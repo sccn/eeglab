@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 3-20-98 fixed bug in multi-channel windowed averaging -sm
 % 6-10-98 changed mean() and sum() to nanmean() and nansum() -sm
@@ -56,7 +59,7 @@ NEARZERO = 1e-22;
 verbose = 0;
 
 nanexist = 0;  
-if exist('nanmean') % test for stat toolbox nan routines
+if exist('nanmean')==2 % test for stat toolbox nan routines
    nanexist = 1;
 end
 if nargin<1
@@ -212,15 +215,15 @@ end
     elseif length(xwin)==1,
       if fastave
         if nanexist
-         outdata(:,f) = nanmean(data(:,round(lox):round(hix))')'; % Else average
+         outdata(:,f) = nanmean(data(:,round(lox):round(hix))')'; % Else average ignoring NaNs
         else
-         outdata(:,f) = mean(data(:,round(lox):round(hix))')'; % Else average
+         outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
         end
       else
         if nanexist
           outdata(:,f) = nanmean(data(:,i)')'; % Else average
         else
-          outdata(:,f) = mean(data(:,i)')'; % Else average
+          outdata(:,f) = nan_mean(data(:,i)')'; % Else average
         end
       end
 if verbose
@@ -255,7 +258,7 @@ end
         if nanexist
          outdata(:,f) = nansum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
         else                % perform normalized windowed smoothing
-         outdata(:,f) = sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
+         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
         end               
        end 
     end
@@ -268,3 +271,39 @@ if verbose,
   fprintf('\n');
 end
 
+%
+%%%%%%%%%%%%%%%%%%%%%%% function nan_mean() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% nan_mean() - take the column means of a matrix, ignoring NaN values
+%
+function out = nan_mean(in)
+
+   nans = find(isnan(in));
+   in(nans) = 0;
+   sums = sum(in);
+   nonnans = ones(size(in));
+   nonnans(nans) = 0;
+   nonnans = sum(nonnans);
+   nononnans = find(nonnans==0);
+   nonnans(nononnans) = 1;
+   out = sum(in)./nonnans;
+   out(nononnans) = NaN;
+
+%
+%%%%%%%%%%%%%%%%%%%%%%% function nan_sum() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% nan_sum() - take the column sums of a matrix, ignoring NaN values
+%
+function out = nan_mean(in)
+
+   nans = find(isnan(in));
+   in(nans) = 0;
+   out = sum(in);
+
+   nonnans = ones(size(in));
+   nonnans(nans) = 0;
+   nonnans = sum(nonnans);
+   nononnans = find(nonnans==0);
+   out(nononnans) = NaN;
