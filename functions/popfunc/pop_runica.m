@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2003/10/15 00:36:33  arno
+% same
+%
 % Revision 1.29  2003/10/15 00:35:41  arno
 % fastica
 %
@@ -219,7 +222,7 @@ switch lower(icatype)
     case 'runica' 
         if nargin < 2
             fig = figure('visible', 'off');
-            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interrupt runica' }, ...
+            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
