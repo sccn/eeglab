@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/04/22 21:42:58  arno
+% corrected returned command
+%
 % Revision 1.5  2002/04/18 18:25:02  arno
 % typo can not2
 %
@@ -229,9 +232,10 @@ end;
 % adding desciption to the fields
 % -------------------------------
 if isempty( EEG.eventdescription )
-    EEG.eventdescription{1} = 'Epoch number';
-    EEG.eventdescription{2} = 'Event type';
-    EEG.eventdescription{3} = 'Event latency';
+	allfields = fieldnames(EEG.event);	
+    EEG.eventdescription{strmatch('epoch', allfields)} = 'Epoch number';
+	if ~isempty(strmatch('type', allfields)), EEG.eventdescription{strmatch('type', allfields)} = 'Event type'; end;
+	if ~isempty(strmatch('latency', allfields)), EEG.eventdescription{strmatch('latency', allfields)} = 'Event latency'; end;
 end;
 
 % checking and updating events
