@@ -90,6 +90,7 @@
 %       'axesfont'  = Axes text font size                                  {10}
 %       'titlefont' = Title text font size                                 {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at given times in ms.
+%       'verbose'   = ['on'|'off'] print text                              {'on'}
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
@@ -144,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2003/10/22 17:37:03  arno
+% slight imprecision on frequency for FFT when padratio > 1
+%
 % Revision 1.63  2003/08/27 21:49:11  arno
 % header typo
 %
@@ -489,9 +493,14 @@ try, g.type;       catch, g.type = 'phasecoher'; end;
 try, g.phsamp;     catch, g.phsamp = 'off'; end;
 try, g.plotphase;  catch, g.plotphase = 'on'; end;
 try, g.itcmax;     catch, g.itcmax = []; end;
+try, g.verbose;    catch, g.verbose = 'on'; end;
 
 % testing arguments consistency
 % -----------------------------
+switch lower(g.verbose)
+    case { 'on', 'off' }, ;
+    otherwise error('verbose must be either on or off');
+end;
 if (~ischar(g.title))
 	error('Title must be a string.');
 end
@@ -529,7 +538,7 @@ if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
 elseif (g.maxfreq <= 0)
 	error('Value of maxfreq must be positive.');
 elseif (g.maxfreq > Fs/2)
-	fprintf(['Warning: value of maxfreq reduced to Nyquist rate' ...
+	myprintf(g.verbose,['Warning: value of maxfreq reduced to Nyquist rate' ...
 		 ' (%3.2f)\n\n'], Fs/2);
 	g.maxfreq = Fs/2;
 end
@@ -549,18 +558,18 @@ end
 if (~isnumeric(g.alpha) | length(g.alpha)~=1)
 	error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
-	fprintf('Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
+	myprintf(g.verbose,'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
-	fprintf('  Increasing the number of bootstrap iterations to %d\n',g.naccu);
+	myprintf(g.verbose,'  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
 if g.alpha>0.5 | g.alpha<=0
     error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
    if g.baseboot > 0
-     fprintf('Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
+     myprintf(g.verbose,'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
    else
-     fprintf('Bootstrap analysis will use data in all subwindows.\n')
+     myprintf(g.verbose,'Bootstrap analysis will use data in all subwindows.\n')
    end
 end
 if ~isnumeric(g.vert)
@@ -733,37 +742,37 @@ else
    baseln = 1:length(times); % use all times as baseline
 end
 if ~isnan(g.alpha) & length(baseln)==0
-  fprintf('timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
+  myprintf(g.verbose,'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
 elseif ~isnan(g.alpha) & g.baseboot
-  fprintf('   %d bootstrap windows in baseline (times<%g).\n',...
+  myprintf(g.verbose,'   %d bootstrap windows in baseline (times<%g).\n',...
           g.baseline,length(baseln))
 end
 dispf = find(freqs <= g.maxfreq);
 stp = (g.frame-g.winsize)/(g.timesout-1);
 
-fprintf('Computing Event-Related Spectral Perturbation (ERSP) and\n');
+myprintf(g.verbose,'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher',  fprintf('  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'phasecoher2', fprintf('  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',       fprintf('  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher',  myprintf(g.verbose,'  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher2', myprintf(g.verbose,'  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'coher',       myprintf(g.verbose,'  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
 end;
-fprintf('  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
-fprintf('Each trial contains samples from %d ms before to\n',g.tlimits(1));
-fprintf('  %d ms after the timelocking event.\n',g.tlimits(2));
-fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize,2*wintime);
-fprintf('The window is applied %d times at an average step\n',g.timesout);
-fprintf('  size of %g samples (%gms).\n',stp,1000*stp/g.srate);
-fprintf('Results are oversampled %d times; the %d frequencies\n',g.padratio,length(dispf));
-fprintf('  displayed are from %2.1f Hz to %3.1f Hz.\n',freqs(dispf(1)),freqs(dispf(end)));
+myprintf(g.verbose,'  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
+myprintf(g.verbose,'Each trial contains samples from %d ms before to\n',g.tlimits(1));
+myprintf(g.verbose,'  %d ms after the timelocking event.\n',g.tlimits(2));
+myprintf(g.verbose,'The window size used is %d samples (%g ms) wide.\n',g.winsize,2*wintime);
+myprintf(g.verbose,'The window is applied %d times at an average step\n',g.timesout);
+myprintf(g.verbose,'  size of %g samples (%gms).\n',stp,1000*stp/g.srate);
+myprintf(g.verbose,'Results are oversampled %d times; the %d frequencies\n',g.padratio,length(dispf));
+myprintf(g.verbose,'  displayed are from %2.1f Hz to %3.1f Hz.\n',freqs(dispf(1)),freqs(dispf(end)));
 if ~isnan(g.alpha)
-  fprintf('Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
-  fprintf('  non-significant values will be plotted in green\n');
+  myprintf(g.verbose,'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
+  myprintf(g.verbose,'  non-significant values will be plotted in green\n');
 end
 
 trials = length(X)/g.frame;
 baselength = length(baseln);
-fprintf('\nOf %d trials total, processing trial:',trials);
+myprintf(g.verbose,'\nOf %d trials total, processing trial:',trials);
 
 % detrend over epochs (trials) if requested
 % -----------------------------------------
@@ -776,12 +785,12 @@ end;
 
 for i=1:trials
     if (rem(i,100)==0)
-        fprintf('\n');
+        myprintf(g.verbose,'\n');
     end
 	if (rem(i,10) == 0)
-		fprintf('%d',i);
+		myprintf(g.verbose,'%d',i);
 	elseif (rem(i,2) == 0)
-		fprintf('.');
+		myprintf(g.verbose,'.');
 	end
 
     ERP = blockave(X,g.frame); % compute the ERP trial average
@@ -910,7 +919,7 @@ switch g.phsamp
 end
 
 if min(Rn) < 1
-  fprintf('timef(): No valid timef estimates for windows %s of %d.\n',...
+  myprintf(g.verbose,'timef(): No valid timef estimates for windows %s of %d.\n',...
                          int2str(find(Rn==0)),length(Rn));
   Rn(find(Rn<1))==1;
   return
@@ -918,10 +927,10 @@ end
 P = P ./ (ones(size(P,1),1) * Rn);
 
 if isnan(g.powbase)
-  fprintf('\nComputing the mean baseline spectrum\n');
+  myprintf(g.verbose,'\nComputing the mean baseline spectrum\n');
   mbase = mean(P(:,baseln),2)';
 else
-  fprintf('Using the input baseline spectrum\n');
+  myprintf(g.verbose,'Using the input baseline spectrum\n');
   mbase = g.powbase;
 end
 if ~isnan( g.baseline ) & ~isnan( mbase )
@@ -957,7 +966,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
            Rboot = g.rboot;
       end
     else
-      fprintf('No valid bootstrap trials...!\n');
+      myprintf(g.verbose,'No valid bootstrap trials...!\n');
     end
 end
 
@@ -975,7 +984,7 @@ switch lower(g.plotitc)
 end;    
 
 if g.plot
-    fprintf('\nNow plotting...\n');
+    myprintf(g.verbose,'\nNow plotting...\n');
     set(gcf,'DefaultAxesFontSize',AXES_FONT)
     colormap(jet(256));
     pos = get(gca,'position');
@@ -1199,3 +1208,8 @@ else
    w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
    w = [w; w(end-1:-1:1)];
 end
+
+function myprintf(verbose, varargin)
+    if strcmpi(verbose, 'on')
+        fprintf(varargin{:});
+    end;
