@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2004/08/25 18:21:34  arno
+% debug last change
+%
 % Revision 1.132  2004/08/25 17:58:52  arno
 % check numeric format of events
 %
@@ -1079,31 +1082,44 @@ if ~isempty( varargin)
               % I PUT IT BACK, BUT IT DOES NOT ERASE NON-EMPTY VALUES
                difffield = setdiff( fieldnames(EEG.event), { 'latency' 'epoch' 'type' });
                for index = 1:length(difffield)
-                     eval(['allvalues = { EEG.event.' difffield{index} ' };']);
+                   eval(['allvalues = { EEG.event.' difffield{index} ' };']);
                    try,   eval(['valempt = cellfun(''isempty'', allvalues);']);
-                  catch, valempt = mycellfun('isempty', allvalues);
-                  end;
-                    arraytmpinfo = cell(1,EEG.trials);
- 
-                   % get the field content
-                   % ---------------------
-                   for indexevent = 1:length(EEG.event)
-                       if ~valempt(indexevent)
-                           arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
+                   catch, valempt = mycellfun('isempty', allvalues);
+                   end;
+                   arraytmpinfo = cell(1,EEG.trials);
+                   
+                   % spetial case of duration
+                   % ------------------------
+                   if strcmp( difffield{index}, 'duration')
+                       if any(valempt)
+                           fprintf(['eeg_checkset: found empty values for field ''' difffield{index} ...
+                                    ''' (filling with 0)\n']);
+                       end;
+                       for indexevent = find(valempt)
+                           EEG.event(indexevent).duration = 0;
+                       end;
+                   else
+                   
+                       % get the field content
+                       % ---------------------
+                       for indexevent = 1:length(EEG.event)
+                           if ~valempt(indexevent)
+                               arraytmpinfo{allepochs(indexevent)} = allvalues{indexevent};
+                           end;
+                       end;
+                       % uniformize content for all epochs
+                       % ---------------------------------
+                       for indexevent = 1:length(EEG.event)
+                           if valempt(indexevent)
+                               EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, ...
+                                                                arraytmpinfo{allepochs(indexevent)});
+                           end;
+                       end;
+                       if any(valempt)
+                           fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
+                           fprintf(['              filling with values of other events in the same epochs\n']);
                        end;
                    end;
-                   % uniformize content for all epochs
-                   % ---------------------------------
-                   for indexevent = 1:length(EEG.event)
-                      if valempt(indexevent)
-                          EEG.event = setfield( EEG.event, { indexevent }, difffield{index}, ...
-                                                           arraytmpinfo{allepochs(indexevent)});
-                      end;
-                   end;
-                  if any(valempt)
-                      fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
-                      fprintf(['eeg_checkset: filling with values of other events in the same epochs\n']);
-                  end;
                end;
           end;
           
