@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/04/05 16:14:16  arno
+% allowing one element value
+%
 % Revision 1.27  2002/10/29 17:14:14  arno
 % typo
 %
@@ -341,6 +344,9 @@ for curfield = tmpfields'
                 end;    
                 EEG.event = rmfield(EEG.event, oldname);
             end;
+            if isfield(EEG, 'urevent')
+                disp('Warning: field name not renamed in urevent structure');
+            end;
        otherwise, % user defined field command
                   % --------------------------
             infofield = findstr(curfield{1}, 'info');
@@ -364,19 +370,23 @@ for curfield = tmpfields'
                      else
 	                    EEG.event = rmfield(EEG.event, curfield{1}); 
 	                    allfields(indexmatch) = [];
+                        if isfield(EEG, 'urevent')
+                            fprintf('Warning: field ''%s'' not deleted from urevent structure\n', curfield{1}  );
+                        end;
 						try,
 							EEG.eventdescription(indexmatch) = [];
 						catch, end;
 	                 end;    
 	            else % interpret
-		            switch g.delold 
+		            switch g.delold % delete old events
 		                case 'yes'
 		                      EEG.event = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      allfields = { curfield{1} };
                               EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
                               EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
+                              EEG = eeg_checkset(EEG, 'makeur');
 		                 case 'no' % match existing fields
-		                            % ---------------------
+		                           % ---------------------
 		                      tmparray = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      if isempty(g.indices) g.indices = [1:size(tmparray(:),1)] + length(EEG.event); end;
 		                      
@@ -389,9 +399,23 @@ for curfield = tmpfields'
                               catch,
                                   error('Wrong size for input array');
                               end;
-							  if strcmp(curfield{1}, 'latency')
+  							  if strcmp(curfield{1}, 'latency')
 								  EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
 							  end;
+ 							  if strcmp(curfield{1}, 'duration')
+                                  for indtmp = 1:length(EEG.event)
+                                      EEG.event(indtmp) = EEG.event(indtmp).duration/EEG.srate;
+                                  end;
+							  end;
+                              if isfield(EEG, 'urevent')
+                                  disp('pop-editeventfield: updating urevent structure');
+                                  for indtmp = g.indices(:)'
+                                      tmpval      = getfield (EEG.event, curfield{1}, indtmp);
+                                      EEG.urevent = setfield (EEG.urevent, curfield{1}, EEG.event(indtmp).urevent, tmpval);
+                                  catch,
+                                      error('Warning: problem while updating event structure');
+                                  end;
+                              end;
 		             end;
 	            end;
 	        end;    
