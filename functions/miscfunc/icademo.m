@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/12/14 15:32:33  arno
+% fixing envtopo
+%
 % Revision 1.12  2004/04/28 06:03:13  scott
 % restoring full function
 %
@@ -232,7 +235,7 @@ fprintf('Try using the on-screen and menu control elements...\n')
 %  >> eegplot(data,srate,spacing,eloc_file,windowlength,title)
 
      %eegplotold(data,srate,0,chan_locs,1,'Two data epochs using eegplot()')
-     eegplot(data,'srate',srate, 'spacing', 0,'eloc_file',chan_locs, ...
+     eegplot(data,'srate',srate, 'spacing', 0,'eloc_file',readlocs(chan_locs), ...
 				'winlength',1,'title','Two data epochs using eegplot()')
      %set(gcf,'Position',pos+2*off); % #3 - eegplot() makes its own figure
 
