@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2002/10/08 23:54:34  arno
+% 'key', 'val' sequence, new args, new header
+%
 % Revision 1.52  2002/10/07 18:51:11  arno
 % all data -> 3D, significance, RMS, subject RMS, ...
 %
@@ -246,41 +249,17 @@ tfdataori = mean(tfdata,4); % for topoplot
 
 % test inputs
 % -----------
-if nargin <= 3 | isstr(varargin{1})
-	% 'key' 'val' sequence
-	fieldlist = { 'timefreqs'     'real'     []                        [] ;
-				  'chanlocs'      { 'string' 'struct' }       []       '' ;
-				  'showchan'      'integer'  [0 nchans]                0 ;
-				  'limits'        'real'     []                        [nan nan nan nan nan nan];
-				  'signifs'       'real'     []                        [];
-				  'sigthresh'     'integer'  [1 Inf]                   [1 1];
-				  'selchans'      'integer'  [1 nchans]                [1:nchans] };
-	
-	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
-	if isstr(g), error(g); end;
-else
-	if nargin > 3,    g.freq = varargin{1};
-	else              g.freq = [];
-	end;
-	if nargin > 4,	  g.chanlocs = varargin{2};
-	else              g.chanlocs = [];
-	end;
-	if nargin > 5,    g.limits = varargin{3};
-	else              g.limits = [nan nan nan nan nan nan];
-	end;
-	if nargin > 6,    g.title = varargin{4};
-	else              g.title = '';
-	end;
-	if nargin > 7,    g.freqfac = varargin{5};
-	else              g.freqfac = FREQFAC;
-	end;
-	if nargin > 8,    g.percent = varargin{6};
-	else              g.percent = 100;
-	end;
-	if nargin > 10,    g.reref = 'averef';
-	else               g.reref = 'no';
-	end;
-end;
+% 'key' 'val' sequence
+fieldlist = { 'timefreqs'     'real'     []                        [] ;
+              'chanlocs'      { 'string' 'struct' }       []       '' ;
+              'showchan'      'integer'  [0 nchans]                0 ;
+              'limits'        'real'     []                        [nan nan nan nan nan nan];
+              'signifs'       'real'     []                        [];
+              'sigthresh'     'integer'  [1 Inf]                   [1 1];
+              'selchans'      'integer'  [1 nchans]                [1:nchans] };
+
+[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
+if isstr(g), error(g); end;
 
 % setting more defaults
 % ---------------------
