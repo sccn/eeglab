@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2002/10/23 16:52:23  arno
+% testing
+%
 % Revision 1.5  2002/08/27 00:35:39  arno
 % closing current figure
 %
@@ -156,8 +159,7 @@ if isstr(values)
     else
        loctype = 'spherical';
     end
-    spline_file = p1
-    return
+    spline_file = p1;
     if nargin >= 4
       comment = v1;
     end
@@ -333,12 +335,18 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Save spline file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    spline_file
     fprintf(['Saving (587k) file ',spline_file])
     if nargin == 3
-      eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames'])
+        save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames');
     else
-      eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames comment'])
-    end
+        save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');
+    end;
+    
+    %  eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames'])
+    %else
+    %  eval(['save ',spline_file,' Xe Ye Ze G gx newElect ElectrodeNames comment'])
+    %end
     fprintf('\n')
     eval(['! ls -l ',spline_file]);
     fprintf('\n')
