@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/21 19:46:15  arno
+% reprogrammed with optional arguments and gui
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -89,7 +92,7 @@ if exist('y') ~= 1
 		y = x(:,2);
 		x = x(:,1);
 	else
-		error('Unsufficient data in first argument');
+		error('Insufficient data in first argument');
 	end
 end;
 
@@ -112,7 +115,7 @@ if strcmp(g.gui, 'on')
 			   { 'Style', 'edit', 'string', '0' } { } ...
 			   { 'Style', 'text', 'string', 'Optim (set=recursive center optimization)', 'fontweight', 'bold'   } ...
 			   { 'Style', 'checkbox', 'value', 0  } { } };
-    results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel location -- cart2topo()' );
+    results = inputgui( geometry, uilist, 'pophelp(''cart2topo'');', 'Convert channel locations -- cart2topo()' );
 	if isempty(results), return; end;
 	g.center  = eval( [ '[' results{1} ']' ] );
 	g.squeeze = eval( [ '[' results{2} ']' ] );
@@ -138,7 +141,7 @@ options = [];
 if isempty(g.center)
 	% Find center
 	% ----------------------------------------------
-	fprintf('Optimising center position...\n');
+	fprintf('Optimizing center position...\n');
 	g.center = fminsearch('spherror',[0 0 0],options,x,y,z);
 	fprintf('Best center is [%g,%g,%g].\n',g.center(1),g.center(2),g.center(3));
 end
@@ -160,7 +163,7 @@ if  wobble/mean(radius) > 0.01 & g.optim==1
     newobble = std(nradius);   
     if newobble<wobble
       center=newcenter;
-      fprintf('Wobble too high (%3.2g%%)! Re-centering data on (%g,%g,%g)\n',...
+      fprintf('Wobble too strong (%3.2g%%)! Re-centering data on (%g,%g,%g)\n',...
                 100*wobble/mean(radius),newcenter(1),newcenter(2),newcenter(3))
       x = nx;  % re-center the data
       y = ny;
@@ -197,7 +200,7 @@ end
 r = r/pi;        % scale r to max 0.500
 if g.squeeze < 0
     g.squeeze = 1 - 0.5/max(r); %(2*max(r)-1)/(2*rmax);
-    fprintf('Electrodes will be squeezed to show all using squeezing act of %2.3g\n', g.squeeze);
+    fprintf('Electrodes will be squeezed together by %2.3g to show all\n', g.squeeze);
 end;
 r = r-g.squeeze*r; % squeeze electrodes in squeeze*100% to have all inside
 
