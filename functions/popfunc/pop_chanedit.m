@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2002/06/25 14:27:40  arno
+% typo and 3d plot check
+%
 % Revision 1.15  2002/05/21 20:44:31  scott
 % removed ; from evalin() calls -sm
 %
@@ -229,9 +232,13 @@ if nargin < 2
 					{ } ...
 					{ 'Style', 'pushbutton', 'string', 'Plot 2D', 'callback', plot2dcom },... 
 					{ 'Style', 'text', 'string', '2D shink factor (-1 to 1)'} ...
-					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), 'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string'');' } ...
-					{ 'Style', 'checkbox', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), 'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; end;' } ...
-					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', 'if ~isempty(chantmp(1).X), plotchans3d([cell2mat({chantmp.X})'' cell2mat({chantmp.Y})'' cell2mat({chantmp.Z})''], {chantmp.labels}); else disp(''cannot plot: no XYZ coordinates''); end;' } ...
+					{ 'Style', 'edit', 'string', fastif(isnumeric(shrinkfact), num2str(shrinkfact), ''), ...
+					  'tag', 'shrinkfactor', 'callback', 'tmpshrink=get(gcbo, ''string''); set(findobj(''tag'', ''shrinkbut''), ''value'', 0);' } ...
+					{ 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', 'Auto shrink', 'value', strcmp(shrinkfact, 'force'), ...
+					  'callback', 'if get(gcbo, ''value''), tmpshrink=''force''; set(findobj(''tag'', ''shrinkfactor''), ''string'', ''''); end;' } ...
+					{ 'Style', 'pushbutton', 'string', 'Plot 3D (XYZ)', 'callback', [ 'if ~isempty(chantmp(1).X),' ...
+					 'plotchans3d([cell2mat({chantmp.X})'' cell2mat({chantmp.Y})'' cell2mat({chantmp.Z})''],' ...
+					'{chantmp.labels}); else disp(''cannot plot: no XYZ coordinates''); end;'] } ...
 					{}, { 'Style', 'pushbutton', 'string', 'Load', 'callback', ...
 						  ['[tmpf tmpp] = uigetfile(''*'', ''Load a channel location file'');' ...
 						   'comtmp = {''load'' [tmpp tmpf] };' endgui ] }, ...
@@ -284,21 +291,30 @@ if nargin < 2
 			guimodif = 1;
 		end;
 	end;
+	
+	% not in the loop, returning
+	% --------------------------
 	if ~isempty(findobj('parent', gcf, 'tag','shrinkfactor'))
 		if evalin('base', 'exist(''tmpshrink'')') == 1
 			tmpshrink = evalin('base', 'tmpshrink');
 			evalin('base', 'clear tmpshrink');
-			if ~strcmp(tmpshrink, 'off'), 
+			if ~strcmp(tmpshrink, 'off') & ~strcmp(num2str(tmpshrink), num2str(shrinkfact))
 				if ~isempty(str2num(tmpshrink))  chans(1).shrink = str2num(tmpshrink);
 				else                             chans(1).shrink = tmpshrink;
 				end;
-			end;
+				totaluserdat{end+1} = 'shrink';
+				totaluserdat{end+1} = chans(1).shrink;			
+			end; 
 		end;
 		close(gcf);
 		if ~isempty( totaluserdat )
-			com = sprintf('%s=pop_chanedit(%s, %s);', vararg2str(totaluserdat));
+			if isempty(inputname(1)), varname = 'EEG.chanlocs';
+			else varname = inputname(1);
+			end;
+			com = sprintf('%s=pop_chanedit(%s, %s);', varname, varname, vararg2str(totaluserdat));
 		end;
 	end;
+	evalin('base', 'clear global tmpchan; clear tmpchan;');
 else 
 	 args = varargin;
 	 % no interactive inputs
@@ -502,8 +518,10 @@ function [chans, shrinkfact]= checkchans(chans);
 		 case 'sph_theta',    pos=13;
 		 case 'sph_phi',      pos=15;
 		 case 'sph_radius',   pos=17;
-		 otherwise, error(['Unrecognized field''' allfields{index} ''' in input structure']);
+		 otherwise, disp(['Unrecognized field''' allfields{index} ''' in channel structure, removing it']); pos = -1;
 		end;
-		newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
+		if pos ~= -1
+			newstruct{pos+1} = eval(['{ chans.' allfields{index} '}']);
+		end;
 	end;
 	chans = struct(newstruct{:});
