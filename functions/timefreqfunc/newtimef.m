@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2005/04/07 01:57:57  arno
+% defining mbase
+%
 % Revision 1.70  2005/04/07 01:51:54  arno
 % allowing to set powbase
 %
@@ -1417,43 +1420,45 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 
       h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
                                                                % to left of ERSP image
-      if ~strcmpi(g.freqscale, 'log')
-          plot(freqs,E,'LineWidth',g.linewidth); hold on;
-          if ~isnan(g.alpha)
-              plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
-              plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
-          end
-          if freqs(1) ~= freqs(end)
-              axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+      if ~isnan(E)
+          if ~strcmpi(g.freqscale, 'log')
+              plot(freqs,E,'LineWidth',g.linewidth); hold on;
+              if ~isnan(g.alpha)
+                  plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
+                  plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
+              end
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+              else
+                  ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
+              end;
           else
-              ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
+              semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
+              if ~isnan(g.alpha)
+                  semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
+                  semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
+              end
+              if freqs(1) ~= freqs(end)
+                  axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
+              else
+                  ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
+              end;
+              set(h(5),'View',[90 90])
+              divs = linspace(log(freqs(1)), log(freqs(end)), 10);
+              set(gca, 'xtickmode', 'manual');
+              divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+                                                           % out-of border label with within border ticks
+              set(gca, 'xtick', divs);
           end;
-      else
-          semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
-          if ~isnan(g.alpha)
-              semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
-              semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
-          end
-          if freqs(1) ~= freqs(end)
-              axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
-          else
-              ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
-          end;
+          set(h(5),'TickLength',[0.020 0.025]);          
           set(h(5),'View',[90 90])
-          divs = linspace(log(freqs(1)), log(freqs(end)), 10);
-          set(gca, 'xtickmode', 'manual');
-          divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
-                                                       % out-of border label with within border ticks
-          set(gca, 'xtick', divs);
+          tick = get(h(5),'YTick');
+          if (length(tick)>2)
+              set(h(5),'YTick',[tick(1) ; tick(end-1)])
+          end
+          xlabel('Frequency (Hz)')
+          ylabel('dB')
       end;
-      set(h(5),'TickLength',[0.020 0.025]);          
-      set(h(5),'View',[90 90])
-      tick = get(h(5),'YTick');
-      if (length(tick)>2)
-          set(h(5),'YTick',[tick(1) ; tick(end-1)])
-      end
-      xlabel('Frequency (Hz)')
-      ylabel('dB')
     end;
 
     switch lower(g.plotitc)
