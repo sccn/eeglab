@@ -33,6 +33,7 @@
 %               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
 %               superior-inferior). Use 'coregist' to coregister electrodes
 %               with the MRI. {default: 'mri'} 
+%  'verbose' - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Plotting options:
 %  'color'    - [cell array of color strings or (1,3) color arrays]. For
@@ -148,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.124  2005/04/01 22:12:14  arno
+%3-D sphere projection
+%
 %Revision 1.123  2005/04/01 20:02:07  arno
 %sagital -> sagittal
 %
@@ -528,6 +532,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
                                  'summary'   'string'   { 'on' 'off' }     'off';
+                                 'verbose'   'string'   { 'on' 'off' }     'on';
                                  'view'      'real'     []                 [0 0 1];
                                  'rvrange'   'real'     [0 Inf]             [];
                                  'normlen'   'string'   { 'on' 'off' }     'off';
@@ -564,17 +569,23 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmpi(g.coordformat, 'auto')
         if ~isempty(g.meshdata)
             g.coordformat = 'MNI';
-            disp('Coordinate format unknown: using ''MNI'' since mesh data was provided as input');
+            if strcmpi(g.verbose, 'on'), 
+                disp('Coordinate format unknown: using ''MNI'' since mesh data was provided as input');
+            end
         else
             maxdiplen = 0;
             for ind = 1:length(sourcesori)
                 maxdiplen = max(maxdiplen, max(sourcesori(ind).momxyz(:)));
             end;
             if maxdiplen>2000
-                disp('Coordinate format unknown: using ''MNI'' because of large dipole moments');
+                if strcmpi(g.verbose, 'on'),
+                    disp('Coordinate format unknown: using ''MNI'' because of large dipole moments');
+                end
             else
                 g.coordformat = 'spherical';
-                disp('Coordinate format unknown: using ''spherical'' since no mesh data was provided as input');
+                if strcmpi(g.verbose, 'on'),
+                    disp('Coordinate format unknown: using ''spherical'' since no mesh data was provided as input');
+                end
             end;
         end;
     end;
@@ -589,7 +600,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % look up an MRI file if necessary
     % --------------------------------
     if isempty(g.mri)
-        disp('No MRI file given as input. Looking up one.');
+        if strcmpi(g.verbose, 'on'),
+            disp('No MRI file given as input. Looking up one.');
+        end
         folder = which('pop_dipfit_settings');
         folder = folder(1:end-21);
         delim  = folder(end);
@@ -665,7 +678,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         sources = computexyzforbesa(sources);
     end;        
     if ~isfield(sources, 'component')
-        disp('No component indices, making incremental ones...');
+        if strcmpi(g.verbose, 'on'),
+            disp('No component indices, making incremental ones...');
+        end        
         for index = 1:length(sources)
             sources(index).component = index;
         end;
@@ -887,7 +902,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
 
             elseif g.dipolelength>0 % plot dipole direction cylinders with end cap patch
-              disp('Cannot plot bar with sphere');
+                if strcmpi(g.verbose, 'on'),
+                    disp('Cannot plot bar with sphere');
+                end
               %thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
               %for k=1:length(xx)
               %  [cx cy cz] = cylinder([1 1 1],SPHEREGRAIN);
@@ -938,7 +955,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             hold on;
             if strcmpi(g.spheres,'on') % plot spheres
                 if strcmpi(g.projimg, 'on')
-                    disp('Warning: projections cannot be plotted for 3-D sphere');
+                    if strcmpi(g.verbose, 'on'),
+                        disp('Warning: projections cannot be plotted for 3-D sphere');
+                    end
                     %tmpcolor = g.color{index} / 2;
                     %h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index}, 'proj', ...
                     %               [dat.imgcoords{1}(1) dat.imgcoords{2}(end) dat.imgcoords{3}(1)]*97/100, 'projcol', tmpcolor);
