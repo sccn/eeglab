@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2005/04/07 01:51:54  arno
+% allowing to set powbase
+%
 % Revision 1.69  2005/03/07 21:25:47  arno
 % chaninfo
 %
@@ -984,6 +987,8 @@ if iscell(X)
 			Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
         end;
         myprintf(g.verbose, '\nSubtracting common baseline\n');
+    else
+        mbase = NaN;
     end;
 
     % plotting
