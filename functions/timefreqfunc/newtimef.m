@@ -186,6 +186,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2005/03/07 21:25:47  arno
+% chaninfo
+%
 % Revision 1.68  2005/01/28 00:52:01  arno
 % same
 %
@@ -967,7 +970,8 @@ if iscell(X)
     
     % recompute baselines for power
     % -----------------------------
-    if ~isnan( g.baseline(1) ) & ~isnan( mbase1 )
+    if ~isnan( g.baseline(1) ) & ~isnan( mbase1 ) & isnan(g.powbase)
+        disp('Recomputing baseline power by using the mean from both conditions');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
