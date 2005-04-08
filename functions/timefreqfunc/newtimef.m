@@ -123,17 +123,21 @@
 %       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
 %                     display significant time regions either in the plot background
 %                     or underneatht the curve.
-%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
-%       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
+%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations              {'on'} 
+%       'plotitc'   = ['on'|'off'] Plot inter trial coherence                     {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
-%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude {'off'}
-%       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
-%       'itcmax'    = [real] set the ITC maximum for the scale       { auto }
-%       'title'     = Optional figure title                              {none}
-%       'marktimes' = Non-0 times to mark with a dotted vertical line (ms) {none}
-%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1) {2}
-%       'axesfont'  = Axes text font size                                {10}
-%       'titlefont' = Title text font size                               {8}
+%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude         {'off'}
+%       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) { auto }
+%       'itcmax'    = [real] set the ITC image maximum for the color scale        { auto }
+%       'erplim'    = [min max] ERP limits for ITC (below ITC image)              { auto }
+%       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC)    { auto }
+%       'speclim'   = [min max] average spectrum limits (left of ERSP image)      { auto }
+%       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) { auto }
+%       'title'     = Optional figure title                                       { none }
+%       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)        { none }
+%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)         {2}
+%       'axesfont'  = Axes text font size                                         {10}
+%       'titlefont' = Title text font size                                        {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms.
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
@@ -186,6 +190,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2005/04/07 02:02:22  arno
+% plotting mbase
+% ,
+%
 % Revision 1.71  2005/04/07 01:57:57  arno
 % defining mbase
 %
@@ -720,8 +728,11 @@ try, g.verbose;    catch, g.verbose = 'on'; end;
 try, g.plottype;   catch, g.plottype = 'image'; end;
 try, g.plotmean;   catch, g.plotmean = 'on'; end;
 try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
-try, g.chaninfo;   catch, g.chaninfo = []; end;
-
+try, g.chaninfo;        catch, g.chaninfo    = []; end; 
+try, g.erspmarglim;     catch, g.erspmarglim = []; end;
+try, g.itcavglim;       catch, g.itcavglim   = []; end;
+try, g.erplim;          catch, g.erplim      = []; end;
+try, g.speclim;         catch, g.speclim     = []; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -908,6 +919,17 @@ if g.tlimits(2)-g.tlimits(1) < 30
     disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.'); 
 end;
 
+% checking keywords
+% -----------------
+allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condboot' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'topovec' 'elocs' 'alpha' 'marktimes' 'powbase' 'pboot' 'rboot' 'plotersp' 'plotitc' 'detrend' 'rmerp' 'baseline' 'baseboot' 'linewidth' 'naccu' 'mtaper' 'maxfreq' 'freqs' ...
+              'nfreqs' 'freqscale' 'vert' 'newfig' 'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' 'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' 'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' 'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' 'ITC_CAXIS_LIMIT' };
+tmpfields = fieldnames(g);
+for index = 1:length(tmpfields)
+    if isempty(strmatch(tmpfields{index}, allfields))
+        error([ 'Unknown keyword ''' tmpfields{index} '''']);
+    end;
+end;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1010,7 +1032,8 @@ if iscell(X)
         end;
             
         subplot(1,3,1); g.title = g.titleall{1}; 
-        plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
+        g = plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
+        g.itcavglim = [];
         subplot(1,3,2); g.title = g.titleall{2}; 
         plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, timesout, mbase, g);
         subplot(1,3,3); g.title = g.titleall{3};
@@ -1293,7 +1316,7 @@ return;
 % -----------------
 % plotting function
 % -----------------
-function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
+function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
     %
     % compute ERP
     %
@@ -1356,23 +1379,25 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           end;
       end
 
-      if ~isempty(g.erspmax)
-          ersp_caxis = [-g.erspmax g.erspmax];
-      elseif g.ERSP_CAXIS_LIMIT == 0
-          ersp_caxis = [-1 1]*1.1*max(max(abs(P(:,:))));
-      else
-          ersp_caxis = g.ERSP_CAXIS_LIMIT*[-1 1];
-      end
+      if isempty(g.erspmax)
+          if g.ERSP_CAXIS_LIMIT == 0
+              g.erspmax = [-1 1]*1.1*max(max(abs(P(:,:))));
+          else
+              g.erspmax = g.ERSP_CAXIS_LIMIT*[-1 1];
+          end
+      elseif length(g.erspmax) == 1
+          g.erspmax = [ -g.erspmax g.erspmax];
+      end;
 
       if ~strcmpi(g.freqscale, 'log')
           if ~isnan( g.baseline ) 
-              imagesc(times,freqs,PP(:,:),ersp_caxis); 
+              imagesc(times,freqs,PP(:,:),g.erspmax); 
           else
               imagesc(times,freqs,PP(:,:));
           end;
       else 
           if ~isnan( g.baseline ) 
-              imagesclogy(times,freqs,PP(:,:),ersp_caxis); 
+              imagesclogy(times,freqs,PP(:,:),g.erspmax); 
           else
               imagesclogy(times,freqs,PP(:,:));
           end;
@@ -1400,14 +1425,22 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       set(h(3),'Position',[.95 ordinate1 .05 height].*s+q)
       title('ERSP (dB)')
 
+      %
+      %%%%% plot marginal ERSP mean below ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %
+
+      h(4) = subplot('Position',[.1 ordinate1-0.1 .8 .1].*s+q);
+      
       E = [min(P(:,:),[],1);max(P(:,:),[],1)];
-      h(4) = subplot('Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal ERSP means
-                                                                % below the ERSP image
-      plot(times,E,[0 0],...
-           [min(E(1,:))-max(max(abs(E)))/3 max(E(2,:))+max(max(abs(E)))/3], ...
-           '--m','LineWidth',g.linewidth)
-      axis([min(times) max(times) ...
-            min(E(1,:))-max(max(abs(E)))/3 max(E(2,:))+max(max(abs(E)))/3])
+
+      % plotting limits
+      if isempty(g.erspmarglim)
+          g.erspmarglim = [min(E(1,:))-max(max(abs(E)))/3 max(E(2,:))+max(max(abs(E)))/3];
+      end;
+      
+      plot(times,E,[0 0],g.erspmarglim, '--m','LineWidth',g.linewidth)
+      xlim([min(times) max(times)])
+      ylim(g.erspmarglim)
       
       tick = get(h(4),'YTick');
       set(h(4),'YTick',[tick(1) ; tick(end)])
@@ -1416,33 +1449,38 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       xlabel('Time (ms)')
       ylabel('dB')
 
+      %
+      %%%%% plot mean spectrum to left of ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %
+
+      h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q);
+      
       E = mbase;
 
-      h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
-                                                               % to left of ERSP image
       if ~isnan(E)
+          
+          % ploting limits
+          if isempty(g.speclim)
+              g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+          end;
+          
+          % plot curves
           if ~strcmpi(g.freqscale, 'log')
               plot(freqs,E,'LineWidth',g.linewidth); hold on;
               if ~isnan(g.alpha)
                   plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
                   plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
               end
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
-              else
-                  ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
-              end;
+              if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
+              ylim(g.speclim)
           else
               semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
               if ~isnan(g.alpha)
                   semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
                   semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
               end
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(abs(E))/3 max(E)+max(abs(E))/3])
-              else
-                  ylim([min(E)-max(abs(E))/3 max(E)+max(abs(E))/3]);
-              end;
+              if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
+              ylim(g.speclim)
               set(h(5),'View',[90 90])
               divs = linspace(log(freqs(1)), log(freqs(end)), 10);
               set(gca, 'xtickmode', 'manual');
@@ -1499,7 +1537,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
         else 
               imagesclogy(times,freqs,RR(:,:)); % <---
         end;
-        g.itcmax = 180;
+        g.itcmax = [-180 180];
         setylim = 0;
       else          
         if ~strcmpi(g.freqscale, 'log')
@@ -1517,11 +1555,13 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
         end;
       end;
 
-      if ~isempty(g.itcmax)
-          caxis([-g.itcmax g.itcmax]);
+      if isempty(g.itcmax)
+          g.itcmax = caxis;
+      elseif length(g.itcmax) == 1
+          g.itcmax = [ -g.itcmax g.itcmax ];
       end;
-      tmpcaxis = caxis;
-
+      caxis(g.itcmax);
+      
       hold on
       plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth);
       if ~isnan(g.marktimes)
@@ -1544,7 +1584,7 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       set(h(7),'Position',[.1 ordinate2 .8 height].*s+q)
       set(h(8),'Position',[.95 ordinate2 .05 height].*s+q)
 	  if setylim
-		  set(h(8),'YLim',[0 tmpcaxis(2)]); 
+		  set(h(8),'YLim',[0 g.itcmax(2)]); 
       end;
       if strcmpi(g.plotphase, 'on')
 	    title('ITC phase')
@@ -1556,17 +1596,19 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%% plot the ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %
 
-      ERPmax = max(ERP);
-      ERPmin = min(ERP);
-      ERPmax = ERPmax + 0.1*(ERPmax-ERPmin);
-      ERPmin = ERPmin - 0.1*(ERPmax-ERPmin);
       h(10) = subplot('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
 
-      plot(ERPtimes,ERP,...
-           [0 0],[ERPmin ERPmin],'--m','LineWidth',g.linewidth);
+      if isempty(g.erplim)
+          ERPmax = max(ERP);
+          ERPmin = min(ERP);
+          g.erplim = [ ERPmin - 0.1*(ERPmax-ERPmin) ERPmax + 0.1*(ERPmax-ERPmin) ];
+      end;
+
+      plot(ERPtimes,ERP, [0 0],g.erplim,'--m','LineWidth',g.linewidth);
       hold on;
       plot([times(1) times(length(times))],[0 0], 'k');
-      axis([min(ERPtimes) max(ERPtimes) ERPmin ERPmax]);
+      xlim([min(ERPtimes) max(ERPtimes)]);
+      ylim(g.erplim)
 
       tick = get(h(10),'YTick');
       set(h(10),'YTick',[tick(1) ; tick(end)])
@@ -1577,42 +1619,39 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 
       E = mean(R(:,:)');
       
+      %
+      %%%%% plot the marginal mean ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %
+
       h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                                 % ITC left of the ITC image
+      
+      % set plotting limits
+      if isempty(g.itcavglim)
+          if ~isnan(g.alpha)
+              g.itcavglim = [ min(E)-max(E)/3 max(Rboot)+max(Rboot)/3];
+          else
+              g.itcavglim = [ min(E)-max(E)/3 max(E)+max(E)/3];
+          end;
+      end;
+      
+      % plot marginal ITC
       if ~strcmpi(g.freqscale, 'log')
           plot(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
               plot(freqs,Rboot,'g', 'LineWidth',g.linewidth)
               plot(freqs,Rboot,'k:','LineWidth',g.linewidth)
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
-              else
-                  ylim([min(E)-max(E)/3 max(Rboot)+max(Rboot)/3]);
-              end;
-          else
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
-              else
-                  ylim([ min(E)-max(E)/3 max(E)+max(E)/3]);
-              end;
           end
+          if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
+          ylim(g.itcavglim)
       else
           semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
           if ~isnan(g.alpha)
               semilogx(freqs,Rboot(:),'g', 'LineWidth',g.linewidth)
               semilogx(freqs,Rboot(:),'k:','LineWidth',g.linewidth)
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(Rboot)+max(Rboot)/3])
-              else
-                  ylim([min(E)-max(E)/3 max(Rboot)+max(Rboot)/3]);
-              end;
-          else 
-              if freqs(1) ~= freqs(end)
-                  axis([freqs(1) freqs(end) min(E)-max(E)/3 max(E)+max(E)/3])
-              else
-                  ylim([min(E)-max(E)/3 max(E)+max(E)/3]);
-              end;
           end
+          if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
+          ylim(g.itcavglim)
           divs = linspace(log(freqs(1)), log(freqs(end)), 10);
           set(gca, 'xtickmode', 'manual');
           divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
@@ -1620,14 +1659,16 @@ function plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           set(gca, 'xtick', divs);
       end;
 
+      % plot details
       tick = get(h(11),'YTick');
       if length(tick) > 1
           set(h(11),'YTick',[tick(1) ; tick(length(tick))])
       end;
       set(h(11),'View',[90 90])
-      set(h(11),'TickLength',[0.020 0.025]);
+      %set(h(11),'TickLength',[0.020 0.025]);
       xlabel('Frequency (Hz)')
       ylabel('ERP')
+      
       %
       %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
       %
