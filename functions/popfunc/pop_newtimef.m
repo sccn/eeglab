@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/03/07 21:21:59  arno
+% chaninfo option
+%
 % Revision 1.31  2004/01/22 21:54:28  scott
 % rm same
 %
@@ -63,7 +66,7 @@
 % debug time limit
 %
 % Revision 1.26  2003/04/22 21:33:51  arno
-% run newtimef if at SCCN
+% run newnewtimef if at SCCN
 %
 % Revision 1.25  2003/02/13 00:03:52  arno
 % debugging last
@@ -116,7 +119,7 @@
 % editing coher button legend -sm
 %
 % Revision 1.9  2002/04/23 17:35:50  scott
-% points optional parameter help to timef() help -sm
+% points optional parameter help to newtimef() help -sm
 %
 % Revision 1.8  2002/04/23 17:25:34  arno
 % adding additional help button
@@ -145,7 +148,7 @@
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 add eeglab option & optimize variable sizes -ad
-% 03-10-02 change timef call -ad
+% 03-10-02 change newtimef call -ad
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm
 
@@ -217,7 +220,7 @@ if popup
 	tlimits	 = eval( [ '[' result{2} ']' ] ); 
 	cycles	 = eval( [ '[' result{3} ']' ] );
     if result{4}
-    	options = [',''type'', ''coher''' ];
+    	options = [ ',''type'', ''coher''' ];
     else
 		options = [',''type'', ''phasecoher''' ];
     end;	
@@ -225,11 +228,13 @@ if popup
     % add topoplot
     % ------------
     if ~isempty(EEG.chanlocs)
-      if typeproc == 1
-		  options = [options ', ''topovec'', ' int2str(num) ', ''elocs'', EEG.chanlocs' ];
-      else
-		  options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
-		   '), ''elocs'', EEG.chanlocs' ];
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
+        if typeproc == 1
+            options = [options ', ''topovec'', ' int2str(num) ...
+                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
+        else
+            options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
+                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
       end;
     end;
     
@@ -262,18 +267,7 @@ if popup
 	end;
 	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else 
-		  if isstruct( varargin{ i } )
-		    options = [ options ', EEG.chanlocs' ];
-		  else
-		    options = [ options ', [' num2str(varargin{i}(:)') ']' ];
-		  end;
-		end;
-	end;	
+    options = vararg2str(varargin);
 end;
 
 % compute epoch limits
