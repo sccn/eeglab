@@ -83,8 +83,10 @@
 % Optional Scalp Map:
 %       'topovec'  = (2,nchans) matrix, plot scalp maps to plot {default: []}
 %                    ELSE (c1,c2), plot two cartoons showing channel locations.
-%       'elocs'    = Electrode location file for scalp map  {default: none}
-%                    File should be ascii in format of >> topoplot example   
+%       'elocs'    = Electrode location structure or file for scalp map  
+%                    {default: none}
+%       'chaninfo' = Electrode location additional information (nose position...)
+%                    {default: none}
 %
 % Optional Plot and Compute Features:
 %       'compute'   = ['matlab'|'c'] Use C subroutines to speed up the
@@ -167,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2005/04/04 17:14:08  scott
+% made 'savecoher' option public
+%
 % Revision 1.66  2005/04/01 16:04:21  arno
 % typo
 %
@@ -529,7 +534,7 @@ for index = 1:length(allfields)
 	 case { 'shuffle' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'maxfreq' 'topovec' 'elocs' 'alpha' ...
 		  'marktimes' 'vert' 'powbase' 'rboot' 'plotamp' 'plotphase' 'plotbootsub' 'detrep' 'detret' ...
 		  'baseline' 'baseboot' 'linewidth' 'naccu' 'angleunit' 'cmax' 'type' 'boottype' 'subitc' ...
-		  'memory' 'compute' 'maxamp' 'savecoher' 'noinput' };
+		  'memory' 'compute' 'maxamp' 'savecoher' 'noinput' 'chaninfo' };
 	  case {'plotersp' 'plotitc' }, disp(['crossf warning: timef option ''' allfields{index} ''' ignored']);
 	 otherwise disp(['crossf error: unrecognized option ''' allfields{index} '''']); beep; return;
 	end;
