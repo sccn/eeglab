@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/04/08 01:44:54  arno
+% changing default symetry constraint
+%
 % Revision 1.3  2005/03/11 18:14:09  arno
 % case sensitive problem
 %
@@ -128,7 +131,8 @@ defaultelectrodes = sprintf('1:%d', nchan);
 
 % these settings determine the symmetry constraint that can be toggled on
 % for the second dipole
-defaultconstraint = 'y';      % symmetry along x-axis
+%defaultconstraint = 'y';      % symmetry along x-axis
+% PROBLEM: change with respect to the model used. Now just assume perpendicular to nose
 
 % defaults for GUI pop_dipfit_batch dialogs
 rejectstr    = '40';	% in percent
