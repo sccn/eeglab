@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/03/11 18:14:09  arno
+% case sensitive problem
+%
 % Revision 1.2  2005/03/10 18:55:49  arno
 % add template files
 %
@@ -125,7 +128,7 @@ defaultelectrodes = sprintf('1:%d', nchan);
 
 % these settings determine the symmetry constraint that can be toggled on
 % for the second dipole
-defaultconstraint = 'x';      % symmetry along x-axis
+defaultconstraint = 'y';      % symmetry along x-axis
 
 % defaults for GUI pop_dipfit_batch dialogs
 rejectstr    = '40';	% in percent
