@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/03/07 21:21:50  arno
+% chaninfo option
+%
 % Revision 1.28  2004/11/06 03:18:25  arno
 % plotitc -> plotphase
 %
@@ -58,7 +61,7 @@
 % remove debug msg
 %
 % Revision 1.23  2003/04/22 21:34:58  arno
-% run newcrossf at SCCN
+% run newnewcrossf at SCCN
 %
 % Revision 1.22  2003/02/23 08:25:16  scott
 % header edits -sm
@@ -203,10 +206,13 @@ if popup
     % add topoplot
     % ------------
 	if ~isempty(EEG.chanlocs)
+        if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 		if typeproc == 1
-			options = [options ', ''topovec'', [' int2str([num1 num2]) '], ''elocs'', EEG.chanlocs' ];
+			options = [options ', ''topovec'', [' int2str([num1 num2]) ...
+                       '], ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
 		else % typeproc == 0
-			options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) '])'', ''elocs'', EEG.chanlocs' ];
+			options = [options ', ''topovec'', EEG.icawinv(:, [' int2str([num1 num2]) ...
+                       '])'', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
 		end;
 	end;
     
@@ -241,18 +247,7 @@ if popup
 	end;
     figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; 
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else
-			if ~isnumeric(varargin) | (size(varargin{i},1) > 1 & size(varargin{i},2) > 1)
-				options = [ options ', varargin{' int2str(i) '}' ];
-			else
-				options = [ options ', [' num2str(varargin{i}) ']' ];	
-			end;
-		end;
-	end;	
+	options = vararg2str(varargin);
 end;
 
 % compute epoch limits
@@ -286,7 +281,6 @@ end;
 tmpsig1 = reshape( tmpsig1, 1, size(tmpsig1,2)*size(tmpsig1,3));
 tmpsig2 = reshape( tmpsig2, 1, size(tmpsig2,2)*size(tmpsig2,3));
 
-%
 % outputs
 % -------
 outstr = '';
@@ -302,12 +296,7 @@ if length( options ) < 2
 end;
 varargout{1} = sprintf('figure; pop_newcrossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
-%if is_sccn
-%    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-%else 
-    com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
- 
-%end;
+com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)
 
 return;
