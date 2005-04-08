@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2005/03/30 22:31:17  arno
+% debug for Matlab 5.3
+%
 % Revision 1.121  2005/03/16 02:47:26  arno
 % fixing transform when some channels do not have coordinates
 %
@@ -1137,6 +1140,8 @@ else
            if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
                    ~isempty(findstr(args{ curfield+1 }, '.elc'))
                params.nosedir = '+Y';
+           else
+               params.nosedir = '+X';
            end;
            
         case 'lookupgui'
