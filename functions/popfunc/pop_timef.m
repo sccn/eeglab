@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/03/07 21:21:59  arno
+% chaninfo option
+%
 % Revision 1.31  2004/01/22 21:54:28  scott
 % rm same
 %
@@ -217,7 +220,7 @@ if popup
 	tlimits	 = eval( [ '[' result{2} ']' ] ); 
 	cycles	 = eval( [ '[' result{3} ']' ] );
     if result{4}
-    	options = [',''type'', ''coher''' ];
+    	options = [ ',''type'', ''coher''' ];
     else
 		options = [',''type'', ''phasecoher''' ];
     end;	
@@ -264,18 +267,7 @@ if popup
 	end;
 	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
-	options = [];
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else 
-		  if isstruct( varargin{ i } )
-		    options = [ options ', EEG.chanlocs' ];
-		  else
-		    options = [ options ', [' num2str(varargin{i}(:)') ']' ];
-		  end;
-		end;
-	end;	
+    options = vararg2str(varargin);
 end;
 
 % compute epoch limits
@@ -320,11 +312,7 @@ if length( options ) < 2
 end;
 varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
 			int2str(tlimits), num2str(cycles), options);
-%if is_sccn
-%    com = sprintf('%s newtimef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-%else
-    com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-%end;
+com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
 
 return;
