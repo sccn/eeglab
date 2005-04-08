@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/03/31 03:02:04  arno
+% auto gui select
+%
 % Revision 1.6  2005/03/31 03:00:02  arno
 % *** empty log message ***
 %
@@ -363,9 +366,16 @@ elseif nargin>=3
       end
       dipfitdefs;
       if get(findobj(parent, 'tag', 'dip2sym'), 'value') & get(findobj(parent, 'tag', 'dip2sel'), 'value')
-        cfg.symmetry = defaultconstraint;
+          cfg.symmetry = 'y';
+          if ~isempty(EEG.chaninfo)
+              if isfield(EEG.chaninfo, 'nosedir')
+                  if lower(EEG.chaninfo.nosedir(2)) == 'y'
+                      cfg.symmetry = 'x';
+                  end;
+              end;
+          end;
       else
-        cfg.symmetry = [];
+          cfg.symmetry = [];
       end
       cfg.component  = current;
       % convert structure into list of input arguments

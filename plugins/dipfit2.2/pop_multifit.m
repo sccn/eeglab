@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/03/22 18:49:22  arno
+% fixing call to dipfit_nonlinear
+%
 % Revision 1.7  2005/03/17 17:45:33  arno
 % reject dipoles
 %
@@ -254,6 +257,17 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         disp('Scanning terminated. Refining dipole locations...');
     end;
    
+    % set symetry constraint
+    % ----------------------
+    defaultconstraint = 'y';
+    if ~isempty(EEG.chaninfo)
+        if isfield(EEG.chaninfo, 'nosedir')
+            if lower(EEG.chaninfo.nosedir(2)) == 'y'
+                defaultconstraint = 'x';
+            end;
+        end;
+    end;
+    
     % Searching dipole localization
     % -----------------------------
     disp('Searching dipoles locations...');
