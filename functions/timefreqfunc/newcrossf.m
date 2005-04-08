@@ -139,6 +139,8 @@
 %                    ELSE [c1,c2], plot two cartoons showing channel locations.
 %       'elocs'    = Electrode location file for scalp map       {none}
 %                    File should be ascii in format of >> topoplot example   
+%       'chaninfo' = Electrode location additional information (nose position...)
+%                    {default: none}
 %
 % Optional plot and compute features:
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
@@ -214,6 +216,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2005/03/30 16:29:11  arno
+% implement angleunit
+%
 % Revision 1.75  2005/03/09 00:09:24  arno
 % add chaninfo
 %
