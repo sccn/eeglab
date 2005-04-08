@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/03/11 00:07:03  arno
+% message
+%
 % Revision 1.22  2005/03/10 23:59:37  arno
 % message
 %
@@ -122,9 +125,9 @@ function [eeg,ev,header] = read_erpss(filename)
                     header.nsteps              = double(fread(fp,1,'uint32'));
                     fseek(fp,24+110*4+nchans*block_size*2,0);
                 end;
+                header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
                 if header.divider & header.clock_freq
                     header.srate     = header.clock_freq/header.divider/header.nsteps;
-                    header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
                     if round(header.srate)
                         fprintf('Sampling rate is %4.4fHz\n', header.srate);
                     else
