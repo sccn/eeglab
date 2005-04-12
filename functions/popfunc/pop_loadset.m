@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/04/12 21:42:58  arno
+% fixed error while checking dataset (wrong section of code)
+%
 % Revision 1.31  2005/04/12 17:41:23  hilit
 % fixing the 'mode' option
 %
@@ -231,7 +234,7 @@ else
     if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
 end;
 if strcmpi(mode, 'all')
-    EEG = eeg_checkset(EEG);
+    VAROUT = eeg_checkset(VAROUT);
 end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
