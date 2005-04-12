@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/04/12 17:27:07  arno
+% check dataset if mode is all
+%
 % Revision 1.29  2004/11/15 22:50:25  arno
 % .dat -> .fdt
 %
@@ -180,7 +183,7 @@ end;
 if isfield(TMPVAR, 'EEG') %individual dataset
 	% load individual dataset
 	% -----------------------
-	VAROUT = checkoldformat(TMPVAR.EEG);
+	VAROUT = checkoldformat(TMPVAR.EEG, mode);
     if isstr(VAROUT.data) & ~strcmpi(VAROUT.data, 'EEGDATA')
         if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
             VAROUT.filepath = inputpath; 
@@ -218,7 +221,7 @@ elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
         end;
     end;
 else
-	VAROUT = checkoldformat(TMPVAR);
+	VAROUT = checkoldformat(TMPVAR,mode);
 	if ~isfield( VAROUT, 'data')
 		error('Pop_loadset: non-EEGLAB dataset file');
 	end;
@@ -227,7 +230,7 @@ end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
 
-function EEG = checkoldformat(EEG)
+function EEG = checkoldformat(EEG,mode)
 	if ~isfield( EEG, 'data')
 		fprintf('Incompatible with new format, trying old format and converting...\n');
 		eegset = EEG.cellArray;
