@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2005/04/12 17:41:23  hilit
+% fixing the 'mode' option
+%
 % Revision 1.30  2005/04/12 17:27:07  arno
 % check dataset if mode is all
 %
@@ -227,6 +230,9 @@ else
 	end;
     if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
 end;
+if strcmpi(mode, 'all')
+    EEG = eeg_checkset(EEG);
+end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
 
@@ -355,7 +361,4 @@ function EEG = checkoldformat(EEG,mode)
 			disp(['Warning: field ' rmfields{index} ' is deprecated']);
 		end;
 	end;
-    if strcmpi(mode, 'all')
-        EEG = eeg_checkset(EEG);
-    end;
 	
