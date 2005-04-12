@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2004/11/15 22:50:25  arno
+% .dat -> .fdt
+%
 % Revision 1.28  2004/11/05 19:27:05  arno
 % uigetfile -> uigetfile2
 %
@@ -349,5 +352,7 @@ function EEG = checkoldformat(EEG)
 			disp(['Warning: field ' rmfields{index} ' is deprecated']);
 		end;
 	end;
-	
+    if strcmpi(mode, 'all')
+        EEG = eeg_checkset(EEG);
+    end;
 	
