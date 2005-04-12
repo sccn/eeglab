@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/04/08 23:09:16  arno
+% fix defaultconstraint
+%
 % Revision 1.8  2005/03/22 18:49:22  arno
 % fixing call to dipfit_nonlinear
 %
@@ -176,7 +179,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         
         % selecting model
         % ---------------
-        options = { 'model' fastif(results{2} == 1, 'BESA', 'BEM') };        
+        options = { 'model' fastif(results{2} == 1, '4Shell', 'BEM') };        
         if ~isempty(results{3})
              options      = { options{:} 'settings' { 'electrodes' setdiff(1:EEG.nbchan, eval( [ '[' results{3} ']' ] )) } };
         end;
