@@ -259,8 +259,8 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
              event(index).latency = event(index).latency-alignlatency+align.event;
         end;
         if length(event) ~= align.nbevent
-            disp([ 'Setevent warning: the number of pre-existing events do not correspond to the ' ...
-                   'number of event that were read, so their latencies may have been wrongly re-aligned' ]);
+            disp('Setevent warning: the number of pre-existing events do not correspond to the number of events');
+            disp('                  that were read, so their latencies may have been wrongly re-aligned');
         end;           
         fprintf(align.txt);
         fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
@@ -302,8 +302,8 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
         end;
         if ~isempty(oldevents)
-            fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
-            fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
+            fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
+            fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
         end;
     else
         % must add one (because first sample point has latency 0
