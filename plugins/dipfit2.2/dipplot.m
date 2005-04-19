@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.125  2005/04/07 18:48:08  hilit
+%adding a 'verbose' option
+%
 %Revision 1.124  2005/04/01 22:12:14  arno
 %3-D sphere projection
 %
@@ -639,7 +642,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         dat.sph2spm    = sph2spm;
     else dat.sph2spm    = [];
     end;
-    dat.imgs       = g.mri.anatomy;
+    if isfield(g.mri, 'anatomycol')
+        dat.imgs       = g.mri.anatomycol;
+    else
+        dat.imgs       = g.mri.anatomy;
+    end;
     dat.transform  = g.mri.transform;    
     
     % MRI coordinates for slices
@@ -1392,13 +1399,25 @@ function plotimgs(dat, mricoord, transmat);
    
     % loading images
     % --------------
-    img1 = rot90(squeeze(dat.imgs(mricoord(1),:,:))); 
-    img2 = rot90(squeeze(dat.imgs(:,mricoord(2),:))); 
-    img3 = rot90(squeeze(dat.imgs(:,:,mricoord(3)))); 
+    if ndims(dat.imgs) == 4 % true color data
+        img1(:,:,3) = rot90(squeeze(dat.imgs(mricoord(1),:,:,3))); 
+        img2(:,:,3) = rot90(squeeze(dat.imgs(:,mricoord(2),:,3))); 
+        img3(:,:,3) = rot90(squeeze(dat.imgs(:,:,mricoord(3),3))); 
+        img1(:,:,2) = rot90(squeeze(dat.imgs(mricoord(1),:,:,2))); 
+        img2(:,:,2) = rot90(squeeze(dat.imgs(:,mricoord(2),:,2))); 
+        img3(:,:,2) = rot90(squeeze(dat.imgs(:,:,mricoord(3),2))); 
+        img1(:,:,1) = rot90(squeeze(dat.imgs(mricoord(1),:,:,1))); 
+        img2(:,:,1) = rot90(squeeze(dat.imgs(:,mricoord(2),:,1))); 
+        img3(:,:,1) = rot90(squeeze(dat.imgs(:,:,mricoord(3),1)));     
+    else
+        img1 = rot90(squeeze(dat.imgs(mricoord(1),:,:))); 
+        img2 = rot90(squeeze(dat.imgs(:,mricoord(2),:))); 
+        img3 = rot90(squeeze(dat.imgs(:,:,mricoord(3)))); 
 
-    if ndims(img1) == 2, img1(:,:,3) = img1; img1(:,:,2) = img1(:,:,1); end;
-    if ndims(img2) == 2, img2(:,:,3) = img2; img2(:,:,2) = img2(:,:,1); end;
-    if ndims(img3) == 2, img3(:,:,3) = img3; img3(:,:,2) = img3(:,:,1); end;
+        if ndims(img1) == 2, img1(:,:,3) = img1; img1(:,:,2) = img1(:,:,1); end;
+        if ndims(img2) == 2, img2(:,:,3) = img2; img2(:,:,2) = img2(:,:,1); end;
+        if ndims(img3) == 2, img3(:,:,3) = img3; img3(:,:,2) = img3(:,:,1); end;
+    end;
     
     % computing coordinates for planes
     % --------------------------------    
