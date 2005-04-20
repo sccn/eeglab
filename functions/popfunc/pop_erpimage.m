@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2005/03/07 21:18:01  arno
+% add chaninfo
+%
 % Revision 1.123  2004/09/21 17:46:42  hilit
 % changed the if statement from if isempty(EEG.chanlocs) -> if ~
 %
@@ -831,7 +834,7 @@ else
 		  if ~iscell( varargin{ i } )
 		      options = [ options ', [' num2str(varargin{i}) ']' ];
 		  else
-		      options = [ options ', { [' num2str(varargin{ i }{1}') ']'' EEG.chanlocs }' ];
+		      options = [ options ', { [' num2str(varargin{ i }{1}') ']'' EEG.chanlocs EEG.chaninfo }' ];
 		  end;    
 		end;
 	end;	
