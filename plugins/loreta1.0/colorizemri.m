@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/04/20 22:03:59  arno
+% divide by max
+%
 % Revision 1.1  2005/04/20 21:54:17  arno
 % Initial revision
 %
@@ -77,8 +80,10 @@ function [ anat, actarray, mri ] = colorizemri( mri, locations, activations, var
     invtransf = pinv( mri.transform );
     mrilocsbeg = round(invtransf*[ locations-g.voxsize/2 ones(size(locations,1),1)]')';
     mrilocsend = round(invtransf*[ locations+g.voxsize/2 ones(size(locations,1),1)]')';
-    mrilocsbeg = mrilocsbeg(:,1:3);
-    mrilocsend = mrilocsend(:,1:3);
+    tmplocsbeg = mrilocsbeg(:,1:3);
+    tmplocsend = mrilocsend(:,1:3);
+    mrilocsbeg = min(tmplocsbeg, tmplocsend);
+    mrilocsend = max(tmplocsbeg, tmplocsend);
     
     % scale activations from 0 to 1
     % -----------------------------
