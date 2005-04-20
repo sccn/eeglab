@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/04/20 21:54:38  arno
+% Initial revision
+%
 
 function mri = plotmri( mri, activations, varargin)
     
@@ -62,7 +65,8 @@ function mri = plotmri( mri, activations, varargin)
                             'colchan'   'integer'   [0 Inf]    1;
                             'plot'      'real'      []         [] });
         if isstr(g), error(g); end;
-    
+        disp('Slice number in MNI coordinates (mm)');
+        
         % find point with highest activation value
         % ----------------------------------------
         if isempty(g.plot)
@@ -156,10 +160,10 @@ function makescroll(fid, curcoords, tag, coordinc)
     ht = 0.05;
     wd = 0.03;
     
-    coordminus = [0.05 -0.05 wd   ht]+s;
-    coordtext  = [0.10 -0.05 0.04 ht]+s;
-    coordcom   = [0.13 -0.05 wd   ht]+s;
-    coordplus  = [0.17 -0.05 wd   ht]+s;
+    coordminus = [0.03 -0.05 wd   ht]+s;
+    coordtext  = [0.08 -0.05 0.04 ht]+s;
+    coordcom   = [0.11 -0.05 wd   ht]+s;
+    coordplus  = [0.15 -0.05 wd   ht]+s;
     
     cb_minus = [ 'tmpobj = findobj(gcbf, ''tag'', ''text' tag ''');' ...
                  'tmpval = str2num(get(tmpobj,''string'')) - ' num2str(coordinc) ';' ...
