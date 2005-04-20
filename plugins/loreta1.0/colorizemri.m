@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/04/20 21:54:17  arno
+% Initial revision
+%
 
 function [ anat, actarray, mri ] = colorizemri( mri, locations, activations, varargin)
     
@@ -103,7 +106,7 @@ function [ anat, actarray, mri ] = colorizemri( mri, locations, activations, var
     mri.anatomycol(:,:,:,1) = mri.anatomy;
     mri.anatomycol(:,:,:,2) = mri.anatomy;
     mri.anatomycol(:,:,:,3) = mri.anatomy;
-    mri.anatomycol = mri.anatomycol/255;
+    mri.anatomycol = mri.anatomycol/max(mri.anatomycol(:));
     mri.anatomycol = mri.anatomycol.^g.mrigamma;
     anat = mri.anatomycol;
     
