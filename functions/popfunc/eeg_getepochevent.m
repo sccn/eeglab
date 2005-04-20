@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2004/11/11 00:07:42  arno
+% can now process strings
+%
 % Revision 1.19  2004/11/10 23:56:45  arno
 % version 1.16
 %
@@ -238,6 +241,17 @@ if strcmp(fieldname, 'latency')
                 disp(['Warning: multiple event latencies found in epoch ' int2str(epoch) ]); 
                 %, ignoring event ' int2str(Ieventtmp(index)) ' (''' num2str(EEG.event(Ieventtmp(index)).type) ''' type)' ]);
             end;
+		end;
+	end;
+elseif strcmp(fieldname, 'duration')
+	for index = 1:length(Ieventtmp)
+		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+		if ~isempty(val)
+            if ~isfield(EEG.event, 'epoch'), epoch = 1;
+            else                             epoch = EEG.event(Ieventtmp(index)).epoch;
+            end;
+            epochval{epoch}           = val/EEG.srate*1000;
+            allepochval{epoch}{end+1} = val/EEG.srate*1000;
 		end;
 	end;
 else
