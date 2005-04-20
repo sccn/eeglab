@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/04/20 21:54:08  arno
+% Initial revision
+%
 
 function [mri, act, mristruct] = loreta_importcomp(mrifile, fileact, varargin)
     
@@ -95,7 +98,9 @@ function [mri, act, mristruct] = loreta_importcomp(mrifile, fileact, varargin)
             mrifile = load('-mat', mrifile);
             mrifile = mrifile.mri;
         catch,
+            warning backtrace off;
             mrifile = read_fcdc_mri(mrifile);
+            warning backtrace on;
         end;
     end;
 
