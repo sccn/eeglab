@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2005/04/21 22:13:17  arno
+% matlab import
+%
 % Revision 1.20  2005/03/24 23:10:39  arno
 % only import data
 %
@@ -114,9 +117,13 @@ function [EEG, command] = pop_loadbci(filename, srate);
         bci = load( filename, '-mat');
         allfields = fields(bci);
         allfields = setdiff(allfields, 'signal');
+        for index = 1:size(bci.signal,2)
+            chanlabels{index} = [ 'C' int2str(index) ];
+        end;
         for index = 1:length(allfields)
             bci.signal(:,end+1) = getfield(bci, allfields{index});
         end;
+        EEG.chanlocs = struct('labels', { chanlabels{:} allfields{:} });
         EEG.data     = bci.signal';
         EEG.nbchan   = size(EEG.data, 1);
         EEG.pnts     = size(EEG.data, 2);
