@@ -1,5 +1,3 @@
-
-
 % tftopo()  - Generate a figure showing a selected image (e.g., an ERSP, ITC or ERP image) 
 %             from a supplied set of images, one for each scalp channel. Plots topoplot() 
 %             scalp maps of value distributions at specified (x,y) (e.g., time, frequency) 
@@ -78,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2005/04/04 20:16:09  hilit
+% changed 'axcopy' to be an input option and not a default
+%
 % Revision 1.69  2005/01/31 19:15:45  hilit
 % added input option 'verbose'
 %
@@ -1128,30 +1129,3 @@ end
 if strcmpi(g.axcopy, 'on')
     axcopy
 end
-
-function tfdat = avedata(tfdat, dim, thresh, mode)
-    tfsign  = sign(mean(tfdat,dim));
-    tfmask  = sum(tfdat ~= 0,dim) >= thresh;
-    if strcmpi(mode, 'rms')
-        tfdat   = tfmask.*tfsign.*sqrt(mean(tfdat.*tfdat,dim)); % std of all channels
-    else
-        tfdat   = tfmask.*mean(tfdat,dim); % std of all channels
-    end;
-    
-function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
-    indicetimes = [floor(1:0.5:size(tfdat,1)) size(tfdat,1)];
-    indicefreqs = [floor(1:0.5:size(tfdat,2)) size(tfdat,2)];
-    tfdatnew = tfdat(indicetimes, indicefreqs, :, :);
-    times = linspace(times(1), times(end), size(tfdat,2)*2);
-    freqs = linspace(freqs(1), freqs(end), size(tfdat,1)*2);
-    
-    % smoothing
-    gauss2 = gauss2d(3,3); 
-    for S = 1:size(tfdat,4)
-        for elec = 1:size(tfdat,3)
-            tfdatnew(:,:,elec,S) = conv2(tfdatnew(:,:,elec,S), gauss2, 'same');
-        end;
-    end;
-
-    %tfdatnew = convn(tfdatnew, gauss2, 'same'); % is equivalent to the loop for slowlier
-
