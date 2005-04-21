@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2005/04/02 05:34:47  scott
+% disallow plotting outside the data limits
+%
 % Revision 1.91  2005/04/01 23:16:11  scott
 % adjusted default limcontrib timerange and limits
 %
@@ -466,20 +469,17 @@ if ndims(data) == 3
 end;
 [chans,frames] = size(data);
 
-if isempty(g.chanlocs)
-        error('requires ''chanlocs'' flag and argument');
-end
 if isstr(g.chanlocs)
-        if exist(g.chanlocs) ~= 2  % if no such file
-            fprintf('envtopo(): named channel location file ''%s'' not found.\n',g.chanlocs);
-            return
-        end
-        eloc = readlocs(g.chanlocs);  % read channel locations information
-        if length(eloc) ~= chans
-            fprintf(...
-              'envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
-            return
-        end
+    if exist(g.chanlocs) ~= 2  % if no such file
+        fprintf('envtopo(): named channel location file ''%s'' not found.\n',g.chanlocs);
+        return
+    end
+    eloc = readlocs(g.chanlocs);  % read channel locations information
+    if length(eloc) ~= chans
+        fprintf(...
+            'envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
+        return
+    end
 end
 
 if ~isempty(g.colors)
