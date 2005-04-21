@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2005/03/24 23:10:39  arno
+% only import data
+%
 % Revision 1.19  2004/09/15 23:40:49  arno
 % fixed strmatch
 %
@@ -109,6 +112,18 @@ function [EEG, command] = pop_loadbci(filename, srate);
         % try to read as matlab
         % ---------------------
         bci = load( filename, '-mat');
+        allfields = fields(bci);
+        allfields = setdiff(allfields, 'signal');
+        for index = 1:length(allfields)
+            bci.signal(:,end+1) = getfield(bci, allfields{index});
+        end;
+        EEG.data     = bci.signal';
+        EEG.nbchan   = size(EEG.data, 1);
+        EEG.pnts     = size(EEG.data, 2);
+        EEG.trials = 1;
+        EEG.srate  = srate;
+        EEG = eeg_checkset(EEG);
+        return;
     catch
         % get file names
         % --------------
