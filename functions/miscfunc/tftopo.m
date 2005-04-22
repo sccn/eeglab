@@ -39,6 +39,9 @@
 %  'shiftimgs' = [resposne_times_vector] - shift time/frequency images from several subjects 
 %                each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string). 
+%  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
+%  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
+%                    using the left mouse button {default: 'on'}.. 
 %
 % Notes:
 %  1) Additional topoplot() optional arguments can be used.
@@ -73,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2005/04/22 01:25:05  arno
+% recovering version 1.68
+%
 % Revision 1.68  2004/11/05 17:56:21  arno
 % add title
 %
@@ -313,6 +319,8 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'logfreq'       'string'   {'on' 'off' }             'off';
               'mode'          'string'   { 'ave' 'rms' }           'rms';
               'title'         'string'   []                        '';
+              'verbose'       'string'   {'on' 'off' }             'on';
+              'axcopy'        'string'   {'on' 'off' }             'on';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
               'showchan'      'integer'  [0 nchans]                0 ;
@@ -436,7 +444,9 @@ end;
 range = g.limits(6)-g.limits(5);
 cc = jet(256);
 if ~isempty(g.signifs)
-    fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
+    if strcmpi(g.verbose, 'on')
+        fprintf('Applying ''signifs'' mask by zeroing non-significant values\n');
+    end    
     for subject = 1:size(tfdata,4)
         for elec = 1:size(tfdata,3)
             
@@ -464,7 +474,9 @@ end;
 % magnify inputs
 %%%%%%%%%%%%%%%%
 if g.smooth ~= 1
-    fprintf('Smoothing...\n');
+    if strcmpi(g.verbose, 'on'), 
+        fprintf('Smoothing...\n');
+    end    
     for index = 1:round(log2(g.smooth))
         [tfdata times freqs] = magnifytwice(tfdata, times, freqs);
     end;
@@ -477,7 +489,9 @@ if ~isempty(g.shiftimgs)
     timestep = times(2) - times(1);
     for S = 1:size(tfdata,4)
         nbsteps = round(g.shiftimgs(S)/timestep);
-        fprintf('Shifing images of subect %d by %3.3f ms or %d time steps\n', S, g.shiftimgs(S), nbsteps);
+        if strcmpi(g.verbose, 'on'), 
+            fprintf('Shifing images of subect %d by %3.3f ms or %d time steps\n', S, g.shiftimgs(S), nbsteps);
+        end        
         if nbsteps < 0,  tfdata(:,-nbsteps+1:end,:,S) = tfdata(:,1:end+nbsteps,:,S);
         else             tfdata(:,1:end-nbsteps,:,S)  = tfdata(:,nbsteps+1:end,:,S);
         end;
@@ -545,12 +559,16 @@ else % g.showchan==0 -> image std() of selchans
     tfdat   = tfdata(tffreqs,tftimes,g.selchans,:);
 
     % average across electrodes
-    fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+    if strcmpi(g.verbose, 'on'), 
+        fprintf('Applying RMS across channels (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(1));
+    end    
     tfdat = avedata(tfdat, 3, g.sigthresh(1), g.mode);
 
     % if several subject, first (RMS) averaging across subjects
     if size(tfdata,4) > 1
-        fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+        if strcmpi(g.verbose, 'on'), 
+            fprintf('Applying RMS across subjects (mask for at least %d non-zeros values at each time/freq)\n', g.sigthresh(2));
+        end        
         tfdat = avedata(tfdat, 4, g.sigthresh(2), g.mode);
     end;
     tfave = tfdat;
@@ -681,7 +699,9 @@ if g.showchan>0 & ~isempty(g.chanlocs)
                   'style', 'blank', 'emarkersize1chan', 10 );
      axis('square');
 end
-axcopy;
+if strcmpi(g.axcopy, 'on')
+    axcopy
+end
 
 
 function tfdat = avedata(tfdat, dim, thresh, mode)
