@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2005/04/08 22:56:57  arno
+% help msg etc.. for chaninfo
+%
 % Revision 1.67  2005/04/04 17:14:08  scott
 % made 'savecoher' option public
 %
@@ -760,7 +763,7 @@ if iscell(X)
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy
 		  alltfx = alltfx.^2;
-		  alltfx = alltfx.^2;
+		  alltfy = alltfy.^2;
 		 case 'phasecoher', % normalize
 		  allsavedcoher = allsavedcoher ./ abs(allsavedcoher);
 		 case 'phasecoher2', % don't do anything
