@@ -2,12 +2,12 @@
 %                        to Tailarach coordinates that can be read using
 %                        the LORETA software.
 % Usage:
-%   eeglab2loreta( chanlocs, comps );
+%   eeglab2loreta( chanlocs, comps, 'key', 'val', ... );
 %
 % Inputs:
 %   chanlocs       - EEGLAB channel location structure using MNI
 %                    coordinates (if not use parameter 'transform').
-%   comps          - ICA inverse matrix or subject of ICA inverse matrix
+%   icawinv        - ICA inverse matrix or subject of ICA inverse matrix
 %                    containing component to export. Enter an empty array
 %                    to export only the channel location file.
 %
@@ -28,6 +28,12 @@
 %   'lowchanlim'   - [float] lower z limit (in MNI space) for exporting
 %                    channel. For instance 0 will only export channel above
 %                    the midline.
+%
+% Output files:
+%   location_file   - contain channel labels or 3-D coordinates in Talairach
+%                     space that can be directly read by LORETA
+%   component_files - contains 10 rows containing 10 identical component
+%                     scalp maps.
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
 %
@@ -52,11 +58,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/04/21 23:31:14  arno
+% Initial revision
+%
 
-function eeglab2loreta( chanlocs, comps, varargin );
+function eeglab2loreta( chanlocs, winv, varargin );
 
     if nargin < 2
-        help chanlocs2talairach;
+        help eeglab2loreta;
         return;
     end;
     
@@ -64,16 +73,16 @@ function eeglab2loreta( chanlocs, comps, varargin );
                                  'filecomp'  'string'     []      'comp';
                                  'compnum'   'integer'    [1 Inf] [];
                                  'transform' 'real'       []      [];
-                                 'labelonly' 'string'     { 'on' 'off' } [];
+                                 'labelonly' 'string'     { 'on' 'off' } 'off';
                                  'excludechan' 'integer'  [1 Inf] [];
                                  'lowchanlim'  'float'    []      NaN });
     if isstr(g), error(g); end;
     
     % remove channels
     % ---------------
-    if ~isemtpy(g.excludechan)
+    if ~isempty(g.excludechan)
         chanlocs(g.excludechan) = [];
-        comps(g.excludechan,:)  = [];
+        winv(g.excludechan,:)  = [];
     end;
     
     if strcmpi(g.labelonly, 'off')
@@ -90,8 +99,9 @@ function eeglab2loreta( chanlocs, comps, varargin );
         % -------------------------------
         if ~isnan(g.lowchanlim)
             rmelec = find(XYZ(:,3) < g.lowchanlim);
-            XYZ(rmelec,:)   = [];
-            comps(rmelec,:) = [];
+            chanlocs(rmelec) = [];
+            XYZ(rmelec,:)    = [];
+            winv(rmelec,:)   = [];
         end;
         
         % convert to tailairach coordinates
@@ -122,11 +132,12 @@ function eeglab2loreta( chanlocs, comps, varargin );
 
     % export components
     % -----------------
-    if ~isempty(comps)
-        if isempty(g.compnum), g.compnum = [1:size(winv,1)]; end;
+    if ~isempty(winv)
+        if isempty(g.compnum), g.compnum = [1:size(winv,2)]; end;
             
         for i=g.compnum(:)'
-            toLORETA = winv(:,i); 
+            toLORETA = winv(:,i)'; 
+            toLORETA(2:10,:)  = ones(9,1)*toLORETA(1,:);
             filename = sprintf( [ g.filecomp '%d.txt' ], i);
             save('-ascii', filename, 'toLORETA');
         end;
