@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/06/04 17:03:28  arno
+% changing function evaluation
+%
 % Revision 1.6  2003/07/10 00:47:58  arno
 % text typo
 %
@@ -129,7 +132,7 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
 
         % histogram of value 12 bins
         % --------------------------
-        [N X] = hist(x, 12);
+        [N X] = hist(x, 25);
         interval = X(2)-X(1);
         X = [X-interval/2 X(end)+interval/2]; % borders
         
@@ -155,11 +158,11 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
         X(indices2rm)   = [];
         
         % compute expected values
-        % -----------------------
+        % -----------------------        
         for index = 1:length(X)-1
             p1 = rsget( l, X(index+1));
             p2 = rsget( l, X(index  ));
-            expect(index) = length(x)*(p1-p2);
+            expect(index) = length(x)*(p1-p2); 
         end;
         
         % value of X2
@@ -170,12 +173,24 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
         % --------
         if plotflag
             if plotflag ~= 2, figure; end;
-            hist(x, 12);
+            hist(x, 25);
             
-            abscisia = (X(1:end-1)+X(2:end))/2;            
-            hold on; plot(abscisia, expect, 'r');
+            % plot fit
+            % --------
+            xdiff = X(end)-X(1);
+            abscisia   = linspace(X(1)-0.2*xdiff, X(end)+0.2*xdiff, 30);
+            %abscisia  = (X(1:end-1)+X(2:end))/2;
+            expectplot = zeros(1,length(abscisia)-1);
+            for index = 2:length(abscisia); 
+                p1 = rsget( l, abscisia(index-1));
+                p2 = rsget( l, abscisia(index  ));
+                expectplot(index-1) = length(x)*(p2-p1); 
+                % have to do this subtraction since this a cumulate density distribution
+            end;
+            abscisia = (abscisia(2:end)+abscisia(1:end-1))/2;
+            hold on; plot(abscisia, expectplot, 'r');
         
-            % plot curve
+            % plot PDF
             % ----------
             pval = linspace(0,1, 102); pval(1) = []; pval(end) = [];
             rp   = l(1) + (pval.^l(3) - (1-pval).^l(4))/l(2);
