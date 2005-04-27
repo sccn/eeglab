@@ -11,9 +11,8 @@
 %   scale     - [scalex scaley scalez] scale axis. A single numeric
 %               input scale all the dimentions the same. Default 1
 %               does not scale.
-%   center    - [cx cy cz] after rotating and scaling, move the
-%               coordinate center to [cx cy cz]. Default [0 0 0]
-%               does not move the center.
+%   shifts    - [x y z] shift coordinates (after rotation and scaling). 
+%               Default [0 0 0] does not move the center.
 %   reverse   - [0|1] when set to 1 perform the reverse transformation,
 %               first moving to the old center, unscaling, and unrotating.
 %               Default is 0.
@@ -71,9 +70,9 @@ function coords = transformcoords(coords, rotate, scale, center, reverse);
     
     % decode parameters
     % -----------------
-    centx = center(1);
-    centy = center(2);
-    centz = center(3);
+    centx = -center(1);
+    centy = -center(2);
+    centz = -center(3);
     if length(scale) == 1
         scale = [scale scale scale];
     end;
