@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2005/01/28 00:29:39  arno
+% same
+%
 % Revision 1.48  2005/01/28 00:26:43  arno
 % change wait bar color
 %
@@ -330,10 +333,10 @@ if isstr(values)
     Ye = Ye./dists;
     Ze = Ze./dists;
     newcoords = [ Ye Xe Ze ];
-    newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 100, [6 0 46]);
+    newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 100, -[6 0 46]);
     % original center was [6 0 16] but the center of the sphere is [0 0 30] 
     % which compensate (see variable Headcenter)
-    %newcoords = transformcoords( [ Xe Ye Ze ], [0 0 -pi/6]);
+    %newcoords = transformcoords( [ Xe Ye Ze ], -[0 0 -pi/6]);
     Xe = newcoords(:,1);
     Ye = newcoords(:,2);
     Ze = newcoords(:,3);
