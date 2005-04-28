@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2005/04/27 00:53:58  arno
+% invert center
+%
 % Revision 1.49  2005/01/28 00:29:39  arno
 % same
 %
@@ -301,8 +304,10 @@ if isstr(values)
         
     g = finputcheck(varargin(2:end), { 'orilocs'   'string'  { 'on' 'off' }  'off';
                                        'meshfile'  'string'  []              DEFAULT_MESH;
+                                       'transform' 'real'    []              [];
                                        'comment'   'string'  []              '' });
     if isstr(g), 
+        error(g);
         clear g; 
         g.comment   = varargin{2}; 
         g.orilocs   = 'off';
@@ -333,7 +338,16 @@ if isstr(values)
     Ye = Ye./dists;
     Ze = Ze./dists;
     newcoords = [ Ye Xe Ze ];
-    newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 100, -[6 0 46]);
+    
+    %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 100, -[6 0 46]);
+    % same performed below with homogenous transformation matrix
+    
+    newcoords = [ Xe Ye Ze ];
+    transmat  = traditional( [ -6 0 -46 0 -pi/16 0 100 100 100 ] ); % julie
+    transmat  = traditional( g.transform ); % arno
+    newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
+    newcoords = newcoords(1:3,:)';
+    
     % original center was [6 0 16] but the center of the sphere is [0 0 30] 
     % which compensate (see variable Headcenter)
     %newcoords = transformcoords( [ Xe Ye Ze ], -[0 0 -pi/6]);
