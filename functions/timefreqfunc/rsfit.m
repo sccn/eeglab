@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/04/27 23:59:14  arno
+% finer fitting
+%
 % Revision 1.7  2004/06/04 17:03:28  arno
 % changing function evaluation
 %
@@ -172,13 +175,13 @@ function [p, c, l, res] = rsfit(x, val, plotflag)
         % plot fit
         % --------
         if plotflag
-            if plotflag ~= 2, figure; end;
-            hist(x, 25);
+            if plotflag ~= 2, figure('paperpositionmode', 'auto'); end;
+            hist(x, 10);
             
             % plot fit
             % --------
             xdiff = X(end)-X(1);
-            abscisia   = linspace(X(1)-0.2*xdiff, X(end)+0.2*xdiff, 30);
+            abscisia   = linspace(X(1)-0.2*xdiff, X(end)+0.2*xdiff, 100);
             %abscisia  = (X(1:end-1)+X(2:end))/2;
             expectplot = zeros(1,length(abscisia)-1);
             for index = 2:length(abscisia); 
