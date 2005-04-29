@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2005/04/29 01:01:31  arno
+% new transformation for Julie's head
+%
 % Revision 1.51  2005/04/28 23:05:30  arno
 % traditional
 %
@@ -280,7 +283,9 @@ end
 
 icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
-DEFAULT_MESH = ['mheadnew.mat'];      % upper head model file (987K)
+DEFAULT_MESH      = ['mheadnew.mat'];      % upper head model file (987K)
+DEFAULT_TRANSFORM = [0 -5 0 -0.1000 0 -1.5700 1040 800 950]; % stretching in different dimensions
+DEFAULT_TRANSFORM = [0 -10 0 -0.1000 0 -1.5700 1100 1100 1100]; % keep spherical shape.
 %DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
 %DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
@@ -316,9 +321,9 @@ if isstr(values)
     spline_file = varargin{1};
         
     g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on' 'off' }  'off';
-                                       'plotmeshonly' 'string'  { 'on' 'off' }  'off';
+                                       'plotmeshonly' 'string'  { 'head' 'off' 'sphere' }  'off';
                                        'meshfile'     'string'  []              DEFAULT_MESH;
-                                       'transform'    'real'    []              [ -6 0 -46 -0.17 0 -1.5 100 100 100 ];
+                                       'transform'    'real'    []              DEFAULT_TRANSFORM;
                                        'comment'      'string'  []              '' });
     if isstr(g), 
         error(g);
@@ -336,51 +341,58 @@ if isstr(values)
     indices = find(~cellfun('isempty', { eloc_file.X }));
     ElectrodeNames = strvcat({ eloc_file.labels });
     ElectrodeNames = ElectrodeNames(indices,:);
-    Xe = [ eloc_file(indices).X ]';
-    Ye = [ eloc_file(indices).Y ]';
-    Ze = [ eloc_file(indices).Z ]';
-    dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-    Xe = Xe./dists;
-    Ye = Ye./dists;
-    Ze = Ze./dists;
-    newcoords = [ Ye Xe Ze ];
+    Xeori = [ eloc_file(indices).X ]';
+    Yeori = [ eloc_file(indices).Y ]';
+    Zeori = [ eloc_file(indices).Z ]';
+    if strcmpi(g.orilocs, 'off')
+        % normalize electrode locations if spherical
+        dists = sqrt(Xeori.^2+Yeori.^2+Zeori.^2);
+        Xeori = Xeori./dists*0.1; % 0.1 is the radius of the sphere for 
+        Yeori = Yeori./dists*0.1; % the standard BESA file that was 
+        Zeori = Zeori./dists*0.1; % used to perform the coregistration
+    end;
+    newcoords = [ Xeori Yeori Zeori ];
     
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
+    newcoords = transformcoords( [ Xeori Yeori Zeori ], g.transform(4:6), g.transform(7:9), g.transform(1:3));
     % same performed below with homogenous transformation matrix
     
-    newcoords = [ Xe Ye Ze ];
-    transmat  = traditional( g.transform ); % arno
-    newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
-    newcoords = newcoords(1:3,:)';
+    %newcoords = [ Xe Ye Ze ];
+    %transmat  = traditional( g.transform ); % arno
+    %newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
+    %newcoords = newcoords(1:3,:)';
     
     % original center was [6 0 16] but the center of the sphere is [0 0 30] 
     % which compensate (see variable Headcenter)
     %newcoords = transformcoords( [ Xe Ye Ze ], -[0 0 -pi/6]);
-    Xe = newcoords(:,1);
-    Ye = newcoords(:,2);
-    Ze = newcoords(:,3);
-    dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-    Xe = Xe(:)./dists;
-    Ye = Ye(:)./dists;
-    Ze = Ze(:)./dists;
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % normalize with respect to head center
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    newcoordsnorm      = newcoords - ones(size(newcoords,1),1)*HeadCenter;
+    tmpnorm            = sqrt(sum(newcoordsnorm.^2,2));
+    Xe = newcoordsnorm(:,1)./tmpnorm;
+    Ye = newcoordsnorm(:,2)./tmpnorm;
+    Ze = newcoordsnorm(:,3)./tmpnorm;
     %plotchans3d([ Xe Ye Ze], cellstr(ElectrodeNames)); return;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculate g(x) for electrodes 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    fprintf('Setting up splining matrix.\n');
-    enum = length(Xe);
-    onemat = ones(enum,1);
-    G = zeros(enum,enum);
-    for i = 1:enum
-        ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
-                         (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
-        gx = zeros(1,enum);
-        for j = 1:enum
-            gx(j) = calcgx(ei(j));
+    if strcmpi(g.plotmeshonly, 'off')
+        fprintf('Setting up splining matrix.\n');
+        enum = length(Xe);
+        onemat = ones(enum,1);
+        G = zeros(enum,enum);
+        for i = 1:enum
+            ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
+                             (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
+            gx = zeros(1,enum);
+            for j = 1:enum
+                gx(j) = calcgx(ei(j));
+            end
+            G(i,:) = gx;
         end
-        G(i,:) = gx;
-    end
+    end;
     fprintf('Calculating splining matrix...\n')
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -410,8 +422,11 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Project head vertices onto unit sphere
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    nPOS = newPOS-ones(size(newPOS,1),1)*HeadCenter;
-    spherePOS = sqrt(ones./(sum((nPOS.*nPOS)')))'*ones(1,3).*nPOS;
+    spherePOS      = newPOS-ones(size(newPOS,1),1)*HeadCenter; % recenter
+    nPOSnorm       = sqrt(sum(spherePOS.^2,2));
+    spherePOS(:,1) = spherePOS(:,1)./nPOSnorm;
+    spherePOS(:,2) = spherePOS(:,2)./nPOSnorm;
+    spherePOS(:,3) = spherePOS(:,3)./nPOSnorm;
     x = spherePOS(:,1);
     y = spherePOS(:,2);
     z = spherePOS(:,3);
@@ -425,7 +440,7 @@ if isstr(values)
             elect = [Xe(i) Ye(i) Ze(i)];
             dists = distance(elect,spherePOS');
             [S,I] = sort(dists);
-            npoints = I(1:3);
+            npoints = I(1:3); % closest 3 points
             diffe = newPOS(npoints,:)-spherePOS(npoints,:);
             newElect(i,:) = elect+mean(diffe)*ElectDFac;
             %if Ze(i) < 0               % Plot superior electrodes only.
@@ -434,16 +449,20 @@ if isstr(values)
         end
     else 
         fprintf('Using original electrode locations on head...\n');
-        newElect(:,1) = cell2mat( tmpX(indices) )';
-        newElect(:,2) = cell2mat( tmpY(indices) )';
-        newElect(:,3) = cell2mat( tmpZ(indices) )';        
+        newElect = newcoords;
     end;
     
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % plot mesh and electrodes only
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if strcmpi(g.plotmeshonly, 'on')
-        plotmesh(TRI1, POS);
+    if ~strcmpi(g.plotmeshonly, 'off')
+        if strcmpi(g.plotmeshonly, 'sphere')
+            newElect(:,1) = Xe;
+            newElect(:,2) = Ye;
+            newElect(:,3) = Ze;        
+            POS(index1,:) = spherePOS; HeadCenter = [ 0 0 0 ];
+        end;
+        plotmesh(TRI1, POS, NORM);
         plotelecopt.labelflag = 0;
         plotelec(newElect, ElectrodeNames, HeadCenter, plotelecopt);
         rotate3d;
@@ -470,6 +489,7 @@ if isstr(values)
       Z = z(j);
       ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); 
                                   % default was /2, no sqrt
+                                  % distance between sphere and all electrodes
       for i = 1:length(ei)
         gx(j,i) = calcgx(ei(i));  
       end
