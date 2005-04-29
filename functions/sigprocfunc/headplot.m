@@ -20,9 +20,6 @@
 % Optional Parameters:
 %   'comment'     - ['string'] optional string vector containing info for spline 
 %                   file.
-%   'orilocs'     - ['off'|'on'] use original electrode location on the head
-%                  default: 'off' (extrapolated to spherical). Note that 
-%                  electrode location must be coregisted with the MRI head.
 %   'meshfile'    - ['string'] Matlab files containing at least 2 variables
 %                   POS    - vertices 3-D positions, x=left-right; y=back-front, 
 %                            z=up-down
@@ -30,6 +27,13 @@
 %                   center (optional) - 3-D center of head mesh
 %                   TRI2   (optional) - faces in skin color
 %                   NORM   (optional) - normal for each vertex (better shades)
+%   'orilocs'     - ['off'|'on'] use original electrode location on the head
+%                  default: 'off' (extrapolated to spherical). Note that 
+%                  electrode location must be coregisted with the head mesh.
+%   'transform'   - [real array] tailarach transformation matrix. 
+%                   [ shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ ]
+%                   to coregister electrode locations with the head mesh. This
+%                   array is returned by the coregister() function.
 %
 % General usage:
 %   >> headplot(values,'spline_file','Param','Value',...)
@@ -52,9 +56,6 @@
 %                  'left'|'l'=[-90 30]; 'right'|'r'=[ 90 30];
 %                  'frontleft'|'bl','backright'|'br', etc.,
 %                  'top'=[0 90]   {default [143 18]}
-%   'orilocs'    - [channel structure or channel file name] Use original 
-%                  channel locations instead of the one extrapolated from 
-%                  spherical locations.
 %   'maplimits'  - 'absmax' -> make limits +/- the absolute-max
 %                  'maxmin' -> scale to data range
 %                   [min,max] -> user-definined values
@@ -64,6 +65,15 @@
 %   'lighting'   - 'off' = show wire frame {default 'on'} 
 %   'colormap'   -  3-column colormap matrix {default jet(64)}
 %   'verbose'    - 'off' -> no msgs, no rotate3d {default 'on'}
+%   'orilocs'    - [channel structure or channel file name] Use original 
+%                  channel locations instead of the one extrapolated from 
+%                  spherical locations. Note that if you use 'orilocs'
+%                  during setup, this is not necessary here as the 
+%                  original channel location have already been saved.
+%                  This option might be usefull to show more channel than
+%                  the one actually used for interpolating (such as fiducials).
+%   'transform'  - [real array] homogenous transformation matrix to apply
+%                  to original location ('orilocs') before plotting them.
 %
 % Note: if an error is generated, headplot may close the current figure
 %
@@ -91,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2005/04/28 23:05:30  arno
+% traditional
+%
 % Revision 1.50  2005/04/27 00:53:58  arno
 % invert center
 %
@@ -281,10 +294,10 @@ HeadCenter = [0 0 30];
 FaceColor  = [.8 .55 .35]*1.1; % ~= ruddy Caucasian - pick your complexion!
 MAX_ELECTRODES = 1024;
 ElectDFac  = 1.06;  % plot electrode marker dots out from head surface
-NamesDFac  = 1.05;  % plot electrode names/numbers out from markers
-NamesColor = 'k'; % 'r';
-NamesSize  =  10;   % FontSize for electrode names
-MarkerColor= 'k';
+plotelecopt.NamesDFac  = 1.05;  % plot electrode names/numbers out from markers
+plotelecopt.NamesColor = 'k'; % 'r';
+plotelecopt.NamesSize  =  10;   % FontSize for electrode names
+plotelecopt.MarkerColor= 'k';
 
 sqaxis     = 1;     % if non-zero, make head proportions anatomical
 title_font = 18;
@@ -302,10 +315,11 @@ if isstr(values)
     eloc_file = arg1;
     spline_file = varargin{1};
         
-    g = finputcheck(varargin(2:end), { 'orilocs'   'string'  { 'on' 'off' }  'off';
-                                       'meshfile'  'string'  []              DEFAULT_MESH;
-                                       'transform' 'real'    []              [];
-                                       'comment'   'string'  []              '' });
+    g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on' 'off' }  'off';
+                                       'plotmeshonly' 'string'  { 'on' 'off' }  'off';
+                                       'meshfile'     'string'  []              DEFAULT_MESH;
+                                       'transform'    'real'    []              [ -6 0 -46 -0.17 0 -1.5 100 100 100 ];
+                                       'comment'      'string'  []              '' });
     if isstr(g), 
         error(g);
         clear g; 
@@ -319,31 +333,22 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     [eloc_file labels Th Rd ind] = readlocs(eloc_file);
     fprintf('Headplot: using existing XYZ coordinates\n');
-    %for index = 1:length(eloc_file)
-    %    eloc_file(index).radius     = eloc_file(index).radius*1.4;
-    %    eloc_file(index).sph_radius = 1;
-    %end;
-    %eloc_file = convertlocs(eloc_file, 'topo2all');
-    tmpX = { eloc_file.X };
-    tmpY = { eloc_file.Y };
-    tmpZ = { eloc_file.Z };
-    indices = find(~cellfun('isempty', tmpX));
+    indices = find(~cellfun('isempty', { eloc_file.X }));
     ElectrodeNames = strvcat({ eloc_file.labels });
     ElectrodeNames = ElectrodeNames(indices,:);
-    Xe = cell2mat( tmpX(indices) )';
-    Ye = cell2mat( tmpY(indices) )';
-    Ze = cell2mat( tmpZ(indices) )';
+    Xe = [ eloc_file(indices).X ]';
+    Ye = [ eloc_file(indices).Y ]';
+    Ze = [ eloc_file(indices).Z ]';
     dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
     Xe = Xe./dists;
     Ye = Ye./dists;
     Ze = Ze./dists;
     newcoords = [ Ye Xe Ze ];
     
-    %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 0], 100, -[6 0 46]);
+    %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
     % same performed below with homogenous transformation matrix
     
     newcoords = [ Xe Ye Ze ];
-    transmat  = traditional( [ -6 0 -46 0 -pi/16 0 100 100 100 ] ); % julie
     transmat  = traditional( g.transform ); % arno
     newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
     newcoords = newcoords(1:3,:)';
@@ -355,16 +360,9 @@ if isstr(values)
     Ye = newcoords(:,2);
     Ze = newcoords(:,3);
     dists = sqrt(Xe.^2+Ye.^2+Ze.^2);
-    Xe = Xe./dists;
-    Ye = Ye./dists;
-    Ze = Ze./dists;
-    Xetmp = Xe;
-    Xe = -Ye;
-    Ye = Xetmp;
-
-    Xe = Xe(:);
-    Ye = Ye(:);
-    Ze = Ze(:);
+    Xe = Xe(:)./dists;
+    Ye = Ye(:)./dists;
+    Ze = Ze(:)./dists;
     %plotchans3d([ Xe Ye Ze], cellstr(ElectrodeNames)); return;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -436,9 +434,20 @@ if isstr(values)
         end
     else 
         fprintf('Using original electrode locations on head...\n');
-        newElect(:,1) = -cell2mat( tmpY(indices) )';
-        newElect(:,2) =  cell2mat( tmpX(indices) )';
-        newElect(:,3) =  cell2mat( tmpZ(indices) )';        
+        newElect(:,1) = cell2mat( tmpX(indices) )';
+        newElect(:,2) = cell2mat( tmpY(indices) )';
+        newElect(:,3) = cell2mat( tmpZ(indices) )';        
+    end;
+    
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % plot mesh and electrodes only
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if strcmpi(g.plotmeshonly, 'on')
+        plotmesh(TRI1, POS);
+        plotelecopt.labelflag = 0;
+        plotelec(newElect, ElectrodeNames, HeadCenter, plotelecopt);
+        rotate3d;
+        return;
     end;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -471,10 +480,11 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Save spline file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    comment = g.comment;
-    try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');   
+    comment          = g.comment;
+    headplot_version = 2;
+    try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment', 'headplot_version');   
     catch,
-        try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment');
+        try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment', 'headplot_version');
         catch, error('headplot: save spline file error, out of space or file permission problem');
         end;
     end;
@@ -546,6 +556,7 @@ else
        'lights'     'real'   []              DEFAULT_LIGHTS;
        'view'       'real'   []              [143 18];
        'colormap'   'real'   []              jet(64);
+       'transform'  'real'   []              [];
        'meshfile'   'string' []              DEFAULT_MESH;
        'electrodes' 'string' { 'on' 'off' }  'on';            
        'orilocs'    { 'string' 'struct' } [] '';            
@@ -565,15 +576,24 @@ else
 	  close;
 	  error('headplot(): Number of values in spline file should equal number of electrodes')
   end
+  
   % change electrode if necessary
   % -----------------------------
   if ~isempty(g.orilocs)
       eloc_file = readlocs( g.orilocs );
       fprintf('Using original electrode locations on head...\n');
       indices = find(~cellfun('isempty', { eloc_file.X } ));
-      newElect(:,1) = -cell2mat( { eloc_file(indices).Y } )';
-      newElect(:,2) =  cell2mat( { eloc_file(indices).X } )';
-      newElect(:,3) =  cell2mat( { eloc_file(indices).Z } )';        
+      newElect(:,1) = cell2mat( { eloc_file(indices).X } )'; % attention inversion before
+      newElect(:,2) = cell2mat( { eloc_file(indices).Y } )';
+      newElect(:,3) = cell2mat( { eloc_file(indices).Z } )';        
+      
+      % optional transformation
+      % -----------------------
+      if ~isempty(g.transform)
+          transmat  = traditional( g.transform ); % arno
+          newElect  = transmat*[ newElect ones(size(newElect,1),1)]';
+          newElect  = newElect(1:3,:)';
+      end;
   end;
   
   % load mesh file
@@ -741,36 +761,12 @@ else
   end
   
   if strcmp(g.electrodes,'on') % plot the electrode locations
-   if exist('newElect')
-    newNames = newElect*NamesDFac; % Calculate electrode label positions
-    for i = 1:size(newElect,1)
-        if newElect(i,:) ~= [0 0 0]  % plot radial lines to electrode sites
-            line([newElect(i,1) HeadCenter(1)],[newElect(i,2) HeadCenter(2)],...
-                 [newElect(i,3) HeadCenter(3)],'color',MarkerColor,'linewidth',1);
-            
-            if g.labels == 1        % plot electrode numbers
-                t=text(newNames(i,1),newNames(i,2),newNames(i,3),int2str(i)); 
-                set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
-                      'HorizontalAlignment','center');
-                
-            elseif g.labels == 2   % plot electrode names
-                if exist('ElectrodeNames')
-                    name = sprintf('%s',ElectrodeNames(i,:));
-                    t=text(newNames(i,1),newNames(i,2),newNames(i,3),name);
-                    set(t,'Color',NamesColor,'FontSize',NamesSize,'FontWeight','bold',...
-                          'HorizontalAlignment','center'); 
-                else
-                    fprintf('Variable ElectrodeNames not read from spline file.\n');
-                end
-            else               % plot electrode markers
-                line(newElect(:,1),newElect(:,2),newElect(:,3),'marker',...
-                     '.','markersize',20,'color',MarkerColor,'linestyle','none');
-            end
-        end
-    end
-   else
-       fprintf('Variable newElect not read from spline file.\n');
-   end
+      if exist('newElect')
+          plotelecopt.labelflag = g.labels;
+          plotelec(newElect, ElectrodeNames, HeadCenter, plotelecopt);
+      else
+          fprintf('Variable newElect not read from spline file.\n');
+      end
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -823,3 +819,35 @@ for i = 1:l1
   x = w(i,:)'*ones(1,l2);
   out(i,:) = sum((x-p).^2).^.5;
 end
+
+% %%%%%%%%%%%%%%%
+% plot electrodes
+% %%%%%%%%%%%%%%%
+function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
+    
+    newNames = newElect*opt.NamesDFac; % Calculate electrode label positions
+    for i = 1:size(newElect,1)
+        if newElect(i,:) ~= [0 0 0]  % plot radial lines to electrode sites
+            line([newElect(i,1) HeadCenter(1)],[newElect(i,2) HeadCenter(2)],...
+                 [newElect(i,3) HeadCenter(3)],'color',opt.MarkerColor,'linewidth',1);
+            
+            if opt.labelflag == 1        % plot electrode numbers
+                t=text(newNames(i,1),newNames(i,2),newNames(i,3),int2str(i)); 
+                set(t,'Color',opt.NamesColor,'FontSize',opt.NamesSize,'FontWeight','bold',...
+                      'HorizontalAlignment','center');
+                
+            elseif opt.labelflag == 2   % plot electrode names
+                if exist('ElectrodeNames')
+                    name = sprintf('%s',ElectrodeNames(i,:));
+                    t=text(newNames(i,1),newNames(i,2),newNames(i,3),name);
+                    set(t,'Color',opt.NamesColor,'FontSize',opt.NamesSize,'FontWeight','bold',...
+                          'HorizontalAlignment','center'); 
+                else
+                    fprintf('Variable ElectrodeNames not read from spline file.\n');
+                end
+            else               % plot electrode markers
+                line(newElect(:,1),newElect(:,2),newElect(:,3),'marker',...
+                     '.','markersize',20,'color',opt.MarkerColor,'linestyle','none');
+            end
+        end
+    end;
