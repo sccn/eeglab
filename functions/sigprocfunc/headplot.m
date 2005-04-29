@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2005/04/29 23:33:09  arno
+% new transformation for Julie's head
+%
 % Revision 1.52  2005/04/29 01:01:31  arno
 % new transformation for Julie's head
 %
@@ -285,7 +288,7 @@ icadefs   % load definitions
 set(gca,'Color',BACKCOLOR);
 DEFAULT_MESH      = ['mheadnew.mat'];      % upper head model file (987K)
 DEFAULT_TRANSFORM = [0 -5 0 -0.1000 0 -1.5700 1040 800 950]; % stretching in different dimensions
-DEFAULT_TRANSFORM = [0 -10 0 -0.1000 0 -1.5700 1100 1100 1100]; % keep spherical shape.
+DEFAULT_TRANSFORM = [0 -10 0 -0.1000 0 -1.600 1100 1100 1100]; % keep spherical shape.
 %DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
 %DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
                                  % whole head model file (183K)
