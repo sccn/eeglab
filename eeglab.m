@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.365  2005/05/12 15:57:24  arno
+% changing for Matlab 7.2 compatibility thanks to Andreas Widmann
+%
 % Revision 1.364  2005/03/08 16:16:35  arno
 % adding eeglab path
 %
@@ -1637,7 +1640,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
     p = p(1:findstr(p,'eeglab.m')-1);
     dircontent1 = what(p);
     dircontent  = dir([ p 'plugins' ]);
-    delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
+    delimiter = p(end); if strcmpi(delimiter, ':'), delimiter = '::'; end;
     dircontent  = { dircontent1.m{:} dircontent.name };
 
     % scan plugin folder
