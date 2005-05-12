@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.364  2005/03/08 16:16:35  arno
+% adding eeglab path
+%
 % Revision 1.363  2005/03/05 02:08:02  arno
 % same
 %
@@ -1644,7 +1647,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
         % find function
         % -------------
         funcname = '';
-        if exist(dircontent{index}) == 7
+        if exist([p 'plugins' delimiter dircontent{index}]) == 7
             if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
                 addpath([ p 'plugins' delimiter dircontent{index} ]);
                 tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
