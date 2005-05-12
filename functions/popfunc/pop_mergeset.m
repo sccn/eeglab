@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2004/12/08 18:29:20  arno
+% creating event table if does not exist to insert boundary event
+%
 % Revision 1.31  2004/11/18 23:20:25  arno
 % fixed urevent boundary latency
 %
@@ -311,7 +314,7 @@ else
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
-            INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+0.5, 0);
+            INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+1, 0); %+1 since 0.5 is subtracted
         end;
  
 	end;
