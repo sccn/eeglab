@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/12/08 18:01:55  arno
+% debug offset
+%
 % Revision 1.26  2004/11/17 00:13:49  arno
 % adding 1 to offset
 %
@@ -218,6 +221,16 @@ if ~isempty(I)
     EEG.event(1:length(I),2) = [ r.event(I).offset ]+1;
     EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 end;
+
+% modified by Andreas Widmann  2005/05/12  14:15:00
+temp = find([r.event.accept_ev1] == 14 | [r.event.accept_ev1] == 11); % 14: Discontinuity, 11: DC reset
+if ~isempty(temp)
+    disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
+    for index = 1:length(temp)
+        EEG.event(temp(index)).type = 'boundary';
+    end;
+end
+% end modification
 
 % process keyboard entries
 % ------------------------
