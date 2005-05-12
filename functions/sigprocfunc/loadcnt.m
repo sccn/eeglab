@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/11/23 17:08:57  hilit
+% fixed a typo
+%
 % Revision 1.18  2004/09/14 23:31:57  arno
 % dataformat
 %
@@ -407,7 +410,14 @@ if type == 'cnt'
               for i=1:nevents
                   ev2(i).stimtype      = fread(fid,1,'ushort');
                   ev2(i).keyboard      = fread(fid,1,'char');
-                  ev2(i).keypad_accept = fread(fid,1,'char');
+
+% modified by Andreas Widmann  2005/05/12  14:15:00
+                  %ev2(i).keypad_accept = fread(fid,1,'char');
+                  temp                 = fread(fid,1,'uint8');
+                  ev2(i).keypad_accept = bitand(15,temp);
+                  ev2(i).accept_ev1    = bitshift(temp,-4);
+% end modification
+
                   ev2(i).offset        = fread(fid,1,'long');
                   ev2(i).type          = fread(fid,1,'short'); 
                   ev2(i).code          = fread(fid,1,'short');
@@ -426,7 +436,14 @@ if type == 'cnt'
               for i=1:nevents
                   ev2(i).stimtype      = fread(fid,1,'ushort');
                   ev2(i).keyboard      = fread(fid,1,'char');
-                  ev2(i).keypad_accept = fread(fid,1,'char');
+
+% modified by Andreas Widmann  2005/05/12  14:15:00
+                  %ev2(i).keypad_accept = fread(fid,1,'char');
+                  temp                 = fread(fid,1,'uint8');
+                  ev2(i).keypad_accept = bitand(15,temp);
+                  ev2(i).accept_ev1    = bitshift(temp,-4);
+% end modification
+
                   ev2(i).offset        = fread(fid,1,'long');
               end;
           else
