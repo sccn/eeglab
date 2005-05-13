@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/12/10 22:24:01  arno
+% erasing ICA matrix
+%
 % Revision 1.24  2004/08/20 23:32:01  arno
 % debug filtering between boundaries
 %
@@ -203,7 +206,7 @@ if EEG.trials == 1
 			disp('Pop_eegfilt:finding continuous data boundaries');
 			tmplat = cell2mat({EEG.event.latency});
             boundaries = tmplat(boundaries);
-            boundaries = [0 round(boundaries-0.5) EEG.pnts];
+            boundaries = [0 floor(boundaries-0.49) EEG.pnts];
             try, warning off MATLAB:divideByZero
             catch, end;
 			for n=1:length(boundaries)-1
