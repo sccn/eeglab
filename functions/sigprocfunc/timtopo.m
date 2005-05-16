@@ -3,22 +3,27 @@
 % Usage:
 %  >> timtopo(data,'chan_locs');
 %  >> timtopo(data,'chan_locs',[limits],[plottimes]','title',[plotchans], ...
-%                    [voffsets], 'key', 'val', ...);
+%                                                     [voffsets], 'key', 'val', ...);
 % Inputs:
 %  data       = (channels,frames) single-epoch data matrix
-%  chan_locs  = EEGLAB channel location file or EEG.chanlocs structure. 
+%  chan_locs  = channel location file or EEG.chanlocs structure. 
 %               See >> topoplot example for file format.
 %
-% Optional inputs:
-%  [limits]   = [minms maxms minval maxval] data limits for latency (in ms) and data values
-%               {default|0 -> use [0 npts-1 data_min data_max]; else [minms maxms] or [minms maxms 0 0] 
-%               -> use [minms maxms data_min data_max]
-%  plottimes  = vector of latencies (in ms) to plot scalp maps {default|NaN -> latency of maximum variance}
-% 'title'     = plot title {default|0 -> none}
+% Optional ordered inputs:
+%  [limits]   = [minms maxms minval maxval] data limits for latency (in ms) and y-values
+%                (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
+%               else [minms maxms] or [minms maxms 0 0] -> use
+%                [minms maxms data_min data_max]
+%  plottimes  = [vector] latencies (in ms) at which to plot scalp maps 
+%                {default|NaN -> latency of maximum variance}
+% 'title'     = [string] plot title {default|0 -> none}
 %  plotchans  = vector of data channel(s) to plot {default|0 -> all}
-%  voffsets   = vector of (plotting-unit) distances vertical lines extend above the data {default -> all =}
+%  voffsets   = vector of (plotting-unit) distances vertical lines should extend 
+%                above the data (in special cases) {default -> all = standard}
+%
+% Optional keyword, arg pair inputs (must come after the above):
 % 'topokey','val' = optional topoplot() scalp map plotting arguments. See >> help topoplot 
-
+%
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 1-10-98 
 %
 % See also: envtopo(), topoplot()
@@ -40,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2005/03/05 02:28:36  arno
+% debug argument passing to topoplot
+%
 % Revision 1.70  2004/10/20 15:20:27  scott
 % still bug at line 551 -sm
 %
@@ -260,6 +268,8 @@
 
 function M = timtopo(data,chan_locs,limits,plottimes,titl,plotchans,voffsets, varargin)
 
+MAX_TOPOS = 24;
+
 if nargin < 1
    help timtopo;
    return
@@ -269,7 +279,7 @@ end
 icadefs;   
 
 if nargin < 7 | voffsets == 0
-  voffsets = zeros(1,32);
+  voffsets = zeros(1,MAX_TOPOS);
 end
 
 if nargin < 6
@@ -314,6 +324,8 @@ end
   elseif length(limits) == 2  % [minms maxms] only
     ymin=min(min(data));
     ymax=max(max(data));
+    xmin = limits(1);
+    xmax = limits(2);
  elseif length(limits) == 4
     xmin = limits(1);
     xmax = limits(2);
@@ -355,9 +367,8 @@ sampint = (xmax-xmin)/(frames-1); % sampling interval = 1000/srate;
 x = xmin:sampint:xmax;   % make vector of x-values
 
 %
-%%%%%%%%%%%%%%% Compute plotframes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Compute plot times/frames %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-
 if plottimes_set == 0
   [mx plotframes] = max(sum(data.*data)); 
                   % default plotting frame has max variance
@@ -370,17 +381,21 @@ if plottimes_set == 0
 end;
 
 if plottimes_set == 1
-	plottimes = sort(plottimes);
   ntopos = length(plottimes);
-  if ntopos > 32
-    fprintf('timtopo(): too many plottimes!\n');
-    return
+  if ntopos > MAX_TOPOS
+    fprintf('timtopo(): too many plottimes - only first %d will be shown!\n',MAX_TOPOS);
+    plottimes = plottimes(1:MAX_TOPOS);
+    ntopos = MAX_TOPOS;
   end
+
   if max(plottimes) > xmax | min(plottimes)< xmin
-    fprintf('timtopo(): plottimes latencies out of range - cannot plot.\n');
+    fprintf(...
+'timtopo(): at least one plottimes value outside of epoch latency range - cannot plot.\n');
     return
   end
-  plottimes = sort(plottimes); % put map latencies in ascending order, else map lines would cross.
+
+  plottimes = sort(plottimes); % put map latencies in ascending order, 
+                               % else map lines would cross.
   xshift = [x(2:frames) xmax];
   plotframes = ones(size(plottimes));
   for t = 1:ntopos
@@ -397,6 +412,9 @@ while vlen< ntopos
         vlen=vlen+1;
 end
 
+%
+%%%%%%%%%%%%%%%%  Compute title and axes font sizes %%%%%%%%%%%%%%%
+%
 pos = get(gca,'Position');
 axis('off')
 cla % clear the current axes
@@ -417,9 +435,12 @@ else
    axfont = 8;
 end
 
+%
+%%%%%%%%%%%%%%%% Compute topoplot head width and separation %%%%%%%%%%%%%%%
+%
 head_sep = 0.2;
-topowidth = pos(3)/(ntopos+(ntopos-1)/5); % width of each topoplot
-if topowidth> 0.25*pos(4) % dont make too high
+topowidth = pos(3)/((6*ntopos-1)/5); % width of each topoplot
+if topowidth> 0.25*pos(4) % dont make too large (more than 1/4 of axes width)!
   topowidth = 0.25*pos(4);
 end
 
@@ -429,6 +450,7 @@ if rem(ntopos,2) == 1  % odd number of topos
 else % even number of topos
    topoleft = pos(3)/2 - ((halfn)+(halfn-1)*head_sep)*topowidth;
 end
+topoleft = topoleft - 0.01; % adjust left a bit for colorbar
 
 if max(plotframes) > frames |  min(plotframes) < 1
     fprintf('Requested map frame %d is outside data range (1-%d)\n',max(plotframes),frames);
@@ -453,7 +475,9 @@ fprintf('\n');
 %
 %%%%%%%%%%%%%%%%%%%%%%% Plot the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% site the plot at bottom of the figure
+%
+%%%%%%%%%%%% site the plot at bottom of the figure %%%%%%%%%%%%%%%%%%
+%
 axdata = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',axfont);
 set(axdata,'Color',BACKCOLOR);
 
@@ -469,10 +493,10 @@ if length(plotchans)==1
   set(pl,'color','k');
   set(pl,'linewidth',2);
 end
-l= xlabel('Latency (ms)');
-set(l,'FontSize',axfont);
-l=ylabel('Potential (uV)');
-set(l,'FontSize',axfont);
+xl= xlabel('Latency (ms)');
+set(xl,'FontSize',axfont);
+yl=ylabel('Potential (\muV)');
+set(yl,'FontSize',axfont,'FontAngle','normal');
 axis([xmin xmax ymin ymax]);
 hold on
 
@@ -490,7 +514,7 @@ end
 %
 width  = xmax-xmin;
 height = ymax-ymin;
-linc = 0.5;  % increment line thickness
+lwidth = 1.5;  % increment line thickness
 
 for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
  if length(plotchans)>1 | voffsets(t)
@@ -501,37 +525,37 @@ for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
   l1 = plot([plottimes(t) plottimes(t)],...
        [min(data(plotchans,plotframes(t))) ...
        voffsets(t) + max(data(plotchans,plotframes(t)))],'b'); % blue line
-  set(l1,'linewidth',1+linc);
+  set(l1,'linewidth',lwidth);
  end
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 axall = axes('Position',pos,...
-             'Visible','Off','FontSize',axfont);    % whole-gca invisible axes
+             'Visible','Off','FontSize',axfont);   % whole-gca invisible axes
 axes(axall)
 set(axall,'Color',BACKCOLOR);
 axis([0 1 0 1])
-
   axes(axall)
   axis([0 1 0 1]);
-  set(gca,'Visible','off');
+  set(gca,'Visible','off'); % make whole-figure axes invisible
 
 for t=1:ntopos % draw oblique lines through to the topoplots 
   maxdata = max(data(:,plotframes(t))); % max data value at plotframe
   axtp = axes('Units','Normalized','Position',...
-       [topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
+       [pos(1)+topoleft+(t-1)*(1+head_sep)*topowidth ...
               pos(2)+0.66*pos(4) ...
                   topowidth ...
                        topowidth*(1+head_sep)]); % this will be the topoplot axes
+                       % topowidth]); % this will be the topoplot axes
   axis([-1 1 -1 1]);
 
-  from = changeunits([plottimes(t),maxdata],axdata,axall);
-  to   = changeunits([0,-0.89],axtp,axall);
+  from = changeunits([plottimes(t),maxdata],axdata,axall); % data axes
+  to   = changeunits([0,-0.74],axtp,axall);                % topoplot axes
   delete(axtp);
-  axes(axall);
+  axes(axall);                                             % whole figure axes
   l1 = plot([from(1) to(1)],[from(2) to(2)]);
-  set(l1,'linewidth',1+linc);
+  set(l1,'linewidth',lwidth);
 
   hold on
   set(axall,'Visible','off');
@@ -540,6 +564,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the topoplots %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+topoaxes = zeros(1,ntopos);
 for t=1:ntopos
        % [pos(3)*topoleft+pos(1)+(t-1)*(1+head_sep)*topowidth ...
   axtp = axes('Units','Normalized','Position',...
@@ -547,6 +572,7 @@ for t=1:ntopos
               pos(2)+0.66*pos(4) ...
                   topowidth topowidth*(1+head_sep)]);
   axes(axtp)                             % topoplot axes
+  topoaxes(t) = axtp; % save axes handles
   cla
 
   if ~isempty(varargin)
@@ -563,27 +589,43 @@ for t=1:ntopos
   %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
   
-  timetext = [num2str(plottimes(t),'%4.0f') ' ms'];
-  text(0.00,0.60,timetext,'FontSize',axfont-2,'HorizontalAlignment','Center'); % ,'fontweight','bold');
+  timetext = [num2str(plottimes(t),'%4.0f')];
+  % timetext = [num2str(plottimes(t),'%4.0f') ' ms']; % add ' ms'
+  text(0.00,0.80,timetext,'FontSize',axfont-3,'HorizontalAlignment','Center'); % ,'fontweight','bold');
 end
 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% Plot a topoplot colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axcb = axes('Position',[pos(1)+pos(3)*0.985 pos(2)+0.62*pos(4) pos(3)*0.02 pos(4)*0.09]);
+axcb = axes('Position',[pos(1)+pos(3)*0.995 pos(2)+0.62*pos(4) pos(3)*0.02 pos(4)*0.09]);
 h=cbar(axcb);                        % colorbar axes
 pos_cb = get(axcb,'Position');
 set(h,'Ytick',[]);
 
 axes(axall)
 set(axall,'Color',axcolor);
-text(0.16,0.635,titl,'FontSize',titlefont,'HorizontalAlignment','Center'); % 'FontWeight','Bold');
+%
+%%%%%%%%%%%%%%%%%%%%% Plot the color bar '+' and '-' %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+text(0.986,0.695,'+','FontSize',axfont,'HorizontalAlignment','Center');
+text(0.986,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
 
-text(0.966,0.695,'+','FontSize',axfont,'HorizontalAlignment','Center');
-text(0.966,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
+%
+%%%%%%%%%%%%%%%%%%%%%%%%% Plot the plot title if any %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% plot title between data panel and topoplots (to avoid crowding at top of figure), on the left
+ttl = text(0.03,0.635,titl,'FontSize',titlefont,'HorizontalAlignment','left'); % 'FontWeight','Bold');
+
+% textent = get(ttl,'extent');
+% titlwidth = textent(3);
+% ttlpos = get(ttl,'position');
+% set(ttl,'position',[     ttlpos(2), ttlpos(3)]);
 
 axes(axall)
 set(axall,'layer','top'); % bring component lines to top
+for t = 1:ntopos
+  set(topoaxes(t),'layer','top'); % bring topoplots to very top
+end
 
   if ~isempty(varargin)
     try,
