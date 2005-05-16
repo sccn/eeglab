@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2005/04/22 21:11:46  arno
+% alltfx twice
+%
 % Revision 1.68  2005/04/08 22:56:57  arno
 % help msg etc.. for chaninfo
 %
@@ -1094,8 +1097,7 @@ elseif strcmp(g.angleunit,'deg')  % convert to degrees
 else
    maxangle = pi;  % radians
 end
-Rangle(find(Rraw==0)) = 0; % when plotting, mask for significance 
-                           % = set angle at non-signif coher points to 0
+
 R = abs(R);
 
 % if ~isnan(g.baseline)
@@ -1103,6 +1105,9 @@ R = abs(R);
 % end;
 
 Rraw = R; % raw coherence (e.g., coherency) magnitude values output
+
+Rangle(find(Rraw==0)) = 0; % when plotting, mask for significance 
+                           % = set angle at non-signif coher points to 0
 
 if g.plot
    fprintf('\nNow plotting...\n');
