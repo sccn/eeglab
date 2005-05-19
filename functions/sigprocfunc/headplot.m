@@ -34,6 +34,10 @@
 %                   [ shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ ]
 %                   to coregister electrode locations with the head mesh. This
 %                   array is returned by the coregister() function.
+%   'plotmeshonly' - [string] plot only mesh and electrode position. Options are
+%                    'head' to plot the standard head mesh, 'sphere' to plot the
+%                    texture of the head on a sphere, and 'off' (default) not to
+%                    plot anything.
 %
 % General usage:
 %   >> headplot(values,'spline_file','Param','Value',...)
@@ -101,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2005/04/29 23:37:45  arno
+% small adjustment
+%
 % Revision 1.53  2005/04/29 23:33:09  arno
 % new transformation for Julie's head
 %
