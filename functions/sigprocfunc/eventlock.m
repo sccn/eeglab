@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/17 00:17:24  arno
+% header
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -105,7 +108,7 @@ else
 end
 
 if MULTICHANNEL
-  if ceil(frames*ntrials ~= size(data,2))
+  if ceil(double(frames*ntrials) ~= size(data,2))
    fprintf(...
  'Input data length (%d) is not a multiple of the eventframes length (%d).\n',...
                    size(data,2),                                    frames);
