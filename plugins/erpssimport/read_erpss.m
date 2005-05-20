@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/04/08 23:23:41  arno
+% rescale to microvolt
+%
 % Revision 1.23  2005/03/11 00:07:03  arno
 % message
 %
@@ -125,7 +128,10 @@ function [eeg,ev,header] = read_erpss(filename)
                     header.nsteps              = double(fread(fp,1,'uint32'));
                     fseek(fp,24+110*4+nchans*block_size*2,0);
                 end;
-                header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
+                
+                if (header.ad_range_mv ~= 0) & (header.amplif ~= 0) | (header.ad_bits ~= 0)
+                    header.rescaleuv = header.ad_range_mv*1000 / header.amplif / pow2(header.ad_bits);
+                end                
                 if header.divider & header.clock_freq
                     header.srate     = header.clock_freq/header.divider/header.nsteps;
                     if round(header.srate)
