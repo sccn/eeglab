@@ -254,7 +254,9 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
             is0epoch = 0;
             for z = 1:length(EEG.event(evidx).epoch) % for each epoch the event is in
               ep = EEG.event(evidx).epoch(z);
+EEG.epoch(ep)
               for e = 1:length(EEG.epoch(ep).event) % for each event in the epoch
+fprintf('%d %d  ',ep,e)
                 if EEG.epoch(ep).event(e) == evidx
                   if EEG.epoch(ep).eventlatency{e} == 0
                       targepochs(targetcount) = ep;
