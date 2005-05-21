@@ -268,10 +268,7 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
                 break; 
               end
             end % for
-
-            if ~is0epoch
-                  noepochs = noepochs+1;
-            end 
+            if ~is0epoch, noepochs = noepochs+1; end 
       end
 
        targs(targetcount) = evidx;                  % save event index
@@ -301,15 +298,15 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
    seekpos = negpos(npidx);                          % begin with first negpos position
    while uidx > 0 & npidx <= nnegpos                 % search through previous urevents
      if strcmpi(num2str(EEG.urevent(uidx).type),'boundary')  % flag boundary urevents
-        if isfield(EEG.urevent,'duration') ...
-          if isnan(EEG.urevent(uidx).duration) ...
-           | isempty(EEG.urevent(uidx).duration)     % pre-v4.4 or real break urevent (NaN duration)
+        if ~isfield(EEG.urevent,'duration') ...
+          | ( isnan(EEG.urevent(uidx).duration) ...
+             | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
+                                                     %   (NaN duration)
              if ~isfield(EEG.urevent,'duration') ... % pre version-4.4 dataset
                     & breakwarning == 0
                fprintf('Pre-v4.4 boundary urevent found - duration field not defined.');
                breakwarning = 1;
              end
-          end
         end
         break           % don't search for neighbors across a boundary urevent
      end
@@ -367,14 +364,14 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
      isneighbor = 0;                                 % initialize neighbor flag
      if strcmpi(num2str(EEG.urevent(uidx).type),'boundary')  % flag boundary events
         if ~isfield(EEG.urevent,'duration') ...
-          if isnan(EEG.urevent(uidx).duration) ...
-           | isempty(EEG.urevent(uidx).duration)     % pre-v4.4 or real break urevent (NaN duration)
-             if ~isfield(EEG.urevent,'duration') ... % pre version-4.4 dataset
+          | ( isnan(EEG.urevent(uidx).duration) ...
+              | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
+                                                      %   (NaN duration)
+             if ~isfield(EEG.urevent,'duration') ...  % pre version-4.4 dataset
                     & breakwarning == 0
                fprintf('Pre-v4.4 boundary urevent found - duration field not defined.');
                breakwarning = 1;
              end
-          end
         end
         break           % don't search for neighbors across a boundary urevent
      end
@@ -383,7 +380,8 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
      while ~isneighbor & pidx<=length(neighbors)     % for each neighbor event type
-       if strcmpi(num2str(EEG.urevent(uidx).type),neighbors(pidx)) | strcmp(neighbors,'_ALL')
+       if strcmpi(num2str(EEG.urevent(uidx).type),neighbors(pidx)) ...
+                          | strcmp(neighbors,'_ALL')
          isneighbor=1;                               % flag 'neighbors' event
          curpos = curpos+1;
          %
