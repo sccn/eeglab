@@ -98,6 +98,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2004/02/27 19:11:09  arno
+% reintroducing non-FFT min
+%
 % Revision 1.43  2004/02/27 19:07:07  arno
 % fixing fft limits
 %
@@ -528,6 +531,9 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize,
         % ----------------
         wintime = 500*winsize/srate;
         tmpind  = find( (timevals >= tlimits(1)+wintime) & (timevals <= tlimits(2)-wintime) );
+        if isempty(tmpind)
+            error('No time points. Reduce time window or minimum frequency.');
+        end;
         if  length(timevals) ~= length(tmpind)
             fprintf('Warning: %d out of %d time values were removed (now %3.2f to %3.2f ms) so the lowest\n', ...
                     length(timevals)-length(tmpind), length(timevals), timevals(tmpind(1)), timevals(tmpind(end)));
