@@ -128,7 +128,7 @@ if ~isnan(g.align.val)
     g.oldevents = oldevent;
     g.align.txt = sprintf([ 'Check alignment between pre-existing (old) and loaded event' ...
                           ' latencies:\nOld event latencies (10 first): %s ...\n' ], ...
-                          int2str(cell2mat({ oldevent(1:min(10, length(oldevent))).latency })));
+                          int2str([ oldevent(1:min(10, length(oldevent))).latency ]));
 else
     g.oldevents = [];
 end;
@@ -176,7 +176,7 @@ for curfield = tmpfields'
                               for indtmp = 1:length(g.indices)
                                   event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
                               end;
-                          else event = setstruct( event, g.fields{eventfield}, g.indices, cell2mat(tmparray(:,eventfield)));
+                          else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
                           end;
                       end;      
 					  % generate ori fields
@@ -222,7 +222,7 @@ function array = load_file_or_array( varname, skipline, delim );
          if isstr(varname)
              array = evalin('base', varname);
              if ~iscell(array)
-                 array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
+                 array = mattocell(array, ones(1, size(array,1)), ones(1, size(array,2)));
              end;    
          else
              array = varname;
@@ -263,11 +263,11 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             disp('                  that were read, so their latencies may have been wrongly re-aligned');
         end;           
         fprintf(align.txt);
-        fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
+        fprintf('New event latencies (10 first): %s ...\n', int2str(round([ event(1:min(10, length(event))).latency ])));
     end;
     if strcmpi(optimalign, 'on') & ~isempty(oldevents)
-        newlat = cell2mat({ event.latency     });
-        oldlat = cell2mat({ oldevents.latency });
+        newlat = [ event.latency     ];
+        oldlat = [ oldevents.latency ];
        
         newlat = repmat(newlat, [length(oldlat) 1]);
         oldlat = repmat(oldlat', [1 size(newlat,2)]);
@@ -302,8 +302,8 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
         end;
         if ~isempty(oldevents)
-            fprintf('Old event latencies (10 first): %s ...\n', int2str(round(cell2mat({ oldevents(1:min(10, length(oldevents))).latency }))));
-            fprintf('New event latencies (10 first): %s ...\n', int2str(round(cell2mat({ event(1:min(10, length(event))).latency }))));
+            fprintf('Old event latencies (10 first): %s ...\n', int2str(round([ oldevents(1:min(10, length(oldevents))).latency ])));
+            fprintf('New event latencies (10 first): %s ...\n', int2str(round([ event(1:min(10, length(event))).latency ])));
         end;
     else
         % must add one (because first sample point has latency 0

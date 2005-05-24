@@ -87,6 +87,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/10/16 21:12:46  scott
+% editing help message -- NEEDS MORE WORK! 'delold' and adding events to end of event struct
+% do not appear to be working -sm
+%
 % Revision 1.36  2004/08/25 00:30:37  arno
 % remove converting inputnames
 %
@@ -442,7 +446,7 @@ for curfield = tmpfields'
 		                          disp(['pop_editeventfield(): creating new field ''' curfield{1} '''' ]);
 		                      end;
                               try
-                                  EEG.event = setstruct(EEG.event, curfield{1}, g.indices, cell2mat(tmparray));
+                                  EEG.event = setstruct(EEG.event, curfield{1}, g.indices, [ tmparray{:} ]);
                               catch,
                                   error('Wrong size for input array');
                               end;
@@ -525,7 +529,7 @@ function array = load_file_or_array( varname, skipline, delim );
              % --------------------------
             array = evalin('base', varname);
             if ~iscell(array)
-                array = mat2cell(array, ones(1, size(array,1)), ones(1, size(array,2)));
+                array = mattocell(array, ones(1, size(array,1)), ones(1, size(array,2)));
             end;   
         end;
     else

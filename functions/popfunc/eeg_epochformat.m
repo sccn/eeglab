@@ -28,7 +28,7 @@
 %          type >> EEG.epoch(i)
 %          Unfortunately, structures are awkward for expert users to deal
 %          with from the command line (Ex: To get an array of 'var1' values,
-%           >> cell2mat({EEG.epoch(:).var1})')
+%           >> celltomat({EEG.epoch(:).var1})')
 %          In array format, asuming 'var1' is the first variable
 %          declared, the same information is obtained by
 %           >> EEG.epoch(:,1)
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/07/20 19:32:20  scott
+% typos
+%
 % Revision 1.2  2002/04/21 01:10:35  scott
 % *** empty log message ***
 %
@@ -93,7 +96,7 @@ case 'struct'
           if iscell(epoch)
               command = [ command '''' fields{index} ''', epoch(:,' num2str(index) ')'',' ];
           else
-              command = [ command '''' fields{index} ''', mat2cell( epoch(:,' num2str(index) ')'',' ...
+              command = [ command '''' fields{index} ''', mattocell( epoch(:,' num2str(index) ')'',' ...
                             '[1], ones(1,size(epoch,1))),' ];
           end;                  
       end;
@@ -123,7 +126,7 @@ case 'array'
 
        tmp = zeros( length(epoch), length( epochfield ));
 	   for index = 1:length( epochfield )
-	        eval([ 'tmp(:, index) = cell2mat({ epoch(:).' epochfield{index} '})'';' ]);
+	        eval([ 'tmp(:, index) = celltomat({ epoch(:).' epochfield{index} '})'';' ]);
        end;
        epoch = tmp;
     end;
