@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/05/24 17:55:40  arno
+% ceremove cell2mat
+%
 % Revision 1.10  2005/04/12 23:41:41  arno
 % fixed model
 %
@@ -346,7 +349,7 @@ function elc = getelecpos(chanlocs, dipfitstruct);
     catch
         disp('No 3-D carthesian coordinates; re-computing them from 2-D polar coordinates');
         EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
-        elc = cell2mat({chanlocs.X; chanlocs.Y; chanlocs.Z}');
+        elc = [ [chanlocs.X]' [chanlocs.Y]' [chanlocs.Z]' ];
     end;
     % constrain electrode to sphere
     % -----------------------------
