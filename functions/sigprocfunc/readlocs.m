@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2005/03/10 17:42:11  arno
+% new format for channel location info
+%
 % Revision 1.70  2005/03/08 23:19:24  arno
 % using old function to read asa format
 %
@@ -499,8 +502,8 @@ if isstr(filename)
    elseif strcmp(g.filetype, 'elc')
        eloc = readeetraklocs( filename );
        %eloc = read_asa_elc( filename ); % from fieldtrip
-       %eloc = struct('labels', eloc.label, 'X', mat2cell(eloc.pnt(:,1)'), 'Y', ...
-       %                        mat2cell(eloc.pnt(:,2)'), 'Z', mat2cell(eloc.pnt(:,3)'));
+       %eloc = struct('labels', eloc.label, 'X', mattocell(eloc.pnt(:,1)'), 'Y', ...
+       %                        mattocell(eloc.pnt(:,2)'), 'Z', mattocell(eloc.pnt(:,3)'));
        eloc = convertlocs(eloc, 'cart2all');
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
@@ -629,7 +632,7 @@ if isstr(filename)
        if ~isnumeric(eloc(1).channum)
            error('Channel numbers must be numeric');
        end;
-       allchannum = cell2mat( { eloc.channum } );
+       allchannum = [ eloc.channum ];
        if any( sort(allchannum) ~= allchannum )
            fprintf('readlocs(): Re-sorting channel numbers based on ''channum'' column indices\n');
            [tmp newindices] = sort(allchannum);
@@ -650,11 +653,11 @@ end;
 if nargout > 2
     tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
     indices = find(~cellfun('isempty', tmptheta));
-    theta = cell2mat(tmptheta(indices));
+    theta = [ tmptheta{indices} ];
 end;
 if nargout > 3
     tmprad = { eloc.radius };
-    radius  = cell2mat(tmprad(indices));
+    radius  = [ tmprad{indices} ];
 end;
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
 %disp('Converting channel labels to string');
