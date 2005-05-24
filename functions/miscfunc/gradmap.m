@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/07/26 18:10:28  arno
+% debug for eeglab
+%
 % Revision 1.2  2004/07/26 18:02:23  arno
 % *** empty log message ***
 %
@@ -68,7 +71,7 @@ else
     fe = find(cellfun('isempty', { tmploc.theta }));
     tmploc(fe) = [];
     map(fe,:) = [];
-	[x,y] = pol2cart(cell2mat({tmploc.theta}),cell2mat({tmploc.radius}));
+	[x,y] = pol2cart( [ tmploc.theta ] , [ tmploc.radius ] );
 end;	
 
 % locates nearest position of electrod in the grid 
