@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/12/17 23:18:02  arno
+% debug scaling
+%
 % Revision 1.3  2003/12/10 01:19:28  arno
 % typo
 %
@@ -178,7 +181,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         if strcmpi(g.uniform, 'off')
             % remove all vertical electrodes for horizontal scaling
             % -----------------------------------------------------
-            theta  = cell2mat({locs1020.theta});
+            theta  = [ locs1020.theta ];
             indxh  = find(abs(theta) == 90);
             indxv  = union(find(theta == 0) , find(theta == 180));
             locs1020horiz = locs1020(indxh);
@@ -196,7 +199,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             else
                 disp([ num2str(length(indelec)) ' landmark electrodes found for horiz. position spherical re-scaling' ]);
                 if strcmpi(g.coordinates, 'cart')
-                    g.hscale(2:2:2*length(indelec)+1) = cell2mat({ locs1020horiz.Y });
+                    g.hscale(2:2:2*length(indelec)+1) = [ locs1020horiz.Y ];
                 else
                     g.hscale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
                 end;
@@ -214,7 +217,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 disp([ num2str(length(indelec)) ' landmark electrodes found for vertical spherical re-scaling' ]);
                 g.vscale(1:2:2*length(indelec))   = tmpnames1020 (indelec);
                 if strcmpi(g.coordinates, 'cart')
-                    g.vscale(2:2:2*length(indelec)+1) = cell2mat({ locs1020vert.X });
+                    g.vscale(2:2:2*length(indelec)+1) = [ locs1020vert.X ];
                 else
                     g.vscale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
                 end;
@@ -233,7 +236,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 disp([ num2str(length(indelec)) ' landmark electrodes found for uniform spherical re-scaling' ]);
                 g.scale(1:2:2*length(indelec))   = tmpnames1020 (indelec);
                 if strcmpi(g.coordinates, 'cart')
-                    tmpabsxyz = mat2cell(abs(cell2mat({ locs1020.X })+j*cell2mat({ locs1020.Y })));
+                    tmpabsxyz = mattocell(abs([ locs1020.X ]+j*[ locs1020.Y ]));
                     g.scale(2:2:2*length(indelec)+1) = tmpabsxyz(indelec);
                 else
                     g.scale(2:2:2*length(indelec)+1) = tmpradius1020(indelec);
@@ -248,15 +251,15 @@ function chanlocs = adjustlocs( chanlocs, varargin)
     % get X and Y coordinates
     % -----------------------
     if strcmpi(g.coordinates, 'sph') | strcmpi(g.coordinates, 'pol')
-        [X Y] = pol2cart( cell2mat( { chanlocs.theta } )/180*pi, cell2mat( { chanlocs.radius })); Z = 1;
+        [X Y] = pol2cart( [ chanlocs.theta ]/180*pi, [ chanlocs.radius ]); Z = 1;
         if strcmpi(g.coordinates, 'sph')
             X = X/0.25*46;
             Y = Y/0.25*46;
         end;
     else
-        X = cell2mat( { chanlocs.X } );
-        Y = cell2mat( { chanlocs.Y } );
-        Z = cell2mat( { chanlocs.Z } );
+        X = [ chanlocs.X ];
+        Y = [ chanlocs.Y ];
+        Z = [ chanlocs.Z ];
     end;
     
     % recenter
@@ -289,7 +292,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             end;
             elec((index+1)/2) = tmpindex;
         end;
-        vals = cell2mat(g.rotate(2:2:end));
+        vals = [ g.rotate{2:2:end} ];
         
         % compute average scaling factor
         % ------------------------------
@@ -322,7 +325,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
             end;
             elec((index+1)/2) = tmpindex;
         end;
-        vals = cell2mat(g.scale(2:2:end));
+        vals = [ g.scale{2:2:end} ];
         
         % compute average scaling factor
         % ------------------------------
@@ -342,7 +345,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 end;
                 elec((index+1)/2) = tmpindex;
             end;
-            vals = cell2mat(g.hscale(2:2:end));
+            vals = [ g.hscale{2:2:end} ];
             showmsg('Using electrode', [ 'for left-right spherical re-scaling (x' num2str(1/hscalefact,4) ')'], g.hscale(1:2:end));
             
             % compute average scaling factor
@@ -363,7 +366,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                 end;
                 elec((index+1)/2) = tmpindex;
             end;
-            vals = cell2mat(g.vscale(2:2:end));
+            vals = [ g.vscale{2:2:end} ];
             showmsg('Using electrode', ['for rear-front spherical re-scaling (x' num2str(1/vscalefact,4) ')'], g.vscale(1:2:end));
             
             % compute average scaling factor
@@ -403,8 +406,8 @@ function chanlocs = adjustlocs( chanlocs, varargin)
         % convert to other types of coordinates
         % -------------------------------------
         labels = names';
-        chanlocs = struct('labels', names, 'sph_theta_besa', mat2cell(theta), ...
-                'sph_phi_besa', mat2cell(phi), 'sph_radius', { chanlocs.sph_radius });
+        chanlocs = struct('labels', names, 'sph_theta_besa', mattocell(theta), ...
+                'sph_phi_besa', mattocell(phi), 'sph_radius', { chanlocs.sph_radius });
         chanlocs = convertlocs( chanlocs, 'sphbesa2all');
     else
         for index = 1:length(chanlocs)
