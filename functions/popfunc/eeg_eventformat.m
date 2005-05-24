@@ -30,7 +30,7 @@
 %          type >> EEG.event(7)
 %          Unfortunately, structures are awkward for expert users to deal
 %          with from the command line (Ex: To get an array of latencies,
-%           >> cell2mat({EEG.event(:).latency})')
+%           >> [ EEG.event(:).latency ] )
 %          In array format, the same information is obtained by typing
 %           >> EEG.event(:,2)
 %       3) This function automatically updates the 'eventfield'
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/07/20 19:34:38  scott
+% typos
+%
 % Revision 1.1  2002/04/05 17:32:13  jorn
 % Initial revision
 %
