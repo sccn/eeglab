@@ -1,10 +1,10 @@
-% mat2cell() - convert matrix to cell array
+% mattocell() - convert matrix to cell array
 %
-% Usage: >> C = mat2cell( M );
+% Usage: >> C = mattocell( M );
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, Jan 25 2002
 %
-% Note: this function overload the nnet toolbox function mat2cell, 
+% Note: this function overload the nnet toolbox function mattocell, 
 % but does not have all its capacities. You can delete the current  
 % function if you have the toolbox.
 
@@ -27,14 +27,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/08/09 00:11:45  arno
+% empty case
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
 
-function C = mat2cell( M, varargin );
+function C = mattocell( M, varargin );
 
 if nargin < 1
-	help mat2cell;
+	help mattocell;
 	return;
 end;
 if isempty(M)
