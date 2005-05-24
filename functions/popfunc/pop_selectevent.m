@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2004/11/17 00:03:29  arno
+% do not rename boundary events
+%
 % Revision 1.53  2004/08/03 23:24:11  arno
 % detect multiple strings with quotes
 %
@@ -413,7 +416,7 @@ for index = 1:length(allfields)
             end;
             Ievent = intersect( Ievent, Ieventtmp );
         elseif isstr( tmpvar ) % real range
-            eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
+            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
@@ -438,7 +441,7 @@ for index = 1:length(allfields)
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
-            eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
+            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp find(tmpvarvalue == tmpvar(index2)) ] );
@@ -472,7 +475,7 @@ for index = 1:length(allfields)
             end;
             Ieventrem = union( Ieventrem, Ieventtmp );
          elseif isstr( tmpvar )
-            eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
+            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
@@ -497,7 +500,7 @@ for index = 1:length(allfields)
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
-            eval( [ 'tmpvarvalue = cell2mat( {EEG.event(:).' allfields{index} '});'] );
+            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp find( tmpvarvalue ==tmpvar(index2)) ] );
