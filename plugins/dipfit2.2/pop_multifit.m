@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/04/12 23:41:41  arno
+% fixed model
+%
 % Revision 1.9  2005/04/08 23:09:16  arno
 % fix defaultconstraint
 %
@@ -339,7 +342,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
 % -----------------------------------
 function elc = getelecpos(chanlocs, dipfitstruct);
     try,
-        elc = cell2mat({chanlocs.X; chanlocs.Y; chanlocs.Z}');
+        elc = [ [chanlocs.X]' [chanlocs.Y]' [chanlocs.Z]' ];
     catch
         disp('No 3-D carthesian coordinates; re-computing them from 2-D polar coordinates');
         EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
