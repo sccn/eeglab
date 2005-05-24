@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.148  2005/03/17 18:02:06  arno
+% debug conversion
+%
 % Revision 1.147  2005/03/17 18:00:23  arno
 % convert old dipfit structure to new one
 %
@@ -1114,7 +1117,7 @@ if ~isempty( varargin)
          case 'checkur', 
           if ~isempty(EEG.event)
               if isfield(EEG.event, 'urevent') & ~isempty(EEG.urevent)
-                  urlatencies = cell2mat( { EEG.urevent.latency });
+                  urlatencies = [ EEG.urevent.latency ];
                   [newlat tmpind] = sort(urlatencies);
                   if ~isequal(newlat, urlatencies)
                       EEG.urevent   = EEG.urevent(tmpind);
@@ -1131,7 +1134,7 @@ if ~isempty( varargin)
           % remove the events which latency are out of boundary
           % ---------------------------------------------------
           if isfield(EEG.event, 'latency')
-              try, alllatencies = cell2mat( { EEG.event.latency } );
+              try, alllatencies = [ EEG.event.latency ];
               catch, error('Checkset: error empty latency entry for new events added by user');
               end;
               I1 = find(alllatencies < 0.5);
@@ -1150,7 +1153,7 @@ if ~isempty( varargin)
               % remove fields with empty epochs
               % -------------------------------
               removeevent = [];
-              try, allepochs = cell2mat( { EEG.event.epoch } );
+              try, allepochs = [ EEG.event.epoch ];
                   removeevent = find( allepochs < 1 | allepochs > EEG.trials);
                   if ~isempty(removeevent)
                       disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
@@ -1165,7 +1168,7 @@ if ~isempty( varargin)
                   end;
               end;
               EEG.event(removeevent) = [];
-              allepochs = cell2mat( { EEG.event.epoch } );
+              allepochs = [ EEG.event.epoch ];
               
               % uniformize fields content for the different epochs
               % --------------------------------------------------
@@ -1313,12 +1316,12 @@ if ~isempty( varargin)
                   for trial = 1:EEG.trials
                       valfield = allfieldvals( EEG.epoch(trial).event );
                       if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
-                          valfield = eeg_point2lat(cell2mat(valfield),trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
-                          valfield = mat2cell(valfield);
+                          valfield = eeg_point2lat([ valfield{:} ] ,trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+                          valfield = mattocell(valfield);
                       end;
                       if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'duration')
-                          valfield = cell2mat(valfield)/EEG.srate*1000;
-                          valfield = mat2cell(valfield);
+                          valfield = [ valfield{:} ]/EEG.srate*1000;
+                          valfield = mattocell(valfield);
                       end;
                       if ~isempty(valfield)
                           if maxlen == 1, EEG.epoch = setfield(EEG.epoch, { trial }, ['event' eventfields{fieldnum}], valfield{1});
