@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/01/28 00:36:45  arno
+% same
+%
 % Revision 1.9  2005/01/28 00:35:11  arno
 % fixed inconsistency
 %
@@ -131,8 +134,8 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
         % rotate X-Z plane 
         % ----------------
         if strcmpi(type, 'x')
-            curx   = mean(cell2mat( { chanlocs(chans).X }));
-            curz   = mean(cell2mat( { chanlocs(chans).Z }));
+            curx   = mean([ chanlocs(chans).X ]);
+            curz   = mean([ chanlocs(chans).Z ]);
             newx = val;
             rotangle = solvesystem(curx, curz, newx);
             
@@ -145,8 +148,8 @@ function [chanlocs,options] = forcelocs( chanlocs, varargin)
         % rotate Y-Z plane 
         % ----------------
         if strcmpi(type, 'y')
-            cury   = mean(cell2mat( { chanlocs(chans).Y }));
-            curz   = mean(cell2mat( { chanlocs(chans).Z }));
+            cury   = mean([ chanlocs(chans).Y ]);
+            curz   = mean([ chanlocs(chans).Z ]);
             newy = val;
             rotangle = solvesystem(cury, curz, newy);
             

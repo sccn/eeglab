@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/02/12 19:44:10  arno
+% reading 3D coordinates
+%
 % Revision 1.11  2003/12/17 23:14:49  arno
 % do not auto-rotate
 %
@@ -112,7 +115,7 @@ function chanlocs = readneurolocs( filename, varargin)
                 % extract location array
                 % ----------------------   
                 nchans = size( locs, 1 ) - index +1;
-                chans  = cell2mat(locs(end-nchans+1:end, 1:5));
+                chans  = [ locs{end-nchans+1:end, 1:5} ];
                 names  = locs(end-nchans*2+1: end-nchans, 2);
                 for index = 1:length(names)
                     if ~isstr(names{index})
@@ -122,10 +125,10 @@ function chanlocs = readneurolocs( filename, varargin)
                 x = chans(:,3);
                 y = -chans(:,4);
             else
-                [tmp2 tmpind] = sort(cell2mat(locs(:,1))');
+                [tmp2 tmpind] = sort( [ locs{:,1} ]);
                 locs = locs(tmpind,:);
-                y      = cell2mat(locs(:,end));
-                x      = cell2mat(locs(:,end-1));
+                y      = [ locs{:,end} ];
+                x      = [ locs{:,end-1} ];
                 x      = x/513.1617*44;
                 y      = y/513.1617*44;
                 names = locs(:,end-2);
@@ -140,7 +143,7 @@ function chanlocs = readneurolocs( filename, varargin)
         % convert to other types of coordinates
         % -------------------------------------
         labels = names';
-        chanlocs = struct('labels', labels, 'sph_theta_besa', mat2cell(theta)', 'sph_phi_besa', mat2cell(phi)');
+        chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
         chanlocs = convertlocs( chanlocs, 'sphbesa2all');
         
         for index = 1:length(chanlocs)

@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/12/01 02:38:33  arno
+% *** empty log message ***
+%
 % Revision 1.1  2003/12/01 02:32:36  arno
 % Initial revision
 %
@@ -52,20 +55,20 @@ tmp = loadtxt(filename);
 
 % resort electrodes
 % -----------------
-[tmp2 tmpind] = sort(cell2mat(tmp(:,1))');
+[tmp2 tmpind] = sort(celltomat(tmp(:,1))');
 tmp = tmp(tmpind,:);
 
 % convert to polar coordinates
 % ----------------------------
-%figure; plot(cell2mat(tmp(:,2)), cell2mat(tmp(:,3)), '.');
-[phi,theta] = cart2pol(cell2mat(tmp(:,end-1)), cell2mat(tmp(:,end)));
+%figure; plot(celltomat(tmp(:,2)), celltomat(tmp(:,3)), '.');
+[phi,theta] = cart2pol(celltomat(tmp(:,end-1)), celltomat(tmp(:,end)));
 theta = theta/513.1617*44;
 phi   = phi/pi*180;
 
 % convert to other types of coordinates
 % -------------------------------------
 labels = tmp(:,end-2)';
-chanlocs = struct('labels', labels, 'sph_theta_besa', mat2cell(theta)', 'sph_phi_besa', mat2cell(phi)');
+chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
 chanlocs = convertlocs( chanlocs, 'sphbesa2all');
 for index = 1:length(chanlocs)
     chanlocs(index).labels = num2str(chanlocs(index).labels);

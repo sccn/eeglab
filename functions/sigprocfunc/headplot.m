@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2005/05/19 17:59:56  arno
+% document plotmshonly
+%
 % Revision 1.54  2005/04/29 23:37:45  arno
 % small adjustment
 %
@@ -613,9 +616,9 @@ else
       eloc_file = readlocs( g.orilocs );
       fprintf('Using original electrode locations on head...\n');
       indices = find(~cellfun('isempty', { eloc_file.X } ));
-      newElect(:,1) = cell2mat( { eloc_file(indices).X } )'; % attention inversion before
-      newElect(:,2) = cell2mat( { eloc_file(indices).Y } )';
-      newElect(:,3) = cell2mat( { eloc_file(indices).Z } )';        
+      newElect(:,1) = [ eloc_file(indices).X ]'; % attention inversion before
+      newElect(:,2) = [ eloc_file(indices).Y ]';
+      newElect(:,3) = [ eloc_file(indices).Z ]';        
       
       % optional transformation
       % -----------------------

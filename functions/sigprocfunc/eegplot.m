@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2005/03/20 18:33:31  scott
+% help msg
+%
 % Revision 1.105  2005/03/11 17:39:31  arno
 % adding ';' to command
 %
@@ -1286,7 +1289,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   if ~isempty(g.events)
       if isstr(g.events(1).type)
            [g.eventtypes tmpind indexcolor] = unique({g.events.type}); % indexcolor countinas the event type
-      else [g.eventtypes tmpind indexcolor] = unique(cell2mat({g.events.type}));
+      else [g.eventtypes tmpind indexcolor] = unique([ g.events.type ]);
       end;
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
       g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};
@@ -1309,9 +1312,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       
       % latency and duration of events
       % ------------------------------
-      g.eventlatencies  = cell2mat({g.events.latency})+1;
+      g.eventlatencies  = [ g.events.latency ]+1;
       if isfield(g.events, 'duration')
-           g.eventlatencyend   = g.eventlatencies + cell2mat({g.events.duration})+1;
+           g.eventlatencyend   = g.eventlatencies + [ g.events.duration ]+1;
       else g.eventlatencyend   = [];
       end;
       g.plotevent       = 'on';
