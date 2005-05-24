@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/01/29 16:48:15  scott
+% changed verbose default to 'off'
+%
 % Revision 1.15  2004/01/01 19:21:55  scott
 % help msg edit
 %
@@ -145,7 +148,7 @@ switch command
    theta  = {chans.theta};
    radius = {chans.radius};
    indices = find(~cellfun('isempty', theta));
-   [sph_phi sph_theta] = topo2sph( [cell2mat(theta(indices))' cell2mat(radius(indices))'] );
+   [sph_phi sph_theta] = topo2sph( [ [ theta{indices} ]' [ radius{indices}]' ] );
    if verbose
        disp('Warning: electrodes forced to lie on a sphere for polar to 3-D conversion');
    end;
@@ -174,7 +177,7 @@ case 'sph2cart',
    if ~isfield(chans, 'sph_radius'), sph_radius(1:length(indices)) = {1};
    else                              sph_radius = {chans.sph_radius};
    end;
-   [x y z] = sph2cart(cell2mat(sph_theta(indices))'/180*pi, cell2mat(sph_phi(indices))'/180*pi, cell2mat(sph_radius(indices))');
+   [x y z] = sph2cart([ sph_theta{indices} ]'/180*pi, [ sph_phi{indices} ]'/180*pi, [ sph_radius{indices} ]');
    for index = 1:length(indices)
       chans(indices(index)).X = x(index);
       chans(indices(index)).Y = y(index);
@@ -187,7 +190,7 @@ case 'sph2topo',
  sph_theta  = {chans.sph_theta};
  sph_phi    = {chans.sph_phi};
  indices = find(~cellfun('isempty', sph_theta));
- [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  cell2mat(sph_phi(indices))' cell2mat(sph_theta(indices))'], 1, 2); % using method 2
+ [chan_num,angle,radius] = sph2topo([ ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2); % using method 2
  for index = 1:length(indices)
      chans(indices(index)).theta  = angle(index);
      chans(indices(index)).radius = radius(index);
@@ -200,7 +203,7 @@ case 'sph2sphbesa',
    sph_theta  = {chans.sph_theta};
    sph_phi    = {chans.sph_phi};
    indices = find(~cellfun('isempty', sph_theta));
-   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  cell2mat(sph_phi(indices))' cell2mat(sph_theta(indices))'], 1, 2);
+   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
    [sph_theta_besa sph_phi_besa] = topo2sph([angle radius], 1, 1);
    for index = 1:length(indices)
       chans(indices(index)).sph_theta_besa  = sph_theta_besa(index);
@@ -215,7 +218,7 @@ case 'sphbesa2sph',
    sph_theta_besa  = {chans.sph_theta_besa};
    sph_phi_besa    = {chans.sph_phi_besa};
    indices = find(~cellfun('isempty', sph_theta_besa));
-   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  cell2mat(sph_theta_besa(indices))' cell2mat(sph_phi_besa(indices))'], 1, 1);
+   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_theta_besa{indices} ]' [ sph_phi_besa{indices} ]' ], 1, 1);
    %for index = 1:length(chans)
    %   chans(indices(index)).theta  = angle(index);
    %   chans(indices(index)).radius = radius(index);
@@ -251,7 +254,7 @@ case 'cart2sph',
     Y  = {chans.Y};
     Z  = {chans.Z};
     indices = find(~cellfun('isempty', X));
-    [th phi radius] = cart2sph(cell2mat(X(indices)), cell2mat(Y(indices)), cell2mat(Z(indices)));
+    [th phi radius] = cart2sph( [ X{indices} ], [ Y{indices} ], [ Z{indices} ]);
 	for index = 1:length(indices)
 		 chans(indices(index)).sph_theta     = th(index)/pi*180;
 		 chans(indices(index)).sph_phi       = phi(index)/pi*180;

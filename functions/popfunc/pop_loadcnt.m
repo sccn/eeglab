@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/05/12 15:51:23  arno
+% deal with keypad etc...
+%
 % Revision 1.27  2004/12/08 18:01:55  arno
 % debug offset
 %
@@ -235,8 +238,8 @@ end
 % process keyboard entries
 % ------------------------
 if ~isempty(findstr('keystroke', lower(options)))
-    tmpkbd  = cell2mat( { r.event(I).keyboard } );
-    tmpkbd2 = cell2mat( { r.event(I).keypad_accept } );
+    tmpkbd  = [ r.event(I).keyboard ];
+    tmpkbd2 = [ r.event(I).keypad_accept ];
     for index = 1:length(EEG.event)
         if EEG.event(index).type == 0
             if r.event(index).keypad_accept,
@@ -263,8 +266,8 @@ end;
 
 % import channel locations (Neuroscan coordinates are not wrong)
 % ------------------------
-%x            = cell2mat( { r.electloc.x_coord } );
-%y            = cell2mat( { r.electloc.y_coord } );
+%x            = celltomat( { r.electloc.x_coord } );
+%y            = celltomat( { r.electloc.y_coord } );
 for index = 1:length(r.electloc)
     names{index} = deblank(char(r.electloc(index).lab'));
     if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end;

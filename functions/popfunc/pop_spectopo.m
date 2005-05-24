@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/03/07 21:16:55  arno
+% check for chaninfo
+%
 % Revision 1.43  2005/03/05 00:11:28  arno
 % add chaninfo
 %
@@ -405,12 +408,12 @@ if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EE
 	boundaries = strmatch('boundary', {EEG.event.type});
 	if ~isempty(boundaries)
 		if exist('pointrange')
-			boundaries = cell2mat({EEG.event(boundaries).latency})-0.5-pointrange(1)+1;
+			boundaries = [ EEG.event(boundaries).latency ] - 0.5-pointrange(1)+1;
 			boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
 			boundaries(find(boundaries<1)) = [];
 			boundaries = [0 boundaries pointrange(end)-pointrange(1)];
 		else
-			boundaries = [0 cell2mat({EEG.event(boundaries).latency})-0.5 EEG.pnts];
+			boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
 		end;
 		spectopooptions = [ spectopooptions ',''boundaries'',[' int2str(round(boundaries)) ']']; 
 	end;		

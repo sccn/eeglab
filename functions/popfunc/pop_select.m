@@ -89,6 +89,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2004/11/10 16:37:18  arno
+% new channel selector
+%
 % Revision 1.36  2004/03/20 01:30:30  arno
 % nothing
 %
@@ -371,8 +374,8 @@ if ~isempty(g.trialcond)
         if ~isfield( EEG.epoch, ttfields{index} )
             error([ ttfields{index} 'is not a field of EEG.epoch' ]);
         end;    
-	    eval( [ 'Itriallow  = find( cell2mat({ EEG.epoch(:).' ttfields{index} ' }) >= tt.' ttfields{index} '(1) );' ] );
-	    eval( [ 'Itrialhigh = find( cell2mat({ EEG.epoch(:).' ttfields{index} ' }) <= tt.' ttfields{index} '(end) );' ] );
+	    eval( [ 'Itriallow  = find( [ EEG.epoch(:).' ttfields{index} ' ] >= tt.' ttfields{index} '(1) );' ] );
+	    eval( [ 'Itrialhigh = find( [ EEG.epoch(:).' ttfields{index} ' ] <= tt.' ttfields{index} '(end) );' ] );
 	    Itrialtmp = intersect(Itriallow, Itrialhigh);
 	    g.trial = intersect( g.trial(:)', Itrialtmp(:)');
    end;	   
@@ -422,7 +425,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
     if EEG.trials > 1
         % select new time window
         % ----------------------    
-        try,   tmpeventlatency = cell2mat({EEG.event.latency});
+        try,   tmpeventlatency = [ EEG.event.latency ];
         catch, tmpeventlatency = [];
         end;
         alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point

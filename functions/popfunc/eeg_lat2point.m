@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/01/01 18:28:11  scott
+% header edit
+%
 % Revision 1.2  2002/08/08 22:03:37  arno
 % update
 %
@@ -67,10 +70,10 @@ if length(timewin) ~= 2
     disp('eeg_lat2point: timelimits must have length 2'); return;
 end;
 if iscell(epoch_array)
-	epoch_array = cell2mat(epoch_array);
+	epoch_array = [ epoch_array{:} ];
 end;
 if iscell(lat_array)
-	lat_array = cell2mat(lat_array);
+	lat_array = [ lat_array{:} ];
 end
 
 timewin = timewin*timeunit;

@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/02/02 20:14:18  arno
+% fix typo
+%
 % Revision 1.43  2004/08/26 16:49:05  arno
 % remove square brackets in time window
 %
@@ -251,7 +254,7 @@ if nargin < 3
 				   '   if isstr(EEG.event(1).type)' ...
 				   '       tmpfieldnames = unique({EEG.event.type});' ...
 				   '   else' ...
-				   '       tmpstr = unique(cell2mat({EEG.event.type}));' ...
+				   '       tmpstr = unique([ EEG.event.type ]);' ...
 				   '       tmpfieldnames = cell(1, length(tmpstr));' ...
                    '       for tmps=1:length(tmpstr), tmpfieldnames{tmps} = num2str(tmpstr(tmps)); end;' ...
 				   '   end;' ...
@@ -312,7 +315,7 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 
 % transform string events into a int array of column indices
 % ----------------------------------------------------------
-tmpeventlatency = cell2mat( { EEG.event(:).latency } );
+tmpeventlatency = [ EEG.event(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort in ascending time 
 Ievent = g.eventindices;
@@ -334,7 +337,7 @@ if ~isempty( events )
 				tmpevent = events{index2};
 				if isstr( tmpevent ),tmpevent = str2num( tmpevent ); end;
 				if isempty( tmpevent ), error('pop_epoch(): string entered in a numeric field'); end;
-				Ieventtmp = [ Ieventtmp find(tmpevent == cell2mat(tmpeventtype)) ];
+				Ieventtmp = [ Ieventtmp find(tmpevent == [ tmpeventtype{:} ]) ];
 			end;
 		end;
     else

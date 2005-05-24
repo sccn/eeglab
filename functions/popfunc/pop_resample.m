@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/09/23 18:19:37  hilit
+% corrected a bug, that in the case of boundaries in continuous data prevented from resampling.
+%
 % Revision 1.14  2004/09/15 06:03:24  arno
 % now systematically crashes under Matlab 7?
 %
@@ -131,7 +134,7 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
         if exist('resample') == 2
             disp('Data break detected and taken into account for resampling');
         end;
-        bounds = cell2mat({ EEG.event(bounds).latency });
+        bounds = [ EEG.event(bounds).latency ];
         if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
     end;
     bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];

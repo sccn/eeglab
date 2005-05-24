@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2005/04/08 23:10:22  arno
+% fixing nose orientation when looking BESA file
+%
 % Revision 1.122  2005/03/30 22:31:17  arno
 % debug for Matlab 5.3
 %
@@ -754,7 +757,7 @@ if nargin < 3
                         'end;' endgui ];
         plot3d =     [ 'tmpind = find(~cellfun(''isempty'', { chantmp.X }));' ...
 					   'if ~isempty(tmpind),' ...
-                       '   plotchans3d([cell2mat({chantmp(tmpind).X})'' cell2mat({chantmp(tmpind).Y})'' cell2mat({chantmp(tmpind).Z})''],' ...
+                       '   plotchans3d([ [ chantmp(tmpind).X ]'' [ chantmp(tmpind).Y ]'' [ chantmp(tmpind).Z ]''],' ...
 					                   '{chantmp(tmpind).labels}); else disp(''cannot plot: no XYZ coordinates'');' ...
                        'end;' ];
         nosecallback = [ 'nosevals = { ''+X'' ''-X'' ''+Y'' ''-Y'' }; ' ...
@@ -919,9 +922,9 @@ else
 		   switch method
 			case 'chancenter',
 			 if isempty(extraargs)
-				 [X Y Z]=chancenter(cell2mat({chans.X})', cell2mat({chans.Y})', cell2mat({chans.Z})',[]);
+				 [X Y Z]=chancenter( [chans.X ]', [ chans.Y ]', [ chans.Z ]',[]);
 			 else
-				 [X Y Z]=chancenter(cell2mat({chans.X})', cell2mat({chans.Y})', cell2mat({chans.Z})', extraargs{:});
+				 [X Y Z]=chancenter( [chans.X ]', [ chans.Y ]', [ chans.Z ]', extraargs{:});
 			 end;
 			 if isempty(X), return; end;
 			 for index = 1:length(chans)

@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/02/14 00:20:57  arno
+% fix delim
+%
 % Revision 1.8  2005/02/04 00:38:50  arno
 % upgrading to use finputcheck
 %
@@ -160,7 +163,7 @@ while isempty(inputline) | inputline~=-1
      if ~mod(linenb,10) & strcmp(g.verbose, 'on'), fprintf('%d ', linenb); end;
 end;        
 if strcmp(g.verbose, 'on'),  fprintf('%d\n', linenb-1); end;
-if strcmp(g.convert, 'force'), array = cell2mat(array); end;
+if strcmp(g.convert, 'force'), array = [ array{:} ]; end;
 fclose(fid); 
 
 % problem strtok do not consider tabulation

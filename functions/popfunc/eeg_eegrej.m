@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/12/09 19:59:09  arno
+% using old EEG.pnts
+%
 % Revision 1.24  2004/06/11 01:27:29  arno
 % now recompute event latencies in eeg_insertbound
 %
@@ -126,7 +129,7 @@ if isempty(regions)
 end;
 
 if isfield(EEG.event, 'latency'), 
-   	 tmpalllatencies = cell2mat( { EEG.event.latency } );
+   	 tmpalllatencies = [ EEG.event.latency ];
 else tmpalllatencies = []; 
 end;
 

@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/01/28 00:41:47  arno
+% same
+%
 % Revision 1.6  2005/01/28 00:39:50  arno
 % add warning
 % /
@@ -111,7 +114,7 @@ c = setdiff([1:length(chanlocs)], union(omitchans, find(cellfun('isempty', { cha
 
 % optimize center
 % ---------------
-[X Y Z newcenter]= chancenter(cell2mat({chanlocs(c).X})', cell2mat({chanlocs(c).Y})', cell2mat({chanlocs(c).Z})', center);
+[X Y Z newcenter]= chancenter( [ chanlocs(c).X ]', [ chanlocs(c).Y ]', [ chanlocs(c).Z ]', center);
 for index = 1:length(c)
     chanlocs(c(index)).X  = X(index);
     chanlocs(c(index)).Y  = Y(index);

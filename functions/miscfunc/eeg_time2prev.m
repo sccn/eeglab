@@ -41,7 +41,7 @@ if ~iscell(target)
   return
 end
 for k=1:length(target)
-   if ~ischar(cell2mat(target{k})
+   if ~ischar([ target{k}{:} ])
        error('2nd argument "target" must be a {cell array} of event type strings.');
    end
 end

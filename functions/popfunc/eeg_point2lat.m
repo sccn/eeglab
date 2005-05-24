@@ -16,11 +16,11 @@
 %   newlat      - converted latency values (in 'timeunit' units) for each epoch
 %
 % Example:
-%   eeg_point2lat(cell2mat({EEG.event.latency}), [], EEG.srate);
+%   eeg_point2lat( [ EEG.event.latency ], [], EEG.srate);
 %   % returns the latency of all events in second for a continuous
 %   % dataset EEG
 %
-%   eeg_point2lat(cell2mat({EEG.event.latency}), cell2mat({EEG.event.epoch}), 
+%   eeg_point2lat( [ EEG.event.latency ], [ EEG.event.epoch ], 
 %                 EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 %   % returns the latency of all events in millisecond for a dataset
 %   % containing data epochs.
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/05/26 23:16:14  arno
+% same
+%
 % Revision 1.6  2004/05/26 23:15:43  arno
 % add example
 %
@@ -95,10 +98,10 @@ if length(timewin) ~= 2
     disp('eeg_point2lat: timelimits array must have length 2'); return;
 end;
 if iscell(epoch_array)
-	epoch_array = cell2mat(epoch_array);
+	epoch_array = [ epoch_array{:} ];
 end;
 if iscell(lat_array)
-	lat_array = cell2mat(lat_array);
+	lat_array = [ lat_array{:} ];
 end
 
 timewin = timewin*timeunit;

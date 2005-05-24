@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2005/03/11 17:53:41  scott
+% help msg
+%
 % Revision 1.17  2005/02/27 03:04:30  scott
 % document options in help
 % .,
@@ -182,7 +185,7 @@ if EEG.trials == 1 & ~isempty(EEG.event) ...
 	boundaries = strmatch('boundary', {EEG.event.type});
 	if ~isempty(boundaries)
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
-        boundaries = cell2mat({EEG.event(boundaries).latency})-0.5-pointrange(1)+1;
+        boundaries = [ EEG.event(boundaries).latency ] -0.5-pointrange(1)+1;
         boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
         boundaries(find(boundaries<1)) = [];
         boundaries = [0 boundaries pointrange(end)-pointrange(1)];

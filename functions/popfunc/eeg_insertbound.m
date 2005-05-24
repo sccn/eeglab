@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2004/12/08 18:58:24  arno
+% removing boundary event correcly
+%
 % Revision 1.30  2004/11/16 23:33:00  arno
 % same
 %
@@ -182,7 +185,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
             % at the correct location in the event structure
             % ----------------------------------------------
             if ~isempty(eventout) & isfield(eventout, 'latency')
-                alllats   = cell2mat( { eventout.latency } ) - boundevents(tmpindex);
+                alllats   = [ eventout.latency ] - boundevents(tmpindex);
                 tmpind    = find( alllats >= 0 );
                 [tmp tmpind2 ] = min(alllats(tmpind));
                 tmpind2        = tmpind(tmpind2);
@@ -257,7 +260,7 @@ function [event, urevent] = removenested(event, urevent, nestind);
     if length(nestind) > 0
         fprintf('Debug msg: removing %d nested urevents\n', length(nestind));
         nestind = sort(nestind);
-        urind = cell2mat({ event.urevent }); % this must not be done in the loop
+        urind = [ event.urevent ]; % this must not be done in the loop
                                              % since the indices are dyanmically updated
     end;
     

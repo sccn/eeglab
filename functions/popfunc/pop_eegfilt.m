@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/05/13 15:13:19  arno
+% floor instead of round
+%
 % Revision 1.25  2004/12/10 22:24:01  arno
 % erasing ICA matrix
 %
@@ -204,7 +207,7 @@ if EEG.trials == 1
 		else
 			options{4} = 0;
 			disp('Pop_eegfilt:finding continuous data boundaries');
-			tmplat = cell2mat({EEG.event.latency});
+			tmplat = [ EEG.event.latency ];
             boundaries = tmplat(boundaries);
             boundaries = [0 floor(boundaries-0.49) EEG.pnts];
             try, warning off MATLAB:divideByZero

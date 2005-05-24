@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/10/07 21:29:14  hilit
+% fixed the bug from command line call with 'delete' option
+%
 % Revision 1.39  2004/07/10 00:50:09  arno
 % 5 decimals
 %
@@ -496,8 +499,9 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       end;
       
       if ~isempty(field2)
-          try, eval(['tmparray = cell2mat( { EEG.event.' field2 ' } );']);
-          catch, eval(['tmparray = { EEG.event.' field2 ' };']);
+          if ~isstr(getfield( EEG.event(1), field2 ))
+               eval(['tmparray = [ EEG.event.' field2 ' ];']);
+          else eval(['tmparray = { EEG.event.' field2 ' };']);
           end;
           if strcmp(field2, 'latency') & EEG.trials > 1
               tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
@@ -508,8 +512,9 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       else
           events = EEG.event;
       end;  
-      try,   eval(['tmparray = cell2mat( { events.' field1 ' } );']);
-      catch, eval(['tmparray = { events.' field1 ' };']);
+      if ~isstr(getfield( EEG.event(1), field1 ))
+           eval(['tmparray = [ EEG.event.' field1 ' ];']);
+      else eval(['tmparray = { EEG.event.' field1 ' };']);
       end;
       if strcmp( field1, 'latency') & EEG.trials > 1
           tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
@@ -698,7 +703,7 @@ function [X, I] = mysort(tmparray);
         if all(cellfun('isreal', tmparray))
             tmpempty = cellfun('isempty', tmparray);
             tmparray(tmpempty) = { 0 };
-            tmparray = cell2mat(tmparray);
+            tmparray = [ tmparray{:} ];
         end;
     end;
     try, 

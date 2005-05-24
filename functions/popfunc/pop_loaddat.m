@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2003/07/24 18:50:59  arno
+% typo
+%
 % Revision 1.9  2003/04/10 17:36:06  arno
 % header
 %
@@ -125,7 +128,7 @@ for index = 1:n
 		EEG.event(end).response = response(index);
 	end
 end;
-tmp = cell2mat({EEG.event.latency});
+tmp = [ EEG.event.latency ];
 [tmp indexsort] = sort(tmp);
 EEG.event = EEG.event(indexsort);
 EEG = eeg_checkset(EEG, 'eventconsistency');

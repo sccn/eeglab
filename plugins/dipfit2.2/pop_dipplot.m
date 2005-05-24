@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/03/22 19:08:20  arno
+% plotting all dipoles
+%
 % Revision 1.29  2005/03/18 17:52:47  arno
 % turning on 'num' for summary mode
 %
@@ -242,7 +245,7 @@ end;
 if strcmpi(typedip, 'besa')
     if ~isfield(EEG, 'sources'), error('No BESA dipole information in dataset');end;
     if ~isempty(comps)
-        [tmp1 int] = intersect(cell2mat({EEG.sources.component}), comps);
+        [tmp1 int] = intersect( [ EEG.sources.component ], comps);
         if isempty(int), error ('Localization not found for selected components'); end;
         dipplot(EEG.sources(int), 'sphere', 1, options{:});
     else
