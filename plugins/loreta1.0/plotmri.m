@@ -20,6 +20,7 @@
 %                 A factor too high might cause the voxel color to go over
 %                 the color limits.
 %    'plot'      - [X Y Z] plot one MRI slices at MNI coordinate [X Y Z].
+%    'scroll'    - ['on'|'off'] GUI for selecting slices. Default is 'on'.
 %
 % 
 % Example: see loreta_importcomp()
@@ -45,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/05/25 21:22:47  arno
+% making all sizes the same
+%
 % Revision 1.2  2005/04/20 22:19:22  arno
 % button position
 %
