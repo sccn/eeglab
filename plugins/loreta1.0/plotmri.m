@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/04/20 22:19:22  arno
+% button position
+%
 % Revision 1.1  2005/04/20 21:54:38  arno
 % Initial revision
 %
@@ -63,7 +66,9 @@ function mri = plotmri( mri, activations, varargin)
                             'actfactor' 'real'      [0 Inf]    0.4;
                             'transform' 'real'      []         eye(4);
                             'colchan'   'integer'   [0 Inf]    1;
-                            'plot'      'real'      []         [] });
+                            'plot'      'real'      []         [];
+                            'scroll'    'string'    { 'on' 'off' } 'on' });
+        
         if isstr(g), error(g); end;
         disp('Slice number in MNI coordinates (mm)');
         
@@ -96,12 +101,15 @@ function mri = plotmri( mri, activations, varargin)
        
         % make scrolling buttons
         % ----------------------
-        g.fid = figure( 'position', [60 705 1366 395]);
+        g.fid = figure( 'position', [60 705 1010 335]);
         set(g.fid, 'userdata', g);
         [sx sy sz tmp] = size(g.mri);
-        subplot(1,3,1); set(gca, 'tag', 'view1'); makescroll(gca, g.plot(3), 'view1', 2);
-        subplot(1,3,2); set(gca, 'tag', 'view2'); makescroll(gca, g.plot(2), 'view2', 2);
-        subplot(1,3,3); set(gca, 'tag', 'view3'); makescroll(gca, g.plot(1), 'view3', 2);
+        h1 = axes('unit', 'pixel', 'position', [58  57 290 270], 'tag', 'view1');
+        h2 = axes('unit', 'pixel', 'position', [358 57 290 270], 'tag', 'view2');
+        h3 = axes('unit', 'pixel', 'position', [658 57 290 270], 'tag', 'view3');
+        makescroll(h1, g.plot(3), 'view1', 2, g.scroll);
+        makescroll(h2, g.plot(2), 'view2', 2, g.scroll);
+        makescroll(h3, g.plot(1), 'view3', 2, g.scroll);
         set(gcf, 'color', 'k');
         
         plotmri('redraw', 'all');
@@ -129,33 +137,41 @@ function redraw(viewnb, slicenb, g);
     options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
                 'direct','tag','img', 'facelighting', 'none' };
     [sx sy sz tmp] = size(g.curmri);
+    maxs = max([ sx sy sz ]);
     switch viewnb
      case 1, img1 = squeeze(g.curmri(:,:,slicenb(3),:));
              axes(findobj(g.fid, 'tag', 'view1'));
              delete(findobj(g.fid, 'tag', 'surfview1'));
              surface([0 0; sx sx], [0 sy; 0 sy], [0 0; 0 0], img1, options{:}, 'tag', 'surfview1'); 
+             xlim([0 maxs]); ylim([0 maxs]); zlim([0 maxs]);
              axis off; axis equal;
+             view( [0 0 1] );
      case 2, img2 = squeeze(g.curmri(:,slicenb(2),:,:));
              axes(findobj(g.fid, 'tag', 'view2'));
              delete(findobj(g.fid, 'tag', 'surfview2'));
-             surface([0 0; sx sx], [0 sz; 0 sz], [0 0; 0 0], img2, options{:}, 'tag', 'surfview2'); 
+             surface([0 0; sx sx], [0 0; 0 0], [0 sz; 0 sz], img2, options{:}, 'tag', 'surfview2'); 
+             xlim([0 maxs]); ylim([0 maxs]); zlim([0 maxs]);
              axis off; axis equal;
+             view( [0 1 0] );
      case 3, img3 = squeeze(g.curmri(slicenb(1),:,:,:));
              axes(findobj(g.fid, 'tag', 'view3'));
              delete(findobj(g.fid, 'tag', 'surfview3'));
-             surface([0 0; sy sy], [0 sz; 0 sz], [0 0; 0 0], img3, options{:}, 'tag', 'surfview3'); 
+             surface([0 0; 0 0], [0 0; sy sy], [0 sz; 0 sz], img3, options{:}, 'tag', 'surfview3'); 
+             xlim([0 maxs]); ylim([0 maxs]); zlim([0 maxs]);
              axis off; axis equal;
+             view( [1 0 0] );
     end;            
     return;
     
     
 % make GUI for each plot
 % ----------------------
-function makescroll(fid, curcoords, tag, coordinc)
+function makescroll(fid, curcoords, tag, coordinc, visible)
     
+    set(fid, 'unit', 'normalized');
     pos = get(fid, 'position');
     set(fid, 'tag', tag);
-    s = [pos(1) pos(2) 0 0];
+    s = [pos(1) pos(2) 0 0]+[0.04 0 0 0];
     q = [pos(3) pos(4) pos(3) pos(4)];
     ht = 0.05;
     wd = 0.03;
@@ -178,12 +194,12 @@ function makescroll(fid, curcoords, tag, coordinc)
     
     % make buttons
     % ------------
-    uicontrol( 'unit', 'normalized', 'style', 'edit', 'tag', [ 'text' tag], 'position', ...
+    h(1) = uicontrol( 'unit', 'normalized', 'style', 'edit', 'tag', [ 'text' tag], 'position', ...
                coordtext, 'string', num2str(curcoords), 'callback', ['plotmri(''update'', ''' tag ''');' ]);
-    uicontrol( 'unit', 'normalized', 'style', 'text', 'position', ...
+    h(2) = uicontrol( 'unit', 'normalized', 'style', 'text', 'position', ...
                coordcom, 'string', 'mm', 'backgroundcolor', 'k', 'foregroundcolor', 'w' );
-    uicontrol( 'unit', 'normalized', 'style', 'pushbutton', 'position', ...
+    h(3) = uicontrol( 'unit', 'normalized', 'style', 'pushbutton', 'position', ...
                coordminus, 'string', '-', 'callback', cb_minus);
-    uicontrol( 'unit', 'normalized', 'style', 'pushbutton', 'position', ...
+    h(4) = uicontrol( 'unit', 'normalized', 'style', 'pushbutton', 'position', ...
                coordplus, 'string', '+', 'callback', cb_plus);
-    axis off;
+    set(h, 'visible', visible);
