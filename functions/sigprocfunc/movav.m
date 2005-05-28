@@ -1,22 +1,23 @@
 % movav() - Perform a moving average of data indexed by xvals.
 %           Supports use of a moving non-rectangular window.
-%           Can be used to resample a data matrix (see NOTE below).
+%           Can be used to resample a data matrix to any size 
+%           (see NOTE below) and to regularize sampling of 
+%           irregularly sampled data.
 % Usage:
 %     >> [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin);
 %
 % Inputs:
 %   data   = input data (chans,frames)
-%   xvals  = index for each data frame (column) {def|[]|0 -> 1:frames}
-%            Note that default is fastest, assumes equal x-spacing.
+%   xvals  = x-value for each data frame (column) The default is fastest, 
+%            and assumes equal x-spacing {def|[]|0 -> 1:frames}
 %   xwidth = smoothing-window width in xvals {def|0 -> (lastx-firstx)/4}
-%   xadv   = xvals step size {default|0 -> 1}
-%            NOTE: to reduce yyy frames to xxx, use yyy/(xxx+2)
+%   xadv   = xvals step size. NOTE: To reduce yyy frames to about xxx, 
+%            xadv needs to be near yyy/xxx {default|0 -> 1}
 %   firstx = low xval of first averaging window {def|[] -> low xvals}
 %   lastx  = high xval of last averaging window {def|[] -> high xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
-%            May be long, since linear interp. is NOT used between values.
-%            An example is >> gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
-%
+%            Can be long; linear interp. is NOT used between values.
+%            Example: >> gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
 % Outputs:
 %   outdata = smoothed data (chans,
 %   outx    = xval midpoints of successive output data windows
@@ -42,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/11/18 17:50:49  arno
+% remove nanmean and nansum
+%
 % Revision 1.13  2002/10/21 00:17:23  arno
 % updating default fisrtx and lastx input to allow for 0 latency (before 0=use default)
 %
@@ -93,6 +97,7 @@ function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin)
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
 verbose = 0;  % If 1, output process info
+debugit = 0;  % If 1, output more process info
 
 nanexist = 0;  
 if nargin<1
@@ -116,8 +121,8 @@ fastave = 0;
 if nargin<2 
   xvals = 0;
 end
-if isempty(xvals)
-  xvals = 0;
+if isempty(xvals) | (numel(xvals) == 1 & size(data,2)>1)
+  xvals = 1:size(data,2);
 end
 if size(xvals,1)>1 & size(xvals,2)>1
   help movav
@@ -221,49 +226,54 @@ if verbose,
     fprintf(' using a width-%d square window.\n',xwidth);
   end
 end
- %fprintf('   firstx = %g, lastx= %g, xwidth = %g xadv = %g\n',...
- %                 firstx,lastx,xwidth,xadv);
+if debugit
+   fprintf('   firstx = %g, lastx= %g, xwidth = %g xadv = %g\n',...
+                   firstx,lastx,xwidth,xadv);
+end
 %
 %%%%%%%%%%%%%%%%%%% Perform averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 lox = firstx;
-i = 0; %fastave default
+i = 0; % fastave default
 for f=1:outframes
-    hix = lox+xwidth;
-    outx(1,f)=outxval;
-    outxval = outxval + xadv;
-    if fastave==0
+   hix = lox+xwidth;
+   outx(1,f)=outxval;
+   outxval = outxval + xadv;
+   if fastave == 0 
       i = find(xvals>=lox & xvals <= hix);
-    end
-    if length(i)==0,
+   end
+   if length(i)==0,
       if f>1,
        outdata(:,f) = outdata(:,f-1); % If no data, replicate
-if verbose,
- fprintf('r');
-end
+       if debugit,
+          fprintf('r');
+       end
       else
        outdata(:,f) = zeros(chans,1); %  or else output zeros
-if verbose
-  fprintf('0');
-end
+       if debugit
+         fprintf('0');
+       end
       end
-    elseif length(xwin)==1,
+   elseif length(xwin)==1,
       if fastave
           outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
       else
           outdata(:,f) = nan_mean(data(:,i)')'; % Else average
       end
-if verbose
-  fprintf('.');
-end
+      if debugit
+          fprintf('.');
+      end
 %
 %%%%%%%%%%%%%%%%% Windowed averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-    else                                 
+   else                                 
+       if debugit
+         fprintf('i %g, f %g\n',i,f);
+       end
        wadv=(hix-lox)/wlen;
        ix = ceil((xvals(i)-lox)/wadv);
        zs = find(ix==0);
-       ix(zs) = ones(1,zs);
+       ix(zs) = ones(1,zs); % ????????????????
        if length(xwin)>1
           sumx = sum(xwin(ix));
        else
@@ -272,23 +282,23 @@ end
        if abs(sumx) < NEARZERO  % cannot normalize
          if f>1,
           outdata(:,f) = outdata(:,f-1); % if no data, replicate
-if verbose,
-  fprintf('R');
-end
+          if debugit,
+            fprintf('R');
+          end
          else
           outdata(:,f) = zeros(chans,1); % or output zeros
-if verbose,
-  fprintf('0');
-end
+          if debugit,
+            fprintf('0');
+          end
          end
        else
            outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
        end 
-    end
-    lox = lox+xadv;
-    if (outframes<MAXPRINT) 
+   end
+   lox = lox+xadv;
+   if (outframes<MAXPRINT) 
       fprintf('%d ',f);
-    end
+   end
 end
 if verbose,
   fprintf('\n');
