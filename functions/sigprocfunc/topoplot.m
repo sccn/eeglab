@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.250  2005/06/09 23:33:21  arno
+% fixing datachan
+%
 % Revision 1.249  2005/06/09 16:36:25  arno
 % getdatachans
 %
@@ -2071,15 +2074,6 @@ if strcmpi(DRAWAXIS, 'on')
     set(gca, 'xlim', [0 10], 'ylim', [0 10]);
 end;
 
-%
-%%%%%%%%%%%%% get data channels %%%%%%%%%%%%%%%%%%%%%%%%%
-%
-function tmplocs = getdatachans( elocs );
-    if ~isfield(elocs, 'datachan')
-        tmplocs = elocs;
-    else
-        tmplocs = elocs([ elocs.datachan ]);
-    end;
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
