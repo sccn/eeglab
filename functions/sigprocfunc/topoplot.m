@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.248  2005/03/09 17:08:03  arno
+% implementing nosedir
+%
 % Revision 1.247  2005/03/07 17:11:19  arno
 % implement chaninfo
 %
@@ -1120,10 +1123,11 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
   if isstr(loc_file)
-	[tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
+      [tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
   elseif isstruct(loc_file) % a locs struct
-	[tmpeloc labels Th Rd indices] = readlocs(loc_file);
-        % Note: Th and Rd correspond to indices channels-with-coordinates only
+      tmpeloc = getdatachans( loc_file );
+      [tmpeloc labels Th Rd indices] = readlocs( tmpeloc );
+      % Note: Th and Rd correspond to indices channels-with-coordinates only
   else
        error('loc_file must be a EEG.locs struct or locs filename');
   end
@@ -2048,8 +2052,16 @@ if strcmpi(DRAWAXIS, 'on')
     end;
     set(gca, 'xlim', [0 10], 'ylim', [0 10]);
 end;
-    
 
+%
+%%%%%%%%%%%%% get data channels %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+function tmplocs = getdatachans( elocs );
+    if ~isfield(elocs, 'datachan')
+        tmplocs = elocs;
+    else
+        tmplocs = elocs([ elocs.datachan ]);
+    end;
 %
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
