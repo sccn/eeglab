@@ -156,6 +156,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.249  2005/06/09 16:36:25  arno
+% getdatachans
+%
 % Revision 1.248  2005/03/09 17:08:03  arno
 % implementing nosedir
 %
@@ -1125,13 +1128,28 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
   if isstr(loc_file)
       [tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
   elseif isstruct(loc_file) % a locs struct
-      tmpeloc = getdatachans( loc_file );
-      [tmpeloc labels Th Rd indices] = readlocs( tmpeloc );
+      [tmpeloc labels Th Rd indices] = readlocs( loc_file );
       % Note: Th and Rd correspond to indices channels-with-coordinates only
   else
        error('loc_file must be a EEG.locs struct or locs filename');
   end
 
+  %
+  %%%%%%%%%%% select channels using datachans
+  %
+  if isfield(tmpeloc, 'datachan')
+      datachans  = [ tmpeloc.datachan ];
+      emptychans = find(cellfun('isempty', { tmpeloc.datachan }) == 1);
+      try,
+          Values = Values(datachans);
+
+          tmpeloc(emptychans) = [];
+          Th(emptychans) = [];
+          Rd(emptychans) = [];
+          indices(emptychans) = [];
+      catch, disp('Note: datachan inconsistency (information ignored)'); end;
+  end;
+  
   if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
     tmpeloc(end) = [];
