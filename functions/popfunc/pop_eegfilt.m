@@ -14,7 +14,7 @@
 %                 values entered as parameters, and set 'revfilt to 1, to swap
 %                 from bandpass to notch filtering.
 %   "Filter length" - [edit box] Filter lenghth in point (default: see 
-%                 >> help pop_eegfilt). Same as 'filtorder' optional input.
+%                 >> help eegfilt). Same as 'filtorder' optional input.
 %
 % Inputs:
 %   EEG       - input dataset
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/05/24 17:31:18  arno
+% remove cell2mat
+%
 % Revision 1.26  2005/05/13 15:13:19  arno
 % floor instead of round
 %
