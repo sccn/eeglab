@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/06/30 17:46:23  scott
+% fixed bug in yticklabel (sometimes was non-monotonic) -sm
+%
 % Revision 1.4  2005/02/12 01:42:29  hilit
 % added a plot 'on'|'off' option
 %
@@ -94,4 +97,4 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
          set(gca,'ytick',log([yt]));
          set(gca,'yticklabel',{yl});
       end
-  
+  end 
