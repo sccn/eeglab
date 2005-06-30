@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/02/12 01:42:29  hilit
+% added a plot 'on'|'off' option
+%
 % Revision 1.3  2002/10/09 17:37:28  arno
 % set NaNs to 0
 %
@@ -77,13 +80,18 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
   
   if strcmp(plot, 'on')
       imagesc(times,freqs,data);
-      nt = ceil(min(freqs)); % new tick - round up min freq to int-hz
+      nt = ceil(min(freqs)); % new tick - round up min y to int
       yt=get(gca,'ytick');
       yl=get(gca,'yticklabel');
       
-      imagesc(times,lgfreqs,datout);
+      imagesc(times,lgfreqs,datout); % plot the image
       set(gca,'ydir','normal')
-      set(gca,'ytick',log([nt yt]));
-      set(gca,'yticklabel',{int2str(nt) yl});
-  end
+
+      if nt > min(yt),
+         set(gca,'ytick',log([nt yt]));
+         set(gca,'yticklabel',{int2str(nt) yl});
+      else
+         set(gca,'ytick',log([yt]));
+         set(gca,'yticklabel',{yl});
+      end
   
