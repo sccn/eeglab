@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/05/25 21:24:28  arno
+% header
+%
 % Revision 1.3  2005/05/25 21:22:47  arno
 % making all sizes the same
 %
@@ -87,6 +90,7 @@ function mri = plotmri( mri, activations, varargin)
             g.plot(1) = i;
             g.plot(2) = mod(j-1,sy)+1;
             g.plot(3) = (j-g.plot(2))/sy+1;
+            plotinmricoord = g.plot;
             g.plot = g.transform*[g.plot+1 1]';
             g.plot = g.plot(1:3)';
             disp('Finding maximum of activity');
@@ -102,6 +106,7 @@ function mri = plotmri( mri, activations, varargin)
         for ic = g.colchan
             g.curmri(:,:,:,ic) = g.curmri(:,:,:,ic) + tmpact*g.actfactor;
         end;
+        g.curmri(plotinmricoord(1), plotinmricoord(2), plotinmricoord(3), :) = 0;
        
         % make scrolling buttons
         % ----------------------
