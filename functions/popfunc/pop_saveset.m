@@ -19,7 +19,8 @@
 %                saves the structure without the data in a Matlab file and
 %                the data in a binary float file, 2 saves the structure in a 
 %                matlab file and doesn't save the data (assumes data is
-%                already saved in binary float file and has'nt changed).
+%                already saved in a binary float file and EEG.data holds 
+%                the pointer to this float file).
 %
 % Outputs:
 %   EEG        - saved dataset (after extensive syntax checks)
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2005/04/01 01:02:43  hilit
+% fixing a bug
+%
 % Revision 1.47  2005/04/01 00:56:20  hilit
 % disable data loading in savemode option 2
 %
