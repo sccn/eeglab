@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2004/03/17 23:06:48  arno
+% diffmovie on
+%
 % Revision 1.73  2004/03/01 19:49:19  arno
 % diffmovieoff
 %
@@ -655,7 +658,11 @@ elseif strcmpi(g.type, '2d')
                         g.movparams{:}};
 else %%%%%%%%%%%%% 3D MOVIE PARAMS %%%%%%%%%%%%%%%%
     disp('******************************** 3D MOVIE *******************************');
-    coordinates = founddipoles(ALLEEG, g.comps);
+    if ~isempty(g.coordinates)
+        coordinates = g.coordinates;
+    else
+        coordinates = founddipoles(ALLEEG, g.comps);
+    end;
     tmp = coordinates(:,1);
     coordinates(:,1) =  -coordinates(:,2);
     coordinates(:,2) =  tmp;
