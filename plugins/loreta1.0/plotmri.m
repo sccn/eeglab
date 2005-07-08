@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/07/01 00:31:46  arno
+% nothing
+%
 % Revision 1.4  2005/05/25 21:24:28  arno
 % header
 %
@@ -73,6 +76,7 @@ function mri = plotmri( mri, activations, varargin)
                             'actfactor' 'real'      [0 Inf]    0.4;
                             'transform' 'real'      []         eye(4);
                             'colchan'   'integer'   [0 Inf]    1;
+                            'cmap'      'integer'   [0 Inf]    hot;
                             'plot'      'real'      []         [];
                             'scroll'    'string'    { 'on' 'off' } 'on' });
         
@@ -96,18 +100,47 @@ function mri = plotmri( mri, activations, varargin)
             disp('Finding maximum of activity');
         end;
         
+        % set the activation to true color
+        % --------------------------------
+        g.act    = activations;
+        tmpact   = g.act.^g.actgamma;
+        ncolors = size(g.cmap,1);
+        tmpact    = round(tmpact/max(tmpact(:))*(ncolors-1))+1; % -> range: colors 1:ncolors
+        newprob3d = zeros(size(tmpact,1), size(tmpact,2), size(tmpact,3), 3);
+        
+        for ix = 1:size(newprob3d,1)  % could somehow use matrix ops here???
+            for iy = 1:size(newprob3d,2)
+                for iz = 1:size(newprob3d,3)
+                    newprob3d(ix, iy, iz, :) = g.cmap(tmpact(ix, iy, iz),:);
+                end;
+            end;
+        end;
+        
         % compute MRI after gamma factor etc...
         % -------------------------------------
         g.invtransf = pinv(g.transform);
         g.mri    = mri;
-        g.act    = activations;
-        g.curmri = g.mri.^g.mrigamma;
-        tmpact   = g.act.^g.actgamma;
-        for ic = g.colchan
-            g.curmri(:,:,:,ic) = g.curmri(:,:,:,ic) + tmpact*g.actfactor;
+        try
+            g.curmri = g.mri.^g.mrigamma;
+        catch,
+            g.curmri = g.mri.anatomy.^g.mrigamma;
+        end;            
+        
+        % make true color if necessary
+        % ----------------------------
+        if ndims(g.curmri) == 3
+            g.curmri(:,:,:,2) = g.curmri(:,:,:,1);
+            g.curmri(:,:,:,3) = g.curmri(:,:,:,1);
         end;
+        
+        % normalize
+        % ---------
+        newprob3d  = newprob3d / max(newprob3d(:));
+        g.curmri   = g.curmri  / max(g.curmri(:));        
+        g.curmri   = 0.5*g.curmri + 0.5*newprob3d;
         g.curmri(plotinmricoord(1), plotinmricoord(2), plotinmricoord(3), :) = 0;
-       
+        size(g.curmri)
+        
         % make scrolling buttons
         % ----------------------
         g.fid = figure( 'position', [60 705 1010 335]);
@@ -144,7 +177,7 @@ function mri = plotmri( mri, activations, varargin)
 function redraw(viewnb, slicenb, g);
     
     options = { 'FaceColor','texturemap', 'EdgeColor','none', 'CDataMapping', ...
-                'direct','tag','img', 'facelighting', 'none' };
+                'scaled','tag','img', 'facelighting', 'none' };
     [sx sy sz tmp] = size(g.curmri);
     maxs = max([ sx sy sz ]);
     switch viewnb
