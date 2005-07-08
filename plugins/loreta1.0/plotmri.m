@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/07/08 16:50:28  arno
+% adding colormap
+%
 % Revision 1.6  2005/07/08 16:48:32  arno
 % scaled activity
 %
@@ -140,7 +143,6 @@ function mri = plotmri( mri, activations, varargin)
         g.curmri   = g.curmri  / max(g.curmri(:));        
         g.curmri   = 0.5*g.curmri + 0.5*newprob3d;
         g.curmri(plotinmricoord(1), plotinmricoord(2), plotinmricoord(3), :) = 0;
-        size(g.curmri)
         
         % make scrolling buttons
         % ----------------------
