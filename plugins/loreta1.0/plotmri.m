@@ -16,11 +16,9 @@
 %    'actgamma' - [float] activity gamma factor (alter contrast). 1 does not
 %                 change contrast. < 1 increases contrast; > 1 decreases
 %                 contrast.
-%    'actfactor' - [float] activity factor from 0 to 1. Default is 0.4.
-%                 A factor too high might cause the voxel color to go over
-%                 the color limits.
-%    'plot'      - [X Y Z] plot one MRI slices at MNI coordinate [X Y Z].
-%    'scroll'    - ['on'|'off'] GUI for selecting slices. Default is 'on'.
+%    'cmap'     - [hot] colormap for activity
+%    'plot'     - [X Y Z] plot one MRI slices at MNI coordinate [X Y Z].
+%    'scroll'   - ['on'|'off'] GUI for selecting slices. Default is 'on'.
 %
 % 
 % Example: see loreta_importcomp()
@@ -46,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/07/08 16:48:32  arno
+% scaled activity
+%
 % Revision 1.5  2005/07/01 00:31:46  arno
 % nothing
 %
