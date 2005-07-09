@@ -1,26 +1,26 @@
 % eeg_context() - returns a matrix giving, for each event of specified ("target") type(s), 
 %                 the latency (in ms) to the Nth preceding and/or following urevents (if any) 
 %                 of specified ("neighbor") type(s). Can return the target event and urevent
-%                 numbers, the neighbor urevent numbers, and the values of a specified urevent
-%                 field for each of the neighbor urevents. Uses the EEG.urevent structure, plus
-%                 EEG.event().urevent pointers to it.  For use in event handling scripts.
+%                 numbers, the neighbor urevent numbers, and the values of specified urevent
+%                 field(s) for each of the neighbor urevents. Uses the EEG.urevent structure, 
+%                 plus EEG.event().urevent pointers to it. For use in event handling scripts.
 % Usage:
 %             >>  [targs,unbrs,unbrtypes,delays,tfields,unfields] = ...
-%                          eeg_context(EEG,{target},{neighbor},[positions],'field',alltargs);
+%                          eeg_context(EEG,{target},{neighbors},[positions],{fields},alltargs);
 % Inputs:
 % EEG         - EEGLAB dataset structure containing EEG.event and EEG.urevent sub-structures
 %
 % Optional inputs:
-% {target}   - cell array of strings naming event type(s) of the specified target events 
+% {target}    - cell array of strings naming event type(s) of the specified target events 
 %               {default | []: all events}
-% {neighbor} - cell array of strings naming event type(s) of the specified neighboring 
+% {neighbors} - cell array of strings naming event type(s) of the specified neighboring 
 %               urevents {default | []: all neighboring events}.
 % [positions] - int vector giving the relative positions of 'neighbor' type urevents to return. 
 %               Ex: [-3 -2 -1 0 1 2 3] -> return the previous 3, current, and succeeding 3 
 %               urevents of the specified {neighbor} types. [positions] values are arranged 
 %               in ascending order before processing.  {default | []: 1 = first succeeding}
-% 'field'     - string naming an (ur)event field to return values for neighbor urevents 
-%               {default: no field info returned}
+% {fields}    - string or cell array of strings naming one or more (ur)event field(s) to return 
+%               values for neighbor urevents. {default: no field info returned}
 % alltargs    - string ('all'|[]) if 'all', return information about all target urevents,
 %               even those on which no epoch in the current dataset is centered. 
 %               {default: [] -> only return information on epoch-centered target events} 
@@ -36,20 +36,24 @@
 %  delays     - matrix giving, for each {target} type event, delays (in ms) from the target 
 %               events to the neighbor urevents . Else, returns NaN when no such event. 
 %               Output matrix size: (ntargets,length(positions)). 
-% tfields     - real or cell array of values of the (ur)event 'field' for the target events.
-%               Values are the same type as the field values, else NaN if no such event.
-% unfields    - real or cell array of values of the urevent 'field' for the neighbor urevents.
-%               Values are the same type as the field values, else NaN if no such event.
+% tfields     - real or cell array of values of the requested (ur)event field(s) for the target 
+%               events. Values are the same type as the field values, else NaN if no such event.
+% unfields    - real or cell array of values of the urevent requested field(s) for the neighbor 
+%               urevents. Values are the same type as the field values, else NaN if no such event.
+%               If > 1 field specified, a 3-D array or cell array (nevents,nnbrpos,nfields).
 % Example:
+%
 % >> target   = {'square'};            % for all target events of type 'square'
 % >> nbr      = {'square','rt'};       % counting neighbor events as either 'square' or 'rt'
-% >> [trgs,unbrs,unbrtypes,delays,trgfld,nbrfld] = eeg_context(EEG,target,nbr,[-4 1],'position');
-%     % Matrix 'delays' now contains latencies (in ms) from each 'square' target event to the 4th
-%     % preceding and 1st succeeding 'rt' OR 'square' urevents (else NaN when none such). Outputs 
-%     % 'trgfld' and 'nbrfld' give the 'position' field values for target events and neighbor urevents,
-%     % output 'unbrtypes', the type ('square' or 'rt') of the ('unbrs') neighbor urevents.
-% >> trts     = find(trgs(:,4)==2);    % i.e., targets followed by an 'rt' (before a 'square')
-% >> pos3     = find(trgfld = 3);      % targets in 'position' 3 (numeric field value).
+%
+% >> [trgs,unbrs,unbrtypes,delays,tfields,unfields] = eeg_context(EEG,target,nbr,[-4 1],'position');
+%      % Matrix 'delays' now contains latencies (in ms) from each 'square' target event to the 4th
+%      % preceding and 1st succeeding 'rt' OR 'square' urevents (else NaN when none such). Outputs 
+%      % Outputs 'tfields' and 'unfields' give the 'position' field values for target events and neighbor 
+%      % urevents. Output 'unbrtypes', the type ('square' or 'rt') of the ('unbrs') neighbor urevents.
+%
+% >> trts      = find(trgs(:,4)==2);   % i.e., targets followed by an 'rt' (before a 'square')
+% >> pos3      = find(trgfld = 3);     % targets in 'position' 3 (numeric field value).
 % >> selevents = intersect(trts,pos3); % target events by both criteria
 % >> selepochs = trgs(selevents,3);    % indices of epochs centered on the selected target events
 %
@@ -190,20 +194,50 @@ ur_nbrtypes  = NaN*zeros(nevents,npos);  % holds {neighbors} type indices
 cellfld = -1;  % flag no field output specified
 
 if ~exist('NO_FIELD','var') % if field values asked for
-  if ~isfield(EEG.urevent,field)
+  if ischar(field)
+    if ~isfield(EEG.urevent,field)
      error('Specified field not found in urevent struct');
-  end
-  if ischar(EEG.urevent(1).(field)) ...
+    end
+    if ischar(EEG.urevent(1).(field)) ...
        | iscell(EEG.urevent(1).(field)) ...
-          | isstruct(EEG.urevent(1).(field)),
+          | isstruct(EEG.urevent(1).(field)), 
      tfields = cell(nevents,1);
      nfields = cell(nevents,npos);
      cellfld = 1;  % flag that field outputs are cell arrays
-  else % is number
+    else % is number
      tfields = NaN*zeros(nevents,1);
      nfields = NaN*zeros(nevents,npos);
      cellfld = 0;  % flag that field outputs are numeric arrays
-  end 
+    end 
+    field = {field}; % make string field a cell array for uniformity
+    nfieldnames = 1;
+   elseif iscell(field)
+    nfieldnames = length(field);
+    for f = 1:nfieldnames
+      if ~isfield(EEG.urevent,field{f})
+       error('Specified field not found in urevent struct');
+      end
+      if ischar(EEG.urevent(1).(field{f})) ...
+         | iscell(EEG.urevent(1).(field{f})) ...
+           | isstruct(EEG.urevent(1).(field{f})),
+        if f==1, 
+           tfields = cell(nevents,nfieldnames);
+           nfields = cell(nevents,npos,nfieldnames);
+        end
+        cellfld = 1;  % flag that field outputs are cell arrays
+      else % is number
+        if f==1
+           tfields = NaN*zeros(nevents,nfieldnames);
+           nfields = NaN*zeros(nevents,npos,nfieldnames);
+        end
+      end 
+    end
+    if cellfld == -1,
+       cellfld = 0; % field value(s) must be numeric
+    end
+   else
+     error('''field'' value must be string or cell array');
+   end
 end
 
 targetcount = 0; % index of current target
@@ -243,10 +277,12 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
       if ~isempty(zeroidx)  % if the target event is asked for in the nbrs array
         delays(targetcount,zeroidx) = 0;
         if ~exist('NO_FIELD','var')
-            if cellfld ==0
-              nfields(targetcount,zeroidx) = EEG.urevent(uridx).(field);
-            elseif cellfld == 1
-              nfields{targetcount,zeroidx} = EEG.urevent(uridx).(field);
+            for f=1:nfieldnames
+              if cellfld == 0
+                nfields(targetcount,zeroidx,f) = EEG.urevent(uridx).(field{f});
+              else % cellfld == 1
+                nfields{targetcount,zeroidx,f} = EEG.urevent(uridx).(field{f});
+              end
             end
         end
       end
@@ -274,10 +310,12 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
        targs(targetcount) = evidx;                  % save event index
        ur_trgs(targetcount) = uridx;                % save urevent index
        if ~exist('NO_FIELD','var')
-         if cellfld ==0
-            tfields(targetcount) = EEG.urevent(uridx).(field);
-         elseif cellfld == 1
-            tfields{targetcount} = EEG.urevent(uridx).(field);
+         for f=1:nfieldnames
+           if cellfld ==0
+            tfields(targetcount,f) = EEG.urevent(uridx).(field{f});
+           elseif cellfld == 1
+            tfields{targetcount,f} = EEG.urevent(uridx).(field{f});
+           end
          end
          break                                        % stop target type checking
        end
@@ -329,10 +367,26 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
            ur_nbrs(targetcount,negidx(npidx))=uidx;  % mark urevent as neighbor
            ur_nbrtypes(targetcount,negidx(npidx)) = nidx;
            if ~exist('NO_FIELD','var')
-             if cellfld ==0
-              nfields(targetcount,negidx(npidx)) = EEG.urevent(uidx).(field);
-             elseif cellfld == 1
-              nfields{targetcount,negidx(npidx)} = EEG.urevent(uidx).(field);
+             for f=1:nfieldnames
+               if cellfld ==0
+                if nfieldnames > 1
+                   if ~isempty(EEG.urevent(uidx).(field{f}))
+                     nfields(targetcount,negidx(npidx),f) = EEG.urevent(uidx).(field{f});
+                   else
+                     nfields(targetcount,negidx(npidx),f) = NaN;
+                   end
+                elseif ~isempty(EEG.urevent(uidx).(field{f}))
+                   nfields(targetcount,negidx(npidx)) = EEG.urevent(uidx).(field{f});
+                else
+                   nfields(targetcount,negidx(npidx)) = NaN;
+                end
+               elseif cellfld == 1
+                if nfieldnames > 1
+                  nfields{targetcount,negidx(npidx),f} = EEG.urevent(uidx).(field{f});
+                else
+                  nfields{targetcount,negidx(npidx)} = EEG.urevent(uidx).(field{f});
+                end
+               end
              end
            end
            npidx = npidx+1;  % look for next negpos position
@@ -395,10 +449,26 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
                                 (EEG.urevent(uidx).latency - EEG.urevent(uridx).latency);
                                 % return positive latencies for pospos events
            if ~exist('NO_FIELD','var')
-             if cellfld ==0
-                nfields(targetcount,posidx(ppidx)) = EEG.urevent(uidx).(field);
-             elseif cellfld == 1
-                nfields{targetcount,posidx(ppidx)} = EEG.urevent(uidx).(field);
+             for f=1:nfieldnames
+               if cellfld ==0
+                  if nfieldnames > 1
+                    if ~isempty(EEG.urevent(uidx).(field{f}))
+                      nfields(targetcount,posidx(ppidx),f) = EEG.urevent(uidx).(field{f});
+                    else
+                      nfields(targetcount,posidx(ppidx),f) = NaN;
+                    end
+                  elseif ~isempty(EEG.urevent(uidx).(field{f}))
+                    nfields(targetcount,posidx(ppidx)) = EEG.urevent(uidx).(field{f});
+                  else
+                    nfields(targetcount,posidx(ppidx)) = NaN;
+                  end
+               else % if cellfld == 1
+                  if nfieldnames > 1
+                    nfields{targetcount,posidx(ppidx),f} = EEG.urevent(uidx).(field{f});
+                  else
+                    nfields{targetcount,posidx(ppidx)} = EEG.urevent(uidx).(field{f});
+                  end
+               end
              end
            end
            ppidx = ppidx+1;
@@ -437,17 +507,23 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
      end
      if ~exist('NO_FIELD','var')
        if cellfld == 0 % numeric field values
-        fprintf('field: %-5g - ',tfields(targetcount))
-        for k=1:npos
-         fprintf('%-5g ',nfields(targetcount,k));
+        fprintf('fields: ')
+        for f=1:nfieldnames
+          fprintf('%-5g - ',tfields(targetcount,f))
+          for k=1:npos
+            fprintf('%-5g ',nfields(targetcount,k,f));
+          end
         end
        elseif cellfld == 1  % cell array field values
-        if ischar(EEG.urevent(1).(field))
-         fprintf('field: %-5g -',tfields{targetcount})
-         for k=1:npos
-            fprintf('%-5g ',nfields{targetcount,k});
-         end % for
-        end % ischar
+        fprintf('fields: ')
+        for f=1:nfieldnames
+          if ischar(EEG.urevent(1).(field{f}))
+           fprintf('%-5g -',tfields{targetcount,f})
+           for k=1:npos
+              fprintf('%-5g ',nfields{targetcount,k,f});
+           end % k
+          end % ischar
+        end % f
        end % cellfield
      end % ~NO_FIELD
     end % uidx > 1
@@ -495,15 +571,15 @@ if targetcount > 0
 
    if ~exist('NO_FIELD','var')
      if cellfld == 0
-       tfields = tfields(1:targetcount);
-       nfields = nfields(1:targetcount,:);
+       tfields = tfields(1:targetcount,:);
+       nfields = nfields(1:targetcount,:,:);
      elseif cellfld == 1
-       tfields = tfields(1:targetcount);
-       nfields = nfields(1:targetcount,:);
+       tfields = tfields(1:targetcount,:);
+       nfields = nfields(1:targetcount,:,:);
      end
      if ~alltargs
         tfields = tfields(epcenttargs,:);
-        nfields = nfields(epcenttargs,:);
+        nfields = nfields(epcenttargs,:,:);
      end
    else % NO_FIELD
      tfields = [];
