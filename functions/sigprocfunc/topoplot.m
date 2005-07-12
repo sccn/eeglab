@@ -77,6 +77,8 @@
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}
 %   'ccolor'          - color of the contours {default: dark grey}
+%   'whitebk'        -  ('on'|'off') make the background color white (e.g., to print empty plotgrid channels) 
+%                       {default: 'off'}
 %   'gridscale'       - [int > 32] size (nrows) of interpolated scalp map data matrix {default: 67}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
@@ -156,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.251  2005/06/09 23:33:46  arno
+% remove getdatachan function
+%
 % Revision 1.250  2005/06/09 23:33:21  arno
 % fixing datachan
 %
@@ -743,7 +748,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,Zi,grid,Xi,Yi] = topoplot2(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi,grid,Xi,Yi] = topoplot(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
