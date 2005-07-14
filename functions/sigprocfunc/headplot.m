@@ -28,16 +28,16 @@
 %                   TRI2   (optional) - faces in skin color
 %                   NORM   (optional) - normal for each vertex (better shades)
 %   'orilocs'     - ['off'|'on'] use original electrode location on the head
-%                  default: 'off' (extrapolated to spherical). Note that 
-%                  electrode location must be coregisted with the head mesh.
+%                   default: 'off' (extrapolated to spherical). Note that 
+%                   electrode locations must be coregisted with the head mesh.
 %   'transform'   - [real array] tailarach transformation matrix. 
 %                   [ shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ ]
 %                   to coregister electrode locations with the head mesh. This
 %                   array is returned by the coregister() function.
-%   'plotmeshonly' - [string] plot only mesh and electrode position. Options are
-%                    'head' to plot the standard head mesh, 'sphere' to plot the
-%                    texture of the head on a sphere, and 'off' (default) not to
-%                    plot anything.
+%  'plotmeshonly' - [string] plot only mesh and electrode position. Options are
+%                   'head' to plot the standard head mesh, 'sphere' to plot the
+%                   texture of the head on a sphere, and 'off' (default) not to
+%                   plot anything.
 %
 % General usage:
 %   >> headplot(values,'spline_file','Param','Value',...)
@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2005/05/24 17:13:56  arno
+% cell2mat -> celltomat
+%
 % Revision 1.55  2005/05/19 17:59:56  arno
 % document plotmshonly
 %
@@ -300,8 +303,7 @@ DEFAULT_MESH      = ['mheadnew.mat'];      % upper head model file (987K)
 DEFAULT_TRANSFORM = [0 -5 0 -0.1000 0 -1.5700 1040 800 950]; % stretching in different dimensions
 DEFAULT_TRANSFORM = [0 -10 0 -0.1000 0 -1.600 1100 1100 1100]; % keep spherical shape.
 %DEFAULT_MESH  = '/home/arno/matlab/juliehiresmesh.mat';
-%DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; 
-                                 % whole head model file (183K)
+%DEFAULT_MESH  = ['/home/scott/matlab/old' '/newupper.mat']; % whole head model file (183K)
 
 DEFAULT_LIGHTS = [-125  125  80; ...
                   125  125  80; ...
