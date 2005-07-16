@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.252  2005/07/12 17:03:25  scott
+% documented 'whitebk' option -sm
+%
 % Revision 1.251  2005/06/09 23:33:46  arno
 % remove getdatachan function
 %
@@ -1523,9 +1526,11 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     else
       error('unknown ''maplimits'' value.');
     end
-  else
+  elseif length(MAPLIMITS) == 2
     amin = MAPLIMITS(1);
     amax = MAPLIMITS(2);
+  else
+    error('unknown maplimits argument');
   end
   delta = xi(2)-xi(1); % length of grid entry
 
@@ -1589,11 +1594,12 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         amin = -max(max(abs([amin amax])));
         amax = max(max(abs([amin amax])));
       end
-    else
+    elseif length(MAPLIMITS) == 2
       amin = MAPLIMITS(1);
       amax = MAPLIMITS(2);
+    else
+      error('unknown maplimits argument');
     end
-
     %
     %%%%%%%%%% explicitly compute grid colors, allowing BACKCOLOR  %%%%%%
     %
