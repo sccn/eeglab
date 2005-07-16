@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.253  2005/07/16 16:27:25  scott
+% fixed 'maplimits',[min max] execution, added test -sm
+%
 % Revision 1.252  2005/07/12 17:03:25  scott
 % documented 'whitebk' option -sm
 %
@@ -1455,7 +1458,7 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Make the plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
- if ~strcmpi(STYLE,'grid')
+ if ~strcmpi(STYLE,'grid') %  not a rectangular channel grid
   %
   %%%%%%%%%%%%%%%% Find limits for interpolation %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1530,7 +1533,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     amin = MAPLIMITS(1);
     amax = MAPLIMITS(2);
   else
-    error('unknown maplimits argument');
+    error('unknown ''maplimits'' value');
   end
   delta = xi(2)-xi(1); % length of grid entry
 
@@ -1588,17 +1591,20 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %%%%%%%%%%% reset color limits for grid plot %%%%%%%%%%%%%%%%%%%%%%%%%
     %
     if isstr(MAPLIMITS) 
-      amin = min(min(gridvalues(~isnan(gridvalues))));
-      amax = max(max(gridvalues(~isnan(gridvalues))));
-      if strcmp(MAPLIMITS,'absmax')
+      if strcmp(MAPLIMITS,'maxmin') | strcmp(MAPLIMITS,'minmax')
+        amin = min(min(gridvalues(~isnan(gridvalues))));
+        amax = max(max(gridvalues(~isnan(gridvalues))));
+      elseif strcmp(MAPLIMITS,'absmax')
         amin = -max(max(abs([amin amax])));
         amax = max(max(abs([amin amax])));
+      else
+        error('unknown ''maplimits'' value');
       end
     elseif length(MAPLIMITS) == 2
       amin = MAPLIMITS(1);
       amax = MAPLIMITS(2);
     else
-      error('unknown maplimits argument');
+      error('unknown ''maplimits'' value');
     end
     %
     %%%%%%%%%% explicitly compute grid colors, allowing BACKCOLOR  %%%%%%
