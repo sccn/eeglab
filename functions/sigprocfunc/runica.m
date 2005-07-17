@@ -41,7 +41,8 @@
 % 'specgram'  = [srate loHz hiHz frames winframes] decompose a complex time/frequency
 %               transform of the data (Note: winframes must divide frames) 
 %                            (defaults [srate 0 srate/2 size(data,2) size(data,2)])
-% 'posact'    = make all component activations net-positive(default 'on'}
+% 'posact'    = make all component activations net-positive(default 'off'}
+%               Requires time and memory; posact() may be applied separately.
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
@@ -98,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/10/06 20:41:10  scott
+% rm debug -sm
+%
 % Revision 1.22  2004/10/06 20:40:32  scott
 % same -sm
 %
@@ -191,7 +195,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [weights,sphere,meanvar,bias,signs,lrates,activations,y] = runica(data,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10,p11,v11,p12,v12,p13,v13,p14,v14)
+function [weights,sphere,meanvar,bias,signs,lrates,data,y] = runica(data,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10,p11,v11,p12,v12,p13,v13,p14,v14) % NB: Now optionally returns activations as variable 'data' -sm 7/05
 
 if nargin < 1
   help runica  
@@ -243,7 +247,7 @@ SIGNCOUNT_STEP       = 2;         % extblocks increment factor
 DEFAULT_SPHEREFLAG   = 'on';      % use the sphere matrix as the default
                                   %   starting weight matrix
 DEFAULT_PCAFLAG      = 'off';     % don't use PCA reduction
-DEFAULT_POSACTFLAG   = 'on';      % use posact()
+DEFAULT_POSACTFLAG   = 'off';     % don't use posact(), to save space -sm 7/05
 DEFAULT_VERBOSE      = 1;         % write ascii info to calling screen
 DEFAULT_BIASFLAG     = 1;         % default to using bias in the ICA update rule
 %                                 
@@ -664,12 +668,13 @@ if verbose,
   end
 end
 %
-%%%%%%%%%%%%%%%%%%%%%%%%% Remove overall row means %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Remove overall row means of data %%%%%%%%%%%%%%%%%%%%%%%
 %
 if verbose,
     fprintf('Removing mean of each channel ...\n');
 end
-data = data - mean(data')'*ones(1,frames);      % subtract row means
+rowmeans = mean(data');
+data = data - rowmeans'*ones(1,frames);      % subtract row means
 
 if verbose,
    fprintf('Final training data range: %g to %g\n', ...
@@ -756,20 +761,20 @@ if strcmp(sphering,'on'), %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if verbose,
       fprintf('Sphering the data ...\n');
   end
-  data = sphere*data;      % actually decorrelate the electrode signals
+  data = sphere*data; % decorrelate the electrode signals by 'sphereing' them
 
 elseif strcmp(sphering,'off') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  if ~weights
+  if ~weights % is starting weights not given
       if verbose,
        fprintf('Using the sphering matrix as the starting weight matrix ...\n');
        fprintf('Returning the identity matrix in variable "sphere" ...\n');
       end
       sphere = 2.0*inv(sqrtm(cov(data'))); % find the "sphering" matrix = spher()
-      weights = eye(ncomps,chans)*sphere; % begin with the identity matrix
+      weights = eye(ncomps,chans)*sphere;  % begin with the identity matrix
       sphere = eye(chans);                 % return the identity matrix
   else % weights ~= 0
       if verbose,
-       fprintf('Using starting weights named on commandline ...\n');
+       fprintf('Using starting weights from commandline ...\n');
        fprintf('Returning the identity matrix in variable "sphere" ...\n');
       end
       sphere = eye(chans);                 % return the identity matrix
@@ -1044,21 +1049,38 @@ end
       end;                                 % with a smaller learning rate
     end; % end if weights in bounds
 
-  end; % end training %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  end; % end ICA training %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   if ~laststep
     laststep = step;
   end;
   lrates = lrates(1,1:laststep);           % truncate lrate history vector
+
   %
   %%%%%%%%%%%%%% Orient components towards max positive activation %%%%%%
   %
-  if strcmp(posactflag,'on')
-      [activations,winvout,weights] = posact(data,weights);
-       % changes signs of activations and weights to make activations
-       % net rms-positive
+  if strcmp(posactflag,'on') % default is now off to save processing and memory
+      [data,winvout,weights] = posact(data,weights); % overwrite data with activations
+       % changes signs of activations (now = data) and weights 
+       % to make activations (data) net rms-positive
+       % can call this outside of runica()
+  elseif strcmp(pcaflag,'off')
+       sr = sphere * rowmeans';
+       for r = 1:ncomps
+         data(r,:) = data(r,:)+sr(r); % add back row means 
+       end
+       data = weights*data;
+       % make activations from data; -sm 7/05
+       % add back the row means removed from data before sphering
   else
-       activations = weights*data;
+       ser = sphere*eigenvectors(:,1:ncomps)'*rowmeans';
+       for r = 1:ncomps
+         data(r,:) = data(r,:)+ser(r); % add back row means 
+       end
+       data = weights*data;
+       % make activations from sphered and pca'd data; -sm 7/05
+       % add back the row means removed from data before sphering
   end
   %
   %%%%%%%%%%%%%% If pcaflag, compose PCA and ICA matrices %%%%%%%%%%%%%%%
@@ -1080,25 +1102,18 @@ end
   %
   %%%%%%%%%%%%%%%%%%%% Find mean variances %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  meanvar  = zeros(ncomps,1);      % size of the projections
+  % meanvar  = zeros(ncomps,1);      % size of the projections
   if ncomps == urchans % if weights are square . . .
       winv = inv(weights*sphere);
   else
       fprintf('Using pseudo-inverse of weight matrix to rank order component projections.\n');
       winv = pinv(weights*sphere);
   end
-  for s=1:ncomps
-      if verbose,
-          fprintf('%d ',s);         % construct single-component data matrix
-      end
-      % project to scalp, then add row means 
-      compproj = winv(:,s)*activations(s,:);
-      meanvar(s) = mean(sum(compproj.*compproj)/(size(compproj,1)-1));
-      % compute mean variance 
-  end                                   % at all scalp channels
-  if verbose,
-      fprintf('\n');
-  end
+  %
+  % compute variances without backprojecting to save time and memory -sm 7/05
+  %
+  meanvar = sum(winv.^2).*sum((data').^2)/(ncomps-1)^2; % NB: data is now activations -sm 7/05
+  %
   %
   %%%%%%%%%%%%%% Sort components by mean variance %%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1112,9 +1127,9 @@ end
       if verbose,
           fprintf('Permuting the activation wave forms ...\n');
       end
-      activations = activations(windex,:);
+      data = data(windex,:); % data is now activations -sm 7/05
   else
-      clear activations
+      clear data
   end
   weights = weights(windex,:);% reorder the weight matrix
   bias  = bias(windex);       % reorder them
@@ -1128,7 +1143,7 @@ end
 return
 
 %
-%%%%%%%%%%%%%%%%%% return nonlinearly-transformed data  %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% DEPRECATED return nonlinearly-transformed data  %%%%%%%%%%%%%%%%
 %
 if nargout > 7
   u=weights*data + bias*ones(1,frames);      
