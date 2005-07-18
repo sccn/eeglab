@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2005/07/08 21:24:15  arno
+% debug g.coordinates call
+%
 % Revision 1.74  2004/03/17 23:06:48  arno
 % diffmovie on
 %
@@ -751,11 +754,11 @@ if ~strcmpi(g.mode, 'compute')
         % --------------
         if strcmpi(g.type, '3d')
             allframes = brainmovie3d( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                        brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+                        brainmovieoptionsfinal{:}); %, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
                         %brainmovieoptionsfinal{:}, 'framesout', 'eps');  
         else
             allframes = brainmovie( newERSP, newITC, newCROSSF, newANGLE, times, freqindex, g.showcomps, ...
-                        brainmovieoptionsfinal{:}, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
+                        brainmovieoptionsfinal{:}); %, 'framesout', fastif(strcmpi(g.quality, 'ultrafast'), 'ppm', 'fig'));  
         end;            
         if strcmp(g.oneframe, 'on')
             disp('Only one frame generated');
