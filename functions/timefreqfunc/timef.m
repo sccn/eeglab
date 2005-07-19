@@ -25,10 +25,10 @@
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
-%       frames      = Frames per trial                               {750}
-%       tlimits     = [mintime maxtime] (ms) Epoch time limits    {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                        {250}
-%       cycles      = If 0 -> Use FFTs (with constant window length) {0}
+%       frames      = Frames per trial                         {def|[]: datalength}
+%       tlimits     = [mintime maxtime] (ms) Epoch time limits {def|[]: from frames,srate}
+%       srate       = data sampling rate (Hz)                  {def:250}
+%       cycles      = If 0 -> Use FFTs (with constant window length) {0 = FFT}
 %                     If >0 -> Number of cycles in each analysis wavelet 
 %                     If [wavecycles factor] -> wavelet cycles increase with frequency 
 %                     beginning at wavecyles (0<factor<1; factor=1 -> no increase,
@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2005/03/07 21:25:54  arno
+% chaninfo
+%
 % Revision 1.80  2005/02/23 19:44:10  hilit
 % coerrected the computation of the last output (itc phase)
 %
@@ -413,7 +416,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,times,freqs,Pboot,Rboot,Rphase,PA] = timef(X,frame,tlimits,Fs,varwin,varargin);
+function [P,R,mbase,times,freqs,Pboot,Rboot,Rphase,PA] = timef(X,frames,tlimits,Fs,varwin,varargin);
 
 % Note: undocumented arg PA is output of 'phsamp','on' 
 
@@ -434,8 +437,8 @@ ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
 MIN_ABS          = 1e-8;        % avoid division by ~zero
 
 % Commandline arg defaults:
-DEFAULT_EPOCH	= 750;			% Frames per trial
-DEFAULT_TIMLIM = [-1000 2000];	% Time range of g.frames (ms)
+DEFAULT_EPOCH	= NaN;		% Frames per trial
+DEFAULT_TIMLIM  = NaN;	                % Time range of g.frames (ms)
 DEFAULT_FS	= 250;			% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;			% Fixed window length or fixed number of cycles.
@@ -474,17 +477,20 @@ if (min(size(X))~=1 | length(X)<2)
 	error('Data must be a row or column vector.');
 end
 
-if (nargin < 2)
-	frame = DEFAULT_EPOCH;
-elseif (~isnumeric(frame) | length(frame)~=1 | frame~=round(frame))
+if nargin < 2 | isempty(frames) | isnan(frames) 
+	frames = DEFAULT_EPOCH;
+elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
 	error('Value of frames must be an integer.');
-elseif (frame <= 0)
+elseif (frames <= 0)
 	error('Value of frames must be positive.');
-elseif (rem(length(X),frame) ~= 0)
+elseif (rem(length(X),frames) ~= 0)
 	error('Length of data vector must be divisible by frames.');
 end
+if isnan(frames) | isempty(frames)
+    frames = length(X);
+end
 
-if (nargin < 3)
+if nargin < 3 | isnan(tlimits) | isempty(tlimits)
 	tlimits = DEFAULT_TIMLIM;
 elseif (~isnumeric(tlimits) | sum(size(tlimits))~=3)
 	error('Value of tlimits must be a vector containing two numbers.');
@@ -498,6 +504,20 @@ elseif (~isnumeric(Fs) | length(Fs)~=1)
 	error('Value of srate must be a number.');
 elseif (Fs <= 0)
 	error('Value of srate must be positive.');
+end
+
+if isnan(tlimits) | isempty(tlimits)
+   hlim = 1000*frames/Fs;  % fit default tlimits to srate and frames
+   tlimits = [0 hlim];
+end
+
+framesdiff = frames - Fs*(tlimits(2)-tlimits(1))/1000;
+if abs(framesdiff) > 1
+        error('Given time limits, frames and sampling rate are incompatible');
+elseif framesdiff ~= 0
+   	tlimits(1) = tlimits(1) - 0.5*framesdiff*1000/Fs;
+   	tlimits(2) = tlimits(2) + 0.5*framesdiff*1000/Fs;
+    	fprintf('Adjusted time limits slightly, to [%.1f,%.1f] ms, to match frames and srate.\n',tlimits(1),tlimits(2));
 end
 
 if (nargin < 5)
@@ -515,7 +535,7 @@ if ~isempty(varargin)
     catch, error('Argument error in the {''param'', value} sequence'); end; 
 end;
 g.tlimits = tlimits;
-g.frame   = frame;
+g.frames   = frames;
 g.srate   = Fs;
 g.cycles  = varwin(1);
 if length(varwin)>1
@@ -525,7 +545,7 @@ else
 end;
 
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
-try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frame)-3),4); end;
+try, g.winsize;    catch, g.winsize = max(pow2(nextpow2(g.frames)-3),4); end;
 try, g.pad;        catch, g.pad = max(pow2(nextpow2(g.winsize)),4); end;
 try, g.timesout;   catch, g.timesout = DEFAULT_NWIN; end;
 try, g.padratio;   catch, g.padratio = DEFAULT_OVERSMP; end;
@@ -571,8 +591,8 @@ elseif (g.winsize <= 0)
 	error('Value of winsize must be positive.');
 elseif (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
 	error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
-elseif (g.winsize > g.frame)
-	error('Value of winsize must be less than frame length.');
+elseif (g.winsize > g.frames)
+	error('Value of winsize must be less than frames per epoch.');
 end
 
 if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesout))
@@ -580,9 +600,9 @@ if (~isnumeric(g.timesout) | length(g.timesout)~=1 | g.timesout~=round(g.timesou
 elseif (g.timesout <= 0)
 	error('Value of timesout must be positive.');
 end
-if (g.timesout > g.frame-g.winsize)
-	g.timesout = g.frame-g.winsize;
-	disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
+if (g.timesout > g.frames-g.winsize)
+	g.timesout = g.frames-g.winsize;
+	disp(['Value of timesout must be <= frames-winsize, timeout adjusted to ' int2str(g.timesout) ]);
 end
 
 if (~isnumeric(g.padratio) | length(g.padratio)~=1 | g.padratio~=round(g.padratio))
@@ -789,7 +809,7 @@ end                                             %       phs   amp
 
 wintime = 1000/g.srate*(g.winsize/2); % (1000/g.srate)*(g.winsize/2);
 times = [g.tlimits(1)+wintime:(g.tlimits(2)-g.tlimits(1)-2*wintime)/(g.timesout-1):g.tlimits(2)-wintime];
-ERPtimes = [g.tlimits(1):(g.tlimits(2)-g.tlimits(1))/(g.frame-1):g.tlimits(2)+0.000001];
+ERPtimes = [g.tlimits(1):(g.tlimits(2)-g.tlimits(1))/(g.frames-1):g.tlimits(2)+0.000001];
 ERPindices = [];
 for ti=times
  [tmp indx] = min(abs(ERPtimes-ti));
@@ -810,20 +830,20 @@ elseif ~isnan(g.alpha) & g.baseboot
           length(baseln), g.baseline)
 end
 dispf = find(freqs <= g.maxfreq);
-stp = (g.frame-g.winsize)/(g.timesout-1);
+stp = (g.frames-g.winsize)/(g.timesout-1);
 
 myprintf(g.verbose,'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher',  myprintf(g.verbose,'  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'phasecoher2', myprintf(g.verbose,'  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',       myprintf(g.verbose,'  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher',  myprintf(g.verbose,'  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frames);
+    case 'phasecoher2', myprintf(g.verbose,'  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frames);
+    case 'coher',       myprintf(g.verbose,'  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',length(X)/g.frames);
 end;
-myprintf(g.verbose,'  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
+myprintf(g.verbose,'  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 myprintf(g.verbose,'Each trial contains samples from %d ms before to\n',g.tlimits(1));
-myprintf(g.verbose,'  %d ms after the timelocking event.\n',g.tlimits(2));
+myprintf(g.verbose,'  %.0f ms after the timelocking event.\n',g.tlimits(2));
 myprintf(g.verbose,'The window size used is %d samples (%g ms) wide.\n',g.winsize,2*wintime);
 myprintf(g.verbose,'The window is applied %d times at an average step\n',g.timesout);
-myprintf(g.verbose,'  size of %g samples (%gms).\n',stp,1000*stp/g.srate);
+myprintf(g.verbose,'  size of %g samples (%g ms).\n',stp,1000*stp/g.srate);
 myprintf(g.verbose,'Results are oversampled %d times; the %d frequencies\n',g.padratio,length(dispf));
 myprintf(g.verbose,'  displayed are from %2.1f Hz to %3.1f Hz.\n',freqs(dispf(1)),freqs(dispf(end)));
 if ~isnan(g.alpha)
@@ -831,7 +851,7 @@ if ~isnan(g.alpha)
   myprintf(g.verbose,'  non-significant values will be plotted in green\n');
 end
 
-trials = length(X)/g.frame;
+trials = length(X)/g.frames;
 baselength = length(baseln);
 myprintf(g.verbose,'\nOf %d trials total, processing trial:',trials);
 
@@ -839,8 +859,8 @@ myprintf(g.verbose,'\nOf %d trials total, processing trial:',trials);
 % -----------------------------------------
 switch g.detrep
     case 'on'
-        X = reshape(X, g.frame, length(X)/g.frame);
-        X = X - mean(X,2)*ones(1, length(X(:))/g.frame);
+        X = reshape(X, g.frames, length(X)/g.frames);
+        X = X - mean(X,2)*ones(1, length(X(:))/g.frames);
         X = X(:)';
 end;        
 
@@ -854,12 +874,12 @@ for i=1:trials
 		myprintf(g.verbose,'.');
 	end
 
-    ERP = blockave(X,g.frame); % compute the ERP trial average
+    ERP = blockave(X,g.frames); % compute the ERP trial average
 
     Wn = zeros(1,g.timesout);
 	for j=1:g.timesout,
-		tmpX = X([1:g.winsize]+floor((j-1)*stp)+(i-1)*g.frame); 
-                                                      % pull out data g.frame
+		tmpX = X([1:g.winsize]+floor((j-1)*stp)+(i-1)*g.frames); 
+                                                      % pull out data g.frames
 		tmpX = tmpX - mean(tmpX); % remove the mean for that window
         switch g.detret, case 'on', tmpX = detrend(tmpX); end;
 		if ~any(isnan(tmpX))
