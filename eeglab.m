@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.366  2005/05/12 15:59:25  arno
+% typo
+%
 % Revision 1.365  2005/05/12 15:57:24  arno
 % changing for Matlab 7.2 compatibility thanks to Andreas Widmann
 %
@@ -1422,6 +1425,7 @@ e_histdone      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''
 % build structures for plugins
 % ----------------------------
 trystrs.no_check                 = e_try;
+trystrs.check_data               = check;
 trystrs.check_ica                = checkica;
 trystrs.check_cont               = checkcont;
 trystrs.check_epoch              = checkepoch;
