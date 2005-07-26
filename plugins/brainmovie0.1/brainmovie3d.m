@@ -51,6 +51,7 @@
 %               given 'path' (see above). The right plot axis will be 3-D rotated by an 
 %               additional horizontal disparity angle specified by the 'stereo' argument:
 %               6 (degrees) suggested. Default is [] = mono display.
+% 'project3d' - ['on'|'off'] project disks on each 3-D axis. Default is 'off'.
 %
 % Movie ITC, Power and Crossf options:
 % 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
@@ -132,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/06/30 01:08:31  arno
+% test if width>1280
+%
 % Revision 1.15  2004/06/29 23:31:19  arno
 % recompute size
 %
