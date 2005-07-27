@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.367  2005/07/21 17:11:29  arno
+% add check data
+%
 % Revision 1.366  2005/05/12 15:59:25  arno
 % typo
 %
@@ -1900,7 +1903,7 @@ try
 catch, return; end;
 index = 1;
 indexmenu = 1;
-MAX_SET = max(length( ALLEEG ), length(EEGMENU));
+MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 	
 clear functions;
 eeg_options;
@@ -1923,9 +1926,11 @@ else
 	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
 end;
 
+% setting the dataset menu
+% ------------------------
 while( index <= MAX_SET)
 	try
-		set( EEGMENU(index), 'Label', '------');
+		set( EEGMENU(index), 'Label', '------', 'checked', 'off');
 	catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;	
 	set( EEGMENU(index), 'Enable', 'on' );
 	try, ALLEEG(index).data;
@@ -1935,16 +1940,32 @@ while( index <= MAX_SET)
 			set( EEGMENU(index), 'CallBack', ['com = ''EEG = eeg_retrieve(ALLEEG, ' int2str(index) ...
 					'); CURRENTSET = ' int2str(index) ';''; eval(com); h(com); eeglab(''redraw'');' ]);
 			set( EEGMENU(index), 'Enable', 'on' );
+            if any(index == CURRENTSET), set( EEGMENU(index), 'checked', 'on' ); end;
 		end;
 	catch, end;	
 	index = index+1;
 end;
 hh = findobj( 'parent', set_m, 'Label', '------');
 set(hh, 'Enable', 'off');
+
+% menu for selecting several datasets
+% -----------------------------------
+if index ~= 0
+    cb_select = [ 'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
+                  'tmpind = pop_chansel({ ALLEEG(nonempty).setname }, ''withindex'', nonempty);' ... 
+                  'CURRENTSET = nonempty(tmpind);' ...
+                  'EEG = ALLEEG(CURRENTSET);' ...
+                  'eeglab(''redraw'');' ];
+    if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;
+    
+    set(EEGMENU(end), 'enable', 'on', 'Label', 'Select multiple datasets', ...
+                      'callback', cb_select, 'separator', 'on');
+end;
+
 EEGUSERDAT{2} = EEGMENU;
 set(W_MAIN, 'userdata', EEGUSERDAT);
 
-if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET | CURRENTSET == 0 | isempty(ALLEEG(CURRENTSET).data))
+if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | CURRENTSET(1) == 0 | isempty(ALLEEG(CURRENTSET(1)).data))
 	CURRENTSET = 0;
 	for index = 1:length(ALLEEG)
 		if ~isempty(ALLEEG(index).data)
@@ -1960,7 +1981,7 @@ if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET | CUR
 	end;
 end;
 
-if (isempty(EEG) | isempty(EEG.data)) & CURRENTSET ~= 0 & option_keepdataset
+if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0 & option_keepdataset
 	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
 	EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;
@@ -1993,76 +2014,198 @@ g = myguihandles(gcf);
 if ~isfield(g, 'win0') % no display
     return;
 end;
-if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG.data)
-	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
-	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
-	
-	if CURRENTSET == 0, strsetnum = '';
-	else                strsetnum = ['#' int2str(CURRENTSET) ': '];
-	end;
-    maxchar = 28;
-    if ~isempty( EEG.setname )
-        if length(EEG.setname) > maxchar+2
-             set( g.win0, 'String', [strsetnum EEG.setname(1:min(maxchar,length(EEG.setname))) '...' ]);
-        else set( g.win0, 'String', [strsetnum EEG.setname ]);
-        end;
-    else
-        set( g.win0, 'String', [strsetnum '(no dataset name)' ] );
-    end;
 
-	% set( g.win3, 'String', '');
-	% set( g.win3, 'String', sprintf('Dataset name      \t\t%s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
-	%set( g.win1, 'String', sprintf('Dataset name: %s\n', fastif(isempty(EEG.setname), 'none', EEG.setname)));
-    fullfilename = [ EEG.filepath EEG.filename];
-	if ~isempty(fullfilename)
-		if length(fullfilename) > 30
-			set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
-		else
-			set( g.win1, 'String', sprintf('Filename: %s\n', fullfilename));
-		end;        	
-	else
-		set( g.win1, 'String', sprintf('Filename: none\n'));
-	end;
-	set( g.win2, 'String', 'Channels per frame');
-	set( g.win3, 'String', 'Frames per epoch');
-	set( g.win4, 'String', 'Epochs');
-	set( g.win5, 'String', 'Events');
-	set( g.win6, 'String', 'Sampling rate (Hz)');
-	set( g.win7, 'String', 'Epoch start (sec)');
-	set( g.win8, 'String', 'Epoch end (sec)');
-	set( g.win9, 'String', 'Average reference');
-	set( g.win10, 'String', 'Channel locations');
-	set( g.win11, 'String', 'ICA weights');
-	set( g.win12, 'String', 'Dataset size (Mb)');
-	
-	set( g.val2, 'String', int2str(fastif(isempty(EEG.data), 0, size(EEG.data,1))));
-	set( g.val3, 'String', int2str(EEG.pnts));
-	set( g.val4, 'String', int2str(EEG.trials));
-	set( g.val5, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
-	set( g.val6, 'String', int2str( round(EEG.srate)) );
-	if round(EEG.xmin) == EEG.xmin & round(EEG.xmax) == EEG.xmax
-		set( g.val7, 'String', sprintf('%d\n', EEG.xmin));
-		set( g.val8, 'String', sprintf('%d\n', EEG.xmax));
-	else 
-		set( g.val7, 'String', sprintf('%6.3f\n', EEG.xmin));
-		set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmax));
-	end;
-	%set( g.val7, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmin+0.5/EEG.srate,0.5/EEG.srate));
-	%set( g.val8, 'String', sprintf('%6.3f ±%1.3f\n', EEG.xmax+0.5/EEG.srate,0.5/EEG.srate));
-	set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'averef'), 'Yes', 'No'));
-    if isempty(EEG.chanlocs)
-        set( g.val10, 'String', 'No');
-    else
-        if ~isfield(EEG.chanlocs, 'theta') | all(cellfun('isempty', { EEG.chanlocs.theta }))
-            set( g.val10, 'String', 'No (labels only)');           
-        else
-            set( g.val10, 'String', 'Yes');
+if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
+    hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
+    hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
+    
+    if length(EEG) > 1 % several datasets
+
+        % head string
+        % -----------
+        strsetnum = 'Datasets ';
+        for i = CURRENTSET
+            strsetnum = [ strsetnum int2str(i) ',' ];
         end;
-    end;
+        strsetnum = strsetnum(1:end-1);
+        set( g.win0, 'String', strsetnum);
         
-	set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
-	tmp = whos('EEG');
-	set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
+        % dataset type
+        % ------------
+        datasettype = unique( [ EEG.trials ] );
+        if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
+        elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
+        else                                               datasettype = 'epoched';
+        end;
+        
+        % epoch consistency
+        % -----------------
+        epochconsist = 'no';
+        if strcmpi(datasettype, 'epoched');
+            allpnts = unique( [ EEG.pnts ] );
+            allxmin = unique( [ EEG.xmin ] );
+            if length(allpnts) == 1 & length(allxmin) == 1, epochconsist = 'yes'; end;
+        end;
+        
+        % channels
+        % --------
+        chanlen    = unique( [ EEG.nbchan ] );
+        chanlenstr = vararg2str( mattocell(chanlen) );
+        
+        % channel consistency
+        % -------------------
+        chanconsist = 'yes';
+        anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+        if length(chanlen) == 1 & all(anyempty == 0)
+            channame1 = { EEG(1).chanlocs.labels };
+            for i = 2:length(EEG)
+                channame2 = { EEG(i).chanlocs.labels };
+                if length(intersect(channame1, channame2)) ~= length(channame1)
+                    chanconsist = 'no';
+                end;
+            end;
+        else
+            chanconsist = 'no';
+        end;
+
+        % channel location
+        % ----------------
+        if length(anyempty) == 2,   chanlocs = 'mixed, yes and no';
+        elseif anyempty == 0,       chanlocs = 'yes';
+        else                        chanlocs = 'no';
+        end;
+        
+        % total number of events
+        % ----------------------
+        totevents    = num2str(sum( cellfun( 'length', { EEG.event }) ));
+ 
+        % sampling rate
+        % -------------
+        srate = vararg2str( mattocell( unique( [ EEG.srate ] ) ));
+        
+        % ica weights
+        % -----------
+        anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
+        if length(anyempty) == 2,   icaweights = 'mixed, yes and no';
+        elseif anyempty == 0,       icaweights = 'yes';
+        else                        icaweights = 'no';
+        end;
+        
+        % ica consistency
+        % ---------------
+        icaconsist = 'yes';
+        if strcmpi(icaweights, 'yes') & strcmpi(chanconsist, 'yes')
+            ica1 = EEG(1).icaweights;
+            for i = 2:length(EEG)
+                if ~isequal(EEG(1).icaweights, EEG(i).icaweights)
+                    icaconsist = 'no';
+                end;
+            end;
+        else
+            icaconsist = 'no';
+        end;
+
+        % total size
+        % ----------
+        totsize = whos('EEG');
+        
+        % text
+        % ----
+        set( g.win2, 'String', 'Number of datasets');
+        set( g.win3, 'String', 'Dataset type');
+        set( g.win4, 'String', 'Epoch consistency');
+        set( g.win5, 'String', 'Channels per frame');
+        set( g.win6, 'String', 'Channel consistency');
+        set( g.win7, 'String', 'Channel locations');
+        set( g.win8, 'String', 'Events (total)');
+        set( g.win9, 'String', 'Sampling rate (Hz)');
+        set( g.win10, 'String', 'ICA weights');
+        set( g.win11, 'String', 'Identical ICA');
+        set( g.win12, 'String', 'Total size (Mb)');
+
+        % values
+        % ------
+        set( g.win1, 'String', sprintf('Groupname: -(soon)-\n'));
+        set( g.val2, 'String', int2str(length(EEG)));
+        set( g.val3, 'String', datasettype);
+        set( g.val4, 'String', epochconsist);
+        set( g.val5, 'String', chanlen);
+        set( g.val6, 'String', chanconsist);
+        set( g.val7, 'String', chanlocs);
+        set( g.val8, 'String', totevents);
+        set( g.val9, 'String', srate);
+        set( g.val10, 'String', icaweights);
+        set( g.val11, 'String', icaconsist);
+        set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
+        
+    else % one dataset selected
+        
+        % text
+        % ----
+        set( g.win2, 'String', 'Channels per frame');
+        set( g.win3, 'String', 'Frames per epoch');
+        set( g.win4, 'String', 'Epochs');
+        set( g.win5, 'String', 'Events');
+        set( g.win6, 'String', 'Sampling rate (Hz)');
+        set( g.win7, 'String', 'Epoch start (sec)');
+        set( g.win8, 'String', 'Epoch end (sec)');
+        set( g.win9, 'String', 'Average reference');
+        set( g.win10, 'String', 'Channel locations');
+        set( g.win11, 'String', 'ICA weights');
+        set( g.win12, 'String', 'Dataset size (Mb)');
+        
+        if CURRENTSET == 0, strsetnum = '';
+        else                strsetnum = ['#' int2str(CURRENTSET) ': '];
+        end;
+        maxchar = 28;
+        if ~isempty( EEG.setname )
+            if length(EEG.setname) > maxchar+2
+                set( g.win0, 'String', [strsetnum EEG.setname(1:min(maxchar,length(EEG.setname))) '...' ]);
+            else set( g.win0, 'String', [strsetnum EEG.setname ]);
+            end;
+        else
+            set( g.win0, 'String', [strsetnum '(no dataset name)' ] );
+        end;
+
+        fullfilename = [ EEG.filepath EEG.filename];
+        if ~isempty(fullfilename)
+            if length(fullfilename) > 30
+                set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
+            else
+                set( g.win1, 'String', sprintf('Filename: %s\n', fullfilename));
+            end;        	
+        else
+            set( g.win1, 'String', sprintf('Filename: none\n'));
+        end;
+        
+        set( g.val2, 'String', int2str(fastif(isempty(EEG.data), 0, size(EEG.data,1))));
+        set( g.val3, 'String', int2str(EEG.pnts));
+        set( g.val4, 'String', int2str(EEG.trials));
+        set( g.val5, 'String', fastif(isempty(EEG.event), 'none', int2str(length(EEG.event))));
+        set( g.val6, 'String', int2str( round(EEG.srate)) );
+        if round(EEG.xmin) == EEG.xmin & round(EEG.xmax) == EEG.xmax
+            set( g.val7, 'String', sprintf('%d\n', EEG.xmin));
+            set( g.val8, 'String', sprintf('%d\n', EEG.xmax));
+        else 
+            set( g.val7, 'String', sprintf('%6.3f\n', EEG.xmin));
+            set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmax));
+        end;
+
+        set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'averef'), 'Yes', 'No'));
+        if isempty(EEG.chanlocs)
+            set( g.val10, 'String', 'No');
+        else
+            if ~isfield(EEG.chanlocs, 'theta') | all(cellfun('isempty', { EEG.chanlocs.theta }))
+                set( g.val10, 'String', 'No (labels only)');           
+            else
+                set( g.val10, 'String', 'Yes');
+            end;
+        end;
+        
+        set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
+        tmp = whos('EEG');
+        set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
+    end;
 else
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
 	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'off');
