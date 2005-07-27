@@ -85,6 +85,10 @@
 %       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
 %                     memory. Default 'off'.
 %       'verbose'   = ['on'|'off'] print text {'on'}
+%       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
+%                     (ITC) from x and y. This computes the  'intrinsic' coherence
+%                     x and y not arising from common synchronization to
+%                     experimental events. See notes. {default: 'off'}
 %
 %    Optional Bootstrap Parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -190,6 +194,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2005/04/08 22:33:05  arno
+% allowing to set limits; common limits for condition difference
+%
 % Revision 1.72  2005/04/07 02:02:22  arno
 % plotting mbase
 % ,
@@ -702,6 +709,7 @@ try, g.powbase;    catch, g.powbase = NaN; end;
 try, g.pboot;      catch, g.pboot = NaN; end;
 try, g.rboot;      catch, g.rboot = NaN; end;
 try, g.plotersp;   catch, g.plotersp = 'on'; end;
+try, g.subitc;     catch, g.subitc  = 'off'; end;
 try, g.plotitc;    catch, g.plotitc  = 'on'; end;
 try, g.detrend;    catch, g.detrend = 'off'; end;
 try, g.rmerp;      catch, g.rmerp = 'off'; end;
@@ -1164,7 +1172,6 @@ end;
 % ----------------------------------------------------
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
-g.subitc = 'off';
 if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
 else                       tmioutopt = { 'ntimesout', g.timesout };
 end;
