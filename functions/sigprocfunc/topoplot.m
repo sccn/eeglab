@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.254  2005/07/16 16:36:08  scott
+% same
+%
 % Revision 1.253  2005/07/16 16:27:25  scott
 % fixed 'maplimits',[min max] execution, added test -sm
 %
@@ -1151,18 +1154,18 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
   %
   %%%%%%%%%%% select channels using datachans
   %
-  if isfield(tmpeloc, 'datachan')
-      datachans  = [ tmpeloc.datachan ];
-      emptychans = find(cellfun('isempty', { tmpeloc.datachan }) == 1);
-      try,
-          Values = Values(datachans);
-
-          tmpeloc(emptychans) = [];
-          Th(emptychans) = [];
-          Rd(emptychans) = [];
-          indices(emptychans) = [];
-      catch, disp('Note: datachan inconsistency (information ignored)'); end;
-  end;
+  %if isfield(tmpeloc, 'datachan')
+  %    datachans  = [ tmpeloc.datachan ];
+  %    emptychans = find(cellfun('isempty', { tmpeloc.datachan }) == 1);
+  %    try,
+  %        Values = Values(datachans);
+  %
+  %        tmpeloc(emptychans) = [];
+  %        Th(emptychans) = [];
+  %        Rd(emptychans) = [];
+  %        indices(emptychans) = [];
+  %    catch, disp('Note: datachan inconsistency (information ignored)'); end;
+  %end;
   
   if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
