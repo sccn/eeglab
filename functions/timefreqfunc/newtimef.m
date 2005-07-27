@@ -194,6 +194,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2005/07/27 18:21:24  arno
+% same
+%
 % Revision 1.74  2005/07/27 18:17:54  arno
 % implementing subitc
 %
@@ -933,7 +936,7 @@ end;
 % checking keywords
 % -----------------
 allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condboot' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'topovec' 'elocs' 'alpha' 'marktimes' 'powbase' 'pboot' 'rboot' 'plotersp' 'plotitc' 'detrend' 'rmerp' 'baseline' 'baseboot' 'linewidth' 'naccu' 'mtaper' 'maxfreq' 'freqs' ...
-              'subitc' 'nfreqs' 'freqscale' 'vert' 'newfig' 'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' 'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' 'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' 'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' 'ITC_CAXIS_LIMIT' };
+              'plotamp' 'subitc' 'nfreqs' 'freqscale' 'vert' 'newfig' 'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' 'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' 'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' 'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' 'ITC_CAXIS_LIMIT' };
 tmpfields = fieldnames(g);
 for index = 1:length(tmpfields)
     if isempty(strmatch(tmpfields{index}, allfields))
