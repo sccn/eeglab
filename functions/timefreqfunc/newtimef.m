@@ -194,6 +194,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2005/07/27 18:23:34  arno
+% keyword
+%
 % Revision 1.75  2005/07/27 18:21:24  arno
 % same
 %
@@ -1293,7 +1296,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         % ----------------
         inputdata = alltfX;
 		switch g.type
-		 	case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3)/ sqrt(' int2str(trials) ');' ];
+		 	case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3))/ sqrt(' int2str(trials) ');' ];
 		 	case 'phasecoher',  formula = [ 'mean(arg1,3);' ]; inputdata = alltfX./sqrt(alltfX.*conj(alltfX));
 		 	case 'phasecoher2', formula = [ 'sum(arg1,3)./sum(sqrt(arg1.*conj(arg1)),3);' ];
 		end;
