@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.371  2005/07/28 17:39:32  arno
+% same
+%
 % Revision 1.370  2005/07/28 17:38:55  arno
 % same
 %
@@ -1942,7 +1945,7 @@ while( index <= MAX_SET)
 	try
 		set( EEGMENU(index), 'Label', '------', 'checked', 'off');
 	catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;	
-	set( EEGMENU(index), 'Enable', 'on' );
+	set( EEGMENU(index), 'Enable', 'on', 'separator', 'off' );
 	try, ALLEEG(index).data;
 		if ~isempty( ALLEEG(index).data)
        		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
@@ -1995,9 +1998,10 @@ if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0 & option_keepdatas
 	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
 	EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;
+
 % test if dataset has changed
 % ---------------------------
-if option_keepdataset
+if option_keepdataset & length(EEG) == 1
     if ~isempty(ALLEEG) & CURRENTSET~= 0 & ~isequal(EEG.data, ALLEEG(CURRENTSET).data) 
         % the above comparison does not work for ome structures
         tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
@@ -2048,51 +2052,16 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         else                                               datasettype = 'epoched';
         end;
         
-        % epoch consistency
-        % -----------------
-        epochconsist = 'no';
-        if strcmpi(datasettype, 'epoched');
-            allpnts = unique( [ EEG.pnts ] );
-            allxmin = unique( [ EEG.xmin ] );
-            if length(allpnts) == 1 & length(allxmin) == 1, epochconsist = 'yes'; end;
-        end;
-        
-        % channels
-        % --------
+        % number of channels and channel locations
+        % ----------------------------------------
         chanlen    = unique( [ EEG.nbchan ] );
         chanlenstr = vararg2str( mattocell(chanlen) );
-        
-        % channel consistency
-        % -------------------
-        chanconsist = 'yes';
         anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
-        if length(chanlen) == 1 & all(anyempty == 0)
-            channame1 = { EEG(1).chanlocs.labels };
-            for i = 2:length(EEG)
-                channame2 = { EEG(i).chanlocs.labels };
-                if length(intersect(channame1, channame2)) ~= length(channame1)
-                    chanconsist = 'no';
-                end;
-            end;
-        else
-            chanconsist = 'no';
-        end;
-
-        % channel location
-        % ----------------
         if length(anyempty) == 2,   chanlocs = 'mixed, yes and no';
         elseif anyempty == 0,       chanlocs = 'yes';
         else                        chanlocs = 'no';
         end;
-        
-        % total number of events
-        % ----------------------
-        totevents    = num2str(sum( cellfun( 'length', { EEG.event }) ));
- 
-        % sampling rate
-        % -------------
-        srate = vararg2str( mattocell( unique( [ EEG.srate ] ) ));
-        
+
         % ica weights
         % -----------
         anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
@@ -2100,25 +2069,16 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         elseif anyempty == 0,       icaweights = 'yes';
         else                        icaweights = 'no';
         end;
-        
-        % ica consistency
-        % ---------------
-        icaconsist = 'yes';
-        if strcmpi(icaweights, 'yes') & strcmpi(chanconsist, 'yes')
-            ica1 = EEG(1).icaweights;
-            for i = 2:length(EEG)
-                if ~isequal(EEG(1).icaweights, EEG(i).icaweights)
-                    icaconsist = 'no';
-                end;
-            end;
-        else
-            icaconsist = 'no';
-        end;
 
-        % total size
-        % ----------
-        totsize = whos('EEG');
-        
+        % consistency & other parameters
+        % ------------------------------
+        [EEG epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
+        [EEG chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
+        [EEG icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
+        totevents = num2str(sum( cellfun( 'length', { EEG.event }) )); % total number of events
+        srate     = vararg2str( mattocell( unique( [ EEG.srate ] ) )); % sampling rate
+        totsize   = whos('EEG');                                       % total size
+                
         % text
         % ----
         set( g.win2, 'String', 'Number of datasets');
