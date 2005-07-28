@@ -9,7 +9,8 @@
 %   chanstruct     - channel structure. See readlocs()
 %
 % Optional input:
-%   'withindex'      - add index to each entry
+%   'withindex'      - ['on'|'off'] add index to each entry. May also a be 
+%                      an array of indices
 %   'select'         - selection of channel. Can take as input all the
 %                      outputs of this function.
 %   'selectionmode' - selection mode 'multiple' or 'single'. See listdlg2().
@@ -40,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/11/10 17:34:46  arno
+% add selection mode
+%
 % Revision 1.14  2004/11/10 17:27:07  arno
 % debug last
 %
@@ -95,10 +99,13 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'     'string'  {'on' 'off'}   'off';
+    g = finputcheck(varargin, { 'withindex'     { 'string' 'integer' } {'on' 'off'}   'off';
                                 'select'        { 'cell' 'string' 'integer' } [] [];
                                 'selectionmode' 'string' { 'single' 'multiple' } 'multiple'});
     if isstr(g), error(g); end;
+    if ~isstr(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
+    else                    chan_indices = 1:length(chans);
+    end;
     
     % convert selection to integer
     % ----------------------------
@@ -127,7 +134,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         tmpfieldnames = cell(1, length(tmpstr));
         for index=1:length(tmpstr), 
             if strcmpi(g.withindex, 'on')
-                tmpfieldnames{index} = [ num2str(index) '  -  ' num2str(tmpstr(index)) ]; 
+                tmpfieldnames{index} = [ num2str(chan_indices(index)) '  -  ' num2str(tmpstr(index)) ]; 
             else
                 tmpfieldnames{index} = num2str(tmpstr(index)); 
             end;
@@ -136,7 +143,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         tmpfieldnames = chans;
         if strcmpi(g.withindex, 'on')
             for index=1:length(tmpfieldnames), 
-                tmpfieldnames{index} = [ num2str(index) '  -  ' tmpfieldnames{index} ]; 
+                tmpfieldnames{index} = [ num2str(chan_indices(index)) '  -  ' tmpfieldnames{index} ]; 
             end;
         end;
     end;
