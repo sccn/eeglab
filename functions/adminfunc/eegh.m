@@ -49,6 +49,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/07/28 18:25:43  arno
+% hostory for multiple dataset command
+%
 % Revision 1.11  2005/07/28 18:05:50  arno
 % history
 %
@@ -159,7 +162,7 @@ else % nargin == 2
                 str = eeg_hist(str, command);
             else
                 for i = 1:length(str)
-                    str = eeg_hist(str(i), [ '% multiple datasets command: ' command ]);
+                    str(i) = eeg_hist(str(i), [ '% multiple datasets command: ' command ]);
                 end;
             end;
         end;
