@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.369  2005/07/28 17:36:53  arno
+% enable/diable menus
+%
 % Revision 1.368  2005/07/27 19:27:32  arno
 % allow selecting different dataset
 % not different -> multiple
@@ -2144,9 +2147,10 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         
         % disable menus
         % -------------
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File'), 'enable', 'off');
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit'), 'enable', 'off');
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot'), 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File')    , 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit')    , 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot')    , 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets'), 'enable', 'on');
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA'), 'enable', 'on');
@@ -2225,6 +2229,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
         plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
+        data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(data_m, 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
@@ -2260,6 +2265,7 @@ else
     edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'off');
     tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'off');
     plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'off');
+    data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(data_m, 'enable', 'off');
     
 end;
 
