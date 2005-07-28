@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.372  2005/07/28 18:03:53  arno
+% allowing storing multiple datasets
+%
 % Revision 1.371  2005/07/28 17:39:32  arno
 % same
 %
@@ -1967,7 +1970,8 @@ if index ~= 0
     cb_select = [ 'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
                   'tmpind = pop_chansel({ ALLEEG(nonempty).setname }, ''withindex'', nonempty);' ... 
                   'CURRENTSET = nonempty(tmpind);' ...
-                  'EEG = ALLEEG(CURRENTSET);' ...
+                  'EEG = eeg_retrieve(ALLEEG, CURRENTSET);' ...
+                  'h([ ''EEG = eeg_retrieve(ALLEEG, '' vararg2str({CURRENTSET}) ''); CURRENTSET = '' vararg2str({CURRENTSET}) '';'' ]);' ...
                   'eeglab(''redraw'');' ];
     if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;
     
