@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.370  2005/07/28 17:38:55  arno
+% same
+%
 % Revision 1.369  2005/07/28 17:36:53  arno
 % enable/diable menus
 %
@@ -2262,10 +2265,10 @@ else
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')      , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                 , 'enable', 'on');
-    edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'off');
-    tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'off');
-    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'off');
-    data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(data_m, 'enable', 'off');
+    edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');      set(edit_m, 'enable', 'off');
+    tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');     set(tool_m, 'enable', 'off');
+    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');      set(plot_m, 'enable', 'off');
+    data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'off');
     
 end;
 
