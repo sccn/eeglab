@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2005/07/26 23:55:17  arno
+% rewrote the function; allow to process several datasets
+%
 % Revision 1.53  2005/03/14 22:20:45  arno
 % fixing hilit correction
 %
@@ -281,24 +284,12 @@ if pop_up
                      { 'style' 'text'    'string' 'Commandline options (See algorithm help messages)' } ...
                      { 'style' 'edit'    'string' '' }  };
 	inistr       = { 'runica' '' };
-    if length(ALLEEG) == 1
-        result       = inputgui( { [2 1] [2 1] }, promptstr, 'pophelp(''pop_runica'')', ...
-                                 'Run ICA decomposition -- pop_runica()');
-        if length(result) == 0 return; end;
-        g.icatype      = allalgs{result{1}};
-        g.dataset      = 1;
-        options        = eval( [ '{' result{2} '}' ]);
-    else
-        promptstr  = { ...
-                     { 'style' 'text'    'string' 'Index of dataset(s) (with same nb of channels if several)' } ...
-                     { 'style' 'edit'    'string' int2str(g.defaultdataset) } promptstr{:} };
-        result       = inputgui( { [2 1] [2 1] [2 1] }, promptstr, 'pophelp(''pop_runica'')', ...
-                                 'Run ICA decomposition -- pop_runica()');
-        if length(result) == 0 return; end;
-        g.dataset    = str2num(result{1});
-        g.icatype    = allalgs{result{2}};
-        options      = eval( [ '{' result{3} '}' ]);
-    end;
+    result       = inputgui( { [2 1] [2 1] }, promptstr, 'pophelp(''pop_runica'')', ...
+                             'Run ICA decomposition -- pop_runica()');
+    if length(result) == 0 return; end;
+    g.icatype      = allalgs{result{1}};
+    g.dataset      = 1:length(ALLEEG);
+    options        = eval( [ '{' result{2} '}' ]);
 end;
 
 % select datasets, create new big dataset if necessary
