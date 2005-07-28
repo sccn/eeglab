@@ -187,6 +187,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.368  2005/07/27 19:27:32  arno
+% allow selecting different dataset
+% not different -> multiple
+%
 % Revision 1.367  2005/07/21 17:11:29  arno
 % add check data
 %
@@ -2138,6 +2142,15 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( g.val11, 'String', icaconsist);
         set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
         
+        % disable menus
+        % -------------
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File'), 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit'), 'enable', 'off');
+        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot'), 'enable', 'off');
+        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');
+        set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
+        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA'), 'enable', 'on');
+       
     else % one dataset selected
         
         % text
@@ -2205,6 +2218,18 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
         tmp = whos('EEG');
         set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
+    
+        % enable menus
+        % ------------
+        file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
+        edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
+        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
+        plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'on');
+
     end;
 else
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
@@ -2223,6 +2248,19 @@ else
 	set( g.mainwin11,'String', '- Epoch data: "Tools > Extract epochs"');
 	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
 	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
+    
+    % disable menus
+    % -------------
+    file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')          , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')      , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                 , 'enable', 'on');
+    edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'off');
+    tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'off');
+    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'off');
+    
 end;
 
 % adjust title extent
