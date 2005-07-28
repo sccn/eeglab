@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2005/05/24 16:55:34  arno
+% cell2mat and mat2cell
+%
 % Revision 1.148  2005/03/17 18:02:06  arno
 % debug conversion
 %
@@ -561,10 +564,63 @@ if nargin < 1
     return;
 end;
 
-% checking multiple datasets
 if isempty(EEG), return; end;
 if ~isfield(EEG, 'data'), return; end;
+
+% checking multiple datasets
+% --------------------------
 if length(EEG) > 1
+ 
+    if nargin > 1
+        switch varargin{1}
+            case 'epochconsist', % test epoch consistency
+                                 % ----------------------
+            res = 'no';
+            datasettype = unique( [ EEG.trials ] );
+            if datasettype(1) == 1 & length(datasettype) == 1, return; % continuous data
+            elseif datasettype(1) == 1,                        return; % continuous and epoch data
+            end;
+            
+            allpnts = unique( [ EEG.pnts ] );
+            allxmin = unique( [ EEG.xmin ] );
+            if length(allpnts) == 1 & length(allxmin) == 1, res = 'yes'; end;
+            return;
+
+            case 'chanconsist'  % test channel number and name consistency
+                                % ----------------------------------------
+             res = 'yes';
+             chanlen    = unique( [ EEG.nbchan ] );             
+             anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+             if length(chanlen) == 1 & all(anyempty == 0)
+                 channame1 = { EEG(1).chanlocs.labels };
+                 for i = 2:length(EEG)
+                     channame2 = { EEG(i).chanlocs.labels };
+                     if length(intersect(channame1, channame2)) ~= length(channame1), res = 'no'; end;
+                 end;
+             else res = 'no';
+             end;
+             return;
+             
+         case 'icaconsist'  % test ICA decomposition consistency
+                            % ----------------------------------
+          res = 'yes';
+          anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );        
+          if length(anyempty) == 1 & anyempty(1) == 0
+              ica1 = EEG(1).icawinv;
+              for i = 2:length(EEG)
+                  if ~isequal(EEG(1).icawinv, EEG(i).icawinv)
+                      res = 'no';
+                  end;
+              end;
+          else res = 'no';
+          end;
+          return;
+             
+        end; 
+    end;
+    
+    % standard checking
+    % -----------------
     for index = 1:length(EEG)
         if ~isempty(EEG(index))
             if ~isempty( varargin)
