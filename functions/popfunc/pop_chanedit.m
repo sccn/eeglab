@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.125  2005/07/29 23:29:31  arno
+% allow processing several structures
+%
 % Revision 1.124  2005/05/24 17:37:20  arno
 % remove cell2mat
 %
@@ -535,7 +538,11 @@ dataset_input = 0;
 if isstruct(chans) & isfield(chans, 'chanlocs')
     dataset_input = 1;
     EEG           = chans;
-    chans         = chans(1).chanlocs;
+    chans         = EEG(1).chanlocs;
+    if isfield(EEG, 'chaninfo')
+         params = EEG(1).chaninfo;
+    else params = [];
+    end;
 end;
 
 nbchan = length(chans);
@@ -901,6 +908,7 @@ if nargin < 3
         if dataset_input
             for i = 1:length(EEG)
                 EEG(i).chanlocs = chans;
+                EEG(i).chaninfo = params;
             end;
             chansout = EEG;
         else
