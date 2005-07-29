@@ -1,5 +1,31 @@
 % eeg_checkset() - check the consistency of fields of an EEG dataset 
 %
+% Usage: EEG = eeg_checkset(EEG);
+%        EEG = eeg_checkset(EEG, 'keyword');
+%
+% Optional keyword:
+%   'icaconsist'   - if EEG contains several dataset, check if they have the
+%                    same ICA decomposition
+%   'epochconsist' - if EEG contains several dataset, check if they have
+%                    identical epoch lengths and time limits.
+%   'chanconsist'  - if EEG contains several dataset, check if they have the
+%                    same number of channela and channel labels.
+%   'data'         - check if EEG contains data
+%   'contdata'     - check if EEG contains continuous data
+%   'epoch'        - check if EEG contains epoched data
+%   'ica'          - check if EEG contains ICA decomposition
+%   'besa'         - check if EEG contains dipole locations
+%   'event'        - check if EEG contains event array
+%   'makeur'       - remake urevent structure
+%   'checkur'      - check if 'urevent' structure is consistent with event 
+%                    structure
+%   'chanlocsize'  - check chanlocs structure length and show warning if
+%                    necessary.
+%   'chanlocs_homogenous' - check if EEG contains consistent channel
+%                           information and if not, correct it.
+%   'eventconsistency'    - check if event information is consistent. 
+%                           Remake 'epoch' field (time consuming).
+%
 % Structure of an EEG dataset under EEGLAB:
 %    EEG.data         - two-dimensional continuous data array (chans, frames)
 %                       OR three-dim. epoched data array (chans, frames, epochs)
@@ -93,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.150  2005/07/28 18:02:17  arno
+% checking multiple dataset consistency
+%
 % Revision 1.149  2005/05/24 16:55:34  arno
 % cell2mat and mat2cell
 %
