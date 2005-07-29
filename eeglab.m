@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.374  2005/07/29 17:24:29  arno
+% enabling/disabling menus
+%
 % Revision 1.373  2005/07/28 18:39:22  arno
 % hisotry for multiple datasets
 %
@@ -1532,10 +1535,10 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
-	uimenu( first_m, 'Label', 'Save datasets'                               , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG);' e_hist_nh ]);
-	uimenu( first_m, 'Label', 'Clear dataset(s)'                            , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
+	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
+	uimenu( first_m, 'Label', 'Save current dataset(s)'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
+	uimenu( first_m, 'Label', 'Save datasets'                            , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
     
 	hist_m = uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on');
@@ -1555,8 +1558,8 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
                         'disp(''TIP: call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                         'disp(''     to convert between channel location file formats'');' ...
-                        '[TMPCHAN TMPINFO LASTCOM] = pop_chanedit(EEG.chanlocs, EEG.chaninfo); if ~isempty(LASTCOM), EEG.chanlocs = TMPCHAN; EEG.chaninfo = TMPINFO; eeg_checkset(EEG, ''chanlocsize'');' ...
-                        'clear TMPCHAN TMPINFO; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
+                        '[EEG TMPINFO LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
+                        'clear TMPINFO; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
 	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
 	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
@@ -2117,14 +2120,33 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         
         % disable menus
         % -------------
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File')    , 'enable', 'off');
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit')    , 'enable', 'off');
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot')    , 'enable', 'off');
-        set( findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets'), 'enable', 'on');
-        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');
+        file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
+        edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
+        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
+        plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
+        hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
+        set( edit_m, 'enable', 'off');
+        set( plot_m, 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
+        set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA'), 'enable', 'on');
-       
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset(s)'), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
+        set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
+
+        % enable specific menus
+        % ---------------------
+        if strcmpi(chanconsist, 'yes')
+            set( edit_m, 'enable', 'on');
+            set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
+            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
+        end;
+        
     else % one dataset selected
         
         % text
@@ -2204,6 +2226,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         stat_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Data statistics');
         erp_m  = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERPs');
         erpi_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERPs');
+        hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
@@ -2212,6 +2235,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', stat_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', erp_m , 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', erpi_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', hist_m, 'type', 'uimenu'), 'enable', 'on');
         
         % continuous data
         % ---------------
