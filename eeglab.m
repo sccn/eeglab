@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.373  2005/07/28 18:39:22  arno
+% hisotry for multiple datasets
+%
 % Revision 1.372  2005/07/28 18:03:53  arno
 % allowing storing multiple datasets
 %
@@ -2197,11 +2200,49 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
         plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
         data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(data_m, 'enable', 'on');
+        ica_m  = findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data using ICA');
+        stat_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Data statistics');
+        erp_m  = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERPs');
+        erpi_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERPs');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'on');
-
+        set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', stat_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', erp_m , 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', erpi_m, 'type', 'uimenu'), 'enable', 'on');
+        
+        % continuous data
+        % ---------------
+        if EEG.trials == 1, 
+            set( findobj('parent', file_m, 'type', 'uimenu', 'Label', 'Import epoch info' ), 'enable', 'off'); 
+            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Remove baseline'   ), 'enable', 'off'); 
+            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data epochs'), 'enable', 'off'); 
+            set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'off'); 
+            set( findobj('parent', ica_m , 'type', 'uimenu', 'label', 'Reject components by map' ), 'enable', 'on'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERP image'), 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERPs')          , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'ERP map series')        , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Sum/Compare ERPs')      , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERP image')   , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERPs')        , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Sum/Compare comp. ERPs'), 'enable', 'off'); 
+            set( findobj('parent', stat_m, 'type', 'uimenu', 'Label', 'Event statistics'), 'enable', 'off'); 
+        end;        
+        
+        % no channel locations
+        % --------------------
+        if ~isfield(EEG.chanlocs, 'theta')
+            set( findobj('parent', erp_m , 'type', 'uimenu', 'Label', 'With scalp maps')          , 'enable', 'off'); 
+            set( findobj('parent', erp_m , 'type', 'uimenu', 'Label', 'In scalp array')           , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel locations')        , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'ERP map series')           , 'enable', 'off'); 
+            set( findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component maps')           , 'enable', 'off');
+            set( findobj('parent', erpi_m, 'type', 'uimenu', 'Label', 'With component maps')      , 'enable', 'off'); 
+            set( findobj('parent', erpi_m, 'type', 'uimenu', 'Label', 'With comp. maps (compare)'), 'enable', 'off'); 
+        end;
+           
     end;
 else
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
