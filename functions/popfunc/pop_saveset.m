@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2005/07/07 22:26:54  hilit
+% cleared the 'savemode' help message
+%
 % Revision 1.48  2005/04/01 01:02:43  hilit
 % fixing a bug
 %
@@ -229,19 +232,24 @@ end;
 if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
 	% ask user
 	if mode == 1 % multiple datasets
-		indices = [];
-		for index = 1:length(EEG)
-			if ~isempty(EEG(index).data)
-				indices = [indices index];
-			end;
-		end;
-		result = inputdlg2( {'Indices of the datasets to save'}, ...
-                             'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
-        drawnow;
-		if length(result) == 0 return; end;
-		indices = eval( [ '[' result{1} ']' ] );
-		[curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
-	else
+        if nargin == 1
+            indices = [];
+            for index = 1:length(EEG)
+                if ~isempty(EEG(index).data)
+                    indices = [indices index];
+                end;
+            end;
+            result = inputdlg2( {'Indices of the datasets to save'}, ...
+                                'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
+            drawnow;
+            if length(result) == 0 return; end;
+            indices = eval( [ '[' result{1} ']' ] );
+            [curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
+        else
+            [curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
+            indices = 1:length(EEG);
+        end;
+    else
 		[curfilename, curfilepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
 	end;
     drawnow;
