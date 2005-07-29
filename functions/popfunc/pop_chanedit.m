@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2005/05/24 17:37:20  arno
+% remove cell2mat
+%
 % Revision 1.123  2005/04/08 23:10:22  arno
 % fixing nose orientation when looking BESA file
 %
@@ -515,9 +518,10 @@
 % hidden parameter
 %   'gui' - [figure value], allow to process the same dialog box several times
 
-function [chans, params, com] = pop_chanedit(chans, params, varargin);
+function [chansout, params, com] = pop_chanedit(chans, params, varargin);
 
-urchans = chans;
+urchans  = chans;
+chansout = chans;
 com ='';
 if nargin < 1
    params = [];
@@ -527,8 +531,11 @@ end;
 
 % in case an EEG structure was given as input
 % -------------------------------------------
+dataset_input = 0;
 if isstruct(chans) & isfield(chans, 'chanlocs')
-    chans = chans.chanlocs;
+    dataset_input = 1;
+    EEG           = chans;
+    chans         = chans(1).chanlocs;
 end;
 
 nbchan = length(chans);
@@ -888,6 +895,17 @@ if nargin < 3
 			end;
             com = sprintf('%s=pop_chanedit(%s, %s);', varname, varname, vararg2str(totaluserdat));
 		end;
+        
+        % multiple datasets
+        % -----------------
+        if dataset_input
+            for i = 1:length(EEG)
+                EEG(i).chanlocs = chans;
+            end;
+            chansout = EEG;
+        else
+            chansout = chans;
+        end;
 	end;
 	evalin('base', 'clear global chantmp; clear chantmp;');
 else 
