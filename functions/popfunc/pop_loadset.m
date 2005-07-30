@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2005/07/30 01:49:59  arno
+% load data
+%
 % Revision 1.33  2005/04/12 21:43:59  arno
 % same
 %
@@ -237,7 +240,7 @@ else
     if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
 end;
 if strcmpi(mode, 'all')
-    VAROUT = eeg_checkset(VAROUT, 'dataload');
+    VAROUT = eeg_checkset(VAROUT, 'loaddata');
 end;
 command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
 return;
