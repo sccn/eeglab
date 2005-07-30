@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2005/07/30 01:45:52  arno
+% loading and saving .dat array
+%
 % Revision 1.151  2005/07/29 15:48:20  arno
 % document keywords
 %
@@ -745,7 +748,7 @@ end;
 
 % save data if necessary
 % ----------------------
-if isstr(EEG.data) & nargin > 1 & isfield(EEG, 'datafile')
+if isstr(EEG.data) & nargin > 1 & isfield(EEG, 'savedata')
     if strcmpi(varargin{1}, 'savedata')
         tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
         floatwrite( tmpdata', EEG.datafile, 'ieee-le');
@@ -1438,6 +1441,7 @@ if ~isempty( varargin)
           catch, errordlg2(['Warning: minor problem encountered when generating' 10 ...
                         'the EEG.epoch structure (used only in user scripts)']); return;
           end;
+         case 'loaddata', 'savedata',;
          otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
