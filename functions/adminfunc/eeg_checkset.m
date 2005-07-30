@@ -11,6 +11,8 @@
 %   'chanconsist'  - if EEG contains several dataset, check if they have the
 %                    same number of channela and channel labels.
 %   'data'         - check if EEG contains data
+%   'loaddata'     - load data array if necessary
+%   'savedata'     - save data array if necessary
 %   'contdata'     - check if EEG contains continuous data
 %   'epoch'        - check if EEG contains epoched data
 %   'ica'          - check if EEG contains ICA decomposition
@@ -119,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.151  2005/07/29 15:48:20  arno
+% document keywords
+%
 % Revision 1.150  2005/07/28 18:02:17  arno
 % checking multiple dataset consistency
 %
@@ -704,37 +709,51 @@ end;
 
 % read data if necessary
 % ----------------------
-if isstr(EEG.data)
-    filename = EEG.data;
-    fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
-    if fid == -1
-        disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
-        fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+if isstr(EEG.data) & nargin > 1
+    if strcmpi(varargin{1}, 'loaddata')
+        filename = EEG.data;
+        fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
-            errordlg2(['Cannot open data file ''' filename ''''], 'error');
-            error('File not found');
+            disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
+            fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+            if fid == -1
+                errordlg2(['Cannot open data file ''' filename ''''], 'error');
+                error('File not found');
+            end;
+            fprintf('Reading float file ''%s''...\n', filename);
+        else 
+            fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
         end;
-        fprintf('Reading float file ''%s''...\n', filename);
-    else 
-        fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
-    end;
 
-    % old format = .fdt; new format = .dat (transposed)
-    % -------------------------------------------------
-    datformat = 0;
-    if length(filename) > 3
-        if strcmpi(filename(end-2:end), 'dat')
-            datformat = 1;
+        % old format = .fdt; new format = .dat (transposed)
+        % -------------------------------------------------
+        datformat = 0;
+        if length(filename) > 3
+            if strcmpi(filename(end-2:end), 'dat')
+                datformat = 1;
+            end;
         end;
+        if datformat
+            EEG.datfile = EEG.data;
+            EEG.data    = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+        else
+            EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+        end;
+        fclose(fid);
     end;
-    if datformat
-        EEG.datfile = EEG.data;
-        EEG.data    = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
-    else
-        EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
-    end;
-    fclose(fid);
 end;
+
+% save data if necessary
+% ----------------------
+if isstr(EEG.data) & nargin > 1 & isfield(EEG, 'datafile')
+    if strcmpi(varargin{1}, 'savedata')
+        tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+        floatwrite( tmpdata', EEG.datafile, 'ieee-le');
+        EEG.data = EEG.datafile;
+        return;
+    end;
+end;
+
 if isnumeric(EEG.data)
     v = version;
     if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
