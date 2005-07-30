@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/07/07 19:07:30  arno
+% return empty if cancel
+%
 % Revision 1.20  2003/12/05 20:01:05  arno
 % eeg_hist for history
 %
@@ -115,7 +118,7 @@ if nargin < 3
    return;
 end;   
 
-if nargin < 4                 % if several arguments, assign values 
+if nargin < 4 & length(EEG) == 1 % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     comcomment = ['tmpuserdat = get(gcbf, ''userdata'');' ...
@@ -171,7 +174,20 @@ if nargin < 4                 % if several arguments, assign values
 			args = { args{:} 'overwrite' 'on' };
 		end;
 	end;
-else % no interactive inputs
+elseif length(EEG) > 1
+    % processing multiple datasets
+    % ----------------------------
+    res = questdlg2(strvcat( 'When processing multiple datasets,', 'old datasets are automatically overwriten.', ...
+                           'Do you still wish to proceed?'), 'Multiple dataset warning', 'Cancel', 'Proceed', 'Proceed');
+    if strcmpi(res, 'Proceed')
+        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );
+        com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );';
+    else
+        EEG = ALLEEG(CURRENTSET);
+    end;
+    return;
+else
+    % no interactive inputs
     args = varargin;
 end;
 
