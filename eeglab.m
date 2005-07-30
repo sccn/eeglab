@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.375  2005/07/29 23:38:27  arno
+% chanlocs for multiple datasets
+%
 % Revision 1.374  2005/07/29 17:24:29  arno
 % enabling/disabling menus
 %
@@ -2145,6 +2148,9 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
             set( edit_m, 'enable', 'on');
             set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
             set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
+            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
+            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
+            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
         end;
         
     else % one dataset selected
