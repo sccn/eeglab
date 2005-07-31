@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2004/11/22 17:30:23  scott
+% edited help message - now tells the whole story
+%
 % Revision 1.20  2004/11/21 02:45:57  scott
 % help message - new transposed binary file option
 %
@@ -172,11 +175,15 @@ end;
 str = fgetl( fid ); % jump a line
 index = 1;
 while (str(1) ~= -1)
-    [varname{index} tmp1 tmp2 count1] = sscanf(str, '%s',1);
-    [equal          tmp1 tmp2 count2] = sscanf(str(count1:end), '%s',1);
-    [value{index}   tmp1 tmp2 count3] = sscanf(str((count1+count2):end), '%d',1);
-    description{index} = str((count1+count2+count3+3):end-1);
-
+    dsffds
+    [ varname{index} str ] = strtok(str); % variable name
+    [ equal          str ] = strtok(str); % =
+    [ value{index}   str ] = strtok(str); % value
+    [ tmp            str ] = strtok(str); % ;
+    [ tmp            dsc ] = strtok(str); % comment
+    dsc = deblank( dsc(end:-1:1) )
+    description{index} = deblank( dsc(end:-1:1) );
+    
     str = fgets( fid ); % jump a line
     index = index+1;
 end;
@@ -197,7 +204,8 @@ if nargin == 0
             if length(tmptext) > 40,    stringtext = [ tmptext(1:40) '...' ]; 
             else                        stringtext = tmptext; 
             end;
-            descrip = { 'string', stringtext, 'callback', ['questdlg2([''' choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
+            descrip = { 'string', stringtext, 'callback', ['questdlg2([''' ...
+                                choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
         catch, descrip = { 'string', 'no-description' }; end;
 
         descrip = { 'string', description{ index } };
@@ -246,7 +254,7 @@ if fid == -1
 end;
 fprintf(fid, '%s\n', header);
 for index = 1:2:length(args)
-    fprintf( fid, '%s = %d ;%% %s\n', args{index}, args{index+1}, description{(index-1)/2+1});
+    fprintf( fid, '%s = %d ; %% %s\n', args{index}, args{index+1}, description{(index-1)/2+1});
 end;
 fclose(fid);    
 
