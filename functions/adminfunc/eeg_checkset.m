@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2005/07/30 01:52:11  arno
+% debug loaddata savedata
+%
 % Revision 1.152  2005/07/30 01:45:52  arno
 % loading and saving .dat array
 %
@@ -748,15 +751,23 @@ end;
 
 % save data if necessary
 % ----------------------
-if isstr(EEG.data) & nargin > 1 & isfield(EEG, 'savedata')
-    if strcmpi(varargin{1}, 'savedata')
-        tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
-        floatwrite( tmpdata', EEG.datafile, 'ieee-le');
-        EEG.data = EEG.datafile;
+if nargin > 1 & isfield(EEG, 'datfile')
+    eeg_options;
+    if strcmpi(varargin{1}, 'savedata') & option_storedisk
+        if ~isstr(EEG.data) % not already saved
+            disp('Writing current dataset file to disk...');
+            tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+            floatwrite( tmpdata', EEG.datfile, 'ieee-le');
+            EEG.data   = EEG.datfile;
+            EEG.icaact = [];
+            res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
+        end;
         return;
     end;
 end;
 
+% numerical format
+% ----------------
 if isnumeric(EEG.data)
     v = version;
     if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
@@ -768,7 +779,8 @@ end;
 
 % verify the type of the variables
 % --------------------------------
-    % data dimensions -------------------------
+% data dimensions -------------------------
+if isnumeric(EEG.data)
     if size(EEG.data,1) ~= EEG.nbchan
        disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,1)) ...
        ') does not match the number of channels (' int2str(EEG.nbchan) '): corrected' ]); 
@@ -812,8 +824,9 @@ end;
        res = com;
        EEG.pnts = size(EEG.data,2);
     end;    
+end;
 
-    % parameters coherence -------------------------
+    % parameters consistency -------------------------
     if     round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts          
        fprintf( 'eeg_checkset note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames\n'); 
        if EEG.srate == 0
@@ -920,40 +933,42 @@ end;
                     %error('eeg_checkset error: invalid weight and sphere array sizes');
                 end;    
             end;
-            if size(EEG.icasphere,2) ~= size(EEG.data,1)
-                  if popask( [ 'eeg_checkset error: number of colums in sphere array (' int2str(size(EEG.icasphere,2)) ')' 10 ...
-                   'does not match the number of rows in the sphere array (' int2str(size(EEG.data,1)) ')' 10 ...
-                   'Should EEGLAB remove ICA information ?' 10 '(press Cancel to fix the problem from the commandline)']) 
-                    res = com;
-                    EEG.icasphere = [];
-                    EEG.icaweights = [];
-                    EEG = eeg_checkset(EEG);
-                    return;
-                else
-                    error('eeg_checkset error: user abort');
-                    res = com;
-                    return;
-                    %error('eeg_checkset error: invalid weight and sphere array sizes');
-                end;    
-            end;
-            if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
-                if option_computeica
-                     fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
-                    res = com;
-                    % Make compatible with Matlab 7
-                    EEG.icaweights = double(EEG.icaweights);
-                    EEG.icawinv = double(EEG.icawinv);
-                    if any(isnan(EEG.data(:)))
-                        fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
-                        tmpindices = find(~isnan(EEG.data(1,:)));
-                        EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
-                        EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
+            if isnumeric(EEG.data)
+                if size(EEG.icasphere,2) ~= size(EEG.data,1)
+                    if popask( [ 'eeg_checkset error: number of colums in sphere array (' int2str(size(EEG.icasphere,2)) ')' 10 ...
+                                 'does not match the number of rows in the sphere array (' int2str(size(EEG.data,1)) ')' 10 ...
+                                 'Should EEGLAB remove ICA information ?' 10 '(press Cancel to fix the problem from the commandline)']) 
+                        res = com;
+                        EEG.icasphere = [];
+                        EEG.icaweights = [];
+                        EEG = eeg_checkset(EEG);
+                        return;
                     else
-                        EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
-                    end;
-                    EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
+                        error('eeg_checkset error: user abort');
+                        res = com;
+                        return;
+                        %error('eeg_checkset error: invalid weight and sphere array sizes');
+                    end;    
                 end;
-             end;
+                if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
+                    if option_computeica
+                        fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
+                        res = com;
+                        % Make compatible with Matlab 7
+                        EEG.icaweights = double(EEG.icaweights);
+                        EEG.icawinv = double(EEG.icawinv);
+                        if any(isnan(EEG.data(:)))
+                            fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
+                            tmpindices = find(~isnan(EEG.data(1,:)));
+                            EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
+                            EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
+                        else
+                            EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
+                        end;
+                        EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
+                    end;
+                end;
+            end;
             if isempty(EEG.icawinv)
                 EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
                 res = com;
@@ -964,7 +979,7 @@ end;
             EEG.icasphere = [];
         end;
         if option_computeica
-            if (ndims(EEG.icaact)) < 3 & (EEG.trials > 1)
+            if ~isempty(EEG.icaact) & ndims(EEG.icaact) < 3 & (EEG.trials > 1)
                 disp( [ 'eeg_checkset note: independent component made 3-D' ]); 
                 res = com;
                 EEG.icaact = reshape(EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);        
@@ -1441,7 +1456,7 @@ if ~isempty( varargin)
           catch, errordlg2(['Warning: minor problem encountered when generating' 10 ...
                         'the EEG.epoch structure (used only in user scripts)']); return;
           end;
-         case 'loaddata', 'savedata',;
+         case { 'loaddata', 'savedata'},;
          otherwise, error('eeg_checkset: unknown option');
         end;        
     end;
