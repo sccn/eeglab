@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.376  2005/07/30 01:50:19  arno
+% more menu disabling/enabling
+%
 % Revision 1.375  2005/07/29 23:38:27  arno
 % chanlocs for multiple datasets
 %
@@ -1960,10 +1963,17 @@ while( index <= MAX_SET)
 	set( EEGMENU(index), 'Enable', 'on', 'separator', 'off' );
 	try, ALLEEG(index).data;
 		if ~isempty( ALLEEG(index).data)
+            
+            cb_retrieve = [ '[EEG LASTCOM] = eeg_checkset(EEG, ''savedata''); h(LASTCOM);' ...
+                            'ALLEEG(CURRENTSET) = EEG; h(''ALLEEG(CURRENTSET) = EEG;'');' ...
+                            'LASTCOM = ''EEG = eeg_retrieve(ALLEEG, ' int2str(index) '); CURRENTSET = ' int2str(index) ';'';' ...
+                            'eval(LASTCOM); h(LASTCOM);' ...
+                            'ALLEEG(CURRENTSET) = EEG; h(''ALLEEG(CURRENTSET) = EEG;'');' ...
+                            'eeglab(''redraw'');' ];
+            
        		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
 			set( EEGMENU(index), 'Label', menutitle);
-			set( EEGMENU(index), 'CallBack', ['com = ''EEG = eeg_retrieve(ALLEEG, ' int2str(index) ...
-					'); CURRENTSET = ' int2str(index) ';''; eval(com); h(com); eeglab(''redraw'');' ]);
+			set( EEGMENU(index), 'CallBack', cb_retrieve );
 			set( EEGMENU(index), 'Enable', 'on' );
             if any(index == CURRENTSET), set( EEGMENU(index), 'checked', 'on' ); end;
 		end;
@@ -1976,7 +1986,9 @@ set(hh, 'Enable', 'off');
 % menu for selecting several datasets
 % -----------------------------------
 if index ~= 0
-    cb_select = [ 'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
+    cb_select = [ '[EEG LASTCOM] = eeg_checkset(EEG, ''savedata''); h(LASTCOM);' ...
+                  'ALLEEG(CURRENTSET) = EEG; h(''ALLEEG(CURRENTSET) = EEG;'');' ...
+                  'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
                   'tmpind = pop_chansel({ ALLEEG(nonempty).setname }, ''withindex'', nonempty);' ... 
                   'CURRENTSET = nonempty(tmpind);' ...
                   'EEG = eeg_retrieve(ALLEEG, CURRENTSET);' ...
@@ -2294,12 +2306,12 @@ else
     
     % disable menus
     % -------------
-    file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
+    file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m   , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')          , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')      , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                 , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')             , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset(s)'), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')         , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
     edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');      set(edit_m, 'enable', 'off');
     tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');     set(tool_m, 'enable', 'off');
     plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');      set(plot_m, 'enable', 'off');
@@ -2344,7 +2356,9 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
         %disp([ tmpp '     |        ' tmpnewpath '(' num2str(~strcmpi(tmpnewpath, tmpp)) ')' ]);
         if ~strcmpi(tmpnewpath, tmpp)
+            warning off;
             addpath(tmpnewpath);
+            warning on;
         end;
     else
         %disp([ 'Adding new path ' tmpnewpath ]);
