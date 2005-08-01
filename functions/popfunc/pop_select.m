@@ -89,6 +89,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2005/07/30 01:09:47  arno
+% allowing to process multiple datasets
+% .,
+%
 % Revision 1.38  2005/05/24 17:24:24  arno
 % remove cell2mat
 %
@@ -276,19 +280,13 @@ if nargin < 2
    end;
 
 else
-        args = varargin;
+    args = varargin;
 end;
 
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
-    for i = 1:length(EEG)
-        fprintf('Processing dataset: %s ****************\n', EEG(i).setname);
-        NEWEEG(i) = pop_select(EEG(i), args{:});
-    end;
-    EEG = NEWEEG;
-    clear NEWEEG;
-    com = sprintf('EEG = pop_select( %s,%s);', inputname(1), vararg2str(args));
+    [ EEG com ] = eeg_eval( 'pop_select', EEG, 'warning', 'on', 'params', args);
     return;
 end;
 
