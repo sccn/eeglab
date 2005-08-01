@@ -5,6 +5,6 @@
 
 option_computeica = 1 ;  % [Set|Unset] -> [Do|Do not] Precompute ICA activations (+RAM) 
 option_keepdataset = 1 ; % [Set|Unset] -> [Do|Do not] Retain parent datasets (+RAM)
-option_savematlab = 1 ;  % [Set|Unset] -> Store EEG.data in [the .set|a .dat] file
-option_rememberfolder = 1 ;  % [Set|Unset] -> When reading EEGLAB dataset, remember old folder
-option_storedisk = 1 ;   % [Set|Unset] -> [Do|Do not] store non-current dataset on disk
+option_savematlab = 1 ;  % [Set|Unset] -> [Do|Do not] write all dataset in a single file
+option_rememberfolder = 1 ;  % [Set|Unset] -> [Do|Do not] remember old folder when reading dataset
+option_storedisk = 0 ;   % [Set|Unset] -> [Do|Do not] write on disk non-current dataset
