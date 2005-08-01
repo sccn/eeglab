@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.379  2005/08/01 17:53:31  arno
+% minor fix for GUI
+%
 % Revision 1.378  2005/08/01 17:51:12  arno
 % debug storing
 %
@@ -1368,6 +1371,7 @@ else
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
+eeg_optionsbackup; 
 eeg_options; 
 if nargin == 1 &  strcmp(onearg, 'redraw')
     if evalin('base', 'exist(''EEG'')', '0') == 1
@@ -1940,6 +1944,7 @@ indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 	
 clear functions;
+eeg_optionsbackup;
 eeg_options;
 if ~option_keepdataset
 	if ~isempty(ALLEEG)
