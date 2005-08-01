@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/08/01 14:50:44  arno
+% loaddata
+%
 % Revision 1.4  2002/08/11 17:32:00  arno
 % header
 %
@@ -60,7 +63,12 @@ if nargin < 2
 end;	
 
 try
-	EEG = eeg_checkset(ALLEEG(retrieveSetIndex), 'loaddata');
+    eeg_options;
+    if length(retrieveSetIndex) > 1 & option_storedisk
+        EEG = eeg_checkset(ALLEEG(retrieveSetIndex)); % do not load data if several datasets
+    else
+        EEG = eeg_checkset(ALLEEG(retrieveSetIndex), 'loaddata');
+    end;
 catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', retrieveSetIndex); 
 	return;
