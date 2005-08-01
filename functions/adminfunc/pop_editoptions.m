@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/07/31 23:01:56  arno
+% debuging option writing
+%
 % Revision 1.21  2004/11/22 17:30:23  scott
 % edited help message - now tells the whole story
 %
@@ -175,14 +178,14 @@ end;
 str = fgetl( fid ); % jump a line
 index = 1;
 while (str(1) ~= -1)
-    dsffds
     [ varname{index} str ] = strtok(str); % variable name
     [ equal          str ] = strtok(str); % =
     [ value{index}   str ] = strtok(str); % value
     [ tmp            str ] = strtok(str); % ;
     [ tmp            dsc ] = strtok(str); % comment
-    dsc = deblank( dsc(end:-1:1) )
+    dsc = deblank( dsc(end:-1:1) );
     description{index} = deblank( dsc(end:-1:1) );
+    value{index}       = str2num( value{index} );
     
     str = fgets( fid ); % jump a line
     index = index+1;
