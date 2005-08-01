@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.378  2005/08/01 17:51:12  arno
+% debug storing
+%
 % Revision 1.377  2005/08/01 15:46:27  arno
 % loading/writing datasets
 %
@@ -2129,7 +2132,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( g.val2, 'String', int2str(length(EEG)));
         set( g.val3, 'String', datasettype);
         set( g.val4, 'String', epochconsist);
-        set( g.val5, 'String', chanlen);
+        set( g.val5, 'String', chanlenstr);
         set( g.val6, 'String', chanconsist);
         set( g.val7, 'String', chanlocs);
         set( g.val8, 'String', totevents);
