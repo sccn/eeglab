@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/08/01 16:43:11  arno
+% Initial revision
+%
 
 function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     
@@ -58,7 +61,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % --------------
     if isstr(EEG(1).data) & strcmpi(g.warning, 'on')
         ButtonName=questdlg2( [ 'Data files on disk will be automatically overwritten.' 10 ...
-                                'Are you sure you want to continue?'
+                                'Are you sure you want to continue?' ], ...
                             'Confirmation', 'Cancel', 'Yes','Yes');
         switch lower(ButtonName),
          case 'cancel', return;
@@ -79,10 +82,9 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
         TMPEEG    = eeg_retrieve(EEG, i);
         if v(1) == '5', eval(command);                      % Matlab 5
-        else            TMPEEG = func(TMPEEG, g.params{:}); % Matlab 6 and higher
+        else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
         end;
-        TMPEEG    = pop_select(TMPEEG, args{:});
-        TMPEEG    = eeg_checkset(EEG, 'savedata');
+        TMPEEG    = eeg_checkset(TMPEEG, 'savedata');
         NEWEEG(i) = TMPEEG;
     end;
     EEG = NEWEEG;
