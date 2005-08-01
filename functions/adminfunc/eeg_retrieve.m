@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/08/11 17:32:00  arno
+% header
+%
 % Revision 1.3  2002/07/22 21:06:52  arno
 % nothing
 %
@@ -57,7 +60,7 @@ if nargin < 2
 end;	
 
 try
-	EEG = ALLEEG(retrieveSetIndex);
+	EEG = eeg_checkset(ALLEEG(retrieveSetIndex), 'loaddata');
 catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', retrieveSetIndex); 
 	return;
