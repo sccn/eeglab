@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.154  2005/08/01 15:46:09  arno
+% loading/writing dataset
+%
 % Revision 1.153  2005/07/30 01:52:11  arno
 % debug loaddata savedata
 %
@@ -752,14 +755,16 @@ end;
 % save data if necessary
 % ----------------------
 if nargin > 1 & isfield(EEG, 'datfile')
+    eeg_optionsbackup;
     eeg_options;
     if strcmpi(varargin{1}, 'savedata') & option_storedisk
         if ~isstr(EEG.data) % not already saved
             disp('Writing current dataset file to disk...');
             tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
-            floatwrite( tmpdata', EEG.datfile, 'ieee-le');
+            floatwrite( tmpdata', fullfile(EEG.filepath, EEG.datfile), 'ieee-le');
             EEG.data   = EEG.datfile;
             EEG.icaact = [];
+            save('-mat', fullfile(EEG(1).filepath, EEG(1).filename), EEG);
             res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
         end;
         return;
