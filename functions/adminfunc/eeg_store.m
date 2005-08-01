@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/07/28 18:11:20  arno
+% allowing storing multiple datasets
+%
 % Revision 1.15  2003/12/05 20:07:48  arno
 % eeg_hist
 %
@@ -138,6 +141,7 @@ EEG = eeg_hist(EEG, com);
 
 % test options
 % ------------
+eeg_optionsbackup; 
 eeg_options; 
 if option_keepdataset == 0
     disp('Current dataset changed.');
