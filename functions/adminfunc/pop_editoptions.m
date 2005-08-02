@@ -8,13 +8,13 @@
 %        >> pop_editoptions( 'key1', value1, 'key2', value2, ...);
 %
 % Graphic interface inputs:
-%   "Precompute ICA activations" - [checkbox] If set, all the ICA activation
-%                   time courses are precomputed (this requires more RAM). 
-%                   Command line equivalent: option_computeica.
-%   "Retain parent dataset" - [checkbox] If set, EEGLAB will retain parents of 
-%                   new datasets in memory (requiring more RAM). 
-%                   Command line equivalent: option_keepdataset.
-%   "Store data in the .set or .dat file" - [checkbox] Set -> dataset data (EEG.data) are 
+%   "If set, keep at most one dataset in memory (this allow processing dozens of 
+%   "datasets at a time)" - [checkbox] If set, EEGLAB will only retain the current
+%                   dataset in memory. All other datasets will be automatically
+%                   read and writen to disk. All EEGLAB functionalities are preserved
+%                   even for dataset stored on disk. 
+%   "If set, write data in same file as dataset (unset allow reading one channel at
+%   "a time from disk)" - [checkbox] Set -> dataset data (EEG.data) are 
 %                   saved in the EEG structure in the standard Matlab dataset (.set) file. 
 %                   Unset -> The EEG.data are saved as a transposed stream of 32-bit 
 %                   floats in a separate binary file. As of Matlab 4.51, the order 
@@ -25,6 +25,13 @@
 %                   .dat instead of the pre-4.51, non-transposed .fdt. Both file types 
 %                   are read by the dataset load function. Command line equivalent: 
 %                   option_savematlab.
+%   "Precompute ICA activations" - [checkbox] If set, all the ICA activation
+%                   time courses are precomputed (this requires more RAM). 
+%                   Command line equivalent: option_computeica.
+%   "If set, remember old folder when reading dataset" - [checkbox] this option
+%                   is convinient if the file you are working on are not in the 
+%                   current folder.
+%
 % Commandline keywords:
 %   'option_computeica' - [0|1] If 1, compute the ICA component activitations and
 %                   store them in a new variable. If 0, compute ICA activations
@@ -72,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/08/02 01:54:07  arno
+% debug header etc...
+%
 % Revision 1.24  2005/08/02 01:45:39  arno
 % dealing with newer option files
 %
@@ -180,39 +190,42 @@ catch, varname1 = {}; value1 = {}; end;
 
 % fuse the two informations
 % -------------------------
-varname(1:length(varname1)) = varname1;
-value  (1:length(varname1)) = value1;
+for i = 1:length(varname)
+    if ~isempty(varname{i})
+        ind = strmatch(varname{i}, varname1);
+        if ~isempty(ind)
+            value{i} = value1{ind};
+        end;
+    end;
+end;
 
 if nargin == 0
-    geometry = { [4 1] };
+    geometry = { [6 1] };
     uilist = { ...
-         { 'Style', 'text', 'string', 'Description', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', '', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Set/Unset', 'fontweight', 'bold'   } };
 
     % add all fields to graphic interface
     % -----------------------------------
     for index = 1:length(varname)
-        try, % format the description to fit a help box THIS DOES NOT WORK (CONFLICT BETWEEN WAITFOR & QUESTLDG IN INPUTDLG)
-             % ----------------------------------------
-            tmptext = description{ index };
-            if length(tmptext) > 40,    stringtext = [ tmptext(1:40) '...' ]; 
-            else                        stringtext = tmptext; 
-            end;
-            descrip = { 'string', stringtext, 'callback', ['questdlg2([''' ...
-                                choptext( tmptext ) '''],''Description of field ' varname{index} ''', ''OK'', ''OK'');' ] }; 
-        catch, descrip = { 'string', 'no-description' }; end;
-
-        descrip = { 'string', description{ index } };
+        % format the description to fit a help box
+        % ----------------------------------------
+        descrip = { 'string', description{ index } }; % strmultiline(description{ index }, 80, 10) };
            
         % create the gui for this variable
         % --------------------------------
-        geometry = { geometry{:} [4 0.7 0.45 0.5] };
-        uilist   = { uilist{:}, ...
-         { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
-         { }, { 'Style', 'checkbox', 'string', '    ', 'value', value{index} } { } }; 
+        geometry = { geometry{:} [4 0.3 0.1] };
+        if ~isempty(value{index})
+            uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
+                         { 'Style', 'checkbox', 'string', '    ', 'value', value{index} } { } }; 
+        else
+            uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, ...
+                         { } { } }; 
+        end;
     end;
 
-    results = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()' );
+    results = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
+                        [], 'normal');
     if length(results) == 0, return; end;
    
     % decode inputs
@@ -300,14 +313,20 @@ function [ header, varname, value, description ] = readoptionfile( fid );
     str = fgetl( fid ); % jump a line
     index = 1;
     while (str(1) ~= -1)
-        [ varname{index} str ] = strtok(str); % variable name
-        [ equal          str ] = strtok(str); % =
-        [ value{index}   str ] = strtok(str); % value
-        [ tmp            str ] = strtok(str); % ;
-        [ tmp            dsc ] = strtok(str); % comment
-        dsc = deblank( dsc(end:-1:1) );
-        description{index} = deblank( dsc(end:-1:1) );
-        value{index}       = str2num( value{index} );
+        if str(1) == '%'
+            description{index} = str(3:end-1);
+            value{index}       = [];
+            varname{index}     = '';
+        else
+            [ varname{index} str ] = strtok(str); % variable name
+            [ equal          str ] = strtok(str); % =
+            [ value{index}   str ] = strtok(str); % value
+            [ tmp            str ] = strtok(str); % ;
+            [ tmp            dsc ] = strtok(str); % comment
+            dsc = deblank( dsc(end:-1:1) );
+            description{index} = deblank( dsc(end:-1:1) );
+            value{index}       = str2num( value{index} );
+        end;
         
         str = fgets( fid ); % jump a line
         index = index+1;
