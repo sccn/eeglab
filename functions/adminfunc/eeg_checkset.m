@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2005/08/02 16:27:57  arno
+% text
+%
 % Revision 1.157  2005/08/02 16:22:16  arno
 % test if datfile is empty
 %
@@ -776,7 +779,6 @@ if nargin > 1 & isfield(EEG, 'datfile')
             save('-mat', fullfile(EEG(1).filepath, EEG(1).filename), 'EEG');
             res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
         end;
-        return;
     end;
 end;
 
