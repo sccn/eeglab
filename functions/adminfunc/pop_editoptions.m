@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/08/01 14:36:03  arno
+% debug wrong alignment etc...
+%
 % Revision 1.22  2005/07/31 23:01:56  arno
 % debuging option writing
 %
@@ -164,33 +167,16 @@ if	fid == -1
 	end;
 end;
 
-% store header
-% ------------
-header = '';
-str = fgets( fid );
-while (str(1) == '%')
-    header = [ header str];
-    str = fgets( fid );
-end;
-
 % read variables values and description
 % --------------------------------------
-str = fgetl( fid ); % jump a line
-index = 1;
-while (str(1) ~= -1)
-    [ varname{index} str ] = strtok(str); % variable name
-    [ equal          str ] = strtok(str); % =
-    [ value{index}   str ] = strtok(str); % value
-    [ tmp            str ] = strtok(str); % ;
-    [ tmp            dsc ] = strtok(str); % comment
-    dsc = deblank( dsc(end:-1:1) );
-    description{index} = deblank( dsc(end:-1:1) );
-    value{index}       = str2num( value{index} );
-    
-    str = fgets( fid ); % jump a line
-    index = index+1;
-end;
-fclose(fid);
+fid2 = fopen('eeg_optionsbackup.m', 'r');
+[ varname1 value1 description1 ] = readoptionfile( fid  );
+[ varname  value  description  ] = readoptionfile( fid2 );
+
+% fuse the two informations
+% -------------------------
+varname(1:length(varname1)) = varname1;
+value  (1:length(varname1)) = value1;
 
 if nargin == 0
     geometry = { [4 1] };
@@ -290,3 +276,35 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
+
+% read option file
+% ----------------
+function [ varname, value, description ] = readoptionfile( fid );
+    
+    % skip header
+    % -----------
+    header = '';
+    str = fgets( fid );
+    while (str(1) == '%')
+        header = [ header str];
+        str = fgets( fid );
+    end;
+    
+    % read variables values and description
+    % --------------------------------------
+    str = fgetl( fid ); % jump a line
+    index = 1;
+    while (str(1) ~= -1)
+        [ varname{index} str ] = strtok(str); % variable name
+        [ equal          str ] = strtok(str); % =
+        [ value{index}   str ] = strtok(str); % value
+        [ tmp            str ] = strtok(str); % ;
+        [ tmp            dsc ] = strtok(str); % comment
+        dsc = deblank( dsc(end:-1:1) );
+        description{index} = deblank( dsc(end:-1:1) );
+        value{index}       = str2num( value{index} );
+        
+        str = fgets( fid ); % jump a line
+        index = index+1;
+    end;
+    fclose(fid);
