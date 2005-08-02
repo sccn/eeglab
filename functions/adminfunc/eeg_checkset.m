@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2005/08/02 16:22:16  arno
+% test if datfile is empty
+%
 % Revision 1.156  2005/08/02 01:55:24  arno
 % debug saving dataset
 %
@@ -765,7 +768,7 @@ if nargin > 1 & isfield(EEG, 'datfile')
     eeg_options;
     if strcmpi(varargin{1}, 'savedata') & option_storedisk & ~isempty(EEG.datfile)
         if ~isstr(EEG.data) % not already saved
-            disp('Writing current dataset file to disk...');
+            disp('Writing previous dataset to disk...');
             tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
             floatwrite( tmpdata', fullfile(EEG.filepath, EEG.datfile), 'ieee-le');
             EEG.data   = EEG.datfile;
