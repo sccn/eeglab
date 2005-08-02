@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2005/08/01 22:40:38  arno
+% save also EEG structure
+%
 % Revision 1.154  2005/08/01 15:46:09  arno
 % loading/writing dataset
 %
@@ -764,7 +767,7 @@ if nargin > 1 & isfield(EEG, 'datfile')
             floatwrite( tmpdata', fullfile(EEG.filepath, EEG.datfile), 'ieee-le');
             EEG.data   = EEG.datfile;
             EEG.icaact = [];
-            save('-mat', fullfile(EEG(1).filepath, EEG(1).filename), EEG);
+            save('-mat', fullfile(EEG(1).filepath, EEG(1).filename), 'EEG');
             res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
         end;
         return;
