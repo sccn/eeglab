@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/08/02 01:45:39  arno
+% dealing with newer option files
+%
 % Revision 1.23  2005/08/01 14:36:03  arno
 % debug wrong alignment etc...
 %
@@ -170,8 +173,10 @@ end;
 % read variables values and description
 % --------------------------------------
 fid2 = fopen('eeg_optionsbackup.m', 'r');
-[ varname1 value1 description1 ] = readoptionfile( fid  );
-[ varname  value  description  ] = readoptionfile( fid2 );
+try 
+    [ header varname1 value1 description1 ] = readoptionfile( fid  );
+catch, varname1 = {}; value1 = {}; end;
+[ header varname  value  description  ] = readoptionfile( fid2 );
 
 % fuse the two informations
 % -------------------------
@@ -279,7 +284,7 @@ function num = popask( text )
 
 % read option file
 % ----------------
-function [ varname, value, description ] = readoptionfile( fid );
+function [ header, varname, value, description ] = readoptionfile( fid );
     
     % skip header
     % -----------
