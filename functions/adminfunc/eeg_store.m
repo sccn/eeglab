@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/08/01 22:43:03  arno
+% eeg_options call
+%
 % Revision 1.16  2005/07/28 18:11:20  arno
 % allowing storing multiple datasets
 %
@@ -106,7 +109,7 @@
 
 % store set
 % ------------------
-function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex);
+function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, varargin);
 
 % check of parameter consistency
 % ------------------------------
@@ -120,10 +123,10 @@ end;
 % -----------------------------
 if length(EEG) > 1
 	TMPEEG = EEG;
-    if nargin == 3
+    if nargin >= 3
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
-            [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index));
+            [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             TMPEEG(index) = EEG;
         end;        
     else
@@ -136,7 +139,11 @@ if length(EEG) > 1
     EEG = TMPEEG;
 	return;
 end;
-[ EEG com] = eeg_checkset(EEG);
+if nargin == 4 % savedata
+    [ EEG com] = eeg_checkset(EEG, 'savedata');
+else 
+    [ EEG com] = eeg_checkset(EEG);
+end;
 EEG = eeg_hist(EEG, com);
 
 % test options
