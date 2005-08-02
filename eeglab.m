@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.380  2005/08/01 22:42:09  arno
+% fix eeg_option call
+%
 % Revision 1.379  2005/08/01 17:53:31  arno
 % minor fix for GUI
 %
@@ -1440,26 +1443,51 @@ checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h
 checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
 
+backupandhist =[ 'if ~isempty(LASTCOM),' ...
+                 '   ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savedata'');' ...
+                 '   h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+                 '   h(OLDCOM , EEG);' ...
+                 '   h(LASTCOM, EEG);' ...
+                 '   [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);' ... % take into account the history
+                 'end;' ...
+                 'clear OLDSET OLDCOM TMPEEG;' ];
+backupandhist_nh = [ 'if ~isempty(LASTCOM),' ...
+                 '   ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savedata'');' ...
+                 '   h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+                 '   h(OLDCOM);' ...  % difference with above
+                 '   h(LASTCOM);' ... % difference with above
+                 'end;' ...
+                 'clear OLDSET OLDCOM TMPEEG;' ];
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
-storeload    = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');';
-storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);';
-storeallcall = 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG); h(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG);''); end;';
+storeload    = [  'OLDSET = CURRENTSET; OLDCOM = LASTCOM;' ...
+                   backupandhist_nh 'h(-1); [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');' ];
+storenewcall_nh = [ 'OLDSET = CURRENTSET; OLDCOM = LASTCOM;' ...
+                 '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET);' backupandhist_nh ];
+storenewcall = [ 'OLDSET = CURRENTSET; OLDCOM = LASTCOM;' ...
+                 '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET);' backupandhist ];
 
-e_newnonempty_nh     = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load_nh            = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_newset_nh          = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store_nh           = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+
+storeallcall = [ 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
+                 'EEG = eeg_checkset(EEG); h(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG);''); end;' ];
+ifeegtmp     =  'if ~isempty(LASTCOM) & ~isempty(EEGTMP),';
+ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
+ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
+
+e_newnonempty_nh     = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall_nh 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_load_nh            = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload       'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_newset_nh          = [e_catch ifeeg                    storenewcall_nh 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store_nh           = [e_catch ifeegnh                  storecall       'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall_nh        = [e_catch ifeeg                    storeallcall    'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist_nh            = [e_catch 'h(LASTCOM);'];
 e_histdone_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newnonempty   = [e_catch 'EEGTMP = h(LASTCOM, EEGTMP); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load          = [e_catch 'EEGTMP = h(LASTCOM, EEGTMP); if ~isempty(LASTCOM) & ~isempty(EEGTMP), EEG = EEGTMP;' storeload 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_newset        = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store         = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),' storecall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM) & ~isempty(EEG),' storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newnonempty   = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
+e_load          = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
+e_newset        = [e_catch ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store         = [e_catch ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall      = [e_catch ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist          = [e_catch 'EEG = h(LASTCOM, EEG);'];
 e_histdone      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
@@ -1975,12 +2003,10 @@ while( index <= MAX_SET)
 	try, ALLEEG(index).data;
 		if ~isempty( ALLEEG(index).data)
             
-            cb_retrieve = [ '[EEG LASTCOM] = eeg_checkset(EEG, ''savedata''); h(LASTCOM);' ...
-                            '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);' ...
-                            'h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');' ...
-                            'LASTCOM = ''EEG = eeg_retrieve(ALLEEG, ' int2str(index) '); CURRENTSET = ' int2str(index) ';'';' ...
+            cb_retrieve = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savedata'');' ...
+                            'h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+                            'LASTCOM = ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, ' int2str(index) ');'';' ...
                             'eval(LASTCOM); h(LASTCOM);' ...
-                            'ALLEEG(CURRENTSET) = EEG; h(''ALLEEG(CURRENTSET) = EEG;'');' ...
                             'eeglab(''redraw'');' ];
             
        		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
@@ -1998,14 +2024,13 @@ set(hh, 'Enable', 'off');
 % menu for selecting several datasets
 % -----------------------------------
 if index ~= 0
-    cb_select = [ '[EEG LASTCOM] = eeg_checkset(EEG, ''savedata''); h(LASTCOM);' ...
-                  '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);' ...
-                  'h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');' ...
+    cb_select = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savedata'');' ...
+                  'h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
                   'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
                   'tmpind = pop_chansel({ ALLEEG(nonempty).setname }, ''withindex'', nonempty);' ... 
                   'CURRENTSET = nonempty(tmpind);' ...
-                  'EEG = eeg_retrieve(ALLEEG, CURRENTSET);' ...
-                  'h([ ''EEG = eeg_retrieve(ALLEEG, '' vararg2str({CURRENTSET}) ''); CURRENTSET = '' vararg2str({CURRENTSET}) '';'' ]);' ...
+                  '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, CURRENTSET);' ...
+                  'h([ ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, '' vararg2str({CURRENTSET}) '');'' ]);' ...
                   'eeglab(''redraw'');' ];
     if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;
     
@@ -2025,16 +2050,16 @@ if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | 
 		end;
 	end;
 	if CURRENTSET ~= 0
-		h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
-		EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
+		h([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
+		[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 	else 
 		EEG = eeg_emptyset;
 	end;
 end;
 
 if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0 & option_keepdataset
-	h([ 'EEG = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) '); CURRENTSET = ' int2str(CURRENTSET) ';'])
-	EEG = eeg_retrieve(ALLEEG, CURRENTSET);	
+	h([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
+	[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;
 
 % test if dataset has changed
@@ -2047,8 +2072,8 @@ if option_keepdataset & length(EEG) == 1
                               'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
         
         if tmpanswer(1) == 'D' % delete changes
-            EEG = eeg_retrieve( ALLEEG, CURRENTSET);
-            h('EEG = eeg_retrieve( ALLEEG, CURRENTSET);');
+            [EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
+            h('[EEG ALLEEG] = eeg_retrieve( ALLEEG, CURRENTSET);');
         elseif tmpanswer(1) == 'K' % keep changes
             [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
             h('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
