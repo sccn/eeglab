@@ -9,6 +9,8 @@
 %
 % Outputs:
 %   EEG        - output dataset. The global variable EEG is also updated 
+%   ALLEEG     - updated ALLEEG structure
+%   CURRENTSET - index of the current dataset
 %
 % Note: at this point the function only performs >> EEG = ALLEEG(index);
 %
@@ -35,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/08/01 22:43:26  arno
+% eeg_options call
+%
 % Revision 1.6  2005/08/01 15:44:31  arno
 % do not load data when retrieveing several datasets
 %
@@ -58,7 +63,7 @@
 %
 % 01-25-02 reformated help & license -ad 
 
-function EEG = eeg_retrieve( ALLEEG, retrieveSetIndex);
+function [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, CURRENTSET);
 
 if nargin < 2
 	help eeg_retrieve;
@@ -68,11 +73,12 @@ end;
 try
     eeg_optionsbackup;
     eeg_options;
-    if length(retrieveSetIndex) > 1 & option_storedisk
-        EEG = eeg_checkset(ALLEEG(retrieveSetIndex)); % do not load data if several datasets
+    if length(CURRENTSET) > 1 & option_storedisk
+        EEG = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
     else
-        EEG = eeg_checkset(ALLEEG(retrieveSetIndex), 'loaddata');
+        EEG = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
     end;
+    ALLEEG(CURRENTSET) = EEG;
 catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', retrieveSetIndex); 
 	return;
