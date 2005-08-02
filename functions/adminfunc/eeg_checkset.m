@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.156  2005/08/02 01:55:24  arno
+% debug saving dataset
+%
 % Revision 1.155  2005/08/01 22:40:38  arno
 % save also EEG structure
 %
@@ -760,7 +763,7 @@ end;
 if nargin > 1 & isfield(EEG, 'datfile')
     eeg_optionsbackup;
     eeg_options;
-    if strcmpi(varargin{1}, 'savedata') & option_storedisk
+    if strcmpi(varargin{1}, 'savedata') & option_storedisk & ~isempty(EEG.datfile)
         if ~isstr(EEG.data) % not already saved
             disp('Writing current dataset file to disk...');
             tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
