@@ -49,6 +49,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/07/28 18:29:59  arno
+% same
+%
 % Revision 1.12  2005/07/28 18:25:43  arno
 % hostory for multiple dataset command
 %
@@ -130,7 +133,6 @@ elseif nargin == 1
 			ALLCOM = [];
 		else if command < 0
 				ALLCOM = ALLCOM( -command+1:end ); % unstack elements
-				h;
 			else
 				txt = ALLCOM{command};
 				if length(txt) > 72
