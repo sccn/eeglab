@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2005/07/30 01:52:32  arno
+% typo
+%
 % Revision 1.34  2005/07/30 01:49:59  arno
 % load data
 %
@@ -172,18 +175,11 @@ end;
 % read file
 % ---------
 fprintf('Pop_loadset: loading file %s ...\n', inputname);
+filename = fullfile(inputpath, inputname);
 try
-    TMPVAR = load([ inputpath inputname ], '-mat', options{:});
+    TMPVAR = load(filename, '-mat', options{:});
 catch,
-    try
-        TMPVAR = load([ inputpath '/' inputname ], '-mat', options{:});
-    catch,
-        try, 
-            TMPVAR = load([ inputpath '\' inputname ], '-mat', options{:});
-        catch,
-            error([ inputname ': File not found' ]);
-        end;
-    end;        
+    error([ filename ': File not found' ]);
 end;
 
 % variable not found
@@ -219,7 +215,7 @@ if isfield(TMPVAR, 'EEG') %individual dataset
         VAROUT.data = TMPVAR.EEGDATA;
     end;
     
-    VAROUT.filename = [ inputname(1:end-3) 'set' ];    
+    [ VAROUT.filepath VAROUT.filename ] = filepart( filename );
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
