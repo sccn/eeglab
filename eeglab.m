@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.381  2005/08/02 18:10:59  arno
+% debuging menus etc ...
+%
 % Revision 1.380  2005/08/01 22:42:09  arno
 % fix eeg_option call
 %
@@ -1579,10 +1582,10 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on'   , 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset(s)'     , 'Separator', 'on', 'CallBack', [ check   '[EEG LASTCOM]    = pop_saveset(EEG);' e_store]);
-	uimenu( first_m, 'Label', 'Save datasets'                            , 'CallBack', [ check   '[ALLEEG LASTCOM] = pop_saveset(ALLEEG);' e_hist_nh ]);
-	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
+	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
+	uimenu( first_m, 'Label', 'Save current dataset(s)'  , 'Separator', 'on', 'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
+	uimenu( first_m, 'Label', 'Save current datasets as'              , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Clear dataset(s)'                      , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
     
 	hist_m = uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on');
