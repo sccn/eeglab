@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2005/08/03 01:41:10  arno
+% also saving if no datfile
+%
 % Revision 1.159  2005/08/02 16:46:32  arno
 % do not return immediately after saving data
 %
@@ -735,21 +738,18 @@ end;
 % ----------------------
 if isstr(EEG.data) & nargin > 1
     if strcmpi(varargin{1}, 'loaddata')
-        filename = EEG.data;
         
-        if strcmpi(filename, 'in set file')
-            filename = fullfile(EEG(1).filepath, EEG(1).filename);
+        if strcmpi(EEG.data, 'in set file')
+            filename = fullfile(EEG.filepath, EEG.filename);
             EEG = load('-mat', filename);
         else
-            fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
+            % opening data file
+            % -----------------
+            filename = fullfile(EEG.filepath, EEG.data);
+            fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
             if fid == -1
-                disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
-                fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
-                if fid == -1
-                    errordlg2(['Cannot open data file ''' filename ''''], 'error');
-                    error('File not found');
-                end;
-                fprintf('Reading float file ''%s''...\n', filename);
+                error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
+                        'the .set file, you must also rename/move the associated data file.' ]);
             else 
                 fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
             end;
@@ -762,9 +762,9 @@ if isstr(EEG.data) & nargin > 1
                     datformat = 1;
                 end;
             end;
+            EEG.datfile = EEG.data;
             if datformat
-                EEG.datfile = EEG.data;
-                EEG.data    = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+                EEG.data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
             else
                 EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
             end;
