@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.159  2005/08/02 16:46:32  arno
+% do not return immediately after saving data
+%
 % Revision 1.158  2005/08/02 16:27:57  arno
 % text
 %
@@ -733,50 +736,81 @@ end;
 if isstr(EEG.data) & nargin > 1
     if strcmpi(varargin{1}, 'loaddata')
         filename = EEG.data;
-        fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
-        if fid == -1
-            disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
-            fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
-            if fid == -1
-                errordlg2(['Cannot open data file ''' filename ''''], 'error');
-                error('File not found');
-            end;
-            fprintf('Reading float file ''%s''...\n', filename);
-        else 
-            fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
-        end;
-
-        % old format = .fdt; new format = .dat (transposed)
-        % -------------------------------------------------
-        datformat = 0;
-        if length(filename) > 3
-            if strcmpi(filename(end-2:end), 'dat')
-                datformat = 1;
-            end;
-        end;
-        if datformat
-            EEG.datfile = EEG.data;
-            EEG.data    = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+        
+        if strcmpi(filename, 'in set file')
+            filename = fullfile(EEG(1).filepath, EEG(1).filename);
+            EEG = load('-mat', filename);
         else
-            EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+            fid = fopen([EEG.filepath filename], 'r', 'ieee-le'); %little endian (see also pop_saveset)
+            if fid == -1
+                disp(['file ' [EEG.filepath filename] ' not found, trying local folder']);
+                fid = fopen(EEG.data, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+                if fid == -1
+                    errordlg2(['Cannot open data file ''' filename ''''], 'error');
+                    error('File not found');
+                end;
+                fprintf('Reading float file ''%s''...\n', filename);
+            else 
+                fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
+            end;
+            
+            % old format = .fdt; new format = .dat (transposed)
+            % -------------------------------------------------
+            datformat = 0;
+            if length(filename) > 3
+                if strcmpi(filename(end-2:end), 'dat')
+                    datformat = 1;
+                end;
+            end;
+            if datformat
+                EEG.datfile = EEG.data;
+                EEG.data    = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+            else
+                EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
+            end;
+            fclose(fid);
         end;
-        fclose(fid);
     end;
 end;
 
 % save data if necessary
 % ----------------------
-if nargin > 1 & isfield(EEG, 'datfile')
+if nargin > 1
     eeg_optionsbackup;
     eeg_options;
-    if strcmpi(varargin{1}, 'savedata') & option_storedisk & ~isempty(EEG.datfile)
+    
+    % datfile available?
+    % ------------------
+    datfile = 0;
+    if isfield(EEG, 'datfile')
+        if ~isempty(EEG.datfile)
+            datfile = 1;
+        end;
+    end;
+    
+    % save data
+    % ---------
+    if strcmpi(varargin{1}, 'savedata') & option_storedisk
         if ~isstr(EEG.data) % not already saved
             disp('Writing previous dataset to disk...');
-            tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
-            floatwrite( tmpdata', fullfile(EEG.filepath, EEG.datfile), 'ieee-le');
-            EEG.data   = EEG.datfile;
+    
+            if datfile
+                tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
+                floatwrite( tmpdata', fullfile(EEG.filepath, EEG.datfile), 'ieee-le');
+                EEG.data   = EEG.datfile;
+            end;            
             EEG.icaact = [];
-            save('-mat', fullfile(EEG(1).filepath, EEG(1).filename), 'EEG');
+        
+            % saving dataset
+            % --------------
+            filename = fullfile(EEG(1).filepath, EEG(1).filename);
+            if ~isstr(EEG.data), EEG.data = single(EEG.data); end;
+            v = version;
+            if str2num(v(1)) >= 7, save( filename, '-v6', '-mat', 'EEG'); % Matlab 7
+            else                   save( filename, '-mat', 'EEG');
+            end;
+            if ~isstr(EEG.data), EEG.data = 'in set file'; end;
+            
             res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
         end;
     end;
