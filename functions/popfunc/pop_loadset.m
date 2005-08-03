@@ -1,15 +1,20 @@
 % pop_loadset() - load a dataset (pop out window if no arguments)
 %
 % Usage:
-%   >> EEGOUT = pop_loadset( filename );
-%   >> EEGOUT = pop_loadset( filename, filepath, mode);
+%   >> EEGOUT = pop_loadset; % pop up window
+%   >> EEGOUT = pop_loadset( 'key1', 'val1', 'key2', 'val2', ...);
+%   >> EEGOUT = pop_loadset( filename, filepath); % old calling format
 %
-% Inputs:
-%   filename  - [string] file name
-%   filepath  - [string] file path (optional)
-%   mode      - ['all', 'info'] load all data associated with the
-%               dataset or only the dataset information without importing
-%               data. Default is 'all'.
+% Optional inputs:
+%   'filename'  - [string] file name
+%   'filepath'  - [string] file path (optional)
+%   'loadmode'  - ['all', 'info', integer] load all data associated with the
+%                 dataset or only the dataset information without importing
+%                 data. Default is 'all'. If integer, load only specific 
+%                 channel. Most efficient if data is stored in a separate 
+%                 '.dat' file so individual channels may be loaded 
+%                 independently of each other.
+%   'eeg'       - [EEGLAB structure] reload current dataset
 %
 % Output
 %   EEGOUT - EEG data structure from EEGLAB
@@ -40,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2005/08/03 15:00:11  arno
+% fix filepart
+%
 % Revision 1.36  2005/08/03 14:54:10  arno
 % filename, filepath
 %
@@ -151,100 +159,147 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [VAROUT, command] = pop_loadset( inputname, inputpath, mode);
+function [EEG, command] = pop_loadset( inputname, inputpath, varargin);
 
 command = '';
-VAROUT  = [];
-%eeg_emptyset;
-if nargin < 2
-    inputpath = '';
-end;
+EEG  = [];
+
 if nargin < 1
+    % pop up window
+    % -------------
 	[inputname, inputpath] = uigetfile2('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
+    options = { 'filename' inputname 'filepath' inputpath };
+else
+    % account for old calling format
+    % ------------------------------
+    if strcmpi(inputname, 'filename'), 
+        options = { 'filename' inputname }; 
+        if nargin > 1
+            options = { options{:} 'filepath' inputpath }; 
+        end;
+        if nargin > 2
+            options = { options{:} 'loadmode' varargin{1} }; 
+        end;
+    else
+        options = { inputname, inputpath, varargin };
+    end;
 end;
 
-% read only selected variables
-% ----------------------------
-if nargin < 3
-    mode = 'all';
-end; 
-if strcmpi(mode, 'info')
-     options = { 'EEG' };
-else options = {};
-end;
+% decode input parameters
+% -----------------------
+g = finputcheck( options, ...
+                 { 'filename'   'string' []   '';
+                   'filepath'   'string' []   '';
+                   'loadmode'   { 'string' 'integer' } { { 'info' 'all' } [] }  'all';
+                   'eeg'        'struct' []   struct('data',{}) }, 'pop_loadset');
+if isstr(g), error(g); end;
 
-% read file
-% ---------
-fprintf('Pop_loadset: loading file %s ...\n', inputname);
-filename = fullfile(inputpath, inputname);
-try
-    TMPVAR = load(filename, '-mat', options{:});
-catch,
-    error([ filename ': File not found' ]);
-end;
+% reloading EEG structure from disk
+% ---------------------------------
+if ~isempty(g.eeg)
 
-% variable not found
-% ------------------
-if isempty(TMPVAR)
-    error('No dataset info associated with this file');
-end;
+    EEG = pop_loadset( 'filepath', EEG.filepath, 'filename', EEG.filename);
 
-if isfield(TMPVAR, 'EEG') %individual dataset
-	% load individual dataset
-	% -----------------------
-	VAROUT = checkoldformat(TMPVAR.EEG, mode);
-    if isstr(VAROUT.data) & ~strcmpi(VAROUT.data, 'EEGDATA')
-        if isempty(find(VAROUT.data == '/')) % account for writing Bug October 2002
-            VAROUT.filepath = inputpath; 
-            if length(inputname) > 3 & ~strcmp(inputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(inputname(end-2:end), 'set')
-                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
-                VAROUT.data     = [ inputname(1:end-3) 'fdt' ];
+else
+    % read file
+    % ---------
+    filename = fullfile(inputpath, inputname);
+    fprintf('Pop_loadset: loading file %s ...\n', filename);
+    try
+        TMPVAR = load(filename, '-mat');
+    catch,
+        error([ filename ': file is protexted or does not exist' ]);
+    end;
+
+    % variable not found
+    % ------------------
+    if isempty(TMPVAR)
+        error('No dataset info associated with this file');
+    end;
+
+    if isfield(TMPVAR, 'EEG')
+        
+        % load individual dataset
+        % -----------------------
+        EEG = checkoldformat(TMPVAR.EEG);
+        [ EEG.filepath EEG.filename ext ] = fileparts( filename );
+        EEG.filename = [ EEG.filename ext ];
+        
+        % account for name changes etc...
+        % -------------------------------
+        if isstr(EEG.data) & ~strcmpi(EEG.data, 'EEGDATA')
+
+            [tmp EEG.data ext] = fileparts( EEG.data ); EEG.data = [ EEG.data ext];
+            if ~isempty(tmp) & ~strcmpi(tmp, EEG.filepath)
+                disp('Warning: updating folder name for .dat/.fdt file');
             end;
-        else 
-            VAROUT.filepath = '';
-            tmpinputname = [ inputpath inputname ];
-            if length(tmpinputname) > 3 & ~strcmp(tmpinputname(1:end-3), VAROUT.data(1:end-3)) & strcmpi(tmpinputname(end-2:end), 'set')
-                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
-                VAROUT.data     = [ tmpinputname(1:end-3) 'fdt' ];
+            if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
+                disp('Warning: the name of the dataset has changed on disk, updating .dat/.fdt data file to the new name');
+                EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+            end;
+            
+        end;
+        
+        % copy data to output variable if necessary (deprecated)
+        % -----------------------------------------
+        if ~strcmpi(g.loadmode, 'info') & isfield(TMPVAR, 'EEGDATA')
+            EEG.data = TMPVAR.EEGDATA;
+        end;
+        
+    elseif isfield(TMPVAR, 'ALLEEG')
+        
+        % this part is deprecated as of EEGLAB 5.00
+        % since all datasets have to be saved in separate files
+        % -----------------------------------------------------
+        disp('Pop_loadset: appending datasets');
+        EEG = TMPVAR.ALLEEG;
+        for index=1:length(EEG)
+            EEG.filename = '';
+            EEG.filepath = '';        
+            if isstr(EEG(index).data), 
+                EEG(index).filepath = inputpath; 
+                if length(inputname) > 4 & ~strcmp(inputname(1:end-4), EEG(index).data(1:end-4)) & strcmpi(inputname(end-3:end), 'sets')
+                    disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
+                    EEG(index).data = [ inputname(1:end-4) 'fdt' int2str(index) ];
+                end;
             end;
         end;
-    end;
-    
-    % copy data to output variable if necessary
-    % -----------------------------------------
-    if ~strcmpi(mode, 'info') & isfield(TMPVAR, 'EEGDATA')
-        VAROUT.data = TMPVAR.EEGDATA;
-    end;
-    
-    [ VAROUT.filepath VAROUT.filename ] = fileparts( filename );
-elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
-	disp('Pop_loadset: appending datasets');
-	VAROUT = TMPVAR.ALLEEG;
-    for index=1:length(VAROUT)
-        if isstr(VAROUT(index).data), 
-            VAROUT(index).filepath = inputpath; 
-            if length(inputname) > 4 & ~strcmp(inputname(1:end-4), VAROUT(index).data(1:end-4)) & strcmpi(inputname(end-3:end), 'sets')
-                disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
-                VAROUT(index).data = [ inputname(1:end-4) 'fdt' int2str(index) ];
-            end;
+    else
+        EEG = checkoldformat(TMPVAR);
+        if ~isfield( EEG, 'data')
+            error('Pop_loadset: non-EEGLAB dataset file');
         end;
+        if isstr(EEG.data), EEG.filepath = inputpath; end;
+    end;
+end;
+
+% load all data or specific data channel
+% --------------------------------------
+if isstr(g.loadmode)
+    if strcmpi(g.loadmode, 'all')
+        EEG = eeg_checkset(EEG, 'loaddata');
     end;
 else
-	VAROUT = checkoldformat(TMPVAR,mode);
-	if ~isfield( VAROUT, 'data')
-		error('Pop_loadset: non-EEGLAB dataset file');
-	end;
-    if isstr(VAROUT.data), VAROUT.filepath = inputpath; end;
+    % load/select specific channel
+    % ----------------------------
+    EEG.datachannel = g.loadmode;
+    if isstr(EEG.data)
+        EEG.datfile = EEG.data;
+        fid = fopen(fullfile(EEG.filepath, EEG.data), 'r', 'ieee-le');
+        fseek(fid, EEG.pnts*EEG.trials*( g.loadmode - 1), 0 );
+        EEG.data    = fread(fid, EEG.pnts*EEG.trials, 'float32');
+        fclose(fid);
+    else
+        EEG.data        = EEG.data(g.loadmode,:,:);
+    end;
 end;
-if strcmpi(mode, 'all')
-    VAROUT = eeg_checkset(VAROUT, 'loaddata');
-end;
-command = sprintf('EEG = pop_loadset( ''%s'', ''%s'');', inputname, inputpath);
+
+command = sprintf('EEG = pop_loadset(%s);', vararg2str(options));
 return;
 
-function EEG = checkoldformat(EEG,mode)
+function EEG = checkoldformat(EEG)
 	if ~isfield( EEG, 'data')
 		fprintf('Incompatible with new format, trying old format and converting...\n');
 		eegset = EEG.cellArray;
