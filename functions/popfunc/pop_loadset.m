@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2005/08/03 14:54:10  arno
+% filename, filepath
+%
 % Revision 1.35  2005/07/30 01:52:32  arno
 % typo
 %
@@ -215,7 +218,7 @@ if isfield(TMPVAR, 'EEG') %individual dataset
         VAROUT.data = TMPVAR.EEGDATA;
     end;
     
-    [ VAROUT.filepath VAROUT.filename ] = filepart( filename );
+    [ VAROUT.filepath VAROUT.filename ] = fileparts( filename );
 elseif isfield(TMPVAR, 'ALLEEG') %multiple dataset
 	disp('Pop_loadset: appending datasets');
 	VAROUT = TMPVAR.ALLEEG;
