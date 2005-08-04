@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/08/02 16:54:15  arno
+% adding outputs
+%
 % Revision 1.7  2005/08/01 22:43:26  arno
 % eeg_options call
 %
@@ -80,7 +83,7 @@ try
     end;
     ALLEEG(CURRENTSET) = EEG;
 catch
-	fprintf('Warning: cannot retrieve dataset with index %d\n', retrieveSetIndex); 
+	fprintf('Warning: cannot retrieve dataset with index %d\n', CURRENTSET); 
 	return;
 end;
 
