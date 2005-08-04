@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2005/08/04 21:22:37  arno
+% debuging input parameters
+%
 % Revision 1.52  2005/08/04 15:01:19  arno
 % fixing old format detection
 %
@@ -238,7 +241,7 @@ if nargin < 2
 else
     % account for old calling format
     % ------------------------------
-   if ~strcmpi(varargin{1}, 'filename'),
+   if isempty(strmatch( lower(varargin{1}), { 'filename' 'filepath' 'savemode' 'check' }))
         options = { 'filename' varargin{1} };
         if nargin > 2
             options = { options{:} 'filepath' varargin{2} };
