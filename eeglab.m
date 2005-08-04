@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.382  2005/08/03 19:49:53  arno
+% updating menus
+%
 % Revision 1.381  2005/08/02 18:10:59  arno
 % debuging menus etc ...
 %
@@ -1977,23 +1980,8 @@ MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 clear functions;
 eeg_optionsbackup;
 eeg_options;
-if ~option_keepdataset
-	if ~isempty(ALLEEG)
-		if popask( strvcat('Remove all datasets except the present one ?', ...
-						   'Otherwise, under "File > Maximize memory" clear dataset overwrite'))
-			ALLEEG = []; CURRENTSET = 0;
-			h('ALLEEG = []; CURRENTSET = 0;');
-		else 
-			return;
-		end;
-	end;
-	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'off');
-	CURRENTSET = 0;
-else
-	if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
-		ALLEEG = EEG;
-	end;
-	set(findobj('parent', gcf, 'label', 'Datasets'), 'enable', 'on');
+if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
+    ALLEEG = EEG;
 end;
 
 % setting the dataset menu
@@ -2044,7 +2032,7 @@ end;
 EEGUSERDAT{2} = EEGMENU;
 set(W_MAIN, 'userdata', EEGUSERDAT);
 
-if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | CURRENTSET(1) == 0 | isempty(ALLEEG(CURRENTSET(1)).data))
+if (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | CURRENTSET(1) == 0 | isempty(ALLEEG(CURRENTSET(1)).data))
 	CURRENTSET = 0;
 	for index = 1:length(ALLEEG)
 		if ~isempty(ALLEEG(index).data)
@@ -2060,14 +2048,14 @@ if option_keepdataset & (isempty(CURRENTSET) | length(ALLEEG) < CURRENTSET(1) | 
 	end;
 end;
 
-if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0 & option_keepdataset
+if (isempty(EEG) | isempty(EEG(1).data)) & CURRENTSET(1) ~= 0
 	h([ '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG,' int2str(CURRENTSET) ');' ])
 	[EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
 end;
 
 % test if dataset has changed
 % ---------------------------
-if option_keepdataset & length(EEG) == 1
+if length(EEG) == 1
     if ~isempty(ALLEEG) & CURRENTSET~= 0 & ~isequal(EEG.data, ALLEEG(CURRENTSET).data) 
         % the above comparison does not work for ome structures
         tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
