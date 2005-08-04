@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2005/08/04 14:57:46  arno
+% reprogrammed the function
+%
 % Revision 1.50  2005/07/29 22:55:30  arno
 % saving several datasets
 %
@@ -232,7 +235,7 @@ if nargin < 2
 else
     % account for old calling format
     % ------------------------------
-   if strcmpi(inputname, 'filename'),
+   if ~strcmpi(inputname, 'filename'),
         options = { 'filename' varargin{1} };
         if nargin > 1
             options = { options{:} 'filepath' varargin{2} };
