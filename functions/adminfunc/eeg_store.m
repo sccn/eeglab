@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/08/04 17:09:50  arno
+% remving ALLEEG stuff
+%
 % Revision 1.21  2005/08/04 16:28:28  arno
 % reprogrammed function
 %
@@ -153,7 +156,7 @@ if length(EEG) > 1
 end;
 if nargin < 4 
     [ EEG com ]  = eeg_checkset(EEG);
-    EEG.changes_not_saved = 'yes';
+    if nargin > 2, EEG.changes_not_saved = 'yes'; end;
 else % savedata
      % --------
     eeg_optionsbackup;
@@ -196,7 +199,7 @@ else % savedata
                 end;
             end;
             if strcmpi(option_save, 'exception')
-                EEG.changes_not_saved = 'yes';
+                if nargin > 2, EEG.changes_not_saved = 'yes'; end;
                 [ EEG com ] = eeg_checkset(EEG);
             else
                 EEG.changes_not_saved = 'no';
@@ -213,7 +216,7 @@ else % savedata
             disp('Dataset not modified since last save, no need for resaving it');
         end;
         [ EEG com ] = eeg_checkset(EEG);
-        EEG.changes_not_saved = 'yes';
+        if nargin > 2, EEG.changes_not_saved = 'yes'; end;
     end;
 end;
 EEG = eeg_hist(EEG, com);
