@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.162  2005/08/04 15:31:15  arno
+% error if using savedata
+%
 % Revision 1.161  2005/08/03 17:37:25  arno
 % updating loadset
 %
@@ -744,7 +747,7 @@ if isstr(EEG.data) & nargin > 1
 
         if strcmpi(EEG.data, 'in set file')
             filename = fullfile(EEG.filepath, EEG.filename);
-            EEG = load('-mat', filename);
+            EEG = load('-mat', filename); EEG = EEG.EEG;
         else
             % opening data file
             % -----------------
