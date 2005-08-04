@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2003/12/24 18:56:16  scott
+% help msg and pop-window text edits
+%
 % Revision 1.22  2003/12/17 18:16:35  arno
 % reject
 %
@@ -277,13 +280,10 @@ if ~isempty(rej)
     end;
 end;
 
-% store variables if necessary
-% -----------------------------
-eeg_options; % changed from eeglaboptions 3/30/02 -sm
-if option_keepdataset
-    if icacomp == 1, EEG.specdata = allspec;
-    else,            EEG.specicaact = allspec;
-    end;
+% store variables
+% ---------------
+if icacomp == 1, EEG.specdata = allspec;
+else,            EEG.specicaact = allspec;
 end;
     
 com = [com sprintf('%s = pop_rejspec( %s, %s);', inputname(1), ...
