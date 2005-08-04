@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/08/04 17:21:44  arno
+% only set changes not saved if updating dataset
+%
 % Revision 1.22  2005/08/04 17:09:50  arno
 % remving ALLEEG stuff
 %
@@ -163,26 +166,19 @@ else % savedata
     eeg_options;
     if option_storedisk & strcmpi(EEG.changes_not_saved, 'yes')
         if option_warningstore & strcmpi(varargin{1}, 'savegui')
-            if ~isempty(EEG.filename) & ~isempty(EEG.filepath)                
-                res = questdlg2(strvcat( 'You set the option to keep at most one dataset in memory at a time, so the previous', ...
-                                         'dataset are automatically saved on disk (and overwrite previous dataset file).', ...
-                                         'Do you still wish to proceed?', ...
-                                         '(Use menu item "File > Maximize memory" to disable this functionality or', ...
-                                         'to prevent this warning from appearing.)'), 'Make exception for this dataset', ...
-                                         'Save as new file', 'Yes resave previous datase');
-                if strcmpi(res, 'Yes resave previous datase'), option_save = 'resave';
-                elseif strcmpi(res, 'Save as new file'),       option_save = 'new';
-                else                                           option_save = 'exception';
+            if ~isempty(EEG.filename)
+                comhelp = 'warndlg2(strvcat( ''You set the option to keep only one dataset in memory'', ''at a time, so the previous dataset has to be saved on disk'', ''(it will overwrite any previous dataset file).'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it on disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''option or remove this warning.)''), ''Save warning'');';
+                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset on disk?', 'visible' 'off' } ...
+                                              { 'style' 'text' 'string' '           Backup previous dataset on disk?' } }, comhelp, 'Save warning');
+                if ~isempty(res), option_save = 'resave';
+                else              option_save = 'exception';
                 end;
             else
-                res = questdlg2(strvcat( 'You set the option to keep at most one dataset in memory at a time, so the previous', ...
-                                         'dataset has to be saved on disk. Do you still wish to proceed?', ...
-                                         'If yes, you will be prompted to enter a file name.', ...
-                                         '(Use menu item "File > Maximize memory" to disable this functionality or', ...
-                                         'to prevent this warning from appearing.)'), 'Make exception for this dataset', ...
-                                         'Yes save previous dataset');                
-                if strcmpi(res, 'Yes save previous datase'), option_save = 'new';
-                else                                         option_save = 'exception';
+                comhelp = 'warndlg2(strvcat( ''You set the option to keep only one dataset in memory'', ''at a time, so the previous dataset has to be saved on disk'', ''(and it will pop-up a window for entering a file name).'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it on disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''option or remove this warning.)''), ''Save warning'');';
+                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset on disk?', 'visible' 'off' } ...
+                                              { 'style' 'text' 'string' '           Backup previous dataset on disk?' } }, comhelp, 'Save warning');
+                if ~isempty(res), option_save = 'new';
+                else              option_save = 'exception';
                 end;
             end;
             
@@ -201,7 +197,7 @@ else % savedata
             if strcmpi(option_save, 'exception')
                 if nargin > 2, EEG.changes_not_saved = 'yes'; end;
                 [ EEG com ] = eeg_checkset(EEG);
-            else
+            elseif ~strcmpi(option_save, 'new')
                 EEG.changes_not_saved = 'no';
                 [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
                 EEG = update_datafield(EEG);
