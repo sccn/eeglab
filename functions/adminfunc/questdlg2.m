@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2002/10/15 17:23:50  arno
+% drawnow
+%
 % Revision 1.10  2002/10/15 16:54:09  arno
 % add drawnow ofr windows
 %
@@ -92,7 +95,8 @@ cr = length(find(Prompt == char(10)))+1;
 if cr == 1
 	cr = size(Prompt,1);
 end;
-
+if cr >= 8, cr = cr-1; end;
+if cr >= 4, cr = cr-1; end;
 [tmp tmp2 allobj] = supergui( fig, geometry, [cr 1], listui{:} );
 
 waitfor( fig, 'userdata');
