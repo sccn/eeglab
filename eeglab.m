@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.383  2005/08/04 15:42:00  arno
+% remove option to keep only one dataset
+%
 % Revision 1.382  2005/08/03 19:49:53  arno
 % updating menus
 %
@@ -2274,6 +2277,7 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         erp_m  = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERPs');
         erpi_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERPs');
         hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
+        data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
