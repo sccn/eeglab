@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2005/08/04 15:35:03  arno
+% remove option to keep only one dataset
+%
 % Revision 1.19  2005/08/04 15:28:40  arno
 % change command to automatically save dataset
 %
@@ -145,10 +148,73 @@ if length(EEG) > 1
     EEG = TMPEEG;
 	return;
 end;
-if nargin == 4 % savedata
-    [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
-else 
-    [ EEG com] = eeg_checkset(EEG);
+if nargin < 4 
+    [ EEG com ]  = eeg_checkset(EEG);
+    EEG = ALLEEG(CURRENTSET);
+    EEG.changes_not_saved = 'yes';
+else % savedata
+     % --------
+    eeg_optionsbackup;
+    eeg_options;
+    if option_storedisk & strcmpi(EEG.changes_not_saved, 'yes')
+        if option_warningstore & strcmpi(varargin{1}, 'savegui')
+            if ~isempty(EEG.filename) & ~isempty(EEG.filepath)                
+                res = questdlg2(strvcat( 'You set the option to keep at most one dataset in memory at a time, so the previous', ...
+                                         'dataset are automatically saved on disk (and overwrite previous dataset file).', ...
+                                         'Do you still wish to proceed?', ...
+                                         '(Use menu item "File > Maximize memory" to disable this functionality or', ...
+                                         'to prevent this warning from appearing.)'), 'Make exception for this dataset', ...
+                                         'Save as new file', 'Yes resave previous datase');
+                if strcmpi(res, 'Yes resave previous datase'), option_save = 'resave';
+                elseif strcmpi(res, 'Save as new file'),       option_save = 'new';
+                else                                           option_save = 'exception';
+                end;
+            else
+                res = questdlg2(strvcat( 'You set the option to keep at most one dataset in memory at a time, so the previous', ...
+                                         'dataset has to be saved on disk. Do you still wish to proceed?', ...
+                                         'If yes, you will be prompted to enter a file name.', ...
+                                         '(Use menu item "File > Maximize memory" to disable this functionality or', ...
+                                         'to prevent this warning from appearing.)'), 'Make exception for this dataset', ...
+                                         'Yes save previous dataset');                
+                if strcmpi(res, 'Yes save previous datase'), option_save = 'new';
+                else                                         option_save = 'exception';
+                end;
+            end;
+            
+            % save mode
+            % ---------
+            if strcmpi(option_save, 'new')
+                EEG.changes_not_saved = 'no';
+                [ EEG com] = pop_saveset(EEG);
+                EEG = update_datafield(EEG);
+                h(com);
+                if isempty(com)
+                    disp('No file name given. Dataset not saved (making an exception).');
+                    option_save = 'exception';
+                end;
+            end;
+            if strcmpi(option_save, 'exception')
+                EEG.changes_not_saved = 'yes';
+                [ EEG com ] = eeg_checkset(EEG);
+                EEG = ALLEEG(CURRENTSET);
+            else
+                EEG.changes_not_saved = 'no';
+                [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
+                EEG = update_datafield(EEG);
+            end;
+        else
+            EEG.changes_not_saved = 'no';
+            [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
+            EEG = update_datafield(EEG);
+        end;
+    else
+        if strcmpi(EEG.changes_not_saved, 'no')
+            disp('Dataset not modified since last save, no need for resaving it');
+        end;
+        [ EEG com ] = eeg_checkset(EEG);
+        EEG = ALLEEG(CURRENTSET);
+        EEG.changes_not_saved = 'yes';
+    end;
 end;
 EEG = eeg_hist(EEG, com);
 
@@ -192,3 +258,14 @@ else
  	end;	
 end;	
 return;
+
+function EEG = update_datafield(EEG);
+    if isfield(EEG, 'datfile')
+        if ~isempty(EEG.datfile)
+            EEG.data = EEG.datfile;
+        else
+            EEG = rmfield(EEG, 'datfile');
+        end;
+    else 
+        EEG.data = 'in set file';
+    end;
