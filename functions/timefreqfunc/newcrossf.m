@@ -216,6 +216,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2005/04/08 22:56:46  arno
+% help msg for chaninfo
+%
 % Revision 1.76  2005/03/30 16:29:11  arno
 % implement angleunit
 %
@@ -998,7 +1001,7 @@ if iscell(X)
         end;
         Rbootout = [];
 	else 
-		% preprocess data and run compstat
+		% preprocess data and run condstat
 		% --------------------------------
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
@@ -1152,6 +1155,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
 	% compute coherences
 	% ------------------
 	tmpprod = alltfX .* conj(alltfY);
+    if nargout > 6 | strcmpi(g.type, 'phasecoher2') |  strcmpi(g.type, 'phasecoher')
+        coherresout = alltfX .* conj(alltfY);
+    end;
 	switch g.type
 	 case 'crossspec',
 	  coherres = alltfX .* conj(alltfY); % no normalization
@@ -1167,11 +1173,9 @@ if ~strcmp(lower(g.compute), 'c') % MATLAB PART
       coherresout = [];
       
 	 case 'phasecoher2',
-	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum(coherresout, 3) ./ sum(abs(coherresout),3);
 	 
      case 'phasecoher',
-	  coherresout = alltfX .* conj(alltfY);
 	  coherres = sum( coherresout ./ abs(coherresout), 3) / g.trials;
 	end;
 	
