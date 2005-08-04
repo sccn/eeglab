@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2005/08/02 01:34:32  arno
+% fixing chansout
+%
 % Revision 1.126  2005/07/29 23:37:40  arno
 % allowing changing several datasets
 %
@@ -827,7 +830,7 @@ if nargin < 3
                                                      'Edit channel info -- pop_chanedit()', {}, 'noclose' );
 			if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
 		end; 
-		if length(results) == 0, com = ''; return; end;
+		if length(results) == 0, com = ''; if dataset_input, chansout = EEG; end; return; end;
 		
 		% transfer events back from global workspace
 		chans  = evalin('base', 'chantmp');
@@ -1246,7 +1249,9 @@ end;
 
 if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
 if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
-chansout = chans;
+if dataset_input, EEG.chanlocs = chans; chansout = EEG;
+else              chansout = chans;
+end;
 return;
 
 function str = commandwarning(str);
