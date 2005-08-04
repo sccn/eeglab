@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/05/24 17:48:27  arno
+% remove cell2mat
+%
 % Revision 1.25  2004/12/09 19:59:09  arno
 % using old EEG.pnts
 %
@@ -140,10 +143,6 @@ if size(regions,2) > 2, regions = regions(:, 3:4); end;
 eeg_options; 
 [EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( EEG.data, ...
 												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
-% the string option has been disable since it was causing problems
-% ----------------------------------------------------------------
-%[EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( fastif(option_keepdataset, EEG.data, 'EEG.data'), ...
-%												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
 oldEEGpnts = EEG.pnts;
 EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
