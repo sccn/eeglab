@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/07/30 01:22:24  arno
+% allowing to remove channels for multiple datasets
+%
 % Revision 1.21  2004/07/07 19:07:30  arno
 % return empty if cancel
 %
@@ -151,13 +154,6 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
          %{ 'Style', 'pushbutton', 'string', 'Memory options', 'tooltipstring', 'Change these options if your computer is short in memory' }, ...
 	};
 
-	eeg_options;
-	if ~option_keepdataset, 
-		uilist{9} = { uilist{9}{:} 'enable', 'off'}; 
-		geometry  = { geometry{:} [1] [1] };
-		uilist = { uilist{:} {} { 'Style', 'text', 'string', ['Note: cancel is inefficient in the automatic '...
-					'dataset overwrite mode (toggle using /File/Maximize memory)']}};
-	end;
     [result userdat] = inputgui( geometry, uilist, 'pophelp(''pop_newset'');', ...
 								  fastif(isempty(EEG.data), 'Import dataset info -- pop_newset()', 'Edit dataset info -- pop_newset()'), userdat);
     if length(result) == 0,
