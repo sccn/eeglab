@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2005/08/04 15:00:56  arno
+% fixing old format detection
+%
 % Revision 1.38  2005/08/03 17:37:36  arno
 % reprogramming the function
 %
@@ -298,6 +301,7 @@ else
         EEG.data        = EEG.data(g.loadmode,:,:);
     end;
 end;
+EEG.changes_not_saved = 'no';
 
 command = sprintf('EEG = pop_loadset(%s);', vararg2str(options));
 return;
