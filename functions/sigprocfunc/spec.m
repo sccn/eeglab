@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/04/28 15:36:26  arno
+% fixing winsize
+%
 % Revision 1.12  2004/02/12 02:08:28  arno
 % do not return power as log
 %
@@ -129,7 +132,7 @@ timesout = floor(length(X)/(win-overlap));
 if timesout <= 1, timesout = 2; end;
 
 warning off;
-[ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs, fs, ...
+[ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs*1000, fs, ...
                                         0, 'padratio', padratio, 'timesout', timesout, 'winsize', win, 'maxfreq', fs/2, ...
                                         'plotersp', 'off', 'plotitc', 'off', 'baseline', NaN, 'verbose', 'off');
 warning on;
