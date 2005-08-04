@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2005/08/02 16:47:40  arno
+% savedata
+%
 % Revision 1.17  2005/08/01 22:43:03  arno
 % eeg_options call
 %
@@ -140,7 +143,7 @@ if length(EEG) > 1
 	return;
 end;
 if nargin == 4 % savedata
-    [ EEG com] = eeg_checkset(EEG, 'savedata');
+    [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
 else 
     [ EEG com] = eeg_checkset(EEG);
 end;
