@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/08/04 15:36:48  arno
+% remove option of keeping only 1 dataset
+%
 % Revision 1.22  2005/07/30 01:22:24  arno
 % allowing to remove channels for multiple datasets
 %
@@ -189,21 +192,16 @@ end;
 
 % assigning values
 % ----------------
-overWflag = 0;
+overWflag    = 0;
+EEG.modified = 'yes';
 for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1; com = ''; return;
-	 case 'save'      , if isunix | strcmp(computer, 'MAC'), 
-                             dirindices = sort(union(findstr(args{ind+1}, ':'), findstr(args{ind+1}, '/')));
-                        else dirindices = find(args{ind+1} == '\');
-                        end;
-                        if ~isempty(dirindices)
-                            EEG = pop_saveset(EEG, args{ind+1}(dirindices(end)+1:end), args{ind+1}(1:dirindices(end)));
-                        else
-                            EEG = pop_saveset(EEG, args{ind+1});
-                        end;
+	 case 'save'      , [filepath filename ext] = fileparts( args{ind+1} );
+                        EEG.modified = 'no';
+                        EEG = pop_saveset(EEG, filepath, [ filename ext ]);
 	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
                             overWflag = 1; 
                         end;
