@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/08/04 15:39:22  arno
+% edit header
+%
 % Revision 1.26  2005/08/02 23:24:14  arno
 % process comments etc...
 %
@@ -229,37 +232,47 @@ if nargin == 0
     % decode inputs
     % -------------
     args = {};
+    count = 1;
     for index = 1:length(varname)
-        args = {  args{:}, varname{index}, results{index} }; 
-    end;
-else % no interactive inputs
-    args = varargin;
-    for index = 1:2:length(varargin)
-        if isempty(strmatch(varargin{index}, varname, 'exact'))
-            error(['Variable name ''' varargin{index} ''' is invalid']);
+        if ~isempty(varname{index})
+            args = {  args{:}, varname{index}, results{count} }; 
+            count = count+1;
         end;
-    end;        
+    end;
+else 
+    % no interactive inputs
+    % ---------------------
+    args = varargin;
 end;
+
+% decode inputs
+% -------------
+for index = 1:2:length(args)
+    ind = strmatch(args{index}, varname, 'exact');
+    if isempty(ind)
+        error(['Variable name ''' args{index} ''' is invalid']);
+    else
+        value{ind} = args{index+1};
+    end;
+end;        
 
 % write to eeg_options file
 % -------------------------
 if storelocal
-    warning off;
-	if isunix | strcmp(computer,'MAC')
-        delimloc = sort(union(findstr(filename, ':'), findstr(filename, '/')));
-	else
-        delimloc = findstr(filename, '\');
-	end;
-    warning on;
-	filename = filename(delimloc(end)+1:end);
+    [tmp filename ext ] = fileparts( filename );
+    filename = [ filename ext ];
 end;
 fid = fopen( filename, 'w');
 if fid == -1
 	error('File error, check writing permission');
 end;
 fprintf(fid, '%s\n', header);
-for index = 1:2:length(args)
-    fprintf( fid, '%s = %d ; %% %s\n', args{index}, args{index+1}, description{(index-1)/2+1});
+for index = 1:length(varname)
+    if isempty(varname{index})
+        fprintf( fid, '%% %s\n', description{index});
+    else
+        fprintf( fid, '%s = %d ; %% %s\n', varname{index}, value{index}, description{index});
+    end;
 end;
 fclose(fid);    
 
