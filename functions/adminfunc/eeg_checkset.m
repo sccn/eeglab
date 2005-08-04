@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.161  2005/08/03 17:37:25  arno
+% updating loadset
+%
 % Revision 1.160  2005/08/03 01:41:10  arno
 % also saving if no datfile
 %
@@ -738,7 +741,7 @@ end;
 % ----------------------
 if isstr(EEG.data) & nargin > 1
     if strcmpi(varargin{1}, 'loaddata')
-        
+
         if strcmpi(EEG.data, 'in set file')
             filename = fullfile(EEG.filepath, EEG.filename);
             EEG = load('-mat', filename);
@@ -791,6 +794,8 @@ if nargin > 1
     % save data
     % ---------
     if strcmpi(varargin{1}, 'savedata') & option_storedisk
+        error('eeg_checkset: cannot call savedata any more');
+        
         if ~isstr(EEG.data) % not already saved
             disp('Writing previous dataset to disk...');
     
