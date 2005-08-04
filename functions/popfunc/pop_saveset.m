@@ -2,25 +2,23 @@
 %
 % Usage:
 %   >> pop_saveset( EEG ); % use an interactive pop-up window 
-%   >> pop_saveset( ALLEEG );               % use pop-up window
-%   >> EEG = pop_saveset( EEG, filename, filepath); % no pop-up
-%   >> ALLEEG = pop_saveset( ALLEEG, indices, filename, filepath, ...
-%                                                          'key', val);
-%
+%   >> EEG = pop_saveset( EEG, 'key', 'val', ...); % no pop-up
+%                                              
 % Inputs:
-%   EEG        - EEG dataset structure
-%   ALLEEG     - array of dataset structures
-%   indices    - indices of datasets in the ALLEEG structure to save 
-%   filename   - name of the file to save to (optional)
-%   filepath   - path of the file to save to (optional)
+%   EEG        - EEG dataset structure. May only contain one dataset.
 %
-% Optional arguments
-%   'savemode' - [0|1|2] 1 saves all the structure in a Matlab file, 0 
-%                saves the structure without the data in a Matlab file and
-%                the data in a binary float file, 2 saves the structure in a 
-%                matlab file and doesn't save the data (assumes data is
-%                already saved in a binary float file and EEG.data holds 
-%                the pointer to this float file).
+% Optional inputs:
+%   'filename' - [string] name of the file to save to
+%   'filepath' - [string] path of the file to save to
+%   'check'    - ['on'|'off'] perform extended syntax check. Default 'off'.
+%   'savemode' - ['resave'|'onefile'|'twofiles'] 'resave' resave the 
+%                current dataset using the filename and path stored
+%                in the dataset; 'onefile' saves the full EEG 
+%                structure in a Matlab '.set' file, 'twofiles' saves 
+%                the structure without the data in a Matlab '.set' file
+%                and the transposed data in a binary float '.dat' file.
+%                By default the option from the eeg_options.m file is 
+%                used.
 %
 % Outputs:
 %   EEG        - saved dataset (after extensive syntax checks)
@@ -52,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2005/07/29 22:55:30  arno
+% saving several datasets
+%
 % Revision 1.49  2005/07/07 22:26:54  hilit
 % cleared the 'savemode' help message
 %
@@ -212,288 +213,137 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_saveset( EEG, inarg, curfilename, curfilepath, tmp, option_savematlab);
+function [EEG, com] = pop_saveset( EEG, varargin);
 
 com = '';
 if nargin < 1
 	help pop_saveset;
 	return;
 end;
-if isempty(EEG)
-	error('Cannot save multiple datasets');
-end;
+if isempty(EEG)  , error('Cannot save empty datasets'); end;
+if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
 
-if length(EEG) > 1
-	mode = 1; % multiple datasets
-else
-	mode = 0; % single datasets
-end;
-
-if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
-	% ask user
-	if mode == 1 % multiple datasets
-        if nargin == 1
-            indices = [];
-            for index = 1:length(EEG)
-                if ~isempty(EEG(index).data)
-                    indices = [indices index];
-                end;
-            end;
-            result = inputdlg2( {'Indices of the datasets to save'}, ...
-                                'Save several datasets -- pop_saveset()', 1, {int2str(indices)}, 'pop_saveset');
-            drawnow;
-            if length(result) == 0 return; end;
-            indices = eval( [ '[' result{1} ']' ] );
-            [curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
-        else
-            [curfilename, curfilepath] = uiputfile2('*.sets', 'Save dataset with .sets extension -- pop_saveset()'); 	
-            indices = 1:length(EEG);
-        end;
-    else
-		[curfilename, curfilepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
-	end;
+if nargin < 2
+    % pop up window to ask for file type
+    % ----------------------------------
+    [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
     drawnow;
-	if curfilename == 0 return; end;	
-else 
-	if mode == 1 | isnumeric(inarg)
-		indices = inarg;
-        if nargin < 4
-            curfilepath = '';
-        end;
-	else
-        if nargin < 3
-            curfilepath ='';
-        else 
-            curfilepath = curfilename;
-        end;
-		curfilename = inarg;
-	end;
-end;
-
-if ~isempty(curfilepath)
-    if curfilepath(end) ~= ':' & curfilepath(end) ~= '/' & curfilepath(end) ~= '\'
-        error('Last character of filepath must be a directory delimiter');
-    end;
-end;
-
-% currentfilename without the .set
-% --------------------------------
-if mode == 0 & ( length(curfilename)<=3 | ~strcmp(lower(curfilename(end-3:end)), '.set'))
-	disp('Adding ''.set'' extension to the file');
-	curfilename = [ curfilename '.set' ];
-end;
-if mode == 1 & ( length(curfilename)<=4 | ~strcmp(lower(curfilename(end-4:end)), '.sets'))
-	if length(curfilename)>3 & strcmp(lower(curfilename(end-3:end)), '.set')
-		disp('Changing file extension to ''.sets''');
-		curfilename = [ curfilename 's' ];
-	else
-		disp('Adding ''.sets'' extension to the file');
-		curfilename = [ curfilename '.sets' ];
-	end;
-end;
-
-if length(curfilename)>4
-	if strcmp(lower(curfilename(end-3:end)), '.set') 
-		noextcurfilename = curfilename(1:end-4);
-	elseif strcmp(lower(curfilename(end-4:end)), '.sets')
-		noextcurfilename = curfilename(1:end-5);
-	else
-		noextcurfilename = curfilename;
-	end;
-else 
-	noextcurfilename = curfilename;
-end;
-
-if mode == 0  % single datasets
-    fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
-    if exist('option_savematlab') == 1
-        if option_savematlab ~= 2
-            EEG = eeg_checkset(EEG, 'eventconsistency');
-        end
-    else
-        EEG = eeg_checkset(EEG, 'eventconsistency');
-    end
-	EEG.filename    = curfilename;
-	EEG.filepath    = curfilepath;
-	tmpica = EEG.icaact;
-	EEG.icaact      = [];
-    
-	% Saving data as float or as Matlab
-    if ~exist('option_savematlab')
-        eeg_options;
-    end;
-	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
-        if option_savematlab == 0
-            tmpdata = reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials);
-        end
-        EEG.data = [ noextcurfilename '.dat' ];
-		try, 
-            fprintf('Saving dataset...\n');
-            try, save([ curfilepath curfilename ], '-v6', '-mat', 'EEG');
-            catch, 
-                try, save([ curfilepath curfilename ], '-mat', 'EEG');
-                catch, error('Pop_saveset: save error, out of space or file permission problem');
-                end;
-            end;
-            if option_savematlab == 0
-                floatwrite( tmpdata', [curfilepath EEG.data], 'ieee-le');
-            end
-		catch, 
-			error('Pop_saveset: save error, out of space or file permission problem');
-		end;
-        if option_savematlab == 0
-            EEG.data   = reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials);
-            EEG.icaact = tmpica;
-        end
-	else % saving data as a single Matlab file
-        tmpfilename = [ noextcurfilename '.dat' ];
-        del = 0;
-        if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
-            if exist(tmpfilename) == 2
-                but = questdlg2(strvcat('Warning: EEGLAB .mat file format has changed (v4.11). EEGLAB now saves', ...
-                                        'data matrices in .set files in single-precision. Therefore, storing data in separate', ...
-                                        '''.fdt'' files no longer saves disk space. (To reinstate saving data in separate .fdt files,', ...
-                                        [ 'select menu item File > Maximize menu). Delete the existing file ''' tmpfilename ''' (recommended)?']), ...
-                                        'File format has changed !', 'No', 'Yes', 'Yes');
-                if strcmpi(but, 'yes'), del =1; end;
-            end;
-        end;
-        EEG.data = single(EEG.data);
-        fprintf('Saving dataset...\n');
-        try, save([ curfilepath curfilename ], '-v6', '-mat', 'EEG'); % Matlab 7
-        catch, 
-            try, save([ curfilepath curfilename ], '-mat', 'EEG');
-            catch, error('Pop_saveset: save error, out of space or file permission problem');
-            end;
-            EEG.data = double(EEG.data); 
-        end;
-        if del,
-            try,
-                tmpfilename = which(tmpfilename);
-                disp([ 'Deleting ''' tmpfilename '''...' ]);
-                delete(tmpfilename);
-            catch, disp('Error while attempting to remove file'); 
-            end;
-        end;
-	end;
-	EEG.icaact = tmpica;
-	
-	com = sprintf('EEG = pop_saveset( %s, ''%s'', ''%s'');', inputname(1), curfilename, curfilepath);
+    options = { 'filename' filename 'filepath' filepath };
 else
-	ALLEEG = EEG; clear EEG;
-	
-	if max(indices) > length(ALLEEG)
-		error('Pop_saveset: index out-of-bounds');
-	end;
-
-	% checking datasets
-	% -----------------
-	disp('Pop_saveset: extended datasets syntax check...');
-	for index = 1:length(indices)
-		if ~isempty(ALLEEG(indices(index)).data)
-            if exist('option_savematlab') == 1
-                if option_savematlab ~= 2
-                    try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
-					catch
-						if nargin < 2
-							if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
-										  'Do you want to continue ?' ])
-								error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
-							end;	
-						else
-							disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
-						end;
-					end;
-                end
-            else
-                try, ALLEEG(indices(index)) = eeg_checkset(ALLEEG(indices(index)), 'eventconsistency');
-				catch
-					if nargin < 2
-						if ~popask( [ 'Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure' 10 ...
-									  'Do you want to continue ?' ])
-							error( ['dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
-						end;	
-					else
-						disp( ['Warning: dataset ' int2str(indices(index)) ' has an inconsistent event structure. You must fix the problem.']);
-					end;
-				end;
-            end
-		else
-			disp(['Pop_saveset warning: dataset ' int2str(indices(index)) ' is empty']);
-		end;
-	end;
-	TMPALLEEG = ALLEEG;
-	for index = 1:length(indices)
-		ALLEEG(indices(index)).icaact = [];
-	end;
-	
-	% saving
-	% ------
-	ALLEEG = ALLEEG(indices);
-	
-	% Saving data as float or as Matlab
-    if ~exist('option_savematlab')
-        eeg_options;
-    end;
-    del = 0;
-	if exist('option_savematlab') == 1 & (option_savematlab == 0 | option_savematlab == 2)
-		for index = 1:length(ALLEEG)
-            if option_savematlab == 0
-                tmpdata = reshape(ALLEEG(index).data, ALLEEG(index).nbchan,  ALLEEG(index).pnts*ALLEEG(index).trials);
-            end            
-			ALLEEG(index).data = [ noextcurfilename '.fdt' int2str(index) ];
-            ALLEEG(index).filepath = '';
-            if option_savematlab == 0
-				try, 
-					floatwrite( tmpdata', [ curfilepath ALLEEG(index).data], 'ieee-le');
-				catch, 
-					error('Pop_saveset: saving error, out of space or file permission problem');
-				end;
-            end
-		end;
-	else % standard file saving
-        if (nargin < 2 & mode == 0) | (nargin < 3 & mode == 1)
-            tmpfilename = [ noextcurfilename '.dat1' ];
-            if exist(tmpfilename) == 2
-                but = questdlg2(strvcat('Warning: EEGLAB .mat file format has changed (v4.11). EEGLAB now saves', ...
-                                        'data matrices in .set files as single precision. Therefore, storing data in separate', ...
-                                        '''.fdt'' files no longer saves disk space. (To reinstate saving data in separate .fdt files,', ...
-                                        [ 'use menu File > Maximize menu). Delete the existing file ''' tmpfilename(1:end-1) 'X'' (recommended)?']), ...
-                                        'File format has changed !', 'No', 'Yes', 'Yes');
-                if strcmpi(but, 'yes'), del =1; end;
-            end;
+    % account for old calling format
+    % ------------------------------
+   if strcmpi(inputname, 'filename'),
+        options = { 'filename' varargin{1} };
+        if nargin > 1
+            options = { options{:} 'filepath' varargin{2} };
         end;
-		for index = 1:length(ALLEEG)
-			ALLEEG(index).data = single(ALLEEG(index).data);
-		end;        
+    else
+        options = varargin;
     end;
-	disp('Pop_saveset: saving datasets...');
-	try, save([ curfilepath curfilename ], '-v6', '-mat', 'ALLEEG');
-	catch, 
-        try, save([ curfilepath curfilename ], '-mat', 'ALLEEG');
-        catch, error('Pop_saveset: save error, out of space or file permission problem');
-        end;
-	end;
-    
-    % delete .fdt files
-    % -----------------
-    if del,
-        try,
-            for index = 1:length(ALLEEG)
-                tmpfilename = [ noextcurfilename '.dat' int2str(index) ];
-                tmpfilename = which(tmpfilename);
-                disp([ 'Deleting ''' tmpfilename '''...' ]);
-                delete(tmpfilename);
-            end;
-        catch, disp('Error while attempting to remove files'); 
-        end;
-    end;
-    disp ('Done');
-
-	ALLEEG = TMPALLEEG;
-	EEG = ALLEEG;	
-	com = sprintf('ALLEEG = pop_saveset( %s, %s, ''%s'', ''%s'');', inputname(1), vararg2str(indices), curfilename, curfilepath);
 end;
+
+% decode input parameters
+% -----------------------
+g = finputcheck(options,  { 'filename'   'string'   []     '';
+                            'filepath'   'string'   []     '';
+                            'check'      'string'   { 'on' 'off' }     'off';
+                            'savemode'   'string'   { 'resave' 'onefile' 'twofiles' '' } '' });
+if isstr(g), error(g); end;
+
+% current filename without the .set
+% ---------------------------------
+[g.filepath filenamenoext ext] = fileparts( fullfile(g.filepath, g.filename) ); ext = '.set';
+g.filename = [ filenamenoext ext ];
+
+% performing extended syntax check
+% --------------------------------
+if strcmpi(g.check, 'on')
+    fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
+    EEG = eeg_checkset(EEG, 'eventconsistency');
+end
+
+% default saving otion
+% --------------------
+save_as_dat_file = 0;
+if strcmpi(g.savemode, 'resave')
+    g.filename = EEG.filename;
+    g.filepath = EEG.filepath;
+    if isfield(EEG, 'datfile')
+        if isempty(EEG.datfile)
+            EEG = rmfield(EEG, 'datfile');
+        else
+            save_as_dat_file = 1;
+        end;
+    end;
+else
+    EEG.filename    = g.filename;
+    EEG.filepath    = g.filepath;
+    eeg_optionsbackup;
+    eeg_options;
+    if isempty(g.savemode)
+        if option_savematlab, g.savemode = 'onefile';
+        else                  g.savemode = 'twofiles';
+        end;
+    end;
+    if strcmpi(g.savemode, 'twofiles')
+        save_as_dat_file = 1;
+        EEG.datfile = [ filenamenoext '.dat' ];
+    end;
+end;
+
+% Saving data as float and Matlab
+% -------------------------------
+tmpica       = EEG.icaact;
+EEG.icaact   = [];
+tmpdata      = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+v = version;
+%try, 
+    fprintf('Saving dataset...\n');
+    if save_as_dat_file
+        EEG.data = EEG.datfile;
+        floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+    end;
+    if v(1) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
+    else         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
+    end;
+    if save_as_dat_file
+        EEG.data = tmpdata;
+    end;
+%catch,
+%    error('Pop_saveset: save error, out of space or file permission problem');
+%end;
+
+% try to delete old .fdt or .dat files
+% ------------------------------------
+tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
+if exist(tmpfilename) == 2
+    disp('Old .fdt file format detected on disk, now replaced by .dat file; trying to erase file...');
+    try,
+        delete(tmpfilename);
+        disp('Delete sucessfull.');
+    catch, disp('Error while attempting to remove file'); 
+    end;
+end;
+if save_as_dat_file == 0
+    tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.dat' ]);
+    if exist(tmpfilename) == 2
+        disp('Old .dat file detected on disk for this dataset, deleting file to avoid confusion...');
+        try,
+            delete(tmpfilename);
+            disp('Delete sucessfull.');
+        catch, disp('Error while attempting to remove file'); 
+        end;
+    end;
+end;
+
+% recovering variables
+% --------------------
+EEG.icaact = tmpica;
+if isnumeric(EEG.data) & v(1) < 7
+    EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
+end;
+
+com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
 return;
 
 function num = popask( text )
