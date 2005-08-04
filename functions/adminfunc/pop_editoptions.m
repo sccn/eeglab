@@ -37,18 +37,13 @@
 %                   store them in a new variable. If 0, compute ICA activations
 %                   only when needed (& only partially, if possible) and do not
 %                   store the results).
-%   'option_keepdataset' - [0|1] If 1, keep datasets in memory so that the user 
-%                   can undo any EEGLAB operation by returning to the parent
-%                   dataset.  The user may work on several datasets at a time.
-%                   If 0, only one dataset is stored in memory, any changes 
-%                   overwriting the current (EEG) dataset. 
 %   NOTE: Turn OFF the options above when working with very large datasets or on 
 %                   computers with limited memory.
 %   'option_savematlab' - [0|1] If 1, datasets are saved as single Matlab .set files. 
 %                   If 0, dataset data are saved in separate 32-bit binary float 
 %                   .dat files.  See the corresponding GUI option above for details. 
 % Outputs:
-%   In the output workspace, variables 'option_computeica', 'option_keepdataset',
+%   In the output workspace, variables 'option_computeica', 
 %   and 'option_savematlab'  are updated, and a new 'eeg_options.m' file may be
 %   written to the working directory. The copy of 'eeg_options.m' placed in your 
 %   working directory overwrites system defaults whenever EEGLAB operates in this
@@ -79,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/08/02 23:24:14  arno
+% process comments etc...
+%
 % Revision 1.25  2005/08/02 01:54:07  arno
 % debug header etc...
 %
