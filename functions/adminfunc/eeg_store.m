@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2005/08/04 15:28:40  arno
+% change command to automatically save dataset
+%
 % Revision 1.18  2005/08/02 16:47:40  arno
 % savedata
 %
@@ -148,16 +151,6 @@ else
     [ EEG com] = eeg_checkset(EEG);
 end;
 EEG = eeg_hist(EEG, com);
-
-% test options
-% ------------
-eeg_optionsbackup; 
-eeg_options; 
-if option_keepdataset == 0
-    disp('Current dataset changed.');
-	storeSetIndex = 0;
-    return;
-end;    
 
 % find first free index
 % ---------------------
