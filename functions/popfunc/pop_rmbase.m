@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2005/05/24 17:26:23  arno
+% remove cell2mat
+%
 % Revision 1.18  2005/03/11 17:53:41  scott
 % help msg
 %
@@ -157,8 +160,8 @@ elseif nargin < 2 & EEG.trials == 1
     pointrange = [1:EEG.pnts];
 end;
 
-if exist('pointrange') ~= 1
-    if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
+if exist('pointrange') ~= 1 & ~isempty(timerange)
+    if (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
     end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
