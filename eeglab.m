@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.389  2005/08/04 21:50:13  arno
+% savedata -> savegui
+%
 % Revision 1.388  2005/08/04 19:12:35  arno
 % same
 %
@@ -1378,7 +1381,8 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 % test for local SCCN copy
 % ------------------------
 addpath(eeglabpath);
-if (strcmpi(computer, 'GLNX86') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
+comp = computer;
+if (strcmpi(comp(1:4), 'GLNX') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
