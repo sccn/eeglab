@@ -8,4 +8,4 @@ option_storedisk = 0 ;   % If set, keep at most one dataset in memory (this allo
 option_savematlab = 1 ;  % If set, write data in same file as dataset (unset - 2 files - allow reading one channel at a time from disk)
 option_computeica = 1 ;  % If set, precompute ICA activations (requires RAM, but faster plotting of component activation) 
 % Folder options
-option_rememberfolder = 1 ;  % If set, remember old folder when reading dataset
+option_rememberfolder = 0 ;  % If set, remember old folder when reading dataset
