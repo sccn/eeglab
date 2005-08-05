@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/03/30 22:36:27  arno
+% matlab 5.3 compatibility
+%
 % Revision 1.13  2004/05/28 19:21:05  arno
 % fixing history for 2 elements
 %
@@ -182,7 +185,7 @@ function str = struct2str( structure )
 	allfields = fieldnames( structure );
 	for index = 1:length( allfields )
 		strtmp = '';
-		allcontent = { getfield( structure, allfields{index}) };
+		eval( [ 'allcontent = { structure.' allfields{index} ' };' ] ); % getfield generates a bug
 		str = [ str, '''' allfields{index} ''',{' vararg2str( allcontent ) '},' ];
 	end;
 	str = [ 'struct(' str(1:end-1) ')' ];
