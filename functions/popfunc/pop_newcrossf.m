@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/04/08 23:01:55  arno
+% new version for chaninfo
+%
 % Revision 1.29  2005/03/07 21:21:50  arno
 % chaninfo option
 %
@@ -247,7 +250,7 @@ if popup
 	end;
     figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; 
 else
-	options = vararg2str(varargin);
+	options = [ ',' vararg2str(varargin) ];
 end;
 
 % compute epoch limits

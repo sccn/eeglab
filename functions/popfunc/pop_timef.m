@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/04/08 22:39:22  arno
+% debug command line call
+%
 % Revision 1.32  2005/03/07 21:21:59  arno
 % chaninfo option
 %
@@ -267,7 +270,7 @@ if popup
 	end;
 	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
-    options = vararg2str(varargin);
+    options = [ ',' vararg2str(varargin) ];
 end;
 
 % compute epoch limits
@@ -310,8 +313,10 @@ end;
 if length( options ) < 2
     options = '';
 end;
-varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
-			int2str(tlimits), num2str(cycles), options);
+if nargin < 3
+    varargout{1} = sprintf('figure; pop_timef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
+                           int2str(tlimits), num2str(cycles), options);
+end;
 com = sprintf('%s timef( tmpsig(:, :), length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)	
 

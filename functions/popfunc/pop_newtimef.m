@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2005/08/05 17:00:05  arno
+% nothing
+%
 % Revision 1.33  2005/04/08 22:39:09  arno
 % scalp map orientation
 %
@@ -270,7 +273,7 @@ if popup
 	end;
 	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
-    options = varargin;
+    options = [ ',' vararg2str(varargin) ];
 end;
 
 % compute epoch limits
