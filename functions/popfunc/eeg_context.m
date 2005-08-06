@@ -68,8 +68,11 @@
 % 3/29/04 changed unbrtypes to int array -sm
 % 3/31/04 ruled out searching 'boundary' events -sm
 % 5/06/04 completed the function -sm
-
+%
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/08/06 13:33:03  scott
+% trying to add edit logging -sm
+%
 
 function [targs,ur_nbrs,ur_nbrtypes,delays,tfields,nfields] = eeg_context(EEG,targets,neighbors,positions,field,alltargs)
 
