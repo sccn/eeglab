@@ -69,6 +69,8 @@
 % 3/31/04 ruled out searching 'boundary' events -sm
 % 5/06/04 completed the function -sm
 
+% $Log: not supported by cvs2svn $
+
 function [targs,ur_nbrs,ur_nbrtypes,delays,tfields,nfields] = eeg_context(EEG,targets,neighbors,positions,field,alltargs)
 
 verbose     = 0;    % flag useful info printout (1=on|0=off)
