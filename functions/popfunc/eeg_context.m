@@ -70,6 +70,9 @@
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/08/06 13:33:54  scott
+% checking edit logging -sm
+%
 % Revision 1.8  2005/08/06 13:33:03  scott
 % trying to add edit logging -sm
 %
@@ -272,8 +275,10 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
  %%%%%%%%%%%%%%% cycle through target types %%%%%%%%%%%%%%%%%%
  %
  while ~istarget & tidx<=length(targets)           % for each potential target type
-    if (strcmpi(num2str(EEG.urevent(uridx).type),targets(tidx)) ...
-               | strcmp(targets{1},'_ALL'))        % if is a target type
+    uridxtype = EEG.urevent(uridx).type;
+    if ~ischar(uridxtype), uridxtype = num2str(uridxtype); end
+    if strcmpi(uridxtype,targets(tidx)) | strcmp(targets{1},'_ALL')         
+                                                   % if is a target type
       istarget=1;                                  % flag event as target
       targetcount = targetcount+1;                 % increment target count
       %
@@ -340,7 +345,9 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
    curpos = 1;                                       % current (negative) position
    seekpos = negpos(npidx);                          % begin with first negpos position
    while uidx > 0 & npidx <= nnegpos                 % search through previous urevents
-     if strcmpi(num2str(EEG.urevent(uidx).type),'boundary')  % flag boundary urevents
+     uidxtype = EEG.urevent(uidx).type;
+     if ~ischar(uidxtype), uidxtype = num2str(uidxtype); end
+     if strcmpi(uidxtype,'boundary')  % flag boundary urevents
         if ~isfield(EEG.urevent,'duration') ...
           | ( isnan(EEG.urevent(uidx).duration) ...
              | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
@@ -359,7 +366,7 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
      while ~isneighbor & nidx<=length(neighbors)     % for each neighbor event type
-       if strcmpi(num2str(EEG.urevent(uidx).type),neighbors(nidx)) | strcmp(neighbors,'_ALL')
+       if strcmpi(uidxtype,neighbors(nidx)) | strcmp(neighbors,'_ALL')
          isneighbor=1;                               % flag 'neighbors' event
          curpos = curpos+1;
          %
@@ -421,7 +428,9 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
    seekpos = pospos(ppidx);                          % begin with first pospos position
    while uidx <= nurevents  & ppidx <= npospos       % search through succeeding urevents
      isneighbor = 0;                                 % initialize neighbor flag
-     if strcmpi(num2str(EEG.urevent(uidx).type),'boundary')  % flag boundary events
+     uidxtype = EEG.urevent(uidx).type;
+     if ~ischar(uidxtype), uidxtype = num2str(uidxtype); end
+     if strcmpi(uidxtype,'boundary')  % flag boundary events
         if ~isfield(EEG.urevent,'duration') ...
           | ( isnan(EEG.urevent(uidx).duration) ...
               | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
@@ -439,7 +448,7 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
      while ~isneighbor & pidx<=length(neighbors)     % for each neighbor event type
-       if strcmpi(num2str(EEG.urevent(uidx).type),neighbors(pidx)) ...
+       if strcmpi(uidxtype,neighbors(pidx)) ...
                           | strcmp(neighbors,'_ALL')
          isneighbor=1;                               % flag 'neighbors' event
          curpos = curpos+1;
