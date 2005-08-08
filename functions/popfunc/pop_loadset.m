@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2005/08/08 18:12:56  arno
+% fix call
+%
 % Revision 1.40  2005/08/04 17:19:03  arno
 % set changes not saved
 %
@@ -195,7 +198,6 @@ else
         options = { inputname inputpath varargin{:} };
     end;
 end;
-options
 
 % decode input parameters
 % -----------------------
@@ -215,7 +217,7 @@ if ~isempty(g.eeg)
 else
     % read file
     % ---------
-    filename = fullfile(inputpath, inputname);
+    filename = fullfile(g.filepath, g.filename);
     fprintf('Pop_loadset: loading file %s ...\n', filename);
     try
         TMPVAR = load(filename, '-mat');
@@ -269,10 +271,10 @@ else
             EEG.filename = '';
             EEG.filepath = '';        
             if isstr(EEG(index).data), 
-                EEG(index).filepath = inputpath; 
-                if length(inputname) > 4 & ~strcmp(inputname(1:end-4), EEG(index).data(1:end-4)) & strcmpi(inputname(end-3:end), 'sets')
+                EEG(index).filepath = g.filepath; 
+                if length(g.filename) > 4 & ~strcmp(g.filename(1:end-4), EEG(index).data(1:end-4)) & strcmpi(g.filename(end-3:end), 'sets')
                     disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
-                    EEG(index).data = [ inputname(1:end-4) 'fdt' int2str(index) ];
+                    EEG(index).data = [ g.filename(1:end-4) 'fdt' int2str(index) ];
                 end;
             end;
         end;
@@ -281,7 +283,7 @@ else
         if ~isfield( EEG, 'data')
             error('Pop_loadset: non-EEGLAB dataset file');
         end;
-        if isstr(EEG.data), EEG.filepath = inputpath; end;
+        if isstr(EEG.data), EEG.filepath = g.filepath; end;
     end;
 end;
 
