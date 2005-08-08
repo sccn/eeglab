@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/08/08 18:40:59  arno
+% fix saving file
+%
 % Revision 1.26  2005/08/04 17:25:18  arno
 % typo
 %
@@ -220,7 +223,7 @@ end;
 if overWflag
 	[ALLEEG, EEG] = eeg_store( ALLEEG, EEG, CURRENTSET);
 else
-	[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+	[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
 end;
 	
 % generate the output command
