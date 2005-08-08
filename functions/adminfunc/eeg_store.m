@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/08/08 17:40:34  arno
+% erasing file information for newly created datasets
+%
 % Revision 1.24  2005/08/04 23:37:58  arno
 % new pop-up
 %
@@ -220,7 +223,7 @@ else % savedata
             EEG = update_datafield(EEG);
         end;
     else
-        if strcmpi(EEG.changes_not_saved, 'no')
+        if strcmpi(EEG.changes_not_saved, 'no') & option_storedisk
             disp('Dataset not modified since last save, no need for resaving it');
         end;
         [ EEG com ] = eeg_checkset(EEG);
