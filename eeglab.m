@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.392  2005/08/08 17:31:21  arno
+% sam
+%
 % Revision 1.391  2005/08/08 17:30:29  arno
 % add backup before check
 %
@@ -1507,11 +1510,11 @@ ifeegtmp     =  'if ~isempty(LASTCOM) & ~isempty(EEGTMP),';
 ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
 ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
 
-e_newnonempty_nh     = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall_nh 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load_nh            = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload       'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_newset_nh          = [e_catch ifeeg                    storenewcall_nh 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store_nh           = [e_catch ifeegnh                  storecall       'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall_nh        = [e_catch ifeeg                    storeallcall    'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newnonempty_nh     = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_load_nh            = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_newset_nh          = [e_catch ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store_nh           = [e_catch ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall_nh        = [e_catch ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist_nh            = [e_catch 'h(LASTCOM);'];
 e_histdone_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
