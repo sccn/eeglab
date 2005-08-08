@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/08/04 23:37:58  arno
+% new pop-up
+%
 % Revision 1.23  2005/08/04 17:21:44  arno
 % only set changes not saved if updating dataset
 %
@@ -157,6 +160,15 @@ if length(EEG) > 1
     EEG = TMPEEG;
 	return;
 end;
+
+if nargin < 3
+    % creating new dataset
+    % -> erasing file information
+    % ---------------------------
+    EEG.filename = '';
+    EEG.filepath = '';
+end;
+
 if nargin < 4 
     [ EEG com ]  = eeg_checkset(EEG);
     if nargin > 2, EEG.changes_not_saved = 'yes'; end;
