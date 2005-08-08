@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/08/04 17:25:18  arno
+% typo
+%
 % Revision 1.25  2005/08/04 16:28:55  arno
 % modified -> changes to save
 %
@@ -207,7 +210,7 @@ for ind = 1:2:length(args)
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1; com = ''; return;
 	 case 'save'      , [filepath filename ext] = fileparts( args{ind+1} );
                         EEG.changes_not_saved = 'no';
-                        EEG = pop_saveset(EEG, filepath, [ filename ext ]);
+                        EEG = pop_saveset(EEG, [ filename ext ], filepath);
 	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
                             overWflag = 1; 
                         end;
