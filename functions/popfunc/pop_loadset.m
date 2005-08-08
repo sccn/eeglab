@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2005/08/04 17:19:03  arno
+% set changes not saved
+%
 % Revision 1.39  2005/08/04 15:00:56  arno
 % fixing old format detection
 %
@@ -189,9 +192,10 @@ else
             options = { options{:} 'loadmode' varargin{1} }; 
         end;
     else
-        options = { inputname, inputpath, varargin };
+        options = { inputname inputpath varargin{:} };
     end;
 end;
+options
 
 % decode input parameters
 % -----------------------
