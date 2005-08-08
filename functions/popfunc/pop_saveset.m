@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2005/08/04 22:25:44  arno
+% nothing
+%
 % Revision 1.53  2005/08/04 21:22:37  arno
 % debuging input parameters
 %
@@ -306,7 +309,7 @@ tmpica       = EEG.icaact;
 EEG.icaact   = [];
 tmpdata      = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
 v = version;
-%try, 
+try, 
     fprintf('Saving dataset...\n');
     if save_as_dat_file
         EEG.data = EEG.datfile;
@@ -318,9 +321,9 @@ v = version;
     if save_as_dat_file
         EEG.data = tmpdata;
     end;
-%catch,
-%    error('Pop_saveset: save error, out of space or file permission problem');
-%end;
+catch,
+    error('Pop_saveset: save error, out of space or file permission problem');
+end;
 
 % try to delete old .fdt or .dat files
 % ------------------------------------
