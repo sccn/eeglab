@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.391  2005/08/08 17:30:29  arno
+% add backup before check
+%
 % Revision 1.390  2005/08/05 01:22:05  arno
 % cluster compatibility
 %
@@ -1476,6 +1479,11 @@ checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''ch
 
 % check string and backup old dataset
 % -----------------------------------
+backup =     [ 'if CURRENTSET ~= 0,' ...
+               '      ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savegui'');' ...
+               '      h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+               'end;' ];
+
 nocheck_back           = [ backup e_try ];
 check_back             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' backup e_try];
 checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' backup e_try];
@@ -1488,11 +1496,6 @@ checkplot_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LAS
 checkicaplot_back      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
 checkepochplot_back    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' backup e_try];
 checkepochicaplot_back = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
-
-backup =     [ 'if CURRENTSET ~= 0,' ...
-               '      ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savegui'');' ...
-               '      h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
-               'end;' ];
 
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
 storeload    = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');'
