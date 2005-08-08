@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/08/08 17:42:16  arno
+% comments
+%
 % Revision 1.25  2005/08/08 17:40:34  arno
 % erasing file information for newly created datasets
 %
@@ -174,7 +177,13 @@ end;
 
 if nargin < 4 
     [ EEG com ]  = eeg_checkset(EEG);
-    if nargin > 2, EEG.changes_not_saved = 'yes'; end;
+    if nargin > 2, 
+        if storeSetIndex == 0
+            EEG.changes_not_saved = 'no'; % just loaded
+        else 
+            EEG.changes_not_saved = 'yes';
+        end;
+    end;
 else % savedata
      % --------
     eeg_optionsbackup;
@@ -210,7 +219,6 @@ else % savedata
                 end;
             end;
             if strcmpi(option_save, 'exception')
-                if nargin > 2, EEG.changes_not_saved = 'yes'; end;
                 [ EEG com ] = eeg_checkset(EEG);
             elseif ~strcmpi(option_save, 'new')
                 EEG.changes_not_saved = 'no';
@@ -227,14 +235,19 @@ else % savedata
             disp('Dataset not modified since last save, no need for resaving it');
         end;
         [ EEG com ] = eeg_checkset(EEG);
-        if nargin > 2, EEG.changes_not_saved = 'yes'; end;
+        if ~isempty(com), EEG.changes_not_saved = 'yes'; end;
     end;
 end;
 EEG = eeg_hist(EEG, com);
 
 % find first free index
 % ---------------------
-if nargin < 3
+findindex = 0;
+if nargin < 3,             findindex = 1;
+elseif storeSetIndex == 0, findindex = 1; 
+end;
+
+if findindex
 	i = 1;
 	while (i<200)
 		try
