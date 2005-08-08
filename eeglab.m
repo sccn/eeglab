@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.390  2005/08/05 01:22:05  arno
+% cluster compatibility
+%
 % Revision 1.389  2005/08/04 21:50:13  arno
 % savedata -> savegui
 %
@@ -1471,39 +1474,32 @@ checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h
 checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' e_try];
 checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
 
-backupandhist =[ 'if ~isempty(NEWCOM),' ...
-                 '   if OLDSET,' ...
-                 '      ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savegui'');' ...
-                 '      h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
-                 '   end;' ...
-                 '   h(OLDCOM , EEG);' ...
-                 '   h(NEWCOM, EEG);' ...
-                 '   [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);' ... % take into account the history
-                 'end;' ...
-                 'clear OLDSET OLDCOM NEWCOM TMPEEG;' ];
-backupandhist_nh = [ 'if ~isempty(NEWCOM),' ...
-                 '   if OLDSET,' ...
-                 '      ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savegui'');' ...
-                 '      h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
-                 '   end;' ...
-                 '   h(OLDCOM);' ...  % difference with above
-                 '   h(NEWCOM);' ... % difference with above
-                 'end;' ...
-                 'clear OLDSET OLDCOM TMPEEG;' ];
+% check string and backup old dataset
+% -----------------------------------
+nocheck_back           = [ backup e_try ];
+check_back             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' backup e_try];
+checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' backup e_try];
+checkica_back          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' backup e_try];
+checkepoch_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' backup e_try];
+checkevent_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' backup e_try];
+checkbesa_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa''); h(''% no history yet for BESA dipole localization'');' backup e_try];
+checkepochica_back     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica''); h(LASTCOM);' backup e_try];
+checkplot_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM);' backup e_try];
+checkicaplot_back      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
+checkepochplot_back    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' backup e_try];
+checkepochicaplot_back = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
+
+backup =     [ 'if CURRENTSET ~= 0,' ...
+               '      ALLEEG = eeg_store(ALLEEG, ALLEEG(OLDSET), OLDSET, ''savegui'');' ...
+               '      h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+               'end;' ];
+
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
-
-storeload    = [  'OLDSET = CURRENTSET; OLDCOM = []; NEWCOM = LASTCOM;' ...
-                   backupandhist_nh 'h(-1); [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');' ];
-
-storenewcall_nh = [ 'OLDSET = CURRENTSET; OLDCOM = LASTCOM;' ...
-                 '[ALLEEG EEG CURRENTSET NEWCOM] = pop_newset(ALLEEG, EEG, CURRENTSET);' backupandhist_nh ];
-
-storenewcall = [ 'OLDSET = CURRENTSET; OLDCOM = LASTCOM;' ...
-                 '[ALLEEG EEG CURRENTSET NEWCOM] = pop_newset(ALLEEG, EEG, CURRENTSET);' backupandhist ];
-
-
+storeload    = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');'
+storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); h(LASTCOM);'
 storeallcall = [ 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
                  'EEG = eeg_checkset(EEG); h(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG);''); end;' ];
+
 ifeegtmp     =  'if ~isempty(LASTCOM) & ~isempty(EEGTMP),';
 ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
 ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
@@ -1529,6 +1525,7 @@ e_histdone      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''
 % build structures for plugins
 % ----------------------------
 trystrs.no_check                 = e_try;
+trystrs.no_check_back            = [ backup e_try ];
 trystrs.check_data               = check;
 trystrs.check_ica                = checkica;
 trystrs.check_cont               = checkcont;
@@ -1582,21 +1579,21 @@ catchstrs.new_non_empty          = e_newnonempty;
     set(W_MAIN, 'MenuBar', 'none');
     first_m = uimenu( W_MAIN, 'Label', 'File');
 	neuromenu = uimenu( first_m, 'Label', 'Import data', 'tag', 'import data'); 
-	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
-	uimenu( neuromenu, 'Label', 'From continuous or seg. EGI .RAW file'           , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Multiple seg. EGI .RAW files', 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_readsegegi;' e_newnonempty ]); 
-	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'      , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'    , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
-	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
-	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From ASCII/float file or Matlab array'              ,     'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_importdata;' e_newnonempty ]);
+	uimenu( neuromenu, 'Label', 'From continuous or seg. EGI .RAW file'           , 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_readegi;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Multiple seg. EGI .RAW files', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_readsegegi;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From BCI2000 ASCII file'      , 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_loadbci;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Snapmaster .SMA file'    , 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_snapread;' e_newnonempty ],  'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Neuroscan .CNT file'     , 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_loadcnt;' e_newnonempty ], 'Separator', 'on'); 
+	uimenu( neuromenu, 'Label', 'From Neuroscan .EEG file'     , 'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_loadeeg;' e_newnonempty ]); 
+	uimenu( neuromenu, 'Label', 'From ERPSS .RAW or .RDF file',  'CallBack', [ nocheck_back '[EEGTMP LASTCOM]= pop_read_erpss;' e_newnonempty ], 'Separator', 'on'); 
     
     % BIOSIG MENUS
     % ------------
     if biosigflag
-        combdf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
-        comedf = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
-        combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
+        combdf = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
+        comedf = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
+        combio = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
         uimenu( neuromenu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
         uimenu( neuromenu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
         uimenu( neuromenu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
@@ -1614,7 +1611,7 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ nocheck '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
+	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
 	uimenu( first_m, 'Label', 'Save current dataset(s)'  , 'Separator', 'on', 'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
 	uimenu( first_m, 'Label', 'Save current datasets as'              , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                      , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
@@ -1639,22 +1636,22 @@ second_m = uimenu( W_MAIN, 'Label', 'Edit');
                         'disp(''     to convert between channel location file formats'');' ...
                         '[EEG TMPINFO LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
                         'clear TMPINFO; EEG = h(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');']);
-	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
+	uimenu( second_m, 'Label', 'Select data'           , 'CallBack', [ check_back      '[EEG LASTCOM] = pop_select(EEG);' e_newset], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Select epochs/events'         , 'CallBack', [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ]);
-	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
+	uimenu( second_m, 'Label', 'Copy current dataset'  , 'CallBack', [ check_back      '[ALLEEG LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh], 'Separator', 'on');
 	uimenu( second_m, 'Label', 'Append datasets', 'CallBack', [ check      '[EEGTMP LASTCOM] = pop_mergeset(ALLEEG);' e_newnonempty_nh]);
 	uimenu( second_m, 'Label', 'Delete dataset(s)'     , 'CallBack', [ nocheck    '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 		
 fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
-	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset]);
-	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset]);
+	uimenu( fourth_m, 'Label', 'Change sampling rate', 'CallBack', [ check_back      '[EEG LASTCOM] = pop_resample(EEG);' e_newset]);
+	uimenu( fourth_m, 'Label', 'Filter the data'     , 'CallBack', [ check_back      '[EEG LASTCOM] = pop_eegfilt(EEG);' e_newset]);
 	uimenu( fourth_m, 'Label', 'Re-reference'   , 'CallBack', [ check      '[EEG LASTCOM] = pop_reref(EEG);' e_newset]);
-	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
-	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store], 'Separator', 'on');
+	uimenu( fourth_m, 'Label', 'Reject continuous data','CallBack',[ checkcont_back  '[LASTCOM] = pop_eegplot(EEG, 1);' e_hist]);
+	uimenu( fourth_m, 'Label', 'Extract epochs'      , 'CallBack', [ check_back      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store], 'Separator', 'on');
 	uimenu( fourth_m, 'Label', 'Remove baseline'     , 'CallBack', [ check      '[EEG LASTCOM] = pop_rmbase(EEG);' e_store]);
 	fourth_sub1 = uimenu( fourth_m, 'Label', 'Reject data epochs');
 	uimenu( fourth_m, 'Label', 'Run ICA'             , 'CallBack', [ check      '[EEG LASTCOM] = pop_runica(EEG);' e_store], 'foregroundcolor', 'b', 'Separator', 'on');
-	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
+	uimenu( fourth_m, 'Label', 'Remove components'   , 'CallBack', [ checkica_back   '[EEG LASTCOM] = pop_subcomp(EEG);' e_newset]);
 	fourth_sub2 = uimenu( fourth_m, 'Label', 'Reject data using ICA');
 
 	uimenu( fourth_sub1, 'Label', 'Reject data (all methods)', 'CallBack', [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';' e_hist]);
@@ -1667,7 +1664,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
 	uimenu( fourth_sub1, 'Label', 'Export marks to ICA reject', 'separator', 'on', 'CallBack', [ checkepochica ...
 					     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); h(LASTCOM);' ...
 					     'LASTCOM = ''EEG.reject.icarejmanual = EEG.reject.rejglobal;''; eval(LASTCOM);' e_store ]);
-	uimenu( fourth_sub1, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepoch ...
+	uimenu( fourth_sub1, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepoch_back ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 1,1,1,1,1,1,1,1); EEG = h(LASTCOM, EEG);' ...
 	     '[EEG LASTCOM] = pop_rejepoch(EEG);' e_newset]);
 	   
@@ -1682,7 +1679,7 @@ fourth_m  = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
 	uimenu( fourth_sub2, 'Label', 'Export marks to data reject', 'separator', 'on', 'CallBack', [ checkepochica ...
 					     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); h(LASTCOM);' ...
 					     'LASTCOM = ''EEG.reject.rejmanual = EEG.reject.rejglobal;''; eval(LASTCOM);' e_store ]);
-	uimenu( fourth_sub2, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepochica ...
+	uimenu( fourth_sub2, 'Label', 'Reject marked epochs', 'separator', 'on', 'foregroundcolor', 'b', 'CallBack', [ checkepochica_back ...
 	     '[EEG LASTCOM] = eeg_rejsuperpose(EEG, 0,1,1,1,1,1,1,1); EEG = h(LASTCOM, EEG);' ...
 	     '[EEG LASTCOM] = pop_rejepoch(EEG);' e_newset ]);
    
