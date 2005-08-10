@@ -1,5 +1,5 @@
-% pop_chanevent() - import event latencies from 'edge' values of a specified EEG.data channel 
-%
+% pop_chanevent() - import event latencies from the rising and/or falling 'edge' 
+%                   latencies of a specified event-marker channel in EEG.data 
 % Usage:
 %   >> OUTEEG = pop_chanevent( INEEG ); % select parameters via a pop-up window
 %   >> OUTEEG = pop_chanevent( INEEG, chanindices, 'key', 'val' ... ); % no pop-up
@@ -35,7 +35,7 @@
 %                  channel value. Command line equivalent: 'nbtype'.
 % Inputs:
 %   INEEG          - input dataset structure
-%   chanindices    - indices of an event channel(s)
+%   chanindices    - index|(indices) of the event channel(s)
 %
 % Optional inputs:
 %   'edge'         - ['leading'|'trailing'|'both'] extract events when values
@@ -66,7 +66,6 @@
 %                    or if there is only one event type in the event channel.
 %                    {Default is 'chanX', X being the index of
 %                    the selected event channel}.
-%
 % Outputs:
 %   OUTEEG         - EEGLAB output data structure
 %
@@ -93,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/08/10 00:46:40  scott
+% dos2unix
+%
 % Revision 1.43  2004/12/06 22:59:23  arno
 % taking abs of X before finding boundaries
 %
