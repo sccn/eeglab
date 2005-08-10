@@ -1,27 +1,28 @@
-% eeg_insertbound() - insert boundary event in EEGLAB event structure.
+% eeg_insertbound() - insert boundary event in an EEG event structure.
 %
 % Usage:
-%   >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
-%                                           abslatency, duration);
-%
+%       >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
+%                                                abslatency, duration);
 % Inputs:
-%   eventin    - EEGLAB event structure
+%   eventin    - EEGLAB event structure (EEG.event)
 %   pnts       - data points in EEG dataset
 %   abslatency - absolute latency of regions in original dataset. Can
-%                also be an array of [beg end] latency with one row
+%                also be an array of [beg end] latencies with one row
 %                per region removed. Then 'lengths' argument is ignored.
-%   duration   - length of removed regions
+%   lengths   - lengths of removed regions
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
 %   indnew     - array of indices returning new event index for any old 
 %                (input eventin) event index
-%
 % Notes:
-%   1) This function performs the following: add boundary events to the 
-%   'event' structures; remove nested boundaries; recompute the latencies
-%   of all events.
-%   2) all latencies are given in data point unit. 
+%   This function performs the following: 
+%   1) add boundary events to the 'event' structure; 
+%        remove nested boundaries; 
+%        recompute the latencies of all events.
+%   2) all latencies are given in units of (float) data points. 
+%        i.e., a latency of 2000.3 means 0.3 samples (at EEG.srate)
+%              after the 2001st data frame (since first frame has latency 0).
 % 
 % Author: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, April, 19, 2004
 %
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/05/24 17:44:41  arno
+% remove cell2mat
+%
 % Revision 1.31  2004/12/08 18:58:24  arno
 % removing boundary event correcly
 %
