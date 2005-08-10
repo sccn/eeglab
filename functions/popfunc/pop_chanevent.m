@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2004/12/06 22:59:23  arno
+% taking abs of X before finding boundaries
+%
 % Revision 1.42  2004/11/10 02:33:11  arno
 % nothing
 %
