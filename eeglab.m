@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.396  2005/08/08 17:48:09  arno
+% currentset 0 if loading life
+%
 % Revision 1.395  2005/08/08 17:38:11  arno
 % same
 %
@@ -1519,21 +1522,21 @@ ifeegtmp     =  'if ~isempty(LASTCOM) & ~isempty(EEGTMP),';
 ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
 ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
 
-e_newnonempty_nh     = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_load_nh            = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
-e_newset_nh          = [e_catch ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store_nh           = [e_catch ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall_nh        = [e_catch ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newnonempty_nh     = [e_catch 'h(LASTCOM);' ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_load_nh            = [e_catch 'h(LASTCOM);' ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end;  clear EEGTMP; eeglab(''redraw'');'];
+e_newset_nh          = [e_catch 'h(LASTCOM);' ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store_nh           = [e_catch 'h(LASTCOM);' ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall_nh        = [e_catch 'h(LASTCOM);' ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist_nh            = [e_catch 'h(LASTCOM);'];
 e_histdone_nh        = [e_catch 'h(LASTCOM); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newnonempty   = [e_catch ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
-e_load          = [e_catch ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
-e_newset        = [e_catch ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
-e_store         = [e_catch ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall      = [e_catch ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newnonempty   = [e_catch 'EEG = h(LASTCOM, EEGTMP);' ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
+e_load          = [e_catch 'EEG = h(LASTCOM, EEGTMP);' ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
+e_newset        = [e_catch 'EEG = h(LASTCOM, EEG);' ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_store         = [e_catch 'EEG = h(LASTCOM, EEG);' ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
+e_storeall      = [e_catch 'EEG = h(LASTCOM, EEG);' ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist          = [e_catch 'EEG = h(LASTCOM, EEG);'];
 e_histdone      = [e_catch 'EEG = h(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
