@@ -4,9 +4,9 @@
 %       /File/Maximize memory in EEGLAB gui
 
 % Memory options 
-option_storedisk = 0 ;   % If set, keep at most one dataset in memory (allow processing dozens of datasets at a time)
-option_warningstore = 1 ;   % If set, warn user before overwriting a file on disk (only relevant when option above is set)
-option_savematlab = 1 ;  % If set, write data in same file as dataset (unset - 2 files - allow reading one channel at a time from disk)
-option_computeica = 1 ;  % If set, precompute ICA activations (requires RAM, but faster plotting of component activation) 
+option_storedisk = 0 ;   % If set, keep at most one dataset in memory. Allows processing many datasets at a time.
+option_warningstore = 1 ;   % If set, warn user before overwriting a dataset file on disk - relevant only if the option above is set.
+option_savematlab = 1 ;  % If set, write the data and dataset structure into the same file; if unset, write two files per dataset (.dat .set).
+option_computeica = 1 ;  % If set, precompute ICA activations. This requires more RAM but allows faster plotting of component activations. 
 % Folder options
-option_rememberfolder = 1 ;  % If set, remember old folder when reading dataset
+option_rememberfolder = 1 ;  % If set, when reading dataset assume the folder/directory of previous dataset; if unset, assume the present working folder/directory (pwd).
