@@ -1,36 +1,36 @@
-% eeg_store() - store a dataset into the variable containing
-%               all datasets
+% eeg_store() - store specified EEG dataset(s) in the ALLEG variable 
+%               containing all current datasets, after first checking 
+%               dataset consistency using eeg_checkset().
 %
 % Usage: >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG);
 %        >> [ALLEEG EEG index] = eeg_store(ALLEEG, EEG, index);
 %
 % Inputs:
-%   ALLEEG     - variable containing all datasets
-%   EEG        - current dataset to store. EEG can also contain an 
-%                array of dataset that will be appended to the current
-%                array of dataset.
-%   index      - (optional), index of where to store the new
-%                dataset. If no index is given, the first 
-%                empty slot in the ALLEEG array is selected.
-%
+%   ALLEEG     - variable containing all current EEGLAB datasets
+%   EEG        - dataset(s) to store - usually the current dataset. 
+%                EEG may also be an array of datasets; these will be 
+%                checked and stored separately in ALLEEG.
+%   index      - (optional), ALLEEG index (or indices) to use to store 
+%                the new dataset(s). If no index is given, eeg_store() 
+%                uses the lowest empty slot(s) in the ALLEEG array. 
 % Outputs:
-%   ALLEEG - variable containing all datasets
-%   EEG    - EEG dataset after syntax checking 
+%   ALLEEG - array of all current datasets
+%   EEG    - EEG dataset (after syntax checking)
 %   index  - index of the new dataset
 %
-% Note: given 3 arguments, after checking the input dataset 
-%       structure syntax consistency, this function simply perfroms 
-%       >> ALLEEG(index) = EEG;
+% Note: When 3 arguments are given, after checking the consistency of 
+%       the input dataset structures this function simply performs 
+%        >> ALLEEG(index) = EEG;
 %
 % Typical use:
-% [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
-% creates a new dataset in variable ALLEEG
-% [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-% erase current dataset in variable ALLEEG
+%        >> [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
+%  creates a new dataset in variable ALLEEG.
+%        >> [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+%  overwrites the current dataset in variable ALLEEG
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
-% See also: eeg_retrieve(), eeglab()
+% See also: eeglab(), eeg_checkset(), eeg_retrieve()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/08/08 18:10:14  arno
+% fix various problems
+%
 % Revision 1.26  2005/08/08 17:42:16  arno
 % comments
 %
@@ -138,7 +141,7 @@
 % ------------------
 function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, varargin);
 
-% check of parameter consistency
+% check parameter consistency
 % ------------------------------
 if nargin == 3
     if length(EEG) ~= length(storeSetIndex),
@@ -191,16 +194,16 @@ else % savedata
     if option_storedisk & strcmpi(EEG.changes_not_saved, 'yes')
         if option_warningstore & strcmpi(varargin{1}, 'savegui')
             if ~isempty(EEG.filename)
-                comhelp = 'warndlg2(strvcat( ''You set the option to keep only one dataset in memory'', ''at a time, so the previous dataset has to be saved on disk'', ''(it will overwrite any previous dataset file).'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it on disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''option or remove this warning.)''), ''Save warning'');';
-                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset on disk?', 'visible' 'off' } ...
-                                              { 'style' 'text' 'string' '           Backup previous dataset on disk?' } }, comhelp, 'Save warning');
+                comhelp = 'warndlg2(strvcat( ''Currently keeping only one dataset in memory'', ''at a time, so the previous dataset must be saved to disk.'', ''This will overwrite any existing dataset file.'', ''If you press cancel, EEGLAB will instead retain the dataset in memory'', ''and not save it to disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''this option and remove this warning).''), ''Save warning'');';
+                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset to disk?', 'visible' 'off' } ...
+                                              { 'style' 'text' 'string' '           Backup previous dataset to disk?' } }, comhelp, 'Save warning');
                 if ~isempty(res), option_save = 'resave';
                 else              option_save = 'exception';
                 end;
             else
-                comhelp = 'warndlg2(strvcat( ''You set the option to keep only one dataset in memory'', ''at a time, so the previous dataset has to be saved on disk'', ''(and it will pop-up a window for entering a file name).'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it on disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''option or remove this warning.)''), ''Save warning'');';
-                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset on disk?', 'visible' 'off' } ...
-                                              { 'style' 'text' 'string' '           Backup previous dataset on disk?' } }, comhelp, 'Save warning');
+                comhelp = 'warndlg2(strvcat( ''Currently keeping only one dataset in memory'', ''at a time, so the previous dataset must be saved to disk'', ''A pop-up window will ask for its filename.'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it to disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''this option and remove this warning).''), ''Save warning'');';
+                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset to disk?', 'visible' 'off' } ...
+                                              { 'style' 'text' 'string' '           Backup previous dataset to disk?' } }, comhelp, 'Save warning');
                 if ~isempty(res), option_save = 'new';
                 else              option_save = 'exception';
                 end;
@@ -214,7 +217,7 @@ else % savedata
                 EEG = update_datafield(EEG);
                 h(com);
                 if isempty(com)
-                    disp('No file name given. Dataset not saved (making an exception).');
+                    disp('eeg_save(): No filename given. Dataset not saved (by your request).');
                     option_save = 'exception';
                 end;
             end;
@@ -232,7 +235,7 @@ else % savedata
         end;
     else
         if strcmpi(EEG.changes_not_saved, 'no') & option_storedisk
-            disp('Dataset not modified since last save, no need for resaving it');
+            disp('eeg_store(): The dataset was not modified since last save; did not resave it');
         end;
         [ EEG com ] = eeg_checkset(EEG);
         if ~isempty(com), EEG.changes_not_saved = 'yes'; end;
@@ -259,7 +262,7 @@ if findindex
 			storeSetIndex = i; i = 200;
 		end;
    end;
-   fprintf('Creating a new dataset with index %d\n', storeSetIndex);
+   fprintf('Creating new ALLEEG dataset %d\n', storeSetIndex);
 else
 	if isempty(storeSetIndex) | storeSetIndex == 0
 		storeSetIndex = 1;
