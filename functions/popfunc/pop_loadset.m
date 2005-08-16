@@ -1,28 +1,27 @@
-% pop_loadset() - load a dataset (pop out window if no arguments)
+% pop_loadset() - load an EEG dataset. If no arguments, pop up an input window.
 %
 % Usage:
-%   >> EEGOUT = pop_loadset; % pop up window
+%   >> EEGOUT = pop_loadset; % pop up window to input arguments
 %   >> EEGOUT = pop_loadset( 'key1', 'val1', 'key2', 'val2', ...);
 %   >> EEGOUT = pop_loadset( filename, filepath); % old calling format
 %
 % Optional inputs:
-%   'filename'  - [string] file name
-%   'filepath'  - [string] file path (optional)
-%   'loadmode'  - ['all', 'info', integer] load all data associated with the
-%                 dataset or only the dataset information without importing
-%                 data. Default is 'all'. If integer, load only specific 
-%                 channel. Most efficient if data is stored in a separate 
-%                 '.dat' file so individual channels may be loaded 
-%                 independently of each other.
-%   'eeg'       - [EEGLAB structure] reload current dataset
-%
+%   'filename'  - [string] dataset filename
+%   'filepath'  - [string] dataset filepath (optional)
+%   'loadmode'  - ['all', 'info', integer] 'all' -> load the data and
+%                 the dataset structure. 'info' -> load only the dataset 
+%                 structure but not the actual data. [integer] ->  load only 
+%                 a specific channel. This is efficient when data is stored 
+%                 in a separate '.dat' file in which individual channels 
+%                 may be loaded independently of each other. {default: 'all'}
+%   'eeg'       - [EEG structure] reload current dataset
+% Note:
+%       Multiple filenames and filepaths may be specified. If more than one,
+%       the output EEG variable will be an array of EEG structures.
 % Output
-%   EEGOUT - EEG data structure from EEGLAB
+%   EEGOUT - EEG dataset structure or array of structures
 %
-% Note: output may be a dataset structure of an array of
-%       dataset structures.
-%
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 %
 % See also: eeglab(), pop_saveset()
 
@@ -45,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2005/08/08 18:17:53  arno
+% fixing call
+%
 % Revision 1.41  2005/08/08 18:12:56  arno
 % fix call
 %
@@ -307,7 +309,7 @@ else
         EEG.data        = EEG.data(g.loadmode,:,:);
     end;
 end;
-EEG.changes_not_saved = 'no';
+EEG.saved = 'yes';
 
 command = sprintf('EEG = pop_loadset(%s);', vararg2str(options));
 return;
