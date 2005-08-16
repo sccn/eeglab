@@ -1,25 +1,23 @@
-% pop_newset() - Edit EEG dataset info. 
+% pop_newset() - Edit EEG dataset structure information. 
 %
 % Usage:
 %   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET, ...
 %                                            'key', val,...);
 % Inputs and outputs:
-%   ALLEEG     - array of dataset structures
-%   EEG        - dataset structure
-%   CURRENTSET - number of the current dataset
+%   ALLEEG     - array of EEG dataset structures
+%   EEG        - current dataset structure or structure array
+%   CURRENTSET - index/indices of the current EEG dataset(s) in ALLEEG
 %
 % Optional inputs:
-%   'setname'     - Name of the dataset
-%   'comments'    - 'string' string of comments
-%   'overwrite'   - ['on'|'off'] overwrite parent dataset
-%   'save'        - 'filename' save the dataset
-%   'retrieve'    - dataset number, retrieve a dataset
+%   'setname'     - Name of the new dataset
+%   'comments'    - ['string'] comments on the new dataset
+%   'overwrite'   - ['on'|'off'] overwrite the parent dataset (ignored
+%                    if the eeg_options.m dataset overwrite option is set).
+%   'save'        - ['filename'] filename to use to save the dataset
+%   'retrieve'    - [index] retrieve this current ALLEEG dataset 
 %
-% Note: 1) This function takes into account the content of eeg_options
-%       for dataset overwriting. If the dataset overwriting
-%       feature is set, then the 'overwrite' arguement is ignored.
-%       2) This function calls eeg_store() which may modify the 
-%       variable ALLEEG containing all the dataset information.
+% Note: Calls eeg_store() which may modify the variable ALLEEG 
+%       containing the current dataset(s).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 Arpil 2002
 %
@@ -44,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/08/08 18:43:33  arno
+% do not erase filename and filepath
+%
 % Revision 1.27  2005/08/08 18:40:59  arno
 % fix saving file
 %
@@ -188,7 +189,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
 elseif length(EEG) > 1
     % processing multiple datasets
     % ----------------------------
-    res = questdlg2(strvcat( 'When processing multiple datasets,', 'old datasets are automatically overwriten.', ...
+    res = questdlg2(strvcat( 'When processing multiple datasets,', 'old datasets are automatically overwritten.', ...
                            'Do you still wish to proceed?'), 'Multiple dataset warning', 'Cancel', 'Proceed', 'Proceed');
     if strcmpi(res, 'Proceed')
         [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );
@@ -205,14 +206,14 @@ end;
 % assigning values
 % ----------------
 overWflag    = 0;
-EEG.changes_not_saved = 'yes';
+EEG.saved = 'no';
 for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1; com = ''; return;
 	 case 'save'      , [filepath filename ext] = fileparts( args{ind+1} );
-                        EEG.changes_not_saved = 'no';
+                        EEG.saved = 'yes';
                         EEG = pop_saveset(EEG, [ filename ext ], filepath);
 	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
                             overWflag = 1; 
