@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2005/05/12 15:50:37  arno
+% keypad modified by Andreas
+%
 % Revision 1.19  2004/11/23 17:08:57  hilit
 % fixed a typo
 %
@@ -97,6 +100,7 @@ try, r.dataformat; catch, r.dataformat = 'int16'; end
 
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
 sizeEvent2 = 19 ; %%% 19 bytes for Event2 
+sizeEvent3 = 19 ; %%% 19 bytes for Event3 
 
 type='cnt';
 if nargin ==1 
@@ -108,7 +112,7 @@ disp(['Loading file ' filename ' ...'])
 
 h.rev               = fread(fid,12,'char');
 h.nextfile          = fread(fid,1,'long');
-h.prevfile          = fread(fid,1,'long');
+h.prevfile          = fread(fid,1,'ulong');
 h.type              = fread(fid,1,'char');
 h.id                = fread(fid,20,'char');
 h.oper              = fread(fid,20,'char');
@@ -286,7 +290,7 @@ h.filterdomain      = fread(fid,1,'char');
 h.snrflag           = fread(fid,1,'char');
 h.coherenceflag     = fread(fid,1,'char');
 h.continuoustype    = fread(fid,1,'char');
-h.eventtablepos     = fread(fid,1,'long');
+h.eventtablepos     = fread(fid,1,'ulong');
 h.continuousseconds = fread(fid,1,'float');
 h.channeloffset     = fread(fid,1,'long');
 h.autocorrectflag   = fread(fid,1,'char');
@@ -397,7 +401,9 @@ if type == 'cnt'
           end
       end     
       
-      fseek(fid, h.eventtablepos, 'bof');      
+      ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
+      fseek(fid, ET_offset, 'bof'); 
+
       disp('Reading Event Table...')
       eT.teeg   = fread(fid,1,'uchar');
       eT.size   = fread(fid,1,'ulong');
@@ -410,15 +416,37 @@ if type == 'cnt'
               for i=1:nevents
                   ev2(i).stimtype      = fread(fid,1,'ushort');
                   ev2(i).keyboard      = fread(fid,1,'char');
-
-% modified by Andreas Widmann  2005/05/12  14:15:00
-                  %ev2(i).keypad_accept = fread(fid,1,'char');
                   temp                 = fread(fid,1,'uint8');
                   ev2(i).keypad_accept = bitand(15,temp);
                   ev2(i).accept_ev1    = bitshift(temp,-4);
-% end modification
-
                   ev2(i).offset        = fread(fid,1,'long');
+                  ev2(i).type          = fread(fid,1,'short'); 
+                  ev2(i).code          = fread(fid,1,'short');
+                  ev2(i).latency       = fread(fid,1,'float');
+                  ev2(i).epochevent    = fread(fid,1,'char');
+                  ev2(i).accept        = fread(fid,1,'char');
+                  ev2(i).accuracy      = fread(fid,1,'char');
+              end     
+          else
+              ev2 = [];
+          end;
+      elseif eT.teeg==3  % type 3 is similar to type 2 except the offset field encodes the global sample frame
+          nevents=eT.size/sizeEvent3;
+          if nevents > 0
+              ev2(nevents).stimtype  = [];
+              if r.dataformat == 'int32'
+                  bytes_per_samp = 4;   % I only have 32 bit data, unable to check whether this is necessary,
+              else                      % perhaps there is no type 3 file with 16 bit data
+                  bytes_per_samp = 2;
+              end
+              for i=1:nevents
+                  ev2(i).stimtype      = fread(fid,1,'ushort');
+                  ev2(i).keyboard      = fread(fid,1,'char');
+                  temp                 = fread(fid,1,'uint8');
+                  ev2(i).keypad_accept = bitand(15,temp);
+                  ev2(i).accept_ev1    = bitshift(temp,-4);
+                  os                   = fread(fid,1,'ulong');
+                  ev2(i).offset = os * bytes_per_samp * h.nchannels;
                   ev2(i).type          = fread(fid,1,'short'); 
                   ev2(i).code          = fread(fid,1,'short');
                   ev2(i).latency       = fread(fid,1,'float');
@@ -450,7 +478,7 @@ if type == 'cnt'
               ev2 = [];
           end;
      else
-          disp('Skipping event table (tag != 1,2 ; theoritically impossible)');
+          disp('Skipping event table (tag != 1,2,3 ; theoritically impossible)');
           ev2 = [];
       end     
 end 
