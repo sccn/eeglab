@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2005/08/08 18:41:09  arno
+% try, catch sintring
+%
 % Revision 1.54  2005/08/04 22:25:44  arno
 % nothing
 %
@@ -309,21 +312,21 @@ tmpica       = EEG.icaact;
 EEG.icaact   = [];
 tmpdata      = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
 v = version;
-try, 
+%try, 
     fprintf('Saving dataset...\n');
     if save_as_dat_file
         EEG.data = EEG.datfile;
         floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
     end;
-    if v(1) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
-    else         save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
+    if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
+    else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end;
     if save_as_dat_file
         EEG.data = tmpdata;
     end;
-catch,
-    error('Pop_saveset: save error, out of space or file permission problem');
-end;
+%catch,
+%    error('Pop_saveset: save error, out of space or file permission problem');
+%end;
 
 % try to delete old .fdt or .dat files
 % ------------------------------------
