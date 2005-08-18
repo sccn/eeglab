@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/08/01 17:02:29  arno
+% allowing to process multiple files
+%
 % Revision 1.1  2005/08/01 16:43:11  arno
 % Initial revision
 %
@@ -72,7 +75,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % execute function
     % ----------------
     v = version;
-    if v(1) == '5' % Matlab 5
+    if str2num(v(1)) == '5' % Matlab 5
         command = [ 'TMPEEG = ' funcname '( TMPEEG, ' vararg2str(g.params) ');' ];
     else
         eval( [ 'func = @' funcname ';' ] );
