@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.126  2005/04/19 23:38:58  arno
+%allow plotting LORETA images
+%
 %Revision 1.125  2005/04/07 18:48:08  hilit
 %adding a 'verbose' option
 %
@@ -823,7 +826,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     else
         if isstr(g.meshdata)
             tmp = load('-mat', g.meshdata);
-            g.meshdata = { 'vertices' tmp.vol.bnd(3).pnt 'faces' tmp.vol.bnd(3).tri };
+            g.meshdata = { 'vertices' tmp.vol.bnd(1).pnt 'faces' tmp.vol.bnd(1).tri };
         end;
         hh = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH, 'tag', 'mesh');
     end;
