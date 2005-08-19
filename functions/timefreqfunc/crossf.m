@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2005/05/16 20:40:50  hilit
+% changing command order to enable right operation
+%
 % Revision 1.69  2005/04/22 21:11:46  arno
 % alltfx twice
 %
@@ -393,8 +396,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-03-02 added new options for bootstrap -ad 
 
-% There are 3 "objects" Tf, Coher and Boot which are handled
-% - by specific functions under Matlab
+% Note: 3 "objects" (Tf, Coher and Boot) are handled by specific functions under Matlab
 %    (Tf) function Tf = tfinit(...) - create object Time Frequency (Tf) associated with some data
 %    (Tf) function [Tf, itcvals] = tfitc(...) - compute itc for the selected data
 %    (Tf) function [Tf, itcvals] = tfitcpost(Tf, trials) - itc normlisation 
@@ -405,15 +407,15 @@
 %    (Boot) function Boot = bootinit(...) - intialize bootstrap object
 %    (Boot) function Boot = bootcomp(...) - compute bootstrap
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
-% - by real objects under C++ (see C++ code)
+% and by real objects under C++ (C++ code, incomplete)
 
 function [R,mbase,times,freqs,Rbootout,Rangle, trialcoher, Tfx, Tfy] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
-%
+% ------------------------
 % Commandline arg defaults:
-%
+% ------------------------
 DEFAULT_ANGLEUNIT = 'deg'; % angle plotting units - 'rad', 'ms', or 'deg'
 DEFAULT_EPOCH	= 750;			% Frames per epoch
 DEFAULT_TIMELIM = [-1000 2000];	% Time range of epochs (ms)
@@ -607,7 +609,7 @@ if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
 elseif (g.maxfreq <= 0)
    error('Value of g.maxfreq must be positive.');
 elseif (g.maxfreq > Fs/2)
-   fprintf('Warning: value of g.maxfreq greater that Nyquist rate\n\n');
+   fprintf('Warning: input value of g.maxfreq larger that Nyquist frequency %3.4 Hz\n\n',Fs/2);
 end
 
 if isempty(g.topovec)
@@ -643,31 +645,31 @@ if ~isnan(g.alpha)
    end
 end
 switch g.angleunit
-case { 'rad', 'ms', 'deg' },;
-otherwise error('Angleunit must be either ''rad'', ''deg'', or ''ms''');
+   case { 'rad', 'ms', 'deg' },;
+   otherwise error('Angleunit must be either ''rad'', ''deg'', or ''ms''');
 end;    
 switch g.type
-case { 'coher', 'phasecoher' 'phasecoher2' },;
-otherwise error('Type must be either ''coher'' or ''phasecoher''');
+   case { 'coher', 'phasecoher' 'phasecoher2' },;
+   otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
 switch g.boottype
-case { 'times' 'timestrials' 'trials'},;
-otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
+   case { 'times' 'timestrials' 'trials'},;
+   otherwise error('Boot type must be either ''times'', ''trials'' or ''timestrials''');
 end;    
 if (~isnumeric(g.shuffle))
    error('Shuffle argument type must be numeric');
 end;
 switch g.memory
-case { 'low', 'high' },;
-otherwise error('memory must be either ''low'' or ''high''');
+   case { 'low', 'high' },;
+   otherwise error('memory must be either ''low'' or ''high''');
 end;
 if strcmp(g.memory, 'low') & ~strcmp(g.boottype, 'times')
    error(['Bootstrap type ''' g.boottype ''' cannot be used in low memory mode']);
 end;
 
 switch g.compute
-case { 'matlab', 'c' },;
-otherwise error('compute must be either ''matlab'' or ''c''');
+   case { 'matlab', 'c' },;
+   otherwise error('compute must be either ''matlab'' or ''c''');
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -678,7 +680,7 @@ if iscell(X)
 		error('crossf: to compare conditions, X and Y input must be 2-elements cell arrays');
 	end;
 	if ~strcmp(g.boottype, 'times')
-		disp('crossf warning: significance bootstrap type is irrelevant when comparing conditions');
+		disp('crossf warning: The significance bootstrap type is irrelevant when comparing conditions');
 	end;
 	for index = 1:2:length(vararginori)
 		if index<=length(vararginori) % needed: if elemenets are deleted
@@ -696,9 +698,11 @@ if iscell(X)
 	end;
 	
 	fprintf('Running crossf on condition 1 *********************\n');
-	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
+	fprintf('Note: If an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
-	fprintf('      (the ''coher'' option takes 3 times more memory than other options)\n');
+	if ~strcmp(g.type, 'coher')
+	   fprintf('Note: Type ''coher'' takes 3 times as much memory as other options!)\n');
+        end
 	figure; 
 	subplot(1,3,1); title(g.title{1});
 	if ~strcmp(g.type, 'coher')
@@ -714,8 +718,8 @@ if iscell(X)
 	% if ~strcmp(g.noinput, 'yes')
 	%	  tmp = whos('Tfx1');
 	%	  fprintf('This function will require an additional %d bytes, do you wish\n', ...
-  %       tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
-	%	  res = input('to continue (y/n) (use ''noinput'' option to disable message):', 's');
+    %     tmp.bytes*6+size(savecoher1,1)*size(savecoher1,2)*g.naccu*8);
+	%	  res = input('to continue (y/n) (use the ''noinput'' option to disable this message):', 's');
 	%  	if res == 'n', return; end;
 	% end;
 
@@ -745,13 +749,13 @@ if iscell(X)
 		
 		if strcmp(g.type, 'coher')
 			alltfx = zeros(size(Tfx1,1), size(Tfx2,2), size(Tfx1,3)+size(Tfx2,3));
-			alltfx(:,:,1:size(Tfx1,3))   = Tfx1;
-			alltfx(:,:,size(Tfx1,3):end) = Tfx2;
+			alltfx(:,:,1:size(Tfx1,3))     = Tfx1;
+			alltfx(:,:,size(Tfx1,3)+1:end) = Tfx2;
 			clear Tfx1 Tfx2;
 			
 			alltfy = zeros(size(Tfy1,1), size(Tfy2,2), size(Tfy1,3)+size(Tfy2,3));
 			alltfy(:,:,1:size(Tfy1,3))   = Tfy1;
-			alltfy(:,:,size(Tfy1,3):end) = Tfy2;
+			alltfy(:,:,size(Tfy1,3)+1:end) = Tfy2;
 			clear Tfy1 Tfy2;
 		end;
 		
@@ -773,9 +777,11 @@ if iscell(X)
 		end;
 		
 		if strcmp(g.type, 'coher')
-			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, cond1trials, g.type, alltfx, alltfy);
+			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, ...
+                                                        cond1trials, g.type, alltfx, alltfy);
 		else
-			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, cond1trials, g.type);
+			[coherdiff coher1 coher2] = coher2conddiff( allsavedcoher, alltrials, ...
+                                                        cond1trials, g.type);
 		end;
 		%figure; g.alpha = NaN; & to check that the new images are the same as the original
 		%subplot(1,3,1); plotall(coher1, [], [], times, freqs, mbase, find(freqs <= g.maxfreq), g);
@@ -787,21 +793,25 @@ if iscell(X)
 			if rem(index,120) == 0, fprintf('\n'); end
 			
 			if strcmp(g.type, 'coher')
-				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), cond1trials, g.type, alltfx, alltfy);
+				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), ...
+                                                        cond1trials, g.type, alltfx, alltfy);
 			else
-				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), cond1trials, g.type);
+				coherimages(:,:,index) = coher2conddiff( allsavedcoher, shuffle(alltrials), ...
+                                                        cond1trials, g.type);
 			end;
 		end;
 		fprintf('\n');
 
 		% create articially a Bootstrap object to compute significance
-		Boot = bootinit( [], size(allsavedcoher,1), g.timesout, g.naccu, 0, g.baseboot, 'noboottype', g.alpha, g.rboot);
+		Boot = bootinit( [], size(allsavedcoher,1), g.timesout, g.naccu, 0, g.baseboot, ...
+														'noboottype', g.alpha, g.rboot);
 		Boot.Coherboot.R = coherimages;
 		Boot = bootcomppost(Boot, [], [], []);
 		g.title = '';
-		plotall(coherdiff, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, find(freqs <= g.maxfreq), g);
+		plotall(coherdiff, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, ...
+														find(freqs <= g.maxfreq), g);
 	end;
-	return; % ********************************** END FOR SEVERAL CONDITIONS
+	return; % ********************************** END PROCESSING TWO CONDITIONS
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -841,7 +851,7 @@ if ~isnan(g.baseline)
    baseln = find(times < g.baseline); % subtract means of pre-0 (centered) windows
    if isempty(baseln)
       baseln = 1:length(times); % use all times as baseline
-      disp('Bootstrap baseline empty, using the whole epoch');
+      disp('Bootstrap baseline empty, using the whole epoch.');
    end;
    baselength = length(baseln);
 else
@@ -856,11 +866,14 @@ tmpsaveall = (~isnan(g.alpha) & isnan(g.rboot) & strcmp(g.memory, 'high')) ...
                  | (strcmp(g.subitc, 'on') & strcmp(g.memory, 'high'));
 trials = length(X)/g.frame;
 if ~strcmp(lower(g.compute), 'c')
-   Tfx = tfinit(X, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
-   Tfy = tfinit(Y, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
+   Tfx = tfinit(X, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, ...
+									g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
+   Tfy = tfinit(Y, g.timesout, g.winsize, g.cycles, g.frame, g.padratio, g.detret, ...
+									g.srate, g.maxfreq, g.subitc, g.type, g.cyclesfact, tmpsaveall);
    Coher     = coherinit(Tfx.nb_points, trials, g.timesout, g.type);
    Coherboot = coherinit(Tfx.nb_points, trials, g.naccu   , g.type);
-   Boot      = bootinit( Coherboot, Tfx.nb_points, g.timesout, g.naccu, baselength, g.baseboot, g.boottype, g.alpha, g.rboot);
+   Boot      = bootinit( Coherboot, Tfx.nb_points, g.timesout, g.naccu, baselength, ...
+									g.baseboot, g.boottype, g.alpha, g.rboot);
    freqs = Tfx.freqs;
    dispf = find(freqs <= g.maxfreq);
    freqs = freqs(dispf);
@@ -869,69 +882,77 @@ else
 end;
 dispf     = find(Tfx.freqs <= g.maxfreq);
 
-%%%%%%%%%%%%%%
-% reserve space
-%%%%%%%%%%%%%%
-%R  = zeros(tfx.nb_points,g.timesout);       % mean coherence
-%RR = repmat(nan,tfx.nb_points,g.timesout); % initialize with nans
-%Rboot = zeros(tfx.nb_points,g.naccu);  % summed bootstrap coher
-%switch g.type
-%ase 'coher',
-%   cumulXY = zeros(tfx.nb_points,g.timesout);
-%   cumulXYboot = zeros(tfx.nb_points,g.naccu);
-%end;        
-%if g.bootsub > 0
-%   Rboottrial = zeros(tfx.nb_points, g.timesout, g.bootsub); % summed bootstrap coher
-%   cumulXYboottrial = zeros(tfx.nb_points, g.timesout, g.bootsub);
-%nd;
-%if ~isnan(g.alpha) & isnan(g.rboot)
-%   tf.tmpalltimes = repmat(nan,tfx.nb_points,g.timesout);
-%nd
+%-------------
+% Reserve space
+%-------------
+% R  = zeros(tfx.nb_points,g.timesout);       % mean coherence
+% RR = repmat(nan,tfx.nb_points,g.timesout); % initialize with nans
+% Rboot = zeros(tfx.nb_points,g.naccu);  % summed bootstrap coher
+% switch g.type
+% case 'coher',
+%    cumulXY = zeros(tfx.nb_points,g.timesout);
+%    cumulXYboot = zeros(tfx.nb_points,g.naccu);
+% end;        
+% if g.bootsub > 0
+%    Rboottrial = zeros(tfx.nb_points, g.timesout, g.bootsub); % summed bootstrap coher
+%    cumulXYboottrial = zeros(tfx.nb_points, g.timesout, g.bootsub);
+% end;
+% if ~isnan(g.alpha) & isnan(g.rboot)
+%    tf.tmpalltimes = repmat(nan,tfx.nb_points,g.timesout);
+% end
    
-% display text to user
 % --------------------
-fprintf('\nComputing the Event-Related \n');
+% Display text to user
+% --------------------
+fprintf('\nComputing Event-Related ');
 switch g.type
-    case 'phasecoher',  fprintf('Phase Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images based on %d trials\n',length(X)/g.frame);
-    case 'coher',       fprintf('Linear Coherence (ITC) images based on %d trials\n',length(X)/g.frame);
+    case 'phasecoher',  fprintf('Phase Coherence (ITC) images for %d trials.\n',length(X)/g.frame);
+    case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images for %d trials.\n',length(X)/g.frame);
+    case 'coher',       fprintf('Linear Coherence (ITC) images for %d trials.\n',length(X)/g.frame);
 end;
-fprintf('Trial timebase is %d ms before to %d ms after the stimulus\n', g.tlimits(1),g.tlimits(2));
+fprintf('The trial latency range is from %4.5g ms before to %4.5g ms after\n     the time-locking event.\n', 1000*g.tlimits(1),1000*g.tlimits(2));
+fprintf('The frequency range displayed will be %g-%g Hz.\n',min(freqs),g.maxfreq);
 if ~isnan(g.baseline)
    if length(baseln) == length(times)
-      fprintf('Using full time range as baseline\n');
+      fprintf('Using the full trial latency range as baseline.\n');
    else
-      fprintf('Using times in under %d ms for baseline\n', g.baseline);
+      fprintf('Using trial latencies from %4.5g ms to %4.5g ms as baseline.\n', 1000*g.tlimits,g.baseline);
    end;
 else 
-   fprintf('No baseline time range specified.\n');	
+   fprintf('No baseline time range was specified.\n');	
 end;
-fprintf('The frequency range displayed is %g-%g Hz.\n',min(dispf),g.maxfreq);
 if g.cycles==0
-   fprintf('The data window size is %d samples (%g ms).\n',g.winsize,2*wintime);
-   fprintf('The FFT length is %d samples\n',g.winsize*g.padratio);
+   fprintf('The data window size will be %d samples (%g ms).\n',g.winsize,2*wintime);
+   fprintf('The FFT length will be %d samples\n',g.winsize*g.padratio);
 else
-   fprintf('The window size is %d cycles.\n',g.cycles);
-   fprintf('The maximum window size is %d samples (%g ms).\n',g.winsize,2*wintime);
+   fprintf('The window size will be %2.3g cycles.\n',g.cycles);
+   fprintf('The maximum window size will be %d samples (%g ms).\n',g.winsize,2*wintime);
 end
-fprintf('The window is applied %d times\n',g.timesout);
-fprintf(' with an average step size of %g samples (%g ms).\n', Tfx.stp,1000*Tfx.stp/g.srate);
-fprintf('Results are oversampled %d times.\n',g.padratio);
+fprintf('The window will be applied %d times\n',g.timesout);
+fprintf('     with an average step size of %2.2g samples (%2.4g ms).\n', Tfx.stp,1000*Tfx.stp/g.srate);
+fprintf('Results will be oversampled %d times.\n',g.padratio);
 if ~isnan(g.alpha)
    fprintf('Bootstrap confidence limits will be computed based on alpha = %g\n', g.alpha);
 else
    fprintf('Bootstrap confidence limits will NOT be computed.\n'); 
 end
 switch g.plotphase
-case 'on', fprintf(['Coherence angles will be imaged in ',g.angleunit,'\n']);
+case 'on', 
+    if strcmp(g.angleunit,'deg')
+       fprintf(['Coherence angles will be imaged in degrees.\n']);
+    elseif strcmp(g.angleunit,'rad')
+       fprintf(['Coherence angles will be imaged in radians.\n']);
+    elseif strcmp(g.angleunit,'ms')
+       fprintf(['Coherence angles will be imaged in ms.\n']);
+    end
 end;
-fprintf('\nProcessing trial (of %d):\n',trials);
+fprintf('\nProcessing trial (of %d): ',trials);
 
-%firstboot = 1;
-%Rn=zeros(trials,g.timesout);
-%X = X(:)'; % make X and Y column vectors
-%Y = Y(:)';
-%tfy = tfx;
+% firstboot = 1;
+% Rn=zeros(trials,g.timesout);
+% X = X(:)'; % make X and Y column vectors
+% Y = Y(:)';
+% tfy = tfx;
 
 if strcmp(lower(g.compute), 'c')
    % C PART
@@ -966,6 +987,7 @@ if strcmp(lower(g.compute), 'c')
    Boot.Coherboot.R = [];
    Boot.Rsignif = [];
 else
+   % ------------------------
    % MATLAB PART
    % compute ITC if necessary
    % ------------------------
@@ -981,7 +1003,8 @@ else
       Tfy = tfitcpost( Tfy, trials); 
    end;
    
-   % main loop
+   % ---------
+   % Main loop
    % ---------
    if g.savecoher,
 	   trialcoher = zeros(Tfx.nb_points, g.timesout, trials);   
@@ -996,8 +1019,7 @@ else
       Tfy = tfcomp( Tfy, t, 1:g.timesout);
 	  if g.savecoher
 		  [Coher trialcoher(:,:,t)] = cohercomp( Coher, Tfx.tmpalltimes, ...
-                                                    Tfy.tmpalltimes, ...
-                                                    t, 1:g.timesout);      
+                                             Tfy.tmpalltimes, t, 1:g.timesout);      
       else
 		  Coher = cohercomp( Coher, Tfx.tmpalltimes, Tfy.tmpalltimes, t, 1:g.timesout);      
 	  end;
@@ -1011,10 +1033,11 @@ else
    Coher  = cohercomppost(Coher, trials);
 end;
 
-% if coherence, perform the division
 % ----------------------------------
-%switch g.type
-%case 'coher',
+% If coherence, perform the division
+% ----------------------------------
+% switch g.type
+% case 'coher',
 %   R = R ./ cumulXY;
 %   if ~isnan(g.alpha) & isnan(g.rboot)
 %      Rboot = Rboot ./ cumulXYboot;  
@@ -1022,7 +1045,7 @@ end;
 %   if g.bootsub > 0
 %      Rboottrial = Rboottrial ./ cumulXYboottrial;
 %   end;
-%case 'phasecoher',
+% case 'phasecoher',
 %   Rn = sum(Rn, 1);
 %   R = R ./ (ones(size(R,1),1)*Rn);               % coherence magnitude
 %   if ~isnan(g.alpha) & isnan(g.rboot)
@@ -1031,19 +1054,21 @@ end;
 %   if g.bootsub > 0
 %      Rboottrial = Rboottrial / trials;
 %   end;
-%end;
+% end;
 
-% compute baseline
+% ----------------
+% Compute baseline
 % ----------------
 mbase = mean(abs(Coher.R(:,baseln)'));     % mean baseline coherence magnitude
 
-% plot everything
+% ---------------
+% Plot everything
 % ---------------
 plotall(Coher.R, Boot.Coherboot.R, Boot.Rsignif, times, freqs, mbase, dispf, g);
 
-%
+% --------------------------------------
 % Convert output Rangle to degrees or ms - Disabled to keep original default: radians output
-%
+% --------------------------------------
 % Rangle = angle(Coher.R); % returns radians
 % if strcmp(g.angleunit,'ms')  % convert to ms
 %    Rangle = (Rangle/(2*pi)).*repmat(1000./freqs(dispf)',1,length(times)); 
