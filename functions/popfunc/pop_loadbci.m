@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/04/21 22:16:19  arno
+% put channel labels
+%
 % Revision 1.21  2005/04/21 22:13:17  arno
 % matlab import
 %
@@ -115,7 +118,7 @@ function [EEG, command] = pop_loadbci(filename, srate);
         % try to read as matlab
         % ---------------------
         bci = load( filename, '-mat');
-        allfields = fields(bci);
+        allfields = fieldnames(bci);
         allfields = setdiff(allfields, 'signal');
         for index = 1:size(bci.signal,2)
             chanlabels{index} = [ 'C' int2str(index) ];
