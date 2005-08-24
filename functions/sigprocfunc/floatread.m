@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/08/24 19:32:12  scott
+% added capability of specifying a starting offset in matrix format
+%
 % Revision 1.3  2005/08/24 19:02:43  scott
 % typo
 %
@@ -113,7 +116,6 @@ if fid>0
      for k=1:length(startpos)
            offset = offset + jumpfac * (startpos(k)-1);
            jumpfac = jumpfac * datasize(k);
-offset
      end
 
    elseif length(offset) > 1
