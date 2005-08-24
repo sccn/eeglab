@@ -18,7 +18,7 @@
 %              float file, OR a cell array containing the dimensions of the original 
 %              data matrix and a starting position vector in that data matrix. 
 %
-$              Example: % Read a [3 10] submatrix of a four-dimensional float matrix 
+%              Example: % Read a [3 10] submatrix of a four-dimensional float matrix 
 %                >> a = floatread('mydata.fdt',[3 10],'native',{[[3 10 4 5],[1,1,3,4]});
 %              % Note: The 'size' and 'offset' arguments must be compatible both
 %              % with each other and with the size and ordering of the float file.
@@ -44,6 +44,9 @@ $              Example: % Read a [3 10] submatrix of a four-dimensional float ma
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/08/24 19:01:08  scott
+% adding offset option
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
