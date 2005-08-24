@@ -1,22 +1,28 @@
 % floatread() - Read matrix from float file ssuming four byte floating point number
+%               Can use fseek() to read an arbitary (continguous) submatrix.
 %
-% Usage: >> A = floatread(filename,size,'format',offset) 
+% Usage:        >> a = floatread(filename,size,'format',offset) 
 %
 % Inputs:
 %   filename - name of the file
 %   size     - determine the number of float elements to be read and 
 %              the dimensions of the resulting matrix. If the last element 
-%              of 'size' is INF the size of the last dimension is determined
+%              of 'size' is Inf, the size of the last dimension is determined
 %              by the file length. If size is 'square,' floatread() attempts 
-%              to read a square matrix.
+%              to read a square 2-D matrix.
 %
 % Optional inputs:
 %  'format'  - the option FORMAT argument specifies the storage format as
 %              defined by fopen(). Default format ([]) is 'native'.
-%  offset    - offset in floats from the beginning of file (=0)
-%              to start reading (4-byte floats assumed).
-%              It uses fseek to read a portion of a large data file.
+%  offset    - either the number of first floats to skip from the beginning of the
+%              float file, OR a cell array containing the dimensions of the original 
+%              data matrix and a starting position vector in that data matrix. 
 %
+$              Example: % Read a [3 10] submatrix of a four-dimensional float matrix 
+%                >> a = floatread('mydata.fdt',[3 10],'native',{[[3 10 4 5],[1,1,3,4]});
+%              % Note: The 'size' and 'offset' arguments must be compatible both
+%              % with each other and with the size and ordering of the float file.
+% 
 % Author: Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998 
 %
 % See also: floatwrite(), fopen()
@@ -38,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 04-26-99  modified by Sigurd Enghoff to handle variable-sized and
 %           multi-dimensional data.
@@ -67,6 +76,9 @@ if fid>0
      return
    end
  end
+
+% determine what 'square' means
+% -----------------------------
  if ischar('Asize')
    if strcmp(Asize,'square')
          fseek(fid,0,'eof'); % go to end of file
@@ -86,8 +98,11 @@ else
  error('floatread() fopen() error.');
  return
 end
+
 % fprintf('   %d floats read\n',prod(size(A)));
 
+% interpret last element of Asize if 'Inf'
+% ----------------------------------------
 if Asize(end) == Inf
 	Asize = Asize(1:end-1);
 	A = reshape(A,[Asize length(A)/prod(Asize)]);
