@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/08/24 19:02:43  scott
+% typo
+%
 % Revision 1.2  2005/08/24 19:01:08  scott
 % adding offset option
 %
@@ -73,7 +76,54 @@ end
 fid = fopen(fname,'rb',fform);
 if fid>0 
  if exist('offset')
+   if iscell(offset)
+     if length(offset) ~= 2
+        error('offset must be a positive integer or a 2-item cell array');
+     end
+     datasize = offset{1};
+     startpos = offset{2};
+     if length(datasize) ~= length(startpos)
+        error('offset must be a positive integer or a 2-item cell array');
+     end
+     for k=1:length(datasize)
+       if startpos(k) < 1 | startpos(k) > datasize(k)
+          error('offset must be a positive integer or a 2-item cell array');
+       end
+     end
+     if length(Asize)> length(datasize)
+        error('offset must be a positive integer or a 2-item cell array');
+     end
+     for k=1:length(Asize)-1
+         if startpos(k) ~= 1 
+            error('offset must be a positive integer or a 2-item cell array');
+         end
+     end
+     sizedim = length(Asize);
+     if Asize(sizedim) + startpos(sizedim) - 1 > datasize(sizedim)
+        error('offset must be a positive integer or a 2-item cell array');
+     end
+     for k=1:length(Asize)-1
+         if Asize(k) ~= datasize(k)
+            error('offset must be a positive integer or a 2-item cell array');
+         end
+     end
+
+     offset = 0;
+     jumpfac = 1;
+     for k=1:length(startpos)
+           offset = offset + jumpfac * (startpos(k)-1);
+           jumpfac = jumpfac * datasize(k);
+offset
+     end
+
+   elseif length(offset) > 1
+     error('offset must be a positive integer or a 2-item cell array');
+   end
+   
+   % perform the fseek() operation
+   % -----------------------------
    stts = fseek(fid,4*offset,'bof');
+
    if stts ~= 0
      error('floatread(): fseek() error.');
      return
@@ -83,7 +133,12 @@ if fid>0
 % determine what 'square' means
 % -----------------------------
  if ischar('Asize')
-   if strcmp(Asize,'square')
+   if iscell(offset)
+         if length(datasize) ~= 2 | datasize(1) ~= datasize(2)
+              error('size ''square'' must refer to a square 2-D matrix');
+         end
+         Asize = [datsize(1) datasize(2)];
+   elseif strcmp(Asize,'square')
          fseek(fid,0,'eof'); % go to end of file
          bytes = ftell(fid); % get byte position
          fseek(fid,0,'bof'); % rewind
