@@ -1,40 +1,42 @@
 % pop_epoch() - Convert a continuous EEG dataset to epoched data by extracting
-%               data epochs time locked to the specified events. Calls epoch().
+%               data epochs time locked to specified event types or event indices. 
+%               May also sub-epoch an already epoched dataset (if sub-epochs are 
+%               same size or smaller). This pop_function calls epoch().
 % Usage:
 %   >> OUTEEG = pop_epoch( EEG); % pop-up a data entry window
 %   >> OUTEEG = pop_epoch( EEG, events, timelimits);
-%   >> [OUTEEG, indices] = pop_epoch( EEG, typerange, timelimits, ...
-%                               'key1', value1 ...);
+%   >> [OUTEEG, indices] = pop_epoch( EEG, typerange, timelimits,'key1', value1 ...);
 %
 % Graphic interface:
 %   "Time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
-%                 to see type values or use the push button. epoch() 
-%                 function command line equivalent: 'typerange' 
-%   "..." - [push button] scroll event types.
-%   "Epoch limits" - [edit box] time range [start, end] in seconds.
-%                 epoch() equivalent: 'timelim' 
-%   "Name for the new dataset" - [edit box] epoch() equivalent: 'newname'
+%                to see a list of event.type values; else use the push button. 
+%                epoch() function command line equivalent: 'typerange' 
+%   "..."      - [push button] scroll event types.
+%   "Epoch limits" - [edit box] epoch latency range [start, end] in seconds relative
+%                to the time-locking events. epoch() function equivalent: 'timelim' 
+%   "Name for the new dataset" - [edit box] 
+%                epoch() function equivalent: 'newname'
 %   "Out-of-bounds EEG ..." - [edit box] Rejection limits ([min max], []=none).
-%                 epoch() equivalent: 'valuelim' 
-%
+%                epoch() function equivalent: 'valuelim' 
 % Inputs:
-%   EEG        - Input dataset. Data may already be epoched. In this case,
+%   EEG        - Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
-%   typerange  - Cell array of event types to time lock to.
-%                {} --> all types of  events. Note: An event field 
-%                called 'type' must be defined in the 'EEG.event' structure.
-%   timelim    - Epoch limits [start end] in seconds relative to the
-%                time-locking event {Default: [-1 2]}
+%   typerange  - Cell array of event types to time lock to. See also: 'eventindices'
+%                {default {} --> time lock epochs to any type of event}
+%                (Note: An event field called 'type' must be defined in the 'EEG.event' structure.
+%                See also: commandline argument 'eventindices' below).
+%   timelim    - Epoch latency limits [start end] in seconds relative to the time-locking event 
+%                {default: [-1 2]}
 %
 % Optional inputs:
-%   'valuelim' - [min max] Lower and upper bounds for trial data.  If one 
-%                positive value is given, use its negative as the lower bound. 
-%                The given values are also considered outliers. {Default: none}
-%   'verbose'  - ['yes'|'no']. {Default: 'yes'}
-%   'newname'  - [string] New dataset name {Default: "[old_dataset] epochs"}
-%   'eventindices'- [indices] Extract data epochs time locked to the indexed events. 
-%   'epochinfo'- ['yes'|'no']. Propagate event information into the new
-%                epoch structure. {Default: 'yes'}
+%   'eventindices'- [int indices] Extract data epochs time locked to the indexed event numbers. 
+%   'valuelim' - [min max] or [max]. Lower and upper bound latencies for trial data. 
+%                Else if one positive value is given, use its negative as the lower bound. 
+%                The given values are also considered outliers (min max) {default: none}
+%   'verbose'  - ['yes'|'no'] {default: 'yes'}
+%   'newname'  - [string] New dataset name {default: "[old_dataset] epochs"}
+%   'epochinfo'- ['yes'|'no'] Propagate event information into the new
+%                epoch structure {default: 'yes'}
 %   
 % Outputs:
 %   OUTEEG     - output dataset
@@ -47,7 +49,7 @@
 % deprecated
 %   'timeunit' - Time unit ['seconds'|'points'] If 'seconds,' consider events 
 %                times to be in seconds. If 'points,' consider events as
-%                indices into the data array. {Default: 'points'}
+%                indices into the data array. {default: 'points'}
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -68,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/05/24 17:30:24  arno
+% remove cell2mat
+%
 % Revision 1.44  2005/02/02 20:14:18  arno
 % fix typo
 %
@@ -221,7 +226,7 @@ indices = [];
 
 if isempty(EEG.event)
     if EEG.trials > 1 & EEG.xmin <= 0 & EEG.xmax >=0
-        disp('No event found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
+        disp('No EEG.event structure found: creating events of type ''TLE'' (Time-Locking Event) at time 0');
         EEG.event(EEG.trials).epoch = EEG.trials; 
         for trial = 1:EEG.trials
             EEG.event(trial).epoch   = trial; 
@@ -234,7 +239,7 @@ if isempty(EEG.event)
     end;
 end;
 if ~isfield(EEG.event, 'latency'),
-    disp( 'Absent latency field in event array/strcuture: first rename one of the field to ''latency''');
+    disp( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
      beep; return;
 end;    
 OLDEEG = EEG;
@@ -317,7 +322,7 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 % ----------------------------------------------------------
 tmpeventlatency = [ EEG.event(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
-EEG.event = EEG.event(Itmp);  % sort in ascending time 
+EEG.event = EEG.event(Itmp);  % sort by ascending time 
 Ievent = g.eventindices;
 
 if ~isempty( events )
@@ -341,12 +346,13 @@ if ~isempty( events )
 			end;
 		end;
     else
-        error('pop_epoch(): multiple event types must be entered as {a  cell array}'); return;
+        error('pop_epoch(): multiple event types must be entered as {''a'', ''cell'', ''array''}'); return;
     end;
     Ievent = Ieventtmp;
 end;
 
 % select event latencies for epoching
+%------------------------------------
 Ievent = sort(Ievent);
 alllatencies = tmpeventlatency(Ievent);
 
@@ -371,7 +377,8 @@ fprintf('pop_epoch():%d epochs generated\n', length(indices));
 % update other fields
 % -------------------
 if lim(1) ~= tmptime(1) & lim(2)-1/EEG.srate ~= tmptime(2)
-	fprintf('pop_epoch(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', tmptime(1), tmptime(2)+1/EEG.srate);
+	fprintf('pop_epoch(): time limits have been adjusted to [%3.3f %3.3f] to fit data points limits\n', ...
+		tmptime(1), tmptime(2)+1/EEG.srate);
 end;
 EEG.xmin = tmptime(1);
 EEG.xmax = tmptime(2);
@@ -392,7 +399,7 @@ totlen = 0;
 for index=1:EEG.trials, totlen = totlen + length(epochevent{index}); end;
 EEG.event(1).epoch = 0;          % create the epoch field (for assignment consistency afterwards)
 if totlen ~= 0
-    newevent(totlen) = EEG.event(1); % reserv array
+    newevent(totlen) = EEG.event(1); % reserve array
 else 
     newevent = [];
 end;
@@ -405,7 +412,8 @@ for index=1:EEG.trials
     for indexevent = epochevent{index}
 		newevent(count)         = EEG.event(indexevent);
         newevent(count).epoch   = index;
-	    newevent(count).latency = newevent(count).latency - alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
+	    newevent(count).latency = newevent(count).latency ...
+			- alllatencies(index) - tmptime(1)*EEG.srate + 1 + EEG.pnts*(index-1);
 		count = count + 1;
     end;
 end;
@@ -444,5 +452,5 @@ for i=1:2:length(args)
     end;    
 end;
 com = [com ');'];
-return;
+return; % text command
 
