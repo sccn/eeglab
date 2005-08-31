@@ -1,72 +1,77 @@
-% pop_select() - remove trials and channels from a dataset
-%
+% pop_select() - given an input EEG dataset structure, output a new EEG data structure 
+%                retaining and/or excluding specified time/latency, data point, channel, 
+%                and/or epoch range(s).
 % Usage:
 %   >> OUTEEG = pop_select(INEEG, 'key1', value1, 'key2', value2 ...);
 %
 % Graphic interface:
-%   "Time range" - [edit box] time range [low high] in ms. For data epochs,
-%                  it is not possible to remove a slice of time (i.e. 
-%                  either low=0 or high=max time). For continuous data
-%                  several intervals can be separated by commas. For 
-%                  instance "5 10; 12 EEG.xmax" will remove the portion of 
-%                  data from 0 to 5 seconds and from 10 to 12 seconds.
-%                  Command line equivalent: 'time' and 'notime'
-%   "Time range" - [checkbox] by checking the checkbox, the regions
-%                  selected will be removed. Command line equivalent: 'time' 
-%                  [unchecked] and 'notime' [checked]
-%   "Point range" - [edit box] select range in data point instead of ms.
-%                  the same remarks as for "Time range" edit box applies.
-%                  Command line equivalent: 'point' and 'nopoint'
-%   "Point range" - [checkbox] see "Time range" checkbox. Command line 
-%                  equivalent: 'point' [unchecked] and 'nopoint' [checked]
-%   "Epoch range" - [edit box] select data epoch indices. This checkbox is
-%                  only visible for data epochs. 
-%                  Command line equivalent: 'trial' and 'notrial'
-%   "Epoch range" - [checkbox] invert epoch selection. Command line
-%                  equivalent: 'trial' [unchecked] and 'notrial' [checked]
-%   "Channel rangee" - [edit box] select data channel indices.
-%                  Command line equivalent: 'channel' and 'nochannel'
-%   "Channel range" - [checkbox] invert channel selection. Command line
-%                  equivalent: 'channel' [unchecked] and 'nochannel' [checked]
+%   "Time range" - [edit box] RETAIN only the indicated epoch latency or continuous data 
+%                  time range: [low high] in ms, inclusive. For continuous data, several 
+%                  time ranges may be specified, separated by semicolons. 
+%                  Example: "5 10; 12 EEG.xmax" will retain the indicated
+%                  stretches of continuous data, and remove data portions outside
+%                  the indicated ranges, e.g. from 0 s to 5 s and from 10 s to 12 s. 
+%                  Command line equivalent: 'time' (or 'notime' - see below)
+%   "Time range" - [checkbox] EXCLUDE the indicated latency range(s) from the data.
+%                  For epoched data, it is not possible to remove a range of latencies 
+%                  from the middle of the epoch, so either the low and/or the high values 
+%                  in the specified latency range (see above) must be at an epoch boundary 
+%                  (EEG.xmin, EEGxmax).  Command line equivalent: [if checked] 'notime' 
+%   "Point range" - [edit box] RETAIN the indicated data point range(s). 
+%                  Same options as for the "Time range" features (above).
+%                  Command line equivalent: 'point' (or 'nopoint' - see below).
+%   "Point range" - [checkbox] EXCLUDE the indicated point range(s).
+%                  Command line equivalent: [if checked] 'nopoint' 
+%   "Epoch range" - [edit box] RETAIN the indicated data epoch indices in the dataset.
+%                  This checkbox is only visible for epoched datasets. 
+%                  Command line equivalent: 'trial' (or 'notrial' - see below)
+%   "Epoch range" - [checkbox] EXCLUDE the specified data epochs. 
+%                   Command line equivalent: [if checked] 'notrial' 
+%   "Channel range" - [edit box] RETAIN the indicdated vector of data channels 
+%                  Command line equivalent: 'channel' (or 'nochannel' - see below)
+%   "Channel range" - [checkbox] EXCLUDE the indicated channel range [min max].
+%                  Command line equivalent: [if checked] 'nochannel' 
 %   "..." - [button] select channels by name.
-%   "Scroll dataset" - [button] call the eegplot function to scroll
-%                  channel activities.
-%
+%   "Scroll dataset" - [button] call the eegplot() function to scroll the
+%                  channel activities in a new window for visual inspection.
+%                  Commandline equivalent: eegplot() - see its help for details.
 % Inputs:
-%   INEEG         - input dataset
+%   INEEG         - input EEG dataset structure
 %
 % Optional inputs
-%   'time'        - time range to include [min max] in seconds. For
-%                   data epoch, the range must include either 0 of the max 
-%                   time, as time regions can not be removed from epochs. For
-%                   continuous data, can be [min max] x n to select 
-%                   several regions. Note that the boundary are both included.
-%   'notime'      - time range to exclude [min max] in seconds. For
-%                   continuous data, can be [min max] x n to select 
-%                   several regions. Note that the boundary are both excluded.
-%   'point'       - data points to include [min max]. For
-%                   data epoch, the range must include either 0 of the last 
-%                   point, as time regions can not be removed from epochs.
-%                   For continuous data, can be [min max] x n to select 
-%                   several regions.
-%                   Note that this parameter used to be a point vector. This
-%                   format is still functional for downward compatibility.
-%   'nopoint'     - frame vector to exclude in points. If points and
-%                   time is set, the point limit values are used.
-%   'trial'       - array of trial numbers to include
-%   'notrial'     - array of trial numbers to exclude
-%   'channel'     - array of channels to include
-%   'nochannel'   - array of channels to exclude
-%   'newname'     - new dataset name
+%   'time'        - [min max] in seconds. Epoch latency or continuous data time range 
+%                   to retain in the new dataset, (Note: not ms, as in the GUI text entry 
+%                   above). For continuous data (only), several time ranges can be specified, 
+%                   separated by semicolons. Example: "5 10; 12 EEG.xmax" will retain 
+%                   the indicated times ranges, removing data  outside the indicated ranges 
+%                   e.g. here from 0 to 5 s and from 10 s to 12 s. (See also, 'notime')
+%   'notime'      - [min max] in seconds. Epoch latency or continuous dataset time range 
+%                   to exclude from the new dataset. For continuous data, may be 
+%                   [min1 max1; min2 max2; ...] to exclude several time ranges. For epoched 
+%                   data, the latency range must include an epoch boundary, as latency 
+%                   ranges in the middle of epochs cannot be removed from epoched data.
+%   'point'       - [min max] epoch or continuous data point range to retain in the new 
+%                   dataset. For continuous datasets, this may be [min1 max1; min2 max2; ...] 
+%                   to retain several point ranges. (Notes: If both 'point'/'nopoint' and 
+%                   'time' | 'notime' are specified, the 'point' limit values take precedence. 
+%                   The 'point' argument was originally a point vector, now deprecated).
+%   'nopoint'     - [min max] epoch or continuous data point range to exclude in the new dataset. 
+%                   For epoched data, the point range must include either the first (0) 
+%                   or the last point (EEG.pnts), as a central point range cannot be removed. 
+%   'trial'       - array of trial indices to retain in the new dataset
+%   'notrial'     - array of trial indices to exclude from the new dataset
+%   'channel'     - vector of channel indices to retain in the new dataset
+%   'nochannel'   - vector of channel indices to exclude from the new dataset
+%   'newname'     - name for the new dataset (OUTEEG)
 %
 % Outputs:
-%   OUTEEG        - output dataset
+%   OUTEEG        - new EEG dataset structure
 %
-% Note: the program perform a conjunction (AND) of all optional inputs.
-%       However because negative counterparts of all options are 
-%       present, you can theorically perform any logical operation.
+% Note: This function performs a conjunction (AND) of all its optional inputs.
+%       Using negative counterparts of all options, any logical combination is
+%       possible.
 % 
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001 
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 % 
 % see also: eeglab()
 
@@ -89,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2005/08/01 17:02:50  arno
+% now calling eeg_eval
+%
 % Revision 1.39  2005/07/30 01:09:47  arno
 % allowing to process multiple datasets
 % .,
