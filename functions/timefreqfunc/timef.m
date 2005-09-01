@@ -149,6 +149,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2005/07/19 15:42:53  scott
+% added check for compatibility of frames, srate, tlimits
+% added [] or NaN default values for frames, tlimits (defaults:
+%    data is 1 epoch; tlimits are 0 to end)
+% added adjustment of tlimits to frames, srate if discrepancy
+%    is < 1 frame
+%
 % Revision 1.81  2005/03/07 21:25:54  arno
 % chaninfo
 %
@@ -941,9 +948,6 @@ for i=1:trials
         end
 	end % window
 
-	%figure; imagesc(times, freqs, angle(RR));
-	%figure; imagesc(times, freqs, log(PP));
-	
 	if ~isnan(g.alpha) % save surrogate data for bootstrap analysis
         j = 1;
         goodbasewins = find(Wn==1);
