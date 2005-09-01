@@ -17,11 +17,10 @@
 % Usage: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot,itcphase] = ...
 %                timef(data,frames,tlimits,srate,cycles,...
-%                        'key1',value1,'key2',value2, ... );        
+%                                 'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
-%        >> timef details  % scrolls more detailed information about timef
-%        Some default values are not relevant if this function is called from
-%           pop_timef()
+%        * To see more detailed information about timef(), >> timef details  
+%        * Some default values are different when called from pop_timef()
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -55,7 +54,7 @@
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
 %                      If cycles==0, all FFT frequencies are output.      {50}
 %       'baseline'  = Spectral baseline end-time (in ms).                 {0}
-%       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%       'powbase'   = Baseline spectrum (power, not dB) to normalize the data. {def|NaN->from data}
 %
 %    Optional multitaper parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
@@ -79,6 +78,7 @@
 %                     File should be ascii in format of  >> topoplot example   
 %                     May also be an EEG.chanlocs struct. {file named in icadefs.m}
 %    Optional plotting parameters:
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes        {'up'}
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
 %       'plotphase' = ['on'|'off'] Plot sign of the phase in the ITC panel, i.e.
@@ -94,16 +94,15 @@
 %       'titlefont' = Title text font size                                 {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at given times in ms.
 %       'verbose'   = ['on'|'off'] print text                              {'on'}
-% Outputs: 
-%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
+%    Outputs: 
+%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (in dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%          powbase  = Baseline power spectrum (subtracted from each window to compute 
-%                     the ERSP).
-%            times  = Vector of output times (sub-window centers) (in ms).
-%            freqs  = Vector of frequency bin centers (in Hz).
-%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
-%          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
-%          itcphase = Matrix (nfreqs,timesout) of ITC phase (in radians).
+%          powbase  = Baseline power spectrum (NOT in dB, used to normalize the ERSP)
+%            times  = Vector of output times (sub-window centers) (in ms)
+%            freqs  = Vector of frequency bin centers (in Hz)
+%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs
+%          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs)
+%          itcphase = Matrix (nfreqs,timesout) of ITC phase (in radians)
 %
 % Plot description:
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
@@ -149,6 +148,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2005/09/01 01:55:40  scott
+% nothing
+%
 % Revision 1.82  2005/07/19 15:42:53  scott
 % added check for compatibility of frames, srate, tlimits
 % added [] or NaN default values for frames, tlimits (defaults:
@@ -581,9 +583,18 @@ try, g.itcmax;     catch, g.itcmax = []; end;
 try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
 try, g.chaninfo;   catch, g.chaninfo = []; end;
+try, g.hzdir;      catch, g.hzdir = 'up'; end;
 
 % testing arguments consistency
 % -----------------------------
+if strcmp(g.hzdir,'up')
+    g.hzdir = 'normal';
+elseif strcmp(g.hzdir,'down')
+    g.hzdir = 'reverse';
+else
+    error('unknown ''hzdir'' value - not ''up'' or ''down''');
+end
+
 switch lower(g.verbose)
     case { 'on', 'off' }, ;
     otherwise error('verbose must be either on or off');
@@ -700,16 +711,18 @@ if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
     g.alltapers = g.mtaper;
     disp('mtaper argument not [N W] or [N W K]; considering raw taper matrix');
   end;
+
   g.winsize = size(g.alltapers, 1);
   g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
+
   %nfk = floor([0 g.maxfreq]./g.srate.*g.pad); % not used any more
   %g.padratio = 2*nfk(2)/g.winsize;
+
   g.padratio = g.pad/g.winsize;
  
   %compute number of frequencies
   %nf = max(256, g.pad*2^nextpow2(g.winsize+1)); 
   %nfk = floor([0 g.maxfreq]./g.srate.*nf);
-  
   %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also work in the case of a FFT
   
 end;           
@@ -1091,7 +1104,6 @@ switch lower(g.plotersp)
     %
     %%%%%%% image the ERSP %%%%%%%%%%%%%%%%%%%%%%%%%%
     %
-    
 	h(1) = subplot('Position',[.1 ordinate1 .9 height].*s+q);
 	
 	PP = P;
@@ -1111,6 +1123,7 @@ switch lower(g.plotersp)
     else
         imagesc(times,freqs(dispf),PP(dispf,:));
     end;
+    set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 	if ~isempty(g.erspmax)
 		caxis([-g.erspmax g.erspmax]);
 	end;
@@ -1172,6 +1185,12 @@ switch lower(g.plotersp)
 	set(h(5),'View',[90 90])
 	xlabel('Frequency (Hz)')
 	ylabel('dB')
+    if strcmp(g.hzdir,'normal')
+        freqdir = 'reverse';
+    else
+        freqdir = 'normal';
+    end
+    set(h(5),'xdir',freqdir);  % make frequency ascend or descend
 end;
 
 switch lower(g.plotitc)
@@ -1201,6 +1220,7 @@ switch lower(g.plotitc)
 		caxis([-g.itcmax g.itcmax]);
 	end;
 	tmpcaxis = caxis;
+    set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
 	hold on
 	plot([0 0],[0 freqs(max(dispf))],'--m','LineWidth',g.linewidth);
@@ -1270,6 +1290,12 @@ switch lower(g.plotitc)
         set(h(11),'TickLength',[0.020 0.025]);
 	xlabel('Frequency (Hz)')
 	ylabel('ERP')
+    if strcmp(g.hzdir,'normal')
+        freqdir = 'reverse';
+    else
+        freqdir = 'normal';
+    end
+    set(gca,'xdir',freqdir);  % make frequency ascend or descend
     %
     %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
     %
