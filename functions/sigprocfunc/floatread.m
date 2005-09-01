@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/08/24 19:46:35  hilit
+% removing debuging variable
+%
 % Revision 1.4  2005/08/24 19:32:12  scott
 % added capability of specifying a starting offset in matrix format
 %
@@ -74,6 +77,10 @@ end
 
 if ~exist('fform') | isempty(fform)|fform==0
 	fform = 'native';
+end
+
+if ~exist('offset') 
+	offset = 0;
 end
 
 fid = fopen(fname,'rb',fform);
