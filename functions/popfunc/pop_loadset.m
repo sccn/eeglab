@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2005/08/16 17:47:02  scott
+% edited help message. EEG.changes_not_saved -> EEG.saved  -sm
+%
 % Revision 1.42  2005/08/08 18:17:53  arno
 % fixing call
 %
@@ -220,17 +223,17 @@ else
     % read file
     % ---------
     filename = fullfile(g.filepath, g.filename);
-    fprintf('Pop_loadset: loading file %s ...\n', filename);
+    fprintf('pop_loadset(): loading file %s ...\n', filename);
     try
         TMPVAR = load(filename, '-mat');
     catch,
-        error([ filename ': file is protexted or does not exist' ]);
+        error([ filename ': file is protected or does not exist' ]);
     end;
 
     % variable not found
     % ------------------
     if isempty(TMPVAR)
-        error('No dataset info associated with this file');
+        error('No dataset info is associated with this file');
     end;
 
     if isfield(TMPVAR, 'EEG')
@@ -247,10 +250,10 @@ else
 
             [tmp EEG.data ext] = fileparts( EEG.data ); EEG.data = [ EEG.data ext];
             if ~isempty(tmp) & ~strcmpi(tmp, EEG.filepath)
-                disp('Warning: updating folder name for .dat/.fdt file');
+                disp('Warning: updating folder name for .dat|.fdt file');
             end;
             if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
-                disp('Warning: the name of the dataset has changed on disk, updating .dat/.fdt data file to the new name');
+                disp('Warning: the name of the dataset has changed on disk, updating .dat & .fdt data file to the new name');
                 EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
             end;
             
@@ -265,9 +268,9 @@ else
     elseif isfield(TMPVAR, 'ALLEEG')
         
         % this part is deprecated as of EEGLAB 5.00
-        % since all datasets have to be saved in separate files
+        % since all dataset data have to be saved in separate files
         % -----------------------------------------------------
-        disp('Pop_loadset: appending datasets');
+        disp('pop_loadset(): appending datasets');
         EEG = TMPVAR.ALLEEG;
         for index=1:length(EEG)
             EEG.filename = '';
@@ -283,7 +286,7 @@ else
     else
         EEG = checkoldformat(TMPVAR);
         if ~isfield( EEG, 'data')
-            error('Pop_loadset: non-EEGLAB dataset file');
+            error('pop_loadset(): not an EEG dataset file');
         end;
         if isstr(EEG.data), EEG.filepath = g.filepath; end;
     end;
@@ -316,7 +319,7 @@ return;
 
 function EEG = checkoldformat(EEG)
 	if ~isfield( EEG, 'data')
-		fprintf('Incompatible with new format, trying old format and converting...\n');
+		fprintf('pop_loadset(): Incompatible with new format, trying old format and converting...\n');
 		eegset = EEG.cellArray;
 		
 		off_setname             = 1;  %= filename
@@ -401,7 +404,7 @@ function EEG = checkoldformat(EEG)
 		EEG.stats.eegkurt    = eegset{off_eegkurt      };
 		EEG.stats.eegkurtg   = eegset{off_eegkurtg     };
 		%catch
-		%	disp('Warning: some variable may not have been assigned');
+		%	disp('Warning: some variables may not have been assigned');
 		%end;
 		
 		% modify the eegtype to match the new one
@@ -431,7 +434,7 @@ function EEG = checkoldformat(EEG)
 				EEG = pop_importepoch(EEG, EEG.trialsval(:,2:3), { 'eegtype' 'response' }, {},1,0,0);
 			end;
 			EEG = eeg_checkset(EEG, 'eventconsistency');
-		catch, disp('warning: could not import events'); end;			
+		catch, disp('Warning: could not import events'); end;			
 	end;
 	rmfields = {'icadata' 'events' 'accept' 'eegtype' 'eegresp' 'trialsval' 'poschan' 'icadata' 'namechan' };
 	for index = 1:length(rmfields)
