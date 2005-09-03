@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/03/20 18:40:49  scott
+% help msg
+%
 % Revision 1.4  2003/04/25 18:33:22  arno
 % small typo for basevector
 %
@@ -113,7 +116,9 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 			rmeans = nan_mean(data(:,(e-1)*frames+basevector)');
 		else
 			rmeans = nan_mean(data(:,(e-1)*frames+1:e*frames)');
-			fprintf('rmbase(): whole-data channel means removed. \n\n');
+                        if e==1
+			   fprintf('rmbase(): whole-data channel means removed. \n\n');
+                        end
         end;
         datamean(:,e) = rmeans';
 		diff = rmeans'*ones(1,frames);
