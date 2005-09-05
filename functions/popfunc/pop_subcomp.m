@@ -1,12 +1,13 @@
-% pop_subcomp() - subtract specified components from an EEG dataset.
-%
+% pop_subcomp() - remove specified components from an EEG dataset.
+%                 and subtract their activities from the data. Else,
+%                 remove components already marked for rejection.
 % Usage:
 %   >> OUTEEG = pop_subcomp( INEEG ); % pop-up window mode
 %   >> OUTEEG = pop_subcomp( INEEG, components, confirm);
 %
 % Pop-up window interface:
 %   "Component(s) to remove ..." - [edit box] Array of components to 
-%                subtract from the data. Sets the 'components' parameter 
+%                remove from the data. Sets the 'components' parameter 
 %                in the command line call (see below).
 %   "Component(s) to retain ..." - [edit box] Array of components to
 %                to retain in the data. Sets the 'components' parameter in
@@ -15,7 +16,7 @@
 %                Overwrites "Component(s) to remove" (above).
 % Command line inputs:
 %   INEEG      - Input EEG dataset.
-%   components - Array of components to subtract from the data. If empty, 
+%   components - Array of components to remove from the data. If empty, 
 %                 remove components previously marked for rejection (e.g., 
 %                 EEG.reject.gcompreject).
 %   confirm    - [0|1] Display the difference between original and processed
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2003/12/24 19:40:58  scott
+% edti help msg and text
+%
 % Revision 1.10  2003/02/19 19:17:25  arno
 % update header for GUI
 %
@@ -138,13 +142,13 @@ compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
 if  nargin < 2 | plotag ~= 0
    tracing  = [ squeeze(mean(EEG.data,3)) squeeze(mean(compproj,3))];
 	figure;   
-	plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], 'Compare datasets (red=first set; blue=second set)');
+	plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], 'Trial ERPs (red) with and (blue) without these components');
 end;
-%fprintf( 'The ICA projection account for %2.2f percent of the data\n', 100*varegg);
+%fprintf( 'The ICA projection accounts for %2.2f percent of the data\n', 100*varegg);
 	
 if nargin < 2 | plotag ~= 0
 
-    ButtonName=questdlg2( 'Do you agree with the projection', ...
+    ButtonName=questdlg2( 'Actually remove these components?', ...
                          'Confirmation', 'NO', 'YES', 'YES');
     switch ButtonName,
         case 'NO', 
@@ -152,7 +156,7 @@ if nargin < 2 | plotag ~= 0
 			close(gcf);
         	return;   
         case 'YES',
-       		disp('Projection computed');
+       		disp('Components removed');
     end % switch
 	close(gcf);
 end;
