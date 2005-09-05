@@ -1,6 +1,5 @@
 % pop_prop() - plot the properties of a channel or of an independent
 %              component. 
-%
 % Usage:
 %   >> pop_prop( EEG, typecomp); % pops up a query window 
 %   >> pop_prop( EEG, typecomp, chan, winhandle);
@@ -11,8 +10,8 @@
 %                property (0). Default is 1.
 %   chan       - channel or component number
 %   winhandle  - if this parameter is present, buttons for the
-%                rejection of the components are drawn. If 
-%                non-zeros, this parameter is used to backpropagate
+%                rejection of the component are drawn. If 
+%                non-zero, this parameter is used to backpropagate
 %                the color of the rejection button.
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
@@ -38,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2005/03/05 00:09:11  arno
+% chaninfo
+%
 % Revision 1.20  2004/07/29 23:32:26  arno
 % fixing spectra limits
 %
@@ -174,7 +176,7 @@ end;
 if nargin == 2
 	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') };
 	inistr       = { '1' };
-	result       = inputdlg2( promptstr, 'Component properties -- pop_prop()', 1,  inistr, 'pop_prop');
+	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
 	if size( result, 1 ) == 0 return; end;
    
 	numcompo   = eval( [ '[' result{1} ']' ] );
@@ -203,7 +205,7 @@ catch,
 end;
 basename = [fastif(typecomp,'Channel ', 'Component ') int2str(numcompo) ];
 
-fh = figure('name', [basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
+fh = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
 pos = get(gcf,'Position');
 set(gcf,'Position', [pos(1) pos(2)-500+pos(4) 500 500], 'visible', 'on');
 pos = get(gca,'position'); % plot relative to current axes
