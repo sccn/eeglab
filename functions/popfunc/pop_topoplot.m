@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2005/03/31 02:52:39  arno
+% dipole plot
+%
 % Revision 1.63  2005/03/18 18:02:24  arno
 % fix plot component dipole for spherical model
 %
@@ -265,6 +268,11 @@ if nargin < 3
 		txtwhat2plot2 = '(negate index to invert component polarity; NaN -> empty subplot; Ex: -1 NaN 3)';
         editwhat2plot = ['1:' int2str(size(EEG.icaweights,1))];
  	end;	
+        if EEG.nbchan > 64, 
+            elecdef = ['''electrodes'', ''on''']; 
+        else, 
+            elecdef = ['''electrodes'', ''on''']; 
+        end;
     uilist = { { 'style'   'text'     'string'    txtwhat2plot1 } ...
                { 'style'   'edit'     'string'    editwhat2plot } ...
                { 'style'   'text'     'string'    txtwhat2plot2 } ...
@@ -278,7 +286,7 @@ if nargin < 3
                { } ...
                { 'style'   'text'     'string'    [ '-> Additional topoplot()' fastif(typeplot,'',' (and dipole)') ...
                                                   ' options (see Help)' ] } ...
-               { 'style'   'edit'     'string'    '''electrodes'', ''on''' } };
+               { 'style'   'edit'     'string'    elecdef } };
     uigeom = { [1.5 1] [1] [1] [1.5 1] [1.5 1] [1.55 0.2 0.8] [1] [1] [1] };
     if typeplot
         uilist(9:11) = [];
