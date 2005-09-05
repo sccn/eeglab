@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.255  2005/07/27 18:12:59  arno
+% removing datachan check
+%
 % Revision 1.254  2005/07/16 16:36:08  scott
 % same
 %
@@ -1104,9 +1107,11 @@ if strcmp(plotgrid,'on')
         error('''plotgrid'' channel index > the number of input channel values');
    end
    gchans = sort(find(abs(gridchans(:))>0));
+
    % if setdiff(gchans,unique(gchans))
    %      fprintf('topoplot() warning: ''plotgrid'' channel matrix has duplicate channels\n');
    % end
+
    if ~isempty(plotchans)
      if intersect(gchans,abs(plotchans))
         fprintf('topoplot() warning: ''plotgrid'' and ''plotchans'' have channels in common\n');
