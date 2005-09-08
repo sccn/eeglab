@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2005/08/17 23:26:01  arno
+% fixing version problem
+%
 % Revision 1.55  2005/08/08 18:41:09  arno
 % try, catch sintring
 %
@@ -289,6 +292,10 @@ if strcmpi(g.savemode, 'resave')
         else
             save_as_dat_file = 1;
         end;
+    end;
+    if isstr(EEG.data) & ~save_as_dat_file % data in .set file
+        TMP = pop_loadset(EEG.filename, EEG.filepath);
+        EEG.data = TMP.data;
     end;
 else
     EEG.filename    = g.filename;
