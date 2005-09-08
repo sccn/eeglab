@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/08/16 17:35:49  scott
+% EEG.changes_not_saved 'no'   ->   EEG.saved 'yes'   -sm
+%
 % Revision 1.28  2005/08/16 17:21:06  scott
 % edited help message and all disp fprint and detailed text messages  -sm
 %
@@ -239,6 +242,7 @@ else % savedata
     else
         if strcmpi(EEG.saved, 'yes') & option_storedisk
             disp('eeg_store(): The dataset was not modified since last save; did not resave it');
+            EEG = update_datafield(EEG);
         end;
         [ EEG com ] = eeg_checkset(EEG);
         if ~isempty(com), EEG.saved = 'no'; end;
