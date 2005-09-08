@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.397  2005/08/15 16:17:06  arno
+% adding back history
+%
 % Revision 1.396  2005/08/08 17:48:09  arno
 % currentset 0 if loading life
 %
@@ -2217,7 +2220,8 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( plot_m, 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
-        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA'), 'enable', 'on');
+        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
+        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset(s)'), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
