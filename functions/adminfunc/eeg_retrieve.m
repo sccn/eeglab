@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/09/08 21:37:31  arno
+% fix retrieving multiple datasets
+%
 % Revision 1.12  2005/09/08 16:54:29  arno
 % preserve saved field
 %
@@ -95,9 +98,14 @@ end;
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
     end;
     [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-    for index = 1:length(EEG)
-        EEG(index).saved = tmpsaved{index};
+    
+    % retain saved field
+    % ------------------
+    for index = 1:length(CURRENTSET)
+        ALLEEG(CURRENTSET(index)).saved = tmpsaved{index};
+        EEG(index).saved                = tmpsaved{index};
     end;
+    
 %catch
 %	fprintf('Warning: cannot retrieve dataset with index %d\n', CURRENTSET); 
 %	return;
