@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.128  2005/08/04 19:02:29  arno
+% fix problem when not returning EEG structure
+%
 % Revision 1.127  2005/08/02 01:34:32  arno
 % fixing chansout
 %
@@ -1249,7 +1252,11 @@ end;
 
 if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
 if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
-if dataset_input, EEG.chanlocs = chans; chansout = EEG;
+if dataset_input, 
+    for index = 1:length(EEG)
+        EEG(index).chanlocs = chans; 
+    end; 
+    chansout = EEG;
 else              chansout = chans;
 end;
 return;
