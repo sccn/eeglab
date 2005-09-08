@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/09/01 15:33:52  scott
+% edited text msgs
+%
 % Revision 1.43  2005/08/16 17:47:02  scott
 % edited help message. EEG.changes_not_saved -> EEG.saved  -sm
 %
@@ -312,7 +315,15 @@ else
         EEG.data        = EEG.data(g.loadmode,:,:);
     end;
 end;
-EEG.saved = 'yes';
+
+% set field indicating that the data has not been modified
+% --------------------------------------------------------
+if isfield(EEG, 'changes_not_saved')
+    EEG = rmfield(EEG, 'changes_not_saved');
+end;
+for index=1:length(EEG)
+    EEG(index).saved = 'yes';
+end;
 
 command = sprintf('EEG = pop_loadset(%s);', vararg2str(options));
 return;
