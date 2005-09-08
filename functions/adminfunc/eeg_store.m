@@ -53,6 +53,10 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2005/09/08 21:37:17  arno
+% fix storing multiple datasets
+% /
+%
 % Revision 1.30  2005/09/08 16:54:41  arno
 % fixed saved field
 %
@@ -166,13 +170,17 @@ if length(EEG) > 1
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
+            tmpsaved      = EEG.saved;
             TMPEEG        = eeg_store(TMPEEG, EEG, index);
+            TMPEEG(index).saved = tmpsaved;
         end;        
     else
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             [ALLEEG, EEG, storeSetIndex(index)] = eeg_store(ALLEEG, EEG);
-            TMPEEG                              = eeg_store(TMPEEG, EEG, index);
+            tmpsaved      = EEG.saved;
+            TMPEEG        = eeg_store(TMPEEG, EEG, index);
+            TMPEEG(index).saved = tmpsaved;
         end;
     end;
     EEG = TMPEEG;
