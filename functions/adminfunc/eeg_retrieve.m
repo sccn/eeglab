@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/08/08 18:03:55  arno
+% fix dissimilar structure problem
+%
 % Revision 1.9  2005/08/04 23:37:24  arno
 % typo
 %
@@ -80,11 +83,13 @@ try
     eeg_optionsbackup;
     eeg_options;
     if length(CURRENTSET) > 1 & option_storedisk
-        EEG = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
+        [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
     else
-        EEG = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
+        [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
     end;
-    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+    if ~isempty(tmpcom)
+        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+    end;
 catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', CURRENTSET); 
 	return;
