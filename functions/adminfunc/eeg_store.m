@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/09/08 16:54:41  arno
+% fixed saved field
+%
 % Revision 1.29  2005/08/16 17:35:49  scott
 % EEG.changes_not_saved 'no'   ->   EEG.saved 'yes'   -sm
 %
@@ -163,13 +166,13 @@ if length(EEG) > 1
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
-            TMPEEG(index) = EEG;
+            TMPEEG        = eeg_store(TMPEEG, EEG, index);
         end;        
     else
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             [ALLEEG, EEG, storeSetIndex(index)] = eeg_store(ALLEEG, EEG);
-            TMPEEG(index) = EEG;
+            TMPEEG                              = eeg_store(TMPEEG, EEG, index);
         end;
     end;
     EEG = TMPEEG;
