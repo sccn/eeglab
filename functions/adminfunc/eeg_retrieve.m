@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/09/08 16:41:04  arno
+% fixing storing problem for saved datasets
+%
 % Revision 1.10  2005/08/08 18:03:55  arno
 % fix dissimilar structure problem
 %
@@ -82,14 +85,14 @@ end;
 try
     eeg_optionsbackup;
     eeg_options;
+    tmpsaved = ALLEEG(CURRENTSET).saved;
     if length(CURRENTSET) > 1 & option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
     else
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
     end;
-    if ~isempty(tmpcom)
-        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-    end;
+    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+    EEG.saved = tmpsaved;
 catch
 	fprintf('Warning: cannot retrieve dataset with index %d\n', CURRENTSET); 
 	return;
