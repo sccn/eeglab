@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/06/29 22:36:45  arno
+% typo
+%
 % Revision 1.27  2005/05/24 17:31:18  arno
 % remove cell2mat
 %
@@ -140,7 +143,7 @@ if nargin < 1
 	help pop_eegfilt;
 	return;
 end;	
-if isempty(EEG.data)
+if isempty(EEG(1).data)
     disp('Pop_eegfilt() error: cannot filter an empty dataset'); return;
 end;    
 if nargin < 2
@@ -180,7 +183,15 @@ else
         revfilt = 0;
     end;
 end;
- 
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    [ EEG com ] = eeg_eval( 'pop_eegfilt', EEG, 'warning', 'on', 'params', ...
+                            { locutoff, hicutoff, filtorder, revfilt } );
+    return;
+end;
+
 options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
 if ~isempty( filtorder )
 	options = { options{:} filtorder };
