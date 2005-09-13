@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2005/09/08 22:11:37  arno
+% relad data if necessary
+%
 % Revision 1.56  2005/08/17 23:26:01  arno
 % fixing version problem
 %
@@ -245,6 +248,7 @@ if nargin < 2
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
+    if ~isstr(filename), return; end;
     drawnow;
     options = { 'filename' filename 'filepath' filepath };
 else
