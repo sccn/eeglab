@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/09/08 21:53:29  arno
+% same
+%
 % Revision 1.31  2005/09/08 21:37:17  arno
 % fix storing multiple datasets
 % /
@@ -207,6 +210,7 @@ if nargin < 4
 else % savedata
      % --------
     eeg_optionsbackup;
+    clear functions;
     eeg_options;
     if option_storedisk & strcmpi(EEG.saved, 'no')
         if option_warningstore & strcmpi(varargin{1}, 'savegui')
