@@ -9,4 +9,4 @@ option_warningstore = 1 ;   % If set, warn user before overwriting a dataset fil
 option_savematlab = 1 ;  % If set, write the data and dataset structure into the same file; if unset, write two files per dataset (.dat .set).
 option_computeica = 1 ;  % If set, precompute ICA activations. This requires more RAM but allows faster plotting of component activations. 
 % Folder options
-option_rememberfolder = 1 ;  % If set, when reading dataset assume the folder/directory of previous dataset; if unset, assume the present working folder/directory (pwd).
+option_rememberfolder = 1 ;  % If set, when reading dataset assume the folder/directory of previous dataset.
