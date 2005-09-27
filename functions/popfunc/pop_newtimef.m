@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2005/08/05 17:13:34  arno
+% same
+%
 % Revision 1.35  2005/08/05 17:12:52  arno
 % fixed command line call
 %
@@ -319,7 +322,7 @@ end;
 if length( options ) < 2
     options = '';
 end;
-if nargin < 3
+if nargin < 4
     varargout{1} = sprintf('figure; pop_newtimef( %s, %d, %d, [%s], [%s] %s);', inputname(1), typeproc, num, ...
 			int2str(tlimits), num2str(cycles), options);
 end;
