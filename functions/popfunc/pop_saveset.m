@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2005/09/13 22:58:22  arno
+% handle canceling save
+%
 % Revision 1.57  2005/09/08 22:11:37  arno
 % relad data if necessary
 %
@@ -244,7 +247,13 @@ end;
 if isempty(EEG)  , error('Cannot save empty datasets'); end;
 if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
 
-if nargin < 2
+% empty filename (resave file)
+emptyfilename = 0;
+if nargin > 1
+    if isempty(varargin{1}), emptyfilename = 1; end;
+end;
+
+if nargin < 2 | emptyfilename
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
