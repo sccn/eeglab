@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2005/05/24 17:07:05  arno
+% cell2mat - celltomat
+%
 % Revision 1.71  2005/03/10 17:42:11  arno
 % new format for channel location info
 %
@@ -415,7 +418,7 @@ chanformat(10).description  = [ 'EEGLAB file containing polar, cartesian 3-D, an
                                'electrode locations.' ];
 chanformat(10).importformat = { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' ...
                                'sph_radius' };
-chanformat(10).skipline     = 2;
+chanformat(10).skipline     = 1;
 % ---------------------------------------------------------------------------------------------------
 chanformat(11).type         = 'custom';
 chanformat(11).typestring   = 'Custom file format';
