@@ -4,7 +4,7 @@
 %   >> strout = strmultiline( strin, maxlen, delimiter);
 %
 % Inputs:
-%   strin     - one-line string
+%   strin     - one-line or several-line string
 %   maxlen    - maximum line length
 %   delimiter - enter 10 here to separate lines with character 10. Default is
 %               empty: lines are on different rows of the returned array.
@@ -34,11 +34,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/20 18:39:14  scott
+% help msg
+%
 % Revision 1.1  2005/03/09 19:15:22  arno
 % Initial revision
 %
 
-function strout = strmultiline( strin, maxlen, delimiter);
+function strout = strmultiline( strinori, maxlen, delimiter);
 
 if nargin < 1
 	help strmultiline;
@@ -48,27 +51,44 @@ if nargin < 3
     delimiter = [];
 end;
 
-lines = {};
-count = 1;
-curline = '';
-while ~isempty( strin )
-    [tok strin] = strtok(strin);
-    if length(curline) + length(tok) +1 > maxlen
-        lines{count} = curline;
-        curline      = '';
-        count = count + 1;
+strout = [];
+for index = 1:size(strinori,1) % scan lines
+    strin = deblank(strinori(index, :));
+    lines = {};
+    count = 1;
+    curline = '';
+    
+    while ~isempty( strin )
+        [tok strin] = strtok(strin);
+        if length(curline) + length(tok) +1 > maxlen
+            lines{count} = curline;
+            curline      = '';
+            count = count + 1;
+        end;
+        if isempty(curline) curline = tok;
+        else                curline = [ curline ' ' tok ];
+        end;
     end;
-    if isempty(curline) curline = tok;
-    else                curline = [ curline ' ' tok ];
+    if ~isempty(curline), lines{count} = curline; end;
+    
+    % type of delimiter
+    % -----------------
+    if isempty(delimiter)
+        strouttmp = strvcat(lines{:});
+        if isempty(strouttmp)
+            strouttmp = ones(1,maxlen)*' ';
+        elseif size(strouttmp, 2) < maxlen
+            strouttmp(:,end+1:maxlen) = ' ';
+        end;
+        strout = [ strout; strouttmp ];
+    else
+        strouttmp = lines{1};
+        for index = 2:length(lines)
+            strouttmp = [ strouttmp 10 lines{index} ];
+        end;
+        if index == 1, strout = strouttmp;
+        else strout = [ strout 10 strouttmp ];
+        end;
     end;
 end;
-if ~isempty(curline), lines{count} = curline; end;
 	 
-if isempty(delimiter)
-    strout = strvcat(lines{:});
-else
-    strout = lines{1};
-    for index = 2:length(lines)
-        strout = [ strout 10 lines{index} ];
-    end;
-end;
