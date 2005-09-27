@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/05/24 17:26:56  arno
+% remove cell2mat
+%
 % Revision 1.15  2004/09/23 18:19:37  hilit
 % corrected a bug, that in the case of boundaries in continuous data prevented from resampling.
 %
@@ -204,6 +207,7 @@ EEG.icaact = [];
 fprintf('resampling finished\n');
 
 EEG.setname = [EEG.setname ' resampled'];
+EEG.pnts    = size(EEG.data,2);
 
 command = sprintf('EEG = pop_resample( %s, %d);', inputname(1), freq);
 return;
@@ -213,14 +217,11 @@ return;
 function tmpeeglab = myresample(data, pnts, new_pnts);
     Y  = [1 2];
 	for index1 = 1:size(data,1)
-		fprintf('Channel %d\n', index1);	
 		for index3 = 1:size(data,3)
 			X = [1:pnts];
 			XX = linspace( 1, pnts, new_pnts);
-			tmpsig = [ squeeze(data(index1, :, index3))' squeeze(data(index1, :, index3))'];
-   			[Xi,Yi,Zi] = griddata(Y,X', tmpsig , Y, XX', 'invdist');   % interpolate data
-			tmpeeglab(index1,:, index3) = Zi(:,1);
+            cs = spline( X, squeeze(data(index1, :, index3))');
+            tmpeeglab(index1,:, index3) = ppval(cs, XX);
 			fprintf('.');
 		end;
-		fprintf('\n');	
 	end;
