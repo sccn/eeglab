@@ -30,25 +30,28 @@
 %   'tlim'     - [min max] Time window (ms) to plot data {default: whole time range}
 %   'title'    - [string] Plot title {default: none}
 %   'ylim'     - [min max] y-axis limits {default: auto from data limits}
-%   'std'      - ['on'|'off'|'none'] 'on' -> plot std. devs.; 'none' -> do not 
-%                interact with other options {default:'none'}
-%   'addstd'   - ['on'|'off'] Plot std. dev. for 'datadd' datasets only 
-%                {default: 'on' if 'datsub' empty, otherwise 'off'}
-%   'substd'   - ['on'|'off'] Plot std. dev. of 'datsub' datasets only {default:'off'}
-%   'diffstd'  - ['on'|'off'] Plot std. dev. of 'datadd'-'datsub' differences {default:'on'}
 %   'mode'     - ['ave'|'rms'] Plotting mode. Plot  either grand average or RMS 
 %                (root mean square) time course(s) {default: 'ave' -> grand average}.
+%   'std'      - ['on'|'off'|'none'] 'on' -> plot std. devs.; 'none' -> do not 
+%                interact with other options {default:'none'}
+%
+% Vizualisation options:
 %   'addavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datadd' datasets
 %                {default: 'on' if 'datsub' empty, otherwise 'off'}
 %   'subavg'   - ['on'|'off'] Plot grand average (or RMS) of 'datsub' datasets 
 %                {default:'off'}
-%   'allerps'  - ['on'|'off'|'none'] 'on' -> show ERPs for all conditions; 
-%                'none' -> do not affect other options {default:'none'}
+%   'diffavg'  - ['on'|'off'] Plot grand average (or RMS) difference 
 %   'addall'   - ['on'|'off'] Plot the ERPs for all 'dataadd' datasets only {default:'off'}
 %   'suball'   - ['on'|'off'] Plot the ERPs for all 'datasub datasets only {default:'off'}
 %   'diffall'  - ['on'|'off'] Plot all the 'datadd'-'datsub' ERP differences {default:'off'}
+%   'addstd'   - ['on'|'off'] Plot std. dev. for 'datadd' datasets only 
+%                {default: 'on' if 'datsub' empty, otherwise 'off'}
+%   'substd'   - ['on'|'off'] Plot std. dev. of 'datsub' datasets only {default:'off'}
+%   'diffstd'  - ['on'|'off'] Plot std. dev. of 'datadd'-'datsub' differences {default:'on'}
 %   'diffonly' - ['on'|'off'|'none'] 'on' -> plot difference only; 'none' -> do not affect 
 %                other options {default:'none'}
+%   'allerps'  - ['on'|'off'|'none'] 'on' -> show ERPs for all conditions; 
+%                'none' -> do not affect other options {default:'none'}
 %   'tplotopt' - [cell array] Pass 'key', val' plotting options to plottopo()
 %
 % Output:
@@ -85,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/03/31 17:51:42  arno
+% debugging scott error message
+%
 % Revision 1.31  2005/03/22 16:14:46  arno
 % fixing error
 %
@@ -207,12 +213,12 @@ if nargin < 3
                  'end;'];
 	uilist = { { } ...
                { 'style' 'text' 'string' 'avg.        std.      all ERPs' } ...
-               { 'style' 'text' 'string' 'Datasets to add (ex: 1 3 4):' } ...
+               { 'style' 'text' 'string' 'Datasets to average (ex: 1 3 4):' } ...
                { 'style' 'edit' 'string' '' } ...
                { 'style' 'checkbox' 'string' '' 'value' 1 } ...
                { 'style' 'checkbox' 'string' '' } ...
                { 'style' 'checkbox' 'string' '' } { } ...
-	           { 'style' 'text' 'string' 'Datasets to subtract (ex: 5 6 7):' } ...
+	           { 'style' 'text' 'string' 'Datasets to average and subtract (ex: 5 6 7):' } ...
                { 'style' 'edit' 'string' '' } ...
                { 'style' 'checkbox' 'string' '' 'value' 1 } ...
                { 'style' 'checkbox' 'string' '' } ...
@@ -320,6 +326,22 @@ end;
 if length(datsub) > 0 & length(datadd) ~= length(datsub)
     error('The number of component to subtract must be the same as the number of components to add');
 end;
+
+% if only 2 dataset entered, toggle average to single trial
+% ---------------------------------------------------------
+if length(datadd) == 1 &strcmpi(g.addavg, 'on')
+    g.addavg  = 'off';
+    g.addall = 'on';
+end;
+if length(datsub) == 1 &strcmpi(g.subavg, 'on')
+    g.subavg  = 'off';
+    g.suball = 'on';
+end;
+if length(datsub) == 1 & length(datadd) == 1 &strcmpi(g.diffavg, 'on')
+    g.diffavg  = 'off';
+    g.diffall = 'on';
+end;      
+
 regions = {};
 pnts   = ALLEEG(datadd(1)).pnts;
 srate  = ALLEEG(datadd(1)).srate;
