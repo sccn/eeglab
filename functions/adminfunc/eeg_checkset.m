@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.163  2005/08/04 23:41:56  arno
+% fix loaddata option
+%
 % Revision 1.162  2005/08/04 15:31:15  arno
 % error if using savedata
 %
@@ -689,7 +692,7 @@ if length(EEG) > 1
     % standard checking
     % -----------------
     for index = 1:length(EEG)
-        if ~isempty(EEG(index))
+        if ~isempty(EEG(index).data)
             if ~isempty( varargin)
                 [TMP, res] = eeg_checkset(EEG(index), varargin{:});
             else
@@ -1249,7 +1252,9 @@ if ~isempty( varargin)
           end;
          case 'event', 
           if isempty(EEG.event)
-              errordlg2(strvcat('Cannot process if no events. Add events.', 'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
+              errordlg2(strvcat('Cannot process if no events. Add events.', ...
+                  'Use "Edit > event fields" to create event fields.', ...
+                  'Or use "File > Import event info" or "File > Import epoch info"'), 'Error');
               error('eeg_checkset: no events'); return;
           end;
          case 'chanloc', 
@@ -1428,12 +1433,14 @@ if ~isempty( varargin)
           % check that numeric format is double (Matlab 7)
           % -----------------------------------
           allf = fieldnames(EEG.event);
-          for index = 1:length(allfields)
-              clear tmpval; tmpval = getfield(EEG.event,{ 1 },allf{index});
-              if isnumeric(tmpval) & ~isa(tmpval, 'double')
-                  for indexevent = 1:length(EEG.event)
-                      tmpval  =   getfield(EEG.event, { indexevent }, allf{index} );
-                      EEG.event = setfield(EEG.event, { indexevent }, allf{index}, double(tmpval));
+          if ~isempty(EEG.event)
+              for index = 1:length(allfields)
+                  clear tmpval; tmpval = getfield(EEG.event,{ 1 },allf{index});
+                  if isnumeric(tmpval) & ~isa(tmpval, 'double')
+                      for indexevent = 1:length(EEG.event)
+                          tmpval  =   getfield(EEG.event, { indexevent }, allf{index} );
+                          EEG.event = setfield(EEG.event, { indexevent }, allf{index}, double(tmpval));
+                      end;
                   end;
               end;
           end;
