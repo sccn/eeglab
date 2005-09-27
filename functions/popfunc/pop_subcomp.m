@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/09/05 21:37:50  scott
+% clarified trial-ERP and Confirmation window comments. -sm
+%
 % Revision 1.11  2003/12/24 19:40:58  scott
 % edti help msg and text
 %
@@ -139,29 +142,38 @@ else
 end;    
 compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
 
-if  nargin < 2 | plotag ~= 0
-   tracing  = [ squeeze(mean(EEG.data,3)) squeeze(mean(compproj,3))];
-	figure;   
-	plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], 'Trial ERPs (red) with and (blue) without these components');
-end;
 %fprintf( 'The ICA projection accounts for %2.2f percent of the data\n', 100*varegg);
 	
 if nargin < 2 | plotag ~= 0
 
-    ButtonName=questdlg2( 'Actually remove these components?', ...
-                         'Confirmation', 'NO', 'YES', 'YES');
+    ButtonName = 'continue';
+    while ~strcmpi(ButtonName, 'Cancel') & ~strcmpi(ButtonName, 'Accept')
+        ButtonName=questdlg2( [ 'Please confirm. Are you sure you want to remove these components?' ], ...
+                             'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
+        if strcmpi(ButtonName, 'Plot ERPs')
+            if EEG.trials > 1
+                tracing  = [ squeeze(mean(EEG.data,3)) squeeze(mean(compproj,3))];
+                figure;   
+                plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], ...
+                    'Trial ERPs (red) with and (blue) without these components');
+            else
+                warndlg2('Cannot plot ERPs for continuous data');
+            end;
+        elseif strcmpi(ButtonName, 'Plot single trials')  
+        	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
+            	 'limits', [EEG.xmin EEG.xmax]*1000, 'data2', compproj); 
+        end;
+    end;    
     switch ButtonName,
-        case 'NO', 
+        case 'Cancel', 
         	disp('Operation cancelled');
-			close(gcf);
-        	return;   
-        case 'YES',
+        	return; 
+        case 'Accept',
        		disp('Components removed');
     end % switch
-	close(gcf);
 end;
 EEG.data  = compproj;
-EEG.setname = 'ICA filtered';
+EEG.setname = [ EEG.setname ' pruned with ICA'];
 EEG.icaact = [];
 EEG.icawinv    = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
 EEG.icaweights = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
