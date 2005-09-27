@@ -39,6 +39,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/08/05 17:08:13  arno
+% fixing structure to string for Matlab
+% 7
+%
 % Revision 1.14  2005/03/30 22:36:27  arno
 % matlab 5.3 compatibility
 %
@@ -152,7 +156,12 @@ function str = str2str( array )
 	if isempty( array), str = ''''''; return; end;
 	str = '';
 	for index = 1:size(array,1)
-		str = [ str ', ''' doublequotes(array(index,:)) '''' ];
+        tmparray = deblank(array(index,:));
+        if isempty(tmparray)
+            str = [ str ', '' ''' ];
+        else    
+            str = [ str ', ''' doublequotes(tmparray) '''' ];
+        end;
 	end;
 	if size(array,1) > 1
 		str = [ 'strvcat(' str(2:end) ')'];
