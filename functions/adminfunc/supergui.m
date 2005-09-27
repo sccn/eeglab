@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2005/09/27 21:55:09  arno
+% remove *1.15 aspect ratio multuplication for Windows
+%
 % Revision 1.40  2004/11/10 16:51:13  arno
 % debug last + header
 %
@@ -321,12 +324,12 @@ try,
 	if strcmp(computer, 'MAC')
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
-			factmulty = factmulty*1.4;
+			factmulty = factmulty;
 		end;
 	elseif ~isunix % windows
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
-			factmulty = factmulty;
+			factmulty = factmulty*1.08;
 		end;
     end;
 catch, end;
