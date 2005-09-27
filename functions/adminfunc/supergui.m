@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2004/11/10 16:51:13  arno
+% debug last + header
+%
 % Revision 1.39  2004/11/10 16:47:37  arno
 % do not take listbox size into account
 %
@@ -323,7 +326,7 @@ try,
 	elseif ~isunix % windows
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
-			factmulty = factmulty*1.15;
+			factmulty = factmulty;
 		end;
     end;
 catch, end;
