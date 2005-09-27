@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2005/09/13 16:12:09  scott
+% help msg
+%
 % Revision 1.129  2005/09/08 21:40:39  arno
 % fix return call for multiple datasets
 %
@@ -540,7 +543,7 @@ chansout = chans;
 com ='';
 if nargin < 1
    params = [];
-   help pop_editeventvals;
+   help pop_chanedit;
    return;
 end;
 
@@ -777,7 +780,7 @@ if nargin < 3
                         '            { ''style'', ''listbox'', ''string'', strvcat(tmpformatstr) ''callback'' ''tmpdesc=get(gcbf, ''''userdata''''); set(findobj(gcbf, ''''tag'''', ''''strdesc''''), ''''string'''',  strmultiline([ ''''File format: '''' tmpdesc{get(gcbo, ''''value'''')} ], 30, 10)); clear tmpdesc;'' } }, ''pophelp(''''readlocs'''')'',' ...
                         '            ''Read electrode file'', tmpformatdesc, ''normal'', 4);' ...
 						'   if isempty(tmpfmt), comtmp = {''load'' [] };' ...
-						'   else comtmp = {''load'' { [tmpp tmpf ] ''filetype'' tmpformattype{tmpfmt{1}} } };' ... 
+						'   else comtmp = {''load'' { fullfile(tmpp, tmpf) ''filetype'' tmpformattype{tmpfmt{1}} } };' ... 
                         '   end; clear tmpfmt tmpp tmpf tmpformats tmpformattype tmpformatstr tmpformatdesc;' ...
                         'else comtmp = {''load'' [] };' ...
                         'end;' endgui ];
@@ -1153,11 +1156,13 @@ else
            tmplocs = readlocs( args{ curfield+1 } );
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
+               chans = struct('labels', { chans.labels });
                for index = 1:length(chans)
                    chans(index).datachan = index;
                end;
                [ind2 ind3] = sort(ind2);
                ind1 = ind1(ind3);
+
                for index = 1:length(ind2)
                    chans(ind2(index)).theta      = tmplocs(ind1(index)).theta;
                    chans(ind2(index)).radius     = tmplocs(ind1(index)).radius;
@@ -1241,7 +1246,7 @@ else
                        { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
             
             res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', ...
-                           userdata, 'normal', [3 1 1] );
+                           userdata, 'normal', [3 1.5 1] );
             if ~isempty(res)
                 %[chans params]  = pop_chanedit(chans, params, 'lookup', res{2});	
                 com = { 'lookup' res{2} };
