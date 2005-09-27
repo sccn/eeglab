@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.398  2005/09/08 22:20:12  arno
+% add filter for multiple dataset
+%
 % Revision 1.397  2005/08/15 16:17:06  arno
 % adding back history
 %
@@ -1406,7 +1409,7 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 % ------------------------
 addpath(eeglabpath);
 comp = computer;
-if (strcmpi(comp(1:4), 'GLNX') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
+if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
