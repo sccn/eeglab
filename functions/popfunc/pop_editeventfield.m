@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2005/05/24 17:00:07  arno
+% cell2mat
+%
 % Revision 1.37  2004/10/16 21:12:46  scott
 % editing help message -- NEEDS MORE WORK! 'delold' and adding events to end of event struct
 % do not appear to be working -sm
@@ -223,7 +226,7 @@ I = [];
 % remove the event field
 % ----------------------
 if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
-else                    allfields = {}; end;
+else                    allfields = { 'type' 'latency' }; end;
     
 if nargin<2
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
@@ -329,14 +332,9 @@ if nargin<2
 	    %---------------------------
 	    sub = 3;
 	    if ~isempty( results{end-sub} )
-	        if ~isempty( results{end-sub+1} )
-	            if exist(results{end-sub+1}) == 2,  args = { args{:}, results{end-sub}, [ results{end-sub+1} ] }; % file
-	            else                                args = { args{:}, results{end-sub}, results{end-sub+1} }; end;
-	            if ~isempty( userdat{end} ),        args = { args{:}, [ results{end-sub} 'info' ], userdat{end} }; end;
-	        else
-	            disp(['pop_editeventfield(): The new field' results{end-sub} ' was ignored since no input data were given for it.' ]);
-	        end;
-	    end;  
+            args = { args{:}, results{end-sub}, results{end-sub+1} }; % file
+	    end;
+        
         % handle rename 
         % -------------
         if results{end-1} ~= 1, args = { args{:}, 'rename', [ allfields{results{end-1}-1} '->' results{end} ] }; end;  
