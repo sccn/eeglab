@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.256  2005/09/05 15:58:14  scott
+% nothing - spacing while looking through code -sm
+%
 % Revision 1.255  2005/07/27 18:12:59  arno
 % removing datachan check
 %
@@ -933,8 +936,8 @@ if nargs > 2
 	 case 'chaninfo'
 	  CHANINFO = Value;
       if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end;
-      if isfield(CHANINFO, 'plotrad'), plotrad      = CHANINFO.plotrad; end;
       if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end;          
+      if isfield(CHANINFO, 'plotrad') & isempty(plotrad), plotrad = CHANINFO.plotrad; end;
 	 case 'drawaxis'
 	  DRAWAXIS = Value;
 	 case 'maplimits'
