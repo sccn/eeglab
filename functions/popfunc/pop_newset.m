@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/08/16 17:54:39  scott
+% edit help message. EEG.changes_not_saved -> EEG.saved   -sm
+%
 % Revision 1.28  2005/08/08 18:43:33  arno
 % do not erase filename and filepath
 %
@@ -189,14 +192,8 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
 elseif length(EEG) > 1
     % processing multiple datasets
     % ----------------------------
-    res = questdlg2(strvcat( 'When processing multiple datasets,', 'old datasets are automatically overwritten.', ...
-                           'Do you still wish to proceed?'), 'Multiple dataset warning', 'Cancel', 'Proceed', 'Proceed');
-    if strcmpi(res, 'Proceed')
-        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );
-        com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );';
-    else
-        EEG = ALLEEG(CURRENTSET);
-    end;
+    [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET ); % it is possible to undo the operation here
+    com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );';
     return;
 else
     % no interactive inputs
@@ -211,7 +208,12 @@ for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
-	 case 'retrieve'  , EEG = eeg_retrieve(ALLEEG, args{ind+1}); overWflag = 1; com = ''; return;
+	 case 'retrieve'  , if ~isempty(ALLEEG) 
+                            EEG = eeg_retrieve(ALLEEG, args{ind+1}); 
+                        else
+                            EEG = eeg_emptyset;
+                        end;
+                        overWflag = 1; com = ''; return;
 	 case 'save'      , [filepath filename ext] = fileparts( args{ind+1} );
                         EEG.saved = 'yes';
                         EEG = pop_saveset(EEG, [ filename ext ], filepath);
