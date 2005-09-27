@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/08/18 15:22:34  arno
+% fix version call
+%
 % Revision 1.2  2005/08/01 17:02:29  arno
 % allowing to process multiple files
 %
@@ -62,13 +65,24 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     
     % warning pop up
     % --------------
-    if isstr(EEG(1).data) & strcmpi(g.warning, 'on')
-        ButtonName=questdlg2( [ 'Data files on disk will be automatically overwritten.' 10 ...
-                                'Are you sure you want to continue?' ], ...
-                            'Confirmation', 'Cancel', 'Yes','Yes');
-        switch lower(ButtonName),
+    if strcmpi(g.warning, 'on')
+        eeg_optionsbackup;
+        clear functions;
+        eeg_options;
+        if ~option_storedisk
+            res = questdlg2(strvcat( 'When processing multiple datasets, it is not', ...
+                                 'possible to enter new names for the newly created', ...
+                                 'datasets and old datasets are overwritten.', ...
+                                 'You may still cancel this operation though.'), ...
+                 'Multiple dataset warning', 'Cancel', 'Proceed', 'Proceed');
+        else
+            res = questdlg2( [ 'Data files on disk will be automatically overwritten.' 10 ...
+                                'Are you sure you want to proceed with this operation?' ], ...
+                            'Confirmation', 'Cancel', 'Proceed', 'Proceed');
+        end;
+        switch lower(res),
          case 'cancel', return;
-         case 'yes',;
+         case 'proceed',;
         end;
     end;
  
@@ -81,14 +95,15 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         eval( [ 'func = @' funcname ';' ] );
     end;
         
+    NEWEEG = [];
     for i = 1:length(EEG)
         fprintf('Processing group dataset %d of %d named: %s ****************\n', i, length(EEG), EEG(i).setname);
         TMPEEG    = eeg_retrieve(EEG, i);
         if v(1) == '5', eval(command);                      % Matlab 5
         else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
         end;
-        TMPEEG    = eeg_checkset(TMPEEG, 'savedata');
-        NEWEEG(i) = TMPEEG;
+        TMPEEG = eeg_checkset(TMPEEG, 'savedata');
+        NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
     end;
     EEG = NEWEEG;
 
