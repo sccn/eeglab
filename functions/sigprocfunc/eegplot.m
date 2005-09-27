@@ -101,6 +101,8 @@
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
 %    'ploteventdur' - ['on'|'off'] Toggle display of event duration { default: 'on' }
+%    'data2'      - [float array] identical size to the original data and
+%                   plotted on top of it.
 %
 % Additional keywords:
 %    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
@@ -163,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2005/05/24 17:15:08  arno
+% cell2mat -> celltomat
+%
 % Revision 1.106  2005/03/20 18:33:31  scott
 % help msg
 %
@@ -590,6 +595,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.scale; 		    catch, g.scale      = 'on'; end;
    try, g.events; 		    catch, g.events      = []; end;
    try, g.ploteventdur;     catch, g.ploteventdur = 'on'; end;
+   try, g.data2;            catch, g.data2      = []; end;
+   try, g.plotdata2;        catch, g.plotdata2 = 'off'; end;
 
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
@@ -602,7 +609,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'ploteventdur' 'butlabel' 'scale' 'events' },;
+               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -1424,21 +1431,35 @@ else
     
     % Plot data and update axes
     % -------------------------
-    switch lower(g.submean) % subtract the mean ?
-     case 'on', meandata = mean(data(:,lowlim:highlim)');  
-     case 'nan',meandata = nan_mean(data(:,lowlim:highlim)');
-     otherwise, meandata = zeros(1,g.chans);
+    if ~isempty(g.data2)
+        switch lower(g.submean) % subtract the mean ?
+            case 'on', meandata = mean(g.data2(:,lowlim:highlim)');  
+            case 'nan',meandata = nan_mean(g.data2(:,lowlim:highlim)');
+            otherwise, meandata = zeros(1,g.chans);
+        end;
+    else
+        switch lower(g.submean) % subtract the mean ?
+            case 'on', meandata = mean(data(:,lowlim:highlim)');  
+            case 'nan',meandata = nan_mean(data(:,lowlim:highlim)');
+            otherwise, meandata = zeros(1,g.chans);
+        end;
     end;
-    axes(ax1)
-    cla
+    if strcmpi(g.plotdata2, 'off')
+        axes(ax1)
+        cla
+    end;
      
     % plot data
     % ---------
     axes(ax1)
     hold on
     for i = 1:g.chans
+        if strcmpi(g.plotdata2, 'on')
+             tmpcolor = [ 1 0 0 ];
+        else tmpcolor = g.color{mod(i-1,length(g.color))+1};
+        end; 
         plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
-             'color', g.color{mod(i-1,length(g.color))+1}, 'clipping','on')
+             'color', tmpcolor, 'clipping','on')
     end
      
     % draw selected channels
@@ -1467,7 +1488,6 @@ else
 
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
-    eegplot('drawb');
 	
 	 if g.children ~= 0
 		if ~exist('p2')
@@ -1476,6 +1496,22 @@ else
 		eegplot( 'drawp', p1, p2, g.children);
 		figure(figh);
 	 end;	  
+
+     % draw second data if necessary
+     if ~isempty(g.data2)
+         tmpdata = data;
+         set(ax1, 'userdata', g.data2);
+         g.data2 = [];
+         g.plotdata2 = 'on';
+         set(figh, 'userdata', g);
+         eegplot('drawp', 0);
+         g.plotdata2 = 'off';
+         g.data2 = get(ax1, 'userdata');
+         set(ax1, 'userdata', tmpdata);
+         set(figh, 'userdata', g);
+     else 
+         eegplot('drawb');
+     end;
   
   case 'drawb' % Draw background ******************************************************
     % Redraw EEG and change position
@@ -1931,7 +1967,7 @@ else
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
-          set(fig2, 'position', [ pos(1) pos(2) 130 10*nleg+20]);
+          set(fig2, 'position', [ pos(1) pos(2) 130 14*nleg+20]);
           
           for index = 1:nleg
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
