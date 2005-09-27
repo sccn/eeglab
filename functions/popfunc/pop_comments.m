@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2004/05/14 18:24:00  arno
+% fixing double quote problem
+%
 % Revision 1.12  2004/05/14 17:16:18  hilit
 % chnaged the help message
 %
@@ -93,21 +96,22 @@ com = '';
 if exist('comments') ~=1, comments = '';
 elseif iscell(comments), comments = strvcat(comments{:}); 
 end;
+
+% remove trailing blanks and make multiline
+comments = strmultiline( comments, 53);
+
 if nargin < 3
     newcomments = comments;
-end;
-if nargin < 3
 	try, icadefs;
 	catch,
 		BACKCOLOR  =  [.8 .8 .8];     
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
 	end;
-	figure('menubar', 'none', 'color', BACKCOLOR, ...
+	figure('menubar', 'none', 'color', BACKCOLOR, 'userdata', 0, ...
 		   'numbertitle', 'off', 'name', 'Read/Enter comments -- pop_comments()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
 	s = [pos(3) pos(4) pos(3) pos(4)]./100;
-	set(gcf, 'userdata', 0);
 	if exist('plottitle') ~=1, plottitle = ''; end;
 	
 	h = title(plottitle);
@@ -119,39 +123,56 @@ if nargin < 3
 	% ------------------
   	uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
-	'Position', [0 0 20 10].*s+q, ...
+	'Position', [0 -5 20 10].*s+q, ...
 	'backgroundcolor', GUIBUTTONCOLOR, ...
-	'string','CANCEL', 'callback', ...
-		[ 'set(gcbf, ''userdata'', -1);' ]);
+	'string','CANCEL', 'callback', 'close(gcbf);' );
 		
   	uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
-	'Position', [80 0 20 10].*s+q, ...
+	'Position', [80 -5 20 10].*s+q, ...
 	'backgroundcolor', GUIBUTTONCOLOR, ...
 	'string','SAVE', 'callback', ...
 		[ 'set(gcbf, ''userdata'', ' ...
 		'get(findobj(''parent'', gcbf, ''tag'', ''edit''), ''string''));' ]);
 
-
 	%hh = text( q(1), 100*s(2)+q(2), comments, 'tag', 'edit');
 	%set( hh, 'editing', 'on', 'verticalalignment', 'top');
-	
-  	hh = uicontrol('Parent',gcf, ...
+
+    %hh = uicontrol('Parent',gcf, ...
+  	%'Units','Normalized', ...
+  	%'style', 'text', ...
+	%'Position', [0 100 105 5].*s+q, ...
+	%'string', 'Warning: each blank line must contain at least a ''space'' character', ...
+	%'horizontalalignment', 'left', ...
+    %'backgroundcolor', BACKCOLOR );
+
+    hh = uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
   	'style', 'edit', ...
   	'tag', 'edit', ... 
-	'Position', [0 15 100 85].*s+q, ...
+	'Position', [0 10 105 85].*s+q, ...
 	'string', comments, ...
 	'backgroundcolor', [ 1 1 1], ...
 	'horizontalalignment', 'left', ...
-	'max', 2, ...
+	'max', 3, ...
 	'fontsize', 12);
 
-	waitfor(gcf, 'userdata');
+    % Try to use 'courier' since it has constant character size
+    lf = listfonts;
+    tmppos = strmatch('Courier', lf);
+    if ~isempty(tmppos)
+        set(hh, 'fontname', lf{tmppos(1)}, 'fontsize', 10);
+    end;
+    
+    waitfor(gcf, 'userdata');
 
-	if isstr(get(gcf, 'userdata'))
-		newcomments = get(gcf, 'userdata'); % ok button
-	end;		
+    % find return mode
+    if isempty(get(0, 'currentfigure')), return; end;
+    tmp = get(gcf, 'userdata');
+    if ~isempty(tmp) & isstr(tmp)    
+        newcomments = tmp; % ok button
+    else return;
+    end;
 
 	close(gcf);
 else
@@ -161,74 +182,24 @@ else
     if nargin > 3 & concat == 1
         newcomments = strvcat(comments, newcomments);
     end;
-end;	
+    return;
+end;
 
 I = find( comments(:) == '''');
 comments(I) = ' ';  
 if nargout > 1
-    if ~strcmp( comments, newcomments)
-
-        ccell    = str2cell( comments );
-        newccell = str2cell( newcomments );
-        
-        if length(ccell) < length(newccell)
-            allsame = 1;
-            for index = 1:length(ccell)
-                if ~strcmp(ccell{index}, newccell{index}), allsame = 0; end;
+        if ~strcmp( comments, newcomments)
+          allsame = 1;
+            for index = 1:size(comments, 1)
+                if ~strcmp(comments(index,:), newcomments(index,:)), allsame = 0; end;
             end;
         else
             allsame = 0;
         end;
         if allsame
-             com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', ...
-                         cell2str(newccell(length(ccell)+1:end)));
+             com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
         else 
-            com =sprintf('EEG.comments = pop_comments('''', '''', %s);', cell2str(newccell));     
+            com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     
         end;
-    end;  
 end;
-return;
- 
-function scell = str2cell( str )
-	scell = cellstr(str);
-	for index = 1:length(scell)
-        scell{index} = deblank(scell{index});
-	end;
-return;
-
-function array = str2array( str )
-	str = '[';
-	for index = 1:size(array,1)
-		str = [ str '; [' num2str(double(array(index,:))) '] ' ];
-	end;
-	str = [ str ']' ];
-return;
-
-function str = cell2str( array )
-	str = '';
-	for index = 1:length(array)
-        if isempty(array{index})
-            str = [ str ', '' ''' ];
-        else
-            str = [ str ', ''' doublequotes(array{index}) '''' ];
-        end;
-	end;
-	str = [ 'strvcat(' str(2:end) ')'];
-return;		 
-
-function str = str2str( array )
-	str = '';
-	for index = 1:size(array,1)
-		str = [ str ', ''' deblank(array(index,:)) ' ''' ];
-	end;
-	str = [ 'strvcat(' str(2:end) ')'];
-return;
-		 
-function str = doublequotes( str )
-        quoteloc = findstr( str, '''');
-        if ~isempty(quoteloc)
-                for index = length(quoteloc):-1:1
-                        str = [ str(1:quoteloc(index)) str(quoteloc(index):end) ];
-                end;
-        end;
 return;
