@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2005/08/31 18:22:42  scott
+% edited help message  -sm
+%
 % Revision 1.40  2005/08/01 17:02:50  arno
 % now calling eeg_eval
 %
@@ -381,8 +384,14 @@ if ~isempty(g.time)
     if size(g.time,2) ~= 2
         error('Time/point range must contain 2 columns exactly');
     end;
-    if max(g.time(:)) > EEG.xmax | min(g.time(:)) < EEG.xmin
-        error('Time/point range out of data limits');
+    for index = 1:length(g.time)
+        if g.time(index) > EEG.xmax
+            g.time(index) = EEG.xmax;
+            disp('Upper time limits exceed data, corrected');
+        elseif g.time(index) < EEG.xmin
+            g.time(index) = EEG.xmin;
+            disp('Lower time limits exceed data, corrected');
+        end;
     end;
 end;
 
