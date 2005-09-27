@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2005/07/28 18:18:19  arno
+% allowing to process mutliple datasets
+%
 % Revision 1.54  2005/07/26 23:55:17  arno
 % rewrote the function; allow to process several datasets
 %
@@ -295,7 +298,7 @@ end;
 % select datasets, create new big dataset if necessary
 % ----------------------------------------------------
 if length(g.dataset) == 1
-    EEG = ALLEEG(g.dataset)
+    EEG = ALLEEG(g.dataset);
 else
     disp('Concatenating datasets...');
     EEG = ALLEEG(g.dataset(1));
@@ -456,7 +459,7 @@ if length(g.dataset) > 1
     ALLEEG = eeg_checkset(ALLEEG);
 else
     EEG = eeg_checkset(EEG);
-    ALLEEG(g.dataset) = EEG;
+    ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
 end;
 
 if pop_up
