@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/03/09 18:50:12  arno
+% nothing
+%
 % Revision 1.10  2005/03/09 18:47:47  arno
 % warning message
 %
@@ -88,6 +91,10 @@ disp('         IF NOT, THE EXPORTED FILE COORDINATES MAY BE INNACURATE')
 % get infos from readlocs
 % -----------------------
 [chanformat listcolformat] = readlocs('getinfos');
+chanformat(end)    = [];
+listcolformat(end) = []; % remove chanedit
+chanformat(end)    = [];
+listcolformat(end) = []; % remove chanedit
 indformat  = [];
 for index = 1:length(chanformat), 
     if ~isstr(chanformat(index).importformat)
@@ -137,7 +144,7 @@ if nargin < 2
                    '  else,' ...
                    '     set(tmpobj1, ''value'', 0);' ...
                    '  end;' ...
-                   '  if tmpdata{4}(tmpval) == 1,' ...
+                   '  if tmpval == 1,' ... % besa only
                    '     set(tmpobj2, ''string'', ''' int2str(length(chans)) ''');' ...
                    '  else,' ...
                    '     set(tmpobj2, ''string'', '''');' ...
