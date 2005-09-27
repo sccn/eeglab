@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2005/05/24 17:34:59  arno
+% remove cell2mat
+%
 % Revision 1.40  2004/10/07 21:29:14  hilit
 % fixed the bug from command line call with 'delete' option
 %
@@ -242,15 +245,16 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       for index = 1:length(allfields) 
           
           enable = 'on';
+          if isfield(EEG.event, 'type') 
+              if strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end;
+          end;
           if strcmp( allfields{index}, 'latency') & ~isempty(EEG.event(valnum).latency)
-              if isfield(EEG.event, 'type') & strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end;
               if isfield(EEG.event, 'epoch')
                    value = eeg_point2lat( EEG.event(valnum).latency, EEG.event(valnum).epoch, ...
                                           EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
               else value = (EEG.event(valnum).latency-1)/EEG.srate+EEG.xmin;
               end;
           elseif strcmp( allfields{index}, 'duration') & ~isempty(EEG.event(valnum).duration)
-              if isfield(EEG.event, 'type') & strcmpi(EEG.event(valnum).type, 'boundary'), enable = 'off'; end;
               if isfield(EEG.event, 'epoch')
                    value = EEG.event(valnum).duration/EEG.srate*1000; % milliseconds
               else value = EEG.event(valnum).duration/EEG.srate;      % seconds
