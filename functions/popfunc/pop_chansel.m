@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/07/28 15:47:51  arno
+% allow using input indices
+%
 % Revision 1.15  2004/11/10 17:34:46  arno
 % add selection mode
 %
@@ -99,7 +102,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'     { 'string' 'integer' } {'on' 'off'}   'off';
+    g = finputcheck(varargin, { 'withindex'     {  'integer' 'string' } { [] {'on' 'off'} }   'off';
                                 'select'        { 'cell' 'string' 'integer' } [] [];
                                 'selectionmode' 'string' { 'single' 'multiple' } 'multiple'});
     if isstr(g), error(g); end;
