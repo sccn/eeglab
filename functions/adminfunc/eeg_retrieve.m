@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/09/08 21:58:58  arno
+% preserving 'saved' field
+%
 % Revision 1.13  2005/09/08 21:37:31  arno
 % fix retrieving multiple datasets
 %
@@ -91,13 +94,22 @@ end;
 %try
     eeg_optionsbackup;
     eeg_options;
-    tmpsaved = { ALLEEG(CURRENTSET).saved };
+    try, 
+           tmpsaved = { ALLEEG(CURRENTSET).saved };
+    catch, tmpsaved = 'no';
+    end;
     if length(CURRENTSET) > 1 & option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
+        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
     else
-        [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
+        if CURRENTSET ~= 0
+            [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
+            [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+        else
+            EEG = eeg_emptyset; % empty dataset
+            return;
+        end;
     end;
-    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
     
     % retain saved field
     % ------------------
