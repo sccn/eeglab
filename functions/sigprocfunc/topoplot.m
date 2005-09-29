@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.257  2005/09/27 21:59:49  arno
+% fix plotrad issue call from pop_chanedit
+%
 % Revision 1.256  2005/09/05 15:58:14  scott
 % nothing - spacing while looking through code -sm
 %
