@@ -101,8 +101,12 @@
 %
 % Add other features:
 %   'cbar'   - Plot color bar to right of ERP-image {default no}
-%   'topo'   - {map_vals,eloc_file} Plot a 2-D scalp map at upper left of image. 
-%               See '>> topoplot example' for electrode location file structure.
+%   'topo'   - {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image. 
+%               map may be a single integer, representing the plotted data channel, 
+%               or a vector of scalp map channel values. chan_locs may be a channel locations 
+%               file or a chanlocs structure (EEG.chanlocs). See '>> topoplot example' 
+%               eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
+%               points towards the nose and all channels are plotted {default: no scalp map}
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
 %   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
@@ -174,6 +178,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.244  2005/03/10 16:54:32  arno
+% returning percentiles
+%
 % Revision 1.243  2005/03/10 16:47:52  arno
 % chaning variable name
 %
@@ -3251,11 +3258,20 @@ if (~isempty(topomap)) & strcmpi(noshow, 'no')
                 0.20*gcapos(3) 0.14*gcapos(4)]);
     % h(12) = subplot('Position',[.10 .86 .20 .14]); 
     fprintf('Plotting a topo map in upper left.\n');
+        eloc_info.plotrad = [];
 	if length(topomap) == 1
+           try
 		topoplot(topomap,eloc_file,'electrodes','off', ...
 				 'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', eloc_info);
+           catch
+                fprintf('topoplot() plotting failed.\n');
+           end;
 	else
+           try
 		topoplot(topomap,eloc_file,'electrodes','off', 'chaninfo', eloc_info);
+           catch
+                fprintf('topoplot() plotting failed.\n');
+           end;
 	end;
     axis('square')
     axhndls = [axhndls h(12)];
