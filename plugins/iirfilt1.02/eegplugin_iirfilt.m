@@ -54,7 +54,7 @@ function vers = eegplugin_iirfilt(fig, trystrs, catchstrs)
   
   % menu callbacks
   % --------------
-  combio = [ trystrs.no_check '[EEG LASTCOM] = pop_iirfilt(EEG);' catchstrs.new_and_hist ]; 
+  combio = [ trystrs.no_check '[EEGTMP LASTCOM] = pop_iirfilt(EEG);' catchstrs.new_and_hist ]; 
   
   % create menus if necessary
   % -------------------------
