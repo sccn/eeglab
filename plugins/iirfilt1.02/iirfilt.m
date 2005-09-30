@@ -13,7 +13,8 @@
 %   epochframes = frames per epoch (filter each epoch separately)
 %                 {default|0: data is 1 epoch}
 %   trans_bw    = width (in Hz) of transition interval between stop and 
-%                 pass bands {default: 1 Hz, or if pass band f < 5 Hz, f/3 Hz}
+%                 pass bands {default: 1 Hz, or if pass band f < 5 Hz, f/3 Hz}.
+%                 Enter 0 to use default.
 %   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch 
 %                 or band-reject filter). {0}
 %   rp          = ripple amplitude in dB in the pass band {default: 0.0025 dB, 
@@ -82,6 +83,9 @@ end
 if hicutoff>=nyq
    hicutoff = 0; 
 end
+if nargin < 6
+    trans_bw = 0;
+end;
 
 if trans_bw==0
 
