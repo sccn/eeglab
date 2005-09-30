@@ -1,7 +1,7 @@
-% pop_ii2filt() - interactively filter EEG dataset data using iirfilt()
+% pop_iirfilt() - interactively filter EEG dataset data using iirfilt()
 %
 % Usage:
-%   >> EEGOUT = pop_ii2filt( EEG, locutoff, hicutoff, trans_bw);
+%   >> EEGOUT = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw);
 %
 % Graphical interface:
 %   "Lower edge ..." - [edit box] Lower edge of the frequency pass band (Hz) 
@@ -14,12 +14,15 @@
 %                 values entered as parameters, and set 'revfilt to 1, to swap
 %                 from bandpass to notch filtering.
 %   "Filter length" - [edit box] Filter lenghth in point (default: see 
-%                 >> help pop_ii2filt). Same as 'trans_bw' optional input.
+%                 >> help pop_iirfilt). Same as 'trans_bw' optional input.
+%
 % Inputs:
 %   EEG       - input dataset
 %   locutoff  - lower edge of the frequency pass band (Hz)  {0 -> lowpass}
 %   hicutoff  - higher edge of the frequency pass band (Hz) {0 -> highpass}
 %   trans_bw  - length of the filter in points {default 3*fix(srate/locutoff)}
+%   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter).
+%                     Default is 0 (bandpass).
 %
 % Outputs:
 %   EEGOUT   - output dataset
@@ -48,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/09/30 17:04:48  arno
+% revision 1.1
+%
 % Revision 1.1  2005/09/30 16:50:28  arno
 % Initial revision
 %
@@ -123,15 +129,15 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_ii2filt( EEG, locutoff, hicutoff, trans_bw);
+function [EEG, com] = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw, revfilt);
 
 com = '';
 if nargin < 1
-	help pop_ii2filt;
+	help pop_iirfilt;
 	return;
 end;	
 if isempty(EEG.data)
-    disp('pop_ii2filt() error: cannot filter an empty dataset'); return;
+    disp('pop_iirfilt() error: cannot filter an empty dataset'); return;
 end;    
 if nargin < 2
 	% which set to save
@@ -140,9 +146,9 @@ if nargin < 2
    				  'Lowpass: high edge of the frequency pass band (Hz) (0 -> highpass)', ...
    				  strvcat('Notch filter the data. Give the notch range, i.e. [45 55] for 50 Hz)', ...
                   '(this option overwrites the low and high edge limits given above)'), ...
-                  'Transition BW filter (default: see >> help pop_ii2filt)' };
+                  'Transition BW filter (default: see >> help pop_iirfilt)' };
 	inistr       = { '0', '0', '', '' };
-   	result       = inputdlg2( promptstr, 'Filter the data -- pop_ii2filt()', 1,  inistr, 'pop_ii2filt');
+   	result       = inputdlg2( promptstr, 'Filter the data -- pop_iirfilt()', 1,  inistr, 'pop_iirfilt');
 	if size(result, 1) == 0 return; end;
 	locutoff   	 = eval( result{1} );
 	hicutoff 	 = eval( result{2} );
@@ -195,7 +201,7 @@ if EEG.trials == 1
             EEG.data = iirfilt( EEG.data, options{:}); 
 		else
 			options{4} = 0;
-			disp('pop_ii2filt:finding continuous data boundaries');
+			disp('pop_iirfilt:finding continuous data boundaries');
 			tmplat = cell2mat({EEG.event.latency});
             boundaries = tmplat(boundaries);
             boundaries = [0 round(boundaries-0.5) EEG.pnts];
@@ -228,6 +234,6 @@ else
 end;	
 
 
-com = sprintf( '%s = pop_ii2filt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
+com = sprintf( '%s = pop_iirfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
 			num2str( locutoff), num2str( hicutoff), num2str( trans_bw ), num2str( revfilt ) );
 return;
