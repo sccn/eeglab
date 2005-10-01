@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/09/27 22:09:30  arno
+% now uses spline interpolation if the signal processing toolbox is absent (should be as efficient as the signal processing toolbox)
+%
 % Revision 1.16  2005/05/24 17:26:56  arno
 % remove cell2mat
 %
@@ -141,6 +144,7 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
         if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
     end;
     bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];
+    bounds(find(bounds(2:end)-bounds(1:end-1)==0))=[]; % remove doublet boundary if any
 else 
     bounds = [1 size(EEG.data,2)+1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
 end;
