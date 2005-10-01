@@ -6,8 +6,9 @@
 %   >> EEGOUT = pop_loadset( filename, filepath); % old calling format
 %
 % Optional inputs:
-%   'filename'  - [string] dataset filename
-%   'filepath'  - [string] dataset filepath (optional)
+%   'filename'  - [string] dataset filename. Default pops up a graphical
+%                 interface to browse for a data file.
+%   'filepath'  - [string] dataset filepath. Default is current folder. 
 %   'loadmode'  - ['all', 'info', integer] 'all' -> load the data and
 %                 the dataset structure. 'info' -> load only the dataset 
 %                 structure but not the actual data. [integer] ->  load only 
@@ -44,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/09/08 16:34:48  arno
+% fixing problem with changes_not_saved and saved'
+%
 % Revision 1.44  2005/09/01 15:33:52  scott
 % edited text msgs
 %
