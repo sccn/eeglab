@@ -47,87 +47,98 @@
 %                         equivalent to use the cluster plotting buttons.
 %                         Additional editing options are reassigning the selected components to 
 %                         another cluster or moving them to the outlier cluster.
-%  "Plot cluster properties" - [button] displays all the mean cluster measures (e.g. scalp maps,
-%                         spectra, etc.) that were calculated and saved in the EEG datasets. 
-%                         The equivalent command line function is pop_clust(). Use STUDY.history
-%                         to get the command line call after it was called from the GUI.
-%  "Plot maps"  - [button] can be applied to clusters or to individual components. 
-%                         For a specific cluster displays all cluster components scalp maps
-%                         along with the mean scsalp map of the cluster in one figure.
-%                         If "all clusters" option is selected, plots all mean cluster scalp maps.
-%                         For specific components displays the scalp-maps of each of the
-%                         chosen components (can have multiple selection) in different figures.
-%                         Uses the command line functions cls_plotclustmap() and cls_plotcompmap().
-%  "Plot ERSPs" - [button] can be applied to clusters or to individual components. 
-%                         For a specific cluster displays all cluster component ERSPs with the 
-%                         mean cluster ERSP in one figure (per condition). If "All clusters" option 
-%                         is selected, plots all mean cluste ERSPs in one figure  (per condition). 
-%                         For specific components displays the ERSP images on separate figures, 
-%                         using one figure for all conditions. 
-%                         Uses the command line functions cls_plotclustersp() and cls_plotcompersp().
-%  "Plot ITCs" - [button] can be applied to clusters or to individual components.  
-%                         Same as  'Plot ERSPs' but with ITC.
-%                         Uses the command line functions cls_plotclustitc() and cls_plotcompitc().
-%  "Plot dipoles" - [button] can be applied to clusters or to individual components.  
-%                         For a specific cluster all the cluster components that have dipoles will be displayed in blue, 
-%                         along with the mean cluster dipole in red. The number of components and the number 
-%                         of actual dipoles is written in the figure name. 
-%                         If "All clusters" option selected, displays all cluster dipoles in the same figure 
-%                         (separate subplots), without the dipplot() GUI. 
-%                         For specific components displays each component dipole (in blue) with the 
-%                         average cluster dipole (in Red). 
-%                         Uses the command line functions cls_plotclustdip() and cls_plotcompdip().
-%  ''Plot spectra''- [button] can be applied to clusters or to individual components.  
-%                         For a specific cluster displays the cluster components spectra plus the   
-%                         average cluster spectrum in bold, in one figure (per condition).
-%                         If "All clusters" option slected, displays the mean spectra of all clusters in the same  
-%                         figure with spectra for different conditions (if any) plotted in different colors.  
-%                         For specific components displays each component spectrum with the cluster mean spectrum
-%                         on separate figures, using one figure for all conditions.  
-%                         Uses the command line functions cls_plotclustspec() and cls_plotcompspec().
-%  ''Plot ERPs''- [button] can be applied to clusters or to individual components. 
-%                         Same as  'Plot spectra' but with ERP.
-%                         Uses the command line functions cls_plotclusterp() and cls_plotcomperp().
-%  ''Plot Cluster properties''- [button] at the moment can be applied only for clusters.  
-%                         Displays all the mean cluster measures
-%                         (e.g., dipole locations, scalp maps, spectra, etc.)  that were calculated
+%  "Plot Cluster properties" - [button] Displays all the mean cluster measures
+%                         (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
 %                         and saved in the EEG datsets in the same figure. If there is more than one 
 %                         condition, the ERP and the spectrum will have different color for 
 %                         each condition. The ERSP and ITC plot will depict only the first condition,
 %                         by clicking on the subplot a new figure will open with all the different 
 %                         conditions displayed together.
 %                         Uses the command line functions cls_plotclust().
-%  ''Rename selected cluster''- [button] renames a cluster using specified (mnemonic) name. 
+%  "Plot scalp maps"  - [button] Displays the scalp maps of cluster components.
+%                         If applied to a cluster, scalp maps of the cluster components
+%                         are plotted with the cluster average scalp map in one figure. 
+%                         If "All # cluster centroids" option is selected, plots all cluster  
+%                         scalp map centroids in the same figure.
+%                         If applied to components, display the scalp maps of the specified 
+%                         cluster components on separate figures.
+%                         Uses the command line functions cls_plotclustmap() and cls_plotcompmap().
+%  "Plot ERSPs" - [button] Displays the cluster component ERSPs. 
+%                         If applied to a cluster, component ERSPs are plotted in one figure  
+%                         (per condition) with the cluster mean ERSP. 
+%                         If "All # cluster centroids" option is selected, plots all average 
+%                         ERSPs of the clusters in one figure per condition. 
+%                         If applied to components, display the ERSP images of specified cluster 
+%                         components in separate figures, using one figure for all conditions.
+%                         Uses the command line functions cls_plotclustersp() and cls_plotcompersp().
+%  "Plot ITCs" - [button] Same as  'Plot ERSPs' but with ITC.
+%                         Uses the command line functions cls_plotclustitc() and cls_plotcompitc().
+%  "Plot dipoles" - [button] Displays the dipoles of the cluster components.
+%                         If applied to a cluster, plots the cluster component dipoles (in blue) 
+%                         plus the average cluster dipole (in red). 
+%                         If "All # cluster centroids" option is selected, all cluster plots will 
+%                         be displayed in one figure each cluster in a separate subplot. 
+%                         If applied to components displays the ERSP images of specified cluster 
+%                         For specific components displays components dipole (in blue) plus the 
+%                         average cluster dipole (in Red) in separate figures. 
+%                         Uses the command line functions cls_plotclustdip() and cls_plotcompdip().
+%  "Plot spectra" - [button] Displays the cluster component spectra.   
+%                         If applied to a cluster, displays component spectra plus the average cluster 
+%                         spectrum in bold.  
+%                         For a specific cluster displays the cluster component spectra plus the   
+%                         average cluster spectrum in bold, in one figure (per condition).
+%                         If "All # cluster centroids" option is selected, displays the average 
+%                         spectrum of all clusters in the same figure, with spectrum for different 
+%                         conditions (if any) plotted in different colors.  
+%                         If applied to components, displays the spectrum of specified cluster 
+%                         components in separate figures, using one figure for all conditions.  
+%                         Uses the command line functions cls_plotclustspec() and cls_plotcompspec().
+%  "Plot ERPs" - [button] Same as "Plot spectra" but with ERP.
+%                         Uses the command line functions cls_plotclusterp() and cls_plotcomperp().
+%  "Create new cluster" - [button] creates a new empty cluster.
+%                         Opens a popup window where a name for the new cluster can be entered.
+%                         If no name is given the default name is 'Cls #', where '#' is the next
+%                         available cluster number. 
+%                         For changes to take place press the popup window OK button, else press
+%                         the cancel button. After the empty cluster is created, components can be 
+%                         moved into it using "Reassign selected component(s)" (see below). 
+%                         Uses the command line function cls_createclust().
+%  "Rename selected cluster" - [button] renames a cluster using specified (mnemonic) name. 
 %                         Opens a popup window where a new name for the selected cluster can be entered. 
 %                         For changes to take place press the popup window OK button, else press
 %                         the cancel button. 
 %                         Uses the command line function cls_renameclust().
-%  "Reject outlier components" - [button] rejects a selected cluster
-%                         outliers. Uses the command line function cls_rejectoutliers().
-%  ''Create new cluster''- [button] creates an empty new cluster.
-%                         Opens a popup window where a name for the new cluster can be entered.
-%                         If no name is given the default name is 'Cls #'. The pound sign is the cluster 
-%                         id number, which is the next available cluster number.  
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. After the empty cluster is created, components can be 
-%                         reassigned to it using the ''Move comp to another cluster'' button.
-%                         Uses the command line function cls_createclust().
-%  "Merge clusters" - [button] merge several clusters ito one cluster.
-%                         Uses the command line function cls_mergeclust().
-%  ''Reassign selected component(s)''- [button] reassigns specified component(s) of one cluster to another cluster. 
-%                         The components that will reassign are the ones selected in the
-%                         "Select component(s) to plot" list box. Opens a popup window where a 
-%                         list of possible clusters to move selected component(s) to  is presented.
+%  "Reject outlier components" - [button] rejects outlier components to an outlier cluster.
+%                         Opens a popup window to specify the outlier threshold. Move outlier 
+%                         components that are more than x standard deviations devs from the 
+%                         cluster centroid to an outlier cluster.     
 %                         For changes to take place press the popup window OK button, else press
 %                         the cancel button. 
-%                         Uses the command line function cls_movecomp().
-%  ''Remove selected outlier component(s)''- [button] move specified component(s) selected 
-%                         by the user to its outlier cluster. The components that will be moved are 
-%                         the ones selected in the "Select component(s) to plot" list box. 
+%                         Uses the command line function cls_rejectoutliers().
+%  "Merge clusters" - [button] merges several clusters into one cluster.
+%                         Opens a popup window where the clusters to merge are specified and an optional 
+%                         name can be given to the merged cluster. If no name is given the default 
+%                         name is 'Cls #', where '#' is the next available cluster number.   
+%                         For changes to take place press the popup window OK button, else press
+%                         the cancel button. 
+%                         Uses the command line function cls_mergeclust().
+%  "Remove selected outlier component(s)" - [button] moves selected component(s) to the outlier cluster. 
+%                         The components that will be moved are the ones selected in the
+%                         "Select component(s) to plot" list box. 
 %                         Opens a popup window where a list of the selected component(s) is presented.
 %                         For changes to take place press the popup window OK button, else press
 %                         the cancel button. 
 %                         Uses the command line function cls_moveoutlier().
+%  "Reassign selected component(s)"- [button] Move selected component(s) from one cluster to another. 
+%                         The components that will reassign are the ones selected in the
+%                         "Select component(s) to plot" list box. Opens a popup window where a 
+%                         list of possible clusters to move selected component(s) to is presented.
+%                         For changes to take place press the popup window OK button, else press
+%                         the cancel button. 
+%                         Uses the command line function cls_movecomp().
+%  "Save STUDY set to disk" - [check box] saves the STUDY set structure modified according 
+%                         to specified user edits to the disk. If no file name is entered will
+%                         overwrite the current STUDY set file. 
 %
 %  See also  pop_preclust, pop_clust.         
 %
