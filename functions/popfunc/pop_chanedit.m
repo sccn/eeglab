@@ -145,6 +145,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2005/09/27 21:56:25  arno
+% change aspect ratio for windows; remove channel locs when looking up location
+%
 % Revision 1.130  2005/09/13 16:12:09  scott
 % help msg
 %
@@ -1182,6 +1185,7 @@ else
                    fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
                            chans(tmpdiff(end)).labels);
                end;
+               chans(1).type = [];
            end;
            if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
                    ~isempty(findstr(args{ curfield+1 }, '.elc'))
