@@ -1,19 +1,46 @@
 % pop_loadstudy() - load an existing STUDY set and its corresponding ALLEEG structure
 %
 % Usage:
-%   >> [STUDY ALLEEG] = pop_loadstudy; % use an interactive pop-up window 
-%   >> [STUDY ALLEEG] = pop_savestudy( 'key', 'val', ...); % no pop-up
+%   >> [STUDY ALLEEG] = pop_loadstudy; % uses an interactive pop-up window
+%                                      % to select the STUDY set to load
+%   >> [STUDY ALLEEG] = pop_loadstudy( 'key', 'val', ...); % no pop-up, uses the input
+%                                      % parameters to select the STUDY set to load   
 %                                              
 %
 % Optional inputs:
-%   'filename' - [string] name of the study set file to load
-%   'filepath' - [string] path of the study set file to load
+%   'filename' - [string] filename of the STUDY set file to load.
+%   'filepath' - [string] filepath of the STUDY set file to load.
 %
 % Outputs:
-% STUDY - an existing STUDY set loaded.
-% ALLEEG - an ALLEEG structure with the datasets corresponding to the
-%                datasets in the study set.    
+% STUDY - the requested STUDY set structure.
+% ALLEEG - the corresponding ALLEEG structure containing the 
+%           datasets in the STUDY.    
 %
+% see also: load_ALLEEG, pop_savestudy, pop_createstudy
+%
+% Authors: Hilit Serby SCCN, INC, UCSD, September 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, Spetember 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% Coding notes: Useful information on functions and global variables used.
+
+
 function [STUDY, ALLEEG] = pop_loadstudy(varargin)
 
 if isempty(varargin)
