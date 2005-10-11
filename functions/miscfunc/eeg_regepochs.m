@@ -99,6 +99,11 @@ fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-recur)/eplength*100);
 % ---------------------------------------------------------------------
 fprintf('Inserting %d type ''X'' events: ',nu);
 nevents = length(EEG.event);
+% convert all event types to strings
+for k = 1:nevents
+    EEG.event(k).type = num2str(EEG.event(k).type);
+end
+
 nurevents = length(EEG.urevent);
 for k = 1:nu
    if rem(k,40)
