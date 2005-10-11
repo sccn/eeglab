@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.402  2005/10/11 17:07:36  arno
+% same
+%
 % Revision 1.401  2005/10/11 17:04:16  arno
 % test error
 %
@@ -1496,17 +1499,18 @@ colordef white
 e_try = 'try, if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h cleared''); end;';
 e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP; end;';
 nocheck           = e_try;
-check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' e_try];
-checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' e_try];
-checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' e_try];
-checkepoch        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' e_try];
-checkevent        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' e_try];
-checkbesa         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa''); h(''% no history yet for BESA dipole localization'');' e_try];
-checkepochica     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica''); h(LASTCOM);' e_try];
-checkplot         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM);' e_try];
-checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' e_try];
-checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' e_try];
-checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' e_try];
+ret = 'if ~isempty(LASTCOM), if LASTCOM(1) == -1, LASTCOM = ''''; return; end; end;';
+check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data'');' ret ' h(LASTCOM);' e_try];
+checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata'');' ret ' h(LASTCOM);' e_try];
+checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'');' ret ' h(LASTCOM);' e_try];
+checkepoch        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'');' ret ' h(LASTCOM);' e_try];
+checkevent        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event'');' ret ' h(LASTCOM);' e_try];
+checkbesa         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa'');' ret ' h(''% no history yet for BESA dipole localization'');' e_try];
+checkepochica     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'');' ret ' h(LASTCOM);' e_try];
+checkplot         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc'');' ret ' h(LASTCOM);' e_try];
+checkicaplot      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc'');' ret ' h(LASTCOM);' e_try];
+checkepochplot    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc'');' ret ' h(LASTCOM);' e_try];
+checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc'');' ret ' h(LASTCOM);' e_try];
 
 % check string and backup old dataset
 % -----------------------------------
@@ -1516,17 +1520,17 @@ backup =     [ 'if CURRENTSET ~= 0,' ...
                'end;' ];
 
 nocheck_back           = [ backup e_try ];
-check_back             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' backup e_try];
-checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); return; h(LASTCOM);' backup e_try];
-checkica_back          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' backup e_try];
-checkepoch_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' backup e_try];
-checkevent_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' backup e_try];
-checkbesa_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa''); h(''% no history yet for BESA dipole localization'');' backup e_try];
-checkepochica_back     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica''); h(LASTCOM);' backup e_try];
-checkplot_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc''); h(LASTCOM);' backup e_try];
-checkicaplot_back      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
-checkepochplot_back    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc''); h(LASTCOM);' backup e_try];
-checkepochicaplot_back = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc''); h(LASTCOM);' backup e_try];
+check_back             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data'');' ret 'h(LASTCOM);' backup e_try];
+checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata'');' ret ' h(LASTCOM);' backup e_try];
+checkica_back          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'');' ret ' h(LASTCOM);' backup e_try];
+checkepoch_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'');' ret ' h(LASTCOM);' backup e_try];
+checkevent_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event'');' ret ' h(LASTCOM);' backup e_try];
+checkbesa_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''besa'');' ret ' h(''% no history yet for BESA dipole localization'');' backup e_try];
+checkepochica_back     = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'');' ret ' h(LASTCOM);' backup e_try];
+checkplot_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''chanloc'');' ret ' h(LASTCOM);' backup e_try];
+checkicaplot_back      = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica'', ''chanloc'');' ret ' h(LASTCOM);' backup e_try];
+checkepochplot_back    = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''chanloc'');' ret ' h(LASTCOM);' backup e_try];
+checkepochicaplot_back = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''chanloc'');' ret ' h(LASTCOM);' backup e_try];
 
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); h(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
 storeload    = '[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, 0); h(''[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);'');';
