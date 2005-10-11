@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2005/10/11 17:24:11  arno
+% ploting event names
+%
 % Revision 1.108  2005/09/27 21:57:13  arno
 % Allow to plot 2 datasets on top of each other; more space between lines for event legend
 %
@@ -1613,9 +1616,10 @@ else
             %schtefan: draw Event types
             ylims=ylim;
             try,
-                tmph2 = text([tmplat], ylims(2)+0.012, ['\bf \fontsize{12} ', ... 
+                tmph2 = text([tmplat], ylims(2)+0.015, ['\bf \fontsize{12} ', ... 
                                     strrep(num2str(g.events(event2plot(index)).type),'_','-')], ...
-                                    'color', g.eventcolors{ event2plot(index) });
+                                    'color', g.eventcolors{ event2plot(index) }, ... 
+                                    'horizontalalignment', 'center');
             catch, end;
             
             % draw duration is not 0
