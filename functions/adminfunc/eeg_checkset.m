@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.165  2005/10/11 17:17:04  arno
+% move checks at the beginning
+%
 % Revision 1.164  2005/09/27 22:00:30  arno
 % fix checking ALLEEG with some datasets missing; dealing with empty event structure
 %
