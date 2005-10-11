@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2005/05/24 17:28:44  arno
+% remove cell2mat
+%
 % Revision 1.125  2005/04/20 23:14:20  arno
 % chaninfo forwarded when script
 %
@@ -699,8 +702,8 @@ if popup
 		if isfield(EEG.chanlocs, 'theta')
             if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 			if typeplot == 0
-				     options = [options ',''topo'', { EEG.icawinv(:,' int2str(channel) ') EEG.chanlocs EEG.chaninfo } '];
-			else     options = [options ',''topo'', { ' int2str(channel) ' EEG.chanlocs EEG.chaninfo } '];
+				     options = [options ',''topo'', { mean(EEG.icawinv(:,[' int2str(channel) ']),2) EEG.chanlocs EEG.chaninfo } '];
+			else     options = [options ',''topo'', { [' int2str(channel) '] EEG.chanlocs EEG.chaninfo } '];
 			end;	
 		end;
 	end;
@@ -886,7 +889,7 @@ else
 end;           
 
 if typeplot == 1
-	tmpsig = ['EEG.data(' int2str(channel) ', :)'];
+	tmpsig = ['mean(EEG.data([' int2str(channel) '], :),1)'];
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
@@ -898,7 +901,7 @@ else
         tmpsig = ['EEG.icaweights([' int2str(channel) '],:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
     end;
 	if ~isempty(projchan)
-		tmpsig = [ 'EEG.icawinv(' int2str(projchan) ',[' int2str(channel) '])*' tmpsig ];
+		tmpsig = [ 'mean(EEG.icawinv(' int2str(projchan) ',[' int2str(channel) '])*' tmpsig ',1)' ];
 	end;
 end;
 
