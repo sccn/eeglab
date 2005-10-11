@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2005/03/31 17:58:21  arno
+% remove dbug message
+%
 % Revision 1.30  2005/03/31 17:57:45  arno
 % debug call for 2 conditions
 %
@@ -213,6 +216,9 @@ if length(EEG) > 2
     error('Cannot process more than two datasets');
 end;
 
+if timerange(1) < EEG.xmin*1000, timerange(1) =  EEG.xmin*1000; end;
+if timerange(2) > EEG.xmax*1000, timerange(2) =  EEG.xmax*1000; end;
+
 sigtmp = reshape(EEG(1).data, EEG(1).nbchan, EEG(1).pnts, EEG(1).trials);
 if length(EEG) == 2
     if ~all(EEG(1).icaweights(:) == EEG(2).icaweights(:))
@@ -221,7 +227,6 @@ if length(EEG) == 2
     sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
 end;
 posi = round( (timerange(1)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
-
 posf = min(round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1, EEG(1).pnts);
 
 % outputs
