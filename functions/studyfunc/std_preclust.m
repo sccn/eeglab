@@ -1,6 +1,17 @@
-% eeg_preclust() - select EEGLAB dataset ICA measures (i.e. ERP, dipole, scalp maps, ...) 
-%                          for clustering the ICA components in the several
-%                          datasets that are part of the STUDY structure.
+% eeg_preclust() - the function prepares information for later clustering.
+%        Selected ICA measures (one or more from ERP, dipole locations, spectra,
+%        scalp maps, ERSP and ITC) will be computed for each dataset in the STUDY 
+%        set, unless they were already computed for previous STUDY sets. Once all 
+%        requested measures are computed and saved in the STUDY datasets, a PCA  
+%        matrix (using runica with PCA option on) is constructed (this is the 
+%        feature reduction step), which will be used as input for the clustering   
+%        algorithm in pop_clust(). The function allows selecting a subset of 
+%        ICA components for the clustering. This subset can be a user predefined 
+%        subset of components, components that have dipole residual variance lower
+%        than a defined threshold, or clustering the components of an already 
+%        existing cluster (hierarchical clustering). The ALLEEG structure might be
+%        updated if new ICA measures needed to be computed, the underlying updated 
+%        EEG sets will be saved to the disk.
 %
 % Usage:    
 %   >> [ALLEEG, STUDY] = eeg_preclust(ALLEEG, STUDY, clustind, compind, preproc1, preproc2, ...);
