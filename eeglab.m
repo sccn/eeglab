@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.401  2005/10/11 17:04:16  arno
+% test error
+%
 % Revision 1.400  2005/09/30 18:59:59  arno
 % non-nan data
 % ./
@@ -1494,7 +1497,7 @@ e_try = 'try, if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h clea
 e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP; end;';
 nocheck           = e_try;
 check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' e_try];
-checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); return; h(LASTCOM);' e_try];
+checkcont         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' e_try];
 checkica          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' e_try];
 checkepoch        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' e_try];
 checkevent        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' e_try];
@@ -1514,7 +1517,7 @@ backup =     [ 'if CURRENTSET ~= 0,' ...
 
 nocheck_back           = [ backup e_try ];
 check_back             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data''); h(LASTCOM);' backup e_try];
-checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); h(LASTCOM);' backup e_try];
+checkcont_back         = ['[EEG LASTCOM] = eeg_checkset(EEG, ''contdata''); return; h(LASTCOM);' backup e_try];
 checkica_back          = ['[EEG LASTCOM] = eeg_checkset(EEG, ''ica''); h(LASTCOM);' backup e_try];
 checkepoch_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch''); h(LASTCOM);' backup e_try];
 checkevent_back        = ['[EEG LASTCOM] = eeg_checkset(EEG, ''event''); h(LASTCOM);' backup e_try];
