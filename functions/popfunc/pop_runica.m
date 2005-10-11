@@ -1,8 +1,8 @@
-% pop_runica() - Run an ICA decomposition on an EEG dataset 
-%                using runica(),binica(), or other ICA algorithm.
+% pop_runica() - Run an ICA decomposition of an EEG dataset using runica(), 
+%                binica(), or some ICA or other method of linear decomposition. 
 % Usage:
-%   >> OUT_EEG = pop_runica( IN_EEG ); % pops-up a data entry window
-%   >> OUT_EEG = pop_runica( IN_EEG, 'key', 'val' ); % no pop_up
+%   >> OUT_EEG = pop_runica( EEG ); % pops-up a data entry window
+%   >> OUT_EEG = pop_runica( EEG, 'key', 'val' ); % no pop_up
 %
 % Graphic interface:
 %   "ICA algorithm to use" - [edit box] The type of ICA algorithm 
@@ -11,7 +11,7 @@
 %   "Commandline options" - [edit box] Command line options to forward
 %                 to the ICA algorithm. Command line equivalent: 'options' 
 % Inputs:
-%   IN_EEG      - input EEG dataset
+%   EEG         - input EEG dataset
 %
 % Optional inputs:
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
@@ -23,23 +23,23 @@
 %   'key','val' - ICA algorithm options (see ICA routine help messages).
 % 
 % Note:
-% 1) Infomax is the ICA algorithm we use most. It is based on Tony Bell's
-%    algorithm implemented for automated use by Scott Makeig using the 
-%    natural gradient of Amari et al.. It can also extract sub-Gaussian 
-%    sources using the 'extended' ICA option of Lee and Girolami. Function
-%    runica() is the all-Matlab version; binica() calls the (1.5x faster) 
-%    binary version (separate download) translated to C by Sigurd Enghoff.
-% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso
-%    It is included in the EEGLAB toolbox by his permission. 
-%    See >> help jader
-% 3) To run fastica(), download the fastICA toolbox from
-%    http://www.cis.hut.fi/projects/ica/fastica/ and make it available 
-%    in your Matlab path. According to the authors, default parameters
-%    are not optimal: Try 'approach', 'sym' to estimate components in
-%    parallel.
+% 1) Infomax (runica, binica) is the ICA algorithm we use most. It is based 
+%    on Tony Bell's infomax algorithm as implemented for automated use by 
+%    Scott Makeig et al. using the natural gradient of Amari et al. It can 
+%    also extract sub-Gaussian sources using the (recommended) 'extended' option 
+%    of Lee and Girolami. Function runica() is the all-Matlab version; function 
+%    binica() calls the (1.5x faster) binary version (a separate download) 
+%    which was translated into C from runica() by Sigurd Enghoff.
+% 2) jader() calls the JADE algorithm of Jean-Francois Cardoso. This is 
+%    included in the EEGLAB toolbox by his permission. See >> help jader
+% 3) To run fastica(), download the fastICA toolbox from its website,
+%    http://www.cis.hut.fi/projects/ica/fastica/, and make it available 
+%    in your Matlab path. According to its authors, default parameters
+%    are not optimal: Try args 'approach', 'sym' to estimate components 
+%    in parallel.
 %
 % Outputs:
-%   OUT_EEG = Input EEGLAB dataset with new .weights and .sphere field values.
+%   OUT_EEG = Input EEGLAB dataset with new icaweights and icasphere fields. 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2005/09/27 22:07:28  arno
+% eeg_store instead of ALLEEG(g.dataset) = EEG;
+%
 % Revision 1.55  2005/07/28 18:18:19  arno
 % allowing to process mutliple datasets
 %
