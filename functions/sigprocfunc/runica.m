@@ -23,8 +23,6 @@
 %               sub-Gaussian comps to -N [faster than N>0] (default|0 -> off)
 % 'pca'       = [N] decompose a principal component     (default -> 0=off)
 %               subspace of the data. Value is the number of PCs to retain.
-% 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
-%               using rectangular ICA decomposition
 % 'sphering'  = ['on'/'off'] flag sphering of data      (default -> 'on')
 % 'weights'   = [W] initial weight matrix               (default -> eye())
 %                            (Note: if 'sphering' 'off', default -> spher())
@@ -43,6 +41,10 @@
 %                            (defaults [srate 0 srate/2 size(data,2) size(data,2)])
 % 'posact'    = make all component activations net-positive(default 'off'}
 %               Requires time and memory; posact() may be applied separately.
+% 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
+%               using rectangular ICA decomposition. This parameter may return
+%               strange results. This is because the weight matrix is rectangular
+%               instead of being square. Do not use except to try to fix the problem.
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
@@ -99,6 +101,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/07/17 15:03:38  scott
+% shortened computation of cmponent variances
+% overwrite data with activations to save memory
+% add back rowmeans when computing activations
+% change default 'posact' to 'off' to save memory -sm
+%
 % Revision 1.23  2004/10/06 20:41:10  scott
 % rm debug -sm
 %
@@ -318,6 +326,10 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf('runica(): Use either PCA or ICA dimension reduction');
             return
          end
+         fprintf('*****************************************************************************************');
+         fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
+         fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
+         fprintf('*****************************************************************************************');
          ncomps = Value;
          if ~ncomps,
             ncomps = chans;
