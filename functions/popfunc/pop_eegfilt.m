@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/09/10 00:44:35  arno
+% adding multiple dataset capabilities
+%
 % Revision 1.28  2005/06/29 22:36:45  arno
 % typo
 %
@@ -184,6 +187,12 @@ else
     end;
 end;
 
+if locutoff & hicutoff
+    disp('WARNING: BANDPASS FILTERS SOMETIMES DO NOT WORK')
+    disp('WARNING: PLOT SPECTRUM AFTER FILTERING TO ASSESS FILTER EFFICIENCY')
+    disp('WARNING: IF FILTER FAILS, LOWPASS DATA THEN HIGHPASS DATA')
+end;
+    
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
