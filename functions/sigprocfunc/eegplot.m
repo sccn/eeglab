@@ -1,5 +1,5 @@
 % eegplot() - Scroll (horizontally and/or vertically) through multichannel data.
-%             Now allows vertical scrolling through channels and manual marking 
+%             Allows vertical scrolling through channels and manual marking 
 %             and unmarking of data stretches or epochs for rejection.
 % Usage: 
 %           >> eegplot(data, 'key1', value1 ...); % use interface buttons, etc.
@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2005/10/11 17:34:13  arno
+% color menu only under Unix
+%
 % Revision 1.110  2005/10/11 17:27:45  arno
 % event names
 %
@@ -1218,6 +1221,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
              'clear g hhdat hh tmpelec tmppos ax2 ESpacing lowlim Allwin Fs winlength EPosition ax1 I1 tmpi' ];
 			 		
   % motion button: move windows or display current position (channel, g.time and activation)
+  % ----------------------------------------------------------------------------------------
   commandmove = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
  			 'g = get(gcbf,''UserData'');' ...
@@ -1254,6 +1258,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
 
   % release button: check window consistency, adpat to trial boundaries
+  % -------------------------------------------------------------------
   commandrelease = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
  			 'g = get(gcbf,''UserData'');' ...
  			 'g.incallback = 0;' ...
@@ -1618,13 +1623,18 @@ else
                           'linestyle', g.eventstyle { event2plot(index) }, ...
                           'linewidth', g.eventwidths( event2plot(index) ) );
     
-            %schtefan: draw Event types
+            % schtefan: add Event types text above event latency line
+            % -------------------------------------------------------
+            MAXEVENTSTRING = 3;
+            EVENTFONT = ' \fontsize{10} ';
             ylims=ylim;
-            try,
-                tmph2 = text([tmplat], ylims(2)+0.015, ['\bf \fontsize{12} ', ... 
-                                    strrep(num2str(g.events(event2plot(index)).type),'_','-')], ...
-                                    'color', g.eventcolors{ event2plot(index) }, ... 
-                                    'horizontalalignment', 'center');
+            evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
+            if length(evntxt)>MAXEVENTSTRING, evntxt = evntxt(1:MAXEVENTSTRING); end; % truncate
+            try, 
+                tmph2 = text([tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
+                                    'color', g.eventcolors{ event2plot(index) }, ...
+                                    'horizontalalignment', 'left',...
+                                    'rotation',90);
             catch, end;
             
             % draw duration is not 0
@@ -1739,13 +1749,16 @@ else
         g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
     end;
 
-    set(ESpacing,'string',num2str(g.spacing,4))  % update edit box
+    % update edit box
+    % ---------------
+    set(ESpacing,'string',num2str(g.spacing,4))  
     set(gcf, 'userdata', g);
 	 eegplot('drawp', 0);
     set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
     
-    % update scaling eye if it exists
+    % update scaling eye (I) if it exists
+    % -----------------------------------
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
     if ~isempty(eyeaxes)
       eyetext = findobj('type','text','parent',eyeaxes,'tag','thescalenum');
@@ -1756,6 +1769,7 @@ else
 
   case 'window'  % change window size
     % get new window length with dialog box
+    % -------------------------------------
     g = get(gcf,'UserData');
 	result       = inputdlg2( { fastif(g.trialstag==-1,'New window length (s):', 'Number of epoch(s):') }, 'Change window length', 1,  { num2str(g.winlength) });
 	if size(result,1) == 0 return; end;
@@ -1767,9 +1781,11 @@ else
     
   case 'winelec'  % change channel window size
                   % get new window length with dialog box
+                  % -------------------------------------
    fig = gcf;
    g = get(gcf,'UserData');
-   result = inputdlg2( { 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
+   result = inputdlg2( ...
+{ 'Number of channels to display:' } , 'Change number of channels to display', 1,  { num2str(g.dispchans) });
    if size(result,1) == 0 return; end;
    
    g.dispchans = eval(result{1});
@@ -1777,7 +1793,7 @@ else
        g.dispchans =g.chans;
    end;
    set(gcf, 'UserData', g);
-   eegplot('updateslidder', fig);
+   eegplot('updateslider', fig);
    eegplot('drawp',0);	
    eegplot('scaleeye', [], fig);
    return;
@@ -1880,7 +1896,7 @@ else
     text(Xl(2)+.1,Yl(4),'-','HorizontalAlignment','left',...
          'verticalalignment','middle', 'tag', 'thescale')
 	if ~isempty(SPACING_UNITS_STRING)
-        text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
+         text(.5,-YLim(2)/23+Yl(4),SPACING_UNITS_STRING,...
 			 'HorizontalAlignment','center','FontSize',10, 'tag', 'thescale')
 	end
 	text(.5,(YLim(2)-YLim(1))/10+Yl(1),'Scale',...
@@ -1919,7 +1935,7 @@ else
       set(ax2, 'xlim', get(ax1, 'xlim'));
       g = get(fig,'UserData');
       
-      % deal with abscicia
+      % deal with abscissa
       % ------------------
       if g.trialstag ~= -1
           Eposition = str2num(get(findobj('tag','EPosition','parent',fig), 'string'));
@@ -1941,7 +1957,7 @@ else
       g.dispchans  = round(1000*(tmpylim(2)-tmpylim(1))/g.spacing)/1000;      
       
       set(fig,'UserData', g);
-      eegplot('updateslidder', fig);
+      eegplot('updateslider', fig);
       eegplot('drawp', 0);
       eegplot('scaleeye', [], fig);
 
@@ -1953,20 +1969,20 @@ else
           set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
       end;
 
-	case 'updateslidder' % if zoom
+	case 'updateslider' % if zoom
       fig = varargin{1};
       g = get(fig,'UserData');
-      slidder = findobj('tag','eegslider','parent',fig);
+      sliider = findobj('tag','eegslider','parent',fig);
       if g.elecoffset < 0
          g.elecoffset = 0;
       end;
       if g.dispchans >= g.chans
          g.dispchans = g.chans;
          g.elecoffset = 0;
-         set(slidder, 'visible', 'off');
+         set(sliider, 'visible', 'off');
       else
-         set(slidder, 'visible', 'on');         
-		 set(slidder, 'value', g.elecoffset/g.chans, ...
+         set(sliider, 'visible', 'on');         
+		 set(sliider, 'value', g.elecoffset/g.chans, ...
 					  'sliderstep', [1/(g.chans-g.dispchans) g.dispchans/(g.chans-g.dispchans)]);
          %'sliderstep', [1/(g.chans-1) g.dispchans/(g.chans-1)]);
       end;
@@ -1983,7 +1999,7 @@ else
       fig = varargin{1};
       g = get(fig,'UserData');
       
-      if ~isempty(g.events)
+      if ~isempty(g.events) % draw vertical colored lines for events, add event name text above
           nleg = length(g.eventtypes);
           fig2 = figure('numbertitle', 'off', 'name', '', 'visible', 'off', 'menubar', 'none', 'color', DEFAULT_FIG_COLOR);
           pos = get(fig2, 'position');
@@ -1993,9 +2009,11 @@ else
               plot([10 30], [(index-0.5) * 10 (index-0.5) * 10], 'color', g.eventtypecolors{index}, 'linestyle', ...
                           g.eventtypestyle{ index }, 'linewidth', g.eventtypewidths( index )); hold on;
               if iscell(g.eventtypes)
-                  text(35, (index-0.5)*10, g.eventtypes{index});
+                  th=text(35, (index-0.5)*10, g.eventtypes{index}, ...
+                                    'color', g.eventtypecolors{index});
               else
-                  text(35, (index-0.5)*10, num2str(g.eventtypes(index)));
+                  th=text(35, (index-0.5)*10, num2str(g.eventtypes(index)), ...
+                                    'color', g.eventtypecolors{index});
               end;
           end;
           xlim([0 130]);
