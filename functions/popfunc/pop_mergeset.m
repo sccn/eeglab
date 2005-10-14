@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/05/12 16:14:58  arno
+% fix event latency boundary
+%
 % Revision 1.32  2004/12/08 18:29:20  arno
 % creating event table if does not exist to insert boundary event
 %
@@ -331,7 +334,7 @@ else
 	%end;
 
 	if ~isempty(INEEG2.event)
-        INEEG1.pnts = size(INEEG1.data,2) / INEEG1.trials;
+        INEEG1.pnts = size(INEEG1.data,2);
         INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
     end;
 end;
