@@ -1,148 +1,141 @@
-% pop_clustedit() -  a Graphical Interface function, with editing and plotting options, for visualizing and 
-%                   manipulating an input STUDY structure. Only component measures (e.g., dipole locations,
-%                   scalp maps, spectra, ERPs, ERSPs, ITCs) that were calculated and saved in the 
-%                   EEG datasets in the STUDY can be visualized. These can be computed during pre-clustering 
-%                   using the GUI-based function pop_preclust() or the equivalent commandline functions 
-%                   eeg_createdata() and eeg_preclust(). To use dipole locations, they must first be stored 
-%                   in the EEG dataset structures using dipfit(). Supported cluster editing functions include 
-%                   cluster creation, merging, outliers rejection and renaming. Components can also be moved   
-%                   from one cluster to another or to an outliers cluster. 
+% pop_clustedit() - graphic user interface (GUI)-based function with editing and plotting 
+%                options for visualizing and manipulating an input STUDY structure. 
+%                Only component measures (e.g., dipole locations, scalp maps, spectra, 
+%                ERPs, ERSPs, ITCs) that have been computed and saved in the study EEG 
+%                datasets can be visualized. These can be computed during pre-clustering 
+%                using the GUI-based function pop_preclust() or the equivalent command
+%                line functions eeg_createdata() and eeg_preclust(). To use dipole 
+%                locations for clustering, they must first be stored in the EEG dataset 
+%                structures using dipfit(). Supported cluster editing functions include 
+%                new cluster creation, cluster merging, outlier rejection, and cluster 
+%                renaming. Components can also be moved from one cluster to another 
+%                or to the outlier cluster. 
 % Usage:    
-%                   >> STUDY = pop_clustedit(ALLEEG, STUDY,clusters);   
+%                >> STUDY = pop_clustedit(ALLEEG, STUDY,clusters);   
 % Inputs:
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically loaded when using pop_loadstudy(),
-%                     or loaded when creating a new STUDY using pop_createstudy().  
+%   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) in the 
+%                STUDY. ALLEEG for a STUDY set is typically loaded using pop_loadstudy(),
+%                else when creating a new STUDY, using pop_createstudy().  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %
-% Optional Input:
-%   clusters    - [numeric vector] of clusters numbers. These clusters will be visualized and manipulated  
-%                     in the pop_clustedit() graphical interface. There are restictions on which clusters can be 
-%                     loaded together. The clusters must either originate from the same clustering run 
-%                     (same pre_clustering() and subsequent pop_clust() run), or be the leaf clusters (i.e. clusters 
-%                     with no children clusters). {default: leaf clusters}.
-%
+% Optional inputs:
+%   clusters   - [integer vector] of cluster numbers. These clusters will be visualized 
+%                and manipulated in the pop_clustedit() graphic interface. There are 
+%                restrictions on which clusters can be loaded together. The clusters must 
+%                either originate from the same clustering (same pre_clustering() and 
+%                subsequent pop_clust() execution), or they must all be leaf clusters 
+%                (i.e., clusters with no child clusters) {default: all leaf clusters}.
 % Outputs:
-%   STUDY    - the input STUDY set structure modified according to specified user edits,
-%                     if any. Plotted cluster means (maps, ERSPs, etc.) are added to the STUDY  
-%                     structure to allow quick replotting.  
-%
+%   STUDY      - The input STUDY set structure modified according to specified user edits,
+%                if any. Plotted cluster measure means (maps, ERSPs, etc.) are added to 
+%                the STUDY structure after they are first plotted to allow quick replotting.  
 %
 % Graphic interface buttons:
-%  "Select cluster to plot" - [list box] displays available clusters to plot (in the format: cluster name (number of components)). 
-%                         The presented clusters depend on the optional input variable 'clusters'.
-%                         Selecting (clicking on) a cluster from the list will display the selected cluster components 
-%                         in the "Select component(s) to plot" list box.
-%                         Use the plotting buttons below to plot different measures of the selected cluster.
-%                         Additional editing options (like renaming the cluster, rejecting outliers and moving components  
-%                         to another cluster) are also available.
-%                         The option 'All N cluster centroids' at the top of the list, displays all the clusters in the list  
-%                         except for 'Notcluster', 'Outlier' and 'ParentCluster' clusters. Selecting this option will plot
-%                         the cluster centroids plotting option (i.e. erp, ersp, ...) on the same figure.
-%  "Select component(s) to plot" - [list box] displays the ICA components of the current selected cluster 
-%                         (in the "Select cluster to plot" list box). Each component has the format: 
-%                         subject name and component index. Multiple components can be selected from the list.
-%                         Use the plotting buttons below to plot different measures of the selected 
-%                         components on different figures. Selecting the 'All components' option is  
-%                         equivalent to use the cluster plotting buttons.
-%                         Additional editing options are reassigning the selected components to 
-%                         another cluster or moving them to the outlier cluster.
-%  "Plot Cluster properties" - [button] Displays all the mean cluster measures
-%                         (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
-%                         and saved in the EEG datsets in the same figure. If there is more than one 
-%                         condition, the ERP and the spectrum will have different color for 
-%                         each condition. The ERSP and ITC plot will depict only the first condition,
-%                         by clicking on the subplot a new figure will open with all the different 
-%                         conditions displayed together.
-%                         Uses the command line functions cls_plotclust().
+%  "Select cluster to plot" - [list box] Displays available clusters to plot (format: 
+%                'cluster name (number of components)'). The presented clusters depend 
+%                on the optional input variable 'clusters'. Selecting (clicking on) a 
+%                cluster from the list will display the selected cluster components in the 
+%                "Select component(s) to plot" list box. Use the plotting buttons below 
+%                to plot selected measures of the selected cluster. Additional editing 
+%                options (renaming the cluster, rejecting outliers, moving components to 
+%                another cluster) are also available. The option 'All N cluster centroids' 
+%                at the top of the list displays all the clusters in the list except the 
+%                'Notcluster', 'Outlier' and 'ParentCluster' clusters. Selecting this option 
+%                will plot the cluster centroids (i.e. ERP, ERSP, ...) in a single figure.
+%  "Select component(s) to plot" - [list box] Displays the ICA components of the currently 
+%                selected cluster (in the "Select cluster to plot" list box). Each component 
+%                has the format: 'subject name, component index'. Multiple components can be 
+%                selected from the list. Use the plotting buttons below to plot different 
+%                measures of the selected components on different figures. Selecting the 
+%                "All components" option is  equivalent to using the cluster plotting buttons. 
+%                Additional editing options are reassigning the selected components to 
+%                another cluster or moving them to the outlier cluster.
+%  "Plot Cluster properties" - [button] Displays in one figure all the mean cluster measures
+%                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
+%                and saved in the EEG datsets. If there is more than one condition, the ERP 
+%                and the spectrum will have different colors for each condition. The ERSP 
+%                and ITC plots will show only the first condition; clicking on the subplot 
+%                will open a new figure with the different conditions displayed together. 
+%                Uses the command line function cls_plotclust().
 %  "Plot scalp maps"  - [button] Displays the scalp maps of cluster components.
-%                         If applied to a cluster, scalp maps of the cluster components
-%                         are plotted with the cluster average scalp map in one figure. 
-%                         If "All # cluster centroids" option is selected, plots all cluster  
-%                         scalp map centroids in the same figure.
-%                         If applied to components, display the scalp maps of the specified 
-%                         cluster components on separate figures.
-%                         Uses the command line functions cls_plotclustmap() and cls_plotcompmap().
+%                If applied to a cluster, scalp maps of the cluster components
+%                are plotted along with the cluster mean scalp map in one figure. 
+%                If "All # cluster centroids" option is selected, all cluster scalp map
+%                means are plotted in the same figure. If applied to components, displays
+%                the scalp maps of the specified cluster components in separate figures.
+%                Uses the command line functions cls_plotclustmap() and cls_plotcompmap().
 %  "Plot ERSPs" - [button] Displays the cluster component ERSPs. 
-%                         If applied to a cluster, component ERSPs are plotted in one figure  
-%                         (per condition) with the cluster mean ERSP. 
-%                         If "All # cluster centroids" option is selected, plots all average 
-%                         ERSPs of the clusters in one figure per condition. 
-%                         If applied to components, display the ERSP images of specified cluster 
-%                         components in separate figures, using one figure for all conditions.
-%                         Uses the command line functions cls_plotclustersp() and cls_plotcompersp().
-%  "Plot ITCs" - [button] Same as  'Plot ERSPs' but with ITC.
-%                         Uses the command line functions cls_plotclustitc() and cls_plotcompitc().
+%                If applied to a cluster, component ERSPs are plotted in one figure  
+%                (per condition) with the cluster mean ERSP. If "All # cluster centroids" 
+%                option is selected, plots all average ERSPs of the clusters in one figure 
+%                per condition. If applied to components, display the ERSP images of specified 
+%                cluster components in separate figures, using one figure for all conditions.
+%                Uses the command line functions cls_plotclustersp() and cls_plotcompersp().
+%  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
+%                Uses the command line functions cls_plotclustitc() and cls_plotcompitc().
 %  "Plot dipoles" - [button] Displays the dipoles of the cluster components.
-%                         If applied to a cluster, plots the cluster component dipoles (in blue) 
-%                         plus the average cluster dipole (in red). 
-%                         If "All # cluster centroids" option is selected, all cluster plots will 
-%                         be displayed in one figure each cluster in a separate subplot. 
-%                         If applied to components displays the ERSP images of specified cluster 
-%                         For specific components displays components dipole (in blue) plus the 
-%                         average cluster dipole (in Red) in separate figures. 
-%                         Uses the command line functions cls_plotclustdip() and cls_plotcompdip().
+%                If applied to a cluster, plots the cluster component dipoles (in blue) 
+%                plus the average cluster dipole (in red). If "All # cluster centroids" option 
+%                is selected, all cluster plots are displayed in one figure each cluster in 
+%                a separate subplot. If applied to components, displays the ERSP images of the
+%                specified cluster. For specific components displays components dipole (in blue) 
+%                plus the average cluster dipole (in Red) in separate figures. 
+%                Uses the command line functions cls_plotclustdip() and cls_plotcompdip().
 %  "Plot spectra" - [button] Displays the cluster component spectra.   
-%                         If applied to a cluster, displays component spectra plus the average cluster 
-%                         spectrum in bold.  
-%                         For a specific cluster displays the cluster component spectra plus the   
-%                         average cluster spectrum in bold, in one figure (per condition).
-%                         If "All # cluster centroids" option is selected, displays the average 
-%                         spectrum of all clusters in the same figure, with spectrum for different 
-%                         conditions (if any) plotted in different colors.  
-%                         If applied to components, displays the spectrum of specified cluster 
-%                         components in separate figures, using one figure for all conditions.  
-%                         Uses the command line functions cls_plotclustspec() and cls_plotcompspec().
-%  "Plot ERPs" - [button] Same as "Plot spectra" but with ERP.
-%                         Uses the command line functions cls_plotclusterp() and cls_plotcomperp().
-%  "Create new cluster" - [button] creates a new empty cluster.
-%                         Opens a popup window where a name for the new cluster can be entered.
-%                         If no name is given the default name is 'Cls #', where '#' is the next
-%                         available cluster number. 
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. After the empty cluster is created, components can be 
-%                         moved into it using "Reassign selected component(s)" (see below). 
-%                         Uses the command line function cls_createclust().
-%  "Rename selected cluster" - [button] renames a cluster using specified (mnemonic) name. 
-%                         Opens a popup window where a new name for the selected cluster can be entered. 
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. 
-%                         Uses the command line function cls_renameclust().
+%                If applied to a cluster, displays component spectra plus the average cluster 
+%                spectrum in bold. For a specific cluster, displays the cluster component 
+%                spectra plus the average cluster spectrum (in bold) in one figure per condition.
+%                If the "All # cluster centroids" option is selected, displays the average 
+%                spectrum of all clusters in the same figure, with spectrum for different 
+%                conditions (if any) plotted in different colors.  
+%                If applied to components, displays the spectrum of specified cluster 
+%                components in separate figures using one figure for all conditions.  
+%                Uses the command line functions cls_plotclustspec() and cls_plotcompspec().
+%  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
+%                Uses the command line functions cls_plotclusterp() and cls_plotcomperp().
+%  "Create new cluster" - [button] Creates a new empty cluster.
+%                Opens a popup window in which a name for the new cluster can be entered.
+%                If no name is given the default name is 'Cls #', where '#' is the next
+%                available cluster number. For changes to take place, press the popup 
+%                window 'OK' button, else press the 'Cancel' button. After the empty 
+%                cluster is created, components can be moved into it using, 
+%                'Reassign selected component(s)' (see below). Uses the command line 
+%                function cls_createclust().
+%  "Rename selected cluster" - [button] Renames a cluster using the selected (mnemonic) name. 
+%                Opens a popup window in which a new name for the selected cluster can be 
+%                entered. For changes to take place, press the popup window 'OK' button, 
+%                else press the 'Cancel' button. Uses the command line function cls_renameclust().
 %  "Reject outlier components" - [button] rejects outlier components to an outlier cluster.
-%                         Opens a popup window to specify the outlier threshold. Move outlier 
-%                         components that are more than x standard deviations devs from the 
-%                         cluster centroid to an outlier cluster.     
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. 
-%                         Uses the command line function cls_rejectoutliers().
-%  "Merge clusters" - [button] merges several clusters into one cluster.
-%                         Opens a popup window where the clusters to merge are specified and an optional 
-%                         name can be given to the merged cluster. If no name is given the default 
-%                         name is 'Cls #', where '#' is the next available cluster number.   
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. 
-%                         Uses the command line function cls_mergeclust().
-%  "Remove selected outlier component(s)" - [button] moves selected component(s) to the outlier cluster. 
-%                         The components that will be moved are the ones selected in the
-%                         "Select component(s) to plot" list box. 
-%                         Opens a popup window where a list of the selected component(s) is presented.
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. 
-%                         Uses the command line function cls_moveoutlier().
-%  "Reassign selected component(s)"- [button] Move selected component(s) from one cluster to another. 
-%                         The components that will reassign are the ones selected in the
-%                         "Select component(s) to plot" list box. Opens a popup window where a 
-%                         list of possible clusters to move selected component(s) to is presented.
-%                         For changes to take place press the popup window OK button, else press
-%                         the cancel button. 
-%                         Uses the command line function cls_movecomp().
-%  "Save STUDY set to disk" - [check box] saves the STUDY set structure modified according 
-%                         to specified user edits to the disk. If no file name is entered will
-%                         overwrite the current STUDY set file. 
+%                Opens a popup window to specify the outlier threshold. Move outlier 
+%                components that are more than x standard deviations devs from the 
+%                cluster centroid to an outlier cluster. For changes to take place, 
+%                press the popup window 'OK' button, else press the 'Cancel' button. 
+%                Uses the command line function cls_rejectoutliers().
+%  "Merge clusters" - [button] Merges several clusters into one cluster.
+%                Opens a popup window in which the clusters to merge may be specified 
+%                An optional name can be given to the merged cluster. If no name is given, 
+%                the default name is 'Cls #', where '#' is the next available cluster number.   
+%                For changes to take place, press the popup window 'OK' button, else press
+%                the 'Cancel' button. Uses the command line function cls_mergeclust().
+%  "Remove selected outlier component(s)" - [button] Moves selected component(s) to the 
+%                outlier cluster. The components that will be moved are the ones selected 
+%                in the "Select component(s) to plot" list box. Opens a popup window in which 
+%                a list of the selected component(s) is presented. For changes to take place,
+%                press the popup window 'OK' button, else press the 'Cancel' button. 
+%                Uses the command line function cls_moveoutlier().
+%  "Reassign selected component(s)"- [button] Moves selected component(s) from one cluster 
+%                to another. The components that will reassign are the ones selected in the
+%                "Select component(s) to plot" list box. Opens a popup window in which 
+%                a list of possible clusters to which to move the selected component(s) is 
+%                presented. For changes to take place, press the popup window 'OK' button, 
+%                else press the 'Cancel' button. Uses the command line function cls_movecomp().
+%  "Save STUDY set to disk" - [check box] Saves the STUDY set structure modified according 
+%                to specified user edits to the disk. If no file name is entered will
+%                overwrite the current STUDY set file. 
 %
-%  See also  pop_preclust, pop_clust.         
+%  See also  pop_preclust(), pop_clust().         
 %
-% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, October 11, 2004
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -168,7 +161,7 @@ function STUDY = pop_clustedit(varargin)
 icadefs;
 if ~isstr(varargin{1})
     if nargin < 2
-        error('pop_clustedit: You must provide at least ALLEEG and STUDY structures for pop_clustedit');
+        error('pop_clustedit(): You must provide ALLEEG and STUDY structures');
     end
     ALLEEG = varargin{1};
     STUDY = varargin{2};
@@ -203,7 +196,7 @@ if ~isstr(varargin{1})
         if ~sameparent
             for k = 1: N %check if all leaves
                  if ~isempty(STUDY.cluster(cls(k)).child) 
-                     error('pop_clustedit: All clusters must be from the same level (same parents, or no children clusters)');
+                     error('pop_clustedit(): All clusters must be from the same level \n         (i.e., have the same parents or not be child clusters)');
                  end
             end
         end
@@ -534,7 +527,7 @@ else
             % Don't rename 'Notclust' and 'Outliers'  clusters.
             if strncmpi('Notclust',STUDY.cluster(cls(clus_num)).name,8) | strncmpi('Outliers',STUDY.cluster(cls(clus_num)).name,8) | ...
                     strncmpi('ParentCluster',STUDY.cluster(cls(clus_num)).name,13)
-                warndlg2('The ParentCluster, Outliers and ''Notclust'' cannot be renamed');
+                warndlg2('The ParentCluster, Outliers, and Notclust clusters cannot be renamed');
                 return;
 			end
             old_name = STUDY.cluster(cls(clus_num)).name;
@@ -757,26 +750,39 @@ else
                       end
                   end
                   [STUDY] = cls_mergeclust(STUDY, ALLEEG, cls_mrg, name); 
+                  % 
                   % update Study history
+                  % 
                   a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) '], ' name ');'];
                   STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                   userdat{1}{2} = STUDY;
+                  %
                   % Replace the merged clusters with the one new merged cluster 
                   % in the GUI if all clusters are leaves
+                  %
                   if allleaves                      
+                    %
                     % Update cluster list
-                    clus_names{end+1} = [STUDY.cluster(end).name ' (' num2str(length(STUDY.cluster(end).comps))  ' ICs)']; %update the cluster list with the new cluster
+                    %
+                    clus_names{end+1} = [STUDY.cluster(end).name ' (' num2str(length(STUDY.cluster(end).comps))  ' ICs)']; 
+                    %
+                    % update the cluster list with the new cluster
+                    %
                     clus_names([optionalcls(reassign_param{1})]) = [];
                     cls = setdiff(cls, cls_mrg); % remove from the GUI clusters list the merged clusters
                     cls(end+1) = length(STUDY.cluster); % update the GUI clusters list with the new cluster
                     N  = length(cls);
+                    %
                     % update the first option on the GUI list : 'All 10 cluster centroids'
                     % with the new number of cluster centroids
+                    %
                     ti = strfind(clus_names{1},'cluster'); %get the number of clusters centroid 
                     cent = num2str(str2num(clus_names{1}(5:ti-2))+1- length(cls_mrg)); % new number of centroids
                     clus_names{1} = [clus_names{1}(1:4) cent clus_names{1}(ti-1:end)]; %update list
                     set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_names);
+                    %
                     % update Study history
+                    %
                     userdat{2} = N; % update N, the number of cluster options in edit window 
                     userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
                   end
@@ -785,4 +791,3 @@ else
               end
     end
 end
-
