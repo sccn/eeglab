@@ -13,9 +13,9 @@
 % Usage:    
 %                >> STUDY = pop_clustedit(ALLEEG, STUDY,clusters);   
 % Inputs:
-%   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) in the 
-%                STUDY. ALLEEG for a STUDY set is typically loaded using pop_loadstudy(),
-%                else when creating a new STUDY, using pop_createstudy().  
+%   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
+%                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
+%                pop_loadstudy(), or in creating a new STUDY, using pop_createstudy().  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %
 % Optional inputs:
