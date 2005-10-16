@@ -10,13 +10,13 @@
 %                  variance lower than a defined threshold (see dipfit()), or components from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated. If new measures are added, the updated 
-%                  EEG sets are also saved to disk.
+%                  EEG sets are also saved to disk. Called by interactive pop_preclust().
 % Usage:    
 %                >> [ALLEEG, STUDY] = eeg_preclust(ALLEEG, STUDY, clustind, compind, preproc1 ...);
 %
 % Inputs:
 %   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
-%   STUDY        - an eeglab STUDY set (containing loaded EEG structures)
+%   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
 %
 %   clustind     - a cluster index for further clustering (hierarchical clustering), for example 
 %                  to cluster a mu component cluster into left mu and right mu sub-clusters. 
@@ -35,11 +35,11 @@
 %   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
 %
 %                  'comnd' = component measures to compute:
-%                    * 'erp'     = cluster on the ICA component ERPs,
+%                    * 'erp'     = cluster on the component ERPs,
 %                    * 'dipoles' = cluster on the component [X Y Z] dipole locations
 %                    * 'dipselect' = select components to cluster on that have residual 
 %                                  dipole variance less than a specified threshold. 
-%                    * 'spec'    = cluster on the ICA component activity spectra 
+%                    * 'spec'    = cluster on the component activity spectra 
 %                                  (with the baseline removed).
 %                    * 'scalp'   = cluster on component topoplot() scalp maps 
 %                                  (or their absolute values),
@@ -47,9 +47,9 @@
 %                                  (or their absolute values),
 %                    * 'scalpGrad' = cluster on the topoplot() scalp map gradients 
 %                                  (or their absolute values),
-%                    * 'ersp'    = cluster on ICA components ERSP. (requires: 'cycles', 
+%                    * 'ersp'    = cluster on components ERSP. (requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
-%                    * 'itc'     = cluster on ICA components ITC.(requires: 'cycles', 
+%                    * 'itc'     = cluster on components ITC.(requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
 %
 %                  'key'   optional inputs used in computing  the specified measures:
@@ -82,14 +82,14 @@
 %
 % Example:
 %   >> [ALLEEG  STUDY] = eeg_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
-%                        { 'spec' 'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
-%                        { 'erp' 'npca' 10 'norm'  1 'weight' 2 'timewindow' [ 350 500 ] } ,...
+%                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
+%                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
-%                                 { 'dipoles' 'norm' 1 'weight' 15 } , ...
-%                        { 'ersp' 'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ....
-%                                 'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 } ,...
-%                        { 'itc' 'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ...
-%                                 'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 });
+%                        { 'dipoles'         'norm' 1 'weight' 15 } , ...
+%                        { 'ersp'  'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ....
+%                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 } ,...
+%                        { 'itc'   'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ...
+%                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 });
 %                        % 
 %                        % This prepares for first stage clustering performed on all the components 
 %                        % in the STUDY datasets except components with dipole model residual variance 
