@@ -1,44 +1,39 @@
-% Usage: >> [ STUDY] = pop_clust(ALLEEG, STUDY); %Graphical interface call
-%            >> [ STUDY] = pop_clust(ALLEEG, STUDY, 'key1', 'val1', ...); %command line call 
-%
-% pop_clust() - a function (both GUI and command line modes) to choose and run a
-% clustering algorithm on a pre-prepared data. The data is prepared using
-% the GUI pop_preclust function or the command line eeg_preclust  function.
-% The function allows you to select a clustering algorithm and requires to set 
-% the number of clusters in advance. In the GUI mode when the clustering is
-% completed the pop_clustedit function is called, to present the clustering results
-% and allow the user to edit them.
-%
-%
+% pop_clust() - select and run a clustering algorithm on components from an EEGLAB STUDY 
+%               set of EEG datasets. Clustering data should be prepared beforehand using 
+%               pop_preclust() and/or eeg_preclust(). The number of clusters must be
+%               specified in advance. If called in GUI mode, the pop_clustedit() window
+%               appears when the clustering is complete to display clustering results
+%               and allow the user to review and edit them.
+% Usage: 
+%               >> [ STUDY] = pop_clust(ALLEEG, STUDY); % pop up a graphic interface
+%               >> [ STUDY] = pop_clust(ALLEEG, STUDY, 'key1', 'val1', ...); % no pop-up
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain all the datasets that were used
-%                      in the STUDY. 
-%   STUDY      - an eeglab STUDY set, can contain some or all of the EEGs
-%                      structures in ALLEEG. 
+%   ALLEEG      - a vector of loaded EEG dataset structures of all sets in the STUDY set.
+%   STUDY       - an EEGLAB STUDY set containing some or all of the EEG sets in ALLEEG. 
+%
 % Optional Inputs:
-%   'algorithm'  - ['kmeans' | 'Neural Network'] what algorithm will be used for clustering.
-%                         {default: 'kmeans'} 
-%   'clust_num' - [num] the number of desired clusters (must be bigger than one). 
-%                         {default: 20}
-%   'save'          - ['on' | 'off'] save the updated STUDY. {default: 'off'} 
-%   'filename'   - [string] if save option is on, will save the STUDY under this file name. 
-%                         {default: current STUDY filename}
-%   'filepath'   - [string] if save option is on, will save the STUDY in this directory. 
-%                         {default: current STUDY filepath}
+%   'algorithm' - ['kmeans' | 'Neural Network'] algorithm to be used for clustering.
+%                 the 'Neural Network' option requires the Matlab Neural Net toolbox 
+%                    {default: 'kmeans'} 
+%   'clust_num' - [num] the number of desired clusters (must be > 1)
+%                    {default: 20}
+%   'save'      - ['on' | 'off'] save the updated STUDY to disk {default: 'off'} 
+%   'filename'  - [string] if save option is 'on', save the STUDY under this file name
+%                    {default: current STUDY filename}
+%   'filepath'  - [string] if save option is 'on', will save the STUDY in this directory 
+%                    {default: current STUDY filepath}
 % Outputs:
-%   STUDY - same as inputs only modified with the clustering algorithm results.
+%   STUDY       - as input, but modified adding the clustering results.
 %
 % Graphic interface buttons:
-%   ''Clustering algorithm'' - [list box] displays an optional clustering algorithms. 
-%                         At the moment only the k-means algorithm is implemented.
-%   ''Number of clusters to compute'' - [edit box] the number of desired clusters,
-%                         minimum is 2.
-%   ''Identify outliers'' - [check box] optional algorithm choice to detect outliers. 
-%   'Save STUDY'' - [check box] an option to save the STUDY after clustering is performed. 
-%                         If  no file is entered will overwrite the current file of STUDY. 
+%  "Clustering algorithm" - [list box] display/choose among the available clustering 
+%                           algorithms. 
+%  "Number of clusters to compute" - [edit box] the number of desired clusters (>2)
+%  "Identify outliers'' - [check box] check to detect outliers. 
+%  "Save STUDY"         - [check box] check to save the updated STUDY after clustering 
+%                         is performed. If no file entered, overwrites the current STUDY. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_preclust, pop_clust         
+%  See also  pop_clustedit(), pop_preclust(), eeg_preclust(), pop_clust()
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, October 11, 2004
 
@@ -152,7 +147,7 @@ else %command line call
     outliers = Inf; % default std is Inf - no outliers
     
     if mod(length(varargin),2) ~= 0
-        error('pop_clust: input varaibles must come in pairs of keyx and valx');
+        error('pop_clust(): input variables must be specified in pairs: keywords, values');
     end
     
     for k = 1:2:length(varargin)
