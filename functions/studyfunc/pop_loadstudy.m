@@ -1,22 +1,19 @@
-% pop_loadstudy() - load an existing STUDY set and its corresponding ALLEEG structure
-%
+% pop_loadstudy() - load an existing EEGLAB STUDY set of EEG datasets plus 
+%                   its corresponding ALLEEG structure. Calls load_ALLEEG().
 % Usage:
-%   >> [STUDY ALLEEG] = pop_loadstudy; % uses an interactive pop-up window
-%                                      % to select the STUDY set to load
-%   >> [STUDY ALLEEG] = pop_loadstudy( 'key', 'val', ...); % no pop-up, uses the input
-%                                      % parameters to select the STUDY set to load   
-%                                              
+%   >> [STUDY ALLEEG] = pop_loadstudy; % pop up a window to collect filename
+%   >> [STUDY ALLEEG] = pop_loadstudy( 'key', 'val', ...); % no pop-up
 %
 % Optional inputs:
 %   'filename' - [string] filename of the STUDY set file to load.
 %   'filepath' - [string] filepath of the STUDY set file to load.
 %
 % Outputs:
-% STUDY - the requested STUDY set structure.
-% ALLEEG - the corresponding ALLEEG structure containing the 
-%           datasets in the STUDY.    
+%   STUDY      - the requested STUDY set structure.
+%   ALLEEG     - the corresponding ALLEEG structure containing 
+%                the (loaded) STUDY EEG datasets.    
 %
-% see also: load_ALLEEG, pop_savestudy, pop_createstudy
+% See also: load_ALLEEG(), pop_savestudy(), pop_createstudy()
 %
 % Authors: Hilit Serby SCCN, INC, UCSD, September 2005
 
@@ -68,10 +65,10 @@ if (~isempty(filename)) & (~isempty(filepath))
     try 
         eval(['load ' STUDYfile ' -mat']);
     catch
-        error(['pop_loadstudy: the Study file ' STUDYfile ' could not be loaded, check file name and file path']);
+        error(['pop_loadstudy(): STUDY set file 'STUDYfile' not loaded -- check filename and path']);
     end
 else
-    error(['pop_loadstudy: No Study file to load was provided.']);
+    error(['pop_loadstudy(): No STUDY set file provided.']);
 end
   
 ALLEEG = load_ALLEEG(STUDY);
