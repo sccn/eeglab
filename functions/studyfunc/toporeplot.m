@@ -1,93 +1,87 @@
-% toporeplot() - plot a topoplot output image (a square matrix) in a 2-D circular
-%              scalp map view (looking down at the top of the head). 
-%              Can also show specified channnel location(s), or return 
-%              an interpolated value at an arbitrary scalp location (see 'noplot').
-%              By default, channel locations below head center (arc_length 0.5) are 
-%              shown in a 'skirt' outside the cartoon head (see 'plotrad' and 'headrad' 
-%              options below). Nose is at top of plot; left is left; right is right.
+% toporeplot() - re-plot a saved topoplot() output image (a square matrix) 
+%              in a 2-D circular scalp map view (as looking down at the top 
+%              of the head).  May also be used to re-plot a mean topoplot() 
+%              map for a number of subjects and/or components without all 
+%              the constitutent maps having the same channel montage.
+%              Nose is at top of plot. Left = left. See topoplot().
 % Usage:
-%        >>  toporeplot(topoimage,'plotrad',val1, 'intrad',val2);   % use
-%               an existing topoplot output image and the 'intrad' and 'plotrad'
-%               values given originally to topoplot to get topoimage.
-%        >>  toporeplot(topoimage,'plotrad',val1,'xsurface', Xi, 'ysurface',Yi );   % use an existing topoplot output image
-%               with the 'plotrad' value used to create it, and if 'intrad'
-%               was not an input to topoplot, use the grid axes Xi and Yi
-%               as inputs.
-%        >>  [hfig val ]= toporeplot(topoimage,'plotrad',val1,
-%               'Param1','Value1', ...); %one of the two options above plus
-%               other optional parameters.
-%
-% Required Input:
-%
-%   topoimage         - output image matrix as from topoplot(). For maximum flexibility, 
-%                                create topoimage using option 'plotrad' ,
-%                                1, and 'intrad' 1 in topoplot.
-%   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
-%                            If plotrad > 0.5, chans with arc_length > 0.5 
-%                            (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
-%                            cartoon head. topoimage is a function of 'plotrad', 
-%                            therefore 'plotrad' is required to reproduce the 'topoplot' image. 
-%
+%          >>  toporeplot(topoimage,'plotrad',val1, 'intrad',val2);   
+%                 % Use an existing (or mean) topoplot output image. Give the 
+%                 % original 'intrad' and 'plotrad' values used to in topoimage.
+%          >>  toporeplot(topoimage,'plotrad',val1,'xsurface', Xi, 'ysurface',Yi );   
+%                 % Use an existing (or mean) topoplot output image. Give the same 
+%                 % 'plotrad' value used to create it. Since 'intrad' was not input 
+%                 % to topoplot(), give the grid axes Xi and Yi as inputs.
+%          >>  [hfig val ]= toporeplot(topoimage,'plotrad',val1, 'Param1','Value1', ...); 
+%                 % Give one of the two options above plus other optional parameters.
+% Required inputs:
+%   topoimage    - output image matrix (as) from topoplot(). For maximum flexibility, 
+%                  create topoimage using topoplot() options: 'plotrad',1, 'intrad',1 
+%   'plotrad'    - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
+%                  If plotrad > 0.5, chans with arc_length > 0.5 (i.e. below ears,eyes) 
+%                  are plotted in a circular 'skirt' outside the cartoon head. 
+%                  The topoimage depends on 'plotrad', so 'plotrad' is required to 
+%                  reproduce the 'topoplot' image. 
 % Optional inputs:
-%   'chanlocs'     - name of an EEG electrode position file (>> topoplot('example)),
-%                       else, an EEG.chanlocs structure (>> help pop_editset).
-%   'maplimits'   - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
-%                       'maxmin'   -> scale colors to the data range (makes green mid-range); 
-%                       [lo,hi]    -> use user-definined lo/hi limits {default: 'absmax'}
-%   'style'           - 'map'      -> plot colored map only
-%                       'contour'  -> plot contour lines only
-%                       'both'     -> plot both colored map and contour lines {default: 'both'}
-%                       'fill'     -> plot constant color between contour lines
-%                       'blank'    -> plot electrode locations only, requires electrode information. 
-%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
-%                       options below. {default: 'on' -> mark electrode locations with points
-%                       unless more than 64 channels, then 'off'}. Requires electrode information. 
-%   'intrad'          - [0.15<=float<=1.0] radius of the interpolation area
-%                          used in topoplot to get the grid. 
-%   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
-%                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
-%                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}. Requires electrode information. 
-%   'noplot'          - [rad theta] are coordinates of a (possibly missing) channel. Do not plot but return interpolated value for channel location.
-%                       Do not plot but return interpolated value for this location. 
-%   'xsurface'     - [Xi- matrix] the Xi grid points for the surface of the
-%                          plotting, output of topoplot.
-%   'ysurface'     - [Yi- matrix] the Yi grid points for the surface of the
-%                          plotting, output of topoplot.
-%
+%   'chanlocs'   - name of an EEG electrode position file (see >> topoplot example).
+%                  Else, an EEG.chanlocs structure        (see >> help pop_editset).
+%   'maplimits'  - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
+%                  'maxmin'   -> scale colors to the data range (makes green mid-range); 
+%                  [lo,hi]    -> use user-definined lo/hi limits {default: 'absmax'}
+%   'style'      - 'map'      -> plot colored map only
+%                  'contour'  -> plot contour lines only
+%                  'both'     -> plot both colored map and contour lines {default: 'both'}
+%                  'fill'     -> plot constant color between contour lines
+%                  'blank'    -> plot electrode locations only, requires electrode info. 
+%   'electrodes' - 'on','off','labels','numbers','ptslabels','ptsnumbers' See Plot detail 
+%                  options below. {default: 'on' -> mark electrode locations with points
+%                  unless more than 64 channels, then 'off'}. Requires electrode info. 
+%   'intrad'     - [0.15<=float<=1.0] radius of the interpolation area used in topoplot() 
+%                  to get the grid. 
+%   'headrad'    - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
+%                  NB: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
+%                  'rim' -> show cartoon head at outer edge of the plot {default: 0.5}. 
+%                  Requires electrode information. 
+%   'noplot'     - [rad theta] are coordinates of a (possibly missing) channel. 
+%                  Do not plot but return interpolated value for channel location.
+%                  Do not plot but return interpolated value for this location. 
+%   'xsurface'   - [Xi- matrix] the Xi grid points for the surface of the plotting
+%                  an output of topoplot().
+%   'ysurface'   - [Yi- matrix] the Yi grid points for the surface of the plotting,
+%                  an output of topoplot().
 % Dipole plotting:
-%   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
-%                       from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
-%                       model has radius 1). If several rows, plot one dipole per row.
-%                       Coordinates returned by dipplot() may be used. Can accept
-%                       an EEG.dipfit.model structure (See >> help dipplot).
-%                       Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
-%   'dipnorm'         - ['on'|'off'] normalize dipole length {default: 'on'}.
-%   'diporient'       - [-1|1] invert dipole orientation {default: 1}.
-%   'diplen'          - [real] scale dipole length {default: 1}.
-%   'dipscale'        - [real] scale dipole size {default: 1}.
-%   'dipsphere'       - [real] size of the dipole sphere. {default: 85 mm}.
-%   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
-%                       {default: 'k' = black}.
+%   'dipole'     - [xi yi xe ye ze] plot dipole on the top of the scalp map
+%                  from coordinate (xi,yi) to coordinates (xe,ye,ze) (dipole head 
+%                  model has radius 1). If several rows, plot one dipole per row.
+%                  Coordinates returned by dipplot() may be used. Can accept
+%                  an EEG.dipfit.model structure (See >> help dipplot).
+%                  Ex: ,'dipole',EEG.dipfit.model(17) % Plot dipole(s) for comp. 17.
+%   'dipnorm'    - ['on'|'off'] normalize dipole length {default: 'on'}.
+%   'diporient'  - [-1|1] invert dipole orientation {default: 1}.
+%   'diplen'     - [real] scale dipole length {default: 1}.
+%   'dipscale'   - [real] scale dipole size {default: 1}.
+%   'dipsphere'  - [real] size of the dipole sphere. {default: 85 mm}.
+%   'dipcolor'   - [color] dipole color as Matlab code code or [r g b] vector
+%                  {default: 'k' = black}.
 % Plot detail options:
-%   'electcolor' {'k'}|'emarker' {'.'}|'emarkersize' {14}|'emarkersize1chan' {40}|'efontsize' {var}
-%                       electrode marking details and their {defaults}. 
-%   'shading'         - 'flat','interp'  {default: 'flat'}
-%   'colormap'        -  (n,3) any size colormap {default: existing colormap}
-%   'numcontour'      - number of contour lines {default: 6}
-%   'ccolor'          - color of the contours {default: dark grey}
+%   'electcolor' {'k'}|'emarker' {'.'}|'emarkersize' {14} ...
+%  |'emarkersize1chan' {40}|'efontsize' {var} - electrode marking details and {defaults}. 
+%   'shading'    - 'flat','interp'  {default: 'flat'}
+%   'colormap'   - (n,3) any size colormap {default: existing colormap}
+%   'numcontour' - number of contour lines {default: 6}
+%   'ccolor'     - color of the contours {default: dark grey}
 %   'hcolor'|'ecolor' - colors of the cartoon head and electrodes {default: black}
-%   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
-%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%   'circgrid'   - [int > 100] number of elements (angles) in head and border circles {201}
+%   'verbose'    - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Outputs:
-%         hfig           - plot axes handle
-%         val         - single interpolated value at the specified 'noplot' arg channel 
-%                        location ([rad theta]).
+%         hfig   - plot axes handle
+%         val    - single interpolated value at the specified 'noplot' arg channel 
+%                   location ([rad theta]).
 %
 % Notes: - To change the plot map masking ring to a new figure background color,
 %            >> set(findobj(gca,'type','patch'),'facecolor',get(gcf,'color'))
-%        - Topoplots may be rotated. From the commandline >> view([deg 90]) {default: [0 90])
-%
+%        - Topoplots may be rotated from the commandline >> view([deg 90]) {default:[0 90])
 %
 % Authors: Hilit Serby, Andy Spydell, Colin Humphries, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute, 8/1996-/10/2001; SCCN/INC/UCSD, Nov. 2001- Nov. 2004
@@ -100,9 +94,7 @@
 
 
 % toporeplot() - From topoplot.m, Revision 1.216  2004/12/05 12:00:00 hilit
- 
 %[hfig grid] = topoplot( EEG.icawinv(:, 5), EEG.chanlocs, 'verbose', 'off','electrodes', 'off' ,'style','both');
-
 %figure; toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
 
 function [handle,chanval] = toporeplot(grid,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
