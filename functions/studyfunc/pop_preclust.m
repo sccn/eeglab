@@ -1,18 +1,67 @@
-% Usage: >> pop_preclust(ALLEEG,STUDY); %Graphical interface, load initial clustering  
-%            >> pop_preclust(ALLEEG,STUDY,cluster_ind); 
+% pop_preclust() - prepare STUDY components' location and activity measures for later clustering.
+%                  Collect information in an interactive pop-up query window. To pre-cluster
+%                  from the commandline, use eeg_preclust(). After data entry into the pop window,
+%                  Selected measures (one or more from options: ERP, dipole locations, spectra,
+%                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
+%                  set, unless they already present. After all requested measures are computed 
+%                  and saved in the STUDY datasets, a PCA  matrix (by runica() with 'pca' option) 
+%                  is constructed (this is the feature reduction step). This matrix will be used 
+%                  as input to the clustering  algorithm in pop_clust(). pop_preclust() allows 
+%                  selection of a subset of components to use in the clustering. This subset 
+%                  may be a user-specified component subset, components with dipole model residual 
+%                  variance lower than a defined threshold (see dipfit()), or components from 
+%                  an already existing cluster (for hierarchical clustering). The EEG datasets
+%                  in the ALLEEG structure are updated, and updated EEG sets are saved to disk.
+%                  Calls eeg_preclust().
+% Usage:    
+%                >> [ALLEEG, STUDY] = pop_preclust(ALLEEG, STUDY); % pop up interactive window
+%                >> [ALLEEG, STUDY] = pop_preclust(ALLEEG, STUDY, clustind); % sub-cluster 
 %
-% see eeg_preclust (the equivalent command line function for more information). 
+% Graphic interface:
+% Inputs:
+%   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
+%   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
+%
+%   clustind     - a (single) cluster index for sub-clustering (hierarchical clustering) --
+%                  for example to cluster a mu component cluster into left mu and right mu 
+%                  sub-clusters. Should be empty for top level (whole STUDY) clustering 
+%                  {default: []}
+% Outputs:
+%   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding preprocessing 
+%                  data (pointers to float files that hold ERSP, spectrum, etc. information).
+%   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
+%
+% Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [ALLEEG, STUDY] = pop_preclust(varargin)
+
 if ~isstr(varargin{1}) %intial settings
     if length(varargin) < 2
-        error('pop_preclust: You must provide both ALLEEG and STUDY structures to pop_preclust');
+        error('pop_preclust(): needs both ALLEEG and STUDY structures');
     end
     ALLEEG = varargin{1};
     STUDY= varargin{2};
     if length(varargin) >= 3
         if length(varargin{3}) > 1
-            error('pop_preclust: You can cluster components from one cluster, if you want to cluster components from several clusters merge them first!');
+            error('pop_preclust(): To cluster components from several clusters, merge them first!');
         end
         cluster_ind = varargin{3};
     else
