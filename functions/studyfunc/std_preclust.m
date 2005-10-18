@@ -10,26 +10,29 @@
 %                  variance lower than a defined threshold (see dipfit()), or components from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated. If new measures are added, the updated 
-%                  EEG sets are also saved to disk. Called by interactive pop_preclust().
+%                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
+%                  eeg_clust() or pop_clust().
 % Usage:    
-%                >> [ALLEEG, STUDY] = eeg_preclust(ALLEEG, STUDY, clustind, compind, preproc1 ...);
+%                >> [ALLEEG,STUDY] = eeg_preclust(ALLEEG,STUDY); % cluster all comps in all sets
+%                >> [ALLEEG,STUDY] = eeg_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
 %
-% Inputs:
-%   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
-%   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
+% Required inputs:
+%   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
+%   STUDY        - an EEGLAB STUDY set of loaded EEG structures
 %
+% Optional inputs:
 %   clustind     - a cluster index for further clustering (hierarchical clustering), for example 
 %                  to cluster a mu component cluster into left mu and right mu sub-clusters. 
-%                  Should be empty for first stage (all STUDY) clustering. 
+%                  Should be empty for first stage (whole STUDY) clustering {default: []}
 %
-%   compind      - [ cell array | file name | [] ] Component indices to cluster. A cell array 
-%                  of vectors of component indices for each dataset: Empty brackets [] means 
-%                  all the components in a dataset, 0 means none (exclude the dataset from 
-%                  pre-clustering). For example: {[2:5] [10:15] [0] []} will include components 
-%                  2 to 5 from the first dataset, components 10 to 15 from the second dataset, 
-%                  will exclude dataset 3, but will include all the components of the fourth dataset.
+%   compind      - [ cell array | filename | [] ] Indices of dataset components to cluster. 
+%                  A cell array of vectors of component indices for each dataset: Empty brackets 
+%                  ([]) means all components in a dataset; 0 means none of them.
+%                  For example: {[2:5] [10:15] [] [0]} includes components 2 to 5 from the first 
+%                  dataset, components 10 to 15 from the second dataset, excludes dataset three, 
+%                  but includes all components of the fourth dataset.
 %                  Else, a quoted string containing the name of a .mat file containing such a cell 
-%                  array in a variable named 'clustcomp' {default: [] => include all components 
+%                  array variable named 'clustcomp' {default: [] => include all components 
 %                  from all datasets}.
 %
 %   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
@@ -67,7 +70,7 @@
 %                                   Laplacian maps {default: 1}
 %                    * 'cycles'  =  [0| cycles_factor] for ERSP and ITC (see timef() for details) 
 %                                   {default: 0 (=> FFT method)}
-%                    * 'padratio'=  [integer] for ERSP and ITC (see timef() for details) {default: 1}
+%                    * 'padratio'=  [integer] for ERSP and ITC (see timef() for details) {default:1}
 %                    * 'alpha'   =  [integer] bootstrap probability significance trhshold 
 %                                   for ERSP and ITC (see timef() for details). {default: 0.01}
 %                    * 'funarg'  =  [cell array] optional function arguments for mean spectrum 
@@ -90,13 +93,13 @@
 %                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 } ,...
 %                        { 'itc'   'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ...
 %                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 });
-%                        % 
-%                        % This prepares for first stage clustering performed on all the components 
-%                        % in the STUDY datasets except components with dipole model residual variance 
-%                        % above 0.15. The clustering will be based on the components' mean spectra in
-%                        % the [3 25] Hz frequency range, the components' ERPs in the [350 500] ms
-%                        % time window, on the absolute component scalp maps and dipole locations,
-%                        % and on their ERSP and ITC images. 
+%                          
+%                        % This prepares for first-stage clustering all components in the STUDY
+%                        % datasets except components with dipole model residual variance above 0.15.
+%                        % Clustering will be based on the components' mean spectra in % the [3 25] Hz 
+%                        % frequency range, the components' ERPs in the [350 500] ms % time window, 
+%                        % the (absolute-value) component scalp maps, their equivalent dipole locations,
+%                        % and their ERSP and ITC images. 
 %
 % Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
@@ -120,23 +123,31 @@
 
 function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components_ind, varargin)
     
-    if nargin < 3
+    if nargin < 2
         help eeg_preclust;
         return;
     end;
-    
+    if nargin == 2
+        cluster_ind = []; % default to clustering the whole STUDY 
+    end    
+    if nargin == 3
+        components_ind = []; % default to clustering all components 
+    end    
+
     Ncond = length(STUDY.condition);
     if Ncond == 0
         Ncond = 1;
     end
     
     % Get component indices that are part of the cluster 
+    % --------------------------------------------------
     if ~isempty(cluster_ind)
         if length(cluster_ind) ~= 1
-            error('Only one cluster can be clustered at a time, if you wish to cluster more than one cluster merge clusters first.');
+            error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
         end
-        for k = 1 : size(STUDY.setind,2) % go over the sets from the first condition (if there are some)
-            sind = find(STUDY.cluster(cluster_ind).sets(1,:) == k);%the component indices that belong to the dataset in the cluster 
+        for k = 1 : size(STUDY.setind,2)   % go over the sets from the first condition (if there are some)
+            sind = find(STUDY.cluster(cluster_ind).sets(1,:) == k); % the component indices that belong to 
+                                                                    % the dataset in the cluster 
             if isempty(sind)
                 succompind{k} = 0;
             else
@@ -145,22 +156,23 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
         end
     end
 
-    if ~isempty(components_ind) % there is a component selection
-        if isstr(components_ind) % if input is a .mat file load component indices
+    if ~isempty(components_ind) % if there is a component selection
+        if isstr(components_ind) % if input is a .mat file, load component indices
             try, 
                 eval( [ 'load ' components_ind ]);
             catch
-                error('eeg_preclust: compsind input is not a valid file')
+                error('The compind argument is not a valid filename')
             end
             if isempty('clustcomp')
-                error('eeg_preclust: compsind input .mat file must have a string argument named clustcomp');
+                error('The compind .mat file must have a cell array variable ''clustcomp''');
             end
             components_ind = clustcomp;
         end
         if length(components_ind) ~= size(STUDY.setind,2)
-            error('eeg_preclust: there must be as many elements in the cell array of component indices compsind input as there are subjects x sessions in STUDY.');
+            error('Size of cell array of component indices (''compsind'') ~= (subjects * sessions) in STUDY.');
         end;
-        if ~isempty(cluster_ind) % components to cluster on must be both part of the specified cluster and slected components
+        if ~isempty(cluster_ind) % components to cluster on must be both part of the specified cluster 
+                                 % and selected components
             for ind = 1:size(STUDY.setind,2)
                 if isempty(components_ind{ind})
                     seti = STUDY.datasetinfo(STUDY.setind(1,ind)).index;
@@ -185,13 +197,13 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
             seti = STUDY.datasetinfo(STUDY.setind(1,ind)).index;
             succompind{ind} = 1:size(ALLEEG(seti).icawinv,2);
         else
-            succompind{ind} = succompind{ind}(find(succompind{ind}));%remove zeros
-            succompind{ind} = sort(succompind{ind}); %sort the components
+            succompind{ind} = succompind{ind}(find(succompind{ind}));% remove zeros
+            succompind{ind} = sort(succompind{ind}); % sort the components
         end
     end;
     
     % Scan which component to remove (no dipole info)
-    % ------------------------------
+    % -----------------------------------------------
     update_flag = 0;
     clear rv
     for index = 1:length(varargin) % scan commands
@@ -207,17 +219,18 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
             end
         end        
     end
-    if update_flag % dipole infromation is used to select components
+    if update_flag % dipole information is used to select components
         for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
             idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;
             if ~isfield(ALLEEG(idat), 'dipfit')
-                error('No dipole information exists in data')
+                error('No dipole information found in the data')
             end
             indrm = []; % components that will be removed from the clustering
             indleft = []; % components that are left in clustering
             for icomp = succompind{si} % scan components
-                if (ALLEEG(idat).dipfit.model(icomp).rv >= rv) | isnan(ALLEEG(idat).dipfit.model(icomp).rv) % Components have rv bigger than asked for 
-                    %fprintf('Component %d of dataset %d has no dipole info and was removed\n', icomp, idat)
+                if (ALLEEG(idat).dipfit.model(icomp).rv >= rv) | isnan(ALLEEG(idat).dipfit.model(icomp).rv) 
+                    % Components have rv bigger than asked for 
+                    % fprintf('Component %d of dataset %d has no dipole info and was removed\n', icomp, idat)
                     indrm = [indrm icomp];
                 else
                     indleft = [indleft icomp];
@@ -227,7 +240,8 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                  succompind{si} = indleft;
              end
         end;
-        % Create a cluster with removed components 
+        % Create a cluster of removed components 
+        % --------------------------------------
         update_flag = 0;
         if isempty(cluster_ind) % first step clustering
             for si = 1:size(STUDY.setind,2)
@@ -252,14 +266,14 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
         end
         if update_flag % Update STUDY with new components
             if isempty(cluster_ind)
-                a =  ['% A subset of components, which have dipole information, were taken for clustering.'...
-                        'The rest of the components are placed in a separate cluster'];
+                a =  ['% A subset of components with dipole information were readied for clustering.'...
+                        'Other components were placed in a separate cluster'];
                 [STUDY] = cls_createclust(STUDY, ALLEEG, 'Notclust');
                 STUDY.cluster(end).parent{end} = STUDY.cluster(1).name; 
                 STUDY.cluster(1).child{end+1} = STUDY.cluster(end).name;
             else
-                a =  ['% A subset of components from ' STUDY.cluster(cluster_ind).name  ', which have dipole information, were taken for clustering.' ...
-                    'The rest of the components are placed in a separate cluster'];    
+                a =  ['% A subset of components from ' STUDY.cluster(cluster_ind).name  'with dipole information, were readied for clustering.' ...
+                    'Other components were placed in a separate cluster'];    
                 [STUDY] = cls_createclust(STUDY, ALLEEG, [ 'Notclust ' num2str(cluster_ind) ] );
                 STUDY.cluster(end).parent{end} = STUDY.cluster(cluster_ind).name;
                 STUDY.cluster(cluster_ind).child{end+1} = STUDY.cluster(end).name;
@@ -328,8 +342,9 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
             end
         end
         
-        % In case ersp / itc values already exist in some of the datasets,
+        % If ersp / itc values already exist in some of the datasets,
         % make sure they are the same as the requested parameters.
+        % -----------------------------------------------------------
         if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') )  
             overwrite = 0; 
             params = [];
@@ -384,7 +399,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                       for cond = 1 : Ncond
                           idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                           if ALLEEG(idat).trials == 1
-                              error('No epochs in dataset, ERP information has no meaning');
+                              error('No epochs in dataset: ERP information has no meaning');
                          end
                          if ~isempty('timewindow')
                              [tmp, X, t] = cls_erp(ALLEEG(idat), succompind{si}, timewindow);
@@ -400,7 +415,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                          if cond == 1
                              con_data = abs(X);
                              con_t = t;
-                         else %concatenate across conditions
+                         else % concatenate across conditions
                              con_t = [con_t; t];
                              con_data = [con_data abs(X)];
                          end
@@ -414,23 +429,23 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                      clear X t con_data con_t tmp;
                  end
               % select ica scalp maps
-             % --------------------------
-             case 'scalp' , %scalp maps are identicle across conditions
+              % --------------------------
+             case 'scalp' , % NB: scalp maps are identical across conditions (within session)
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
                      [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si});
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
-                     if abso %absolute values
+                     if abso % absolute values
                          data = [ data; abs(X) ];
                      else
                          data = [ data; X ];
                      end
                      clear X tmp;
                  end       
-             % select ica Laplacian scalp maps
-             % -----------------------------------
+             % select Laplacian ica comp scalp maps
+             % ------------------------------------
              case 'scalpLaplac' , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
@@ -445,8 +460,8 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                      end
                      clear X tmp;
                  end
-             % select ica Gradient scalp maps
-             % ------------------------------
+             % select Gradient ica comp scalp maps
+             % -----------------------------------
              case 'scalpGrad'   , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
@@ -461,8 +476,8 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                      end
                      clear X tmp;
                  end 
-             % select ica spectrum
-             % --------------------------
+             % select ica comp spectra
+             % -----------------------
              case 'spec'   , 
                  if si == 1
                     overwrite = 0;
@@ -471,12 +486,14 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                     for cond = 1 : Ncond 
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          if ~isempty('freqrange')
-                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, freqrange, fun_arg,overwrite);
+                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
+                                                                  freqrange, fun_arg,overwrite);
                              if ~isempty(tmp)
                                  ALLEEG(idat).etc = tmp;
                              end
                          else
-                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, [], fun_arg,overwrite);
+                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
+                                                                         [], fun_arg,overwrite);
                              if ~isempty(tmp)
                                  ALLEEG(idat).etc = tmp;
                              end
@@ -484,7 +501,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                          if cond == 1
                              con_data = X;
                              con_f = f;
-                         else %concatenate across conditions
+                         else % concatenate across conditions
                              con_f = [con_f; f];
                              con_data = [con_data X];
                          end
@@ -499,19 +516,22 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                   end               
              % select dipole information
              % -------------------------
-             case 'dipoles' %dipoles are identicle across conditions (no need to scan across condition)
+             case 'dipoles' % NB: dipoles are identical across conditions (within session)
+                            % (no need to scan across conditions)
               idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
               count = size(data,1)+1;
               for icomp = succompind{si}
-                  % select between 3 suboptions
-                  % ---------------------------
+                  % select among 3 sub-options
+                  % --------------------------
                   if ~isempty(succompind{si})
                       ldip = 1;
                       if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
-                          if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
-                              [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); %find the left most dipole
+                          if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
+                              & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
+                              % find the leftmost dipole
+                              [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
                           elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
-                              ldip = 2; %left most dipole is the only one that exists
+                              ldip = 2; % the leftmost dipole is the only one that exists
                           end
                       end
                       data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
@@ -519,7 +539,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                   end
               end                     
              % cluster on ica ersp / itc values
-             % --------------------------
+             % --------------------------------
              case  {'ersp', 'itc'}
                 type =  strcom;            
                 if ~isempty(succompind{si})
@@ -528,13 +548,15 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          idattot = [idattot idat];
                          % compute ERSP/ ITC, if doesn't exist.
-                         [tmp] = cls_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, cycles, padratio, alpha, type);
+                         [tmp] = cls_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
+                                                                     cycles, padratio, alpha, type);
                          if ~isempty(tmp)
                              ALLEEG(idat).etc = tmp;
                          end
                     end
-                    % prepare ERSP / ITC data for clustering (selecet requested components, mask 
-                    % and change ro a common base if multiple conditions).
+                    % prepare ERSP / ITC data for clustering (select requested components, 
+                    % mask and change to a common base if multiple conditions).
+                    % --------------------------------------------------------------------
                     X = cls_ersptocluster(ALLEEG(idattot),succompind{si}, timewindow, freqrange, type); 
                     data = [data; X];
                     clear tmp X 
@@ -563,7 +585,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                               data(end+1:end+size(X,1),:) = X;
                           else
                               data(end+1:end+size(X,1),:) = X;
-                              disp('Warning: wrong number of components (rows) generated by string command');
+                              disp('Warning: wrong number of components (rows) generated by string command.');
                           end;
                       end;
                   end
@@ -576,8 +598,8 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
         % ---------------------------
         if isnan(npca), npca = 5; end; % default number of components
         if npca >= size(data,2)
-            % no need to run PCA, just copy the data
-            % but we will still run it to "normalize" coordinates
+            % no need to run PCA, just copy the data.
+            % But still run it to "normalize" coordinates
             % --------------------------------------
             npca = size(data,2);
         end;        
@@ -588,7 +610,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
             fprintf('PCA dimension reduction to %d for command ''%s'' (normalize:%s; weight:%d)\n', ...
                 npca, strcom, fastif(norm, 'on', 'off'), weight);
         else
-            fprintf('Retaining the three dimensional location of the dipoles (normalize:%s; weight:%d)\n', ...
+            fprintf('Retaining the three-dimensional dipole locations (normalize:%s; weight:%d)\n', ...
                 fastif(norm, 'on', 'off'), weight);
         end
         
@@ -602,7 +624,9 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                         clustdatatmp = runpca( data.', npca, 1);
                         dsflag = 0;
                     catch,
-                        [data, freqs, times] = erspdownsample(data,4, freqs,times,Ncond); %down sample frequency by 2 and times by 2
+                        % downsample frequency by 2 and times by 2
+                        % ----------------------------------------
+                        [data, freqs, times] = erspdownsample(data,4, freqs,times,Ncond); 
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
                         else
@@ -613,7 +637,7 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                 end
                 clustdatatmp = clustdatatmp.';
             case 'dipoles'
-                %normalize each cordinate by the std of the radius
+                % normalize each cordinate by the std dev of the radii
                 normval = std(sqrt(data(:,1).^2 + data(:,2).^2 + data(:,3).^2));
                 clustdatatmp = data./normval;
                 norm = 0;
@@ -637,10 +661,10 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
         
     end;
     
-    % Compute a second PCA of the already PCA data if there are too many
-    % PCA dimentions.
+    % Compute a second PCA of the already PCA'd data if there are too many PCA dimensions.
+    % ------------------------------------------------------------------------------------
     if size(clustdata,2) > 10
-        fprintf('Performing a second level of PCA. The dimension is reduced from %d to 10 \n', size(clustdata,2));
+        fprintf('Performing second-level PCA: reducing dimension from %d to 10 \n', size(clustdata,2));
         clustdata = runpca( clustdata.', 10, 1);
         clustdata = clustdata.';
     end
@@ -648,7 +672,8 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
     STUDY.etc.preclust.preclustdata = clustdata;
     STUDY.etc.preclust.preclustparams = varargin;
     STUDY.etc.preclust.preclustcomps = succompind;
-    % The preclustering level equals to the parent cluster that the components belong to.
+
+    % The preclustering level is equal to the parent cluster that the components belong to.
     if ~isempty(cluster_ind)
         STUDY.etc.preclust.clustlevel = cluster_ind; 
     else
