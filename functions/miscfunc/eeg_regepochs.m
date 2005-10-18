@@ -1,30 +1,31 @@
-% eeg_regepochs() - Divide a continuous dataset into consecutive epochs of 
-%                   specified regular length by adding regular events of
-%                   type 'X' and epoching the data around these events.
+% eeg_regepochs() - Convert a continuous dataset into consecutive epochs of 
+%                   a specified regular length by adding dummy events of type 
+%                   'X' and epoching the data around these events.
 %                   The mean of each epoch (or if min epochlimits arg < 0,
 %                   the mean of the pre-0 baseline) is removed from each 
 %                   epoch. May be used to split up continuous data for
 %                   artifact rejection followed by ICA decomposition.
 %                   The computed EEG.icaweights and EEG.icasphere matrices
-%                   may then be exported to the continuous or to its other
-%                   epoched child datasets. 
+%                   may then be exported to the continuous dataset and/or 
+%                   to its epoched descendents.
 % Usage:
 %     >> EEGout = eeg_regepochs(EEG); % use defaults
 %     >> EEGout = eeg_regepochs(EEG, recurrence_interval, epochlimits); 
-% Inputs:
+%
+% Required input:
 %     EEG                 - EEG continuous data structure (EEG.trials = 1)
 %
 % Optional inputs:
-%     recurrence_interval - [sec] the regular recurrence interval of the added type 
-%                           'X' events used as time-locking events for the consecutive 
-%                           epochs {default: 1 sec}
+%     recurrence_interval - [in s] the regular recurrence interval of the dummay
+%                           'X' events used as time-locking events for the 
+%                           consecutive epochs {default: 1 s}
 %     epochlimits         - [minsec maxsec] latencies relative to the time-locking
 %                           events to use as epoch boundaries. Stated epoch length 
-%                           will be reduced by one data point to avoid point overlaps 
+%                           will be reduced by one data point to avoid overlaps 
 %                           {default: [0 recurrence_interval]}
 % Outputs:
-%     EEGout              - the input EEG structure epoch separated into 
-%                           consecutive epochs.
+%     EEGout              - the input EEG structure separated into consecutive 
+%                           epochs.
 %
 % See also: pop_editeventvals(), pop_epoch(), rmbase();
 
@@ -55,7 +56,7 @@ function EEG = eeg_regepochs(EEG, recur, epochlimits)
 if ~isstruct(EEG) | ~isfield(EEG,'event')
    error('first argument must be an EEG structure')
 elseif EEG.trials > 1
-   error('dataset must not be epoched data');
+   error('input dataset must be continuous data (1 epoch)');
 end
 
 if nargin < 2
@@ -82,7 +83,7 @@ nu = floor(EEG.xmax/recur); % number of type 'X' events to add and epoch on
 
 % bg = EEG.event(1).latency/EEG.srate;   % time in sec of first event
 % en = EEG.event(end).latency/EEG.srate; % time in sec of last event
-% nu = length((bg+recur):recur:(en-recur));    % number of 'X' events, one every 'recur' sec
+% nu = length((bg+recur):recur:(en-recur)); % number of 'X' events, one every 'recur' sec
 
 if nu < 1
   error('specified recurrence_interval too long')
@@ -131,7 +132,7 @@ EEG = pop_editeventvals( EEG, 'sort', {'latency' 0});
 
 % split the dataset into epochs
 % ------------------------------
-fprintf('Splitting the dataset into %d %2.2f-s epochs\n',nu,eplength); 
+fprintf('Splitting the data into %d %2.2f-s epochs\n',nu,eplength); 
 setname = sprintf('%s - %g-s epochs', EEG.setname, recur);
 EEG = pop_epoch( EEG, { 'X' }, epochlimits, 'newname', ...
                                   setname, 'epochinfo', 'yes');
