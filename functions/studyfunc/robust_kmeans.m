@@ -1,3 +1,7 @@
+% robust_kmeans() - an extension of Matlab kmeans() that removes outlier 
+%        components from all clusters. 
+%        This is a helper function called from pop_clust(). 
+
 function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD, MAXiter)
 % data - pre-clustering data matrix.
 % N - number of wanted clusters.
