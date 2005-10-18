@@ -65,7 +65,7 @@ if (~isempty(filename)) & (~isempty(filepath))
     try 
         eval(['load ' STUDYfile ' -mat']);
     catch
-        error(['pop_loadstudy(): STUDY set file 'STUDYfile' not loaded -- check filename and path']);
+        error(['pop_loadstudy(): STUDY set file ''STUDYfile'' not loaded -- check filename and path']);
     end
 else
     error(['pop_loadstudy(): No STUDY set file provided.']);
