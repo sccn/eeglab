@@ -1,4 +1,9 @@
-function [time_range, winsize] = compute_ERSP_times(cycles, srate, epoch_lim, lowfreq,padratio) 
+% compute_ERSP_times() - computes the maximum time window of the ERSP,  
+%        based on the frequency range requested, and other input parameters 
+%        that are used by timef(). 
+%        This is a helper function called from pop_preclust() & cls_ersp(). 
+
+function [time_range, winsize] = compute_ERSP_times(cycles, srate, epoch_lim, lowfreq, padratio) 
 
 if cycles == 0 %FFT option
     if ~exist('padratio')
