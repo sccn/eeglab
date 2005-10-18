@@ -1,3 +1,7 @@
+% neural_net() - computes clusters using Matlab Neural Net toolbox. 
+%        Alternative clustering algorithm to kmeans().
+%        This is a helper function called from pop_clust(). 
+
 function [IDX,C] = neural_net(clustdata,clus_num)
 
 nmin = min(clustdata);
