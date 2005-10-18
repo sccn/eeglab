@@ -626,6 +626,9 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                     catch,
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
+                        idat = STUDY.datasetinfo(STUDY.setind(1)).index; 
+                        times = ALLEEG(idat).etc.icaerspparams.times;
+                        freqs = ALLEEG(idat).etc.icaerspparams.logfreqs;
                         [data, freqs, times] = erspdownsample(data,4, freqs,times,Ncond); 
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
