@@ -1,9 +1,9 @@
 % cls_clusread() - load a requested measure (i.e. ['erp'|'spec'|'ersp'|'itc'|...
-%        'dipole'|'scalp']), for all the components of specified cluster.  
+%        'dipole'|'scalp']), for all the components of a specified cluster.  
 %        Used mostly by cluster plotting functions. 
-%        This is a helper function called from cls_envtopo(), cls_plotclusterp(),
+%        This helper function is called by cls_envtopo(), cls_plotclusterp(),
 %        cls_plotclustersp(), cls_plotclustitc(), cls_plotclustmap(), 
-%        cls_plotclustspec() & cls_ERPdiff(). 
+%        cls_plotclustspec(), & cls_ERPdiff(). 
 
 function clusinfo = cls_clusread(STUDY,ALLEEG, cluster, infotype, cond);
 
