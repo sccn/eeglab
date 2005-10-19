@@ -1,7 +1,8 @@
-% compute_ERSP_times() - computes the maximum time window of the ERSP,  
-%        based on the frequency range requested, and other input parameters 
-%        that are used by timef(). 
-%        This is a helper function called from pop_preclust() & cls_ersp(). 
+% compute_ERSP_times() - computes the maximum possible ERSP/ITC time window,   
+%        which depends on requested ERSP/ITC parameters such as epoch limits, 
+%        frequency range, wavelet parameters, sampling rate and frequency 
+%        resolution that are used by timef(). 
+%        This helper function is called by pop_preclust() & cls_ersp(). 
 
 function [time_range, winsize] = compute_ERSP_times(cycles, srate, epoch_lim, lowfreq, padratio) 
 
