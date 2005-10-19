@@ -1,4 +1,4 @@
-% cls_findoutlierclust() - determine whether an outlier cluster already exist 
+% cls_findoutlierclust() - determine whether an outlier cluster already exists 
 %       for a specified cluster. If so return the outlier cluster index;  
 %       if not return zero.
 %
