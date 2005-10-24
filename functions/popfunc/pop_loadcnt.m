@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/05/24 17:28:06  arno
+% remove cell2mat
+%
 % Revision 1.28  2005/05/12 15:51:23  arno
 % deal with keypad etc...
 %
@@ -212,7 +215,7 @@ if isfield(r, 'dat')
     error('pop_loadcnt is not compatible with current loadcnt version, please use latest loadcnt() version');
 end;
 EEG.data            = r.data;
-EEG.filename        = filename;
+EEG.comments        = [ 'Original file: ' fullFileName ];
 EEG.setname 		= 'CNT file';
 EEG.nbchan          = r.header.nchannels; 
 

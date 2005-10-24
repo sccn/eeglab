@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/09/16 18:21:13  hilit
+% corrected a typo with the filepath delimiter
+%
 % Revision 1.17  2004/03/17 22:30:03  arno
 % debug filepath...
 %
@@ -173,8 +176,8 @@ else
 end;    
 [EEG.data, accept, eegtype, rt, eegresp, namechan, EEG.pnts, EEG.trials, EEG.srate, EEG.xmin, EEG.xmax] = ...
     loadeeg( fullFileName, range_chan, range_sweeps, range_typeeeg, 'all', 'all', range_response, datformat);
-EEG.filename        = filename;
-EEG.filepath        = filepath;
+
+EEG.comments        = [ 'Original file: ' fullFileName ];
 EEG.setname 		= 'Neuroscan EEG data';
 EEG.nbchan          = size(EEG.data,1);
 EEG.chanlocs        = struct('labels', cellstr(char(namechan)));
