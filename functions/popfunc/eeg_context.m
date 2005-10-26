@@ -70,6 +70,9 @@
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/08/07 22:46:53  diane
+% allowed urevent type to be a string, 'boundary' for merged datasets! -sm
+%
 % Revision 1.9  2005/08/06 13:33:54  scott
 % checking edit logging -sm
 %
@@ -275,6 +278,7 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
  %%%%%%%%%%%%%%% cycle through target types %%%%%%%%%%%%%%%%%%
  %
  while ~istarget & tidx<=length(targets)           % for each potential target type
+keyboard
     uridxtype = EEG.urevent(uridx).type;
     if ~ischar(uridxtype), uridxtype = num2str(uridxtype); end
     if strcmpi(uridxtype,targets(tidx)) | strcmp(targets{1},'_ALL')         
