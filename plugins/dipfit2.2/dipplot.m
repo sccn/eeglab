@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.128  2005/10/26 18:03:34  arno
+%remove dual 0 dipoles
+%
 %Revision 1.127  2005/08/19 04:41:26  arno
 %mesh for BEM
 %
@@ -949,6 +952,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.mricoord  = [xxmri yymri zzmri];   % Coordinates in MRI space
             dipstruct.eleccoord = [ xx yy zz ];          % Coordinates in elec space
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
+            outsources(index).eleccoord(dip,:) = [xx yy zz];
             outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
             outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
             
