@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2005/08/23 21:52:03  hilit
+% changed from fields -> filednames() to avoid confusion with the variable name fields
+%
 % Revision 1.22  2005/04/21 22:16:19  arno
 % put channel labels
 %
@@ -130,8 +133,9 @@ function [EEG, command] = pop_loadbci(filename, srate);
         EEG.data     = bci.signal';
         EEG.nbchan   = size(EEG.data, 1);
         EEG.pnts     = size(EEG.data, 2);
-        EEG.trials = 1;
-        EEG.srate  = srate;
+        EEG.trials   = 1;
+        EEG.srate    = srate;
+        EEG.comments = [ 'Original file: ' filename ];
         EEG = eeg_checkset(EEG);
         return;
     catch
