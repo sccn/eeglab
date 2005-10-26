@@ -73,5 +73,8 @@ end
   
 ALLEEG = load_ALLEEG(STUDY);
 
-    
+% Update the pointers from STUDY to the ALLEEG datasets
+for k = 1:length(STUDY.datasetinfo)
+    STUDY.datasetinfo(k).index = k;
+end
        
