@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/05/24 17:00:38  arno
+% mattocell
+%
 % Revision 1.7  2004/11/10 02:15:33  arno
 % nothing
 %
@@ -101,7 +104,7 @@ EEG = eeg_emptyset;
 [EEG.data,params,events, head] = snapread(filename);  
 
 EEG.data            = EEG.data*gain;
-EEG.filename        = filename;
+EEG.comments        = [ 'Original file: ' filename ];
 EEG.filepath        = '';
 EEG.setname 		= 'SnapMaster file';
 EEG.nbchan          = params(1);
