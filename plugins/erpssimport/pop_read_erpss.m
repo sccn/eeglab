@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/03/24 22:27:38  arno
+% remove debug msg
+%
 % Revision 1.13  2005/03/11 00:06:51  arno
 % edit box for sampling rate
 %
@@ -105,10 +108,9 @@ end;
 EEG.srate = srate;
 EEG.setname = 'ERPSS data';
 if exist('filepath') == 1
-    EEG.filepath = filepath;
-    EEG.filename = filenametmp;
+    EEG.comments        = [ 'Original file: ' fullfilename(filepath, filenametmp) ];
 else
-    EEG.filename = filename;
+    EEG.comments        = [ 'Original file: ' filename ];
 end;
 if ~isempty(events)
     EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
