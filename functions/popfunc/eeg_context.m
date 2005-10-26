@@ -70,6 +70,9 @@
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/10/26 21:00:52  scott
+% print warning if EEG.event.urevent is empty
+%
 % Revision 1.11  2005/10/26 20:52:44  scott
 % adding break
 %
@@ -115,9 +118,8 @@ if ~isfield(EEG.event,'urevent')
    error('no EEG.event().urevent field found');
 end
       
-
 if EEG.trials == 1 | ~isfield(EEG.event(1),'epoch')
-  fprintf('Continuous data: returning info on all targets; no epoch info returned.\n')
+  fprintf('Data are continuous: Returning info on all targets; no epoch info returned.\n')
   alltargs = 1;
   epochinfo = 0;
 else
@@ -269,14 +271,19 @@ targetcount = 0; % index of current target
 wb=waitbar(0,'Computing event contexts...','createcancelbtn','delete(gcf)');
 noepochs = 0;                                      % counter of targets that are not epoch-centered
 targidx = zeros(nevents,1);
-for evidx = 1:nevents                              % for each event in the dataset
+
+for evidx = 1:nevents  %%%%%% for each event in the dataset %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 waitbar(evidx/nevents);                            % update the waitbar fraction
+if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no urevents!)
  %
  %%%%%%%%%%%%%%%%%%%%%%%% find target events %%%%%%%%%%%%%%%%%
  %
  uridx = EEG.event(evidx).urevent;                 % find its urevent index
  if isempty(uridx)
    fprintf('eeg_context(): Data event %d does not point to an urevent.\n',evidx);
+   delete(wb);
    return
  end
  istarget = 0;                                     % initialize target flag
@@ -557,6 +564,7 @@ waitbar(evidx/nevents);                            % update the waitbar fraction
  %
  %%%%%%%%%%%%%%%%% find next target event %%%%%%%%%%%%%%%%%%%%%%
  %
+ end % if not 'boundary' event
  evidx = evidx+1;      % continue event checking
 end % event loop
 
