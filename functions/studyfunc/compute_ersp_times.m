@@ -1,4 +1,4 @@
-% compute_ERSP_times() - computes the maximum possible ERSP/ITC time window,   
+% compute_ERSP_times() - computes the widest possible ERSP/ITC time window,   
 %        which depends on requested ERSP/ITC parameters such as epoch limits, 
 %        frequency range, wavelet parameters, sampling rate and frequency 
 %        resolution that are used by timef(). 
