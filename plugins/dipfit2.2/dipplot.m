@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.127  2005/08/19 04:41:26  arno
+%mesh for BEM
+%
 %Revision 1.126  2005/04/19 23:38:58  arno
 %allow plotting LORETA images
 %
@@ -595,7 +598,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             end;
         end;
     end;
-
+    
     % axis image and limits
     % ---------------------
     dat.axistight  = strcmpi(g.axistight, 'on');
@@ -708,6 +711,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         sources(index).momxyz = sources(index).momxyz/1000;
     end;
     
+    % remove 0 second dipoles if any
+    % ------------------------------
+    for index = 1:length(sources)
+        if size(sources(index).momxyz,1) == 2
+            if all(sources(index).momxyz(2,:) == 0)
+                sources(index).momxyz = sources(index).momxyz(1,:);
+                sources(index).posxyz = sources(index).posxyz(1,:);
+            end;
+        end;
+    end;
+
     % remove sources with out of bound Residual variance
     % --------------------------------------------------
     if isfield(sources, 'rv') & ~isempty(g.rvrange)
@@ -876,7 +890,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             z = sources(index).posxyz(dip,3);
             if strcmpi(g.normlen, 'on')
                 len    = sqrt(sum(sources(index).momxyz(dip,:).^2));
-                factor = 15/len;
+                if len ~= 0, factor = 15/len; end;
             else
                 if strcmpi(g.coordformat, 'spherical')
                      factor = 100;
