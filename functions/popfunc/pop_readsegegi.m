@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/07/20 19:38:17  scott
+% typo
+%
 % Revision 1.5  2003/07/11 22:17:36  arno
 % adding more messages
 %
@@ -72,10 +75,10 @@ Eventdata = [];
 
 disp('Removing trailing character of selected file to find base file name');
 fprintf('Base file name is: %s\n', basename);
-tmpfilename = [ basename sprintf('%3.3d', index) tailname ];
-if ~exist(tmpfilename)
-    disp ([ 'First file of series ''' tmpfilename ''' not found' ] );
-    error([ 'First file of series ''' tmpfilename ''' not found' ] );
+orifilename = [ basename sprintf('%3.3d', index) tailname ];
+if ~exist(orifilename)
+    disp ([ 'First file of series ''' orifilename ''' not found' ] );
+    error([ 'First file of series ''' orifilename ''' not found' ] );
 end;
 
 while cont
@@ -96,7 +99,7 @@ end;
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
-EEG.filename        = filename;
+EEG.comments        = [ 'Original files: ' orifilename ' to ' tmpfilename ];
 EEG.filepath        = '';
 EEG.setname 		= 'EGI file';
 EEG.nbchan          = size(EEG.data,1);
