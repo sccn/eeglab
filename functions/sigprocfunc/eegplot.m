@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2005/10/12 15:03:03  scott
+% adjusted event text; 'slidder' -> 'slider' or 'sliider' (to avoid conflict) -sm
+%
 % Revision 1.111  2005/10/11 17:34:13  arno
 % color menu only under Unix
 %
@@ -557,7 +560,7 @@ DEFAULT_NOUI_PLOT_COLOR = 'k';    % EEG line color for noui option
                                   %   0 - 1st color in AxesColorOrder
 SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
-DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.788095];
+DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75];
                                   % dimensions of main EEG axes
 ORIGINAL_POSITION = [50 50 800 500];
                                   
@@ -1625,11 +1628,11 @@ else
     
             % schtefan: add Event types text above event latency line
             % -------------------------------------------------------
-            MAXEVENTSTRING = 3;
+            MAXEVENTSTRING = 5;
             EVENTFONT = ' \fontsize{10} ';
             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
-            if length(evntxt)>MAXEVENTSTRING, evntxt = evntxt(1:MAXEVENTSTRING); end; % truncate
+            if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
             try, 
                 tmph2 = text([tmplat], ylims(2)-0.005, [EVENTFONT evntxt], ...
                                     'color', g.eventcolors{ event2plot(index) }, ...
