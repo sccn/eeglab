@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/09/30 17:06:06  arno
+% added revfilt etc...
+%
 % Revision 1.4  2005/09/30 17:04:48  arno
 % revision 1.1
 %
@@ -210,13 +213,13 @@ if EEG.trials == 1
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
-                    EEGdata(:,boundaries(n)+1:boundaries(n+1)) = ...
+                    EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
                         iirfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
 					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
                     if locutoff ~= 0 & hicutoff == 0
                         tmprange = [boundaries(n)+1:boundaries(n+1)];
-                        EEGdata(:,tmprange) = ...
+                        EEG.data(:,tmprange) = ...
                             EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
                     end;
 				end;
