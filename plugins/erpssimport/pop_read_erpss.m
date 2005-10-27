@@ -32,6 +32,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/10/26 01:46:16  arno
+% fix filename
+% ./
+%
 % Revision 1.14  2005/03/24 22:27:38  arno
 % remove debug msg
 %
@@ -107,11 +111,7 @@ elseif nargin ~= 2
 end;
 EEG.srate = srate;
 EEG.setname = 'ERPSS data';
-if exist('filepath') == 1
-    EEG.comments        = [ 'Original file: ' fullfilename(filepath, filenametmp) ];
-else
-    EEG.comments        = [ 'Original file: ' filename ];
-end;
+EEG.comments        = [ 'Original file: ' filename ];
 if ~isempty(events)
     EEG.event = struct( 'type', { events.event_code }, 'latency', {events.sample_offset});
 end;
