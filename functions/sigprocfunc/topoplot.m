@@ -20,7 +20,8 @@
 % Optional inputs:
 %   'maplimits'       - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
 %                       'maxmin'   -> scale colors to the data range (makes green mid-range); 
-%                       [lo.hi]    -> use user-definined lo/hi limits {default: 'absmax'}
+%                       [lo.hi]    -> use user-definined lo/hi limits
+%                       {default: 'absmax'}
 %   'style'           - 'map'      -> plot colored map only
 %                       'contour'  -> plot contour lines only
 %                       'both'     -> plot both colored map and contour lines
@@ -46,7 +47,8 @@
 %                       If the chanlocs structure includes a field chanlocs.plotrad, its value 
 %                       is used by default}.
 %   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose. Default is '+X'.
-%   'chaninfo'        - [struct] structure containing fields 'nosedir', 'plotrad', 'shrink'.
+%   'chaninfo'        - [struct] structure containing fields 'nosedir', 'plotrad', 'shrink', 
+%                       and optionally, 'chantype', which defines the channel type(s) to plot.
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
@@ -64,7 +66,10 @@
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
 %   'drawaxis'        - ['on'|'off'] draw axis on the top left corner.
-%
+%   'chantype'        - cell array of the channel type(s) to plot. channel type is defined in 
+%                       EEG.chanlocs.type . Will also accept a character string if entering 
+%                       a single type to plot. Overrides 'plotchans' and 'chaninfo' when 
+%                       'chaninfo' defines 'chantype'. Ex. {'EEG','EOG'} or 'EEG'
 % Plot detail options:
 %   'emarker'         - Matlab marker char | {markerchar color size linewidth} char, else cell array 
 %                       specifying the electrode 'pts' marker. Ex: {'s','r',32,1} -> 32-point solid 
@@ -769,7 +774,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,Zi,grid,Xi,Yi] = topoplot(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10)
+function [handle,Zi,grid,Xi,Yi] = topoplot(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10,p11,v11)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -829,6 +834,7 @@ VERBOSE = 'off';
 MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
+CHOOSECHANTYPE = 0;
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
@@ -907,12 +913,12 @@ if nargs > 2
       error('Flag arguments must be strings')
     end
     Param = lower(Param);
-    switch lower(Param)
-         case 'conv'
-           CONVHULL = lower(Value);
-           if ~strcmp(CONVHULL,'on') & ~strcmp(CONVHULL,'off')
-             error('Value of ''conv'' must be ''on'' or ''off''.');
-          end
+    switch Param
+     case 'conv'
+      CONVHULL = lower(Value);
+      if ~strcmp(CONVHULL,'on') & ~strcmp(CONVHULL,'off')
+       error('Value of ''conv'' must be ''on'' or ''off''.');
+      end
 	 case 'colormap'
 	  if size(Value,2)~=3
           error('Colormap must be a n x 3 matrix')
@@ -944,6 +950,16 @@ if nargs > 2
       if isfield(CHANINFO, 'nosedir'), NOSEDIR      = CHANINFO.nosedir; end;
       if isfield(CHANINFO, 'shrink' ), shrinkfactor = CHANINFO.shrink;  end;          
       if isfield(CHANINFO, 'plotrad') & isempty(plotrad), plotrad = CHANINFO.plotrad; end;
+      if isfield(CHANINFO, 'chantype')
+          chantype = CHANINFO.chantype;
+          if ischar(chantype), chantype = cellstr(chantype); end
+          CHOOSECHANTYPE = 1;
+      end
+     case 'chantype'
+      chantype = Value;
+      CHOOSECHANTYPE = 1;
+      if ischar(chantype), chantype = cellstr(chantype); end
+      if ~iscell(chantype), error('chantype must be cell array. e.g. {''EEG'', ''EOG''}'); end
 	 case 'drawaxis'
 	  DRAWAXIS = Value;
 	 case 'maplimits'
@@ -1107,6 +1123,9 @@ if nargs > 2
   end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type, if specified %%%%%%%%%%%%%%%%%%%%% 
+%
+if CHOOSECHANTYPE, plotchans = eeg_chantype(loc_file,chantype); end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
 %
