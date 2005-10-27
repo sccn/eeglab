@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/10/24 23:36:56  arno
+% fix file name
+%
 % Revision 1.14  2005/02/02 20:22:15  arno
 % now import category names
 %
@@ -119,7 +122,7 @@ end;
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
-EEG.comments        = [ 'Original file: ' fullFileName ];
+EEG.comments        = [ 'Original file: ' filename ];
 EEG.setname 		= 'EGI file';
 EEG.nbchan          = size(EEG.data,1);
 EEG.srate           = Head.samp_rate;
