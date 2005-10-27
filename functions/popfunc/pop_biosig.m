@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/03/23 16:01:17  arno
+% implmenting DUR and CHN
+%
 % Revision 1.1  2004/11/12 18:22:11  arno
 % Initial revision
 %
@@ -116,7 +119,7 @@ end;
 try, EEG = eeg_emptyset;
 catch, end;
 [signal, H]  = sload(filename);
-EEG.filename = filename;
+EEG.comments = [ 'Original file: ' filename ];
 EEG.srate    = H.SampleRate(1);
 EEG.data     = signal';
 EEG.nbchan   = size(EEG.data,1);
