@@ -12,11 +12,16 @@
 %    comps     - vector of component indices to sum {default|[] -> progressive mode}
 %                In progressive mode, comps is first [1], then [1 2], etc. up to
 %                [1:size(EEG.icaweights,2)] (all components); here, the plot shows pvaf.
-%    artcomps  - vector of artifact component indices to remove from data before
-%                computing pvaf {default|[]: none}
-%    omitchans - channels to omit from the computation (e.g. off-head, etc) {default|[]: none}
-%    fraction  - (0<real<=1) fraction of the data to randomly select {default|[]: 1=all}
-%    'plot'    - Plot scalp map of channel pvafs. {default: Plot only if no output arguments}
+%
+% Optional inputs:
+%    'artcomps'  - [integer] vector of artifact component indices to remove from data before
+%                  computing pvaf {default|[]: none}
+%    'omitchans' - [integer] channels to omit from the computation (e.g. off-head, etc) 
+%                  {default|[]: none}
+%    'chans'     - [integer] only compute pvaf at selected channels. Overwrite omitchans above.
+%    'fraction'  - [0<real<=1] fraction of the data to randomly select {default|[]: 1=all}
+%    'plot'      - ['on'|'off'] Plot scalp map of channel pvafs. {default: Plot only if no 
+%                  output arguments}
 %
 % Outputs:
 %    pvaf      - (real) percent total variance accounted for by the summed back-projection of
@@ -30,50 +35,69 @@
 % Fields:  
 %    Assumes existence of the following EEG fiels: EEG.data, EEG.pnts, EEG.nbchan, EEG.trials,
 %          EEG.icaact, EEG.icaweights, EEG.icasphere, EEG.icawinv, and for plot, EEG.chanlocs
+%
+% Author: Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD, Fri Feb 13, 2004
 
-% Author: Scott Makeig, SCCN/INC/UCSD, Fri Feb 13, 2004
+%123456789012345678901234567890123456789012345678901234567890123456789012
 
-function [pvaf,pvafs,pvall] = eeg_pvaf(EEG,comps,artcomps,omitchans,fraction,plotflag)
+% Copyright (C) 2004- Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-if nargin < 1 | nargin > 6
+% $Log: not supported by cvs2svn $
+
+function [pvaf,pvafs,pvall] = eeg_pvaf(EEG,comps, varargin)
+
+if nargin < 1
    help eeg_pvaf
    return
 end
+
+g = finputcheck(varargin, { 'artcomps'   'integer'    []         [];
+                            'omitchans'  'integer'    []         [];
+                            'chans'      'integer'    []         [];
+                            'fraction'   'real'       []         1;
+                            'plot'       'string'     { 'on' 'off' 'def' } 'def' }, 'eeg_pvaf');
+if isstr(g), error(g); end;
+
 numcomps = size(EEG.icaact,1);
-plotit = 0;
-if nargin>5 | nargout < 1
-   plotit = 1;
-end
-if nargin<5 | isempty(fraction)
-  fraction = 1;
-end
-if fraction>1
-  fprintf('eeg_pvaf(): considering all the data.\n');
-  fraction=1;
-end
-if round(fraction*EEG.pnts*EEG.trials)<1
-   error('fraction of data specified too small.')
+if round(g.fraction*EEG.pnts*EEG.trials)<1
+   error('g.fraction of data specified too small.')
    return
 end
-if nargin<4 | isempty(omitchans)
-  omitchans = [];
-end
-if nargin<3|isempty(artcomps)
-  artcomps=[];
-end
+if strcmpi(g.plot, 'def')
+    if nargout > 0, g.plot = 'on';
+    else            g.plot = 'off';
+    end;
+end 
 
 numchans = EEG.nbchan;
 chans = 1:numchans;
-if ~isempty(omitchans)
- if max(omitchans)>numchans
+if ~isempty(g.chans)
+    g.omitchans = setdiff([1:EEG.nbchan], g.chans);
+end;
+if ~isempty(g.omitchans)
+ if max(g.omitchans)>numchans
   help eeg_pvaf
   error('at least one channel to omit > number of channels in data');
  end
- if min(omitchans)<1
+ if min(g.omitchans)<1
   help eeg_pvaf
   error('channel numbers to omit must be > 0');
  end
- chans(omitchans) = [];
+ chans(g.omitchans) = [];
 end
 
 progressive = 0; % by default, progressive mode is off
@@ -104,9 +128,9 @@ if max(comps) > size(EEG.icawinv,1)
    fprintf('Only %d components in this dataset. Cannot project component %d.\n',numcomps,max(comps));
    error('bad comps input');
 end
-if ~isempty(artcomps) & max(artcomps) > numcomps
+if ~isempty(g.artcomps) & max(g.artcomps) > numcomps
     help eeg_pvaf
-   fprintf('Only %d components in this dataset. Cannot project artcomp %d.\n',numcomps,max(artcomps));
+   fprintf('Only %d components in this dataset. Cannot project artcomp %d.\n',numcomps,max(g.artcomps));
    error('bad artcomps input')
 end
 
@@ -124,8 +148,8 @@ if progressive
    fprintf('%d ',comp)
 end
 
-if ~isempty(artcomps)
-   [a b c] = intersect(artcomps,comps);
+if ~isempty(g.artcomps)
+   [a b c] = intersect(g.artcomps,comps);
    if ~isempty(a)
       if ~progressive
         if length(a)>1
@@ -137,21 +161,21 @@ if ~isempty(artcomps)
       comps(c) = [];
    end
 end
-if ~isempty(artcomps) & min([comps artcomps]) < 1
+if ~isempty(g.artcomps) & min([comps g.artcomps]) < 1
    error('comps and artcomps must contain component indices');
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% compute variance accounted for by specified components %%%%%%%%%%%%%
 %
-if ~progressive | comp == 1 % pare out omitchans and artcomps from EEG.data
-  if ~isempty(artcomps)
-    EEG.data = EEG.data(chans,:) - EEG.icawinv(chans,artcomps)*EEG.icaact(artcomps,:);
+if ~progressive | comp == 1 % pare out g.omitchans and artcomps from EEG.data
+  if ~isempty(g.artcomps)
+    EEG.data = EEG.data(chans,:) - EEG.icawinv(chans,g.artcomps)*EEG.icaact(g.artcomps,:);
   else
     EEG.data = EEG.data(chans,:); 
   end
 
-  nsel = round(fraction*npts);
+  nsel = round(g.fraction*npts);
   varpts = randperm(npts);
   varwts = ones(size(varpts));
   if nsel<npts
@@ -183,7 +207,7 @@ if progressive % output accumulated results
   fprintf('\n');
   pvaf = cum_pvaf;
   pvafs = cum_pvafs;
-  if plotit
+  if strcmpi(g.plot, 'on');
      plot(1:numcomps,pvaf);
      xl = xlabel('Components Included (1:n)');
      yl = ylabel('Percent Variance Accounted For (pvaf)');
@@ -191,28 +215,30 @@ if progressive % output accumulated results
      set(yl,'fontsize',15);
      set(gca,'fontsize',14);
   end
-elseif plotit 
+elseif strcmpi(g.plot, 'on')
 %
 %%%%%%%%%%%%%%%%%%%%%%%% plot the scalp distribtion of pvaf %%%%%%%%%%%%%
 %
  if isfield(EEG,'chanlocs')
    chanlocs = EEG.chanlocs;
-   if ~isempty(omitchans)
-     chanlocs(omitchans) = [];
+   if ~isempty(g.omitchans)
+     chanlocs(g.omitchans) = [];
    end
-   topoplot(pvafs',chanlocs);  % plot pvaf here
-
+   if length(chanlocs) > 1
+       topoplot(pvafs',chanlocs);  % plot pvaf here
+   end;
+   
    if length(comps)>5        % add text legend
-     if length(artcomps)>3
-        tlstr=sprintf('Pvaf by %d comps in data minus %d comps',length(comps),length(artcomps));
-     elseif isempty(artcomps)
+     if length(g.artcomps)>3
+        tlstr=sprintf('Pvaf by %d comps in data minus %d comps',length(comps),length(g.artcomps));
+     elseif isempty(g.artcomps)
         tlstr=sprintf('Pvaf by %d comps in data',length(comps));
-     elseif length(artcomps)==1 % < 4 artcomps, list them
+     elseif length(g.artcomps)==1 % < 4 g.artcomps, list them
         tlstr=sprintf('Pvaf by %d comps in data (less comp ',length(comps));
-        tlstr = [tlstr sprintf('%d ',artcomps) ')'];
+        tlstr = [tlstr sprintf('%d ',g.artcomps) ')'];
      else
         tlstr=sprintf('Pvaf by %d comps in data (less comps ',length(comps));
-        tlstr = [tlstr sprintf('%d ',artcomps) ')'];
+        tlstr = [tlstr sprintf('%d ',g.artcomps) ')'];
      end
    else %  < 6 comps, list them
      if length(comps)>1
@@ -220,18 +246,18 @@ elseif plotit
      else
         tlstr=sprintf('Pvaf by comp ');
      end
-     if length(artcomps)>3
+     if length(g.artcomps)>3
         tlstr = ...
-[tlstr sprintf('%d ',comps) sprintf('in data minus %d comps',length(comps),length(artcomps))];
+[tlstr sprintf('%d ',comps) sprintf('in data minus %d comps',length(comps),length(g.artcomps))];
      else
-        if isempty(artcomps)
+        if isempty(g.artcomps)
            tlstr = [tlstr sprintf('%d ',comps) 'in data'];
-        elseif length(artcomps)==1
+        elseif length(g.artcomps)==1
            tlstr = [tlstr sprintf('%d ',comps) 'in data (less comp '];
-           tlstr = [tlstr int2str(artcomps) ')'];
+           tlstr = [tlstr int2str(g.artcomps) ')'];
         else
            tlstr = [tlstr sprintf('%d ',comps) 'in data (less comps '];
-           tlstr = [tlstr sprintf('%d ',artcomps) ')'];
+           tlstr = [tlstr sprintf('%d ',g.artcomps) ')'];
         end
      end
    end
@@ -250,6 +276,6 @@ elseif plotit
  else
     fprintf('EEG.chanlocs not found - not plotting scalp pvaf\n');
  end
-end % plotit
+end % end plot
 
 
