@@ -1,7 +1,7 @@
 % loreta_importcomp() - Overlay activation on MNI normalized brain. 
 %
 % Usage:
-%  >> mri = loreta_importcomp( mri, act, smooth );
+%  >> mri = loreta_importcomp( mrifile, actfile, 'key', 'val', ... );
 %
 % Inputs:
 %      mri   - mri structure normalized to MNI brain. Supposed to contain 
@@ -9,7 +9,7 @@
 %      act       - activation value, one per voxel
 %
 % optional inputs:
-%    'smooth' - [integer] optional 3-D smoothing (in MNI voxels (mm)).
+%    'smooth'   - [integer] optional 3-D smoothing (in MNI voxels (mm)).
 %    'mrigamma' - [float] mri gamma factor (alter contrast). 1 does not
 %                 change contrast. < 1 increases contrast; > 1 decreases
 %                 contrast.
@@ -19,6 +19,10 @@
 %    'actfactor' - [float] activity factor from 0 to 1. Default is 0.4.
 %                 A factor too high might cause the voxel color to go over
 %                 the color limits.
+%    'filelocs' - [string] location file for LORETA voxels in MNI space.
+%                 This is contained in the file 'LORETAtalairach.xyz' from
+%                 the LORETA distribution. This is also distributed with 
+%                 this plugin.
 %
 % Outputs:
 %      mri   - mri structure with a new field "anatomycol" containing
@@ -28,9 +32,6 @@
 % [anat act mri] = loreta_importcomp( [ '/data/common/matlab/eeglab/plugins/dipfit2.0/' ...
 %                             'standard_BEM/standard_mri.mat' ], 'LORETAloc.lor3');
 % plotmri(anat, act, 'transform', mri.transform);
-%
-% Note: this function will read the data file 'LORETAtalairach.xyz', which contains
-%       the MNI coordinates of the activated voxels, so do not delete this file.
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
 
@@ -53,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/04/20 22:08:30  arno
+% warning backrace off
+%
 % Revision 1.1  2005/04/20 21:54:08  arno
 % Initial revision
 %
@@ -66,15 +70,15 @@ function [mri, act, mristruct] = loreta_importcomp(mrifile, fileact, varargin)
     g = finputcheck(varargin, { 'smooth'    'integer'   [0 Inf]    0;
                                 'actgamma'  'real'      [0 Inf]    1;
                                 'mrigamma'  'real'      [0 Inf]    1;
+                                'filelocs'  'string'    []         'LORETAtalairach.xyz';
                                 'actfactor' 'real'      [0 Inf]    0.4 });
     if isstr(g), error(g); end;
     
     % get locations
     % -------------
-    filelocs = 'LORETAtalairach.xyz';
-    fid = fopen(filelocs, 'r'); % should be at the same location as
+    fid = fopen(g.filelocs, 'r'); % should be at the same location as
                                              % this file
-    if fid == -1, error([ 'Cannot find or open ''' filelocs ''' file' ]); end;
+    if fid == -1, error([ 'Cannot find or open ''' g.filelocs ''' file' ]); end;
     nlines = fscanf(fid, '%d',1 ); % should be equal to 2394
     locations = fscanf(fid, '%d', [2394*3]);
     locations = reshape(locations, [3 2394])';
