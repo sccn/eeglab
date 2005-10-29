@@ -16,7 +16,7 @@
 %   datavector        - single vector of channel values. Else, if a vector of selected subset
 %                       (int) channel numbers -> mark their location(s) using 'style' 'blank'.
 %   chan_locs         - name of an EEG electrode position file (>> topoplot example).
-%                       Else, an EEG.chanlocs structure (>> help pop_editset)
+%                       Else, an EEG.chanlocs structure (>> help readlocs or >> topoplot example)
 % Optional inputs:
 %   'maplimits'       - 'absmax'   -> scale map colors to +/- the absolute-max (makes green 0); 
 %                       'maxmin'   -> scale colors to the data range (makes green mid-range); 
@@ -27,34 +27,39 @@
 %                       'both'     -> plot both colored map and contour lines
 %                       'fill'     -> plot constant color between contour lines
 %                       'blank'    -> plot electrode locations only {default: 'both'}
-%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'. To set the 'pts' marker,
-%                       see 'Plot detail options' below. {default: 'on' -> mark electrode locations 
-%                       with points ('.') unless more than 64 channels, then 'off'}. 
-%   'plotchans'       - vector of channel indices to use in making the head plot. 
+%   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'. To set the 'pts' 
+%                       marker,,see 'Plot detail options' below. {default: 'on' -> mark electrode 
+%                       locations with points ('.') unless more than 64 channels, then 'off'}. 
+%   'plotchans'       - [vector] channel numbers (indices) to use in making the head plot. 
 %                       {default: [] -> plot all chans}
+%   'chantype'        - cell array of channel type(s) to plot. Will also accept a single quoted
+%                       string type. Channel type for channel k is field EEG.chanlocs(k).type. 
+%                       If present, overrides 'plotchans' and also 'chaninfo' with field 
+%                       'chantype'. Ex. 'EEG' or {'EEG','EOG'} {default: all, or 'plotchans' arg}
 %   'plotgrid'        - [channels] Plot channel data in one or more rectangular grids, as 
 %                       specified by [channels],  a position matrix of channel numbers defining 
 %                       the topographic locations of the channels in the grid. Zero values are 
 %                       given the figure background color; negative integers, the color of the 
 %                       polarity-reversed channel values.  Ex: >> figure; ...
-%                             topoplot(values,'chanlocs','plotgrid',[11 12 0; 13 14 15]);
+%                        >> topoplot(values,'chanlocs','plotgrid',[11 12 0; 13 14 15]);
 %                       % Plot a (2,3) grid of data values from channels 11-15 with one empty 
 %                       grid cell (top right) {default: no grid plot} 
+%   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose {default: '+X'}
+%   'chaninfo'        - [struct] optional structure containing fields 'nosedir', 'plotrad' 
+%                       and/or 'chantype'. See these (separate) field definitions above, below.
+%                       {default: nosedir +X, plotrad 0.5, all channels}
 %   'plotrad'         - [0.15<=float<=1.0] plotting radius = max channel arc_length to plot.
 %                       See >> topoplot example. If plotrad > 0.5, chans with arc_length > 0.5 
 %                       (i.e. below ears-eyes) are plotted in a circular 'skirt' outside the
 %                       cartoon head. See 'intrad' below. {default: max(max(chanlocs.radius),0.5);
 %                       If the chanlocs structure includes a field chanlocs.plotrad, its value 
 %                       is used by default}.
-%   'nosedir'         - ['+X'|'-X'|'+Y'|'-Y'] direction of nose. Default is '+X'.
-%   'chaninfo'        - [struct] structure containing fields 'nosedir', 'plotrad', 'shrink', 
-%                       and optionally, 'chantype', which defines the channel type(s) to plot.
 %   'headrad'         - [0.15<=float<=1.0] drawing radius (arc_length) for the cartoon head. 
 %                       NOTE: Only headrad = 0.5 is anatomically correct! 0 -> don't draw head; 
 %                       'rim' -> show cartoon head at outer edge of the plot {default: 0.5}
-%   'intrad'          - [0.15<=float<=1.0] radius of the scalp map interpolation area (square or disk, 
-%                       see 'intsquare' below). Interpolate electrodes in this area and use this
-%                       limit to define boundaries of the scalp map interpolated data matrix
+%   'intrad'          - [0.15<=float<=1.0] radius of the scalp map interpolation area (square or 
+%                       disk, see 'intsquare' below). Interpolate electrodes in this area and use 
+%                       this limit to define boundaries of the scalp map interpolated data matrix
 %                       {default: max channel location radius}
 %   'intsquare'       - ['on'|'off'] 'on' -> Interpolate values at electrodes located in the whole 
 %                       square containing the (radius intrad) interpolation disk; 'off' -> Interpolate
@@ -65,12 +70,10 @@
 %                       Else, if [rad theta] are coordinates of a (possibly missing) channel, 
 %                       returns interpolated value for channel location.  For more info, 
 %                       see >> topoplot 'example' {default: 'off'}
-%   'drawaxis'        - ['on'|'off'] draw axis on the top left corner.
-%   'chantype'        - cell array of the channel type(s) to plot. channel type is defined in 
-%                       EEG.chanlocs.type . Will also accept a character string if entering 
-%                       a single type to plot. Overrides 'plotchans' and 'chaninfo' when 
-%                       'chaninfo' defines 'chantype'. Ex. {'EEG','EOG'} or 'EEG'
+%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%
 % Plot detail options:
+%   'drawaxis'        - ['on'|'off'] draw axis on the top left corner.
 %   'emarker'         - Matlab marker char | {markerchar color size linewidth} char, else cell array 
 %                       specifying the electrode 'pts' marker. Ex: {'s','r',32,1} -> 32-point solid 
 %                       red square. {default: {'.','k',[],1} where marker size ([]) depends on the number 
@@ -87,7 +90,6 @@
 %   'gridscale'       - [int > 32] size (nrows) of interpolated scalp map data matrix {default: 67}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
-%   'verbose'         - ['on'|'off'] comment on operations on command line {default: 'on'}.
 %
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
@@ -163,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.260  2005/10/27 22:00:26  toby
+% adding channel type
+%
 % Revision 1.258  2005/09/29 14:56:41  scott
 % nothing
 %
@@ -793,7 +798,7 @@ noplot  = 'off';
 handle = [];
 Zi = [];
 chanval = NaN;
-rmax = 0.5;             % head radius - don't change this!
+rmax = 0.5;             % actual head radius - Don't change this!
 INTERPLIMITS = 'head';  % head, electrodes
 INTSQUARE = 'on';       % default, interpolate electrodes located though the whole square containing
                         % the plotting disk
@@ -1123,7 +1128,7 @@ if nargs > 2
   end
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type, if specified %%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type(s), if specified %%%%%%%%%%%%%%%%%%%%% 
 %
 if CHOOSECHANTYPE, plotchans = eeg_chantype(loc_file,chantype); end
 %
@@ -1330,12 +1335,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'), 
-    
     if isempty(shrinkfactor) & isfield(tmpeloc, 'shrink'), 
         shrinkfactor = tmpeloc(1).shrink;
         if strcmpi(VERBOSE,'on')
             if isstr(shrinkfactor)
-                fprintf('Automatically shrinking coordinates\n');
+                fprintf('Automatically shrinking coordinates to lie above the head perimter.\n');
             else                
                 fprintf('Automatically shrinking coordinates by %3.2f\n', shrinkfactor);
             end;
@@ -1344,6 +1348,9 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
     
     if isstr(shrinkfactor)
         if strcmpi(shrinkfactor, 'on') | strcmpi(shrinkfactor, 'force') | strcmpi(shrinkfactor, 'auto')  
+            if abs(headrad-rmax) > 1e-2
+             fprintf('     NOTE -> the head cartoon will NOT accurately indicate the actual electrode locations\n');
+            end
             if strcmpi(VERBOSE,'on')
                 fprintf('     Shrink flag -> plotting cartoon head at plotrad\n');
             end
@@ -1355,7 +1362,7 @@ if ~isempty(shrinkfactor) | isfield(tmpeloc, 'shrink'),
         if strcmpi(VERBOSE,'on')
             fprintf('    %g%% shrink  applied.');
             if abs(headrad-rmax) > 1e-2
-                fprintf(' Warning: With these settings, the drawn cartoon head is not anatomically correct.\n');
+                fprintf(' Warning: With this "shrink" setting, the cartoon head will NOT be anatomically correct.\n');
             else
                 fprintf('\n');
             end
