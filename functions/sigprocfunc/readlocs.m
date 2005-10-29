@@ -7,10 +7,9 @@
 %   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
 %   >>  [eloc, labels, theta, radius, indices, chaninfo] = ...
 %                                               readlocs( filename, 'key', 'val', ... );
-%
 % Inputs:
 %   filename   - Name of the file containing the electrode locations
-%                Default is 2-D polar coordinates (see >> help topoplot )
+%                {default: 2-D polar coordinates} (see >> help topoplot )
 %
 % Optional inputs:
 %   'filetype'  - ['loc'|'sph'|'sfp'|'xyz'|'asc'|'polhemus'|'besa'|'chanedit'|'custom'] 
@@ -39,9 +38,9 @@
 %                  determine the nose direction for scanned electrode files. 'native' import
 %                  original carthesian coordinates (user can then specify the position of
 %                  the nose when calling the topoplot() function; in EEGLAB the position
-%                  of the nose is stored in the EEG.chaninfo structure). Default is 'eeglab'.
+%                  of the nose is stored in the EEG.chaninfo structure). {default 'eeglab'}
 %   'format'    - [cell array] Format of a 'custom' channel location file (see above).
-%                          Default, if no file type is defined. The cell array contains
+%                          {default: if no file type is defined. The cell array contains
 %                          labels defining the meaning of each column of the input file:
 %                           'channum'   [positive integer] channel number 
 %                           'labels'    [string] channel name (no spaces)
@@ -63,7 +62,7 @@
 %                                       positive = rotating from vertex (0) towards right ear.
 %                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle; 
 %                                       positive = rotating from right ear (0) toward nose.
-%                           'ignore'    ignore column
+%                           'ignore'    ignore column}
 %     The input file may also contain other channel information fields
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
 %                           'calib'     [real near 1.0] channel calibration value.
@@ -72,11 +71,11 @@
 %                           'custom2', 'custom3', 'custom4', etc.    more custom fields
 %   'skiplines' - [integer] Number of header lines to skip (in 'custom' file types only).
 %                 Note: Characters on a line following '%' will be treated as comments.
-%   'readchans' - [integer array] indices of electrodes to read. Default is all.
+%   'readchans' - [integer array] indices of electrodes to read. {default: all}
 %   'center'    - [(1,3) real array or 'auto'] center of xyz coordinates for conversion 
 %                 to spherical or polar, Specify the center of the sphere here, or 'auto'. 
 %                 This uses the center of the sphere that best fits all the electrode 
-%                 locations read. Default is [0 0 0].
+%                 locations read. {default: [0 0 0]}
 % Outputs:
 %   eloc        - structure containing the channel names and locations (if present).
 %                 It has three fields: 'eloc.labels', 'eloc.theta' and 'eloc.radius' 
@@ -190,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2005/09/27 22:08:41  arno
+% fixing reading .ced files
+%
 % Revision 1.72  2005/05/24 17:07:05  arno
 % cell2mat - celltomat
 %
@@ -433,9 +435,9 @@ listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
       'X' 'Y' 'Z' '-X' '-Y' '-Z' 'custom1' 'custom2' 'custom3' 'custom4' 'ignore' 'not def' };
 
 % ----------------------------------
-% special mode for getting the infos
+% special mode for getting the info
 % ----------------------------------
-if isstr(filename) & strcmp(filename, 'getinfos')
+	if isstr(filename) & strcmp(filename, 'getinfos')
    eloc = chanformat;
    labels = listcolformat;
    return;
