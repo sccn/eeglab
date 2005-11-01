@@ -1,61 +1,65 @@
-% eeg_context() - returns a matrix giving, for each event of specified ("target") type(s), 
-%                 the latency (in ms) to the Nth preceding and/or following urevents (if any) 
-%                 of specified ("neighbor") type(s). Can return the target event and urevent
-%                 numbers, the neighbor urevent numbers, and the values of specified urevent
-%                 field(s) for each of the neighbor urevents. Uses the EEG.urevent structure, 
-%                 plus EEG.event().urevent pointers to it. For use in event handling scripts.
+% eeg_context() - returns (in output 'delays') a matrix giving, for each event of specified 
+%                 ("target") type(s), the latency (in ms) to the Nth preceding and/or following
+%                 urevents (if any) of specified ("neighbor") type(s). Return the target event 
+%                 and urevent numbers, the neighbor urevent numbers, and the values of specified 
+%                 urevent field(s) for each of the neighbor urevents. Uses the EEG.urevent 
+%                 structure, plus EEG.event().urevent pointers to it. If epoched data, also 
+%                 uses the EEG.epoch structure. For use in event-handling scripts and functions.
 % Usage:
-%             >>  [targs,unbrs,unbrtypes,delays,tfields,unfields] = ...
-%                          eeg_context(EEG,{target},{neighbors},[positions],{fields},alltargs);
-% Inputs:
+%             >>  [targs,urnbrs,urnbrtypes,delays,tfields,urnfields] = ...
+%                          eeg_context(EEG,{targets},{neighbors},[positions],{fields},alltargs);
+% Required input:
 % EEG         - EEGLAB dataset structure containing EEG.event and EEG.urevent sub-structures
 %
 % Optional inputs:
-% {target}    - cell array of strings naming event type(s) of the specified target events 
-%               {default | []: all events}
-% {neighbors} - cell array of strings naming event type(s) of the specified neighboring 
-%               urevents {default | []: all neighboring events}.
+% targets     - string or cell array of strings naming event type(s) of the specified target 
+%               events {default | []: all events}
+% neighbors   - string or cell array of strings naming event type(s) of the specified 
+%               neighboring urevents {default | []: any neighboring events}.
 % [positions] - int vector giving the relative positions of 'neighbor' type urevents to return. 
 %               Ex: [-3 -2 -1 0 1 2 3] -> return the previous 3, current, and succeeding 3 
 %               urevents of the specified {neighbor} types. [positions] values are arranged 
 %               in ascending order before processing.  {default | []: 1 = first succeeding}
-% {fields}    - string or cell array of strings naming one or more (ur)event field(s) to return 
+% fields      - string or cell array of strings naming one or more (ur)event field(s) to return 
 %               values for neighbor urevents. {default: no field info returned}
 % alltargs    - string ('all'|[]) if 'all', return information about all target urevents,
 %               even those on which no epoch in the current dataset is centered. 
 %               {default: [] -> only return information on epoch-centered target events} 
 % Outputs:
-%  targs      - size (ntargets,4) matrix giving the indices of "target" events in the event 
+%  targs      - size(ntargets,4) matrix giving the indices of target events in the event 
 %               structure in column 1 and in the urevent structure in column 2. Column 3 gives 
 %               the epoch number in which the target has latency 0 (else NaN if no such epoch).
-%               The fourth column gives the index of the target type in the {target} cell array.
-%  unbrs      - matrix of indices of "neighbor" events in the urevent structure (NaN if none).
-%  unbrtypes  - int array giving the unbrs event type indices in the {neighbor} cell arra, 
-%               else NaN if no such neighbor.  Ex: If nbr = {'square','rt'}, 
-%               (see below) then unbrtypes outputs are [1|2]; if nbr = {'rt'}, returns [1]s.
-%  delays     - matrix giving, for each {target} type event, delays (in ms) from the target 
-%               events to the neighbor urevents . Else, returns NaN when no such event. 
-%               Output matrix size: (ntargets,length(positions)). 
-% tfields     - real or cell array of values of the requested (ur)event field(s) for the target 
+%               The fourth column gives the index of the target type in the {targets} cell array.
+%  urnbrs     - matrix of indices of "neighbor" events in the URevent structure (NaN if none).
+%  urnbrtypes - int array giving the urnbrs event type indices in the {neighbor} cell array, 
+%               else NaN if no such neighbor.  Ex: If nbr = {'square','rt'} (see below),
+%               then urnbrtypes outputs are [1|2]; if nbr = {'rt'}, returns [1]s.
+%  delays     - matrix giving, for each {targets} type event, the latency of the delay (in ms) 
+%               from each target event to its neighbor urevents. Else, returns NaN when no 
+%               neighbor event. Output matrix size: (ntargets,length(positions)). 
+%  tfields    - real or cell array of values of the requested (ur)event field(s) for the target 
 %               events. Values are the same type as the field values, else NaN if no such event.
-% unfields    - real or cell array of values of the urevent requested field(s) for the neighbor 
+%  urnfields  - real or cell array of values of the requested (ur)event field(s) for the neighbor 
 %               urevents. Values are the same type as the field values, else NaN if no such event.
 %               If > 1 field specified, a 3-D array or cell array (nevents,nnbrpos,nfields).
 % Example:
 %
-% >> target   = {'square'};            % for all target events of type 'square'
-% >> nbr      = {'square','rt'};       % counting neighbor events as either 'square' or 'rt'
+% >> target   = 'square';                % target events are type 'square'
+% >> nbr      = {'square','rt'};         % neighbor events are either 'square' or 'rt'
 %
-% >> [trgs,unbrs,unbrtypes,delays,tfields,unfields] = eeg_context(EEG,target,nbr,[-4 1],'position');
-%      % Matrix 'delays' now contains latencies (in ms) from each 'square' target event to the 4th
-%      % preceding and 1st succeeding 'rt' OR 'square' urevents (else NaN when none such). Outputs 
-%      % Outputs 'tfields' and 'unfields' give the 'position' field values for target events and neighbor 
-%      % urevents. Output 'unbrtypes', the type ('square' or 'rt') of the ('unbrs') neighbor urevents.
-%
-% >> trts      = find(trgs(:,4)==2);   % i.e., targets followed by an 'rt' (before a 'square')
-% >> pos3      = find(trgfld = 3);     % targets in 'position' 3 (numeric field value).
+% >> [trgs,urnbrs,urnbrtypes,delays,tflds,urnflds] = ...
+%                                          eeg_context(EEG,target,nbr,[-4 1],'position');
+%    %
+%    % Output 'delays' now contains latencies (in ms) from each 'square' target event to the 
+%    % 4th preceding and 1st succeeding 'rt' OR 'square' urevent (else NaN when none such). 
+%    % Outputs 'tfields' and 'urnflds' give the 'position' field values of target events and 
+%    % neighbor urevents. Output 'urnbrtypes', the index of the type (1='square' or 2='rt') 
+%    % of the ('urnbrs') neighbor urevents.
+%    %
+% >> trts      = find(trgs(:,4)==2);   % targets followed by an 'rt' (before any 'square')
+% >> pos3      = find(trgfld = 3);     % targets with 'position'=3 (numeric field value).
 % >> selevents = intersect(trts,pos3); % target events by both criteria
-% >> selepochs = trgs(selevents,3);    % indices of epochs centered on the selected target events
+% >> selepochs = trgs(selevents,3);    % epoch numbers centered on the selected target events
 %
 % Author: Scott Makeig, SCCN, Institute for Neural Computation, UCSD, March 27, 2004
 
@@ -64,12 +68,15 @@
 % 5/25/04 test for isnan(urevent.duration) to detect real break events -sm
 % 3/27/04 made no-such-event return NaNs; added {target} and {neighbor} defaults -sm
 % 3/28/04 added test for boundary urevents; renamed relidx as positions, lats as delays  -sm
-% 3/29/04 reorganized output order, adding unbrtypes -sm
-% 3/29/04 changed unbrtypes to int array -sm
+% 3/29/04 reorganized output order, adding urnbrtypes -sm
+% 3/29/04 changed urnbrtypes to int array -sm
 % 3/31/04 ruled out searching 'boundary' events -sm
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/10/26 21:15:20  scott
+% ignore 'boundary' type events
+%
 % Revision 1.12  2005/10/26 21:00:52  scott
 % print warning if EEG.event.urevent is empty
 %
@@ -89,7 +96,7 @@
 function [targs,ur_nbrs,ur_nbrtypes,delays,tfields,nfields] = eeg_context(EEG,targets,neighbors,positions,field,alltargs)
 
 verbose     = 0;    % flag useful info printout (1=on|0=off)
-debug_print = 1;    % flag overly verbose printout
+debug_print = 0;    % flag overly verbose printout
 breakwarning = 0;   % flag no pre-4.4 warning given
 
 if nargin < 1
@@ -106,7 +113,7 @@ else
 end
 
 if ~isstruct(EEG)
-   error('1st argument must be an EEG dataset structure');
+   error('first argument must be an EEG dataset structure');
 end
 if ~isfield(EEG,'event')
    error('no EEG.event structure found');
@@ -124,6 +131,15 @@ if EEG.trials == 1 | ~isfield(EEG.event(1),'epoch')
   epochinfo = 0;
 else
   epochinfo = 1;
+end
+if epochinfo & ~isfield(EEG,'epoch')
+  error('EEG.epoch information missing from this epoched dataset');
+end
+if epochinfo & ~isfield(EEG.epoch,'event')
+  error('EEG.epoch.event information missing from this epoched dataset');
+end
+if epochinfo & ~isfield(EEG.epoch,'eventlatency')
+  error('EEG.epoch.eventlatency information missing from this epoched dataset');
 end
 
 nevents   = length(EEG.event);
@@ -150,8 +166,14 @@ end
 %
 %%%%%%%%%%%%% Test and adjust input arguments %%%%%%%%%%%%%%%%%%%%
 %
+if ischar(targets)
+   targets = {targets};
+end
 if ~iscell(targets)
   error('2nd argument "targets" must be a {cell array} of event types.');
+end
+if ischar(neighbors)
+   neighbors = {neighbors};
 end
 if ~iscell(neighbors)
   error('3rd argument "neighbors" must be a {cell array} of event types.');
@@ -227,7 +249,7 @@ if ~exist('NO_FIELD','var') % if field values asked for
     end 
     field = {field}; % make string field a cell array for uniformity
     nfieldnames = 1;
-   elseif iscell(field)
+  elseif iscell(field)
     nfieldnames = length(field);
     for f = 1:nfieldnames
       if ~isfield(EEG.urevent,field{f})
@@ -251,9 +273,9 @@ if ~exist('NO_FIELD','var') % if field values asked for
     if cellfld == -1,
        cellfld = 0; % field value(s) must be numeric
     end
-   else
+  else
      error('''field'' value must be string or cell array');
-   end
+  end
 end
 
 targetcount = 0; % index of current target
@@ -313,14 +335,19 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
             end
         end
       end
-      if epochinfo
+      if epochinfo % if the data are epoched
             is0epoch = 0;
             for z = 1:length(EEG.event(evidx).epoch) % for each epoch the event is in
               ep = EEG.event(evidx).epoch(z);
               for e = 1:length(EEG.epoch(ep).event) % for each event in the epoch
                 if EEG.epoch(ep).event(e) == evidx  % if current event
-                  evlt = EEG.epoch(ep).eventlatency{1};  % get its epoch latency
-                  if evlt == 0
+                  if length(EEG.epoch(ep).eventlatency{e}) == 1  
+                    trglt = EEG.epoch(ep).eventlatency{e};    % get its epoch latency 
+                  else
+                    trglt = EEG.epoch(ep).eventlatency{e}(1); % this shouldn't happen
+                    fprintf('EEG.epoch(%d).eventlatency{%d} length > 1 ??\n',ep,e);
+                  end;
+                  if trglt == 0
                       targepochs(targetcount) = ep;
                       is0epoch = 1;
                       break;
@@ -334,8 +361,8 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
             if ~is0epoch, noepochs = noepochs+1; end 
       end
 
-       targs(targetcount) = evidx;                  % save event index
-       ur_trgs(targetcount) = uridx;                % save urevent index
+       targs(targetcount) = evidx;                   % save event index
+       ur_trgs(targetcount) = uridx;                 % save urevent index
        if ~exist('NO_FIELD','var')
          for f=1:nfieldnames
            if cellfld ==0
@@ -344,10 +371,10 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
             tfields{targetcount,f} = EEG.urevent(uridx).(field{f});
            end
          end
-         break                                        % stop target type checking
+         break                                       % stop target type checking
        end
     else % next target type
-       tidx = tidx+1;                                   % else try next target type
+       tidx = tidx+1;                                % else try next target type
     end % if is target
  end % while ~istarget
 
@@ -367,7 +394,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
      if strcmpi(uidxtype,'boundary')  % flag boundary urevents
         if ~isfield(EEG.urevent,'duration') ...
           | ( isnan(EEG.urevent(uidx).duration) ...
-             | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
+             | isempty(EEG.urevent(uidx).duration))  % pre-v4.4 or real break urevent 
                                                      %   (NaN duration)
              if ~isfield(EEG.urevent,'duration') ... % pre version-4.4 dataset
                     & breakwarning == 0
@@ -450,7 +477,7 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
      if strcmpi(uidxtype,'boundary')  % flag boundary events
         if ~isfield(EEG.urevent,'duration') ...
           | ( isnan(EEG.urevent(uidx).duration) ...
-              | isempty(EEG.urevent(uidx).duration)) % pre-v4.4 or real break urevent 
+              | isempty(EEG.urevent(uidx).duration))  % pre-v4.4 or real break urevent 
                                                       %   (NaN duration)
              if ~isfield(EEG.urevent,'duration') ...  % pre version-4.4 dataset
                     & breakwarning == 0
@@ -460,20 +487,20 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
         end
         break           % don't search for neighbors across a boundary urevent
      end
-     pidx = 1;                                       % initialize neighbor type index
+     pidx = 1;                                        % initialize neighbor type index
      %
      %%%%%%%%%% cycle through neighbor types %%%%%%%%%%%%%
      %
-     while ~isneighbor & pidx<=length(neighbors)     % for each neighbor event type
+     while ~isneighbor & pidx<=length(neighbors)      % for each neighbor event type
        if strcmpi(uidxtype,neighbors(pidx)) ...
                           | strcmp(neighbors,'_ALL')
-         isneighbor=1;                               % flag 'neighbors' event
+         isneighbor=1;                                % flag 'neighbors' event
          curpos = curpos+1;
          %
          %%%% if an event in one of the specified positions %%%%%
          %
          if curpos-1 == seekpos
-           ur_nbrs(targetcount,posidx(ppidx))=uidx;  % mark urevent as neighbor
+           ur_nbrs(targetcount,posidx(ppidx))=uidx;   % mark urevent as neighbor
            % ur_nbrtypes{targetcount,posidx(ppidx)} = EEG.urevent(uidx).type; % note its type
            ur_nbrtypes(targetcount,posidx(ppidx)) = pidx; % note its type
            delays(targetcount,posidx(ppidx)) = 1000/EEG.srate * ...
@@ -504,16 +531,16 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
            end
            ppidx = ppidx+1;
            if ppidx<=npospos
-              seekpos = pospos(ppidx);               % new seek position
+              seekpos = pospos(ppidx);                % new seek position
            end
-           break                                    % stop neighbors type checking
+           break                                      % stop neighbors type checking
          end % if seekpos
          break
        else
          %
          %%%%%%%%%%%% find succeeding neighbor event %%%%%%%%%%%%
          %
-         pidx = pidx+1;                              % try next 'neighbors' event-type
+         pidx = pidx+1;                               % try next 'neighbors' event-type
        end
      end  % pidx - neighbor-type testing loop
      uidx = uidx+1;                     % keep checking for 'neighbors' type urevents
