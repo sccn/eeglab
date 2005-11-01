@@ -1,6 +1,6 @@
 % headplot() - plot a spherically-splined EEG field map on a semi-realistic 
 %              3-D head model. Rotate head using left mouse button.
-% Example:
+% Example: 
 %   >> headplot example   - show an example spherical 'eloc_angles' file
 %   >> headplot cartesian - show an example cartesian 'eloc_angles' file
 %
@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2005/07/14 17:42:14  scott
+% minor help typo
+%
 % Revision 1.56  2005/05/24 17:13:56  arno
 % cell2mat -> celltomat
 %
