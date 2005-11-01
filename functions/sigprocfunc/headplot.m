@@ -1,6 +1,6 @@
 % headplot() - plot a spherically-splined EEG field map on a semi-realistic 
 %              3-D head model. Rotate head using left mouse button.
-% Example: 
+% Example:
 %   >> headplot example   - show an example spherical 'eloc_angles' file
 %   >> headplot cartesian - show an example cartesian 'eloc_angles' file
 %
@@ -397,7 +397,7 @@ if isstr(values)
     % Calculate g(x) for electrodes 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if strcmpi(g.plotmeshonly, 'off')
-        fprintf('Setting up splining matrix.\n');
+        fprintf('Setting up splining matrix.\n');    
         enum = length(Xe);
         onemat = ones(enum,1);
         G = zeros(enum,enum);
@@ -494,12 +494,15 @@ if isstr(values)
                       length(x))
     fprintf('            but doesnt have to be done again for this montage...\n');
     icadefs;
+
+    gx = fastcalcgx(x,y,z,Xe,Ye,Ze);
+
+    %{
     hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
 
-    %figure; plot3(x (:),  y(:),  z(:), '.' );
-    %figure; plot3(Xe(:), Ye(:), Ze(:), '.' );
 
-    hwbend = length(x);
+    hwbend = length(x)
+    tic
     for j = 1:length(x)
       % fprintf('%d ',j)
       X = x(j);
@@ -507,13 +510,15 @@ if isstr(values)
       Z = z(j);
       ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); 
                                   % default was /2, no sqrt
-                                  % distance between sphere and all electrodes
+                                  % distance between sphere and all
+                                  % electrodes
       for i = 1:length(ei)
         gx(j,i) = calcgx(ei(i));  
       end
       waitbar(j/hwbend, hwb)
     end
     close(hwb)
+%}
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Save spline file
@@ -841,6 +846,28 @@ for n = 1:7  % compute 7 terms
 end
 out = out/(4*pi);
 
+    
+%%%%%%%%%%%%%%%%%%%
+function gx = fastcalcgx(x,y,z,Xe,Ye,Ze)
+
+onemat = ones(length(x),length(Xe));
+EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
+                    (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
+                    (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2);
+%
+gx = zeros(length(x),length(Xe));
+m = 4;
+icadefs;
+hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
+hwbend = 7
+for n = 1:7
+    L = legendre(n,EI);
+    gx = gx + ((2*n+1)/(n^m*(n+1)^m))*squeeze(L(1,:,:));
+    waitbar(n/hwbend,hwb);
+end
+gx = gx/(4*pi);    
+close(hwb);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  distance() - function used in 'setup'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -889,3 +916,4 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
             end
         end
     end;
+
