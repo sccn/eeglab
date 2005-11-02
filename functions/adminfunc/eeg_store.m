@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/09/13 16:34:56  arno
+% add a clear function
+%
 % Revision 1.32  2005/09/08 21:53:29  arno
 % same
 %
@@ -236,7 +239,7 @@ else % savedata
                 EEG.saved = 'yes';
                 [ EEG com] = pop_saveset(EEG);
                 EEG = update_datafield(EEG);
-                h(com);
+                eegh(com);
                 if isempty(com)
                     disp('eeg_save(): No filename given. Dataset not saved (by your request).');
                     option_save = 'exception';
