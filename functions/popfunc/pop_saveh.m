@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
-% See also: h(), eeglab()
+% See also: eegh(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/06/01 21:35:46  arno
+% msg
+%
 % Revision 1.6  2004/06/01 21:35:01  arno
 % debug command line call
 %
