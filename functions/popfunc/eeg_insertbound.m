@@ -5,11 +5,11 @@
 %                                                abslatency, duration);
 % Inputs:
 %   eventin    - EEGLAB event structure (EEG.event)
-%   pnts       - data points in EEG dataset
+%   pnts       - data points in EEG dataset (EEG.pnts * EEG.trials)
 %   abslatency - absolute latency of regions in original dataset. Can
 %                also be an array of [beg end] latencies with one row
 %                per region removed. Then 'lengths' argument is ignored.
-%   lengths   - lengths of removed regions
+%   lengths    - lengths of removed regions
 %
 % Outputs:
 %   eventout   - EEGLAB event output structure with added boundaries
@@ -20,8 +20,8 @@
 %   1) add boundary events to the 'event' structure; 
 %        remove nested boundaries; 
 %        recompute the latencies of all events.
-%   2) all latencies are given in units of (float) data points. 
-%        i.e., a latency of 2000.3 means 0.3 samples (at EEG.srate)
+%   2) all latencies are given in (float) data points. 
+%        e.g., a latency of 2000.3 means 0.3 samples (at EEG.srate)
 %              after the 2001st data frame (since first frame has latency 0).
 % 
 % Author: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, April, 19, 2004
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/08/10 01:47:32  scott
+% clarifying latencies in help msg (Arno, please check the example -sm)
+%
 % Revision 1.32  2005/05/24 17:44:41  arno
 % remove cell2mat
 %
@@ -163,12 +166,12 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     end;
     
     if length(regions)
-        fprintf('eeg_eegrej(): %d boundary (break) events added.\n', size(regions, 1));
+        fprintf('eeg_insertbound(): %d boundary (break) events added.\n', size(regions, 1));
     else 
         return;
     end;
 
-    % recompute latencies fo boundevents (in new dataset)
+    % recompute latencies of boundevents (in new dataset)
     % ---------------------------------------------------
     [regions tmpsort] = sort(regions);
     lengths           = lengths(tmpsort);
@@ -222,8 +225,8 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
                 eventout(latind).latency = eventout(latind).latency-lengths(tmpindex);
             end;
             
-            % add lengths of previous events (must be done after above
-            % --------------------------------------------------------
+            % add lengths of previous events (must be done after above)
+            % ---------------------------------------------------------
             eventout(tmpind2).duration = lengths(tmpindex)+addlength;                
             if eventout(tmpind2).duration == 0, eventout(tmpind2).duration=NaN; end;
         
@@ -231,7 +234,7 @@ function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
 	end;
 
     if countrm > 0
-        fprintf('eeg_eegrej(): event latencies recomputed and %d events removed.\n', countrm);
+        fprintf('eeg_insertbound(): event latencies recomputed and %d events removed.\n', countrm);
     end;
 
     
@@ -262,7 +265,7 @@ function [ indnested, addlen ] = findnested(event, ind);
 function [event, urevent] = removenested(event, urevent, nestind);
     
     if length(nestind) > 0
-        fprintf('Debug msg: removing %d nested urevents\n', length(nestind));
+        fprintf('eeg_insertbound() debug msg: removing %d nested urevents\n', length(nestind));
         nestind = sort(nestind);
         urind = [ event.urevent ]; % this must not be done in the loop
                                              % since the indices are dyanmically updated
