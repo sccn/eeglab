@@ -1,8 +1,8 @@
-% h() - history function.           
+% eegh() - history function.           
 %
 % Usage:
-%   >> h( arg );
-%   >> h( arg1, arg2 );
+%   >> eegh( arg );
+%   >> eegh( arg1, arg2 );
 %
 % Inputs:
 %   - With no argument, it return the command history.
@@ -49,6 +49,9 @@
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/08/02 16:41:11  arno
+% remove history display when removing elements
+%
 % Revision 1.13  2005/07/28 18:29:59  arno
 % same
 %
@@ -89,7 +92,7 @@
 % Initial revision
 %
 
-function str = h( command, str );
+function str = eegh( command, str );
 
 mode = 1; % mode = 1, full print, mode = 0, truncated print
 
@@ -141,7 +144,7 @@ elseif nargin == 1
 					fprintf('%s\n', txt );
 				end;				
 				evalin( 'base', ALLCOM{command} ); % execute element
-				h( ALLCOM{command} );    % add to history
+				eegh( ALLCOM{command} );    % add to history
 			end;
 		end;	
 	end;		
@@ -158,7 +161,7 @@ else % nargin == 2
         end;
     else
         % warning also some code present in eeg_store and pop_newset
-        h(command); % add to history
+        eegh(command); % add to history
         if ~isempty(command)
             if length(str) == 1
                 str = eeg_hist(str, command);
