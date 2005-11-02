@@ -12,7 +12,7 @@
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, Dec 2003
 %
-% See also: h(), eeglab()
+% See also: eegh(), eeglab()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/05/14 23:21:06  arno
+% do not add empty commands
+%
 % Revision 1.3  2004/05/14 17:43:10  arno
 % different concatenation
 %
