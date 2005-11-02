@@ -38,8 +38,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 
-function [STUDY, ALLEEG] = pop_loadstudy(varargin)
+function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)
 
+com = '';
 if isempty(varargin)
     [filename, filepath] = uigetfile2('*.study', 'Load a STUDY -- pop_loadstudy()'); 
     if ~strncmp(filename(end-5:end), '.study',6)
@@ -78,3 +79,4 @@ for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).index = k;
 end
        
+com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', filename, filepath);
