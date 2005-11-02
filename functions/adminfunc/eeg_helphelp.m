@@ -14,9 +14,9 @@
 % The advantage of this process is that the same function can be called in 
 % two ways, either in interactive (pop_) mode or directly from the commandline. 
 % This trick allows EEGLAB to build a history of the commands run under an 
-% EEGLAB session. (See the h() function for details). The command history allows 
+% EEGLAB session. (See the eegh() function for details). The command history allows 
 % users to build their own EEGLAB macros by copying and pasting commands from 
-% the EEGLAB history (using h() and pop_saveh()) into new Matlab script files.
+% the EEGLAB history (using eegh() and pop_saveh()) into new Matlab script files.
 %
 % EEGLAB HELP WINDOWS:
 % The help message of any function may be called from from the EEGLAB menu 
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/15 01:29:59  arno
+% header for web
+%
 % Revision 1.6  2002/08/13 18:54:14  scott
 % editing help message
 %
