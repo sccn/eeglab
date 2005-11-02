@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/11/02 19:53:21  arno
+% header
+%
 % Revision 1.6  2002/08/11 19:27:53  arno
 % updating header message
 %
@@ -64,3 +67,5 @@ global CURRENTSET;	% current set index
 %global EEGMENU;		% main menu
 global ALLCOM;		% all commands (history)
 global LASTCOM;		% last command
+global STUDY;
+global CURRENTSTUDY;
