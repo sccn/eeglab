@@ -1,5 +1,5 @@
 % eeg_retrieve() - Retrieve an EEG dataset from the variable
-%                  containing all datasets (standard:ALLEEG).
+%                  containing all datasets (standard: ALLEEG).
 %
 % Usage: >> EEG = eeg_retrieve( ALLEEG, index );
 %
@@ -8,11 +8,12 @@
 %   index      - index of the dataset to retrieve
 %
 % Outputs:
-%   EEG        - output dataset. The global variable EEG is also updated 
+%   EEG        - output dataset. The workspace variable EEG is also updated 
 %   ALLEEG     - updated ALLEEG structure
-%   CURRENTSET - index of the current dataset
+%   CURRENTSET - workspace variable index of the current dataset
 %
-% Note: at this point the function only performs >> EEG = ALLEEG(index);
+% Note: The function performs >> EEG = ALLEEG(index);
+%       It also runs eeg_checkset() on it.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/09/27 22:06:53  arno
+% fix empty dataset retrieve
+%
 % Revision 1.14  2005/09/08 21:58:58  arno
 % preserving 'saved' field
 %
@@ -94,10 +98,13 @@ end;
 %try
     eeg_optionsbackup;
     eeg_options;
-    try, 
+
+    try,   % check whether recent changes to this dataset have been saved or not
+           %--------------------------------------------------------------------
            tmpsaved = { ALLEEG(CURRENTSET).saved };
     catch, tmpsaved = 'no';
     end;
+
     if length(CURRENTSET) > 1 & option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
         [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
