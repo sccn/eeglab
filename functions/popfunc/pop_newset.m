@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/09/27 22:03:38  arno
+% save multiple datasets
+%
 % Revision 1.29  2005/08/16 17:54:39  scott
 % edit help message. EEG.changes_not_saved -> EEG.saved   -sm
 %
