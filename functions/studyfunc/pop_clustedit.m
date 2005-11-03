@@ -626,7 +626,7 @@ else
             if ~isempty(reassign_param) %if not canceled
                 STUDY = cls_moveoutlier(STUDY, ALLEEG,  cls(old_clus), comp_ind - 1);
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
-                outlier_clust = cls_findoutlierclust(STUDY,old_clus); %find the outlier cluster for this cluster
+                outlier_clust = cls_findoutlierclust(STUDY,cls(old_clus)); %find the outlier cluster for this cluster
                 oind = find(cls == outlier_clust); % the outlier clust index (if already exist) in the cluster list GUI
                 if ~isempty(oind) % the outlier clust is already presented in the cluster list GUI
                     clus_name_list{oind+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
