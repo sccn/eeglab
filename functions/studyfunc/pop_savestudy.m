@@ -48,6 +48,16 @@ end;
 if isempty(STUDY)  , error('pop_savestudy(): cannot save empty STUDY'); end;
 if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); end;
 
+% backward compatibility
+% ----------------------
+if nargin > 1 
+    if isstr(EEG)
+        options = { EEG varargin{:} };
+    else
+        options = varargin;
+    end;
+end;
+
 if nargin < 3
     % pop up window to ask for file type
     % ----------------------------------
@@ -62,8 +72,6 @@ if nargin < 3
         end
     end
     options = { 'filename' filename 'filepath' filepath };
-else
-    options = varargin;
 end
 
 % decoding parameters
