@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.405  2005/11/03 00:45:17  arno
+% study set
+%
 % Revision 1.404  2005/11/02 18:34:10  arno
 % h -> eegh
 %
@@ -2120,6 +2123,7 @@ end;
 
 % menu for selecting STUDY set
 % ----------------------------
+exist_study = 0;
 if exist('STUDY') & exist('CURRENTSTUDY')
     if ~isempty(STUDY)
         exist_study = 1;
