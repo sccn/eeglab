@@ -86,7 +86,7 @@ if isstr(g), error(g); end;
 if strcmpi(g.savemode, 'resave')
     disp('Re-saving study file');
     g.filename = STUDY.filename;
-    g.filepth  = STUDY.filepth;
+    g.filepath = STUDY.filepth;
 end;
 
 if isempty(g.filename)
