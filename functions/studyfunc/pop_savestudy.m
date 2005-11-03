@@ -1,17 +1,22 @@
 % pop_savestudy() - save a STUDY structure to a disk file
 %
 % Usage:
-%   >> STUDY = pop_savestudy( STUDY ); % pop up and interactive window 
-%   >> STUDY = pop_savestudy( STUDY, 'key', 'val', ...); % no pop-up
+%   >> STUDY = pop_savestudy( STUDY, EEG ); % pop up and interactive window 
+%   >> STUDY = pop_savestudy( STUDY, EEG, 'key', 'val', ...); % no pop-up
 %                                              
 % Inputs:
 %   STUDY      - STUDY structure. 
+%   EEG        - Array of datasets contained in the study.
 %
 % Optional inputs:
 %   'filename' - [string] name of the STUDY file {default: STUDY.filename}
 %   'filepath' - [string] path of the STUDY file {default: STUDY.filepath}
 %   'savemode' - ['resave'|'standard'] in resave mode, the file name in
 %                the study is being used to resave it.
+%
+% Note: the parameter EEG is currenlty not being used. In the future, this function
+%       will check if any of the datasets of the study have been modified and
+%       have to be resaved.
 %
 % Authors: Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, September 2005
 
@@ -33,8 +38,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY] = pop_savestudy(STUDY, varargin);
+function [STUDY, EEG, com] = pop_savestudy(STUDY, EEG, varargin);
 
+com = '';
 if nargin < 1
 	help pop_savestudy;
 	return;
@@ -42,7 +48,7 @@ end;
 if isempty(STUDY)  , error('pop_savestudy(): cannot save empty STUDY'); end;
 if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); end;
 
-if nargin < 2
+if nargin < 3
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
@@ -109,3 +115,7 @@ catch
         end
     end
 end
+
+% history
+% -------
+com = sprintf('[STUDY EEG] = pop_savestudy( %s, %s, %s);', inputname(1), inputname(2), vararg2str(options));
