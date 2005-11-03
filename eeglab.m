@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.406  2005/11/03 16:43:09  arno
+% fix exist study
+%
 % Revision 1.405  2005/11/03 00:45:17  arno
 % study set
 %
@@ -1662,12 +1665,12 @@ catchstrs.new_non_empty          = e_newnonempty;
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
 	uimenu( first_m, 'Label', 'Save current dataset'  ,                    'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
-	uimenu( first_m, 'Label', 'Save current datasets as'              , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
-	uimenu( first_m, 'Label', 'Clear dataset(s)'                      , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
-	uimenu( first_m, 'Label', 'Load existing study' , 'Separator', 'on', 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
-	uimenu( first_m, 'Label', 'Save current study'  ,                    'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
-	uimenu( first_m, 'Label', 'Save current study as'                  , 'CallBack', [ check   '[EEG LASTCOM] = pop_savestudy(EEG);' e_hist_nh ]);
-	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
+	uimenu( first_m, 'Label', 'Save current datasets as'                 , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
+	uimenu( first_m, 'Label', 'Load existing study' , 'Separator', 'on'  , 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
+	uimenu( first_m, 'Label', 'Save current study'  ,                      'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ]);
+	uimenu( first_m, 'Label', 'Save current study as'                    , 'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'     , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
     
 	hist_m = uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on');
 	uimenu( hist_m, 'Label', 'Dataset history', 'CallBack', [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh]);
