@@ -67,12 +67,14 @@ end
 len = length(cls);
 % Plot clusters mean measures
 for k = 1: len
-	try 
-        % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
-        h_wait = waitbar(0,['Computing cluster measures ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
-	catch % for Matlab 5.3
-        h_wait = waitbar(0,['Computing cluster measures ...'],'position', [300, 200, 300, 48]);
-	end
+    if k == 1
+        try 
+            % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
+            h_wait = waitbar(0,['Computing cluster measures ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
+        catch % for Matlab 5.3
+            h_wait = waitbar(0,['Computing cluster measures ...'],'position', [300, 200, 300, 48]);
+        end
+    end    
     figure
     orient tall
     set(gcf,'Color', BACKCOLOR);
