@@ -444,16 +444,19 @@ else
                    tmp = strfind(comp_name{ci},'''');
                    clust_name = comp_name{ci}(tmp(1)+1:tmp(end)-1);
                    for k = 1:length(cls)
-                       if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
-                           cind = comp_ind(ci) - num_comps; % component index in the cluster
-                           eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );'  ]);
-                            % update Study history
-                            a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );' ];
-                            STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-                            break;
-                       else
-                           num_comps = num_comps + length(STUDY.cluster(cls(k)).comps);
-                       end
+                       if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
+                            (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
+                           if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
+                               cind = comp_ind(ci) - num_comps; % component index in the cluster
+                               eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );'  ]);
+                               % update Study history
+                               a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );' ];
+                               STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                               break;
+                           else
+                               num_comps = num_comps + length(STUDY.cluster(cls(k)).comps);
+                           end
+                       end                       
                    end
                end
             end
