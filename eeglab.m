@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.404  2005/11/02 18:34:10  arno
+% h -> eegh
+%
 % Revision 1.403  2005/10/11 17:10:41  arno
 % do not crash when error
 %
@@ -1456,8 +1459,6 @@ eeg_global;
 
 % for the history function
 % ------------------------
-evalin('base'  , 'if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h cleared''); end;');
-
 comtmp = 'warning off MATLAB:mir_warning_variable_used_as_function';
 evalin('base'  , comtmp, '');
 evalin('caller', comtmp, '');
@@ -1499,8 +1500,8 @@ colordef white
 
 % checking strings
 % ----------------
-e_try = 'try, if exist(''h'') == 1, clear h; disp(''EEGLAB note: variable h cleared''); end;';
-e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP; end;';
+e_try = 'try,';
+e_catch = 'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP ALLEEGTMP STUDYTMP; end;';
 nocheck           = e_try;
 ret = 'if ~isempty(LASTCOM), if LASTCOM(1) == -1, LASTCOM = ''''; return; end; end;';
 check             = ['[EEG LASTCOM] = eeg_checkset(EEG, ''data'');' ret ' eegh(LASTCOM);' e_try];
@@ -1562,6 +1563,10 @@ e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh                  
 e_storeall      = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
 e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
+
+% study checking
+% --------------
+e_load_study    = [e_catch 'eegh(LASTCOM); if ~isempty(LASTCOM), ALLEEG = ALLEEGTMP; EEG = ALLEEG; CURRENTSET = [1:length(EEG)]; eegh(''CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:' int2str(length(EEG)) '];''); STUDY = STUDYTMP; CURRENTSTUDY = 1; disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');'];
 
 % build structures for plugins
 % ----------------------------
@@ -1652,10 +1657,13 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Weight matrix to text file'        , 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
-	uimenu( first_m, 'Label', 'Load existing dataset(s)' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset(s)'  , 'Separator', 'on', 'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
+	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
+	uimenu( first_m, 'Label', 'Save current dataset'  ,                    'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
 	uimenu( first_m, 'Label', 'Save current datasets as'              , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                      , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
+	uimenu( first_m, 'Label', 'Load existing study' , 'Separator', 'on', 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
+	uimenu( first_m, 'Label', 'Save current study'  ,                    'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
+	uimenu( first_m, 'Label', 'Save current study as'                  , 'CallBack', [ check   '[EEG LASTCOM] = pop_savestudy(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'        , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
     
 	hist_m = uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on');
@@ -2054,9 +2062,21 @@ end;
 % setting the dataset menu
 % ------------------------
 while( index <= MAX_SET)
-	try
-		set( EEGMENU(index), 'Label', '------', 'checked', 'off');
-	catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;	
+    try
+        set( EEGMENU(index), 'Label', '------', 'checked', 'off');
+    catch,
+        if mod(index, 30) == 0
+            tag = [ 'More (' int2str(index/30) ') ->' ];
+            tmp_m = findobj('label', tag);
+            if isempty(tmp_m)
+                 set_m = uimenu( set_m, 'Label', tag, 'Enable', 'on'); 
+            else set_m = tmp_m;
+            end;	
+        end;
+        try
+            set( EEGMENU(index), 'Label', '------', 'checked', 'off');
+        catch, EEGMENU(index) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;	
+    end;        
 	set( EEGMENU(index), 'Enable', 'on', 'separator', 'off' );
 	try, ALLEEG(index).data;
 		if ~isempty( ALLEEG(index).data)
@@ -2064,6 +2084,7 @@ while( index <= MAX_SET)
             cb_retrieve = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
                             'eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
                             'LASTCOM = ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, ' int2str(index) ');'';' ...
+                            'if CURRENTSTUDY, LASTCOM = [ ''CURRENTSTUDY = 0; '' LASTCOM ]; end;' ...
                             'eval(LASTCOM); eegh(LASTCOM);' ...
                             'eeglab(''redraw'');' ];
             
@@ -2087,13 +2108,34 @@ if index ~= 0
                   'nonempty = find(~cellfun(''isempty'', { ALLEEG.data } ));' ...                  
                   'tmpind = pop_chansel({ ALLEEG(nonempty).setname }, ''withindex'', nonempty);' ... 
                   'CURRENTSET = nonempty(tmpind);' ...
-                  '[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, CURRENTSET);' ...
-                  'eegh([ ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, '' vararg2str({CURRENTSET}) '');'' ]);' ...
+                  'LASTCOM = [ ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, '' vararg2str({CURRENTSET}) '');'' ];' ...
+                  'if CURRENTSTUDY, LASTCOM = [ ''CURRENTSTUDY = 0; '' LASTCOM ]; end;' ...
+                  'eval(LASTCOM); eegh(LASTCOM);' ...
                   'eeglab(''redraw'');' ];
     if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;
     
     set(EEGMENU(end), 'enable', 'on', 'Label', 'Select multiple datasets', ...
                       'callback', cb_select, 'separator', 'on');
+end;
+
+% menu for selecting STUDY set
+% ----------------------------
+if exist('STUDY') & exist('CURRENTSTUDY')
+    if ~isempty(STUDY)
+        exist_study = 1;
+    end;
+end;
+if exist_study
+    cb_select = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
+                  'eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
+                  'LASTCOM = ''CURRENTSTUDY = 1;'';' ...
+                  'eval(LASTCOM); eegh(LASTCOM);' ...
+                  'eeglab(''redraw'');' ];
+    tmp_m = findobj('label', 'Select the study set');
+    if isempty(tmp_m), tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on'); end;       
+    set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
+else 
+    delete( findobj('label', 'Select the study set') );
 end;
 
 EEGUSERDAT{2} = EEGMENU;
@@ -2150,7 +2192,138 @@ if ~isfield(g, 'win0') % no display
     return;
 end;
 
-if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
+study_selected = 0;
+if exist('STUDY') & exist('CURRENTSTUDY')
+    if CURRENTSTUDY == 1, study_selected = 1; end;
+end;
+
+if study_selected
+    hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
+    hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
+
+    % head string
+    % -----------
+    set( g.win0, 'String', sprintf('STUDY set: %s', STUDY.name) );
+    
+    % dataset type
+    % ------------
+    datasettype = unique( [ EEG.trials ] );
+    if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
+    elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
+    else                                               datasettype = 'epoched';
+    end;
+    
+    % number of channels and channel locations
+    % ----------------------------------------
+    chanlen    = unique( [ EEG.nbchan ] );
+    chanlenstr = vararg2str( mattocell(chanlen) );
+    anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+    if length(anyempty) == 2,   chanlocs = 'mixed, yes and no';
+    elseif anyempty == 0,       chanlocs = 'yes';
+    else                        chanlocs = 'no';
+    end;
+
+    % ica weights
+    % -----------
+    anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
+    if length(anyempty) == 2,   icaweights = 'mixed, yes and no';
+    elseif anyempty == 0,       icaweights = 'yes';
+    else                        icaweights = 'no';
+    end;
+
+    % consistency & other parameters
+    % ------------------------------
+    [EEG epochconsist] = eeg_checkset(EEG, 'epochconsist');        % epoch consistency
+    [EEG chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
+    [EEG icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
+    totevents = num2str(sum( cellfun( 'length', { EEG.event }) )); % total number of events
+    srate     = vararg2str( mattocell( unique( [ EEG.srate ] ) )); % sampling rate
+    totsize   = whos('STUDY', 'ALLEEG');                              % total size
+    if isempty(STUDY.session),   sessionstr = ''; else sessionstr = vararg2str(STUDY.session); end;
+    if isempty(STUDY.condition), condstr    = ''; else condstr    = vararg2str(STUDY.condition); end;
+    
+    % determine study status
+    % ----------------------
+    studystatus = 'Not-preclustered';
+    if isfield(STUDY.etc, 'preclust')
+        if ~isempty( STUDY.etc.preclust )
+            studystatus = 'Preclustered';
+        elseif length(STUDY.cluster) > 1
+            studystatus = 'Clustered';
+        end;
+    elseif length(STUDY.cluster) > 1
+        studystatus = 'Clustered';
+    end;        
+    
+    % text
+    % ----
+    set( g.win2, 'String', 'Study task name:');
+    set( g.win3, 'String', 'Number of subjects:');
+    set( g.win4, 'String', 'Conditions:');
+    set( g.win5, 'String', 'Sessions:');
+    set( g.win6, 'String', 'Epoch consistency');
+    set( g.win7, 'String', 'Channels per frame');
+    set( g.win8, 'String', 'Channel locations');
+    set( g.win9, 'String', 'Sampling rate (Hz)');
+    set( g.win10, 'String', 'Nb of clusters');
+    set( g.win11, 'String', 'Status');
+    set( g.win12, 'String', 'Total size (Mb)');
+    
+    % values
+    % ------
+    fullfilename = fullfile( STUDY.filepath, STUDY.filename);
+    if length(fullfilename) > 30
+        set( g.win1, 'String', sprintf('Study filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
+    else
+        set( g.win1, 'String', sprintf('Study filename: %s\n', fullfilename));
+    end;        	
+    set( g.val2, 'String', STUDY.task);
+    set( g.val3, 'String', int2str(length(EEG)));
+    set( g.val4, 'String', condstr);
+    set( g.val5, 'String', sessionstr);
+    set( g.val6, 'String', epochconsist);
+    set( g.val7, 'String', chanlenstr);
+    set( g.val8, 'String', chanlocs);
+    set( g.val9, 'String', srate);
+    set( g.val10, 'String', length(STUDY.cluster));
+    set( g.val11, 'String', studystatus);
+    set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
+    
+    % disable menus
+    % -------------
+    file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
+    edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
+    tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
+    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
+    hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
+    set( edit_m, 'enable', 'off');
+    set( plot_m, 'enable', 'off');
+    set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
+    set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
+    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
+    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset'    ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
+    set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
+    
+    % enable specific menus
+    % ---------------------
+    if strcmpi(chanconsist, 'yes')
+        set( edit_m, 'enable', 'on');
+        set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
+        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
+        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
+        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
+        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
+    end;
+    
+elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
     hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
     
@@ -2243,9 +2416,10 @@ if (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset(s)'), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset'    ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
         set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
@@ -2407,7 +2581,8 @@ else
     file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m   , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')             , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset(s)'), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')         , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
     edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');      set(edit_m, 'enable', 'off');
