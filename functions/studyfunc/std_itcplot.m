@@ -229,7 +229,7 @@ if strcmpi(mode, 'centroid')
             if len ~= 1
                 sbplot(rowcols(1),rowcols(2),k) , 
             end
-            a = [ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
+            a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
             ave_itc = STUDY.cluster(cls(k)).centroid.itc{n};
             logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
             if figureon % plot on a new figure
