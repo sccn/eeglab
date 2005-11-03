@@ -10,7 +10,29 @@
 % Optional inputs:
 %   'filename' - [string] name of the STUDY file {default: STUDY.filename}
 %   'filepath' - [string] path of the STUDY file {default: STUDY.filepath}
-% 
+%   'savemode' - ['resave'|'standard'] in resave mode, the file name in
+%                the study is being used to resave it.
+%
+% Authors: Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, September 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, Spetember 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 function [STUDY] = pop_savestudy(STUDY, varargin);
 
 if nargin < 1
@@ -23,23 +45,36 @@ if length(STUDY) >1, error('pop_savestudy(): cannot save multiple STUDY sets'); 
 if nargin < 2
     % pop up window to ask for file type
     % ----------------------------------
-    [g.filename, g.filepath] = uiputfile2('*.study', ...
+    [filename, filepath] = uiputfile2('*.study', ...
                     'Save STUDY with .study extension -- pop_savestudy()'); 
-    if ~strncmp(g.filename(end-5:end), '.study',6)
-        if isempty(strfind(g.filename,'.'))
-            g.filename = [g.filename '.study'];
+    if isempty(filename), return; end;
+    if ~strncmp(filename(end-5:end), '.study',6)
+        if isempty(strfind(filename,'.'))
+            filename = [filename '.study'];
         else
-            g.filename = [g.filename(1:strfind(g.filename,'.')-1) '.study'];
+            filename = [filename(1:strfind(filename,'.')-1) '.study'];
         end
     end
+    options = { 'filename' filename 'filepath' filepath };
+else
+    options = varargin;
 end
 
-if nargin > 2 
-    options = varargin;
-    g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
-                            'filepath'   'string'   []     STUDY.filepath;});
-    if isstr(g), error(g); end;
-end
+% decoding parameters
+% -------------------
+g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
+                            'filepath'   'string'   []     STUDY.filepath;
+                            'savemode'   'string'   { 'standard' 'resave' } 'standard' });
+if isstr(g), error(g); end;
+
+% resave mode
+% -----------
+if strcmpi(g.savemode, 'resave')
+    disp('Re-saving study file');
+    g.filename = STUDY.filename;
+    g.filepth  = STUDY.filepth;
+end;
+
 if isempty(g.filename)
     disp('pop_savestudy(): no STUDY filename: make sure the STUDY has a filename');
     return;
