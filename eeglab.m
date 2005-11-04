@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.407  2005/11/03 18:26:54  arno
+% save study
+%
 % Revision 1.406  2005/11/03 16:43:09  arno
 % fix exist study
 %
@@ -2303,6 +2306,7 @@ if study_selected
     tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
     plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
     hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
+    data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
     set( edit_m, 'enable', 'off');
     set( plot_m, 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
@@ -2311,9 +2315,10 @@ if study_selected
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset'    ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study'      ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
     set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
