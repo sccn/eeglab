@@ -29,7 +29,10 @@
 %                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
 %                  Command line equivalent: 'icasphere'.
 %   "Data reference" - [text] to change data reference, use menu Tools > Re-reference
-%                  calling function pop_reref().
+%                  calling function pop_reref(). The reference can be a string, 
+%                  'common' indicating an unknow common reference, 'averef' indicating
+%                  average reference, or an array of integer containing the indices of
+%                  the reference channels.
 % Inputs:
 %   EEG          - EEG dataset structure
 %
@@ -98,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/11/04 22:42:12  arno
+% new fields, new gui
+%
 % Revision 1.44  2004/02/04 18:18:43  arno
 % implementing binary read for weights and sphere
 %
