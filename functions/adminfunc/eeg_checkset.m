@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.167  2005/11/04 22:18:31  arno
+% enforce new field order
+%
 % Revision 1.166  2005/10/11 23:02:32  arno
 % convert data to single
 %
@@ -1471,9 +1474,9 @@ else
     end;
 end;
 
-if ~isfield(EEG, 'subject')    EEG.subject    = []; res = com; end;
-if ~isfield(EEG, 'condition')  EEG.condition  = []; res = com; end;
-if ~isfield(EEG, 'group')      EEG.group      = []; res = com; end;
+if ~isfield(EEG, 'subject')    EEG.subject    = ''; res = com; end;
+if ~isfield(EEG, 'condition')  EEG.condition  = ''; res = com; end;
+if ~isfield(EEG, 'group')      EEG.group      = ''; res = com; end;
 if ~isfield(EEG, 'session')    EEG.session    = []; res = com; end;
 if ~isfield(EEG, 'urchanlocs') EEG.urchanlocs = []; res = com; end;
 if ~isfield(EEG, 'specdata')   EEG.specdata   = []; res = com; end;
