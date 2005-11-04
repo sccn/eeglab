@@ -544,6 +544,7 @@ else
                 % update Study history
                 a = ['STUDY = cls_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' new_name ');'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                new_name = STUDY.cluster(cls(clus_num)).name;
                 clus_name_list{clus_num+1} = [new_name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 set(findobj('parent', hdl, 'tag', 'clus_rename'), 'String', '');
@@ -718,7 +719,11 @@ else
                 clus_name_list{1} = [clus_name_list{1}(1:4) cent clus_name_list{1}(ti-1:end)]; %update list
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 % update Study history
-                a = ['STUDY = cls_createclust(STUDY, ALLEEG, ' clus_name ');'];
+                if isempty(clus_name)
+                    a = ['STUDY = cls_createclust(STUDY, ALLEEG);'];
+                else
+                    a = ['STUDY = cls_createclust(STUDY, ALLEEG, ' clus_name ');'];
+                end                
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 userdat{1}{2} = STUDY;
                 userdat{2} = userdat{2} + 1; % update N, the number of cluster options in edit window 
@@ -751,12 +756,16 @@ else
                       if ~isempty(STUDY.cluster(cls(k)).child) 
                           allleaves = 0;
                       end
-                  end
+                  end                     
                   [STUDY] = cls_mergeclust(STUDY, ALLEEG, cls_mrg, name); 
                   % 
                   % update Study history
                   % 
-                  a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) '], ' name ');'];
+                  if isempty(name)
+                      a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) ']);'];
+                  else
+                      a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) '], ' name ');'];
+                  end                  
                   STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                   userdat{1}{2} = STUDY;
                   %
