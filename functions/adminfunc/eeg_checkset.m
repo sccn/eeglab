@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.166  2005/10/11 23:02:32  arno
+% convert data to single
+%
 % Revision 1.165  2005/10/11 17:17:04  arno
 % move checks at the beginning
 %
@@ -1468,9 +1471,15 @@ else
     end;
 end;
 
-if ~isfield(EEG, 'specdata') EEG.specdata = []; res = com; end;
+if ~isfield(EEG, 'subject')    EEG.subject    = []; res = com; end;
+if ~isfield(EEG, 'condition')  EEG.condition  = []; res = com; end;
+if ~isfield(EEG, 'group')      EEG.group      = []; res = com; end;
+if ~isfield(EEG, 'session')    EEG.session    = []; res = com; end;
+if ~isfield(EEG, 'urchanlocs') EEG.urchanlocs = []; res = com; end;
+if ~isfield(EEG, 'specdata')   EEG.specdata   = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
-if ~isfield(EEG, 'comments') EEG.comments = ''; res = com; end;
+if ~isfield(EEG, 'comments')   EEG.comments   = ''; res = com; end;
+if ~isfield(EEG, 'etc'     )   EEG.etc        = []; res = com; end;
 if ~isfield(EEG, 'ref') | isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
 
 % create fields if absent
@@ -1494,39 +1503,90 @@ if ~isfield(EEG.reject, 'rejglobalE')        EEG.reject.rejglobalE = []; res = c
 
 % default colors for rejection
 % ----------------------------
-if ~isfield(EEG.reject, 'rejmanualcol')        EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end;
-if ~isfield(EEG.reject, 'rejthreshcol')        EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end;
-if ~isfield(EEG.reject, 'rejconstcol')        EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end;
-if ~isfield(EEG.reject, 'rejjpcol')            EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
-if ~isfield(EEG.reject, 'rejkurtcol')        EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end;
-if ~isfield(EEG.reject, 'rejfreqcol')        EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end;
-if ~isfield(EEG.reject, 'disprej')            EEG.reject.disprej      = { }; end;
+if ~isfield(EEG.reject, 'rejmanualcol')   EEG.reject.rejmanualcol = [1.0000    1     0.783]; res = com; end;
+if ~isfield(EEG.reject, 'rejthreshcol')   EEG.reject.rejthreshcol = [0.8487    1.0000    0.5008]; res = com; end;
+if ~isfield(EEG.reject, 'rejconstcol')    EEG.reject.rejconstcol  = [0.6940    1.0000    0.7008]; res = com; end;
+if ~isfield(EEG.reject, 'rejjpcol')       EEG.reject.rejjpcol     = [1.0000    0.6991    0.7537]; res = com; end;
+if ~isfield(EEG.reject, 'rejkurtcol')     EEG.reject.rejkurtcol   = [0.6880    0.7042    1.0000]; res = com; end;
+if ~isfield(EEG.reject, 'rejfreqcol')     EEG.reject.rejfreqcol   = [0.9596    0.7193    1.0000]; res = com; end;
+if ~isfield(EEG.reject, 'disprej')        EEG.reject.disprej      = { }; end;
     
-if ~isfield(EEG, 'stats')            EEG.stats.jp = []; res = com; end;
+if ~isfield(EEG, 'stats')           EEG.stats.jp = []; res = com; end;
 if ~isfield(EEG.stats, 'jp')        EEG.stats.jp = []; res = com; end;
-if ~isfield(EEG.stats, 'jpE')        EEG.stats.jpE = []; res = com; end;
-if ~isfield(EEG.stats, 'icajp')        EEG.stats.icajp = []; res = com; end;
+if ~isfield(EEG.stats, 'jpE')       EEG.stats.jpE = []; res = com; end;
+if ~isfield(EEG.stats, 'icajp')     EEG.stats.icajp = []; res = com; end;
 if ~isfield(EEG.stats, 'icajpE')    EEG.stats.icajpE = []; res = com; end;
-if ~isfield(EEG.stats, 'kurt')        EEG.stats.kurt = []; res = com; end;
-if ~isfield(EEG.stats, 'kurtE')        EEG.stats.kurtE = []; res = com; end;
-if ~isfield(EEG.stats, 'icakurt')    EEG.stats.icakurt = []; res = com; end;
-if ~isfield(EEG.stats, 'icakurtE')    EEG.stats.icakurtE = []; res = com; end;
+if ~isfield(EEG.stats, 'kurt')      EEG.stats.kurt = []; res = com; end;
+if ~isfield(EEG.stats, 'kurtE')     EEG.stats.kurtE = []; res = com; end;
+if ~isfield(EEG.stats, 'icakurt')   EEG.stats.icakurt = []; res = com; end;
+if ~isfield(EEG.stats, 'icakurtE')  EEG.stats.icakurtE = []; res = com; end;
 
 % component rejection
 % -------------------
 if ~isfield(EEG.stats, 'compenta')        EEG.stats.compenta = []; res = com; end;
 if ~isfield(EEG.stats, 'compentr')        EEG.stats.compentr = []; res = com; end;
-if ~isfield(EEG.stats, 'compkurta')        EEG.stats.compkurta = []; res = com; end;
-if ~isfield(EEG.stats, 'compkurtr')        EEG.stats.compkurtr = []; res = com; end;
+if ~isfield(EEG.stats, 'compkurta')       EEG.stats.compkurta = []; res = com; end;
+if ~isfield(EEG.stats, 'compkurtr')       EEG.stats.compkurtr = []; res = com; end;
 if ~isfield(EEG.stats, 'compkurtdist')    EEG.stats.compkurtdist = []; res = com; end;
-if ~isfield(EEG.reject, 'threshold')        EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end;
-if ~isfield(EEG.reject, 'threshentropy')    EEG.reject.threshentropy = 600; res = com; end;
-if ~isfield(EEG.reject, 'threshkurtact')    EEG.reject.threshkurtact = 600; res = com; end;
-if ~isfield(EEG.reject, 'threshkurtdist')    EEG.reject.threshkurtdist = 600; res = com; end;
-if ~isfield(EEG.reject, 'gcompreject')        EEG.reject.gcompreject = []; res = com; end;
+if ~isfield(EEG.reject, 'threshold')      EEG.reject.threshold = [0.8 0.8 0.8]; res = com; end;
+if ~isfield(EEG.reject, 'threshentropy')  EEG.reject.threshentropy = 600; res = com; end;
+if ~isfield(EEG.reject, 'threshkurtact')  EEG.reject.threshkurtact = 600; res = com; end;
+if ~isfield(EEG.reject, 'threshkurtdist') EEG.reject.threshkurtdist = 600; res = com; end;
+if ~isfield(EEG.reject, 'gcompreject')    EEG.reject.gcompreject = []; res = com; end;
 if length(EEG.reject.gcompreject) ~= size(EEG.icaweights,1)
     EEG.reject.gcompreject = zeros(1, size(EEG.icaweights,1));
 end;
+
+% remove old fields
+% -----------------
+if isfield(EEG, 'averef'), EEG = rmfield(EEG, 'averef'); end;
+if isfield(EEG, 'rt'    ), EEG = rmfield(EEG, 'rt');     end;
+
+% recorder fields
+% ---------------
+fieldorder = { 'setname' ...
+               'filename' ...
+               'filepath' ...
+               'subject' ...
+               'group' ...
+               'condition' ...
+               'session' ...
+               'comments' ...
+               'nbchan' ...
+               'trials' ...
+               'pnts' ...
+               'srate' ...
+               'xmin' ...
+               'xmax' ...
+               'ref' ...
+               'data' ...
+               'times' ...
+               'icaact' ...
+               'icawinv' ...
+               'icasphere' ...
+               'icaweights' ...
+               'chanlocs' ...
+               'chaninfo' ...
+               'urchanlocs' ...
+               'event' ...
+               'urevent' ...
+               'eventdescription' ...
+               'epoch' ...
+               'epochdescription' ...
+               'reject' ...
+               'stats' ...
+               'specdata' ...
+               'specicaact' ...
+               'splinefile' ...
+               'dipfit' ...
+               'history' ...
+               'saved' ... 
+               'etc' };
+
+% order fields
+% ------------
+fieldorder = [ fieldorder, setdiff(fieldnames(EEG), fieldorder) ];
+EEG = orderfields(EEG, fieldorder);
 
 return;    
 
