@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/09/27 22:01:28  arno
+% fix multiline text for windows
+%
 % Revision 1.13  2004/05/14 18:24:00  arno
 % fixing double quote problem
 %
@@ -107,7 +110,7 @@ if nargin < 3
 		BACKCOLOR  =  [.8 .8 .8];     
 		GUIBUTTONCOLOR   = [.8 .8 .8];    
 	end;
-	figure('menubar', 'none', 'color', BACKCOLOR, 'userdata', 0, ...
+	figure('menubar', 'none', 'tag', 'comment', 'color', BACKCOLOR, 'userdata', 0, ...
 		   'numbertitle', 'off', 'name', 'Read/Enter comments -- pop_comments()');
 	pos = get(gca,'position'); % plot relative to current axes
 	q = [pos(1) pos(2) 0 0];
@@ -125,7 +128,7 @@ if nargin < 3
   	'Units','Normalized', ...
 	'Position', [0 -5 20 10].*s+q, ...
 	'backgroundcolor', GUIBUTTONCOLOR, ...
-	'string','CANCEL', 'callback', 'close(gcbf);' );
+	'string','CANCEL', 'callback', 'close(findobj(''tag'', ''comment''));' );
 		
   	uicontrol('Parent',gcf, ...
   	'Units','Normalized', ...
@@ -174,7 +177,7 @@ if nargin < 3
     else return;
     end;
 
-	close(gcf);
+	close(findobj('tag', 'comment'));
 else
     if iscell(newcomments)
         newcomments = strvcat(newcomments{:});
