@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.408  2005/11/04 00:27:24  arno
+% study set etc...
+%
 % Revision 1.407  2005/11/03 18:26:54  arno
 % save study
 %
@@ -2142,7 +2145,8 @@ if exist_study
                   'eval(LASTCOM); eegh(LASTCOM);' ...
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
-    if isempty(tmp_m), tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on'); end;       
+    delete(tmp_m); % in case it is not at the end
+    tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on');
     set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
     delete( findobj('label', 'Select the study set') );
