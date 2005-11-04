@@ -2,15 +2,17 @@
 %
 % Usage:
 %   >> ALLEEG = pop_copyset(ALLEEG, index1); % pop-up
-%   >> ALLEEG = pop_copyset(ALLEEG, index1, index2 );
+%   >> [ ALLEEG EEG CURRENTSET ] = pop_copyset(ALLEEG, index1, index2 );
 %
 % Inputs:
-%   ALLEEG - array of dataset structure
-%   index1  - input dataset number
-%   index2  - index of dataset to copy into
+%   ALLEEG     - array of dataset structure
+%   index1     - input dataset number
+%   index2     - index of dataset to copy into
 %
 % Inputs:
-%   ALLEEG - array of dataset structures
+%   ALLEEG     - array of dataset structures
+%   EEG        - new copied structure
+%   CURRENTSET - index of the new dataset
 %
 % Note: this function performs ALLEEG(index2) = ALLEEG(index1);
 %       with dataset checks
@@ -38,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/02/21 00:24:08  arno
+% msg
+%
 % Revision 1.7  2002/11/15 02:18:25  scott
 % can not -> cannot
 %
@@ -63,7 +68,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [ALLEEG, com] = pop_copyset(ALLEEG, set_in, set_out);
+function [ALLEEG, EEG, CURRENTSET, com] = pop_copyset(ALLEEG, set_in, set_out);
 
 com = '';
 if nargin < 2
@@ -91,6 +96,8 @@ if nargin < 3
 	set_out   	 = eval( result{1} );
 end;
 ALLEEG = eeg_store(ALLEEG, eeg_retrieve(ALLEEG, set_in), set_out);
+EEG    = eeg_retrieve(ALLEEG, set_out);
+CURRENTSET = set_out;
 
-com = sprintf('%s = pop_copyset( %s, %d, %d);', inputname(1), inputname(1), set_in, set_out);
+com = sprintf('[ALLEEG EEG CURRENTSET] = pop_copyset( %s, %d, %d);', inputname(1), set_in, set_out);
 return;
