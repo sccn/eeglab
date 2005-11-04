@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2005/11/04 22:55:27  arno
+% changing field order
+%
 % Revision 1.169  2005/11/04 22:25:55  arno
 % saved field
 %
@@ -1475,11 +1478,11 @@ end;
 if (EEG.trials > 1)
     EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
 else
-    if isfield(EEG, 'times')
-        EEG = rmfield(EEG, 'times');
-    end;
+    EEG.times = [];
 end;
 
+if ~isfield(EEG, 'history')    EEG.history    = ''; res = com; end;
+if ~isfield(EEG, 'splinefile') EEG.splinefile = ''; res = com; end;
 if ~isfield(EEG, 'saved')      EEG.saved      = 'no'; res = com; end;
 if ~isfield(EEG, 'subject')    EEG.subject    = ''; res = com; end;
 if ~isfield(EEG, 'condition')  EEG.condition  = ''; res = com; end;
@@ -1490,6 +1493,7 @@ if ~isfield(EEG, 'specdata')   EEG.specdata   = []; res = com; end;
 if ~isfield(EEG, 'specicaact') EEG.specicaact = []; res = com; end;
 if ~isfield(EEG, 'comments')   EEG.comments   = ''; res = com; end;
 if ~isfield(EEG, 'etc'     )   EEG.etc        = []; res = com; end;
+if ~isfield(EEG, 'urevent' )   EEG.urevent    = []; res = com; end;
 if ~isfield(EEG, 'ref') | isempty(EEG.ref) EEG.ref = 'common'; res = com; end;
 
 % create fields if absent
