@@ -544,7 +544,6 @@ else
                 % update Study history
                 a = ['STUDY = cls_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' new_name ');'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                new_name = STUDY.cluster(cls(clus_num)).name;
                 clus_name_list{clus_num+1} = [new_name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 set(findobj('parent', hdl, 'tag', 'clus_rename'), 'String', '');
