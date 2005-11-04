@@ -4,7 +4,7 @@
 %   >> EEGOUT = pop_importdata( EEG ); % pop-up a data entry window 
 %   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
-% Graphic interface:
+% Graphic interface (refer to a previous version of the GUI):
 %   "EEGLAB dataset name" - [Edit box] name for the new dataset. 
 %                  Command line equivalent: 'setname'
 %   "Data file/array" - [Edit box] Data file or Matlab variable name to import
@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/11/04 22:42:00  arno
+% new fields etc...
+%
 % Revision 1.24  2004/03/26 23:21:57  arno
 % window width
 %

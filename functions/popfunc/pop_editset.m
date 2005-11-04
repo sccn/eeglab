@@ -4,7 +4,7 @@
 %   >> EEGOUT = pop_editset( EEG ); % pops-up a data entry window
 %   >> EEGOUT = pop_editset( EEG, 'key', val,...); % no pop-up window
 %
-% Graphic interface:
+% Graphic interface (refer to a previous version of the GUI):
 %   "EEGLAB dataset name" - [Edit box] Name for the new dataset. 
 %                  In the last column of the graphic interface, the "EEG.setname"
 %                  text indicates which field of the EEG structure this parameter
@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/11/04 22:43:46  arno
+% updating header
+%
 % Revision 1.45  2005/11/04 22:42:12  arno
 % new fields, new gui
 %
