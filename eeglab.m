@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.409  2005/11/04 22:47:38  arno
+% menu order in Datasets
+%
 % Revision 1.408  2005/11/04 00:27:24  arno
 % study set etc...
 %
@@ -1531,7 +1534,7 @@ checkepochicaplot = ['[EEG LASTCOM] = eeg_checkset(EEG, ''epoch'', ''ica'', ''ch
 % check string and backup old dataset
 % -----------------------------------
 backup =     [ 'if CURRENTSET ~= 0,' ...
-               '    ALLEEG = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
+               '    [ ALLEEG EEG ] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
                '    eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
                'end;' ];
 
