@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/10/01 22:29:38  arno
+% header
+%
 % Revision 1.45  2005/09/08 16:34:48  arno
 % fixing problem with changes_not_saved and saved'
 %
@@ -318,6 +321,17 @@ else
     else
         EEG.data        = EEG.data(g.loadmode,:,:);
     end;
+end;
+
+% set file name and path
+% ----------------------
+if length(EEG) == 1
+    if isempty(g.filepath)
+        [g.filepath g.filename ext] = fileparts(g.filename);
+        g.filename = [ g.filename ext ];
+    end;
+    EEG.filename = g.filename;
+    EEG.filepath = g.filepath;
 end;
 
 % set field indicating that the data has not been modified
