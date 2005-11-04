@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.168  2005/11/04 22:21:00  arno
+% same
+%
 % Revision 1.167  2005/11/04 22:18:31  arno
 % enforce new field order
 %
@@ -1474,6 +1477,7 @@ else
     end;
 end;
 
+if ~isfield(EEG, 'saved')      EEG.saved      = 'no'; res = com; end;
 if ~isfield(EEG, 'subject')    EEG.subject    = ''; res = com; end;
 if ~isfield(EEG, 'condition')  EEG.condition  = ''; res = com; end;
 if ~isfield(EEG, 'group')      EEG.group      = ''; res = com; end;
