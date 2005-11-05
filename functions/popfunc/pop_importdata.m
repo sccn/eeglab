@@ -5,8 +5,6 @@
 %   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
 % Graphic interface (refer to a previous version of the GUI):
-%   "EEGLAB dataset name" - [Edit box] name for the new dataset. 
-%                  Command line equivalent: 'setname'
 %   "Data file/array" - [Edit box] Data file or Matlab variable name to import
 %                  to EEGLAB. Command line equivalent: 'data'
 %   "Data file/array" - [list box] select data format from listbox. If you
@@ -15,25 +13,53 @@
 %                  his list box accordingly. Note that you have to click on
 %                  the option to make it active. Command line equivalent:
 %                  'dataformat'
+%   "Dataset name" - [Edit box] name for the new (EEGLAB) dataset. 
+%                  Command line equivalent: 'setname'
+%   "Time points per epoch" - [Edit box] Number of points per data epoch.
+%                  Irrelevant for continuous data. Command line equivalent: 'pnts'
+
+
+%   "Start time"   - [Edit box]
+
 %   "Number of channels" - [Edit box] Number of data channels. 
 %                  Command line equivalent: 'nbchan'
-%   "Time points per epoch" - [Edit box] Number of points per data epoch.
-%                  Irrelevant for continuous data. Command line equivalent: 'pnts' 
+%   "Ref. channel indices or mode - [Edit box]
+
+
+
+
 %   "Data sampling rate" - [Edit box] Command line equivalent: 'srate'
 %   "Optional epoch start time" - [Edit box] Command line equivalent: 'xmin'
 %   "Channel locations file or array" - [Edit box] see readlocs() help for
 %                  data channel format. Command line equivalent: 'chanlocs'
-%   "ICA weights array or text file" - [edit box] Use this option to import
+%   "ICA weights array or text/binary file" - [edit box] Use this option to import
 %                  ICA weights from other decompositions (for instance: same
 %                  data, different conditions). To use the ICA weights from
 %                  another loaded dataset (n) enter 'ALLEEG(n).icaweights'
 %                  in this edit box. Command line equivalent: 'icaweights'
-%   "ICA sphere array or text file" - [edit box] Import an ICA sphering matrix. 
+%   "ICA sphere array or text/binary file" - [edit box] Import an ICA sphering matrix. 
 %                  For computational reasons, an ICA decomposition may be defined 
 %                  by a sphere matrix and an unmixing (weight) matrix (above).
 %                  To use the ICA weights from another loaded dataset (n)
 %                  enter "ALLEEG(n).icasphere". If no sphering matrix, enter 
 %                  'eye(EEG.nbchan)'. Command line equivalent: 'icasphere'.
+
+
+
+
+%   "Subject code" - [Edit box]
+
+%   "Task Condition" - [Edit box]
+
+%   "Session number" - [Edit box]
+
+%   "Subject group" - [Edit box]
+
+%   "About this dataset" - [Edit box]
+
+
+
+
 % Optional inputs:
 %   'setname'    - ['string'] Name of the new EEGLAB dataset
 %   'data'       - ['varname'|'filename'] Data variable or file name to import.
@@ -87,6 +113,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/11/04 22:44:50  arno
+% header
+%
 % Revision 1.25  2005/11/04 22:42:00  arno
 % new fields etc...
 %
