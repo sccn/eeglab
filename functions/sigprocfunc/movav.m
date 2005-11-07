@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/11/07 19:25:14  scott
+% debugged nonorm -sm
+%
 % Revision 1.16  2005/11/07 19:03:58  scott
 % added nonorm option -sm
 %
@@ -106,8 +109,8 @@ function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm)
 
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
-verbose = 1;  % If 1, output process info
-debugit = 1;  % If 1, output more process info
+verbose = 0;  % If 1, output process info
+debugit = 0;  % If 1, output more process info
 
 nanexist = 0;  
 if nargin<1
