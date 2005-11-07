@@ -4,7 +4,7 @@
 %           (see NOTE below) and to regularize sampling of 
 %           irregularly sampled data.
 % Usage:
-%     >> [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin);
+%  >> [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm);
 %
 % Inputs:
 %   data   = input data (chans,frames)
@@ -16,8 +16,11 @@
 %   firstx = low xval of first averaging window {def|[] -> low xvals}
 %   lastx  = high xval of last averaging window {def|[] -> high xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
-%            Can be long; linear interp. is NOT used between values.
-%            Example: >> gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
+%            May be long: note linear interp. is NOT used between values.
+%            Example: gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
+%   nonorm = [1|0] If non-zero, do not normalize the moving sum, thereby
+%            creating a moving histogram (e.g., if all y values are 1).
+%            {default: 0}
 % Outputs:
 %   outdata = smoothed data (chans,
 %   outx    = xval midpoints of successive output data windows
@@ -43,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/05/28 21:09:24  scott
+% fixed 'fastave' bug
+%
 % Revision 1.14  2003/11/18 17:50:49  arno
 % remove nanmean and nansum
 %
@@ -98,6 +104,7 @@ MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
 verbose = 0;  % If 1, output process info
 debugit = 0;  % If 1, output more process info
+nonorm  = 0; % if non-zero, return moving sum
 
 nanexist = 0;  
 if nargin<1
@@ -140,6 +147,13 @@ end
 if fastave == 0 & frames ~= length(xvals)
     fprintf('movav(): columns in (%d) xvals vector and (%d) in data matrix must be equal.\n',length(xvals),size(data,2));
     return
+end
+
+if nargin < 8 | isempty(nonorm)
+  nonorm = 0;  % default -> return moving mean
+end
+if abs(nonorm) ~= 0
+   nonorm = 1;
 end
 
 if nargin < 7 | isempty(xwin)
@@ -257,8 +271,13 @@ for f=1:outframes
    elseif length(xwin)==1,
       if fastave
           outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
+          nix = length([round(lox):round(hix)]);
       else
           outdata(:,f) = nan_mean(data(:,i)')'; % Else average
+          nix = length(i);
+      end
+      if nonorm & nix % undo division by number of elements summed
+          outdata(:,f) = outdata(:,f)*nix;
       end
       if debugit
           fprintf('.');
@@ -266,7 +285,7 @@ for f=1:outframes
 %
 %%%%%%%%%%%%%%%%% Windowed averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-   else                                 
+   else % length(xwin) > 1
        if debugit
          fprintf('i %g, f %g\n',i,f);
        end
@@ -291,9 +310,12 @@ for f=1:outframes
             fprintf('0');
           end
          end
-       else
+       else % normalize
            outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
        end 
+       if nonorm & length(ix) % undo division by number of elements summed
+          outdata(:,f) = outdata(:,f)*sumx;
+       end
    end
    lox = lox+xadv;
    if (outframes<MAXPRINT) 
