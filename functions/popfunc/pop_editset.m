@@ -36,7 +36,7 @@
 %                  To use the ICA weights from another loaded dataset (n), enter 
 %                  ALLEEG(n).icaweights. Command line equivalent: 'icaweights'
 %   "ICA sphere array or text/binary file" - [edit box] Import ICA sphere matrix. 
-%                  Infomax ICA decompositions may be defined by a sphere matrix 
+%                  In EEGLAB, ICA decompositions require a sphere matrix 
 %                  and an unmixing weight matrix (see above).  To use the sphere 
 %                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
 %                  Command line equivalent: 'icasphere'.
@@ -75,31 +75,41 @@
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
 %                  'array' is a Matlab array in the global workspace.
 %                  'matlab' is a Matlab file (which must contain a single variable).
-%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bits
-%                  float data files (little endian or big endian byte ordering).
+%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bit
+%                  float data files with little-endian and big-endian byte order.
 %                  Data must be organised as (channels, timepoints) i.e. 
-%                  channels = rows and timepoints = columns or (channels, timepoints, 
-%                  epochs). For convenience, The data file is transposed if the number
-%                  of rows is larger than the number of columns.
-%   'subject'    - [string] subject code. For instance S01.
-%   'condition'  - [string] task condition.
-%   'group'      - [string] subject group. For instance 'patients' or 'control'.
-%   'session'    - [integer] session number. 
+%                  channels = rows, timepoints = columns; else, as 3-D (channels, 
+%WHY IS THIS?      timepoints, epochs). For convenience, the data file is transposed 
+%                  if the number of rows is larger than the number of columns.
+
+%   'subject'    - [string] subject code. For example, 'S01'.
+%                   {default: none -> each dataset from a different subject}
+%   'condition'  - [string] task condition. For example, 'Targets'
+%                   {default: none -> all datasets from one condition}
+%   'group'      - [string] subject group. For example 'Patients' or 'Control'.
+%                   {default: none -> all subjects in one group}
+%   'session'    - [integer] session number (from the same subject). All datasets
+%                   from the same subject and session will be assumed to use the
+%                   same ICA decomposition {default: none -> each dataset from
+%                   a different session}
 %   'chanlocs'   - ['varname'|'filename'] Import a channel location file.
-%                  For file formats, see >> help readlocs
+%                   For file formats, see >> help readlocs
 %   'nbchan'     - [int] Number of data channels. 
-%   'xmin'       - [real] Data start time (in seconds).
-%   'pnts'       - [int] Number of data points per epoch (epoched data only)
-%   'srate'      - [real] Data sampling rate in Hz. 
+%   'xmin'       - [real] Data epoch start time (in seconds).
+%                   {default: 0}
+%   'pnts'       - [int] Number of data points per data epoch. 
+%                   {default: length of the data -> continuous data assumed}
+% NO TRIALS variable?
+%   'srate'      - [real] Data sampling rate in Hz {default: ???}
 %   'ref'        - [string or integer] reference channel indices. 'averef' indicates
 %                  average reference. Note that this does not perform referencing
-%                  but only set the initial reference.
+% MEANING-> ??     but only sets the initial reference.
 %   'icaweight'  - [matrix] ICA weight matrix. 
 %   'icasphere'  - [matrix] ICA sphere matrix. By default, the sphere matrix 
 %                  is initialized to the identity matrix if it is left empty.
-%   'comments'   - [string] Comments on the dataset accessible through the EEGLAB
-%                  main menu (Edit > About This Dataset). Use this to attach 
-%                  background information about the data to the dataset.
+%   'comments'   - [string] Comments on the dataset, accessible through the EEGLAB
+%                  main menu using (Edit > About This Dataset). Use this to attach 
+%                  background information about the experiment or data to the dataset.
 % Outputs:
 %   EEGOUT       - Modified EEG dataset structure
 %
@@ -133,6 +143,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2005/11/05 03:10:36  toby
+% > Revised edition helpmenu outline
+%
 % Revision 1.47  2005/11/04 22:44:52  arno
 % header
 %
