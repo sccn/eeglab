@@ -20,7 +20,8 @@
 %            Example: gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
 %   nonorm = [1|0] If non-zero, do not normalize the moving sum, thereby
 %            creating a moving histogram (e.g., if all y values are 1).
-%            {default: 0}
+%            Ex: >> [oy,ox] = movav(ones(size(y)),x,xwd,xadv,[],[],0,1);
+%            returns a moving histogram of y  {default: 0}
 % Outputs:
 %   outdata = smoothed data (chans,
 %   outx    = xval midpoints of successive output data windows
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/11/07 19:03:58  scott
+% added nonorm option -sm
+%
 % Revision 1.15  2005/05/28 21:09:24  scott
 % fixed 'fastave' bug
 %
@@ -98,13 +102,12 @@
 % 9-03-01 fixed gauss() example -sm
 % 01-25-02 reformated help & licenses -ad 
 
-function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin)
+function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm)
 
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
-verbose = 0;  % If 1, output process info
-debugit = 0;  % If 1, output more process info
-nonorm  = 0; % if non-zero, return moving sum
+verbose = 1;  % If 1, output process info
+debugit = 1;  % If 1, output more process info
 
 nanexist = 0;  
 if nargin<1
@@ -120,7 +123,7 @@ if chans>1 & frames == 1,
   frames = tmp;
 end
 if frames < 4
-  fprintf('movav(): data size (%d,%d) is too short.]\n',chans,frames);
+  error('data are too short');
   return
 end
 
@@ -132,27 +135,24 @@ if isempty(xvals) | (numel(xvals) == 1 & size(data,2)>1)
   xvals = 1:size(data,2);
 end
 if size(xvals,1)>1 & size(xvals,2)>1
-  help movav
-  return
+  error('does not work on multi-channel data');
 end
 xvals = xvals(:)'; % make row vector
 if length(xvals)==1 
   if xvals(1)==0,
     fastave =1;
   else
-    help movav
-    return
+    error('data are too small');
   end
 end
 if fastave == 0 & frames ~= length(xvals)
-    fprintf('movav(): columns in (%d) xvals vector and (%d) in data matrix must be equal.\n',length(xvals),size(data,2));
-    return
+    error('sizes of xvals and data not equal');
 end
 
 if nargin < 8 | isempty(nonorm)
   nonorm = 0;  % default -> return moving mean
 end
-if abs(nonorm) ~= 0
+if abs(nonorm) > NEARZERO
    nonorm = 1;
 end
 
@@ -198,11 +198,9 @@ end
 wlen = 1;  % default;
 if fastave==0
   if length(xwin)==1 & xwin ~=0,  % should be a vector or 0
-    help movav
-    return
+    error('xwin not vector or 0');
   elseif size(xwin,1)>1 & size(xwin,2)>1 % not a matrix
-    help movav
-    return
+    error('xwin cannot be a matrix'); 
   end
   if size(xwin,1)>1
     xwin = xwin';   % make row vector
@@ -278,10 +276,9 @@ for f=1:outframes
       end
       if nonorm & nix % undo division by number of elements summed
           outdata(:,f) = outdata(:,f)*nix;
+      if debugit, fprintf('n'); end;
       end
-      if debugit
-          fprintf('.');
-      end
+      if debugit, fprintf('.'); end;
 %
 %%%%%%%%%%%%%%%%% Windowed averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -315,6 +312,7 @@ for f=1:outframes
        end 
        if nonorm & length(ix) % undo division by number of elements summed
           outdata(:,f) = outdata(:,f)*sumx;
+          if debugit, fprintf('n'); end;
        end
    end
    lox = lox+xadv;
