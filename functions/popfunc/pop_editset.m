@@ -12,23 +12,31 @@
 %                  Command line equivalent: 'setname'. 
 %   "Data sampling rate" - [Edit box] In Hz. Command line equivalent: 'srate'
 %   "Time points per epoch" - [Edit box] Number of data frames (points) per epoch.
-%                  Command line equivalent: 'pnts'
-
-
-
-%   "Start Time"   - [Edit box]
-
-%   "Number of channels" - [Edit box] Number of data channels. 
-%                  Command line equivalent: 'nbchan'
-%   "Ref. channel indices or mode - [Edit box]
-
-
-
-
-%   "Optional epoch start time" - [Edit box]  This edit box is only present for 
+%                  Changing this value will change the number of data epochs.
+%                  Command line equivalent: 'pnts'. 
+%   "Start time" - [Edit box]  This edit box is only present for 
 %                  data epoch and specify the epochs start time in ms. Epoch upper
 %                  time limit is automatically calculated. 
 %                  Command line equivalent: 'xmin'
+%   "Number of channels" - [Edit box] Number of data channels. Command line 
+%                  equivalent: 'nbchan'. This edit box cannot be edited.
+%   "Ref. channel indices or mode" - [edit box] current reference. This edit box
+%                  cannot be edited. To change data reference, use menu 
+%                  Tools > Re-reference calling function pop_reref(). The reference 
+%                  can be a string, 'common' indicating an unknow common reference, 
+%                  'averef' indicating average reference, or an array of integer 
+%                  containing the indices of the reference channels.
+%   "Subject code" - [Edit box] subject code. For example, 'S01'. See also command
+%                    line equivalent 'subject'.
+%   "Task Condition" - [Edit box] task condition. For example, 'Targets'. See also
+%                    command line equivalent 'condition'.
+%   "Session number" - [Edit box] session number (from the same subject). All datasets
+%                   from the same subject and session will be assumed to use the
+%                   same ICA decomposition. See also command line equivalent 'session'.
+%   "Subject group" - [Edit box] subject group. For example 'Patients' or 'Control'.
+%                   Command line equivalent is 'group'.
+%   "About this dataset" - [Edit box] Comments about the dataset. Command line 
+%                   equivalent is 'comments'.
 %   "Channel locations file or array" - [Edit box] For channel data formats, see 
 %                  >> readlocs help     Command line equivalent: 'chanlocs'
 %   "ICA weights array or text/binary file" - [edit box] Import ICA weights from other 
@@ -40,31 +48,10 @@
 %                  and an unmixing weight matrix (see above).  To use the sphere 
 %                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
 %                  Command line equivalent: 'icasphere'.
-
-
-% REMOVE?
-%   "Data reference" - [text] to change data reference, use menu Tools > Re-reference
-%                  calling function pop_reref(). The reference can be a string, 
-%                  'common' indicating an unknow common reference, 'averef' indicating
-%                  average reference, or an array of integer containing the indices of
-%                  the reference channels.
-% /REMOVE?
-
-
-
-%   "Subject code" - [Edit box]
-
-%   "Task Condition" - [Edit box]
-
-%   "Session number" - [Edit box]
-
-%   "Subject group" - [Edit box]
-
-%   "About this dataset" - [Edit box]
-
-
-
-
+%   "From other dataset" - [push button] Press this button and enter the index
+%                  of another dataset. This will update the channel location or the
+%                  ICA edit box.
+%
 % Inputs:
 %   EEG          - EEG dataset structure
 %
@@ -79,9 +66,9 @@
 %                  float data files with little-endian and big-endian byte order.
 %                  Data must be organised as (channels, timepoints) i.e. 
 %                  channels = rows, timepoints = columns; else, as 3-D (channels, 
-%WHY IS THIS?      timepoints, epochs). For convenience, the data file is transposed 
-%                  if the number of rows is larger than the number of columns.
-
+%                  timepoints, epochs). For convenience, the data file is transposed 
+%                  if the number of rows is larger than the number of columns as the
+%                  program assumes that there is more channel than data points. 
 %   'subject'    - [string] subject code. For example, 'S01'.
 %                   {default: none -> each dataset from a different subject}
 %   'condition'  - [string] task condition. For example, 'Targets'
@@ -97,13 +84,13 @@
 %   'nbchan'     - [int] Number of data channels. 
 %   'xmin'       - [real] Data epoch start time (in seconds).
 %                   {default: 0}
-%   'pnts'       - [int] Number of data points per data epoch. 
+%   'pnts'       - [int] Number of data points per data epoch. The number of trial
+%                  is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
-% NO TRIALS variable?
 %   'srate'      - [real] Data sampling rate in Hz {default: ???}
 %   'ref'        - [string or integer] reference channel indices. 'averef' indicates
 %                  average reference. Note that this does not perform referencing
-% MEANING-> ??     but only sets the initial reference.
+%                  but only sets the initial reference when the data is imported.
 %   'icaweight'  - [matrix] ICA weight matrix. 
 %   'icasphere'  - [matrix] ICA sphere matrix. By default, the sphere matrix 
 %                  is initialized to the identity matrix if it is left empty.
@@ -143,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2005/11/07 00:57:29  scott
+% added some defaults, detail and QUESTIONS... Please check. -sm
+%
 % Revision 1.48  2005/11/05 03:10:36  toby
 % > Revised edition helpmenu outline
 %
