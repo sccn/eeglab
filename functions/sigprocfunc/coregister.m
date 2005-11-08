@@ -23,6 +23,12 @@
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials default is 'on'.
 %
+% Output:
+%    chan1       - transformed channel location structure
+%    transform   - transformation matrix. Use function traditional() to 
+%                  convert to homogenous transformation matrix and input
+%                  it into functions like headplot().
+% 
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
         
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -44,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/11/08 22:48:05  arno
+% Initial revision
+%
 
 function [ chan1, transformmat ] = coregister(chan1, chan2, varargin)
 
