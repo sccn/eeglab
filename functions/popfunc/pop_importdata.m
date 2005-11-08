@@ -13,78 +13,95 @@
 %                  his list box accordingly. Note that you have to click on
 %                  the option to make it active. Command line equivalent:
 %                  'dataformat'
-%   "Dataset name" - [Edit box] name for the new (EEGLAB) dataset. 
-%                  Command line equivalent: 'setname'
-%   "Time points per epoch" - [Edit box] Number of points per data epoch.
-%                  Irrelevant for continuous data. Command line equivalent: 'pnts'
-
-
-%   "Start time"   - [Edit box]
-
-%   "Number of channels" - [Edit box] Number of data channels. 
-%                  Command line equivalent: 'nbchan'
-%   "Ref. channel indices or mode - [Edit box]
-
-
-
-
-%   "Data sampling rate" - [Edit box] Command line equivalent: 'srate'
-%   "Optional epoch start time" - [Edit box] Command line equivalent: 'xmin'
-%   "Channel locations file or array" - [Edit box] see readlocs() help for
-%                  data channel format. Command line equivalent: 'chanlocs'
-%   "ICA weights array or text/binary file" - [edit box] Use this option to import
-%                  ICA weights from other decompositions (for instance: same
-%                  data, different conditions). To use the ICA weights from
-%                  another loaded dataset (n) enter 'ALLEEG(n).icaweights'
-%                  in this edit box. Command line equivalent: 'icaweights'
-%   "ICA sphere array or text/binary file" - [edit box] Import an ICA sphering matrix. 
-%                  For computational reasons, an ICA decomposition may be defined 
-%                  by a sphere matrix and an unmixing (weight) matrix (above).
-%                  To use the ICA weights from another loaded dataset (n)
-%                  enter "ALLEEG(n).icasphere". If no sphering matrix, enter 
-%                  'eye(EEG.nbchan)'. Command line equivalent: 'icasphere'.
-
-
-
-
-%   "Subject code" - [Edit box]
-
-%   "Task Condition" - [Edit box]
-
-%   "Session number" - [Edit box]
-
-%   "Subject group" - [Edit box]
-
-%   "About this dataset" - [Edit box]
-
-
-
-
+%   "Dataset name" - [Edit box] Name for the new dataset. 
+%                  In the last column of the graphic interface, the "EEG.setname"
+%                  text indicates which field of the EEG structure this parameter
+%                  is corresponding to (in this case 'setname').
+%                  Command line equivalent: 'setname'. 
+%   "Data sampling rate" - [Edit box] In Hz. Command line equivalent: 'srate'
+%   "Time points per epoch" - [Edit box] Number of data frames (points) per epoch.
+%                  Changing this value will change the number of data epochs.
+%                  Command line equivalent: 'pnts'. 
+%   "Start time" - [Edit box]  This edit box is only present for 
+%                  data epoch and specify the epochs start time in ms. Epoch upper
+%                  time limit is automatically calculated. 
+%                  Command line equivalent: 'xmin'
+%   "Number of channels" - [Edit box] Number of data channels. Command line 
+%                  equivalent: 'nbchan'. This edit box cannot be edited.
+%   "Ref. channel indices or mode" - [edit box] current reference. This edit box
+%                  cannot be edited. To change data reference, use menu 
+%                  Tools > Re-reference calling function pop_reref(). The reference 
+%                  can be a string, 'common' indicating an unknow common reference, 
+%                  'averef' indicating average reference, or an array of integer 
+%                  containing the indices of the reference channels.
+%   "Subject code" - [Edit box] subject code. For example, 'S01'. See also command
+%                    line equivalent 'subject'.
+%   "Task Condition" - [Edit box] task condition. For example, 'Targets'. See also
+%                    command line equivalent 'condition'.
+%   "Session number" - [Edit box] session number (from the same subject). All datasets
+%                   from the same subject and session will be assumed to use the
+%                   same ICA decomposition. See also command line equivalent 'session'.
+%   "Subject group" - [Edit box] subject group. For example 'Patients' or 'Control'.
+%                   Command line equivalent is 'group'.
+%   "About this dataset" - [Edit box] Comments about the dataset. Command line 
+%                   equivalent is 'comments'.
+%   "Channel locations file or array" - [Edit box] For channel data formats, see 
+%                  >> readlocs help     Command line equivalent: 'chanlocs'
+%   "ICA weights array or text/binary file" - [edit box] Import ICA weights from other 
+%                  decompositions (e.g., same data, different conditions). 
+%                  To use the ICA weights from another loaded dataset (n), enter 
+%                  ALLEEG(n).icaweights. Command line equivalent: 'icaweights'
+%   "ICA sphere array or text/binary file" - [edit box] Import ICA sphere matrix. 
+%                  In EEGLAB, ICA decompositions require a sphere matrix 
+%                  and an unmixing weight matrix (see above).  To use the sphere 
+%                  matrix from another loaded dataset (n), enter ALLEEG(n).icasphere 
+%                  Command line equivalent: 'icasphere'.
+%   "From other dataset" - [push button] Press this button and enter the index
+%                  of another dataset. This will update the channel location or the
+%                  ICA edit box.
+%
 % Optional inputs:
-%   'setname'    - ['string'] Name of the new EEGLAB dataset
-%   'data'       - ['varname'|'filename'] Data variable or file name to import.
+%   'setname'    - Name of the EEG dataset
+%   'data'       - ['varname'|'filename'] Import data from a Matlab variable or file
+%                  into an EEG data structure 
 %   'dataformat' - ['array|matlab|ascii|float32le|float32be'] Input data format.
 %                  'array' is a Matlab array in the global workspace.
 %                  'matlab' is a Matlab file (which must contain a single variable).
-%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bits
-%                  float data files (little endian or big endian byte ordering).
+%                  'ascii' is an ascii file. 'float32le' and 'float32be' are 32-bit
+%                  float data files with little-endian and big-endian byte order.
 %                  Data must be organised as (channels, timepoints) i.e. 
-%                  channels = rows and timepoints = columns or (channels, timepoints, 
-%                  epochs). For convenience, the data file is transposed if the number
-%                  of rows is larger than the number of columns.
-%   'chanlocs'   - ['varname'|'filename'] Import a file containing electrode 
-%                  locations (see >> help readlocs for file format).
-%   'nbchan'     - Number of data channels. 
-%   'xmin'       - Starting time in seconds.
-%   'session'    - Session (day) on which the data was recorded. Just enter an
-%                  integer here (1, 2, 3, ...) not the actual date.
-%   'condition'  - Basic condition for the data.
-%   'group'      - Basic subject group for the data.
-%   'pnts'       - Number of data frames (time points) per data epoch (epoched data only).
-%   'srate'      - Data sampling rate in Hz.
-%   'icaweights' - ICA weight matrix. 
-%   'icasphere'  - ICA sphering matrix (if [], eye(nchans)).
-% 
+%                  channels = rows, timepoints = columns; else, as 3-D (channels, 
+%                  timepoints, epochs). For convenience, the data file is transposed 
+%                  if the number of rows is larger than the number of columns as the
+%                  program assumes that there is more channel than data points. 
+%   'subject'    - [string] subject code. For example, 'S01'.
+%                   {default: none -> each dataset from a different subject}
+%   'condition'  - [string] task condition. For example, 'Targets'
+%                   {default: none -> all datasets from one condition}
+%   'group'      - [string] subject group. For example 'Patients' or 'Control'.
+%                   {default: none -> all subjects in one group}
+%   'session'    - [integer] session number (from the same subject). All datasets
+%                   from the same subject and session will be assumed to use the
+%                   same ICA decomposition {default: none -> each dataset from
+%                   a different session}
+%   'chanlocs'   - ['varname'|'filename'] Import a channel location file.
+%                   For file formats, see >> help readlocs
+%   'nbchan'     - [int] Number of data channels. 
+%   'xmin'       - [real] Data epoch start time (in seconds).
+%                   {default: 0}
+%   'pnts'       - [int] Number of data points per data epoch. The number of trial
+%                  is automatically calculated.
+%                   {default: length of the data -> continuous data assumed}
+%   'srate'      - [real] Data sampling rate in Hz {default: ???}
+%   'ref'        - [string or integer] reference channel indices. 'averef' indicates
+%                  average reference. Note that this does not perform referencing
+%                  but only sets the initial reference when the data is imported.
+%   'icaweight'  - [matrix] ICA weight matrix. 
+%   'icasphere'  - [matrix] ICA sphere matrix. By default, the sphere matrix 
+%                  is initialized to the identity matrix if it is left empty.
+%   'comments'   - [string] Comments on the dataset, accessible through the EEGLAB
+%                  main menu using (Edit > About This Dataset). Use this to attach 
+%                  background information about the experiment or data to the dataset.
 % Outputs:
 %   EEGOUT      - modified EEG dataset structure
 %
@@ -113,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/11/05 03:10:27  toby
+% Revised edition helpmenu outline
+%
 % Revision 1.26  2005/11/04 22:44:50  arno
 % header
 %
