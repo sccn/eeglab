@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.134  2005/11/09 22:44:35  arno
+% plotting urchans correctly
+%
 % Revision 1.133  2005/11/09 00:42:30  arno
 % urchanlocs
 %
@@ -1126,14 +1129,24 @@ else
 		   if ~isempty(tmpargs), 
 			   if isstr(tmpargs)
 				   chans = readlocs(tmpargs);
+                   params.filename = tmpargs;
                else 
                    chans = readlocs(tmpargs{:});
+                   params.filename = tmpargs{1};
 			   end;
+               
+               % backup file content etc...
+               % --------------------------
+               tmptext         = loadtxt( params.filename, 'delim', [], 'verbose', 'off', 'convert', 'off');
+               params.filecontent = strvcat(tmptext{:});
+               
+               % set urchan structure
+               % --------------------
+               urchans = chans;
+               for index = 1:length(chans)
+                   chans(index).urchan = index;
+               end;
 		   end;
-           urchans = chans;
-           for index = 1:length(chans)
-               chans(index).urchan = index;
-           end;
            
           case 'eval'
 		   tmpargs = args{ curfield+1 };
