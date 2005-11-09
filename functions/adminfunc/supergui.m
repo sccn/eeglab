@@ -7,55 +7,49 @@
 %
 % Usage:
 %   >> [handlers, width, height ] = ...
-%             supergui( figh, geomx, geomy, { arguments1 }, { arguments2 }... );
+%             supergui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
-%   'geometry'   - see supergui()
-%   'uilist'     - list of uicontrol lists describing elements properties
-%                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
-%                  uicontrol arguments such as { 'style', 'radiobutton', 
-%                  'String', 'hello' }. See supergui() for details.
-%   'helpcom'    - optional help command 
-%   'title'      - optional figure title
-%   'userdata'   - optional userdata input for the figure
-%   'mode'       - ['normal'|'noclose'|'plot' fignumber]. Either wait for
-%                  user to press OK or CANCEL ('normal'), return without
-%                  closing window input ('noclose'), only draw the gui ('plot')
-%                  or process an existing window which number is given as 
-%                  input (fignumber). Default is 'normal'.
-%   'geomvert'   - vertical geometry argument, this argument is passed on to
-%                  supergui()
-%   figh    - figure handler, if 0 create a new figure
-%   geomx   - cell array describing the geometry of the elements
-%             in the figure. For instance, [2 3 2] means that the
-%             figures will have 3 rows, with 2 elements in the first
-%             and last row and 3 elements in the second row.
-%             An other syntax is { [2 8] [1 2 3] } which means
-%             that figures will have 2 rows, the first one with 2
-%             elements of relative width 2 and 8 (20% and 80%). The
-%             second row will have 3 elements of relative size 1, 2 
-%             and 3.
-%   geomy  - [array] describting geometry for the rows. For instance
-%            [1 2 1] means that the second row will be twice the height
-%            of the other ones. If [], all the lines have the same height.
-%  {argument} - GUI matlab element arguments. Ex { 'style', 
-%               'radiobutton', 'String', 'hello' }.
+%   'fig'       - figure handler, if not given, create a new figure.
+%   'geomhoriz' - cell array describing the geometry of the elements
+%               in the figure. For instance, [2 3 2] means that the
+%               figures will have 3 rows, with 2 elements in the first
+%               and last row and 3 elements in the second row.
+%               An other syntax is { [2 8] [1 2 3] } which means
+%               that figures will have 2 rows, the first one with 2
+%               elements of relative width 2 and 8 (20% and 80%). The
+%               second row will have 3 elements of relative size 1, 2 
+%               and 3.
+%   'geomvert' - describting geometry for the rows. For instance
+%               [1 2 1] means that the second row will be twice the height
+%               of the other ones. If [], all the lines have the same height.
+%   'uilist'   - list of uicontrol lists describing elements properties
+%               { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
+%               uicontrol arguments such as { 'style', 'radiobutton', 
+%               'String', 'hello' }. See supergui() for details.
+%   'title'    - optional figure title
+%   'userdata' - optional userdata input for the figure
+%   'inseth'   - horizontal space between elements. Default is 2% 
+%                of window size.
+%   'insetv'   - vertical space between elements. Default is 2% 
+%                of window height.
 %
 % Hint:
 %    use 'print -mfile filemane' to save a matlab file of the figure.
 %
 % Output:
-%    handlers  - all the handler of the elements (in the same form as the
-%                geometry cell input.
+%    handlers  - all the handler of the elements (in the same ordre as the
+%                uilist input).
 %    height    - adviced widht for the figure (so the text look nice).   
 %    height    - adviced height for the figure (so the text look nice).   
 %
 % Example:
 %    figure;   
-%    supergui( [1 1], [], { 'style', 'radiobutton', 'string', 'radio' }, ...
-%        { 'style', 'pushbutton', 'string', 'push' });
+%    supergui( 'geomhoriz', { 1 1 }, 'uilist', { ...
+%        { 'style', 'radiobutton', 'string', 'radio' }, ...
+%        { 'style', 'pushbutton' , 'string', 'push' } } );
 %      
-% Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 2001-
 %
 % See also: eeglab()
 
@@ -78,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2005/11/09 22:58:33  arno
+% changing inset default; rewrote function input
+%
 % Revision 1.42  2005/09/27 21:55:53  arno
 % change multiplicative factor
 %
@@ -229,10 +226,10 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      [];
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
                            'geomvert'  'real'   []      [];
-                           'insetx'    'real'   []      0.02; % x border absolute (5% of width)
-                           'insety'    'real'   []      0.02 }, 'supergui');
+                           'inseth'    'real'   []      0.02; % x border absolute (5% of width)
+                           'insetv'    'real'   []      0.02 }, 'supergui');
 if isstr(g), error(g); end;
-g.insety = g.insety/length(g.geomhoriz);
+g.insetv = g.insetv/length(g.geomhoriz);
 
 % create new figure
 % -----------------
@@ -259,14 +256,14 @@ for row = 1:length(g.geomhoriz)
 	tmprow = g.geomhoriz{row};
 	sumrow = sum(g.geomhoriz{row});
 	g.geomhoriz{row} = 1.05*g.geomhoriz{row}/sumrow;
-	g.geomhoriz{row} = g.geomhoriz{row} - g.insetx*(length(tmprow)-1)/length(tmprow);
+	g.geomhoriz{row} = g.geomhoriz{row} - g.inseth*(length(tmprow)-1)/length(tmprow);
 end;
 
 % setting relative height in percent
 % ---------------------------------
 sumcol = sum(g.geomvert);
 g.geomvert  = (1.03+0.003*sumcol)*g.geomvert/sumcol;
-g.geomvert  = g.geomvert - g.insety*(length(g.geomvert)-1)/length(g.geomvert);
+g.geomvert  = g.geomvert - g.insetv*(length(g.geomvert)-1)/length(g.geomvert);
 
 % get axis coordinates
 % --------------------
@@ -281,11 +278,11 @@ axis('off');
 counter = 1; % count the elements
 outwidth = 0;
 outheight = 0;
-%height = 1.05/(length(g.geomhoriz)+1)*(1-g.insety);
-%posy = 1 - height - 1/length(g.geomhoriz)*g.insety;
+%height = 1.05/(length(g.geomhoriz)+1)*(1-g.insetv);
+%posy = 1 - height - 1/length(g.geomhoriz)*g.insetv;
 factmultx = 0;
 factmulty = 0; %zeros(length(g.geomhoriz));
-posy = 0.98+(0.003*sumcol)/2+g.insety;
+posy = 0.98+(0.003*sumcol)/2+g.insetv;
 for row = 1:length(g.geomhoriz)
 
 	% init
@@ -293,7 +290,7 @@ for row = 1:length(g.geomhoriz)
 	clear rowhandle;
 	tmprow = g.geomhoriz{row};
     height = g.geomvert(row);
-	posy = posy - height - g.insety;
+	posy = posy - height - g.insetv;
 	
 	for column = 1:length(tmprow)
 
@@ -341,10 +338,10 @@ for row = 1:length(g.geomhoriz)
 		handlers{ row } = rowhandle;
 		allhandlers(counter) = rowhandle(column);
 		
-		posx   = posx + width + g.insetx;
+		posx   = posx + width + g.inseth;
 		counter = counter+1;
 	end;
-	%posy      = posy - height - 1/length(g.geomhoriz)*g.insety; %compensate for inset 
+	%posy      = posy - height - 1/length(g.geomhoriz)*g.insetv; %compensate for inset 
 end;
 
 % adjustments
