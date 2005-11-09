@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/11/09 23:06:29  arno
+% header
+%
 % Revision 1.43  2005/11/09 22:58:33  arno
 % changing inset default; rewrote function input
 %
