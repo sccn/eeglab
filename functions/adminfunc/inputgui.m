@@ -6,26 +6,28 @@
 %              you intend to put text buttons and descriptions.
 %
 % Usage:
-%   >> [ outparam ] = inputgui( geometry, listui );
+%   >> [ outparam ] = inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 %   >> [ outparam userdat strhalt] = ...
-%             inputgui( geometry, listui, help, title, userdat, mode, geomvert );
+%             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
-%   geometry   - see supergui()
-%   listui     - list of uicontrol lists describing elements properties
-%                { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
-%                uicontrol arguments such as { 'style', 'radiobutton', 
-%                'String', 'hello' }. See supergui() for details.
-%   help       - optional help command 
-%   title      - optional figure title
-%   userdat    - optional userdata input for the figure
-%   mode       - ['normal'|'noclose'|'plot' fignumber]. Either wait for
-%                user to press OK or CANCEL ('normal'), return without
-%                closing window input ('noclose'), only draw the gui ('plot')
-%                or process an existing window which number is given as 
-%                input (fignumber). Default is 'normal'.
-%   geomvert   - vertical geometry argument, this argument is passed on to
-%                supergui()
+%   'geometry'   - see supergui()
+%   'uilist'     - list of uicontrol lists describing elements properties
+%                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
+%                  uicontrol arguments such as { 'style', 'radiobutton', 
+%                  'String', 'hello' }. See supergui() for details.
+%   'helpcom'    - optional help command 
+%   'title'      - optional figure title
+%   'userdata'   - optional userdata input for the figure
+%   'mode'       - ['normal'|'noclose'|'plot' fignumber]. Either wait for
+%                  user to press OK or CANCEL ('normal'), return without
+%                  closing window input ('noclose'), only draw the gui ('plot')
+%                  or process an existing window which number is given as 
+%                  input (fignumber). Default is 'normal'.
+%   'geomvert'   - vertical geometry argument, this argument is passed on to
+%                  supergui()
+%   'eval'       - [string] command to evaluate at the end of the creation 
+%                  of the GUI but before waiting for user input. 
 %
 % Output:
 %   outparam   - list of outputs. The function scans all lines and
@@ -42,6 +44,11 @@
 % Note: the function also adds three buttons at the bottom of each 
 %       interactive windows: 'CANCEL', 'HELP' (if callback command
 %       is provided) and 'OK'.
+%
+% Example:
+%   res = inputgui('geometry', { 1 1 }, 'uilist', ...
+%                         { { 'style' 'text' 'string' 'Enter a value' } ...
+%                           { 'style' 'edit' 'string' '' } });
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 1 Feb 2002
 %
@@ -66,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/11/09 22:30:32  arno
+% new calling format
+%
 % Revision 1.26  2005/03/03 17:33:57  arno
 % *** empty log message ***
 %
@@ -172,6 +182,7 @@ g = finputcheck(options, { 'geometry' 'cell'   []      [];
                            'uilist'   'cell'   []      {};
                            'helpcom'  'string' []      '';
                            'title'    'string' []      '';
+                           'eval'     'string' []      '';
                            'userdata' ''       []      [];
                            'mode'     ''       []      'normal';
                            'geomvert' 'real'   []       [] }, 'inputgui');
@@ -209,6 +220,10 @@ else
 	allobj = findobj('parent',fig);
 	allobj = allobj(end:-1:1);
 end;
+
+% evaluate command before waiting?
+% --------------------------------
+if ~isempty(g.eval), eval(g.eval); end;
 
 % create figure and wait for return
 % ---------------------------------
