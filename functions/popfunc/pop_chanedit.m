@@ -114,8 +114,10 @@
 %                   do not have location.
 %
 % Outputs:
-%   newchans      - new EEGLAB channel locations structure
-%   options       - structure containing plotting options
+%   newchans      - new EEGLAB channel locations structure or EEG dataset with
+%                   updated channel location structures (EEG.chanlocs EEG.urchanlocs 
+%                   and EEG.chaninfo }.
+%   options       - structure containing plotting options (equivalent to EEG.chaninfo)
 %
 % Ex:  EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
 %          'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
@@ -145,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.132  2005/10/10 17:35:46  arno
+% fix problem when looking-up channel location file
+%
 % Revision 1.131  2005/09/27 21:56:25  arno
 % change aspect ratio for windows; remove channel locs when looking up location
 %
@@ -539,9 +544,9 @@
 % hidden parameter
 %   'gui' - [figure value], allow to process the same dialog box several times
 
-function [chansout, params, com] = pop_chanedit(chans, params, varargin);
+function [chansout, params, urchans, com] = pop_chanedit(chans, params, varargin);
 
-urchans  = chans;
+urchans  = [];
 chansout = chans;
 com ='';
 if nargin < 1
@@ -561,10 +566,13 @@ if isstruct(chans) & isfield(chans, 'chanlocs')
          params = EEG(1).chaninfo;
     else params = [];
     end;
+    if isfield(EEG, 'urchanlocs')
+         urchans = EEG.urchanlocs;
+    end;
 end;
 
 nbchan = length(chans);
-allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'datachan' };
+allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'urchan' };
 
 if isfield(chans, 'shrink')
     icadefs;
@@ -581,6 +589,12 @@ end;
 % dealing with additional parameters
 % ----------------------------------
 if nargin > 1 & ~isstr(params), % nothing
+    if nargin > 2
+        if ~isstr(varargin{1})
+            urchans  = varargin{1};
+            varargin = varargin(2:end);
+        end;
+    end;
 elseif nargin > 1
     varargin = { params varargin{:} };
     clear params;
@@ -590,6 +604,7 @@ else
     params.shrink  = [];
     params.plotrad = [];
 end;
+
 nosevals       = { '+X' '-X' '+Y' '-Y' };
 if ~isfield(params, 'plotrad')
     params.plotrad = [];
@@ -621,7 +636,7 @@ if nargin < 3
 		commentfields = { 'Channel label ("label")', 'Polar angle ("theta")', 'Polar radius ("radius")', ...
                           'Cartesian X ("X")', 'Cartesian Y ("Y")', 'Cartesian Z ("Z")', ...
 						  'Spherical horiz. angle ("sph_theta")', 'Spherical azimuth angle ("sph_phi")', ...
-                          'Spherical radius ("sph_radius")' 'Channel type' 'Associated data channel' };
+                          'Spherical radius ("sph_radius")' 'Channel type' 'Index in backup ''urchanlocs'' structure' };
 		% transfer channel to global workspace
 		global chantmp;
 		chantmp  = chans;
@@ -653,9 +668,6 @@ if nargin < 3
         %              'if tmpoptim, newcenter = []; end;' ...
         %              'set( gcbf, ''userdata'', { olduserdat{:} ''convert'', { ''chancenter'' newcenter 0 } });' ...
         %              'clear tmpcell olduserdat tmpoptim tpmpX tmpY tmpZ newcenter;' ];
-		shiftdatachan  = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ...
-                           'tmpshift = inputdlg2( { strvcat(''Enter shift of index from current channel to the last one'', ' ...
-                           '''(you may use positive or negative shifts)'') }, ''Channel data indices'' , 1, { ''+1'' }, ''pop_chanedit'');' ];
         
 		uiconvert = { { 'Style', 'pushbutton', 'string', 'Opt. head center', 'callback', ...
 						guicenter }, ...
@@ -677,15 +689,18 @@ if nargin < 3
 						[ headrad 'comtmp = {''headrad'' str2num(tmpres{1}) }; clear tmpres;' endgui] } ...
                       { 'Style', 'pushbutton', 'string', 'Set channel types', 'callback', ...
 						['comtmp = {''settype'' ' settype '};' endgui] } ...
-                      { 'style', 'pushbutton' , 'string', 'Shift data channels', 'callback', ...
-						[ shiftdatachan 'comtmp = {''shiftdatachans'' [ valnum str2num(tmpshift{1}) ] }; clear tmpshift valnum;' endgui] } };
+                      {  } };
+        
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
-			geometry = { geometry{:} [1.5 1 0.2 1] };
+			geometry = { geometry{:} [1.5 1 0.2 1] }; 
+            if strcmpi(allfields{index}, 'urchan'), style = 'text';
+            else                                    style = 'edit';
+            end;
 			uilist   = { uilist{:}, ...
 						 { 'Style', 'text', 'string', commentfields{index} }, ...
-						 { 'Style', 'edit', 'tag', [ 'chanedit' allfields{index}], 'string', ...
-                           num2str(getfield(chans,{1}, allfields{index})), 'callback', ...
+						 { 'Style', style, 'tag', [ 'chanedit' allfields{index}], 'string', ...
+                           num2str(getfield(chans,{1}, allfields{index})), 'horizontalalignment', 'center', 'callback', ...
 						   [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ' ...
                              '                   ''chaneditnumval''), ''string''));' ...
 							 'editval = get(gcbo, ''string'');' ...
@@ -795,7 +810,7 @@ if nargin < 3
         nosecallback = [ 'nosevals = { ''+X'' ''-X'' ''+Y'' ''-Y'' }; ' ...
                          'chaninfo.nosedir = nosevals{ get(gcbo, ''value'') };' ...
                          'clear noseval;' ];
-        lookuplocs = [ '[chantmp chaninfo comtmp] = pop_chanedit(chantmp, chaninfo, ''lookupgui'', []);' endgui ];
+        lookuplocs = [ '[chantmp chaninfo urchantmp comtmp] = pop_chanedit(chantmp, chaninfo, urchantmp, ''lookupgui'', []);' endgui ];
        
         switch upper(params.nosedir)
             case '+X', noseparam = 1;
@@ -853,7 +868,7 @@ if nargin < 3
 			tmpcom = evalin('base', 'comtmp');
             if ~isempty(tmpcom)
                 try, 
-                    [chans params ] = pop_chanedit(chans, params, tmpcom{:}); % apply modification to channel structure
+                    [chans params urchans] = pop_chanedit(chans, params, urchans, tmpcom{:}); % apply modification to channel structure
                     if iscell(tmpcom{2}) & (length(tmpcom{2}) == 2) & isstr(tmpcom{2}{2}) & strcmpi(tmpcom{2}{2}, 'gui'),
                         tmpcom = { tmpcom{1} tmpcom{2}{1} };
                     end;
@@ -925,8 +940,9 @@ if nargin < 3
         % -----------------
         if dataset_input
             for i = 1:length(EEG)
-                EEG(i).chanlocs = chans;
-                EEG(i).chaninfo = params;
+                EEG(i).chanlocs   = chans;
+                EEG(i).chaninfo   = params;
+                EEG(i).urchanlocs = urchans;
             end;
             chansout = EEG;
         else
@@ -1053,19 +1069,7 @@ else
            
 		  case 'delete'
 		   chans(args{ curfield+1 })=[];
-           
-		  case 'shiftdatachans'
-		   tmpargs = args{ curfield+1 };
-           for indtmp = tmpargs(1):tmpargs(1)+tmpargs(2)-1
-               chans(indtmp).datachan = [];
-           end;
-           for indtmp = max(1,tmpargs(1)+tmpargs(2)):length(chans)
-               chans(indtmp).datachan = chans(indtmp).datachan-tmpargs(2);
-           end;
-           for indtmp = length(chans)+tmpargs(2)+1:length(chans)
-               chans(indtmp).datachan = [];
-           end;
-           
+                      
           case 'changefield'
 		   tmpargs = args{ curfield+1 };
 		   if length( tmpargs ) < 3
@@ -1119,6 +1123,10 @@ else
                    chans = readlocs(tmpargs{:});
 			   end;
 		   end;
+           urchans = chans;
+           for index = 1:length(chans)
+               chans(index).urchan = index;
+           end;
            
           case 'eval'
 		   tmpargs = args{ curfield+1 };
@@ -1192,6 +1200,10 @@ else
                params.nosedir = '+Y';
            else
                params.nosedir = '+X';
+           end;
+           urchans = chans;
+           for index = 1:length(chans)
+               chans(index).urchan = index;
            end;
            
         case 'lookupgui'
