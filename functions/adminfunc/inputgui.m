@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2005/03/03 17:33:57  arno
+% *** empty log message ***
+%
 % Revision 1.25  2005/03/02 19:57:11  hilit
 % added a listbox object to the returned output structure
 %
@@ -146,44 +149,62 @@
 % 02/15/02 add userdat option -ad
 % 02/16/02 add figure title option -ad
 
-function [result, userdat, strhalt, resstruct] = inputgui( geometry, listui, helpcom, mytitle, userdat, mode, geomvert);
+function [result, userdat, strhalt, resstruct] = inputgui( varargin);
 
 if nargin < 2
    help inputgui;
    return;
 end;	
-if exist('mode') ~= 1
-	mode = 'normal';
+
+% decoding input and backward compatibility
+% -----------------------------------------
+if isstr(varargin{1})
+    options = varargin;
+else
+    options = { 'geometry' 'uilist' 'helpcom' 'title' 'userdata' 'mode' 'geomvert' };
+    options = { options{1:length(varargin)}; varargin{:} };
+    options = options(:)';
 end;
 
-if isstr(mode)
+% checking inputs
+% ---------------
+g = finputcheck(options, { 'geometry' 'cell'   []      [];
+                           'uilist'   'cell'   []      {};
+                           'helpcom'  'string' []      '';
+                           'title'    'string' []      '';
+                           'userdata' ''       []      [];
+                           'mode'     ''       []      'normal';
+                           'geomvert' 'real'   []       [] }, 'inputgui');
+if isstr(g), error(g); end;
+
+if isstr(g.mode)
 	fig = figure('visible', 'off');
-	if exist('mytitle') == 1, set(fig, 'name', mytitle); end;
-	if exist('userdat') == 1, set(fig, 'userdata', userdat); end; 
-	geometry = { geometry{:} [1] [1 1 1] }; % add button to geometry
+	set(fig, 'name', g.title);
+	set(fig, 'userdata', g.userdata);
+	g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
 	
-	% add the three buttons
-	% ---------------------
-	listui = { listui{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
-	if exist('helpcom') == 1 & ~isempty(helpcom)
-        if ~iscell(helpcom)
-            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', helpcom } };
+	% add the three buttons (CANCEL HELP OK) at the bottom of the GUI
+	% ---------------------------------------------------------------
+	g.uilist = { g.uilist{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
+	if ~isempty(g.helpcom)
+        if ~iscell(g.helpcom)
+            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', g.helpcom } };
         else
-            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'Help gui', 'callback', helpcom{1} } };
-            listui = { listui{:}, { 'Style', 'pushbutton', 'string', 'More help', 'callback', helpcom{2} } };
-            geometry{end} = [1 1 1 1];
+            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
+            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
+            g.geometry{end} = [1 1 1 1];
         end;
 	else
-		listui = { listui{:}, {} };
+		g.uilist = { g.uilist{:}, {} };
 	end;   
-	listui = { listui{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-	if exist('geomvert') ~= 1 | isempty(geomvert)
-		[tmp tmp2 allobj] = supergui( fig, geometry, [], listui{:} );
+	g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+	if isempty(g.geomvert)
+		[tmp tmp2 allobj] = supergui( fig, g.geometry, [], g.uilist{:} );
 	else
-		[tmp tmp2 allobj] = supergui( fig, geometry, [geomvert(:)' 1 1], listui{:} );
+		[tmp tmp2 allobj] = supergui( fig, g.geometry, [g.geomvert(:)' 1 1], g.uilist{:} );
 	end;
 else 
-	fig = mode;
+	fig = g.mode;
 	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
 	allobj = findobj('parent',fig);
 	allobj = allobj(end:-1:1);
@@ -191,7 +212,7 @@ end;
 
 % create figure and wait for return
 % ---------------------------------
-if isstr(mode) & strcmpi(mode, 'plot')
+if isstr(g.mode) & strcmpi(g.mode, 'plot')
    return; % only plot and returns
 else 
 	waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
@@ -226,7 +247,7 @@ if nargout >= 4
 	resstruct = myguihandles(fig);
 end;
 
-if isstr(mode) & strcmp(mode, 'normal')
+if isstr(g.mode) & strcmp(g.mode, 'normal')
 	close(fig);
 end;
 drawnow; % for windows
