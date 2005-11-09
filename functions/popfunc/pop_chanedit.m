@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2005/11/09 00:42:30  arno
+% urchanlocs
+%
 % Revision 1.132  2005/10/10 17:35:46  arno
 % fix problem when looking-up channel location file
 %
@@ -694,12 +697,9 @@ if nargin < 3
 		%{ 'Style', 'pushbutton', 'string', 'UNDO LAST ', 'callback', '' } { } { } };
 		for index = 1:length(allfields)
 			geometry = { geometry{:} [1.5 1 0.2 1] }; 
-            if strcmpi(allfields{index}, 'urchan'), style = 'text';
-            else                                    style = 'edit';
-            end;
 			uilist   = { uilist{:}, ...
 						 { 'Style', 'text', 'string', commentfields{index} }, ...
-						 { 'Style', style, 'tag', [ 'chanedit' allfields{index}], 'string', ...
+						 { 'Style', 'edit', 'tag', [ 'chanedit' allfields{index}], 'string', ...
                            num2str(getfield(chans,{1}, allfields{index})), 'horizontalalignment', 'center', 'callback', ...
 						   [ 'valnum   = str2num(get(findobj(''parent'', gcbf, ''tag'', ' ...
                              '                   ''chaneditnumval''), ''string''));' ...
@@ -720,7 +720,12 @@ if nargin < 3
 		callpart2 = [ 'set(findobj(''tag'', ''chaneditnumval''), ''string'', num2str(valnum));' ];
 		for index = 1:length(allfields)
 			callpart2 = [ callpart2  'set(findobj(''tag'', ''chanedit' allfields{index} ...
-						   '''), ''string'', num2str(chantmp(valnum).' allfields{index} '));' ];
+						   '''), ''horizontalalignment'', ''center'', ''string'', num2str(chantmp(valnum).' ...
+                          allfields{index} '));' ];
+            if strcmpi(allfields(index), 'urchan')
+                 callpart2 = [ callpart2  'set(findobj(''tag'', ''chanedit' allfields{index} ...
+                               '''), ''style'', ''text'', ''backgroundcolor'', [.66 .76 1]);' ];
+            end;
 		end;
 		callpart2 = [ callpart2 'set(findobj(''tag'', ''chaneditscantitle''), ' ...
 					  '''string'', [''Channel number (of '' int2str(length(chantmp)) '')'']);' ...
@@ -848,13 +853,15 @@ if nargin < 3
 %	    { 'Style', 'checkbox', 'tag', 'shrinkbut', 'string', ' Shrink to vertex', 'value', params.shrink } ...
 
 		if guimodif
-			set(currentfig, 'userdat', {});
+			set(currentfig, 'userdata', {});
 			eval([ callpart1 callpart2 ]);
 			[results userdat returnmode] = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', ...
                                                      'Edit channel info -- pop_chanedit()', {}, currentfig );
 		else 
-			[results userdat returnmode] = inputgui( geometry, uilist, 'pophelp(''pop_chanedit'');', ...
-                                                     'Edit channel info -- pop_chanedit()', {}, 'noclose' );
+            comeval = 'set(findobj( ''tag'', ''chanediturchan''), ''style'', ''text'', ''backgroundcolor'', [.66 .76 1] );';
+			[results userdat returnmode] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', ...
+                          'pophelp(''pop_chanedit'');', 'title', 'Edit channel info -- pop_chanedit()', ...
+                                                  'userdata', {}, 'mode', 'noclose', 'eval' , comeval );
 			if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
 		end; 
 		if length(results) == 0, com = ''; if dataset_input, chansout = EEG; end; return; end;
