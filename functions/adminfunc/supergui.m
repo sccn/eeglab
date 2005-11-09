@@ -10,6 +10,21 @@
 %             supergui( figh, geomx, geomy, { arguments1 }, { arguments2 }... );
 % 
 % Inputs:
+%   'geometry'   - see supergui()
+%   'uilist'     - list of uicontrol lists describing elements properties
+%                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
+%                  uicontrol arguments such as { 'style', 'radiobutton', 
+%                  'String', 'hello' }. See supergui() for details.
+%   'helpcom'    - optional help command 
+%   'title'      - optional figure title
+%   'userdata'   - optional userdata input for the figure
+%   'mode'       - ['normal'|'noclose'|'plot' fignumber]. Either wait for
+%                  user to press OK or CANCEL ('normal'), return without
+%                  closing window input ('noclose'), only draw the gui ('plot')
+%                  or process an existing window which number is given as 
+%                  input (fignumber). Default is 'normal'.
+%   'geomvert'   - vertical geometry argument, this argument is passed on to
+%                  supergui()
 %   figh    - figure handler, if 0 create a new figure
 %   geomx   - cell array describing the geometry of the elements
 %             in the figure. For instance, [2 3 2] means that the
@@ -63,6 +78,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2005/09/27 21:55:53  arno
+% change multiplicative factor
+%
 % Revision 1.41  2005/09/27 21:55:09  arno
 % remove *1.15 aspect ratio multuplication for Windows
 %
@@ -187,53 +205,72 @@
 % Initial revision
 %
 
-function [handlers, outheight, allhandlers] = supergui( fig, geomx, geomy, varargin);
+function [handlers, outheight, allhandlers] = supergui( varargin);
 
 % handlers cell format
 % allhandlers linear format
-
-INSETX = 0.05; % x border absolute (5% of width)
-INSETY = 0.05/length(geomx);  % y border relative (50% of heigth)  
 
 if nargin < 2
 	help supergui;
 	return;
 end;
-if fig == 0
-	fig = figure('visible','off');
+
+% decoding input and backward compatibility
+% -----------------------------------------
+if isstr(varargin{1})
+    options = varargin;
+else
+    options = { 'fig'      varargin{1} 'geomhoriz' varargin{2} ...
+                'geomvert' varargin{3} 'uilist'    varargin(4:end) }; 
+end;
+g = finputcheck(options, { 'geomhoriz' 'cell'   []      [];
+                           'fig'       'real'   []      0;
+                           'uilist'    'cell'   []      {};
+                           'title'     'string' []      '';
+                           'userdata'  ''       []      [];
+                           'geomvert'  'real'   []      [];
+                           'insetx'    'real'   []      0.02; % x border absolute (5% of width)
+                           'insety'    'real'   []      0.02 }, 'supergui');
+if isstr(g), error(g); end;
+g.insety = g.insety/length(g.geomhoriz);
+
+% create new figure
+% -----------------
+if g.fig == 0
+	g.fig = figure('visible','off');
 end;
 
 % converting the geometry formats
 % -------------------------------
-if ~iscell( geomx )
-	oldgeom = geomx;
-	geomx = {};
+if ~iscell( g.geomhoriz )
+	oldgeom = g.geomhoriz;
+	g.geomhoriz = {};
 	for row = 1:length(oldgeom)
-		geomx = { geomx{:} ones(1, oldgeom(row)) };
+		g.geomhoriz = { g.geomhoriz{:} ones(1, oldgeom(row)) };
 	end;
 end;
-if isempty(geomy)
-	geomy = ones(1, length(geomx));
+if isempty(g.geomvert)
+	g.geomvert = ones(1, length(g.geomhoriz));
 end;
 
 % setting relative width in percent
 % ---------------------------------
-for row = 1:length(geomx)
-	tmprow = geomx{row};
-	sumrow = sum(geomx{row});
-	geomx{row} = 1.05*geomx{row}/sumrow;
-	geomx{row} = geomx{row} - INSETX*(length(tmprow)-1)/length(tmprow);
+for row = 1:length(g.geomhoriz)
+	tmprow = g.geomhoriz{row};
+	sumrow = sum(g.geomhoriz{row});
+	g.geomhoriz{row} = 1.05*g.geomhoriz{row}/sumrow;
+	g.geomhoriz{row} = g.geomhoriz{row} - g.insetx*(length(tmprow)-1)/length(tmprow);
 end;
 
 % setting relative height in percent
 % ---------------------------------
-sumcol = sum(geomy);
-geomy  = (1.03+0.003*sumcol)*geomy/sumcol;
-geomy  = geomy - INSETY*(length(geomy)-1)/length(geomy);
+sumcol = sum(g.geomvert);
+g.geomvert  = (1.03+0.003*sumcol)*g.geomvert/sumcol;
+g.geomvert  = g.geomvert - g.insety*(length(g.geomvert)-1)/length(g.geomvert);
 
 % get axis coordinates
 % --------------------
-set(fig, 'menubar', 'none', 'numbertitle', 'off');		
+set(g.fig, 'menubar', 'none', 'numbertitle', 'off');		
 pos = get(gca,'position'); % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]; % allow to use normalized position [0 100] for x and y
@@ -244,31 +281,31 @@ axis('off');
 counter = 1; % count the elements
 outwidth = 0;
 outheight = 0;
-%height = 1.05/(length(geomx)+1)*(1-INSETY);
-%posy = 1 - height - 1/length(geomx)*INSETY;
+%height = 1.05/(length(g.geomhoriz)+1)*(1-g.insety);
+%posy = 1 - height - 1/length(g.geomhoriz)*g.insety;
 factmultx = 0;
-factmulty = 0; %zeros(length(geomx));
-posy = 0.98+(0.003*sumcol)/2+INSETY;
-for row = 1:length(geomx)
+factmulty = 0; %zeros(length(g.geomhoriz));
+posy = 0.98+(0.003*sumcol)/2+g.insety;
+for row = 1:length(g.geomhoriz)
 
 	% init
     posx = -0.05;
 	clear rowhandle;
-	tmprow = geomx{row};
-    height = geomy(row);
-	posy = posy - height - INSETY;
+	tmprow = g.geomhoriz{row};
+    height = g.geomvert(row);
+	posy = posy - height - g.insety;
 	
 	for column = 1:length(tmprow)
 
 		width  = tmprow(column);
 		try
-			currentelem = varargin{ counter };
+			currentelem = g.uilist{ counter };
 		catch
 			fprintf('Warning: not all boxes were filled\n');
 			return;
 		end;		
 		if ~isempty(currentelem)
-			rowhandle(column) = uicontrol(fig, 'unit', 'normalized', 'position', ...
+			rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
 						                      [posx posy width height].*s+q, currentelem{:});
 						
 			% this simply compute a factor so that all uicontrol will be visible
@@ -304,10 +341,10 @@ for row = 1:length(geomx)
 		handlers{ row } = rowhandle;
 		allhandlers(counter) = rowhandle(column);
 		
-		posx   = posx + width + INSETX;
+		posx   = posx + width + g.insetx;
 		counter = counter+1;
 	end;
-	%posy      = posy - height - 1/length(geomx)*INSETY; %compensate for inset 
+	%posy      = posy - height - 1/length(g.geomhoriz)*g.insety; %compensate for inset 
 end;
 
 % adjustments
@@ -337,14 +374,14 @@ warning on;
 
 % scale and replace the figure in the screen
 % -----------------------------------------
-pos = get(fig, 'position');
+pos = get(g.fig, 'position');
 if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
 pos(3) = pos(3)*factmultx;
 pos(4) = pos(4)*factmulty;
-set(fig, 'position', pos);
+set(g.fig, 'position', pos);
 
 % vertical alignment to bottom for text
 % ---------------------------------------
@@ -367,20 +404,20 @@ catch,
 	GUITEXTCOLOR        = [0 0 0];
 end;
 
-hh = findobj(allhandlers, 'parent', fig, 'style', 'text');
-%set(hh, 'BackgroundColor', get(fig, 'color'), 'horizontalalignment', 'left');
+hh = findobj(allhandlers, 'parent', g.fig, 'style', 'text');
+%set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-set(fig, 'color',GUIBACKCOLOR );
+set(g.fig, 'color',GUIBACKCOLOR );
 set(hh, 'horizontalalignment', 'left');
 
 hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
-hh =findobj(allhandlers, 'parent', fig, 'style', 'pushbutton');
+hh =findobj(allhandlers, 'parent', g.fig, 'style', 'pushbutton');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlers, 'parent', fig, 'style', 'checkbox');
+hh =findobj(allhandlers, 'parent', g.fig, 'style', 'checkbox');
 if isunix
 	set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 	set(hh, 'foregroundcolor', GUITEXTCOLOR);	
@@ -388,13 +425,17 @@ else
 	set(hh, 'backgroundcolor', GUIBACKCOLOR);
 	set(hh, 'foregroundcolor', GUITEXTCOLOR);
 end;
-hh =findobj(allhandlers, 'parent', fig, 'style', 'listbox');
+hh =findobj(allhandlers, 'parent', g.fig, 'style', 'listbox');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
-hh =findobj(allhandlers, 'parent', fig, 'style', 'radio');
+hh =findobj(allhandlers, 'parent', g.fig, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
+set(g.fig, 'visible', 'on');
 
-set(fig, 'visible', 'on');
+% set userdata and title
+% ----------------------
+if ~isempty(g.userdata), set(g.fig, 'userdata', g.userdata); end;
+if ~isempty(g.title   ), set(g.fig, 'name',     g.title   ); end;
 
 return;
