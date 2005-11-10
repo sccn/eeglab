@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/11/10 23:23:30  arno
+% nothing
+%
 % Revision 1.32  2005/10/11 16:17:49  arno
 % typo
 %
@@ -306,7 +309,6 @@ end;
 varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
 com = sprintf( '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
-com
 eval(com)
 
 return;
