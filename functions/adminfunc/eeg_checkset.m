@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.172  2005/11/07 19:40:39  arno
+% nothing
+%
 % Revision 1.171  2005/11/04 23:02:37  arno
 % fixing missing fields
 %
@@ -1305,6 +1308,8 @@ end;
 
     % check ica
     % ---------
+    if ~isfield(EEG, 'icachansind')    EEG.icachansind = [1:EEG.nbchan]; res = com; end;
+    eeg_optionsbackup;
     eeg_options; % changed from eeglaboptions 3/30/02 -sm
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
@@ -1325,9 +1330,9 @@ end;
                 end;    
             end;
             if isnumeric(EEG.data)
-                if size(EEG.icasphere,2) ~= size(EEG.data,1)
-                    if popask( [ 'eeg_checkset error: number of colums in sphere array (' int2str(size(EEG.icasphere,2)) ')' 10 ...
-                                 'does not match the number of rows in the sphere array (' int2str(size(EEG.data,1)) ')' 10 ...
+                if length(EEG.icachansind) ~= size(EEG.icasphere,2)
+                    if popask( [ 'eeg_checkset error: number of elements in ''icachansind'' (' int2str(length(EEG.icachansind)) ')' 10 ...
+                                 'does not match the number of columns in the sphere array (' int2str(size(EEG.icasphere,2)) ')' 10 ...
                                  'Should EEGLAB remove ICA information ?' 10 '(press Cancel to fix the problem from the commandline)']) 
                         res = com;
                         EEG.icasphere = [];
@@ -1354,7 +1359,7 @@ end;
                             EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
                             EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                         else
-                            EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(:,:);
+                            EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:);
                         end;
                         EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
                     end;
@@ -1581,6 +1586,7 @@ fieldorder = { 'setname' ...
                'icawinv' ...
                'icasphere' ...
                'icaweights' ...
+               'icachansind' ...
                'chanlocs' ...
                'urchanlocs' ...
                'chaninfo' ...
