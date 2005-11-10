@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2005/11/10 23:39:56  arno
+% fixing concatenated datasets
+%
 % Revision 1.59  2005/11/10 22:38:51  arno
 % channel type, concatenation etc...
 %
@@ -394,13 +397,6 @@ else
     EEG.pnts   = size(EEG.data,2);
 end;    
 
-% select sub_channels
-% -------------------
-if isempty(g.chanind)
-    g.chanind = 1:ALLEEG(1).nbchan;
-end;
-EEG.icachansind = g.chanind;
-
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
 fprintf('\n');
@@ -410,14 +406,23 @@ if ~isempty(EEG.icaweights)
     if ~isfield(EEG.etc,'oldicaweights')
         EEG.etc.oldicaweights = {};
         EEG.etc.oldicasphere = {};
+        EEG.etc.oldicachansind = {};
     end;
-    EEG.etc.oldicaweights = { EEG.icaweights EEG.etc.oldicaweights{:} };
-    EEG.etc.oldicasphere  = { EEG.icasphere  EEG.etc.oldicasphere{:}  };
+    EEG.etc.oldicaweights = { EEG.icaweights  EEG.etc.oldicaweights{:} };
+    EEG.etc.oldicasphere  = { EEG.icasphere   EEG.etc.oldicasphere{:}  };
+    EEG.etc.oldicasphere  = { EEG.icachansind EEG.etc.oldicachansind{:}  };
 end
 EEG.icaweights = [];
 EEG.icasphere  = [];
 EEG.icawinv    = [];
 EEG.icaact     = [];
+
+% select sub_channels
+% -------------------
+if isempty(g.chanind)
+    g.chanind = 1:ALLEEG(1).nbchan;
+end;
+EEG.icachansind = g.chanind;
 
 % is pca already an option?
 % -------------------------
