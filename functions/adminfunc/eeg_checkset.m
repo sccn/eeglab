@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.173  2005/11/10 22:38:17  arno
+% adding icachansind
+%
 % Revision 1.172  2005/11/07 19:40:39  arno
 % nothing
 %
@@ -1443,6 +1446,8 @@ end;
 if ~isfield(EEG, 'chaninfo')
     EEG.chaninfo = [];
 end;
+EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convinience
+
 %if ~isfield(EEG, 'urchanlocs')
 %    EEG.urchanlocs = EEG.chanlocs;
 %    for index = 1:length(EEG.chanlocs)
