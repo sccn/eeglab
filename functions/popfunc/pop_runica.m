@@ -11,7 +11,7 @@
 %   "Commandline options" - [edit box] Command line options to forward
 %                 to the ICA algorithm. Command line equivalent: 'options' 
 % Inputs:
-%   EEG         - input EEG dataset
+%   EEG         - input EEG dataset or array of datasets
 %
 % Optional inputs:
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
@@ -20,6 +20,11 @@
 %                 not been well characterized. Default is binica(), if
 %                 found, else runica().
 %   'dataset'   - [integer array] dataset indices.
+%   'chanind'   - [integer array] subset of channel indices for running
+%                 the ICA decomposition.
+%   'concatenate' - ['on'|'off'] 'on' concatenate all input datasets 
+%                 (assuming there are several). 'off' run ICA independently
+%                 on each dataset. Default is 'on'.
 %   'key','val' - ICA algorithm options (see ICA routine help messages).
 % 
 % Note:
@@ -64,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2005/11/10 02:25:48  arno
+% channel type GUI
+%
 % Revision 1.57  2005/10/11 17:32:06  scott
 % help message - note: binica.sc 'stop' default changed to 1e-7 from 1e-6
 %
@@ -255,7 +263,6 @@ allalgs   = { 'runica' 'binica' 'jader' 'jadeop' 'jade_td_p' 'MatlabshibbsR' 'fa
               'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'evd24' 'sons' 'sobi' 'ng_ol' ...
               'acsobiro' 'acrsobibpf' 'pearson_ica' 'egld_ica' 'eeA' 'tfbss' 'icaML' 'icaMS' }; % do not use egld_ica => too slow
 selectalg = {};
-
 linenb    = 1;
 count     = 1;
 for index = length(allalgs):-1:1
@@ -264,59 +271,101 @@ for index = length(allalgs):-1:1
     end;
 end;
 
-% decode input arguments
-% ----------------------
-pop_up = 0;
-if nargin < 2 
-    pop_up = 1;
-    g.defaultdataset = 1;
-else
-    if ~isstr(varargin{1})
-        g.icatype = varargin{1};
-        options    = varargin(2:end);
-    else
-        [ g options ] = finputcheck( varargin, { 'icatype'        'string'  allalgs   'runica'; ...
-                                                 'dataset'        'integer' []        1;
-                                                 'defaultdataset' 'integer' []        [] }, ...
-                                 'pop_runica', 'ignore');
-        if isstr(g), error(g); end;
-        if ~isempty(g.defaultdataset), pop_up = 1; end;
-    end;    
-end;
-
+% popup window parameters
+% -----------------------
 fig = [];
-if pop_up
-    % popup window parameters
-    % -----------------------
-	commandtype = ['tmptype = get(gcbf, ''userdata'');' ...
-		           '[tmps,tmpv, tmpstr] = listdlg2(''PromptString'',''Select type(s)'', ''ListString'', tmptype);' ...
-				   'if tmpv' ...
-				   '     set(findobj(''parent'', gcbf, ''tag'', ''chantype''), ''string'', tmpstr);' ...
-				   'end;' ...
-				   'clear tmps tmpv tmpstr tmptype;' ];
+if nargin < 2
+    commandchans = [ 'tmpchans = get(gcbf, ''userdata'');' ...
+                     'tmpchans = tmpchans{1};' ...
+                     'set(findobj(gcbf, ''tag'', ''chantype''), ''string'', ' ...
+                     '       int2str(pop_chansel( tmpchans )));' ...
+                     'clear tmpchans;' ];
+    commandtype = ['tmptype = get(gcbf, ''userdata'');' ...
+                   'tmptype = tmptype{2};' ...
+                   'if ~isempty(tmptype),' ...
+                   '    [tmps,tmpv, tmpstr] = listdlg2(''PromptString'',''Select type(s)'', ''ListString'', tmptype);' ...
+				   '    if tmpv' ...
+				   '        set(findobj(''parent'', gcbf, ''tag'', ''chantype''), ''string'', tmpstr);' ...
+				   '    end;' ...
+                   'else,' ...
+                   '    warndlg2(''No channel type'', ''No channel type'');' ...
+                   'end;' ...
+				   'clear tmps tmpv tmpstr tmptype tmpchans;' ];
     promptstr    = { { 'style' 'text'       'string' 'ICA algorithm to use (click to select)' } ...
                      { 'style' 'listbox'    'string' strvcat(allalgs{:}) } ...
                      { 'style' 'text'       'string' 'Commandline options (See algorithm help messages)' } ...
                      { 'style' 'edit'       'string' '' } ...
-                     { 'style' 'text'       'string' 'Run only on selected channel type(s)' } ...
+                     { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
-                     { 'style' 'pushbutton' 'string' 'Browse' 'callback' commandtype } };
-    if isfield(ALLEEG(1).chanlocs, 'type'), alltypes = unique( { ALLEEG(1).chanlocs.type } );
-    else                                    alltypes = [];
+                     { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
+                     { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
+    geometry = { [2 1] [2 1] [2 1 1 1] };
+    if length(ALLEEG) > 1
+        promptstr = { promptstr{:} ...
+                     { 'style' 'text'       'string' 'Concatenate all datasets (check=yes; uncheck=run ICA on each dataset)?' } ...
+                     { 'style' 'checkbox'   'string' '' 'value' 1 } };
+        geometry = { geometry{:} [ 2 0.2 ] };
+    end;                 
+    % channel types
+    % -------------
+    if isfield(ALLEEG(1).chanlocs, 'type'), alltypes = { ALLEEG(1).chanlocs.type };
+                                            indempty = cellfun('isempty', alltypes);
+                                            alltypes(indempty) = '';
+                                            alltypes = unique(alltypes);
+    else                                    alltypes = '';
     end;
-    result       = inputgui( 'geometry', { [2 1] [2 1] [2 1 1] }, 'uilist', promptstr, ...
+    
+    % channel labels
+    % --------------
+    if ~isempty(ALLEEG(1).chanlocs)
+        alllabels = { ALLEEG(1).chanlocs.labels };
+    else
+        for index = 1:length(ALLEEG(1).chanlocs)
+            alllabels{index} = int2str(index);
+        end;
+    end;
+    
+    % gui
+    % ---
+    result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
                              'helpcom', 'pophelp(''pop_runica'')', ...
-                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', alltypes );
-    if length(result) == 0 return; end;
-    g.icatype      = allalgs{result{1}};
-    g.dataset      = 1:length(ALLEEG);
-    options        = eval( [ '{' result{2} '}' ]);
+                             'title', 'Run ICA decomposition -- pop_runica()', 'userdata', { alllabels alltypes } );
+    if length(result) == 0 return; end;        
+    options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) };
+    if ~isempty(result{3})
+        if ~isempty(str2num(result{3})), options = { options{:} 'chanind' str2num(result{3}) };
+        else                             options = { options{:} 'chanind' eeg_chantype(ALLEEG(1).chanlocs, parsetxt(result{3})) }; 
+        end;
+    end;
+    if length(result) > 3
+        options = { options{:} 'concatenate' fastif(result{4}, 'on', 'off') };
+    end;
+else 
+    if ~strcmpi(varargin{1}, 'icatype')
+        options = { 'icatype' varargin(1:end) };
+    else
+        options = varargin;
+    end;
 end;
+
+% decode input arguments
+% ----------------------
+g = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+                            'dataset'        'integer' []        1;
+                            'options'        'cell'    []        {};
+                            'concatenate'    'string'  { 'on' 'off' }   'on';
+                            'chanind'        'integer' []        [];}, ...
+                                 'pop_runica', 'ignore');
+if isstr(g), error(g); end;
 
 % select datasets, create new big dataset if necessary
 % ----------------------------------------------------
 if length(g.dataset) == 1
     EEG = ALLEEG(g.dataset);
+elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on')
+    [ ALLEEG com ] = eeg_eval( 'pop_runica', ALLEEG, 'warning', 'off', 'params', ...
+           { 'icatype' g.icatype 'options' g.options 'chanind' g.chanind } );
+    return;
 else
     disp('Concatenating datasets...');
     EEG = ALLEEG(g.dataset(1));
@@ -342,6 +391,15 @@ else
     EEG.pnts   = size(EEG.data,2);
 end;    
 
+% select sub_channels
+% -------------------
+if isempty(g.chanind)
+    g.chanind = 1:ALLEEG(1).nbchan;
+end;
+for index = 1:length(EEG)
+    EEG(index).icachansind = g.chanind;
+end;
+
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
 fprintf('\n');
@@ -363,9 +421,9 @@ EEG.icaact     = [];
 % is pca already an option?
 % -------------------------
 pca_opt = 0;
-for i = 1:length(options)
-    if isstr(options{i})
-        if strcmpi(options{1}, 'pca')
+for i = 1:length(g.options)
+    if isstr(g.options{i})
+        if strcmpi(g.options{1}, 'pca')
             pca_opt = 1;
         end;
     end;
@@ -374,7 +432,7 @@ end;
 %------------------------------
 % compute ICA on a definite set
 % -----------------------------
-tmpdata = reshape( EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
+tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 switch lower(g.icatype)
     case 'runica' 
@@ -386,10 +444,10 @@ switch lower(g.icatype)
         end;
         tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(EEG.data,1) | pca_opt
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, options{:} );
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
      case 'binica'
         icadefs;
@@ -400,53 +458,53 @@ switch lower(g.icatype)
         end;
         tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(EEG.data,1) | pca_opt
-            [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, options{:} );
+            [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(EEG.data,1)) ').']);
-            [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, options{:} );
+            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
+            [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
      case 'pearson_ica' 
-        if isempty(options)
+        if isempty(g.options)
             disp('Warning: EEG default for pearson ICA changed to 1000 iterations and epsilon=0.0005');
             [tmp EEG.icaweights] = pearson_ica( tmpdata, 'maxNumIterations', 1000,'epsilon',0.0005);
         else    
-            [tmp EEG.icaweights] = pearson_ica( tmpdata, options{:});
+            [tmp EEG.icaweights] = pearson_ica( tmpdata, g.options{:});
         end;
      case 'egld_ica', disp('Warning: this algorithm is very slow!!!');
-                      [tmp EEG.icaweights] = egld_ica( tmpdata, options{:} );
+                      [tmp EEG.icaweights] = egld_ica( tmpdata, g.options{:} );
      case 'tfbss' 
-        if  isempty(options)
+        if  isempty(g.options)
              [tmp EEG.icaweights] = tfbss( tmpdata, size(tmpdata,1), 8, 512 );
         else    
-             [tmp EEG.icaweights] = tfbss( tmpdata, options{:} );
+             [tmp EEG.icaweights] = tfbss( tmpdata, g.options{:} );
         end;
-     case 'jader',         [EEG.icaweights] = jader( tmpdata, options{:} );
-     case 'matlabshibbsr', [EEG.icaweights] = MatlabshibbsR( tmpdata, options{:} );
-     case 'eea',           [EEG.icaweights] = eeA( tmpdata, options{:} );
-     case 'icaml',         [tmp EEG.icawinv] = icaML( tmpdata, options{:} );
-     case 'icams',         [tmp EEG.icawinv] = icaMS( tmpdata, options{:} );
-     case 'fastica',       [ ICAcomp, EEG.icawinv, EEG.icaweights] = fastica( tmpdata, 'displayMode', 'off', options{:} );
+     case 'jader',         [EEG.icaweights] = jader( tmpdata, g.options{:} );
+     case 'matlabshibbsr', [EEG.icaweights] = MatlabshibbsR( tmpdata, g.options{:} );
+     case 'eea',           [EEG.icaweights] = eeA( tmpdata, g.options{:} );
+     case 'icaml',         [tmp EEG.icawinv] = icaML( tmpdata, g.options{:} );
+     case 'icams',         [tmp EEG.icawinv] = icaMS( tmpdata, g.options{:} );
+     case 'fastica',       [ ICAcomp, EEG.icawinv, EEG.icaweights] = fastica( tmpdata, 'displayMode', 'off', g.options{:} );
      case { 'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'sons' ...
             'jadeop' 'jade_td_p' 'evd24' 'sobi' 'ng_ol' 'acrsobiro' 'acrsobibpf' } 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         
-        if isempty(options), options = { size(tmpdata,1) }; end;
+        if isempty(g.options), g.options = { size(tmpdata,1) }; end;
         switch lower(g.icatype)
-         case 'tica',     EEG.icaweights = tica( tmpdata, options{:} );
-         case 'erica',    EEG.icaweights = erica( tmpdata, options{:} );
-         case 'simbec',   EEG.icaweights = simbec( tmpdata, options{:} );
-         case 'unica',    EEG.icaweights = unica( tmpdata, options{:} );
+         case 'tica',     EEG.icaweights = tica( tmpdata, g.options{:} );
+         case 'erica',    EEG.icaweights = erica( tmpdata, g.options{:} );
+         case 'simbec',   EEG.icaweights = simbec( tmpdata, g.options{:} );
+         case 'unica',    EEG.icaweights = unica( tmpdata, g.options{:} );
          case 'amuse',    EEG.icaweights = amuse( tmpdata );
-         case 'fobi',     [tmp EEG.icaweights] = fobi( tmpdata, options{:} );
-         case 'evd',      EEG.icaweights = evd( tmpdata, options{:} );
-         case 'sons',     EEG.icaweights = sons( tmpdata, options{:} );
-         case 'jadeop',   EEG.icaweights = jadeop( tmpdata, options{:} );
-         case 'jade_td_p',EEG.icaweights = jade_td_p( tmpdata, options{:} );
-         case 'evd24',    EEG.icaweights = evd24( tmpdata, options{:} );
-         case 'sobi',     EEG.icawinv = sobi( EEG.data, options{:} );
-         case 'ng_ol',    [tmp EEG.icaweights] = ng_ol( tmpdata, options{:} );
-         case 'acsobiro', EEG.icawinv = acsobiro( EEG.data, options{:} );
-         case 'acrsobibpf', EEG.icawinv = acrsobibpf( tmpdata, options{:} );
+         case 'fobi',     [tmp EEG.icaweights] = fobi( tmpdata, g.options{:} );
+         case 'evd',      EEG.icaweights = evd( tmpdata, g.options{:} );
+         case 'sons',     EEG.icaweights = sons( tmpdata, g.options{:} );
+         case 'jadeop',   EEG.icaweights = jadeop( tmpdata, g.options{:} );
+         case 'jade_td_p',EEG.icaweights = jade_td_p( tmpdata, g.options{:} );
+         case 'evd24',    EEG.icaweights = evd24( tmpdata, g.options{:} );
+         case 'sobi',     EEG.icawinv = sobi( EEG.data, g.options{:} );
+         case 'ng_ol',    [tmp EEG.icaweights] = ng_ol( tmpdata, g.options{:} );
+         case 'acsobiro', EEG.icawinv = acsobiro( EEG.data, g.options{:} );
+         case 'acrsobibpf', EEG.icawinv = acrsobibpf( tmpdata, g.options{:} );
         end;
         clear tmp;
         close(fig);
@@ -473,6 +531,7 @@ if length(g.dataset) > 1
         ALLEEG(i).icaweights = EEG.icaweights;
         ALLEEG(i).icasphere  = EEG.icasphere;
         ALLEEG(i).icawinv    = EEG.icawinv;
+        ALLEEG(i).icachansind = g.chanind;
     end;            
     ALLEEG = eeg_checkset(ALLEEG);
 else
@@ -480,9 +539,9 @@ else
     ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
 end;
 
-if pop_up
+if nargin < 2
     com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
-                  vararg2str({ 'icatype' g.icatype 'dataset' g.dataset options{:} }) );
+                  vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
 end;
 
 return;
