@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2005/11/10 22:38:51  arno
+% channel type, concatenation etc...
+%
 % Revision 1.58  2005/11/10 02:25:48  arno
 % channel type GUI
 %
@@ -396,9 +399,7 @@ end;
 if isempty(g.chanind)
     g.chanind = 1:ALLEEG(1).nbchan;
 end;
-for index = 1:length(EEG)
-    EEG(index).icachansind = g.chanind;
-end;
+EEG.icachansind = g.chanind;
 
 % Store and then remove current EEG ICA weights and sphere
 % ---------------------------------------------------
@@ -443,7 +444,7 @@ switch lower(g.icatype)
             drawnow;
         end;
         tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        if tmprank == size(EEG.data,1) | pca_opt
+        if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
             disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
@@ -457,7 +458,7 @@ switch lower(g.icatype)
             error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
         end;
         tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        if tmprank == size(EEG.data,1) | pca_opt
+        if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
             disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
@@ -527,7 +528,7 @@ end;
 % copy back data to datasets if necessary
 % ---------------------------------------
 if length(g.dataset) > 1
-    for i = 1:g.dataset
+    for i = g.dataset
         ALLEEG(i).icaweights = EEG.icaweights;
         ALLEEG(i).icasphere  = EEG.icasphere;
         ALLEEG(i).icawinv    = EEG.icawinv;
