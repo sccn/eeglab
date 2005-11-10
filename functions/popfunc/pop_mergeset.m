@@ -294,19 +294,6 @@ else % INEEG is an EEG struct
 
     else % is ~isempty(INEEG2.event)
 
-		%{
-        if isfield( INEEG1.event, 'epoch')
-			for index = 1:length(INEEG2.event(:))
-				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1trials;
-			end;    
-		end;
-		if isfield( INEEG1.event, 'latency')
-			for index = 1:length(INEEG2.event(:))
-				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1trials*INEEG1pnts;
-			end;    
-		end;
-        %}
-
         % concatenate urevents
         % --------------------
         if isfield(INEEG2, 'urevent') 
@@ -343,14 +330,12 @@ else % INEEG is an EEG struct
         disp('Concatenating events...');
         orilen = length(INEEG1.event);
         allfields = fieldnames(INEEG2.event);
-        
+        % Toby 11/10/2005
 		%for i=1:length( allfields )
             for e=1:length(INEEG2.event)
                 INEEG1.event(orilen + e) = INEEG2.event(e);
                 INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
                 INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
-                %tmpval = getfield(INEEG2.event, { e }, allfields{i});
-                %INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
             end;
 		%end;
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
