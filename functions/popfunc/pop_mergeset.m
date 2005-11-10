@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2005/11/02 07:18:10  scott
+% disp() statements
+%
 % Revision 1.34  2005/10/14 18:55:27  hilit
 % fixed a bug that disabled merging epoched datasets
 %
@@ -192,13 +195,10 @@ if ~isstruct(INEEG2) % if INEEG2 is a vector of ALLEEG indices
 	end;
 
 	NEWEEG = eeg_retrieve(INEEG1, indices(1)); % why abandoned?
-	% NEWEEG  = INEEG1(indices(1));
 
-	for index = indices(2:end)
+	for index = 2:length(indices)
 		INEEG2 = eeg_retrieve(INEEG1, indices(index));
-		% INEEG2 = INEEG1(index);
-
-		NEWEEG = pop_mergeset(NEWEEG, INEEG2, keepall); % recursive call
+        NEWEEG = pop_mergeset(NEWEEG, INEEG2, keepall); % recursive call
 	end;
 	INEEG1 = NEWEEG;
 
@@ -294,7 +294,8 @@ else % INEEG is an EEG struct
 
     else % is ~isempty(INEEG2.event)
 
-		if isfield( INEEG1.event, 'epoch')
+		%{
+        if isfield( INEEG1.event, 'epoch')
 			for index = 1:length(INEEG2.event(:))
 				INEEG2.event(index).epoch = INEEG2.event(index).epoch + INEEG1trials;
 			end;    
@@ -304,6 +305,7 @@ else % INEEG is an EEG struct
 				INEEG2.event(index).latency = INEEG2.event(index).latency + INEEG1trials*INEEG1pnts;
 			end;    
 		end;
+        %}
 
         % concatenate urevents
         % --------------------
@@ -341,12 +343,16 @@ else % INEEG is an EEG struct
         disp('Concatenating events...');
         orilen = length(INEEG1.event);
         allfields = fieldnames(INEEG2.event);
-		for i=1:length( allfields )
+        
+		%for i=1:length( allfields )
             for e=1:length(INEEG2.event)
-                tmpval = getfield(INEEG2.event, { e }, allfields{i});
-                INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
+                INEEG1.event(orilen + e) = INEEG2.event(e);
+                INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
+                INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
+                %tmpval = getfield(INEEG2.event, { e }, allfields{i});
+                %INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
             end;
-		end;
+		%end;
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
 
         % add discontinuity event if continuous
