@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.3  2005/02/16 02:52:38  arno
+%debug sumary array size
+%
 %Revision 1.2  2005/02/15 02:21:43  arno
 %plot_indiv option
 %
@@ -67,7 +70,7 @@
 
 function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = subjerpimage( subjind, data, sortvar, times, titleim, movewin, decim, varargin );
     
-    plot_indiv = 0; % 0 or 1
+    plot_indiv = 1; % 0 or 1
     
     if nargin < 7
         help subjerpimage
