@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.261  2005/10/29 03:57:01  scott
+% chantype help
+%
 % Revision 1.260  2005/10/27 22:00:26  toby
 % adding channel type
 %
@@ -1128,9 +1131,6 @@ if nargs > 2
   end
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type(s), if specified %%%%%%%%%%%%%%%%%%%%% 
-%
-if CHOOSECHANTYPE, plotchans = eeg_chantype(loc_file,chantype); end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1189,22 +1189,6 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
        error('loc_file must be a EEG.locs struct or locs filename');
   end
 
-  %
-  %%%%%%%%%%% select channels using datachans
-  %
-  %if isfield(tmpeloc, 'datachan')
-  %    datachans  = [ tmpeloc.datachan ];
-  %    emptychans = find(cellfun('isempty', { tmpeloc.datachan }) == 1);
-  %    try,
-  %        Values = Values(datachans);
-  %
-  %        tmpeloc(emptychans) = [];
-  %        Th(emptychans) = [];
-  %        Rd(emptychans) = [];
-  %        indices(emptychans) = [];
-  %    catch, disp('Note: datachan inconsistency (information ignored)'); end;
-  %end;
-  
   if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
     tmpeloc(end) = [];
@@ -1222,32 +1206,60 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
   %
   %%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
   %
-  if length(Values) < length(tmpeloc) % if Values contains int channel indices to mark (STYLE'blank')
-    if isempty(plotchans)
-      if Values ~= abs(round(Values)) | min(abs(Values))< 1  % if not positive integer values
-        error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
-      elseif strcmpi(VERBOSE, 'on')
-          fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
-                                     max(indices),length(Values));
-          fprintf('            Marking the locations of the %d indicated channels.\n', ...
-                                      length(Values));
+  if length(Values) < length(tmpeloc) & strcmpi( STYLE, 'blank') % if Values contains int channel indices to mark (STYLE'blank')
+      if isempty(plotchans)
+          if Values ~= abs(round(Values)) | min(abs(Values))< 1  % if not positive integer values
+              if ~isfield(CHANINFO, 'icachansind')
+                  error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
+              end;
+          elseif strcmpi(VERBOSE, 'on')
+              fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
+                      max(indices),length(Values));
+              fprintf('            Marking the locations of the %d indicated channels.\n', ...
+                      length(Values));
+          end
+          plotchans = Values;
+          STYLE = 'blank'; % plot channels only, marking the indicated channel number
+          if strcmpi(ELECTRODES,'off')
+              ELECTRODES = 'on';
+          end
+      else
+          error('input ''plotchans'' not allowed when input data are channel numbers');
       end
-      plotchans = Values;
-      STYLE = 'blank'; % plot channels only, marking the indicated channel number
-      if strcmpi(ELECTRODES,'off')
-           ELECTRODES = 'on';
-      end
-    else
-      error('input ''plotchans'' not allowed when input data are channel numbers');
-    end
   end
   
   if ~isempty(plotchans)
-    if max(plotchans) > length(Th)
-      error('''plotchans'' values must be <= max channel index');
-    end
+      if max(plotchans) > length(Th)
+          error('''plotchans'' values must be <= max channel index');
+      end
   end
-  
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% channels to plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
+    plotchans = 1:length(Th);
+end
+if isempty(plotchans) & strcmpi( STYLE, 'blank')
+    plotchans = 1:length(Th);
+end
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type(s), if specified %%%%%%%%%%%%%%%%%%%%% 
+%
+
+if CHOOSECHANTYPE, plotchans = eeg_chantype(loc_file,chantype); end
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% filter channels used for components %%%%%%%%%%%%%%%%%%%%% 
+%
+if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= length(plotchans)
+    plotchans = intersect(CHANINFO.icachansind, plotchans);
+    tmpvals   = zeros(1, length(Th));
+    tmpvals(CHANINFO.icachansind) = Values;
+    Values    = tmpvals;
+end;
+
 %
 %%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -1261,20 +1273,13 @@ end;
 
 if length(Values) > 1
    if max(indices)>length(Values)
-      STYLE = 'blank';
+       STYLE = 'blank';
    else
-      Values = Values(indices);
+       Values = Values(indices);
    end
 end;
 labels = labels(indices); % remove labels for electrodes without locations
 labels = strvcat(labels); % make a label string matrix
-
-if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
-  plotchans = 1:length(Th);
-end
-if isempty(plotchans) & strcmpi( STYLE, 'blank')
-  plotchans = 1:length(Th);
-end
 
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1428,7 +1433,8 @@ if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
 		intValues = Values(intchans);
 		Values = Values(pltchans);
-	else if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
+	else 
+        if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
             tmpValues=[];
             cc=1;
             for kk=1:length(Values)
@@ -1686,7 +1692,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map and contours %%%%%%%%%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
-    if strcmp(SHADING,'interp')
+      if strcmp(SHADING,'interp')
        tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi)),Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
     else % SHADING == 'flat'
