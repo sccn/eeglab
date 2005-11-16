@@ -713,9 +713,7 @@ end
 %
 %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
 %
-toby.compnums = g.compnums;
 ntopos = length(g.compnums);
-toby.ntopos = ntopos;
 if ntopos > MAXTOPOS
       ntopos = MAXTOPOS; % limit the number of topoplots to display
 end
