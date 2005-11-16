@@ -92,6 +92,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2005/05/20 22:13:14  arno
+% remake the function backward compatible for channel locaiton
+% .,
+% ,
+%
 % Revision 1.93  2005/04/21 01:09:26  arno
 % chanlocs not mandatory
 %
@@ -654,21 +659,33 @@ end
 %
 %%%%%%%%%%%%%%% Subtract components from data if requested %%%%%%%%%%%%%
 %
+
+ncomps = length(g.compnums);
 if ~isempty(g.subcomps)
 	    fprintf('Subtracting requested components from plotting data: ');
             for c=g.subcomps
               fprintf('%d ',c);
             end
             fprintf('\n');
-	    tmpproj = icaproj(data,weights,g.subcomps); % updated arg list 12/00 -sm
-	    data = data - tmpproj;
-            clear tmpproj;
+            
+        g.icaact = weights*data;
+        for i = 1:ncomps
+            for subcompind = g.subcomps
+                if g.compnums(i) == subcompind
+                    g.icaact(i,:) = zeros(1,length(g.icaact(i,:)));
+                end
+            end
+        end
+        
+	    %tmpproj = icaproj(data,weights,g.subcomps) ; % updated arg list 12/00 -sm
+        %data = data - tmpproj;
+        %clear tmpproj;
 end;
-	    
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Process components %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-ncomps = length(g.compnums);
+
 for i=1:ncomps-1
     if g.compnums(i) == 0
 	       fprintf('Removing component number 0 in compnums.\n');
@@ -696,7 +713,9 @@ end
 %
 %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
 %
+toby.compnums = g.compnums;
 ntopos = length(g.compnums);
+toby.ntopos = ntopos;
 if ntopos > MAXTOPOS
       ntopos = MAXTOPOS; % limit the number of topoplots to display
 end
