@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2005/03/21 16:13:09  arno
+% highlight regions of significance at the end
+%
 % Revision 1.37  2004/09/14 09:30:04  arno
 % fix matlab 7
 %
@@ -771,7 +774,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     tmpreg = g.regions{c}(:,index);
                     figure(curfig); tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
                                                  [-100 -100 100 100], [0.9 0.9 0.9]); hold on;
-                    set(tmph, 'edgecolor', [0.9 0.9 0.9]);
+                    set(tmph, 'edgecolor', [0.9 0.9 0.9],'facealpha',0.5,'edgealpha',0.5);
                 end;
             end;
         end;
