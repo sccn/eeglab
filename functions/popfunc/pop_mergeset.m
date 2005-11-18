@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2005/11/10 23:42:03  toby
+% edit to be compatible with Matlab 5
+%
 % Revision 1.35  2005/11/02 07:18:10  scott
 % disp() statements
 %
@@ -332,11 +335,18 @@ else % INEEG is an EEG struct
         allfields = fieldnames(INEEG2.event);
         % Toby 11/10/2005
 		%for i=1:length( allfields )
+
             for e=1:length(INEEG2.event)
+                % Will break if 'event' doesn't have the same subfields, need to fix this. 
                 INEEG1.event(orilen + e) = INEEG2.event(e);
-                INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
-                INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
+                if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
+                    INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
+                end
+                if isfield(INEEG1.event,'epoch') & isfield(INEEG2.event,'epoch')
+                    INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
+                end
             end;
+       
 		%end;
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
 
@@ -346,7 +356,7 @@ else % INEEG is an EEG struct
             disp('Adding boundary event...');
             INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+1, 0); % +1 since 0.5 is subtracted
         end;
- 
+
 	end;
         
 	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
@@ -367,6 +377,9 @@ else % INEEG is an EEG struct
         disp('Reconstituting epoch information...');
         INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
     end;
+     global toby
+        toby.orilen = orilen;
+        toby.event = INEEG1.event;
 end;
 
 % build the command
