@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2005/09/27 21:58:09  arno
+% disable all fields for boundary events
+%
 % Revision 1.41  2005/05/24 17:34:59  arno
 % remove cell2mat
 %
@@ -502,6 +505,9 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           end;
       end;
       
+      % Toby edit 11/16/2005 This section is scrambling the eeg.event
+      % fields. Requires further investigation.
+      %{
       if ~isempty(field2)
           if ~isstr(getfield( EEG.event(1), field2 ))
                eval(['tmparray = [ EEG.event.' field2 ' ];']);
@@ -526,6 +532,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       [X I] = mysort( tmparray );
       if dir1 == 1, I = I(end:-1:1); end;
       EEG.event = events(I);
+      %}
       
       if gui
           % warn user
