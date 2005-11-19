@@ -507,15 +507,22 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       
       % Toby edit 11/16/2005 This section is scrambling the eeg.event
       % fields. Requires further investigation.
-      %{
+ 
       if ~isempty(field2)
           if ~isstr(getfield( EEG.event(1), field2 ))
                eval(['tmparray = [ EEG.event.' field2 ' ];']);
           else eval(['tmparray = { EEG.event.' field2 ' };']);
-          end;
-          if strcmp(field2, 'latency') & EEG.trials > 1
-              tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
-          end;
+          end
+          % Commented out 11/18/2005, Toby
+          % These lines were incorrectly sorting the event.latency field in
+          % units of time (seconds) relevant to each event's relative
+          % latency time as measured from the start of each epoch. It is
+          % possible that there are occasions when it is desirable to do
+          % so, but in the case of pop_mergset() it is not. 
+          
+          %if strcmp(field2, 'latency') & EEG.trials > 1
+          %    tmparray = eeg_point2lat(tmparray, {EEG.event.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
+          %end;
           [X I] = mysort( tmparray );
           if dir2 == 1, I = I(end:-1:1); end;
           events = EEG.event(I);
@@ -526,13 +533,14 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
            eval(['tmparray = [ EEG.event.' field1 ' ];']);
       else eval(['tmparray = { EEG.event.' field1 ' };']);
       end;
-      if strcmp( field1, 'latency') & EEG.trials > 1
-          tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
-      end;
+      % Commented out 11/18/2005, Toby
+      %if strcmp( field1, 'latency') & EEG.trials > 1
+      %    tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
+      %end;
       [X I] = mysort( tmparray );
       if dir1 == 1, I = I(end:-1:1); end;
       EEG.event = events(I);
-      %}
+
       
       if gui
           % warn user
