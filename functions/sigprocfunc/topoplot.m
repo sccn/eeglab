@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.262  2005/11/11 00:58:03  arno
+% nothing
+%
 % Revision 1.261  2005/10/29 03:57:01  scott
 % chantype help
 %
@@ -1644,8 +1647,13 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         amin = min(min(gridvalues(~isnan(gridvalues))));
         amax = max(max(gridvalues(~isnan(gridvalues))));
       elseif strcmp(MAPLIMITS,'absmax')
-        amin = -max(max(abs([amin amax])));
-        amax = max(max(abs([amin amax])));
+        % 11/21/2005 Toby edit
+        % This should now work as specified. Before it only crashed (using
+        % "plotgrid" and "maplimits>absmax" options).
+        amax = max(max(abs(gridvalues(~isnan(gridvalues)))));
+        amin = -amax;
+        %amin = -max(max(abs([amin amax])));
+        %amax = max(max(abs([amin amax])));
       else
         error('unknown ''maplimits'' value');
       end
