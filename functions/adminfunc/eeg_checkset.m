@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2005/11/10 23:48:27  arno
+% copying icachansind
+%
 % Revision 1.173  2005/11/10 22:38:17  arno
 % adding icachansind
 %
@@ -1638,5 +1641,12 @@ function res = mycellfun(com, vals, classtype);
           error('unknown cellfun command');
       end;
      otherwise error('unknown cellfun command');
+    end;
+    
+function newfields = orderfields(fields, neworder);
+    
+    newfields = [];
+    for index = 1:length(neworder)
+        newfields = setfield(newfields, neworder{index}, getfield(fields, neworder{index}));
     end;
     
