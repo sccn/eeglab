@@ -14,22 +14,21 @@
 %                  in the ALLEEG structure are updated, and updated EEG sets are saved to disk.
 %                  Calls eeg_preclust().
 % Usage:    
-%                >> [ALLEEG, STUDY] = pop_preclust(ALLEEG, STUDY); % pop up interactive window
-%                >> [ALLEEG, STUDY] = pop_preclust(ALLEEG, STUDY, clustind); % sub-cluster 
+%                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
+%                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
 %
 % Graphic interface:
 % Inputs:
-%   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
 %   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
-%
+%   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
 %   clustind     - a (single) cluster index for sub-clustering (hierarchical clustering) --
 %                  for example to cluster a mu component cluster into left mu and right mu 
 %                  sub-clusters. Should be empty for top level (whole STUDY) clustering 
 %                  {default: []}
 % Outputs:
+%   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding preprocessing 
 %                  data (pointers to float files that hold ERSP, spectrum, etc. information).
-%   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
 %
 % Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
@@ -51,14 +50,15 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ALLEEG, STUDY] = pop_preclust(varargin)
+function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 
+com = '';
 if ~isstr(varargin{1}) %intial settings
     if length(varargin) < 2
         error('pop_preclust(): needs both ALLEEG and STUDY structures');
     end
-    ALLEEG = varargin{1};
-    STUDY= varargin{2};
+    STUDY  = varargin{1};
+    ALLEEG = varargin{2};
     if length(varargin) >= 3
         if length(varargin{3}) > 1
             error('pop_preclust(): To cluster components from several clusters, merge them first!');
