@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2005/09/27 21:59:03  arno
+% pop-up if resaving a file that has not been saved yet
+%
 % Revision 1.58  2005/09/13 22:58:22  arno
 % handle canceling save
 %
@@ -297,6 +300,7 @@ end
 % --------------------
 save_as_dat_file = 0;
 if strcmpi(g.savemode, 'resave')
+    if strcmpi( EEG.saved, 'yes'), return; end;
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
@@ -330,18 +334,25 @@ end;
 % -------------------------------
 tmpica       = EEG.icaact;
 EEG.icaact   = [];
-tmpdata      = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+if ~isstr(EEG.data)
+    tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+    no_resave_dat = 'no';
+else 
+    no_resave_dat = 'yes';
+end;
 v = version;
 %try, 
     fprintf('Saving dataset...\n');
     if save_as_dat_file
-        EEG.data = EEG.datfile;
-        floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+        if ~isstr(EEG.data)
+            EEG.data = EEG.datfile;
+            floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+        end;
     end;
     if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
     else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end;
-    if save_as_dat_file
+    if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end;
 %catch,
