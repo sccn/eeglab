@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.416  2005/11/22 23:12:34  arno
+% clear study if restarting EEGLAB
+%
 % Revision 1.415  2005/11/22 23:11:25  arno
 % same
 %
@@ -1500,6 +1503,7 @@ evalin('caller', comtmp, '');
 evalin('base', 'eeg_global;');
 if nargin < 1 | exist('EEG') ~= 1
 	clear global EEG ALLEEG CURRENTSET ALLCOM LASTCOM STUDY;
+    CURRENTSTUDY = 0;
 	eeg_global;
 	EEG = eeg_emptyset;
 	eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
