@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/11/08 23:08:55  arno
+% header
+%
 % Revision 1.1  2005/11/08 22:48:05  arno
 % Initial revision
 %
@@ -58,10 +61,10 @@ function [ chan1, transformmat ] = coregister(chan1, chan2, varargin)
 
 if nargin < 1
     % chan1 = readlocs('/home/arno/P3FigArno/juliedata/jop3_raw.elp');
-    chan1 = readlocs('/home/arno/P3FigArno/arnodata/ad-256.elp');
+    chan1 = readlocs('D:\data\arnodata\ad-256.elp');
    % manually for Arno:  transf = [4 0 -50 -0.3 0 -1.53 1.05 1.1 1.1]
    % manually for Julie: transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
-    chan2 = readlocs('/data/common/matlab/eeglab/plugins/dipfit2.0/standard_BEM/elec/standard_1005.elc');
+    chan2 = readlocs('D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\elec\standard_1005.elc');
     normalize = 1;
 end;
 
@@ -98,7 +101,7 @@ end;
 
 % check input arguments
 % ---------------------
-defaultmesh = '/data/common/matlab/eeglab/plugins/dipfit2.0/standard_BEM/standard_vol.mat';
+defaultmesh = 'D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
                             'transform'  'real'  []      [];
@@ -319,10 +322,11 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
     cfg.fiducial = fidnames;
     elec3 = electrodenormalize(cfg);
     transf = elec3.m
-    transf(1,1:3) = transf(1,1:3)*1.23;
-    transf(2,1:3) = transf(2,1:3)*1.05;
-    transf(3,1:3) = transf(3,1:3)*1.05;
+    %transf(1,1:3) = transf(1,1:3)*1.23;
+    %transf(2,1:3) = transf(2,1:3)*1.05;
+    %transf(3,1:3) = transf(3,1:3)*1.05;
     elec1.pnt = transf*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
+    transfmat = traditional(elec3.m);
     elec1.pnt = elec1.pnt(1:3,:)';
 
 % warp channels
