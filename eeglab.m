@@ -187,6 +187,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.413  2005/11/22 00:30:49  arno
+% study menu
+%  etc.
+%
 % Revision 1.412  2005/11/09 00:43:29  arno
 % call to pop_chanedit
 %
@@ -2307,10 +2311,10 @@ if study_selected
     % values
     % ------
     fullfilename = fullfile( STUDY.filepath, STUDY.filename);
-    if length(fullfilename) > 30
-        set( g.win1, 'String', sprintf('Study filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
+    if length(fullfilename) > 26
+        set( g.win1, 'String', sprintf('Study filename: ...%s\n', fullfilename(max(1,length(fullfilename)-26):end) ));
     else
-        set( g.win1, 'String', sprintf('Study filename: %s\n', fullfilename));
+        set( g.win1, 'String', sprintf('Study filename: %s\n'   , fullfilename));
     end;        	
     set( g.val2, 'String', STUDY.task);
     set( g.val3, 'String', int2str(length(EEG)));
@@ -2332,6 +2336,7 @@ if study_selected
     plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
     hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
     data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
+    std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'on');
     set( edit_m, 'enable', 'off');
     set( plot_m, 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
@@ -2445,6 +2450,7 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
         plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
+        std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'off');
         hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
         set( edit_m, 'enable', 'off');
         set( plot_m, 'enable', 'off');
@@ -2547,13 +2553,14 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
         plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'on');
-        data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(data_m, 'enable', 'on');
+        std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'off');
         ica_m  = findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data using ICA');
         stat_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Data statistics');
         erp_m  = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Channel ERPs');
         erpi_m = findobj('parent', plot_m, 'type', 'uimenu', 'Label', 'Component ERPs');
         hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
         data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
+        std2_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', plot_m, 'type', 'uimenu'), 'enable', 'on');
@@ -2563,6 +2570,7 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', erp_m , 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', erpi_m, 'type', 'uimenu'), 'enable', 'on');
         set( findobj('parent', hist_m, 'type', 'uimenu'), 'enable', 'on');
+        set( findobj('parent', std2_m, 'type', 'uimenu'), 'enable', 'on');
         
         % continuous data
         % ---------------
@@ -2622,10 +2630,13 @@ else
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')         , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study'    )        , 'enable', 'on');
+    set( findobj('type', 'uimenu', 'label', 'Using all loaded datasets'), 'enable', 'off');
     edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');      set(edit_m, 'enable', 'off');
     tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');     set(tool_m, 'enable', 'off');
     plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');      set(plot_m, 'enable', 'off');
     data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'off');
+    std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study');     set(std_m , 'enable', 'off');
     
 end;
 
