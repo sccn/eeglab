@@ -115,8 +115,8 @@ if isempty(STUDY.cluster)
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
         ind_nonnan = find(~isnan(STUDY.setind(:,k)));
-        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,STUDY.datasetinfo(ind_nonnan).ncomps)];
-        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      [1:STUDY.datasetinfo(ind_nonnan).ncomps]];
+        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,STUDY.datasetinfo(ind_nonnan(1)).ncomps)];
+        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      [1:STUDY.datasetinfo(ind_nonnan(1)).ncomps]];
     end
     if length(STUDY.condition) > 1
         tmp = ones(length(STUDY.condition), length(STUDY.cluster(1).sets));
