@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2005/11/10 23:44:45  arno
+% saving icachansind
+%
 % Revision 1.60  2005/11/10 23:39:56  arno
 % fixing concatenated datasets
 %
@@ -326,7 +329,7 @@ if nargin < 2
     if ~isempty(ALLEEG(1).chanlocs)
         alllabels = { ALLEEG(1).chanlocs.labels };
     else
-        for index = 1:length(ALLEEG(1).chanlocs)
+        for index = 1:ALLEEG(1).nbchan
             alllabels{index} = int2str(index);
         end;
     end;
