@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.414  2005/11/22 23:10:48  arno
+% debugging filename
+%
 % Revision 1.413  2005/11/22 00:30:49  arno
 % study menu
 %  etc.
@@ -2510,8 +2513,8 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
 
         fullfilename = [ EEG.filepath EEG.filename];
         if ~isempty(fullfilename)
-            if length(fullfilename) > 30
-                set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-30):end) ));
+            if length(fullfilename) > 26
+                set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-26):end) ));
             else
                 set( g.win1, 'String', sprintf('Filename: %s\n', fullfilename));
             end;        	
