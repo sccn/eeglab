@@ -118,9 +118,10 @@ if ~isstr(STUDY) %intial settings
 end;
 
 if isempty(STUDY)
-    STUDY.name  = '';
-    STUDY.task  = '';
-    STUDY.notes = '';
+    STUDY.name     = '';
+    STUDY.task     = '';
+    STUDY.notes    = '';
+    STUDY.filename = '';
 end;
 
 if strcmpi(mode, 'script') % script mode
@@ -208,14 +209,20 @@ elseif strcmpi(mode, 'gui') % GUI mode
 	{'style' 'pushbutton' 'string' '>'      'Callback' nextpage 'userdata' 'addt'} ...
     {'style' 'checkbox'   'value' 1 'tag' 'copy_to_dataset' } ...
     {'style' 'text'       'string' 'Update dataset info (unset=local to study)' } ...
-    {'style' 'checkbox'   'value' 0 'tag' 'save_dataset' } ...
-    {'style' 'text'       'string' 'Resave modified datasets' } ...
     {'style' 'text'       'string' 'Important note: Removed datasets will not be saved prior to being delete from EEGLAB memory' } ...
     { } ... 
     {'style' 'text'       'string' 'Save this STUDY set to disk file'} ...
-	{'style' 'edit'       'string' ''       'tag' 'studyfile' 'userdata' 'save'} ...
+	{'style' 'edit'       'string' ''       'tag' 'studyfile'                        'userdata' 'save'} ...
 	{'style' 'pushbutton' 'string' '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
 	guigeom = { guigeom{:} [0.3 1 0.3 1 0.3] [0.2 3] [0.2 3] [1] [1] [1 1.5 0.3] [1]};
+
+    if ~isempty(STUDY.filename)
+        guispec{12} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
+        guispec{13} = {'style' 'text'     'string' 'Resave study. Uncheck and use menu File > Save study as to save under a new filename'};
+        guispec{14} = {};
+        guigeom{end-1} = [0.1 1.5 0.1];
+    end;
+    
 	
     fig_arg{1} = ALLEEG;      % datasets         
     fig_arg{2} = datasetinfo; % datasetinfo
@@ -247,18 +254,22 @@ elseif strcmpi(mode, 'gui') % GUI mode
     if ~strcmpi(result{1}, STUDY.name ), options = { options{:} 'name'        result{1} }; end;
     if ~strcmpi(result{2}, STUDY.task ), options = { options{:} 'task'        result{2} }; end;
     if ~strcmpi(result{3}, STUDY.notes), options = { options{:} 'notes'       result{3} }; end;
-    if ~isempty(result{4}), options = { options{:} 'commands'    allcom    }; end;
-    if ~isempty( outstruct(1).studyfile )
-        options = { options{:} 'filename' { outstruct(1).studyfile } };
-    end;
-    if outstruct(1).save_dataset == 1
-         options = { options{:} 'savedat' 'on' };
-    else options = { options{:} 'savedat' 'off' };
+    if ~isempty(result{4}),              options = { options{:} 'commands'    allcom    }; end;
+    if isnumeric(outstruct(1).studyfile)
+        if outstruct(1).studyfile == 1,  options = { options{:} 'resave'      'on' }; end;
+    else
+        if ~isempty(outstruct(1).studyfile), options = { options{:} 'filename'    { outstruct(1).studyfile } }; end;
     end;
     if outstruct(1).copy_to_dataset == 1
          options = { options{:} 'updatedat' 'on' };
     else options = { options{:} 'updatedat' 'off' };
     end;
+    %{'style' 'checkbox'   'value' 0 'tag' 'save_dataset' } ...
+    %{'style' 'text'       'string' 'Resave modified datasets' } ...
+    %if outstruct(1).save_dataset == 1
+    %     options = { options{:} 'savedat' 'on' };
+    %else options = { options{:} 'savedat' 'off' };
+    %end;
     
     % run command and create history
     % ------------------------------
