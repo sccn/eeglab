@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2005/11/22 22:40:38  arno
+% resave option
+%
 % Revision 1.59  2005/09/27 21:59:03  arno
 % pop-up if resaving a file that has not been saved yet
 %
