@@ -82,7 +82,8 @@ end
 for k = 1:length(STUDY.datasetinfo)
     setcond = find(strcmp(STUDY.datasetinfo(k).condition, STUDY.condition));
     setsubj = find(strcmp(STUDY.datasetinfo(k).subject,   STUDY.subject));
-    setsess = find(strcmp(STUDY.datasetinfo(k).session,   STUDY.session));       
+    setsess = find(strcmp(STUDY.datasetinfo(k).session,   STUDY.session));
+    ncomps  = [];
     if ~isempty(setcond)
         if ~isempty(setsess)
             STUDY.setind(setcond, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
@@ -97,6 +98,7 @@ for k = 1:length(STUDY.datasetinfo)
         end
     end    
     STUDY.datasetinfo(k).index = k; %The dataset index in the current ALLEEG structure
+    STUDY.setind( find(STUDY.setind(:) == 0) ) = NaN;
 end
 
 % number of component per dataset
@@ -112,8 +114,9 @@ if isempty(STUDY.cluster)
     [STUDY] = cls_createclust(STUDY, ALLEEG, 'ParentCluster');
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
-        STUDY.cluster(1).sets = [STUDY.cluster(1).sets k*ones(1,STUDY.datasetinfo(STUDY.setind(1,k)).ncomps)];
-        STUDY.cluster(1).comps = [STUDY.cluster(1).comps [1:STUDY.datasetinfo(STUDY.setind(1,k)).ncomps]];
+        ind_nonnan = find(~isnan(STUDY.setind(:,k)));
+        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,STUDY.datasetinfo(ind_nonnan).ncomps)];
+        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      [1:STUDY.datasetinfo(ind_nonnan).ncomps]];
     end
     if length(STUDY.condition) > 1
         tmp = ones(length(STUDY.condition), length(STUDY.cluster(1).sets));
