@@ -75,7 +75,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'on';
                             'notes'     'string'  { }             '';
                             'filename'  'string'  { }             '';
                             'filepath'  'string'  { }             '';
-                            'savedat'   'string'  { 'on' 'off' }  'on';
+                            'resave'    'string'  { 'on' 'off' }  'on';
                             'savedat'   'string'  { 'on' 'off' }  'on';
                             'savedat'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'editstudy');
@@ -189,6 +189,13 @@ if ~isempty(g.filename),
     else save('-mat',      'STUDY', fullfile( STUDY.filepath, STUDY.filename));
     end;
 end
+if strcmpi(g.resave, 'on')
+    ver = version;
+    if ver(1) > '6'
+         save('-mat','-V6','STUDY', fullfile( STUDY.filepath, STUDY.filename));
+    else save('-mat',      'STUDY', fullfile( STUDY.filepath, STUDY.filename));
+    end;
+end;    
 
 % ---------------------
 % remove empty elements
