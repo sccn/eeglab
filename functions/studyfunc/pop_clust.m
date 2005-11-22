@@ -57,7 +57,7 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-function [STUDY] = pop_clust(ALLEEG, STUDY, varargin)
+function [STUDY] = pop_clust(STUDY, ALLEEG, varargin)
 
 if isempty(varargin) %GUI call
 	alg_options = {'Kmeans' 'Neural Network' }; %'Hierarchical tree' 
@@ -90,7 +90,7 @@ if isempty(varargin) %GUI call
         
         outliers = [];
         clustdata = STUDY.etc.preclust.preclustdata;
-        command = '[STUDY] = pop_clust(ALLEEG, STUDY,';
+        command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         
         switch clus_alg
             case 'Kmeans'
@@ -134,7 +134,7 @@ if isempty(varargin) %GUI call
            STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);            
        end
            
-        [STUDY] = pop_clustedit(ALLEEG, STUDY,clusters);           
+        [STUDY] = pop_clustedit(STUDY, ALLEEG, clusters);           
 	end
     
 else %command line call

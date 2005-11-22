@@ -11,7 +11,7 @@
 %                renaming. Components can also be moved from one cluster to another 
 %                or to the outlier cluster. 
 % Usage:    
-%                >> STUDY = pop_clustedit(ALLEEG, STUDY,clusters);   
+%                >> STUDY = pop_clustedit(STUDY, ALLEEG, clusters);   
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
@@ -163,8 +163,8 @@ if ~isstr(varargin{1})
     if nargin < 2
         error('pop_clustedit(): You must provide ALLEEG and STUDY structures');
     end
-    ALLEEG = varargin{1};
-    STUDY = varargin{2};
+    STUDY  = varargin{1};
+    ALLEEG = varargin{2};
     clus_comps = 0; % the number of clustered components
     if nargin > 2 % load specific clusters
         cls = varargin{3}; %cluster numbers
