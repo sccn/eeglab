@@ -217,9 +217,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
 	guigeom = { guigeom{:} [0.3 1 0.3 1 0.3] [0.2 3] [1] [1] [1 1.5 0.3] [1]};
 
     if ~isempty(STUDY.filename)
-        guispec{12} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
-        guispec{13} = {'style' 'text'     'string' 'Resave study. Uncheck and use menu File > Save study as to save under a new filename'};
-        guispec{14} = {};
+        guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
+        guispec{end-2} = {'style' 'text'     'string' 'Resave study. Uncheck and use menu File > Save study as to save under a new filename'};
+        guispec{end-1} = {};
         guigeom{end-1} = [0.1 1.5 0.1];
     end;
 	
