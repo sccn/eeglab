@@ -185,15 +185,15 @@ if ~isempty(g.filename),
     STUDY.filename = [ STUDY.filename ext ];
     ver = version;
     if ver(1) > '6'
-         save('-mat','-V6','STUDY', fullfile( STUDY.filepath, STUDY.filename));
-    else save('-mat',      'STUDY', fullfile( STUDY.filepath, STUDY.filename));
+         save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
+    else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
     end;
 end
 if strcmpi(g.resave, 'on')
     ver = version;
     if ver(1) > '6'
-         save('-mat','-V6','STUDY', fullfile( STUDY.filepath, STUDY.filename));
-    else save('-mat',      'STUDY', fullfile( STUDY.filepath, STUDY.filename));
+         save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
+    else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
     end;
 end;    
 
