@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.412  2005/11/09 00:43:29  arno
+% call to pop_chanedit
+%
 % Revision 1.411  2005/11/04 23:33:46  arno
 % call to pop_copyset
 %
@@ -1679,10 +1682,13 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset'  ,                    'CallBack', [ check   '[EEG    LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
+	uimenu( first_m, 'Label', 'Save current dataset'  ,                    'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
 	uimenu( first_m, 'Label', 'Save current datasets as'                 , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
-	uimenu( first_m, 'Label', 'Load existing study' , 'Separator', 'on'  , 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
+	std_m = uimenu( first_m, 'Label', 'Create study', 'Separator', 'on'); 
+	uimenu( std_m,   'Label', 'Using all loaded datasets',                 'callback', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]); 
+	uimenu( std_m,   'Label', 'Browse for datasets',                       'callback', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]); 
+	uimenu( first_m, 'Label', 'Load existing study' ,                      'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
 	uimenu( first_m, 'Label', 'Save current study'  ,                      'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ]);
 	uimenu( first_m, 'Label', 'Save current study as'                    , 'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'     , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
@@ -1793,6 +1799,12 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 		uimenu( spec_m, 'Label', 'Component time-frequency' , 'CallBack', [ checkepochica 'LASTCOM = pop_timef(EEG, 0, eegh(''find'',''pop_timef(EEG,0''));' e_hist],'Separator', 'on');
 		uimenu( spec_m, 'Label', 'Component cross-coherence', 'CallBack', [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,eegh(''find'',''pop_crossf(EEG,0''));' e_hist]);
 		
+    std_m   = uimenu( W_MAIN, 'Label', 'Study');
+    uimenu( std_m, 'Label', 'Edit study info',           'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study]);
+    uimenu( std_m, 'Label', 'Build preclustering array', 'separator', 'on', 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);' e_load_study]);
+    uimenu( std_m, 'Label', 'Cluster components'       , 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);' e_load_study]);
+    uimenu( std_m, 'Label', 'Edit/plot clusters'       , 'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);' e_load_study]);
+    
     set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
     help_m  = uimenu( W_MAIN, 'Label', 'Help');
     uimenu( help_m, 'Label', 'About EEGLAB', 'CallBack', 'pophelp(''eeglab'');');
@@ -2150,7 +2162,7 @@ end;
 if exist_study
     cb_select = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
                   'eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
-                  'LASTCOM = ''CURRENTSTUDY = 1;'';' ...
+                  'LASTCOM = ''CURRENTSTUDY = 1; [EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, [1:' int2str(length(ALLEEG)) ']);'';' ...
                   'eval(LASTCOM); eegh(LASTCOM);' ...
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
