@@ -75,7 +75,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'on';
                             'notes'     'string'  { }             '';
                             'filename'  'string'  { }             '';
                             'filepath'  'string'  { }             '';
-                            'resave'    'string'  { 'on' 'off' }  'on';
+                            'resave'    'string'  { 'on' 'off' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'on';
                             'savedat'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'editstudy');
