@@ -184,6 +184,7 @@ if ~isempty(g.filename),
     [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
     STUDY.filename = [ STUDY.filename ext ];
     ver = version;
+    disp('Saving study...');
     if ver(1) > '6'
          save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
     else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
@@ -191,6 +192,7 @@ if ~isempty(g.filename),
 end
 if strcmpi(g.resave, 'on')
     ver = version;
+    disp('Saving study...');
     if ver(1) > '6'
          save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
     else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
