@@ -152,11 +152,11 @@ for k = 1:2:length(g.commands)
             
             % update datasetinfo structure
             % ----------------------------
-            STUDY.datasetinfo(realindex).filename  = fullfile(ALLEEG(realindex).filepath, ALLEEG(realindex).filename);   
-            STUDY.datasetinfo(realindex).subject   = ALLEEG(realindex).subject;
-            STUDY.datasetinfo(realindex).session   = ALLEEG(realindex).session;
-            STUDY.datasetinfo(realindex).condition = ALLEEG(realindex).condition;
-            STUDY.datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
+            STUDY.datasetinfo(currentind).filename  = fullfile(ALLEEG(currentind).filepath, ALLEEG(currentind).filename);   
+            STUDY.datasetinfo(currentind).subject   = ALLEEG(currentind).subject;
+            STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
+            STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
+            STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
     end
 end
 
