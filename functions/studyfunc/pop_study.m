@@ -130,7 +130,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % show warning if necessary
     % -------------------------
     if isreal(ALLEEG)
-        if ALLEEG == 1
+        if ALLEEG == 0
             res = questdlg2( strvcat('Datasets currently loaded will be removed from EEGLAB memory.', ...
                                      'Are you sure you want to pursue and ignore currenlty loaded datasets?'), ...
                                      'Discard datasets loaded in EEGLAB?', 'Cancel', 'Yes', 'Yes');
