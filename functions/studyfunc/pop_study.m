@@ -243,10 +243,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % convert GUI selection to options
     % --------------------------------
     allcom = simplifycom(userdat2{4});
-    if ~isempty(ALLEEG)
-         options = { 'ALLEEG' ALLEEG };
-    else options = {};
-    end;
+    options = {};
     if ~strcmpi(result{1}, STUDY.name ), options = { options{:} 'name'        result{1} }; end;
     if ~strcmpi(result{2}, STUDY.task ), options = { options{:} 'task'        result{2} }; end;
     if ~strcmpi(result{3}, STUDY.notes), options = { options{:} 'notes'       result{3} }; end;
@@ -265,7 +262,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % run command and create history
     % ------------------------------
-    [STUDY ALLEEG] = editstudy(options{:});
+    [STUDY ALLEEG] = editstudy(STUDY, ALLEEG, options{:});
     com = sprintf( '[%s %s] = pop_study( %s, %s, %s );', inputname(1), inputname(2), ...
                                                          inputname(1), inputname(2), vararg2str(options(3:end)) );
     
@@ -439,7 +436,7 @@ function bool = test_wrong_parameters(hdl)
     anysession   = any(~cellfun('isempty', { datasetinfo.session }));
     allsession   = all(~cellfun('isempty', { datasetinfo.session }));
     anycondition = any(~cellfun('isempty', { datasetinfo.condition }));
-    anycondition = all(~cellfun('isempty', { datasetinfo.condition }));
+    allcondition = all(~cellfun('isempty', { datasetinfo.condition }));
     anygroup     = any(~cellfun('isempty', { datasetinfo.group }));
     allgroup     = all(~cellfun('isempty', { datasetinfo.group }));
 
