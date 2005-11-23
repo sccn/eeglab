@@ -240,17 +240,9 @@ floatwrite([f X'], [ EEG.filename(1:end-3) 'icaspecm']);%save removed mean spect
 
 %Save the updated dataset
 try
-    EEG = pop_saveset( EEG, 1, EEG.filename, EEG.filepath, 'savemode',2);
+    EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
-    try
-        EEG = pop_saveset( EEG, 1, EEG.filename, [EEG.filepath '/'], 'savemode',2 );
-    catch,
-        try
-            EEG = pop_saveset( EEG, 1, EEG.filename, [EEG.filepath '\'], 'savemode',2);
-        catch,
-            error([ 'cls_spec: problems saving into path ' EEG.filepath])
-        end
-    end
+    error([ 'cls_spec: problems saving into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc;
 eval ([ 'cd ' olddir]); 
