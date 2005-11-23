@@ -222,23 +222,24 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
     if update_flag % dipole information is used to select components
         for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
             idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;
-            if ~isfield(ALLEEG(idat), 'dipfit')
-                error('No dipole information found in the data')
-            end
-            indrm = []; % components that will be removed from the clustering
-            indleft = []; % components that are left in clustering
-            for icomp = succompind{si} % scan components
-                if (ALLEEG(idat).dipfit.model(icomp).rv >= rv) | isnan(ALLEEG(idat).dipfit.model(icomp).rv) 
-                    % Components have rv bigger than asked for 
-                    % fprintf('Component %d of dataset %d has no dipole info and was removed\n', icomp, idat)
-                    indrm = [indrm icomp];
-                else
-                    indleft = [indleft icomp];
+            if isfield(ALLEEG(idat).dipfit, 'rv')
+                indrm = []; % components that will be removed from the clustering
+                indleft = []; % components that are left in clustering
+                for icomp = succompind{si} % scan components
+                    if (ALLEEG(idat).dipfit.model(icomp).rv >= rv) | isnan(ALLEEG(idat).dipfit.model(icomp).rv) 
+                        % Components have rv bigger than asked for 
+                        % fprintf('Component %d of dataset %d has no dipole info and was removed\n', icomp, idat)
+                        indrm = [indrm icomp];
+                    else
+                        indleft = [indleft icomp];
+                    end;
                 end;
-            end;
-             if ~isempty(indrm)
-                 succompind{si} = indleft;
-             end
+                if ~isempty(indrm)
+                    succompind{si} = indleft;
+                end
+            else
+                disp('No dipole information found in the data, using all dipoles')
+            end
         end;
         % Create a cluster of removed components 
         % --------------------------------------
