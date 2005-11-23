@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.418  2005/11/23 22:16:59  arno
+% clear study menu
+%
 % Revision 1.417  2005/11/22 23:14:06  arno
 % set CURRENTSTUDY to 0
 %
@@ -1707,8 +1710,8 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( std_m,   'Label', 'Browse for datasets',                       'callback', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]); 
 	uimenu( first_m, 'Label', 'Load existing study' ,                      'CallBack', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;' e_load_study]); 
 	uimenu( first_m, 'Label', 'Save current study'  ,                      'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ]);
-	uimenu( first_m, 'Label', 'Clear study'  ,                             'CallBack', 'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0;''; eval(LASTCOM); eegh( LASTCOM );' );
 	uimenu( first_m, 'Label', 'Save current study as'                    , 'CallBack', [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Clear study'  ,                             'CallBack', 'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0;''; eval(LASTCOM); eegh( LASTCOM );' );
 	uimenu( first_m, 'Label', 'Maximize memory'  , 'Separator', 'on'     , 'CallBack', [ nocheck 'LASTCOM = pop_editoptions;' e_storeall_nh]);
     
 	hist_m = uimenu( first_m, 'Label', 'Save history'     , 'Separator', 'on');
