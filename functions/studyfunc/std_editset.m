@@ -104,7 +104,9 @@ g.commands = allcoms;
 if ~isfield(STUDY, 'datasetinfo')
     for realindex = 1:length(ALLEEG)
         if ~isempty(ALLEEG(realindex).data)
-            STUDY.datasetinfo(realindex).filename  = fullfile(ALLEEG(realindex).filepath, ALLEEG(realindex).filename);   
+            [tmppath tmpfile tmpext] = fileparts(  fullfile(ALLEEG(realindex).filepath, ALLEEG(realindex).filename) );
+            STUDY.datasetinfo(realindex).filepath  = tmppath;   
+            STUDY.datasetinfo(realindex).filename  = [ tmpfile tmpext ];   
             STUDY.datasetinfo(realindex).subject   = ALLEEG(realindex).subject;
             STUDY.datasetinfo(realindex).session   = ALLEEG(realindex).session;
             STUDY.datasetinfo(realindex).condition = ALLEEG(realindex).condition;
@@ -152,7 +154,9 @@ for k = 1:2:length(g.commands)
             
             % update datasetinfo structure
             % ----------------------------
-            STUDY.datasetinfo(currentind).filename  = fullfile(ALLEEG(currentind).filepath, ALLEEG(currentind).filename);   
+            [tmppath tmpfile tmpext] = fileparts( fullfile(ALLEEG(currentind).filepath, ALLEEG(currentind).filename) );
+            STUDY.datasetinfo(currentind).filepath  = tmppath;   
+            STUDY.datasetinfo(currentind).filename  = [ tmpfile tmpext ];   
             STUDY.datasetinfo(currentind).subject   = ALLEEG(currentind).subject;
             STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
