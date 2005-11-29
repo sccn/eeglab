@@ -334,8 +334,18 @@ else % INEEG is an EEG struct
         orilen = length(INEEG1.event);
         allfields = fieldnames(INEEG2.event);
         % Toby 11/10/2005
-		%for i=1:length( allfields )
+        orilen = length(INEEG1.event);
+        allfields = fieldnames(INEEG2.event);
+		for i=1:length( allfields )
+            for e=1:length(INEEG2.event)
+                tmpval = getfield(INEEG2.event, { e }, allfields{i});
+                INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
+            end;
+		end;
+        INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
 
+		%for i=1:length( allfields )
+%{
             for e=1:length(INEEG2.event)
                 % Will break if 'event' doesn't have the same subfields, need to fix this. 
                 INEEG1.event(orilen + e) = INEEG2.event(e);
@@ -346,10 +356,10 @@ else % INEEG is an EEG struct
                     INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
                 end
             end;
-       
+     
 		%end;
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
-
+  %}
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
