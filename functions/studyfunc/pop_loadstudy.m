@@ -40,6 +40,8 @@
 
 function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)
 
+STUDY  = [];
+ALLEEG = [];
 com = '';
 if isempty(varargin)
     [filename, filepath] = uigetfile2('*.study', 'Load a STUDY -- pop_loadstudy()'); 
