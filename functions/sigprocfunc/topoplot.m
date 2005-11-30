@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.263  2005/11/21 21:30:08  toby
+% Corrected a crash-error when attempting to use "plotgrid" and "maplimit>absmax" options
+%
 % Revision 1.262  2005/11/11 00:58:03  arno
 % nothing
 %
@@ -1180,41 +1183,27 @@ if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
 end
 
 if ~strcmpi(STYLE,'grid')                     % if not plot grid only
+
 %
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
   if isstr(loc_file)
-      [tmpeloc labels Th Rd indices] = readlocs(loc_file,'filetype','loc');
+      [tmpeloc labels Th Rd indices] = readlocs( loc_file,'filetype','loc');
   elseif isstruct(loc_file) % a locs struct
       [tmpeloc labels Th Rd indices] = readlocs( loc_file );
       % Note: Th and Rd correspond to indices channels-with-coordinates only
   else
        error('loc_file must be a EEG.locs struct or locs filename');
   end
-
-  if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
-                                         % (common reference channel)
-    tmpeloc(end) = [];
-    labels(end) = [];
-    Th(end) = [];
-    Rd(end) = [];
-    ni = length(indices);
-    fixit = find(indices==ni);
-    if ~isempty(ni)
-        indices(fixit) = [];
-    end
-  end;
   Th = pi/180*Th;                              % convert degrees to radians
 
-  %
-  %%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
-  %
-  if length(Values) < length(tmpeloc) & strcmpi( STYLE, 'blank') % if Values contains int channel indices to mark (STYLE'blank')
+%
+%%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
+%
+  if length(Values) < length(tmpeloc) & strcmpi( STYLE, 'blank') % if Values contains int channel indices to mark
       if isempty(plotchans)
           if Values ~= abs(round(Values)) | min(abs(Values))< 1  % if not positive integer values
-              if ~isfield(CHANINFO, 'icachansind')
-                  error('plotting fewer channels than in chanlocs: needs channel indices in ''plotchans''');
-              end;
+              error('Negative channel indices');
           elseif strcmpi(VERBOSE, 'on')
               fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
                       max(indices),length(Values));
@@ -1240,49 +1229,77 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% channels to plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+if ~isempty(plotchans)
+    plotchans = intersect(plotchans, indices);
+end;
 if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
-    plotchans = 1:length(Th);
+    plotchans = indices;
 end
 if isempty(plotchans) & strcmpi( STYLE, 'blank')
-    plotchans = 1:length(Th);
+    plotchans = indices;
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% filter for channel type(s), if specified %%%%%%%%%%%%%%%%%%%%% 
 %
 
-if CHOOSECHANTYPE, plotchans = eeg_chantype(loc_file,chantype); end
+if CHOOSECHANTYPE, 
+    newplotchans = eeg_chantype(loc_file,chantype); 
+    plotchans = intersect(newplotchans, plotchans);
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% filter channels used for components %%%%%%%%%%%%%%%%%%%%% 
 %
-if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= length(plotchans)
-    plotchans = intersect(CHANINFO.icachansind, plotchans);
-    tmpvals   = zeros(1, length(Th));
-    tmpvals(CHANINFO.icachansind) = Values;
-    Values    = tmpvals;
+if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= length(tmpeloc)
+
+    % test if ICA component
+    % ---------------------
+    if length(CHANINFO.icachansind) == length(Values)
+        
+        % if only a subset of channels are to be plotted
+        % and ICA components also use a subject of channel
+        % we must find the new indices for these channels
+        
+        plotchans = intersect(CHANINFO.icachansind, plotchans);
+        tmpvals   = zeros(1, length(tmpeloc));
+        tmpvals(CHANINFO.icachansind) = Values;
+        Values    = tmpvals;
+        
+    end;
+end;
+
+%
+%%%%%%%%%%%%%%%%%%% last channel is reference? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
+                                         % (common reference channel)
+    if plotchan(end) == length(tmpeloc)
+        plotchan(end) = [];
+    end;
+
 end;
 
 %
 %%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if length(Values) > 1
-    inds = union(find(isnan(Values)), find(isinf(Values)));
-    indices = setdiff(indices, inds);
-    tmpeloc(inds) = [];
-    Th(inds) = [];
-    Rd(inds) = [];
+    inds          = union(find(isnan(Values)), find(isinf(Values))); % NaN and Inf values
+    plotchans     = setdiff(plotchans, inds);
 end;
+if strcmp(plotgrid,'on')
+    plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
+end
 
-if length(Values) > 1
-   if max(indices)>length(Values)
-       STYLE = 'blank';
-   else
-       Values = Values(indices);
-   end
-end;
-labels = labels(indices); % remove labels for electrodes without locations
-labels = strvcat(labels); % make a label string matrix
+[x,y]     = pol2cart(Th,Rd);  % transform electrode locations from polar to cartesian coordinates
+plotchans = abs(plotchans);   % reverse indicated channel polarities
+Th        = Th(plotchans);
+Rd        = Rd(plotchans);
+x         = x(plotchans);
+y         = y(plotchans);
+Values    = Values(plotchans);
+labels    = labels(plotchans); % remove labels for electrodes without locations
+labels    = strvcat(labels); % make a label string matrix
 
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1314,12 +1331,9 @@ else
      plotrad = intrad;
   end
 end                                           % don't interpolate channels with Rd > 1 (below head)
-
 if isstr(plotrad) | plotrad < MINPLOTRAD | plotrad > 1.0
    error('plotrad must be between 0.15 and 1.0');
 end
-
-% plotrad now set
 
 %
 %%%%%%%%%%%%%%%%%%%%%%% Set radius of head cartoon %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1338,7 +1352,6 @@ elseif strcmpi(headrad,'rim') % force plotting at rim of map
   headrad = plotrad;
 end
 
-% headrad now set
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Shrink mode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1390,9 +1403,8 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%% Find plotting channels  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
-pltchans = find(Rd <= plotrad); % plot channels inside plotting circle
 
-[x,y] = pol2cart(Th,Rd);  % transform electrode locations from polar to cartesian coordinates
+pltchans = find(Rd <= plotrad); % plot channels inside plotting circle
 
 if strcmpi(INTSQUARE,'on') &  ~strcmpi(STYLE,'blank') % interpolate channels in the radius intrad square
   intchans = find(x <= intrad & y <= intrad); % interpolate and plot channels inside interpolation square
@@ -1404,17 +1416,10 @@ end
 %%%%%%%%%%%%%%%%%%%%% Eliminate channels not plotted  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 
-if strcmp(plotgrid,'on')
-     plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
-end
-
-allx = x;
-ally = y;
-
-plotchans = abs(plotchans); % reverse indicated channel polarities
-
-intchans = intersect(intchans,plotchans); % interpolate using only the 'intchans' channels
-pltchans = intersect(pltchans,plotchans); % plot using only indicated 'plotchans' channels
+allx      = x;
+ally      = y;
+intchans; % interpolate using only the 'intchans' channels
+pltchans; % plot using only indicated 'plotchans' channels
 
 if length(pltchans) < length(Rd) & strcmpi(VERBOSE, 'on')
         fprintf('Interpolating %d and plotting %d of the %d scalp electrodes.\n', ...
