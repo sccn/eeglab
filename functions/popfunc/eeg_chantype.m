@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/10/27 22:22:44  arno
+% header
+%
 
 function indices = eeg_chantype(data,chantype)
 
@@ -62,10 +65,12 @@ function indices = eeg_chantype(data,chantype)
     k = 1;
     for i = 1:length(chantype)
         for j = 1:length(datatype)
-            if strcmpi(chantype{i},char(datatype(j)))
-                plotchans(k) = j;
-                k = k + 1;
-            end
+            if ~isempty( datatype(j) )
+                if strcmpi(chantype{i},char(datatype(j)))
+                    plotchans(k) = j;
+                    k = k + 1;
+                end
+            end;
         end
     end
     indices = sort(plotchans);
