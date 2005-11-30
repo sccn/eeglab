@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/11/30 00:42:05  arno
+% fixing icachansind
+%
 % Revision 1.43  2005/11/30 00:30:07  arno
 % fixing icachansind
 %
@@ -551,7 +554,7 @@ if ~isempty(EEG.icachansind)
     oldinds = intersect(EEG.icachansind, g.channels);
     count   = 1;
     for index = 1:length(g.channel)
-        if any(EEG.icachansind == g.channel)
+        if any(EEG.icachansind == g.channel(index))
             newinds(count) = index;
             count          = count+1;
         end;
