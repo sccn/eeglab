@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/11/30 19:36:52  arno
+% handling empty channel types
+%
 % Revision 1.2  2005/10/27 22:22:44  arno
 % header
 %
@@ -65,11 +68,9 @@ function indices = eeg_chantype(data,chantype)
     k = 1;
     for i = 1:length(chantype)
         for j = 1:length(datatype)
-            if ~isempty( datatype(j) )
-                if strcmpi(chantype{i},char(datatype(j)))
-                    plotchans(k) = j;
-                    k = k + 1;
-                end
+            if strcmpi(chantype{i},char(datatype{j}))
+                plotchans(k) = j;
+                k = k + 1;
             end;
         end
     end
