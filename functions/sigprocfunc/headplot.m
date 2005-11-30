@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2005/11/30 20:24:35  arno
+% adding indices, etc... in structure
+%
 % Revision 1.59  2005/11/01 23:23:46  toby
 % Faster spline calculation.
 %
@@ -393,12 +396,12 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % rotate channel coordinates if necessary
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if strcmpi(lower(chaninfo.nosedir), '+x')
+    if strcmpi(lower(g.chaninfo.nosedir), '+x')
         rotate = 0;
     else
-        if strcmpi(lower(chaninfo.nosedir), '+y')
+        if strcmpi(lower(g.chaninfo.nosedir), '+y')
             rotate = 3*pi/2;
-        elseif strcmpi(lower(chaninfo.nosedir), '-x')
+        elseif strcmpi(lower(g.chaninfo.nosedir), '-x')
             rotate = pi;
         else rotate = pi/2;
         end;
@@ -888,7 +891,7 @@ gx = zeros(length(x),length(Xe));
 m = 4;
 icadefs;
 hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
-hwbend = 7
+hwbend = 7;
 for n = 1:7
     L = legendre(n,EI);
     gx = gx + ((2*n+1)/(n^m*(n+1)^m))*squeeze(L(1,:,:));
