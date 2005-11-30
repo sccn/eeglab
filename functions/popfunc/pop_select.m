@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2005/11/30 00:30:07  arno
+% fixing icachansind
+%
 % Revision 1.42  2005/09/27 22:08:08  arno
 % fix out of range time limit error
 %
@@ -524,9 +527,6 @@ end;
 % performing removal
 % ------------------
 EEG.data      = EEG.data(g.channel, :, g.trial);
-if ~isempty(EEG.icachansind)
-    EEG.icachansind = intersect(g.channel, EEG.icachansind);
-end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
@@ -547,14 +547,27 @@ end;
 
 % ica specific
 % ------------
+if ~isempty(EEG.icachansind)
+    oldinds = intersect(EEG.icachansind, g.channels);
+    count   = 1;
+    for index = 1:length(g.channel)
+        if any(EEG.icachansind == g.channel)
+            newinds(count) = index;
+            count          = count+1;
+        end;
+    end;
+    EEG.icachansind = newinds;
+else
+    oldinds = g.channels;
+end;
 if ~isempty(EEG.icasphere)
-   EEG.icasphere = EEG.icasphere(:,g.channel);
+   EEG.icasphere = EEG.icasphere(:,oldinds);
 end;
 if ~isempty(EEG.icawinv)
-   EEG.icawinv = EEG.icawinv(g.channel,:);
+   EEG.icawinv = EEG.icawinv(oldinds,:);
 end;
 if ~isempty(EEG.icaact)
-	if length(g.channel) == size( EEG.icaact,1)
+	if length(oldinds) == size( EEG.icaact,1)
    		EEG.icaact = [];
 		if ~isempty(EEG.specicaact)
 			if length(g.point) == EEG.pnts
