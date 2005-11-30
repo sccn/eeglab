@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2005/11/30 18:28:37  arno
+% reformat outputs
+%
 % Revision 1.74  2005/10/29 03:49:50  scott
 % NOTE: there  is no mention of 'chantype' - should at least add a help mention after line  69 -sm
 %
@@ -661,12 +664,12 @@ end;
 if nargout > 2
     tmptheta          = { eloc.theta }; % check which channels have (polar) coordinates set
     indices           = find(~cellfun('isempty', tmptheta));
-    tmptheta{indices} = NaN;
+    tmptheta(indices) = { NaN };
     theta             = [ tmptheta{:} ];
 end;
 if nargout > 3
     tmprad            = { eloc.radius };
-    tmprad{indices}   = NaN;
+    tmprad(indices)   = { NaN };
     radius            = [ tmprad{:} ];
 end;
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
