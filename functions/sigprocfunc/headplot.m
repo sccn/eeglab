@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2005/11/01 23:23:46  toby
+% Faster spline calculation.
+%
 % Revision 1.57  2005/07/14 17:42:14  scott
 % minor help typo
 %
@@ -338,11 +341,14 @@ if isstr(values)
     eloc_file = arg1;
     spline_file = varargin{1};
         
-    g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on' 'off' }  'off';
+    g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on' 'off' }             'off';
                                        'plotmeshonly' 'string'  { 'head' 'off' 'sphere' }  'off';
-                                       'meshfile'     'string'  []              DEFAULT_MESH;
-                                       'transform'    'real'    []              DEFAULT_TRANSFORM;
-                                       'comment'      'string'  []              '' });
+                                       'meshfile'     'string'  []                         DEFAULT_MESH;
+                                       'chaninfo'     'struct'  []                         struct([]);
+                                       'plotchans'    'integer' []                         [];
+                                       'ica'          'string'  { 'on' 'off' }             'off';
+                                       'transform'    'real'    []                         DEFAULT_TRANSFORM;
+                                       'comment'      'string'  []                         '' });
     if isstr(g), 
         error(g);
         clear g; 
@@ -355,13 +361,52 @@ if isstr(values)
     % Open electrode file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     [eloc_file labels Th Rd ind] = readlocs(eloc_file);
-    fprintf('Headplot: using existing XYZ coordinates\n');
     indices = find(~cellfun('isempty', { eloc_file.X }));
+    
+    % channels to plot
+    % ----------------
+    if isempty(g.plotchans), g.plotchans = [1:length(eloc_file)]; end;
+    if ~isfield(g.chaninfo, 'nosedir'),     g.chaninfo(1).nosedir     = '+x'; end;
+    indices = intersect(g.plotchans, indices);
+    
+    % if ICA select subset of channels if necessary
+    % ---------------------------------------------
+    if ~isfield(g.chaninfo, 'icachansind'), g.chaninfo(1).icachansind = 1:length(eloc_file); end;
+    if strcmpi(g.ica, 'on'), 
+        rmchans = setdiff( g.chaninfo.icachansind, indices ); % channels to remove
+        newinds = 1:length(g.chaninfo.icachansind);
+        for index = 1:length(rmchans)
+            chanind          = find(g.chaninfo.icachansind == rmchans(index));
+            newinds(chanind) = [];
+        end;
+        indices   = newinds;
+        eloc_file = eloc_file(g.chaninfo.icachansind); 
+    end;
+    
+    fprintf('Headplot: using existing XYZ coordinates\n');
     ElectrodeNames = strvcat({ eloc_file.labels });
     ElectrodeNames = ElectrodeNames(indices,:);
     Xeori = [ eloc_file(indices).X ]';
     Yeori = [ eloc_file(indices).Y ]';
     Zeori = [ eloc_file(indices).Z ]';
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % rotate channel coordinates if necessary
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if strcmpi(lower(chaninfo.nosedir), '+x')
+        rotate = 0;
+    else
+        if strcmpi(lower(chaninfo.nosedir), '+y')
+            rotate = 3*pi/2;
+        elseif strcmpi(lower(chaninfo.nosedir), '-x')
+            rotate = pi;
+        else rotate = pi/2;
+        end;
+        allcoords = (Yeori + Xeori*sqrt(-1))*exp(sqrt(-1)*rotate);
+        Xeori     = imag(allcoords);
+        Yeori     = real(allcoords);
+    end;
+    
     if strcmpi(g.orilocs, 'off')
         % normalize electrode locations if spherical
         dists = sqrt(Xeori.^2+Yeori.^2+Zeori.^2);
@@ -497,37 +542,16 @@ if isstr(values)
 
     gx = fastcalcgx(x,y,z,Xe,Ye,Ze);
 
-    %{
-    hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
-
-
-    hwbend = length(x)
-    tic
-    for j = 1:length(x)
-      % fprintf('%d ',j)
-      X = x(j);
-      Y = y(j);
-      Z = z(j);
-      ei = onemat-sqrt((X*onemat-Xe).^2 + (Y*onemat-Ye).^2 + (Z*onemat-Ze).^2); 
-                                  % default was /2, no sqrt
-                                  % distance between sphere and all
-                                  % electrodes
-      for i = 1:length(ei)
-        gx(j,i) = calcgx(ei(i));  
-      end
-      waitbar(j/hwbend, hwb)
-    end
-    close(hwb)
-%}
-
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Save spline file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     comment          = g.comment;
     headplot_version = 2;
-    try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment', 'headplot_version');   
+    try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
+              'ElectrodeNames', 'indices', 'comment', 'headplot_version');   
     catch,
-        try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', 'ElectrodeNames', 'comment', 'headplot_version');
+        try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
+                   'ElectrodeNames', 'indices', 'comment', 'headplot_version');
         catch, error('headplot: save spline file error, out of space or file permission problem');
         end;
     end;
@@ -614,6 +638,11 @@ else
            spline_file));
   end
   load(spline_file, '-mat');
+  if exist('indices'), 
+      try,
+          values = values(indices);
+      catch, error('problem of index or electrode number with splinefile'); end;
+  end;
   enum = length(values);
   if enum ~= length(Xe)
 	  close;
