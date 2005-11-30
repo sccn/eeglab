@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/11/30 00:44:21  arno
+% fix
+%
 % Revision 1.44  2005/11/30 00:42:05  arno
 % fixing icachansind
 %
@@ -551,7 +554,7 @@ end;
 % ica specific
 % ------------
 if ~isempty(EEG.icachansind)
-    oldinds = intersect(EEG.icachansind, g.channels);
+    oldinds = intersect(EEG.icachansind, g.channel);
     count   = 1;
     for index = 1:length(g.channel)
         if any(EEG.icachansind == g.channel(index))
@@ -561,7 +564,7 @@ if ~isempty(EEG.icachansind)
     end;
     EEG.icachansind = newinds;
 else
-    oldinds = g.channels;
+    oldinds = g.channel;
 end;
 if ~isempty(EEG.icasphere)
    EEG.icasphere = EEG.icasphere(:,oldinds);
