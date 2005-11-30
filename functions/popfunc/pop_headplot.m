@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/11/30 23:29:43  arno
+% taking into account icachansind and channel location file orientation; reprogrammed options cell array
+%
 % Revision 1.27  2004/08/31 13:50:20  scott
 % edited printed messages -sm
 %
@@ -380,7 +383,7 @@ if nbgraph> 1,
 end;
 if nbgraph== 1, com = [ 'figure; ' com ]; rotate3d(gcf); end;
 
-com = sprintf('pop_headplot(%s, %d, %s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), ...
+com = sprintf('pop_headplot(%s, %d, %s, ''%s'', [%s], %s);', inputname(1), typeplot, vararg2str(arg2), ...
               topotitle, int2str(rowcols), vararg2str( { options{:} pop_options{:} } ) );
 if compute_file, com = [ 'EEG = ' com ]; end;
 return;
