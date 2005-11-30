@@ -43,6 +43,7 @@ function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)
 com = '';
 if isempty(varargin)
     [filename, filepath] = uigetfile2('*.study', 'Load a STUDY -- pop_loadstudy()'); 
+    if filename(1) == 0, return; end;
     if ~strncmp(filename(end-5:end), '.study',6)
         if isempty(strfind(filename,'.'))
             filename = [filename '.study'];
