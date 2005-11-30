@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.264  2005/11/30 19:02:40  arno
+% generic plotchan
+%
 % Revision 1.263  2005/11/21 21:30:08  toby
 % Corrected a crash-error when attempting to use "plotgrid" and "maplimit>absmax" options
 %
@@ -1297,9 +1300,11 @@ Th        = Th(plotchans);
 Rd        = Rd(plotchans);
 x         = x(plotchans);
 y         = y(plotchans);
-Values    = Values(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
+if ~isempty(Values) 
+    Values    = Values(plotchans);
+end;
 
 %
 %%%%%%%%%%%%%%%%%% Read plotting radius from chanlocs  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
