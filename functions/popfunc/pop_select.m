@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2005/09/27 22:08:08  arno
+% fix out of range time limit error
+%
 % Revision 1.41  2005/08/31 18:22:42  scott
 % edited help message  -sm
 %
@@ -521,6 +524,9 @@ end;
 % performing removal
 % ------------------
 EEG.data      = EEG.data(g.channel, :, g.trial);
+if ~isempty(EEG.icachansind)
+    EEG.icachansind = intersect(g.channel, EEG.icachansind);
+end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
