@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2004/08/31 13:50:20  scott
+% edited printed messages -sm
+%
 % Revision 1.26  2004/07/26 19:01:57  arno
 % debug detection of old channel location file
 %
@@ -145,17 +148,43 @@ if isempty(EEG.chanlocs)
 end;
 
 if nargin < 3
-    % remove electrode file
-    % ---------------------
-    if isfield(EEG, 'splinefile') & ~isempty(EEG.splinefile)
-        splfile = dir(EEG.splinefile);
-        byteperelec = splfile.bytes/EEG.nbchan;
-        if byteperelec/EEG.nbchan < 625, % old head plot file
-            EEG.splinefile = [];
-            disp('Warning: Old spline file version detected and removed; a new spline file must be recomputed');
+    % remove old spline file
+    % ----------------------
+    if isfield(EEG, 'splinefile') 
+        if ~isempty(EEG.splinefile)
+            splfile = dir(EEG.splinefile);
+            byteperelec = splfile.bytes/EEG.nbchan;
+            if byteperelec/EEG.nbchan < 625, % old head plot file
+                EEG.splinefile = [];
+                disp('Warning: Old spline file version detected and removed; a new spline file must be recomputed');
+            end;
         end;
     end;
-    if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
+    
+    % show the file be recomputed
+    % ---------------------------
+    compute_file = 0;
+    if typeplot == 1 % ********** data plot
+        fieldname    = 'splinefile';        
+        if isempty(EEG.splinefile)            
+            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
+                EEG.splinefile = EEG.icasplinefile;
+            else
+                compute_file = 1;
+            end;
+        end;
+    else % ************* Component plot       
+        fieldname    = 'icasplinefile';
+        if isempty(EEG.icasplinefile)
+            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
+                EEG.icasplinefile = EEG.splinefile;
+            else
+                compute_file = 1;
+            end;
+        end;
+    end;
+            
+    if compute_file
 		 ButtonName=questdlg2( strvcat('headplot() must generate a spline file the first', ...
 		                 'time it is called and after changes in the channel location file.', ...
 		                 'Should it generate a spline file now (takes time - see wait bar)?'), ...
@@ -166,31 +195,32 @@ if nargin < 3
 				    [filename, filepath] = uigetfile('*.spl', 'Load a spline file'); 
                     drawnow;
 				    if filename == 0 return; end;
-		            EEG.splinefile = [ filepath filename ];
-		            pop_options = [ ', ''load'', ''' EEG.splinefile '''' ]; 
-                    com = 'EEG = ';
+		            EEG = setfield(EEG, fieldname, fullfile(filepath, filename));
+		            pop_options = { 'load' getfield(EEG, fieldname) }; 
 		      case 'yes',
 				    [filename, filepath] = uiputfile('*.spl', 'Save the spline file with an .spl extension');
                     drawnow;
 				    if filename == 0 return; end;
-		            EEG.splinefile = [ filepath filename ];
-		            headplot('setup', EEG.chanlocs, EEG.splinefile);
-		            pop_options = [ ', ''setup'', ''' EEG.splinefile '''' ]; 
-                    com = 'EEG = ';
+		            EEG = setfield(EEG, fieldname, fullfile(filepath, filename));
+                    if typeplot
+                        headplot('setup', EEG.chanlocs, fullfile(filepath, filename), 'chaninfo', EEG.chaninfo);
+                    else
+                        headplot('setup', EEG.chanlocs, fullfile(filepath, filename), 'ica', 'on', 'chaninfo', EEG.chaninfo);
+                    end;
+		            pop_options = { 'setup' getfield(EEG, fieldname) }; 
 		 end;
     else
-    	pop_options      = '';
+    	pop_options      = {};
     end;
     
-	if isempty(EEG.splinefile) | exist(EEG.splinefile) ~= 2
-	    errmsg = sprintf('Pop_headplot: cannot find spline file %s. Check path. Aborting...',EEG.splinefile);
+	if isempty(getfield(EEG, fieldname)) | exist(getfield(EEG, fieldname)) ~= 2
+	    errmsg = sprintf('Pop_headplot: cannot find spline file %s. Check path. Aborting...',getfield(EEG, fieldname));
 	    error(errmsg);
 	end;
 
- 	% which set to save
+ 	% graphic interface
 	% -----------------
 	if typeplot
-		%txt = sprintf('ERP head plot at these latencies (from %d to %d ms):\n(NaN -> empty subplot)(Ex: -100 NaN 100)', round(EEG.xmin*1000), round(EEG.xmax*1000));
 		txt = sprintf('Making headplots for these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
 		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
@@ -204,7 +234,8 @@ if nargin < 3
 	inistr       = { fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))]) ...
 	               ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] ...
 	               '' '' };
-	result       = inputdlg2( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', 'Component head plot(s) -- pop_headplot()'), 1,  inistr, 'pop_headplot');
+	result       = inputdlg2( txt, fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
+                                           'Component head plot(s) -- pop_headplot()'), 1,  inistr, 'pop_headplot');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
 	arg2   	     = eval( [ '[' result{1} ']' ] );
@@ -212,45 +243,51 @@ if nargin < 3
 		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
-	topotitle    = result{2};
-	rowcols     = eval( [ '[' result{3} ']' ] );
-    if ~isempty(result{4})
-        options = [ ',' result{4} ];
-    else
-        options = '';
-    end;
+	topotitle  = result{2};
+	rowcols    = eval( [ '[' result{3} ']' ] );
+    options    = eval( [ '{ ' result{4} ' }' ]);
 	if size(arg2(:),1) == 1, figure; end;
 else
 	% read or generate file if necessary
 	% ----------------------------------
     loc = strmatch('load', varargin(1:2:end)); loc = loc*2-1;
     if ~isempty(loc)
-        EEG.splinefile = varargin{ loc+1 };
+        if typeplot
+            EEG.splinefile = varargin{ loc+1 };
+        else            
+            EEG.icasplinefile = varargin{ loc+1 };
+        end;
         varargin(loc:loc+1) = [];
     end;
     loc = strmatch('setup', varargin(1:2:end)); loc = loc*2-1;
     if ~isempty(loc)
-        headplot('setup', EEG.chanlocs, EEG.splinefile);
+        if typeplot
+            headplot('setup', EEG.chanlocs, EEG.splinefile, 'chaninfo', EEG.chaninfo);
+        else
+            headplot('setup', EEG.chanlocs, EEG.icasplinefile, 'ica', 'on', 'chaninfo', EEG.chaninfo);
+        end;
         varargin(loc:loc+1) = [];
+        compute_file = 1;
+    else
+        compute_file = 0;
     end;
     
-	options = [];
-    pop_options = '';
-	for i=1:length( varargin )
-		if isstr( varargin{ i } )
-			options = [ options ', ''' varargin{i} '''' ];
-		else
-			options = [ options ', [' num2str(varargin{i}) ']' ];
-		end;
-	end;	
+	options = varargin;
+    pop_options = {};
 end;
 
 if ~exist('topotitle')  
     topotitle = '';
 end;    
-if ~isfield(EEG, 'splinefile') | isempty(EEG.splinefile)
-    error('Pop_headplot: cannot find spline file, aborting...');
-end;
+if typeplot
+    if isempty(EEG.splinefile)
+        error('Pop_headplot: cannot find spline file, aborting...');
+    end;
+else
+    if isempty(EEG.icasplinefile)
+        error('Pop_headplot: cannot find spline file, aborting...');
+    end;
+end;    
 
 SIZEBOX = 150;
 nbgraph = size(arg2(:),1);
@@ -282,8 +319,6 @@ end;
 	
 % plot the graphs
 % ---------------
-chanind = find(~cellfun('isempty', { EEG.chanlocs.X }));
-
 counter = 1;
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
@@ -301,28 +336,16 @@ for index = 1:size(arg2(:),1)
 
 	if ~isnan(arg2(index))
 		if typeplot
-			if length( options ) < 2
-    			headplot( SIGTMPAVG(chanind,index), EEG.splinefile, 'maplimits', maplimits);
-		    else	
-			     eval( [ 'headplot( SIGTMPAVG(chanind,index), EEG.splinefile, ''maplimits'', maplimits ' options ');' ] );
-			end;
+            headplot( SIGTMPAVG(:,index), EEG.splinefile, 'maplimits', maplimits, options{:});
 			if nbgraph == 1, title( topotitle );
 			else title([int2str(arg2(index)) ' ms']);
 			end;
 		else
-			if length( options ) < 2
-			    if arg2(index) < 0
-			         headplot( -EEG.icawinv(chanind, -arg2(index)), EEG.splinefile);
-		        else	
-			         headplot( EEG.icawinv(chanind, arg2(index)), EEG.splinefile);
-	            end;    			
-			else	
-			    if arg2(index) < 0
-			         eval( [ 'headplot(  -EEG.icawinv(chanind, -arg2(index)), EEG.splinefile ' options ');' ] );
-	            else
-			         eval( [ 'headplot(  EEG.icawinv(chanind, arg2(index)), EEG.splinefile ' options ');' ] );
-	            end;    			
-			end;
+            if arg2(index) < 0
+                headplot( -EEG.icawinv(:, -arg2(index)), EEG.icasplinefile, options{:});
+            else	
+                headplot( EEG.icawinv(:, arg2(index)), EEG.icasplinefile, options{:});
+            end;    			
 			if nbgraph == 1, title( topotitle );
 			else title(['' int2str(arg2(index))]);
 			end;
@@ -357,5 +380,7 @@ if nbgraph> 1,
 end;
 if nbgraph== 1, com = [ 'figure; ' com ]; rotate3d(gcf); end;
 
-com = [com sprintf('pop_headplot(%s,%d,%s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), topotitle, int2str(rowcols), [ options pop_options ])];
+com = sprintf('pop_headplot(%s, %d, %s, ''%s'', [%s] %s);', inputname(1), typeplot, vararg2str(arg2), ...
+              topotitle, int2str(rowcols), vararg2str( { options{:} pop_options{:} } ) );
+if compute_file, com = [ 'EEG = ' com ]; end;
 return;
