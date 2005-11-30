@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2005/10/29 03:49:50  scott
+% NOTE: there  is no mention of 'chantype' - should at least add a help mention after line  69 -sm
+%
 % Revision 1.73  2005/09/27 22:08:41  arno
 % fixing reading .ced files
 %
@@ -656,13 +659,15 @@ if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
 if nargout > 2
-    tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
-    indices = find(~cellfun('isempty', tmptheta));
-    theta = [ tmptheta{indices} ];
+    tmptheta          = { eloc.theta }; % check which channels have (polar) coordinates set
+    indices           = find(~cellfun('isempty', tmptheta));
+    tmptheta{indices} = NaN;
+    theta             = [ tmptheta{:} ];
 end;
 if nargout > 3
-    tmprad = { eloc.radius };
-    radius  = [ tmprad{indices} ];
+    tmprad            = { eloc.radius };
+    tmprad{indices}   = NaN;
+    radius            = [ tmprad{:} ];
 end;
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
 %disp('Converting channel labels to string');
