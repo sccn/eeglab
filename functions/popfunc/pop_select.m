@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/11/30 17:57:38  arno
+% fixing channels
+%
 % Revision 1.45  2005/11/30 00:44:21  arno
 % fix
 %
@@ -554,7 +557,19 @@ end;
 % ica specific
 % ------------
 if ~isempty(EEG.icachansind)
-    oldinds = intersect(EEG.icachansind, g.channel);
+    
+    rmchans = setdiff( EEG.icachansind, g.channel ); % channels to remove
+    
+    % channel sub-indices
+    % -------------------
+    icachans = 1:length(EEG.icachansind);
+    for index = 1:length(rmchans)
+        chanind           = find(EEG.icachansind == rmchans(index));
+        icachans(chanind) = [];
+    end;
+        
+    % new channels indices
+    % --------------------
     count   = 1;
     for index = 1:length(g.channel)
         if any(EEG.icachansind == g.channel(index))
@@ -563,30 +578,27 @@ if ~isempty(EEG.icachansind)
         end;
     end;
     EEG.icachansind = newinds;
+    
 else
-    oldinds = g.channel;
+    icachans = 1:size(EEG.icasphere,2);
 end;
+
 if ~isempty(EEG.icasphere)
-   EEG.icasphere = EEG.icasphere(:,oldinds);
+   EEG.icasphere = EEG.icasphere(:,icachans);
 end;
 if ~isempty(EEG.icawinv)
-   EEG.icawinv = EEG.icawinv(oldinds,:);
+   EEG.icawinv = EEG.icawinv(icachans,:);
 end;
 if ~isempty(EEG.icaact)
-	if length(oldinds) == size( EEG.icaact,1)
-   		EEG.icaact = [];
-		if ~isempty(EEG.specicaact)
-			if length(g.point) == EEG.pnts
-   				EEG.specicaact = EEG.specicaact(:, :, g.trial);
-   			else
-   				EEG.specicaact = [];
-		   		fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
-   			end;	
-	   	end;
-   	else
-   		EEG.icaact = [];
-   		EEG.specicaact = [];
-   	end;		
+    EEG.icaact = EEG.icaact(icachans,:,:);
+end;
+if ~isempty(EEG.specicaact)
+    if length(g.point) == EEG.pnts
+        EEG.specicaact = EEG.specicaact(icachans, :, g.trial);
+    else
+        EEG.specicaact = [];
+        fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
+    end;	
 end;
 
 EEG = rmfield( EEG, 'reject');
