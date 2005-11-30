@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2005/11/30 19:33:58  arno
+% final debug of icachansind
+%
 % Revision 1.46  2005/11/30 17:57:38  arno
 % fixing channels
 %
