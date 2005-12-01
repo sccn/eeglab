@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2005/12/01 03:36:47  toby
+% Corrected channel remove bug
+%
 % Revision 1.50  2005/12/01 03:32:39  toby
 % *** empty log message ***
 %
