@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2005/11/30 20:10:53  arno
+% nothing
+%
 % Revision 1.47  2005/11/30 19:33:58  arno
 % final debug of icachansind
 %
@@ -346,8 +349,8 @@ for index = 1:length(allfields)
         end;
 end;
 
-g.trial   = setdiff( g.trial, g.notrial );
-g.channel = setdiff( g.channel, g.nochannel );
+g.trial   = sort(setdiff( g.trial, g.notrial ));
+g.channel = sort(setdiff( g.channel, g.nochannel ));
 
 if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
