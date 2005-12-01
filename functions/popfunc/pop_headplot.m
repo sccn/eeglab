@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/11/30 23:38:57  arno
+% typo
+%
 % Revision 1.28  2005/11/30 23:29:43  arno
 % taking into account icachansind and channel location file orientation; reprogrammed options cell array
 %
@@ -273,6 +276,24 @@ else
         compute_file = 1;
     else
         compute_file = 0;
+    end;
+
+    % search for existing file if necessary
+    % -------------------------------------
+    if typeplot == 1 % ********** data plot
+        fieldname    = 'splinefile';        
+        if isempty(EEG.splinefile)            
+            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
+                EEG.splinefile = EEG.icasplinefile;
+            end;
+        end;
+    else % ************* Component plot       
+        fieldname    = 'icasplinefile';
+        if isempty(EEG.icasplinefile)
+            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
+                EEG.icasplinefile = EEG.splinefile;
+            end;
+        end;
     end;
     
 	options = varargin;
