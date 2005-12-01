@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2005/12/01 03:32:39  toby
+% *** empty log message ***
+%
 % Revision 1.49  2005/12/01 00:32:13  arno
 % sorting channels etc...
 %
@@ -572,7 +575,7 @@ if ~isempty(EEG.icachansind)
     % channel sub-indices
     % -------------------
     icachans = 1:length(EEG.icachansind);
-    for index = 1:length(rmchans)
+    for index = length(rmchans):-1:1
         chanind           = find(EEG.icachansind == rmchans(index));
         icachans(chanind) = [];
     end;
