@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.265  2005/11/30 19:07:58  arno
+% fixing ploting electrodes only
+%
 % Revision 1.264  2005/11/30 19:02:40  arno
 % generic plotchan
 %
@@ -1277,8 +1280,8 @@ end;
 % 
 if length(tmpeloc) == length(Values) + 1 % remove last channel if necessary 
                                          % (common reference channel)
-    if plotchan(end) == length(tmpeloc)
-        plotchan(end) = [];
+    if plotchans(end) == length(tmpeloc)
+        plotchans(end) = [];
     end;
 
 end;
