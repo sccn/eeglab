@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.421  2005/11/23 22:20:28  arno
+% same
+%
 % Revision 1.420  2005/11/23 22:19:51  arno
 % change separator
 %
@@ -1708,8 +1711,8 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset'  ,                    'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
-	uimenu( first_m, 'Label', 'Save current datasets as'                 , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
+	uimenu( first_m, 'Label', 'Save current dataset(s)'  ,                    'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, EEG.filename, EEG.filepath);' e_store]);
+	uimenu( first_m, 'Label', 'Save current dataset as'                 , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 	std_m = uimenu( first_m, 'Label', 'Create study', 'Separator', 'on'); 
 	uimenu( std_m,   'Label', 'Using all loaded datasets',                 'callback', [ nocheck_back '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]); 
@@ -2483,7 +2486,7 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset'    ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
