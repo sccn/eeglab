@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.423  2005/12/03 00:36:49  arno
+% resave
+%
 % Revision 1.422  2005/12/03 00:21:44  arno
 % menu editing
 %
@@ -1714,7 +1717,7 @@ catchstrs.new_non_empty          = e_newnonempty;
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file', 'CallBack', [ check   'LASTCOM = pop_expica(EEG, ''inv'');' e_histdone ]); 
 
 	uimenu( first_m, 'Label', 'Load existing dataset' , 'Separator', 'on', 'CallBack', [ nocheck_back '[EEGTMP LASTCOM] = pop_loadset;' e_load_nh]); 
-	uimenu( first_m, 'Label', 'Save current dataset(s)'  ,                 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''resave'');' e_store]);
+	uimenu( first_m, 'Label', 'Save current dataset(s)'  ,                 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store]);
 	uimenu( first_m, 'Label', 'Save current dataset as'                 , 'CallBack', [ check   '[EEG LASTCOM] = pop_saveset(EEG);' e_hist_nh ]);
 	uimenu( first_m, 'Label', 'Clear dataset(s)'                         , 'CallBack', [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ]);
 	std_m = uimenu( first_m, 'Label', 'Create study', 'Separator', 'on'); 
