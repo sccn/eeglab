@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2005/11/22 22:43:26  arno
+% nothing
+%
 % Revision 1.60  2005/11/22 22:40:38  arno
 % resave option
 %
@@ -251,7 +254,7 @@ if nargin < 1
 	return;
 end;
 if isempty(EEG)  , error('Cannot save empty datasets'); end;
-if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
+if length(EEG) > 1 & nargin < 2, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
 
 % empty filename (resave file)
 emptyfilename = 0;
@@ -303,21 +306,22 @@ end
 % --------------------
 save_as_dat_file = 0;
 if strcmpi(g.savemode, 'resave')
-    if strcmpi( EEG.saved, 'yes'), return; end;
-    g.filename = EEG.filename;
-    g.filepath = EEG.filepath;
-    if isfield(EEG, 'datfile')
-        if isempty(EEG.datfile)
-            EEG = rmfield(EEG, 'datfile');
-        else
-            save_as_dat_file = 1;
+    for index = 1:length(EEG)
+        if strcmpi( EEG(index).saved, 'yes'), return; end;
+        g.filename = EEG(index).filename;
+        g.filepath = EEG(index).filepath;
+        if isfield(EEG(index), 'datfile')
+            if ~isempty(EEG(index).datfile)
+                save_as_dat_file = 1;
+            end;
+        end;
+        if isstr(EEG(index).data) & ~save_as_dat_file % data in .set file
+            TMP = pop_loadset(EEG(index).filename, EEG(index).filepath);
+            EEG(index).data = TMP.data;
         end;
     end;
-    if isstr(EEG.data) & ~save_as_dat_file % data in .set file
-        TMP = pop_loadset(EEG.filename, EEG.filepath);
-        EEG.data = TMP.data;
-    end;
 else
+    if length(EEG) > 1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
     eeg_optionsbackup;
@@ -335,61 +339,68 @@ end;
 
 % Saving data as float and Matlab
 % -------------------------------
-tmpica       = EEG.icaact;
-EEG.icaact   = [];
-if ~isstr(EEG.data)
-    tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
-    no_resave_dat = 'no';
-else 
-    no_resave_dat = 'yes';
-end;
-v = version;
-%try, 
-    fprintf('Saving dataset...\n');
-    if save_as_dat_file
-        if ~isstr(EEG.data)
-            EEG.data = EEG.datfile;
-            floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+ALLEEG = EEG;
+for index = 1:length(ALLEEG)
+    EEG = ALLEEG(index);
+    
+    tmpica       = EEG.icaact;
+    EEG.icaact   = [];
+    if ~isstr(EEG.data)
+        tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+        no_resave_dat = 'no';
+    else 
+        no_resave_dat = 'yes';
+    end;
+    v = version;
+    try, 
+        fprintf('Saving dataset...\n');
+        if save_as_dat_file
+            if ~isstr(EEG.data)
+                EEG.data = EEG.datfile;
+                floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+            end;
         end;
+        if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
+        else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
+        end;
+        if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
+            EEG.data = tmpdata;
+        end;
+    catch,
+        error('Pop_saveset: save error, out of space or file permission problem');
     end;
-    if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
-    else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
-    end;
-    if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
-        EEG.data = tmpdata;
-    end;
-%catch,
-%    error('Pop_saveset: save error, out of space or file permission problem');
-%end;
 
-% try to delete old .fdt or .dat files
-% ------------------------------------
-tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
-if exist(tmpfilename) == 2
-    disp('Old .fdt file format detected on disk, now replaced by .dat file; trying to erase file...');
-    try,
-        delete(tmpfilename);
-        disp('Delete sucessfull.');
-    catch, disp('Error while attempting to remove file'); 
-    end;
-end;
-if save_as_dat_file == 0
-    tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.dat' ]);
+    % try to delete old .fdt or .dat files
+    % ------------------------------------
+    tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
     if exist(tmpfilename) == 2
-        disp('Old .dat file detected on disk for this dataset, deleting file to avoid confusion...');
+        disp('Old .fdt file format detected on disk, now replaced by .dat file; trying to erase file...');
         try,
             delete(tmpfilename);
             disp('Delete sucessfull.');
         catch, disp('Error while attempting to remove file'); 
         end;
     end;
-end;
+    if save_as_dat_file == 0
+        tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.dat' ]);
+        if exist(tmpfilename) == 2
+            disp('Old .dat file detected on disk for this dataset, deleting file to avoid confusion...');
+            try,
+                delete(tmpfilename);
+                disp('Delete sucessfull.');
+            catch, disp('Error while attempting to remove file'); 
+            end;
+        end;
+    end;
 
-% recovering variables
-% --------------------
-EEG.icaact = tmpica;
-if isnumeric(EEG.data) & v(1) < 7
-    EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
+    % recovering variables
+    % --------------------
+    EEG.icaact = tmpica;
+    if isnumeric(EEG.data) & v(1) < 7
+        EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
+    end;
+    
+    ALLEEG = eeg_store(ALLEEG, EEG, index);
 end;
 
 com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
