@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2005/11/09 23:19:37  arno
+% backing file content in info structure
+%
 % Revision 1.134  2005/11/09 22:44:35  arno
 % plotting urchans correctly
 %
@@ -573,7 +576,7 @@ if isstruct(chans) & isfield(chans, 'chanlocs')
     else params = [];
     end;
     if isfield(EEG, 'urchanlocs')
-         urchans = EEG.urchanlocs;
+         urchans = EEG(1).urchanlocs;
     end;
 end;
 
