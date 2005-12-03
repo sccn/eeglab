@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2005/12/03 00:32:22  arno
+% remove last edits
+%
 % Revision 1.61  2005/11/22 22:43:26  arno
 % nothing
 %
@@ -254,7 +257,6 @@ if nargin < 1
 	return;
 end;
 if isempty(EEG)  , error('Cannot save empty datasets'); end;
-if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
 
 % empty filename (resave file)
 emptyfilename = 0;
@@ -263,6 +265,7 @@ if nargin > 1
 end;
 
 if nargin < 2 | emptyfilename
+    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     % pop up window to ask for file type
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
@@ -306,6 +309,14 @@ end
 % --------------------
 save_as_dat_file = 0;
 if strcmpi(g.savemode, 'resave')
+    % process multiple datasets
+    % -------------------------
+    if length(EEG) > 1
+        [ EEG com ] = eeg_eval( 'pop_saveset', EEG, 'warning', 'on', 'params', ...
+                                options );
+        return;
+    end;
+    
     if strcmpi( EEG.saved, 'yes'), return; end;
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
@@ -321,6 +332,7 @@ if strcmpi(g.savemode, 'resave')
         EEG.data = TMP.data;
     end;
 else
+    if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
     eeg_optionsbackup;
