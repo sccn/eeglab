@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2005/12/03 01:52:56  toby
+% *** empty log message ***
+%
 % Revision 1.52  2005/12/01 18:19:47  arno
 % nothing
 %
@@ -606,9 +609,6 @@ if ~isempty(EEG.icasphere)
 end;
 if ~isempty(EEG.icawinv)
    EEG.icawinv = EEG.icawinv(icachans,:);
-end;
-if ~isempty(EEG.icaact)
-    EEG.icaact = EEG.icaact(icachans,:,:);
 end;
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts
