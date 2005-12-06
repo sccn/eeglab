@@ -152,7 +152,7 @@
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%          powbase  = Baseline power spectrum (removed for each window to compute the ersp)
+%          powbase  = Baseline power spectrum (in dB removed for each window to compute the ersp)
 %            times  = Vector of output times (subwindow centers) (in ms).
 %            freqs  = Vector of frequency bin centers (in Hz).
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
@@ -194,6 +194,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2005/07/27 18:30:37  arno
+% typo for bootstrap
+%
 % Revision 1.76  2005/07/27 18:23:34  arno
 % keyword
 %
