@@ -40,6 +40,8 @@
 %                each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string). 
 %  'cbar'      = ['on'|'off'] plot color bar {default: 'on'}
+%  'cmode'     = ['common'|'separate'] 'common' or 'separate' color axis for each
+%                topoplot {default: 'common'}
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
 %                    using the left mouse button {default: 'on'}.. 
@@ -77,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2005/12/06 20:45:08  arno
+% same
+%
 % Revision 1.74  2005/12/06 20:44:10  arno
 % colorbar option
 %
@@ -329,6 +334,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'title'         'string'   []                        '';
               'verbose'       'string'   {'on' 'off' }             'on';
               'axcopy'        'string'   {'on' 'off' }             'on';
+              'cmode'         'string'   {'common' 'separate' }    'common';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
               'showchan'      'integer'  [0 nchans]                0 ;
@@ -689,16 +695,18 @@ if ~isempty(g.timefreqs)
         endcaxis = max(endcaxis,max(abs(caxis)));
         %caxis([g.limits(5:6)]);
     end;
-    for n=1:tfpoints
-        axes(topoaxes(n));
-        caxis([-endcaxis endcaxis]);
-        if n==tfpoints & strcmpi(g.cbar, 'on') % & (mod(tfpoints,2)~=0) % image color bar by last map
-            cb=cbar;
-            pos = get(cb,'position');
-            set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+    if strcmpi(g.cmode, 'common')
+        for n=1:tfpoints
+            axes(topoaxes(n));
+            caxis([-endcaxis endcaxis]);
+            if n==tfpoints & strcmpi(g.cbar, 'on') % & (mod(tfpoints,2)~=0) % image color bar by last map
+                cb=cbar;
+                pos = get(cb,'position');
+                set(cb,'position',[pos(1:2) 0.023 pos(4)]);
+            end
+            drawnow
         end
-        drawnow
-    end
+    end;
 end;
 
 if g.showchan>0 & ~isempty(g.chanlocs)
