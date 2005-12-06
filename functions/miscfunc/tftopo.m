@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2005/12/06 20:44:10  arno
+% colorbar option
+%
 % Revision 1.73  2005/04/22 01:39:17  hilit
 % added axcopy and verbose input options
 %
@@ -689,7 +692,7 @@ if ~isempty(g.timefreqs)
     for n=1:tfpoints
         axes(topoaxes(n));
         caxis([-endcaxis endcaxis]);
-        if n==tfpoints % & (mod(tfpoints,2)~=0) % image color bar by last map
+        if n==tfpoints & strcmpi(g.cbar, 'on') % & (mod(tfpoints,2)~=0) % image color bar by last map
             cb=cbar;
             pos = get(cb,'position');
             set(cb,'position',[pos(1:2) 0.023 pos(4)]);
