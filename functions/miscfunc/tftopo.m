@@ -39,6 +39,7 @@
 %  'shiftimgs' = [resposne_times_vector] - shift time/frequency images from several subjects 
 %                each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string). 
+%  'cbar'      = ['on'|'off'] plot color bar {default: 'on'}
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
 %                    using the left mouse button {default: 'on'}.. 
@@ -76,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2005/04/22 01:39:17  hilit
+% added axcopy and verbose input options
+%
 % Revision 1.72  2005/04/22 01:25:05  arno
 % recovering version 1.68
 %
@@ -317,6 +321,7 @@ tfdataori = mean(tfdata,4); % for topoplot
 fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
               'logfreq'       'string'   {'on' 'off' }             'off';
+              'cbar'          'string'   {'on' 'off' }             'on';
               'mode'          'string'   { 'ave' 'rms' }           'rms';
               'title'         'string'   []                        '';
               'verbose'       'string'   {'on' 'off' }             'on';
