@@ -5,20 +5,70 @@
 %
 % Inputs:
 %   data       = data consisting of arrays to be compared. The last dimension
-%                of the data array is shufled across conditions.
+%                of the data array (up to 4-D) is shufled across conditions 
+%                either in a 'paired fashion (no changing of order in the last
+%                 dimension) or in an umpaired fashion. If the number of 
+%                element in the last dimension is not the same across
+%                condition, the 'paired' option is automatically set to 'off'.
+%                Note that all other dimension MUST be the same (for instance
+%                time-frequency decomposition) for all condition, and that
+%                only the last dimension can differ. The test being used 
+%                depends on the size of the data array input. If the size is 2
+%                (columns) and the data is paired, a paired t-test is used. If
+%                the size is 2 (columns) and the data is not paired an unpaired
+%                t-test is used. If data is only one row (paired or unpaired 
+%                data), an 1-way ANOVA test is used. If the data cell array
+%                contains several rows and columns (paired or unpaired data), 
+%                a 2-way ANOVA test is used.
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array. Default is 'on'. 'off'
-%                option not implemented yet.
+%                option not implemented yet. 
 %   'mode'     = ['perm'|'param'] mode for the computation of the p-value. 
 %                'param is parametric (standard ANOVA) and 'perm' is 
 %                using permutations. Default is 'perm'.
 %   'naccu'    = [integer] for the 'perm' mode above, use that many 
 %                repetition. Default is 200.
 %
+% Output:
+%   stat       = F or t value array (t value only if 2 paired conditions).
+%                same size as data input minus the last dimension.
+%   df         = number of degrees of freedom (2x1 array if F value is
+%                returned)
+%   pvals      = array of p-values. Same size as data input minus the 
+%                last dimension.
+%   surrog     = surrogate array (same size as data input with the last 
+%                dimension replaced by the number of accumulation).
+%
+% Important note: If two-way ANOVA is used. All outputs contains cell
+%                 arrays with 3 elements: the first element is the
+%                 1-way ANOVA between column; the second element is the
+%                 1-way ANOVA between rows; the third element is the
+%                 interaction between rows and columns.
+%
+% Examples:
+% a = { rand(1,10) rand(1,10) };
+% [t df pvals] = statcond(a); % paired t-test
+% pvals % standard t-test siginficance
+% [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
+% pvals % permutation t-test siginficance with 2000 accumulations
+%
+% a = { rand(2,11) rand(2,10) rand(2,12) };
+% [F df pvals] = statcond(a); % unpaired ANOVA test
+% pvals % (1-way ANOVA) p value for interaction between columns 
+%       % (2 values for the 2 rows in the input data arrays)
+%
+% a = { rand(3,4,10) rand(3,4,10) rand(3,4,10); 
+%       rand(3,4,10) rand(3,4,10) rand(3,4,10) }
+% [F df pvals] = statcond(a); % paired 2-way ANOVA test 
+% pvals{1} % (2-way ANOVA) test across columns (3x4 values)
+% pvals{2} % (2-way ANOVA) test across rows (3x4 values)
+% pvals{3} % (2-way ANOVA) test for interaction between columns and 
+%          %  rows (3x4 values)
+%
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005
 %
-% See also: statcond()
+% See also: anova1_cell(), anova2_cell()
 
 % testing paired t-test
 % a = { rand(2,10) rand(2,10) };
@@ -50,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/12/07 17:26:09  arno
+% Initial revision
+%
 
 function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     
@@ -67,7 +120,10 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if size(data,2) == 1, data  = transpose(data); end;
     
     tmpsize   = size(data{1});
-    surrogval = zeros([ tmpsize(1:end-1) g.naccu ]);
+    if ~strcmpi(g.mode, 'param')
+         surrogval = zeros([ tmpsize(1:end-1) g.naccu ]);
+    else surrogval = [];
+    end;
         
     % test if data can be paired
     % --------------------------
@@ -224,10 +280,14 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
             tmp          = a(:,indswap);
             a(:,indswap) = b(:,indswap);
             b(:,indswap) = tmp;
-        else
+        elseif myndims(a) == 3
             tmp            = a(:,:,indswap);
             a(:,:,indswap) = b(:,:,indswap);
             b(:,:,indswap) = tmp;
+        else
+            tmp              = a(:,:,:,indswap);
+            a(:,:,:,indswap) = b(:,:,:,indswap);
+            b(:,:,:,indswap) = tmp;
         end;
         
     else % more than 2 conditions -> one cell array input and one cell array output
@@ -249,10 +309,14 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
                 tmp                         = a{indarg1(i)}(:,indswap(i));
                 a{indarg1(i)}(:,indswap(i)) = a{indarg2(i)}(:,indswap(i));
                 a{indarg2(i)}(:,indswap(i)) = tmp;
-            else
+            elseif myndims(in1) == 3
                 tmp                           = a{indarg1(i)}(:,:,indswap(i));
                 a{indarg1(i)}(:,:,indswap(i)) = a{indarg2(i)}(:,:,indswap(i));
                 a{indarg2(i)}(:,:,indswap(i)) = tmp;
+            else
+                tmp                             = a{indarg1(i)}(:,:,:,indswap(i));
+                a{indarg1(i)}(:,:,:,indswap(i)) = a{indarg2(i)}(:,:,:,indswap(i));
+                a{indarg2(i)}(:,:,:,indswap(i)) = tmp;
             end;
         end;
         a = reshape(a, dims);
@@ -266,7 +330,7 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
     % --------
     dims      = size(a);
     a         = a(:)';                
-    alllen       = cellfun('length', a );
+    alllen    = cellfun('length', a ); % by chance, pick up the last dimension
     
     indswap1 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin index (cumulated indices)
     indswap2 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin target
@@ -295,10 +359,14 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
             tmp                           = a{indtarg1(i)}(:,indswap1(i));
             a{indtarg1(i)}(:,indswap1(i)) = a{indtarg2(i)}(:,indswap2(i));
             a{indtarg2(i)}(:,indswap2(i)) = tmp;
-        else
+        elseif myndims(a{1}) == 3    
             tmp                             = a{indtarg1(i)}(:,:,indswap1(i));
             a{indtarg1(i)}(:,:,indswap1(i)) = a{indtarg2(i)}(:,:,indswap2(i));
             a{indtarg2(i)}(:,:,indswap2(i)) = tmp;
+        else
+            tmp                               = a{indtarg1(i)}(:,:,:,indswap1(i));
+            a{indtarg1(i)}(:,:,:,indswap1(i)) = a{indtarg2(i)}(:,:,:,indswap2(i));
+            a{indtarg2(i)}(:,:,:,indswap2(i)) = tmp;
         end;
     end;
     a = reshape(a, dims);
