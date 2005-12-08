@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.266  2005/12/01 20:28:29  arno
+% typo
+%
 % Revision 1.265  2005/11/30 19:07:58  arno
 % fixing ploting electrodes only
 %
@@ -1305,7 +1308,7 @@ x         = x(plotchans);
 y         = y(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
-if ~isempty(Values) 
+if ~isempty(Values) & length(Values) > 1
     Values    = Values(plotchans);
 end;
 
