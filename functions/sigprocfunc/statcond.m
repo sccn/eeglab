@@ -3,7 +3,7 @@
 %                Parametric testing uses fcdf() from the Matlab Statistical 
 %                Toolbox. Use of up to 4-D data matrices speeds processing.
 % Usage:
-%             >> [stats, df, pvals] = statcond( data, 'key', 'val', ... );
+%             >> [stats, df, pvals, surrog] = statcond( data, 'key', 'val', ... );
 % Inputs:
 %   data       = 1-dim or 2-dim cell array of data matrices. 
 %                For nonparametric permutation-based testing, the last 
@@ -11,8 +11,8 @@
 %                dimensions), is permuted across conditions, either in
 %                a 'paired' fashion (not changing the, e.g., subject or
 %                trial order in the last dimension) or in an umpaired 
-5                fashion (not respecting this order). If the number of 
-5                elements in the last dimension is not the same across 
+%                fashion (not respecting this order). If the number of 
+%                elements in the last dimension is not the same across 
 %                conditions, the 'paired' option is turned 'off'.  Note: 
 %                All other dimensions MUST be constant across conditions. 
 %                  For example, consider a (1,3) cell array of matrices of 
@@ -23,27 +23,30 @@
 %                  The test used depends on the size of the data array input: 
 %                When data has 2 columns and the data are paired, a paired 
 %                t-test is performed; when the data are unpaired, an 
-%                unpaired t-test is performed. If 'data' has only one row 
-%                (paired or unpaired), a 1-way ANOVA is performed. 
-%                If the data cell array contains several rows and columns 
-%                (of paired or unpaired data), a 2-way ANOVA is performed.
+%                unpaired t-test is performed (note that a F-value is
+%                returned since the function will use a 1-way ANOVA which 
+%                returns identical p-values as umpaired t-test). If 'data' 
+%                has only one row (paired or unpaired), a 1-way ANOVA is 
+%                performed. If the data cell array contains several rows 
+%                and columns (of paired or unpaired data), a 2-way ANOVA 
+%                is performed.
 %
 % Optional inputs:
-%   'paired'   = ['on'|'off'] pair the data array {default: 'on'}.
-%                Note: The 'off' option is not yet implemented. 
+%   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
+%                the last dimension of data array is of different length}.
 %   'mode'     = ['perm'|'param'] mode for the computation of the p-values:
-%                 'param' = parametric testing (standard ANOVA); 
+%                 'param' = parametric testing (standard ANOVA, t-test); 
 %                 'perm' = non-parametric testing on surrogate data 
 %                  made by permuting the nput data {default: 'perm'}
 %   'naccu'    = [integer] Number of surrogate data to use in 'perm' mode 
 %                 estimation (see above) {default: 200}.
 %
 % Outputs:
-%   stats      = F- or t-value array (t value only if 2 paired conditions).
-%                 Of the same size as input data without the last dimension.
+%   stats      = F- or t-value array (t value only if 2 paired conditions)
+%                of the same size as input data without the last dimension.
 %   df         = degrees of freedom, a (2,1) vector if F-values are returned
 %   pvals      = array of p-values. Same size as data input without the 
-%                 last dimension.
+%                last dimension.
 %   surrog     = surrogate data array (same size as data input with the last 
 %                 dim. replaced by a number ('naccu') of surrogate data sets.
 %
@@ -60,6 +63,7 @@
 %         [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
 %         pvals =
 %            0.0065 % nonparametric t-test using 2000 permuted data sets
+%
 %         a = { rand(2,11) rand(2,10) rand(2,12)+0.5 }; % pseudo 'unpaired' 
 %         [F df pvals] = statcond(a); % perform an unpaired ANOVA 
 %         pvals =
@@ -110,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/12/09 18:43:39  arno
+% scott's edit
+%
 % Revision 1.2  2005/12/07 23:31:23  arno
 % chaging help message - allowing 4-D permutation
 %
