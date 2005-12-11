@@ -1,65 +1,67 @@
-%  statcond()  - compare conditions using standard parametric or permutation
-%                -based nonparametric ANOVA (1-way or 2-way) or t-test. 
-%                Parametric testing uses fcdf() from the Matlab Statistical 
-%                Toolbox. Use of up to 4-D data matrices speeds processing.
+%  statcond()  - compare 2 or more conditions statistically using standard 
+%                parametric or nonparametric permutation-based ANOVA 
+%                (1-way or 2-way) or t-test methods. Parametric testing uses 
+%                fcdf() from the Matlab Statistical Toolbox. Use of up to 
+%                4-D data matrices speeds processing.
 % Usage:
 %             >> [stats, df, pvals, surrog] = statcond( data, 'key', 'val', ... );
 % Inputs:
 %   data       = 1-dim or 2-dim cell array of data matrices. 
 %                For nonparametric permutation-based testing, the last 
 %                dimension of the data arrays (which may be of up to 4
-%                dimensions), is permuted across conditions, either in
+%                dimensions) is permuted across conditions, either in
 %                a 'paired' fashion (not changing the, e.g., subject or
 %                trial order in the last dimension) or in an umpaired 
 %                fashion (not respecting this order). If the number of 
 %                elements in the last dimension is not the same across 
 %                conditions, the 'paired' option is turned 'off'.  Note: 
 %                All other dimensions MUST be constant across conditions. 
-%                  For example, consider a (1,3) cell array of matrices of 
-%                size (100,20,x) each holding a (100,20) time/frequency 
+%                   For example, consider a (1,3) cell array of matrices 
+%                of size (100,20,x) each holding a (100,20) time/frequency 
 %                transform from each of x subjects. Only the last dimension 
 %                (here x, the number of subjects) may differ across the 
-%                3 conditions. 
-%                  The test used depends on the size of the data array input: 
-%                When data has 2 columns and the data are paired, a paired 
-%                t-test is performed; when the data are unpaired, an 
-%                unpaired t-test is performed (note that a F-value is
-%                returned since the function will use a 1-way ANOVA which 
-%                returns identical p-values as umpaired t-test). If 'data' 
-%                has only one row (paired or unpaired), a 1-way ANOVA is 
+%                three conditions. 
+%                   The test used depends on the size of the data array input: 
+%                When the data cell array has 2 columns and the data are 
+%                paired, a paired t-test is performed; when the data are 
+%                unpaired, an unpaired t-test is performed. Note that an F-value 
+%                is returned since the function uses a one-way ANOVA that 
+%                returns p-values identical to an unpaired t-test. If 'data' 
+%                has only one row (paired or unpaired), a one-way ANOVA is 
 %                performed. If the data cell array contains several rows 
-%                and columns (of paired or unpaired data), a 2-way ANOVA 
+%                and columns (of paired or unpaired data), a two-way ANOVA 
 %                is performed.
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
-%                the last dimension of data array is of different length}.
-%   'mode'     = ['perm'|'param'] mode for the computation of the p-values:
-%                 'param' = parametric testing (standard ANOVA, t-test); 
-%                 'perm' = non-parametric testing on surrogate data 
-%                  made by permuting the nput data {default: 'perm'}
-%   'naccu'    = [integer] Number of surrogate data to use in 'perm' mode 
-%                 estimation (see above) {default: 200}.
+%                the last dimension of data array is of different lengths}.
+%   'mode'     = ['perm'|'param'] mode for computing the p-values:
+%                 'param' = parametric testing (standard ANOVA or t-test); 
+%                 'perm' = non-parametric testing using surrogate data 
+%                  made by permuting the input data {default: 'perm'}
+%   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
+%                 mode estimation (see above) {default: 200}.
 %
 % Outputs:
-%   stats      = F- or t-value array (t value only if 2 paired conditions)
-%                of the same size as input data without the last dimension.
+%   stats      = F- or t-value array of the same size as input data without 
+%                the last dimension. A t value is returned only if the data 
+%                consist of two paired conditions.
 %   df         = degrees of freedom, a (2,1) vector if F-values are returned
-%   pvals      = array of p-values. Same size as data input without the 
-%                last dimension.
-%   surrog     = surrogate data array (same size as data input with the last 
-%                 dim. replaced by a number ('naccu') of surrogate data sets.
+%   pvals      = array of p-values. Same size as input data without the last
+%                data dimension.
+%   surrog     = surrogate data array (same size as input data with the last 
+%                 dim. filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
-%                 with 3 elements: output(1) = effects across columns; 
-%                 output(2) = effects between rows; output(3) = interaction
-%                 effects rows and columns.
+%                 with three elements: output(1) = effects of column; 
+%                 output(2) = effectss of row; output(3) = interactions
+%                 between rows and columns.
 % Examples:
 %      >> a = { rand(1,10) rand(1,10)+0.5 }; % pseudo 'paired' data vectors
 %         [t df pvals] = statcond(a);        % perform paired t-test
 %         pvals =                  
 %            5.2807e-04          % standard t-test probability value
-%            % Note: for different rand() data results will differ
+%            % Note: for different rand() data results will differ.
 %         [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
 %         pvals =
 %            0.0065 % nonparametric t-test using 2000 permuted data sets
@@ -114,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/12/09 19:05:13  arno
+% editing header
+%
 % Revision 1.3  2005/12/09 18:43:39  arno
 % scott's edit
 %
