@@ -40,8 +40,8 @@
 %   'noshow' - ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Optionally sort input epochs: 
-%   'nosort' - Do not sort data epochs.
 %  {default} - Sort data epochs by sortvar (see Necessary inputs above).
+%   'nosort' - Do not sort data epochs.
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
@@ -145,11 +145,15 @@
 % Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title 'Test', 
 % sorted epochs not smoothed or decimated. Also plots the epoch-mean ERP, a color bar, 
 % and a dashed vertical line at -350 ms.
-
+%
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme, 
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
 %
 % See also: erpimages(), phasecoher(), rmbase(), cbar(), movav()
+
+% Unimplemented arg:
+% 'freqsort' - [lofreq hifreq centerms] Sort epochs by max power frequency between 
+%                lofreq and hifreq (Hz) in a time window centered on centerms (ms).
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -178,6 +182,10 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.245  2005/09/29 15:18:04  scott
+% documented the 'topo' flag args; set eloc_info.plotrad = [] to avoid lower-head topoplot() problem
+% when plotrad < radius of channel plotted -sm
+%
 % Revision 1.244  2005/03/10 16:54:32  arno
 % returning percentiles
 %
@@ -203,7 +211,7 @@
 % [Amore debugging
 %
 % Revision 1.236  2005/02/14 01:32:47  arno
-% debuging ampsort
+% debugging ampsort
 %
 % Revision 1.235  2005/02/11 03:27:38  arno
 % help msg
@@ -1013,6 +1021,7 @@ Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
 Phaseflag = NO;     % don't sort by phase
 Ampflag   = NO;     % don't sort by amplitude
+Freqsortflag = NO;  % don't sort by frequency
 Sortwinflag = NO;   % sort by amplitude over a window
 Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
@@ -1402,6 +1411,15 @@ if nargin > 6
           end
           Ampflag = NO;
 
+      elseif Freqsortflag == YES % sort epochs by frequency
+          freqsortargs = Arg;
+          losortfreq = Arg(1);
+          hisortfreq = Arg(2);
+          if hisortflag < losortflag
+             losortfreq = Arg(2);
+             hisortfreq = Arg(1);
+          end
+          freqsortms = Arg(3);
 	  elseif Valflag == YES % sort by potential value in a given window
           % Usage: 'valsort',[mintime,maxtime,direction]
           n = length(Arg);
@@ -1475,6 +1493,8 @@ if nargin > 6
 		  Phaseflag = YES;
 	  elseif strcmp(Arg,'ampsort') 
 		  Ampflag = YES;
+	  elseif strcmp(Arg,'freqsort') 
+		  Freqsortflag = YES;
 	  elseif strcmp(Arg,'sortwin') 
 		  Sortwinflag = YES;
 	  elseif strcmp(Arg,'valsort')
@@ -1585,6 +1605,23 @@ if exist('ampargs')
 	if length(ampargs)==4 & abs(ampargs(4)) > srate/2
 		ampargs(4) = srate/2;
   fprintf('> Reducing max ''ampsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
+	end
+end
+if exist('freqsortargs')
+	if abs(hisortfreq) > srate/2
+    	  fprintf(...
+           'erpimage(): frequency-sorting max frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
+              abs(hisortfreq),srate/2);
+	end
+    % DEFAULT_CYCLES = 9*abs(ampargs(3))/(abs(ampargs(3))+10); % 3 cycles at 5 Hz
+	if frames < DEFAULT_CYCLES*srate/abs(losortfreq)
+		fprintf('\nerpimage(): frequency-sorting min freq. (%g) too low: epoch length < %d cycles.\n',...
+				abs(losortfreq),DEFAULT_CYCLES);
+		return
+	end
+	if hisortfreq > srate/2
+		hisortfreq = srate/2;
+  fprintf('> Reducing max ''freqsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
 	end
 end
 if ~any(isnan(coherfreq))
@@ -1930,6 +1967,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
            phsamps = phsamps+phsamp;  % accumulate amplitudes across 'sortwin'
 	     end
         end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
      	if length(tmprange) ~=  winlen+1 % ????????? 
        	 	filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
         	timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
