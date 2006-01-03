@@ -1,23 +1,41 @@
 % binica() - Run stand-alone binary version of runica() from the
-%            Matlab command line. Saves time and memory. 
-%            If stored in a file, data are not read into Matlab.
+%            Matlab command line. Saves time and memory relative
+%            to runica().  If stored in a float file, data are not 
+%            read into Matlab, and so may be larger than Matlab
+%            can handle owing to memory limitations.
 % Usage:
-%  >> [wts,sph] = binica( datavar, 'key1', value1, 'key2', value2 ...);
-%  >> [wts,sph] = binica( 'datafile', chans, frames, 'key1', value1, ...);
+%  >> [wts,sph] = binica( datavar,  'key1', arg1, 'key2', arg2 ...);
+%  >> [wts,sph] = binica('datafile', chans, frames, 'key1', arg1, ...);
 %
 % Inputs:
-%   datavar  = (chans,frames) data matrix 
-%   datafile = quoted 'filename' of float data file
+%   datavar  = (chans,frames) data matrix in the Matlab workspace
+%   datafile = quoted 'filename' of float data file multiplexed by channel
 %
-% Optional inputs:
-%   'extended'     = 0   [default: don't look for subGaussian components]
-%   'pca'          = 0   [default: don't reduce data dimension]
-%   'blocksize'    = 0   [default: heuristic dependent on data size]
-%   'lrate'        = 1e-4    %        stop           1e-6
-%   'maxsteps'     = 512     %        annealstep     0.98  [range 0-1]
-%   'annealdeg'    = 60      %        momentum       0     [range 0-1]
-%   'sphering'     = 'on'    %        bias           on
-%   'posact'       = 'on'    %        verbose        on
+% Optional flag,argument pairs:
+%   'extended'   - int>=0        [0 default: assume no subgaussian comps]
+%                  Search for subgaussian comps: 'extended',1 recommended
+%   'pca'        - int>=0        [0 default: don't reduce data dimension]
+%                    NB: 'pca' reduction not recommended if not needed.
+%   'sphering'   - 'on'/'off'    first 'sphere' the data {default: 'on'}    
+%   'lrate'      - (0<float<<1)  starting learning rate {default: 1e-4}
+%   'blocksize'  - int>=0        [0 default: heuristic, from data size]
+%   'maxsteps'   - int>0         {default: 512}
+%   'stop'       - (0<float<<<1) stopping learning rate {default: 1e-6) 
+%                    NB: 'stop' <= 1e-7 recommended
+%   'weightsin'  - Filename string of beginning weight matrix of size
+%                  (comps,chans) floats.  Else, a weight matrix variable 
+%                  in the current Matlab dataspace. You may want to reduce 
+%                  the starting 'lrate' arg (above) when resuming training, 
+%                  and/or to reduce the 'stop' arg (above). By default, 
+%                  binary ica begins with a (recommended) identity matrix. 
+%   'verbose     - 'on'/'off'    {default: 'off'}    
+% Rarely specified flags:
+%   'posact'     - ('on'/'off') Make maximum value for each comp positive.
+%                    NB: 'off' recommended! {{default: 'on'} 
+%   'annealstep' - (0<float<1)   {default: 0.98}
+%   'annealdeg'  - (0<n<360)     {default: 60} 
+%   'bias'       - 'on'/'off'    {default: 'on'}    
+%   'momentum'   - (0<float<1)   {default: 0 --> 'off']
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 %
@@ -44,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/03/14 19:43:45  arno
+% fixing argument passing
+%
 % Revision 1.12  2005/03/13 19:03:45  scott
 % trying to read flag,arg pairs - FAILS!!!
 % Arno/Hilit - PLEASE CHECK LINE 219 and etc. ! -Scott
@@ -168,6 +189,7 @@ else % data filename given
   end
   firstarg = 4;
 end
+
 %
 % read in the master ica script file SC
 %
@@ -249,6 +271,19 @@ for x=1:length(flags)
   if strcmp(flags{x},'DataFile')
      datafile = [pwd '/' datafile];
      args{x} = datafile;
+  elseif strcmp(flags{x},'weightsin')
+     flag{x} = 'WeightsInFile'; % translate binica 'weightsin' --> ica 'WeightsInFile'
+     if exist(args{x}) == 1 % variable
+       winfn = [pwd '/binica' tmpint '.inwts']);
+       floatwrite(args{x},winfn);
+       args{x} = winfn;
+     elseif exist(args{x}) == 2 % file
+       weightsinfile = args{x};
+       weightsinfile =  [pwd '/' weightsinfile];
+       arg{x} = weightsinfile;
+     else
+       error('input weight file or variable not found');
+     end 
   elseif strcmp(flags{x},'WeightsOutFile')
      weightsfile = ['binica' tmpint '.wts'];
      weightsfile =  [pwd '/' weightsfile];
