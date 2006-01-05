@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.426  2006/01/05 21:09:29  arno
+% adding new biosig paths
+%
 % Revision 1.425  2005/12/30 18:40:52  scott
 % font 'courrier' --> 'courier'  -sm
 %
@@ -1938,6 +1941,17 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
         end;
     end;
 
+    % add other import ...
+    % --------------------
+    cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import cogniscan,'',' ...
+                                   ''' micromed, and TDT formats. To download plugins go to http://www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
+                                   '''  '',' ...
+                                   '''The BIOSIG toolbox (included by default in menu item "File > Import data > From other'',' ...
+                                   '''formats using BIOSIG") also allow to import in EEGLAB a variety of data file formats'',' ...
+                                   '''(see http://biosig.sourceforge.net/SupportedSystems.html for supported file formats)''),' ...
+                                   '''import other data formats'');' ];
+    uimenu( neuromenu, 'Label', 'Other data formats...', 'CallBack', cb_others);    
+    
     % changing plugin menu color
     % --------------------------
     fourthsub_m = findobj('parent', fourth_m);
