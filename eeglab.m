@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.425  2005/12/30 18:40:52  scott
+% font 'courrier' --> 'courier'  -sm
+%
 % Revision 1.424  2005/12/03 00:39:28  arno
 % change resave
 %
@@ -1669,6 +1672,12 @@ catchstrs.new_non_empty          = e_newnonempty;
         try,
             addpath(path_biosig);
             addpath([ p '..' delimiter 'biosig' ]); % for str2double
+            addpath([ p '..' delimiter 'biosig' delimiter 't200' ]);
+            addpath([ p '..' delimiter 'biosig' delimiter 't250' ]);
+            addpath([ p '..' delimiter 'biosig' delimiter 't300' ]);
+            addpath([ p '..' delimiter 'biosig' delimiter 't400' ]);
+            addpath([ p '..' delimiter 'biosig' delimiter 't490' ]);
+            addpath([ p '..' delimiter 'biosig' delimiter 't500' ]);
             version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
             version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
             version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
