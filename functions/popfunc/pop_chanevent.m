@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/01/05 20:39:14  arno
+% change default edge length
+%
 % Revision 1.45  2005/08/10 00:56:21  scott
 % help message description
 %
@@ -302,7 +305,7 @@ else
     options = varargin;
 end;
 listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
-              'edgelen'   'integer'    [1 Inf]                            0;
+              'edgelen'   'integer'    [1 Inf]                            1;
               'delchan'   'string'     { 'on' 'off' }                     'on';
               'oper'      'string'     []                                 '';
               'delevent'  'string'     { 'on' 'off' }                     'on';
