@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.113  2005/10/27 17:00:14  arno
+% event labels
+%
 % Revision 1.112  2005/10/12 15:03:03  scott
 % adjusted event text; 'slidder' -> 'slider' or 'sliider' (to avoid conflict) -sm
 %
@@ -700,7 +703,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	stds = std(data(:,1:maxindex),[],2);
 	stds = sort(stds);
 	if length(stds) > 2
-		stds = mean(stds(2:end-1));
+		stds = mean(stds(2:end-1)); 
 	else
 		stds = mean(stds);
 	end;	
