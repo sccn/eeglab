@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/08/10 00:56:21  scott
+% help message description
+%
 % Revision 1.44  2005/08/10 00:46:40  scott
 % dos2unix
 %
@@ -262,7 +265,7 @@ if nargin < 2
 			   { 'style' 'text' 'string' 'Transition length (1=perfect edges)' 'tooltipstring'  ...
                  [ 'Increase this number to avoid having events very close to each other due.' 10 ...
                    'to a not perfectly straight edge' ] } ...
-			   { 'style' 'edit' 'string' '1' } { } ...
+			   { 'style' 'edit' 'string' '0' } { } ...
 			   { 'style' 'text' 'string' 'Assign duration to each events?' 'tag' 'dur' 'tooltipstring' ...
 				 [ 'You may assign an event duration to each event if you select to detect' 10 ...
 				   'event on the leading edge above. Event will last as long as the signal is non-0.' ] } ...
@@ -299,7 +302,7 @@ else
     options = varargin;
 end;
 listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
-              'edgelen'   'integer'    [1 Inf]                            1;
+              'edgelen'   'integer'    [1 Inf]                            0;
               'delchan'   'string'     { 'on' 'off' }                     'on';
               'oper'      'string'     []                                 '';
               'delevent'  'string'     { 'on' 'off' }                     'on';
