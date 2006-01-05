@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/11/09 23:07:01  arno
+% nothing
+%
 % Revision 1.28  2005/11/09 22:44:56  arno
 % fixing calling format and header
 %
@@ -251,7 +254,7 @@ for index=1:length(allobj)
    try,
       objstyle = get(allobj( index ), 'style');
       switch lower( objstyle )
-      case { 'listbox', 'checkbox', 'radiobutton' }
+      case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' }
          result{counter} = get( allobj( index ), 'value');
          counter = counter+1;
       case 'edit' 
