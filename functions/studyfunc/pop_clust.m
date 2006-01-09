@@ -57,8 +57,9 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-function [STUDY] = pop_clust(STUDY, ALLEEG, varargin)
+function [STUDY, ALLEEG, com] = pop_clust(STUDY, ALLEEG, varargin)
 
+com = '';
 if isempty(varargin) %GUI call
 	alg_options = {'Kmeans' 'Neural Network' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
