@@ -83,6 +83,8 @@ if isempty(varargin) %GUI call
 	[2 1 1 1 1 1 1 1 ]);
 	
 	if ~isempty(clust_param)
+        com = '% no history yet for clustering';
+        
         clus_alg = alg_options{clust_param{1}};
         clus_num = str2num(clust_param{2});
         outliers_on = clust_param{3};
