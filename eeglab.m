@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.427  2006/01/05 22:01:29  arno
+% adding warning in import menu
+%
 % Revision 1.426  2006/01/05 21:09:29  arno
 % adding new biosig paths
 %
@@ -1680,7 +1683,7 @@ catchstrs.new_non_empty          = e_newnonempty;
             addpath([ p '..' delimiter 'biosig' delimiter 't300' ]);
             addpath([ p '..' delimiter 'biosig' delimiter 't400' ]);
             addpath([ p '..' delimiter 'biosig' delimiter 't490' ]);
-            addpath([ p '..' delimiter 'biosig' delimiter 't500' ]);
+            % addpath([ p '..' delimiter 'biosig' delimiter 't500' ]); % topoplot conflict
             version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
             version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
             version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
