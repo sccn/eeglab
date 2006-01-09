@@ -305,6 +305,8 @@ if ~isstr(varargin{1}) %intial settings
          end
 
        end
+       
+       com = '% No history yet for preclustering';
 	end
 else
     hdl = varargin{2}; %figure handle
