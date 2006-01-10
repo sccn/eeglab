@@ -1,11 +1,14 @@
 % eeglab2fieldtrip() - do this ...
 %
-% Usage:    >> data = eeglab2fieldtrip( EEG, fieldbox );
+% Usage:    >> data = eeglab2fieldtrip( EEG, fieldbox, transform );
 %
 % Inputs:
-%   EEG      - [struct] EEGLAB structure
-%   fieldbox - ['preprocessing'|'freqanalysis'|'timelockanalysis'|'companalysis']
-%
+%   EEG       - [struct] EEGLAB structure
+%   fieldbox  - ['preprocessing'|'freqanalysis'|'timelockanalysis'|'companalysis']
+%   transform - ['none'|'dipfit'] transform channel locations for DIPFIT
+%               using the transformation matrix in the field
+%               'coord_transform' of the dipfit substructure of the EEG
+%               structure.
 % Outputs:
 %   data    - FIELDTRIP structure
 %
@@ -32,7 +35,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function data = eeglab2fieldtrip(EEG, fieldbox)
+function data = eeglab2fieldtrip(EEG, fieldbox, transform)
 
 if nargin < 2
   help eeglab2fieldtrip
@@ -63,6 +66,19 @@ for ind = 1:length( EEG.chanlocs )
     end;
 end;
 
+if nargin > 2
+    if strcmpi(transform, 'dipfit') 
+        if ~isempty(EEG.dipfit.coord_transform)
+            disp('Transforming electrode coordinates to match head model');
+            transfmat = traditional(EEG.dipfit.coord_transform);
+            data.elec.pnt = transfmat * [ data.elec.pnt ones(size(data.elec.pnt,1),1) ]';
+            data.elec.pnt = data.elec.pnt(1:3,:)';
+        else
+            disp('Warning: no transformation of electrode coordinates to match head model');
+        end;
+    end;
+end;
+        
 switch fieldbox
   case 'preprocessing'
     for index = 1:EEG.trials
@@ -109,6 +125,6 @@ catch
 end
 
 % add the version details of this function call to the configuration
-data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.2 2005-03-16 02:32:41 arno Exp $';
+data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.3 2006-01-10 00:45:01 arno Exp $';
 
 return
