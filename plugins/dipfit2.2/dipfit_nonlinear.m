@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/03/11 00:18:39  arno
+% Initial revision
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT] = dipfit_nonlinear( EEG, varargin )
@@ -80,7 +83,7 @@ cfg.dip.mom = cfg.dip.mom(:);
 
 % convert the EEGLAB data structure into a structure that looks as if it
 % was computed using FIELDTRIPs componentanalysis function
-comp = eeglab2fieldtrip(EEG, 'componentanalysis');
+comp = eeglab2fieldtrip(EEG, 'componentanalysis', 'dipfit');
 
 % fit the dipoles to the ICA component(s) of interest using FIELDTRIPs
 % dipolefitting function
