@@ -22,7 +22,6 @@
 %                  recognized).
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials default is 'on'.
-%
 % Output:
 %    chan1       - transformed channel location structure
 %    transform   - transformation matrix. Use function traditional() to 
@@ -50,11 +49,20 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/11/22 00:23:35  arno
+% channel correspondance etc...
+%
 % Revision 1.2  2005/11/08 23:08:55  arno
 % header
 %
 % Revision 1.1  2005/11/08 22:48:05  arno
 % Initial revision
+%
+
+% Here we bypass channel info
+%    'chaninfo'  - [struct] channel information structure for the first
+%                  dataset (may use a cell array { struct struct } to enter
+%                  channel location info for both channel location struct.
 %
 
 function [ chan1, transformmat ] = coregister(chan1, chan2, varargin)
@@ -83,15 +91,18 @@ if isstr(chan1)
     dat = get(fid, 'userdata');
     if strcmpi(com, 'fiducials')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials', 'gui', 'off');
-        [ tmp dat.transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
+        [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
+        if ~isempty(transform), dat.transform = transform; end;
     elseif strcmpi(com, 'warp')
-        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
+        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
         % copy electrode names
-        tmpelec2 = dat.elec2;
-        for index = 1:length(clist2)
-            tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
+        if ~isempty(clist1)
+            tmpelec2 = dat.elec2;
+            for index = 1:length(clist2)
+                tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
+            end;
+            [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2));
         end;
-        [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2));
     end;
     set(fid, 'userdata', dat);
     redrawgui(fid); 
@@ -104,6 +115,7 @@ end;
 defaultmesh = 'D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
+                            'chaninfo'   'struct' {}     struct('no', {});
                             'transform'  'real'  []      [];
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'mesh'       ''      []   defaultmesh });
@@ -117,8 +129,14 @@ if ~isempty(g.mesh)
     end;
     if isstruct(g.mesh)
         if isfield(g.mesh, 'vol')
-            dat.meshpnt = g.mesh.vol.bnd(1).pnt;
-            dat.meshtri = g.mesh.vol.bnd(1).tri;
+            if isfield(g.mesh.vol, 'r')
+                [X Y Z] = sphere(50);
+                dat.meshpnt = { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
+                dat.meshtri = [];
+            else
+                dat.meshpnt = g.mesh.vol.bnd(1).pnt;
+                dat.meshtri = g.mesh.vol.bnd(1).tri;
+            end;
         elseif isfield(g.mesh, 'bnd')
             dat.meshpnt = g.mesh.bnd(1).pnt;
             dat.meshtri = g.mesh.bnd(1).tri;
@@ -139,16 +157,18 @@ end;
 
 % transform to arrays chan1
 % -------------------------
-[tmp1 tmp2 tmp3 ind1] = readlocs(chan1);
 TMP   = eeg_emptyset;
-TMP.chanlocs = chan1;
+[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1);
+TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'timelockanalysis');
 elec1 = cfg.elec;
 
 % transform to arrays chan2
 % -------------------------
 if ~isempty(chan2)
-    TMP.chanlocs = chan2;
+    TMP   = eeg_emptyset;
+    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2);
+    TMP.nbchan = length(TMP.chanlocs);
     cfg = eeglab2fieldtrip(TMP, 'timelockanalysis');
     elec2 = cfg.elec;
 else 
@@ -176,7 +196,8 @@ else
             electmp.pnt = elec1.pnt*ratio;
         end;
 
-        [ electransf dat.transform ] = align_fiducials(electmp, elec2, g.alignfid);
+        [ electransf transform ] = align_fiducials(electmp, elec2, g.alignfid);
+        if ~isempty(transform), dat.transform = transform; end;
         %dat.transform = invtrad(dat.transform, 1)
         
         if strcmpi(g.autoscale, 'on')
@@ -195,6 +216,13 @@ end;
 % ---------------------------
 dat.elec1      = elec1;
 dat.elec2      = elec2;
+dat.elecshow1  = 1:length(elec1.label);
+dat.elecshow2  = 1:length(elec2.label);
+dat.color1     = [0 1 0];
+dat.color2     = [1 0 0];
+dat.label1     = 0;
+dat.label2     = 0;
+dat.meshon     = 1;
 fid = figure('userdata', dat);
 
 if 1
@@ -237,6 +265,55 @@ if 1
     h = uicontrol( opt{:}, [0.8  .05 .2  .05], 'style', 'pushbutton', 'string', 'Warp montage', 'callback', cb_warp );
     h = uicontrol( opt{:}, [0.8  0   .1  .05], 'style', 'pushbutton', 'string', 'Cancel', 'callback', 'close(gcbf);' );
     h = uicontrol( opt{:}, [0.9  0   .1  .05], 'style', 'pushbutton', 'string', 'Ok', 'tag', 'ok', 'callback', cb_ok);
+    
+    % put labels next to electrodes
+    % -----------------------------
+    cb_label1 = [   'tmp = get(gcbf, ''userdata'');' ...
+                    'if tmp.label1, set(gcbo, ''string'', ''Label on'');' ...
+                    'else           set(gcbo, ''string'', ''Label off'');' ...
+                    'end;' ...
+                    'tmp.label1 = ~tmp.label1;' ...
+                    'set(gcbf, ''userdata'', tmp);' ...
+                    'clear tmp;' ...
+                    'coregister(''redraw'', gcbf);' ];
+    cb_label2 = [   'tmp = get(gcbf, ''userdata'');' ...
+                    'if tmp.label2, set(gcbo, ''string'', ''Label on'');' ...
+                    'else           set(gcbo, ''string'', ''Label off'');' ...
+                    'end;' ...
+                    'tmp.label2 = ~tmp.label2;' ...
+                    'set(gcbf, ''userdata'', tmp);' ...
+                    'clear tmp;' ...
+                    'coregister(''redraw'', gcbf);' ];
+    cb_mesh   = [   'tmp = get(gcbf, ''userdata'');' ...
+                    'if tmp.meshon, set(gcbo, ''string'', ''Mesh on'');' ...
+                    'else           set(gcbo, ''string'', ''Mesh off'');' ...
+                    'end;' ...
+                    'tmp.meshon = ~tmp.meshon;' ...
+                    'set(gcbf, ''userdata'', tmp);' ...
+                    'clear tmp;' ...
+                    'coregister(''redraw'', gcbf);' ];
+    cb_elecshow1 = [ 'tmp = get(gcbf, ''userdata'');' ...
+                      'tmp.elecshow1 = pop_chansel( tmp.elec1.label, ''select'', tmp.elecshow1 );' ...
+                      'set(gcbf, ''userdata'', tmp);' ...
+                      'clear tmp;' ...
+                      'coregister(''redraw'', gcbf);' ];
+    cb_elecshow2 = [ 'tmp = get(gcbf, ''userdata'');' ...
+                      'tmpstrs = { ''19 elec in 10/20'' ''32 elec in 10/20'' ''all 347 elec'' };' ...
+                      'tmpres = inputgui( ''uilist'', {{ ''style'' ''text'' ''string'' ''show only'' } ' ...
+                                        ' { ''style'' ''listbox'' ''string'' strvcat(tmpstrs) }}, ' ...
+                                        ' ''geometry'', { 1 1 }, ''geomvert'', [1 3] );' ...
+                      'if ~isempty(tmpres), tmp.elecshow2 = tmpstrs{tmpres{1}}; end;' ... 
+                      'set(gcbf, ''userdata'', tmp);' ...
+                      'clear tmp tmpres;' ...
+                      'coregister(''redraw'', gcbf);' ];
+    h = uicontrol( opt{:}, [0  0.95 .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Label on', 'callback', cb_label1 );
+    h = uicontrol( opt{:}, [0  0.9  .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Show elec', 'callback', cb_elecshow1 );
+
+    h = uicontrol( opt{:}, [0 0.85  .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Label on', 'callback', cb_label2 );
+    h = uicontrol( opt{:}, [0 0.8   .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Show elec', 'callback', cb_elecshow2 );
+    
+    h = uicontrol( opt{:}, [0 0.75  .1 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
+    
 end;
 
 coregister('redraw', fid);
@@ -254,11 +331,11 @@ close(fid);
 
 % plot electrodes
 % ---------------
-function plotelec(elec, color);
+function plotelec(elec, elecshow, color, tag);
     
-    X1 = elec.pnt(:,1);
-    Y1 = elec.pnt(:,2);
-    Z1 = elec.pnt(:,3);    
+    X1 = elec.pnt(elecshow,1);
+    Y1 = elec.pnt(elecshow,2);
+    Z1 = elec.pnt(elecshow,3);    
 
     XL = xlim;
     YL = ylim;
@@ -266,44 +343,54 @@ function plotelec(elec, color);
     
     lim=max(1.05*max([X1;Y1;Z1]), max([XL YL ZL]));
     eps=lim/20;
-    delete(findobj(gcf, 'tag', [ color 'plot']));
-    h = plot3(X1,Y1,Z1, [ color 'o' ]); hold on;
-    set(h, 'tag', [ color 'plot'], ...
+    delete(findobj(gcf, 'tag', tag));
+    h = plot3(X1,Y1,Z1, 'o', 'color', color); hold on;
+    set(h, 'tag', tag, ...
            'marker', '.', 'markersize', 20);
-
-    
-    %if ~isempty(elocname)
-    %    plot3(X1(elec_ind),Y1(elec_ind),Z1(elec_ind),'b*')
-    %end;
 
     % plot axis and labels
     %- -------------------
-    plot3([0.08 0.12],[0 0],[0 0],'r','LineWidth',4) % nose
-    plot3([0 lim],[0 0],[0 0],'b--')                 % axis
-    plot3([0 0],[0 lim],[0 0],'g--')
-    plot3([0 0],[0 0],[0 lim],'r--')
-    plot3(0,0,0,'b+')
-    text(lim+eps,0,0,'X','HorizontalAlignment','center',...
-         'VerticalAlignment','middle','Color',[0 0 0],...
-         'FontSize',10)
-    text(0,lim+eps,0,'Y','HorizontalAlignment','center',...
-         'VerticalAlignment','middle','Color',[0 0 0],...
-         'FontSize',10)
-    text(0,0,lim+eps,'Z','HorizontalAlignment','center',...
-         'VerticalAlignment','middle','Color',[0 0 0],...
-         'FontSize',10)
-    box on
-    
-    %if ~isempty(elocname)
-    %    for i = 1:length(elec_ind)
-    %        text(X(elec_ind(i)),Y(elec_ind(i)),Z(elec_ind(i))+eps,elocname(elec_ind(i)),'HorizontalAlignment','center',...
-    %             'VerticalAlignment','middle','Color',[0 0 0], 'FontSize',10)
-    %    end
-    %nd;
-
+    if isempty(findobj(gcf, 'tag', 'axlabels'))
+        plot3([0.08 0.12],[0 0],[0 0],'r','LineWidth',4) % nose
+        plot3([0 lim],[0 0],[0 0],'b--', 'tag', 'axlabels')                 % axis
+        plot3([0 0],[0 lim],[0 0],'g--')
+        plot3([0 0],[0 0],[0 lim],'r--')
+        plot3(0,0,0,'b+')
+        text(lim+eps,0,0,'X','HorizontalAlignment','center',...
+             'VerticalAlignment','middle','Color',[0 0 0],...
+             'FontSize',10)
+        text(0,lim+eps,0,'Y','HorizontalAlignment','center',...
+             'VerticalAlignment','middle','Color',[0 0 0],...
+             'FontSize',10)
+        text(0,0,lim+eps,'Z','HorizontalAlignment','center',...
+             'VerticalAlignment','middle','Color',[0 0 0],...
+             'FontSize',10)
+        box on
+    end;
     axis([-lim lim -lim lim -lim*0.5 lim])
     axis equal;
 
+% decode labels for electrode caps
+% --------------------------------
+function indices = decodelabels( strchan );
+    if ~isstr(strchan), indices = strchan; return; end;
+    switch strchan
+        case '10 elec in 10/20', indices = 1:10;
+        case '32 elec in 10/20', indices = 1:20;
+        otherwise, indices = 1:346;
+    end;
+    
+% plot electrode labels
+% ---------------------
+function plotlabels(elec, elecshow, color, tag);
+
+    for i = 1:length(elecshow)
+        coords = elec.pnt(elecshow(i),:);
+        coords = coords*1.07;
+        text(coords(1), coords(2), coords(3), elec.label{elecshow(i)},'HorizontalAlignment','center',...
+            'VerticalAlignment','middle','Color',color, 'FontSize',10, 'tag', tag)
+    end
+    
 % align fiducials
 % ---------------
 function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
@@ -311,24 +398,41 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
     % rename fiducials in template
     % ----------------------------
     fidtemplate = { 'Nz' 'LPA' 'RPA' };
-    ind = strmatch(fidtemplate{1}, elec2.label, 'exact'); elec2.label{ind} = fidnames{1};
-    ind = strmatch(fidtemplate{2}, elec2.label, 'exact'); elec2.label{ind} = fidnames{2};
-    ind = strmatch(fidtemplate{3}, elec2.label, 'exact'); elec2.label{ind} = fidnames{3};
-
+    ind21 = strmatch(fidtemplate{1}, elec2.label, 'exact');
+    ind22 = strmatch(fidtemplate{2}, elec2.label, 'exact');
+    ind23 = strmatch(fidtemplate{3}, elec2.label, 'exact');
+    ind11 = strmatch(fidtemplate{1}, elec1.label, 'exact');
+    ind12 = strmatch(fidtemplate{2}, elec1.label, 'exact');
+    ind13 = strmatch(fidtemplate{3}, elec1.label, 'exact');
+    if isempty(ind11) | isempty(ind12) | isempty(ind13)
+        transf = []; return;
+    end;
+    if isempty(ind21) | isempty(ind22) | isempty(ind23)
+        transf = []; return;
+    else
+         elec2.label{ind21} = fidnames{1};
+         elec2.label{ind22} = fidnames{2};
+         elec2.label{ind23} = fidnames{3};
+    end;
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
     cfg.method   = 'realignfiducial'; 
     cfg.fiducial = fidnames;
     elec3 = electrodenormalize(cfg);
-    transf = elec3.m
-    %transf(1,1:3) = transf(1,1:3)*1.23;
-    %transf(2,1:3) = transf(2,1:3)*1.05;
-    %transf(3,1:3) = transf(3,1:3)*1.05;
-    elec1.pnt = transf*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
-    transfmat = traditional(elec3.m);
-    elec1.pnt = elec1.pnt(1:3,:)';
+    transf = homogenous2traditional(elec3.m);
 
+    % rescale if necessary
+    % --------------------
+    coords2 = elec2.pnt([ind21 ind22 ind23],:); dist_coords2 = sqrt(sum(coords2.^2,2));
+    coords1 = elec1.pnt([ind11 ind12 ind13],:); dist_coords1 = sqrt(sum(coords1.^2,2));
+    ratio = mean(dist_coords2./dist_coords1);
+    transf(7:9) = ratio;
+    
+    transfmat = traditional(transf);
+    elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
+    elec1.pnt = elec1.pnt(1:3,:)';
+    
 % warp channels
 % -------------
 function [elec1, transf] = warp_chans(elec1, elec2, chanlist)
@@ -347,15 +451,15 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist)
 % ----------
 function redrawgui(fid)
     dat = get(fid, 'userdata');
-    tmpobj = findobj(fid, 'tag', 'pitch'); set(tmpobj, 'string', num2str(dat.transform(4),3));
-    tmpobj = findobj(fid, 'tag', 'roll' ); set(tmpobj, 'string', num2str(dat.transform(5),3));
-    tmpobj = findobj(fid, 'tag', 'yaw'  ); set(tmpobj, 'string', num2str(dat.transform(6),3));
-    tmpobj = findobj(fid, 'tag', 'right'  ); set(tmpobj, 'string', num2str(dat.transform(1),3));
-    tmpobj = findobj(fid, 'tag', 'forward'); set(tmpobj, 'string', num2str(dat.transform(2),3));
-    tmpobj = findobj(fid, 'tag', 'up'     ); set(tmpobj, 'string', num2str(dat.transform(3),3));
-    tmpobj = findobj(fid, 'tag', 'resizex'); set(tmpobj, 'string', num2str(dat.transform(7),3));
-    tmpobj = findobj(fid, 'tag', 'resizey'); set(tmpobj, 'string', num2str(dat.transform(8),3));
-    tmpobj = findobj(fid, 'tag', 'resizez'); set(tmpobj, 'string', num2str(dat.transform(9),3));
+    tmpobj = findobj(fid, 'tag', 'pitch'); set(tmpobj, 'string', num2str(dat.transform(4),4));
+    tmpobj = findobj(fid, 'tag', 'roll' ); set(tmpobj, 'string', num2str(dat.transform(5),4));
+    tmpobj = findobj(fid, 'tag', 'yaw'  ); set(tmpobj, 'string', num2str(dat.transform(6),4));
+    tmpobj = findobj(fid, 'tag', 'right'  ); set(tmpobj, 'string', num2str(dat.transform(1),4));
+    tmpobj = findobj(fid, 'tag', 'forward'); set(tmpobj, 'string', num2str(dat.transform(2),4));
+    tmpobj = findobj(fid, 'tag', 'up'     ); set(tmpobj, 'string', num2str(dat.transform(3),4));
+    tmpobj = findobj(fid, 'tag', 'resizex'); set(tmpobj, 'string', num2str(dat.transform(7),4));
+    tmpobj = findobj(fid, 'tag', 'resizey'); set(tmpobj, 'string', num2str(dat.transform(8),4));
+    tmpobj = findobj(fid, 'tag', 'resizez'); set(tmpobj, 'string', num2str(dat.transform(9),4));
     tmpview = view;
     
     if size(dat.transform,1) > 1
@@ -363,7 +467,8 @@ function redrawgui(fid)
     else
         dat.electransf.pnt = traditional(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     end;
-    dat.electransf.pnt = dat.electransf.pnt(1:3,:)';
+    dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
+    dat.electransf.label = dat.elec1.label;
     set(fid, 'userdata', dat);
     
     h = findobj(fid, 'tag', 'plot3d');
@@ -374,19 +479,47 @@ function redrawgui(fid)
         axis off;
     else 
         axes(h);
-        axis off;
+        %axis off;
     end;
-    plotelec(dat.electransf, 'r');
+    plotelec(dat.electransf, dat.elecshow1, dat.color1, 'elec1');
     if ~isempty(dat.elec2)
-        plotelec(dat.elec2     , 'b');
+        dat.elecshow2 = decodelabels( dat.elecshow2 );
+        plotelec(dat.elec2, dat.elecshow2, dat.color2, 'elec2');
     end;
     set(h, 'tag', 'plot3d');
     
     % plot mesh
     % ---------
-    if ~isempty(dat.meshtri) & isempty(findobj(gcf, 'tag', 'mesh'))
-        p1 = plotmesh(dat.meshtri, dat.meshpnt, [], 1);
-        set(p1, 'tag', 'mesh');
+    if ~isempty(dat.meshpnt) & isempty(findobj(gcf, 'tag', 'mesh'))
+        if ~isempty(dat.meshtri)
+            p1 = plotmesh(dat.meshtri, dat.meshpnt, [], 1);
+            set(p1, 'tag', 'mesh');
+        else
+            facecolor(1,1,1) = 1; facecolor(1,1,2) = .75; facecolor(1,1,3) = .65;
+            cdat = repmat( facecolor, [ size(dat.meshpnt{1}) 1]);
+            h = mesh(dat.meshpnt{1}, dat.meshpnt{2}, dat.meshpnt{3}, ...
+                'cdata', cdat, 'tag', 'mesh', 'facecolor', squeeze(facecolor), 'edgecolor', 'none');
+            hidden off;
+            lightangle(45,30);
+            lightangle(45+180,30);
+            lighting phong
+        end;
+    end;
+    meshobj = findobj(gcf, 'tag', 'mesh');
+    if dat.meshon
+         set( meshobj, 'visible', 'on');
+    else set( meshobj, 'visible', 'off');
+    end;
+    
+    % plot electrodes
+    % ---------------
+    delete(findobj(gcf, 'tag', 'elec1labels'));        
+    delete(findobj(gcf, 'tag', 'elec2labels'));        
+    if dat.label1
+        plotlabels(dat.electransf, dat.elecshow1, dat.color1, 'elec1labels');
+    end;
+    if dat.label2
+        plotlabels(dat.elec2, dat.elecshow2, dat.color2, 'elec2labels');
     end;
     
     %view(tmpview);
