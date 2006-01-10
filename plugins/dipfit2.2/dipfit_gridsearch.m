@@ -76,7 +76,7 @@ end
 
 % convert the EEGLAB data structure into a structure that looks as if it
 % was computed using FIELDTRIPs componentanalysis function
-comp = eeglab2fieldtrip(EEG, 'componentanalysis');
+comp = eeglab2fieldtrip(EEG, 'componentanalysis', 'dipfit');
 
 if ~isfield(cfg, 'component')
   % default is to scan all components
