@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/01/10 22:41:15  arno
+% same
+%
 % Revision 1.18  2006/01/10 22:39:00  arno
 % allowing non-1 radius conversion for besa
 %
@@ -223,13 +226,8 @@ case 'sphbesa2sph',
    % using polar coordinates
    sph_theta_besa  = {chans.sph_theta_besa};
    sph_phi_besa    = {chans.sph_phi_besa};
-   sph_rad         = {chans.sph_radius};
    indices = find(~cellfun('isempty', sph_theta_besa));
-   try,
-       [chan_num,angle,radius] = sph2topo([[ sph_rad{indices} ]' [ sph_theta_besa{indices} ]' [ sph_phi_besa{indices} ]' ], 1, 1);
-   catch,
-       [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
-   end;       
+   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
        
    %for index = 1:length(chans)
    %   chans(indices(index)).theta  = angle(index);
