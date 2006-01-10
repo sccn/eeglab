@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/03/09 18:49:57  arno
+% new format
+%
 % Revision 1.10  2003/05/13 23:18:51  arno
 % default unicoord on
 %
@@ -246,6 +249,7 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, 'sph_phi_besa'), str = lower(str); return; end;
 	if strcmpi(str, 'gain'), str = lower(str); return; end;
 	if strcmpi(str, 'calib'), str = lower(str); return; end;
+	if strcmpi(str, 'type') , str = lower(str); return; end;
 	if strcmpi(str, 'X'), str = upper(str); return; end;
 	if strcmpi(str, 'Y'), str = upper(str); return; end;
 	if strcmpi(str, 'Z'), str = upper(str); return; end;
