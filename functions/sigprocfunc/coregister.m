@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/01/10 22:59:11  arno
+% move noze
+%
 % Revision 1.5  2006/01/10 21:54:06  arno
 % plotting the noze
 %
@@ -131,30 +134,38 @@ if isstr(g), error(g); end;
 % ----------------
 if ~isempty(g.mesh)
     if isstr(g.mesh)
-        g.mesh  = load(g.mesh);
+        try
+            g.mesh  = load(g.mesh);
+        catch, g.mesh = [];
+        end;
     end;
-    if isstruct(g.mesh)
-        if isfield(g.mesh, 'vol')
-            if isfield(g.mesh.vol, 'r')
-                [X Y Z] = sphere(50);
-                dat.meshpnt = { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
-                dat.meshtri = [];
+    if ~isempty(g.mesh)
+        if isstruct(g.mesh)
+            if isfield(g.mesh, 'vol')
+                if isfield(g.mesh.vol, 'r')
+                    [X Y Z] = sphere(50);
+                    dat.meshpnt = { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
+                    dat.meshtri = [];
+                else
+                    dat.meshpnt = g.mesh.vol.bnd(1).pnt;
+                    dat.meshtri = g.mesh.vol.bnd(1).tri;
+                end;
+            elseif isfield(g.mesh, 'bnd')
+                dat.meshpnt = g.mesh.bnd(1).pnt;
+                dat.meshtri = g.mesh.bnd(1).tri;
+            elseif isfield(g.mesh, 'TRI1')
+                dat.meshpnt = g.mesh.POS;
+                dat.meshtri = g.mesh.TRI1;
             else
-                dat.meshpnt = g.mesh.vol.bnd(1).pnt;
-                dat.meshtri = g.mesh.vol.bnd(1).tri;
+                error('Unknown Matlab mesh file');
             end;
-        elseif isfield(g.mesh, 'bnd')
-            dat.meshpnt = g.mesh.bnd(1).pnt;
-            dat.meshtri = g.mesh.bnd(1).tri;
-        elseif isfield(g.mesh, 'TRI1')
-            dat.meshpnt = g.mesh.POS;
-            dat.meshtri = g.mesh.TRI1;
         else
-            error('Unknown Matlab mesh file');
+            dat.meshpnt = g.mesh{1};
+            dat.meshtri = g.mesh{2};
         end;
     else
-        dat.meshpnt = g.mesh{1};
-        dat.meshtri = g.mesh{2};
+        dat.meshpnt = [];
+        dat.meshtri = [];
     end;
 else
     dat.meshpnt = [];
@@ -304,7 +315,7 @@ if 1
                       'clear tmp;' ...
                       'coregister(''redraw'', gcbf);' ];
     cb_elecshow2 = [ 'tmp = get(gcbf, ''userdata'');' ...
-                      'tmpstrs = { ''19 elec in 10/20'' ''32 elec in 10/20'' ''all 347 elec'' };' ...
+                      'tmpstrs = { ''19 elec in 10/20'' ''33 elec in 10/20'' ''61 elec in 10/20'' ''all 347 elec'' };' ...
                       'tmpres = inputgui( ''uilist'', {{ ''style'' ''text'' ''string'' ''show only'' } ' ...
                                         ' { ''style'' ''listbox'' ''string'' strvcat(tmpstrs) }}, ' ...
                                         ' ''geometry'', { 1 1 }, ''geomvert'', [1 3] );' ...
@@ -381,8 +392,9 @@ function plotelec(elec, elecshow, color, tag);
 function indices = decodelabels( strchan );
     if ~isstr(strchan), indices = strchan; return; end;
     switch strchan
-        case '10 elec in 10/20', indices = 1:10;
-        case '32 elec in 10/20', indices = 1:20;
+        case '19 elec in 10/20', indices = [ 4 6 19 21 23 25 27 41 43 45 47 49 63 65 67 69 71 84 86 ];
+        case '33 elec in 10/20', indices = [ 4 6 18 19 21 23 25 27 28 31 33 35 37 40 41 43 45 47 49 50 53 55 57 59 62 63 65 67 69 71 72 84 86];
+        case '61 elec in 10/20', indices = [ 4   5   6   8  10  12  14  16  19  20  21  22  23  24  25  26  27  31  32  33  34  35  36  37  38  41  42  43  44  45  46  47  48  52  53  54  55  56  57  58  59  60  62  63  64  65  67  68  69  70  71  72  74  76  78  80  82  84  85  86  88];
         otherwise, indices = 1:346;
     end;
     
