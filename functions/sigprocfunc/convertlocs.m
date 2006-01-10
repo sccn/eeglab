@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/05/24 17:20:30  arno
+% remove cell2mat
+%
 % Revision 1.16  2004/01/29 16:48:15  scott
 % changed verbose default to 'off'
 %
@@ -202,8 +205,13 @@ case 'sph2sphbesa',
    % using polar coordinates
    sph_theta  = {chans.sph_theta};
    sph_phi    = {chans.sph_phi};
+   sph_rad    = {chans.sph_radius};
    indices = find(~cellfun('isempty', sph_theta));
-   [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
+   try,
+       [chan_num,angle,radius] = sph2topo([[ sph_rad{indices} ]' [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
+   catch,
+       [chan_num,angle,radius] = sph2topo([ones(length(indices),1)  [ sph_phi{indices} ]' [ sph_theta{indices} ]' ], 1, 2);
+   end;
    [sph_theta_besa sph_phi_besa] = topo2sph([angle radius], 1, 1);
    for index = 1:length(indices)
       chans(indices(index)).sph_theta_besa  = sph_theta_besa(index);
