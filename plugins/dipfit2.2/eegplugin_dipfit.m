@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/01/10 23:34:01  arno
+% also adding warping toolbox
+%
 % Revision 1.13  2005/04/01 23:29:40  arno
 % trapping error for dipfit
 %
@@ -172,7 +175,7 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
         ind = strmatch('fieldtrip', lower(dircontent));
         if ~isempty(ind)
             addpath([ p '..' p(end) '..' p(end) '..' p(end) dircontent{ind} ] );
-            addpath([ p '..' p(end) '..' p(end) '..' p(end) 'warping' );
+            addpath([ p '..' p(end) '..' p(end) '..' p(end) 'warping' ] );
         else
             disp('Warning: Add Fieldtrip folder path manualy or dipfit2 will not be functional');
         end;
