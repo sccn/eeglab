@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/01/10 21:54:06  arno
+% plotting the noze
+%
 % Revision 1.4  2006/01/10 00:43:46  arno
 % finalizing GUI etc...
 %
@@ -160,8 +163,8 @@ end;
 
 % transform to arrays chan1
 % -------------------------
-TMP   = eeg_emptyset;
-[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1);
+TMP                           = eeg_emptyset;
+[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1, 'defaultelp', 'besa');
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'timelockanalysis');
 elec1 = cfg.elec;
@@ -170,7 +173,7 @@ elec1 = cfg.elec;
 % -------------------------
 if ~isempty(chan2)
     TMP   = eeg_emptyset;
-    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2);
+    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2, 'defaultelp', 'besa');
     TMP.nbchan = length(TMP.chanlocs);
     cfg = eeglab2fieldtrip(TMP, 'timelockanalysis');
     elec2 = cfg.elec;
@@ -507,7 +510,7 @@ function redrawgui(fid)
             lightangle(45+180,30);
             lighting phong
         end;
-        plotnoze([100 0 -75 0 0 pi/2 10 10 40]);
+        plotnoze([85 0 -75 0 0 pi/2 10 10 40]);
     end;
     meshobj = findobj(gcf, 'tag', 'mesh');
     if dat.meshon
