@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/01/10 22:47:38  arno
+% revert version 1.17
+%
 % Revision 1.17  2005/05/24 17:20:30  arno
 % remove cell2mat
 %
@@ -158,7 +161,9 @@ switch command
    for index = 1:length(indices)
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);
-      chans(indices(index)).sph_radius = 1;
+   end;
+   if ~isfield(chans, 'sph_radius'),                             sph_radius(1:length(indices)) = {1};
+   elseif any(cellfun('isempty', { chans(indices).sph_radius })) sph_radius(1:length(indices)) = {1};
    end;
 case 'topo2sphbesa',
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
