@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/05/24 17:10:59  arno
+% cell2mat -> celltomat
+%
 % Revision 1.12  2004/02/12 19:44:10  arno
 % reading 3D coordinates
 %
@@ -143,7 +146,7 @@ function chanlocs = readneurolocs( filename, varargin)
         % convert to other types of coordinates
         % -------------------------------------
         labels = names';
-        chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
+        chanlocs = struct('labels', labels(:), 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
         chanlocs = convertlocs( chanlocs, 'sphbesa2all');
         
         for index = 1:length(chanlocs)
