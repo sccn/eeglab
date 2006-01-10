@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/09/27 22:03:07  arno
+% fix argument 'withindex' must be numeric
+%
 % Revision 1.16  2005/07/28 15:47:51  arno
 % allow using input indices
 %
