@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.428  2006/01/09 23:31:22  arno
+% remove topoplot conflict
+%
 % Revision 1.427  2006/01/05 22:01:29  arno
 % adding warning in import menu
 %
@@ -1997,7 +2000,7 @@ WINY		    = WINYDEC*NBLINES;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;
-FONTNAME        = 'courier';
+FONTNAME        = ''; %courier';
 FONTSIZE        = 11;
 
 hh = findobj('tag', 'EEGLAB');
