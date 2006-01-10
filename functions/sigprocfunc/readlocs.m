@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2005/11/30 18:31:40  arno
+% same
+%
 % Revision 1.76  2005/11/30 18:29:48  arno
 % same
 %
@@ -377,7 +380,8 @@ chanformat(2).type         = 'besa';
 chanformat(2).typestring   = 'BESA spherical .elp file';
 chanformat(2).description  = [ 'BESA spherical coordinate file. Note that BESA spherical coordinates ' ...
                                'are different from Matlab spherical coordinates' ];
-chanformat(2).importformat = { 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' };
+chanformat(2).skipline     = 1;
+chanformat(2).importformat = { 'type' 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' };
 % ---------------------------------------------------------------------------------------------------
 chanformat(3).type         = 'xyz';
 chanformat(3).typestring   = 'Matlab .xyz file';
@@ -582,22 +586,28 @@ if isstr(filename)
    % handling BESA coordinates
    % -------------------------
    if isfield(eloc, 'sph_theta_besa')
-       if isnumeric(eloc(1).labels)
-           disp('Alternate BESA format detected ( Theta | Phi )');
+       if isnumeric(eloc(1).type)
+           disp('BESA format detected ( Theta | Phi )');
+           for index = 1:length(eloc)
+               eloc(index).sph_phi_besa   = eloc(index).labels;
+               eloc(index).sph_theta_besa = eloc(index).type;
+               eloc(index).labels         = '';
+               eloc(index).type           = '';
+           end;
+           eloc = rmfield(eloc, 'labels');
+       elseif isnumeric(eloc(1).labels)
+           disp('BESA format detected ( Elec | Theta | Phi )');
            for index = 1:length(eloc)
                eloc(index).sph_phi_besa   = eloc(index).sph_theta_besa;
                eloc(index).sph_theta_besa = eloc(index).labels;
-           end;
-           eloc = rmfield(eloc, 'labels');
-       elseif isstr(eloc(1).sph_theta_besa)
-           disp('Alternate BESA format detected ( E_type| Elec | Theta | Phi )');
-           for index = 1:length(eloc)
-               eloc(index).labels         = eloc(index).sph_theta_besa;
-               eloc(index).sph_theta_besa = eloc(index).sph_phi_besa;
-               eloc(index).sph_phi_besa   = eloc(index).sph_radius;
+               eloc(index).labels         = eloc(index).type;
+               eloc(index).type           = '';
                eloc(index).radius         = 1;
            end;           
+       else
+           disp('BESA format detected ( Type | Elec | Theta | Phi | Radius )');           
        end;
+       
        try
            eloc = convertlocs(eloc, 'sphbesa2all');
            eloc = convertlocs(eloc, 'topo2all'); % problem with some EGI files (not BESA files)
