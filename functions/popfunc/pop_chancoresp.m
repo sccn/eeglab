@@ -32,15 +32,18 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/11/22 00:24:38  arno
+% Initial revision
+%
 
-function [chanlist1, chanlist2, thirdout, outfourth] = pop_chancoresp(chans1, chans2, varargin); 
+function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chans1, chans2, varargin); 
     
     if nargin < 2
         help pop_chancoresp;
         return;
     end;
-    chanlist1 = [];
-    chanlist2 = [];
+    chanlistout1 = [];
+    chanlistout2 = [];
     
     % process sub command
     % -------------------
@@ -100,6 +103,8 @@ function [chanlist1, chanlist2, thirdout, outfourth] = pop_chancoresp(chans1, ch
             g.chanlist2 = [ naz2 lpa2 rpa2 ];
             if length(g.chanlist1) ~= length(g.chanlist2) | length(g.chanlist1) == 0
                 disp('Warning: could not find fiducials in at least of channel loc. structure');
+                g.chanlist1 = [];
+                g.chanlist2 = [];
             end;
         elseif strcmpi(g.autoselect, 'all')
             % find common channels in both channel location strustures
@@ -237,8 +242,8 @@ function [chanlist1, chanlist2, thirdout, outfourth] = pop_chancoresp(chans1, ch
     waitfor( okbut, 'userdata');
     try,
         tmpdat = get(fig, 'userdata');
-        chanlist1 = tmpdat.chanlist1;
-        chanlist2 = tmpdat.chanlist2;
+        chanlistout1 = tmpdat.chanlist1;
+        chanlistout2 = tmpdat.chanlist2;
         close(fig);
         drawnow;
     end;
