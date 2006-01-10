@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/01/10 00:43:46  arno
+% finalizing GUI etc...
+%
 % Revision 1.3  2005/11/22 00:23:35  arno
 % channel correspondance etc...
 %
@@ -504,6 +507,7 @@ function redrawgui(fid)
             lightangle(45+180,30);
             lighting phong
         end;
+        plotnoze([100 0 -75 0 0 pi/2 10 10 40]);
     end;
     meshobj = findobj(gcf, 'tag', 'mesh');
     if dat.meshon
@@ -525,8 +529,122 @@ function redrawgui(fid)
     %view(tmpview);
     rotate3d on    
     
+  
+% function to plot the noze
+% -------------------------
+function plotnoze(transf, col)
+
+    if nargin < 1
+        transf = [0 0 0 0 0 0 1 1 1];
+    end;
+    if nargin < 2
+        col = [1 0.75 0.65 ];
+    end;
+        
+    x=[ % cube
+     NaN -1 1 NaN
+      -1 -1 1 1
+      -1 -1 1 1
+     NaN -1 1 NaN
+     NaN -1 1 NaN
+     NaN NaN NaN NaN
+     ];
     
+    y=[ % cube
+     NaN -1 -1   NaN
+      -1 -1 -1   -1
+       1  1  1    1
+     NaN  1  1   NaN
+     NaN -1 -1   NaN
+     NaN NaN NaN NaN
+     ];
     
+    z=[ % cube
+     NaN 0 0 NaN
+       0 1 1 0
+       0 1 1 0
+     NaN 0 0 NaN
+     NaN 0 0 NaN
+     NaN NaN NaN NaN
+     ];
+
+    x=[ % noze
+     NaN -1  1 NaN
+      -1  0  0 1
+     -.3  0  0 .3
+     NaN -.3 .3 NaN
+     NaN -1  1 NaN
+     NaN NaN NaN NaN
+     ];
+    
+    y=[ % noze
+     NaN -1 -1   NaN
+      -1 -1 -1   -1
+       1 -1 -1    1
+     NaN  1  1   NaN
+     NaN -1 -1   NaN
+     NaN NaN NaN NaN
+     ];
+    
+    z=[ % noze
+     NaN 0 0 NaN
+       0 1 1 0
+       0 1 1 0
+     NaN 0 0 NaN
+     NaN 0 0 NaN
+     NaN NaN NaN NaN
+     ];
+
+    % apply homogenous transformation
+    % -------------------------------
+    transfhom = traditional( transf );
+    xyz       = [ x(:) y(:) z(:) ones(length(x(:)),1) ];
+    xyz2      = transfhom * xyz';
+    x(:)      = xyz2(1,:)';
+    y(:)      = xyz2(2,:)';
+    z(:)      = xyz2(3,:)';
+
+    % dealing with colors
+    % -------------------
+    cc=zeros(8,3);
+    cc(1,:) = col;
+    cc(2,:) = col;
+    cc(3,:) = col;
+    cc(4,:) = col;
+    cc(5,:) = col;
+    cc(6,:) = col;
+    cc(7,:) = col;
+    cc(8,:) = col;
+    cc(1,:)=[0 0 0]; % black
+    cc(2,:)=[1 0 0]; % red
+    cc(3,:)=[0 1 0]; % green
+    cc(4,:)=[0 0 1]; % blue
+    cc(5,:)=[1 0 1]; % magenta
+    cc(6,:)=[0 1 1]; % cyan
+    cc(7,:)=[1 1 0]; % yellow
+    cc(8,:)=[1 1 1]; % white
+    cs=size(x);
+    c=repmat(zeros(cs),[1 1 3]);
+    for i=1:size(cc,1)
+        ix=find(x==cc(i,1) &...
+                y==cc(i,2) &...
+                z==cc(i,3));
+        [ir,ic]=ind2sub(cs,ix);
+        for k=1:3
+            for m=1:length(ir)
+                c(ir(m),ic(m),k)=cc(i,k);
+            end
+        end
+    end
+    
+    % plotting surface
+    % ----------------
+    facecolor = zeros(size(x,1), size(z,2), 3);
+    facecolor(:,:,1) = 1; facecolor(:,:,2) = .75; facecolor(:,:,3) = .65;
+   
+    s=surf(x,y,z,facecolor);
+    set(s, 'edgecolor', [0.5 0.5 0.5]);
+
     
     
     
