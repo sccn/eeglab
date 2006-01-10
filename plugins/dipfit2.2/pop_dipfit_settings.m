@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2005/03/21 19:03:00  arno
+% adding one line
+%
 % Revision 1.8  2005/03/17 17:33:41  arno
 % warning if dipole info already present
 %
@@ -218,13 +221,14 @@ if nargin < 2
     
     userdata    = [];
     
-    geomvert = [2 1 1 1 1 1 1 1 1 1];
+    geomvert = [2 1 1 1 1 1 1 1 1 1 1];
     
     geomhorz = {
         [1 2] 
         [1]
         [1 1.3 0.5 0.5 ]
         [1 1.3 0.9 0.1 ]
+        [1 1.3 0.5 0.5 ]
         [1 1.3 0.5 0.5 ]
         [1 1.3 0.5 0.5 ]
         [1 1.3 0.5 0.5 ]
@@ -252,7 +256,15 @@ if nargin < 2
                     '   set(findobj(''parent'', gcbf, ''tag'', ''mri''), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];    
-   
+    cb_selectcoreg = [ 'tmpmodel = get( findobj(gcbf, ''tag'', ''model''), ''string'');' ...
+                       'tmploc2  = get( findobj(gcbf, ''tag'', ''meg'')  , ''string'');' ...
+                       'tmploc1  = get( gcbo, ''userdata'');' ...
+                       'tmptransf = get( findobj(gcbf, ''tag'', ''coregtext''), ''string'');' ...
+                       '[tmp tmptransf] = coregister(tmploc1, tmploc2, ''mesh'', tmpmodel,' ...
+                       '                       ''transform'', str2num(tmptransf));' ...
+                       'if ~isempty(tmptransf), set( findobj(gcbf, ''tag'', ''coregtext''), ''string'', num2str(tmptransf)); end;' ...
+                       'clear tmpmodel tmploc2 tmploc1 tmp tmptransf;' ];
+    
     dipfitdefs; % contains template_model
     setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
                  'tmpval = get(gcbo, ''value'');' ...
@@ -281,24 +293,42 @@ if nargin < 2
         { 'style' 'edit'        'string' template_models{1}{4} 'tag'      'meg' } ...
         { 'style' 'pushbutton'  'string' 'Browse'       'callback' commandload2 } ...
         { 'style' 'pushbutton'  'string' 'Help'         'callback' comhelp2 } ...
+        { 'style' 'text'        'string' 'Coregister chan. locations with model' } ...
+        { 'style' 'edit'        'string' ''             'tag' 'coregtext' } ...
+        { 'style' 'pushbutton'  'string' 'Manual coreg.' 'callback' cb_selectcoreg 'userdata' EEG.chanlocs } ... 
+        { 'style' 'checkbox'    'string' 'No coreg'     'tag' 'coregcheckbox' } ... 
         { 'style' 'text'        'string' 'Omit channels for dipole fit' } ...
         { 'style' 'edit'        'string' ''             'tag' 'elec' } ...
-        { 'style' 'pushbutton'  'string' 'List' 'callback' cb_selectelectrodes } { } ... 
+        { 'style' 'pushbutton'  'string' 'List' 'callback' cb_selectelectrodes } { } ...
         { } ...
         { 'style' 'text'        'string' 'Note: check that the channels lie on the surface of the head model' } ...
         { 'style' 'text'        'string' '(e.g., in the channel editor ''Set head radius'' to usually 85).' } ...
                 };
     
-    result = inputgui( geomhorz, elements, 'pophelp(''pop_dipfit_settings'')', ...
-                                     'Dipole fit settings - pop_dipfit_settings()', template_models, 'normal', geomvert );
+    % plot GUI and protect parameters
+    % -------------------------------
+    optiongui = { 'geometry', geomhorz, 'uilist', elements, 'helpcom', 'pophelp(''pop_dipfit_settings'')', ...
+                  'title', 'Dipole fit settings - pop_dipfit_settings()', ...
+                  'userdata', template_models, 'geomvert', geomvert };
+	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
+    if isempty(result), return; end;
+    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end;
     
-    if isempty(result), return; end
+    while test_wrong_parameters(currentfig)
+    	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+        if isempty(result), return; end;
+    end;
+    close(currentfig);
+
+    % decode GUI inputs
+    % -----------------
     options = {};
     options = { options{:} 'hdmfile'      result{2} };
     options = { options{:} 'coordformat'  fastif(result{3} == 2, 'MNI', 'Spherical') };
     options = { options{:} 'mrifile'      result{4} };
     options = { options{:} 'chanfile'     result{5} };
-    options = { options{:} 'chansel'      setdiff(1:EEG.nbchan, str2num(result{6})) };
+    if ~result{7}, options = { options{:} 'coord_transform' str2num(result{6}) }; end;
+    options = { options{:} 'chansel'      setdiff(1:EEG.nbchan, str2num(result{8})) };
 
 else
     options = varargin;
@@ -309,6 +339,7 @@ options = finputcheck(options, { 'hdmfile'  'string'    []         '';
                                  'chanfile' 'string'    []         '';
                                  'chansel'  'integer'   []         [1:EEG.nbchan];
                                  'electrodes' 'integer'   []         [];
+                                 'coord_transform' 'real' []         [];
                                  'coordformat' 'string'    { 'MNI' 'spherical' } 'MNI' });
 if isstr(options), error(options); end;
 
@@ -317,7 +348,8 @@ OUTEEG.dipfit.hdmfile     = options.hdmfile;
 OUTEEG.dipfit.mrifile     = options.mrifile;
 OUTEEG.dipfit.chanfile    = options.chanfile;
 OUTEEG.dipfit.chansel     = options.chansel;
-OUTEEG.dipfit.coordformat = options.coordformat;
+OUTEEG.dipfit.coordformat     = options.coordformat;
+OUTEEG.dipfit.coord_transform = options.coord_transform;
 if ~isempty(options.electrodes), OUTEEG.dipfit.chansel = options.electrodes; end;
 
 % removing channels with no coordinates
@@ -363,52 +395,19 @@ if 0
     end;
     
 end;
-%    allsph = [ OUTEEG.chanlocs.sph_radius ];
-%    if length(unique(allsph)) ~= 1
-%        disp('Warning: electrodes do not lie on a sphere');
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIXME commented out by Robert
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% g = finputcheck( options, { 'radii'        'float'     []             [defaultvolume.r];
-%                             'conductances' 'float'     []             [defaultvolume.c];
-%                             'origin'       'float'     []             [defaultvolume.o];
-%                             'projectelectrodes' 'integer' [0 1]       [0];
-%                             'electrodes'   'integer'   [1 Inf]        [1:EEG.nbchan]});
-% if isstr(g), error(g); end;
-% 
-% % remember the volume conductor and electrode settings
-% OUTEEG.dipfit.chansel = g.electrodes;
-% OUTEEG.dipfit.vol.r   = g.radii;
-% OUTEEG.dipfit.vol.c   = g.conductances;
-% OUTEEG.dipfit.vol.o   = defaultvolume.o;
-%
-% if g.projectelectrodes & isfield(EEG, 'chanlocs')
-%   if isfield(OUTEEG.chanlocs, 'X') & isfield(OUTEEG.chanlocs, 'Y') & isfield(OUTEEG.chanlocs, 'Z')
-%     % here we have the option to remember the original channel locations
-%     % but it is not decided yet upon where to put them
-%     % OUTEEG.urchanlocs = OUTEEG.chanlocs;
-% 
-%     % project the electrodes towards the skin (not used by default)
-%     for el = 1:length(EEG.chanlocs)
-%       xyz(1) = OUTEEG.chanlocs(el).X;
-%       xyz(2) = OUTEEG.chanlocs(el).Y;
-%       xyz(3) = OUTEEG.chanlocs(el).Z;
-%       xyz = xyz - g.origin;
-%       xyz = max(g.radii) * xyz / norm(xyz);
-%       xyz = xyz + g.origin;
-%       OUTEEG.chanlocs(el).X = xyz(1);
-%       OUTEEG.chanlocs(el).Y = xyz(2);
-%       OUTEEG.chanlocs(el).Z = xyz(3);
-%     end
-%     OUTEEG.chanlocs = convertlocs(OUTEEG.chanlocs, 'cart2all');
-%   else
-%     error('could not project electrodes because carthesian coordinates are not available');
-%   end
-% else 
-%     warning off backtrace; % avoid long error messages
-% end
 
 com = sprintf('%s = pop_dipfit_settings( %s, %s);', inputname(1), inputname(1), vararg2str(options));
+
+% test for wrong parameters
+% -------------------------
+function bool = test_wrong_parameters(hdl)
+
+    coreg1 = get( findobj( hdl, 'tag', 'coregtext')    , 'string' );
+    coreg2 = get( findobj( hdl, 'tag', 'coregcheckbox'), 'value' );
+    
+    bool = 0;
+    if coreg2 == 0 & isempty(coreg1)
+         bool = 1; warndlg2(strvcat('You must coregister your channel locations', ...
+                                    'with the head model. To bypass coregistration,', ...
+                                    'check the checkbox "no coreg".'), 'Error');
+    end;
