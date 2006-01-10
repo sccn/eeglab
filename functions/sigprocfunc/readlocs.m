@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2006/01/10 22:53:49  arno
+% [6~[6~changing default besa format
+%
 % Revision 1.77  2005/11/30 18:31:40  arno
 % same
 %
@@ -459,6 +462,7 @@ end;
 g = finputcheck( varargin, ...
    { 'filetype'	   'string'  {}                 '';
      'importmode'  'string'  { 'eeglab' 'native' } 'eeglab';
+     'defaultelp'  'string'  { 'besa'   'polhemus' } 'polhemus';
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');
@@ -481,7 +485,7 @@ if isstr(filename)
                   'If importing EGI Cartesian coords, force type "sfp" instead.\n'] );
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
-        case 'elp', g.filetype = 'polhemus';
+        case 'elp', g.filetype = g.defaultelp;
             fprintf( [ 'WARNING: Polhemus Cartesian coord. file extension (".elp") detected.\n' ... 
                     '         If importing BESA spherical coords, force type "besa" instead.\n'] );
         case 'asc', g.filetype = 'asc';
