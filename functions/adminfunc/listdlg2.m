@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2004/11/10 17:06:39  arno
+% initval -> initialvalue
+%
 % Revision 1.9  2004/11/10 16:51:25  arno
 % remove dbug message
 %
@@ -95,7 +98,7 @@ if ~strcmp(g.selectionmode, 'multiple') | ...
 else
 	maxval = length(g.liststring)+1;
 end;
-listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'value', g.initialvalue, 'min', 1, 'max', maxval } ...
+listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'min', 1, 'max', maxval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
 		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
 
@@ -105,6 +108,12 @@ if ~isempty(g.promptstring)
 	listui = { { 'Style', 'text', 'string', g.promptstring } listui{:}};
 end;
 [tmp tmp2 allobj] = supergui( fig, geometry, geomvert, listui{:} );
+
+% assign value to listbox
+% must be done after creating it 
+% ------------------------------
+lstbox = findobj(fig, 'tag', 'listboxvals');
+set(lstbox, 'value', g.initialvalue);
 
 if ~isempty(g.listsize)
 	pos = get(gcf, 'position');
