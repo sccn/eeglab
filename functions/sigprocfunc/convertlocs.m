@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/01/10 22:52:42  arno
+% same
+%
 % Revision 1.22  2006/01/10 22:50:53  arno
 % not forcing spherical channel coord to 1
 %
@@ -167,8 +170,10 @@ switch command
    end;
    if isfield(chans, 'sph_radius'),
        meanrad = mean([ chans(indices).sph_radius ]);
+       if isempty(meanrad), meanrad = 1; end;
+   else
+       meanrad = 1;
    end;
-   if isempty(meanrad), meanrad = 1; end;
    sph_radius(1:length(indices)) = {meanrad};
 case 'topo2sphbesa',
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
