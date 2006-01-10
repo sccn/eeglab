@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/01/10 22:50:53  arno
+% not forcing spherical channel coord to 1
+%
 % Revision 1.21  2006/01/10 22:47:38  arno
 % revert version 1.17
 %
@@ -162,9 +165,11 @@ switch command
       chans(indices(index)).sph_theta  = sph_theta(index);
       chans(indices(index)).sph_phi    = sph_phi  (index);
    end;
-   if ~isfield(chans, 'sph_radius'),                             sph_radius(1:length(indices)) = {1};
-   elseif any(cellfun('isempty', { chans(indices).sph_radius })) sph_radius(1:length(indices)) = {1};
+   if isfield(chans, 'sph_radius'),
+       meanrad = mean([ chans(indices).sph_radius ]);
    end;
+   if isempty(meanrad), meanrad = 1; end;
+   sph_radius(1:length(indices)) = {meanrad};
 case 'topo2sphbesa',
    chans = convertlocs(chans, 'topo2sph', varargin{:}); % search for spherical coords
    chans = convertlocs(chans, 'sph2sphbesa', varargin{:}); % search for spherical coords
