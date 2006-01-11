@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/01/11 00:32:55  arno
+% edit help message.
+%
 % Revision 1.7  2006/01/10 23:27:32  arno
 % default electrode montages
 %
@@ -540,8 +543,9 @@ function redrawgui(fid)
             lightangle(45,30);
             lightangle(45+180,30);
             lighting phong
+            s = plotnoze([85 0 -75 0 0 pi/2 10 10 40]);
+            set(s, 'tag', 'mesh');
         end;
-        plotnoze([85 0 -75 0 0 pi/2 10 10 40]);
     end;
     meshobj = findobj(gcf, 'tag', 'mesh');
     if dat.meshon
@@ -566,7 +570,7 @@ function redrawgui(fid)
   
 % function to plot the noze
 % -------------------------
-function plotnoze(transf, col)
+function s = plotnoze(transf, col)
 
     if nargin < 1
         transf = [0 0 0 0 0 0 1 1 1];
