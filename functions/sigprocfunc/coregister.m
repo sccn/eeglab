@@ -22,6 +22,8 @@
 %                  recognized).
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials default is 'on'.
+%    'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
+%                  Default is 'off'.
 % Output:
 %    chan1       - transformed channel location structure
 %    transform   - transformation matrix. Use function traditional() to 
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/01/10 23:27:32  arno
+% default electrode montages
+%
 % Revision 1.6  2006/01/10 22:59:11  arno
 % move noze
 %
@@ -127,8 +132,22 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'chaninfo'   'struct' {}     struct('no', {});
                             'transform'  'real'  []      [];
                             'autoscale'  'string' { 'on' 'off' } 'on';
+                            'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
 if isstr(g), error(g); end;
+
+% help message
+% ------------
+if strcmpi(g.helpmsg, 'on')
+    warndlg2( strvcat( 'User channels (sometimes hidden by 3D mesh) are in green, template channels in red.', ...
+            'Press ''Warp'' to automatically warp channels to corresponding template channel locations.', ...
+            'If desired, then edit the transformation manually.', ...
+            ' ', ...
+            'To use the location of the corresponding template channels (and discard your current locations),', ...
+            'go to menu item "Edit > Channel locations", press the "Look up loc" button, and select a', ...
+            'head model. Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.'), ...
+          'Co-register channel locations');
+end;
 
 % load mesh if any
 % ----------------
