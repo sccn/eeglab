@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/03/15 18:46:56  arno
+% now reading fidutials
+%
 % Revision 1.9  2004/03/19 18:19:22  arno
 % same
 %
@@ -100,6 +103,7 @@ while noteof
                     eloc(index).X  = tmp(1); x(index) = tmp(1);
                     eloc(index).Y  = tmp(2); y(index) = tmp(2);
                     eloc(index).Z  = tmp(3); z(index) = tmp(3);
+                    eloc(index).type = 'FID';
                     index     = index    + 1;
                     countfid  = countfid + 1;
                     
@@ -116,6 +120,7 @@ while noteof
                     eloc(index).X  = tmp(1); x(index) = tmp(1);
                     eloc(index).Y  = tmp(2); y(index) = tmp(2);
                     eloc(index).Z  = tmp(3); z(index) = tmp(3);
+                    eloc(index).type = 'EEG';
                     index = index + 1;
                 end;
             end;
