@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.139  2006/01/12 23:01:37  arno
+% fixing fiducials
+%
 % Revision 1.138  2006/01/12 22:55:21  arno
 % nothing
 % ./
@@ -604,6 +607,7 @@ if isfield(params, 'nodatchans')
         end;
     end;
     disp('Fiducial have been added at the end of the channel structure');
+    params = rmfield(params, 'nodatchans');
     
     % put these channels first
     % ------------------------
