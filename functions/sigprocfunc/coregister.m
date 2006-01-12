@@ -20,6 +20,10 @@
 %                  function plotmesh() for details. Can also contain the name
 %                  of a file containing head mesh information (several format
 %                  recognized).
+%    'chaninfo1' - [struct] channel information structure for first eeglab
+%                  channel location structure (might contain fiducials).
+%    'chaninfo2' - [struct] channel information structure for second eeglab
+%                  channel location structure (might contain fiducials).
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials default is 'on'.
 %    'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
@@ -51,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/01/11 00:34:36  arno
+% noze tag
+%
 % Revision 1.8  2006/01/11 00:32:55  arno
 % edit help message.
 %
@@ -132,7 +139,8 @@ end;
 defaultmesh = 'D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
-                            'chaninfo'   'struct' {}     struct('no', {});
+                            'chaninfo1'  'struct' {}     struct('no', {}); % empty structure
+                            'chaninfo2'  'struct' {}     struct('no', {}); % empty structure
                             'transform'  'real'  []      [];
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'helpmsg'    'string' { 'on' 'off' } 'off';
@@ -198,6 +206,7 @@ end;
 % -------------------------
 TMP                           = eeg_emptyset;
 [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1, 'defaultelp', 'besa');
+TMP.chaninfo                  = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'timelockanalysis');
 elec1 = cfg.elec;
@@ -207,6 +216,7 @@ elec1 = cfg.elec;
 if ~isempty(chan2)
     TMP   = eeg_emptyset;
     [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2, 'defaultelp', 'besa');
+    TMP.chaninfo                  = g.chaninfo2;
     TMP.nbchan = length(TMP.chanlocs);
     cfg = eeglab2fieldtrip(TMP, 'timelockanalysis');
     elec2 = cfg.elec;
