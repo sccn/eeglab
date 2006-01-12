@@ -54,6 +54,22 @@ data.fsample = EEG.srate;
 % every channel has a position, or the potential was not measured on every
 % position. This is not supported by EEGLAB, but it is supported by FIELDTRIP.
 
+if strcmpi(fieldbox, 'chanloc_withfid')
+    % insert "no data channels" in channel structure
+    % ----------------------------------------------
+    if isfield(EEG.chaninfo, 'nodatchans')
+        chanlen = length(EEG.chanlocs);
+        fields = fieldnames( EEG.chaninfo.nodatchans );
+        for index = 1:length(EEG.chaninfo.nodatchans)
+            ind = chanlen+index;
+            for f = 1:length( fields )
+                EEG.chanlocs = setfield(EEG.chanlocs, { ind }, fields{f}, ...
+                                        getfield( EEG.chaninfo.nodatchans, { index },  fields{f}));
+            end;
+        end;
+    end;
+end;
+
 data.elec.pnt   = zeros(length( EEG.chanlocs ), 3);
 for ind = 1:length( EEG.chanlocs )
     data.elec.label{ind} = EEG.chanlocs(ind).labels;
@@ -108,6 +124,8 @@ switch fieldbox
     data.topolabel = { EEG.chanlocs(1:EEG.nbchan).labels };
     data.topo      = EEG.icawinv;
     
+  case { 'chanloc' 'chanloc_withfid' }
+ 
   case 'freqanalysis'
     error('freqanalysis fieldbox not implemented yet')
     
@@ -125,6 +143,6 @@ catch
 end
 
 % add the version details of this function call to the configuration
-data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.3 2006-01-10 00:45:01 arno Exp $';
+data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.4 2006-01-12 22:43:02 arno Exp $';
 
 return
