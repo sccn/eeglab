@@ -40,8 +40,8 @@
 %   'noshow' - ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Optionally sort input epochs: 
-%  {default} - Sort data epochs by sortvar (see Necessary inputs above).
 %   'nosort' - Do not sort data epochs.
+%  {default} - Sort data epochs by sortvar (see Necessary inputs above).
 %  'valsort' - [startms endms direction] Sort data on (mean) value 
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
@@ -145,15 +145,11 @@
 % Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title 'Test', 
 % sorted epochs not smoothed or decimated. Also plots the epoch-mean ERP, a color bar, 
 % and a dashed vertical line at -350 ms.
-%
+
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme, 
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
 %
 % See also: erpimages(), phasecoher(), rmbase(), cbar(), movav()
-
-% Unimplemented arg:
-% 'freqsort' - [lofreq hifreq centerms] Sort epochs by max power frequency between 
-%                lofreq and hifreq (Hz) in a time window centered on centerms (ms).
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -211,7 +207,7 @@
 % [Amore debugging
 %
 % Revision 1.236  2005/02/14 01:32:47  arno
-% debugging ampsort
+% debuging ampsort
 %
 % Revision 1.235  2005/02/11 03:27:38  arno
 % help msg
@@ -1021,7 +1017,6 @@ Colorbar  = NO;     % if YES, plot a colorbar to right of erp image
 Limitflag = NO;     % plot whole times range by default
 Phaseflag = NO;     % don't sort by phase
 Ampflag   = NO;     % don't sort by amplitude
-Freqsortflag = NO;  % don't sort by frequency
 Sortwinflag = NO;   % sort by amplitude over a window
 Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
@@ -1411,15 +1406,6 @@ if nargin > 6
           end
           Ampflag = NO;
 
-      elseif Freqsortflag == YES % sort epochs by frequency
-          freqsortargs = Arg;
-          losortfreq = Arg(1);
-          hisortfreq = Arg(2);
-          if hisortflag < losortflag
-             losortfreq = Arg(2);
-             hisortfreq = Arg(1);
-          end
-          freqsortms = Arg(3);
 	  elseif Valflag == YES % sort by potential value in a given window
           % Usage: 'valsort',[mintime,maxtime,direction]
           n = length(Arg);
@@ -1493,8 +1479,6 @@ if nargin > 6
 		  Phaseflag = YES;
 	  elseif strcmp(Arg,'ampsort') 
 		  Ampflag = YES;
-	  elseif strcmp(Arg,'freqsort') 
-		  Freqsortflag = YES;
 	  elseif strcmp(Arg,'sortwin') 
 		  Sortwinflag = YES;
 	  elseif strcmp(Arg,'valsort')
@@ -1605,23 +1589,6 @@ if exist('ampargs')
 	if length(ampargs)==4 & abs(ampargs(4)) > srate/2
 		ampargs(4) = srate/2;
   fprintf('> Reducing max ''ampsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
-	end
-end
-if exist('freqsortargs')
-	if abs(hisortfreq) > srate/2
-    	  fprintf(...
-           'erpimage(): frequency-sorting max frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
-              abs(hisortfreq),srate/2);
-	end
-    % DEFAULT_CYCLES = 9*abs(ampargs(3))/(abs(ampargs(3))+10); % 3 cycles at 5 Hz
-	if frames < DEFAULT_CYCLES*srate/abs(losortfreq)
-		fprintf('\nerpimage(): frequency-sorting min freq. (%g) too low: epoch length < %d cycles.\n',...
-				abs(losortfreq),DEFAULT_CYCLES);
-		return
-	end
-	if hisortfreq > srate/2
-		hisortfreq = srate/2;
-  fprintf('> Reducing max ''freqsort'' frequency to Nyquist rate (%g Hz)\n',srate/2)
 	end
 end
 if ~any(isnan(coherfreq))
@@ -1967,7 +1934,6 @@ elseif exist('ampargs') == 1 % if amplitude-sort
            phsamps = phsamps+phsamp;  % accumulate amplitudes across 'sortwin'
 	     end
         end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
      	if length(tmprange) ~=  winlen+1 % ????????? 
        	 	filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
         	timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
@@ -2306,7 +2272,9 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
         % need to receive cohsig and ampsig to get allamps
-        ampsig = 20*log10(ampsig); % convert to dB
+        
+        ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
+        
         fprintf('Coherence significance level: %g\n',cohsig);
 
     else % no plotting of significance
@@ -2323,7 +2291,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         fprintf('Using %g to %g ms as amplitude baseline.\n',...
                 times(1),times(base(end)));
     end
-    amps = 20*log10(amps); % convert to dB
+    amps = 20*(log10(amps) - log10(mean(amps))); % convert to dB
     
     if alpha>0
         fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
@@ -2402,8 +2370,10 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         outtrials = 1:ntrials;
         outsort = sortvar;
     end
-
+    
+    %toby
     allamps = 20*log10(allamps);
+    
     if isnan(baseamp) % if not specified in 'limits'
         [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
         allamps = allamps - baseamp; % divide by (non-log) baseline amplitude
@@ -2488,8 +2458,12 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
     if length(base)<2
         base = 1:floor(length(times)/4); % default first quarter-epoch
     end
-    amps = 20*log10(amps); % convert to dB
-    ampsig = 20*log10(ampsig); % convert to dB
+    
+    amps = 20*(log10(amps) - log10(mean(amps))); % convert to dB
+    %amps = 20*log10(amps); % convert to dB
+    ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
+    %ampsig = 20*log10(ampsig); % convert to dB
+    
     if isnan(baseamp)
         [amps,baseamp] = rmbase(amps,length(times),base); % remove baseline
     else
@@ -3027,10 +3001,30 @@ if ~isnan(coherfreq)
             [amps,cohers,cohsig,ampsig] = ...
                 phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
             fprintf('Coherence significance level: %g\n',cohsig);
-            ampsig = 20*log10(ampsig); % convert to dB
+            %toby 1/10/2006
+            global toby
+            toby.urdata=urdata;
+            toby.times = times;
+            toby.srate = srate;
+            toby.coherfreq = coherfreq;
+            toby.DEFAULT_CYCLES = DEFAULT_CYCLES;
+            toby.alpha = alpha;
+            
+            toby.amps = amps;
+            toby.cohers = cohers;
+            
+            toby.cohsig = cohsig;
+            toby.ampsig = ampsig;
+            
+            ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
+
+            %ampsig = 20*log10(ampsig./mean(ampsig)); % convert to dB
         end
         
-        amps   = 20*log10(amps);      % convert to dB
+        amps = 20*(log10(amps) - log10(mean(amps))); % convert to dB
+
+        %amps   = 20*log10(amps./mean(amps));      % convert to dB
+        
         fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
         if alpha>0 % if computed significance levels
             fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
