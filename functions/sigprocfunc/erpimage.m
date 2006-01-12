@@ -3001,20 +3001,6 @@ if ~isnan(coherfreq)
             [amps,cohers,cohsig,ampsig] = ...
                 phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
             fprintf('Coherence significance level: %g\n',cohsig);
-            %toby 1/10/2006
-            global toby
-            toby.urdata=urdata;
-            toby.times = times;
-            toby.srate = srate;
-            toby.coherfreq = coherfreq;
-            toby.DEFAULT_CYCLES = DEFAULT_CYCLES;
-            toby.alpha = alpha;
-            
-            toby.amps = amps;
-            toby.cohers = cohers;
-            
-            toby.cohsig = cohsig;
-            toby.ampsig = ampsig;
             
             ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
 
@@ -3029,7 +3015,7 @@ if ~isnan(coherfreq)
         if alpha>0 % if computed significance levels
             fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
         end
-        
+               
         if isnan(baseamp) % if baseamp not specified in 'limits'
             base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
             if length(base)<2
@@ -3047,6 +3033,7 @@ if ~isnan(coherfreq)
         if Cohsigflag
             ampsig = ampsig - baseamp;
         end;
+                
     end % ~Allampsflag
     
     if strcmpi(noshow, 'no')
