@@ -147,6 +147,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2006/01/12 22:55:21  arno
+% nothing
+% ./
+%
 % Revision 1.137  2006/01/12 22:37:40  arno
 % allowing fiducials to be processed
 %
@@ -981,11 +985,10 @@ if nargin < 3
         % ---------------------------------------
         if isfield(chans, 'type')
             alltypes          = { chans.type };
-            indnoempty        = ~cellfun('isempty', alltypes);
+            indnoempty        = find(~cellfun('isempty', alltypes));
             inds              = strmatch( 'fid', lower(alltypes(indnoempty)) );
-            tmpchans          = chans(indnoempty);
-            params.nodatchans = tmpchans(inds);
-            chans(inds)       = [];
+            params.nodatchans = chans(indnoempty(inds));
+            chans(indnoempty(inds)) = [];
         end;
         
         % multiple datasets
