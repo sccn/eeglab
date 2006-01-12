@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2006/01/10 22:56:17  arno
+% adding defaultelp option
+%
 % Revision 1.78  2006/01/10 22:53:49  arno
 % [6~[6~changing default besa format
 %
@@ -697,12 +700,20 @@ for index = 1:length(eloc)
         eloc(index).labels = int2str(eloc(index).labels);
     end;
 end;
-if nargout > 1
-    labels = { eloc.labels };
-end;
+labels = { eloc.labels };
 if isfield(eloc, 'ignore')
     eloc = rmfield(eloc, 'ignore');
 end;
+
+% process fiducials if any
+% ------------------------
+fidnames = { 'nz' 'lpa' 'rpa' };
+indices = [];
+for index = 1:length(fidnames)
+    ind = strmatch(fidnames{index}, lower(labels), 'exact');
+    if ~isempty(ind), eloc(ind).type = 'FID'; end;
+end;
+
 return;
 
 % interpret the variable name
