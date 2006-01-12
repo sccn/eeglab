@@ -1,5 +1,5 @@
 % phasecoher() - Implements inter-trial amp/coherence using Gaussian wavelets.
-%                Removes epoch means. Returns same data length as input frames.
+%                Returns same data length as input frames.
 %                Plots results when nargin>6. Outputs have flat ends 
 %                at data indices [1:halfwin] and [frames-halfwin:frames].
 % Usage:
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2003/11/30 18:29:18  scott
+% phase() (obsolete) -> angle()
+%
 % Revision 1.8  2003/04/23 00:49:07  arno
 % debug ploting is alpha == nan
 %
@@ -186,7 +189,7 @@ data = [data([halfwin+1:-1:1],:); ...
 %
 % Remove epoch means
 %
-data = data - ones(frames+winlength+1,1)* mean(data); % remove column means
+%data = data - ones(frames+winlength+1,1)* mean(data); % remove column means
 
 angleinc = cycles*2*pi/winlength;
 cosx = cos(-cycles*pi:angleinc:cycles*pi); % sinusoids
@@ -217,7 +220,7 @@ ix = 0:winlength-1;
 nsums = zeros(1,frames);
 for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
   epoch = data(ix+f,:);
-  epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
+  %epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
   if rem(f,50)== 0
     fprintf(' %d',f)
   end
@@ -273,7 +276,7 @@ if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
   nsums   = 0;
   for t = 1:trials %%%%%%%%%%%% trials %%%%%%%%%%%%%%%
     epoch = data(ix+randoff(t),t); % random time-window 
-    epoch = epoch - ones(winlength,1)*mean(epoch); 
+    %epoch = epoch - ones(winlength,1)*mean(epoch); 
     realpart = coswin*epoch;
     imagpart = sinwin*epoch;
     amp = sqrt(realpart.^2+imagpart.^2);
