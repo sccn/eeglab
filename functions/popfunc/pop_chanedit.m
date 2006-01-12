@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.136  2005/12/03 00:15:34  arno
+% fix urchanlocs
+%
 % Revision 1.135  2005/11/09 23:19:37  arno
 % backing file content in info structure
 %
@@ -559,9 +562,11 @@ urchans  = [];
 chansout = chans;
 com ='';
 if nargin < 1
-   params = [];
    help pop_chanedit;
    return;
+end;
+if nargin < 2
+   params = [];
 end;
 
 % in case an EEG structure was given as input
@@ -578,6 +583,26 @@ if isstruct(chans) & isfield(chans, 'chanlocs')
     if isfield(EEG, 'urchanlocs')
          urchans = EEG(1).urchanlocs;
     end;
+end;
+
+% insert "no data channels" in channel structure
+% ----------------------------------------------
+if isfield(params, 'nodatchans')
+    chanlen = length(chans);
+    
+    fields = fieldnames( params.nodatchans );
+    for index = 1:length(params.nodatchans)
+        ind = chanlen+index;
+        for f = 1:length( fields )
+            chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
+        end;
+    end;
+    
+    % put these channels first
+    % ------------------------
+    tmp = chans(chanlen+1:end);
+    chans(length(tmp)+1:end) = chans(1:end-length(tmp));
+    chans(1:length(tmp)) = tmp;
 end;
 
 nbchan = length(chans);
@@ -948,6 +973,17 @@ if nargin < 3
 			end;
             com = sprintf('%s=pop_chanedit(%s, %s);', varname, varname, vararg2str(totaluserdat));
 		end;
+        
+        % move no data channels to info structure
+        % ---------------------------------------
+        if isfield(chans, 'type')
+            alltypes          = { chans.type };
+            indnoempty        = ~cellfun('isempty', alltypes);
+            inds              = strmatch( 'fid', lower(alltypes(indnoempty)) );
+            tmpchans          = chans(indnoempty);
+            params.nodatchans = tmpchans(inds);
+            chans(inds)       = [];
+        end;
         
         % multiple datasets
         % -----------------
