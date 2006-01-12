@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2006/01/12 22:03:51  arno
+% fiducial type
+%
 % Revision 1.79  2006/01/10 22:56:17  arno
 % adding defaultelp option
 %
@@ -708,7 +711,6 @@ end;
 % process fiducials if any
 % ------------------------
 fidnames = { 'nz' 'lpa' 'rpa' };
-indices = [];
 for index = 1:length(fidnames)
     ind = strmatch(fidnames{index}, lower(labels), 'exact');
     if ~isempty(ind), eloc(ind).type = 'FID'; end;
