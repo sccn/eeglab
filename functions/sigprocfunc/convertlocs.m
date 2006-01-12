@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/01/10 23:07:56  arno
+% fixing meanrad
+%
 % Revision 1.23  2006/01/10 22:52:42  arno
 % same
 %
@@ -194,6 +197,11 @@ case 'sph2cart',
    indices = find(~cellfun('isempty', sph_theta));
    if ~isfield(chans, 'sph_radius'), sph_radius(1:length(indices)) = {1};
    else                              sph_radius = {chans.sph_radius};
+   end;
+   inde = find(cellfun('isempty', sph_radius));
+   if ~isempty(inde)
+       meanrad = mean( [ sph_radius{:} ]);
+       sph_radius(inde) = { meanrad };
    end;
    [x y z] = sph2cart([ sph_theta{indices} ]'/180*pi, [ sph_phi{indices} ]'/180*pi, [ sph_radius{indices} ]');
    for index = 1:length(indices)
