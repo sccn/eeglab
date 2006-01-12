@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/10 00:42:14  arno
+% fixing somthing (cannot remember)
+%
 % Revision 1.1  2005/11/22 00:24:38  arno
 % Initial revision
 %
@@ -126,8 +129,8 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     % plot
     % ----
     if strcmpi(g.gui, 'off')
-        chanlist1 = g.chanlist1;
-        chanlist2 = g.chanlist2;
+        chanlistout1 = g.chanlist1;
+        chanlistout2 = g.chanlist2;
         return;
     end;
     try,  g.promptstring;  catch, g.promptstring = ''; end;
