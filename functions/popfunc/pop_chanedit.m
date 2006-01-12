@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.137  2006/01/12 22:37:40  arno
+% allowing fiducials to be processed
+%
 % Revision 1.136  2005/12/03 00:15:34  arno
 % fix urchanlocs
 %
@@ -589,7 +592,6 @@ end;
 % ----------------------------------------------
 if isfield(params, 'nodatchans')
     chanlen = length(chans);
-    
     fields = fieldnames( params.nodatchans );
     for index = 1:length(params.nodatchans)
         ind = chanlen+index;
@@ -597,12 +599,13 @@ if isfield(params, 'nodatchans')
             chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
         end;
     end;
+    disp('Fiducial have been added at the end of the channel structure');
     
     % put these channels first
     % ------------------------
-    tmp = chans(chanlen+1:end);
-    chans(length(tmp)+1:end) = chans(1:end-length(tmp));
-    chans(1:length(tmp)) = tmp;
+    % tmp = chans(chanlen+1:end);
+    % chans(length(tmp)+1:end) = chans(1:end-length(tmp));
+    % chans(1:length(tmp)) = tmp;
 end;
 
 nbchan = length(chans);
