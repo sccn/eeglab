@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/01/12 23:05:08  arno
+% allowing fiducials
+%
 % Revision 1.9  2006/01/11 00:34:36  arno
 % noze tag
 %
@@ -208,7 +211,7 @@ TMP                           = eeg_emptyset;
 [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1, 'defaultelp', 'besa');
 TMP.chaninfo                  = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
-cfg   = eeglab2fieldtrip(TMP, 'timelockanalysis');
+cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
 elec1 = cfg.elec;
 
 % transform to arrays chan2
@@ -218,7 +221,7 @@ if ~isempty(chan2)
     [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2, 'defaultelp', 'besa');
     TMP.chaninfo                  = g.chaninfo2;
     TMP.nbchan = length(TMP.chanlocs);
-    cfg = eeglab2fieldtrip(TMP, 'timelockanalysis');
+    cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
     elec2 = cfg.elec;
 else 
     elec2 = [];
