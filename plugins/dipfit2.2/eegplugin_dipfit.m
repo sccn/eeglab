@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/01/10 23:34:55  arno
+% same
+%
 % Revision 1.14  2006/01/10 23:34:01  arno
 % also adding warping toolbox
 %
@@ -204,11 +207,11 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     
     % menu callback commands
     % ----------------------
-    comauto    = [ trystrs.check_ica check_chans  '[EEG LASTCOM] = pop_multifit(EEG);'        catchstrs.store_and_hist ];
     comsetting = [ trystrs.check_ica check_chans '[EEG LASTCOM]=pop_dipfit_settings(EEG);'    catchstrs.store_and_hist ]; 
     combatch   = [ check_dipfit check_chans  '[EEG LASTCOM] = pop_dipfit_gridsearch(EEG);'    catchstrs.store_and_hist ];
     comfit     = [ check_dipfitnocheck check_chans [ 'EEG = pop_dipfit_nonlinear(EEG); ' ...
                         'LASTCOM = ''% === History not supported for manual dipole fitting ==='';' ]  catchstrs.store_and_hist ];
+    comauto    = [ check_dipfit check_chans  '[EEG LASTCOM] = pop_multifit(EEG);'        catchstrs.store_and_hist ];
     % preserve the '=" sign in the comment above: it is used by EEGLAB to detect appropriate LASTCOM
     complot    = [ check_dipfit check_chans 'LASTCOM = pop_dipplot(EEG);'                     catchstrs.add_to_hist ];
 
@@ -216,8 +219,8 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     % create menus
     % ------------
     submenu = uimenu( menu, 'Label', 'Locate dipoles using DIPFIT 2.x');
-    uimenu( submenu, 'Label', 'Autofit components'       , 'CallBack', comauto);
     uimenu( submenu, 'Label', 'Head model and settings'  , 'CallBack', comsetting, 'separator', 'on');
     uimenu( submenu, 'Label', 'Coarse fit (grid scan)'   , 'CallBack', combatch);
     uimenu( submenu, 'Label', 'Fine fit (iterative)'     , 'CallBack', comfit);
+    uimenu( submenu, 'Label', 'Autofit (coarse fit, fine fit & plot)', 'CallBack', comauto);
     uimenu( submenu, 'Label', 'Plot component dipoles'   , 'CallBack', complot, 'separator', 'on');
