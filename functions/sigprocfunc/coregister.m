@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/01/13 20:18:04  arno
+% invert fiducials etc...
+%
 % Revision 1.14  2006/01/13 00:45:56  arno
 % adding fiducials to the plotted electrodes
 %
@@ -130,12 +133,12 @@ if isstr(chan1)
     dat = get(fid, 'userdata');
     if strcmpi(com, 'fiducials')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-        %try,
+        try,
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
-        %catch,
-        %    warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
-        %end;
+        catch,
+            warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
+        end;
     elseif strcmpi(com, 'warp')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
         % copy electrode names
