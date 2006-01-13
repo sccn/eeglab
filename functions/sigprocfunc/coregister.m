@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/01/12 23:47:04  arno
+% channel conversion to fieldtrip
+%
 % Revision 1.10  2006/01/12 23:05:08  arno
 % allowing fiducials
 %
@@ -117,9 +120,13 @@ if isstr(chan1)
     % ----------------------------------
     dat = get(fid, 'userdata');
     if strcmpi(com, 'fiducials')
-        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials', 'gui', 'off');
-        [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
-        if ~isempty(transform), dat.transform = transform; end;
+        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
+        try,
+            [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
+            if ~isempty(transform), dat.transform = transform; end;
+        catch,
+            warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
+        end;
     elseif strcmpi(com, 'warp')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
         % copy electrode names
@@ -396,9 +403,18 @@ function plotelec(elec, elecshow, color, tag);
     lim=max(1.05*max([X1;Y1;Z1]), max([XL YL ZL]));
     eps=lim/20;
     delete(findobj(gcf, 'tag', tag));
-    h = plot3(X1,Y1,Z1, 'o', 'color', color); hold on;
-    set(h, 'tag', tag, ...
-           'marker', '.', 'markersize', 20);
+    
+    % make bigger if fiducial
+    % ------------------------
+    fidlist = { 'nz' 'lpa' 'rpa' };
+    [tmp fids ] = intersect(lower(elec.label), fidlist);
+    nonfids     = setdiff(1:length(elec.label), fids);
+    h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
+    set(h1, 'tag', tag, 'marker', '.', 'markersize', 20);
+    if ~isempty(fids)
+        h2 = plot3(X1(fids),Y1(fids),Z1(fids), 'o', 'color', color*2/3); hold on;
+        set(h2, 'tag', tag, 'marker', '.', 'markersize', 35); % make bigger if fiducial
+    end;
 
     % plot axis and labels
     %- -------------------
