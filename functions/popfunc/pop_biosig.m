@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/01/13 22:21:32  arno
+% special handling of BDF files
+%
 % Revision 1.4  2006/01/13 22:01:01  arno
 % now uses biosig2eeglabevent
 %
@@ -115,7 +118,6 @@ if exist('channels') ~= 1
     channels = 0;
 end;
 disp('Importing data...');
-fdhgf
 [signal,H] = sload(filename,channels);
         
 % decoding data
