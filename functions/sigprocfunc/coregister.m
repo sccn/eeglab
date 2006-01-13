@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/01/13 00:45:56  arno
+% adding fiducials to the plotted electrodes
+%
 % Revision 1.13  2006/01/13 00:41:45  arno
 % tags etc...
 %
@@ -127,12 +130,12 @@ if isstr(chan1)
     dat = get(fid, 'userdata');
     if strcmpi(com, 'fiducials')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-        try,
+        %try,
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
-        catch,
-            warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
-        end;
+        %catch,
+        %    warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
+        %end;
     elseif strcmpi(com, 'warp')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
         % copy electrode names
@@ -496,6 +499,23 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
     cfg.fiducial = fidnames;
     elec3 = electrodenormalize(cfg);
     transf = homogenous2traditional(elec3.m);
+    
+    % test difference
+    % ---------------
+    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    transf(6) = -transf(6);
+    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    if diff1 < diff2, transf(6) = -transf(6); end;
+    
+    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    transf(5) = -transf(5);
+    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    if diff1 < diff2, transf(5) = -transf(5); end;
+    
+    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    transf(4) = -transf(4);
+    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    if diff1 < diff2, transf(4) = -transf(4); end;
 
     % rescale if necessary
     % --------------------
