@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/01/13 00:34:21  arno
+% detect if transformation is failing
+%
 % Revision 1.11  2006/01/12 23:47:04  arno
 % channel conversion to fieldtrip
 %
@@ -314,9 +317,9 @@ if 1
     h = uicontrol( opt{:}, [0.4  .1  .1  .05], 'tag', 'resizex', 'callback', cbresizex, 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.4  .05 .1  .05], 'tag', 'resizey', 'callback', cbresizey, 'style', 'edit', 'string', '' );
     h = uicontrol( opt{:}, [0.4  0   .1  .05], 'tag', 'resizez', 'callback', cbresizez, 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Right {x in mm}');
-    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Forward {y in mm}' );
-    h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Up {z in mm}');
+    h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Move right {x in mm}');
+    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move forward {y in mm}' );
+    h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Move up {z in mm}');
     h = uicontrol( opt{:}, [0.7  .1  .1  .05], 'tag', 'right'  , 'callback', cbright  , 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.7  .05 .1  .05], 'tag', 'forward', 'callback', cbforward, 'style', 'edit', 'string', '' );
     h = uicontrol( opt{:}, [0.7  0   .1  .05], 'tag', 'up'     , 'callback', cbup     , 'style', 'edit', 'string', '');
@@ -328,16 +331,16 @@ if 1
     % put labels next to electrodes
     % -----------------------------
     cb_label1 = [   'tmp = get(gcbf, ''userdata'');' ...
-                    'if tmp.label1, set(gcbo, ''string'', ''Label on'');' ...
-                    'else           set(gcbo, ''string'', ''Label off'');' ...
+                    'if tmp.label1, set(gcbo, ''string'', ''Labels on'');' ...
+                    'else           set(gcbo, ''string'', ''Labels off'');' ...
                     'end;' ...
                     'tmp.label1 = ~tmp.label1;' ...
                     'set(gcbf, ''userdata'', tmp);' ...
                     'clear tmp;' ...
                     'coregister(''redraw'', gcbf);' ];
     cb_label2 = [   'tmp = get(gcbf, ''userdata'');' ...
-                    'if tmp.label2, set(gcbo, ''string'', ''Label on'');' ...
-                    'else           set(gcbo, ''string'', ''Label off'');' ...
+                    'if tmp.label2, set(gcbo, ''string'', ''Labels on'');' ...
+                    'else           set(gcbo, ''string'', ''Labels off'');' ...
                     'end;' ...
                     'tmp.label2 = ~tmp.label2;' ...
                     'set(gcbf, ''userdata'', tmp);' ...
@@ -365,13 +368,13 @@ if 1
                       'set(gcbf, ''userdata'', tmp);' ...
                       'clear tmp tmpres;' ...
                       'coregister(''redraw'', gcbf);' ];
-    h = uicontrol( opt{:}, [0  0.95 .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Label on', 'callback', cb_label1 );
-    h = uicontrol( opt{:}, [0  0.9  .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Show elec', 'callback', cb_elecshow1 );
+    h = uicontrol( opt{:}, [0  0.95 .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Labels on', 'callback', cb_label1 );
+    h = uicontrol( opt{:}, [0  0.9  .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Electrodes', 'callback', cb_elecshow1 );
 
-    h = uicontrol( opt{:}, [0 0.85  .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Label on', 'callback', cb_label2 );
-    h = uicontrol( opt{:}, [0 0.8   .1 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Show elec', 'callback', cb_elecshow2 );
+    h = uicontrol( opt{:}, [0 0.85  .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Labels on', 'callback', cb_label2 );
+    h = uicontrol( opt{:}, [0 0.8   .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Electrodes', 'callback', cb_elecshow2 );
     
-    h = uicontrol( opt{:}, [0 0.75  .1 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
+    h = uicontrol( opt{:}, [0 0.75  .13 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
     
 end;
 
@@ -407,8 +410,8 @@ function plotelec(elec, elecshow, color, tag);
     % make bigger if fiducial
     % ------------------------
     fidlist = { 'nz' 'lpa' 'rpa' };
-    [tmp fids ] = intersect(lower(elec.label), fidlist);
-    nonfids     = setdiff(1:length(elec.label), fids);
+    [tmp fids ] = intersect(lower(elec.label(elecshow)), fidlist);
+    nonfids     = setdiff(1:length(elec.label(elecshow)), fids);
     h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
     set(h1, 'tag', tag, 'marker', '.', 'markersize', 20);
     if ~isempty(fids)
