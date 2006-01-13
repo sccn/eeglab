@@ -30,10 +30,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/01/13 21:59:19  arno
+% Initial revision
+%
 
 function event = biosig2eeglabevent(EVENT)
 
-disp('Importing data events...');
+    event = [];
+    disp('Importing data events...');
     if isfield(EVENT, 'Teeg')
         event = EVENT.Teeg;
     end
