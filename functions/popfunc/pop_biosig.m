@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/01/13 22:01:01  arno
+% now uses biosig2eeglabevent
+%
 % Revision 1.3  2005/10/27 05:24:55  arno
 % filename
 %
@@ -112,6 +115,7 @@ if exist('channels') ~= 1
     channels = 0;
 end;
 disp('Importing data...');
+fdhgf
 [signal,H] = sload(filename,channels);
         
 % decoding data
@@ -123,8 +127,13 @@ EEG.comments = [ 'Original file: ' filename ];
 EEG.srate    = H.SampleRate(1);
 EEG.data     = signal';
 EEG.nbchan   = size(EEG.data,1);
-EEG.trials   = H.NRec;
-EEG.pnts     = size(EEG.data,2)/H.NRec;
+if strcmpi(H.TYPE, 'BDF')
+    EEG.trials   = 1;
+    EEG.pnts     = size(EEG.data,2);
+else
+    EEG.trials   = H.NRec;
+    EEG.pnts     = size(EEG.data,2)/H.NRec;
+end;
 if isfield(H, 'Label') & ~isempty(H.Label)
     EEG.chanlocs        = struct('labels', cellstr(char(H.Label)));
 end;
