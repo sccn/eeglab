@@ -9,9 +9,6 @@
 %  comps    - component to fit
 %
 % Optional inputs:
-%  'model'     - ['4Shell'|'BEM'] dipfit template model settings.
-%  'settings'  - [cell array] optional arguments for pop_dipfit_settings
-%                such as electrodes to omit.
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
 %                symetry. Default is 1.
 %  'dipplot'   - ['on'|'off'] plot dipoles. Default is 'off'.
@@ -48,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/05/24 17:56:21  arno
+% same
+%
 % Revision 1.11  2005/05/24 17:55:40  arno
 % ceremove cell2mat
 %
@@ -159,13 +159,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         
         uilist = { { 'style' 'text' 'string' 'Component indices' } ...
                    { 'style' 'edit' 'string' [ '1:' int2str(ncomps) ] } ... 
-                   { 'style' 'text' 'string' 'Template dipole model' } ...
-                   { 'style' 'listbox' 'string' '4 shell (same as BESA)|Boundary Element Model' } ... 
-                   { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''pop_dipfit_settings'')' } ... 
-                   { 'style' 'text' 'string' 'Omit the following channels' } ...
-                   { 'style' 'edit' 'string' '' 'tag' 'chans' } ... 
-                   { 'style' 'pushbutton' 'string' '...' 'callback' cb_chans } ... 
-                   { 'style' 'text' 'string' 'Rejection threshold RV (%)' } ...
+                    { 'style' 'text' 'string' 'Rejection threshold RV (%)' } ...
                    { 'style' 'edit' 'string' '40' } ... 
                    { 'style' 'text' 'string' 'Remove dipoles outside the head' } ...
                    { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
@@ -177,7 +171,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                    { 'style' 'edit' 'string' '''normlen'' ''on''' } ...
                    { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''dipplot'')' } }; 
 
-        results = inputgui( { [1.91 2.8] [2.12 2.2 0.8]  [2.12 2.2 0.8] [1.91 2.8] [3.1 0.4 2] [3.1 0.4 2] [3.1 0.4 2] [2.12 2.2 0.8]}, ...
+        results = inputgui( { [1.91 2.8] [1.91 2.8] [3.1 0.4 2] [3.1 0.4 2] [3.1 0.4 2] [2.12 2.2 0.8]}, ...
                             uilist, 'pophelp(''pop_multifit'')', ...
                             'Fit multiple ICA components -- pop_multifit()');
         if length(results) == 0 return; end;
@@ -185,25 +179,22 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         
         % selecting model
         % ---------------
-        options = { 'model' fastif(results{2} == 1, '4Shell', 'BEM') };        
-        if ~isempty(results{3})
-             options      = { options{:} 'settings' { 'electrodes' setdiff(1:EEG.nbchan, eval( [ '[' results{3} ']' ] )) } };
+        options = {};
+         if ~isempty(results{2})
+            options      = { options{:} 'threshold' eval( results{2} ) };
         end;
-        if ~isempty(results{4})
-            options      = { options{:} 'threshold' eval( results{4} ) };
-        end;
-        if results{5}, options = { options{:} 'rmout' 'on' }; end;
-        if results{6}, options = { options{:} 'dipoles' 2 }; end;
-        if results{7}, options = { options{:} 'dipplot' 'on' }; end;
-        options = { options{:} 'plotopt' eval( [ '{ ' results{8} ' }' ]) };
+        if results{3}, options = { options{:} 'rmout' 'on' }; end;
+        if results{4}, options = { options{:} 'dipoles' 2 }; end;
+        if results{5}, options = { options{:} 'dipplot' 'on' }; end;
+        options = { options{:} 'plotopt' eval( [ '{ ' results{6} ' }' ]) };
     else 
         options = varargin;
     end;
     
     % checking parameters
     % -------------------
-    g = finputcheck(options, { 'settings'  'cell'     []        {}; 
-                               'model'     'string'   { '4Shell' 'BEM' } '4Shell';
+    g = finputcheck(options, { 'settings'  'cell'     []        {};                % deprecated
+                               'model'     'string'   { '4Shell' 'BEM' } '4Shell'; % deprecated
                                'dipoles'   'integer'  [1 2]      1;
                                'threshold' 'float'    [0 100]   40;
                                'dipplot'   'string'   { 'on' 'off' } 'off';
