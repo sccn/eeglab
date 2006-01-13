@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.431  2006/01/13 23:30:38  arno
+% biosig menu
+%
 % Revision 1.430  2006/01/13 23:13:45  arno
 % changing warning message
 %
@@ -1961,7 +1964,7 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                                    '''(see http://biosig.sourceforge.net/SupportedSystems.html for supported file formats)'',' ...
                                    '''If the EEGLAB import function fails, try also using "From Other formats using BIOSIG"''),' ...
                                    '''import other data formats'');' ];
-    uimenu( neuromenu, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others, 'separation', 'on');    
+    uimenu( neuromenu, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others, 'separator', 'on');    
     
     % changing plugin menu color
     % --------------------------
