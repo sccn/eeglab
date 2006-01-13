@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/01/13 20:20:24  arno
+% put back warning
+%
 % Revision 1.15  2006/01/13 20:18:04  arno
 % invert fiducials etc...
 %
@@ -601,7 +604,7 @@ function redrawgui(fid)
             lightangle(45,30);
             lightangle(45+180,30);
             lighting phong
-            s = plotnoze([85 0 -75 0 0 pi/2 10 10 40]);
+            s = plotnose([85 0 -75 0 0 pi/2 10 10 40]);
             set(s, 'tag', 'mesh');
         end;
     end;
@@ -628,7 +631,7 @@ function redrawgui(fid)
   
 % function to plot the noze
 % -------------------------
-function s = plotnoze(transf, col)
+function s = plotnose(transf, col)
 
     if nargin < 1
         transf = [0 0 0 0 0 0 1 1 1];
