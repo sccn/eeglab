@@ -6,18 +6,30 @@
 %
 % Inputs:
 %   filename - [string] file name
-%   channels - [integer array] list of channel indices
-%   type     - [string] file type. See sload() function. Not functional
-%              because sload() does not support it anymore.
+%
+% Optional inputs:
+%   'channels'   - [integer array] list of channel indices
+%   'blockrange' - [min max] integer range of data blocks to import.
+%                  Default is empty -> import all data blocks. 
+%   'ref'        - [integer] channel index or index(s) for the reference.
+%                  Reference channels are not removed from the data,
+%                  allowing easy re-referencing. If more than one
+%                  channel, data are referenced to the average of the
+%                  indexed channels. WARNING! Biosemi Active II data 
+%                  are recorded reference-free, but LOSE 40 dB of SNR 
+%                  if no reference is used!. If you do not know which
+%                  channel to use, pick one and then re-reference after 
+%                  the channel locations are read in. {default: none}
+%   'rmeventchan' - ['on'|'off'] remove event channel after event 
+%                  extraction. Default is 'on'.
 %
 % Outputs:
 %   OUTEEG   - EEGLAB data structure
 %
-% Author: Arnaud Delorme, SCCN, INC, UCSD, Oct. 29, 2003
+% Author: Arnaud Delorme, SCCN, INC, UCSD, Oct. 29, 2003-
 %
 % Note: BIOSIG toolbox must be installed. Download BIOSIG at 
-%       http://sourceforge.net/project/showfiles.php?group_id=7072
-%       (please let us know at eeglab@sccn.ucsd.edu if this link is outdated).
+%       http://biosig.sourceforge.net
 %       Contact a.schloegl@ieee.org for troubleshooting using BIOSIG.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -39,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/01/13 22:23:01  arno
+% same
+%
 % Revision 1.5  2006/01/13 22:21:32  arno
 % special handling of BDF files
 %
@@ -79,76 +94,144 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_biosig(filename, channels, type); 
+function [EEG, command] = pop_biosig(filename, varargin); 
 EEG = [];
 command = '';
 
 if nargin < 1
-    if ~exist('inputgui')
-        error('requires the EEGLAB toolbox for pop up window');
-    end;
-    
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a DAQ file -- pop_biosig'); 
+	[filename, filepath] = uigetfile('*.*', 'Choose an BDF file -- pop_readbdf()'); 
     drawnow;
+    
 	if filename == 0 return; end;
-	filename = fullfile(filepath,filename);
-    %alltypes = { 'autodetect' 'DAQ' 'MAT' 'DAT' 'EBS' 'RAW' 'RDT' 'XLS' 'DA_' 'RG64' 'SIG' };
-
+	filename = [filepath filename];
+    
+    % open file to get infos
+    % ----------------------
+    disp('Reading function header...');
+    dat = sopen(filename);
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
+                 { 'style' 'edit' 'string' '' } ...
+                 { 'style' 'text' 'String' [ 'Data block range to read (default all [1 ' int2str(dat.NRec) '])' ] } ...
+                 { 'style' 'edit' 'string' '' }  };
+    geom = { [3 1] [3 1] };
+    
+    % special BIOSEMI
+    % ---------------
+    if strcmpi(dat.TYPE, 'BDF')
+        disp('We highly recommend that you choose a reference channel IF these are Biosemi data');
+        disp('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!');
+        uilist = { uilist{:} ...
+                 { 'style' 'text' 'String' 'Delete event channel (after extracting events, set=yes)' } ...
+                 { 'style' 'checkbox' 'string' '' 'value' 1 } {} ...
+                 { 'style' 'text' 'String' 'Biosemi: reference chan(s) number(s) (''all''= average ref)' } ...
                  { 'style' 'edit' 'string' '' } };
-    %             { 'style' 'text' 'string' 'Force data type' } ...
-    %             { 'style' 'list' 'string'  strvcat(alltypes{:}) } };
-    
-    results = inputgui( { [1 1] }, uilist, 'pophelp(''pop_biosig'')', ...
+        geom = { geom{:} [3 0.2 0.5] [3 1] };
+    end;    
+    result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
-    if length(results) == 0 return; end;
+    if length(result) == 0 return; end;
     
-    if ~isempty(results{1})
-        channels = eval( [ '[ ' results{1} ' ]' ]);
+    % decode GUI params
+    % -----------------
+    options = {};
+    if ~isempty(result{1}), options = { options{:} 'blockrange' eval( [ '[' result{1} ']' ] ) }; end;
+    if ~isempty(result{2}), options = { options{:} 'channels'   eval( [ '[' result{2} ']' ] ) }; end;
+    if length(result) > 2
+        if ~isempty(result{4}), options = { options{:} 'ref'        eval( [ '[' result{4} ']' ] ) }; end;
+        if ~result{3},          options = { options{:} 'rmeventchan' 'off' }; end;
     end;
-    %if results{2} ~= 1
-    %    type = alltypes{results{2}};
-    %end;
+else
+    options = varargin;
 end;
 
-% loading data
-% ------------
-if exist('channels') ~= 1
-    channels = 0;
+% decode imput parameters
+% -----------------------
+g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
+                            'channels'    'integer' [0 Inf]    [];
+                            'ref'         'integer' [0 Inf]    [];
+                            'rmeventchan' 'string'  { 'on' 'off' } 'on' }, 'pop_biosig');
+if isstr(g), error(g); end;
+
+% import data
+% -----------
+EEG = eeg_emptyset;
+fprintf('Reading data in %s format...\n', dat.TYPE);
+if ~isempty(g.channels)
+     dat = sopen(filename, 'r', g.channels);
+else dat = sopen(filename);
 end;
-disp('Importing data...');
-[signal,H] = sload(filename,channels);
-        
-% decoding data
-% -------------
-try, EEG = eeg_emptyset;
-catch, end;
-[signal, H]  = sload(filename);
-EEG.comments = [ 'Original file: ' filename ];
-EEG.srate    = H.SampleRate(1);
-EEG.data     = signal';
-EEG.nbchan   = size(EEG.data,1);
-if strcmpi(H.TYPE, 'BDF')
+    
+if ~isempty(g.blockrange)
+    newblockrange    = g.blockrange;
+    newblockrange(2) = min(newblockrange(2), dat.NRec);
+    newblockrange    = (newblockrange-1)*dat.Dur;
+    DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1))';
+else 
+    DAT=sread(dat, Inf)';
+end;
+
+% convert to seconds for sread
+% ----------------------------
+EEG.nbchan          = size(DAT,1);
+EEG.srate           = dat.SampleRate(1);
+EEG.data            = DAT;
+EEG.setname 		= sprintf('%s file', dat.TYPE);
+EEG.comments        = [ 'Original file: ' filename ];
+EEG.xmin            = 0; 
+if strcmpi(dat.TYPE, 'BDF')
     EEG.trials   = 1;
     EEG.pnts     = size(EEG.data,2);
 else
-    EEG.trials   = H.NRec;
-    EEG.pnts     = size(EEG.data,2)/H.NRec;
+    EEG.trials   = dat.NRec;
+    EEG.pnts     = size(EEG.data,2)/dat.NRec;
 end;
-if isfield(H, 'Label') & ~isempty(H.Label)
-    EEG.chanlocs        = struct('labels', cellstr(char(H.Label)));
+if isfield(dat, 'Label') & ~isempty(dat.Label)
+    EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
 end;
-if isfield(H, 'EVENT')    
-    EEG.event = biosig2eeglabevent(H.EVENT);
+EEG = eeg_checkset(EEG);
+
+% extract events
+% --------------
+disp('Extracting events...');
+if ~isempty(dat.EVENT)
+    EEG.event = biosig2eeglabevent(dat.EVENT);
+    if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF')
+        disp('Removing event channel...');
+        EEG.data(dat.BDF.Status,:) = [];
+        EEG.nbchan = size(EEG.data,1);
+        EEG.chanlocs(dat.BDF.Status,:) = [];
+    end;
+    EEG = eeg_checkset(EEG, 'eventconsistency');
 else 
     disp('Warning: no event found. Events might be embeded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
 end;
 
-if exist('type') ~= 1
-    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str({ channels }));
-else
-    command = sprintf('EEG = pop_biosig(''%s'', %s);',filename, vararg2str({ channels type }));
+% rerefencing
+% -----------
+if ~isempty(g.ref)
+    disp('Re-referencing...');
+    EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
+    if length(g.ref) == size(EEG.data,1)
+        EEG.ref  = 'averef';
+    end;
+    if length(g.ref) == 1
+        disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
+    else
+        disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
+    end;
 end;
-return;
+
+% convert data to single if necessary
+% -----------------------------------
+EEG = eeg_checkset(EEG);
+
+% history
+% -------
+if isempty(options)
+    command = sprintf('EEG = pop_biosig(''%s'');', filename); 
+else
+    command = sprintf('EEG = pop_biosig(''%s'' %s);', filename, vararg2str(options)); 
+end;    
+
