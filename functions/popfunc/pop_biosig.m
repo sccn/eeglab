@@ -7,7 +7,8 @@
 % Inputs:
 %   filename - [string] file name
 %   channels - [integer array] list of channel indices
-%   type     - [string] file type. See sload() function.
+%   type     - [string] file type. See sload() function. Not functional
+%              because sload() does not support it anymore.
 %
 % Outputs:
 %   OUTEEG   - EEGLAB data structure
@@ -38,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/10/27 05:24:55  arno
+% filename
+%
 % Revision 1.2  2005/03/23 16:01:17  arno
 % implmenting DUR and CHN
 %
@@ -82,24 +86,24 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.*', 'Choose a DAQ file -- pop_biosig'); 
     drawnow;
 	if filename == 0 return; end;
-	filename = [filepath '/' filename];
-    alltypes = { 'autodetect' 'DAQ' 'MAT' 'DAT' 'EBS' 'RAW' 'RDT' 'XLS' 'DA_' 'RG64' 'SIG' };
+	filename = fullfile(filepath,filename);
+    %alltypes = { 'autodetect' 'DAQ' 'MAT' 'DAT' 'EBS' 'RAW' 'RDT' 'XLS' 'DA_' 'RG64' 'SIG' };
 
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
-                 { 'style' 'edit' 'string' '' } ...
-                 { 'style' 'text' 'string' 'Force data type' } ...
-                 { 'style' 'list' 'string'  strvcat(alltypes{:}) } };
+                 { 'style' 'edit' 'string' '' } };
+    %             { 'style' 'text' 'string' 'Force data type' } ...
+    %             { 'style' 'list' 'string'  strvcat(alltypes{:}) } };
     
-    results = inputgui( { [1 1] [1 1] }, uilist, 'pophelp(''pop_biosig'')', ...
+    results = inputgui( { [1 1] }, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
     if length(results) == 0 return; end;
     
     if ~isempty(results{1})
         channels = eval( [ '[ ' results{1} ' ]' ]);
     end;
-    if results{2} ~= 1
-        type = alltypes{results{2}};
-    end;
+    %if results{2} ~= 1
+    %    type = alltypes{results{2}};
+    %end;
 end;
 
 % loading data
@@ -108,11 +112,7 @@ if exist('channels') ~= 1
     channels = 0;
 end;
 disp('Importing data...');
-if exist('type') ~= 1
-    [signal,H] = sload(filename,channels);
-else
-    [signal,H] = sload(filename,channels, type);
-end;
+[signal,H] = sload(filename,channels);
         
 % decoding data
 % -------------
@@ -129,34 +129,7 @@ if isfield(H, 'Label') & ~isempty(H.Label)
     EEG.chanlocs        = struct('labels', cellstr(char(H.Label)));
 end;
 if isfield(H, 'EVENT')    
-    disp('Importing data events...');
-    if isfield(H.EVENT, 'Teeg')
-        EEG.event = H.EVENT.Teeg;
-    end
-    if isfield(H.EVENT, 'TYP')
-        for index = 1:length( H.EVENT.TYP )
-            EEG.event(index).type = H.EVENT.TYP(index);
-        end;
-    end;
-    if isfield(H.EVENT, 'POS')
-        for index = 1:length( H.EVENT.POS )
-            EEG.event(index).latency = H.EVENT.POS(index);
-        end;
-    end;
-    if isfield(H.EVENT, 'DUR')
-        if any( [ H.EVENT.DUR ] )
-            for index = 1:length( H.EVENT.DUR )
-                EEG.event(index).duration = H.EVENT.DUR(index);
-            end;
-        end;
-    end;
-    if isfield(H.EVENT, 'CHN')
-        if any( [ H.EVENT.CHN ] )
-            for index = 1:length( H.EVENT.CHN )
-                EEG.event(index).chanindex = H.EVENT.CHN(index);
-            end;
-        end;
-    end;            
+    EEG.event = biosig2eeglabevent(H.EVENT);
 else 
     disp('Warning: no event found. Events might be embeded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
