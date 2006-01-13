@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/01/13 00:41:45  arno
+% tags etc...
+%
 % Revision 1.12  2006/01/13 00:34:21  arno
 % detect if transformation is failing
 %
@@ -446,11 +449,11 @@ function plotelec(elec, elecshow, color, tag);
 function indices = decodelabels( strchan );
     if ~isstr(strchan), indices = strchan; return; end;
     switch strchan
-        case '19 elec in 10/20', indices = [ 4 6 19 21 23 25 27 41 43 45 47 49 63 65 67 69 71 84 86 ];
-        case '33 elec in 10/20', indices = [ 4 6 18 19 21 23 25 27 28 31 33 35 37 40 41 43 45 47 49 50 53 55 57 59 62 63 65 67 69 71 72 84 86];
-        case '61 elec in 10/20', indices = [ 4   5   6   8  10  12  14  16  19  20  21  22  23  24  25  26  27  31  32  33  34  35  36  37  38  41  42  43  44  45  46  47  48  52  53  54  55  56  57  58  59  60  62  63  64  65  67  68  69  70  71  72  74  76  78  80  82  84  85  86  88];
-        otherwise, indices = 1:346;
-    end;
+        case '19 elec in 10/20', indices = [ 1 2 3 4 6 19 21 23 25 27 41 43 45 47 49 63 65 67 69 71 84 86 ];
+        case '33 elec in 10/20', indices = [ 1 2 3 4 6 18 19 21 23 25 27 28 31 33 35 37 40 41 43 45 47 49 50 53 55 57 59 62 63 65 67 69 71 72 84 86];
+        case '61 elec in 10/20', indices = [ 1 2 3 4 5 6 8 10 12 14 16 19 20 21 22 23 24 25 26 27 31 32 33 34 35 36 37 38 41 42 43 44 45 46 47 48 52 53 54 55 56 57 58 59 60 62 63 64 65 67 68 69 70 71 72 74 76 78 80 82 84 85 86 88];
+    otherwise, indices = 1:346;
+  end;
     
 % plot electrode labels
 % ---------------------
