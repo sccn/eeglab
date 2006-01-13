@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.429  2006/01/10 23:58:44  arno
+% change default font
+%
 % Revision 1.428  2006/01/09 23:31:22  arno
 % remove topoplot conflict
 %
@@ -2270,21 +2273,25 @@ end;
 if length(EEG) == 1
     if ~isempty(ALLEEG) & CURRENTSET~= 0 & ~isequal(EEG.data, ALLEEG(CURRENTSET).data) & ~isnan(EEG.data(1))
         % the above comparison does not work for ome structures
-        tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
-                              'Dataset change detected', ...
-                              'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
+        %tmpanswer = questdlg2(strvcat('The current EEG dataset has changed. What should eeglab do with the changes?', ' '), ...
+        %                      'Dataset change detected', ...
+        %                      'Keep changes', 'Delete changes', 'New dataset', 'Make new dataset');
+        disp('Warning: for some reason, the backup dataset in EEGLAB memory does not');
+        disp('         match the current dataset. The dataset in memory has been overwritten');
+        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+        eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
         
-        if tmpanswer(1) == 'D' % delete changes
-            [EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
-            eegh('[EEG ALLEEG] = eeg_retrieve( ALLEEG, CURRENTSET);');
-        elseif tmpanswer(1) == 'K' % keep changes
-            [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-            eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
-        else % make new dataset
-            [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
-            eegh(LASTCOM);
-            MAX_SET = max(length( ALLEEG ), length(EEGMENU));
-        end;
+        %if tmpanswer(1) == 'D' % delete changes
+        %    [EEG ALLEEG] = eeg_retrieve(ALLEEG, CURRENTSET);	
+        %    eegh('[EEG ALLEEG] = eeg_retrieve( ALLEEG, CURRENTSET);');
+        %elseif tmpanswer(1) == 'K' % keep changes
+        %    [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+        %    eegh('[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);');
+        %else % make new dataset
+        %    [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET); 
+        %    eegh(LASTCOM);
+        %    MAX_SET = max(length( ALLEEG ), length(EEGMENU));
+        %end;
     end;
 end;
 
