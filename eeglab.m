@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.430  2006/01/13 23:13:45  arno
+% changing warning message
+%
 % Revision 1.429  2006/01/10 23:58:44  arno
 % change default font
 %
@@ -1720,11 +1723,9 @@ catchstrs.new_non_empty          = e_newnonempty;
     % BIOSIG MENUS
     % ------------
     if biosigflag
-        combdf = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_readbdf;' catchstrs.new_non_empty ]; 
-        comedf = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_readedf;' catchstrs.new_non_empty ]; 
-        combio = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_biosig;'  catchstrs.new_non_empty ]; 
+        combdf = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_biosig;' catchstrs.new_non_empty ]; 
+        combio = [ trystrs.no_check_back '[EEGTMP LASTCOM] = pop_biosig;' catchstrs.new_non_empty ]; 
         uimenu( neuromenu, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', combdf, 'Separator', 'on'); 
-        uimenu( neuromenu, 'Label', 'From .EDF file using BIOSIG'        , 'CallBack', comedf, 'tag', 'biosig'); 
         uimenu( neuromenu, 'Label', 'From other formats using BIOSIG'    , 'CallBack', combio); 
     end;
     
@@ -1957,9 +1958,10 @@ third_m = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
                                    '''  '',' ...
                                    '''The BIOSIG toolbox (included by default in menu item "File > Import data > From other'',' ...
                                    '''formats using BIOSIG") also allow to import in EEGLAB a variety of data file formats'',' ...
-                                   '''(see http://biosig.sourceforge.net/SupportedSystems.html for supported file formats)''),' ...
+                                   '''(see http://biosig.sourceforge.net/SupportedSystems.html for supported file formats)'',' ...
+                                   '''If the EEGLAB import function fails, try also using "From Other formats using BIOSIG"''),' ...
                                    '''import other data formats'');' ];
-    uimenu( neuromenu, 'Label', 'Other data formats...', 'CallBack', cb_others);    
+    uimenu( neuromenu, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others, 'separation', 'on');    
     
     % changing plugin menu color
     % --------------------------
