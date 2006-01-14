@@ -13,35 +13,35 @@
 %
 % Optional flag,argument pairs:
 %   'extended'   - int>=0        [0 default: assume no subgaussian comps]
-%                  Search for subgaussian comps: 'extended',1 recommended
+%                  Search for subgaussian comps: 'extended',1 is recommended
 %   'pca'        - int>=0        [0 default: don't reduce data dimension]
-%                    NB: 'pca' reduction not recommended if not needed.
+%                    NB: 'pca' reduction not recommended unless necessary
 %   'sphering'   - 'on'/'off'    first 'sphere' the data {default: 'on'}    
-%   'lrate'      - (0<float<<1)  starting learning rate {default: 1e-4}
+%   'lrate'      - (0<float<<1) starting learning rate {default: 1e-4}
 %   'blocksize'  - int>=0        [0 default: heuristic, from data size]
 %   'maxsteps'   - int>0         {default: 512}
-%   'stop'       - (0<float<<<1) stopping learning rate {default: 1e-6) 
+%   'stop'       - (0<float<<<1) stopping learning rate {default: 1e-7} 
 %                    NB: 'stop' <= 1e-7 recommended
-%   'weightsin'  - Filename string of beginning weight matrix of size
-%                  (comps,chans) floats.  Else, a weight matrix variable 
-%                  in the current Matlab dataspace. You may want to reduce 
+%   'weightsin'  - Filename string of inital weight matrix of size
+%                  (comps,chans) floats, else a weight matrix variable 
+%                  in the current Matlab workspace. You may want to reduce 
 %                  the starting 'lrate' arg (above) when resuming training, 
 %                  and/or to reduce the 'stop' arg (above). By default, 
 %                  binary ica begins with a (recommended) identity matrix. 
 %   'verbose     - 'on'/'off'    {default: 'off'}    
 % Rarely specified flags:
 %   'posact'     - ('on'/'off') Make maximum value for each comp positive.
-%                    NB: 'off' recommended! {{default: 'on'} 
+%                    NB: 'off' recommended! {default: 'on'} 
 %   'annealstep' - (0<float<1)   {default: 0.98}
 %   'annealdeg'  - (0<n<360)     {default: 60} 
 %   'bias'       - 'on'/'off'    {default: 'on'}    
-%   'momentum'   - (0<float<1)   {default: 0 --> 'off']
+%   'momentum'   - (0<float<1)   {default: 0 = off]
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 %
 % See also: runica()
 
-% Calls ica implementation of Sigurd Enghoff, translation of runica()
+% Calls binary translation of runica() by Sigurd Enghoff
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/01/03 20:05:26  scott
+% added 'weightsin' argument (not yet tested), reformed help message -sm
+%
 % Revision 1.13  2005/03/14 19:43:45  arno
 % fixing argument passing
 %
@@ -149,15 +152,17 @@ end
 % make sure no such script file already exists in the pwd
 %
 scriptfile = SC;
+tmpint = 1000;
 while exist(scriptfile)
-  tmpint = randperm(10000);
-  tmpint = int2str(tmpint(10000));
+  tmpints = randperm(10000);
+  tmpint = int2str(tmpints(tmpint));
   scriptfile = ['binica' tmpint '.sc'];
 end
+fprintf('scriptfile = %s\n',scriptfile);
 
 nchans = 0;
 tmpdata = [];
-if ~isstr(data) % data variable name given
+if ~isstr(data) % data variable given
   if ~exist('data')
     fprintf('\nbinica(): Variable name data not found.\n');
     return
@@ -190,58 +195,24 @@ else % data filename given
   firstarg = 4;
 end
 
-%
-% read in the master ica script file SC
-%
-flags = [];
-args  = [];
-fid = fopen(SC,'r');
-if fid < 0
-  fprintf('\nbinica(): Master .sc file %s not read!\n',SC)
-     return
-end
-
-%
-% read SC file info into flags and args lists
-%
-s = [];
-f = 0; % flag number in file
-while isempty(s) | s ~= -1
- s = fgetl(fid);
-  if s ~= -1
-   if ~isempty(s)
-     s = rmcomment(s,'#');
-     if ~isempty(s)
-       f = f+1;
-       s = rmspace(s);
-       [w s]=firstword(s);
-       if ~isempty(s)
-          flags{f} = w;
-          s = rmspace(s);
-          [w s]=firstword(s);
-          args{f} = w;
-       end
-     end
-   end
-  end
-end 
+[flags,args] = read_sc(SC); % read flags and args in master SC file
 
 %
 % substitute the flags/args pairs in the .sc file
 %
 arg = firstarg;
 if arg > nargin
-   fprintf('\nbinica(): no optional (flag, argument) pairs received.\n');
+   fprintf('binica(): no optional (flag, argument) pairs received.\n');
 else
  if (nargin-arg+1)/2 > 1
-    fprintf('\nbinica(): processing %d (flag, arg) pairs.\n',(nargin-arg+1)/2);
+    fprintf('binica(): processing %d (flag, arg) pairs.\n',(nargin-arg+1)/2);
  else
-    fprintf('\nbinica(): processing one (flag, arg) pair.\n');
+    fprintf('binica(): processing one (flag, arg) pair.\n');
  end
- while arg <= nargin
+ while arg <= nargin %%%%%%%%%%%% process flags & args %%%%%%%%%%%%%%%%
 
-  eval(['OPTIONFLAG = var' int2str(arg) ';']); % WHY DOES THIS MAKE FLAG (64,3) ?????  
-  fprintf('WARNING: binica() did NOT read the specified flag, arg pair!!!!\n');
+  eval(['OPTIONFLAG = var' int2str(arg) ';']); 
+  % NB: Found that here Matlab var 'FLAG' is (64,3) why!?!?
 
   if arg == nargin
     fprintf('\nbinica(): Flag %s needs an argument.\n',OPTIONFLAG)
@@ -252,13 +223,28 @@ else
   if strcmpi(OPTIONFLAG,'pca')
         ncomps = Arg; % get number of components out for reading wts.
   end
+
+  if strcmpi(OPTIONFLAG,'weightsin')
+        wtsin = Arg;
+        if exist('wtsin') == 2 % file
+           fprintf('   setting %s, %s\n','weightsin',Arg);
+        elseif exist('wtsin') == 1 % variable
+           if size(wtsin,2) ~= nchans
+                fprintf('weightsin variable must be of width %d\n',nchans);
+                return
+           end
+        else
+           fprintf('weightsin variable not found.\n');
+           return
+        end
+  end
   arg = arg+2;
 
-  nflags = f;
-  for f=1:length(flags)   % replace arg with Arg
+  nflags = length(flags);
+  for f=1:nflags   % replace SC arg with Arg passed from commandline
     if strcmp(OPTIONFLAG,flags{f})
        args{f} = num2str(Arg);
-       fprintf('setting %s, %s.\n',flags{f},args{f});
+       fprintf('   setting %s, %s\n',flags{f},args{f});
     end
   end
  end
@@ -271,19 +257,6 @@ for x=1:length(flags)
   if strcmp(flags{x},'DataFile')
      datafile = [pwd '/' datafile];
      args{x} = datafile;
-  elseif strcmp(flags{x},'weightsin')
-     flag{x} = 'WeightsInFile'; % translate binica 'weightsin' --> ica 'WeightsInFile'
-     if exist(args{x}) == 1 % variable
-       winfn = [pwd '/binica' tmpint '.inwts']);
-       floatwrite(args{x},winfn);
-       args{x} = winfn;
-     elseif exist(args{x}) == 2 % file
-       weightsinfile = args{x};
-       weightsinfile =  [pwd '/' weightsinfile];
-       arg{x} = weightsinfile;
-     else
-       error('input weight file or variable not found');
-     end 
   elseif strcmp(flags{x},'WeightsOutFile')
      weightsfile = ['binica' tmpint '.wts'];
      weightsfile =  [pwd '/' weightsfile];
@@ -299,13 +272,28 @@ for x=1:length(flags)
   end
 end
 
-
 %
 % write the new .sc file
 %
 fid = fopen(scriptfile,'w');
 for x=1:length(flags)
   fprintf(fid,'%s %s\n',flags{x},args{x});
+end
+if exist('wtsin') % specify WeightsInfile from 'weightsin' flag, arg
+     if exist('wtsin') == 1 % variable
+       winfn = [pwd '/binica' tmpint '.inwts'];
+       floatwrite(wtsin,winfn);
+       fprintf('   saving input weights:\n  ');
+       weightsinfile = winfn; % weights in file name
+     elseif exist(wtsin) == 2 % file
+       weightsinfile = wtsin;
+       weightsinfile =  [pwd '/' weightsinfile];
+     else
+       fprintf('binica(): weightsin file|variable not found.\n');
+       return
+     end 
+    eval(['!ls -l ' weightsinfile]);
+    fprintf(fid,'%s %s\n','WeightsInFile',weightsinfile);
 end
 fclose(fid);
 if ~exist(scriptfile)
@@ -315,7 +303,7 @@ if ~exist(scriptfile)
 end
   
 %
-% %%%%%%%%%%%%%%%%%%%%%% run ica %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%% run binary ica %%%%%%%%%%%%%%%%%%%%%%%%%
 %
    fprintf('\nRunning ica from script file %s\n',scriptfile);
    if exist('ncomps')
@@ -344,8 +332,11 @@ if isempty(sph)
    fprintf('\nbinica():  sphere matrix not read.\n')
    return
 end
-fprintf('\nica files left in pwd:\n');
+fprintf('\nbinary ica files left in pwd:\n');
 eval(['!ls -l ' scriptfile ' ' weightsfile ' ' spherefile]);
+if exist('wtsin')
+   eval(['!ls -l ' weightsinfile]);
+end
 fprintf('\n');
 
 if isstr(data)
@@ -356,7 +347,8 @@ end
 
 %
 % If created by binica(), rm temporary data file
-% Note: doesn't remove the .sc .wts and .fdt files
+% NOTE: doesn't remove the .sc .wts and .fdt files
+
 if ~isempty(tmpdata)
     eval(['!rm -f ' datafile]);
 end
@@ -398,3 +390,39 @@ function [word,sout] = firstword(s)
          word = s(1:n-1);
          sout = s(n:end);
        end
+
+function [flags,args] = read_sc(master_sc)
+%
+% read in the master ica script file SC
+%
+flags = [];
+args  = [];
+fid = fopen(master_sc,'r');
+if fid < 0
+  fprintf('\nbinica(): Master .sc file %s not read!\n',master_sc)
+     return
+end
+%
+% read SC file info into flags and args lists
+%
+s = [];
+f = 0; % flag number in file
+while isempty(s) | s ~= -1
+ s = fgetl(fid);
+  if s ~= -1
+   if ~isempty(s)
+     s = rmcomment(s,'#');
+     if ~isempty(s)
+       f = f+1;
+       s = rmspace(s);
+       [w s]=firstword(s);
+       if ~isempty(s)
+          flags{f} = w;
+          s = rmspace(s);
+          [w s]=firstword(s);
+          args{f} = w;
+       end
+     end
+   end
+  end
+end 
