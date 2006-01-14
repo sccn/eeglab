@@ -5,6 +5,7 @@
 %            can handle owing to memory limitations.
 % Usage:
 %  >> [wts,sph] = binica( datavar,  'key1', arg1, 'key2', arg2 ...);
+% else
 %  >> [wts,sph] = binica('datafile', chans, frames, 'key1', arg1, ...);
 %
 % Inputs:
@@ -24,18 +25,26 @@
 %                    NB: 'stop' <= 1e-7 recommended
 %   'weightsin'  - Filename string of inital weight matrix of size
 %                  (comps,chans) floats, else a weight matrix variable 
-%                  in the current Matlab workspace. You may want to reduce 
-%                  the starting 'lrate' arg (above) when resuming training, 
-%                  and/or to reduce the 'stop' arg (above). By default, 
-%                  binary ica begins with a (recommended) identity matrix. 
+%                  in the current Matlab workspace (copied to a local
+%                  .inwts files). You may want to reduce the starting 
+%                  'lrate' arg (above) when resuming training, and/or 
+%                  to reduce the 'stop' arg (above). By default, binary 
+%                  ica begins with the identity matrix after sphering. 
 %   'verbose     - 'on'/'off'    {default: 'off'}    
-% Rarely specified flags:
+% Rarely specified input flags:
 %   'posact'     - ('on'/'off') Make maximum value for each comp positive.
-%                    NB: 'off' recommended! {default: 'on'} 
+%                    NB: 'off' recommended. {default: 'off'} 
 %   'annealstep' - (0<float<1)   {default: 0.98}
 %   'annealdeg'  - (0<n<360)     {default: 60} 
 %   'bias'       - 'on'/'off'    {default: 'on'}    
 %   'momentum'   - (0<float<1)   {default: 0 = off]
+%
+% Outputs:
+%   wts          - output weights matrix, size (ncomps,nchans)
+%   sph          - output sphere matrix, size (nchans,nchans)
+%                  Both files are read from float files left on disk
+%   stem         - random integer used in the names of the .sc, .wts, 
+%                  .sph, and if requested, .intwts files
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 %
@@ -62,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/01/14 17:37:11  scott
+% implemented 'weightsin' flag  -sm
+%
 % Revision 1.14  2006/01/03 20:05:26  scott
 % added 'weightsin' argument (not yet tested), reformed help message -sm
 %
@@ -114,7 +126,7 @@
 % 11/06/01 add absolute path of files (lines 157-170 & 198) -ad
 % 01-25-02 reformated help & license, added links -ad 
  
-function [wts,sph] = binica(data,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,var15,var16,var17,var18,var19,var20,var21,var22,var23,var24,var25)
+function [wts,sph,tmpint] = binica(data,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,var15,var16,var17,var18,var19,var20,var21,var22,var23,var24,var25)
 
 if nargin < 1 | nargin > 25
     more on
