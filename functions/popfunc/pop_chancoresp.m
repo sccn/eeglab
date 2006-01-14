@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/01/12 23:53:05  arno
+% fix output when no gui
+%
 % Revision 1.2  2006/01/10 00:42:14  arno
 % fixing somthing (cannot remember)
 %
@@ -52,13 +55,13 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     % -------------------
     if isstr(chans1) 
        if strcmpi(chans1, 'pair')
-           [chanlist1, chanlist2, thirdout, outfourth] = pair(chans2, varargin{:});
+           [chanlistout1, chanlistout2, thirdout, outfourth] = pair(chans2, varargin{:});
        elseif strcmpi(chans1, 'unpair')
-           [chanlist1, chanlist2, thirdout, outfourth] = unpair(chans2, varargin{:});
+           [chanlistout1, chanlistout2, thirdout, outfourth] = unpair(chans2, varargin{:});
        elseif strcmpi(chans1, 'clear')
-           [chanlist1, chanlist2, thirdout, outfourth] = clearchans(chans2, varargin{:});
+           [chanlistout1, chanlistout2, thirdout, outfourth] = clearchans(chans2, varargin{:});
        elseif strcmpi(chans1, 'auto')
-           [chanlist1, chanlist2, thirdout, outfourth] = autoselect(chans2, varargin{:});
+           [chanlistout1, chanlistout2, thirdout, outfourth] = autoselect(chans2, varargin{:});
        end;
        return;
     end;
@@ -142,7 +145,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
 	g.chanstr2 = chanstr2;
 
     fig = figure('visible', 'off');
-    set(fig, 'name', 'selchans');
+    set(fig, 'name', 'Select channels to pair');
     
     % make text for list
     % ------------------
@@ -223,7 +226,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
               { 'Style', 'listbox', 'tag', 'list1', 'string', g.newchanstr1, 'value', 1, 'min', 1, 'max', 2, 'callback', cb_list1 } ...
               { 'Style', 'listbox', 'tag', 'list2', 'string', g.newchanstr2, 'value', 1, 'min', 1, 'max', 2, 'callback', cb_list2 } ...
               { 'Style', 'pushbutton', 'string', 'Pair channels'  , 'callback', cb_pair } ...     
-              { 'Style', 'pushbutton', 'string', 'Unpair channels', 'callback', cb_unpair } ...     
+              { 'Style', 'pushbutton', 'string', 'Clear this pair', 'callback', cb_unpair } ...     
               { 'Style', 'pushbutton', 'string', 'Clear all pairs' , 'callback', cb_clear } ...     
               { 'Style', 'pushbutton', 'string', 'Auto select', 'callback', cb_auto } ...     
               { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close(gcbf);' }  ...
