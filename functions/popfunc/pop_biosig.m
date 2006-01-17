@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/01/13 23:07:54  arno
+% new generic function for all BIOSIG
+%
 % Revision 1.6  2006/01/13 22:23:01  arno
 % same
 %
@@ -161,11 +164,14 @@ if ~isempty(g.channels)
      dat = sopen(filename, 'r', g.channels);
 else dat = sopen(filename);
 end;
-    
+
+if strcmpi(dat.TYPE, 'BDF')
+    HDR.FLAG.OVERFLOWDETECTION=0; 
+end;
 if ~isempty(g.blockrange)
     newblockrange    = g.blockrange;
     newblockrange(2) = min(newblockrange(2), dat.NRec);
-    newblockrange    = (newblockrange-1)*dat.Dur;
+    newblockrange    = (newblockrange-1)*dat.Dur;    
     DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1))';
 else 
     DAT=sread(dat, Inf)';
