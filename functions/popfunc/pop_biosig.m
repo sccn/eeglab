@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/01/17 00:54:13  arno
+% disable overflow detection
+%
 % Revision 1.8  2006/01/17 00:47:08  arno
 % 0verflow detection off
 %
@@ -176,6 +179,7 @@ if ~isempty(g.blockrange)
 else 
     DAT=sread(dat, Inf)';
 end;
+DAT = sclose(DAT);
 
 % convert to seconds for sread
 % ----------------------------
