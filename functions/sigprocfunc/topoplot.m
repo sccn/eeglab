@@ -140,13 +140,6 @@
 %                       'head'-> interpolate the whole disk {default: 'head'}.
 
 % Unimplemented future options:
-%                      Grid chans, if any, are not included in plotchans (see 'plotgrid' below). 
-%
-%   'plotgrid'        - [channels] or {[channels], 'position'} where [channels] is a matrix of grid 
-%                       - and char 'position' (if either 'l' or 'r') 
-%                       indicates which side of the head to plot the grid, or if 'o', plot the 
-%                       grid only {default grid plotting mode: 'o' = plot the grid only}
-%
 
 % Copyright (C) Colin Humphries & Scott Makeig, CNL / Salk Institute, Aug, 1996
 %                                          
@@ -165,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.267  2005/12/08 00:22:19  arno
+% fixing ploting one channel
+%
 % Revision 1.266  2005/12/01 20:28:29  arno
 % typo
 %
