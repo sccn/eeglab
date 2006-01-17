@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/10/11 16:17:07  arno
+% ncomps warning
+%
 % Revision 1.24  2005/07/17 15:03:38  scott
 % shortened computation of cmponent variances
 % overwrite data with activations to save memory
@@ -1072,12 +1075,7 @@ end
   %
   %%%%%%%%%%%%%% Orient components towards max positive activation %%%%%%
   %
-  if strcmp(posactflag,'on') % default is now off to save processing and memory
-      [data,winvout,weights] = posact(data,weights); % overwrite data with activations
-       % changes signs of activations (now = data) and weights 
-       % to make activations (data) net rms-positive
-       % can call this outside of runica()
-  elseif strcmp(pcaflag,'off')
+  if strcmp(pcaflag,'off')
        sr = sphere * rowmeans';
        for r = 1:ncomps
          data(r,:) = data(r,:)+sr(r); % add back row means 
@@ -1094,6 +1092,9 @@ end
        % make activations from sphered and pca'd data; -sm 7/05
        % add back the row means removed from data before sphering
   end
+  %
+  % NOTE: Now 'data' are the component activations = weights*sphere*raw_data
+  %
   %
   %%%%%%%%%%%%%% If pcaflag, compose PCA and ICA matrices %%%%%%%%%%%%%%%
   %
@@ -1126,12 +1127,34 @@ end
   %
   meanvar = sum(winv.^2).*sum((data').^2)/(ncomps-1)^2; % NB: data is now activations -sm 7/05
   %
-  %
   %%%%%%%%%%%%%% Sort components by mean variance %%%%%%%%%%%%%%%%%%%%%%%%
   %
   [sortvar, windex] = sort(meanvar);
   windex = windex(ncomps:-1:1); % order large to small 
   meanvar = meanvar(windex);
+  %
+  %%%%%%%%%%%% re-orient max(abs(activations)) to >=0 ('posact') %%%%%%%%
+  %
+  if strcmp(posactflag,'on') % default is now off to save processing and memory
+      fprintf('Making the max(abs(activations)) positive ...\n');
+      [tmp ix] = max(abs(data')); % = max abs activations
+      signsflipped = 0;
+      for r=1:ncomps
+         if sign(data(r,ix(r)) < 0
+            data(r,:) = -1*data(r,:);  % flip activations so max(abs()) is >= 0
+            winv(:,r) = -1*winv(:,r);  % flip component maps
+            signsflipped = 1;
+         end
+      end
+      if signsflipped == 1
+          weights = pinv(winv)*inv(sphere); % re-invert the component maps
+      end
+       
+      % [data,winvout,weights] = posact(data,weights); % overwrite data with activations
+      % changes signs of activations (now = data) and weights 
+      % to make activations (data) net rms-positive
+      % can call this outside of runica() - though it is inefficient!
+  end
   % 
   %%%%%%%%%%%%%%%%%%%%% Filter data using final weights %%%%%%%%%%%%%%%%%%
   %
