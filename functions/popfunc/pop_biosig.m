@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/01/17 00:47:08  arno
+% 0verflow detection off
+%
 % Revision 1.7  2006/01/13 23:07:54  arno
 % new generic function for all BIOSIG
 %
@@ -111,7 +114,7 @@ if nargin < 1
     
     % open file to get infos
     % ----------------------
-    disp('Reading function header...');
+    disp('Reading data file header...');
     dat = sopen(filename);
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
@@ -138,8 +141,8 @@ if nargin < 1
     % decode GUI params
     % -----------------
     options = {};
-    if ~isempty(result{1}), options = { options{:} 'blockrange' eval( [ '[' result{1} ']' ] ) }; end;
-    if ~isempty(result{2}), options = { options{:} 'channels'   eval( [ '[' result{2} ']' ] ) }; end;
+    if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end;
+    if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
         if ~isempty(result{4}), options = { options{:} 'ref'        eval( [ '[' result{4} ']' ] ) }; end;
         if ~result{3},          options = { options{:} 'rmeventchan' 'off' }; end;
@@ -161,13 +164,10 @@ if isstr(g), error(g); end;
 EEG = eeg_emptyset;
 fprintf('Reading data in %s format...\n', dat.TYPE);
 if ~isempty(g.channels)
-     dat = sopen(filename, 'r', g.channels);
-else dat = sopen(filename);
+     dat = sopen(filename, 'r', g.channels,'OVERFLOWDETECTION:OFF');
+else dat = sopen(filename, 'r', 0,'OVERFLOWDETECTION:OFF');
 end;
 
-if strcmpi(dat.TYPE, 'BDF')
-    HDR.FLAG.OVERFLOWDETECTION=0; 
-end;
 if ~isempty(g.blockrange)
     newblockrange    = g.blockrange;
     newblockrange(2) = min(newblockrange(2), dat.NRec);
