@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/01/17 16:29:05  scott
+% re-wrote 'posact' processing for efficiency -sm
+%
 % Revision 1.25  2005/10/11 16:17:07  arno
 % ncomps warning
 %
@@ -1140,8 +1143,10 @@ end
       [tmp ix] = max(abs(data')); % = max abs activations
       signsflipped = 0;
       for r=1:ncomps
-         if sign(data(r,ix(r)) < 0
-            data(r,:) = -1*data(r,:);  % flip activations so max(abs()) is >= 0
+         if sign(data(r,ix(r))) < 0
+            if nargout>6  % if activations are to be returned (only)
+               data(r,:) = -1*data(r,:);  % flip activations so max(abs()) is >= 0
+            end
             winv(:,r) = -1*winv(:,r);  % flip component maps
             signsflipped = 1;
          end
