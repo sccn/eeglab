@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/01/19 22:21:56  arno
+% debut command line call
+%
 % Revision 1.31  2005/05/24 17:54:36  arno
 % remove cell2mat
 %
@@ -176,6 +179,7 @@ if ~isfield(EEG, 'dipfit') & ~isfield(EEG, 'sources')
     error('No dipole information in dataset'); 
 end;
 
+typedip = 'nonbesa';
 if nargin < 2
 	% popup window parameters
 	% -----------------------
@@ -228,9 +232,9 @@ if nargin < 2
     if result{9} == 1, options = { options{:} 'pointout'  'on' }; end; 
     if result{10} == 1, options = { options{:} 'normlen'   'on' }; end;
     if ~isempty( result{11} ), tmpopt = eval( [ '{' result{11} '}' ] ); options = { options{:} tmpopt{:} }; end;
-    typedip = 'nonbesa';
 else 
     if isstr(comps)
+        typedip = comps;
         options = varargin(2:end);
         comps = varargin{1};
     else
