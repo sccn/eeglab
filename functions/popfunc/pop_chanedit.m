@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2006/01/19 18:40:14  arno
+% do not erase channel type when lookup
+%
 % Revision 1.141  2006/01/19 00:37:58  arno
 % fixing default elp BESA
 %
@@ -1243,9 +1246,6 @@ else
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
                chans = struct('labels', { chans.labels });
-               for index = 1:length(chans)
-                   chans(index).datachan = index;
-               end;
                [ind2 ind3] = sort(ind2);
                ind1 = ind1(ind3);
 
