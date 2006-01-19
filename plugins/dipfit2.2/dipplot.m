@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.133  2006/01/19 23:38:57  arno
+%using field talcoord
+%
 %Revision 1.132  2006/01/19 23:35:17  arno
 %spherical to talairach changed
 %
@@ -774,7 +777,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
-                    'coordformat' g.coordformat 'mri' g.mri };
+                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata };
         axes('position', [0 0 0.5 0.5]);  newsources = dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; 
         axes('position', [0 0.5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; 
         axes('position', [.5 .5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; 
