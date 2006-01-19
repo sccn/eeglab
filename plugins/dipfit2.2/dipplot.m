@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.129  2005/10/26 21:49:41  arno
+%returning electrode coordinates
+%
 %Revision 1.128  2005/10/26 18:03:34  arno
 %remove dual 0 dipoles
 %
@@ -761,7 +764,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmp(g.summary, 'on')
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
-                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen };
+                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
+                    'ccordformat' g.coordformat 'mri' g.mri };
         axes('position', [0 0 0.5 0.5]);  newsources = dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; 
         axes('position', [0 0.5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; 
         axes('position', [.5 .5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; 
