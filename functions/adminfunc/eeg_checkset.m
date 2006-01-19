@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2005/12/01 03:32:42  toby
+% *** empty log message ***
+%
 % Revision 1.177  2005/12/01 00:33:46  arno
 % making icachansind empty
 %
@@ -1499,6 +1502,7 @@ else
             EEG.dipfit.coordformat = template_models{1}{2};
             EEG.dipfit.mrifile     = template_models{1}{3};
             EEG.dipfit.chanfile    = template_models{1}{4};
+            EEG.dipfit.coord_transform = [];
             res = com;
         end;
     end;
