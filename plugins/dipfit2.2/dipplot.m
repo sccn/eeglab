@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.131  2006/01/19 21:45:56  arno
+%typo
+%
 %Revision 1.130  2006/01/19 21:45:01  arno
 %coordformat and mri for summary mode
 %
@@ -929,8 +932,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             
             % from spherical to electrode space
             % ---------------------------------
-            [xx   yy   zz]   = transform(x,   y,   z,   dat.sph2spm); % nothing happens for BEM            
-            [xxo1 yyo1 zzo1] = transform(xo1, yo1, zo1, dat.sph2spm); 
+            [xx   yy   zz]   = transform(x,   y,   z,   dat.sph2spm); % nothing happens for BEM
+            [xxo1 yyo1 zzo1] = transform(xo1, yo1, zo1, dat.sph2spm); % because dat.sph2spm = []
 
             if ~strcmpi(g.spheres,'on') % plot dipole direction lines
                h1 = line( [xx xxo1]', [yy yyo1]', [zz zzo1]');
@@ -961,7 +964,11 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
             outsources(index).eleccoord(dip,:) = [xx yy zz];
             outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
-            outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
+            if ~isempty(dat.sph2spm)
+                outsources(index).talcoord(dip,:) = mni2tal(2*[xxmri yymri zzmri]);
+            else
+                outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
+            end;
             
             % copy for output
             % ---------------
