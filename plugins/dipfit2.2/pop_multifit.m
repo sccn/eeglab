@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/01/13 00:34:02  arno
+% removing settings
+%
 % Revision 1.12  2005/05/24 17:56:21  arno
 % same
 %
@@ -224,15 +227,15 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     %    EEG     = pop_dipfit_settings( EEG, g.settings{:}, 'electrodes', elecsel);
     %end;
     
-    if strcmpi(g.model, '4Shell'), ind = 1; else ind = 2; end;
-    dipfitdefs;
-	[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
-    if isempty(g.settings), g.settings = { 'electrodes', indices }; end;
-    g.settings = { g.settings{:} 'hdmfile'     template_models{ind}{1} ...
-                                 'coordformat' template_models{ind}{2} ...
-                                 'mrifile'     template_models{ind}{3} ...
-                                 'chanfile'    template_models{ind}{4} };
-    EEG     = pop_dipfit_settings( EEG, g.settings{:} );        
+    %if strcmpi(g.model, '4Shell'), ind = 1; else ind = 2; end;
+    %dipfitdefs;
+	%[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
+    %if isempty(g.settings), g.settings = { 'electrodes', indices }; end;
+    %g.settings = { g.settings{:} 'hdmfile'     template_models{ind}{1} ...
+    %                             'coordformat' template_models{ind}{2} ...
+    %                             'mrifile'     template_models{ind}{3} ...
+    %                             'chanfile'    template_models{ind}{4} };
+    %EEG     = pop_dipfit_settings( EEG, g.settings{:} );        
         
     % Scanning dipole locations
     % -------------------------
