@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.132  2006/01/19 23:35:17  arno
+%spherical to talairach changed
+%
 %Revision 1.131  2006/01/19 21:45:56  arno
 %typo
 %
@@ -966,8 +969,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
             if ~isempty(dat.sph2spm)
                 outsources(index).talcoord(dip,:) = mni2tal(2*[xxmri yymri zzmri]);
+                dipstruct.talcoord                = mni2tal(2*[xxmri yymri zzmri]);
             else
                 outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
+                dipstruct.talcoord                = mni2tal([xxmri yymri zzmri]);
             end;
             
             % copy for output
@@ -1388,7 +1393,7 @@ function updatedipplot(fig)
    % ---------------------
    if exist('foundind')
       tmp = get(newdip(foundind), 'userdata');
-      tal = mni2tal(tmp.mricoord);
+      tal = tmp.talcoord;
       if ~isstr( tmp.name )
            tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', [ 'Comp: ' int2str(tmp.name) ] );
       else tmprvobj = findobj('parent', fig, 'userdata', 'comp'); set( tmprvobj(end), 'string', tmp.name );
