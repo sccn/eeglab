@@ -1,10 +1,10 @@
-% entropy() - calculation of entropy of a 1D, 2D or 3D array and
+% entropy_rej() - calculation of entropy of a 1D, 2D or 3D array and
 %             rejection of odd last dimension values of the input data array   
 %             using the discrete entropy of the values in that dimension
 %             (and using the probability distribution of all columns).
 %
 % Usage:
-%   >>  [entropy rej] = entropy( signal, threshold, entropy, normalize, discret);
+%   >>  [entropy rej] = entropy_rej( signal, threshold, entropy, normalize, discret);
 %
 % Inputs:
 %   signal     - one dimensional column vector of data values, two 
@@ -15,7 +15,7 @@
 %   threshold  - Absolute threshold. If normalization is used then the 
 %                threshold is expressed in standard deviation of the
 %                mean. 0 means no threshold.
-%   entropy    - pre-computed entropy (only perform thresholding). Default
+%   entropy    - pre-computed entropy_rej (only perform thresholding). Default
 %                is the empty array [].
 %   normalize  - 0 = do not not normalize entropy. 1 = normalize entropy.
 %                Default is 0.
@@ -50,19 +50,22 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 01-25-02 reformated help & license -ad 
 
-function [ent, rej] = entropy( signal, threshold, oldentropy, normalize, discret );
+function [ent, rej] = entropy_rej( signal, threshold, oldentropy_rej, normalize, discret );
 
 if nargin < 1
-	help entropy;
+	help entropy_rej;
 	return;
 end;	
 if nargin < 2
 	threshold = 0;
 end;	
 if nargin < 3
-	oldentropy = [];
+	oldentropy_rej = [];
 end;	
 if nargin < 4
 	normalize = 0;
@@ -79,8 +82,8 @@ end;
 [nbchan pnts sweeps] = size(signal);
 ent  = zeros(nbchan,sweeps);
 
-if ~isempty( oldentropy ) % speed up the computation
-	ent = oldentropy;
+if ~isempty( oldentropy_rej ) % speed up the computation
+	ent = oldentropy_rej;
 else
 	for rc = 1:nbchan
 
