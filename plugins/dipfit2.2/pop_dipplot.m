@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2005/05/24 17:54:36  arno
+% remove cell2mat
+%
 % Revision 1.30  2005/03/22 19:08:20  arno
 % plotting all dipoles
 %
@@ -156,7 +159,7 @@
 % Initial revision
 %
 
-function [com] = pop_dipplot( EEG, typedip, comps, varargin);
+function [com] = pop_dipplot( EEG, comps, varargin);
 
 com ='';
 if nargin < 1
@@ -171,14 +174,6 @@ if ~isfield(EEG, 'dipfit') & ~isfield(EEG, 'sources')
         error('No dipole information in dataset'); 
     end;
     error('No dipole information in dataset'); 
-end;
-if nargin == 1
-    if isfield(EEG, 'sources')
-        typedip = 'BESA';
-        disp('Besa sources detected');
-    else 
-        typedip = 'DIPFIT';
-    end;
 end;
 
 if nargin < 2
@@ -233,10 +228,11 @@ if nargin < 2
     if result{9} == 1, options = { options{:} 'pointout'  'on' }; end; 
     if result{10} == 1, options = { options{:} 'normlen'   'on' }; end;
     if ~isempty( result{11} ), tmpopt = eval( [ '{' result{11} '}' ] ); options = { options{:} tmpopt{:} }; end;
+    typedip = 'nonbesa';
 else 
     if isstr(comps)
-        options = { comps varargin{:} };
-        comps = typedip;
+        options = varargin(2:end);
+        comps = varargin{1};
     else
         options = varargin;
     end;
