@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/01/19 21:22:56  arno
+% putting back dipfitdefs
+%
 % Revision 1.14  2006/01/19 21:19:15  arno
 % removing pop_dipfit_settings
 %
@@ -199,8 +202,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     % checking parameters
     % -------------------
-    g = finputcheck(options, { 'settings'  'cell'     []        {};                % deprecated
-                               'model'     'string'   { '4Shell' 'BEM' } '4Shell'; % deprecated
+    g = finputcheck(options, { 'settings'  { 'cell' 'struct' }    []        {};                % deprecated
                                'dipoles'   'integer'  [1 2]      1;
                                'threshold' 'float'    [0 100]   40;
                                'dipplot'   'string'   { 'on' 'off' } 'off';
@@ -210,25 +212,13 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     if isstr(g), error(g); end;    
     EEG     = eeg_checkset(EEG, 'chanlocs_homogeneous');
     
-    % removing eye channels
-    % ---------------------
-    %if length(EEG.chanlocs) > 69 & length(g.dipfit) < 3
-    %[tmp tmp2 indreye] = intersect( 'reye', lower({ EEG.chanlocs.labels }));
-    %[tmp tmp2 indleye] = intersect( 'leye', lower({ EEG.chanlocs.labels }));
-    %elecsel = setdiff([1:71], [indleye indreye]);
-    %disp('Removing eye channels');
-    %elecopt = 0;
-    %for index = 1:2:length(g.settings)
-    %    if strcmpi(g.settings{index}, 'electrodes')
-    %        g.settings{index+1} = intersect( g.settings{index+1}, elecsel);
-    %        electopt = 1;
-    %    end;
-    %end;
-    %if electopt
-    %   EEG     = pop_dipfit_settings( EEG, g.settings{:});
-    %else
-    %    EEG     = pop_dipfit_settings( EEG, g.settings{:}, 'electrodes', elecsel);
-    %end;
+    % dipfit settings
+    % ---------------
+    if ~isstruct(g.settings)
+        EEG.dipfit = g.settings;
+    elseif ~isempty(g.settings)
+        EEG = pop_dipfit_settings( EEG, g.settings{:}); % will probably not work but who knows
+    end;
     
     %if strcmpi(g.model, '4Shell'), ind = 1; else ind = 2; end;
     %dipfitdefs;
