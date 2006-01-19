@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/11/09 23:23:05  arno
+% nothing
+%
 % Revision 1.44  2005/11/09 23:06:29  arno
 % header
 %
@@ -415,6 +418,9 @@ hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'pushbutton');
+set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
+hh =findobj(allhandlers, 'parent', g.fig, 'style', 'popupmenu');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'checkbox');
