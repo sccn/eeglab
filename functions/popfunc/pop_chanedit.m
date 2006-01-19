@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2006/01/12 23:44:43  arno
+% removing nodatchans field from params after transfering nodatchans to structure
+%
 % Revision 1.139  2006/01/12 23:01:37  arno
 % fixing fiducials
 %
@@ -857,7 +860,7 @@ if nargin < 3
         nosecallback = [ 'nosevals = { ''+X'' ''-X'' ''+Y'' ''-Y'' }; ' ...
                          'chaninfo.nosedir = nosevals{ get(gcbo, ''value'') };' ...
                          'clear noseval;' ];
-        lookuplocs = [ '[chantmp chaninfo urchantmp comtmp] = pop_chanedit(chantmp, chaninfo, urchantmp, ''lookupgui'', []);' endgui ];
+        lookuplocs = [ '[chantmp chaninfo urchantmp comtmp] = pop_chanedit(chantmp, chaninfo, [], ''lookupgui'', []);' endgui ];
        
         switch upper(params.nosedir)
             case '+X', noseparam = 1;
@@ -1233,7 +1236,7 @@ else
             end;
            
 		  case 'lookup'
-           tmplocs = readlocs( args{ curfield+1 } );
+           tmplocs = readlocs( args{ curfield+1 }, 'defaultelp', 'BESA' );
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
                chans = struct('labels', { chans.labels });
