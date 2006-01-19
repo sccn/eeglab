@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/01/19 22:10:37  arno
+% dipfit settings
+%
 % Revision 1.15  2006/01/19 21:22:56  arno
 % putting back dipfitdefs
 %
@@ -214,7 +217,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     % dipfit settings
     % ---------------
-    if ~isstruct(g.settings)
+    if isstruct(g.settings)
         EEG.dipfit = g.settings;
     elseif ~isempty(g.settings)
         EEG = pop_dipfit_settings( EEG, g.settings{:}); % will probably not work but who knows
