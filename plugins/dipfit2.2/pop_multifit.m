@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/01/19 21:19:15  arno
+% removing pop_dipfit_settings
+%
 % Revision 1.13  2006/01/13 00:34:02  arno
 % removing settings
 %
@@ -239,6 +242,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         
     % Scanning dipole locations
     % -------------------------
+    dipfitdefs;
     skipscan = 0;
     try 
         alls = cellfun('size', { EEG.dipfit.model.posxyz }, 2);
