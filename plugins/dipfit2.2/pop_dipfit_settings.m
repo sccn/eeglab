@@ -26,9 +26,11 @@
 %                check if your channel location file is compatible with the
 %                model.
 %   'chansel'  - [integer] channel index selection. Default: all.
-%
-%   'electrodes'   - [integer array] indices of electrode to include
-%                    in model. Default: all.
+%   'coord_transform' - [float array] talairach transformation matrix to
+%                       align input dataset channel structure to the selected 
+%                       head model.
+%   'electrodes'      - [integer array] indices of electrode to include
+%                       in model. Default: all.
 %
 % Outputs:
 %   OUTEEG	output dataset
@@ -60,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/01/12 23:07:32  arno
+% now processing chaninfo
+%
 % Revision 1.11  2006/01/11 00:13:38  arno
 % adding help message for coregister
 %
