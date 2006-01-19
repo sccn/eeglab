@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2006/01/19 00:37:58  arno
+% fixing default elp BESA
+%
 % Revision 1.140  2006/01/12 23:44:43  arno
 % removing nodatchans field from params after transfering nodatchans to structure
 %
@@ -1265,7 +1268,7 @@ else
                    fprintf('%s\nSend us standard location for your channels at eeglab@sccn.ucsd.edu\n', ...
                            chans(tmpdiff(end)).labels);
                end;
-               chans(1).type = [];
+               if ~isfield(chans, 'type'), chans(1).type = []; end;
            end;
            if ~isempty(findstr(args{ curfield+1 }, 'standard_10')) & ...
                    ~isempty(findstr(args{ curfield+1 }, '.elc'))
