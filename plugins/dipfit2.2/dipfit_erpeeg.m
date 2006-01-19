@@ -1,7 +1,7 @@
 % dipfit_erpeeg - fit multiple component dipoles using DIPFIT 
 %
 % Usage:
-%         >> [ dipole model ] = dipfit_erpeeg(data, chanlocs, 'key', 'val', ...);
+%         >> [ dipole model EEG] = dipfit_erpeeg(data, chanlocs, 'key', 'val', ...);
 %
 % Inputs:
 %  data      - input data [channel x point]. One dipole per point is
@@ -23,6 +23,8 @@
 %  model       - structure containing model information ('vol.r' field is 
 %                radius, 'vol.c' conductances, 'vol.o' the 3-D origin and
 %                'chansel', the selected channels).
+%  EEG         - faked EEG structure containing erp activation at the place
+%                of ICA components but allowing to plot ERP dipoles.
 %
 % Note: residual variance is set to NaN if Dipfit does not converge
 %  
@@ -47,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/05/20 00:32:03  arno
+% header
+%
 % Revision 1.2  2004/05/05 21:50:38  arno
 % test before rmfield
 %
@@ -54,7 +59,7 @@
 % Initial revision
 %
 
-function [dipoles, model] = dipfit_erpeeg(DATA, chanlocs, varargin);
+function [dipoles, model, EEG] = dipfit_erpeeg(DATA, chanlocs, varargin);
     
     if nargin < 1
         help dipfit_erpeeg;
