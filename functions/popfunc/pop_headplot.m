@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/01/10 00:41:29  arno
+% trying to allow coregistration - not finished
+%
 % Revision 1.30  2005/12/01 20:06:16  arno
 % search for existing file
 %
@@ -165,7 +168,7 @@ if nargin < 3
             byteperelec = splfile.bytes/EEG.nbchan;
             if byteperelec/EEG.nbchan < 625, % old head plot file
                 EEG.splinefile = [];
-                disp('Warning: Old spline file version detected and removed; a new spline file must be recomputed');
+                disp('Warning: Wrong montage or old-versin spline file version detected and removed; new spline file required');
             end;
         end;
     end;
@@ -195,46 +198,21 @@ if nargin < 3
             
     if compute_file
         
-		 ButtonName=questdlg2( strvcat('headplot() must generate a spline file the first', ...
+		 warndlg2( strvcat('headplot() must generate a spline file the first', ...
 		                 'time it is called and after changes in the channel location file.', ...
-		                 'Should it generate a spline file now (takes time - see wait bar)?'), ...
-		                 'Spline File', 'Cancel', 'Load file', 'Yes','Yes');
-		 switch lower(ButtonName),
-		      case 'cancel', return;
-		      case 'load file', 
-				    [filename, filepath] = uigetfile('*.spl', 'Load a spline file'); 
-                    drawnow;
-				    if filename == 0 return; end;
-		            EEG = setfield(EEG, fieldname, fullfile(filepath, filename));
-		            pop_options = { 'load' getfield(EEG, fieldname) }; 
-		      case 'yes',
-				    [filename, filepath] = uiputfile('*.spl', 'Save the spline file with an .spl extension');
-                    drawnow;
-				    if filename == 0 return; end;
-		            EEG = setfield(EEG, fieldname, fullfile(filepath, filename));
-                    if typeplot
-                        headplot('setup', EEG.chanlocs, fullfile(filepath, filename), 'chaninfo', EEG.chaninfo);
-                    else
-                        headplot('setup', EEG.chanlocs, fullfile(filepath, filename), 'ica', 'on', 'chaninfo', EEG.chaninfo);
-                    end;
-		            pop_options = { 'setup' getfield(EEG, fieldname) }; 
-		 end;
+		                 'You must also coregister your channel location structure with the', ...
+                         'head template.'), 'Headplot() warning');
     else
     	pop_options      = {};
     end;
     
-	if isempty(getfield(EEG, fieldname)) | exist(getfield(EEG, fieldname)) ~= 2
-	    errmsg = sprintf('Pop_headplot: cannot find spline file %s. Check path. Aborting...',getfield(EEG, fieldname));
-	    error(errmsg);
-	end;
-
  	% graphic interface
 	% -----------------
 	if typeplot
 		txt = sprintf('Making headplots for these latencies (from %d to %d ms):', round(EEG.xmin*1000), round(EEG.xmax*1000));
 	else
 		%txt = ['Component numbers (negate index to invert component polarity):' 10 '(NaN -> empty subplot)(Ex: -1 NaN 3)'];
-		txt = ['Component numbers to plot (negative numbers invert component polarities):' ];
+		txt = ['Component numbers to plot (negative numbers invert comp. polarities):' ];
 	end;	
     if compute_file
         enableload = 'off';
@@ -273,97 +251,127 @@ if nargin < 3
                        'if ~isempty(tmptransf), set( findobj(gcbf, ''userdata'', ''coregtext''), ''string'', num2str(tmptransf)); end;' ...
                        'clear tmpmodel tmploc2 tmploc1 tmp tmptransf;' ];
         
+    cb_helpload = [ 'warndlg2(strvcat(''If you have already generated a spline file for this channel location'',' ...
+                                   '''structure, you may enter it here. Click on the "Use existing spline file or'',' ...
+                                   '''structure" to activate the edit box first.''), ''Load file for headplot()'');' ];
 	txt = { { 'style' 'text'        'string' 'Coregister channel locations with head and compute spline file (done only once)' 'fontweight' 'bold' } ...
-            { 'style' 'checkbox'    'string' 'Use existing spline file or structure' 'tag' 'loadcb' 'callback' cb_load 'value' ~compute_file } ...
+            { 'style' 'checkbox'    'string' 'Use the following spline file or structure' 'userdata' 'loadfile' 'tag' 'loadcb' 'callback' cb_load 'value' ~compute_file } ...
             { 'style' 'edit'        'string' fastif(typeplot, EEG.splinefile, EEG.icasplinefile)  'userdata' 'load' 'tag' 'load' 'enable' enableload } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browseload                               'tag' 'load' 'enable' enableload } ... 
-            { } ...
-            { 'style' 'checkbox'    'string' 'Or (re)compute new spline file' 'tag' 'compcb' 'callback' cb_comp 'value' compute_file } ...
-            { 'style' 'edit'        'string' ''              'userdata' 'comp'                                      'tag' 'comp' 'enable' enablecomp } ...
+            { 'style' 'pushbutton'  'string' 'Help'          'callback' cb_helpload } ...
+            { 'style' 'checkbox'    'string' 'Or (re)compute a new spline file named:' 'tag' 'compcb' 'callback' cb_comp 'value' compute_file } ...
+            { 'style' 'edit'        'string' ''              'userdata' 'coregfile'                                 'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browsecomp                               'tag' 'comp' 'enable' enablecomp } ... 
             { } ...
             { 'style' 'text'        'string' '            3-D head mesh file'                                       'tag' 'comp' 'enable' enablecomp } ...
-            { 'style' 'edit'        'string' ''              'userdata' 'mesh'                                      'tag' 'comp' 'enable' enablecomp } ...
+            { 'style' 'edit'        'string' 'mheadnew.mat'  'userdata' 'mesh'                                      'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browsemesh                               'tag' 'comp' 'enable' enablecomp } ... 
             { } ... 
             { 'style' 'text'        'string' '            Talairach transformation matrix'                          'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'edit'        'string' ''              'userdata' 'coregtext'                                 'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'pushbutton'  'string' 'Manual coreg.' 'callback' cb_selectcoreg 'userdata' EEG.chanlocs      'tag' 'comp' 'enable' enablecomp } ... 
-            { 'style' 'checkbox'    'string' 'No coreg'                                                             'tag' 'comp' 'enable' enablecomp } ... 
+            { 'style' 'checkbox'    'string' 'No coreg'      'userdata' 'coregcheckbox'                             'tag' 'comp' 'enable' enablecomp } ... 
             { } ...
             { 'style' 'text'        'string' 'Plot interpolated activity onto 3-D head' 'fontweight' 'bold' } ...
             { 'style' 'text' 'string' txt } ...
 	        { 'style' 'edit' 'string' fastif( typeplot, '', ['1:' int2str(size(EEG.data,1))] ) } ...
 	        { 'style' 'text' 'string' 'Plot title:' } ...
-	        { 'style' 'edit' 'string' ['ERP scalp maps' fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] } ...
+	        { 'style' 'edit' 'string' [ fastif( typeplot, 'ERP scalp maps', 'Components of') fastif(~isempty(EEG.setname), [' of ' EEG.setname ], '') ] } ...
 	        { 'style' 'text' 'string' 'Plot geometry (rows,columns): (Default [] = near square)' } ...
 	        { 'style' 'edit' 'string' '' } ...
 	        { 'style' 'text' 'string' '-> headplot() options  (See >> help headplot):' } ...
 	        { 'style' 'edit' 'string' '' } };
         
-    geom = { [1] [1 1.3 0.5 0.5 ] [1 1.3 0.5 0.5 ] [1 1.3 0.5 0.5 ] [1 1.3 0.5 0.5 ] [1] [1] [2 1] [2 1] [2 1] [2 1] };
-	result = inputgui( 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
-                       'Component head plot(s) -- pop_headplot()'), 'geometry', geom);
-	if length( result ) == 0 return; end;
-
-    % decode parameters
-    % -----------------
-    arg2   	     = eval( [ '[' result{1} ']' ] );
+    % plot GUI and protect parameters
+    % -------------------------------
+    geom = { [1] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1] [1] [2 1] [2 1] [2 1] [2 1] };
+    optiongui = { 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
+                       'Component head plot(s) -- pop_headplot()'), 'geometry', geom };
+	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
+    if isempty(result), return; end;
+    if ~isempty(get(0, 'currentfigure')) currentfig = gcf; else return; end;
+    
+    while test_wrong_parameters(currentfig)
+    	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', currentfig, optiongui{:});
+        if isempty(result), return; end;
+    end;
+    close(currentfig);
+    
+    % decode setup parameters
+    % -----------------------
+    options = {};
+    if result{1},               options = { options{:} 'load'    result{2} };
+    else
+        if result{7}            options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
+        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' result{6} } };
+        end;
+    end;
+    
+    % decode other parameters
+    % -----------------------
+    arg2 = eval( [ '[' result{8} ']' ] );
 	if length(arg2) > EEG.nbchan
 		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
-	topotitle  = result{2};
-	rowcols    = eval( [ '[' result{3} ']' ] );
-    options    = eval( [ '{ ' result{4} ' }' ]);
+	topotitle  = result{9};
+	rowcols    = eval( [ '[ ' result{10} ' ]' ] );
+    tmpopts    = eval( [ '{ ' result{11} ' }' ] );
+    if ~isempty(tmpopts)
+        options    = { options{:} tmpopts{:} };
+    end;
 	if size(arg2(:),1) == 1, figure; end;
 else
-	% read or generate file if necessary
-	% ----------------------------------
-    loc = strmatch('load', varargin(1:2:end)); loc = loc*2-1;
-    if ~isempty(loc)
-        if typeplot
-            EEG.splinefile = varargin{ loc+1 };
-        else            
-            EEG.icasplinefile = varargin{ loc+1 };
-        end;
-        varargin(loc:loc+1) = [];
-    end;
-    loc = strmatch('setup', varargin(1:2:end)); loc = loc*2-1;
-    if ~isempty(loc)
-        if typeplot
-            headplot('setup', EEG.chanlocs, EEG.splinefile, 'chaninfo', EEG.chaninfo);
-        else
-            headplot('setup', EEG.chanlocs, EEG.icasplinefile, 'ica', 'on', 'chaninfo', EEG.chaninfo);
-        end;
-        varargin(loc:loc+1) = [];
-        compute_file = 1;
-    else
-        compute_file = 0;
-    end;
-
-    % search for existing file if necessary
-    % -------------------------------------
-    if typeplot == 1 % ********** data plot
-        fieldname    = 'splinefile';        
-        if isempty(EEG.splinefile)            
-            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
-                EEG.splinefile = EEG.icasplinefile;
-            end;
-        end;
-    else % ************* Component plot       
-        fieldname    = 'icasplinefile';
-        if isempty(EEG.icasplinefile)
-            if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
-                EEG.icasplinefile = EEG.splinefile;
-            end;
-        end;
-    end;
-    
-	options = varargin;
-    pop_options = {};
+    options = varargin;
 end;
 
+% read or generate file if necessary
+% ----------------------------------
+pop_options = options;
+loc = strmatch('load', options(1:2:end)); loc = loc*2-1;
+if ~isempty(loc)
+    if typeplot
+        EEG.splinefile    = options{ loc+1 };
+    else            
+        EEG.icasplinefile = options{ loc+1 };
+    end;
+    options(loc:loc+1) = [];
+end;
+loc = strmatch('setup', options(1:2:end)); loc = loc*2-1;
+if ~isempty(loc)
+    if typeplot
+        headplot('setup', EEG.chanlocs, options{loc+1}{1}, 'chaninfo', EEG.chaninfo, options{ loc+1 }{2:end});
+        EEG.splinefile    = options{loc+1}{1};
+    else
+        headplot('setup', EEG.chanlocs, options{loc+1}{1}, 'chaninfo', EEG.chaninfo, 'ica', 'on', options{ loc+1 }{2:end});
+        EEG.icasplinefile = options{loc+1}{1};
+    end;
+    options(loc:loc+1) = [];
+    compute_file = 1;
+else
+    compute_file = 0;
+end;
+
+% search for existing file if necessary
+% -------------------------------------
+if typeplot == 1 % ********** data plot
+    fieldname    = 'splinefile';        
+    if isempty(EEG.splinefile)            
+        if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
+            EEG.splinefile = EEG.icasplinefile;
+        end;
+    end;
+else % ************* Component plot       
+    fieldname    = 'icasplinefile';
+    if isempty(EEG.icasplinefile)
+        if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
+            EEG.icasplinefile = EEG.splinefile;
+        end;
+    end;
+end;
+
+% check parameters
+% ----------------
 if ~exist('topotitle')  
     topotitle = '';
 end;    
@@ -376,7 +384,6 @@ else
         error('Pop_headplot: cannot find spline file, aborting...');
     end;
 end;    
-
 SIZEBOX = 150;
 nbgraph = size(arg2(:),1);
 if ~exist('rowcols') | isempty(rowcols) | rowcols == 0
@@ -464,11 +471,42 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 if nbgraph> 1, 
     a = textsc(0.5, 0.05, topotitle); 
     set(a, 'fontweight', 'bold');
-    axcopy(gcf, 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position''''); set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;');
+    axcopy(gcf, [ 'set(gcf, ''''units'''', ''''pixels''''); postmp = get(gcf, ''''position'''');' ...
+                  'set(gcf, ''''position'''', [postmp(1) postmp(2) 560 420]); rotate3d(gcf); clear postmp;' ]);
 end;
-if nbgraph== 1, com = [ 'figure; ' com ]; rotate3d(gcf); end;
 
+% generate output command
+% -----------------------
 com = sprintf('pop_headplot(%s, %d, %s, ''%s'', [%s], %s);', inputname(1), typeplot, vararg2str(arg2), ...
-              topotitle, int2str(rowcols), vararg2str( { options{:} pop_options{:} } ) );
+              topotitle, int2str(rowcols), vararg2str( pop_options ) );
 if compute_file, com = [ 'EEG = ' com ]; end;
+if nbgraph== 1,  com = [ 'figure; ' com ]; rotate3d(gcf); end;
+
 return;
+
+% test for wrong parameters
+% -------------------------
+function bool = test_wrong_parameters(hdl)
+
+    bool = 0;
+    loadfile = get( findobj( hdl, 'userdata', 'loadfile')     , 'value' );
+    
+    if ~loadfile
+        coreg1   = get( findobj( hdl, 'userdata', 'coregtext')    , 'string' );
+        coreg2   = get( findobj( hdl, 'userdata', 'coregcheckbox'), 'value' );
+        coreg3   = get( findobj( hdl, 'userdata', 'coregfile')    , 'string' );
+        if coreg2 == 0 & isempty(coreg1)
+            textlines = strvcat('You must coregister your channel locations', ...
+                                'with the head model. To bypass coregistration,', ...
+                                'check the checkbox "no coreg".');
+            bool = 1;
+        end;
+        if isempty(coreg3)
+            textlines = strvcat(textlines, ' ', 'You need to enter an output file name.');
+            bool = 1;
+        end;
+        
+        if bool
+            warndlg2( textlines, 'Error');
+        end;
+    end;
