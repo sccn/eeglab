@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/01/13 20:24:03  arno
+% change noze to nose
+%
 % Revision 1.16  2006/01/13 20:20:24  arno
 % put back warning
 %
@@ -230,7 +233,7 @@ end;
 % transform to arrays chan1
 % -------------------------
 TMP                           = eeg_emptyset;
-[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1, 'defaultelp', 'besa');
+[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1);
 TMP.chaninfo                  = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
@@ -240,7 +243,7 @@ elec1 = cfg.elec;
 % -------------------------
 if ~isempty(chan2)
     TMP   = eeg_emptyset;
-    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2, 'defaultelp', 'besa');
+    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2);
     TMP.chaninfo                  = g.chaninfo2;
     TMP.nbchan = length(TMP.chanlocs);
     cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
