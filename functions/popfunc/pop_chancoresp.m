@@ -1,11 +1,17 @@
 % pop_chancoresp() - build correspondance between channel location files
 %
 % Usage:
-%   >> [chanlist] = pop_chancoresp(chanstruct1, chanstruc2); 
+%   >> [chanlist] = pop_chancoresp(chanstruct1, chanstruc2, 'key', 'val', ...); 
 %
 % Inputs:
 %   chanstruct1     - first channel structure. See readlocs()
 %   chanstruct2     - second channel structure.
+%
+% Optional parameters:
+%   'autoselect'    - ['none'|'fiducials'|'all'] automatically pair channels
+%   'gui'           - ['on'|'off'] display gui or not
+%   'chaninfo1'     - channel info structure for first channel structure
+%   'chaninfo2'     - channel info structure for second channel structure
 %
 % Output:
 %   chanlist1  - indices of selected channels
@@ -32,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/01/14 00:35:22  arno
+% debugging output
+%
 % Revision 1.3  2006/01/12 23:53:05  arno
 % fix output when no gui
 %
