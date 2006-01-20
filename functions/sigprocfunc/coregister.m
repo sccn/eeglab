@@ -4,8 +4,7 @@
 %        >> coregister( chan1, chan2, 'key', 'val' )
 %
 % Inputs:
-%    chan1    - channel location file or eeglab channel location 
-%               structure to align.
+%    chan1    - eglab channel location structure to align.
 %    chan2    - reference channel location file or eeglab channel location 
 %               structure
 %
@@ -55,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/01/20 22:36:05  arno
+% remove defaultelp
+%
 % Revision 1.17  2006/01/13 20:24:03  arno
 % change noze to nose
 %
