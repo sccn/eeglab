@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2006/01/12 23:22:39  arno
+% fixing indices
+%
 % Revision 1.80  2006/01/12 22:03:51  arno
 % fiducial type
 %
@@ -492,8 +495,6 @@ if isstr(filename)
         case 'sph', g.filetype = 'sph';
         case 'ced', g.filetype = 'chanedit';
         case 'elp', g.filetype = g.defaultelp;
-            fprintf( [ 'WARNING: Polhemus Cartesian coord. file extension (".elp") detected.\n' ... 
-                    '         If importing BESA spherical coords, force type "besa" instead.\n'] );
         case 'asc', g.filetype = 'asc';
         case 'dat', g.filetype = 'dat';
         case 'elc', g.filetype = 'elc';
@@ -539,14 +540,17 @@ if isstr(filename)
            strcmp(g.filetype, 'polhemus')
        try, 
            [eloc labels X Y Z]= readelp( filename );
-       catch, error('readlocs(): Error reading Polhemus coords. If BESA .elp file, force file type to BESA.'); end;
-       if strcmp(g.filetype, 'polhemusy')
-           tmp = X; X = Y; Y = tmp;
-       end;
-       for index = 1:length( eloc )
-           eloc(index).X = X(index);
-           eloc(index).Y = Y(index);	
-           eloc(index).Z = Z(index);	
+           if strcmp(g.filetype, 'polhemusy')
+               tmp = X; X = Y; Y = tmp;
+           end;
+           for index = 1:length( eloc )
+               eloc(index).X = X(index);
+               eloc(index).Y = Y(index);	
+               eloc(index).Z = Z(index);	
+           end;
+       catch, 
+           disp('readlocs(): Could not read Polhemus coords. Trying to read BESA .elp file.');
+           [eloc, labels, theta, radius, indices] = readlocs( filename, 'defaultelp', 'besa', varargin{:} );
        end;
    else      
        % importing file
