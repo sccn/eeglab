@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/01/20 22:43:50  arno
+% header info
+%
 % Revision 1.18  2006/01/20 22:36:05  arno
 % remove defaultelp
 %
@@ -377,7 +380,7 @@ if 1
                       'clear tmp;' ...
                       'coregister(''redraw'', gcbf);' ];
     cb_elecshow2 = [ 'tmp = get(gcbf, ''userdata'');' ...
-                      'tmpstrs = { ''19 elec in 10/20'' ''33 elec in 10/20'' ''61 elec in 10/20'' ''all 347 elec'' };' ...
+                      'tmpstrs = { ''21 elec (10/20 system)'' ''86 elec (10/10 system)'' ''all elec (10/5 system)'' };' ...
                       'tmpres = inputgui( ''uilist'', {{ ''style'' ''text'' ''string'' ''show only'' } ' ...
                                         ' { ''style'' ''listbox'' ''string'' strvcat(tmpstrs) }}, ' ...
                                         ' ''geometry'', { 1 1 }, ''geomvert'', [1 3] );' ...
@@ -460,13 +463,17 @@ function plotelec(elec, elecshow, color, tag);
 
 % decode labels for electrode caps
 % --------------------------------
-function indices = decodelabels( strchan );
+% 86 channels
+function indices = decodelabels( chanlocs, strchan );
+    label1020 = {'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8',  'T7', 'C3', 'Cz', 'C4', 'T8',  'P7', 'P3', 'Pz', 'P4', 'P8', 'O1', 'Oz', 'O2'}'; % 21 channels
+    label1010 = {'Fp1', 'Fpz', 'Fp2', 'AF9', 'AF7', 'AF5', 'AF3', 'AF1', 'AFz', 'AF2', 'AF4', 'AF6', 'AF8', 'AF10', 'F9', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'F10', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T9', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', ...
+             'C4', 'C6', 'T8', 'T10', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P9', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 'P10', 'PO9', 'PO7', 'PO5', 'PO3', 'PO1', 'POz', 'PO2', 'PO4', 'PO6', 'PO8', 'PO10', 'O1', 'Oz', 'O2', 'I1', 'Iz', 'I2'}'; ...
     if ~isstr(strchan), indices = strchan; return; end;
     switch strchan
-        case '19 elec in 10/20', indices = [ 1 2 3 4 6 19 21 23 25 27 41 43 45 47 49 63 65 67 69 71 84 86 ];
-        case '33 elec in 10/20', indices = [ 1 2 3 4 6 18 19 21 23 25 27 28 31 33 35 37 40 41 43 45 47 49 50 53 55 57 59 62 63 65 67 69 71 72 84 86];
-        case '61 elec in 10/20', indices = [ 1 2 3 4 5 6 8 10 12 14 16 19 20 21 22 23 24 25 26 27 31 32 33 34 35 36 37 38 41 42 43 44 45 46 47 48 52 53 54 55 56 57 58 59 60 62 63 64 65 67 68 69 70 71 72 74 76 78 80 82 84 85 86 88];
-    otherwise, indices = 1:346;
+     case '21 elec (10/20 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1020), 'gui', 'off');
+     case '86 elec (10/10 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1010), 'gui', 'off');
+     case 'all elec (10/5 system)', indices = 1:length(chanlocs.label);
+    otherwise, error('Unknown option');
   end;
     
 % plot electrode labels
@@ -589,7 +596,7 @@ function redrawgui(fid)
     end;
     plotelec(dat.electransf, dat.elecshow1, dat.color1, 'elec1');
     if ~isempty(dat.elec2)
-        dat.elecshow2 = decodelabels( dat.elecshow2 );
+        dat.elecshow2 = decodelabels( dat.elec2, dat.elecshow2 );
         plotelec(dat.elec2, dat.elecshow2, dat.color2, 'elec2');
     end;
     set(h, 'tag', 'plot3d');
