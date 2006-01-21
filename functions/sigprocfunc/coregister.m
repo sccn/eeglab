@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/01/21 00:01:06  arno
+% new list of channels for template
+%
 % Revision 1.19  2006/01/20 22:43:50  arno
 % header info
 %
@@ -465,8 +468,8 @@ function plotelec(elec, elecshow, color, tag);
 % --------------------------------
 % 86 channels
 function indices = decodelabels( chanlocs, strchan );
-    label1020 = {'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8',  'T7', 'C3', 'Cz', 'C4', 'T8',  'P7', 'P3', 'Pz', 'P4', 'P8', 'O1', 'Oz', 'O2'}'; % 21 channels
-    label1010 = {'Fp1', 'Fpz', 'Fp2', 'AF9', 'AF7', 'AF5', 'AF3', 'AF1', 'AFz', 'AF2', 'AF4', 'AF6', 'AF8', 'AF10', 'F9', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'F10', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T9', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', ...
+    label1020 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8',  'T7', 'C3', 'Cz', 'C4', 'T8',  'P7', 'P3', 'Pz', 'P4', 'P8', 'O1', 'Oz', 'O2'}'; % 21 channels
+    label1010 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'AF9', 'AF7', 'AF5', 'AF3', 'AF1', 'AFz', 'AF2', 'AF4', 'AF6', 'AF8', 'AF10', 'F9', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'F10', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T9', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', ...
              'C4', 'C6', 'T8', 'T10', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P9', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 'P10', 'PO9', 'PO7', 'PO5', 'PO3', 'PO1', 'POz', 'PO2', 'PO4', 'PO6', 'PO8', 'PO10', 'O1', 'Oz', 'O2', 'I1', 'Iz', 'I2'}'; ...
     if ~isstr(strchan), indices = strchan; return; end;
     switch strchan
