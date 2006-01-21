@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.145  2006/01/19 19:44:34  arno
+% fix popupmenu
+%
 % Revision 1.144  2006/01/19 19:40:59  arno
 % replace listbox by pop-up menu
 %
@@ -1248,6 +1251,7 @@ else
             end;
            
 		  case 'lookup'
+           params.filename = args{ curfield+1 };
            tmplocs = readlocs( args{ curfield+1 }, 'defaultelp', 'BESA' );
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
