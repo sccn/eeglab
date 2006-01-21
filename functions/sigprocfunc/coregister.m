@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/01/21 00:02:41  arno
+% adding fiducials
+%
 % Revision 1.20  2006/01/21 00:01:06  arno
 % new list of channels for template
 %
@@ -186,14 +189,21 @@ if isstr(g), error(g); end;
 % help message
 % ------------
 if strcmpi(g.helpmsg, 'on')
-    warndlg2( strvcat( 'User channels (sometimes hidden by 3D mesh) are in green, template channels in red.', ...
+    mytext = strvcat( 'User channels (sometimes hidden by 3D mesh) are in green, template channels in red.', ...
             'Press ''Warp'' to automatically warp channels to corresponding template channel locations.', ...
             'If desired, then edit the transformation manually.', ...
             ' ', ...
             'To use the location of the corresponding template channels (and discard your current locations),', ...
             'go to menu item "Edit > Channel locations", press the "Look up loc" button, and select a', ...
-            'head model. Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.'), ...
-          'Co-register channel locations');
+            'head model. Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.');
+    if ~isempty(findstr(lower(chan2), 'standard-10-5-cap385')) | ...
+        ~isempty(findstr(lower(chan2), 'standard_1005')),
+        mytext = strvcat( mytext, 'Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.');
+    else
+        mytext = strvcat( mytext, 'Then re-open the graphic interface you were using.');
+    end;        
+       
+    warndlg2( mytext, 'Co-register channel locations');
 end;
 
 % load mesh if any
