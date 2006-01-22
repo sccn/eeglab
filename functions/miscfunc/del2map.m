@@ -10,9 +10,16 @@
 %    draw       - integer, if not nul draw the gradient (default:0)
 %
 % Output:
-%    laplac     - laplacian map 
+%    laplac     - laplacian map. If the input values are in microV and the
+%                 the sensors placement are in mm, the output values are
+%                 returned in microV/mm^2. In order to use current density 
+%                 units like milliamps/mm2, you would  need to know skin 
+%                 conductance information, which as far as we know is not
+%                 really known with enough accuracy to be worthwhile. 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
+%         Thanks Ramesh Srinivasan and Tom Campbell for the discussion
+%         on laplacian output units.
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -33,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/05/18 18:58:56  arno
+% allowing to process different maps
+%
 % Revision 1.3  2003/10/30 22:02:16  arno
 % allowing to read any channel location file
 %
