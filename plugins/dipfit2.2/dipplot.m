@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.137  2006/01/23 22:23:18  arno
+%factor -> multfactor
+%
 %Revision 1.136  2006/01/23 22:19:16  arno
 %same
 %
@@ -913,6 +916,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         
         for dip = 1:nbdip
         
+            multfactor = 1;
             x = sources(index).posxyz(dip,1);
             y = sources(index).posxyz(dip,2);
             z = sources(index).posxyz(dip,3);
