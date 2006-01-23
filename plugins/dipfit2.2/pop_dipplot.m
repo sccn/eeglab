@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/01/19 22:22:44  arno
+% same
+%
 % Revision 1.32  2006/01/19 22:21:56  arno
 % debut command line call
 %
@@ -276,10 +279,11 @@ else
     % plotting
     % --------
     tmpoptions = { options{:} 'coordformat', EEG.dipfit.coordformat };
+    tmpoptions
     if strcmpi(EEG.dipfit.coordformat, 'spherical')
-        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, tmpoptions{:});
+        dipplot(EEG.dipfit.model(comps), tmpoptions{:});
     else
-        dipplot(EEG.dipfit.model(comps), 'mri', EEG.dipfit.mrifile, 'meshdata', EEG.dipfit.hdmfile, tmpoptions{:});
+        dipplot(EEG.dipfit.model(comps), 'meshdata', EEG.dipfit.hdmfile, tmpoptions{:});
     end;
 end;
     
