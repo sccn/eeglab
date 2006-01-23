@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.136  2006/01/23 22:19:16  arno
+%same
+%
 %Revision 1.135  2006/01/23 22:17:32  arno
 %fixing coordinate error
 %
@@ -915,17 +918,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             z = sources(index).posxyz(dip,3);
             if strcmpi(g.normlen, 'on')
                 len    = sqrt(sum(sources(index).momxyz(dip,:).^2));
-                if len ~= 0, factor = 15/len; end;
+                if len ~= 0, multfactor = 15/len; end;
             else
                 if strcmpi(g.coordformat, 'spherical')
-                     factor = 100;
-                else factor = 1.5;
+                     multfactor = 100;
+                else multfactor = 1.5;
                 end;            
             end;
             
-            xo = sources(index).momxyz(dip,1)*g.dipolelength*factor;
-            yo = sources(index).momxyz(dip,2)*g.dipolelength*factor;
-            zo = sources(index).momxyz(dip,3)*g.dipolelength*factor;
+            xo = sources(index).momxyz(dip,1)*g.dipolelength*multfactor;
+            yo = sources(index).momxyz(dip,2)*g.dipolelength*multfactor;
+            zo = sources(index).momxyz(dip,3)*g.dipolelength*multfactor;
             
             if strcmpi(g.pointout,'on') & abs([x+xo,y+yo,z+zo]) < abs([x,y,z])
                 xo1 = x-xo; % make dipole point outward from head center
@@ -1515,10 +1518,10 @@ function index = minpos(vals);
 	vals(find(vals < 0)) = inf;
 	[tmp index] = min(vals);
 
-function scalegca(factor)
-    xl = xlim; xf = ( xl(2) - xl(1) ) * factor;
-    yl = ylim; yf = ( yl(2) - yl(1) ) * factor;
-    zl = zlim; zf = ( zl(2) - zl(1) ) * factor;
+function scalegca(multfactor)
+    xl = xlim; xf = ( xl(2) - xl(1) ) * multfactor;
+    yl = ylim; yf = ( yl(2) - yl(1) ) * multfactor;
+    zl = zlim; zf = ( zl(2) - zl(1) ) * multfactor;
     xlim( [ xl(1)-xf xl(2)+xf ]);
     ylim( [ yl(1)-yf yl(2)+yf ]);
     zlim( [ zl(1)-zf zl(2)+zf ]);
