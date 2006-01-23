@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.134  2006/01/19 23:54:27  arno
+%adding meshdata to summary mode
+%
 %Revision 1.133  2006/01/19 23:38:57  arno
 %using field talcoord
 %
@@ -970,13 +973,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
             outsources(index).eleccoord(dip,:) = [xx yy zz];
             outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
-            if ~isempty(dat.sph2spm)
-                outsources(index).talcoord(dip,:) = mni2tal(2*[xxmri yymri zzmri]);
-                dipstruct.talcoord                = mni2tal(2*[xxmri yymri zzmri]);
-            else
-                outsources(index).talcoord(dip,:) = mni2tal([xxmri yymri zzmri]);
-                dipstruct.talcoord                = mni2tal([xxmri yymri zzmri]);
-            end;
+            outsources(index).talcoord(dip,:) = mni2tal(xx yy zz]);
+            dipstruct.talcoord                = mni2tal(xx yy zz]);
             
             % copy for output
             % ---------------
