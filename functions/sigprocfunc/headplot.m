@@ -105,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2005/11/30 23:29:14  arno
+% taking into account icachansind and channel location file orientation
+%
 % Revision 1.60  2005/11/30 20:24:35  arno
 % adding indices, etc... in structure
 %
@@ -363,7 +366,7 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Open electrode file
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [eloc_file labels Th Rd ind] = readlocs(eloc_file);
+    [eloc_file labels Th Rd indices] = readlocs(eloc_file);
     indices = find(~cellfun('isempty', { eloc_file.X }));
     
     % channels to plot
@@ -376,12 +379,16 @@ if isstr(values)
     % ---------------------------------------------
     if ~isfield(g.chaninfo, 'icachansind'), g.chaninfo(1).icachansind = 1:length(eloc_file); end;
     if strcmpi(g.ica, 'on'), 
-        rmchans = setdiff( g.chaninfo.icachansind, indices ); % channels to remove
-        newinds = 1:length(g.chaninfo.icachansind);
-        for index = 1:length(rmchans)
-            chanind          = find(g.chaninfo.icachansind == rmchans(index));
-            newinds(chanind) = [];
+        rmchans2 = setdiff( g.chaninfo.icachansind, indices ); % channels to remove (non-plotted) 
+        newinds = 1:length(g.chaninfo.icachansind);     
+        allrm = [];       
+        % remove non-plotted channels from indices
+        for index = 1:length(rmchans2)
+            chanind = find(g.chaninfo.icachansind == rmchans2(index));
+            allrm   = [ allrm chanind ];
         end;
+
+        newinds(allrm) = [];        
         indices   = newinds;
         eloc_file = eloc_file(g.chaninfo.icachansind); 
     end;
@@ -389,6 +396,7 @@ if isstr(values)
     fprintf('Headplot: using existing XYZ coordinates\n');
     ElectrodeNames = strvcat({ eloc_file.labels });
     ElectrodeNames = ElectrodeNames(indices,:);
+        
     Xeori = [ eloc_file(indices).X ]';
     Yeori = [ eloc_file(indices).Y ]';
     Zeori = [ eloc_file(indices).Z ]';
@@ -420,13 +428,12 @@ if isstr(values)
     newcoords = [ Xeori Yeori Zeori ];
     
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
-    newcoords = transformcoords( [ Xeori Yeori Zeori ], g.transform(4:6), g.transform(7:9), g.transform(1:3));
+    %newcoords = transformcoords( [ Xeori Yeori Zeori ], g.transform(4:6), g.transform(7:9), g.transform(1:3));
     % same performed below with homogenous transformation matrix
     
-    %newcoords = [ Xe Ye Ze ];
-    %transmat  = traditional( g.transform ); % arno
-    %newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
-    %newcoords = newcoords(1:3,:)';
+    transmat  = traditional( g.transform ); % arno
+    newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
+    newcoords = newcoords(1:3,:)';
     
     % original center was [6 0 16] but the center of the sphere is [0 0 30] 
     % which compensate (see variable Headcenter)
@@ -440,7 +447,7 @@ if isstr(values)
     Ye = newcoordsnorm(:,2)./tmpnorm;
     Ze = newcoordsnorm(:,3)./tmpnorm;
     %plotchans3d([ Xe Ye Ze], cellstr(ElectrodeNames)); return;
-    
+     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculate g(x) for electrodes 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
