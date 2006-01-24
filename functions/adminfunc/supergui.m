@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/01/19 19:42:40  arno
+% color of popupmenus
+%
 % Revision 1.45  2005/11/09 23:23:05  arno
 % nothing
 %
