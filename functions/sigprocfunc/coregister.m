@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/01/24 19:31:24  arno
+% window title
+%
 % Revision 1.23  2006/01/21 02:55:56  scott
 % nothing
 %
@@ -323,7 +326,8 @@ dat.color2     = [1 0 0];
 dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
-fid = figure('userdata', dat, 'title', 'Co-registration window');
+fid = figure('userdata', dat, 'name', 'Co-registration window');
+try, icadefs; catch, end;
 
 if 1
     header    = 'dattmp = get(gcbf, ''userdata'');';
@@ -406,14 +410,26 @@ if 1
                       'set(gcbf, ''userdata'', tmp);' ...
                       'clear tmp tmpres;' ...
                       'coregister(''redraw'', gcbf);' ];
+    h = uicontrol( opt{:}, [0 0.75  .13 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
+
+    % change colors
+    % -------------
+    hh = findobj('parent', gcf, 'style', 'text');
+    set(hh, 'Backgroundcolor', GUIBACKCOLOR);
+    set(hh, 'foregroundcolor', GUITEXTCOLOR);
+    hh = findobj('parent', gcf, 'style', 'edit');
+    set(hh, 'Backgroundcolor', GUIBACKCOLOR);
+    set(hh, 'foregroundcolor', GUITEXTCOLOR);
+    hh = findobj('parent', gcf, 'style', 'pushbutton');
+    set(hh, 'Backgroundcolor', GUIBACKCOLOR);
+    set(hh, 'foregroundcolor', GUITEXTCOLOR);
+
     h = uicontrol( opt{:}, [0  0.95 .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Labels on', 'callback', cb_label1 );
     h = uicontrol( opt{:}, [0  0.9  .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color1, 'string', 'Electrodes', 'callback', cb_elecshow1 );
 
     h = uicontrol( opt{:}, [0 0.85  .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Labels on', 'callback', cb_label2 );
     h = uicontrol( opt{:}, [0 0.8   .13 .05], 'style', 'pushbutton', 'backgroundcolor', dat.color2, 'string', 'Electrodes', 'callback', cb_elecshow2 );
-    
-    h = uicontrol( opt{:}, [0 0.75  .13 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
-    
+        
 end;
 
 coregister('redraw', fid);
