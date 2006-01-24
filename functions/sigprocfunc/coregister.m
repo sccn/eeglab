@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/01/21 02:55:56  scott
+% nothing
+%
 % Revision 1.22  2006/01/21 00:31:24  arno
 % update help text message
 %
@@ -320,7 +323,7 @@ dat.color2     = [1 0 0];
 dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
-fid = figure('userdata', dat);
+fid = figure('userdata', dat, 'title', 'Co-registration window');
 
 if 1
     header    = 'dattmp = get(gcbf, ''userdata'');';
