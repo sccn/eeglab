@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/01/25 00:38:08  arno
+% fixing sclose
+%
 % Revision 1.10  2006/01/17 00:56:19  arno
 % closing data file after reading
 %
@@ -168,11 +171,11 @@ if isstr(g), error(g); end;
 % import data
 % -----------
 EEG = eeg_emptyset;
-fprintf('Reading data in %s format...\n', dat.TYPE);
 if ~isempty(g.channels)
      dat = sopen(filename, 'r', g.channels,'OVERFLOWDETECTION:OFF');
 else dat = sopen(filename, 'r', 0,'OVERFLOWDETECTION:OFF');
 end;
+fprintf('Reading data in %s format...\n', dat.TYPE);
 
 if ~isempty(g.blockrange)
     newblockrange    = g.blockrange;
@@ -245,6 +248,6 @@ EEG = eeg_checkset(EEG);
 if isempty(options)
     command = sprintf('EEG = pop_biosig(''%s'');', filename); 
 else
-    command = sprintf('EEG = pop_biosig(''%s'' %s);', filename, vararg2str(options)); 
+    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
 end;    
 
