@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/01/17 00:56:19  arno
+% closing data file after reading
+%
 % Revision 1.9  2006/01/17 00:54:13  arno
 % disable overflow detection
 %
@@ -179,7 +182,7 @@ if ~isempty(g.blockrange)
 else 
     DAT=sread(dat, Inf)';
 end;
-DAT = sclose(DAT);
+dat = sclose(dat);
 
 % convert to seconds for sread
 % ----------------------------
