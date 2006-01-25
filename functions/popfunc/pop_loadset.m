@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2005/11/04 23:20:27  arno
+% set file name and file path
+%
 % Revision 1.46  2005/10/01 22:29:38  arno
 % header
 %
@@ -194,7 +197,7 @@ EEG  = [];
 if nargin < 1
     % pop up window
     % -------------
-	[inputname, inputpath] = uigetfile2('*.set*;*.SET*', 'Load dataset(s) -- pop_loadset()');
+	[inputname, inputpath] = uigetfile2('*.SET*;*.set', 'Load dataset(s) -- pop_loadset()');
     drawnow;
 	if inputname == 0 return; end;
     options = { 'filename' inputname 'filepath' inputpath };
