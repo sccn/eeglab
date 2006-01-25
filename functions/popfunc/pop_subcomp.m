@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/01/25 21:24:16  arno
+% fixing remove components
+%
 % Revision 1.13  2005/09/27 22:10:02  arno
 % change default set name; allow to plot single trials
 %
@@ -144,7 +147,7 @@ if option_computeica
     %[ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 else
     compproj = EEG.icawinv(:, component_keep)*EEG.icaweights(component_keep,:)*EEG.icasphere ...
-                 *reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
+                 *reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.pnts*EEG.trials);
     %[ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 end;    
 compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
