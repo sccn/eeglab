@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2005/09/27 22:10:02  arno
+% change default set name; allow to plot single trials
+%
 % Revision 1.12  2005/09/05 21:37:50  scott
 % clarified trial-ERP and Confirmation window comments. -sm
 %
@@ -135,10 +138,14 @@ end;
 
 fprintf('Computing projection ....\n');
 eeg_options; 
+component_keep = setdiff(1:size(EEG.icaweights,1), components);
 if option_computeica  
-    [ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
+    compproj = EEG.icawinv(:, component_keep)*reshape(EEG.icaact(component_keep,:), length(component_keep), EEG.pnts*EEG.trials);
+    %[ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 else
-    [ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
+    compproj = EEG.icawinv(:, component_keep)*EEG.icaweights(component_keep,:)*EEG.icasphere ...
+                 *reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
+    %[ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 end;    
 compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
 
