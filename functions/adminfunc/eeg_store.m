@@ -8,7 +8,7 @@
 % Inputs:
 %   ALLEEG     - variable containing all current EEGLAB datasets
 %   EEG        - dataset(s) to store - usually the current dataset. 
-%                EEG may also be an array of datasets; these will be 
+%                May also be an array of datasets; these will be 
 %                checked and stored separately in ALLEEG.
 %   index      - (optional), ALLEEG index (or indices) to use to store 
 %                the new dataset(s). If no index is given, eeg_store() 
@@ -26,7 +26,7 @@
 %        >> [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
 %  creates a new dataset in variable ALLEEG.
 %        >> [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-%  overwrites the current dataset in variable ALLEEG
+%  overwrites the current dataset in variable ALLEEG.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/01/26 00:29:57  arno
+% message
+%
 % Revision 1.35  2006/01/26 00:26:25  arno
 % better message
 %
@@ -170,7 +173,7 @@ function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, va
 % ------------------------------
 if nargin == 3
     if length(EEG) ~= length(storeSetIndex),
-        error('Length of input dataset structure must be equal to length of index array');
+        error('Length of input dataset structure must equal the length of the index array');
     end;
 end;
 
@@ -293,7 +296,7 @@ if findindex
 			storeSetIndex = i; i = 200;
 		end;
    end;
-   fprintf('Creating new ALLEEG dataset %d\n', storeSetIndex);
+   fprintf('Creating a new ALLEEG dataset %d\n', storeSetIndex);
 else
 	if isempty(storeSetIndex) | storeSetIndex == 0
 		storeSetIndex = 1;
