@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.146  2006/01/21 00:13:41  arno
+% saving filename also when lookup
+%
 % Revision 1.145  2006/01/19 19:44:34  arno
 % fix popupmenu
 %
