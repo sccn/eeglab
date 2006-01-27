@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/01/24 19:40:23  arno
+% nothing
+%
 % Revision 1.46  2006/01/19 19:42:40  arno
 % color of popupmenus
 %
@@ -271,6 +274,7 @@ end;
 % setting relative height in percent
 % ---------------------------------
 sumcol = sum(g.geomvert);
+ind1   = find(g.geomvert == 1); ind1 = ind1(1);
 g.geomvert  = (1.03+0.003*sumcol)*g.geomvert/sumcol;
 g.geomvert  = g.geomvert - g.insetv*(length(g.geomvert)-1)/length(g.geomvert);
 
@@ -311,9 +315,14 @@ for row = 1:length(g.geomhoriz)
 			return;
 		end;		
 		if ~isempty(currentelem)
-			rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+            if ~strcmp(currentelem{2}, 'popupmenu') & ~strcmp(currentelem{2}, 'pushbutton')
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
 						                      [posx posy width height].*s+q, currentelem{:});
-						
+            else % force height to be unitary
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+						[posx posy+height-(height+g.geomvert(ind1))/2 width g.geomvert(ind1)].*s+q, currentelem{:});
+            end;
+            
 			% this simply compute a factor so that all uicontrol will be visible
 			% ------------------------------------------------------------------
 			style = get( rowhandle(column), 'style');			
