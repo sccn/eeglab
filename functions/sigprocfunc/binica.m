@@ -9,8 +9,10 @@
 %  >> [wts,sph] = binica('datafile', chans, frames, 'key1', arg1, ...);
 %
 % Inputs:
-%   datavar  = (chans,frames) data matrix in the Matlab workspace
-%   datafile = quoted 'filename' of float data file multiplexed by channel
+%   datavar       - (chans,frames) data matrix in the Matlab workspace
+%   datafile      - quoted 'filename' of float data file multiplexed by channel
+%     channels    -   number of channels in datafile (not needed for datavar)
+%     frames      -   number of frames (time points) in datafile (only)
 %
 % Optional flag,argument pairs:
 %   'extended'   - int>=0        [0 default: assume no subgaussian comps]
@@ -31,7 +33,8 @@
 %                  to reduce the 'stop' arg (above). By default, binary 
 %                  ica begins with the identity matrix after sphering. 
 %   'verbose     - 'on'/'off'    {default: 'off'}    
-% Rarely specified input flags:
+%
+% Less frequently used input flags:
 %   'posact'     - ('on'/'off') Make maximum value for each comp positive.
 %                    NB: 'off' recommended. {default: 'off'} 
 %   'annealstep' - (0<float<1)   {default: 0.98}
@@ -71,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/01/14 18:04:35  scott
+% added 'stem' output -sm
+%
 % Revision 1.15  2006/01/14 17:37:11  scott
 % implemented 'weightsin' flag  -sm
 %
