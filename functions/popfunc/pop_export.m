@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/05/22 15:03:41  arno
+% [A[Awindow size and header typo
+%
 % Revision 1.2  2003/05/22 03:44:58  scott
 % changed pop-up window text, header message and defaults
 %
@@ -126,7 +129,7 @@ if isstr(g), error(g); end;
 % select data
 % ----------
 if strcmpi(g.ica, 'on');
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 		x = EEG.icaact;
 	else

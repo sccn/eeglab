@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/01/31 00:32:02  arno
+% fix problem for saved field
+%
 % Revision 1.33  2006/01/31 00:23:48  arno
 % allow no previous dataset
 %
@@ -176,8 +179,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
 	userdat = EEG.comments;
     
     % status of parent dataset etc...
-    eeg_optionsbackup;
-    eeg_options;
+    eeglab_options;
     saved = 1;
     filename = '';
     if ~isempty(ALLEEG)
