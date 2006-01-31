@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/01/31 00:01:52  arno
+% adding callback
+%
 % Revision 1.28  2005/08/04 17:40:40  arno
 % debug saving new option file
 %
@@ -168,6 +171,7 @@ datasets_in_memory = 0;
 if nargin > 0
     if ~isstr(varargin{1})
         datasets_in_memory = varargin{1};
+        varargin = {};
     end;
 end;
 
