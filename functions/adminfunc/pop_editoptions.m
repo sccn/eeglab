@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/01/31 19:47:31  arno
+% change default folder etc...
+%
 % Revision 1.36  2006/01/31 19:33:39  arno
 % adding filepath to new options
 %
@@ -208,15 +211,16 @@ if	fid == -1
 		else 
             warndlg2(strvcat('Warning: you must store the file in a FOLDER always accessible', ...
                              'from Matlab (i.e. a folder in the Matlab path) and not necessarilly in', ...
-                             'the local folder. Otherwise, every time you change of folder, the default', ...
-                             'EEGLAB options will apply (the path you choose will be added temporarily' ...
-                             'for this session). Select a folder in the next pop-up file window.').
+                             'the local folder. Otherwise, every time you restart EEGLAB, the default', ...
+                             'EEGLAB options will apply (the path you choose will be added temporarily', ...
+                             'for this session). Select a folder in the next pop-up file window.'), 'Warning');
             try
                 filepath = uigetdir('', 'Pick a Directory');
             catch,
                 [filename filepath] = uigetfile('*.m', 'Pick a folder', 'eeg_options');
             end;
 		end;
+        if filepath(1) == 0, return; end;
         
         % see if the folder can be written into
         % -------------------------------------
@@ -327,7 +331,7 @@ for index = 1:length(opt)
     if isempty(opt(index).varname)
         fprintf( fid, '%% %s\n', opt(index).description);
     else
-        fprintf( fid, '%s = %d ; %% %s\n', opt(index).varname}, opt(index).value, opt(index).description);
+        fprintf( fid, '%s = %d ; %% %s\n', opt(index).varname, opt(index).value, opt(index).description);
     end;
 end;
 fclose(fid);    
