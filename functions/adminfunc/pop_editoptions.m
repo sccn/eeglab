@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/01/31 00:12:49  arno
+% fix checking number of dataset loaded
+%
 % Revision 1.29  2006/01/31 00:01:52  arno
 % adding callback
 %
@@ -215,7 +218,7 @@ for i = 1:length(varname)
     end;
 end;
 
-if nargin == 0
+if nargin < 2
     geometry = { [6 1] };
     uilist = { ...
          { 'Style', 'text', 'string', '', 'fontweight', 'bold'  }, ...
