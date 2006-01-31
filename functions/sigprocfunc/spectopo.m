@@ -2,72 +2,79 @@
 %              as a bundle of traces. At specified frequencies, plot the relative 
 %              topographic distribution of power. If available, uses pwelch() from 
 %              the Matlab signal processing toolbox, else the EEGLAB spec() function.
+%              Plots the mean spectrum for all of the supplied data, not just
+%              the pre-stimulus baseline.
 % Usage:
 %              >> spectopo(data, frames, srate);
 %              >> [spectra,freqs,speccomp,contrib,specstd] = ...
-%                     spectopo(data, frames, srate, 'key1', 'val1', 'key2', 'val2' ...);
+%                   spectopo(data, frames, srate, 'key1','val1', 'key2','val2' ...);
 % Inputs:
-%       data   = If 2-D (nchans,frames*epochs); % can be single-epoch
-%                else, 3-D (nchans,frames,epochs)
-%       frames = frames per epoch {0 -> data length}
+%       data   = If 2-D (nchans,time_points); % may be continuous = a single epoch,
+%                else a set of concatenated data epochs. Else, a 3-D set of data 
+%                epochs (nchans,frames,epochs)
+%       frames = frames per epoch {default|0 -> data length}
 %       srate  = sampling rate per channel (Hz)
 %
 % Optional inputs:
-%   'freq'     = [float vector (Hz)] vector of frequencies for topoplot() scalp maps
-%                of power at all channels, or single frequency to plot component 
+%   'freq'     = [float vector (Hz)] vector of frequencies at which to plot power 
+%                scalp maps, or else a single frequency at which to plot component 
 %                contributions at a single channel (see also 'plotchan').
-%   'chanlocs' = electrode locations file (format: >> topoplot example)
-%   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax]
-%                To use data limits, omit final values or use nan's
-%                i.e. [-100 900 nan nan -10 10], [-100 900]
-%                Note that default color limits are symmetric around 0 and are
-%                different for each head {defaults: all nans}
+%   'chanlocs' = electrode locations file or EEG.chanlocs structure. For format, see
+%                    >> topoplot example
+%   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax] set x y and color axis
+%                limits. May omit final values or use NaN's
+%                   Ex: [-100 900 NaN NaN -10 10], [-100 900], ...
+%                Default color limits are symmetric around 0 and are different 
+%                for each scalp map {default|all NaN's: from data}
 %   'title'    = [quoted string] plot title {default: none}
 %   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
-%   'nfft'     = [integer] value to zero pad data to. Overwrites 'freqfac' above.
+%   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
 %   'winsize'  = [integer] window size in data points {default: from data}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
-%   'percent'  = [float 0 to 100] percent of the data to sample in computing the 
-%                spectra. Can be used to speed up the computation. {default: 100}.
-%   'freqrange' = [min max] frequency range to plot. Changes x-axis limits. Default is
-%                1 Hz for the min and niquist (srate/2) for the max (if some scalp
-%                maps are plotted, the scalp map at the highest frequency specifies
-%                the maximum).
+%   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
+%                spectra. Values < 100 speed up the computation. {default: 100}.
+%   'freqrange' = [min max] frequency range to plot. Changes x-axis limits {default: 
+%                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
+%                power distribution maps are plotted, the highest mapped frequency 
+%                determines the max freq}.
 %   'reref'    = ['averef'|'off'] convert input data to average reference 
 %                {default: 'off'}
-%   'mapnorm'  = [float vector] if 'data' contain the activity of an independant 
+%   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
 %                component, this parameter should contain its scalp map. In this case
-%                the spectrum amplitude will be scaled by component RMS scalp power.
-%                Useful for comparing component strengths.
-%   'boundaries' = data point indices of discontinuities in the signal
-%   'plot'     = ['on'|'off'] 'off' -> disable plotting. {default: 'on'}
-%   'rmdc'     = ['on'|'off'] 'on' -> remove DC. {default: 'off'}  
+%                the spectrum amplitude will be scaled to component RMS scalp power.
+%                Useful for comparing component strengths {default: none}
+%   'boundaries' = data point indices of discontinuities in the signal {default: none}
+%   'plot'     = ['on'|'off'] 'off' -> disable plotting {default: 'on'}
+%   'rmdc'     = ['on'|'off'] 'on' -> remove DC {default: 'off'}  
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
-%                ICA maps of the N (='nicamaps') components that account for the most
+%                ICA maps of the N ('nicamaps') components that account for the most
 %                power at the selected frequency ('freq') are plotted along with
 %                the spectra of the selected channel ('plotchan') and components
 %                ('icacomps').
 %   'plotchan' = [integer] channel at which to compute independent conmponent
-%                contributions at the selected frequency ('freq'). {[]=channel with
-%                higest power at 'freq'). If 0, plot RMS power at all channels. 
-%   'nicamaps' = [integer] number of ICA component maps to plot (default: 4).
+%                contributions at the selected frequency ('freq'). If 0, plot RMS 
+%                power at all channels. {defatul|[] -> channel with highest power 
+%                at specified 'freq' (above)). 
+%   'nicamaps' = [integer] number of ICA component maps to plot {default: 4}.
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([] -> all).
-%   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectrum of
+%   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectra of
 %                individual ICA components, the function computes the spectrum of
 %                the data minus their contributions {default: 'normal'}
-%   'icamaps'  = [integer array] force plotting of selected ICA compoment maps ([]=the
-%                'nicamaps' largest).
-%   'icawinv'  = [float array] inverse weight matrix. By default computed by inverting
-%                the weight matrix. However, if some components have been removed, then
-%                weight's pseudo-inverse matrix does not represent component's maps. 
-%   'memory'   = ['low'|'high'] setting to low will use less memory for component 
-%                computing, but computing time will be longer.
+%   'icamaps'  = [integer array] force plotting of selected ICA compoment maps 
+%                {default: [] = the 'nicamaps' largest contributing components}.
+%   'icawinv'  = [float array] inverse component weight or mixing matrix. Normally,
+%                this is computed by inverting the ICA unmixing matrix 'weights' (above).
+%                However, if any components were removed from the supplied 'weights'
+%                then the component maps will not be correctly drawn and the 'icawinv'
+%                matrix should be supplied here {default: from component 'weights'}
+%   'memory'   = ['low'|'high'] a 'low' setting will use less memory for computing 
+%                component activities, will take longer {default: 'high'}
 
 % Topoplot options:
-%    opther 'key','val' options are propagated to topoplot() for map display
-%    (see help topoplot())
+%    other 'key','val' options are propagated to topoplot() for map display
+%                (See >> help topoplot)
 %
 % Outputs:
 %        spectra  = (nchans,nfreqs) power spectra (mean power over epochs), in dB
@@ -106,6 +113,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2005/02/04 18:42:51  arno
+% updating chanlocs2
+%
 % Revision 1.93  2005/02/03 00:23:44  arno
 % checking if array is empty
 %
@@ -396,7 +406,8 @@
 % Uses: MATLAB pwelch(), changeunits(), topoplot(), textsc()
 
 function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,srate,varargin) 
-	%headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
+
+% formerly: ... headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
 LOPLOTHZ = 1;  % low  Hz to plot
 FREQFAC  = 2;  % approximate frequencies/Hz (default)
@@ -444,7 +455,7 @@ if nargin <= 3 | isstr(varargin{1})
 	if ~isempty(g.weights)
 		if isempty(g.freq) | length(g.freq) > 2
             if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
-			error('spectopo(): for computing component contribution, one must specify a (single) frequency');
+         error('spectopo(): for computing component contribution, one must specify a (single) frequency');
 		end;
 	end;
 else
@@ -486,7 +497,7 @@ if g.percent > 1
 	g.percent = g.percent/100; % make it from 0 to 1
 end;
 if ~isempty(g.freq) & isempty(g.chanlocs)
-	error('spectopo: need channel location file');
+	error('spectopo(): needs channel location information');
 end;
 
 if strcmpi(g.rmdc, 'on')
@@ -497,10 +508,12 @@ data = reshape(data, size(data,1), size(data,2)*size(data,3));
 if frames == 0
   frames = size(data,2); % assume one epoch
 end
+
 %if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
 %    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
 %    error('Cannot plot data component at all channels (option not implemented)');
 %end;
+
 if ~isempty(g.freq) & min(g.freq)<0
     if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
    fprintf('spectopo(): freqs must be >=0 Hz\n');
@@ -682,7 +695,9 @@ if ~isempty(g.freq)
 		[tmp fi] = min(abs(freqs-g.freq(f)));
 		freqidx(f)=fi;
 	end
-else
+
+else % no freq specified
+
     if isnan(g.limits(2))
         g.limits(2) = srate/2;
     end;
@@ -959,7 +974,10 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	if ~isempty(g.weights)
 		if realpos(1) == max(realpos), plotcolbar(g); end;
 		% use headaxe from 2 to end (reserved earlier)
-		set(li(realpos(1)), 'linewidth', 2.5); % make the line with the scalp topoplot thicker than others
+
+		set(li(realpos(1)), 'linewidth', 2.5); 
+		% make the line with the scalp topoplot thicker than others
+
 		for index = 1:length(g.icamaps)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
