@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/05/07 22:08:11  arno
+% debug GUI call
+%
 % Revision 1.18  2003/12/24 16:55:39  scott
 % pop-window text edits
 %
@@ -223,7 +226,7 @@ else
 	fprintf('Computing joint probability for components...\n');
     % test if ICA was computed
     % ------------------------
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
  	if option_computeica  
     	icaacttmp = EEG.icaact;
 	else
