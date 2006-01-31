@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/09/05 21:25:14  scott
+% added pop_prop() to title of properties figure -sm
+%
 % Revision 1.21  2005/03/05 00:09:11  arno
 % chaninfo
 %
@@ -231,7 +234,7 @@ title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14);
 % -----------------
 hhh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 if EEG.trials > 1
-	eeg_options; 
+	eeglab_options; 
 	 % put title at top of erpimage
 	axis off
 	hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);

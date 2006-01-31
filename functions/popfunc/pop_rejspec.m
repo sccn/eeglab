@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2005/08/04 15:37:52  arno
+% remove memory saving option
+%
 % Revision 1.23  2003/12/24 18:56:16  scott
 % help msg and pop-window text edits
 %
@@ -229,7 +232,7 @@ if icacomp == 1
 else
     % test if ICA was computed
     % ------------------------
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
  	if option_computeica  
     	icaacttmp = EEG.icaact(elecrange, :, :);
 	else

@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/01/24 00:24:57  arno
+% fixed plotting channel location if no chanlocs
+%
 % Revision 1.14  2004/10/03 19:16:56  scott
 % commented out text() calls to work in v7. -sm
 %
@@ -120,7 +123,7 @@ if typeproc == 1
 	map = cnum;
 else 
 	if ~isempty( EEG.icasphere )
-        eeg_options; 
+        eeglab_options; 
  	    if option_computeica  
     		tmpsig = EEG.icaact(cnum,:);
  	    else

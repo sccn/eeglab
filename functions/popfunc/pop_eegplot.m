@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2005/11/02 19:54:51  arno
+% history
+%
 % Revision 1.36  2004/05/08 16:08:28  scott
 % typo
 %
@@ -257,7 +260,7 @@ else % case of a single trial (continuous data)
          %   	'EEG.event = EEG.event(find(EEG.event(:,1) >= 0),:);' ...
          %      'EEG.icaact = [];' ...
          %      'EEG = eeg_checkset(EEG);' ];
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
     if reject == 0, command = [];
     else, 
         command = ...

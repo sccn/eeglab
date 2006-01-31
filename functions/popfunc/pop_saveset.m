@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2005/12/03 00:40:08  arno
+% nothing
+%
 % Revision 1.66  2005/12/03 00:38:26  arno
 % removing warning for processing multiple datasets
 %
@@ -344,8 +347,7 @@ else
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
-    eeg_optionsbackup;
-    eeg_options;
+    eeglab_options;
     if isempty(g.savemode)
         if option_savematlab, g.savemode = 'onefile';
         else                  g.savemode = 'twofiles';

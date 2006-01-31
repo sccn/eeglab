@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2004/03/17 22:58:21  arno
+% debug pop_rejmenu
+%
 % Revision 1.17  2003/12/24 17:27:04  scott
 % edited help and pop-window text
 %
@@ -212,7 +215,7 @@ if icacomp == 1
 else
     % test if ICA was computed
     % ------------------------
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
  	if option_computeica  
     	icaacttmp = EEG.icaact(elecrange, :, :);
 	else
