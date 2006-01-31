@@ -2,16 +2,17 @@
 %                    set the various options in the eeg_options() file.
 %
 % Usage:
-%   [ header, varname, value, description ] = eeg_readoptions( filename );
+%   [ header, opt ] = eeg_readoptions( filename );
 %
 % Input:
 %   filename    - [string] name of the option file
 %
 % Outputs:
 %   header      - [string] file header.
-%   varname     - [cell array] all variable names.
-%   value       - [cell array] value for each variable name
-%   description - [cell array] all description associated with each variable
+%   opt         - [struct] option structure containing an array of 3 fields
+%                 varname     -> all variable names.
+%                 value       -> value for each variable name
+%                 description -> all description associated with each variable
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
@@ -34,9 +35,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/01/31 18:41:49  arno
+% Initial revision
+%
 % read option file
 % ----------------
-function [ header, varname, value, description ] = eeg_readoptions( filename );
+function [ header, opt ] = eeg_readoptions( filename );
     
     if nargin < 1
         help eeg_readoptions;
@@ -63,18 +67,18 @@ function [ header, varname, value, description ] = eeg_readoptions( filename );
     index = 1;
     while (str(1) ~= -1)
         if str(1) == '%'
-            description{index} = str(3:end-1);
-            value{index}       = [];
-            varname{index}     = '';
+            opt(index).description = str(3:end-1);
+            opt(index).value       = [];
+            opt(index).varname     = '';
         else
-            [ varname{index} str ] = strtok(str); % variable name
-            [ equal          str ] = strtok(str); % =
-            [ value{index}   str ] = strtok(str); % value
-            [ tmp            str ] = strtok(str); % ;
-            [ tmp            dsc ] = strtok(str); % comment
+            [ opt(index).varname str ] = strtok(str); % variable name
+            [ equal              str ] = strtok(str); % =
+            [ opt(index).value   str ] = strtok(str); % value
+            [ tmp                str ] = strtok(str); % ;
+            [ tmp                dsc ] = strtok(str); % comment
             dsc = deblank( dsc(end:-1:1) );
-            description{index} = deblank( dsc(end:-1:1) );
-            value{index}       = str2num( value{index} );
+            opt(index).description = deblank( dsc(end:-1:1) );
+            opt(index).value       = str2num(  opt(index).value );
         end;
         
         str = fgets( fid ); % jump a line
