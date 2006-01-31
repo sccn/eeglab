@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/01/31 19:33:39  arno
+% adding filepath to new options
+%
 % Revision 1.35  2006/01/31 19:06:03  arno
 % use new features of eeg_readoptions
 %
@@ -214,6 +217,23 @@ if	fid == -1
                 [filename filepath] = uigetfile('*.m', 'Pick a folder', 'eeg_options');
             end;
 		end;
+        
+        % see if the folder can be written into
+        % -------------------------------------
+        fid = fopen( fullfile(filepath, 'eeg_options.m'), 'w');
+        if fid == -1
+            error('Cannot write into this folder');
+        end;
+        fclose(fid);
+        
+        % change default folder option
+        % ----------------------------
+        W_MAIN = findobj('tag', 'EEGLAB');
+        if ~isempty(W_MAIN)
+            tmpuserdata    = get(W_MAIN, 'userdata');
+            tmpuserdata{3} = filepath;
+            set(W_MAIN, 'userdata', tmpuserdata);
+        end;
         
         % read variables values and description
         % --------------------------------------
