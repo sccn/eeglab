@@ -187,6 +187,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.438  2006/01/31 19:54:50  arno
+% typo
+% /.
+%
 % Revision 1.437  2006/01/31 19:42:09  arno
 % default option file
 %
@@ -1530,6 +1534,7 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 addpath(eeglabpath);
 comp = computer;
 OPT_FOLDER = which('eeg_options');
+OPT_FOLDER = fileparts( OPT_FOLDER );
 if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
@@ -1549,13 +1554,6 @@ else
     myaddpath( funcpath , 'eeglab1020.ced', 'resources');    
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
-if ~isempty(OPT_FOLDER)
-    fprintf('EEGLAB current options file is %s\n', OPT_FOLDER);
-    OPT_FOLDER = fileparts( OPT_FOLDER );
-    addpath( OPT_FOLDER );
-else
-    disp('EEGLAB will be using the default options');
-end;
 
 eeg_optionsbackup; 
 eeg_options; 
@@ -1607,6 +1605,15 @@ else
 end;
 ALLCOM = ALLCOM;
 colordef white
+
+% default option folder
+% ---------------------
+if ~isempty(OPT_FOLDER)
+    fprintf('EEGLAB current options file is %s\n', OPT_FOLDER);
+    addpath( OPT_FOLDER );
+else
+    disp('EEGLAB will be using the default options');
+end;
 
 % checking strings
 % ----------------
