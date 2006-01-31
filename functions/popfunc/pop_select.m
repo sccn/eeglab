@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2006/01/25 23:44:15  arno
+% disable channel browser if no channel location
+%
 % Revision 1.54  2005/12/05 20:04:06  arno
 % fix component slection problem
 %
