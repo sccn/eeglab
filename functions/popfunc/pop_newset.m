@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/01/31 20:21:50  arno
+% eeglab options
+%
 % Revision 1.34  2006/01/31 00:32:02  arno
 % fix problem for saved field
 %
@@ -216,7 +219,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     elseif ~saved
         text_old = 'What do you want to do with the old dataset (some changes have not been saved)?';
     else
-        text_old       = 'What do you want to do with the old dataset (NOT modified since last change)?';
+        text_old       = 'What do you want to do with the old dataset (NOT modified since last saved)?';
         cb_save2       = 'set(gcbo, ''value'', 0);';
         cb_overwrite   = 'Overwrite current dataset|New dataset';
     end;
@@ -243,11 +246,27 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
          { 'Style', 'edit'      , 'string', filename, 'tag', 'saveedit2' 'userdata' 'saveedit2'  'enable' enable_save2 } ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', comsave2 'userdata' 'saveedit2'  'enable' enable_save2 } };
     
-    % remove odl dataset if not present
+    % remove old dataset if not present
     % ---------------------------------
     if CURRENTSET == 0
         uilist = uilist(1:9);
         geometry = geometry(1:3);
+    end;
+    
+    % remove new dataset if already saved
+    % -----------------------------------
+    if strcmpi(EEG.saved, 'justloaded')
+        if overwrite_or_save % only pop-up a window if some action has to be taken
+            uilist = uilist(11:end);
+            geometry = geometry(5:end);
+            shift    = 3;
+        else
+            [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
+            com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );';
+            return;
+        end;
+    else 
+        shift    = 0;
     end;
     
     % show GUI (do not return if old dataset has to saved or overwritten)
@@ -255,12 +274,12 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     cont = 1;
     while cont
         [result userdat] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_newset'');', ...
-                                     'title', fastif(isempty(EEG.data), 'Import dataset info -- pop_newset()', 'Edit dataset info -- pop_newset()'), ...
+                                     'title', 'Dataset info -- pop_newset()', ...
                                      'userdata', userdat, 'geomvert', geomvert);
         cont = 0;
-        if length(result) > 4 & overwrite_or_save
-            if result{5} & ~result{4} % save but not overwrite
-                if isempty(result{6})
+        if length(result) > 4-shift & overwrite_or_save
+            if result{5-shift} & ~result{4-shift} % save but not overwrite
+                if isempty(result{6-shift})
                     warndlg2(strvcat('Error: You must enter a name for the old dataset!',' ', ...
                            'The old dataset has to be saved because,', ...
                            'according to your memory option, only one full ', ...
@@ -274,27 +293,33 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     
     % decode parameters
     % -----------------
+    args = {};
     if length(result) == 0,
 		args = { 'retrieve', CURRENTSET }; % cancel
 	else 
-		args = { 'setname', result{1} };
-		if result{2} 
-            if ~isempty(result{3}) 
-                args = { args{:} 'savenew', result{3} };
-            else
-                disp('Warning: no file name given for new dataset (the dataset will not be saved on disk)');
+        if strcmpi(EEG.saved, 'justloaded') & overwrite_or_save
+            if ~strcmp(EEG.setname, result{1} )       
+                args = { 'setname', result{1} };
             end;
-		end;
-		if ~strcmp(EEG.comments, userdat)
-			args = { args{:} 'comments', userdat };
-		end;
-        if length(result) > 4
-            if result{4}
+            if result{2} 
+                if ~isempty(result{3}) 
+                    args = { args{:} 'savenew', result{3} };
+                else
+                    disp('Warning: no file name given for new dataset (the dataset will not be saved on disk)');
+                end;
+            end;
+            if ~strcmp(EEG.comments, userdat)
+                args = { args{:} 'comments', userdat };
+            end;
+        end;
+        
+        if length(result) > 4-shift
+            if result{4-shift}
                 args = { args{:} 'overwrite' 'on' };
             end;
-            if result{5} 
-                if ~isempty(result{6}) 
-                    args = { args{:} 'saveold', result{6} };
+            if result{5-shift} 
+                if ~isempty(result{6-shift}) 
+                    args = { args{:} 'saveold', result{6-shift} };
                 else
                     disp('Warning: no file name given for old dataset (the dataset will not be saved on disk)');
                 end;
@@ -315,10 +340,14 @@ end;
 % assigning values
 % ----------------
 overWflag    = 0;
-EEG.saved = 'no';
+if strcmpi(EEG.saved, 'justloaded')
+    EEG.saved = 'yes';
+else
+    EEG.saved = 'no';
+end;
 for ind = 1:2:length(args)
     switch lower(args{ind})
-	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
+	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]); 
 	 case 'comments'  , EEG.comments = args{ind+1};
 	 case 'retrieve'  , if ~isempty(ALLEEG) & args{ind+1} ~= 0
                             EEG = eeg_retrieve(ALLEEG, args{ind+1}); 
