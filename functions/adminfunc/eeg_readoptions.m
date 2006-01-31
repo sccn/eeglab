@@ -2,10 +2,11 @@
 %                    set the various options in the eeg_options() file.
 %
 % Usage:
-%   [ header, opt ] = eeg_readoptions( filename );
+%   [ header, opt ] = eeg_readoptions( filename, opt );
 %
 % Input:
 %   filename    - [string] name of the option file
+%   opt         - [struct] option structure containing backup values
 %
 % Outputs:
 %   header      - [string] file header.
@@ -35,16 +36,23 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/31 18:54:56  arno
+% returns structure
+%
 % Revision 1.1  2006/01/31 18:41:49  arno
 % Initial revision
 %
 % read option file
 % ----------------
-function [ header, opt ] = eeg_readoptions( filename );
+function [ header, opt ] = eeg_readoptions( filename, opt_backup );
     
     if nargin < 1
         help eeg_readoptions;
         return;
+    end;
+    
+    if nargin < 2
+        opt_backup = [];
     end;
     
     if isstr(filename)
@@ -85,3 +93,15 @@ function [ header, opt ] = eeg_readoptions( filename );
         index = index+1;
     end;
     fclose(fid);
+
+    % replace in backup structure if any
+    % ----------------------------------
+    if ~isempty(opt_backup)
+        for index = 1:length(opt_backup)
+            ind = strmatch(opt_backup(index).varname, { opt.varname }, 'exact');
+            if ~isempty(ind) & ~isempty(opt_backup(index).varname)
+                opt_backup(index).value = opt(ind).value;
+            end;
+        end;
+        opt = opt_backup;
+    end;
