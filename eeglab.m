@@ -187,6 +187,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.435  2006/01/31 00:06:57  arno
+% option
+% pop_editoptions
+%
 % Revision 1.434  2006/01/31 00:04:48  arno
 % no backup
 %
@@ -1519,6 +1523,7 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 % ------------------------
 addpath(eeglabpath);
 comp = computer;
+eegopt_folder = which('eeg_options');
 if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
@@ -1538,6 +1543,10 @@ else
     myaddpath( funcpath , 'eeglab1020.ced', 'resources');    
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
+if ~isempty(eegopt_folder)
+    eegopt_folder = fileparts( eegopt_folder );
+    addpath( eegopt_folder );
+end;
 
 eeg_optionsbackup; 
 eeg_options; 
