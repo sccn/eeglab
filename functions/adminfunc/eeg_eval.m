@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/01/31 20:51:45  arno
+% eeglab options
+%
 % Revision 1.5  2005/10/19 21:38:18  arno
 % nothing
 %
@@ -114,5 +117,5 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % history
     % -------
     if nargout > 1
-        com = sprintf('%s = pop_select( %s,%s);', inputname(2), funcname, inputname(2), vararg2str(g.params));
+        com = sprintf('%s = %s( %s,%s);', funcname, inputname(2), funcname, inputname(2), vararg2str(g.params));
     end;
