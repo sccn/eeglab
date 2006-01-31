@@ -1,14 +1,17 @@
-% envtopo() - Plot the envelope of a data epoch, plus envelopes and scalp maps of specified 
-%             or largest-contributing components. If a 3-D input matrix, operates on the
-%             mean of the data epochs. Click on individual axes to examine them in detail. 
+%
+% envtopo() - Plot the envelope of a multichannel data epoch, plus envelopes and scalp maps 
+%             of specified or largest-contributing components. If a 3-D input matrix, operates 
+%             on the mean of the data epochs. Click on individual axes to examine them in detail. 
+%
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
 %             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
 %                                           = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data        = single data epoch (chans,frames) or a 3-D data matrix 
-%                 (chans,frames,epochs). If data are 3-D, process the mean data epoch.
-%  weights     = linear decomposition (unmixing) weight matrix (e.g., icaweights*icasphere)
+%                 (chans,frames,epochs). If data are 3-D, processes the mean data epoch.
+%  weights     = linear decomposition (unmixing) weight matrix 
+%                 Ex: (EEG.icaweights*EEG.icasphere)
 %
 % Required keyword:
 %  'chanlocs'  = [string] channel location filename or EEG.chanlocs structure. 
@@ -41,23 +44,24 @@
 %                  {default|[] -> standard Matlab color order}
 %  'fillcomp'   = int_vector>0 -> fill the numbered component envelope(s) with 
 %                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
-%  'vert'       = vector of times (in ms) at which to plot vertical dashed lines {default|[] -> none}
-%  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
-%                  the weight matrix (but if some components have been removed, then
-%                  weight's pseudo-inverse matrix does not represent component's maps).
-%  'icaact'     = [float array] component activations. By default these are computed 
-%                  from the input weight matrix.
+%  'vert'       = vector of times (in ms) at which to plot vertical dashed lines 
+%                  {default|[] -> none}
+%  'icawinv'    = [float array] inverse weight matrix. Normally computed by inverting
+%                  the weight*sphere matrix (but note, if some components have been removed, 
+%                  the pseudo-inverse does not represent component maps accurately).
+%  'icaact'     = [float array] component activations. {default: computed from the 
+%                  input weight matrix}
 %  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
-%  'subcomps'   = [integer vector] indices of components to remove from data before 
-%                  plotting. {default: none}
+%  'subcomps'   = [integer vector] indices of components to remove from data before plotting 
+%                  {default: none}
 %  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections 
 %                  of the selected components; 'on' -> show the envelope only {default: 'fill'}
 %  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity in the
 %                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
-%                  +/-max(abs(map value)) {default: 'off'}
+%                  +/- max(abs(map value)) {default: 'off'}
 %  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
-%  'topoplotkey','val' = any optional arguments for topoplot.
+%  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
 %
 % Outputs:
 %  compvarorder = component numbers in decreasing order of max variance in data
@@ -92,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2005/11/16 21:48:19  toby
+% *** empty log message ***
+%
 % Revision 1.94  2005/05/20 22:13:14  arno
 % remake the function backward compatible for channel locaiton
 % .,
@@ -476,6 +483,9 @@ if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
 [chans,frames] = size(data);
+if chans < 2
+   error('requires multiple data channels');
+end
 
 if isstr(g.chanlocs)
     g.chanlocs = readlocs(g.chanlocs);  % read channel locations information
