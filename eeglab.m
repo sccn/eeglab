@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.437  2006/01/31 19:42:09  arno
+% default option file
+%
 % Revision 1.436  2006/01/31 19:36:11  arno
 % eeg option folder first
 %
@@ -1547,7 +1550,7 @@ else
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 if ~isempty(OPT_FOLDER)
-    disp('EEGLAB current options file is %s\n', OPT_FOLDER);
+    fprintf('EEGLAB current options file is %s\n', OPT_FOLDER);
     OPT_FOLDER = fileparts( OPT_FOLDER );
     addpath( OPT_FOLDER );
 else
