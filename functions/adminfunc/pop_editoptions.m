@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/01/31 18:51:19  arno
+% now dealing with structure not variables
+%
 % Revision 1.33  2006/01/31 18:35:05  arno
 % change read options
 %
@@ -210,22 +213,8 @@ end;
 
 % read variables values and description
 % --------------------------------------
-fid2 = fopen('eeg_optionsbackup.m', 'r');
-try 
-    [ header opt1 ] = eeg_readoptions( fid  );
-catch, opt1 = []; end;
-[ header opt  ] = eeg_readoptions( fid2 );
-
-% fuse the two informations
-% -------------------------
-for i = 1:length(opt)
-    if ~isempty(opt(i).varname)
-        ind = strmatch(opt(i).varname}, { opt1.varname });
-        if ~isempty(ind)
-            opt(i).value = opt1(ind).value;
-        end;
-    end;
-end;
+[ header opt ] = eeg_readoptions( 'eeg_optionsbackup.m' ); 
+[ header opt ] = eeg_readoptions( fid, opt  ); % use opt from above as default
 
 if nargin < 2
     geometry = { [6 1] };
