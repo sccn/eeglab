@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2005/10/11 17:57:09  arno
+% allowing to plot several channels and several components
+%
 % Revision 1.126  2005/05/24 17:28:44  arno
 % remove cell2mat
 %
@@ -893,7 +896,7 @@ if typeplot == 1
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
 	else

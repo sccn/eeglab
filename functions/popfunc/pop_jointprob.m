@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2004/05/07 22:09:37  arno
+% debug rejecttrials
+%
 % Revision 1.21  2003/12/24 18:12:50  scott
 % help msg and text edits
 %
@@ -230,7 +233,7 @@ if icacomp == 1
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
 	[ EEG.stats.jp rej ] = jointprob( tmpdata, globthresh, EEG.stats.jp, 1); 
 else
-	eeg_options; % changed from eeglaboptions 3/30/02 -sm
+	eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 	    tmpdata = EEG.icaact;
 	else

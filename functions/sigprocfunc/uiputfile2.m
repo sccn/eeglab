@@ -24,6 +24,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/03/10 01:35:53  arno
+% option only to remember folder
+%
 % Revision 1.3  2004/12/10 23:10:46  hilit
 % correcting the chmod option
 %
@@ -47,7 +50,7 @@ function varargout = uiputfile2(varargin);
     % -------------------
     olddir = pwd;
     try,
-        eeg_options;
+        eeglab_options;
         if option_rememberfolder
             tmp_fld = getenv('TEMP');
             if isempty(tmp_fld) & isunix

@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/01/31 20:16:47  arno
+% options
+%
 % Revision 1.22  2005/09/05 21:25:14  scott
 % added pop_prop() to title of properties figure -sm
 %
@@ -273,7 +276,7 @@ else
 end;
 %h = axes('units','normalized', 'position',[45 5 60 40].*s+q);
 try
-	eeg_options; 
+	eeglab_options; 
 	if typecomp == 1
 		[spectra freqs] = spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
 	else 

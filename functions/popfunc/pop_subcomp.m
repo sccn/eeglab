@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/01/25 21:27:30  arno
+% nothing
+%
 % Revision 1.15  2006/01/25 21:26:15  arno
 % add icachansind
 %
@@ -143,7 +146,7 @@ else
 end;
 
 fprintf('Computing projection ....\n');
-eeg_options; 
+eeglab_options; 
 component_keep = setdiff(1:size(EEG.icaweights,1), components);
 if option_computeica  
     compproj = EEG.icawinv(:, component_keep)*reshape(EEG.icaact(component_keep,:), length(component_keep), EEG.pnts*EEG.trials);

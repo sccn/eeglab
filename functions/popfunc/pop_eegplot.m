@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/01/31 20:18:21  arno
+% options
+%
 % Revision 1.37  2005/11/02 19:54:51  arno
 % history
 %
@@ -300,7 +303,7 @@ if icacomp == 1
 	%eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 else
-	eeg_options; % changed from eeglaboptions 3/30/02 -sm
+	eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 	    tmpdata = EEG.icaact;
 	else
