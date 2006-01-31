@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/01/31 00:13:35  arno
+% same
+%
 % Revision 1.30  2006/01/31 00:12:49  arno
 % fix checking number of dataset loaded
 %
@@ -234,7 +237,7 @@ if nargin < 2
         % create the gui for this variable
         % --------------------------------
         geometry = { geometry{:} [4 0.3 0.1] };
-        if strcmpi(varname, 'option_storedisk')
+        if strcmpi(varname{index}, 'option_storedisk') & datasets_in_memory
             cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
             
