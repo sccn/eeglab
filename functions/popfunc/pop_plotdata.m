@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/11/04 02:41:48  toby
+% Fixed a minor bug in default number of channels
+%
 % Revision 1.21  2005/02/07 17:54:33  scott
 % adjust pop-window text
 %
@@ -183,7 +186,7 @@ if EEG.trials > 1 & singletrials == 0
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
 	   end;   
-	   eeg_options; % changed from eeglaboptions 3/30/02 -sm
+	   eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	   if option_computeica
 	        if length(indices) ~= size(EEG.icaact)
 	    	   tmpdata = EEG.icaact(indices,:,:);
