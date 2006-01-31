@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/11/02 06:35:58  scott
+% added missing help info -sm
+%
 % Revision 1.15  2005/09/27 22:06:53  arno
 % fix empty dataset retrieve
 %
@@ -96,8 +99,7 @@ if nargin < 2
 end;	
 
 %try
-    eeg_optionsbackup;
-    eeg_options;
+    eeglab_options;
 
     try,   % check whether recent changes to this dataset have been saved or not
            %--------------------------------------------------------------------

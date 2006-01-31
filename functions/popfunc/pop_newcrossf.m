@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/10/11 16:18:05  arno
+% typo
+%
 % Revision 1.31  2005/08/05 17:15:17  arno
 % fixed command line call
 %
@@ -272,7 +275,7 @@ if typeproc == 1
 	tmpsig2 = EEG.data(num2,pointrange,:);
 else
 	if ~isempty( EEG.icasphere )
-        eeg_options; % changed from eeglaboptions 3/30/02 -sm
+        eeglab_options; % changed from eeglaboptions 3/30/02 -sm
  	    if option_computeica  
     		tmpsig1 = EEG.icaact(num1,pointrange,:);
     		tmpsig2 = EEG.icaact(num2,pointrange,:);

@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/10/19 21:38:18  arno
+% nothing
+%
 % Revision 1.4  2005/09/27 22:04:07  arno
 % warnings
 %
@@ -69,9 +72,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     % warning pop up
     % --------------
     if strcmpi(g.warning, 'on')
-        eeg_optionsbackup;
-        clear functions;
-        eeg_options;
+        eeglab_options;
         if ~option_storedisk
             res = questdlg2(strvcat( 'When processing multiple datasets, it is not', ...
                                  'possible to enter new names for the newly created', ...

@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.180  2006/01/26 00:23:32  arno
+% nothing
+%
 % Revision 1.179  2006/01/19 19:54:58  arno
 % coord_tranfrom default field
 %
@@ -1139,8 +1142,7 @@ end;
 % save data if necessary
 % ----------------------
 if nargin > 1
-    eeg_optionsbackup;
-    eeg_options;
+    eeglab_options;
     
     % datfile available?
     % ------------------
@@ -1336,8 +1338,7 @@ end;
             EEG.icachansind = [1:EEG.nbchan]; res = com; 
         end;
     end;
-    eeg_optionsbackup;
-    eeg_options; % changed from eeglaboptions 3/30/02 -sm
+    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
     if ~isempty(EEG.icasphere)
         if ~isempty(EEG.icaweights)
             if size(EEG.icaweights,2) ~= size(EEG.icasphere,1)
