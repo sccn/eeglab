@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2006/01/25 01:35:29  toby
+% minor change to make it more Mac friendly, shouldn't affect behavior on other OSs.
+%
 % Revision 1.47  2005/11/04 23:20:27  arno
 % set file name and file path
 %
@@ -343,7 +346,7 @@ if isfield(EEG, 'changes_not_saved')
     EEG = rmfield(EEG, 'changes_not_saved');
 end;
 for index=1:length(EEG)
-    EEG(index).saved = 'yes';
+    EEG(index).saved = 'justloaded';
 end;
 
 command = sprintf('EEG = pop_loadset(%s);', vararg2str(options));
