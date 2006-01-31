@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/01/31 18:35:05  arno
+% change read options
+%
 % Revision 1.32  2006/01/31 00:15:38  arno
 % fixing last changes
 %
@@ -209,17 +212,17 @@ end;
 % --------------------------------------
 fid2 = fopen('eeg_optionsbackup.m', 'r');
 try 
-    [ header varname1 value1 description1 ] = eeg_readoptions( fid  );
-catch, varname1 = {}; value1 = {}; end;
-[ header varname  value  description  ] = eeg_readoptions( fid2 );
+    [ header opt1 ] = eeg_readoptions( fid  );
+catch, opt1 = []; end;
+[ header opt  ] = eeg_readoptions( fid2 );
 
 % fuse the two informations
 % -------------------------
-for i = 1:length(varname)
-    if ~isempty(varname{i})
-        ind = strmatch(varname{i}, varname1);
+for i = 1:length(opt)
+    if ~isempty(opt(i).varname)
+        ind = strmatch(opt(i).varname}, { opt1.varname });
         if ~isempty(ind)
-            value{i} = value1{ind};
+            opt(i).value = opt1(ind).value;
         end;
     end;
 end;
@@ -232,15 +235,15 @@ if nargin < 2
 
     % add all fields to graphic interface
     % -----------------------------------
-    for index = 1:length(varname)
+    for index = 1:length(opt)
         % format the description to fit a help box
         % ----------------------------------------
-        descrip = { 'string', description{ index } }; % strmultiline(description{ index }, 80, 10) };
+        descrip = { 'string', opt(index).description }; % strmultiline(description{ index }, 80, 10) };
            
         % create the gui for this variable
         % --------------------------------
         geometry = { geometry{:} [4 0.3 0.1] };
-        if strcmpi(varname{index}, 'option_storedisk') & datasets_in_memory
+        if strcmpi(opt(index).varname, 'option_storedisk') & datasets_in_memory
             cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
             
@@ -248,9 +251,9 @@ if nargin < 2
             cb_nomodif = '';
         end;
         
-        if ~isempty(value{index})
+        if ~isempty(opt(index).value)
             uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
-                         { 'Style', 'checkbox', 'string', '    ', 'value', value{index} 'callback' cb_nomodif } { } }; 
+                         { 'Style', 'checkbox', 'string', '    ', 'value', opt(index).value 'callback' cb_nomodif } { } }; 
         else
             uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, ...
                          { } { } }; 
@@ -265,9 +268,9 @@ if nargin < 2
     % -------------
     args = {};
     count = 1;
-    for index = 1:length(varname)
-        if ~isempty(varname{index})
-            args = {  args{:}, varname{index}, results{count} }; 
+    for index = 1:length(opt)
+        if ~isempty(opt(index).varname)
+            args = {  args{:}, opt(index).varname, results{count} }; 
             count = count+1;
         end;
     end;
@@ -280,11 +283,11 @@ end;
 % decode inputs
 % -------------
 for index = 1:2:length(args)
-    ind = strmatch(args{index}, varname, 'exact');
+    ind = strmatch(args{index}, { opt.varname }, 'exact');
     if isempty(ind)
         error(['Variable name ''' args{index} ''' is invalid']);
     else
-        value{ind} = args{index+1};
+        opt(ind).value = args{index+1};
     end;
 end;        
 
@@ -299,11 +302,11 @@ if fid == -1
 	error('File error, check writing permission');
 end;
 fprintf(fid, '%s\n', header);
-for index = 1:length(varname)
-    if isempty(varname{index})
-        fprintf( fid, '%% %s\n', description{index});
+for index = 1:length(opt)
+    if isempty(opt(index).varname)
+        fprintf( fid, '%% %s\n', opt(index).description);
     else
-        fprintf( fid, '%s = %d ; %% %s\n', varname{index}, value{index}, description{index});
+        fprintf( fid, '%s = %d ; %% %s\n', opt(index).varname}, opt(index).value, opt(index).description);
     end;
 end;
 fclose(fid);    
