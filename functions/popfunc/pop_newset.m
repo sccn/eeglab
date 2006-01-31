@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/01/30 22:50:16  arno
+% new format
+%
 % Revision 1.31  2005/11/02 18:35:28  arno
 % nothing
 %
@@ -233,6 +236,13 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
          { 'Style', 'edit'      , 'string', filename, 'tag', 'saveedit2' 'userdata' 'saveedit2'  'enable' enable_save2 } ...
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', comsave2 'userdata' 'saveedit2'  'enable' enable_save2 } };
     
+    % remove odl dataset if not present
+    % ---------------------------------
+    if CURRENTSET == 0
+        uilist = uilist(1:8);
+        geometry = geometry(1:3);
+    end;
+    
     % show GUI (do not return if old dataset has to saved or overwritten)
     % -------------------------------------------------------------------
     cont = 1;
@@ -241,7 +251,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
                                      'title', fastif(isempty(EEG.data), 'Import dataset info -- pop_newset()', 'Edit dataset info -- pop_newset()'), ...
                                      'userdata', userdat, 'geomvert', geomvert);
         cont = 0;
-        if length(result) ~= 0 & overwrite_or_save
+        if length(result) > 4 & overwrite_or_save
             if result{5} & ~result{4} % save but not overwrite
                 if isempty(result{6})
                     warndlg2(strvcat('Error: You must enter a name for the old dataset!',' ', ...
@@ -271,14 +281,16 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
 		if ~strcmp(EEG.comments, userdat)
 			args = { args{:} 'comments', userdat };
 		end;
-        if result{4}
-			args = { args{:} 'overwrite' 'on' };
-        end;
-		if result{5} 
-            if ~isempty(result{6}) 
-                args = { args{:} 'saveold', result{6} };
-            else
-                disp('Warning: no file name given for old dataset (the dataset will not be saved on disk)');
+        if length(result) > 4
+            if result{4}
+                args = { args{:} 'overwrite' 'on' };
+            end;
+            if result{5} 
+                if ~isempty(result{6}) 
+                    args = { args{:} 'saveold', result{6} };
+                else
+                    disp('Warning: no file name given for old dataset (the dataset will not be saved on disk)');
+                end;
             end;
 		end;
     end;
@@ -301,7 +313,7 @@ for ind = 1:2:length(args)
     switch lower(args{ind})
 	 case 'setname'   , EEG.setname = args{ind+1}; EEG = eeg_hist(EEG, [ 'EEG.setname=''' EEG.setname ''';' ]);
 	 case 'comments'  , EEG.comments = args{ind+1};
-	 case 'retrieve'  , if ~isempty(ALLEEG) 
+	 case 'retrieve'  , if ~isempty(ALLEEG) & args{ind+1} ~= 0
                             EEG = eeg_retrieve(ALLEEG, args{ind+1}); 
                         else
                             EEG = eeg_emptyset;
