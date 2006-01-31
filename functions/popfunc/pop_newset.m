@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/01/31 00:23:48  arno
+% allow no previous dataset
+%
 % Revision 1.32  2006/01/30 22:50:16  arno
 % new format
 %
@@ -218,10 +221,12 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
         
     geometry    = { [1] [0.12 0.5 1 0.5] [0.12 0.5 1 0.5] [1] [1] [0.12 1.8 0.1 0.1] [0.12 0.5 1 0.5] };
     geomvert    = [ ];
-    uilist = { { 'style', 'text',       'string', 'What do you want to do with the new dataset?', 'fontweight', 'bold' } ...
-         {} { 'Style', 'text',       'string', 'Name it:' } ...
+    uilist = { ...
+         { 'style', 'text',       'string', 'What do you want to do with the new dataset?', 'fontweight', 'bold' } ...
+         {} ...
+         { 'Style', 'text',       'string', 'Name it:' } ...
 		 { 'Style', 'edit',       'string', EEG.setname } ...
-		 { 'Style', 'pushbutton', 'string', 'Edit description', 'tooltipstring', 'Modify comments of this new dataset', 'callback', comcomment } ...
+		 { 'Style', 'pushbutton', 'string', 'Edit description', 'callback', comcomment } ...
          { 'Style', 'checkbox'  , 'string', '', 'callback', cb_save1 } ...
          { 'Style', 'text',       'string', 'Save it as file:' } ...
          { 'Style', 'edit',       'string', '', 'tag', 'saveedit1' 'userdata' 'saveedit1'  'enable' 'off' } ...
@@ -239,7 +244,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     % remove odl dataset if not present
     % ---------------------------------
     if CURRENTSET == 0
-        uilist = uilist(1:8);
+        uilist = uilist(1:9);
         geometry = geometry(1:3);
     end;
     
@@ -334,7 +339,11 @@ end;
 if overWflag
 	[ALLEEG, EEG] = eeg_store( ALLEEG, EEG, CURRENTSET);
 else
-	[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
+    if strcmpi(EEG.saved, 'yes')
+        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
+    else
+        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+    end;
 end;
 	
 % generate the output command
