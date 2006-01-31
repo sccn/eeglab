@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/08/04 17:40:40  arno
+% debug saving new option file
+%
 % Revision 1.27  2005/08/04 15:39:22  arno
 % edit header
 %
@@ -160,6 +163,14 @@
 function com = pop_editoptions(varargin);
 
 com = '';
+
+datasets_in_memory = 0;
+if nargin > 0
+    if ~isstr(varargin{1})
+        datasets_in_memory = varargin{1};
+    end;
+end;
+
 % parse the eeg_options file
 % ----------------------------
 filename = which('eeg_options.m');
@@ -216,9 +227,17 @@ if nargin == 0
         % create the gui for this variable
         % --------------------------------
         geometry = { geometry{:} [4 0.3 0.1] };
+        if strcmpi(varname, 'option_storedisk')
+            cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
+                           'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
+            
+        else
+            cb_nomodif = '';
+        end;
+        
         if ~isempty(value{index})
             uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
-                         { 'Style', 'checkbox', 'string', '    ', 'value', value{index} } { } }; 
+                         { 'Style', 'checkbox', 'string', '    ', 'value', value{index} 'callback' cb_nomodif } { } }; 
         else
             uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, ...
                          { } { } }; 
