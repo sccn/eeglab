@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.436  2006/01/31 19:36:11  arno
+% eeg option folder first
+%
 % Revision 1.435  2006/01/31 00:06:57  arno
 % option
 % pop_editoptions
@@ -1523,7 +1526,7 @@ eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 % ------------------------
 addpath(eeglabpath);
 comp = computer;
-eegopt_folder = which('eeg_options');
+OPT_FOLDER = which('eeg_options');
 if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
@@ -1543,9 +1546,12 @@ else
     myaddpath( funcpath , 'eeglab1020.ced', 'resources');    
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
-if ~isempty(eegopt_folder)
-    eegopt_folder = fileparts( eegopt_folder );
-    addpath( eegopt_folder );
+if ~isempty(OPT_FOLDER)
+    disp('EEGLAB current options file is %s\n', OPT_FOLDER);
+    OPT_FOLDER = fileparts( OPT_FOLDER );
+    addpath( OPT_FOLDER );
+else
+    disp('EEGLAB will be using the default options');
 end;
 
 eeg_optionsbackup; 
@@ -2109,7 +2115,7 @@ catchstrs.new_non_empty          = e_newnonempty;
     if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
-set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU });
+set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU OPT_FOLDER });
 eeglab('redraw');
 if nargout < 1
     clear ALLEEG;
