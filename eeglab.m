@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.439  2006/01/31 19:56:47  arno
+% same
+%
 % Revision 1.438  2006/01/31 19:54:50  arno
 % typo
 % /.
@@ -1609,7 +1612,7 @@ colordef white
 % default option folder
 % ---------------------
 if ~isempty(OPT_FOLDER)
-    fprintf('EEGLAB current options file is %s\n', OPT_FOLDER);
+    fprintf('EEGLAB current options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
     addpath( OPT_FOLDER );
 else
     disp('EEGLAB will be using the default options');
