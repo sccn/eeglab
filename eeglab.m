@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.440  2006/01/31 19:57:52  arno
+% same
+%
 % Revision 1.439  2006/01/31 19:56:47  arno
 % same
 %
@@ -1558,8 +1561,7 @@ else
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
-eeg_optionsbackup; 
-eeg_options; 
+eeglab_options; 
 if nargin == 1 &  strcmp(onearg, 'redraw')
     if evalin('base', 'exist(''EEG'')', '0') == 1
         evalin('base', 'warning off; eeg_global; warning on;');
@@ -1656,7 +1658,6 @@ ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',L
 % nh = no dataset history
 % -----------------------
 e_newnonempty_nh = [e_catch 'eegh(LASTCOM);' ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
-e_load_nh        = [e_catch 'eegh(LASTCOM);' ifeegtmp 'EEG = EEGTMP;' storeload    'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
 e_storeall_nh    = [e_catch 'eegh(LASTCOM);' ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist_nh        = [e_catch 'eegh(LASTCOM);'];
 
@@ -1747,7 +1748,7 @@ catchstrs.new_non_empty          = e_newnonempty;
 	cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
     
-    cb_loadset     = [ nocheck '[EEGTMP LASTCOM] = pop_loadset;'                                  e_load_nh];
+    cb_loadset     = [ nocheck '[EEGTMP LASTCOM] = pop_loadset;'                                  e_newnonempty];
     cb_saveset     = [ check        '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store];
     cb_savesetas   = [ check        '[EEG LASTCOM] = pop_saveset(EEG);'                           e_hist_nh ];
 	cb_delset      = [ nocheck      '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ];
@@ -2307,8 +2308,7 @@ indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
 	
 clear functions;
-eeg_optionsbackup;
-eeg_options;
+eeglab_options;
 if isempty(ALLEEG) & ~isempty(EEG) & ~isempty(EEG.data)
     ALLEEG = EEG;
 end;
