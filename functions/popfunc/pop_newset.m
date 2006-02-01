@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/02/01 06:33:42  arno
+% revert version 1.37
+%
 % Revision 1.37  2006/02/01 00:45:19  arno
 % newset
 %
@@ -166,6 +169,29 @@ end;
 CURRENTSET = OLDSET;
 if nargin < 4
     NEWSET = [];
+end;
+
+option_saveoold = 0;
+if ~isempty(NEWSET) & nargin == 4
+    % transfer dataset
+    % have to test options
+    % --------------------
+    eeglab_options;
+    if option_storedisk & strcmpi(EEG.saved, 'no')
+        option_saveold = 1;
+        EEG = update_datafield(EEG);
+    else
+        if strcmpi(EEG.saved, 'yes') & option_storedisk
+            fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', storeSetIndex);
+            EEG = update_datafield(EEG);
+        end;
+        [ EEG com ] = eeg_checkset(EEG);
+        if ~isempty(com), EEG.saved = 'no'; end;
+        EEG = eeg_hist(EEG, com);
+        ALLEEG(OLDSET) = EEG;
+        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+        return;
+    end;
 end;
 
 if nargin < 5 & length(EEG) == 1 % if several arguments, assign values 
@@ -384,28 +410,37 @@ for ind = 1:2:length(args)
 	 otherwise, error(['pop_newset error: unrecognized key ''' args{ind} '''']); 
     end;
 end;
-if overWflag
-    if isempty(NEWSET)
+
+% moving/erasing/creating datasets
+% --------------------------------
+if ~isempty(NEWSET)
+    % dataset retrieval
+    % -----------------
+    if overWflag
+         % delete old dataset
+        ALLEEG = pop_delset( ALLEEG, OLDSET);
+    else        
+        EEG = update_datafield(EEG);
+        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+    end;
+    [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+else
+    % new dataset
+    % -----------
+    if overWflag
         [ALLEEG, EEG] = eeg_store( ALLEEG, EEG, OLDSET);
     else
-        % delete old dataset
-        ALLEEG = pop_delset( ALLEEG, OLDSET);
-    end;        
-else
-    if isempty(NEWSET)    
         if strcmpi(EEG.saved, 'yes')
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
         else
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
         end;
-    else
-        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
     end;
-end;
-	
+end;        
+
 % generate the output command
 % ---------------------------
-com = sprintf( '[ALLEEG EEG %s] = pop_newset(ALLEEG, EEG, %s, [], %s);', inputname(3), inputname(3), vararg2str(args));
+com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, int2str(NEWSET), vararg2str(args));
 return;
 
 function num = popask( text )
@@ -415,3 +450,14 @@ function num = popask( text )
 	      case 'cancel', num = 0;
 	      case 'yes',    num = 1;
 	 end;
+
+function EEG = update_datafield(EEG);
+    if isfield(EEG, 'datfile')
+        if ~isempty(EEG.datfile)
+            EEG.data = EEG.datfile;
+        else
+            EEG = rmfield(EEG, 'datfile');
+        end;
+    else 
+        EEG.data = 'in set file';
+    end;
