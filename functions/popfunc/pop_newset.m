@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/02/01 07:11:07  arno
+% typo
+%
 % Revision 1.41  2006/02/01 07:09:48  arno
 % retreiving from multiple datasets
 %
@@ -193,16 +196,23 @@ elseif existnewset & nargin == 4
     % --------------------
     eeglab_options;
     if option_storedisk & strcmpi(EEG.saved, 'no')
+        [ EEG com ] = pop_saveset(EEG, 'savemode', 'resave');
         EEG = update_datafield(EEG);
     else
         if strcmpi(EEG.saved, 'yes') & option_storedisk
             fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', OLDSET);
+            [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
             EEG = update_datafield(EEG);
         end;
-        [ EEG com ] = eeg_checkset(EEG);
+        
         if ~isempty(com), EEG.saved = 'no'; end;
+        tmpsave = EEG.saved;
         EEG = eeg_hist(EEG, com);
-        ALLEEG(OLDSET) = EEG;
+        
+        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
+        EEG.saved            = tmpsave; % eeg_store automatically set it to 'no'
+        ALLEEG(OLDSET).saved = tmpsave;
+        
         if ~isempty(NEWSET)
             [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
         end;
