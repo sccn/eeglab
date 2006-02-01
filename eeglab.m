@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.441  2006/02/01 00:46:33  arno
+% change eeglab_options
+%
 % Revision 1.440  2006/01/31 19:57:52  arno
 % same
 %
@@ -2335,9 +2338,7 @@ while( index <= MAX_SET)
 	try, ALLEEG(index).data;
 		if ~isempty( ALLEEG(index).data)
             
-            cb_retrieve = [ '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''savegui'');' ...
-                            'eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET, ''''savedata'''');'');' ...
-                            'LASTCOM = ''[EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, ' int2str(index) ');'';' ...
+            cb_retrieve = [ '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ' int2str(index) ');' ...
                             'if CURRENTSTUDY, LASTCOM = [ ''CURRENTSTUDY = 0; '' LASTCOM ]; end;' ...
                             'eval(LASTCOM); eegh(LASTCOM);' ...
                             'eeglab(''redraw'');' ];
