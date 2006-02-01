@@ -1,17 +1,17 @@
 %
 % envtopo() - Plot the envelope of a multichannel data epoch, plus envelopes and scalp maps 
 %             of specified or largest-contributing components. If a 3-D input matrix, operates 
-%             on the mean of the data epochs. Click on individual axes to examine them in detail. 
+%             on the mean of the data epochs. Click on individual axes to examine them in detail.
 %
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
 %             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
 %                                           = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
-%  data        = single data epoch (chans,frames) or a 3-D data matrix 
-%                 (chans,frames,epochs). If data are 3-D, processes the mean data epoch.
-%  weights     = linear decomposition (unmixing) weight matrix 
-%                 Ex: (EEG.icaweights*EEG.icasphere)
+%  data        = single data epoch (chans,frames), else it a 3-D epoched data matrix 
+%                (chans,frames,epochs) ->  processes the mean data epoch. 
+%  weights     = linear decomposition (unmixing) weight matrix. The whole matrix should
+%                be passed to the function here.  Ex: (EEG.icaweights*EEG.icasphere)
 %
 % Required keyword:
 %  'chanlocs'  = [string] channel location filename or EEG.chanlocs structure. 
@@ -27,15 +27,16 @@
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv', 
-%                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative 
-%                  variance. Here:                                      
+%                  (boundaries shown with thin dotted lines) 
+%                  {default|[]|[0 0] -> plotting limits}
+%  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; 
+%                  if 'pv', sort by percent variance accounted for (pvaf). 
+%                  If 'rv', sort by relative variance. Here: 
 %                   pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data) {default: 'mv'}
+%                   rv(component)   = 100*variance(component)/variance(data) {default:'mv'}
 %  'title'      = [string] plot title {default|[] -> none}
-%  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
-%                  and also for making scalp topo plots {default|[] -> all}
+%  'plotchans'  = [integer array] data channels to use in computing contributions and 
+%                  envelopes, and also for making scalp topo plots {default|[] -> all}
 %  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
 %                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
 %  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
@@ -47,19 +48,20 @@
 %  'vert'       = vector of times (in ms) at which to plot vertical dashed lines 
 %                  {default|[] -> none}
 %  'icawinv'    = [float array] inverse weight matrix. Normally computed by inverting
-%                  the weight*sphere matrix (but note, if some components have been removed, 
+%                  the weights*sphere matrix (Note: If some components have been removed, 
 %                  the pseudo-inverse does not represent component maps accurately).
 %  'icaact'     = [float array] component activations. {default: computed from the 
 %                  input weight matrix}
 %  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
-%  'subcomps'   = [integer vector] indices of components to remove from data before plotting 
-%                  {default: none}
-%  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections 
-%                  of the selected components; 'on' -> show the envelope only {default: 'fill'}
-%  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity in the
-%                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
-%                  +/- max(abs(map value)) {default: 'off'}
+%  'subcomps'   = [integer vector] indices of components to remove from data before 
+%                  plotting {default: none}
+%  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed 
+%                  projections of the selected components; 'on' -> show the envelope only 
+%                  {default: 'fill'}
+%  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity 
+%                  in the designated (limcontrib) interval. 'off' -> scale scalp maps 
+%                  individually using +/- max(abs(map value)) {default: 'off'}
 %  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
 %  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
 %
@@ -69,11 +71,12 @@
 %  compframes   = frames of max variance
 %  comptimes    = times of max variance
 %  compsplotted = components plotted
-%  mv|pvaf|rv   = max variance, percent variance accounted for, or relative variance (see 'sortvar')
-%
+%  mv|pvaf|rv   = max variance, percent variance accounted for, 
+%                 or relative variance (see 'sortvar')
 % Notes:
-%  To label maps with other than component numbers, put four-char strings into a local (pwd) file 
-%  named 'envtopo.labels' (using . = space) in time-order of their projection maxima
+%  To label maps with other than component numbers, put four-char strings into 
+%  a local (pwd) file named 'envtopo.labels' (using . = space) in time-order 
+%  of their projection maxima
 %
 % Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
@@ -96,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2006/01/31 18:18:54  scott
+% touched up help message, and added error for nchans=1 -sm
+%
 % Revision 1.96  2005/11/16 21:48:19  toby
 % *** empty log message ***
 %
@@ -488,9 +494,11 @@ if chans < 2
 end
 
 if isstr(g.chanlocs)
-    g.chanlocs = readlocs(g.chanlocs);  % read channel locations information
+    g.chanlocs = readlocs(g.chanlocs);  % read channel location information
     if length(g.chanlocs) ~= chans
-        fprintf('envtopo(): locations for the %d data channels not in the channel location file.\n',chans);
+     fprintf(...
+      'envtopo(): locations for the %d data channels not in the channel location file.\n', ...
+        chans);
         return
     end
 end
@@ -634,6 +642,10 @@ colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
 [wtcomps,wchans] = size(weights);
 if wchans ~= chans
      error('Sizes of weights and data do not agree');
+end
+if wtcomps ~= chans
+   fprintf('Number of components not the same as number of channels.\n'); 
+   fprintf('  - component scalp maps and time courses may not be correct.\n');
 end
 
 if isempty(g.voffsets) | ( size(g.voffsets) == [1,1] & g.voffsets(1) == 0 )
