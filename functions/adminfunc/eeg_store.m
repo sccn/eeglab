@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/01/31 20:50:41  arno
+% eeglab options
+%
 % Revision 1.37  2006/01/26 18:53:15  scott
 % looking at help & msgs  -sm
 %
@@ -222,59 +225,8 @@ if nargin < 4
             EEG.saved = 'no';
         end;
     end;
-else % savedata
-     % --------
-    eeglab_options;
-    if option_storedisk & strcmpi(EEG.saved, 'no')
-        if option_warningstore & strcmpi(varargin{1}, 'savegui')
-            if ~isempty(EEG.filename)
-                comhelp = 'warndlg2(strvcat( ''Currently keeping only one dataset in memory'', ''at a time, so the previous dataset must be saved to disk.'', ''This will overwrite any existing dataset file.'', ''If you press cancel, EEGLAB will instead retain the dataset in memory'', ''and not save it to disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''this option and remove this warning).''), ''Save warning'');';
-                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset to disk?', 'visible' 'off' } ...
-                                              { 'style' 'text' 'string' '           Backup previous dataset to disk?' } }, comhelp, 'Save warning');
-                if ~isempty(res), option_save = 'resave';
-                else              option_save = 'exception';
-                end;
-            else
-                comhelp = 'warndlg2(strvcat( ''Currently keeping only one dataset in memory'', ''at a time, so the previous dataset must be saved to disk'', ''A pop-up window will ask for its filename.'', ''If you press cancel, EEGLAB will retain the dataset in memory'', ''and not save it to disk'', '' '', ''(Use menu item "File > Maximize memory" to change'', ''this option and remove this warning).''), ''Save warning'');';
-                res = inputgui( { 1 1 }, { { 'style' 'edit' 'string' 'Backup previous dataset to disk?', 'visible' 'off' } ...
-                                              { 'style' 'text' 'string' '           Backup previous dataset to disk?' } }, comhelp, 'Save warning');
-                if ~isempty(res), option_save = 'new';
-                else              option_save = 'exception';
-                end;
-            end;
-            
-            % save mode
-            % ---------
-            if strcmpi(option_save, 'new')
-                EEG.saved = 'yes';
-                [ EEG com] = pop_saveset(EEG);
-                EEG = update_datafield(EEG);
-                eegh(com);
-                if isempty(com)
-                    disp('eeg_save(): No filename given. Dataset not saved (by your request).');
-                    option_save = 'exception';
-                end;
-            end;
-            if strcmpi(option_save, 'exception')
-                [ EEG com ] = eeg_checkset(EEG);
-            elseif ~strcmpi(option_save, 'new')
-                EEG.saved = 'yes';
-                [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
-                EEG = update_datafield(EEG);
-            end;
-        else
-            EEG.saved = 'yes';
-            [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
-            EEG = update_datafield(EEG);
-        end;
-    else
-        if strcmpi(EEG.saved, 'yes') & option_storedisk
-            fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', storeSetIndex);
-            EEG = update_datafield(EEG);
-        end;
-        [ EEG com ] = eeg_checkset(EEG);
-        if ~isempty(com), EEG.saved = 'no'; end;
-    end;
+else
+    error('does not support more than 3 arguments anymore');
 end;
 EEG = eeg_hist(EEG, com);
 
