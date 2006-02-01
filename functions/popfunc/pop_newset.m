@@ -1,7 +1,7 @@
 % pop_newset() - Edit/save EEG dataset structure information.
 %
 % Usage:
-%   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET, ...
+%   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, OLDSET, NEWSET,...
 %                                            'key', val,...);
 % Inputs and outputs:
 %   ALLEEG     - array of EEG dataset structures
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/01/31 22:36:30  arno
+% allowing no options to be set
+%
 % Revision 1.35  2006/01/31 20:21:50  arno
 % eeglab options
 %
@@ -150,15 +153,19 @@
 
 %   'aboutparent' - ['on'|'off'] insert reference to parent dataset in the comments
 
-function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, CURRENTSET, varargin);
+function [ALLEEG, EEG, CURRENTSET, com] = pop_newset( ALLEEG, EEG, OLDSET, NEWSET, varargin);
 
 com = '';
 if nargin < 3
    help pop_newset;
    return;
 end;
+CURRENTSET = OLDSET;
+if nargin < 4
+    NEWSET = [];
+end;
 
-if nargin < 4 & length(EEG) == 1 % if several arguments, assign values 
+if nargin < 5 & length(EEG) == 1 % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     comcomment = ['tmpuserdat = get(gcbf, ''userdata'');' ...
@@ -186,10 +193,10 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     saved = 1;
     filename = '';
     if ~isempty(ALLEEG)
-        if strcmpi(ALLEEG(CURRENTSET).saved, 'no')
+        if strcmpi(ALLEEG(OLDSET).saved, 'no')
             saved = 0;
-            if ~isempty(ALLEEG(CURRENTSET).filename)
-                filename = fullfile(ALLEEG(CURRENTSET).filepath, ALLEEG(CURRENTSET).filename);
+            if ~isempty(ALLEEG(OLDSET).filename)
+                filename = fullfile(ALLEEG(OLDSET).filepath, ALLEEG(OLDSET).filename);
             end;
         end;
     end;
@@ -202,7 +209,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
                            '''The old dataset has to be saved because,'',' ...
                            '''according to your memory option, only one full '',' ...
                            '''dataset can be retained in memory. Thus, you either'',' ...
-                           ''' have to save or overwrite the old dataset''));' ... 
+                           ''' have to save or delete/overwrite the old dataset''));' ... 
                        'else, ' cb_save2 ...
                        'end;' ];
         cb_owrt      = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_save2''), ''value''),' ...
@@ -211,7 +218,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
                            '''The old dataset has to be saved because,'',' ...
                            '''according to your memory option, only one full '',' ...
                            '''dataset can be retained in memory. Thus, you either'',' ...
-                           ''' have to save or overwrite the old dataset''));' ... 
+                           ''' have to save or delete/overwrite the old dataset''));' ... 
                        'end;' ];
         enable_save2 = 'on';
         value_save2  = 1;
@@ -239,7 +246,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
          { } ...
          { 'style', 'text', 'string', text_old 'fontweight' 'bold' } ...
          { 'Style', 'checkbox'  , 'string', '' 'tag' 'cb_owrt' 'callback' cb_owrt } ...
-         { 'Style', 'text'      , 'string', 'Overwrite it in memory (set=yes; unset=create a new dataset)' } {} ...
+         { 'Style', 'text'      , 'string', 'Delete/overwrite it in memory (set=yes; unset=create a new dataset)' } {} ...
          { } ...
          { 'Style', 'checkbox'  , 'string', '', 'callback', cb_save2 'value' value_save2  'tag' 'cb_save2' } ...
          { 'Style', 'text'      , 'string', 'Save it as file:' } ...
@@ -248,19 +255,19 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     
     % remove old dataset if not present
     % ---------------------------------
-    if CURRENTSET == 0
+    if OLDSET == 0
         uilist = uilist(1:9);
         geometry = geometry(1:3);
     end;
     
     % remove new dataset if already saved
     % -----------------------------------
-    if strcmpi(EEG.saved, 'justloaded')
+    if strcmpi(EEG.saved, 'justloaded') | ~isempty(NEWSET)
         if overwrite_or_save % only pop-up a window if some action has to be taken
             uilist = uilist(11:end);
             geometry = geometry(5:end);
             shift    = 3;
-        else
+        elseif isempty(NEWSET) % just loaded from disk
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
             com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );';
             return;
@@ -269,8 +276,8 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
         shift    = 0;
     end;
     
-    % show GUI (do not return if old dataset has to saved or overwritten)
-    % -------------------------------------------------------------------
+    % show GUI (do not return if old dataset has to be saved or overwritten)
+    % ----------------------------------------------------------------------
     cont = 1;
     while cont
         [result userdat] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', 'pophelp(''pop_newset'');', ...
@@ -295,7 +302,7 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
     % -----------------
     args = {};
     if length(result) == 0,
-		args = { 'retrieve', CURRENTSET }; % cancel
+		args = { 'retrieve', OLDSET }; % cancel
 	else 
         if strcmpi(EEG.saved, 'justloaded') & overwrite_or_save
             if ~strcmp(EEG.setname, result{1} )       
@@ -329,21 +336,28 @@ if nargin < 4 & length(EEG) == 1 % if several arguments, assign values
 elseif length(EEG) > 1
     % processing multiple datasets
     % ----------------------------
-    [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET ); % it is possible to undo the operation here
+    [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, OLDSET ); % it is possible to undo the operation here
     com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, CURRENTSET );';
     return;
 else
     % no interactive inputs
-    args = varargin;
+    if isstr(NEWSET)
+        args = { NEWSET varargin{:} };
+        NEWSET = [];
+    else
+        args = varargin;
+    end;
 end;
 
 % assigning values
 % ----------------
 overWflag    = 0;
-if strcmpi(EEG.saved, 'justloaded')
-    EEG.saved = 'yes';
-else
-    EEG.saved = 'no';
+if isempty(NEWSET)
+    if strcmpi(EEG.saved, 'justloaded')
+        EEG.saved = 'yes';
+    else
+        EEG.saved = 'no';
+    end;
 end;
 for ind = 1:2:length(args)
     switch lower(args{ind})
@@ -359,8 +373,8 @@ for ind = 1:2:length(args)
                         EEG.saved = 'yes';
                         EEG = pop_saveset(EEG, [ filename ext ], filepath);
 	 case 'saveold',    [filepath filename ext] = fileparts( args{ind+1} );
-                        ALLEEG(CURRENTSET).saved = 'yes';
-                        EEG = pop_saveset(ALLEEG(CURRENTSET), [ filename ext ], filepath);
+                        ALLEEG(OLDSET).saved = 'yes';
+                        EEG = pop_saveset(ALLEEG(OLDSET), [ filename ext ], filepath);
 	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
                             overWflag = 1; % so it can be done at the end
                         end;
@@ -368,18 +382,27 @@ for ind = 1:2:length(args)
     end;
 end;
 if overWflag
-	[ALLEEG, EEG] = eeg_store( ALLEEG, EEG, CURRENTSET);
-else
-    if strcmpi(EEG.saved, 'yes')
-        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
+    if isempty(NEWSET)
+        [ALLEEG, EEG] = eeg_store( ALLEEG, EEG, OLDSET);
     else
-        [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+        % delete old dataset
+        ALLEEG = pop_delset( ALLEEG, OLDSET);
+    end;        
+else
+    if isempty(NEWSET)    
+        if strcmpi(EEG.saved, 'yes')
+            [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
+        else
+            [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+        end;
+    else
+        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
     end;
 end;
 	
 % generate the output command
 % ---------------------------
-com = sprintf( '[ALLEEG EEG %s] = pop_newset(ALLEEG, EEG, %s, %s);', inputname(3), inputname(3), vararg2str(args));
+com = sprintf( '[ALLEEG EEG %s] = pop_newset(ALLEEG, EEG, %s, [], %s);', inputname(3), inputname(3), vararg2str(args));
 return;
 
 function num = popask( text )
