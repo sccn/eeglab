@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/02/01 07:09:48  arno
+% retreiving from multiple datasets
+%
 % Revision 1.40  2006/02/01 06:53:34  arno
 % new saving data etc...
 %
@@ -193,7 +196,7 @@ elseif existnewset & nargin == 4
         EEG = update_datafield(EEG);
     else
         if strcmpi(EEG.saved, 'yes') & option_storedisk
-            fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', storeSetIndex);
+            fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', OLDSET);
             EEG = update_datafield(EEG);
         end;
         [ EEG com ] = eeg_checkset(EEG);
