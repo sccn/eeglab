@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/02/01 06:53:34  arno
+% new saving data etc...
+%
 % Revision 1.39  2006/02/01 06:33:42  arno
 % revert version 1.37
 %
@@ -167,18 +170,26 @@ if nargin < 3
    return;
 end;
 CURRENTSET = OLDSET;
-if nargin < 4
-    NEWSET = [];
+existnewset = 0;
+if nargin > 3
+    if ~isstr(NEWSET)
+        existnewset = 1;
+    end;
 end;
 
-option_saveoold = 0;
-if ~isempty(NEWSET) & nargin == 4
+if existnewset & length(EEG) > 1
+    % cases when length(EEG) > 1: when retreiving a dataset and before several datasets were processed (NEWSET non empty)
+    %                          2: when storing multiple datasets 
+    if ~isempty(NEWSET)
+        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+    end;
+    return;
+elseif existnewset & nargin == 4
     % transfer dataset
     % have to test options
     % --------------------
     eeglab_options;
     if option_storedisk & strcmpi(EEG.saved, 'no')
-        option_saveold = 1;
         EEG = update_datafield(EEG);
     else
         if strcmpi(EEG.saved, 'yes') & option_storedisk
@@ -189,7 +200,9 @@ if ~isempty(NEWSET) & nargin == 4
         if ~isempty(com), EEG.saved = 'no'; end;
         EEG = eeg_hist(EEG, com);
         ALLEEG(OLDSET) = EEG;
-        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+        if ~isempty(NEWSET)
+            [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+        end;
         return;
     end;
 end;
@@ -291,12 +304,12 @@ if nargin < 5 & length(EEG) == 1 % if several arguments, assign values
     
     % remove new dataset if already saved
     % -----------------------------------
-    if strcmpi(EEG.saved, 'justloaded') | ~isempty(NEWSET)
+    if strcmpi(EEG.saved, 'justloaded') | existnewset
         if overwrite_or_save % only pop-up a window if some action has to be taken
             uilist = uilist(11:end);
             geometry = geometry(5:end);
             shift    = 3;
-        elseif isempty(NEWSET) % just loaded from disk
+        elseif ~existnewset % just loaded from disk
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
             com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );';
             return;
@@ -381,7 +394,7 @@ end;
 % assigning values
 % ----------------
 overWflag    = 0;
-if isempty(NEWSET)
+if ~existnewset
     if strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes';
     else
@@ -413,7 +426,7 @@ end;
 
 % moving/erasing/creating datasets
 % --------------------------------
-if ~isempty(NEWSET)
+if existnewset
     % dataset retrieval
     % -----------------
     if overWflag
@@ -423,7 +436,9 @@ if ~isempty(NEWSET)
         EEG = update_datafield(EEG);
         [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
     end;
-    [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+    if ~isempty(NEWSET)
+        [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
+    end;
 else
     % new dataset
     % -----------
