@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/02/02 00:40:17  arno
+% removing data from file in ALLEEG
+%
 % Revision 1.45  2006/02/02 00:30:29  arno
 % important changes for processing multiple datasets
 %
@@ -225,7 +228,9 @@ elseif existnewset & nargin == 4
     end;
 end;
 
-if nargin < 5 & length(EEG) == 1 % if several arguments, assign values 
+if isempty(EEG)
+    args = { 'retrieve', OLDSET }; % cancel    
+elseif nargin < 5 & length(EEG) == 1 % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     comcomment = ['tmpuserdat = get(gcbf, ''userdata'');' ...
@@ -424,7 +429,7 @@ end;
 % assigning values
 % ----------------
 overWflag    = 0;
-if ~existnewset
+if ~existnewset & ~isempty(EEG)
     if strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes';
     else
@@ -440,7 +445,7 @@ for ind = 1:2:length(args)
                         else
                             EEG = eeg_emptyset;
                         end;
-                        overWflag = 1; com = ''; return;
+                        com = ''; return;
 	 case { 'save' 'savenew' }, [filepath filename ext] = fileparts( args{ind+1} );
                         EEG.saved = 'yes';
                         EEG = pop_saveset(EEG, [ filename ext ], filepath);
