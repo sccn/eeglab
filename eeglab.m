@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.445  2006/02/02 00:16:48  arno
+% same
+%
 % Revision 1.444  2006/02/02 00:13:56  arno
 % option menu
 %
@@ -1678,7 +1681,6 @@ e_hist_nh        = [e_catch 'eegh(LASTCOM);'];
 e_newnonempty   = [e_catch 'EEGTMP = eegh(LASTCOM, EEGTMP);' ifeegtmp 'EEG = EEGTMP;' storenewcall 'disp(''Done.''); end; clear EEGTMP; eeglab(''redraw'');'];
 e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeeg                    storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh                  storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
-e_storeall      = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeeg                    storeallcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
 e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
 
@@ -1760,17 +1762,17 @@ catchstrs.new_non_empty          = e_newnonempty;
 	cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
     
-    cb_loadset     = [ nocheck '[EEGTMP LASTCOM] = pop_loadset;'                                  e_newnonempty];
-    cb_saveset     = [ check        '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store];
-    cb_savesetas   = [ check        '[EEG LASTCOM] = pop_saveset(EEG);'                           e_hist_nh ];
-	cb_delset      = [ nocheck      '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);' e_hist_nh 'eeglab redraw;' ];
+    cb_loadset     = [ nocheck '[EEGTMP LASTCOM] = pop_loadset;'                             e_newnonempty];
+    cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store];
+    cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                           e_hist_nh ];
+	cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_nh 'eeglab redraw;' ];
 	cb_study1      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');'          e_load_study]; 
 	cb_study2      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');'          e_load_study]; 
 	cb_loadstudy   = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;'                                            e_load_study]; 
-	cb_savestudy1  = [ check        '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ];
-	cb_savestudy2  = [ check        '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ];
-	cb_clearstudy  = 'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0;''; eval(LASTCOM); eegh( LASTCOM );';
-	cb_editoptions = [ nocheck      'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
+	cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ];
+	cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ];
+	cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0;''; eval(LASTCOM); eegh( LASTCOM );';
+	cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
                                     'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
     
 	cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
