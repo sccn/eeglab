@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/02/02 00:11:39  arno
+% nothing
+%
 % Revision 1.43  2006/02/01 18:39:29  arno
 % automatically save datasets ...
 %
@@ -209,9 +212,9 @@ elseif existnewset & nargin == 4
         end;
         
         if ~isempty(com), EEG.saved = 'no'; end;
-        tmpsave = EEG.saved;
-        EEG = eeg_hist(EEG, com);
         
+        tmpsave = EEG.saved;
+        EEG = eeg_hist(EEG, com);        
         [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
         EEG.saved            = tmpsave; % eeg_store automatically set it to 'no'
         ALLEEG(OLDSET).saved = tmpsave;
@@ -326,6 +329,13 @@ if nargin < 5 & length(EEG) == 1 % if several arguments, assign values
             geometry = geometry(5:end);
             shift    = 3;
         elseif ~existnewset % just loaded from disk
+            
+            % remove data from file
+            % ---------------------
+            if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+                ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
+            end;
+            
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
             com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );';
             return;
@@ -492,3 +502,4 @@ function EEG = update_datafield(EEG);
     else 
         EEG.data = 'in set file';
     end;
+    EEG.icaact = [];
