@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/01/31 20:56:47  arno
+% nothing
+%
 % Revision 1.55  2006/01/25 23:44:15  arno
 % disable channel browser if no channel location
 %
@@ -563,6 +566,7 @@ end;
 % performing removal
 % ------------------
 EEG.data      = EEG.data(g.channel, :, g.trial);
+if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
 EEG.nbchan    = length(g.channel);
