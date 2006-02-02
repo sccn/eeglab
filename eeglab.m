@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.444  2006/02/02 00:13:56  arno
+% option menu
+%
 % Revision 1.443  2006/02/02 00:11:15  arno
 % new version of pop_newset
 %
@@ -1767,7 +1770,8 @@ catchstrs.new_non_empty          = e_newnonempty;
 	cb_savestudy1  = [ check        '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');' e_load_study ];
 	cb_savestudy2  = [ check        '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ];
 	cb_clearstudy  = 'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0;''; eval(LASTCOM); eegh( LASTCOM );';
-	cb_editoptions = [ nocheck      'LASTCOM = pop_editoptions(fastif(isempty(ALLEEG),0,eval(''length([ ALLEEG.nbchan ]) >1;'')));' e_storeall_nh];
+	cb_editoptions = [ nocheck      'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
+                                    'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
     
 	cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 	cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
