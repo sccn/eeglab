@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/02/02 00:30:29  arno
+% important changes for processing multiple datasets
+%
 % Revision 1.44  2006/02/02 00:11:39  arno
 % nothing
 %
@@ -189,6 +192,7 @@ if nargin > 3
     end;
 end;
 
+eeglab_options;
 if existnewset & length(EEG) > 1
     % cases when length(EEG) > 1: when retreiving a dataset and before several datasets were processed (NEWSET non empty)
     %                          2: when storing multiple datasets 
@@ -200,24 +204,19 @@ elseif existnewset & nargin == 4
     % transfer dataset
     % have to test options
     % --------------------
-    eeglab_options;
-    if option_storedisk & strcmpi(EEG.saved, 'no')
-        [ EEG com ] = pop_saveset(EEG, 'savemode', 'resave');
-        EEG = update_datafield(EEG);
-    else
+    if ~(option_storedisk & strcmpi(EEG.saved, 'no'))
         if strcmpi(EEG.saved, 'yes') & option_storedisk
             fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', OLDSET);
-            [ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
+            %[ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
             EEG = update_datafield(EEG);
+            if ~isempty(com), EEG.saved = 'no'; end;
+        
+            tmpsave = EEG.saved;
+            EEG = eeg_hist(EEG, com);        
+            [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
+            EEG.saved            = tmpsave; % eeg_store automatically set it to 'no'
+            ALLEEG(OLDSET).saved = tmpsave;
         end;
-        
-        if ~isempty(com), EEG.saved = 'no'; end;
-        
-        tmpsave = EEG.saved;
-        EEG = eeg_hist(EEG, com);        
-        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
-        EEG.saved            = tmpsave; % eeg_store automatically set it to 'no'
-        ALLEEG(OLDSET).saved = tmpsave;
         
         if ~isempty(NEWSET)
             [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, NEWSET);
@@ -250,7 +249,6 @@ if nargin < 5 & length(EEG) == 1 % if several arguments, assign values
 	userdat = EEG.comments;
     
     % status of parent dataset etc...
-    eeglab_options;
     saved = 1;
     filename = '';
     if ~isempty(ALLEEG)
@@ -417,6 +415,12 @@ else
     end;
 end;
 
+% remove data from file if necessary
+% ----------------------------------
+if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+    ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
+end;
+
 % assigning values
 % ----------------
 overWflag    = 0;
@@ -481,6 +485,7 @@ end;
 
 % generate the output command
 % ---------------------------
+if exist('NEWSET') ~= 1, NEWSET = []; end;
 com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, int2str(NEWSET), vararg2str(args));
 return;
 
