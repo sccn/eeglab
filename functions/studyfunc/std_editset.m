@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/02/03 22:47:58  arno
+% preserving save field when storing
+%
 % Revision 1.10  2006/02/03 22:33:41  arno
 % fix updating the ALLEEG structure
 %
@@ -207,6 +210,7 @@ if ~isempty(g.filename),
     [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
     STUDY.filename = [ STUDY.filename ext ];
     ver = version;
+    STUDY.saved = 'yes';
     disp('Saving study...');
     if ver(1) > '6'
          save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
@@ -216,6 +220,7 @@ end
 if strcmpi(g.resave, 'on')
     ver = version;
     disp('Saving study...');
+    STUDY.saved = 'yes';
     if ver(1) > '6'
          save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
     else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
