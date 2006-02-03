@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2006/02/03 22:48:40  arno
+% nothing
+%
 % Revision 1.69  2006/02/03 22:45:02  arno
 % nothing
 %
@@ -338,7 +341,6 @@ if strcmpi(g.savemode, 'resave')
     if strcmpi( EEG.saved, 'yes'), return; end;
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
-    EEG.saved = 'yes';
     if isfield(EEG, 'datfile')
         if isempty(EEG.datfile)
             EEG = rmfield(EEG, 'datfile');
@@ -379,6 +381,7 @@ end;
 v = version;
 %try, 
     fprintf('Saving dataset...\n');
+    EEG.saved = 'yes';
     if save_as_dat_file
         if ~isstr(EEG.data)
             EEG.data = EEG.datfile;
@@ -391,6 +394,7 @@ v = version;
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end;
+    EEG.saved = 'justloaded';
 %catch,
 %    error('Pop_saveset: save error, out of space or file permission problem');
 %end;
