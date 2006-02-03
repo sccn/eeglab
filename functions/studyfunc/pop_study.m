@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/02/03 20:48:35  arno
+% typo
+%
 % Revision 1.11  2006/02/03 20:47:03  arno
 % adding savedat option
 %
@@ -161,9 +164,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
             if datasetinfo(k).session ~= ALLEEG(k).session,             different = 1; break; end;
         end
         if different
-            info = 'from_STUDY';
-        else
             info = 'from_STUDY_different_from_ALLEEG';
+        else
+            info = 'from_STUDY';
         end;
     else
         info = 'from_ALLEEG';
@@ -234,7 +237,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     
     if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) different from info stored in study. Overwrite dataset info (set)?'
+        text1    = 'Dataset info (condition, group, ...) different from info stored in study. Overwrite dataset info (set)?';
         value_cb = 0;
     else
         text1    = 'Update dataset info (unset=local to study). If datasets are stored on disk, they will be overwritten.';
