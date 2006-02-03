@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/02/03 22:33:41  arno
+% fix updating the ALLEEG structure
+%
 % Revision 1.9  2006/02/03 22:12:50  arno
 % fix typo
 %
@@ -190,7 +193,9 @@ if strcmpi(g.savedat, 'on')
             fprintf('Cannot resave ALLEEG(%d) because the dataset has no filename\n', index);
         else
             TMP = pop_saveset(ALLEEG(index), 'savemode', 'resave');
+            tmpsave = ALLEEG(index).saved;
             ALLEEG = eeg_store(ALLEEG, TMP, index);
+            ALLEEG(index).saved = tmpsave;
         end;
     end;
 end;
