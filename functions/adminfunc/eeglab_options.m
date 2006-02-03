@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/01/31 20:07:08  arno
+% Initial revision
+%
 
 % load local file
 % ---------------
@@ -43,8 +46,9 @@ try,
     tmp_opt_path2 = fileparts( tmp_opt_path2 );
     if ~isempty(tmp_opt_path) & ~strcmpi(tmp_opt_path2, tmp_opt_path)
         if exist(fullfile(tmp_opt_path, 'eeg_options.m')) == 2
-            fprintf('Warning: you should delete the eeg_option.m file in %s\n', tmp_opt_path2);
-            fprintf('         using instead the current eeg_option.m file in %s\n', tmp_opt_path);
+            fprintf('Warning: you should delete the eeg_option.m file in folder %s\n', tmp_opt_path2);
+            fprintf('         using instead the eeg_option.m file accessible at EEGLAB startup in %s\n', tmp_opt_path);
+            fprintf('         To use the first option file, restart EEGLAB and reload datasets\n');
             addpath(tmp_opt_path);
         else
             fprintf('IMPORTANT WARNING: the current eeg_option.m file in %s HAS BEEN DELETED\n', tmp_opt_path);
