@@ -142,18 +142,22 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % set initial datasetinfo
     % -----------------------
-    datasetinfo.filename  = [];
-    datasetinfo.subject   = [];
-    datasetinfo.session   = [];
-    datasetinfo.condition = [];
-    datasetinfo.group     = [];     
-    for k = 1:length(ALLEEG)
-        datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
-        datasetinfo(k).subject   = ALLEEG(k).subject;
-        datasetinfo(k).session   = ALLEEG(k).session;
-        datasetinfo(k).condition = ALLEEG(k).condition;
-        datasetinfo(k).group     = ALLEEG(k).group;                    
-    end
+    if ~isfield(STUDY, 'datasetinfo')
+        datasetinfo.filename  = [];
+        datasetinfo.subject   = [];
+        datasetinfo.session   = [];
+        datasetinfo.condition = [];
+        datasetinfo.group     = [];     
+        for k = 1:length(ALLEEG)
+            datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
+            datasetinfo(k).subject   = ALLEEG(k).subject;
+            datasetinfo(k).session   = ALLEEG(k).session;
+            datasetinfo(k).condition = ALLEEG(k).condition;
+            datasetinfo(k).group     = ALLEEG(k).group;                    
+        end
+    else
+        datasetinfo = STUDY.datasetinfo;
+    end;
 
     nextpage = 'pop_study(''nextpage'', gcbf);';
     prevpage = 'pop_study(''prevpage'', gcbf);';
