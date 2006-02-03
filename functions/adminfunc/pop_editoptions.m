@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/01/31 20:11:28  arno
+% editing option etc...
+%
 % Revision 1.37  2006/01/31 19:47:31  arno
 % change default folder etc...
 %
@@ -201,6 +204,7 @@ end;
 
 % parse the eeg_options file
 % ----------------------------
+eeglab_options;
 filename = which('eeg_options.m');
 fid = fopen( filename, 'r+');
 storelocal = 0;
