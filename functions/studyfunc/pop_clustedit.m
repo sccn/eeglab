@@ -521,7 +521,8 @@ else
             comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             for ci = 1 : length(comp_ind)
             end
-        case 'renameclust'
+     case 'renameclust'
+            STUDY.saved = 'no';
             clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
             clus_num = get(findobj('parent', hdl, 'tag', 'clus_list'), 'Value') -1;
             if clus_num == 0  % 'all clusters' option 
@@ -552,6 +553,7 @@ else
             end
             
         case 'movecomp'
+            STUDY.saved = 'no';
             old_clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value') -1;
             comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             if old_clus == 0 % 'all clusters' option 
@@ -598,6 +600,7 @@ else
             end          
             
         case 'moveoutlier'
+            STUDY.saved = 'no';
             old_clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value') -1;
             comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             if ~isempty(find(comp_ind ==1))
@@ -647,6 +650,7 @@ else
             end
             
         case 'rejectoutliers'
+            STUDY.saved = 'no';
             clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'Value') -1;
             if clus
                 cls_name = STUDY.cluster(cls(clus)).name;
@@ -701,6 +705,7 @@ else
             end
             
         case 'createclust'
+            STUDY.saved = 'no';
             create_param  = inputgui( { [1] [1 1] [1]}, ...
                 { {'style' 'text' 'string' 'Create new empty cluster' 'FontWeight' 'Bold'} ...
                    {'style' 'text' 'string' 'Enter cluster name:'} {'style' 'edit' 'string' '' } {} }, ...
@@ -732,6 +737,7 @@ else
             end
             
         case 'mergeclusters'
+            STUDY.saved = 'no';
             clus_names = get(findobj('parent', hdl, 'tag', 'clus_list'), 'string') ;
             optionalcls =[];
             for k = 2:length(clus_names)
