@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/02/03 20:36:41  arno
+% saving log
+%
 
 function [STUDY, ALLEEG, com]  = pop_study(STUDY, ALLEEG, varargin)
 
@@ -293,6 +296,10 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     if outstruct(1).copy_to_dataset == 1
          options = { options{:} 'updatedat' 'on' };
+         eeglab_options;
+         if option_storedisk
+             options = { options{:} 'savedat' 'on' };
+         end;
     else options = { options{:} 'updatedat' 'off' };
     end;
     %{'style' 'checkbox'   'value' 0 'tag' 'save_dataset' } ...
