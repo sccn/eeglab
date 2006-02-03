@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/02/03 20:47:03  arno
+% adding savedat option
+%
 % Revision 1.10  2006/02/03 20:36:41  arno
 % saving log
 %
@@ -147,7 +150,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % set initial datasetinfo
     % -----------------------
-    if ~isfield(STUDY, 'datasetinfo')
+    if isfield(STUDY, 'datasetinfo')
         datasetinfo = STUDY.datasetinfo;
         different = 0;
         for k = 1:length(ALLEEG)
