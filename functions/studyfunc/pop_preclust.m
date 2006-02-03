@@ -462,4 +462,4 @@ else
            set(findobj('parent', hdl,'tag', 'compcls_str'), 'enable', fastif(~set_PCA,'on','off'));
     end
 end
-
+STUDY.saved = 'no';
