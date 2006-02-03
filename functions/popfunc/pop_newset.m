@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2006/02/03 00:46:49  arno
+% fix study call
+%
 % Revision 1.50  2006/02/03 00:19:30  arno
 % debug last changes
 %
@@ -289,7 +292,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
         cb_owrt      = [ ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
-                           '''The old dataset has to be overwriten because,'',' ...
+                           '''The old dataset has to be overwriten because'',' ...
                            '''all datasets must be in the study.''), ''warning'');' ];
         value_owrt   = 1;
     elseif ~saved & option_storedisk
