@@ -83,6 +83,7 @@ if isstr(g), error(g); end;
 
 % resave mode
 % -----------
+STUDY.saved = 'yes';
 if strcmpi(g.savemode, 'resave')
     disp('Re-saving study file');
     g.filename = STUDY.filename;
