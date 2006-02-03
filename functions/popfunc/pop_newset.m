@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/02/03 00:47:30  arno
+% same
+%
 % Revision 1.51  2006/02/03 00:46:49  arno
 % fix study call
 %
@@ -521,7 +524,7 @@ end;
 
 % generate the output command
 % ---------------------------
-if ~isempty(g.retrieve) & g.retreive ~= -1
+if ~isempty(g.retrieve) & g.retrieve ~= -1
     if ~isempty(args)
         com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
     end;
