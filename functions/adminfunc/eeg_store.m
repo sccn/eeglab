@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/02/01 06:54:37  arno
+% remove all the savedata stuff
+%
 % Revision 1.38  2006/01/31 20:50:41  arno
 % eeglab options
 %
@@ -214,6 +217,9 @@ if nargin < 3
     % ---------------------------
     EEG.filename = '';
     EEG.filepath = '';
+    if isfield(EEG, 'datfile')
+        EEG = rmfield(EEG, 'datfile');
+    end;
 end;
 
 if nargin < 4 
