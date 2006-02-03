@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/02/03 23:16:08  arno
+% adding .saved field
+%
 % Revision 1.11  2006/02/03 22:47:58  arno
 % preserving save field when storing
 %
@@ -196,9 +199,8 @@ if strcmpi(g.savedat, 'on')
             fprintf('Cannot resave ALLEEG(%d) because the dataset has no filename\n', index);
         else
             TMP = pop_saveset(ALLEEG(index), 'savemode', 'resave');
-            tmpsave = ALLEEG(index).saved;
             ALLEEG = eeg_store(ALLEEG, TMP, index);
-            ALLEEG(index).saved = tmpsave;
+            ALLEEG(index).saved = 'yes';
         end;
     end;
 end;
