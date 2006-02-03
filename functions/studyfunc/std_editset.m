@@ -40,7 +40,7 @@
 %  See also:  pop_createstudy(), load_ALLEEG(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, October , 2004
+% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -60,6 +60,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [STUDY, ALLEEG] = editstudy(STUDY, ALLEEG, varargin) 
 
 if (nargin < 3)
@@ -75,8 +77,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'on';
                             'notes'     'string'  { }             '';
                             'filename'  'string'  { }             '';
                             'filepath'  'string'  { }             '';
-                            'resave'    'string'  { 'on' 'off' }  'off';
-                            'savedat'   'string'  { 'on' 'off' }  'on';
+                            'resave'    'string'  { 'on' 'off' 'info' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'editstudy');
 if isstr(g), error(g); end;
@@ -118,32 +119,41 @@ end;
 % execute commands
 % ----------------
 currentind = 1;
+rmlist = [];
 for k = 1:2:length(g.commands)
     switch g.commands{k}
         case 'index'
             currentind = g.commands{k+1};
         case 'subject'
             if strcmpi(g.updatedat, 'on')
-                ALLEEG(currentind).subject        = g.commands{k+1};
-                ALLEEG(currentind).saved          = 'no';
+                if ~strcmpi(ALLEEG(currentind).subject, g.commands{k+1})
+                    ALLEEG(currentind).subject        = g.commands{k+1};
+                    ALLEEG(currentind).saved          = 'no';
+                end;
             end; 
             STUDY.datasetinfo(currentind).subject = g.commands{k+1};
         case 'condition'
             if strcmpi(g.updatedat, 'on')
-                ALLEEG(currentind).condition      = g.commands{k+1};
-                ALLEEG(currentind).saved          = 'no';
+                if ~strcmpi(ALLEEG(currentind).condition, g.commands{k+1})
+                    ALLEEG(currentind).condition      = g.commands{k+1};
+                    ALLEEG(currentind).saved          = 'no';
+                end;
             end; 
             STUDY.datasetinfo(currentind).condition = g.commands{k+1};
         case 'group'
             if strcmpi(g.updatedat, 'on')
-                ALLEEG(currentind).group          = g.commands{k+1};
-                ALLEEG(currentind).saved          = 'no';
+                if ~strcmpi(ALLEEG(currentind).group, g.commands{k+1})
+                    ALLEEG(currentind).group          = g.commands{k+1};
+                    ALLEEG(currentind).saved          = 'no';
+                end;
             end; 
             STUDY.datasetinfo(currentind).group   = g.commands{k+1};
         case 'session' 
             if strcmpi(g.updatedat, 'on')
-                ALLEEG(currentind).session        = g.commands{k+1};
-                ALLEEG(currentind).saved          = 'no';
+                if session(ALLEEG(currentind).session ~= g.commands{k+1}
+                    ALLEEG(currentind).session        = g.commands{k+1};
+                    ALLEEG(currentind).saved          = 'no';
+                end;
             end; 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
@@ -154,7 +164,8 @@ for k = 1:2:length(g.commands)
             
             % update datasetinfo structure
             % ----------------------------
-            [tmppath tmpfile tmpext] = fileparts( fullfile(ALLEEG(currentind).filepath, ALLEEG(currentind).filename) );
+            [tmppath tmpfile tmpext] = fileparts( fullfile(ALLEEG(currentind).filepath, ...
+                                                           ALLEEG(currentind).filename) );
             STUDY.datasetinfo(currentind).filepath  = tmppath;   
             STUDY.datasetinfo(currentind).filename  = [ tmpfile tmpext ];   
             STUDY.datasetinfo(currentind).subject   = ALLEEG(currentind).subject;
@@ -164,7 +175,7 @@ for k = 1:2:length(g.commands)
     end
 end
 
-% remove empty datasets
+% remove empty datasets (cnnot be done above because some empty datasets might not have been removed
 % ---------------------
 [ ALLEEG STUDY.datasetinfo ] = removeempty(ALLEEG, STUDY.datasetinfo);
 
