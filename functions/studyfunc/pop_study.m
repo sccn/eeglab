@@ -70,11 +70,11 @@
 %
 %  See also  create_study(), pop_loadstudy(), pop_preclust(), eeg_preclust(), pop_clust()
 %
-% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
+% Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, July 22, 2005, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, July 22, 2005, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -91,6 +91,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
+
+% $Log: not supported by cvs2svn $
 
 function [STUDY, ALLEEG, com]  = pop_study(STUDY, ALLEEG, varargin)
 
@@ -143,11 +145,27 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % set initial datasetinfo
     % -----------------------
     if ~isfield(STUDY, 'datasetinfo')
-        datasetinfo.filename  = [];
-        datasetinfo.subject   = [];
-        datasetinfo.session   = [];
-        datasetinfo.condition = [];
-        datasetinfo.group     = [];     
+        datasetinfo = STUDY.datasetinfo;
+        different = 0;
+        for k = 1:length(ALLEEG)
+            if ~strcmpi(datasetinfo(k).filename, fullfile(ALLEEG(k).filepath, ALLEEG(k).filename)), different = 1; break; end;
+            if ~strcmpi(datasetinfo(k).subject,   ALLEEG(k).subject),   different = 1; break; end;
+            if ~strcmpi(datasetinfo(k).condition, ALLEEG(k).condition), different = 1; break; end;
+            if ~strcmpi(datasetinfo(k).group,     ALLEEG(k).group),     different = 1; break; end;              
+            if datasetinfo(k).session ~= ALLEEG(k).session,             different = 1; break; end;
+        end
+        if different
+            info = 'from_STUDY';
+        else
+            info = 'from_STUDY_different_from_ALLEEG';
+        end;
+    else
+        info = 'from_ALLEEG';
+        datasetinfo(length(ALLEEG)).filename  = [];
+        datasetinfo(length(ALLEEG)).subject   = [];
+        datasetinfo(length(ALLEEG)).session   = [];
+        datasetinfo(length(ALLEEG)).condition = [];
+        datasetinfo(length(ALLEEG)).group     = [];     
         for k = 1:length(ALLEEG)
             datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
             datasetinfo(k).subject   = ALLEEG(k).subject;
@@ -155,8 +173,6 @@ elseif strcmpi(mode, 'gui') % GUI mode
             datasetinfo(k).condition = ALLEEG(k).condition;
             datasetinfo(k).group     = ALLEEG(k).group;                    
         end
-    else
-        datasetinfo = STUDY.datasetinfo;
     end;
 
     nextpage = 'pop_study(''nextpage'', gcbf);';
@@ -210,13 +226,21 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end;
+    
+    if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
+        text1    = 'Dataset info (condition, group, ...) different from info stored in study. Overwrite dataset info (set)?'
+        value_cb = 0;
+    else
+        text1    = 'Update dataset info (unset=local to study). If datasets are stored on disk, they will be overwritten.';
+        value_cb = 1;
+    end;
     guispec = { guispec{:} ...
                 {} {} {'style' 'pushbutton' 'string'  '<'      'Callback' prevpage 'userdata' 'addt'} ...
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' } ... 
                 {'style' 'pushbutton' 'string'  '>'      'Callback' nextpage 'userdata' 'addt'} {} ...
                 {} ...
-                {'style' 'checkbox'   'value' 1 'tag' 'copy_to_dataset' } ...
-                {'style' 'text'       'string'  'Update dataset info (unset=local to study). If datasets are stored on disk, they will be overwritten.' } ...
+                {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' } ...
+                {'style' 'text'       'string'  text1 } ...
                 {'style' 'text'       'string'  'Important note: Removed datasets will not be saved prior to being delete from EEGLAB memory' } ...
                 { } ... 
                 {'style' 'text'       'string'  'Save this STUDY set to disk file'} ...
