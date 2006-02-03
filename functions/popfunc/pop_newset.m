@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2006/02/03 00:19:30  arno
+% debug last changes
+%
 % Revision 1.49  2006/02/03 00:07:10  arno
 % typo
 %
@@ -288,7 +291,6 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
                            '''The old dataset has to be overwriten because,'',' ...
                            '''all datasets must be in the study.''), ''warning'');' ];
-        enable_save2 = 'on';
         value_owrt   = 1;
     elseif ~saved & option_storedisk
         text_old = 'What do you want to do with the old dataset (some changes have not been saved)?';
@@ -349,7 +351,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
         geometry = geometry(1:3);
     end;
     if isempty(cb_save2)
-        uilist(end-1:end) = [];
+        uilist(end-3:end) = [];
         geometry(end)     = [];
     end;        
     
@@ -516,7 +518,7 @@ end;
 
 % generate the output command
 % ---------------------------
-if ~isempty(g.retrieve)
+if ~isempty(g.retrieve) & g.retreive ~= -1
     if ~isempty(args)
         com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
     end;
