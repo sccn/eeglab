@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2006/02/03 23:54:03  arno
+% saved field
+%
 % Revision 1.70  2006/02/03 22:48:40  arno
 % nothing
 %
@@ -394,7 +397,6 @@ v = version;
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end;
-    EEG.saved = 'justloaded';
 %catch,
 %    error('Pop_saveset: save error, out of space or file permission problem');
 %end;
