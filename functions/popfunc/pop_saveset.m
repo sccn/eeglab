@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2006/02/03 22:45:02  arno
+% nothing
+%
 % Revision 1.68  2006/01/31 20:14:23  arno
 % options
 %
@@ -335,6 +338,7 @@ if strcmpi(g.savemode, 'resave')
     if strcmpi( EEG.saved, 'yes'), return; end;
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
+    EEG.saved = 'yes';
     if isfield(EEG, 'datfile')
         if isempty(EEG.datfile)
             EEG = rmfield(EEG, 'datfile');
