@@ -33,50 +33,60 @@
 
 function [STUDY, ALLEEG] = checkstudy(STUDY, ALLEEG);
 
-if ~isfield(STUDY, 'name'),  STUDY.name  = ''; end;
-if ~isfield(STUDY, 'task'),  STUDY.task  = ''; end;
-if ~isfield(STUDY, 'notes'), STUDY.notes = ''; end;
-if ~isfield(STUDY, 'filename'),  STUDY.filename  = ''; end;
-if ~isfield(STUDY, 'filepath'),  STUDY.filepath  = ''; end;
-if ~isfield(STUDY, 'history'),   STUDY.history   = ''; end;
-if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; end;
+if nargin < 2
+    help checkstudy;
+    return;
+end;
+    
+modif = 0;
+if ~isfield(STUDY, 'name'),  STUDY.name  = ''; modif = 1; end;
+if ~isfield(STUDY, 'task'),  STUDY.task  = ''; modif = 1; end;
+if ~isfield(STUDY, 'notes'), STUDY.notes = ''; modif = 1; end;
+if ~isfield(STUDY, 'filename'),  STUDY.filename  = ''; modif = 1; end;
+if ~isfield(STUDY, 'filepath'),  STUDY.filepath  = ''; modif = 1; end;
+if ~isfield(STUDY, 'history'),   STUDY.history   = ''; modif = 1; end;
+if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
 
 % all summary fields
 % ------------------
-try, STUDY.subject = unique({ STUDY.datasetinfo.subject });
+try, subject = unique({ STUDY.datasetinfo.subject });
 catch, 
-     STUDY.subject = ''; 
+     subject = ''; 
      disp('Important warning: not all dataset contain subject code, some functions may crash');
 end;
-try, STUDY.group = unique({ STUDY.datasetinfo.group });
+try, group = unique({ STUDY.datasetinfo.group });
 catch, 
-     STUDY.group = ''; 
+     group = ''; 
      disp('Important warning: not all dataset contain group info, some functions may crash');
 end;
-try, STUDY.condition = unique({ STUDY.datasetinfo.condition });
+try, condition = unique({ STUDY.datasetinfo.condition });
 catch, 
-     STUDY.condition = ''; 
+     condition = ''; 
      disp('Important warning: not all dataset contain condition info, some functions may crash');
 end;
-try, STUDY.session = unique([STUDY.datasetinfo.session]);
+try, session = unique([STUDY.datasetinfo.session]);
 catch, 
-     STUDY.session = ''; 
+     session = ''; 
      disp('Important warning: not all dataset contain integer session info, some functions may crash');
 end;
+if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;  
+if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;  
+if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;  
+if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;  
 
 % recompute setind matrix
 % -----------------------
 if ~isempty(STUDY.condition)
     if ~isempty(STUDY.session)
-        STUDY.setind = zeros(length(STUDY.condition), length(STUDY.subject) *length(STUDY.session));
+        setind = zeros(length(STUDY.condition), length(STUDY.subject) *length(STUDY.session));
     else
-        STUDY.setind = zeros(length(STUDY.condition), length(STUDY.subject) );
+        setind = zeros(length(STUDY.condition), length(STUDY.subject) );
     end
 else
     if ~isempty(STUDY.session)        
-        STUDY.setind = zeros(1, length(STUDY.subject) *length(STUDY.session));
+        setind = zeros(1, length(STUDY.subject) *length(STUDY.session));
     else
-        STUDY.setind = zeros(1, length(STUDY.subject) );
+        setind = zeros(1, length(STUDY.subject) );
     end
 end
 for k = 1:length(STUDY.datasetinfo)
@@ -86,31 +96,43 @@ for k = 1:length(STUDY.datasetinfo)
     ncomps  = [];
     if ~isempty(setcond)
         if ~isempty(setsess)
-            STUDY.setind(setcond, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
+            setind(setcond, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
         else
-            STUDY.setind(setcond, setsubj ) = k; 
+            setind(setcond, setsubj ) = k; 
         end
     else
         if ~isempty(setsess)
-            STUDY.setind(1, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
+            setind(1, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
         else
-            STUDY.setind(1, setsubj) = k; 
+            setind(1, setsubj) = k; 
         end
-    end    
-    STUDY.datasetinfo(k).index = k; %The dataset index in the current ALLEEG structure
-    STUDY.setind( find(STUDY.setind(:) == 0) ) = NaN;
+    end
+    
+    if STUDY.datasetinfo(k).index ~= k
+        STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
+    end;
+    
 end
+% set to NaN empty indices
+% ------------------------    
+setind( find(setind(:) == 0) ) = NaN;
+if ~isequal(setind, STUDY.setind)
+    STUDY.setind = setind; modif = 1; 
+end;
 
 % number of component per dataset
 % -------------------------------
 for k = 1:length(STUDY.datasetinfo)
-   STUDY.datasetinfo(k).ncomps = size(ALLEEG(STUDY.datasetinfo(k).index).icawinv,2);
+    if STUDY.datasetinfo(k).ncomps ~= size(ALLEEG(STUDY.datasetinfo(k).index).icawinv,2)
+        STUDY.datasetinfo(k).ncomps = size(ALLEEG(STUDY.datasetinfo(k).index).icawinv,2); modif = 1; 
+    end;
 end
 
 % set cluster array if empty
 % --------------------------
-if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; end;
+if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
 if isempty(STUDY.cluster)
+    modif = 1; 
     [STUDY] = cls_createclust(STUDY, ALLEEG, 'ParentCluster');
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
@@ -126,4 +148,12 @@ if isempty(STUDY.cluster)
         STUDY.cluster(1).sets = tmp;
         clear tmp
     end
+end;
+
+% determine if there has been any change
+% --------------------------------------
+if modif;
+    STUDY.saved = 'no';
+    eegh('[STUDY, ALLEEG] = checkstudy(STUDYIN, ALLEEG);');
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, '[STUDY, ALLEEG] = checkstudy(STUDYIN, ALLEEG);');
 end;
