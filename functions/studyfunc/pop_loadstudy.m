@@ -67,13 +67,17 @@ end
 if (~isempty(filename)) & (~isempty(filepath))
     STUDYfile = fullfile(filepath,filename);
     try 
-        eval(['load ' STUDYfile ' -mat']);
+        load('-mat', STUDYfile);
     catch
         error(['pop_loadstudy(): STUDY set file ''STUDYfile'' not loaded -- check filename and path']);
     end
+    [filepath filename ext] = fileparts(STUDYfile);
+    STUDY.filename = [filename ext];
+    STUDY.filepath = filepath;
 else
     error(['pop_loadstudy(): No STUDY set file provided.']);
 end
+STUDY.saved = 'yes';
   
 ALLEEG = load_ALLEEG(STUDY);
 
