@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/02/03 22:12:50  arno
+% fix typo
+%
 % Revision 1.8  2006/02/03 20:47:27  arno
 % do not modify dat fields if they have not changed
 %
@@ -128,36 +131,12 @@ for k = 1:2:length(g.commands)
         case 'index'
             currentind = g.commands{k+1};
         case 'subject'
-            if strcmpi(g.updatedat, 'on')
-                if ~strcmpi(ALLEEG(currentind).subject, g.commands{k+1})
-                    ALLEEG(currentind).subject        = g.commands{k+1};
-                    ALLEEG(currentind).saved          = 'no';
-                end;
-            end; 
             STUDY.datasetinfo(currentind).subject = g.commands{k+1};
         case 'condition'
-            if strcmpi(g.updatedat, 'on')
-                if ~strcmpi(ALLEEG(currentind).condition, g.commands{k+1})
-                    ALLEEG(currentind).condition      = g.commands{k+1};
-                    ALLEEG(currentind).saved          = 'no';
-                end;
-            end; 
             STUDY.datasetinfo(currentind).condition = g.commands{k+1};
         case 'group'
-            if strcmpi(g.updatedat, 'on')
-                if ~strcmpi(ALLEEG(currentind).group, g.commands{k+1})
-                    ALLEEG(currentind).group          = g.commands{k+1};
-                    ALLEEG(currentind).saved          = 'no';
-                end;
-            end; 
             STUDY.datasetinfo(currentind).group   = g.commands{k+1};
         case 'session' 
-            if strcmpi(g.updatedat, 'on')
-                if ALLEEG(currentind).session ~= g.commands{k+1}
-                    ALLEEG(currentind).session        = g.commands{k+1};
-                    ALLEEG(currentind).saved          = 'no';
-                end;
-            end; 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
             ALLEEG = eeg_store(ALLEEG, eeg_empty, g.commands{k+1});
@@ -177,6 +156,27 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
     end
 end
+
+% update ALLEEG structure?
+% ------------------------
+if strcmpi(g.updatedat, 'on')
+    if ~strcmpi(ALLEEG(currentind).subject,   STUDY.datasetinfo(currentind).subject)
+        ALLEEG(currentind).subject          = STUDY.datasetinfo(currentind).subject;
+        ALLEEG(currentind).saved            = 'no';
+    end;
+    if ~strcmpi(ALLEEG(currentind).condition, STUDY.datasetinfo(currentind).condition)
+        ALLEEG(currentind).condition        = STUDY.datasetinfo(currentind).condition;
+        ALLEEG(currentind).saved            = 'no';
+    end;
+    if ALLEEG(currentind).session ~=          STUDY.datasetinfo(currentind).session
+        ALLEEG(currentind).session          = STUDY.datasetinfo(currentind).session;
+        ALLEEG(currentind).saved            = 'no';
+    end;
+    if ~strcmpi(ALLEEG(currentind).group,     STUDY.datasetinfo(currentind).group)
+        ALLEEG(currentind).group            = STUDY.datasetinfo(currentind).group;
+        ALLEEG(currentind).saved            = 'no';
+    end;
+end;
 
 % remove empty datasets (cnnot be done above because some empty datasets might not have been removed
 % ---------------------
