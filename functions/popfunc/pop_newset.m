@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2006/02/03 00:07:10  arno
+% typo
+%
 % Revision 1.48  2006/02/03 00:05:45  arno
 % dealing with study structure
 %
@@ -194,15 +197,12 @@ if nargin < 3
    return;
 end;
 CURRENTSET = OLDSET;
-save_retrieve = 0;
-if nargin > 3
-    save_retrieve = 1;
-end;
 
-[g varargin] = finputcheck({ 'retrieve'      'integer'    []               -1;
-                             'study'         'integer'    [0 1]            0  }, 'pop_newset', 'ignore');
-if g.retreive == -1, save_retrieve = 0; 
-else                 save_retrieve = 0;
+[g varargin] = finputcheck(varargin, { ...
+                    'retrieve'      'integer'    []               -1;
+                    'study'         'integer'    [0 1]            0  }, 'pop_newset', 'ignore');
+if g.retrieve == -1, save_retrieve = 0; 
+else                 save_retrieve = 1;
 end;
 
 eeglab_options;
@@ -213,7 +213,7 @@ if save_retrieve & length(EEG) > 1
         [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, g.retrieve);
     end;
     return;
-elseif save_retrieve & nargin == 4
+elseif save_retrieve
     % transfer dataset
     % have to test options
     % --------------------
@@ -240,7 +240,7 @@ end;
 
 if isempty(EEG)
     args = { 'retrieve', OLDSET }; % cancel    
-elseif nargin < 5 & length(EEG) == 1 % if several arguments, assign values 
+elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     comcomment = ['tmpuserdat = get(gcbf, ''userdata'');' ...
@@ -348,7 +348,7 @@ elseif nargin < 5 & length(EEG) == 1 % if several arguments, assign values
         uilist = uilist(1:9);
         geometry = geometry(1:3);
     end;
-    if isempty(g.save2)
+    if isempty(cb_save2)
         uilist(end-1:end) = [];
         geometry(end)     = [];
     end;        
