@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2006/02/03 00:05:45  arno
+% dealing with study structure
+%
 % Revision 1.47  2006/02/02 22:43:08  arno
 % processing empty dataset
 %
@@ -517,7 +520,7 @@ if ~isempty(g.retrieve)
     if ~isempty(args)
         com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
     end;
-    com = [com sprintf( '[ALLEEG EEG CURRENTSET] = eeg_retrieve(ALLEEG, %d);', g.retrieve);
+    com = [com sprintf( '[ALLEEG EEG CURRENTSET] = eeg_retrieve(ALLEEG, %d);', g.retrieve) ];
 else
     com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
 end;    
