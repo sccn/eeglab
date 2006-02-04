@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.450  2006/02/04 00:14:24  arno
+% change clustedit call
+%
 % Revision 1.449  2006/02/03 21:52:07  arno
 % nothing
 %
@@ -1874,7 +1877,7 @@ catchstrs.new_non_empty          = e_newset;
     cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study];
     cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'               e_load_study];
     cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                  e_load_study];
-    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; LASTCOM = ''[STUDY]  = pop_clustedit(STUDY, ALLEEG);''' ...
+    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; LASTCOM = ''[STUDY]  = pop_clustedit(STUDY, ALLEEG);'';' ...
                                                              '[STUDYTMP] = pop_clustedit(STUDY, ALLEEG);' e_load_study];
     
     % menu definition
