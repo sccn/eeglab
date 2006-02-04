@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/02/03 17:54:38  arno
+% typo
+%
 % Revision 1.52  2006/02/03 00:47:30  arno
 % same
 %
@@ -428,12 +431,12 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
             end;
         end;
         
-        if length(result) > 4-shift
+        if length(result) > 3-shift
             if result{4-shift}
                 args = { args{:} 'overwrite' 'on' };
             end;
         end;
-        if length(result) > 5-shift
+        if length(result) > 4-shift
             if result{5-shift} 
                 if ~isempty(result{6-shift}) 
                     args = { args{:} 'saveold', result{6-shift} };
@@ -526,11 +529,11 @@ end;
 % ---------------------------
 if ~isempty(g.retrieve) & g.retrieve ~= -1
     if ~isempty(args)
-        com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
+        com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, %s);', OLDSET, vararg2str(args));
     end;
     com = [com sprintf( '[ALLEEG EEG CURRENTSET] = eeg_retrieve(ALLEEG, %d);', g.retrieve) ];
 else
-    com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, [%s], %s);', OLDSET, vararg2str(args));
+    com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, %s);', OLDSET, vararg2str(args));
 end;    
 return;
 
