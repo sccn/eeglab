@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2006/02/04 00:02:06  arno
+% fixing history
+%
 % Revision 1.53  2006/02/03 17:54:38  arno
 % typo
 %
@@ -366,6 +369,9 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     
     % remove new dataset if already saved
     % -----------------------------------
+    if ~isfield(EEG, 'saved')
+        EEG = eeg_checkset(EEG);
+    end;
     if strcmpi(EEG.saved, 'justloaded') | save_retrieve
         if overwrite_or_save % only pop-up a window if some action has to be taken
             uilist = uilist(11:end);
