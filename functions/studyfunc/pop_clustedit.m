@@ -169,9 +169,11 @@ if ~isstr(varargin{1})
     if nargin > 2 % load specific clusters
         cls = varargin{3}; %cluster numbers
         N = length(cls); %number of clusters
+        
         % Check clusters are either from the same level (same parents) or are
         % all leaf clusters.
-        % Check all have the same parent
+        % Check all input clusters have the same parent
+        
         sameparent = 1;
         for k = 1: N
             % Assess the number of clustered components
@@ -186,20 +188,24 @@ if ~isstr(varargin{1})
                 end
                 % For any other case verify that all clusters have the same parents
                 if ~(sum(strcmp(STUDY.cluster(cls(k)).parent, parent)) == length(parent)) % different parent
-                    if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') & ~strcmp(parent, 'manual') % if nither is an empty cluster (which was created manually)
+                    if ~strcmp(STUDY.cluster(cls(k)).parent,'manual') & ~strcmp(parent, 'manual') 
+                        % if nither is an empty cluster (which was created manually)
                         sameparent = 0; % then the clusters have different parents
                     end
                 end
             end
         end
+        
         % If not same parent check if all leaf clusters 
         if ~sameparent
             for k = 1: N %check if all leaves
                  if ~isempty(STUDY.cluster(cls(k)).child) 
-                     error('pop_clustedit(): All clusters must be from the same level \n         (i.e., have the same parents or not be child clusters)');
+                     error([ 'pop_clustedit(): All clusters must be from the same level \n'
+                             '         (i.e., have the same parents or not be child clusters)' ]);
                  end
             end
         end
+        
     else   % load leaf clusters
         sameparent = 1;
         cls = [];
@@ -517,7 +523,8 @@ else
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                         for l = 1: length(STUDY.cluster(cls(k)).comps)
                             subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(k)).sets(1,l))).subject;
-                            compid{count} = [ 'Cluster ''' STUDY.cluster(cls(k)).name ''' comp. ' num2str(l) ' (' subject  ' IC' num2str(STUDY.cluster(cls(k)).comps(l)) ')'];
+                            compid{count} = [ 'Cluster ''' STUDY.cluster(cls(k)).name ''' comp. ' ...
+                                              num2str(l) ' (' subject  ' IC' num2str(STUDY.cluster(cls(k)).comps(l)) ')'];
                             count = count +1;
                         end
                     end
