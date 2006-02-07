@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.452  2006/02/07 22:01:20  arno
+% changing STUDY interface
+%
 % Revision 1.451  2006/02/04 00:15:55  arno
 % same
 %
@@ -2504,9 +2507,9 @@ if study_selected
     % ica weights
     % -----------
     anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
-    if length(anyempty) == 2,   icaweights = 'mixed, yes and no';
-    elseif anyempty == 0,       icaweights = 'yes';
-    else                        icaweights = 'no';
+    if length(anyempty) == 2,   studystatus = 'Missing ICA dec.';
+    elseif anyempty == 0,       studystatus = 'Ready to precluster';
+    else                        studystatus = 'Missing ICA dec.';
     end;
 
     % consistency & other parameters
@@ -2515,17 +2518,15 @@ if study_selected
     [EEG chanconsist ] = eeg_checkset(EEG, 'chanconsist');         % channel consistency
     [EEG icaconsist  ] = eeg_checkset(EEG, 'icaconsist');          % ICA consistency
     totevents = num2str(sum( cellfun( 'length', { EEG.event }) )); % total number of events
-    srate     = vararg2str( mattocell( unique( [ EEG.srate ] ) )); % sampling rate
     totsize   = whos('STUDY', 'ALLEEG');                              % total size
     if isempty(STUDY.session),   sessionstr = ''; else sessionstr = vararg2str(STUDY.session); end;
     if isempty(STUDY.condition), condstr    = ''; else condstr    = vararg2str(STUDY.condition); end;
     
     % determine study status
     % ----------------------
-    studystatus = 'Not-preclustered';
     if isfield(STUDY.etc, 'preclust')
         if ~isempty( STUDY.etc.preclust )
-            studystatus = 'Preclustered';
+            studystatus = 'Preclust. - ready to cluster';
         elseif length(STUDY.cluster) > 1
             studystatus = 'Clustered';
         end;
@@ -2539,10 +2540,10 @@ if study_selected
     set( g.win3, 'String', 'Number of subjects:');
     set( g.win4, 'String', 'Number of conditions:');
     set( g.win5, 'String', 'Number of sessions:');
-    set( g.win6, 'String', 'Epoch consistency');
-    set( g.win7, 'String', 'Channels per frame');
-    set( g.win8, 'String', 'Channel locations');
-    set( g.win9, 'String', 'Sampling rate (Hz)');
+    set( g.win6, 'String', 'Number of groups:');
+    set( g.win7, 'String', 'Epoch consistency');
+    set( g.win8, 'String', 'Channels per frame');
+    set( g.win9, 'String', 'Channel locations');
     set( g.win10, 'String', 'Nb of clusters');
     set( g.win11, 'String', 'Status');
     set( g.win12, 'String', 'Total size (Mb)');
@@ -2556,13 +2557,13 @@ if study_selected
         set( g.win1, 'String', sprintf('Study filename: %s\n'   , fullfilename));
     end;        	
     set( g.val2, 'String', STUDY.task);
-    set( g.val3, 'String', max(1, int2str(length(STUDY.subject))));
-    set( g.val4, 'String', max(1, int2str(length(STUDY.condition))));
-    set( g.val5, 'String', max(1, int2str(length(STUDY.session))));
-    set( g.val6, 'String', epochconsist);
-    set( g.val7, 'String', chanlenstr);
-    set( g.val8, 'String', chanlocs);
-    set( g.val9, 'String', srate);
+    set( g.val3, 'String', int2str(max(1, length(STUDY.subject))));
+    set( g.val4, 'String', int2str(max(1, length(STUDY.condition))));
+    set( g.val5, 'String', int2str(max(1, length(STUDY.session))));
+    set( g.val6, 'String', int2str(max(1, length(STUDY.group))));
+    set( g.val7, 'String', epochconsist);
+    set( g.val8, 'String', chanlenstr);
+    set( g.val9, 'String', chanlocs);
     set( g.val10, 'String', length(STUDY.cluster));
     set( g.val11, 'String', studystatus);
     set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
