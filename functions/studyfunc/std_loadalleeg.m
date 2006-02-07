@@ -70,7 +70,7 @@ function ALLEEG = load_alleeg(varargin)
             paths = cell(1,length(datasets));
             paths(:) = { '' };
         end;
-        genpath = STUDY.filepath;
+        genpath = varargin{1}.filepath;
     else
         genpath = '';
         paths = varargin{1};
