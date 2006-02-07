@@ -37,7 +37,7 @@
 %                plus additional information from the optional inputs above. 
 %   ALLEEG     - an EEGLAB vector of EEG sets included in the STUDY structure 
 %
-%  See also:  pop_createstudy(), load_ALLEEG(), pop_clust(), pop_preclust(), 
+%  See also:  pop_createstudy(), load_alleeg(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004-
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/02/03 23:52:31  arno
+% save field
+%
 % Revision 1.12  2006/02/03 23:16:08  arno
 % adding .saved field
 %
