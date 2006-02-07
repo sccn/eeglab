@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/03/09 17:24:00  arno
+% add chaninfo
+%
 % Revision 1.7  2004/03/02 16:37:49  arno
 % reference unspecified
 %
@@ -75,6 +78,7 @@ EEG.chanlocs    = '';
 EEG.chaninfo    = '';
 EEG.comments    = '';
 EEG.ref         = []; % unspecified
+EEG.saved       = 'no';
 
 %EEG.reject.threshold  = [1 0.8 0.85];
 %EEG.reject.icareject  = [];
