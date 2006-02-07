@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.453  2006/02/07 22:09:04  arno
+% same
+%
 % Revision 1.452  2006/02/07 22:01:20  arno
 % changing STUDY interface
 %
@@ -2526,7 +2529,7 @@ if study_selected
     % ----------------------
     if isfield(STUDY.etc, 'preclust')
         if ~isempty( STUDY.etc.preclust )
-            studystatus = 'Preclust. - ready to cluster';
+            studystatus = 'Pre-clustered';
         elseif length(STUDY.cluster) > 1
             studystatus = 'Clustered';
         end;
