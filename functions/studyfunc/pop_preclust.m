@@ -83,6 +83,43 @@ if ~isstr(varargin{1}) %intial settings
     
     scalp_options = {'Use channel values' 'Use Laplacian values' 'Use Gradient values'} ;
     
+    % cluster text
+    % ------------
+    % load leaf clusters
+    cls = [];
+    clus_comps = 0; % the number of clustered components
+    for k = 2:length(STUDY.cluster)
+        if isempty(STUDY.cluster(k).child) 
+            if isempty(cls)
+                parent = STUDY.cluster(k).parent;
+            elseif ~isempty(STUDY.cluster(k).parent)  | ~isempty(parent) % if not both empty                          
+                                                                         % Check if all parents are the same
+                if ~(sum(strcmp(STUDY.cluster(k).parent, parent)) == length(parent)) % different parent
+                    if ~strcmp(STUDY.cluster(k).parent,'manual') & ~strcmp(parent, 'manual') 
+                        sameparent = 0;
+                    end
+                end
+            end
+            cls = [ cls k];
+            if ~strncmpi('Notclust',STUDY.cluster(k).name,8)
+                clus_comps = clus_comps + length(STUDY.cluster(k).comps);
+            end
+        end
+    end
+    N = length(cls); %number of clusters
+    num_cls = 0;
+    for k = 1:N
+        show_options{k} = [STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps))  ' ICs)'];
+        if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) & (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  & ...
+                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
+            num_cls = num_cls + 1;
+        end
+    end
+
+    % callbacks
+    % ---------
+    show_clust      = [ 'pop_preclust(''showclust'',gcf);'];
+    show_comps      = [ 'pop_preclust(''showcomplist'',gcf);'];
     help_spectopo =  ['pophelp(''spectopo'')'];         
 	set_spectra = ['pop_preclust(''setspec'',gcf);']; 
     set_erp = ['pop_preclust(''seterp'',gcf);']; 
@@ -104,11 +141,9 @@ if ~isstr(varargin{1}) %intial settings
                     fastif(isempty(STUDY.condition),'',[num2str(length(STUDY.condition)) ' conditions, ']) 'from ' ...
                     fastif((length(STUDY.subject)==1),'one subject).', [num2str(length(STUDY.subject)) ' subjects).']) ] ...
                     'FontSize' 12 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
-    {'style' 'text'  'string' 'Save computed measures in datasets.' 'FontSize' 12 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...        
-	{'style' 'text'  'string' 'Components to cluster (.mat file name or {list}, else []=all)' 'FontWeight' 'Bold'  'tooltipstring' ...
-      'Press the Help button for explanation.' 'tag' 'compcls_str' } ...
-	{'style' 'edit' 'string' [ fastif((isempty(cluster_ind)),'', ['Components from cluster: ' num2str(cluster_ind)]) ] 'tag' 'chosen_component' } ...
-    {'style' 'pushbutton' 'string'  'Help' 'Callback' help_clusteron} ...
+	{'style' 'text'  'string' 'Components to cluster' 'FontWeight' 'Bold' } ...
+    {'style' 'listbox'    'string' show_options 'value' 1 'tag' 'clus_list' 'Callback' show_clust } ...
+    {'style' 'listbox'    'string' '' 'tag' 'clust_comp' 'max' 2 'min' 1 'callback'    show_comps } ... 
 	{ 'style' 'text' 'tag' 'dipole_select_on' 'string' 'Of these select only the components with residual dipole variance less than' }  ...
     {'style' 'edit' 'string' '0.15' 'horizontalalignment' 'center' 'tag' 'dipole_rv'} {'style' 'text' 'string'  '([] = select all)'} {} {} ...
     {'style' 'text' 'string' 'Pre-compute or load'  'FontWeight' 'Bold'} ...
@@ -159,10 +194,10 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'edit' 'string' '' 'enable' 'off' 'tag' 'studyfile' 'userdata' 'save'} ...
 	{'style' 'pushbutton' 'string' '...' 'tag' 'browsesave' 'Callback' browsesave 'enable' 'off' 'userdata' 'save'} {} };
   
-    fig_arg{1} = varargin;               
+    fig_arg{1} = { ALLEEG STUDY cls };
     fig_arg{2} = ersp;
     geomline = [0.8 2 1 0.8 1 3 3 ];
-    geometry = { [1] [1] [5 3 1] [2.5 0.5 1 1] [1] [1] ...
+    geometry = { [1] [1] [1 1] [2.5 0.5 1 1] [1] [1] ...
                  [1.5 2 3 ] ...
                  geomline ...
                  geomline ...
@@ -170,47 +205,58 @@ if ~isstr(varargin{1}) %intial settings
                  geomline ...
                  geomline ...
                  geomline [1] [0.55 10] [1] [0.53 2 5 0.8] [1]};
-	[preclust_param, userdat2, strhalt, outstruct] = inputgui( geometry, gui_spec, ...
-	' pophelp(''eeg_preclust'')', 'Select and compute component measures for later clustering -- pop_preclust()', fig_arg);
+    geomvert = [ 1 1 4 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
+	[preclust_param, userdat2, strhalt, outstruct] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
+                                                      'helpcom', ' pophelp(''eeg_preclust'')', ...
+                                                      'title', 'Select and compute component measures for later clustering -- pop_preclust()', ...
+                                                      'userdata', fig_arg);
 	
 	% GUI selection
 	if ~isempty(preclust_param)  
         
         if ~(outstruct(1).preclust_PCA) %create PCA data for clustering
             if isempty(cluster_ind) 
-                preclust_command = sprintf('%s ', '[ALLEEG  STUDY] = eeg_preclust(ALLEEG, STUDY, [] ');
+                preclust_command = sprintf('%s ', '[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, [] ');
                 if ~isempty(outstruct(1).chosen_component)
                     preclust_command = strcat(preclust_command,', ', outstruct(1).chosen_component, ' '); % add components_ind input
                 else
                     preclust_command = strcat(preclust_command,', [] ');
                 end
             else % cluster on specific cluster components
-                preclust_command = sprintf('%s %d %s', '[ALLEEG  STUDY] = eeg_preclust(ALLEEG, STUDY, ', cluster_ind, ', [] ');
+                preclust_command = sprintf('%s %d %s', '[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, ', cluster_ind, ', [] ');
             end
             if (~isempty(outstruct(1).dipole_rv)) & ~strcmpi( outstruct(1).dipole_rv, '[]') %dipole information is used for component selection
-                 preclust_command = sprintf('%s %s %s %s %s ', preclust_command, ', { ''dipselect''', ' ''rv'' ',  (outstruct(1).dipole_rv), ' }' );
+                 preclust_command = sprintf('%s %s %s %s %s ', preclust_command, ', { ''dipselect''', ' ''rv'' ', ...
+                                            (outstruct(1).dipole_rv), ' }' );
             end
         else % just compute measure and save in datasets
-            preclust_command = '[ALLEEG STUDY] = eeg_createdata(ALLEEG, STUDY ';
+            preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
         end
         
         %Spectrum option is on
         if outstruct(1).spectra_on== 1 
             if ~(outstruct(1).preclust_PCA) 
-                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ', { ''spec''  ''npca'' ' , str2num(outstruct(1).spectra_PCA), ...
-                    ' ''norm'' ', outstruct(1).spectra_norm, ' ''weight'' ' , str2num(outstruct(1).spectra_weight),  ' ''freqrange'' [' , outstruct(1).spectra_freq_edit, '] }');
+                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ...
+                                           ', { ''spec''  ''npca'' ' , str2num(outstruct(1).spectra_PCA), ...
+                                           ' ''norm'' ', outstruct(1).spectra_norm, ' ''weight'' ' , ...
+                                           str2num(outstruct(1).spectra_weight),  ' ''freqrange'' [' , ...
+                                           outstruct(1).spectra_freq_edit, '] }');
             else
-                preclust_command = sprintf('%s %s  %s  %s', preclust_command, ', { ''spec'' ''freqrange'' [' , outstruct(1).spectra_freq_edit, '] }');
+                preclust_command = sprintf('%s %s  %s  %s', preclust_command, ...
+                                           ', { ''spec'' ''freqrange'' [' , outstruct(1).spectra_freq_edit, '] }');
             end
         end
         
         %ERP option is on
         if outstruct(1).erp_on == 1 
             if ~(outstruct(1).preclust_PCA) 
-                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ', { ''erp''  ''npca'' ' , str2num(outstruct(1).erp_PCA), ...
-                    ' ''norm'' ', outstruct(1).erp_norm, ' ''weight'' ' , str2num(outstruct(1).erp_weight),  ' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
+                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ...
+                                           ', { ''erp''  ''npca'' ' , str2num(outstruct(1).erp_PCA), ...
+                                           ' ''norm'' ', outstruct(1).erp_norm, ' ''weight'' ' , ...
+                                           str2num(outstruct(1).erp_weight),  ' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
             else
-                preclust_command = sprintf('%s %s %s  %s', preclust_command, ', { ''erp'' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
+                preclust_command = sprintf('%s %s %s  %s', preclust_command, ...
+                                           ', { ''erp'' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
             end
         end
        
@@ -224,7 +270,9 @@ if ~isstr(varargin{1}) %intial settings
             if (outstruct(1).scalp_choice == 2)  %Laplacian scalp maps
                 if ~(outstruct(1).preclust_PCA) 
                     preclust_command = sprintf('%s %s %s %d %s %d %s %d %s %d %s', preclust_command, ', { ''scalpLaplac''', ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
+                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', ...
+                                               outstruct(1).scalp_norm, ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ...
+                                               ' ''abso'' ', abso, ' }');
                 else
                     preclust_command = sprintf('%s %s', preclust_command, ', { ''scalpLaplac'' }');
                 end
@@ -232,7 +280,8 @@ if ~isstr(varargin{1}) %intial settings
             if (outstruct(1).scalp_choice == 3)  %Gradient scalp maps
                 if ~(outstruct(1).preclust_PCA) 
                     preclust_command = sprintf('%s %s %s %d %s %d %s %d  %s %d %s', preclust_command, ', { ''scalpGrad''', ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
+                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ...
+                                               ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
                 else
                     preclust_command = sprintf('%s %s', preclust_command, ', { ''scalpGrad'' }');
                 end
@@ -240,7 +289,8 @@ if ~isstr(varargin{1}) %intial settings
             if (outstruct(1).scalp_choice == 1) %scalp map case
                 if ~(outstruct(1).preclust_PCA) 
                     preclust_command = sprintf('%s %s %s %d %s %d %s %d %s %d %s', preclust_command, ', { ''scalp''' , ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
+                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ...
+                                               ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
                 else
                     preclust_command = sprintf('%s %s', preclust_command, ', { ''scalp'' }');
                 end
@@ -250,7 +300,8 @@ if ~isstr(varargin{1}) %intial settings
         %Dipole option is on
         if outstruct(1).dipole_on == 1 
             if ~(outstruct(1).preclust_PCA) 
-                preclust_command = sprintf('%s %s  %s  %d  %s %d %s', preclust_command, ', { ''dipoles''', ' ''norm'' ', outstruct(1).locations_norm,...
+                preclust_command = sprintf('%s %s  %s  %d  %s %d %s', preclust_command, ...
+                                           ', { ''dipoles''', ' ''norm'' ', outstruct(1).locations_norm,...
                     ' ''weight'' ',str2num(outstruct(1).locations_weight) , ' }');
             else
                 preclust_command =sprintf('%s %s ', preclust_command, ', { ''dipoles'' }');
@@ -262,7 +313,8 @@ if ~isstr(varargin{1}) %intial settings
             ersp = userdat2{2};
             if ~(outstruct(1).preclust_PCA) % prepare data for clustering (PCA, weight, normalize) 
                 preclust_command = sprintf('%s %s %d %s %s  %s %s %s %s %s %s %s %s %s %d %s %d %s', preclust_command, ...
-                    ', { ''ersp''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f),  '] ''cycles'' [', num2str(ersp.c), ...
+                    ', { ''ersp''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f), ...
+                                           '] ''cycles'' [', num2str(ersp.c), ...
                     '] ''alpha'' ', num2str(ersp.a),  ' ''padratio'' ', num2str(ersp.p),   ' ''timewindow'' [', num2str(ersp.t), ... 
                     '] ''norm'' ', outstruct(1).ersp_norm, ' ''weight'' ' , str2num(outstruct(1).ersp_weight),  ' }');
             else % compute ersp values for later clustering
@@ -277,7 +329,8 @@ if ~isstr(varargin{1}) %intial settings
             ersp = userdat2{2};
             if ~isempty(ersp.t) % prepare data for clustering (PCA, weight, normalize) 
                 preclust_command = sprintf('%s %s %d %s %s  %s %s %s %s %s %s %s %s %s %d %s %d %s', preclust_command, ...
-                    ', { ''itc''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f),  '] ''cycles'' [', num2str(ersp.c), ...
+                    ', { ''itc''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f),  ...
+                                           '] ''cycles'' [', num2str(ersp.c), ...
                     '] ''alpha'' ', num2str(ersp.a),  ' ''padratio'' ', num2str(ersp.p),   ' ''timewindow'' [', num2str(ersp.t), ... 
                     '] ''norm'' ', outstruct(1).ersp_norm, ' ''weight'' ' , str2num(outstruct(1).ersp_weight),  ' }');
             else% compute itc values for later clustering
@@ -295,11 +348,13 @@ if ~isstr(varargin{1}) %intial settings
        if outstruct(1).saveSTUDY == 1 %save updated STUDY to the disk
          if ~isempty(outstruct(1).studyfile)
               [filepath filename ext] = fileparts(outstruct(1).studyfile);
-              a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', [filename ext], ''', ''filepath'', ''', filepath, ''');' );
+              a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', [filename ext], ...
+                          ''', ''filepath'', ''', filepath, ''');' );
               STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
               STUDY = pop_savestudy(STUDY, 'filename', [filename ext], 'filepath', filepath);
          else
-              a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', STUDY.filename, ''', ''filepath'', ''', STUDY.filepath, ''');' );
+              a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', STUDY.filename, ...
+                          ''', ''filepath'', ''', STUDY.filepath, ''');' );
               STUDY.history =  sprintf('%s\n%s',  STUDY.history, a); 
               STUDY = pop_savestudy(STUDY, 'filename', STUDY.filename, 'filepath', STUDY.filepath);              
          end
@@ -311,9 +366,43 @@ if ~isstr(varargin{1}) %intial settings
 else
     hdl = varargin{2}; %figure handle
     userdat = get(varargin{2}, 'userdat');    
-    ALLEEG = userdat{1}{1};
-    STUDY = userdat{1}{2};
+    ALLEEG  = userdat{1}{1};
+    STUDY   = userdat{1}{2};
+    cls     = userdat{1}{3};
+    N       = length(cls);
+
     switch  varargin{1}
+        
+        case 'showcomplist' % save the list of selected clusters
+            clust = get(findobj('parent', hdl, 'tag', 'clus_list') , 'value');
+            comp  = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'value');
+            count = 1;
+            if clust ~= 1 %specific cluster
+                STUDY.cluster(cls(clust-1)).selected = comp;
+            end;
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
+               
+       case 'showclust'
+            cind = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
+            N = userdat{2};
+            count = 1;
+            selected = 1;
+            len = length(STUDY.cluster(cls(cind)).comps);
+            compid = cell(len+1,1);
+            compid{1} = 'All components';
+            % Convert from components numbering to the indexing form 'setXcomY'
+            for l = 1:len % go over the components of the cluster
+                subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(cind)).sets(1,l))).subject;
+                compid{l+1} = [  subject ' IC' num2str(STUDY.cluster(cls(cind)).comps(1,l)) ];
+            end
+            if isfield(STUDY.cluster, 'selected')
+                if ~isempty(STUDY.cluster(cls(cind)).selected)
+                    selected = STUDY.cluster(cls(cind)).selected;
+                end;
+            end;
+          set(findobj('parent', hdl, 'tag', 'clust_comp'), 'String', compid, 'value', selected);
+       
         case 'setspec'
             set_spec =  get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 
             set(findobj('parent', hdl, 'userdata', 'spec'), 'enable', fastif(set_spec,'on','off'));
