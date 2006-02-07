@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.451  2006/02/04 00:15:55  arno
+% same
+%
 % Revision 1.450  2006/02/04 00:14:24  arno
 % change clustedit call
 %
@@ -2534,8 +2537,8 @@ if study_selected
     % ----
     set( g.win2, 'String', 'Study task name:');
     set( g.win3, 'String', 'Number of subjects:');
-    set( g.win4, 'String', 'Conditions:');
-    set( g.win5, 'String', 'Sessions:');
+    set( g.win4, 'String', 'Number of conditions:');
+    set( g.win5, 'String', 'Number of sessions:');
     set( g.win6, 'String', 'Epoch consistency');
     set( g.win7, 'String', 'Channels per frame');
     set( g.win8, 'String', 'Channel locations');
@@ -2553,9 +2556,9 @@ if study_selected
         set( g.win1, 'String', sprintf('Study filename: %s\n'   , fullfilename));
     end;        	
     set( g.val2, 'String', STUDY.task);
-    set( g.val3, 'String', int2str(length(EEG)));
-    set( g.val4, 'String', condstr);
-    set( g.val5, 'String', sessionstr);
+    set( g.val3, 'String', max(1, int2str(length(STUDY.subject))));
+    set( g.val4, 'String', max(1, int2str(length(STUDY.condition))));
+    set( g.val5, 'String', max(1, int2str(length(STUDY.session))));
     set( g.val6, 'String', epochconsist);
     set( g.val7, 'String', chanlenstr);
     set( g.val8, 'String', chanlocs);
