@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/01/10 00:40:28  arno
+% fix multiline
+%
 % Revision 1.10  2004/11/10 17:06:39  arno
 % initval -> initialvalue
 %
@@ -119,9 +122,8 @@ if ~isempty(g.listsize)
 	pos = get(gcf, 'position');
 	set(gcf, 'position', [ pos(1:2) g.listsize]);
 end;
-h = findobj( 'parent', gcf, 'tag', 'listboxvals');
+h = findobj( 'parent', fig, 'tag', 'listboxvals');
 	
-
 okornot = 0;
 strval = '';
 vals = [];
@@ -131,9 +133,15 @@ waitfor( fig, 'userdata');
 try,
 	vals = get(h, 'value');
 	strval = '';
-	for index = vals
-		strval = [ strval ' ' g.liststring{index} ];
-	end;
+    if iscell(g.liststring)
+        for index = vals
+            strval = [ strval ' ' g.liststring{index} ];
+        end;
+    else
+        for index = vals
+            strval = [ strval ' ' g.liststring(index,:) ];
+        end;
+    end;        
 	strval = strval(2:end);
 	if strcmp(get(fig, 'userdata'), 'cancel')
 		okornot = 0;
