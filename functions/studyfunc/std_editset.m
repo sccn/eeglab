@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/02/07 21:52:23  arno
+% header
+%
 % Revision 1.13  2006/02/03 23:52:31  arno
 % save field
 %
@@ -144,6 +147,8 @@ for k = 1:2:length(g.commands)
             currentind = g.commands{k+1};
         case 'subject'
             STUDY.datasetinfo(currentind).subject = g.commands{k+1};
+        case 'comps'
+            STUDY.datasetinfo(currentind).comps = g.commands{k+1};
         case 'condition'
             STUDY.datasetinfo(currentind).condition = g.commands{k+1};
         case 'group'
