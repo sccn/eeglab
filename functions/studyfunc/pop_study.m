@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/02/03 21:47:18  arno
+% fixing text
+%
 % Revision 1.12  2006/02/03 20:48:35  arno
 % typo
 %
@@ -129,10 +132,13 @@ if ~isstr(STUDY) %intial settings
 end;
 
 if isempty(STUDY)
+    newstudy       = 1;
     STUDY.name     = '';
     STUDY.task     = '';
     STUDY.notes    = '';
     STUDY.filename = '';
+else
+    newstudy       = 0;
 end;
 
 if strcmpi(mode, 'script') % script mode
@@ -193,7 +199,8 @@ elseif strcmpi(mode, 'gui') % GUI mode
     sescom    = 'pop_study(''session''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     condcom   = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     grpcom    = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    
+    grpcom    = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+
 	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
@@ -203,21 +210,26 @@ elseif strcmpi(mode, 'gui') % GUI mode
                    'end;' ...
                    'clear filename filepath;' ];
 	
+    texthead = fastif(newstudy, 'Create a new STUDY set', 'Edit STUDY set information');
 	guispec = { ...
-        {'style' 'text' 'string' 'Create a new STUDY set' 'FontWeight' 'Bold' 'FontSize' 11 'HorizontalAlignment' 'center'} ...
+        {'style' 'text' 'string' texthead 'FontWeight' 'Bold' 'FontSize' 11 'HorizontalAlignment' 'center'} ...
         {'style' 'text' 'string' 'STUDY set name:' } { 'style' 'edit' 'string' STUDY.name 'tag' 'study_name' } ...
         {'style' 'text' 'string' 'STUDY set task name:' } { 'style' 'edit' 'string' STUDY.task 'tag' 'study_task' } ...
         {'style' 'text' 'string' 'STUDY set notes:' } { 'style' 'edit' 'string' STUDY.notes 'tag' 'study_notes' } {}...
         {} ...
         {'style' 'text' 'string' 'dataset filename' 'userdata' 'addt'} {'style' 'text' 'string' 'browse' 'userdata' 'addt'} ...
-        {'style' 'text' 'string' 'subject' 'userdata' 'addt'} {'style' 'text' 'string' 'session' 'userdata' 'addt'} ...
-        {'style' 'text' 'string' 'condition' 'userdata' 'addt'} {'style' 'text' 'string' 'group'  'userdata' 'addt'} {} };
-	guigeom = { [1] [1 2] [1 2] [1 2] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.3]};
+        {'style' 'text' 'string' 'subject'    'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'session'    'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'condition'  'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
+        {'style' 'text' 'string' 'components' 'userdata' 'addt'} ...
+        {} };
+	guigeom = { [1] [1 2] [1 2] [1 2] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
 	
     % create edit boxes
     % -----------------
     for index = 1:10
-        guigeom = { guigeom{:} [0.2 1 0.2 0.5 0.2 0.5 0.5 0.3] };
+        guigeom = { guigeom{:} [0.2 1 0.2 0.5 0.2 0.5 0.5 0.5 0.3] };
         select_com = ['[inputname, inputpath] = uigetfile2(''*.set*;*.SET*'', ''Choose dataset to add to STUDY -- pop_study()'');'...
                       'if inputname ~= 0,' ...
                       '   guiind = findobj(''parent'', gcbf, ''tag'', ''set' int2str(index) ''');' ...
@@ -233,29 +245,30 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
+        {'style' 'pushbutton' 'string' 'All'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end;
     
     if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) different from info stored in study. Overwrite dataset info (set)?';
+        text1    = 'The dataset info (condition, group, ...) is different from info stored in study. [set] Overwrite dataset info.';
         value_cb = 0;
     else
         text1    = 'Update dataset info (unset=local to study). If datasets are stored on disk, they will be overwritten.';
         value_cb = 1;
     end;
     guispec = { guispec{:} ...
-                {} {} {'style' 'pushbutton' 'string'  '<'      'Callback' prevpage 'userdata' 'addt'} ...
+                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved prior to being delete from EEGLAB memory' } ...
+                {} ...
+                {'style' 'pushbutton' 'string'  '<'      'Callback' prevpage 'userdata' 'addt'} ...
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' } ... 
                 {'style' 'pushbutton' 'string'  '>'      'Callback' nextpage 'userdata' 'addt'} {} ...
                 {} ...
                 {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' } ...
                 {'style' 'text'       'string'  text1 } ...
-                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved prior to being delete from EEGLAB memory' } ...
-                { } ... 
                 {'style' 'text'       'string'  'Save this STUDY set to disk file'} ...
                 {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
                 {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
-	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [1] [1] [1 1.5 0.3] [1]};
+	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [1 1.5 0.3] [1]};
 
     if ~isempty(STUDY.filename)
         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
@@ -386,6 +399,22 @@ else % internal command
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
+     
+        case 'component'
+            guiindex  = varargin{1};
+            realindex = guiindex+(page-1)*10;
+            
+            for index = 1:size(ALLEEG(realindex).icaweights,1)
+                complist{index} = [ 'IC ' int2str(index) ];
+            end;
+            [tmps,tmpv] = listdlg2('PromptString', 'Select components', 'SelectionMode', ...
+                                    'multiple', 'ListString', strvcat(complist));
+            
+            datasetinfo(realindex).comps = varargin{2};
+            allcom = { allcom{:} { 'index' realindex 'comps' varargin{2} } };
+            userdat{2} = datasetinfo;
+            userdat{4} = allcom;
+            set(hdl, 'userdata', userdat);            
 
         case 'clear'
             guiindex  = varargin{1};
@@ -451,7 +480,7 @@ else % internal command
                     set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
                 else
                     set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', datasetinfo(kk).filename);
+                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(datasetinfo(kk).filepath, datasetinfo(kk).filename));
                     set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string',datasetinfo(kk).subject);
                     set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string',int2str(datasetinfo(kk).session));
                     set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string',datasetinfo(kk).condition);
