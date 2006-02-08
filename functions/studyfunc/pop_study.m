@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/02/08 23:15:59  arno
+% don't know
+%
 % Revision 1.13  2006/02/03 21:47:18  arno
 % fixing text
 %
@@ -409,9 +412,15 @@ else % internal command
             end;
             [tmps,tmpv] = listdlg2('PromptString', 'Select components', 'SelectionMode', ...
                                     'multiple', 'ListString', strvcat(complist));
-            
-            datasetinfo(realindex).comps = varargin{2};
-            allcom = { allcom{:} { 'index' realindex 'comps' varargin{2} } };
+            if tmpv ~= 0 % no cancel                
+                datasetinfo(realindex).comps = tmps;
+                allcom = { allcom{:} { 'index' realindex 'comps' tmps } };
+                if length(tmps) > 5, strbut = [ ' ' int2str(tmps(1:4)) ' ...' ];
+                else                 strbut = [ ' ' int2str(tmps) ];
+                end;
+                set(findobj('tag', [ 'comps' int2str(guiindex) ]), ...
+                    'string', strbut, 'horizontalalignment', 'left');
+            end;
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
