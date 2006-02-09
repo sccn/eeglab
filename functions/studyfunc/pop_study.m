@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/02/08 23:23:40  arno
+% allow comps input
+%
 % Revision 1.14  2006/02/08 23:15:59  arno
 % don't know
 %
@@ -140,6 +143,7 @@ if isempty(STUDY)
     STUDY.task     = '';
     STUDY.notes    = '';
     STUDY.filename = '';
+    STUDY.cluster  = [];
 else
     newstudy       = 0;
 end;
@@ -177,20 +181,28 @@ elseif strcmpi(mode, 'gui') % GUI mode
         else
             info = 'from_STUDY';
         end;
+        if ~isfield(datasetinfo, 'comps');
+            datasetinfo(1).comps = [];
+        end;
     else
         info = 'from_ALLEEG';
-        datasetinfo(length(ALLEEG)).filename  = [];
-        datasetinfo(length(ALLEEG)).subject   = [];
-        datasetinfo(length(ALLEEG)).session   = [];
-        datasetinfo(length(ALLEEG)).condition = [];
-        datasetinfo(length(ALLEEG)).group     = [];     
-        for k = 1:length(ALLEEG)
-            datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
-            datasetinfo(k).subject   = ALLEEG(k).subject;
-            datasetinfo(k).session   = ALLEEG(k).session;
-            datasetinfo(k).condition = ALLEEG(k).condition;
-            datasetinfo(k).group     = ALLEEG(k).group;                    
-        end
+        if length(ALLEEG) > 0
+            datasetinfo(length(ALLEEG)).filename  = [];
+            datasetinfo(length(ALLEEG)).subject   = [];
+            datasetinfo(length(ALLEEG)).session   = [];
+            datasetinfo(length(ALLEEG)).condition = [];
+            datasetinfo(length(ALLEEG)).group     = [];     
+            for k = 1:length(ALLEEG)
+                datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
+                datasetinfo(k).subject   = ALLEEG(k).subject;
+                datasetinfo(k).session   = ALLEEG(k).session;
+                datasetinfo(k).condition = ALLEEG(k).condition;
+                datasetinfo(k).group     = ALLEEG(k).group;                    
+            end
+            if ~isfield(datasetinfo, 'comps');
+                datasetinfo(1).comps = [];
+            end;
+        end;
     end;
 
     nextpage = 'pop_study(''nextpage'', gcbf);';
@@ -203,6 +215,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     condcom   = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     grpcom    = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     grpcom    = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    cb_del    = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
 
 	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
@@ -243,7 +256,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         guispec = { guispec{:} ...
         {'style' 'text'       'string' numstr  'tag' [ 'num'   int2str(index) ] 'userdata' index } ...
         {'style' 'edit'       'string' ''      'tag' [ 'set'   int2str(index) ] 'userdata' index 'callback' loadsetedit} ...
-        {'style' 'pushbutton' 'string' '...'                                    'userdata' index 'Callback' select_com} ...
+        {'style' 'pushbutton' 'string' '...'   'tag' [ 'brw'   int2str(index) ] 'userdata' index 'Callback' select_com} ...
         {'style' 'edit'       'string' ''      'tag' [ 'sub'   int2str(index) ] 'userdata' index 'Callback' subcom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom} ...
@@ -268,10 +281,12 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {} ...
                 {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' } ...
                 {'style' 'text'       'string'  text1 } ...
+                {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del } ...
+                {'style' 'text'       'string'  'Delete cluster information (allow to load new datasets, set new starting components for clustering, ...)' } ...
                 {'style' 'text'       'string'  'Save this STUDY set to disk file'} ...
                 {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
                 {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
-	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [1 1.5 0.3] [1]};
+	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] [1 1.5 0.3] [1]};
 
     if ~isempty(STUDY.filename)
         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
@@ -284,6 +299,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     fig_arg{2} = datasetinfo; % datasetinfo
     fig_arg{3} = 1;           % page
     fig_arg{4} = {};          % all commands
+    fig_arg{5} = (length(STUDY.cluster) > 1); % are cluster present
     
     % generate GUI
     % ------------
@@ -292,7 +308,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                   'helpcom' , 'pophelp(''pop_study'')', ...
                   'title'   , 'Create a new STUDY set -- pop_study()', ...
                   'userdata', fig_arg, ...
-                  'eval'    , 'pop_study(''redraw'', gcf);' };
+                  'eval'    , 'pop_study(''delclust'', gcf); pop_study(''redraw'', gcf);' };
 	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
     if isempty(result), return; end;
     if ~isempty(get(0, 'currentfigure')) currentfig = gcf; end;
@@ -349,11 +365,13 @@ else % internal command
     datasetinfo = userdat{2};
     page        = userdat{3};
     allcom      = userdat{4};
+    clusterpresent = userdat{5};
 
     switch  com
         case 'subject'
             guiindex  = varargin{1};
             realindex = guiindex+(page-1)*10;
+            
             datasetinfo(realindex).subject   = varargin{2};
             if get(findobj(hdl, 'tag', 'copy_to_dataset'), 'value')
                 ALLEEG(realindex).subject    = varargin{2};
@@ -415,11 +433,8 @@ else % internal command
             if tmpv ~= 0 % no cancel                
                 datasetinfo(realindex).comps = tmps;
                 allcom = { allcom{:} { 'index' realindex 'comps' tmps } };
-                if length(tmps) > 5, strbut = [ ' ' int2str(tmps(1:4)) ' ...' ];
-                else                 strbut = [ ' ' int2str(tmps) ];
-                end;
                 set(findobj('tag', [ 'comps' int2str(guiindex) ]), ...
-                    'string', strbut, 'horizontalalignment', 'left');
+                    'string', formatbut(tmps), 'horizontalalignment', 'left');
             end;
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
@@ -456,7 +471,7 @@ else % internal command
             guiindex  = varargin{1};
             filename  = varargin{2};
             realindex = guiindex+(page-1)*10;
-            
+
             % load dataset
             % ------------
             TMPEEG = pop_loadset('filename', filename, 'loadmode', 'info');
@@ -477,6 +492,30 @@ else % internal command
             set(hdl, 'userdata', userdat);
             pop_study('redraw', hdl);
 
+     case 'delclust'
+            if clusterpresent
+                if ~get(findobj(hdl, 'tag', 'delclust'), 'value')
+                    for k = 1:10
+                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'text');
+                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'off');
+                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'off');
+                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'off');
+                    end;
+                else
+                    for k = 1:10
+                        set(findobj('parent', hdl, 'tag',['set'   num2str(k)]), 'style', 'edit');
+                        set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'enable', 'on');
+                        set(findobj('parent', hdl, 'tag',['sess'  num2str(k)]), 'enable', 'on');
+                        set(findobj('parent', hdl, 'tag',['brw'   num2str(k)]), 'enable', 'on');
+                    end;
+                end;
+            else 
+                set(findobj(hdl, 'tag', 'delclust'), 'value', 0)
+                if nargin > 2
+                    warndlg2('No cluster present');
+                end;
+            end;
+         
         case 'redraw'
             for k = 1:10
                 kk = k+(page-1)*10; % real index
@@ -486,14 +525,16 @@ else % internal command
                     set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string','');
+                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string','');
                     set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
                 else
                     set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
                     set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(datasetinfo(kk).filepath, datasetinfo(kk).filename));
-                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string',datasetinfo(kk).subject);
-                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string',int2str(datasetinfo(kk).session));
-                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string',datasetinfo(kk).condition);
-                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string',datasetinfo(kk).group);
+                    set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string', datasetinfo(kk).subject);
+                    set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
+                    set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string', datasetinfo(kk).condition);
+                    set(findobj('parent', hdl, 'tag',['comps' num2str(k)]), 'string', formatbut(datasetinfo(kk).comps));
+                    set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string', datasetinfo(kk).group);
                 end;
             end
             if page<10
@@ -547,4 +588,13 @@ function bool = test_wrong_parameters(hdl)
     end;
     if anysession & ~allsession
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
+    end;
+    
+function strbut = formatbut(complist)
+    if isempty(complist)
+        strbut = 'All';
+    else
+        if length(complist) > 5, strbut = [ ' ' int2str(complist(1:4)) ' ...' ];
+        else                     strbut = [ ' ' int2str(complist) ];
+        end;
     end;
