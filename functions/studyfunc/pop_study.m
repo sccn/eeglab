@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/02/09 00:40:35  arno
+% adding new button to delete cluster information
+%
 % Revision 1.15  2006/02/08 23:23:40  arno
 % allow comps input
 %
@@ -170,10 +173,10 @@ elseif strcmpi(mode, 'gui') % GUI mode
         datasetinfo = STUDY.datasetinfo;
         different = 0;
         for k = 1:length(ALLEEG)
-            if ~strcmpi(datasetinfo(k).filename, fullfile(ALLEEG(k).filepath, ALLEEG(k).filename)), different = 1; break; end;
+            if ~strcmpi(datasetinfo(k).filename, ALLEEG(k).filename), different = 1; break; end;
             if ~strcmpi(datasetinfo(k).subject,   ALLEEG(k).subject),   different = 1; break; end;
             if ~strcmpi(datasetinfo(k).condition, ALLEEG(k).condition), different = 1; break; end;
-            if ~strcmpi(datasetinfo(k).group,     ALLEEG(k).group),     different = 1; break; end;              
+            if ~strcmpi(char(datasetinfo(k).group), char(ALLEEG(k).group)),     different = 1; break; end;              
             if datasetinfo(k).session ~= ALLEEG(k).session,             different = 1; break; end;
         end
         if different
@@ -188,12 +191,14 @@ elseif strcmpi(mode, 'gui') % GUI mode
         info = 'from_ALLEEG';
         if length(ALLEEG) > 0
             datasetinfo(length(ALLEEG)).filename  = [];
+            datasetinfo(length(ALLEEG)).filepath  = [];
             datasetinfo(length(ALLEEG)).subject   = [];
             datasetinfo(length(ALLEEG)).session   = [];
             datasetinfo(length(ALLEEG)).condition = [];
             datasetinfo(length(ALLEEG)).group     = [];     
             for k = 1:length(ALLEEG)
-                datasetinfo(k).filename  = fullfile(ALLEEG(k).filepath, ALLEEG(k).filename);   
+                datasetinfo(k).filename  = ALLEEG(k).filename;   
+                datasetinfo(k).filepath  = ALLEEG(k).filepath;   
                 datasetinfo(k).subject   = ALLEEG(k).subject;
                 datasetinfo(k).session   = ALLEEG(k).session;
                 datasetinfo(k).condition = ALLEEG(k).condition;
@@ -202,6 +207,8 @@ elseif strcmpi(mode, 'gui') % GUI mode
             if ~isfield(datasetinfo, 'comps');
                 datasetinfo(1).comps = [];
             end;
+        else
+            datasetinfo = [];
         end;
     end;
 
@@ -445,10 +452,12 @@ else % internal command
             realindex = guiindex+(page-1)*10;
             
             datasetinfo(realindex).filename  = '';   
+            datasetinfo(realindex).filepath  = '';   
             datasetinfo(realindex).subject   = '';
             datasetinfo(realindex).session   = [];
             datasetinfo(realindex).condition = '';
             datasetinfo(realindex).group     = '';                    
+            datasetinfo(realindex).comps     = [];                    
 
             allcom = { allcom{:} { 'remove' realindex } };
             userdat{1} = ALLEEG;
@@ -479,11 +488,13 @@ else % internal command
             
             % update datasetinfo structure
             % ----------------------------
-            datasetinfo(realindex).filename  = fullfile(ALLEEG(realindex).filepath, ALLEEG(realindex).filename);   
+            datasetinfo(realindex).filename  = ALLEEG(realindex).filename;   
+            datasetinfo(realindex).filepath  = ALLEEG(realindex).filepath;   
             datasetinfo(realindex).subject   = ALLEEG(realindex).subject;
             datasetinfo(realindex).session   = ALLEEG(realindex).session;
             datasetinfo(realindex).condition = ALLEEG(realindex).condition;
             datasetinfo(realindex).group     = ALLEEG(realindex).group;                    
+            datasetinfo(realindex).comps     = [];                    
 
             allcom = { allcom{:} { 'index' realindex 'load' filename } };
             userdat{1} = ALLEEG;
