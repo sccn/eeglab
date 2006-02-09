@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/02/08 23:24:44  arno
+% adding the comps entry
+%
 % Revision 1.14  2006/02/07 21:52:23  arno
 % header
 %
@@ -177,21 +180,23 @@ end
 % update ALLEEG structure?
 % ------------------------
 if strcmpi(g.updatedat, 'on')
-    if ~strcmpi(ALLEEG(currentind).subject,   STUDY.datasetinfo(currentind).subject)
-        ALLEEG(currentind).subject          = STUDY.datasetinfo(currentind).subject;
-        ALLEEG(currentind).saved            = 'no';
-    end;
-    if ~strcmpi(ALLEEG(currentind).condition, STUDY.datasetinfo(currentind).condition)
-        ALLEEG(currentind).condition        = STUDY.datasetinfo(currentind).condition;
-        ALLEEG(currentind).saved            = 'no';
-    end;
-    if ALLEEG(currentind).session ~=          STUDY.datasetinfo(currentind).session
-        ALLEEG(currentind).session          = STUDY.datasetinfo(currentind).session;
-        ALLEEG(currentind).saved            = 'no';
-    end;
-    if ~strcmpi(ALLEEG(currentind).group,     STUDY.datasetinfo(currentind).group)
-        ALLEEG(currentind).group            = STUDY.datasetinfo(currentind).group;
-        ALLEEG(currentind).saved            = 'no';
+    for currentind = 1:length(ALLEEG)
+        if ~strcmpi(ALLEEG(currentind).subject,   STUDY.datasetinfo(currentind).subject)
+            ALLEEG(currentind).subject          = STUDY.datasetinfo(currentind).subject;
+            ALLEEG(currentind).saved            = 'no';
+        end;
+        if ~strcmpi(ALLEEG(currentind).condition, STUDY.datasetinfo(currentind).condition)
+            ALLEEG(currentind).condition        = STUDY.datasetinfo(currentind).condition;
+            ALLEEG(currentind).saved            = 'no';
+        end;
+        if ALLEEG(currentind).session ~=          STUDY.datasetinfo(currentind).session
+            ALLEEG(currentind).session          = STUDY.datasetinfo(currentind).session;
+            ALLEEG(currentind).saved            = 'no';
+        end;
+        if ~strcmpi(char(ALLEEG(currentind).group), char(STUDY.datasetinfo(currentind).group))
+            ALLEEG(currentind).group            = STUDY.datasetinfo(currentind).group;
+            ALLEEG(currentind).saved            = 'no';
+        end;
     end;
 end;
 
@@ -202,6 +207,7 @@ end;
 % save datasets if necessary
 % --------------------------
 if strcmpi(g.savedat, 'on')
+    afdsfds
     for index = 1:length(ALLEEG)
         if isempty(ALLEEG(index).filename)
             fprintf('Cannot resave ALLEEG(%d) because the dataset has no filename\n', index);
