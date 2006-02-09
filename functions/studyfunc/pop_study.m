@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/02/09 20:07:09  arno
+% OK for creating new dataset, consistency etc...
+%
 % Revision 1.16  2006/02/09 00:40:35  arno
 % adding new button to delete cluster information
 %
@@ -438,10 +441,20 @@ else % internal command
             [tmps,tmpv] = listdlg2('PromptString', 'Select components', 'SelectionMode', ...
                                     'multiple', 'ListString', strvcat(complist));
             if tmpv ~= 0 % no cancel                
-                datasetinfo(realindex).comps = tmps;
-                allcom = { allcom{:} { 'index' realindex 'comps' tmps } };
-                set(findobj('tag', [ 'comps' int2str(guiindex) ]), ...
-                    'string', formatbut(tmps), 'horizontalalignment', 'left');
+                
+                % find other subjects with the same session
+                % -----------------------------------------
+                for index = 1:length(datasetinfo)
+                    if realindex == index | (strcmpi(datasetinfo(index).subject, datasetinfo(realindex).subject) & ...
+                                ~isempty(datasetinfo(index).subject) & ...
+                                isequal( datasetinfo(index).session, datasetinfo(realindex).session ) )
+                        datasetinfo(index).comps = tmps;
+                        allcom = { allcom{:} { 'index' index 'comps' tmps } };
+                        set(findobj('tag', [ 'comps' int2str(index) ]), ...
+                            'string', formatbut(tmps), 'horizontalalignment', 'left');
+                    end;
+                end;
+                
             end;
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
@@ -503,7 +516,7 @@ else % internal command
             set(hdl, 'userdata', userdat);
             pop_study('redraw', hdl);
 
-     case 'delclust'
+         case 'delclust'
             if clusterpresent
                 if ~get(findobj(hdl, 'tag', 'delclust'), 'value')
                     for k = 1:10
