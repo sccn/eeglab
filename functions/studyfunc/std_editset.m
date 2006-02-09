@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/02/09 21:46:14  arno
+% rmclust
+%
 % Revision 1.17  2006/02/09 19:44:26  arno
 % same
 %
@@ -223,6 +226,12 @@ if strcmpi(g.savedat, 'on')
             ALLEEG(index).saved = 'yes';
         end;
     end;
+end;
+
+% remove cluster information if necessary
+% ---------------------------------------
+if strcmpi(g.rmclust, 'on')
+    STUDY.cluster = [];
 end;
 
 % save study if necessary
