@@ -128,14 +128,6 @@ if ~isequal(setind, STUDY.setind)
     STUDY.setind = setind; modif = 1; 
 end;
 
-% number of component per dataset
-% -------------------------------
-for k = 1:length(STUDY.datasetinfo)
-    if STUDY.datasetinfo(k).ncomps ~= size(ALLEEG(STUDY.datasetinfo(k).index).icawinv,2)
-        STUDY.datasetinfo(k).ncomps = size(ALLEEG(STUDY.datasetinfo(k).index).icawinv,2); modif = 1; 
-    end;
-end
-
 % set cluster array if empty
 % --------------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
