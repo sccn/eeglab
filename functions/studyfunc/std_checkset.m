@@ -114,7 +114,7 @@ for k = 1:length(STUDY.datasetinfo)
     end
     
     if isfield(STUDY.datasetinfo, 'index')
-        if STUDY.datasetinfo(k).index ~= k
+        if STUDY.datasetinfo(k).index ~= k | isempty(STUDY.datasetinfo(k).index)
             STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
         end;
     else
