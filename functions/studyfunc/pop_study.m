@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/02/09 21:39:28  arno
+% automatically update other datasets with same session and subject
+%
 % Revision 1.17  2006/02/09 20:07:09  arno
 % OK for creating new dataset, consistency etc...
 %
@@ -350,12 +353,9 @@ elseif strcmpi(mode, 'gui') % GUI mode
          end;
     else options = { options{:} 'updatedat' 'off' };
     end;
-    %{'style' 'checkbox'   'value' 0 'tag' 'save_dataset' } ...
-    %{'style' 'text'       'string' 'Resave modified datasets' } ...
-    %if outstruct(1).save_dataset == 1
-    %     options = { options{:} 'savedat' 'on' };
-    %else options = { options{:} 'savedat' 'off' };
-    %end;
+    if outstruct(1).delstruct == 1
+        options = { options{:} 'rmclust' 'on' };
+    end;
     
     % run command and create history
     % ------------------------------
