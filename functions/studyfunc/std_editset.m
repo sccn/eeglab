@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/02/09 19:44:26  arno
+% same
+%
 % Revision 1.16  2006/02/09 19:43:45  arno
 % scanning datasets
 %
@@ -106,6 +109,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'on';
                             'filepath'  'string'  { }             '';
                             'resave'    'string'  { 'on' 'off' 'info' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'on';
+                            'rmclust'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'editstudy');
 if isstr(g), error(g); end;
 
