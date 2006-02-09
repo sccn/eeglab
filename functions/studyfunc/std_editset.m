@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/02/09 19:43:45  arno
+% scanning datasets
+%
 % Revision 1.15  2006/02/08 23:24:44  arno
 % adding the comps entry
 %
@@ -207,7 +210,6 @@ end;
 % save datasets if necessary
 % --------------------------
 if strcmpi(g.savedat, 'on')
-    afdsfds
     for index = 1:length(ALLEEG)
         if isempty(ALLEEG(index).filename)
             fprintf('Cannot resave ALLEEG(%d) because the dataset has no filename\n', index);
