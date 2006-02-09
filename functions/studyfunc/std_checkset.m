@@ -113,10 +113,13 @@ for k = 1:length(STUDY.datasetinfo)
         end
     end
     
-    if STUDY.datasetinfo(k).index ~= k
+    if isfield(STUDY.datasetinfo, 'index')
+        if STUDY.datasetinfo(k).index ~= k
+            STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
+        end;
+    else
         STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
     end;
-    
 end
 % set to NaN empty indices
 % ------------------------    
