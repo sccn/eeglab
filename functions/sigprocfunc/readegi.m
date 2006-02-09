@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/02/02 20:08:06  arno
+% empty SegCatIndex if not segmented data
+%
 % Revision 1.15  2005/02/02 20:06:37  arno
 % error msg
 %
@@ -204,25 +207,25 @@ else
     % if dataChunks is empty, read all frames
     if isempty(dataChunks)
 
-  [TrialData, readtotal] = fread(fid, [FrameVals,head.samples],datatype);     
+        [TrialData, readtotal] = fread(fid, [FrameVals,head.samples],datatype);     
   
     else   % grab only the desiredFrames
            % This could take a while...
 
-    for i=1:head.samples,
+        for i=1:head.samples,
 
           [tdata, count] = fread(fid, [FrameVals,1],datatype);
   
-        % check if this segment is a keeper
-	  if ismember(i,desiredSegments),
-	       j=j+1;
-               TrialData(:,j) = tdata;
-               readtotal = readtotal + count;
+          % check if this segment is a keeper
+          if ismember(i,desiredFrames),
+              j=j+1;
+              TrialData(:,j) = tdata;
+              readtotal = readtotal + count;
           end
 
           if (j >= nframes), break; end;
 
-       end
+        end
     end
 end
 
