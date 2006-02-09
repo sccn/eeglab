@@ -45,6 +45,11 @@ if ~isfield(STUDY, 'notes'), STUDY.notes = ''; modif = 1; end;
 if ~isfield(STUDY, 'filename'),  STUDY.filename  = ''; modif = 1; end;
 if ~isfield(STUDY, 'filepath'),  STUDY.filepath  = ''; modif = 1; end;
 if ~isfield(STUDY, 'history'),   STUDY.history   = ''; modif = 1; end;
+if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modif = 1; end;
+if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modif = 1; end;
+if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
+if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
+if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
 
 % all summary fields
