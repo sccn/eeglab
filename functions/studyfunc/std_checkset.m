@@ -138,7 +138,7 @@ if isempty(STUDY.cluster)
     for k = 1:size(STUDY.setind,2)
         ind_nonnan = find(~isnan(STUDY.setind(:,k)));
         ncomps = size(ALLEEG(STUDY.datasetinfo(ind_nonnan(1)).index).icaweights,1);
-        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,ncomps];
+        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,ncomps)];
         STUDY.cluster(1).comps = [STUDY.cluster(1).comps      [1:ncomps]];
     end
     if length(STUDY.condition) > 1
