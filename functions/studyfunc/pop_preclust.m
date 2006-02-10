@@ -217,6 +217,7 @@ if ~isstr(varargin{1}) %intial settings
     
     % precluster on what?
     % -------------------
+    dipselect = 0;
     if ~isempty(show_options)
         options{3} = os.clus_list+2; % hierarchical clustering
         options{4} = [];
@@ -224,6 +225,7 @@ if ~isstr(varargin{1}) %intial settings
         options{3} = [];
         options{4} = [];
         if ~isempty(str2num(os.dipole_rv)) %dipole information is used for component selection
+            dipselect = 1;
             options{end+1} = { 'dipselect' 'rv' os.dipole_rv };
         end
     end;
@@ -293,8 +295,13 @@ if ~isstr(varargin{1}) %intial settings
     
     % evaluate command
     % ----------------
-    [STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, options{:});
-    com = sprintf('%s\n[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, %s);',  STUDY.history, vararg2str(options));
+    if length(options) == 4 | ( length(options) == 5 & dipselect )
+        warndlg2('No measure selected, abording operation.'); 
+        return; 
+    end;
+    [STUDY ALLEEG] = eeg_preclust(options{:});
+    com = sprintf('%s\n[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, %s);', ...
+                  STUDY.history, vararg2str(options(3:end)));
     
     % save updated STUDY to the disk
     % ------------------------------
