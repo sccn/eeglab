@@ -186,9 +186,14 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
         else
             succompind = components_ind;
         end
-    else % no component selection 
+    else % no component selection (use pre-selected components)
+        if ~isfield(STUDY.datasetinfo, 'comps')
+            STUDY.datasetinfo(1).comps = [];
+        end;
         if ~exist('succompind')
-            for ind = 1:size(STUDY.setind,2), succompind{ind} = []; end;
+            for ind = 1:size(STUDY.setind,2)
+                succompind{ind} = STUDY.datasetinfo(STUDY.setind(1,ind)).comps; 
+            end;
         end
     end
     
