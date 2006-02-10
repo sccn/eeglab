@@ -195,7 +195,7 @@ if ~isstr(varargin{1}) %intial settings
     geomline = [0.45 2 1 0.45 1 3 3 ];
     geometry = { [1] [1] [1 1 1] [1] ...
                  [3] geomline geomline geomline geomline geomline geomline [1] [0.32 2 5 0.8] };
-    geomvert = [ 1 1 4 1 1 1 1 1 1 1 1 1 1 1 1 1 ];
+    geomvert = [ 1 1 4 1 1 1 1 1 1 1 1 1 1 ];
 
     if isempty(show_options)
         gui_spec(2:6) = { {} ...
