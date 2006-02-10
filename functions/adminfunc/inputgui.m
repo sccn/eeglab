@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/01/13 00:18:33  arno
+% nothing
+%
 % Revision 1.30  2006/01/05 21:15:03  arno
 % adding popupmenu
 %
@@ -286,7 +289,7 @@ function g = myguihandles(fig)
 			try, 
 				switch get(h(index), 'style')
 				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
-				 case { 'value' 'radio' 'checkbox' 'listbox'}, ...
+				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' }, ...
 					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
 				end;
 			catch, end;
