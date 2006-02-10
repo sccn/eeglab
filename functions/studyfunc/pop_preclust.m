@@ -207,7 +207,7 @@ if ~isstr(varargin{1}) %intial settings
     end;
     
     
-	[preclust_param, userdat2, strhalt, outstruct] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
+	[preclust_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''eeg_preclust'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_preclust()', ...
                                                       'userdata', fig_arg);
@@ -215,83 +215,60 @@ if ~isstr(varargin{1}) %intial settings
 	% GUI selection
 	if ~isempty(preclust_param)  
         
-        if ~(outstruct(1).preclust_PCA) %create PCA data for clustering
-            if isempty(cluster_ind) 
-                preclust_command = sprintf('%s ', '[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, [] ');
-                if ~isempty(outstruct(1).chosen_component)
-                    preclust_command = strcat(preclust_command,', ', outstruct(1).chosen_component, ' '); % add components_ind input
-                else
-                    preclust_command = strcat(preclust_command,', [] ');
-                end
-            else % cluster on specific cluster components
-                preclust_command = sprintf('%s %d %s', '[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, ', cluster_ind, ', [] ');
+        preclust_command = sprintf('%s ', '[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, [] ');
+       
+        options = { STUDY, ALLEEG };
+        if isempty(cluster_ind) 
+            options{3} = [];
+            if ~isempty(os(1).chosen_component)
+                options{4} = os(1).chosen_component; % add components_ind input
+            else
+                options{4} = [];
             end
-            if (~isempty(outstruct(1).dipole_rv)) & ~strcmpi( outstruct(1).dipole_rv, '[]') %dipole information is used for component selection
-                 preclust_command = sprintf('%s %s %s %s %s ', preclust_command, ', { ''dipselect''', ' ''rv'' ', ...
-                                            (outstruct(1).dipole_rv), ' }' );
-            end
-        else % just compute measure and save in datasets
-            preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
+        else % cluster on specific cluster components
+            options{3} = cluster_ind;
+            options{4} = [];
+        end
+        if ~isempty(str2num(os(1).dipole_rv)) %dipole information is used for component selection
+            options{end+1} = { 'dipselect' 'rv' os(1).dipole_rv };
         end
         
-        %Spectrum option is on
-        if outstruct(1).spectra_on== 1 
-            if ~(outstruct(1).preclust_PCA) 
-                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ...
-                                           ', { ''spec''  ''npca'' ' , str2num(outstruct(1).spectra_PCA), ...
-                                           ' ''norm'' ', outstruct(1).spectra_norm, ' ''weight'' ' , ...
-                                           str2num(outstruct(1).spectra_weight),  ' ''freqrange'' [' , ...
-                                           outstruct(1).spectra_freq_edit, '] }');
-            else
-                preclust_command = sprintf('%s %s  %s  %s', preclust_command, ...
-                                           ', { ''spec'' ''freqrange'' [' , outstruct(1).spectra_freq_edit, '] }');
-            end
+        %if ~(os(1).preclust_PCA) %create PCA data for clustering
+        %preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
+        %end
+        
+        % Spectrum option is on
+        % --------------------
+        if os(1).spectra_on== 1 
+            options{end+1} = {  'spec' 'npca' str2num(os(1).spectra_PCA) 'norm' os(1).spectra_norm ...
+                                'weight' str2num(os(1).spectra_weight)  'freqrange' os(1).spectra_freq_edit };
         end
         
-        %ERP option is on
-        if outstruct(1).erp_on == 1 
-            if ~(outstruct(1).preclust_PCA) 
-                preclust_command = sprintf('%s %s  %d  %s %d  %s %d %s %s  %s', preclust_command, ...
-                                           ', { ''erp''  ''npca'' ' , str2num(outstruct(1).erp_PCA), ...
-                                           ' ''norm'' ', outstruct(1).erp_norm, ' ''weight'' ' , ...
-                                           str2num(outstruct(1).erp_weight),  ' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
-            else
-                preclust_command = sprintf('%s %s %s  %s', preclust_command, ...
-                                           ', { ''erp'' ''timewindow'' [' , outstruct(1).erp_time_edit, '] }');
-            end
+        % ERP option is on
+        % ----------------
+        if os(1).erp_on == 1 
+            options{end} = { 'erp' 'npca' str2num(os(1).erp_PCA) 'norm' os(1).erp_norm ...
+                             'weight' str2num(os(1).erp_weight) 'timewindow' eval( [ '[' os(1).erp_time_edit ']' ]) };
         end
        
-        %Scalp maps option is on
-        if outstruct(1).scalp_on == 1 
-            if outstruct(1).scalp_absolute %absolute maps
+        % Scalp maps option is on
+        % ----------------------
+        if os(1).scalp_on == 1 
+            if os(1).scalp_absolute %absolute maps
                 abso = 1;
             else
                 abso = 0;
             end
-            if (outstruct(1).scalp_choice == 2)  %Laplacian scalp maps
-                if ~(outstruct(1).preclust_PCA) 
-                    preclust_command = sprintf('%s %s %s %d %s %d %s %d %s %d %s', preclust_command, ', { ''scalpLaplac''', ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', ...
-                                               outstruct(1).scalp_norm, ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ...
-                                               ' ''abso'' ', abso, ' }');
-                else
-                    preclust_command = sprintf('%s %s', preclust_command, ', { ''scalpLaplac'' }');
-                end
-            end
-            if (outstruct(1).scalp_choice == 3)  %Gradient scalp maps
-                if ~(outstruct(1).preclust_PCA) 
-                    preclust_command = sprintf('%s %s %s %d %s %d %s %d  %s %d %s', preclust_command, ', { ''scalpGrad''', ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ...
-                                               ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
-                else
-                    preclust_command = sprintf('%s %s', preclust_command, ', { ''scalpGrad'' }');
-                end
-            end
-            if (outstruct(1).scalp_choice == 1) %scalp map case
-                if ~(outstruct(1).preclust_PCA) 
-                    preclust_command = sprintf('%s %s %s %d %s %d %s %d %s %d %s', preclust_command, ', { ''scalp''' , ...
-                        ' ''npca'' ', str2num(outstruct(1).scalp_PCA) ,' ''norm'' ', outstruct(1).scalp_norm, ...
-                                               ' ''weight'' ' , str2num(outstruct(1).scalp_weight), ' ''abso'' ', abso, ' }');
+            if (os(1).scalp_choice == 2)  %Laplacian scalp maps
+                options{end+1} = { 'scalpLaplac' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm ...
+                                   'weight' str2num(os(1).scalp_weight) 'abso' abso };
+
+            elseif (os(1).scalp_choice == 3)  %Gradient scalp maps
+                options{end+1} = { 'scalpGrad' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm, ...
+                                   'weight' str2num(os(1).scalp_weight) 'abso' abso };
+            elseif (os(1).scalp_choice == 1) %scalp map case
+                options{end+1} = { 'scalp' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm, ...
+                                   'weight' str2num(os(1).scalp_weight) 'abso' abso };
                 else
                     preclust_command = sprintf('%s %s', preclust_command, ', { ''scalp'' }');
                 end
@@ -299,25 +276,25 @@ if ~isstr(varargin{1}) %intial settings
         end
         
         %Dipole option is on
-        if outstruct(1).dipole_on == 1 
-            if ~(outstruct(1).preclust_PCA) 
+        if os(1).dipole_on == 1 
+            if ~(os(1).preclust_PCA) 
                 preclust_command = sprintf('%s %s  %s  %d  %s %d %s', preclust_command, ...
-                                           ', { ''dipoles''', ' ''norm'' ', outstruct(1).locations_norm,...
-                    ' ''weight'' ',str2num(outstruct(1).locations_weight) , ' }');
+                                           ', { ''dipoles''', ' ''norm'' ', os(1).locations_norm,...
+                    ' ''weight'' ',str2num(os(1).locations_weight) , ' }');
             else
                 preclust_command =sprintf('%s %s ', preclust_command, ', { ''dipoles'' }');
             end
         end
         
        %ERSP option is on
-        if outstruct(1).ersp_on  == 1 
+        if os(1).ersp_on  == 1 
             ersp = userdat2{2};
-            if ~(outstruct(1).preclust_PCA) % prepare data for clustering (PCA, weight, normalize) 
+            if ~(os(1).preclust_PCA) % prepare data for clustering (PCA, weight, normalize) 
                 preclust_command = sprintf('%s %s %d %s %s  %s %s %s %s %s %s %s %s %s %d %s %d %s', preclust_command, ...
-                    ', { ''ersp''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f), ...
+                    ', { ''ersp''  ''npca'' ' , str2num(os(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f), ...
                                            '] ''cycles'' [', num2str(ersp.c), ...
                     '] ''alpha'' ', num2str(ersp.a),  ' ''padratio'' ', num2str(ersp.p),   ' ''timewindow'' [', num2str(ersp.t), ... 
-                    '] ''norm'' ', outstruct(1).ersp_norm, ' ''weight'' ' , str2num(outstruct(1).ersp_weight),  ' }');
+                    '] ''norm'' ', os(1).ersp_norm, ' ''weight'' ' , str2num(os(1).ersp_weight),  ' }');
             else % compute ersp values for later clustering
                preclust_command = sprintf('%s %s %s %s %s %s %s %s %s %s %s %s', preclust_command, ...
                     ', { ''ersp''  ''freqrange'' [' , num2str(ersp.f),  '] ''cycles'' [', num2str(ersp.c), ...
@@ -326,14 +303,14 @@ if ~isstr(varargin{1}) %intial settings
         end
   
        %ITC option is on 
-        if outstruct(1).itc_on  == 1 
+        if os(1).itc_on  == 1 
             ersp = userdat2{2};
             if ~isempty(ersp.t) % prepare data for clustering (PCA, weight, normalize) 
                 preclust_command = sprintf('%s %s %d %s %s  %s %s %s %s %s %s %s %s %s %d %s %d %s', preclust_command, ...
-                    ', { ''itc''  ''npca'' ' , str2num(outstruct(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f),  ...
+                    ', { ''itc''  ''npca'' ' , str2num(os(1).ersp_PCA), ' ''freqrange'' [', num2str(ersp.f),  ...
                                            '] ''cycles'' [', num2str(ersp.c), ...
                     '] ''alpha'' ', num2str(ersp.a),  ' ''padratio'' ', num2str(ersp.p),   ' ''timewindow'' [', num2str(ersp.t), ... 
-                    '] ''norm'' ', outstruct(1).ersp_norm, ' ''weight'' ' , str2num(outstruct(1).ersp_weight),  ' }');
+                    '] ''norm'' ', os(1).ersp_norm, ' ''weight'' ' , str2num(os(1).ersp_weight),  ' }');
             else% compute itc values for later clustering
               preclust_command = sprintf('%s %s %s %s %s %s %s %s %s %s %s %s', preclust_command, ...
                     ', { ''itc''  ''freqrange'' [' , num2str(ersp.f),  '] ''cycles'' [', num2str(ersp.c), ...
@@ -346,9 +323,9 @@ if ~isstr(varargin{1}) %intial settings
               
        STUDY.history =  sprintf('%s\n%s',  STUDY.history, preclust_command);
        
-       if outstruct(1).saveSTUDY == 1 %save updated STUDY to the disk
-         if ~isempty(outstruct(1).studyfile)
-              [filepath filename ext] = fileparts(outstruct(1).studyfile);
+       if os(1).saveSTUDY == 1 %save updated STUDY to the disk
+         if ~isempty(os(1).studyfile)
+              [filepath filename ext] = fileparts(os(1).studyfile);
               a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', [filename ext], ...
                           ''', ''filepath'', ''', filepath, ''');' );
               STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
