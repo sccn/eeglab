@@ -215,78 +215,78 @@ if ~isstr(varargin{1}) %intial settings
     
     % precluster on what?
     % -------------------
-    if isempty(show_options)
-        options{3} = os(1).clus_list+2; % hierarchical clustering
+    if ~isempty(show_options)
+        options{3} = os.clus_list+2; % hierarchical clustering
         options{4} = [];
     else
         options{3} = [];
         options{4} = [];
-        if ~isempty(str2num(os(1).dipole_rv)) %dipole information is used for component selection
-            options{end+1} = { 'dipselect' 'rv' os(1).dipole_rv };
+        if ~isempty(str2num(os.dipole_rv)) %dipole information is used for component selection
+            options{end+1} = { 'dipselect' 'rv' os.dipole_rv };
         end
     end;
 
-    %if ~(os(1).preclust_PCA) %create PCA data for clustering
+    %if ~(os.preclust_PCA) %create PCA data for clustering
     %preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
     %end
     
     % Spectrum option is on
     % --------------------
-    if os(1).spectra_on== 1 
-        options{end+1} = {  'spec' 'npca' str2num(os(1).spectra_PCA) 'norm' os(1).spectra_norm ...
-                            'weight' str2num(os(1).spectra_weight)  'freqrange' os(1).spectra_freq_edit };
+    if os.spectra_on== 1 
+        options{end+1} = {  'spec' 'npca' str2num(os.spectra_PCA) 'norm' os.spectra_norm ...
+                            'weight' str2num(os.spectra_weight)  'freqrange' os.spectra_freq_edit };
     end
     
     % ERP option is on
     % ----------------
-    if os(1).erp_on == 1 
-        options{end} = { 'erp' 'npca' str2num(os(1).erp_PCA) 'norm' os(1).erp_norm ...
-                         'weight' str2num(os(1).erp_weight) 'timewindow' eval( [ '[' os(1).erp_time_edit ']' ]) };
+    if os.erp_on == 1 
+        options{end} = { 'erp' 'npca' str2num(os.erp_PCA) 'norm' os.erp_norm ...
+                         'weight' str2num(os.erp_weight) 'timewindow' eval( [ '[' os.erp_time_edit ']' ]) };
     end
     
     % Scalp maps option is on
     % ----------------------
-    if os(1).scalp_on == 1 
-        if os(1).scalp_absolute %absolute maps
+    if os.scalp_on == 1 
+        if os.scalp_absolute %absolute maps
             abso = 1;
         else abso = 0;
         end
-        if (os(1).scalp_choice == 2)  %Laplacian scalp maps
-            options{end+1} = { 'scalpLaplac' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm ...
-                               'weight' str2num(os(1).scalp_weight) 'abso' abso };
-        elseif (os(1).scalp_choice == 3)  %Gradient scalp maps
-            options{end+1} = { 'scalpGrad' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm, ...
-                               'weight' str2num(os(1).scalp_weight) 'abso' abso };
-        elseif (os(1).scalp_choice == 1) %scalp map case
-            options{end+1} = { 'scalp' 'npca' str2num(os(1).scalp_PCA) 'norm' os(1).scalp_norm, ...
-                               'weight' str2num(os(1).scalp_weight) 'abso' abso };
+        if (os.scalp_choice == 2)  %Laplacian scalp maps
+            options{end+1} = { 'scalpLaplac' 'npca' str2num(os.scalp_PCA) 'norm' os.scalp_norm ...
+                               'weight' str2num(os.scalp_weight) 'abso' abso };
+        elseif (os.scalp_choice == 3)  %Gradient scalp maps
+            options{end+1} = { 'scalpGrad' 'npca' str2num(os.scalp_PCA) 'norm' os.scalp_norm, ...
+                               'weight' str2num(os.scalp_weight) 'abso' abso };
+        elseif (os.scalp_choice == 1) %scalp map case
+            options{end+1} = { 'scalp' 'npca' str2num(os.scalp_PCA) 'norm' os.scalp_norm, ...
+                               'weight' str2num(os.scalp_weight) 'abso' abso };
         end
     end
     
     % Dipole option is on
     % -------------------
-    if os(1).dipole_on == 1 
-        options{end+1} = { 'dipoles' 'norm' os(1).locations_norm 'weight' str2num(os(1).locations_weight) };
+    if os.dipole_on == 1 
+        options{end+1} = { 'dipoles' 'norm' os.locations_norm 'weight' str2num(os.locations_weight) };
     end
     
     % ERSP option is on
     % -----------------
-    if os(1).ersp_on  == 1 
+    if os.ersp_on  == 1 
         ersp = userdat2{2};
-        options{end+1} = { 'ersp' 'npca' str2num(os(1).ersp_PCA) 'freqrange' num2str(ersp.f) ...
+        options{end+1} = { 'ersp' 'npca' str2num(os.ersp_PCA) 'freqrange' num2str(ersp.f) ...
                            'cycles' num2str(ersp.c) 'alpha' num2str(ersp.a) 'padratio' num2str(ersp.p) ...
-                           'timewindow' num2str(ersp.t) 'norm' os(1).ersp_norm ...
-                           'weight' str2num(os(1).ersp_weight) };
+                           'timewindow' num2str(ersp.t) 'norm' os.ersp_norm ...
+                           'weight' str2num(os.ersp_weight) };
     end
     
     % ITC option is on 
     % ----------------
-    if os(1).itc_on  == 1 
+    if os.itc_on  == 1 
         ersp = userdat2{2};
-        options{end+1} = { 'itc' 'npca' str2num(os(1).ersp_PCA) 'freqrange' num2str(ersp.f) ...
+        options{end+1} = { 'itc' 'npca' str2num(os.ersp_PCA) 'freqrange' num2str(ersp.f) ...
                            'cycles' num2str(ersp.c) 'alpha' num2str(ersp.a) 'padratio' num2str(ersp.p) ...
-                           'timewindow' num2str(ersp.t) 'norm' os(1).ersp_norm ...
-                           'weight' str2num(os(1).ersp_weight) };
+                           'timewindow' num2str(ersp.t) 'norm' os.ersp_norm ...
+                           'weight' str2num(os.ersp_weight) };
     end       
     
     % evaluate command
@@ -296,9 +296,9 @@ if ~isstr(varargin{1}) %intial settings
     
     % save updated STUDY to the disk
     % ------------------------------
-    if os(1).saveSTUDY == 1 
-        if ~isempty(os(1).studyfile)
-            [filepath filename ext] = fileparts(os(1).studyfile);
+    if os.saveSTUDY == 1 
+        if ~isempty(os.studyfile)
+            [filepath filename ext] = fileparts(os.studyfile);
             STUDY.filename = [ filename ext ];
             STUDY.filepath = filepath;
         end;
