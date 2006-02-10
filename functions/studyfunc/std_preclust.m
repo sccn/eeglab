@@ -101,7 +101,7 @@
 %                        % the (absolute-value) component scalp maps, their equivalent dipole locations,
 %                        % and their ERSP and ITC images. 
 %
-% Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
+% Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
