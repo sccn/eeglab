@@ -2,9 +2,9 @@
 %                  Selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
-%                  and saved in the STUDY datasets, a PCA  matrix (by runica() with 'pca' option) 
-%                  is constructed (this is the feature reduction step). This matrix will be used 
-%                  as input to the clustering  algorithm in pop_clust(). eeg_preclust() allows 
+%                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
+%                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
+%                  used as input to the clustering  algorithm in pop_clust(). eeg_preclust() allows 
 %                  selection of a subset of components to use in the clustering. This subset 
 %                  may be a user-specified component subset, components with dipole model residual 
 %                  variance lower than a defined threshold (see dipfit()), or components from 
