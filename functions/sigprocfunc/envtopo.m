@@ -21,11 +21,12 @@
 %  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
 %                  Else if int < 0, the number of largest contributing components to plot 
 %                  {default|[] -> 7}
-%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
 %                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
+%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
+%                  Note: Does not select a portion of the input data, just makes time labels.
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
@@ -99,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2006/02/01 15:32:34  scott
+% added warnings about passing incoplete weights matrix -sm
+%
 % Revision 1.97  2006/01/31 18:18:54  scott
 % touched up help message, and added error for nchans=1 -sm
 %
@@ -394,6 +398,7 @@ FILLCOLOR   = [.815 .94 1]; % use lighter blue for better env visibility
 MAXTOPOS = 20;      % max topoplots to plot
 VERTWEIGHT = 2.0;  % lineweight of specified vertical lines
 LIMCONTRIBWEIGHT = 1.2; % lineweight of limonctrib vertical lines
+MAX_FRAMES = 10000; % maximum frames to plot
 
 myfig =gcf;         % remember the current figure (for Matlab 7.0.0 bug)
 xmin = 0; xmax = 0;
@@ -491,6 +496,9 @@ end;
 [chans,frames] = size(data);
 if chans < 2
    error('requires multiple data channels');
+end
+if frames > MAX_FRAMES
+   error('number of frames to plot too large');
 end
 
 if isstr(g.chanlocs)
