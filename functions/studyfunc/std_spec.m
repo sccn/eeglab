@@ -1,7 +1,9 @@
+% cls_spec() - Returns the ICA spectra of a dataset. Updates the EEG structure in the 
+%              Matlab environment and on the disk too!
+%
 % Usage:    
 %   >> [EEG_etc, X, f, overwrite] = cls_spec(EEG, components, freqrange, arg, overwrite)
-%   Returns the ICA spectra of a dataset. Updates the EEG structure in the 
-%   Matlab environment and on the disk too!
+%   
 %
 % cls_spec() - This function computes the spectra of a dataset ICA components,
 % saves it into a float file and saves a pointer to it in the EEG structure.
@@ -20,28 +22,28 @@
 %
 %
 % Inputs:
-%   EEG            - an EEG data structure. 
+%   EEG        - an EEGLAB data structure. 
 %   components - [numeric vector] of the EEG structure for which a spectrum  
-%                     will be computed. 
-%   freqrange - [minHz maxHz] the frequency range to compute the spectra.
-%   arg            - {'key1', 'val1',...} cell array with optional spectopo inputs (default empty).
+%                will be computed. 
+%   freqrange  - [minHz maxHz] the frequency range to compute the spectra.
+%   arg        - {'key1', 'val1',...} cell array with optional spectopo inputs (default empty).
 %   overwrite  - [0|1|2] 0 - if frequency range is different from saved info ask using a 
-%                     pop-up menu if to keep existing spectra or overwrite it, 1- overwrite
-%                     the saved spectra of this dataset or other datasets if exist, 2 - keep the 
-%                     spectra for all the datasets in STUDY (default - 0).
+%                pop-up menu if to keep existing spectra or overwrite it, 1- overwrite
+%                the saved spectra of this dataset or other datasets if exist, 2 - keep the 
+%                spectra for all the datasets in STUDY (default - 0).
 %
 %
 % Outputs:
-%   EEG_etc    - the EEG dataset etc structure (i.e. EEG.etc), which is
-%                      modified with the pointer and some information about
-%                      the floating file that holds the dataset spectra information.
-%                      If the spectra file already exists and wasn't modified (this output will be empty). 
-%   X              - the spectra of the requested ICA components in the selected 
-%                     frequency range (spectra mean removed). 
-%   f              - a frequency vector of the points in which the spectra were computed. 
+%   EEG_etc   - the EEG dataset etc structure (i.e. EEG.etc), which is
+%               modified with the pointer and some information about
+%               the floating file that holds the dataset spectra information.
+%               If the spectra file already exists and wasn't modified (this output will be empty). 
+%   X         - the spectra of the requested ICA components in the selected 
+%               frequency range (spectra mean removed). 
+%   f         - a frequency vector of the points in which the spectra were computed. 
 %   overwrite - same as input option, only modified with what the user
-%                     asked for the rest of the datasets in STUDY (from the
-%                     pop-up menu, or from command line).
+%               asked for the rest of the datasets in STUDY (from the
+%               pop-up menu, or from command line).
 %
 %  See also  spectopo, cls_erp, cls_ersp, cls_scalp, eeg_preclust, eeg_createdata         
 %
@@ -126,7 +128,7 @@ if isfield(EEG,'etc')
                          {'style' 'checkbox' 'tag' 'spec_yesall' 'string' 'Yes to all datasets' 'value' 0 'Callback' set_yesall }  ...
                          {'style' 'checkbox' 'tag' 'spec_no' 'string' 'Use existing spectrum info' 'value' 0 'Callback' set_no } ...
                          {'style' 'checkbox' 'tag' 'spec_noall' 'string' 'Use existing info for all sets' 'value' 0 'Callback' set_noall } {} }, ...
-                     [], 'Recalculate spectrum information -- part of cls_spec()'); 
+                     '', 'Recalculate spectrum information -- part of cls_spec()'); 
                  switch (find(celltomat(spec_ans)))
                      case 1
                          [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite the info in this dataset
