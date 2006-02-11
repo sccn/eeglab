@@ -121,7 +121,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components_ind, varargin)
+% $Log: not supported by cvs2svn $
+
+function [ STUDY, ALLEEG ] = eeg_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
     
     if nargin < 2
         help eeg_preclust;
@@ -224,10 +226,13 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
             end
         end        
     end
+    
+    nodip = 0;
     if update_flag % dipole information is used to select components
         for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
             idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;
-            if isfield(ALLEEG(idat).dipfit, 'rv')
+            if isfield(ALLEEG(idat).dipfit, 'model')
+                fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', 100*rv, ALLEEG(idat).setname)
                 indrm = []; % components that will be removed from the clustering
                 indleft = []; % components that are left in clustering
                 for icomp = succompind{si} % scan components
@@ -243,9 +248,14 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                     succompind{si} = indleft;
                 end
             else
-                disp('No dipole information found in the data, using all dipoles')
+                fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
+                nodip = 1;
             end
         end;
+        if nodip
+            error('Some dipole information is missing so dipole information may not be used for clustering\n');
+        end;
+        
         % Create a cluster of removed components 
         % --------------------------------------
         update_flag = 0;
@@ -367,14 +377,14 @@ function [ ALLEEG, STUDY ] = eeg_preclust(ALLEEG, STUDY, cluster_ind, components
                                     (padratio ~= params.padratio) | (alpha~= params.alpha) 
                                 set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
                                 set_no =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
-                                ersp_ans = inputgui({[1] [1] [1] [1] [1 1] [1]}, ...
+                                ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [1 1] [1]}, 'uilist', ...
                                        { {'style' 'text' 'string' [upper(strcom) ' info exists for dataset: '  ALLEEG(idat).filename '. It does not fit requested values.' ] } ...
                                          {'style' 'text' 'string' ['Existing values are: frequency range - [' num2str(params.freqrange) '], wavelet cycles - [' num2str(params.cycles) ...
                                                  '], padratio - ' num2str(params.padratio) ', and bootstrap significance - ' num2str(params.alpha) ] } {} ...
                                          {'style' 'text' 'string' ['Would you like to recalculate ' upper(strcom) ' and overwrite those values?' ]} ...
                                          {'style' 'checkbox' 'tag' 'ersp_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
                                          {'style' 'checkbox' 'tag' 'ersp_no' 'string' 'Use existing ERSP info' 'value' 0 'Callback' set_no } {} },...
-                                       [], ['Recalculate ' upper(strcom) ' parameters -- part of cls_ersp()']); 
+                                         'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of cls_ersp()']); 
                                 if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
                                     overwrite = 2;
                                     cycles = params.cycles;
