@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/02/11 00:17:47  arno
+% fixing ersp parameters
+%
 % Revision 1.20  2006/02/11 00:15:40  arno
 % fixing ERSP
 %
@@ -291,7 +294,7 @@ if ~isstr(varargin{1}) %intial settings
                            'timewindow' str2num(ersp.t) 'norm' os.ersp_norm ...
                            'weight' str2num(os.ersp_weight) };
     end
-    dsfdsd
+    
     % ITC option is on 
     % ----------------
     if os.itc_on  == 1 
