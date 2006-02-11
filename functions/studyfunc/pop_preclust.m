@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/02/11 00:08:37  arno
+% numeric conversion
+%
 
 function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 
@@ -244,7 +247,7 @@ if ~isstr(varargin{1}) %intial settings
     % ERP option is on
     % ----------------
     if os.erp_on == 1 
-        options{end} = { 'erp' 'npca' str2num(os.erp_PCA) 'norm' os.erp_norm ...
+        options{end+1} = { 'erp' 'npca' str2num(os.erp_PCA) 'norm' os.erp_norm ...
                          'weight' str2num(os.erp_weight) 'timewindow' eval( [ '[' os.erp_time_edit ']' ]) };
     end
     
