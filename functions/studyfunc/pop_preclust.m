@@ -50,7 +50,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $pop_preclust.m,v$
+% $Log: not supported by cvs2svn $
 
 function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 
@@ -226,7 +226,7 @@ if ~isstr(varargin{1}) %intial settings
         options{4} = [];
         if ~isempty(str2num(os.dipole_rv)) %dipole information is used for component selection
             dipselect = 1;
-            options{end+1} = { 'dipselect' 'rv' num2str(os.dipole_rv) };
+            options{end+1} = { 'dipselect' 'rv' str2num(os.dipole_rv) };
         end
     end;
 
