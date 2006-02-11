@@ -226,7 +226,7 @@ if ~isstr(varargin{1}) %intial settings
         options{4} = [];
         if ~isempty(str2num(os.dipole_rv)) %dipole information is used for component selection
             dipselect = 1;
-            options{end+1} = { 'dipselect' 'rv' os.dipole_rv };
+            options{end+1} = { 'dipselect' 'rv' num2str(os.dipole_rv) };
         end
     end;
 
