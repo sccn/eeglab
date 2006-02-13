@@ -200,7 +200,7 @@ if ~isstr(varargin{1})
         if ~sameparent
             for k = 1: N %check if all leaves
                  if ~isempty(STUDY.cluster(cls(k)).child) 
-                     error([ 'pop_clustedit(): All clusters must be from the same level \n'
+                     error([ 'pop_clustedit(): All clusters must be from the same level \n' ...
                              '         (i.e., have the same parents or not be child clusters)' ]);
                  end
             end
