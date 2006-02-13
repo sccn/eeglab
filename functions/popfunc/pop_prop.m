@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/01/31 20:20:52  arno
+% options
+%
 % Revision 1.23  2006/01/31 20:16:47  arno
 % options
 %
@@ -298,7 +301,7 @@ try
     
 	%tmpy = get(gca, 'ylim');
     %set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
-	set( get(gca, 'ylabel'), 'string', 'Magnitude (dB)', 'fontsize', 14); 
+	set( get(gca, 'ylabel'), 'string', 'Power 10*log_{10}(\muV^{2}/Hz)', 'fontsize', 14); 
 	set( get(gca, 'xlabel'), 'string', 'Frequency (Hz)', 'fontsize', 14); 
 	title('Activity power spectrum', 'fontsize', 14); 
 catch
