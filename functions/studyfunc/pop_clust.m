@@ -102,6 +102,7 @@ if isempty(varargin) %GUI call
         end;
         command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         
+        disp('Performing clustering...');
         switch clus_alg
             case 'Kmeans'
                 command = sprintf('%s %s %d %s', command, '''algorithm'', ''kmeans'',''clus_num'', ', clus_num, ',');
@@ -121,6 +122,7 @@ if isempty(varargin) %GUI call
              [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
         end
+        disp('Done.');
         
         % If save updated STUDY to disk
         if save_on
