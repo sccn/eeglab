@@ -27,7 +27,7 @@
 %            >> sbplot(3,3,[7 2]);plot(rand(1,10),'r');
 %            >> sbplot(8,7,47);plot(rand(1,10),'b'); 
 %
-% Authors: Colin Humphries & Scott Makeig, SCCN/INC/UCSD, La Jolla, June, 1998 
+% Authors: Colin Humphries, Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, La Jolla, June, 1998 
 
 % Copyright (C) June 1998, Colin Humphries & Scott Makeig, SCCN/INC/UCSD, 
 % scott@sccn.ucsd.edu
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % reformatted by Scott Makeig, 6/10/98
 % 12/22/00 test nargin<3 -sm
@@ -124,7 +127,7 @@ end
 
 % Calculate axes coordinates
 position(1) = Xpad+xspace*(xgridpos(1)-1)+xlength*(xgridpos(1)-1);
-position(2) = Ypad+yspace*(ygridpos(1)-1)+ylength*(ygridpos(1)-1);
+position(2) = Ypad+yspace*(ygridpos(1)-1)+ylength*(ygridpos(1)-1)-0.03;
 position(3) = xspace*(xgridpos(2)-1)+xlength*xgridpos(2);
 position(4) = yspace*(ygridpos(2)-1)+ylength*ygridpos(2);
 
