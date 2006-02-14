@@ -35,7 +35,7 @@
 %
 %  See also  pop_clustedit(), pop_preclust(), eeg_preclust(), pop_clust()
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, October 11, 2004
+% Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -56,6 +56,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
+
+% $Log: not supported by cvs2svn $
 
 function [STUDY, ALLEEG, com] = pop_clust(STUDY, ALLEEG, varargin)
 
