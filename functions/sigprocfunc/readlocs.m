@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2006/01/20 22:37:08  arno
+% default for BESA and polhemus
+%
 % Revision 1.81  2006/01/12 23:22:39  arno
 % fixing indices
 %
@@ -399,7 +402,7 @@ chanformat(3).type         = 'xyz';
 chanformat(3).typestring   = 'Matlab .xyz file';
 chanformat(3).description  = [ 'Standard 3-D cartesian coordinate files with electrode labels in ' ...
                                'the first column and X, Y, and Z coordinates in columns 2, 3, and 4' ];
-chanformat(3).importformat = { 'labels' '-Y' 'X' 'Z' };
+chanformat(3).importformat = { 'channum' '-Y' 'X' 'Z' 'labels'};
 % ---------------------------------------------------------------------------------------------------
 chanformat(4).type         = 'sfp';
 chanformat(4).typestring   = 'BESA or EGI 3-D cartesian .sfp file';
