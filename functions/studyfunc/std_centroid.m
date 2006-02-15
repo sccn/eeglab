@@ -289,7 +289,6 @@ for clust =  1:length(clsind) %go over all requested clusters
 		    STUDY.cluster(clsind(clust)).centroid.erp_t = centroid{clust}.erp_t;
         end
 		if specC
-            dsdfd
             centroid{clust}.spec{cond} = centroid{clust}.spec{cond}/ncomp;
             STUDY.cluster(clsind(clust)).centroid.spec{cond} = centroid{clust}.spec{cond};
 		    STUDY.cluster(clsind(clust)).centroid.spec_f = centroid{clust}.spec_f;
