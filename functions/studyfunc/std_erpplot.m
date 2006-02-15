@@ -16,8 +16,8 @@
 %                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'                         -> plot all clusters in STUDY.
+%   'clusters'   - [numeric vector]  -> specific cluster indices to plot.
+%                     'all'          -> plot all clusters in STUDY.
 %                     {default: 'all'}.
 %   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERPs 
 %                     of the requested clusters are plotted in the same figure, with ERPs for  
@@ -59,6 +59,8 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
 
 function STUDY = cls_plotclusterp(STUDY, ALLEEG,  varargin)
 icadefs;
@@ -192,7 +194,7 @@ if strcmpi(mode, 'centroid')
             erp_max = max(STUDY.cluster(cls(k)).centroid.erp{1});
         end
         if len ~= 1
-            sbplot(rowcols(1),rowcols(2),k) ; 
+            handl(k) = sbplot(rowcols(1),rowcols(2),k) ; 
         end
         hold on;
         for n = 1:Ncond
@@ -225,7 +227,7 @@ if strcmpi(mode, 'centroid')
             if (k == len) & (n == Ncond)
                 for clsi = 1:len % plot all on same scale
                     if len ~= 1
-                        subplot(rowcols(1),rowcols(2),clsi) ; 
+                        axes(handl(clsi)); 
                     end
                     axis([t(1)/1000 t(end)/1000 erp_min erp_max]);
                     axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; legend(leg_color); xlabel(''''Time [sec]'''');ylabel(''''Activations'''') ;');
