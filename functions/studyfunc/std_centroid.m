@@ -61,6 +61,8 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
+% $ Log: cls_centroid.m,v $
+
 function [STUDY, centroid] = cls_centroid(STUDY,ALLEEG, clsind, varargin);
 
  if nargin < 3
@@ -287,6 +289,7 @@ for clust =  1:length(clsind) %go over all requested clusters
 		    STUDY.cluster(clsind(clust)).centroid.erp_t = centroid{clust}.erp_t;
         end
 		if specC
+            dsdfd
             centroid{clust}.spec{cond} = centroid{clust}.spec{cond}/ncomp;
             STUDY.cluster(clsind(clust)).centroid.spec{cond} = centroid{clust}.spec{cond};
 		    STUDY.cluster(clsind(clust)).centroid.spec_f = centroid{clust}.spec_f;
