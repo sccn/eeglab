@@ -61,7 +61,7 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $ Log: cls_centroid.m,v $
+% $Log: not supported by cvs2svn $
 
 function [STUDY, centroid] = cls_centroid(STUDY,ALLEEG, clsind, varargin);
 
