@@ -68,4 +68,3 @@ for k = l:cls
 end
 
 clusters = [ clusters l+len:cls+len];%the new created clusters indices.
-STUDY.etc.preclust = [];
