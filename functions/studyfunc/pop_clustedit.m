@@ -390,9 +390,9 @@ else
             clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''comps'');'  ]);
+                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ]);
                      % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''comps'');'  ];
+                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters
