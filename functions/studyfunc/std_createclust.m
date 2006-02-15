@@ -62,11 +62,6 @@ for k = l:cls
         STUDY.cluster(STUDY.etc.preclust.clustlevel).child{end+1} = STUDY.cluster(k+nc).name;
     end
     STUDY.cluster(k+len).child = [];
-    if k == 0
-        STUDY.cluster(len).centroid = mean(STUDY.etc.preclust.preclustdata(tmp,:));
-    else
-        STUDY.cluster(k+len).centroid = C(k,:);
-    end
     STUDY.cluster(k+len).preclust.preclustdata = STUDY.etc.preclust.preclustdata(tmp,:);
     STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
     STUDY.cluster(k+len).preclust.preclustcomps = STUDY.etc.preclust.preclustcomps;
