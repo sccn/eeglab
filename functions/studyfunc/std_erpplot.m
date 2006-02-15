@@ -120,6 +120,18 @@ if strcmpi(mode, 'comps')
                 clear tmp ave_erp
             end
         end
+        
+        % figure properties
+        % -----------------
+        figure
+        rowcols(2) = ceil(sqrt(Ncond)); 
+        rowcols(1) = ceil((Ncond)/rowcols(2));
+        pos = get(gcf, 'position');
+        magnif = 2.5/sqrt(Ncond);
+        set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
+        orient tall
+        set(gcf,'Color', BACKCOLOR);
+        
         for n = 1:Ncond
             try
                 clusnval = cls_clusread(STUDY, ALLEEG, cls(clus),'erp',n);
@@ -127,34 +139,31 @@ if strcmpi(mode, 'comps')
                 warndlg2([ 'Some ERP information is missing, aborting'] , ['Abort - Plot ERP'] );   
                 return;
            end
-           figure
-           orient tall
-            ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
-            t = STUDY.cluster(cls(clus)).centroid.erp_t;
-            [all_erp pol] = comppol(clusnval.erp');
-            plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
-            hold on
-            plot(t/1000,Avepol(n)*ave_erp,'k','linewidth',2);
-            xlabel('time [s]');
-            ylabel('activations');
-            title(['ERP, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
-            % Make common axis to all conditions
-            if n == 1
-                ylimits = get(gca,'YLim');
-            else
-                tmp = get(gca,'YLim');
-                ylimits(1) = min(tmp(1),ylimits(1) );
-                ylimits(2) = max(tmp(2),ylimits(2) );
-            end
-            if n == Ncond %set all condition figures to be on the same scale
-                ofi = gcf;
-                for condi = 1: Ncond
-                    figure(ofi - condi + 1)
-                    axis([t(1)/1000 t(end)/1000  ylimits(1)  ylimits(2) ]);
-                    set(gcf,'Color', BACKCOLOR);
-                    axcopy;
-                end
-            end
+           handl(n) = sbplot(rowcols(1),rowcols(2),n);
+           ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
+           t = STUDY.cluster(cls(clus)).centroid.erp_t;
+           [all_erp pol] = comppol(clusnval.erp');
+           plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
+           hold on
+           plot(t/1000,Avepol(n)*ave_erp,'k','linewidth',2);
+           xlabel('time [s]');
+           ylabel('activations');
+           title(['ERP, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
+           % Make common axis to all conditions
+           if n == 1
+               ylimits = get(gca,'YLim');
+           else
+               tmp = get(gca,'YLim');
+               ylimits(1) = min(tmp(1),ylimits(1) );
+               ylimits(2) = max(tmp(2),ylimits(2) );
+           end
+           if n == Ncond %set all condition figures to be on the same scale
+               for condi = 1: Ncond
+                   axes(handl(condi));
+                   axis([t(1)/1000 t(end)/1000  ylimits(1)  ylimits(2) ]);
+                   axcopy;
+               end
+           end
         end % finished one condition
     end % finished all requested clusters 
 end % Finished 'comps' mode plot option
