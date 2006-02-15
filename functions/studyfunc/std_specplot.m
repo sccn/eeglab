@@ -60,6 +60,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function STUDY = cls_plotclustspec(STUDY, ALLEEG,  varargin)
 icadefs;
 % Set default values
@@ -150,6 +152,9 @@ if strcmpi(mode, 'centroid')
 	end
     color_codes = {'b', 'r', 'g', 'c', 'm', 'y', 'k','b--', 'r--', 'g--', 'c--', 'm--', 'y--', 'k--','b-.', 'r-.', 'g-.', 'c-.', 'm-.', 'y-.', 'k-.'};
     orient tall
+    
+    min_spec = Inf;
+    max_spec = -Inf;
     for k = 1:len % Go through the clusters
         if ~isfield(STUDY.cluster(cls(k)).centroid,'spec')
             STUDY = cls_centroid(STUDY,ALLEEG, cls(k) , 'spec');
@@ -165,6 +170,10 @@ if strcmpi(mode, 'centroid')
             ave_spec = STUDY.cluster(cls(k)).centroid.spec{n};
             f = STUDY.cluster(cls(k)).centroid.spec_f;
             plot(f,ave_spec,color_codes{n},'linewidth',2);
+            
+            min_spec = min(min(ave_spec), min_spec);
+            max_spec = max(max(ave_spec), max_spec);
+            
             if n == Ncond
                 a = [ STUDY.cluster(cls(k)).name ', '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ];
                 title(a);
@@ -188,6 +197,8 @@ if strcmpi(mode, 'centroid')
                     a = [ STUDY.cluster(cls(k)).name ' spectra, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ];
                     title(a);
                 end
+                diffspec = max_spec-min_spec;
+                ylim( [ minspec - 0.1*diff_spec maxspec + 0.1*diff_spec]);
                 set(gcf,'Color', BACKCOLOR);
                 legend(leg_color);
                 if figureon
