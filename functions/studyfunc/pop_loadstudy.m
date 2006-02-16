@@ -88,4 +88,4 @@ end
 [STUDY ALLEEG] = checkstudy(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 
-com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', filename, filepath);
+com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', STUDY.filename, STUDY.filepath);
