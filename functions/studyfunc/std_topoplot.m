@@ -15,12 +15,16 @@
 %
 % Optional inputs:
 %   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                       'all'                       -> plot all clusters in STUDY.
+%                       'all'        -> plot all clusters in STUDY.
 %                       {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average scalp maps 
-%                     of the requested clusters are plotted in the same figure. In 'comps' mode, scalp maps 
-%                     of the cluster components are plotted in a separate figure with the cluster mean scalp 
-%                     map. {default: 'centroid'}.
+%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'        -> plot all the components in the cluster {default: 'all'}.
+%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
+%                     of the requested clusters are plotted in the same figure - one per condition. 
+%                     In 'comps' mode, component scalp map for each cluster are plotted in a
+%                     separate figure (per condition) with the cluster mean map.
+%                     {default: 'centroid'}. Note that this option is irrelevant if component
+%                     indices are provided as input.
 %   'figure'       - ['on'|'off'] for the 'centroid' mode option, plots on
 %                     a new figure ('on')  or plots on current figure ('off').
 %                     {default: 'on'}.
@@ -80,6 +84,9 @@ for k = 3:2:nargin
                     error('cls_plotclustmap: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'comps'
+            STUDY = cls_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1});
+            return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
          case 'figure'
@@ -205,4 +212,93 @@ if strcmpi(mode, 'centroid')
     orient tall
     axcopy
 end        
+
+% cls_plotcompmap() - Commandline function, to visualizing cluster components scalp maps. 
+%                   Displays the scalp maps of specified cluster components on separate figures. 
+%                   The scalp maps can be visualized only if component scalp maps     
+%                   were calculated and saved in the EEG datasets in the STUDY.
+%                   These can be computed during pre-clustering using the GUI-based function
+%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
+%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% Usage:    
+%                   >> [STUDY] = cls_plotcompmap(STUDY, ALLEEG, cluster, comps);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
+%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   cluster     - single cluster number.  
+%
+% Optional inputs:
+%   comps      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'                       -> plot all the components in the cluster
+%                                                      (as in cls_plotclustmap). {default: 'all'}.
+%
+% Outputs:
+%   STUDY    - the input STUDY set structure modified with plotted cluster scalp
+%                     map mean, to allow quick replotting (unless cluster mean 
+%                     already existed in the STUDY).  
+%
+%   Example:
+%                         >> cluster = 4; comps= [1 7 10];  
+%                         >> [STUDY] = cls_plotcompmap(STUDY,ALLEEG, cluster, comps);
+%                    Plots components 1, 7 & 10  scalp maps of cluster 4 on separate figures. 
+%
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclustmap         
+%
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function STUDY = cls_plotcompmap(STUDY, ALLEEG, cls, varargin)
+icadefs;
+
+if ~exist('cls')
+    error('cls_plotcompmap: you must provide a cluster numberas an input.');
+end
+if isempty(cls)
+   error('cls_plotcompmap: you must provide a cluster numberas an input.');
+end
+if nargin == 3 % no components indices were given
+    % Default plot all components of the cluster
+    [STUDY] = cls_plotclustmap(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    return
+else
+    comp_ind = varargin{1}; 
+end
+for ci = 1:length(comp_ind)
+    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+    comp = STUDY.cluster(cls).comps(comp_ind(ci));
+    subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    if ~isfield(ALLEEG(abset).etc,'icascalpparams')
+        warndlg2([ 'Dataset ' num2str(abset) ' has no topoplot image information, aborting'] , 'Abort - Plot scalp maps' ); 
+        return;
+    end
+    [grid, yi, xi] = cls_readscalp(ALLEEG, abset, comp);
+    if isempty(grid)
+        warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot scalp maps' ); 
+        return
+    end
+    [Xi,Yi] = meshgrid(yi,xi);
+    figure;
+    toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
+    title([ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ]);
+    set(gcf,'Color', BACKCOLOR);
+    axcopy
+end
 
