@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2006/02/16 21:34:30  scott
+% same
+%
 % Revision 1.98  2006/02/16 21:31:19  scott
 % same
 %
@@ -460,7 +463,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
 				  'icamaps'       'integer'  []                       [] ;
-                  'rmdc'           'string'   {'on' 'off'}             'off'  
+                  'rmdc'           'string'   {'on' 'off'}          'off';
 				  'mapchans'      'integer'  [1:size(data,1)]         [] };
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
