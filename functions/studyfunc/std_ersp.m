@@ -116,7 +116,7 @@ if isempty(EEG.icaact)
 end
 
 %compute ERSP for all components
-[time_range, winsize] = compute_ERSP_times(cycles,  EEG.srate, [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
+[time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
     error(['cls_ersp: the parameters given for ' upper(type) ' calculation result in invalid time range. Aborting. Please change lower frequency bound or other parameters to resolve the problem.'] )
 end

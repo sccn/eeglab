@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/02/11 00:29:56  arno
+% ERSP and ITC parameters
+%
 % Revision 1.21  2006/02/11 00:17:47  arno
 % fixing ersp parameters
 %
@@ -88,7 +91,7 @@ if ~isstr(varargin{1}) %intial settings
     ersp.p = '4';
     ersp.a = '0.01';
     seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-    [time_range, winsize] = compute_ERSP_times(str2num(ersp.c),  ALLEEG(seti).srate, ...
+    [time_range, winsize] = compute_ersp_times(str2num(ersp.c),  ALLEEG(seti).srate, ...
         [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, str2num(ersp.f(1)),str2num(ersp.p)); 
     ersp.t = [num2str(round(time_range(1))) ' ' num2str(round(time_range(2))) ];
     erspparams_str = ['                                                             ''frange'', [' ...
@@ -411,7 +414,7 @@ else
                 ersp_str = [ 'ersp_p = struct( ' ersp_params ');' ];
                 eval(ersp_str);
                 seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-                [time_range, winsize] = compute_ERSP_times(ersp_p.cycles,  ALLEEG(seti).srate,...
+                [time_range, winsize] = compute_ersp_times(ersp_p.cycles,  ALLEEG(seti).srate,...
                     [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, ersp_p.frange(1),ersp_p.padratio); 
                 if isfield(ersp_p, 'tlimits')
                     if ersp_p.tlimits(1) < time_range(1)
