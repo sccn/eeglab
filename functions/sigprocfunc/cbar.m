@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/02/16 21:20:35  arno
+% new option pos
+%
 % Revision 1.3  2004/05/07 16:07:49  scott
 % help comments - added a useful example -sm
 %
@@ -158,7 +161,6 @@ n = size(map,1);
 if length(colors) == 1
   if strcmp(arg,'vert')
       if strcmpi(posscale, 'on')
-          dsfg
           image([0 1],[0 t(2)],[ceil(n/2):n-colors]');
       else
           image([0 1],t,[1:n-colors]');
