@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.184  2006/02/16 00:16:30  arno
+% nothing
+%
 % Revision 1.183  2006/02/07 19:14:55  arno
 % nothing
 %
@@ -1341,6 +1344,12 @@ end;
     % check ica
     % ---------
     if ~isfield(EEG, 'icachansind') 
+        if isempty(EEG.icaweights)
+            EEG.icachansind = []; res = com; 
+        else
+            EEG.icachansind = [1:EEG.nbchan]; res = com; 
+        end;
+    elseif isempty(EEG.icachansind) 
         if isempty(EEG.icaweights)
             EEG.icachansind = []; res = com; 
         else
