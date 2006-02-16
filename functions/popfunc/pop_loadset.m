@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2006/01/31 22:28:25  arno
+% EEG.saved = 'justloaded'
+%
 % Revision 1.48  2006/01/25 01:35:29  toby
 % minor change to make it more Mac friendly, shouldn't affect behavior on other OSs.
 %
@@ -342,6 +345,7 @@ end;
 
 % set field indicating that the data has not been modified
 % --------------------------------------------------------
+EEG = eeg_checkset(EEG);
 if isfield(EEG, 'changes_not_saved')
     EEG = rmfield(EEG, 'changes_not_saved');
 end;
