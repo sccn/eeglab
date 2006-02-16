@@ -264,6 +264,16 @@ if strcmpi(mode, 'centroid')
             logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
             tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ITC', 'verbose', 'off');
+            ft = str2num(get(gca,'yticklabel'));
+            ft = exp(1).^ft;
+            ft = unique(round(ft));
+            ftick = get(gca,'ytick');
+            ftick = exp(1).^ftick;
+            ftick = unique(round(ftick));
+            ftick = log(ftick);
+            set(gca,'ytick',ftick);
+            set(gca,'yticklabel', num2str(ft));
+            xlabel('Time [ms]');
             cbar('pos');
        else
            for n = 1:Ncond
