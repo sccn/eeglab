@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/02/15 22:59:20  arno
+% adding scaling etc...
+%
 
 function STUDY = cls_plotclustspec(STUDY, ALLEEG,  varargin)
 icadefs;
@@ -197,8 +200,8 @@ if strcmpi(mode, 'centroid')
                     a = [ STUDY.cluster(cls(k)).name ' spectra, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ];
                     title(a);
                 end
-                diffspec = max_spec-min_spec;
-                ylim( [ minspec - 0.1*diff_spec maxspec + 0.1*diff_spec]);
+                diff_spec = max_spec-min_spec;
+                ylim( [ min_spec - 0.1*diff_spec max_spec + 0.1*diff_spec]);
                 set(gcf,'Color', BACKCOLOR);
                 legend(leg_color);
                 if figureon
