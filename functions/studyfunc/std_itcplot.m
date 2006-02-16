@@ -251,29 +251,45 @@ if strcmpi(mode, 'centroid')
         
         % plot
         % ----
-        for n = 1:Ncond
-            sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
-            a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
-            ave_itc  = STUDY.cluster(cls(k)).centroid.itc{n};
+       if ~figureon % only for summary mode: average all conditions
+            % average all conditions
+            % ----------------------
+            for n = 1:Ncond          
+                if n == 1
+                    ave_itc = STUDY.cluster(cls(k)).centroid.itc{n}/Ncond;
+                else
+                    ave_itc = ave_itc + STUDY.cluster(cls(k)).centroid.itc{n}/Ncond;
+                end;
+            end;
             logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
             tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
-                   'title', a, 'verbose', 'off');
-            ft = str2num(get(gca,'yticklabel'));
-            ft = exp(1).^ft;
-            ft = unique(round(ft));
-            ftick = get(gca,'ytick');
-            ftick = exp(1).^ftick;
-            ftick = unique(round(ftick));
-            ftick = log(ftick);
-            set(gca,'ytick',ftick);
-            set(gca,'yticklabel', num2str(ft));
-            if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
-                xlabel('Time [ms]');
-            else
-                xlabel('');
-            end;
+                   'title', 'Average ITC', 'verbose', 'off');
             cbar('pos');
-            waitbar((k*n)/(len*Ncond),h_wait);
+       else
+           for n = 1:Ncond
+               sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
+               a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
+               ave_itc  = STUDY.cluster(cls(k)).centroid.itc{n};
+               logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
+               tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+                      'title', a, 'verbose', 'off');
+               ft = str2num(get(gca,'yticklabel'));
+               ft = exp(1).^ft;
+               ft = unique(round(ft));
+               ftick = get(gca,'ytick');
+               ftick = exp(1).^ftick;
+               ftick = unique(round(ftick));
+               ftick = log(ftick);
+               set(gca,'ytick',ftick);
+               set(gca,'yticklabel', num2str(ft));
+               if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
+                   xlabel('Time [ms]');
+               else
+                   xlabel('');
+               end;
+               cbar('pos');
+               waitbar((k*n)/(len*Ncond),h_wait);
+           end;
         end % Finish plotting all centroids for one condition
     end  % Finished all conditions
     if figureon
