@@ -77,7 +77,6 @@ if (~isempty(filename)) & (~isempty(filepath))
 else
     error(['pop_loadstudy(): No STUDY set file provided.']);
 end
-STUDY.saved = 'yes';
   
 ALLEEG = load_alleeg(STUDY);
 
@@ -85,5 +84,8 @@ ALLEEG = load_alleeg(STUDY);
 for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).index = k;
 end
-       
+
+[STUDY ALLEEG] = checkstudy(STUDY, ALLEEG);
+STUDY.saved = 'yes';
+
 com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', filename, filepath);
