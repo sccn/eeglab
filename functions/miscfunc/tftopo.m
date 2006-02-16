@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2005/12/06 20:51:48  arno
+% allowing separate color axis
+%
 % Revision 1.75  2005/12/06 20:45:08  arno
 % same
 %
@@ -563,7 +566,7 @@ if tfpoints ~= 0
     plotdim = max(1+floor(tfpoints/2),4); % number of topoplots on top of image
     imgax = sbplot(plotdim,plotdim,[plotdim*(plotdim-1)+1,2*plotdim-1],'ax',curax);
 else
-    imgax = sbplot(1,1,1,'ax',curax);
+    imgax = curax;
 end;
 tftimes = mmidx(1):mmidx(2);
 tffreqs = mmidx(3):mmidx(4);
