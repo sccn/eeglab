@@ -15,13 +15,16 @@
 %
 % Optional inputs:
 %   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'                         -> plot all clusters in STUDY.
+%                     'all'          -> plot all clusters in STUDY.
 %                     {default: 'all'}.
+%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'        -> plot all the components in the cluster {default: 'all'}.
 %   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
 %                     of the requested clusters are plotted in the same figure - one per condition. 
 %                     In 'comps' mode, component ERSPs for each cluster are plotted in a
 %                     separate figure (per condition) with the cluster mean ERSP.
-%                     {default: 'centroid'}.
+%                     {default: 'centroid'}. Note that this option is irrelevant if component
+%                     indices are provided as input.
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
 %                    figure ('off'). 'figure' 'off' is optional for one cluster in 'centroid' mode.
 %                    Useful for incomporating cluster ERSP into a complex figure.
@@ -61,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/02/16 18:24:03  arno
+% title\
+%
 % Revision 1.3  2006/02/16 00:48:34  arno
 % new format etc...
 %
@@ -88,6 +94,9 @@ for k = 3:2:nargin
                     error('cls_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'comps'
+            STUDY = cls_plotcompersp(STUDY, ALLEEG,  cls, varargin{k-1});
+            return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
         case 'figure' % plot on exisiting figure or a new figure
@@ -146,7 +155,7 @@ if strcmpi(mode, 'comps')
             ersp_times = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index).etc.icaerspparams.times;
             logfreqs = STUDY.cluster(cls(clus)).centroid.ersp_logf;
             a = [ STUDY.cluster(cls(clus)).name ' average ERSP, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
-            tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end) -lim lim],...
+            tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end)],...
                 'title', a, 'verbose', 'off', 'axcopy', 'off');
             ft = str2num(get(gca,'yticklabel'));
             ft = exp(1).^ft;
@@ -160,6 +169,7 @@ if strcmpi(mode, 'comps')
             xlabel('Time [ms]');
             axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
                 'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); ylabel(''''Frequency [Hz]''''); cbar; clear ft fti;' ]);
+            cbar;
             for k = 1:len % Plot the individual component ersp  
                 abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
                 subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
@@ -275,3 +285,129 @@ if strcmpi(mode, 'centroid')
         delete(h_wait)
     end
 end % Finished 'centroid' mode plot option
+
+% cls_plotcompersp() - Commandline function, to visualizing cluster component ERSP images. 
+%                    Displays the ERSP images of specified cluster components on separate figures,
+%                    using one figure for all conditions. 
+%                   The ERSPs can be visualized only if component ERSPs     
+%                   were calculated and saved in the EEG datasets in the STUDY.
+%                   These can be computed during pre-clustering using the GUI-based function
+%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
+%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% Usage:    
+%                   >> [STUDY] = cls_plotcompersp(STUDY, ALLEEG, cluster, comps);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
+%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   cluster     - single cluster number.  
+%
+% Optional inputs:
+%   comps      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'                       -> plot all the components in the cluster
+%                                                      (as in cls_plotclustersp). {default: 'all'}.
+%
+% Outputs:
+%   STUDY    - the input STUDY set structure modified with plotted cluster ersp
+%                     image mean, to allow quick replotting (unless cluster mean 
+%                     already existed in the STUDY).  
+%
+%   Example:
+%                         >> cluster = 4; comps= [1 7 10];  
+%                         >> [STUDY] = cls_plotcompersp(STUDY,ALLEEG, cluster, comps);
+%                    Plots components 1, 7 & 10  ersps of cluster 4 on separate figures. 
+%
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclustersp         
+%
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $ Log: cls_plotcompersp.m,v $
+
+function STUDY = cls_plotcompersp(STUDY, ALLEEG, cls, varargin)
+icadefs;
+if ~exist('cls')
+    error('cls_plotcompersp: you must provide a cluster number as an input.');
+end
+if isempty(cls)
+   error('cls_plotcompersp: you must provide a cluster number as an input.');
+end
+if nargin == 3 % no components indices were given
+    % Default plot all components of the cluster
+    [STUDY] = cls_plotclustersp(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    return
+else
+    comp_ind = varargin{1}; 
+end
+Ncond = length(STUDY.condition);
+if Ncond == 0
+    Ncond = 1;
+end
+for ci = 1 : length(comp_ind) %for each comp
+   rowcols(2) = ceil(sqrt(Ncond)); 
+   rowcols(1) = ceil((Ncond)/rowcols(2));
+   
+   comp = STUDY.cluster(cls).comps(comp_ind(ci));     
+   subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+   
+   % figure properties
+   % -----------------
+   figure
+   pos = get(gcf, 'position');
+   magnif = 2.5/sqrt(Ncond);
+   set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
+   orient tall
+   set(gcf,'Color', BACKCOLOR);
+   
+   for n = 1:Ncond  %for each cond
+        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        if ~isfield(ALLEEG(abset).etc,'icaerspparams')
+            warndlg2([ 'Dataset ' num2str(abset) ' has no ERSP info, aborting'] , ['Abort - Plot ERSP']); 
+            return;
+        end
+        params = ALLEEG(abset).etc.icaerspparams;
+        sbplot(rowcols(1),rowcols(2),n), 
+        if n == 1
+            [ersp, logfreqs] = cls_readersp(ALLEEG, [STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index], comp);
+            if isempty(ersp)
+                warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icalogersp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ERSP' ); 
+                return
+            end
+        end
+        if Ncond >1
+            a = [ 'ERSP, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
+        else
+            a = ['ERSP, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
+        end
+        tftopo(ersp(:,:,n),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -4 4],'title', a, 'verbose', 'off', 'axcopy', 'off');
+        ft = str2num(get(gca,'yticklabel'));
+        ft = exp(1).^ft;
+        ft = unique(round(ft));
+        ftick = get(gca,'ytick');
+        ftick = exp(1).^ftick;
+        ftick = unique(round(ftick));
+        ftick = log(ftick);
+        set(gca,'ytick',ftick);
+        set(gca,'yticklabel', num2str(ft));
+        cbar;
+        axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
+            'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
+   end
+end
