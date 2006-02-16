@@ -54,10 +54,11 @@ icadefs;
 % Set default values
 cls = 1:length(STUDY.cluster); % plot all clusters in STUDY
 
-if ~isempty(varargin)
-    if isnumeric(varargin{1})
-        cls = varargin{1};
-    elseif isstr(varargin{1}) & strcmpi(varargin{1}, 'all')
+if length(varargin) > 0
+    if length(varargin) == 1, varargin{2} = varargin{1}; end; % backward compatibility
+    if isnumeric(varargin{2})
+        cls = varargin{2};
+    elseif isstr(varargin{2}) & strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
         error('cls_plotclust: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
@@ -85,36 +86,34 @@ for k = 1: len
     end
     waitbar(k/(len*6),h_wait)
     subplot(2,3,2),
-     try,
-         [STUDY] = cls_plotclustersp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
-     catch, end
-    waitbar((k*2)/(len*6),h_wait)
-    subplot(2,3,3),
     try,
         STUDY = cls_plotclusterp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
     end
-    waitbar((k*3)/(len*6),h_wait)
-    subplot(2,3,5),
+    waitbar((k*2)/(len*6),h_wait)
+    subplot(2,3,3),
     try,
-        [STUDY] = cls_plotclustitc(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
+        [STUDY] = cls_plotclustersp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
     catch, end
-    waitbar((k*4)/(len*6),h_wait);
-    subplot(2,3,4),
+    waitbar((k*3)/(len*6),h_wait)
+    axes('unit', 'normalized', 'position', [0.1 0.16 0.2 0.28]); %subplot(2,3,4),
+    try,
+        STUDY = cls_plotclustdip(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'apart', 'figure', 'off'); set(gcf,'Color', BACKCOLOR);
+    catch
+    end
+    waitbar((k*4)/(len*6),h_wait)
+    subplot(2,3,5),
     try,
         STUDY = cls_plotclustspec(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
     end
     waitbar((k*5)/(len*6),h_wait)
-    subplot('position', [0.77 0.16 0.15 0.28]),
-    %subplot(2,3,6),
+    subplot(2,3,6),
     try,
-        STUDY = cls_plotclustdip(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'apart', 'figure', 'off');
-        set(gcf,'Color', BACKCOLOR);
-        %title([ STUDY.cluster(cls(k)).name ' dipoles']);
-    catch
-    end
-    waitbar((k*6)/(len*6),h_wait)
+        [STUDY] = cls_plotclustitc(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
+    catch, end
+    waitbar((k*6)/(len*6),h_wait);
+    %subplot('position', [0.77 0.16 0.15 0.28]),
     maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' average measures (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
     a = textsc(maintitle, 'title'); 
     set(a, 'fontweight', 'bold');     
