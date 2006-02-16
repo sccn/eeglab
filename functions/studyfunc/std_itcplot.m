@@ -229,7 +229,7 @@ if strcmpi(mode, 'centroid')
     end;
     
     if len > 1
-        maintitle = ['Average ERSP for clusters ' int2str(1:len) ];
+        maintitle = ['Average ERSP for clusters ' int2str(cls(1:len)) ];
         a = textsc(maintitle, 'title'); 
         set(a, 'fontweight', 'bold'); 
     end;
