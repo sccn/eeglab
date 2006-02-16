@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2006/02/16 21:24:58  scott
+% debugging same -sm
+%
 % Revision 1.96  2006/02/16 21:13:00  scott
 % adding 'mapchans' -sm
 %
@@ -450,7 +453,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'weights'       'real'     []                       [] ;
 				  'mapnorm'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
-				  'mapchans'      'integer'  [1:size(data,1)]         size(data,1);
+				  'mapchans'      'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
@@ -515,6 +518,10 @@ data = reshape(data, size(data,1), size(data,2)*size(data,3));
 
 if frames == 0
   frames = size(data,2); % assume one epoch
+end
+
+if isempty(g.mapchans) | g.mapchans == 0
+	g.mapchans = 1:size(data,1); % default to plotting all chans
 end
 
 %if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
