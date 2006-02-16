@@ -57,6 +57,7 @@
 %                contributions at the selected frequency ('freq'). If 0, plot RMS 
 %                power at all channels. {defatul|[] -> channel with highest power 
 %                at specified 'freq' (above)). 
+%   'mapchans' = [int vector] channels to plot in topoplots {default: all}
 %   'nicamaps' = [integer] number of ICA component maps to plot {default: 4}.
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([] -> all).
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectra of
@@ -113,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2006/01/31 17:25:26  scott
+% upgraded the whole help msg -sm
+%
 % Revision 1.94  2005/02/04 18:42:51  arno
 % updating chanlocs2
 %
@@ -443,6 +447,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'weights'       'real'     []                       [] ;
 				  'mapnorm'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
+				  'mapchans'      'integer'  [1:size(data,1)]         size(data,1);
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
@@ -558,7 +563,7 @@ end;
 g.chanlocs2 = g.chanlocs;
 if isempty(g.weights)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% compute data spectrum
+	% compute data spectra
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Computing spectra')
 	[eegspecdB freqs specstd] = spectcomp( data, frames, srate, epoch_subset, g);
@@ -573,7 +578,9 @@ if isempty(g.weights)
     
     tmpc = find(eegspecdB(:,1));
     if length(tmpc) ~= size(eegspecdB,1)
-        fprintf('\nWarning: channels [%s] have 0 value and are omitted for display', int2str(find(eegspecdB(:,1) == 0)));
+        fprintf(...
+'\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
+                   int2str(find(eegspecdB(:,1) == 0)));
         eegspecdB = eegspecdB(tmpc,:);
         if ~isempty(specstd),  specstd = specstd(tmpc,:); end;
         g.chanlocs2 = g.chanlocs(tmpc);
@@ -925,35 +932,42 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		axis off;
 	end;
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% plot heads using topoplot()
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% plot selected channel head using topoplot()
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	fprintf('Plotting scalp distributions: ')
 	for f=1:length(g.freq)
 		axes(headax(realpos(f)));
 		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
-		if isnan(g.limits(5)),     maplimits = 'absmax';
-		else                       maplimits = [g.limits(5) g.limits(6)];
+
+		if isnan(g.limits(5)),     
+			maplimits = 'absmax';
+		else                       
+			maplimits = [g.limits(5) g.limits(6)];
 		end;
-		if ~isempty(g.plotchan) & g.plotchan ~= 0
-			if ~isempty(varargin)
-				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
-						 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
-			else
+		%
+		% If 1 channel in g.plotchan
+		%
+		if ~isempty(g.plotchan) & g.plotchan ~= 0 
+			% if ~isempty(varargin) % if there are extra topoplot() flags
+			%	topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
+			%			 'style', 'blank', 'emarkersize1chan', 10, varargin{:});
+			% else
 				topoplot(g.plotchan,g.chanlocs,'electrodes','off', ...
 						 'style', 'blank', 'emarkersize1chan', 10);
-			end
+			% end
 			if isstruct(g.chanlocs)
 				tl=title(g.chanlocs(g.plotchan).labels);
 			else
 				tl=title([ 'c' int2str(g.plotchan)]);
 			end;
             
-		else	
+		else % plot all channels in g.plotchans 
+
 			if ~isempty(varargin)
-				topoplot(topodata,g.chanlocs2,'maplimits',maplimits, varargin{:}); 
+				topoplot(topodata(g.mapchans,:),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
 			else
-				topoplot(topodata,g.chanlocs2,'maplimits',maplimits); 
+				topoplot(topodata(g.mapchans,:),g.chanlocs2,'maplimits',maplimits); 
 			end
 			if f<length(g.freq)
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
@@ -969,19 +983,20 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	fprintf('\n');
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% plot independant components
+	% plot independent components
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if ~isempty(g.weights)
-		if realpos(1) == max(realpos), plotcolbar(g); end;
 		% use headaxe from 2 to end (reserved earlier)
+		if realpos(1) == max(realpos), plotcolbar(g); end;
 
-		set(li(realpos(1)), 'linewidth', 2.5); 
 		% make the line with the scalp topoplot thicker than others
+		set(li(realpos(1)), 'linewidth', 2.5); 
 
 		for index = 1:length(g.icamaps)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
-			topoplot(g.icawinv(:,compnum).^2,g.chanlocs,varargin{:}); 
+
+			topoplot(icawinv(g.mapchans,compnum).^2,g.chanlocs,varargin{:}); 
 			tl=title(int2str(g.icacomps(compnum)));
 			set(tl,'fontsize',16);
 			axis square;
