@@ -17,8 +17,10 @@
 %
 % Optional inputs:
 %   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'                         -> plot all clusters in STUDY.
+%                     'all'          -> plot all clusters in STUDY.
 %                     {default: 'all'}.
+%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'        -> plot all the components in the cluster {default: 'all'}.
 %   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average spectra 
 %                     of the requested clusters are plotted in the same figure, with spectra for  
 %                     different conditions (if any) plotted in different colors. In 'comps' mode, spectra
@@ -61,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/02/16 19:01:33  arno
+% plotting both conditions on the same figure
+%
 % Revision 1.3  2006/02/16 00:01:21  arno
 % fixing axis limits
 %
@@ -89,6 +94,9 @@ for k = 3:2:nargin
                     error('cls_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'comps'
+            STUDY = cls_plotcompspec(STUDY, ALLEEG,  cls, varargin{k-1});
+            return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
         case 'figure'
@@ -144,7 +152,6 @@ if strcmpi(mode, 'comps')
             plot(f,clusnval.spec,'color', [0.5 0.5 0.5]);
             hold on
             plot(f,ave_spec,'k','linewidth',2);
-            axis([f(1) f(end) -10 20]);
             xlabel('Frequency [Hz]');
             ylabel('Power [dB]');
             title(['Spectra, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
@@ -237,4 +244,120 @@ if strcmpi(mode, 'centroid')
         end % finished the different conditions
     end % finished all clusters 
 end % finished 'centroid' plot mode
+
+% cls_plotcompspec() - Commandline function, to visualizing cluster component spectra. 
+%                   Displays the spectra of specified cluster components with the cluster mean 
+%                   spectra on separate figures, using one figure for all conditions. 
+%                   The spectra can be visualized only if component spectra     
+%                   were calculated and saved in the EEG datasets in the STUDY.
+%                   These can be computed during pre-clustering using the GUI-based function
+%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
+%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% Usage:    
+%                   >> [STUDY] = cls_plotcompspec(STUDY, ALLEEG, cluster, comps);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
+%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   cluster     - single cluster number.  
+%
+% Optional inputs:
+%   comps      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'                       -> plot all the components in the cluster
+%                                                      (as in cls_plotclustspec). {default: 'all'}.
+%
+% Outputs:
+%   STUDY    - the input STUDY set structure modified with plotted cluster
+%                     spectrum mean, to allow quick replotting (unless cluster mean 
+%                     already existed in the STUDY).  
+%
+%   Example:
+%                         >> cluster = 4; comps= 'all';  
+%                         >> [STUDY] = cls_plotcompspec(STUDY,ALLEEG, cluster, comps);
+%                    Plots all components of cluster 4, calls cls_plotclustspec() . 
+%
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclustspec         
+%
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function STUDY = cls_plotcompspec(STUDY, ALLEEG, cls, varargin)
+icadefs;
+
+if ~exist('cls')
+    error('cls_plotcompspec: you must provide a cluster number as an input.');
+end
+if isempty(cls)
+   error('cls_plotcompspec: you must provide a cluster number as an input.');
+end
+if nargin == 3 % no components indices were given
+    % Default plot all components of the cluster
+    [STUDY] = cls_plotclustspec(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    return
+else
+    comp_ind = varargin{1}; 
+end
+
+Ncond = length(STUDY.condition);
+if Ncond == 0
+    Ncond =1;
+end
+for ci = 1 : length(comp_ind) %for each comp
+    rowcols(2) = ceil(sqrt(Ncond)); rowcols(1) = ceil((Ncond)/rowcols(2));
+    comp = STUDY.cluster(cls).comps(comp_ind(ci));     
+    figure
+    orient tall
+    set(gcf,'Color', BACKCOLOR);
+    subject  = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    if Ncond >1
+        textsc(['Spectra, ' subject ' / IC' num2str(comp) ', ' STUDY.cluster(cls).name ],'title');
+    end
+    for n = 1:Ncond  %for each cond
+        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        sbplot(rowcols(1),rowcols(2),n),
+        hold on
+        if Ncond  > 1
+            a = [ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
+        else
+            a = [ 'Spectra, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ];
+        end
+        if ~isfield(STUDY.cluster(cls).centroid,'spec')
+            STUDY = cls_centroid(STUDY,ALLEEG, cls, 'spec');
+        end
+        if ~isfield(ALLEEG(abset).etc,'icaspecparams')
+            warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no spectra info, aborting'] , 'Abort - Plot spectra' ); 
+            return;
+        end
+        [spec, f] = cls_readspec(ALLEEG, abset, comp);
+        if isempty(spec)
+            warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaspec ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot spectra' ); 
+            return
+        end
+        plot(f,spec, 'c');
+        ave_spec = STUDY.cluster(cls).centroid.spec{n};
+        plot(f,ave_spec,'k','linewidth',2);
+        xlim([f(1) f(end)]);
+        xlabel('Frequency [Hz]');
+        ylabel('Power [dB]');
+        title(a);
+        axcopy
+    end
+end
 
