@@ -25,7 +25,8 @@
 %                     of the requested clusters are plotted in the same figure, with ERPs for  
 %                     different conditions (if any) plotted in different colors. In 'comps' mode, ERPS
 %                     for each specified cluster are plotted in separate figures (per condition), each 
-%                     containing cluster component ERPs plus the average cluster ERP in bold.
+%                     containing cluster component ERPs plus the average cluster ERP in bold. Note
+%                     that this parameter has no effect if the 'comps' option is used.
 %                     {default: 'centroid'}.
 %   'figure'       - ['on'|'off'] for the 'centroid' mode option, plots on
 %                     a new figure ('on')  or plots on current figure ('off').
@@ -63,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/02/16 19:14:49  arno
+% now integrating cls_plotcompserp.m
+%
 % Revision 1.3  2006/02/15 22:48:10  arno
 % fix rescaling\
 %
