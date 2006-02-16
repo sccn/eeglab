@@ -17,11 +17,14 @@
 %   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
 %                     'all'                         -> plot all clusters in STUDY.
 %                     {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ITCs 
+%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'        -> plot all the components in the cluster {default: 'all'}.
+%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
 %                     of the requested clusters are plotted in the same figure - one per condition. 
-%                     In 'comps' mode, component ITCs for each cluster are plotted in a
-%                     separate figure (per condition) with the cluster mean ITC.
-%                     {default: 'centroid'}.
+%                     In 'comps' mode, component ERSPs for each cluster are plotted in a
+%                     separate figure (per condition) with the cluster mean ERSP.
+%                     {default: 'centroid'}. Note that this option is irrelevant if component
+%                     indices are provided as input.
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
 %                    figure ('off'). 'figure' 'off' is optional for one cluster in 'centroid' mode.
 %                    Useful for incomporating cluster ITC into a complex figure.
@@ -82,6 +85,9 @@ for k = 3:2:nargin
                     error('cls_plotclustitc: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'comps'
+            STUDY = cls_plotcompitc(STUDY, ALLEEG,  cls, varargin{k-1});
+            return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
         case 'figure' % plot on exisiting figure or a new figure
@@ -155,6 +161,7 @@ if strcmpi(mode, 'comps')
             cbar;
             axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
                 'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
+            cbar;
             for k = 1:len % Plot the individual component itc  
                 abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
                 subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
@@ -274,3 +281,127 @@ if strcmpi(mode, 'centroid')
         delete(h_wait)
     end
 end % Finished 'centroid' mode plot option
+
+% cls_plotcompitc() - Commandline function, to visualizing cluster component ITC images. 
+%                    Displays the ITC images of specified cluster components on separate figures,
+%                    using one figure for all conditions. 
+%                   The ITCs can be visualized only if component ITCs     
+%                   were calculated and saved in the EEG datasets in the STUDY.
+%                   These can be computed during pre-clustering using the GUI-based function
+%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
+%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% Usage:    
+%                   >> [STUDY] = cls_plotcompitc(STUDY, ALLEEG, cluster, comps);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
+%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   cluster     - single cluster number.  
+%
+% Optional inputs:
+%   comps      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'                       -> plot all the components in the cluster
+%                                                      (as in cls_plotclustmap). {default: 'all'}.
+%
+% Outputs:
+%   STUDY    - the input STUDY set structure modified with plotted cluster itc
+%                     image mean, to allow quick replotting (unless cluster mean 
+%                     already existed in the STUDY).  
+%
+%   Example:
+%                         >> cluster = 4; comps= [1 7 10];  
+%                         >> [STUDY] = cls_plotcompmap(STUDY,ALLEEG, cluster, comps);
+%                    Plots components 1, 7 & 10  itcs of cluster 4 on separate figures. 
+%
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclustitc         
+%
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $ Log: cls_plotcompitc.m,v $
+
+function STUDY = cls_plotcompitc(STUDY, ALLEEG, cls, varargin)
+icadefs;
+if ~exist('cls')
+    error('cls_plotcompitc: you must provide a cluster number as an input.');
+end
+if isempty(cls)
+   error('cls_plotcompitc: you must provide a cluster number as an input.');
+end
+if nargin == 3 % no components indices were given
+    % Default plot all components of the cluster
+    [STUDY] = cls_plotclustitc(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    return
+else
+    comp_ind = varargin{1}; 
+end
+
+Ncond = length(STUDY.condition);
+if Ncond == 0
+    Ncond =1;
+end
+for ci = 1 : length(comp_ind) %for each comp
+   rowcols(2) = ceil(sqrt(Ncond)); rowcols(1) = ceil((Ncond)/rowcols(2));
+   comp = STUDY.cluster(cls).comps(comp_ind(ci));     
+   subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+   
+   % figure properties
+   % -----------------
+   figure
+   pos = get(gcf, 'position');
+   magnif = 2.5/sqrt(Ncond);
+   set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
+   orient tall
+   set(gcf,'Color', BACKCOLOR);
+   
+   for n = 1:Ncond  %for each cond
+        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        if ~isfield(ALLEEG(abset).etc,'icaitcparams')
+            warndlg2([ 'Dataset ' num2str(abset) ' has no ITC info, aborting'] , ['Abort - Plot ITC']); 
+            return;
+        end
+        params = ALLEEG(abset).etc.icaitcparams;
+        sbplot(rowcols(1),rowcols(2),n), 
+        [itc, logfreqs] = cls_readitc(ALLEEG, abset, comp);
+        if isempty(itc)
+            warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icalogitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ITC' ); 
+            return
+        end
+        if Ncond >1
+            a = [ 'ITC, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
+        else
+            a = ['ITC, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
+        end
+        tftopo(abs(itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -.5 .5],...
+            'title', a, 'verbose', 'off', 'axcopy', 'off');
+                ft = str2num(get(gca,'yticklabel'));
+        ft = exp(1).^ft;
+        ft = unique(round(ft));
+        ftick = get(gca,'ytick');
+        ftick = exp(1).^ftick;
+        ftick = unique(round(ftick));
+        ftick = log(ftick);
+        set(gca,'ytick',ftick);
+        set(gca,'yticklabel', num2str(ft));
+        cbar;
+        axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
+            'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
+   end
+end
