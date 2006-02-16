@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/02/16 00:01:21  arno
+% fixing axis limits
+%
 % Revision 1.2  2006/02/15 22:59:20  arno
 % adding scaling etc...
 %
@@ -116,15 +119,26 @@ if strcmpi(mode, 'comps')
         if ~isfield(STUDY.cluster(cls(clus)).centroid,'spec')
             STUDY = cls_centroid(STUDY,ALLEEG, cls(clus) , 'spec');
         end
+        
+        % figure properties
+        % -----------------
+        figure
+        rowcols(2) = ceil(sqrt(Ncond)); 
+        rowcols(1) = ceil((Ncond)/rowcols(2));
+        pos = get(gcf, 'position');
+        magnif = 2.5/sqrt(Ncond);
+        set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
+        orient tall
+        set(gcf,'Color', BACKCOLOR);        
+        
         for n = 1:Ncond
             try
                 clusnval = cls_clusread(STUDY, ALLEEG, cls(clus),'spec',n);
             catch,
                 warndlg2([ 'Some spectra information is missing, aborting'] , ['Abort - Plot spectra'] );   
                 return;
-           end
-           figure
-           orient tall
+            end
+            handl(n) = sbplot(rowcols(1),rowcols(2),n);
             ave_spec = STUDY.cluster(cls(clus)).centroid.spec{n};
             f = STUDY.cluster(cls(clus)).centroid.spec_f;
             plot(f,clusnval.spec,'color', [0.5 0.5 0.5]);
@@ -134,8 +148,20 @@ if strcmpi(mode, 'comps')
             xlabel('Frequency [Hz]');
             ylabel('Power [dB]');
             title(['Spectra, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
-            set(gcf,'Color', BACKCOLOR);
-            axcopy
+            if n == 1
+                ylimits = get(gca,'YLim');
+            else
+                tmp = get(gca,'YLim');
+                ylimits(1) = min(tmp(1),ylimits(1) );
+                ylimits(2) = max(tmp(2),ylimits(2) );
+            end
+            if n == Ncond %set all condition figures to be on the same scale
+                for condi = 1: Ncond
+                    axes(handl(condi));
+                    axis([f(1) f(end)  ylimits(1)  ylimits(2) ]);
+                    axcopy;
+                end
+            end
         end % finished one condition
     end % finished all requested clusters 
 end % Finished 'comps' mode plot option
