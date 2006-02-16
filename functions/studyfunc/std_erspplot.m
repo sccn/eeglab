@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/02/16 23:33:12  arno
+% fix figure off
+%
 % Revision 1.5  2006/02/16 20:31:39  arno
 % integrate cls_plotcompersp.m
 %
@@ -272,6 +275,16 @@ if strcmpi(mode, 'centroid')
             logfreqs = STUDY.cluster(cls(k)).centroid.ersp_logf;
             tftopo(ave_ersp,params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ERSP', 'verbose', 'off');
+            ft = str2num(get(gca,'yticklabel'));
+            ft = exp(1).^ft;
+            ft = unique(round(ft));
+            ftick = get(gca,'ytick');
+            ftick = exp(1).^ftick;
+            ftick = unique(round(ftick));
+            ftick = log(ftick);
+            set(gca,'ytick',ftick);
+            set(gca,'yticklabel', num2str(ft));
+            xlabel('Time [ms]');
             cbar;
         else
             for n = 1:Ncond
