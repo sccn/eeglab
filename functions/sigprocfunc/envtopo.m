@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2006/02/10 02:28:40  scott
+% clarified 'timerange' help; made MAX_FRAMES == 10000 test -sm
+%
 % Revision 1.98  2006/02/01 15:32:34  scott
 % added warnings about passing incoplete weights matrix -sm
 %
@@ -494,9 +497,12 @@ if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
 [chans,frames] = size(data);
+%toby
+%{
 if chans < 2
    error('requires multiple data channels');
 end
+%}
 if frames > MAX_FRAMES
    error('number of frames to plot too large');
 end
@@ -806,8 +812,13 @@ for c = 1:ncomps
       end;                                                % now proj has only g.plotchans and g.compnums     
 
       envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); % save the comp envelope
-
-      [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2))); 
+      
+      %toby
+      if length(g.plotchans) > 1
+        [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2)));
+      else
+        [maxval,maxi] = max(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2)); 
+      end
                                   % find point of max variance for comp c
       compvars(c)   = maxval;
       %
