@@ -149,6 +149,13 @@ if isempty(STUDY.cluster)
         STUDY.cluster(1).sets = tmp;
         clear tmp
     end
+else
+    for index = 1:length(STUDY.cluster)
+        if ~isempty(STUDY.cluster(index).centroid) & ~isstruct(STUDY.cluster(index).centroid)
+            STUDY.cluster(index).centroid = [];
+            modif = 1; 
+        end;
+    end;    
 end;
 
 % determine if there has been any change
