@@ -158,10 +158,9 @@ if strcmpi(mode, 'comps')
             set(gca,'ytick',ftick);
             set(gca,'yticklabel', num2str(ft));
             xlabel('Time [ms]');
-            cbar;
             axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
-            cbar;
+                'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar(''pos''); clear ft fti;' ]);
+            cbar('pos');
             for k = 1:len % Plot the individual component itc  
                 abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
                 subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
@@ -181,10 +180,10 @@ if strcmpi(mode, 'comps')
                 xlabel('');
                 ylabel('');
                 axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
+                'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar(''pos''); clear ft fti;' ]);
                 waitbar((k*n)/(Ncond*len),h_wait);
                 if k == len
-                    cbar;
+                    cbar('pos');
                 end
             end % finished all components in cluster 
        end % finished all conditions
@@ -273,7 +272,7 @@ if strcmpi(mode, 'centroid')
             else
                 xlabel('');
             end;
-            cbar;
+            cbar('pos');
             waitbar((k*n)/(len*Ncond),h_wait);
         end % Finish plotting all centroids for one condition
     end  % Finished all conditions
@@ -400,8 +399,8 @@ for ci = 1 : length(comp_ind) %for each comp
         ftick = log(ftick);
         set(gca,'ytick',ftick);
         set(gca,'yticklabel', num2str(ft));
-        cbar;
+        cbar('pos');
         axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-            'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
+            'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar(''pos''); clear ft fti;' ]);
    end
 end
