@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2006/02/16 21:13:00  scott
+% adding 'mapchans' -sm
+%
 % Revision 1.95  2006/01/31 17:25:26  scott
 % upgraded the whole help msg -sm
 %
@@ -576,11 +579,11 @@ if isempty(g.weights)
         % spec = sqrt( g.mapnorm(1)^4 + g.mapnorm(1)^4 + ... )*power(compact)
     end;
     
-    tmpc = find(eegspecdB(:,1));
+    tmpc = find(eegspecdB(:,1)); 			% > 0 power chans
+    zchans = int2str(find(eegspecdB(:,1) == 0)); 	% 0-power chans
     if length(tmpc) ~= size(eegspecdB,1)
-        fprintf(...
-'\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
-                   int2str(find(eegspecdB(:,1) == 0)));
+        fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
+                   zchans);
         eegspecdB = eegspecdB(tmpc,:);
         if ~isempty(specstd),  specstd = specstd(tmpc,:); end;
         g.chanlocs2 = g.chanlocs(tmpc);
@@ -604,7 +607,7 @@ else
 	g.reref = 'no';
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% select channel and spectrum
+	% select channels and spectra
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	if isempty(g.plotchan) % find channel of minimum power
 		[tmp indexfreq] = min(abs(g.freq-freqs));
@@ -646,8 +649,8 @@ else
     
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% rescale spectra with respect to projection (rms = root mean square)
-    % all channel: component_i power = rms(inverseweigths(component_i)^2)*power(activation_component_i);
-    % one channel: component_i power = inverseweigths(channel_j,component_i)^2)*power(activation_component_i);
+    % all channels: component_i power = rms(inverseweigths(component_i)^2)*power(activation_component_i);
+    % one channel:  component_i power = inverseweigths(channel_j,component_i)^2)*power(activation_component_i);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if strcmpi(g.icamode, 'normal')
         for index = 1:size(compeegspecdB,1) 
@@ -965,9 +968,9 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		else % plot all channels in g.plotchans 
 
 			if ~isempty(varargin)
-				topoplot(topodata(g.mapchans,:),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
+				topoplot(topodata(g.mapchans),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
 			else
-				topoplot(topodata(g.mapchans,:),g.chanlocs2,'maplimits',maplimits); 
+				topoplot(topodata(g.mapchans),g.chanlocs2,'maplimits',maplimits); 
 			end
 			if f<length(g.freq)
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
