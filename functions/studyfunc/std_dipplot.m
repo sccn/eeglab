@@ -61,7 +61,7 @@ function STUDY = cls_plotclustdip(STUDY, ALLEEG, varargin)
 cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
 mode = 'apart'; % plot clusters on separate figures  
 figureon = 1; % plot on a new figure
-options = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0};
+opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0};
 %, 'spheres', 'on'
 for k = 3:2:nargin
     switch varargin{k-2}
@@ -82,12 +82,12 @@ for k = 3:2:nargin
             mode = varargin{k-1};
          case 'figure'
             if strcmpi(varargin{k-1},'off') 
-                options{end + 1} = 'gui';
-                options{end + 1} = 'off';
+                opt_dipplot{end + 1} = 'gui';
+                opt_dipplot{end + 1} = 'off';
                 figureon = 0;
             else
-                options{end + 1} = 'projimg';
-                options{end + 1} = 'on';
+                opt_dipplot{end + 1} = 'projimg';
+                opt_dipplot{end + 1} = 'on';
             end
     end
 end
@@ -137,9 +137,13 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                end
            end % finished going over cluster comps
            cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).centroid.dipole;
+           
+           % additional options
+           % ------------------
            dip_color = cell(1,ndip+1);
            dip_color(1:ndip) = {'b'};
            dip_color(end) = {'r'};
+           options = opt_dipplot;
            options{end+1} =  'mri';
            options{end+1} =  ALLEEG(abset).dipfit.mrifile;
            options{end+1} =  'coordformat';
@@ -159,6 +163,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                options{end+1} = 'projlines';
                options{end+1} = 'on'
            end
+           
            if figureon
                dipplot(cluster_dip_models, options{:});
                fig_h = gcf;
@@ -181,6 +186,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                dipinfo.title = diptitle;
                set(gcf, 'UserData', dipinfo);
                set(gca,'UserData', dipinfo);
+               rotate3d off;
                axcopy(gcf, ['dipinfo = get(gca, ''''UserData''''); dipplot(dipinfo.dipmod, dipinfo.op{:}); set(gcf, ''''Name'''', dipinfo.title,''''NumberTitle'''',''''off''''); ']);
            end
         end % finished the if condition that cluster isn't empty
@@ -188,8 +194,6 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
 end
 
 if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (must be a new figure)
-    options{end + 1} =  'gui';
-    options{end + 1} =  'off';
     N = length(cls);
     rowcols(2) = ceil(sqrt(N)); % Number of rows in the subplot figure.
     rowcols(1) = ceil(N/rowcols(2));
@@ -226,6 +230,9 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
         dip_color = cell(1,length(cluster_dip_models));
         dip_color(1:end-1) = {'b'};
         dip_color(end) = {'r'};
+        options = opt_dipplot;
+        options{end + 1} =  'gui';
+        options{end + 1} =  'off';
         options{end+1} =  'mri';
         options{end+1} =  ALLEEG(abset).dipfit.mrifile;
         options{end+1} =  'coordformat';
@@ -260,7 +267,6 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
         %set(gcf, 'UserData', dipinfo);
         %set(gca,'UserData', dipinfo);
         %axcopy(gcf, ['dipinfo = get(gca, ''''UserData''''); dipplot(dipinfo.dipmod, dipinfo.op{:}); set(gcf, ''''Name'''', dipinfo.title,''''NumberTitle'''',''''off'''');']);
-        axcopy
    end %finished going over all clusters
    set(fig_h, 'resize','on');
 end % finished case of 'all' clusters
