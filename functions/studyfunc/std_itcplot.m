@@ -189,7 +189,9 @@ end % Finished 'comps' mode plot option
 if strcmpi(mode, 'centroid') 
     len = length(cls);
     if len ~= 1
-        rowcols(2) = ceil(sqrt(len)); rowcols(1) = ceil((len)/rowcols(2));
+        rowcols(2) = ceil(sqrt(len)/Ncond); rowcols(1) = ceil((len)/rowcols(2)); rowcols(2) = rowcols(2)*Ncond;
+    else
+        rowcols(2) = Ncond;  rowcols(1) = 1;
     end
     if figureon
         try 
@@ -199,9 +201,9 @@ if strcmpi(mode, 'centroid')
             h_wait = waitbar(0,['Computing ITC ...'],'position', [300, 200, 300, 48]);
         end
     end
-    % ITC plotting limitis is the average limits across all clusters
-    %lim(1:Ncond) = 0;   
+    
     % Compute cluster centroid
+    % ------------------------
     for k = 1:len 
         if ~isfield(STUDY.cluster(cls(k)).centroid,'itc')
             STUDY = cls_centroid(STUDY,ALLEEG, cls(k) , 'itc');
@@ -210,83 +212,62 @@ if strcmpi(mode, 'centroid')
             warndlg2(['eeg_clustedit: some .icaitc files could not be found for cluster ' STUDY.cluster(cls(k)).name ], 'Abort - Plot itc' ); 
             return
         end
+        % ITC plotting limitis is the average limits across all clusters
         %for n = 1:Ncond
         %    lim(n) = lim(n)+STUDY.cluster(cls(k)).centroid.itc_limits{n}; %plotting limits
         %end
     end
-    %lim = lim./len;
+
     params = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(1)).sets(1,1))).index).etc.icaerspparams;
-    for n = 1:Ncond
-        if figureon 
-            figure
-            maintitle = ['Average ITC for all clusters, condition ' num2str(n)];
-            a = textsc(maintitle, 'title'); 
-            set(a, 'fontweight', 'bold'); 
-        end
+    if figureon
+        figure
+        pos = get(gcf, 'position');
+        magnif = 2.5/sqrt(Ncond);
+        set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
         orient tall
         set(gcf,'Color', BACKCOLOR);
-        for k = 1:len 
-            if len ~= 1
-                sbplot(rowcols(1),rowcols(2),k) , 
-            end
+    end;
+    
+    if len > 1
+        maintitle = ['Average ERSP for clusters ' int2str(1:len) ];
+        a = textsc(maintitle, 'title'); 
+        set(a, 'fontweight', 'bold'); 
+    end;
+    
+    for k = 1:len 
+        
+        % find maximum value
+        % ------------------
+        maxval = 0;
+        for n = 1:Ncond
+            maxval = max(max(max(abs(STUDY.cluster(cls(k)).centroid.itc{n}))), maxval);
+        end;
+        
+        % plot
+        % ----
+        for n = 1:Ncond
+            sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
             a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
-            ave_itc = STUDY.cluster(cls(k)).centroid.itc{n};
+            ave_itc  = STUDY.cluster(cls(k)).centroid.itc{n};
             logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
-            if figureon % plot on a new figure
-                tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -.5 .5],...
-                    'title', a, 'verbose', 'off', 'axcopy', 'off');
-                axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                    'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
-                if k ~= len
-                    set(gca, 'xtick', [], 'ytick', []);
-                    xlabel('');
-                    ylabel('');
-                else
-                    ft = str2num(get(gca,'yticklabel'));
-                    ft = exp(1).^ft;
-                    ft = unique(round(ft));
-                    ftick = get(gca,'ytick');
-                    ftick = exp(1).^ftick;
-                    ftick = unique(round(ftick));
-                    ftick = log(ftick);
-                    set(gca,'ytick',ftick);
-                    set(gca,'yticklabel', num2str(ft));
-                    xlabel('Time [ms]');
-                    cbar;
-                end
-                waitbar((k*n)/(len*Ncond),h_wait);
+            tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+                   'title', a, 'verbose', 'off');
+            ft = str2num(get(gca,'yticklabel'));
+            ft = exp(1).^ft;
+            ft = unique(round(ft));
+            ftick = get(gca,'ytick');
+            ftick = exp(1).^ftick;
+            ftick = unique(round(ftick));
+            ftick = log(ftick);
+            set(gca,'ytick',ftick);
+            set(gca,'yticklabel', num2str(ft));
+            if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
+                xlabel('Time [ms]');
             else
-               itc{n}.itc = abs(ave_itc);
-               itc{n}.times = params.times;
-               itc{n}.logf = logfreqs;
-               itc{n}.limits = [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -.5 .5];
-               itc{n}.title = a;
-               if n == Ncond % finished computing all conditions
-                   tftopo(itc{1}.itc,itc{1}.times,itc{1}.logf,'limits', itc{1}.limits, 'title', itc{1}.title, 'verbose', 'off', 'axcopy', 'off');
-                   ft = str2num(get(gca,'yticklabel'));
-                   ft = exp(1).^ft;
-                   ft = unique(round(ft));
-                   ftick = get(gca,'ytick');
-                   ftick = exp(1).^ftick;
-                   ftick = unique(round(ftick));
-                   ftick = log(ftick);
-                   set(gca,'ytick',ftick);
-                   set(gca,'yticklabel', num2str(ft));
-                   set(get(gca,'Title'),'FontSize',10);
-                   xlabel('Time [ms]');
-                   set(get(gca,'Ylabel'),'FontSize',10);
-                   set(get(gca,'Xlabel'),'FontSize',10);                   
-                   set(get(gcf,'Children'),'FontSize',10);
-                   set(gcf, 'UserData', itc);
-                   set(gca,'UserData', itc);
-                   axcopy(gcf, ['itc = get(gca, ''''UserData''''); len = length(itc); rowcols(2) = ceil(sqrt(len)); rowcols(1) = ceil((len)/rowcols(2)); '...
-                   ' for k = 1:len, subplot(rowcols(1),rowcols(2),k), '...
-                   ' tftopo(itc{k}.itc,itc{k}.times,itc{k}.logf,''''limits'''', itc{k}.limits, ''''title'''', itc{k}.title, ''''verbose'''', ''''off'''', ''''axcopy'''', ''''off'''');' ...
-                   ' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                   'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]'''');' ...
-                   'ylabel(''''Frequency [Hz]''''); end; cbar; clear ft fti ersp;' ]);
-               end
-           end
+                xlabel('');
+            end;
+            cbar;
+            waitbar((k*n)/(len*Ncond),h_wait);
         end % Finish plotting all centroids for one condition
     end  % Finished all conditions
     if figureon
