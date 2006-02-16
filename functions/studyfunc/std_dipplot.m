@@ -86,6 +86,9 @@ for k = 3:2:nargin
             return;
         case 'mode' % Plotting mode 'apart' / 'joined'
             mode = varargin{k-1};
+            if strcmpi(mode, 'centroid') | strcmpi(mode, 'comps')
+                if length(cls) == 1, mode = 'apart'; else mode = 'joined'; end;
+            end;
          case 'figure'
             if strcmpi(varargin{k-1},'off') 
                 opt_dipplot{end + 1} = 'gui';
