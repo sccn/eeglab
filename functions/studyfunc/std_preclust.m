@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/02/16 22:09:43  arno
+% scalpG -> scalpg
+%
 % Revision 1.11  2006/02/11 00:29:44  arno
 % final fix
 %
@@ -468,7 +471,7 @@ function [ STUDY, ALLEEG ] = eeg_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpLaplac' , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalpL(ALLEEG(idat), succompind{si}); 
+                     [tmp, X] = cls_scalpl(ALLEEG(idat), succompind{si}); 
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
