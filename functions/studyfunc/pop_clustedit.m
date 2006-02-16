@@ -536,9 +536,9 @@ else
         case 'plotclustsum'
             clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             if clus ~= 1 % specific cluster option
-                [STUDY] = cls_plotclust(STUDY, ALLEEG, cls(clus-1));
+                [STUDY] = cls_plotclust(STUDY, ALLEEG, 'cluster', cls(clus-1));
                 % update Study history
-                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, '  num2str(cls(clus-1)) ' );'  ];
+                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, ''cluster'', '  num2str(cls(clus-1)) ' );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             else % all clusters
                 % All clusters does not include 'Notclust' and 'Outliers' clusters. 
@@ -549,9 +549,9 @@ else
                         tmpcls = [tmpcls cls(k)];
                     end
                 end
-                [STUDY] = cls_plotclust(STUDY, ALLEEG, tmpcls);
+                [STUDY] = cls_plotclust(STUDY, ALLEEG, 'cluster', tmpcls);
                 % update Study history
-                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, ['  num2str(tmpcls) '] );'  ];
+                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, ''cluster'', ['  num2str(tmpcls) '] );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
            userdat{1}{2} = STUDY;
