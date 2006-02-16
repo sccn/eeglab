@@ -438,23 +438,24 @@ else
            set(hdl, 'userdat',userdat);    
         case {'plotcompmap', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
             plotting_option = varargin{1};
+            plotting_option = [ 'plotclust' plotting_option(9:end) ];
             clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             if (clus ~= 1 ) %specific cluster
                 if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ',[' num2str(comp_ind-1) '] );'  ]);
+                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''comps'',[' num2str(comp_ind-1) '] );'  ]);
                     % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ',[' num2str(comp_ind-1) '] );'  ];
+                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind-1) '] );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                  else
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ' );'  ]);
+                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ]);
                     % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ' );'  ];
+                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                     if length(comp_ind) > 1 % plot specific components too
-                        eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ',[' num2str(comp_ind(2:end)-1) '] );'  ]);
+                        eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );'  ]);
                         % update Study history
-                        a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(clus-1)) ',[' num2str(comp_ind(2:end)-1) '] );' ];
+                        a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );' ];
                         STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                     end
                 end
@@ -470,9 +471,9 @@ else
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                            if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
                                cind = comp_ind(ci) - num_comps; % component index in the cluster
-                               eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );'  ]);
+                               eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );'  ]);
                                % update Study history
-                               a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,'  num2str(cls(k)) ',[' num2str(cind) '] );' ];
+                               a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );' ];
                                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                                break;
                            else
