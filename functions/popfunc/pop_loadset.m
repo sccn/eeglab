@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2006/02/16 19:23:52  arno
+% checking dataset
+%
 % Revision 1.49  2006/01/31 22:28:25  arno
 % EEG.saved = 'justloaded'
 %
@@ -313,6 +316,7 @@ end;
 
 % load all data or specific data channel
 % --------------------------------------
+EEG = eeg_checkset(EEG);
 if isstr(g.loadmode)
     if strcmpi(g.loadmode, 'all')
         EEG = eeg_checkset(EEG, 'loaddata');
@@ -345,7 +349,6 @@ end;
 
 % set field indicating that the data has not been modified
 % --------------------------------------------------------
-EEG = eeg_checkset(EEG);
 if isfield(EEG, 'changes_not_saved')
     EEG = rmfield(EEG, 'changes_not_saved');
 end;
