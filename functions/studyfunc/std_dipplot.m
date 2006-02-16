@@ -13,12 +13,15 @@
 %
 % Optional inputs:
 %   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
-%                    'all'                         -> plot all clusters in STUDY.
+%                    'all'         -> plot all clusters in STUDY.
 %                    {default: 'all'}.
-%   'mode'    - ['joined'|'apart'] Display all requested cluster on one 
+%   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
+%                     'all'        -> plot all the components in the cluster {default: 'all'}.
+%   'mode'     - ['joined'|'apart'] Display all requested cluster on one 
 %                    figure or separate figures. {default: 'joined'}
 %                    'joined' -> plot all 'clusters' in one figure (without the gui).
-%                    'apart'   -> plot each cluster in a separate figure.
+%                    'apart'   -> plot each cluster in a separate figure. Note
+%                     that this parameter has no effect if the 'comps' option is used.
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
 %                    figure ('off'). If figure 'off' does not display gui controls,
 %                    Useful for incomporating one cluster dipplot into a 
@@ -78,6 +81,9 @@ for k = 3:2:nargin
                     error('cls_plotclustdip: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'comps'
+            STUDY = cls_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
+            return;
         case 'mode' % Plotting mode 'apart' / 'joined'
             mode = varargin{k-1};
          case 'figure'
@@ -270,3 +276,101 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
    end %finished going over all clusters
    set(fig_h, 'resize','on');
 end % finished case of 'all' clusters
+% cls_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
+%                   Displays the dipoles of specified cluster components with the cluster mean 
+%                   dipole on separate figures. 
+%                   To visualize dipoles they first must be stored in the EEG dataset structures
+%                   using dipfit(). Only components that have a dipole locations will be displayed,
+%                   along with the cluster mean dipole in red. 
+% Usage:    
+%                   >> [STUDY] = cls_plotcompdip(STUDY, ALLEEG, cluster, comps);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
+%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   cluster     - single cluster number.  
+%
+% Optional inputs:
+%   comps      - [numeric vector]  -> indices of the cluster components to plot.
+%                       'all'                       -> plot all the components in the cluster {default: 'all'}. 
+%
+% Outputs:
+%   STUDY    - the input STUDY set structure modified with plotted cluster
+%                     dipole mean, to allow quick replotting (unless cluster mean 
+%                     already existed in the STUDY).  
+%
+%   Example:
+%                         >> cluster = 4; comps= 1;  
+%                         >> [STUDY] = cls_plotcompdip(STUDY,ALLEEG, cluster, comps);
+%                    Plots component 1 dipole in blue with the cluster 4 mean dipole in red. 
+%
+%  See also  pop_clustedit, dipfit, cls_plotclustdip         
+%
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 08, 2005, hilit@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function STUDY = cls_plotcompdip(STUDY, ALLEEG, cls, varargin)
+if ~exist('cls')
+    error('cls_plotcompdip: you must provide a cluster number as an input.');
+end
+if isempty(cls)
+   error('cls_plotcompdip: you must provide a cluster number as an input.');
+end
+if nargin == 3 % no components indices were given
+    % Default plot all components of the cluster
+    [STUDY] = cls_plotclustdip(STUDY, ALLEEG, 'clusters', cls);
+    return
+else
+    comp_ind = varargin{1}; 
+end
+
+for ci = 1:length(comp_ind)
+    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+    comp = STUDY.cluster(cls).comps(comp_ind(ci));
+    subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    if ~isfield(ALLEEG(abset), 'dipfit')
+        warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
+        return;
+    end
+    if ~isfield(STUDY.cluster(cls).centroid,'dipole')
+        STUDY = cls_centroid(STUDY,ALLEEG, cls , 'dipole');
+    end
+    comp_to_disp = ['IC' num2str(comp) ' / ' subject];
+    cluster_dip_models = ALLEEG(abset).dipfit.model(comp);
+    cluster_dip_models(2) = STUDY.cluster(cls).centroid.dipole;
+    if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
+        if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
+            eval(['load ' ALLEEG(abset).dipfit.hdmfile]);
+            max_r = max(vol.r);
+        else
+            max_r = max(ALLEEG(abset).dipfit.vol.r);
+        end
+        dipplot(cluster_dip_models, 'sphere', max_r, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
+           'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [ STUDY.cluster(cls).name ' mean' ] },...
+            'spheres', 'on', 'verbose', 'off');
+    else
+       dipplot(cluster_dip_models, 'meshdata', ALLEEG(abset).dipfit.hdmfile, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
+          'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [STUDY.cluster(cls).name ' mean']}, ...
+          'spheres', 'on', 'verbose', 'off');
+    end
+    fig_h = gcf;
+    set(fig_h,'Name', [ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name],'NumberTitle','off');
+end
+        
