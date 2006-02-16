@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/02/15 22:12:42  arno
+% revision
+%
 
 function [STUDY, centroid] = cls_centroid(STUDY,ALLEEG, clsind, varargin);
 
@@ -230,7 +233,9 @@ if itcC | erspC | specC | erpC | scalpC
                     end
                 end
             end
-            fprintf('\n');
+            if ~scalpC
+                fprintf('\n');
+            end;
         end
 	end
 end
