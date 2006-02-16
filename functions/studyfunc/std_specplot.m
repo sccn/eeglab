@@ -26,7 +26,8 @@
 %                     different conditions (if any) plotted in different colors. In 'comps' mode, spectra
 %                     for each specified cluster are plotted in separate figures (per condition), each 
 %                     containing  cluster components spectra plus the average cluster spectrum in bold.
-%                     {default: 'centroid'}.
+%                     {default: 'centroid'}. Note that this option is irrelevant if component
+%                     indices are provided as input.
 %   'figure'       - ['on'|'off'] for the 'centroid' mode option, plots on
 %                     a new figure ('on')  or plots on current figure ('off').
 %                     {default: 'on'}.
@@ -63,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/02/16 19:47:48  arno
+% set xlimits and move cls_plotcompspec.m inside
+%
 % Revision 1.4  2006/02/16 19:01:33  arno
 % plotting both conditions on the same figure
 %
