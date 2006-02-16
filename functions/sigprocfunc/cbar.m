@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/05/07 16:07:49  scott
+% help comments - added a useful example -sm
+%
 % Revision 1.2  2003/07/30 01:53:13  arno
 % adding grad option
 %
@@ -61,6 +64,7 @@ function [handle]=cbar(arg,colors,minmax, grad)
 if nargin < 2
   colors = 0;
 end
+posscale = 'off';
 if nargin < 1
   arg = 'vert';
   ax = [];
@@ -68,10 +72,14 @@ else
   if isempty(arg)
     arg = 0;
   end
-  if arg == 0
+  if arg(1) == 0
     ax = [];
     arg = 'vert';
-  else
+  elseif strcmpi(arg, 'pos')
+    ax = [];
+    arg = 'vert';
+    posscale = 'on';
+  else      
     if isstr(arg)
       ax = [];
     else
@@ -149,9 +157,14 @@ n = size(map,1);
 
 if length(colors) == 1
   if strcmp(arg,'vert')
-    image([0 1],t,[1:n-colors]');
-    set(ax,'xticklabelmode','manual')
-    set(ax,'xticklabel',[],'YAxisLocation','right')
+      if strcmpi(posscale, 'on')
+          dsfg
+          image([0 1],[0 t(2)],[ceil(n/2):n-colors]');
+      else
+          image([0 1],t,[1:n-colors]');
+      end;
+      set(ax,'xticklabelmode','manual')
+      set(ax,'xticklabel',[],'YAxisLocation','right')
       
   else
     image(t,[0 1],[1:n-colors]);
