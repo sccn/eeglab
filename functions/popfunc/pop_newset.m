@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/02/07 19:21:09  arno
+% nothing
+%
 % Revision 1.55  2006/02/07 19:17:51  arno
 % checking dataset consistency
 %
@@ -424,7 +427,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     if length(result) == 0,
 		args = { 'retrieve', OLDSET }; % cancel
 	else 
-        if strcmpi(EEG.saved, 'justloaded') & overwrite_or_save
+        if shift == 0
             if ~strcmp(EEG.setname, result{1} )       
                 args = { 'setname', result{1} };
             end;
@@ -507,18 +510,22 @@ end;
 
 % moving/erasing/creating datasets
 % --------------------------------
+com = '';
 if save_retrieve
     % dataset retrieval
     % -----------------
     if overWflag
          % delete old dataset
         ALLEEG = pop_delset( ALLEEG, OLDSET);
+        com = sprintf('ALLEEG = pop_delset( ALLEEG, %d);', OLDSET);
     else        
         EEG = update_datafield(EEG);
         [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
+        com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, %s);', OLDSET, vararg2str(args));        
     end;
     if ~isempty(g.retrieve)
         [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, g.retrieve);
+        com = [ com sprintf('[EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, %d);', g.retrieve) ];
     end;
 else
     % new dataset
@@ -532,18 +539,12 @@ else
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
         end;
     end;
-end;        
-
-% generate the output command
-% ---------------------------
-if ~isempty(g.retrieve) & g.retrieve ~= -1
     if ~isempty(args)
         com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, %s);', OLDSET, vararg2str(args));
+    else
+        com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d);', OLDSET);
     end;
-    com = [com sprintf( '[ALLEEG EEG CURRENTSET] = eeg_retrieve(ALLEEG, %d);', g.retrieve) ];
-else
-    com = sprintf( '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %d, %s);', OLDSET, vararg2str(args));
-end;    
+end;        
 return;
 
 function num = popask( text )
