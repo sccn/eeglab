@@ -1304,7 +1304,7 @@ if strcmpi(g.dispmaps, 'on')
         if ~isempty(chanlocs)  % plot the component scalp maps
             if ~isempty(varargin)
                 figure(myfig);
-                topoplot(proj(:,t),g.chanlocs, varargin{:});
+                topoplot(maxproj(:,t),g.chanlocs, varargin{:});
                 
             else  % if no varargin specified
                 figure(myfig);
