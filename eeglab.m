@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.454  2006/02/07 23:18:32  arno
+% changing text
+%
 % Revision 1.453  2006/02/07 22:09:04  arno
 % same
 %
@@ -1967,7 +1970,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'CallBack', cb_resample);
 	uimenu( tools_m, 'Label', 'Filter the data'                       , 'CallBack', cb_eegfilt);
 	uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
-	uimenu( tools_m, 'Label', 'Reject continuous data'                , 'CallBack', cb_eegplot);
+	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
 	uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
 	rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
