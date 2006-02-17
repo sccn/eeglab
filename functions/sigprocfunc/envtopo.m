@@ -37,7 +37,8 @@
 %                   rv(component)   = 100*variance(component)/variance(data) {default:'mv'}
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and 
-%                  envelopes, and also for making scalp topo plots {default|[] -> all}
+%                  envelopes, and also for making scalp topo plots
+%                  {default|[] -> all}, by calling topoplot().
 %  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
 %                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
 %  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
@@ -497,12 +498,7 @@ if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
 [chans,frames] = size(data);
-%toby
-%{
-if chans < 2
-   error('requires multiple data channels');
-end
-%}
+
 if frames > MAX_FRAMES
    error('number of frames to plot too large');
 end
@@ -761,7 +757,10 @@ if max(g.compnums) > wtcomps | min(g.compnums)< 1
 end
 
 plotframes = ones(ncomps);
-maxproj = zeros(length(g.plotchans),ncomps);
+%toby 2.16.2006: maxproj will now contain all channel info, in case
+%plotgrid is called in topoplot.
+%maxproj = zeros(length(g.plotchans),ncomps);
+maxproj = zeros(chans,ncomps);
 %
 % first, plot the data envelope
 %
@@ -774,6 +773,7 @@ fprintf('Comparing maximum projections for components:  ');
         if ncomps>32
            fprintf('\n');
         end
+
 compvars = zeros(1,ncomps);
 mapsigns = zeros(1,ncomps);
 
@@ -806,20 +806,24 @@ for c = 1:ncomps
       end
 
       if isempty(g.icaact) % make the back-projection of component c
-          proj = g.icawinv(g.plotchans,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -sm 11/04
+          %toby 2.16.2006: Changed to include all channels in computation
+          %for use in topoplot and particularly with plotgrid option, if called.
+          %proj = g.icawinv(g.plotchans,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -sm 11/04
+          proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data;
       else 
-          proj = g.icawinv(g.plotchans,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 11/04
+          %proj = g.icawinv(g.plotchans,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 11/04
+          proj = g.icawinv(:,g.compnums(c))*g.icaact(g.compnums(c),:);
       end;                                                % now proj has only g.plotchans and g.compnums     
 
       envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); % save the comp envelope
       
-      %toby
+      %toby 2.16.2006: Added to allow plotchans to call a single channel
       if length(g.plotchans) > 1
         [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2)));
       else
-        [maxval,maxi] = max(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2)); 
+        [maxval,maxi] = max(max(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2))); 
       end
-                                  % find point of max variance for comp c
+      % find point of max variance for comp c
       compvars(c)   = maxval;
       %
       %%%%%% find variance in interval after removing component %%%%%%%%%%%
@@ -828,7 +832,11 @@ for c = 1:ncomps
                  g.pvaf = g.sortvar;
       end
       if strcmpi(g.pvaf, 'pvaf') | strcmpi('pvaf','on') | strcmpi(g.pvaf,'mv')
-              pvaf(c) = mean(mean((data(g.plotchans,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2)); 
+          %toby 2.16.2006: Change to be consistent with change in proj.
+          %Just means pvaf values are calculated for all channels now, rather than
+          %stopping at the plotchans limit.
+          %pvaf(c) = mean(mean((data(g.plotchans,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2));
+          pvaf(c) = mean(mean((data(:,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2));
       else % if 'pvaf' is 'rv' (or, formerly, 'off')
               pvaf(c) = mean(mean(proj(:,limframe1:limframe2).^2));      
       end;
@@ -1294,12 +1302,15 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(chanlocs)  % plot the component scalp maps
-            if ~isempty(varargin) 
+            if ~isempty(varargin)
                 figure(myfig);
-                topoplot(maxproj(:,t),chanlocs, varargin{:}); 
+                topoplot(proj(:,t),g.chanlocs, varargin{:});
+                
             else  % if no varargin specified
                 figure(myfig);
-                topoplot(maxproj(:,t),chanlocs,'style','both','emarkersize',3);
+                %toby 2.16.2006: Changed to accomodate fact that maxproj
+                %contains all channel info now.
+                topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
             if strcmpi(g.pvaf, 'on')
