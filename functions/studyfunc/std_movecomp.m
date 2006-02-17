@@ -74,7 +74,7 @@ for  ci = 1:length(comps)
     sets = STUDY.cluster(old_clus).sets(:,comps(ci));
     
     %update new cluster
-    indcomp = length(STUDY.cluster(new_clus));
+    indcomp = length(STUDY.cluster(new_clus).comps)+1;
     STUDY.cluster(new_clus).comps(indcomp) = comp;%with comp index
     STUDY.cluster(new_clus).sets(:,indcomp) = sets; %with set indices 
     if strcmpi(STUDY.cluster(new_clus).parent, 'manual')
@@ -113,6 +113,6 @@ STUDY.cluster(old_clus).comps = STUDY.cluster(old_clus).comps(left_comps);
 STUDY.cluster(old_clus).sets = STUDY.cluster(old_clus).sets(:,left_comps);
 if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
     STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
+    STUDY = cls_centroid(STUDY, ALLEEG, old_clus);%new centroid
 end;
-STUDY = cls_centroid(STUDY, ALLEEG, old_clus);%new centroid
 disp('Done.');
