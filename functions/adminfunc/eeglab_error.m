@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/31 19:59:42  arno
+% fixing matlab 5 etc ...
+%
 % Revision 1.1  2006/01/31 00:11:31  arno
 % Initial revision
 %
@@ -45,9 +48,9 @@ function eeglab_error;
     catch % Matlab 5 and when the stack is empty
         tmperr = [ 'EEGLAB error:' 10 10 tmplasterr ];
     end;
-    tmperr = [ tmperr 10 10 'If you think it is a bug, send a detailed' 10 ...
-               'description of how to reproduce the problem' 10 ...
-               'and a (small) test dataset to eeglab@sccn.ucsd.edu' ];
+    tmperr = [ tmperr 10 10 'If you think this is a bug, please send a detailed' 10 ...
+                            'description of how to reproduce the problem, with' 10 ...
+                            'a (small) test dataset, to eeglab@sccn.ucsd.edu' ];
     errordlg2(tmperr, 'EEGLAB error');
     
     
