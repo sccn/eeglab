@@ -818,10 +818,13 @@ for c = 1:ncomps
       envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); % save the comp envelope
       
       %toby 2.16.2006: Added to allow plotchans to call a single channel
+      %toby 2.17.2006: Changed to compute maximum component contribution to
+      %channels using only those channels specified by plotchans. This what
+      %was done before I started making changes, but my changes broke that.
       if length(g.plotchans) > 1
-        [maxval,maxi] = max(sum(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2)));
+        [maxval,maxi] = max(sum((proj(g.plotchans,limframe1:limframe2)).^2));
       else
-        [maxval,maxi] = max(max(proj(:,limframe1:limframe2).*proj(:,limframe1:limframe2))); 
+        [maxval,maxi] = max((proj(g.plotchans,limframe1:limframe2)).^2); 
       end
       % find point of max variance for comp c
       compvars(c)   = maxval;
