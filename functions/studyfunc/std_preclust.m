@@ -1,10 +1,10 @@
-% eeg_preclust() - prepare STUDY components' location and activity measures for later clustering.
+% cls_preclust() - prepare STUDY components' location and activity measures for later clustering.
 %                  Selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
 %                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
 %                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
-%                  used as input to the clustering  algorithm in pop_clust(). eeg_preclust() allows 
+%                  used as input to the clustering  algorithm in pop_clust(). cls_preclust() allows 
 %                  selection of a subset of components to use in the clustering. This subset 
 %                  may be a user-specified component subset, components with dipole model residual 
 %                  variance lower than a defined threshold (see dipfit()), or components from 
@@ -13,8 +13,8 @@
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
 %                  eeg_clust() or pop_clust().
 % Usage:    
-%                >> [ALLEEG,STUDY] = eeg_preclust(ALLEEG,STUDY); % cluster all comps in all sets
-%                >> [ALLEEG,STUDY] = eeg_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
+%                >> [ALLEEG,STUDY] = cls_preclust(ALLEEG,STUDY); % cluster all comps in all sets
+%                >> [ALLEEG,STUDY] = cls_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
 %
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
@@ -84,7 +84,7 @@
 %   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG  STUDY] = eeg_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [ALLEEG  STUDY] = cls_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/02/18 00:56:34  arno
+% showing more warnings
+%
 % Revision 1.13  2006/02/16 22:10:16  arno
 % scalpL -> scalpl
 %
@@ -132,10 +135,10 @@
 % final fix
 %
 
-function [ STUDY, ALLEEG ] = eeg_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
+function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
     
     if nargin < 2
-        help eeg_preclust;
+        help cls_preclust;
         return;
     end;
     if nargin == 2

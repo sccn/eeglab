@@ -1,6 +1,6 @@
 % pop_preclust() - prepare STUDY components' location and activity measures for later clustering.
 %                  Collect information in an interactive pop-up query window. To pre-cluster
-%                  from the commandline, use eeg_preclust(). After data entry into the pop window,
+%                  from the commandline, use cls_preclust(). After data entry into the pop window,
 %                  Selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
@@ -12,7 +12,7 @@
 %                  variance lower than a defined threshold (see dipfit()), or components from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated, and updated EEG sets are saved to disk.
-%                  Calls eeg_preclust().
+%                  Calls cls_preclust().
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/02/18 00:54:37  arno
+% changing default value for ERSP and spectrum so it matches the tutorial one
+%
 % Revision 1.23  2006/02/16 23:11:46  arno
 % ERSP -> ersp
 %
@@ -226,7 +229,7 @@ if ~isstr(varargin{1}) %intial settings
     end;
     
 	[preclust_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
-                                                      'helpcom', ' pophelp(''eeg_preclust'')', ...
+                                                      'helpcom', ' pophelp(''cls_preclust'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_preclust()', ...
                                                       'userdata', fig_arg);	
 	if isempty(preclust_param), return; end;
@@ -317,8 +320,8 @@ if ~isstr(varargin{1}) %intial settings
         warndlg2('No measure selected, abording operation.'); 
         return; 
     end;
-    [STUDY ALLEEG] = eeg_preclust(options{:});
-    com = sprintf('%s\n[STUDY ALLEEG] = eeg_preclust(STUDY, ALLEEG, %s);', ...
+    [STUDY ALLEEG] = cls_preclust(options{:});
+    com = sprintf('%s\n[STUDY ALLEEG] = cls_preclust(STUDY, ALLEEG, %s);', ...
                   STUDY.history, vararg2str(options(3:end)));
     
     % save updated STUDY to the disk
