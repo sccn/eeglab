@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/02/16 23:11:46  arno
+% ERSP -> ersp
+%
 % Revision 1.22  2006/02/11 00:29:56  arno
 % ERSP and ITC parameters
 %
@@ -86,7 +89,7 @@ if ~isstr(varargin{1}) %intial settings
     end
     
     % Create default ERSP / ITC time/freq. paramters 
-    ersp.f = '3 50';
+    ersp.f = '3 25';
     ersp.c = '3 0.5';
     ersp.p = '4';
     ersp.a = '0.01';
@@ -94,7 +97,7 @@ if ~isstr(varargin{1}) %intial settings
     [time_range, winsize] = compute_ersp_times(str2num(ersp.c),  ALLEEG(seti).srate, ...
         [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, str2num(ersp.f(1)),str2num(ersp.p)); 
     ersp.t = [num2str(round(time_range(1))) ' ' num2str(round(time_range(2))) ];
-    erspparams_str = ['                                                             ''frange'', [' ...
+    erspparams_str = ['''frange'', [' ...
             ersp.f '], ''cycles'', [' ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', ''tlimits'', [' ersp.t ']'];
 
     
@@ -163,7 +166,7 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'checkbox'   'string' '' 'tag' 'spectra_norm' 'value' 1 'enable' 'off' 'userdata' 'specP' } ...
     {'style' 'edit'       'string' '1' 'tag' 'spectra_weight' 'enable' 'off' 'userdata' 'specP'} ...
     {'style' 'text'       'string' 'Frequency range [Hz]' 'tag' 'spectra_freq_txt' 'userdata' 'spec' 'enable' 'off' } ...
-	{'style' 'edit'       'string' '3  30'  'tag' 'spectra_freq_edit' 'userdata' 'spec' 'enable' 'off' } ...
+	{'style' 'edit'       'string' '3  25'  'tag' 'spectra_freq_edit' 'userdata' 'spec' 'enable' 'off' } ...
     {'style' 'checkbox'   'string' '' 'tag' 'erp_on' 'value' 0 'Callback' set_erp 'userdata' '1'}  ...
 	{'style' 'text'       'string' 'ERPs' 'FontWeight' 'Bold' 'horizontalalignment' 'center' } ...
     {'style' 'edit'       'string' '10' 'tag' 'erp_PCA' 'enable' 'off' 'userdata' 'erpP'} ...
@@ -253,7 +256,7 @@ if ~isstr(varargin{1}) %intial settings
     % --------------------
     if os.spectra_on== 1 
         options{end+1} = {  'spec' 'npca' str2num(os.spectra_PCA) 'norm' os.spectra_norm ...
-                            'weight' str2num(os.spectra_weight)  'freqrange' os.spectra_freq_edit };
+                            'weight' str2num(os.spectra_weight)  'freqrange' str2num(os.spectra_freq_edit) };
     end
     
     % ERP option is on
