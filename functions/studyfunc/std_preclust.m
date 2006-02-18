@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/02/16 22:10:16  arno
+% scalpL -> scalpl
+%
 % Revision 1.12  2006/02/16 22:09:43  arno
 % scalpG -> scalpg
 %
@@ -400,6 +403,8 @@ function [ STUDY, ALLEEG ] = eeg_preclust(STUDY, ALLEEG, cluster_ind, components
                                else % Over write data in dataset
                                     overwrite = 1;
                                 end
+                            else
+                                disp('Using existing ERSP information...');
                             end
                         end
                     end
@@ -507,18 +512,10 @@ function [ STUDY, ALLEEG ] = eeg_preclust(STUDY, ALLEEG, cluster_ind, components
                 if ~isempty(succompind{si})
                     for cond = 1 : Ncond 
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                         if ~isempty('freqrange')
-                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
-                                                                  freqrange, fun_arg,overwrite);
-                             if ~isempty(tmp)
-                                 ALLEEG(idat).etc = tmp;
-                             end
-                         else
-                             [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
-                                                                         [], fun_arg,overwrite);
-                             if ~isempty(tmp)
-                                 ALLEEG(idat).etc = tmp;
-                             end
+                         [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
+                                                          freqrange, fun_arg,overwrite);
+                         if ~isempty(tmp)
+                             ALLEEG(idat).etc = tmp;
                          end
                          if cond == 1
                              con_data = X;
