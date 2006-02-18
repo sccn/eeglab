@@ -108,6 +108,7 @@ if isfield(EEG,'etc')
                  eval ( ['cd '  olddir]);
                  return
              end
+             
              if overwrite ~= 2
                  set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
@@ -143,6 +144,7 @@ if isfield(EEG,'etc')
                          overwrite = 2; % keep the info in all datasets
                  end
              end
+             
              X = zeros(length(comp),md) ;
              for k = 1:length(comp)
                  X(k,:) = floatread([ EEG.etc.icaspec 'm'], [md 1],[],md*comp(k))';
