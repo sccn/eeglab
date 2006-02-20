@@ -114,7 +114,7 @@
 %               as separate traces. Else, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
 %               (See also: 'vert' above). {default: none}
-%   'sortvarpercent' - [float vector] plot percentiles for the sorting variable
+%   'svpc'  - [0 < float_vector < 1] output percentiles for the sorting variable
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %               and the 90th percentile.
 % Miscellaneous options:
@@ -124,7 +124,7 @@
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
 %     outvar  = (1,epochsout) actual values trials are sorted on (after smoothing).
-%               if 'sortvarpercent' is used, this variable contains a cell array with
+%               if 'svpc' is used, this variable contains a cell array with
 %               { sorted_values { sorted_percent1 ... sorted_percentN } }
 %   outtrials = (1,epochsout)  smoothed trial numbers
 %     limits  = (1,10) array, 1-9 as in 'limits' above, then analysis frequency (Hz) 
@@ -178,6 +178,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.248  2006/01/12 01:33:04  toby
+% Comment edit
+%
 % Revision 1.245  2005/09/29 15:18:04  scott
 % documented the 'topo' flag args; set eloc_info.plotrad = [] to avoid lower-head topoplot() problem
 % when plotrad < radius of channel plotted -sm
@@ -1439,7 +1442,7 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
-	  elseif strcmp(Arg,'sortvarpercent')
+	  elseif strcmp(Arg,'svpc') | strcmp(Arg.'sortvarpercent')
 		  percentileflag = YES;
 	  elseif strcmp(Arg,'showwin')
 		  Showwin = YES;
