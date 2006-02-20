@@ -18,9 +18,12 @@
 %                For more information, see >> topoplot example 
 %
 % Optional inputs:
-%  'compnums'  = [integer array] vector of component numbers to plot {default|0 -> all}
-%                  Else if int < 0, the number of largest contributing components to plot 
-%                  {default|[] -> 7}
+%  'compnums'  = [integer array] vector of indices of component numbers to use in the 
+%                 calculations and to chose plots from {default|[] -> all}, or
+%                [negative integer]  the number of largest contributing components to plot.
+%                 compnums in the latter case is restricted in size by the internal MAXTOPOS, 
+%                 currently MAXTOPOS = 20.                
+%                  {default|[] -> -7}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
 %                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
@@ -30,11 +33,13 @@
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; 
-%                  if 'pv', sort by percent variance accounted for (pvaf). 
+%  'sortvar'    = ['mv'|'pv'|'rv'] 
+%                  If 'mv'(default), sort components by back-projected variance. 
+%                  If 'pv', sort by percent variance accounted for (pvaf). 
 %                  If 'rv', sort by relative variance. Here: 
 %                   pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data) {default:'mv'}
+%                   rv(component)   = 100*variance(component)/variance(data)
+%                  {default:'mv'}
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
@@ -797,6 +802,10 @@ end
 %
 %%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
 %
+% For the calculation of pvaf. Placed here for computational efficiency. Toby 2.19.2006
+% Variance of the data in the interval.
+vardat = mean(var(data(g.plotchans,limframe1:limframe2),1));
+
 for c = 1:ncomps 
       if ~rem(c,5) 
           fprintf('%d ... ',g.compnums(c)); % c is index into compnums
@@ -806,21 +815,19 @@ for c = 1:ncomps
       end
 
       if isempty(g.icaact) % make the back-projection of component c
-          %toby 2.16.2006: Changed to include all channels in computation
-          %for use in topoplot and particularly with plotgrid option, if called.
-          %proj = g.icawinv(g.plotchans,g.compnums(c))*weights(g.compnums(c),:)*data; % updated -sm 11/04
+          %Changed to include all channels in computation for use in 
+          %topoplot and particularly with plotgrid option, if called. toby 2.16.2006
           proj = g.icawinv(:,g.compnums(c))*weights(g.compnums(c),:)*data;
       else 
-          %proj = g.icawinv(g.plotchans,g.compnums(c))*g.icaact(g.compnums(c),:);     % updated -sm 11/04
           proj = g.icawinv(:,g.compnums(c))*g.icaact(g.compnums(c),:);
-      end;                                                % now proj has only g.plotchans and g.compnums     
+      end;    
+      % save the comp envelope
+      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); 
 
-      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); % save the comp envelope
-      
-      %toby 2.16.2006: Added to allow plotchans to call a single channel
-      %toby 2.17.2006: Changed to compute maximum component contribution to
-      %channels using only those channels specified by plotchans. This what
-      %was done before I started making changes, but my changes broke that.
+      % Find the frame(timepoint) of greatest component value and the relative value to those 
+      % channels defined by plotchans. The data is squared in order to make it positive, maxval
+      % is not used and we are only interested in the location of the maxval, not it's value. 
+      % toby 2.19.2006
       if length(g.plotchans) > 1
         [maxval,maxi] = max(sum((proj(g.plotchans,limframe1:limframe2)).^2));
       else
@@ -834,29 +841,27 @@ for c = 1:ncomps
       if isempty(g.pvaf)
                  g.pvaf = g.sortvar;
       end
-      if strcmpi(g.pvaf, 'pvaf') | strcmpi('pvaf','on') | strcmpi(g.pvaf,'mv')
-          %toby 2.16.2006: Change to be consistent with change in proj.
-          %Just means pvaf values are calculated for all channels now, rather than
-          %stopping at the plotchans limit.
-          %pvaf(c) = mean(mean((data(g.plotchans,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2));
-          pvaf(c) = mean(mean((data(:,limframe1:limframe2)-proj(:,limframe1:limframe2)).^2));
+      if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
+          %toby 2.19.2006: Change to be consistent with pvaf calculation in eeg_pvaf().
+          pvaf(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
+              -proj(g.plotchans,limframe1:limframe2),1))/vardat;
+          
+          
       else % if 'pvaf' is 'rv' (or, formerly, 'off')
-              pvaf(c) = mean(mean(proj(:,limframe1:limframe2).^2));      
+              pvaf(c) = 100*mean(var(proj(g.plotchans,limframe1:limframe2)))/vardat;
+                        
       end;
 
       maxi = maxi+limframe1-1;
       plotframes(c) = maxi;
-      maxproj(:,c)  = proj(:,maxi); % Note: maxproj contains only g.plotchans -sm 11/04
-      
-      %    ix = find(envdata(1,c*frames+1:(c+1)*frames) > ymax);
-      %    [val,ix] = max(envdata(1,c*frames+ix));
-      %    plotframes(c) = ix; % draw line from max non-clipped env maximum
-      %    maxproj(:,c)  = proj(:,ix);
-      % else draw line from max envelope value at max projection time point
+      maxproj(:,c)  = proj(:,maxi); % maxproj now contains all channels, to handle the 
+                                    % 'plotchans'/topoplot'gridplot' conflict. Toby 2.17.2006
 
 end % component c
 fprintf('\n');
-
+global toby
+toby.pvaf =pvaf;
+toby.compvars = compvars;
 %
 %%%%%%%%%%%%%%% Compute component selection criterion %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -865,14 +870,11 @@ fprintf('\n');
 if ~xunitframes
   fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
-vardat = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
 
 if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
-    pvaf = 100-100*pvaf/vardat;
     ot   = g.pvaf;
     if strcmpi(ot,'on'), ot = 'pvaf'; end
 elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')
-    pvaf = 100*pvaf/vardat;
     ot   = 'rv';
 end;
 [sortpvaf spx] = sort(pvaf);
@@ -1317,11 +1319,9 @@ if strcmpi(g.dispmaps, 'on')
             end
             axis square
             if strcmpi(g.pvaf, 'on')
-                set(gca, 'userdata', ...
-                         ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             else
-                set(gca, 'userdata', ...
-                         ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+                set(gca, 'userdata', ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
             end;
         else axis off;
         end;
