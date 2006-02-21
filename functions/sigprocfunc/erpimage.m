@@ -114,7 +114,7 @@
 %               as separate traces. Else, 'auxvar',{[that_matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
 %               (See also: 'vert' above). {default: none}
-%   'svpc'  - [0 < float_vector < 1] output percentiles for the sorting variable
+%   'svpc'   - [0 < float_vector < 1] output percentiles for the sorting variable
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %               and the 90th percentile.
 % Miscellaneous options:
@@ -178,6 +178,12 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.249  2006/02/20 18:03:41  scott
+% 'sortvarpercent' -> 'svpc'  changed help msg "plot" to "output"
+% since this option plotted nothing. Left 'sortvarpercent' == 'svpc' as
+% an undocumented option for backwards compatability. We should not use
+% long, prominent keywords for non-functional features...  -sm
+%
 % Revision 1.248  2006/01/12 01:33:04  toby
 % Comment edit
 %
@@ -1442,7 +1448,7 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
-	  elseif strcmp(Arg,'svpc') | strcmp(Arg.'sortvarpercent')
+	  elseif (strcmp(Arg,'svpc') | strcmp(Arg.'sortvarpercent'))
 		  percentileflag = YES;
 	  elseif strcmp(Arg,'showwin')
 		  Showwin = YES;
