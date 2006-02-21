@@ -33,13 +33,36 @@
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mv'|'pv'|'rv'] 
-%                  If 'mv'(default), sort components by back-projected variance. 
-%                  If 'pv', sort by percent variance accounted for (pvaf). 
+%  'sortvar'    = ['mp'|'pv'|'pp'|'rv'] {default:'mv'} 
+%                  If 'mp'(default), sort components by maximum mean back-projected power. 
+%                  Formerly called 'mv'. These values, sorted, are written to the output
+%                  variable compvars.
+%                  If 'pv', sort by percent variance accounted for (pvaf) by each component in
+%                  the specified ensemble of channels. See Also eeg_pvaf()
+%                  If 'pp', sort by percent power accounted for (ppaf) by each component in the
+%                  specified ensemble of channels.
 %                  If 'rv', sort by relative variance. Here: 
-%                   pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data)
-%                  {default:'mv'}
+%                   mp(component)   = max(mean(square(backproj_value(plotchans))))
+%                   pvaf(component) =
+%                       100-100*mean(variance(data-backproj_value))/mean(variance(data))
+%                   ppaf(component) =
+%                       100-100*mean(mean(square(data-backproj_value)))/mean(variance(data))
+%                   rv(component)   = 100*mean(variance(backproj_value))/mean(variance(data))
+%
+%                   A Few Notes on Differences and Usage: 
+%                   'mp' is most likely to select major contributing components to specific 
+%                   large peaks of interest in the ERP of plotchans.
+%                   'pv' selects components closest to that ERP in a least-squares sense. 
+%                   'pp' acts similarly but with a preference for components which contribute 
+%                   most to major peaks. And
+%                   'rp' ranks the components by total power of the backprojections to the 
+%                   selected channels without making a direct comparison with them.
+%                   So one might choose 'mp' if the primary concern is a single or pair of 
+%                   peaks in the ERP timeframe,'pv' if interested in seeing the components most
+%                   similar in shape to the ERP, 'pp' if mostly interested in what is causing a
+%                   particular peak but also concerned about the component's behavior in the
+%                   rest of the timeframe, and 'mp' if just interested to know which components
+%                   have the greatest overall impact on the ERP.
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
@@ -829,7 +852,7 @@ for c = 1:ncomps
       % is not used and we are only interested in the location of the maxval, not it's value. 
       % toby 2.19.2006
       if length(g.plotchans) > 1
-        [maxval,maxi] = max(sum((proj(g.plotchans,limframe1:limframe2)).^2));
+        [maxval,maxi] = max(mean((proj(g.plotchans,limframe1:limframe2)).^2));
       else
         [maxval,maxi] = max((proj(g.plotchans,limframe1:limframe2)).^2); 
       end
@@ -848,8 +871,7 @@ for c = 1:ncomps
           
           
       else % if 'pvaf' is 'rv' (or, formerly, 'off')
-              pvaf(c) = 100*mean(var(proj(g.plotchans,limframe1:limframe2)))/vardat;
-                        
+              pvaf(c) = 100*mean(mean(proj(g.plotchans,limframe1:limframe2)).^2)/vardat;
       end;
 
       maxi = maxi+limframe1-1;
