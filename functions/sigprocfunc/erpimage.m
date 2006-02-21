@@ -178,6 +178,9 @@
 %                 and trial. {default: no}
  
 % $Log: not supported by cvs2svn $
+% Revision 1.250  2006/02/21 17:28:00  scott
+% debug same -sm
+%
 % Revision 1.249  2006/02/20 18:03:41  scott
 % 'sortvarpercent' -> 'svpc'  changed help msg "plot" to "output"
 % since this option plotted nothing. Left 'sortvarpercent' == 'svpc' as
@@ -1448,7 +1451,7 @@ if nargin > 6
           Erpalphaflag = NO;
 	  elseif strcmp(Arg,'nosort')
 		  Nosort = YES;
-	  elseif (strcmp(Arg,'svpc') | strcmp(Arg.'sortvarpercent'))
+	  elseif (strcmp(Arg,'svpc')|strcmp(Arg,'sortvarpercent'))
 		  percentileflag = YES;
 	  elseif strcmp(Arg,'showwin')
 		  Showwin = YES;
