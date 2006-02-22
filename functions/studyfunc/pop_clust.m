@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/02/22 22:37:41  arno
+% allowing subclustering
+%
 % Revision 1.11  2006/02/22 21:34:13  arno
 % add cluster description to GUI
 %
@@ -77,7 +80,19 @@ if isempty(STUDY.etc.preclust)
 end;
 
 if isempty(varargin) %GUI call
-    if length(STUDY.cluster) > 2
+    
+    % remove clusters below clustering level (done also after GUI)
+    % --------------------------------------
+    rmindex    = [];
+    clustlevel = STUDY.etc.preclust.clustlevel;
+    nameclustbase = STUDY.cluster(clustlevel).name;
+    for index = 2:length(STUDY.cluster)
+        if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
+            rmindex = [ rmindex index ];
+        end;
+    end;
+    
+    if length(STUDY.cluster) > 2 & ~isempty(rmindex)
         resp = questdlg2('Clustering again will delete the last clustering results', 'Warning', 'Cancel', 'Ok', 'Ok');
         if strcmpi(resp, 'cancel'), return; end;
     end;
@@ -117,22 +132,8 @@ if isempty(varargin) %GUI call
 	
 	if ~isempty(clust_param)
         
-        clus_alg = alg_options{clust_param{1}};
-        clus_num = str2num(clust_param{2});
-        outliers_on = clust_param{3};
-        stdval = clust_param{4};
-        save_on = clust_param{5};
-        
-        % remove clusters below clustering level
-        % --------------------------------------
-        rmindex    = [];
-        clustlevel = STUDY.etc.preclust.clustlevel;
-        nameclustbase = STUDY.cluster(clustlevel).name;
-        for index = 2:length(STUDY.cluster)
-            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
-                rmindex = [ rmindex index ];
-            end;
-        end;
+        % removing previous cluster information
+        % -------------------------------------
         if ~isempty(rmindex)
             fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
             STUDY.cluster(rmindex)          = [];
@@ -142,6 +143,12 @@ if isempty(varargin) %GUI call
             end;
         end;
         
+        clus_alg = alg_options{clust_param{1}};
+        clus_num = str2num(clust_param{2});
+        outliers_on = clust_param{3};
+        stdval = clust_param{4};
+        save_on = clust_param{5};
+                
         outliers = [];
         try
             clustdata = STUDY.etc.preclust.preclustdata;
